@@ -159,6 +159,16 @@ export const configFieldsReducer: LoopReducer<
       const fields = (state as IEventTypes)[selectedFieldEvent][
         selectedFieldSection
       ]
+
+      if (selectedField.precedingFieldId) {
+        fields[selectedField.precedingFieldId].foregoingFieldId =
+          selectedField.foregoingFieldId
+      }
+      if (selectedField.foregoingFieldId) {
+        fields[selectedField.foregoingFieldId].precedingFieldId =
+          selectedField.precedingFieldId
+      }
+
       delete fields[selectedField.fieldId]
 
       return {

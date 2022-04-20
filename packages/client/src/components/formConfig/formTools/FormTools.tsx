@@ -68,35 +68,35 @@ const listViewItems = (intl: IntlShape) => {
       label: intl.formatMessage(messages.textAreaInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction(customField)
+        dispatchAction({ ...customField })
       }
     },
     {
       label: intl.formatMessage(messages.numberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction(customField)
+        dispatchAction({ ...customField })
       }
     },
     {
       label: intl.formatMessage(messages.phoneNumberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction(customField)
+        dispatchAction({ ...customField })
       }
     },
     {
       label: intl.formatMessage(messages.heading),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction(customField)
+        dispatchAction({ ...customField })
       }
     },
     {
       label: intl.formatMessage(messages.supportingCopy),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction(customField)
+        dispatchAction({ ...customField })
       }
     }
   ]

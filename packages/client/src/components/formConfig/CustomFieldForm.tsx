@@ -27,7 +27,7 @@ import {
 import { Box } from '@opencrvs/components/lib/interface'
 import { camelCase } from 'lodash'
 import * as React from 'react'
-import { injectIntl, IntlShape } from 'react-intl'
+import { injectIntl, IntlShape, MessageDescriptor } from 'react-intl'
 import { connect } from 'react-redux'
 
 const CustomFieldFormContainer = styled(Box)`
@@ -94,7 +94,7 @@ type IFullProps = {
   selectedField: IConfigFormField
 }
 
-interface IFieldForm {
+interface ICustomField {
   label: string
   placeholder: string
   description: string
@@ -109,7 +109,7 @@ interface ICustomFieldForms {
   hideField: boolean
   requiredField: boolean
   fieldForms: {
-    [key: string]: IFieldForm
+    [key: string]: ICustomField
   }
 }
 
@@ -123,17 +123,25 @@ class CustomFieldFormsComp extends React.Component<
 > {
   constructor(props: IFullProps) {
     super(props)
+    this._initialize()
+  }
 
+  _initialize() {
     const defaultLanguage = getDefaultLanguage()
     const languages = this._getLanguages()
+    const {
+      intl,
+      selectedField: { definition }
+    } = this.props
 
-    const fieldForms: { [key: string]: IFieldForm } = {}
+    const fieldForms: { [key: string]: ICustomField } = {}
+
     Object.keys(languages).map((lang) => {
       fieldForms[lang] = {
-        label: '',
-        placeholder: '',
-        description: '',
-        tooltip: '',
+        label: this._getIntlMessage(definition.label),
+        placeholder: this._getIntlMessage(definition.placeholder),
+        description: this._getIntlMessage(definition.description),
+        tooltip: this._getIntlMessage(definition.tooltip),
         errorMessage: '',
         maxLength: ''
       }
@@ -146,6 +154,11 @@ class CustomFieldFormsComp extends React.Component<
       requiredField: false,
       fieldForms
     }
+  }
+
+  _getIntlMessage(message: MessageDescriptor | undefined) {
+    const { intl } = this.props
+    return message ? intl.formatMessage(message) : ''
   }
 
   _getLanguages(): ILanguageState {
