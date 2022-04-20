@@ -294,9 +294,6 @@ describe('Verify point generation', () => {
     expect(point).toMatchObject({
       measurement: 'declarations_started',
       tags: {
-        eventType: 'BIRTH',
-        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
-        locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
         officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
@@ -355,9 +352,6 @@ describe('Verify point generation', () => {
     expect(point).toMatchObject({
       measurement: 'declarations_started',
       tags: {
-        eventType: 'BIRTH',
-        practitionerId: 'cae39955-557d-49d3-bc79-521f86f9a182',
-        officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
         locationLevel4: 'Location/4',
         locationLevel3: 'Location/3',
         locationLevel2: 'Location/2',
