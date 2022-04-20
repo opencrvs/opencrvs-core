@@ -288,6 +288,7 @@ export const getDistrictLocation = async (
   let lId = locationId
 
   let locationBundle = await fetchLocation(lId, authHeader)
+
   let locationType = getLocationType(locationBundle)
   while (
     locationBundle &&

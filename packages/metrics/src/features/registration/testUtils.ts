@@ -478,6 +478,21 @@ export const testPayload = {
           }
         ]
       }
+    },
+    {
+      fullUrl: 'urn:uuid:97de26f7-a9ea-4c46-a974-9be38cac41ca',
+      resource: {
+        resourceType: 'Encounter',
+        status: 'finished',
+        location: [
+          {
+            location: {
+              reference: 'Location/f05c6382-4781-4fa4-98f2-72c4433dc2f7'
+            }
+          }
+        ],
+        id: '039bcc8e-bb36-4ab1-97fb-95b92b07b7c1'
+      }
     }
   ],
   meta: {

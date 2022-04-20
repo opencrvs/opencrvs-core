@@ -130,6 +130,8 @@ const office = {
   }
 }
 
+beforeEach(() => fetchLocation.mockReset())
+
 describe('verify metrics util', () => {
   describe('verify calculateInterval', () => {
     it('Should return 365d', () => {
@@ -248,6 +250,7 @@ describe('verify metrics util', () => {
     })
 
     it('Returns the district location', async () => {
+      fetchLocation.mockResolvedValueOnce(location)
       const result = await getDistrictLocation(
         'b2b3ca8b-a14f-41c6-b97f-7cb99a1299e5',
         { Authorization: 'bearer token' }
@@ -255,7 +258,6 @@ describe('verify metrics util', () => {
       expect(result.id).toEqual('0eaa73dd-2a21-4998-b1e6-b08430595201')
     })
     it('Throws error for invalid location', async () => {
-      fetchLocation.mockReset()
       fetchLocation
         .mockResolvedValueOnce({
           resourceType: 'Location',
