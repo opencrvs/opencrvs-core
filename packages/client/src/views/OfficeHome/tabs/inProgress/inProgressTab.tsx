@@ -131,7 +131,6 @@ export class InProgressTabComponent extends React.Component<
   IRegistrarHomeProps,
   IRegistrarHomeState
 > {
-  pageSize = 10
   constructor(props: IRegistrarHomeProps) {
     super(props)
     this.state = {
@@ -139,6 +138,34 @@ export class InProgressTabComponent extends React.Component<
       sortedCol: COLUMNS.NAME,
       sortOrder: SORT_ORDER.ASCENDING
     }
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
+  }
+
+  pageSize = 10
+  isFieldAgent =
+    !this.props.selectorId || this.props.selectorId === SELECTOR_ID.ownDrafts
+
+  onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+    this.setState({
+      sortOrder: newSortOrder,
+      sortedCol: newSortedCol
+    })
   }
 
   transformRemoteDraftsContent = (data: GQLEventSearchResultSet) => {
@@ -149,7 +176,7 @@ export class InProgressTabComponent extends React.Component<
     const { intl } = this.props
     const { locale } = intl
 
-    return data.results.map((reg, index) => {
+    const items = data.results.map((reg, index) => {
       if (!reg) {
         throw new Error('Registration is null')
       }
@@ -160,26 +187,27 @@ export class InProgressTabComponent extends React.Component<
         (reg && reg.registration && reg.registration.modifiedAt) ||
         (reg && reg.registration && reg.registration.createdAt) ||
         ''
-      const trackingId = reg && reg.registration && reg.registration.trackingId
       const pageRoute = REVIEW_EVENT_PARENT_FORM_PAGE
-      const eventLocationId = get(reg, 'registration.eventLocationId') || ''
-      const facility =
-        get(this.props.offlineCountryConfig.facilities, eventLocationId) || {}
-      const startedBy = facility.name || ''
 
       let name
+      let eventDate = ''
       if (reg.registration && reg.type === 'Birth') {
         const birthReg = reg as GQLBirthEventSearchSet
         const names = birthReg && (birthReg.childName as GQLHumanName[])
         const namesMap = createNamesMap(names)
         name = namesMap[locale] || namesMap[LANG_EN]
+        const date = (reg as GQLBirthEventSearchSet).dateOfBirth
+        eventDate = date && date
       } else {
         const deathReg = reg as GQLDeathEventSearchSet
         const names = deathReg && (deathReg.deceasedName as GQLHumanName[])
         const namesMap = createNamesMap(names)
         name = namesMap[locale] || namesMap[LANG_EN]
+        const date = (reg as GQLDeathEventSearchSet).dateOfDeath
+        eventDate = date && date
       }
-
+      const dateOfEvent =
+        eventDate && eventDate.length > 0 ? new Date(eventDate) : ''
       const actions: IAction[] = []
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
@@ -223,13 +251,23 @@ export class InProgressTabComponent extends React.Component<
               dynamicConstantsMessages[event.toLowerCase()]
             )) ||
           '',
-        name,
-        trackingId,
-        startedBy,
-        dateOfModification:
-          (lastModificationDate &&
-            formattedDuration(parseInt(lastModificationDate))) ||
-          '',
+        name: name.toString().toLowerCase(),
+        iconWithName: (
+          <IconWithName
+            status={reg.registration?.status || SUBMISSION_STATUS.DRAFT}
+            name={name}
+          />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={reg.registration?.status || SUBMISSION_STATUS.DRAFT}
+            name={name}
+            event={event}
+          />
+        ),
+        dateOfEvent,
+        notificationSent:
+          (lastModificationDate && parseInt(lastModificationDate)) || '',
         actions,
         rowClickHandler: [
           {
@@ -238,6 +276,21 @@ export class InProgressTabComponent extends React.Component<
               this.props.goToDeclarationRecordAudit('inProgressTab', regId)
           }
         ]
+      }
+    })
+    const sortedItems = getSortedItems(
+      items,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+    return sortedItems.map((item) => {
+      return {
+        ...item,
+        notificationSent:
+          item.notificationSent &&
+          formattedDuration(item.notificationSent as number),
+        dateOfEvent:
+          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date)
       }
     })
   }
@@ -326,83 +379,11 @@ export class InProgressTabComponent extends React.Component<
       return {
         ...item,
         dateOfEvent:
-          item.dateOfEvent &&
-          formattedDuration(item.dateOfEvent as Date | number),
+          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
         lastUpdated:
-          item.lastUpdated &&
-          formattedDuration(item.lastUpdated as Date | number)
+          item.lastUpdated && formattedDuration(item.lastUpdated as number)
       }
     })
-  }
-
-  renderFieldAgentTable = (
-    data: GQLEventSearchResultSet,
-    intl: IntlShape,
-    page: number,
-    onPageChange: (newPageNumber: number) => void
-  ) => {
-    return (
-      <>
-        <GridTable
-          content={this.transformRemoteDraftsContent(data)}
-          columns={this.getRemoteDraftColumns()}
-          noResultText={intl.formatMessage(officeHomeMessages.progress)}
-          onPageChange={onPageChange}
-          pageSize={this.pageSize}
-          totalItems={(data && data.totalItems) || 0}
-          currentPage={page}
-          clickable={true}
-          showPaginated={this.props.showPaginated}
-          loading={this.props.loading}
-          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
-        />
-        <LoadingIndicator
-          loading={this.props.loading ? true : false}
-          hasError={this.props.error ? true : false}
-        />
-      </>
-    )
-  }
-
-  renderHospitalTable = (
-    data: GQLEventSearchResultSet,
-    intl: IntlShape,
-    page: number,
-    onPageChange: (newPageNumber: number) => void
-  ) => {
-    return (
-      <>
-        <GridTable
-          content={this.transformRemoteDraftsContent(data)}
-          columns={this.getNotificationColumns()}
-          noResultText={intl.formatMessage(officeHomeMessages.progress)}
-          onPageChange={onPageChange}
-          pageSize={this.pageSize}
-          totalItems={(data && data.totalItems) || 0}
-          currentPage={page}
-          clickable={true}
-          showPaginated={this.props.showPaginated}
-          loading={this.props.loading}
-          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
-        />
-        <LoadingIndicator
-          loading={this.props.loading ? true : false}
-          hasError={this.props.error ? true : false}
-        />
-      </>
-    )
-  }
-
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
   }
 
   getColumns = () => {
@@ -430,15 +411,13 @@ export class InProgressTabComponent extends React.Component<
           sortFunction: this.onColumnClick
         },
         {
-          label:
-            !this.props.selectorId ||
-            this.props.selectorId === SELECTOR_ID.ownDrafts
-              ? this.props.intl.formatMessage(constantsMessages.lastUpdated)
-              : this.props.intl.formatMessage(
-                  constantsMessages.notificationSent
-                ),
+          label: this.isFieldAgent
+            ? this.props.intl.formatMessage(constantsMessages.lastUpdated)
+            : this.props.intl.formatMessage(constantsMessages.notificationSent),
           width: 20,
-          key: COLUMNS.LAST_UPDATED,
+          key: this.isFieldAgent
+            ? COLUMNS.LAST_UPDATED
+            : COLUMNS.NOTIFICATION_SENT,
           isSorted: this.state.sortedCol === COLUMNS.LAST_UPDATED,
           sortFunction: this.onColumnClick
         },
@@ -461,111 +440,6 @@ export class InProgressTabComponent extends React.Component<
           key: COLUMNS.ACTIONS,
           isActionColumn: true,
           alignment: ColumnContentAlignment.RIGHT
-        }
-      ]
-    }
-  }
-
-  getRemoteDraftColumns = () => {
-    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-      return [
-        {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 15,
-          key: 'event'
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 30,
-          key: 'name',
-          errorValue: this.props.intl.formatMessage(
-            constantsMessages.noNameProvided
-          )
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
-          width: 20,
-          key: 'dateOfModification'
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.trackingId),
-          width: 15,
-          key: 'trackingId'
-        },
-        {
-          label: this.props.intl.formatMessage(messages.listItemAction),
-          width: 20,
-          key: 'actions',
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
-        }
-      ]
-    } else {
-      return [
-        {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 30,
-          key: 'event'
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 70,
-          key: 'name',
-          errorValue: this.props.intl.formatMessage(
-            constantsMessages.noNameProvided
-          )
-        }
-      ]
-    }
-  }
-
-  getNotificationColumns = () => {
-    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-      return [
-        {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 15,
-          key: 'event'
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 30,
-          key: 'name',
-          errorValue: this.props.intl.formatMessage(
-            constantsMessages.noNameProvided
-          )
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.lastUpdated),
-          width: 20,
-          key: 'dateOfModification'
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.startedBy),
-          width: 15,
-          key: 'startedBy'
-        },
-        {
-          width: 20,
-          key: 'actions',
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
-        }
-      ]
-    } else {
-      return [
-        {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 30,
-          key: 'event'
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 70,
-          key: 'name',
-          errorValue: this.props.intl.formatMessage(
-            constantsMessages.noNameProvided
-          )
         }
       ]
     }
@@ -611,16 +485,62 @@ export class InProgressTabComponent extends React.Component<
     }
   }
 
-  onColumnClick = (columnName: string) => {
-    const { newSortedCol, newSortOrder } = changeSortedColumn(
-      columnName,
-      this.state.sortedCol,
-      this.state.sortOrder
+  renderFieldAgentTable = (
+    data: GQLEventSearchResultSet,
+    intl: IntlShape,
+    page: number,
+    onPageChange: (newPageNumber: number) => void
+  ) => {
+    return (
+      <>
+        <GridTable
+          content={this.transformRemoteDraftsContent(data)}
+          columns={this.getColumns()}
+          noResultText={intl.formatMessage(officeHomeMessages.progress)}
+          onPageChange={onPageChange}
+          pageSize={this.pageSize}
+          totalItems={(data && data.totalItems) || 0}
+          currentPage={page}
+          clickable={true}
+          showPaginated={this.props.showPaginated}
+          loading={this.props.loading}
+          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
+        />
+        <LoadingIndicator
+          loading={this.props.loading ? true : false}
+          hasError={this.props.error ? true : false}
+        />
+      </>
     )
-    this.setState({
-      sortOrder: newSortOrder,
-      sortedCol: newSortedCol
-    })
+  }
+
+  renderHospitalTable = (
+    data: GQLEventSearchResultSet,
+    intl: IntlShape,
+    page: number,
+    onPageChange: (newPageNumber: number) => void
+  ) => {
+    return (
+      <>
+        <GridTable
+          content={this.transformRemoteDraftsContent(data)}
+          columns={this.getColumns()}
+          noResultText={intl.formatMessage(officeHomeMessages.progress)}
+          onPageChange={onPageChange}
+          pageSize={this.pageSize}
+          totalItems={(data && data.totalItems) || 0}
+          currentPage={page}
+          clickable={true}
+          showPaginated={this.props.showPaginated}
+          loading={this.props.loading}
+          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
+        />
+        <LoadingIndicator
+          loading={this.props.loading ? true : false}
+          hasError={this.props.error ? true : false}
+        />
+      </>
+    )
   }
 
   render() {
