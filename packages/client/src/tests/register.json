@@ -13265,15 +13265,15 @@
               ]
             },
             {
-              "id": "deathEvent-deathPlaceAddress",
+              "id": "deathEvent-placeOfDeath",
               "fields": [
                 {
-                  "name": "deathPlaceAddress",
+                  "name": "placeOfDeath",
                   "type": "RADIO_GROUP",
                   "label": {
                     "defaultMessage": "Where did the death occur?",
                     "description": "Label for form field: Place of occurrence of death",
-                    "id": "form.field.label.deathPlaceAddress"
+                    "id": "form.field.label.placeOfDeath"
                   },
                   "required": true,
                   "initialValue": "",
@@ -13285,7 +13285,7 @@
                       "label": {
                         "defaultMessage": "Primary address of the deceased",
                         "description": "Option for form field: Place of occurrence of death",
-                        "id": "form.field.label.deathPlaceAddressSameAsPrimary"
+                        "id": "form.field.label.placeOfDeathSameAsPrimary"
                       }
                     },
                     {
@@ -13293,7 +13293,7 @@
                       "label": {
                         "defaultMessage": "Current address of the deceased",
                         "description": "Option for form field: Place of occurrence of death",
-                        "id": "form.field.label.deathPlaceAddressSameAsCurrent"
+                        "id": "form.field.label.placeOfDeathSameAsCurrent"
                       }
                     },
                     {
@@ -13339,7 +13339,7 @@
               "conditionals": [
                 {
                   "action": "hide",
-                  "expression": "values.deathPlaceAddress!=\"HEALTH_FACILITY\""
+                  "expression": "values.placeOfDeath!=\"HEALTH_FACILITY\""
                 }
               ],
               "fields": [
@@ -13387,7 +13387,7 @@
               "conditionals": [
                 {
                   "action": "hide",
-                  "expression": "values.deathPlaceAddress !== \"PRIVATE_HOME\""
+                  "expression": "values.placeOfDeath !== \"PRIVATE_HOME\""
                 }
               ],
               "fields": [
@@ -14149,7 +14149,7 @@
               "conditionals": [
                 {
                   "action": "hide",
-                  "expression": "values.deathPlaceAddress !== \"OTHER\""
+                  "expression": "values.placeOfDeath !== \"OTHER\""
                 }
               ],
               "fields": [

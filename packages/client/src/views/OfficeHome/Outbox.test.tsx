@@ -99,7 +99,7 @@ describe('OutBox tests', () => {
       },
       deathEvent: {
         deathDate: '2018-11-11',
-        deathPlaceAddress: 'PRIMARY_ADDRESS',
+        placeOfDeath: 'PRIMARY_ADDRESS',
         country: 'BGD'
       },
       causeOfDeath: {

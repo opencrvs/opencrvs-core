@@ -17,7 +17,8 @@ import {
   IQuestionConfig,
   SerializedFormField,
   ISerializedFormSection,
-  IFormSectionGroup
+  IFormSectionGroup,
+  Event
 } from '@client/forms/index'
 import {
   configureCustomQuestions,
@@ -218,12 +219,16 @@ export function filterQuestionsByEventType(
 
 export function configureRegistrationForm(
   formCustomisations: IFormConfigurations,
-  defaultEventForm: ISerializedForm
+  defaultEventForm: ISerializedForm,
+  event: Event
 ): ISerializedForm {
-  populateRegisterFormsWithAddresses(defaultEventForm)
+  const formWithAddresses = populateRegisterFormsWithAddresses(
+    defaultEventForm,
+    event
+  )
   const defaultFormWithCustomisations = configureDefaultQuestions(
     formCustomisations.defaultFieldCustomisations,
-    defaultEventForm
+    formWithAddresses
   )
   return configureCustomQuestions(
     formCustomisations.customQuestionConfigurations,

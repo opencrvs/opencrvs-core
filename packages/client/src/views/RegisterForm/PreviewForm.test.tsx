@@ -464,7 +464,7 @@ describe('when user is previewing the form data', () => {
     const deathEventDetails = {
       deathDate: '2017-01-01',
       manner: 'ACCIDENT',
-      deathPlaceAddress: 'PRIMARY_ADDRESS',
+      placeOfDeath: 'PRIMARY_ADDRESS',
       country: 'BGD',
       state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
       district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',

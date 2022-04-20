@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm, ReviewSection, ISerializedForm } from '@client/forms'
+import {
+  IForm,
+  ReviewSection,
+  ISerializedForm,
+  Event as VitalEvent
+} from '@client/forms'
 import { messages } from '@client/i18n/messages/views/review'
 import * as offlineActions from '@client/offline/actions'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
@@ -54,17 +59,25 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
     case offlineActions.CONTENT_LOADED:
       const configuredBirthForm: ISerializedForm = configureRegistrationForm(
         sortFormCustomisations(
-          filterQuestionsByEventType(action.payload.formConfig, 'birth'),
+          filterQuestionsByEventType(
+            action.payload.formConfig,
+            VitalEvent.BIRTH
+          ),
           registerForms.birth
         ),
-        registerForms.birth
+        registerForms.birth,
+        VitalEvent.BIRTH
       )
       const configuredDeathForm: ISerializedForm = configureRegistrationForm(
         sortFormCustomisations(
-          filterQuestionsByEventType(action.payload.formConfig, 'death'),
+          filterQuestionsByEventType(
+            action.payload.formConfig,
+            VitalEvent.DEATH
+          ),
           registerForms.death
         ),
-        registerForms.death
+        registerForms.death,
+        VitalEvent.DEATH
       )
       const birth = deserializeForm(configuredBirthForm)
       const death = deserializeForm(configuredDeathForm)

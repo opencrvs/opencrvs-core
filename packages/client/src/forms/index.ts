@@ -714,7 +714,7 @@ export interface IConditionals {
   deathCertificateCollectorNotVerified: IConditional
   secondaryAddressSameAsPrimary: IConditional
   placeOfBirthHospital: IConditional
-  deathPlaceAddressTypeHeathInstitue: IConditional
+  placeOfDeathTypeHeathInstitue: IConditional
   otherBirthEventLocation: IConditional
   isNotCityLocation: IConditional
   isCityLocation: IConditional

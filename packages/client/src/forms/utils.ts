@@ -779,9 +779,9 @@ export const conditionals: IConditionals = {
     expression:
       '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
   },
-  deathPlaceAddressTypeHeathInstitue: {
+  placeOfDeathTypeHeathInstitue: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress!="HEALTH_FACILITY"'
+    expression: 'values.placeOfDeath!="HEALTH_FACILITY"'
   },
   otherBirthEventLocation: {
     action: 'hide',
@@ -818,15 +818,15 @@ export const conditionals: IConditionals = {
   },
   deathPlaceOther: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress !== "OTHER"'
+    expression: 'values.placeOfDeath !== "OTHER"'
   },
   deathPlaceAtPrivateHome: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress !== "PRIVATE_HOME"'
+    expression: 'values.placeOfDeath !== "PRIVATE_HOME"'
   },
   deathPlaceAtOtherLocation: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress !== "OTHER"'
+    expression: 'values.placeOfDeath !== "OTHER"'
   },
   causeOfDeathEstablished: {
     action: 'hide',

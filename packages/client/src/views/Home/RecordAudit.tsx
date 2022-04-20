@@ -464,8 +464,7 @@ const getLocation = (
   let locationDistrict = ''
   let locationPrimary = ''
   if (declaration.event === 'death') {
-    locationType =
-      declaration.data?.deathEvent?.deathPlaceAddress?.toString() || ''
+    locationType = declaration.data?.deathEvent?.placeOfDeath?.toString() || ''
     locationId = declaration.data?.deathEvent?.deathLocation?.toString() || ''
     locationDistrict = declaration.data?.deathEvent?.district?.toString() || ''
     locationPrimary =

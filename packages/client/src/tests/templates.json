@@ -1904,7 +1904,7 @@
             "conditions": [
               {
                 "condition": {
-                  "key": "deathEvent.deathPlaceAddress",
+                  "key": "deathEvent.placeOfDeath",
                   "values": ["PRIMARY_ADDRESS"]
                 },
                 "addressType": "locations",
@@ -1917,7 +1917,7 @@
               },
               {
                 "condition": {
-                  "key": "deathEvent.deathPlaceAddress",
+                  "key": "deathEvent.placeOfDeath",
                   "values": ["SECONDARY_ADDRESS"]
                 },
                 "addressType": "locations",
@@ -1930,7 +1930,7 @@
               },
               {
                 "condition": {
-                  "key": "deathEvent.deathPlaceAddress",
+                  "key": "deathEvent.placeOfDeath",
                   "values": ["PRIVATE_HOME", "OTHER"]
                 },
                 "addressType": "locations",
@@ -1943,7 +1943,7 @@
               },
               {
                 "condition": {
-                  "key": "deathEvent.deathPlaceAddress",
+                  "key": "deathEvent.placeOfDeath",
                   "values": ["HEALTH_FACILITY"]
                 },
                 "addressType": "facilities",

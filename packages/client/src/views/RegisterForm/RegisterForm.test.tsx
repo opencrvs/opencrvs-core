@@ -1255,7 +1255,7 @@ describe('When user is in Preview section death event', () => {
     const hospitalLocatioMockDeathDeclarationData = clone(
       mockDeathDeclarationData
     )
-    hospitalLocatioMockDeathDeclarationData.deathEvent.deathPlaceAddress =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.placeOfDeath =
       'HEALTH_FACILITY'
     hospitalLocatioMockDeathDeclarationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
@@ -1272,7 +1272,7 @@ describe('When user is in Preview section death event', () => {
     const hospitalLocatioMockDeathDeclarationData = clone(
       mockDeathDeclarationData
     )
-    hospitalLocatioMockDeathDeclarationData.deathEvent.deathPlaceAddress =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.placeOfDeath =
       'HEALTH_FACILITY'
     hospitalLocatioMockDeathDeclarationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
@@ -1287,7 +1287,7 @@ describe('When user is in Preview section death event', () => {
 
   it('Check if death location is deceased parmanent address', () => {
     const mockDeathDeclaration = clone(mockDeathDeclarationData)
-    mockDeathDeclaration.deathEvent.deathPlaceAddress = 'PRIMARY_ADDRESS'
+    mockDeathDeclaration.deathEvent.placeOfDeath = 'PRIMARY_ADDRESS'
 
     expect(
       draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)
@@ -1310,7 +1310,7 @@ describe('When user is in Preview section death event', () => {
       maritalStatus: 'MARRIED',
       birthDate: '1987-02-16'
     }
-    mockDeathDeclaration.deathEvent.deathPlaceAddress = 'SECONDARY_ADDRESS'
+    mockDeathDeclaration.deathEvent.placeOfDeath = 'SECONDARY_ADDRESS'
 
     expect(
       draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)

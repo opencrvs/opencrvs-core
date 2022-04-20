@@ -96,11 +96,11 @@ interface IFormMessages
   deathEventName: MessageDescriptor
   deathEventTitle: MessageDescriptor
   deathPlace: MessageDescriptor
-  deathPlaceAddress: MessageDescriptor
-  deathPlaceAddressOther: MessageDescriptor
-  deathPlaceAddressSameAsCurrent: MessageDescriptor
-  deathPlaceAddressSameAsPrimary: MessageDescriptor
-  deathPlaceAddressType: MessageDescriptor
+  placeOfDeath: MessageDescriptor
+  placeOfDeathOther: MessageDescriptor
+  placeOfDeathSameAsCurrent: MessageDescriptor
+  placeOfDeathSameAsPrimary: MessageDescriptor
+  placeOfDeathType: MessageDescriptor
   deceasedCurrentAddressSameAsPrimary: MessageDescriptor
   deceasedDateOfBirth: MessageDescriptor
   deceasedDeathProof: MessageDescriptor
@@ -797,30 +797,30 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Title for place of occurrence of death',
     id: 'form.field.label.deathPlace'
   },
-  deathPlaceAddress: {
+  placeOfDeath: {
     defaultMessage: 'Where did the death occur?',
     description: 'Label for form field: Place of occurrence of death',
-    id: 'form.field.label.deathPlaceAddress'
+    id: 'form.field.label.placeOfDeath'
   },
-  deathPlaceAddressOther: {
+  placeOfDeathOther: {
     defaultMessage: 'Different Address',
     description: 'Option for form field: Place of occurrence of death',
-    id: 'form.field.label.deathPlaceAddressOther'
+    id: 'form.field.label.placeOfDeathOther'
   },
-  deathPlaceAddressSameAsCurrent: {
+  placeOfDeathSameAsCurrent: {
     defaultMessage: 'Current address of the deceased',
     description: 'Option for form field: Place of occurrence of death',
-    id: 'form.field.label.deathPlaceAddressSameAsCurrent'
+    id: 'form.field.label.placeOfDeathSameAsCurrent'
   },
-  deathPlaceAddressSameAsPrimary: {
+  placeOfDeathSameAsPrimary: {
     defaultMessage: 'Primary address of the deceased',
     description: 'Option for form field: Place of occurrence of death',
-    id: 'form.field.label.deathPlaceAddressSameAsPrimary'
+    id: 'form.field.label.placeOfDeathSameAsPrimary'
   },
-  deathPlaceAddressType: {
+  placeOfDeathType: {
     defaultMessage: 'Type of Place',
     description: 'Label for form field: Type of place of death occurrence',
-    id: 'form.field.label.deathPlaceAddressType'
+    id: 'form.field.label.placeOfDeathType'
   },
   deceasedCurrentAddressSameAsPrimary: {
     defaultMessage:
