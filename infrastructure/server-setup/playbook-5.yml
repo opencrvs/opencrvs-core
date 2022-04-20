@@ -21,6 +21,7 @@
         that:
           - mongodb_admin_username is defined
           - mongodb_admin_password is defined
+          - elasticsearch_superuser_password is defined
     - name: 'Add docker repository key'
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
@@ -69,6 +70,27 @@
         hour: '0'
         job: '/usr/bin/docker system prune -af >> /var/log/docker-prune.log'
 
+    - name: Inserts Elasticsearch super user username environment variable to crontab
+      cron:
+        name: ELASTICSEARCH_ADMIN_USER
+        env: yes
+        job: 'elastic'
+      when: elasticsearch_superuser_password is defined
+
+    - name: Inserts Elasticsearch super user password environment variable to crontab
+      cron:
+        name: ELASTICSEARCH_ADMIN_PASSWORD
+        env: yes
+        job: '{{ elasticsearch_superuser_password }}'
+      when: elasticsearch_superuser_password is defined
+
+    - name: Inserts Elasticsearch super user password environment variable to crontab
+      cron:
+        name: ELASTICSEARCH_SUPERUSER_PASSWORD
+        env: yes
+        job: '{{ elasticsearch_superuser_password }}'
+      when: elasticsearch_superuser_password is defined
+
     - name: Inserts MongoDB username environment variable to crontab
       cron:
         name: MONGODB_ADMIN_USER
@@ -92,7 +114,7 @@
       when: external_backup_server_ip is defined
 
     - name: Copy MongoDB replication security key file to nodes
-      copy: src=/tmp/mongodb-keyfile dest=/etc/mongodb-keyfile mode=0400 force=no
+      copy: src=/tmp/mongodb-keyfile dest=/mongodb-keyfile mode=0400 force=no
 
     - name: Change access right of key file
       file:

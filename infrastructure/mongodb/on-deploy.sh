@@ -18,7 +18,17 @@ apt-get install curl
 curl -L https://github.com/ufoscout/docker-compose-wait/releases/download/2.9.0/wait --output /wait
 chmod +x /wait
 
-WAIT_TIMEOUT=240 WAIT_HOSTS=mongo1:27017,mongo2:27017,mongo3:27017 /wait
+if [ "$REPLICAS" = "1" ]; then
+  WAIT_TIMEOUT=240 WAIT_HOSTS=mongo1:27017 /wait
+elif [ "$REPLICAS" = "3" ]; then
+  WAIT_TIMEOUT=240 WAIT_HOSTS=mongo1:27017,mongo2:27017,mongo3:27017 /wait
+elif [ "$REPLICAS" = "5" ]; then
+  WAIT_TIMEOUT=240 WAIT_HOSTS=mongo1:27017,mongo2:27017,mongo3:27017,mongo4:27017,mongo5:27017 /wait
+else
+  echo "Script must be passed an understandable number of replicas: 0,1,3 or 5"
+  exit 1
+fi
+
 
 mongo_credentials() {
   if [ ! -z ${MONGODB_ADMIN_USER+x} ] || [ ! -z ${MONGODB_ADMIN_PASSWORD+x} ]; then

@@ -16,6 +16,9 @@ print_usage_and_exit () {
     echo ""
     echo "If your MongoDB is password protected, an admin user's credentials can be given as environment variables:"
     echo "MONGODB_ADMIN_USER=your_user MONGODB_ADMIN_PASSWORD=your_pass"
+    echo ""
+    echo "If your Elasticsearch is password protected, an admin user's credentials can be given as environment variables:"
+    echo "ELASTICSEARCH_ADMIN_USER=your_user ELASTICSEARCH_ADMIN_PASSWORD=your_pass"
     exit 1
 }
 
@@ -61,6 +64,14 @@ mongo_credentials() {
   fi
 }
 
+elasticsearch_host() {
+  if [ ! -z ${ELASTICSEARCH_ADMIN_USER+x} ] || [ ! -z ${ELASTICSEARCH_ADMIN_PASSWORD+x} ]; then
+    echo "$ELASTICSEARCH_ADMIN_USER:$ELASTICSEARCH_ADMIN_PASSWORD@elasticsearch:9200";
+  else
+    echo "elasticsearch:9200";
+  fi
+}
+
 drop_database () {
   local database=${1}
   docker run --rm --network=$NETWORK mongo:4.4 mongo $database $(mongo_credentials) --host $HOST --eval "db.dropDatabase()"
@@ -82,7 +93,7 @@ drop_database application-config
 
 # Delete all data from elasticsearch
 #-----------------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE 'http://elasticsearch:9200/*' -v
+docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE "http://$(elasticsearch_host)/*" -v
 
 # Delete all data from metrics
 #-----------------------------
