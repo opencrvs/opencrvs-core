@@ -30,6 +30,7 @@ on:
 
 jobs:
   manual-deploy-staging-e2e:
+    environment: staging
     runs-on: ubuntu-20.04
     timeout-minutes: 120
     strategy:
@@ -63,7 +64,6 @@ jobs:
       - name: Get CORE_VERSION
         if: ${{ !github.event.inputs.core-image-tag }}
         run: echo "CORE_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
       - name: Set CORE_VERSION from inputs
         if: ${{ github.event.inputs.core-image-tag }}
         run: echo "CORE_VERSION=${{ github.event.inputs.core-image-tag }}" >> $GITHUB_ENV
@@ -78,11 +78,13 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: Deploy to development
-        environment: staging
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
           KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
+          MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
+          MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
+          ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
         run: |
           yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
       - name: Run Cypress tests
