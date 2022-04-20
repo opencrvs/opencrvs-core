@@ -73,8 +73,6 @@ export const SYS_ADMIN_HOME = '/sys-admin-home'
 export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
 export const PERFORMANCE_HOME = '/performance'
-export const PERFORMANCE_REPORT_LIST = '/performance/reports'
-export const PERFORMANCE_REPORT = '/performance/report'
 export const OPERATIONAL_REPORT = '/performance/operations'
 export const EVENT_REGISTRATION_RATES =
   '/performance/operations/regestrationRates/:eventType'

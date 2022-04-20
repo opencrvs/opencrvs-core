@@ -41,11 +41,8 @@ import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { SelectInformant } from '@client/views/SelectInformant/SelectInformant'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
-import { OperationalReport } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
 import { RegistrationRates } from '@client/views/SysAdmin/Performance/RegistrationRates'
-import { Report } from '@client/views/SysAdmin/Performance/Report'
-import { ReportList } from '@client/views/SysAdmin/Performance/ReportList'
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
@@ -66,6 +63,7 @@ import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
+import { OperationalReport } from './views/SysAdmin/Performance/OperationalReport'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -330,18 +328,6 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.PERFORMANCE_HOME}
                                             component={PerformanceHome}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={
-                                              routes.PERFORMANCE_REPORT_LIST
-                                            }
-                                            component={ReportList}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.PERFORMANCE_REPORT}
-                                            component={Report}
                                           />
                                           <ProtectedRoute
                                             exact
