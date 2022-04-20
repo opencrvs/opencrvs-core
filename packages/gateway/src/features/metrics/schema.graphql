@@ -117,17 +117,12 @@ type BirthKeyFiguresData {
   value: Int
 }
 
-type EventEstimationMetrics {
-  birthTargetDayMetrics: EstimationMetrics
-  deathTargetDayMetrics: EstimationMetrics
-}
-
-type EstimationMetrics {
-  actualRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedPercentage: Float!
-  malePercentage: Float!
-  femalePercentage: Float!
+type EventMetrics {
+  total: Int
+  gender: String
+  eventLocationType: String
+  timeLabel: String
+  estimated: Int
 }
 
 type DeclarationsStartedMetrics {
@@ -192,11 +187,12 @@ type Query {
     locationId: String!
     event: String!
   ): RegistrationMetrics
-  getEventEstimationMetrics(
+  getTotalMetrics(
     timeStart: String!
     timeEnd: String!
     locationId: String!
-  ): EventEstimationMetrics
+    event: String!
+  ): [EventMetrics]
   getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!

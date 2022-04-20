@@ -65,17 +65,22 @@ export const resolvers: GQLResolver = {
         }
       }
     },
-    async getEventEstimationMetrics(
+    /**
+     *
+     * @deprecated
+     */
+    async getTotalMetrics(
       _,
-      { timeStart, timeEnd, locationId },
+      { timeStart, timeEnd, locationId, event },
       authHeader
     ) {
       return getMetrics(
-        '/eventEstimations',
+        '/totalMetrics',
         {
           timeStart,
           timeEnd,
-          locationId
+          locationId,
+          event
         },
         authHeader
       )

@@ -62,11 +62,12 @@ type Query {
     locationId: String!
     event: String!
   ): RegistrationMetrics
-  getEventEstimationMetrics(
+  getTotalMetrics(
     timeStart: String!
     timeEnd: String!
     locationId: String!
-  ): EventEstimationMetrics
+    event: String!
+  ): [EventMetrics]
   getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
@@ -366,9 +367,12 @@ type RegistrationMetrics {
   payments: CertificationPaymentMetrics
 }
 
-type EventEstimationMetrics {
-  birthTargetDayMetrics: EstimationMetrics
-  deathTargetDayMetrics: EstimationMetrics
+type EventMetrics {
+  total: Int
+  gender: String
+  eventLocationType: String
+  timeLabel: String
+  estimated: Int
 }
 
 type DeclarationsStartedMetrics {
@@ -846,14 +850,6 @@ type RegistrationTargetDayEstimatedMetrics {
 type CertificationPaymentMetrics {
   details: [CertificationPaymentDetailsMetrics!]
   total: CertificationPaymentTotalCount
-}
-
-type EstimationMetrics {
-  actualRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedPercentage: Float!
-  malePercentage: Float!
-  femalePercentage: Float!
 }
 
 type MonthWiseTargetDayEstimation {

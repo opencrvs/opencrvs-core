@@ -32,7 +32,7 @@ export interface GQLQuery {
   searchFieldAgents?: GQLSearchFieldAgentResult
   verifyPasswordById?: GQLVerifyPasswordResult
   fetchRegistrationMetrics?: GQLRegistrationMetrics
-  getEventEstimationMetrics?: GQLEventEstimationMetrics
+  getTotalMetrics?: Array<GQLEventMetrics | null>
   getDeclarationsStartedMetrics?: GQLDeclarationsStartedMetrics
   fetchMonthWiseEventMetrics?: GQLMonthWiseEstimationMetrics
   fetchLocationWiseEventMetrics?: GQLLocationWiseEstimationMetrics
@@ -256,9 +256,12 @@ export interface GQLRegistrationMetrics {
   payments?: GQLCertificationPaymentMetrics
 }
 
-export interface GQLEventEstimationMetrics {
-  birthTargetDayMetrics?: GQLEstimationMetrics
-  deathTargetDayMetrics?: GQLEstimationMetrics
+export interface GQLEventMetrics {
+  total?: number
+  gender?: string
+  eventLocationType?: string
+  timeLabel?: string
+  estimated?: number
 }
 
 export interface GQLDeclarationsStartedMetrics {
@@ -736,14 +739,6 @@ export interface GQLRegistrationTargetDayEstimatedMetrics {
 export interface GQLCertificationPaymentMetrics {
   details?: Array<GQLCertificationPaymentDetailsMetrics>
   total?: GQLCertificationPaymentTotalCount
-}
-
-export interface GQLEstimationMetrics {
-  actualRegistration: number
-  estimatedRegistration: number
-  estimatedPercentage: number
-  malePercentage: number
-  femalePercentage: number
 }
 
 export interface GQLMonthWiseTargetDayEstimation {
@@ -1398,7 +1393,7 @@ export interface GQLResolver {
   SearchFieldAgentResult?: GQLSearchFieldAgentResultTypeResolver
   VerifyPasswordResult?: GQLVerifyPasswordResultTypeResolver
   RegistrationMetrics?: GQLRegistrationMetricsTypeResolver
-  EventEstimationMetrics?: GQLEventEstimationMetricsTypeResolver
+  EventMetrics?: GQLEventMetricsTypeResolver
   DeclarationsStartedMetrics?: GQLDeclarationsStartedMetricsTypeResolver
   MonthWiseEstimationMetrics?: GQLMonthWiseEstimationMetricsTypeResolver
   LocationWiseEstimationMetrics?: GQLLocationWiseEstimationMetricsTypeResolver
@@ -1434,7 +1429,6 @@ export interface GQLResolver {
   RegistrationTimeFrameMetrics?: GQLRegistrationTimeFrameMetricsTypeResolver
   RegistrationTargetDayEstimatedMetrics?: GQLRegistrationTargetDayEstimatedMetricsTypeResolver
   CertificationPaymentMetrics?: GQLCertificationPaymentMetricsTypeResolver
-  EstimationMetrics?: GQLEstimationMetricsTypeResolver
   MonthWiseTargetDayEstimation?: GQLMonthWiseTargetDayEstimationTypeResolver
   EventInTargetDayEstimationCount?: GQLEventInTargetDayEstimationCountTypeResolver
   LocationWiseTargetDayEstimation?: GQLLocationWiseTargetDayEstimationTypeResolver
@@ -1492,7 +1486,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   searchFieldAgents?: QueryToSearchFieldAgentsResolver<TParent>
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
   fetchRegistrationMetrics?: QueryToFetchRegistrationMetricsResolver<TParent>
-  getEventEstimationMetrics?: QueryToGetEventEstimationMetricsResolver<TParent>
+  getTotalMetrics?: QueryToGetTotalMetricsResolver<TParent>
   getDeclarationsStartedMetrics?: QueryToGetDeclarationsStartedMetricsResolver<TParent>
   fetchMonthWiseEventMetrics?: QueryToFetchMonthWiseEventMetricsResolver<TParent>
   fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<TParent>
@@ -1830,18 +1824,16 @@ export interface QueryToFetchRegistrationMetricsResolver<
   ): TResult
 }
 
-export interface QueryToGetEventEstimationMetricsArgs {
+export interface QueryToGetTotalMetricsArgs {
   timeStart: string
   timeEnd: string
   locationId: string
+  event: string
 }
-export interface QueryToGetEventEstimationMetricsResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface QueryToGetTotalMetricsResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
-    args: QueryToGetEventEstimationMetricsArgs,
+    args: QueryToGetTotalMetricsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3317,22 +3309,34 @@ export interface RegistrationMetricsToPaymentsResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLEventEstimationMetricsTypeResolver<TParent = any> {
-  birthTargetDayMetrics?: EventEstimationMetricsToBirthTargetDayMetricsResolver<TParent>
-  deathTargetDayMetrics?: EventEstimationMetricsToDeathTargetDayMetricsResolver<TParent>
+export interface GQLEventMetricsTypeResolver<TParent = any> {
+  total?: EventMetricsToTotalResolver<TParent>
+  gender?: EventMetricsToGenderResolver<TParent>
+  eventLocationType?: EventMetricsToEventLocationTypeResolver<TParent>
+  timeLabel?: EventMetricsToTimeLabelResolver<TParent>
+  estimated?: EventMetricsToEstimatedResolver<TParent>
 }
 
-export interface EventEstimationMetricsToBirthTargetDayMetricsResolver<
+export interface EventMetricsToTotalResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsToGenderResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsToEventLocationTypeResolver<
   TParent = any,
   TResult = any
 > {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface EventEstimationMetricsToDeathTargetDayMetricsResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface EventMetricsToTimeLabelResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsToEstimatedResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4539,49 +4543,6 @@ export interface CertificationPaymentMetricsToDetailsResolver<
 }
 
 export interface CertificationPaymentMetricsToTotalResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLEstimationMetricsTypeResolver<TParent = any> {
-  actualRegistration?: EstimationMetricsToActualRegistrationResolver<TParent>
-  estimatedRegistration?: EstimationMetricsToEstimatedRegistrationResolver<TParent>
-  estimatedPercentage?: EstimationMetricsToEstimatedPercentageResolver<TParent>
-  malePercentage?: EstimationMetricsToMalePercentageResolver<TParent>
-  femalePercentage?: EstimationMetricsToFemalePercentageResolver<TParent>
-}
-
-export interface EstimationMetricsToActualRegistrationResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface EstimationMetricsToEstimatedRegistrationResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface EstimationMetricsToEstimatedPercentageResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface EstimationMetricsToMalePercentageResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface EstimationMetricsToFemalePercentageResolver<
   TParent = any,
   TResult = any
 > {
