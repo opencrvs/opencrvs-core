@@ -2386,7 +2386,6 @@ export const mockDeathDeclarationData = {
     addressLine1: '193 Kalibari Road',
     postCode: '2200',
     primaryAddress: '',
-    informantPrimaryAddressSameAsCurrent: true,
     countryPrimary: 'BGD',
     statePrimary: '',
     districtPrimary: '',

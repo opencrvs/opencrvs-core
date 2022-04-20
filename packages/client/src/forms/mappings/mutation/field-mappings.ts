@@ -291,7 +291,6 @@ export const copyAddressTransformer =
     if (nodeName) {
       fromSectionData = transformedData[fromSection][nodeName]
     }
-
     if (
       (sectionId !== 'informant' && !fromSectionData.address) ||
       (sectionId === 'informant' && !fromSectionData.individual.address)

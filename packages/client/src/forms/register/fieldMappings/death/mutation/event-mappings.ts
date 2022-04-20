@@ -59,8 +59,9 @@ export const deathEventLocationMutationTransformer =
     sectionId: string,
     field: IFormField
   ) => {
-    if (!transformedData.eventLocation) {
-      transformedData.eventLocation = {
+    let defaultLocation: fhir.Location = {}
+    if (!transformedData.eventLocation.address) {
+      defaultLocation = {
         address: {
           country: '',
           state: '',
@@ -70,6 +71,10 @@ export const deathEventLocationMutationTransformer =
           line: ['', '', '', '', '', '']
         }
       } as fhir.Location
+      if (transformedData.eventLocation.type) {
+        defaultLocation['type'] = transformedData.eventLocation.type
+      }
+      transformedData.eventLocation = defaultLocation
     }
     if (lineNumber > 0) {
       transformedData.eventLocation.address.line[lineNumber - 1] = `${
