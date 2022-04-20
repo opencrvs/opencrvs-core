@@ -64,6 +64,7 @@ export type AllowedAddressConfigurations = {
   xComparisonSection?: BirthSection | DeathSection
   yComparisonSection?: BirthSection | DeathSection
   comparisonCase?: AddressComparisonCases
+  informant?: boolean
 }
 
 export const defaultAddressConfiguration: IAddressConfiguration[] = [
@@ -79,7 +80,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     preceedingFieldId: 'birth.informant.informant-view-group.primaryAddress',
     configurations: [
       { config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION },
-      { config: AddressCases.PRIMARY_ADDRESS }
+      { config: AddressCases.PRIMARY_ADDRESS, informant: true }
     ]
   },
   {
@@ -89,7 +90,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.primaryAddress
       },
-      { config: AddressCases.PRIMARY_ADDRESS },
+      { config: AddressCases.PRIMARY_ADDRESS, informant: false },
       {
         config: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY,
         label: formMessageDescriptors.secondaryAddressSameAsPrimary,
@@ -103,6 +104,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
+        informant: false,
         comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
       }
     ]
@@ -124,6 +126,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       },
       {
         config: AddressCases.PRIMARY_ADDRESS,
+        informant: false,
         comparisonCase:
           AddressComparisonCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY
       },
@@ -142,6 +145,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
+        informant: false,
         comparisonCase:
           AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY
       }
@@ -154,7 +158,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.deceasedPrimaryAddress
       },
-      { config: AddressCases.PRIMARY_ADDRESS },
+      { config: AddressCases.PRIMARY_ADDRESS, informant: false },
       {
         config: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY,
         label: formMessageDescriptors.deceasedSecondaryAddressSameAsPrimary,
@@ -168,6 +172,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
+        informant: false,
         comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
       }
     ]
@@ -179,7 +184,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.primaryAddress
       },
-      { config: AddressCases.PRIMARY_ADDRESS },
+      { config: AddressCases.PRIMARY_ADDRESS, informant: true },
       {
         config: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY,
         label: formMessageDescriptors.informantSecondaryAddressSameAsPrimary,
@@ -193,6 +198,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
+        informant: true,
         comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
       }
     ]
@@ -205,15 +211,27 @@ export function getAddressFields(
   switch (configuration.config) {
     case EventLocationAddressCases.PLACE_OF_BIRTH:
     case EventLocationAddressCases.PLACE_OF_DEATH:
-      return getPlaceOfEvent(configuration.config)
+      return getPlaceOfEventAddressFields(configuration.config)
     case AddressCases.PRIMARY_ADDRESS:
+      if (configuration.informant === undefined) {
+        throw new Error(
+          `Invalid address configuration, missing informant value for: ${configuration.config}`
+        )
+      }
       return getAddress(
         AddressCases.PRIMARY_ADDRESS,
+        configuration.informant,
         configuration.comparisonCase
       )
     case AddressCases.SECONDARY_ADDRESS:
+      if (configuration.informant === undefined) {
+        throw new Error(
+          `Invalid address configuration, missing informant value for: ${configuration.config}`
+        )
+      }
       return getAddress(
         AddressCases.SECONDARY_ADDRESS,
+        configuration.informant,
         configuration.comparisonCase
       )
     case AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY:
@@ -367,7 +385,20 @@ export const getXAddressSameAsY = (
           }
         }
       ],
-      conditionals: [],
+      conditionals:
+        xComparisonSection === BirthSection.Father
+          ? [
+              {
+                action: 'hide',
+                expression: '!values.fathersDetailsExist'
+              },
+              {
+                action: 'hide',
+                expression:
+                  '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && draftData.primaryCaregiver.parentDetailsType ===  "FATHER_ONLY")'
+              }
+            ]
+          : [],
       mapping: {
         mutation: {
           operation: 'copyAddressTransformer',
@@ -458,1679 +489,2144 @@ export function populateRegisterFormsWithAddresses(
       }
     }
   )
+  /* if (event === 'birth') {
+    console.log(JSON.stringify(newForm))
+  }*/
   return newForm
 }
 
 export function getAddress(
   addressCase: AddressCases,
+  informant: boolean,
   comparisonCase?: AddressComparisonCases
 ): SerializedFormField[] {
   const defaultFields: SerializedFormField[] =
     addressCase === AddressCases.PRIMARY_ADDRESS
-      ? primaryAddressFields
-      : secondaryAddressFields
+      ? getPrimaryAddressFields(informant)
+      : getSecondaryAddressFields(informant)
   if (comparisonCase) {
     defaultFields.forEach((field) => {
-      if (field.conditionals) {
-        field.conditionals.push({
-          action: 'hide',
-          expression: `values.${comparisonCase}`
-        })
-      } else {
-        field.conditionals = [
-          {
-            action: 'hide',
-            expression: `values.${comparisonCase}`
-          }
-        ]
+      const newConditional = {
+        action: 'hide',
+        expression: `values.${comparisonCase}`
+      }
+      if (
+        field.conditionals &&
+        field.conditionals.filter(
+          (conditional) => conditional.expression === `values.${comparisonCase}`
+        ).length === 0
+      ) {
+        field.conditionals.push(newConditional)
+      } else if (!field.conditionals) {
+        field.conditionals = [newConditional]
       }
     })
   }
   return defaultFields
 }
-export const primaryAddressFields: SerializedFormField[] = [
-  {
-    name: 'countryPrimary',
-    type: 'SELECT_WITH_OPTIONS',
-    label: {
-      defaultMessage: 'Country',
-      description: 'Title for the country select',
-      id: 'form.field.label.country'
-    },
-    previewGroup: 'primaryAddress',
-    required: true,
-    initialValue: window.config.COUNTRY.toUpperCase(),
-    validate: [],
-    placeholder: {
-      defaultMessage: 'Select',
-      description: 'Placeholder text for a select',
-      id: 'form.field.select.placeholder'
-    },
-    options: {
-      resource: 'countries'
-    },
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'country']
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'country']
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'statePrimary',
-    type: 'SELECT_WITH_DYNAMIC_OPTIONS',
-    label: {
-      defaultMessage: 'Province',
-      description: 'Title for the state select',
-      id: 'form.field.label.state'
-    },
-    previewGroup: 'primaryAddress',
-    required: true,
-    initialValue: '',
-    validate: [],
-    placeholder: {
-      defaultMessage: 'Select',
-      description: 'Placeholder text for a select',
-      id: 'form.field.select.placeholder'
-    },
-    dynamicOptions: {
-      resource: 'locations',
-      dependency: 'countryPrimary',
-      initialValue: 'agentDefault'
-    },
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countryPrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'districtPrimary',
-    type: 'SELECT_WITH_DYNAMIC_OPTIONS',
-    label: {
-      defaultMessage: 'District',
-      description: 'Title for the district select',
-      id: 'form.field.label.district'
-    },
-    previewGroup: 'primaryAddress',
-    required: true,
-    initialValue: '',
-    validate: [],
-    placeholder: {
-      defaultMessage: 'Select',
-      description: 'Placeholder text for a select',
-      id: 'form.field.select.placeholder'
-    },
-    dynamicOptions: {
-      resource: 'locations',
-      dependency: 'statePrimary',
-      initialValue: 'agentDefault'
-    },
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countryPrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.statePrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'ruralOrUrbanPrimary',
-    type: 'RADIO_GROUP',
-    label: {
-      defaultMessage: ' ',
-      description: 'Empty label for form field',
-      id: 'form.field.label.emptyLabel'
-    },
-    options: [
-      {
-        label: {
-          defaultMessage: 'Urban',
-          id: 'form.field.label.urban',
-          description: 'Label for form field checkbox option Urban'
-        },
-        value: 'URBAN'
-      },
-      {
-        label: {
-          defaultMessage: 'Rural',
-          id: 'form.field.label.rural',
-          description: 'Label for form field checkbox option Rural'
-        },
-        value: 'RURAL'
-      }
-    ],
-    initialValue: 'URBAN',
-    flexDirection: FLEX_DIRECTION.ROW,
-    previewGroup: 'primaryAddress',
-    hideValueInPreview: true,
-    required: false,
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countryPrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.statePrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.districtPrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 7]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 7]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'addressLine4CityOptionPrimary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Town',
-      description: 'Title for the address line 4',
-      id: 'form.field.label.addressLine4CityOption'
-    },
-    previewGroup: 'primaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countryPrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.statePrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.districtPrimary'
-      },
-      {
-        action: 'hide',
-        expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 4]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 4]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'addressLine3CityOptionPrimary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Residential Area',
-      description: 'Title for the address line 3 option 2',
-      id: 'form.field.label.addressLine3CityOption'
-    },
-    previewGroup: 'primaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countryPrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.statePrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.districtPrimary'
-      },
-      {
-        action: 'hide',
-        expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 3]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 3]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'addressLine2CityOptionPrimary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Street / Plot Number',
-      description: 'Title for the address line 1',
-      id: 'form.field.label.addressLine2CityOption'
-    },
-    previewGroup: 'primaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countryPrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.statePrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.districtPrimary'
-      },
-      {
-        action: 'hide',
-        expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 2]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 2]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'numberOptionPrimary',
-    type: 'NUMBER',
-    label: {
-      defaultMessage: 'Number',
-      description: 'Title for the number field',
-      id: 'form.field.label.number'
-    },
-    previewGroup: 'primaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countryPrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.statePrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.districtPrimary'
-      },
-      {
-        action: 'hide',
-        expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 1]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 1]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'addressLine1Primary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Village',
-      description: 'Title for the address line 1',
-      id: 'form.field.label.addressLine1'
-    },
-    previewGroup: 'primaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countryPrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.statePrimary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.districtPrimary'
-      },
-      {
-        action: 'hide',
-        expression: 'values.ruralOrUrbanPrimary !== "RURAL"'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 5]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 5]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'internationalStatePrimary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'State',
-      description: 'Title for the international state select',
-      id: 'form.field.label.internationalState'
-    },
-    previewGroup: 'primaryAddress',
-    required: true,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'internationalDistrictPrimary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'District',
-      description: 'Title for the international district select',
-      id: 'form.field.label.internationalDistrict'
-    },
-    previewGroup: 'primaryAddress',
-    required: true,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'internationalCityPrimary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'City / Town',
-      description: 'Title for the international city select',
-      id: 'form.field.label.internationalCity'
-    },
-    previewGroup: 'primaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'city']
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'city']
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'internationalAddressLine1Primary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Address Line 1',
-      description: 'Title for the international address line 1 select',
-      id: 'form.field.label.internationalAddressLine1'
-    },
-    previewGroup: 'primaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 7]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 7]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'internationalAddressLine2Primary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Address Line 2',
-      description: 'Title for the international address line 2 select',
-      id: 'form.field.label.internationalAddressLine2'
-    },
-    previewGroup: 'primaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 8]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 8]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'internationalAddressLine3Primary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Address Line 3',
-      description: 'Title for the international address line 3 select',
-      id: 'form.field.label.internationalAddressLine3'
-    },
-    previewGroup: 'primaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 9]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 9]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'internationalPostcodePrimary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Postcode / Zip',
-      description: 'Title for the international postcode',
-      id: 'form.field.label.internationalPostcode'
-    },
-    previewGroup: 'primaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countryPrimary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'postalCode']
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'postalCode']
-          }
-        ]
-      }
-    }
-  }
-]
 
-export const secondaryAddressFields: SerializedFormField[] = [
-  {
-    name: 'countrySecondary',
-    type: 'SELECT_WITH_OPTIONS',
-    label: {
-      defaultMessage: 'Country',
-      description: 'Title for the country select',
-      id: 'form.field.label.country'
-    },
-    previewGroup: 'secondaryAddress',
-    required: true,
-    initialValue: window.config.COUNTRY.toUpperCase(),
-    validate: [],
-    placeholder: {
-      defaultMessage: 'Select',
-      description: 'Placeholder text for a select',
-      id: 'form.field.select.placeholder'
-    },
-    options: {
-      resource: 'countries'
-    },
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'country']
-          },
-          'address'
-        ]
+function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
+  return [
+    {
+      name: 'countryPrimary',
+      type: 'SELECT_WITH_OPTIONS',
+      label: {
+        defaultMessage: 'Country',
+        description: 'Title for the country select',
+        id: 'form.field.label.country'
       },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'country']
-          }
-        ]
+      previewGroup: 'primaryAddress',
+      required: true,
+      initialValue: window.config.COUNTRY.toUpperCase(),
+      validate: [],
+      placeholder: {
+        defaultMessage: 'Select',
+        description: 'Placeholder text for a select',
+        id: 'form.field.select.placeholder'
+      },
+      options: {
+        resource: 'countries'
+      },
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'country']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'country']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'country']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'country']
+            }
       }
-    }
-  },
-  {
-    name: 'stateSecondary',
-    type: 'SELECT_WITH_DYNAMIC_OPTIONS',
-    label: {
-      defaultMessage: 'Province',
-      description: 'Title for the state select',
-      id: 'form.field.label.state'
     },
-    previewGroup: 'secondaryAddress',
-    required: true,
-    initialValue: '',
-    validate: [],
-    placeholder: {
-      defaultMessage: 'Select',
-      description: 'Placeholder text for a select',
-      id: 'form.field.select.placeholder'
-    },
-    dynamicOptions: {
-      resource: 'locations',
-      dependency: 'countrySecondary',
-      initialValue: 'agentDefault'
-    },
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countrySecondary'
+    {
+      name: 'statePrimary',
+      type: 'SELECT_WITH_DYNAMIC_OPTIONS',
+      label: {
+        defaultMessage: 'Province',
+        description: 'Title for the state select',
+        id: 'form.field.label.state'
       },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countrySecondary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
-          },
-          'address'
-        ]
+      previewGroup: 'primaryAddress',
+      required: true,
+      initialValue: '',
+      validate: [],
+      placeholder: {
+        defaultMessage: 'Select',
+        description: 'Placeholder text for a select',
+        id: 'form.field.select.placeholder'
       },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'districtSecondary',
-    type: 'SELECT_WITH_DYNAMIC_OPTIONS',
-    label: {
-      defaultMessage: 'District',
-      description: 'Title for the district select',
-      id: 'form.field.label.district'
-    },
-    previewGroup: 'secondaryAddress',
-    required: true,
-    initialValue: '',
-    validate: [],
-    placeholder: {
-      defaultMessage: 'Select',
-      description: 'Placeholder text for a select',
-      id: 'form.field.select.placeholder'
-    },
-    dynamicOptions: {
-      resource: 'locations',
-      dependency: 'stateSecondary',
-      initialValue: 'agentDefault'
-    },
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countrySecondary'
+      dynamicOptions: {
+        resource: 'locations',
+        dependency: 'countryPrimary',
+        initialValue: 'agentDefault'
       },
-      {
-        action: 'hide',
-        expression: '!values.stateSecondary'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countrySecondary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'ruralOrUrbanSecondary',
-    type: 'RADIO_GROUP',
-    label: {
-      defaultMessage: ' ',
-      description: 'Empty label for form field',
-      id: 'form.field.label.emptyLabel'
-    },
-    options: [
-      {
-        label: {
-          defaultMessage: 'Urban',
-          id: 'form.field.label.urban',
-          description: 'Label for form field checkbox option Urban'
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countryPrimary'
         },
-        value: 'URBAN'
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
+            }
+      }
+    },
+    {
+      name: 'districtPrimary',
+      type: 'SELECT_WITH_DYNAMIC_OPTIONS',
+      label: {
+        defaultMessage: 'District',
+        description: 'Title for the district select',
+        id: 'form.field.label.district'
       },
-      {
-        label: {
-          defaultMessage: 'Rural',
-          id: 'form.field.label.rural',
-          description: 'Label for form field checkbox option Rural'
+      previewGroup: 'primaryAddress',
+      required: true,
+      initialValue: '',
+      validate: [],
+      placeholder: {
+        defaultMessage: 'Select',
+        description: 'Placeholder text for a select',
+        id: 'form.field.select.placeholder'
+      },
+      dynamicOptions: {
+        resource: 'locations',
+        dependency: 'statePrimary',
+        initialValue: 'agentDefault'
+      },
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countryPrimary'
         },
-        value: 'RURAL'
+        {
+          action: 'hide',
+          expression: '!values.statePrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
+            }
       }
-    ],
-    initialValue: 'URBAN',
-    flexDirection: FLEX_DIRECTION.ROW,
-    previewGroup: 'secondaryAddress',
-    hideValueInPreview: true,
-    required: false,
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countrySecondary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.stateSecondary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.districtSecondary'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countrySecondary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 7]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 7]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'addressLine4CityOptionSecondary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Town',
-      description: 'Title for the address line 4',
-      id: 'form.field.label.addressLine4CityOption'
     },
-    previewGroup: 'secondaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countrySecondary'
+    {
+      name: 'ruralOrUrbanPrimary',
+      type: 'RADIO_GROUP',
+      label: {
+        defaultMessage: ' ',
+        description: 'Empty label for form field',
+        id: 'form.field.label.emptyLabel'
       },
-      {
-        action: 'hide',
-        expression: '!values.stateSecondary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.districtSecondary'
-      },
-      {
-        action: 'hide',
-        expression: 'values.ruralOrUrbanSecondary !== "URBAN"'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countrySecondary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 4]
+      options: [
+        {
+          label: {
+            defaultMessage: 'Urban',
+            id: 'form.field.label.urban',
+            description: 'Label for form field checkbox option Urban'
           },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 4]
-          }
-        ]
+          value: 'URBAN'
+        },
+        {
+          label: {
+            defaultMessage: 'Rural',
+            id: 'form.field.label.rural',
+            description: 'Label for form field checkbox option Rural'
+          },
+          value: 'RURAL'
+        }
+      ],
+      initialValue: 'URBAN',
+      flexDirection: FLEX_DIRECTION.ROW,
+      previewGroup: 'primaryAddress',
+      hideValueInPreview: true,
+      required: false,
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countryPrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.statePrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtPrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 7]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 7]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 7]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 7]
+            }
       }
-    }
-  },
-  {
-    name: 'addressLine3CityOptionSecondary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Residential Area',
-      description: 'Title for the address line 3 option 2',
-      id: 'form.field.label.addressLine3CityOption'
     },
-    previewGroup: 'secondaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countrySecondary'
+    {
+      name: 'addressLine4CityOptionPrimary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Town',
+        description: 'Title for the address line 4',
+        id: 'form.field.label.addressLine4CityOption'
       },
-      {
-        action: 'hide',
-        expression: '!values.stateSecondary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.districtSecondary'
-      },
-      {
-        action: 'hide',
-        expression: 'values.ruralOrUrbanSecondary !== "URBAN"'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countrySecondary)'
+      previewGroup: 'primaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countryPrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.statePrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtPrimary'
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'city']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'city']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'city']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'city']
+            }
       }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 3]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 3]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'addressLine2CityOptionSecondary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Street / Plot Number',
-      description: 'Title for the address line 1',
-      id: 'form.field.label.addressLine2CityOption'
     },
-    previewGroup: 'secondaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countrySecondary'
+    {
+      name: 'addressLine3CityOptionPrimary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Residential Area',
+        description: 'Title for the address line 3 option 2',
+        id: 'form.field.label.addressLine3CityOption'
       },
-      {
-        action: 'hide',
-        expression: '!values.stateSecondary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.districtSecondary'
-      },
-      {
-        action: 'hide',
-        expression: 'values.ruralOrUrbanSecondary !== "URBAN"'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countrySecondary)'
+      previewGroup: 'primaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countryPrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.statePrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtPrimary'
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 3]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 3]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 3]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 3]
+            }
       }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 2]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 2]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'numberOptionSecondary',
-    type: 'NUMBER',
-    label: {
-      defaultMessage: 'Number',
-      description: 'Title for the number field',
-      id: 'form.field.label.number'
     },
-    previewGroup: 'secondaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countrySecondary'
+    {
+      name: 'addressLine2CityOptionPrimary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Street / Plot Number',
+        description: 'Title for the address line 1',
+        id: 'form.field.label.addressLine2CityOption'
       },
-      {
-        action: 'hide',
-        expression: '!values.stateSecondary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.districtSecondary'
-      },
-      {
-        action: 'hide',
-        expression: 'values.ruralOrUrbanSecondary !== "URBAN"'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countrySecondary)'
+      previewGroup: 'primaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countryPrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.statePrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtPrimary'
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 2]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 2]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 2]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 2]
+            }
       }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 1]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 1]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'addressLine1Secondary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Village',
-      description: 'Title for the address line 1',
-      id: 'form.field.label.addressLine1'
     },
-    previewGroup: 'secondaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: '!values.countrySecondary'
+    {
+      name: 'numberOptionPrimary',
+      type: 'NUMBER',
+      label: {
+        defaultMessage: 'Number',
+        description: 'Title for the number field',
+        id: 'form.field.label.number'
       },
-      {
-        action: 'hide',
-        expression: '!values.stateSecondary'
-      },
-      {
-        action: 'hide',
-        expression: '!values.districtSecondary'
-      },
-      {
-        action: 'hide',
-        expression: 'values.ruralOrUrbanSecondary !== "RURAL"'
-      },
-      {
-        action: 'hide',
-        expression: '!isDefaultCountry(values.countrySecondary)'
+      previewGroup: 'primaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countryPrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.statePrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtPrimary'
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 1]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 1]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 1]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 1]
+            }
       }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 5]
-          },
-          'address'
-        ]
-      },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 5]
-          }
-        ]
-      }
-    }
-  },
-  {
-    name: 'internationalStateSecondary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'State',
-      description: 'Title for the international state select',
-      id: 'form.field.label.internationalState'
     },
-    previewGroup: 'secondaryAddress',
-    required: true,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countrySecondary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
-          },
-          'address'
-        ]
+    {
+      name: 'postcodePrimary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Postcode / Zip',
+        description: 'Title for the international postcode',
+        id: 'form.field.label.internationalPostcode'
       },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
-          }
-        ]
+      previewGroup: 'primaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countryPrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.statePrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtPrimary'
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrbanPrimary !== "URBAN"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'postalCode']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'postalCode']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'postalCode']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'postalCode']
+            }
       }
-    }
-  },
-  {
-    name: 'internationalDistrictSecondary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'District',
-      description: 'Title for the international district select',
-      id: 'form.field.label.internationalDistrict'
     },
-    previewGroup: 'secondaryAddress',
-    required: true,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countrySecondary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
-          },
-          'address'
-        ]
+    {
+      name: 'addressLine1Primary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Village',
+        description: 'Title for the address line 1',
+        id: 'form.field.label.addressLine1'
       },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
-          }
-        ]
+      previewGroup: 'primaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countryPrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.statePrimary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtPrimary'
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrbanPrimary !== "RURAL"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 5]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 5]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 5]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 5]
+            }
       }
-    }
-  },
-  {
-    name: 'internationalCitySecondary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'City / Town',
-      description: 'Title for the international city select',
-      id: 'form.field.label.internationalCity'
     },
-    previewGroup: 'secondaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countrySecondary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'city']
-          },
-          'address'
-        ]
+    {
+      name: 'internationalStatePrimary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'State',
+        description: 'Title for the international state select',
+        id: 'form.field.label.internationalState'
       },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'city']
-          }
-        ]
+      previewGroup: 'primaryAddress',
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'state']
+            }
       }
-    }
-  },
-  {
-    name: 'internationalAddressLine1Secondary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Address Line 1',
-      description: 'Title for the international address line 1 select',
-      id: 'form.field.label.internationalAddressLine1'
     },
-    previewGroup: 'secondaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countrySecondary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 7]
-          },
-          'address'
-        ]
+    {
+      name: 'internationalDistrictPrimary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'District',
+        description: 'Title for the international district select',
+        id: 'form.field.label.internationalDistrict'
       },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 7]
-          }
-        ]
+      previewGroup: 'primaryAddress',
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'district']
+            }
       }
-    }
-  },
-  {
-    name: 'internationalAddressLine2Secondary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Address Line 2',
-      description: 'Title for the international address line 2 select',
-      id: 'form.field.label.internationalAddressLine2'
     },
-    previewGroup: 'secondaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countrySecondary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 8]
-          },
-          'address'
-        ]
+    {
+      name: 'internationalCityPrimary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'City / Town',
+        description: 'Title for the international city select',
+        id: 'form.field.label.internationalCity'
       },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 8]
-          }
-        ]
+      previewGroup: 'primaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'city']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'city']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'city']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'city']
+            }
       }
-    }
-  },
-  {
-    name: 'internationalAddressLine3Secondary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Address Line 3',
-      description: 'Title for the international address line 3 select',
-      id: 'form.field.label.internationalAddressLine3'
     },
-    previewGroup: 'secondaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countrySecondary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 9]
-          },
-          'address'
-        ]
+    {
+      name: 'internationalAddressLine1Primary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Address Line 1',
+        description: 'Title for the international address line 1 select',
+        id: 'form.field.label.internationalAddressLine1'
       },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 9]
-          }
-        ]
+      previewGroup: 'primaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 7]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 7]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 7]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 7]
+            }
       }
-    }
-  },
-  {
-    name: 'internationalPostcodeSecondary',
-    type: 'TEXT',
-    label: {
-      defaultMessage: 'Postcode / Zip',
-      description: 'Title for the international postcode',
-      id: 'form.field.label.internationalPostcode'
     },
-    previewGroup: 'secondaryAddress',
-    required: false,
-    initialValue: '',
-    validate: [],
-    conditionals: [
-      {
-        action: 'hide',
-        expression: 'isDefaultCountry(values.countrySecondary)'
-      }
-    ],
-    mapping: {
-      mutation: {
-        operation: 'fieldValueNestingTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'fieldToAddressTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'postalCode']
-          },
-          'address'
-        ]
+    {
+      name: 'internationalAddressLine2Primary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Address Line 2',
+        description: 'Title for the international address line 2 select',
+        id: 'form.field.label.internationalAddressLine2'
       },
-      query: {
-        operation: 'nestedValueToFieldTransformer',
-        parameters: [
-          'individual',
-          {
-            operation: 'addressToFieldTransformer',
-            parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'postalCode']
-          }
-        ]
+      previewGroup: 'primaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 8]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 8]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 8]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 8]
+            }
+      }
+    },
+    {
+      name: 'internationalAddressLine3Primary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Address Line 3',
+        description: 'Title for the international address line 3 select',
+        id: 'form.field.label.internationalAddressLine3'
+      },
+      previewGroup: 'primaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 9]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 9]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 9]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 9]
+            }
+      }
+    },
+    {
+      name: 'internationalPostcodePrimary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Postcode / Zip',
+        description: 'Title for the international postcode',
+        id: 'form.field.label.internationalPostcode'
+      },
+      previewGroup: 'primaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countryPrimary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'postalCode']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'postalCode']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'postalCode']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.PRIMARY_ADDRESS, 0, 'postalCode']
+            }
       }
     }
-  }
-]
+  ]
+}
+function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
+  return [
+    {
+      name: 'countrySecondary',
+      type: 'SELECT_WITH_OPTIONS',
+      label: {
+        defaultMessage: 'Country',
+        description: 'Title for the country select',
+        id: 'form.field.label.country'
+      },
+      previewGroup: 'secondaryAddress',
+      required: true,
+      initialValue: window.config.COUNTRY.toUpperCase(),
+      validate: [],
+      placeholder: {
+        defaultMessage: 'Select',
+        description: 'Placeholder text for a select',
+        id: 'form.field.select.placeholder'
+      },
+      options: {
+        resource: 'countries'
+      },
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'country']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'country']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'country']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'country']
+            }
+      }
+    },
+    {
+      name: 'stateSecondary',
+      type: 'SELECT_WITH_DYNAMIC_OPTIONS',
+      label: {
+        defaultMessage: 'Province',
+        description: 'Title for the state select',
+        id: 'form.field.label.state'
+      },
+      previewGroup: 'secondaryAddress',
+      required: true,
+      initialValue: '',
+      validate: [],
+      placeholder: {
+        defaultMessage: 'Select',
+        description: 'Placeholder text for a select',
+        id: 'form.field.select.placeholder'
+      },
+      dynamicOptions: {
+        resource: 'locations',
+        dependency: 'countrySecondary',
+        initialValue: 'agentDefault'
+      },
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countrySecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
+            }
+      }
+    },
+    {
+      name: 'districtSecondary',
+      type: 'SELECT_WITH_DYNAMIC_OPTIONS',
+      label: {
+        defaultMessage: 'District',
+        description: 'Title for the district select',
+        id: 'form.field.label.district'
+      },
+      previewGroup: 'secondaryAddress',
+      required: true,
+      initialValue: '',
+      validate: [],
+      placeholder: {
+        defaultMessage: 'Select',
+        description: 'Placeholder text for a select',
+        id: 'form.field.select.placeholder'
+      },
+      dynamicOptions: {
+        resource: 'locations',
+        dependency: 'stateSecondary',
+        initialValue: 'agentDefault'
+      },
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countrySecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.stateSecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
+            }
+      }
+    },
+    {
+      name: 'ruralOrUrbanSecondary',
+      type: 'RADIO_GROUP',
+      label: {
+        defaultMessage: ' ',
+        description: 'Empty label for form field',
+        id: 'form.field.label.emptyLabel'
+      },
+      options: [
+        {
+          label: {
+            defaultMessage: 'Urban',
+            id: 'form.field.label.urban',
+            description: 'Label for form field checkbox option Urban'
+          },
+          value: 'URBAN'
+        },
+        {
+          label: {
+            defaultMessage: 'Rural',
+            id: 'form.field.label.rural',
+            description: 'Label for form field checkbox option Rural'
+          },
+          value: 'RURAL'
+        }
+      ],
+      initialValue: 'URBAN',
+      flexDirection: FLEX_DIRECTION.ROW,
+      previewGroup: 'secondaryAddress',
+      hideValueInPreview: true,
+      required: false,
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countrySecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.stateSecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtSecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 7]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 7]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 7]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 7]
+            }
+      }
+    },
+    {
+      name: 'addressLine4CityOptionSecondary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Town',
+        description: 'Title for the address line 4',
+        id: 'form.field.label.addressLine4CityOption'
+      },
+      previewGroup: 'secondaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countrySecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.stateSecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtSecondary'
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrbanSecondary !== "URBAN"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'city']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'city']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'city']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'city']
+            }
+      }
+    },
+    {
+      name: 'addressLine3CityOptionSecondary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Residential Area',
+        description: 'Title for the address line 3 option 2',
+        id: 'form.field.label.addressLine3CityOption'
+      },
+      previewGroup: 'secondaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countrySecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.stateSecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtSecondary'
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrbanSecondary !== "URBAN"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 3]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 3]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 3]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 3]
+            }
+      }
+    },
+    {
+      name: 'addressLine2CityOptionSecondary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Street / Plot Number',
+        description: 'Title for the address line 1',
+        id: 'form.field.label.addressLine2CityOption'
+      },
+      previewGroup: 'secondaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countrySecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.stateSecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtSecondary'
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrbanSecondary !== "URBAN"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 2]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 2]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 2]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 2]
+            }
+      }
+    },
+    {
+      name: 'numberOptionSecondary',
+      type: 'NUMBER',
+      label: {
+        defaultMessage: 'Number',
+        description: 'Title for the number field',
+        id: 'form.field.label.number'
+      },
+      previewGroup: 'secondaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countrySecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.stateSecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtSecondary'
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrbanSecondary !== "URBAN"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 1]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 1]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 1]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 1]
+            }
+      }
+    },
+    {
+      name: 'postcodeSecondary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Postcode / Zip',
+        description: 'Title for the international postcode',
+        id: 'form.field.label.internationalPostcode'
+      },
+      previewGroup: 'secondaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countrySecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.stateSecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtSecondary'
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrbanSecondary !== "URBAN"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'postalCode']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'postalCode']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'postalCode']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'postalCode']
+            }
+      }
+    },
+    {
+      name: 'addressLine1Secondary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Village',
+        description: 'Title for the address line 1',
+        id: 'form.field.label.addressLine1'
+      },
+      previewGroup: 'secondaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.countrySecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.stateSecondary'
+        },
+        {
+          action: 'hide',
+          expression: '!values.districtSecondary'
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrbanSecondary !== "RURAL"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 5]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 5]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 5]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 5]
+            }
+      }
+    },
+    {
+      name: 'internationalStateSecondary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'State',
+        description: 'Title for the international state select',
+        id: 'form.field.label.internationalState'
+      },
+      previewGroup: 'secondaryAddress',
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'state']
+            }
+      }
+    },
+    {
+      name: 'internationalDistrictSecondary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'District',
+        description: 'Title for the international district select',
+        id: 'form.field.label.internationalDistrict'
+      },
+      previewGroup: 'secondaryAddress',
+      required: true,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'district']
+            }
+      }
+    },
+    {
+      name: 'internationalCitySecondary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'City / Town',
+        description: 'Title for the international city select',
+        id: 'form.field.label.internationalCity'
+      },
+      previewGroup: 'secondaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'city']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'city']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'city']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'city']
+            }
+      }
+    },
+    {
+      name: 'internationalAddressLine1Secondary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Address Line 1',
+        description: 'Title for the international address line 1 select',
+        id: 'form.field.label.internationalAddressLine1'
+      },
+      previewGroup: 'secondaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 7]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 7]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 7]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 7]
+            }
+      }
+    },
+    {
+      name: 'internationalAddressLine2Secondary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Address Line 2',
+        description: 'Title for the international address line 2 select',
+        id: 'form.field.label.internationalAddressLine2'
+      },
+      previewGroup: 'secondaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 8]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 8]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 8]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 8]
+            }
+      }
+    },
+    {
+      name: 'internationalAddressLine3Secondary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Address Line 3',
+        description: 'Title for the international address line 3 select',
+        id: 'form.field.label.internationalAddressLine3'
+      },
+      previewGroup: 'secondaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 9]
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 9]
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 9]
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 9]
+            }
+      }
+    },
+    {
+      name: 'internationalPostcodeSecondary',
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Postcode / Zip',
+        description: 'Title for the international postcode',
+        id: 'form.field.label.internationalPostcode'
+      },
+      previewGroup: 'secondaryAddress',
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: 'isDefaultCountry(values.countrySecondary)'
+        }
+      ],
+      mapping: {
+        mutation: informant
+          ? {
+              operation: 'fieldValueNestingTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'fieldToAddressTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'postalCode']
+                },
+                'address'
+              ]
+            }
+          : {
+              operation: 'fieldToAddressTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'postalCode']
+            },
+        query: informant
+          ? {
+              operation: 'nestedValueToFieldTransformer',
+              parameters: [
+                'individual',
+                {
+                  operation: 'addressToFieldTransformer',
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'postalCode']
+                }
+              ]
+            }
+          : {
+              operation: 'addressToFieldTransformer',
+              parameters: [AddressCases.SECONDARY_ADDRESS, 0, 'postalCode']
+            }
+      }
+    }
+  ]
+}
 
-export function getPlaceOfEvent(
+export function getPlaceOfEventAddressFields(
   configCase: EventLocationAddressCases
 ): SerializedFormField[] {
   return [
@@ -2430,11 +2926,11 @@ export function getPlaceOfEvent(
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
               : 'deathEventLocationMutationTransformer',
-          parameters: [4]
+          parameters: [0, 'city']
         },
         query: {
           operation: 'eventLocationQueryTransformer',
-          parameters: [4]
+          parameters: [0, 'city']
         }
       }
     },
@@ -2594,6 +3090,59 @@ export function getPlaceOfEvent(
         query: {
           operation: 'eventLocationQueryTransformer',
           parameters: [1]
+        }
+      }
+    },
+    {
+      name: 'postalCode',
+      customisable: false,
+      type: 'TEXT',
+      label: {
+        defaultMessage: 'Postcode / Zip',
+        description: 'Title for the international postcode',
+        id: 'form.field.label.internationalPostcode'
+      },
+      previewGroup: configCase,
+      required: false,
+      initialValue: '',
+      validate: [],
+      conditionals: [
+        {
+          action: 'hide',
+          expression: '!values.country'
+        },
+        {
+          action: 'hide',
+          expression: '!values.state'
+        },
+        {
+          action: 'hide',
+          expression: '!values.district'
+        },
+        {
+          action: 'hide',
+          expression: `(values.${configCase}!="OTHER" && values.${configCase}!="PRIVATE_HOME")`
+        },
+        {
+          action: 'hide',
+          expression: 'values.ruralOrUrban !== "URBAN"'
+        },
+        {
+          action: 'hide',
+          expression: '!isDefaultCountry(values.country)'
+        }
+      ],
+      mapping: {
+        mutation: {
+          operation:
+            configCase === EventLocationAddressCases.PLACE_OF_BIRTH
+              ? 'birthEventLocationMutationTransformer'
+              : 'deathEventLocationMutationTransformer',
+          parameters: [0, 'postalCode']
+        },
+        query: {
+          operation: 'eventLocationQueryTransformer',
+          parameters: [0, 'postalCode']
         }
       }
     },
