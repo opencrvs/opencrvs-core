@@ -1340,15 +1340,6 @@ export const registerForms: IDefaultRegisterForms = {
             ],
             previewGroups: [
               {
-                id: 'placeOfBirth',
-                label: {
-                  defaultMessage: 'Place of delivery',
-                  description: 'Title for place of birth sub section',
-                  id: 'form.field.label.placeOfBirthPreview'
-                },
-                fieldToRedirect: 'placeOfBirth'
-              },
-              {
                 id: 'childNameInEnglish',
                 label: {
                   defaultMessage: 'English name',
@@ -1557,16 +1548,6 @@ export const registerForms: IDefaultRegisterForms = {
               // PRIMARY ADDRESS
             ],
             previewGroups: [
-              {
-                id: 'primaryAddress',
-                label: {
-                  defaultMessage: 'Residential address',
-                  description:
-                    'Preview groups label for form field: residential address',
-                  id: 'form.field.previewGroups.primaryAddress'
-                },
-                fieldToRedirect: 'countryPrimary'
-              },
               {
                 id: 'informantNameInEnglish',
                 label: {
@@ -2700,24 +2681,6 @@ export const registerForms: IDefaultRegisterForms = {
             ],
             previewGroups: [
               {
-                id: 'primaryAddress',
-                label: {
-                  defaultMessage: 'Primary address',
-                  description: 'Tag definition for primaryAddress',
-                  id: 'form.preview.tag.permanent.address'
-                },
-                fieldToRedirect: 'countryPrimary'
-              },
-              {
-                id: 'secondaryAddress',
-                label: {
-                  defaultMessage: 'Current address',
-                  description: 'Tag definition for crrent address',
-                  id: 'form.preview.tag.current.address'
-                },
-                fieldToRedirect: 'countrySecondary'
-              },
-              {
                 id: 'motherNameInEnglish',
                 label: {
                   defaultMessage: "Mother's English name",
@@ -3216,24 +3179,6 @@ export const registerForms: IDefaultRegisterForms = {
               // SECONDARY ADDRESS
             ],
             previewGroups: [
-              {
-                id: 'primaryAddress',
-                label: {
-                  defaultMessage: 'Primary address',
-                  description: 'Tag definition for primaryAddress',
-                  id: 'form.preview.tag.permanent.address'
-                },
-                fieldToRedirect: 'countryPrimary'
-              },
-              {
-                id: 'secondaryAddress',
-                label: {
-                  defaultMessage: 'Current address',
-                  description: 'Tag definition for crrent address',
-                  id: 'form.preview.tag.current.address'
-                },
-                fieldToRedirect: 'country'
-              },
               {
                 id: 'fatherNameInEnglish',
                 label: {
@@ -4662,24 +4607,6 @@ export const registerForms: IDefaultRegisterForms = {
             ],
             previewGroups: [
               {
-                id: 'primaryAddress',
-                label: {
-                  defaultMessage: 'Primary address',
-                  description: 'Tag definition for primaryAddress',
-                  id: 'form.preview.tag.permanent.address'
-                },
-                fieldToRedirect: 'countryPrimary'
-              },
-              {
-                id: 'secondaryAddress',
-                label: {
-                  defaultMessage: 'Current address',
-                  description: 'Tag definition for crrent address',
-                  id: 'form.preview.tag.current.address'
-                },
-                fieldToRedirect: 'countrySecondary'
-              },
-              {
                 id: 'deceasedNameInEnglish',
                 label: {
                   defaultMessage: 'English name',
@@ -5414,25 +5341,6 @@ export const registerForms: IDefaultRegisterForms = {
               // SECONDARY ADDRESS
             ],
             previewGroups: [
-              {
-                id: 'primaryAddress',
-                label: {
-                  defaultMessage: 'Residential address',
-                  description:
-                    'Preview groups label for form field: residential address',
-                  id: 'form.field.previewGroups.primaryAddress'
-                },
-                fieldToRedirect: 'countryPrimary'
-              },
-              {
-                id: 'secondaryAddress',
-                label: {
-                  defaultMessage: 'Current address',
-                  description: 'Tag definition for crrent address',
-                  id: 'form.preview.tag.current.address'
-                },
-                fieldToRedirect: 'countrySecondary'
-              },
               {
                 id: 'informantNameInEnglish',
                 label: {

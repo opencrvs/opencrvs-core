@@ -15,7 +15,8 @@ import {
   DeathSection,
   FLEX_DIRECTION,
   SerializedFormField,
-  ISerializedForm
+  ISerializedForm,
+  IPreviewGroup
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { MessageDescriptor } from 'react-intl'
@@ -250,6 +251,64 @@ export function getAddressFields(
   }
 }
 
+export function getPreviewGroups(
+  configuration: AllowedAddressConfigurations
+): IPreviewGroup[] {
+  switch (configuration.config) {
+    case EventLocationAddressCases.PLACE_OF_BIRTH:
+      return [
+        {
+          id: 'placeOfBirth',
+          label: {
+            defaultMessage: 'Place of delivery',
+            description: 'Title for place of birth sub section',
+            id: 'form.field.label.placeOfBirthPreview'
+          },
+          fieldToRedirect: 'placeOfBirth'
+        }
+      ]
+    case EventLocationAddressCases.PLACE_OF_DEATH:
+      return [
+        {
+          id: 'placeOfDeath',
+          label: {
+            defaultMessage: 'Where did the death occur?',
+            description: 'Title for place of death sub section',
+            id: 'form.field.label.placeOfDeath'
+          },
+          fieldToRedirect: 'placeOfDeath'
+        }
+      ]
+    case AddressCases.PRIMARY_ADDRESS:
+      return [
+        {
+          id: 'primaryAddress',
+          label: {
+            defaultMessage: 'Residential address',
+            description:
+              'Preview groups label for form field: residential address',
+            id: 'form.field.previewGroups.primaryAddress'
+          },
+          fieldToRedirect: 'countryPrimary'
+        }
+      ]
+    case AddressCases.SECONDARY_ADDRESS:
+      return [
+        {
+          id: 'secondaryAddress',
+          label: {
+            defaultMessage: 'Current address',
+            description: 'Tag definition for crrent address',
+            id: 'form.preview.tag.current.address'
+          },
+          fieldToRedirect: 'countrySecondary'
+        }
+      ]
+    default:
+      return []
+  }
+}
+
 export const getAddressSubsection = (
   previewGroup: AddressSubsections,
   label: MessageDescriptor,
@@ -365,18 +424,36 @@ export function populateRegisterFormsWithAddresses(
           getDefaultField(newForm, addressConfiguration.preceedingFieldId)
 
         let addressFields: SerializedFormField[] = []
+        let previewGroups: IPreviewGroup[] = []
         if (preceedingDefaultField) {
           addressConfiguration.configurations.forEach((configuration) => {
             // At this point we can check the ApplicationConfig and see if 2 addresses are enabled
-            const newAddressFields: SerializedFormField[] =
+            const tmpAddressFields: SerializedFormField[] =
               addressFields.concat(getAddressFields(configuration))
-            addressFields = newAddressFields
+            addressFields = tmpAddressFields
+            const tmpPreviewGroups: IPreviewGroup[] = previewGroups.concat(
+              getPreviewGroups(configuration)
+            )
+            previewGroups = tmpPreviewGroups
           })
         }
         if (preceedingDefaultField && addressFields.length) {
           newForm.sections[preceedingDefaultField?.selectedSectionIndex].groups[
             preceedingDefaultField?.selectedGroupIndex
           ].fields.splice(preceedingDefaultField.index + 1, 0, ...addressFields)
+        }
+
+        if (preceedingDefaultField && previewGroups.length) {
+          const group =
+            newForm.sections[preceedingDefaultField?.selectedSectionIndex]
+              .groups[preceedingDefaultField?.selectedGroupIndex]
+          if (group.previewGroups) {
+            const newPreviewGroups: IPreviewGroup[] =
+              group.previewGroups.concat(previewGroups)
+            group.previewGroups = newPreviewGroups
+          } else {
+            group.previewGroups = previewGroups
+          }
         }
       }
     }

@@ -668,7 +668,7 @@ export type IFormField =
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
 
-export interface IFormTag {
+export interface IPreviewGroup {
   id: string
   label: MessageDescriptor
   fieldToRedirect?: string
@@ -971,7 +971,7 @@ export interface IFormSectionGroup {
   id: string
   title?: MessageDescriptor
   fields: IFormField[]
-  previewGroups?: IFormTag[]
+  previewGroups?: IPreviewGroup[]
   disabled?: boolean
   ignoreSingleFieldView?: boolean
   conditionals?: IConditional[]
