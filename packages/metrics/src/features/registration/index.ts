@@ -44,6 +44,7 @@ export type IAuthHeader =
 
 export interface IBirthRegistrationTags {
   regStatus: string
+  eventLocationType: string
   gender: string | undefined
   officeLocation?: string
   locationLevel5?: string
@@ -54,6 +55,7 @@ export interface IBirthRegistrationTags {
 
 export interface IDeathRegistrationTags {
   regStatus: string
+  eventLocationType: string
   gender: string | undefined
   mannerOfDeath: string
   causeOfDeath: string
