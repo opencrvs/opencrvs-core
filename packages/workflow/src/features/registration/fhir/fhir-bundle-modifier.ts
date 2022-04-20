@@ -40,6 +40,7 @@ import { logger } from '@workflow/logger'
 import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils'
 import { RESOURCE_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
+import { checkFormDraftStatusToAddTestExtention } from '@workflow/utils/formDraftUtils'
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
@@ -80,6 +81,9 @@ export async function modifyRegistrationBundle(
     /* setting lastRegLocation here */
     await setupLastRegLocation(taskResource, practitioner)
   }
+
+  /* check if form draft status is IN_PREVIEW and setttings new configuration extention*/
+  await checkFormDraftStatusToAddTestExtention(taskResource, token)
 
   /* setting author and time on notes here */
   setupAuthorOnNotes(taskResource, practitioner)
@@ -463,6 +467,28 @@ export function setupLastRegUser(
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
       valueReference: { reference: getPractitionerRef(practitioner) }
+    })
+  }
+  taskResource.lastModified =
+    taskResource.lastModified || new Date().toISOString()
+  return taskResource
+}
+
+export function setupTestExtention(taskResource: fhir.Task): fhir.Task {
+  if (!taskResource.extension) {
+    taskResource.extension = []
+  }
+  const testExtension = taskResource.extension.find((extension) => {
+    return (
+      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/configuration`
+    )
+  })
+  if (testExtension && testExtension.valueReference) {
+    testExtension.valueReference.reference = 'IN_CONFIGURATION'
+  } else {
+    taskResource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/configuration`,
+      valueReference: { reference: 'IN_CONFIGURATION' }
     })
   }
   taskResource.lastModified =

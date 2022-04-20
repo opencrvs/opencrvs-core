@@ -163,7 +163,15 @@ export default function getRoutes() {
         tags: ['api'],
         description: 'Get form draft',
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: [
+            RouteScope.NATLSYSADMIN,
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
         }
       }
     },
