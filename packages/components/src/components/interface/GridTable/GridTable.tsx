@@ -116,6 +116,9 @@ export enum COLUMNS {
   SENT_FOR_REVIEW = 'sentForReview',
   SENT_FOR_UPDATES = 'sentForUpdates',
   STATUS_INDICATOR = 'statusIndicator',
+  LAST_UPDATED = 'lastUpdated',
+  ACTIONS = 'actions',
+  NOTIFICATION_SENT = 'notificationSent',
   NAME = 'name'
 }
 

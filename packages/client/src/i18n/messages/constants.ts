@@ -108,6 +108,7 @@ interface IConstantsMessages
   toCapitalized: MessageDescriptor
   trackingId: MessageDescriptor
   dateOfEvent: MessageDescriptor
+  notificationSent: MessageDescriptor
   sentForReview: MessageDescriptor
   sentForUpdates: MessageDescriptor
   type: MessageDescriptor
@@ -646,6 +647,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Date of event',
     description: 'label for Date of event',
     id: 'constants.dateOfEvent'
+  },
+  notificationSent: {
+    defaultMessage: 'Notification sent',
+    description: 'label for notification sent',
+    id: 'constants.notificationSent'
   },
   sentForReview: {
     defaultMessage: 'Sent for review',

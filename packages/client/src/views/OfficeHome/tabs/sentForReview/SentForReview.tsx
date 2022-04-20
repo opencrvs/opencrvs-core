@@ -320,7 +320,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         {
           label: '',
           width: 10,
-          alignment: ColumnContentAlignment.CENTER,
+          alignment: ColumnContentAlignment.RIGHT,
           key: COLUMNS.STATUS_INDICATOR
         }
       ]

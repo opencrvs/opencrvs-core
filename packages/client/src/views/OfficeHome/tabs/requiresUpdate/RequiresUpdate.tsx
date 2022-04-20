@@ -66,7 +66,6 @@ import {
   IconWithNameEvent
 } from '@client/views/OfficeHome/tabs/components'
 import { SUBMISSION_STATUS } from '@client/declarations'
-import { Event } from '@client/forms'
 
 interface IProps {
   userDetails: IUserDetails | null
@@ -143,7 +142,7 @@ const transformRejectedContent = (
               dynamicConstantsMessages[event.toLowerCase()]
             )) ||
           '',
-        name: name,
+        name: name.toString().toLowerCase(),
         iconWithName: (
           <IconWithName status={SUBMISSION_STATUS.REJECTED} name={name} />
         ),

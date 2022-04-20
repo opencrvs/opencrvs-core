@@ -12,7 +12,9 @@
 import { Button } from '@opencrvs/components/lib/buttons'
 import {
   ColumnContentAlignment,
-  GridTable
+  GridTable,
+  COLUMNS,
+  SORT_ORDER
 } from '@opencrvs/components/lib/interface/GridTable'
 import {
   GQLHumanName,
@@ -20,7 +22,11 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import {
+  IDeclaration,
+  DOWNLOAD_STATUS,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import {
   goToPage as goToPageAction,
   goToRegistrarHomeTab as goToRegistrarHomeTabAction,
@@ -50,7 +56,7 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { Action } from '@client/forms'
+import { Action, Event, IFormFieldValue } from '@client/forms'
 import { get } from 'lodash'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
@@ -64,6 +70,14 @@ import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { IFormTabProps } from '@opencrvs/components/lib/forms'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
+import {
+  IconWithName,
+  IconWithNameEvent
+} from '@client/views/OfficeHome/tabs/components'
+import {
+  changeSortedColumn,
+  getSortedItems
+} from '@client/views/OfficeHome/tabs/utils'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -88,6 +102,8 @@ interface IBaseRegistrarHomeProps {
 
 interface IRegistrarHomeState {
   width: number
+  sortedCol: COLUMNS
+  sortOrder: SORT_ORDER
 }
 
 interface IProps {
@@ -119,7 +135,9 @@ export class InProgressTabComponent extends React.Component<
   constructor(props: IRegistrarHomeProps) {
     super(props)
     this.state = {
-      width: window.innerWidth
+      width: window.innerWidth,
+      sortedCol: COLUMNS.NAME,
+      sortOrder: SORT_ORDER.ASCENDING
     }
   }
 
@@ -230,7 +248,7 @@ export class InProgressTabComponent extends React.Component<
     if (!this.props.drafts || this.props.drafts.length <= 0) {
       return []
     }
-    return this.props.drafts.map((draft: IDeclaration) => {
+    const items = this.props.drafts.map((draft: IDeclaration) => {
       let pageRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
         pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
@@ -253,18 +271,41 @@ export class InProgressTabComponent extends React.Component<
           }
         }
       ]
+      const event =
+        (draft.event &&
+          intl.formatMessage(
+            dynamicConstantsMessages[draft.event.toLowerCase()]
+          )) ||
+        ''
+      const eventTime =
+        draft.event === Event.BIRTH
+          ? draft.data.child?.childBirthDate || ''
+          : draft.data.deathEvent?.deathDate || ''
+      const dateOfEvent = (eventTime && new Date(eventTime as string)) || ''
+
       return {
         id: draft.id,
-        event:
-          (draft.event &&
-            intl.formatMessage(
-              dynamicConstantsMessages[draft.event.toLowerCase()]
-            )) ||
-          '',
-        name: name || '',
-        dateOfModification:
-          (lastModificationDate && formattedDuration(lastModificationDate)) ||
-          '',
+        event,
+        name: name.toString().toLowerCase() || '',
+        iconWithName: (
+          <IconWithName
+            status={
+              (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
+            }
+            name={name}
+          />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={
+              (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
+            }
+            name={name}
+            event={event}
+          />
+        ),
+        lastUpdated: lastModificationDate || '',
+        dateOfEvent,
         actions,
         rowClickHandler: [
           {
@@ -273,6 +314,23 @@ export class InProgressTabComponent extends React.Component<
               this.props.goToDeclarationRecordAudit('inProgressTab', draft.id)
           }
         ]
+      }
+    })
+    const sortedItems = getSortedItems(
+      items,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+
+    return sortedItems.map((item) => {
+      return {
+        ...item,
+        dateOfEvent:
+          item.dateOfEvent &&
+          formattedDuration(item.dateOfEvent as Date | number),
+        lastUpdated:
+          item.lastUpdated &&
+          formattedDuration(item.lastUpdated as Date | number)
       }
     })
   }
@@ -347,49 +405,62 @@ export class InProgressTabComponent extends React.Component<
     this.setState({ width: window.innerWidth })
   }
 
-  getDraftColumns = () => {
+  getColumns = () => {
     if (this.state.width > this.props.theme.grid.breakpoints.lg) {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 15,
-          key: 'event'
-        },
-        {
           label: this.props.intl.formatMessage(constantsMessages.name),
           width: 35,
-          key: 'name',
-          errorValue: this.props.intl.formatMessage(
-            constantsMessages.noNameProvided
-          )
+          key: COLUMNS.ICON_WITH_NAME,
+          isSorted: this.state.sortedCol === COLUMNS.NAME,
+          sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.lastEdited),
-          width: 35,
-          key: 'dateOfModification'
+          label: this.props.intl.formatMessage(constantsMessages.event),
+          width: 10,
+          key: COLUMNS.EVENT,
+          isSorted: this.state.sortedCol === COLUMNS.EVENT,
+          sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(messages.listItemAction),
+          label: this.props.intl.formatMessage(constantsMessages.dateOfEvent),
+          width: 20,
+          key: COLUMNS.DATE_OF_EVENT,
+          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
+          sortFunction: this.onColumnClick
+        },
+        {
+          label:
+            !this.props.selectorId ||
+            this.props.selectorId === SELECTOR_ID.ownDrafts
+              ? this.props.intl.formatMessage(constantsMessages.lastUpdated)
+              : this.props.intl.formatMessage(
+                  constantsMessages.notificationSent
+                ),
+          width: 20,
+          key: COLUMNS.LAST_UPDATED,
+          isSorted: this.state.sortedCol === COLUMNS.LAST_UPDATED,
+          sortFunction: this.onColumnClick
+        },
+        {
           width: 15,
-          key: 'actions',
+          key: COLUMNS.ACTIONS,
           isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
+          alignment: ColumnContentAlignment.RIGHT
         }
       ]
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 30,
-          key: 'event'
-        },
-        {
           label: this.props.intl.formatMessage(constantsMessages.name),
           width: 70,
-          key: 'name',
-          errorValue: this.props.intl.formatMessage(
-            constantsMessages.noNameProvided
-          )
+          key: COLUMNS.ICON_WITH_NAME_EVENT
+        },
+        {
+          width: 30,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.RIGHT
         }
       ]
     }
@@ -540,6 +611,18 @@ export class InProgressTabComponent extends React.Component<
     }
   }
 
+  onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+    this.setState({
+      sortOrder: newSortOrder,
+      sortedCol: newSortedCol
+    })
+  }
+
   render() {
     const {
       intl,
@@ -567,7 +650,7 @@ export class InProgressTabComponent extends React.Component<
           <>
             <GridTable
               content={this.transformDraftContent()}
-              columns={this.getDraftColumns()}
+              columns={this.getColumns()}
               noResultText={intl.formatMessage(officeHomeMessages.progress)}
               onPageChange={onPageChange}
               pageSize={this.pageSize}
@@ -577,6 +660,8 @@ export class InProgressTabComponent extends React.Component<
               showPaginated={this.props.showPaginated}
               loading={isFieldAgent ? false : this.props.loading}
               loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
+              sortedCol={this.state.sortedCol}
+              sortOrder={this.state.sortOrder}
             />
             <LoadingIndicator
               loading={this.props.loading && !isFieldAgent ? true : false}
