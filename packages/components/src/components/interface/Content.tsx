@@ -65,11 +65,11 @@ const TopTabBar = styled.div`
   gap: 28px;
   width: 100%;
   padding: 0;
-  margin-top: -8px;
   position: relative;
   & > div {
     bottom: -1px;
   }
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 24px 16px 0;
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -81,7 +81,7 @@ const TopBar = styled.div`
   justify-content: space-between;
   width: 100%;
   padding: 16px 0;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
