@@ -287,13 +287,10 @@ export const copyAddressTransformer =
       return transformedData
     }
 
-    console.log('fromSection: ', fromSection, 'sectionId: ', sectionId)
-
     let fromSectionData = transformedData[fromSection]
     if (nodeName) {
       fromSectionData = transformedData[fromSection][nodeName]
     }
-    console.log(JSON.stringify(fromSectionData))
 
     if (
       (sectionId !== 'informant' && !fromSectionData.address) ||

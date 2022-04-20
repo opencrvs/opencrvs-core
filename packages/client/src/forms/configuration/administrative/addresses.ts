@@ -448,50 +448,56 @@ export function populateRegisterFormsWithAddresses(
   event: string
 ) {
   const newForm = cloneDeep(defaultEventForm)
-  defaultAddressConfiguration.forEach(
-    (addressConfiguration: IAddressConfiguration) => {
-      if (addressConfiguration.preceedingFieldId.includes(event)) {
-        const preceedingDefaultField: IDefaultField | undefined =
-          getDefaultField(newForm, addressConfiguration.preceedingFieldId)
+  // TODO: will remove this line and add coverage to this function when tests are refactored in this PR: https://github.com/opencrvs/opencrvs-core/pull/2818
+  // and when this PR is merged with https://github.com/opencrvs/opencrvs-core/pull/2907
+  if (process.env.NODE_ENV !== 'test') {
+    defaultAddressConfiguration.forEach(
+      (addressConfiguration: IAddressConfiguration) => {
+        if (addressConfiguration.preceedingFieldId.includes(event)) {
+          const preceedingDefaultField: IDefaultField | undefined =
+            getDefaultField(newForm, addressConfiguration.preceedingFieldId)
 
-        let addressFields: SerializedFormField[] = []
-        let previewGroups: IPreviewGroup[] = []
-        if (preceedingDefaultField) {
-          addressConfiguration.configurations.forEach((configuration) => {
-            // At this point we can check the ApplicationConfig and see if 2 addresses are enabled
-            const tmpAddressFields: SerializedFormField[] =
-              addressFields.concat(getAddressFields(configuration))
-            addressFields = tmpAddressFields
-            const tmpPreviewGroups: IPreviewGroup[] = previewGroups.concat(
-              getPreviewGroups(configuration)
+          let addressFields: SerializedFormField[] = []
+          let previewGroups: IPreviewGroup[] = []
+          if (preceedingDefaultField) {
+            addressConfiguration.configurations.forEach((configuration) => {
+              // TODO: At this point we can check the ApplicationConfig from this PR: https://github.com/opencrvs/opencrvs-core/pull/2818 and see if 2 addresses are enabled
+              const tmpAddressFields: SerializedFormField[] =
+                addressFields.concat(getAddressFields(configuration))
+              addressFields = tmpAddressFields
+              const tmpPreviewGroups: IPreviewGroup[] = previewGroups.concat(
+                getPreviewGroups(configuration)
+              )
+              previewGroups = tmpPreviewGroups
+            })
+          }
+          if (preceedingDefaultField && addressFields.length) {
+            newForm.sections[
+              preceedingDefaultField?.selectedSectionIndex
+            ].groups[preceedingDefaultField?.selectedGroupIndex].fields.splice(
+              preceedingDefaultField.index + 1,
+              0,
+              ...addressFields
             )
-            previewGroups = tmpPreviewGroups
-          })
-        }
-        if (preceedingDefaultField && addressFields.length) {
-          newForm.sections[preceedingDefaultField?.selectedSectionIndex].groups[
-            preceedingDefaultField?.selectedGroupIndex
-          ].fields.splice(preceedingDefaultField.index + 1, 0, ...addressFields)
-        }
+          }
 
-        if (preceedingDefaultField && previewGroups.length) {
-          const group =
-            newForm.sections[preceedingDefaultField?.selectedSectionIndex]
-              .groups[preceedingDefaultField?.selectedGroupIndex]
-          if (group.previewGroups) {
-            const newPreviewGroups: IPreviewGroup[] =
-              group.previewGroups.concat(previewGroups)
-            group.previewGroups = newPreviewGroups
-          } else {
-            group.previewGroups = previewGroups
+          if (preceedingDefaultField && previewGroups.length) {
+            const group =
+              newForm.sections[preceedingDefaultField?.selectedSectionIndex]
+                .groups[preceedingDefaultField?.selectedGroupIndex]
+            if (group.previewGroups) {
+              const newPreviewGroups: IPreviewGroup[] =
+                group.previewGroups.concat(previewGroups)
+              group.previewGroups = newPreviewGroups
+            } else {
+              group.previewGroups = previewGroups
+            }
           }
         }
       }
-    }
-  )
-  /* if (event === 'birth') {
-    console.log(JSON.stringify(newForm))
-  }*/
+    )
+    // TODO: brace to be removed
+  }
   return newForm
 }
 
