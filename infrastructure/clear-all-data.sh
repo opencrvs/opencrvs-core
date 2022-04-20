@@ -93,7 +93,7 @@ drop_database application-config
 
 # Delete all data from elasticsearch
 #-----------------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE "http://$(elasticsearch_host)/*" -v
+docker run --rm --network=$NETWORK appropriate/curl curl -XDELETE "http://$(elasticsearch_host)/ocrvs" -v
 
 # Delete all data from metrics
 #-----------------------------
