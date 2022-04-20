@@ -24,7 +24,7 @@ import {
   OperationalReport,
   OPERATIONAL_REPORT_SECTION
 } from './OperationalReport'
-import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
+
 import { parse } from 'query-string'
 import { PERFORMANCE_METRICS } from './metricsQuery'
 import { GraphQLError } from 'graphql'
@@ -150,25 +150,6 @@ describe('OperationalReport tests', () => {
     expect(
       component.find('#registration-rates-reports-loader').hostNodes()
     ).toHaveLength(0)
-  })
-
-  it('on details link click will forward time range and location to route', async () => {
-    const registrationRatesReports = await waitForElement(
-      component,
-      RegistrationRatesReport
-    )
-
-    registrationRatesReports.prop('onClickEventDetails')(
-      'birth',
-      'Birth registration rate within 45 days of event'
-    )
-
-    expect(parse(history.location.search)).toEqual({
-      locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-      timeEnd: new Date(1487076708000).toISOString(),
-      timeStart: new Date(1455454308000).toISOString(),
-      title: 'Birth registration rate within 45 days of event'
-    })
   })
 
   it('performance select updates history when changed', async () => {

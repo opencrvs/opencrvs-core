@@ -14,7 +14,6 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { MonthlyReports } from './MonthlyReports'
 
 type Props = WrappedComponentProps & RouteComponentProps
 type State = {}
@@ -23,11 +22,7 @@ class ReportListComponent extends React.Component<Props, State> {
   render() {
     const { history } = this.props
 
-    return (
-      <SysAdminContentWrapper>
-        <MonthlyReports history={history} />
-      </SysAdminContentWrapper>
-    )
+    return <SysAdminContentWrapper>moi</SysAdminContentWrapper>
   }
 }
 

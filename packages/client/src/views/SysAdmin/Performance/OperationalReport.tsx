@@ -23,7 +23,6 @@ import { messages as statusMessages } from '@client/i18n/messages/views/registra
 import {
   goToOperationalReport,
   goToPerformanceHome,
-  goToPerformanceReport,
   goToRegistrationRates,
   goToWorkflowStatus
 } from '@client/navigation'
@@ -63,7 +62,6 @@ import {
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   GQLDeclarationsStartedMetrics,
-  GQLEventEstimationMetrics,
   GQLRegistrationCountResult
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
@@ -78,7 +76,7 @@ import {
   PERFORMANCE_METRICS_FOR_OFFICE
 } from './metricsQuery'
 import { DeclarationsStartedReport } from './reports/operational/DeclarationsStartedReport'
-import { RegistrationRatesReport } from './reports/operational/RegistrationRatesReport'
+
 import format from '@client/utils/date-formatting'
 interface IConnectProps {
   locations: { [key: string]: ILocation }
@@ -87,13 +85,11 @@ interface IConnectProps {
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
   goToOperationalReport: typeof goToOperationalReport
-  goToPerformanceReport: typeof goToPerformanceReport
   goToRegistrationRates: typeof goToRegistrationRates
   goToWorkflowStatus: typeof goToWorkflowStatus
 }
 
 interface IMetricsQueryResult {
-  getEventEstimationMetrics: GQLEventEstimationMetrics
   getDeclarationsStartedMetrics: GQLDeclarationsStartedMetrics
   fetchRegistrationCountByStatus: GQLRegistrationCountResult
 }
@@ -297,54 +293,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
     )
   }
 
-  getContent(eventType: Event) {
-    window.__localeId__ = this.props.intl.locale
-    const content = []
-    const currentYear = this.state.timeStart.getFullYear()
-    let currentMonth = this.state.timeStart.getMonth() + 1
-    const startMonth =
-      this.state.timeStart.getMonth() + this.state.timeStart.getFullYear() * 12
-    const endMonth =
-      this.state.timeEnd.getMonth() + this.state.timeEnd.getFullYear() * 12
-    const monthDiff = currentMonth + (endMonth - startMonth)
-    while (currentMonth <= monthDiff) {
-      const { start, end } = getMonthDateRange(currentYear, currentMonth)
-      const title = `${format(start, 'dd MMMM')} to ${format(
-        end,
-        'dd MMMM yyyy'
-      )}`
-      content.push({
-        month: (
-          <LinkButton
-            isBoldLink={true}
-            onClick={() =>
-              this.props.goToPerformanceReport(
-                this.state.selectedLocation!,
-                eventType,
-                start,
-                end
-              )
-            }
-            disabled={!this.state.selectedLocation}
-          >
-            {title}
-          </LinkButton>
-        ),
-        export: (
-          <RowLink
-            onClick={() =>
-              this.downloadMonthlyData(start, end, eventType.toString())
-            }
-          >
-            Export
-          </RowLink>
-        )
-      })
-      currentMonth++
-    }
-    return content.reverse()
-  }
-
   getPercentage(
     totalMetrics: GQLDeclarationsStartedMetrics,
     value: number
@@ -511,9 +459,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 if (error) {
                   return (
                     <>
-                      {!this.isOfficeSelected() && (
-                        <RegistrationRatesReport loading={true} />
-                      )}
                       <DeclarationsStartedReport
                         loading={true}
                         locationId={locationId}
@@ -526,17 +471,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 } else {
                   return (
                     <>
-                      {!this.isOfficeSelected() && (
-                        <RegistrationRatesReport
-                          loading={loading}
-                          data={data && data.getEventEstimationMetrics}
-                          reportTimeFrom={format(timeStart, 'MMMM yyyy')}
-                          reportTimeTo={format(timeEnd, 'MMMM yyyy')}
-                          onClickEventDetails={
-                            this.onClickRegistrationRatesDetails
-                          }
-                        />
-                      )}
                       <DeclarationsStartedReport
                         loading={loading}
                         locationId={locationId}
@@ -549,58 +483,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 }
               }}
             </Query>
-          )}
-          {sectionId === OPERATIONAL_REPORT_SECTION.REPORTS && (
-            <MonthlyReportsList id="report-lists">
-              <TableView
-                hideTableHeader={true}
-                tableTitle={intl.formatMessage(constantsMessages.births)}
-                isLoading={false}
-                content={this.getContent(Event.BIRTH)}
-                tableHeight={280}
-                pageSize={24}
-                hideBoxShadow={true}
-                columns={[
-                  {
-                    label: intl.formatMessage(constantsMessages.month),
-                    width: 70,
-                    key: 'month'
-                  },
-                  {
-                    label: intl.formatMessage(constantsMessages.export),
-                    width: 30,
-                    alignment: ColumnContentAlignment.RIGHT,
-                    key: 'export'
-                  }
-                ]}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-              />
-              <DeathReportHolder>
-                <TableView
-                  hideTableHeader={true}
-                  tableTitle={intl.formatMessage(constantsMessages.deaths)}
-                  isLoading={false}
-                  content={this.getContent(Event.DEATH)}
-                  tableHeight={280}
-                  pageSize={24}
-                  hideBoxShadow={true}
-                  columns={[
-                    {
-                      label: intl.formatMessage(constantsMessages.month),
-                      width: 70,
-                      key: 'month'
-                    },
-                    {
-                      label: intl.formatMessage(constantsMessages.export),
-                      width: 30,
-                      alignment: ColumnContentAlignment.RIGHT,
-                      key: 'export'
-                    }
-                  ]}
-                  noResultText={intl.formatMessage(constantsMessages.noResults)}
-                />
-              </DeathReportHolder>
-            </MonthlyReportsList>
           )}
         </Container>
         {expandStatusWindow && (
@@ -674,7 +556,6 @@ function mapStateToProps(state: IStoreState) {
 export const OperationalReport = connect(mapStateToProps, {
   goToPerformanceHome,
   goToOperationalReport,
-  goToPerformanceReport,
   goToRegistrationRates,
   goToWorkflowStatus
 })(withTheme(injectIntl(OperationalReportComponent)))
