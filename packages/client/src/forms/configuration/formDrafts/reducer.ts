@@ -113,13 +113,13 @@ export const formDraftReducer: LoopReducer<
       )
 
     case actions.FETCH_FORM_DRAFT_SUCCESS:
-      const { queryData: formDraftQueryData } = action.payload
+      const { formDrafts } = action.payload
 
-      const birthFormDraft = find(formDraftQueryData.data.getFormDraft, {
+      const birthFormDraft = find(formDrafts, {
         event: Event.BIRTH
       })
 
-      const deathFormDraft = find(formDraftQueryData.data.getFormDraft, {
+      const deathFormDraft = find(formDrafts, {
         event: Event.DEATH
       })
 

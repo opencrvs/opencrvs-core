@@ -49,16 +49,18 @@ export const FETCH_FORM_DRAFT_SUCCESS = 'FORM/FETCH_FORM_DRAFT_SUCCESS'
 export type FetchFormDraftSuccessAction = {
   type: typeof FETCH_FORM_DRAFT_SUCCESS
   payload: {
-    queryData: ApolloQueryResult<{ getFormDraft: GQLFormDraft[] }>
+    formDrafts: GQLFormDraft[]
   }
 }
 
-export const fetchFormDraftSuccessAction = (
-  queryData: ApolloQueryResult<{ getFormDraft: GQLFormDraft[] }>
-): FetchFormDraftSuccessAction => ({
+export const fetchFormDraftSuccessAction = ({
+  formDrafts
+}: {
+  formDrafts: GQLFormDraft[]
+}): FetchFormDraftSuccessAction => ({
   type: FETCH_FORM_DRAFT_SUCCESS,
   payload: {
-    queryData
+    formDrafts
   }
 })
 

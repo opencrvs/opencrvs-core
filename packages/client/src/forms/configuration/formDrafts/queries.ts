@@ -11,6 +11,8 @@
  */
 import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
+import { ApolloQueryResult } from 'apollo-client'
+import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 
 export const GET_FORM_DRAFT = gql`
   query {
@@ -31,13 +33,17 @@ export const GET_FORM_DRAFT = gql`
   }
 `
 async function fetchFormDraft() {
-  return (
-    client &&
-    client.query({
+  try {
+    const queryResult: ApolloQueryResult<GQLQuery> = await client.query({
       query: GET_FORM_DRAFT,
       fetchPolicy: 'no-cache'
     })
-  )
+    return {
+      formDrafts: queryResult.data.getFormDraft
+    }
+  } catch {
+    throw new Error('FormDraft fetch failed')
+  }
 }
 
 export const formDraftQueries = {
