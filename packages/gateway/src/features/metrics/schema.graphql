@@ -101,7 +101,7 @@ type Query {
     timeEnd: String!
     locationId: String
     event: String!
-  ): [PaymentMetric!]!
+  ): [PaymentMetric!]
   getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
