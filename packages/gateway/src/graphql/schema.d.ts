@@ -724,6 +724,7 @@ export interface GQLEventMetrics {
   gender: string
   eventLocationType: string
   timeLabel: string
+  practitionerRole: string
 }
 
 export interface GQLMonthWiseTargetDayEstimation {
@@ -4374,6 +4375,7 @@ export interface GQLEventMetricsTypeResolver<TParent = any> {
   gender?: EventMetricsToGenderResolver<TParent>
   eventLocationType?: EventMetricsToEventLocationTypeResolver<TParent>
   timeLabel?: EventMetricsToTimeLabelResolver<TParent>
+  practitionerRole?: EventMetricsToPractitionerRoleResolver<TParent>
 }
 
 export interface EventMetricsToTotalResolver<TParent = any, TResult = any> {
@@ -4392,6 +4394,13 @@ export interface EventMetricsToEventLocationTypeResolver<
 }
 
 export interface EventMetricsToTimeLabelResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EventMetricsToPractitionerRoleResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

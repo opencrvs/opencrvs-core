@@ -120,6 +120,14 @@ export async function getPreviousTask(
   return findPreviousTask(taskHistory, allowedPreviousStates)
 }
 
+export function getPractitionerIdFromBundle(bundle: fhir.Bundle) {
+  const task = getTask(bundle)
+  if (!task) {
+    throw new Error('Task not found in bundle')
+  }
+  return getPractionerIdFromTask(task)
+}
+
 export function getPractionerIdFromTask(task: fhir.Task) {
   return task?.extension
     ?.find(

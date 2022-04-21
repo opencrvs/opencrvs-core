@@ -830,6 +830,7 @@ type EventMetrics {
   gender: String!
   eventLocationType: String!
   timeLabel: String!
+  practitionerRole: String!
 }
 
 type MonthWiseTargetDayEstimation {
