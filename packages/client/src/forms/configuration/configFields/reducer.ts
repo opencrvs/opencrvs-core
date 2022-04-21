@@ -9,23 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { loop, Cmd, Loop, LoopReducer } from 'redux-loop'
-import { storage } from '@client/storage'
-import * as actions from '@client/forms/configuration/configFields/actions'
-import { APPLICATION_CONFIG_LOADED } from '@client/offline/actions'
-import { Event, ISerializedForm, IQuestionConfig } from '@client/forms'
+import { Event, IQuestionConfig, ISerializedForm } from '@client/forms'
 import {
   configureRegistrationForm,
-  sortFormCustomisations,
-  filterQuestionsByEventType
+  filterQuestionsByEventType,
+  sortFormCustomisations
 } from '@client/forms/configuration'
+import * as actions from '@client/forms/configuration/configFields/actions'
 import { registerForms } from '@client/forms/configuration/default'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
-import {
-  ISectionFieldMap,
-  getEventSectionFieldsMap,
-  prepareCustomFieldConfig
-} from './utils'
+import { APPLICATION_CONFIG_LOADED } from '@client/offline/actions'
+import { storage } from '@client/storage'
+import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
+import { getEventSectionFieldsMap, ISectionFieldMap } from './utils'
 
 export interface IEventTypes {
   birth: ISectionFieldMap

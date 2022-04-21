@@ -99,7 +99,7 @@ function determineNextFieldIdNumber(
   return customFieldNumber.length ? Math.max(...customFieldNumber) + 1 : 1
 }
 
-export function prepareCustomFieldConfig(
+export function prepareNewCustomFieldConfig(
   state: IEventTypes,
   event: keyof IEventTypes,
   section: string,
@@ -124,6 +124,10 @@ export function prepareCustomFieldConfig(
             ...customField.definition.label,
             id: `${customField.definition.label.id}${customFieldNumber}`,
             defaultMessage: 'Custom text input'
+          },
+          mapping: {
+            ...customField.definition.mapping
+            // template: ['some', () => {}]
           }
         }
       }

@@ -12732,20 +12732,8 @@ export const DEFAULT_TEXT: IFormField = {
   },
   validate: [],
   required: false,
-  initialValue: ''
-  // mapping: {
-  //   template: {
-  //     operation: 'fieldValueTransformer',
-  //     fieldName: 'eventDate',
-  //     parameters: ['birthDate']
-  //   },
-  //   mutation: {
-  //     operation: 'fieldNameTransformer',
-  //     parameters: []
-  //   },
-  //   query: {
-  //     operation: 'fieldValueTransformer',
-  //     parameters: ['']
-  //   }
-  // }
+  initialValue: '',
+  mapping: {
+    template: ['testHandlebars', () => {}]
+  }
 }

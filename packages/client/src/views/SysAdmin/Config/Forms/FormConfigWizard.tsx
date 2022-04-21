@@ -29,7 +29,7 @@ import { Canvas } from '@client/components/formConfig/Canvas'
 import { selectEventFormDraft } from '@client/forms/configuration/selector'
 import {
   IConfigFormField,
-  prepareCustomFieldConfig
+  prepareNewCustomFieldConfig
 } from '@client/forms/configuration/configFields/utils'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
 import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
@@ -189,7 +189,7 @@ export function FormConfigWizard() {
           ) : (
             <FormTools
               onAddClickListener={(fieldMap: IConfigFormField) => {
-                const customFieldConfig = prepareCustomFieldConfig(
+                const customFieldConfig = prepareNewCustomFieldConfig(
                   state as IEventTypes,
                   event,
                   section,
