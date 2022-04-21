@@ -24,7 +24,7 @@ import {
 import styled from '@client/styledComponents'
 import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
-import { Event, BirthSection, DeathSection } from '@client/forms'
+import { Event, BirthSection, DeathSection, WizardSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
 import { selectEventFormDraft } from '@client/forms/configuration/selector'
@@ -33,8 +33,9 @@ import { DefaultFieldTools } from '@client/components/formConfig/formTools/Defau
 import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { IStoreState } from '@client/store'
-import { goToFormConfig, goToFormConfigSettings } from '@client/navigation'
+import { goToFormConfig, goToFormConfigWizard } from '@client/navigation'
 import { Dispatch } from 'redux'
+import { FormConfigSettings } from './FormConfigSettings'
 
 const Container = styled.div`
   display: flex;
@@ -84,12 +85,12 @@ type IRouteProps = {
   section: string
 }
 
-const topBarActions = (intl: IntlShape, dispatch: Dispatch) => {
+const topBarActions = (event: Event, intl: IntlShape, dispatch: Dispatch) => {
   return [
     <TertiaryButton
       id="settings"
       icon={() => <SettingsBlue />}
-      onClick={() => dispatch(goToFormConfigSettings())}
+      onClick={() => dispatch(goToFormConfigWizard(event, 'settings'))}
     ></TertiaryButton>,
     <SecondaryButton key="save" size="small" onClick={() => {}}>
       {intl.formatMessage(buttonMessages.save)}
@@ -104,12 +105,11 @@ function isValidEvent(event: string): event is Event {
   return Object.values<string>(Event).includes(event)
 }
 
-function isValidSection(
-  section: string
-): section is BirthSection | DeathSection {
+function isValidSection(section: string): section is WizardSection {
   return [
     ...Object.values<string>(BirthSection),
-    ...Object.values<string>(DeathSection)
+    ...Object.values<string>(DeathSection),
+    'settings'
   ].includes(section)
 }
 
@@ -143,30 +143,36 @@ export function FormConfigWizard() {
       <EventTopBar
         title={`${intl.formatMessage(constantsMessages[event])} v${version}`}
         pageIcon={<></>}
-        topBarActions={topBarActions(intl, dispatch)}
+        topBarActions={topBarActions(event, intl, dispatch)}
         goHome={() => dispatch(goToFormConfig())}
       />
       <WizardContainer>
         <NavigationContainer>
           <SectionNavigation event={event} section={section} />
         </NavigationContainer>
-        <CanvasContainer>
-          <Canvas
-            event={event}
-            section={section}
-            selectedField={selectedField}
-            onFieldSelect={(field) => setSelectedField(field)}
-          />
-        </CanvasContainer>
-        <ToolsContainer>
-          {selectedField ? (
-            !selectedField.definition.custom && (
-              <DefaultFieldTools configField={selectedField} />
-            )
-          ) : (
-            <FormTools />
-          )}
-        </ToolsContainer>
+        {section !== 'settings' ? (
+          <>
+            <CanvasContainer>
+              <Canvas
+                event={event}
+                section={section}
+                selectedField={selectedField}
+                onFieldSelect={(field) => setSelectedField(field)}
+              />
+            </CanvasContainer>
+            <ToolsContainer>
+              {selectedField ? (
+                !selectedField.definition.custom && (
+                  <DefaultFieldTools configField={selectedField} />
+                )
+              ) : (
+                <FormTools />
+              )}
+            </ToolsContainer>
+          </>
+        ) : (
+          <FormConfigSettings />
+        )}
       </WizardContainer>
     </Container>
   )

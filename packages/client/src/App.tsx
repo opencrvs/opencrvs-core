@@ -236,13 +236,6 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={
-                                              routes.FORM_CONFIG_WIZARD_SETTINGS
-                                            }
-                                            component={FormConfigSettings}
-                                          />
-                                          <ProtectedRoute
-                                            exact
                                             path={routes.FORM_CONFIG}
                                             component={FormConfiguration}
                                           />

@@ -14,8 +14,7 @@ import {
   Event,
   UserSection,
   CorrectionSection,
-  BirthSection,
-  DeathSection
+  WizardSection
 } from '@client/forms'
 import {
   CERTIFICATE_COLLECTOR,
@@ -61,8 +60,7 @@ import {
   VERIFY_CORRECTOR,
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
-  FORM_CONFIG,
-  FORM_CONFIG_WIZARD_SETTINGS
+  FORM_CONFIG
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
@@ -427,20 +425,13 @@ export function goToFieldAgentHomeTab(tabId: string) {
   }
 }
 
-export function goToFormConfigWizard(
-  event: Event,
-  section: BirthSection | DeathSection
-) {
+export function goToFormConfigWizard(event: Event, section: WizardSection) {
   return push(
     formatUrl(FORM_CONFIG_WIZARD, {
       event: event,
       section: section
     })
   )
-}
-
-export function goToFormConfigSettings() {
-  return push(FORM_CONFIG_WIZARD_SETTINGS)
 }
 
 export function goToSysAdminHomeTab(tabId: string) {

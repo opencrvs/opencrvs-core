@@ -15,9 +15,7 @@ import { IStoreState } from '@client/store'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
-  ListView,
   FloatingNotification,
   NOTIFICATION_TYPE,
   ResponsiveModal
@@ -62,6 +60,11 @@ const ErrorContent = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-direction: column-reverse;
   }
+`
+const Containter = styled.div`
+  flex: 1;
+  height: min-content;
+  margin: 32px auto 0;
 `
 const ErrorMessage = styled.div`
   position: relative;
@@ -179,7 +182,7 @@ class FormConfigSettingsComponent extends React.Component<
       this.state
 
     return (
-      <SysAdminContentWrapper>
+      <Containter>
         <Content
           title={intl.formatMessage(messages.settingsTitle)}
           titleColor={'copy'}
@@ -331,7 +334,7 @@ class FormConfigSettingsComponent extends React.Component<
         >
           {this.state.notificationMessages}
         </FloatingNotification>
-      </SysAdminContentWrapper>
+      </Containter>
     )
   }
 }
