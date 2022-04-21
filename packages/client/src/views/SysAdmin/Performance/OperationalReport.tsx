@@ -17,7 +17,7 @@ import {
 } from '@client/components/interface/ToastNotification'
 import { Query } from '@client/components/Query'
 import { Event } from '@client/forms'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
 import {
@@ -61,13 +61,14 @@ import {
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { Link } from '@opencrvs/components/lib/typography'
 import {
-  GQLDeclarationsStartedMetrics,
-  GQLRegistrationCountResult
+  GQLEventMetrics,
+  GQLRegistrationCountResult,
+  GQLTotalMetricsResult
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { FormattedNumber, injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
@@ -75,9 +76,9 @@ import {
   PERFORMANCE_METRICS,
   PERFORMANCE_METRICS_FOR_OFFICE
 } from './metricsQuery'
-import { DeclarationsStartedReport } from './reports/operational/DeclarationsStartedReport'
 
 import format from '@client/utils/date-formatting'
+import { getPercentage } from '@client/utils/data-formatting'
 
 interface IConnectProps {
   locations: { [key: string]: ILocation }
@@ -91,9 +92,12 @@ interface IDispatchProps {
 }
 
 interface IMetricsQueryResult {
-  getDeclarationsStartedMetrics: GQLDeclarationsStartedMetrics
+  getTotalMetrics: GQLTotalMetricsResult
+}
+interface IStatusQueryResult {
   fetchRegistrationCountByStatus: GQLRegistrationCountResult
 }
+
 export enum OPERATIONAL_REPORT_SECTION {
   OPERATIONAL = 'OPERATIONAL',
   REPORTS = 'REPORTS'
@@ -181,6 +185,15 @@ const BreakdownValue = styled.span`
   ${({ theme }) => theme.fonts.reg12};
 `
 
+const LoaderBox = styled.span<{
+  width?: number
+}>`
+  background: ${({ theme }) => theme.colors.background};
+  display: inline-block;
+  height: 1em;
+  width: ${({ width }) => (width ? `${width}em` : '5em')};
+`
+
 export const StatusMapping: IStatusMapping = {
   IN_PROGRESS: {
     labelDescriptor: statusMessages.inProgress,
@@ -218,6 +231,29 @@ export const StatusMapping: IStatusMapping = {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
   }
+}
+
+function PercentageDisplay(props: { total: number; ofNumber: number }) {
+  return <span>{getPercentage(props.ofNumber, props.total)}%</span>
+}
+
+function TotalDisplayWithPercentage(props: {
+  total: number
+  ofNumber: number
+}) {
+  return (
+    <span>
+      <FormattedNumber value={props.total}></FormattedNumber>
+      &nbsp;(
+      <PercentageDisplay {...props} />)
+    </span>
+  )
+}
+
+function calculateTotal(metrics: GQLEventMetrics[]) {
+  return metrics
+    .map((metric) => metric.total)
+    .reduce((m, metric) => m + metric, 0)
 }
 
 class OperationalReportComponent extends React.Component<Props, State> {
@@ -294,21 +330,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
     this.props.goToPerformanceHome({
       selectedLocation: this.state.selectedLocation
     })
-  }
-
-  getTotal(declarationMetrics: GQLDeclarationsStartedMetrics): number {
-    return (
-      declarationMetrics.fieldAgentDeclarations +
-      declarationMetrics.hospitalDeclarations +
-      declarationMetrics.officeDeclarations
-    )
-  }
-
-  getPercentage(
-    totalMetrics: GQLDeclarationsStartedMetrics,
-    value: number
-  ): number {
-    return Math.round((value / this.getTotal(totalMetrics)) * 100)
   }
 
   onClickRegistrationRatesDetails = (event: Event, title: string) => {
@@ -454,7 +475,8 @@ class OperationalReportComponent extends React.Component<Props, State> {
               variables={{
                 timeStart: timeStart.toISOString(),
                 timeEnd: timeEnd.toISOString(),
-                locationId
+                locationId,
+                event: 'BIRTH' // @todo
               }}
               fetchPolicy="no-cache"
             >
@@ -470,54 +492,221 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 if (error) {
                   return (
                     <>
-                      <DeclarationsStartedReport
-                        loading={true}
-                        locationId={locationId}
-                        reportTimeFrom={timeStart}
-                        reportTimeTo={timeEnd}
-                      />
                       <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
                     </>
                   )
-                } else {
-                  return (
-                    <>
-                      <ListViewSimplified>
-                        <ListViewItemSimplified
-                          label={<PerformanceTitle>Total</PerformanceTitle>}
-                          value={
-                            <div>
-                              <PerformanceValue>25.0%</PerformanceValue>
-                              <Breakdown>
-                                <BreakdownRow>
-                                  <BreakdownLabel>Male: </BreakdownLabel>
-                                  <BreakdownValue>41%</BreakdownValue>
-                                </BreakdownRow>
-                                <BreakdownRow>
-                                  <BreakdownLabel>Female: </BreakdownLabel>
-                                  <BreakdownValue>41%</BreakdownValue>
-                                </BreakdownRow>
-                              </Breakdown>
-                            </div>
-                          }
-                          actions={<Link></Link>}
-                        />
-                        <ListViewItemSimplified
-                          label="Delayed registrations"
-                          value="400,000"
-                          actions={<button></button>}
-                        />
-                      </ListViewSimplified>
-                      <DeclarationsStartedReport
-                        loading={loading}
-                        locationId={locationId}
-                        data={data && data.getDeclarationsStartedMetrics}
-                        reportTimeFrom={timeStart}
-                        reportTimeTo={timeEnd}
-                      />
-                    </>
-                  )
                 }
+                return (
+                  <>
+                    <ListViewSimplified>
+                      <ListViewItemSimplified
+                        label={<PerformanceTitle>Total</PerformanceTitle>}
+                        value={
+                          <div>
+                            <PerformanceValue>
+                              {loading ? (
+                                <LoaderBox width={5} />
+                              ) : (
+                                data!.getTotalMetrics.results.reduce(
+                                  (m, x) => m + x.total,
+                                  0
+                                )
+                              )}
+                            </PerformanceValue>
+                            <Breakdown>
+                              <BreakdownRow>
+                                <BreakdownLabel>Male: </BreakdownLabel>
+                                <BreakdownValue>
+                                  {loading ? (
+                                    <LoaderBox width={5} />
+                                  ) : (
+                                    <PercentageDisplay
+                                      total={calculateTotal(
+                                        data!.getTotalMetrics.results.filter(
+                                          (x) => x.gender === 'male'
+                                        )
+                                      )}
+                                      ofNumber={calculateTotal(
+                                        data!.getTotalMetrics.results
+                                      )}
+                                    />
+                                  )}
+                                </BreakdownValue>
+                              </BreakdownRow>
+                              <BreakdownRow>
+                                <BreakdownLabel>Female: </BreakdownLabel>
+                                <BreakdownValue>
+                                  {loading ? (
+                                    <LoaderBox width={5} />
+                                  ) : (
+                                    <PercentageDisplay
+                                      total={calculateTotal(
+                                        data!.getTotalMetrics.results.filter(
+                                          (x) => x.gender === 'female'
+                                        )
+                                      )}
+                                      ofNumber={calculateTotal(
+                                        data!.getTotalMetrics.results
+                                      )}
+                                    />
+                                  )}
+                                </BreakdownValue>
+                              </BreakdownRow>
+                            </Breakdown>
+                          </div>
+                        }
+                        actions={<Link></Link>}
+                      />
+                      <ListViewItemSimplified
+                        label={
+                          <PerformanceTitle>
+                            Delayed registrations
+                          </PerformanceTitle>
+                        }
+                        value={
+                          <div>
+                            <PerformanceValue>
+                              {loading ? (
+                                <LoaderBox width={5} />
+                              ) : (
+                                <TotalDisplayWithPercentage
+                                  total={calculateTotal(
+                                    data!.getTotalMetrics.results.filter(
+                                      (x) =>
+                                        ![
+                                          'withinLate',
+                                          'withinTarget'
+                                        ].includes(x.timeLabel)
+                                    )
+                                  )}
+                                  ofNumber={calculateTotal(
+                                    data!.getTotalMetrics.results
+                                  )}
+                                />
+                              )}
+                            </PerformanceValue>
+                            <Breakdown>
+                              <BreakdownRow>
+                                <BreakdownLabel>Male: </BreakdownLabel>
+                                <BreakdownValue>
+                                  {loading ? (
+                                    <LoaderBox width={5} />
+                                  ) : (
+                                    <PercentageDisplay
+                                      total={calculateTotal(
+                                        data!.getTotalMetrics.results.filter(
+                                          (x) =>
+                                            x.gender === 'male' &&
+                                            ![
+                                              'withinLate',
+                                              'withinTarget'
+                                            ].includes(x.timeLabel)
+                                        )
+                                      )}
+                                      ofNumber={calculateTotal(
+                                        data!.getTotalMetrics.results.filter(
+                                          (x) =>
+                                            ![
+                                              'withinLate',
+                                              'withinTarget'
+                                            ].includes(x.timeLabel)
+                                        )
+                                      )}
+                                    />
+                                  )}
+                                </BreakdownValue>
+                              </BreakdownRow>
+                              <BreakdownRow>
+                                <BreakdownLabel>Female: </BreakdownLabel>
+                                <BreakdownValue>
+                                  {loading ? (
+                                    <LoaderBox width={5} />
+                                  ) : (
+                                    <PercentageDisplay
+                                      total={calculateTotal(
+                                        data!.getTotalMetrics.results.filter(
+                                          (x) =>
+                                            x.gender === 'female' &&
+                                            ![
+                                              'withinLate',
+                                              'withinTarget'
+                                            ].includes(x.timeLabel)
+                                        )
+                                      )}
+                                      ofNumber={calculateTotal(
+                                        data!.getTotalMetrics.results.filter(
+                                          (x) =>
+                                            ![
+                                              'withinLate',
+                                              'withinTarget'
+                                            ].includes(x.timeLabel)
+                                        )
+                                      )}
+                                    />
+                                  )}
+                                </BreakdownValue>
+                              </BreakdownRow>
+                            </Breakdown>
+                          </div>
+                        }
+                        actions={<Link></Link>}
+                      />
+                      <ListViewItemSimplified
+                        label={<PerformanceTitle>Home</PerformanceTitle>}
+                        value={
+                          <div>
+                            <PerformanceValue>
+                              {loading ? (
+                                <LoaderBox width={5} />
+                              ) : (
+                                <TotalDisplayWithPercentage
+                                  total={calculateTotal(
+                                    data!.getTotalMetrics.results.filter(
+                                      (x) =>
+                                        x.eventLocationType === 'PRIVATE_HOME'
+                                    )
+                                  )}
+                                  ofNumber={calculateTotal(
+                                    data!.getTotalMetrics.results
+                                  )}
+                                />
+                              )}
+                            </PerformanceValue>
+                          </div>
+                        }
+                        actions={<Link></Link>}
+                      />
+                      <ListViewItemSimplified
+                        label={
+                          <PerformanceTitle>Health Facility</PerformanceTitle>
+                        }
+                        value={
+                          <div>
+                            <PerformanceValue>
+                              {loading ? (
+                                <LoaderBox width={5} />
+                              ) : (
+                                <TotalDisplayWithPercentage
+                                  total={calculateTotal(
+                                    data!.getTotalMetrics.results.filter(
+                                      (x) =>
+                                        x.eventLocationType ===
+                                        'HEALTH_FACILITY'
+                                    )
+                                  )}
+                                  ofNumber={calculateTotal(
+                                    data!.getTotalMetrics.results
+                                  )}
+                                />
+                              )}
+                            </PerformanceValue>
+                          </div>
+                        }
+                        actions={<Link></Link>}
+                      />
+                    </ListViewSimplified>
+                  </>
+                )
               }}
             </Query>
           )}
@@ -549,7 +738,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
               }: {
                 loading: boolean
                 error?: ApolloError
-                data?: IMetricsQueryResult
+                data?: IStatusQueryResult
               }) => {
                 if (error) {
                   return (

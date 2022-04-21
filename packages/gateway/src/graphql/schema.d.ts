@@ -250,7 +250,7 @@ export interface GQLVerifyPasswordResult {
 
 export interface GQLTotalMetricsResult {
   estimated?: GQLEstimation
-  results?: Array<GQLEventMetrics | null>
+  results: Array<GQLEventMetrics>
 }
 
 export interface GQLDeclarationsStartedMetrics {
@@ -720,10 +720,10 @@ export interface GQLEstimation {
 }
 
 export interface GQLEventMetrics {
-  total?: number
-  gender?: string
-  eventLocationType?: string
-  timeLabel?: string
+  total: number
+  gender: string
+  eventLocationType: string
+  timeLabel: string
 }
 
 export interface GQLMonthWiseTargetDayEstimation {

@@ -25,13 +25,26 @@ export const PERFORMANCE_METRICS_FOR_OFFICE = gql`
   }
 `
 export const PERFORMANCE_METRICS = gql`
-  query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
+  query data(
+    $event: String!
+    $timeStart: String!
+    $timeEnd: String!
+    $locationId: String!
+  ) {
     getTotalMetrics(
       timeStart: $timeStart
       timeEnd: $timeEnd
       locationId: $locationId
+      event: $event
     ) {
-      estimated
+      estimated {
+        totalEstimation
+        maleEstimation
+        femaleEstimation
+        locationId
+        estimationYear
+        locationLevel
+      }
       results {
         total
         gender

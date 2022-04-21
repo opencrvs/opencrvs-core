@@ -356,7 +356,7 @@ type VerifyPasswordResult {
 
 type TotalMetricsResult {
   estimated: Estimation
-  results: [EventMetrics]
+  results: [EventMetrics!]!
 }
 
 type DeclarationsStartedMetrics {
@@ -826,10 +826,10 @@ type Estimation {
 }
 
 type EventMetrics {
-  total: Int
-  gender: String
-  eventLocationType: String
-  timeLabel: String
+  total: Int!
+  gender: String!
+  eventLocationType: String!
+  timeLabel: String!
 }
 
 type MonthWiseTargetDayEstimation {
