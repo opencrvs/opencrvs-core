@@ -88,7 +88,7 @@ describe('Introduction page settings update test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#Introduction-page_value').hostNodes().text()
+      testComponent.find('#Introduction-page_value').hostNodes().first().text()
     ).toBe('Disabled')
   })
 
@@ -146,9 +146,9 @@ describe('Addresses settings update test', () => {
     testComponent.find('#apply').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
-    expect(testComponent.find('#numberOfAddresses').hostNodes().text()).toBe(
-      '1'
-    )
+    expect(
+      testComponent.find('#numberOfAddresses').hostNodes().first().text()
+    ).toBe('1')
   })
 
   it('should show success notification if appliction name change', async () => {

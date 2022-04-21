@@ -187,11 +187,13 @@ class FormConfigSettingsComponent extends React.Component<
           <ListViewSimplified>
             <ListViewItemSimplified
               label={intl.formatMessage(messages.introductionSettings)}
-              value={
-                introductionPage
-                  ? intl.formatMessage(messages.enable)
-                  : intl.formatMessage(messages.disable)
-              }
+              value={[
+                <span id="Introduction-page_value">
+                  {introductionPage
+                    ? intl.formatMessage(messages.enable)
+                    : intl.formatMessage(messages.disable)}
+                </span>
+              ]}
               actions={[
                 <LinkButton
                   id={'introductionPageSettings'}
@@ -208,7 +210,7 @@ class FormConfigSettingsComponent extends React.Component<
             />
             <ListViewItemSimplified
               label={intl.formatMessage(messages.addressesSettings)}
-              value={<div id="numberOfAddresses">{numberOfAddresses}</div>}
+              value={<span id="numberOfAddresses">{numberOfAddresses}</span>}
               actions={[
                 <LinkButton
                   id={'addressesSettings'}
