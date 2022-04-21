@@ -13,7 +13,6 @@ import * as React from 'react'
 import { ReactElement } from 'react'
 import styled, { ThemeConsumer } from 'styled-components'
 import { colors } from '../colors'
-import { FormTabs, IFormTabProps } from '../forms/FormTabs'
 import { Box } from './Box'
 
 const Container = styled(Box)<{ size: string }>`
@@ -66,11 +65,11 @@ const TopTabBar = styled.div`
   gap: 28px;
   width: 100%;
   padding: 0;
-  margin-top: -8px;
   position: relative;
   & > div {
     bottom: -1px;
   }
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 24px 16px 0;
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -82,7 +81,7 @@ const TopBar = styled.div`
   justify-content: space-between;
   width: 100%;
   padding: 16px 0;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
@@ -121,7 +120,7 @@ interface IProps {
   title?: string
   titleColor?: keyof typeof colors
   topActionButtons?: ReactElement[]
-  tabs?: IFormTabProps
+  tabBarContent?: React.ReactNode
   subtitle?: string
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
@@ -135,7 +134,7 @@ export class Content extends React.Component<IProps> {
       title,
       titleColor,
       topActionButtons,
-      tabs,
+      tabBarContent,
       subtitle,
       children,
       bottomActionButtons,
@@ -153,15 +152,7 @@ export class Content extends React.Component<IProps> {
               <TopActionBar>{topActionButtons}</TopActionBar>
             )}
           </TopBar>
-          {tabs && (
-            <TopTabBar>
-              <FormTabs
-                sections={tabs.sections}
-                activeTabId={tabs.activeTabId}
-                onTabClick={(id: string) => tabs.onTabClick(id)}
-              />
-            </TopTabBar>
-          )}
+          {tabBarContent && <TopTabBar>{tabBarContent}</TopTabBar>}
         </Header>
         {subtitle && <SubHeader>{subtitle}</SubHeader>}
         {children && <Body>{children}</Body>}
