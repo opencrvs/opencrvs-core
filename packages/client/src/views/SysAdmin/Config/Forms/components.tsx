@@ -13,6 +13,7 @@ import React from 'react'
 import styled from '@client/styledComponents'
 import { useIntl } from 'react-intl'
 import { constantsMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/formConfig'
 import { Event } from '@client/forms'
 
 const Label = styled.span`
@@ -32,8 +33,11 @@ export function DraftVersion({
 }) {
   const intl = useIntl()
   return (
-    <Label>{`${intl.formatMessage(
-      constantsMessages[event]
-    )} v${version}`}</Label>
+    <Label>
+      {intl.formatMessage(messages.draftLabel, {
+        event: intl.formatMessage(constantsMessages[event]),
+        version
+      })}
+    </Label>
   )
 }

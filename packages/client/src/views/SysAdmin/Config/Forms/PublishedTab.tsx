@@ -19,7 +19,10 @@ import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { Event } from '@client/forms'
 import { useIntl } from 'react-intl'
-import { draftStatusMessages } from '@client/i18n/messages/views/formConfig'
+import {
+  messages,
+  draftStatusMessages
+} from '@client/i18n/messages/views/formConfig'
 import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
 import { Value, DraftVersion } from './components'
 import formatDate from '@client/utils/date-formatting'
@@ -46,9 +49,9 @@ function EventDrafts({ event }: { event: Event }) {
           <Value>
             {isDefaultDraft(formDraft)
               ? comment
-              : `${intl.formatMessage(
-                  draftStatusMessages.PUBLISHED
-                )} ${formatDate(updatedAt, 'MMMM yyyy')}`}
+              : intl.formatMessage(messages.publishedDate, {
+                  updatedAt
+                })}
           </Value>
         }
         actions={

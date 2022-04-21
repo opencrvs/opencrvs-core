@@ -79,10 +79,9 @@ function EventDrafts({ event }: { event: Event }) {
         <Value>
           {isDefaultDraft(formDraft)
             ? comment
-            : `${intl.formatMessage(messages.created)} ${formatDate(
-                updatedAt,
-                'MMMM yyyy'
-              )}`}
+            : intl.formatMessage(messages.previewDate, {
+                updatedAt
+              })}
         </Value>
       }
       actions={

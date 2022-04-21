@@ -30,7 +30,6 @@ interface IFormConfigMessages
   previewDescription: MessageDescriptor
   publishedDescription: MessageDescriptor
   publishedWarning: MessageDescriptor
-  created: MessageDescriptor
   contentKey: MessageDescriptor
   certificateHandlebars: MessageDescriptor
   hideField: MessageDescriptor
@@ -38,6 +37,9 @@ interface IFormConfigMessages
   statusChangeError: MessageDescriptor
   statusChangeInPreview: MessageDescriptor
   statusChangePublish: MessageDescriptor
+  draftLabel: MessageDescriptor
+  previewDate: MessageDescriptor
+  publishedDate: MessageDescriptor
 }
 
 type INavigationMessages = Record<
@@ -177,11 +179,6 @@ const messagesToDefine: IFormConfigMessages = {
       'Nothing is currently published. Awaiting to be published: {events}',
     description: 'Description for published tab'
   },
-  created: {
-    id: 'config.formConfig.preview.created',
-    defaultMessage: 'Created',
-    description: 'Label for created in preview tab'
-  },
   contentKey: {
     id: 'config.formConfig.formTools.contentKey',
     defaultMessage: 'Content Key',
@@ -217,6 +214,21 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage:
       '{event} declaration form v{version} successfully published',
     description: 'Success toast description for status change to inPreview'
+  },
+  draftLabel: {
+    id: 'config.formConfig.draft.label',
+    defaultMessage: '{event} v{version}',
+    description: 'FormDraft label'
+  },
+  previewDate: {
+    id: 'config.formConfig.preview.created',
+    defaultMessage: 'Created {updatedAt, date, ::MMMM yyyy}',
+    description: 'FormDraft label'
+  },
+  publishedDate: {
+    id: 'config.formConfig.publish.published',
+    defaultMessage: 'Published {updatedAt, date, ::MMMM yyyy}',
+    description: 'FormDraft label'
   }
 }
 
