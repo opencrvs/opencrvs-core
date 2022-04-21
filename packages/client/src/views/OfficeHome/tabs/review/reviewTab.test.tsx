@@ -585,7 +585,7 @@ describe('OfficeHome sent for review tab related tests', () => {
       testComponent = createdTestComponent
     })
 
-    it.only('downloads declaration after clicking download button', async () => {
+    it('downloads declaration after clicking download button', async () => {
       const downloadButton = await waitForElement(
         testComponent,
         '#ListItemAction-0-icon'
