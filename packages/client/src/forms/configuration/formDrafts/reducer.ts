@@ -144,6 +144,18 @@ export const formDraftReducer: LoopReducer<
         },
         Cmd.run(saveFormDraftData, { args: [formDraftData] })
       )
+    case actions.MODIFY_FORM_DRAFT:
+      const { formDraft } = action.payload
+      if (state.state === 'LOADING') {
+        return state
+      }
+      return {
+        ...state,
+        formDraftData: {
+          ...state.formDraftData,
+          [formDraft.event]: formDraft
+        }
+      }
     case actions.FETCH_FORM_DRAFT_FAILED:
       return {
         ...state,

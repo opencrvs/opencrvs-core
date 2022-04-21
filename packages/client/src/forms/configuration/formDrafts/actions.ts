@@ -12,6 +12,7 @@
 
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLFormDraft } from '@opencrvs/gateway/src/graphql/schema'
+import { IDraft } from './reducer'
 
 export const LOAD_STORAGE_FORM_DRAFT = 'FORM/LOAD_STORAGE_FORM_DRAFT'
 export type LoadStorageFormDraftAction = {
@@ -73,9 +74,27 @@ export const fetchFormDraftFailedAction = (): FetchFormDraftFailedAction => ({
   type: FETCH_FORM_DRAFT_FAILED
 })
 
+export const MODIFY_FORM_DRAFT = 'FORM/MODIFY_FORM_DRAFT'
+export type ModifyFormDraftAction = {
+  type: typeof MODIFY_FORM_DRAFT
+  payload: {
+    formDraft: IDraft
+  }
+}
+
+export const modifyFormDraftAction = (
+  formDraft: IDraft
+): ModifyFormDraftAction => ({
+  type: MODIFY_FORM_DRAFT,
+  payload: {
+    formDraft
+  }
+})
+
 export type FormDraftActions =
   | LoadStorageFormDraftAction
   | FetchFormDraftAction
   | FetchFormDraftSuccessAction
   | FetchFormDraftFailedAction
   | LoadStorageFormDraftSuccessAction
+  | ModifyFormDraftAction
