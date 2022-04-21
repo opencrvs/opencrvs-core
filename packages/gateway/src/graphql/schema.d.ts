@@ -249,7 +249,7 @@ export interface GQLVerifyPasswordResult {
 }
 
 export interface GQLTotalMetricsResult {
-  estimated?: GQLEstimation
+  estimated: GQLEstimation
   results: Array<GQLEventMetrics>
 }
 
@@ -711,12 +711,12 @@ export interface GQLSearchFieldAgentResponse {
 }
 
 export interface GQLEstimation {
-  totalEstimation?: number
-  maleEstimation?: number
-  femaleEstimation?: number
-  locationId?: string
-  estimationYear?: number
-  locationLevel?: string
+  totalEstimation: number
+  maleEstimation: number
+  femaleEstimation: number
+  locationId: string
+  estimationYear: number
+  locationLevel: string
 }
 
 export interface GQLEventMetrics {

@@ -12,12 +12,16 @@
 import styled from '@client/styledComponents'
 import {
   GQLLocation,
-  GQLIdentifier
+  GQLIdentifier,
+  GQLEventMetrics
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from '@client/utils/userUtils'
 import { ILocation } from '@client/offline/reducer'
 import startOfMonth from 'date-fns/startOfMonth'
 import endOfMonth from 'date-fns/endOfMonth'
+import React from 'react'
+import { getPercentage } from '@client/utils/data-formatting'
+import { FormattedNumber } from 'react-intl'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
@@ -75,6 +79,50 @@ export const FilterContainer = styled.div`
     margin: 0;
   }
 `
+export const PerformanceTitle = styled.div`
+  ${({ theme }) => theme.fonts.bold16}
+`
+
+export const PerformanceValue = styled.div`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.reg16};
+`
+
+export const Breakdown = styled.div`
+  margin-top: 0.5rem;
+`
+export const BreakdownRow = styled.div``
+export const BreakdownLabel = styled.span`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.bold12};
+`
+export const BreakdownValue = styled.span`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.reg12};
+`
+export function PercentageDisplay(props: { total: number; ofNumber: number }) {
+  return <span>{getPercentage(props.ofNumber, props.total)}%</span>
+}
+
+export function TotalDisplayWithPercentage(props: {
+  total: number
+  ofNumber: number
+}) {
+  return (
+    <span>
+      <FormattedNumber value={props.total}></FormattedNumber>
+      &nbsp;(
+      <PercentageDisplay {...props} />)
+    </span>
+  )
+}
+
+export function calculateTotal(metrics: GQLEventMetrics[]) {
+  return metrics
+    .map((metric) => metric.total)
+    .reduce((m, metric) => m + metric, 0)
+}
+
 export function getJurisidictionType(location: GQLLocation): string | null {
   let jurisdictionType = null
 

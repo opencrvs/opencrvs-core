@@ -16,16 +16,16 @@ type EventMetrics {
 }
 
 type Estimation {
-  totalEstimation: Int
-  maleEstimation: Int
-  femaleEstimation: Int
-  locationId: String
-  estimationYear: Int
-  locationLevel: String
+  totalEstimation: Int!
+  maleEstimation: Int!
+  femaleEstimation: Int!
+  locationId: String!
+  estimationYear: Int!
+  locationLevel: String!
 }
 
 type TotalMetricsResult {
-  estimated: Estimation
+  estimated: Estimation!
   results: [EventMetrics!]!
 }
 

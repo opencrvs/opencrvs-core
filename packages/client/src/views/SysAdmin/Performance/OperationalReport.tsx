@@ -43,7 +43,16 @@ import {
 } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import {
   ActionContainer,
-  FilterContainer
+  FilterContainer,
+  PerformanceTitle,
+  PerformanceValue,
+  Breakdown,
+  BreakdownRow,
+  BreakdownLabel,
+  BreakdownValue,
+  PercentageDisplay,
+  calculateTotal,
+  TotalDisplayWithPercentage
 } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
@@ -77,6 +86,7 @@ import { PERFORMANCE_METRICS } from './metricsQuery'
 
 import format from '@client/utils/date-formatting'
 import { getPercentage } from '@client/utils/data-formatting'
+import { CompletenessReport } from './CompletenessReport'
 
 interface IConnectProps {
   locations: { [key: string]: ILocation }
@@ -162,27 +172,6 @@ const Title = styled.div`
     ${({ theme }) => theme.fonts.bold16}
   }
 `
-const PerformanceTitle = styled.div`
-  ${({ theme }) => theme.fonts.bold16}
-`
-
-const PerformanceValue = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
-`
-
-const Breakdown = styled.div`
-  margin-top: 0.5rem;
-`
-const BreakdownRow = styled.div``
-const BreakdownLabel = styled.span`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bold12};
-`
-const BreakdownValue = styled.span`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg12};
-`
 
 export const StatusMapping: IStatusMapping = {
   IN_PROGRESS: {
@@ -221,29 +210,6 @@ export const StatusMapping: IStatusMapping = {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
   }
-}
-
-function PercentageDisplay(props: { total: number; ofNumber: number }) {
-  return <span>{getPercentage(props.ofNumber, props.total)}%</span>
-}
-
-function TotalDisplayWithPercentage(props: {
-  total: number
-  ofNumber: number
-}) {
-  return (
-    <span>
-      <FormattedNumber value={props.total}></FormattedNumber>
-      &nbsp;(
-      <PercentageDisplay {...props} />)
-    </span>
-  )
-}
-
-function calculateTotal(metrics: GQLEventMetrics[]) {
-  return metrics
-    .map((metric) => metric.total)
-    .reduce((m, metric) => m + metric, 0)
 }
 
 class OperationalReportComponent extends React.Component<Props, State> {
@@ -492,6 +458,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
 
                 return (
                   <>
+                    <CompletenessReport data={data!.getTotalMetrics} />
                     <ListViewSimplified>
                       <ListViewItemSimplified
                         label={

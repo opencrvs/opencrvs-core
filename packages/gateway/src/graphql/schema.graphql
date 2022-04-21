@@ -355,7 +355,7 @@ type VerifyPasswordResult {
 }
 
 type TotalMetricsResult {
-  estimated: Estimation
+  estimated: Estimation!
   results: [EventMetrics!]!
 }
 
@@ -817,12 +817,12 @@ type SearchFieldAgentResponse {
 }
 
 type Estimation {
-  totalEstimation: Int
-  maleEstimation: Int
-  femaleEstimation: Int
-  locationId: String
-  estimationYear: Int
-  locationLevel: String
+  totalEstimation: Int!
+  maleEstimation: Int!
+  femaleEstimation: Int!
+  locationId: String!
+  estimationYear: Int!
+  locationLevel: String!
 }
 
 type EventMetrics {
