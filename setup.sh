@@ -97,6 +97,8 @@ echo "Installing Docker and Node for example, is outside the scope of this scrip
 sleep 10
 echo
 echo "As part of this script, we checkout another GIT repo: The fictional Farajaland country configuration module into the folder next to this one called: 'opencrvs-farajaland'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should delete this folder and fork the config repo somewhere else."
+[ -d "../opencrvs-farajaland" ] && echo "Enter your password to delete the existing Farajaland country configuration to reset OpenCRVS to factory settings." && sudo rm -r ../opencrvs-farajaland
+
 sleep 10
 echo
 echo -e "\033[32m:::::::::::::::: PLEASE WAIT FOR THE OPEN CRVS LOGO TO APPEAR ::::::::::::::::\033[0m"
@@ -252,7 +254,10 @@ done
 echo
 echo -e "\033[32m:::::::::: Stopping any currently running Docker containers ::::::::::\033[0m"
 echo
-if [[ $(docker ps -aq) ]] ; then docker stop $(docker ps -aq) ; fi
+if [[ $(docker ps -aq) ]] ; then
+  docker stop $(docker ps -aq)
+  sleep 5
+fi
 
 
 echo
@@ -323,11 +328,18 @@ if [ -d "data" ] ; then sudo rm -r data ; fi
 openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
 mkdir -p data/elasticsearch
 chmod 775 data/elasticsearch
+mkdir -p data/mongo
+chmod 775 data/mongo
+mkdir -p data/influxdb
+chmod 775 data/influxdb
 
 echo -e "\033[32m:::::::::::::::::::: Building OpenCRVS dependencies ::::::::::::::::::::\033[0m"
 echo
 echo "This can take some time on slow connections.  Docker is downloading Mongo DB, ElasticSearch, OpenHIM and Hearth docker images.  These are large files.  Then it will build them."
 echo
+if [ $OS == "MAC" ]; then
+ export LOCAL_IP=host-gateway
+fi
 yarn compose:deps:detached
 DOCKER_STARTED=1
 echo "wait-on tcp:3447" && wait-on -l tcp:3447
@@ -352,8 +364,9 @@ tmux split-window -h -p 30
 if [ $OS == "UBUNTU" ]; then
   tmux send-keys -t opencrvs "LANGUAGES=en,fr && yarn start" C-m
   else
-  tmux send-keys -t opencrvs "LANGUAGES=en,fr && LOCAL_IP=$(ifconfig | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}') && yarn start" C-m
+  tmux send-keys -t opencrvs "LANGUAGES=en,fr && LOCAL_IP=host-gateway && yarn start" C-m
 fi
+
 tmux set -p @mytitle "opencrvs-core"
 tmux split-window -v
 tmux set -p @mytitle "opencrvs-farajaland"
