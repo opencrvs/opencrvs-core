@@ -35,6 +35,9 @@ interface IFormConfigMessages
   certificateHandlebars: MessageDescriptor
   hideField: MessageDescriptor
   requiredForRegistration: MessageDescriptor
+  statusChangeError: MessageDescriptor
+  statusChangeInPreview: MessageDescriptor
+  statusChangePublish: MessageDescriptor
 }
 
 type INavigationMessages = Record<
@@ -198,6 +201,22 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.formConfig.formTools.requiredForRegistration',
     defaultMessage: 'Required for registration',
     description: 'Required for registration label for formTools'
+  },
+  statusChangeError: {
+    id: 'config.formConfig.statusChange.error',
+    defaultMessage: 'Something went wrong. Please try again',
+    description: 'Error toast description for status change failure'
+  },
+  statusChangeInPreview: {
+    id: 'config.formConfig.statusChange.inPreview',
+    defaultMessage: '{event} declaration form v{version} is now in preview',
+    description: 'Success toast description for status change to inPreview'
+  },
+  statusChangePublish: {
+    id: 'config.formConfig.statusChange.publish',
+    defaultMessage:
+      '{event} declaration form v{version} successfully published',
+    description: 'Success toast description for status change to inPreview'
   }
 }
 

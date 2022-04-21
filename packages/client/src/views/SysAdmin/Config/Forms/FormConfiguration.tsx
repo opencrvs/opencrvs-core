@@ -38,6 +38,7 @@ import {
   ActionsModal,
   defaultActionState
 } from './ActionsModal'
+import { ActionsNotification } from './ActionsNotification'
 
 const StyledWarning = styled(Warning)`
   margin: 0 auto 16px;
@@ -133,6 +134,7 @@ export function FormConfiguration() {
             <></>
           )}
           <ActionsModal />
+          {formDraftLoaded && <ActionsNotification />}
         </ActionContext.Provider>
       </Content>
     </SysAdminContentWrapper>
