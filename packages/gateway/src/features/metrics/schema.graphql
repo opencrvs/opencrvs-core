@@ -15,6 +15,11 @@ type EventMetrics {
   timeLabel: String
 }
 
+type TotalMetricsResult {
+  estimated: Int
+  results: [EventMetrics]
+}
+
 type DeclarationsStartedMetrics {
   fieldAgentDeclarations: Int!
   hospitalDeclarations: Int!
@@ -74,9 +79,9 @@ type Query {
   getTotalMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): [EventMetrics]
+  ): TotalMetricsResult
   getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!

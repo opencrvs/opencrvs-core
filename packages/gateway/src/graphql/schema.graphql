@@ -59,9 +59,9 @@ type Query {
   getTotalMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): [EventMetrics]
+  ): TotalMetricsResult
   getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
@@ -354,11 +354,9 @@ type VerifyPasswordResult {
   id: String
 }
 
-type EventMetrics {
-  total: Int
-  gender: String
-  eventLocationType: String
-  timeLabel: String
+type TotalMetricsResult {
+  estimated: Int
+  results: [EventMetrics]
 }
 
 type DeclarationsStartedMetrics {
@@ -816,6 +814,13 @@ type SearchFieldAgentResponse {
   totalNumberOfInProgressAppStarted: Int
   totalNumberOfRejectedDeclarations: Int
   averageTimeForDeclaredDeclarations: Int
+}
+
+type EventMetrics {
+  total: Int
+  gender: String
+  eventLocationType: String
+  timeLabel: String
 }
 
 type MonthWiseTargetDayEstimation {
