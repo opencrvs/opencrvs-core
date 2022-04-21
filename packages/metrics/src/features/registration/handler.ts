@@ -357,10 +357,14 @@ export async function markCertifiedHandler(
 ) {
   try {
     const points = await Promise.all([
-      generatePaymentPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization,
-        'x-correlation-id': request.headers['x-correlation-id']
-      }),
+      generatePaymentPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        },
+        'certification'
+      ),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED'],
@@ -418,7 +422,7 @@ export async function requestCorrectionHandler(
         {
           Authorization: request.headers.authorization
         },
-        'correction_payment'
+        'correction'
       ),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,

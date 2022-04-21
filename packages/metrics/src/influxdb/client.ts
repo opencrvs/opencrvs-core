@@ -113,28 +113,14 @@ export const influx = new Influx.InfluxDB({
       tags: ['currentStatus', 'previousStatus', 'eventType']
     },
     {
-      measurement: 'certification_payment',
+      measurement: 'payment',
       fields: {
         total: Influx.FieldType.FLOAT,
         compositionId: Influx.FieldType.STRING
       },
       tags: [
         'eventType',
-        'officeLocation',
-        'locationLevel5',
-        'locationLevel4',
-        'locationLevel3',
-        'locationLevel2'
-      ]
-    },
-    {
-      measurement: 'correction_payment',
-      fields: {
-        total: Influx.FieldType.FLOAT,
-        compositionId: Influx.FieldType.STRING
-      },
-      tags: [
-        'eventType',
+        'paymentType',
         'officeLocation',
         'locationLevel5',
         'locationLevel4',
@@ -184,9 +170,16 @@ export const writePoints = (points: IPoints[]) => {
   })
 }
 
-export const query = <T = any>(q: string): Promise<T> => {
+type InfluxQueryOptions = {
+  placeholders: Record<string, any>
+}
+
+export const query = <T = any>(
+  q: string,
+  options?: InfluxQueryOptions
+): Promise<T> => {
   try {
-    return influx.query(q)
+    return influx.query(q, options)
   } catch (err) {
     logger.error(`Error reading data from InfluxDB! ${err.stack}`)
     throw err

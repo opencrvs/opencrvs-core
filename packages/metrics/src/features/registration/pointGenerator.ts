@@ -114,7 +114,7 @@ export const generateInCompleteFieldPoints = async (
         missingFieldSectionId: missingFieldIds[0],
         missingFieldGroupId: missingFieldIds[1],
         missingFieldId: missingFieldIds[2],
-        eventType: getDeclarationType(task) as string,
+        eventType: getDeclarationType(task),
         regStatus: 'IN_PROGESS',
         ...locationTags
       }
@@ -265,7 +265,7 @@ const generatePointLocations = async (
 export async function generatePaymentPoint(
   payload: fhir.Bundle,
   authHeader: IAuthHeader,
-  measurement = 'certification_payment'
+  paymentType: 'certification' | 'correction'
 ): Promise<IPaymentPoints> {
   const reconciliation = getPaymentReconciliation(payload)
   const composition = getComposition(payload)
@@ -290,11 +290,12 @@ export async function generatePaymentPoint(
   const tags = {
     eventType: getDeclarationType(task),
     officeLocation: getRegLastOffice(payload),
+    paymentType,
     ...(await generatePointLocations(payload, authHeader))
   }
 
   return {
-    measurement,
+    measurement: 'payment',
     tags,
     fields,
     timestamp: toInfluxTimestamp(reconciliation.created)
@@ -349,7 +350,7 @@ export async function generateEventDurationPoint(
   const tags: IDurationTags = {
     currentStatus: getDeclarationStatus(currentTask) as string,
     previousStatus: getDeclarationStatus(previousTask) as string,
-    eventType: getDeclarationType(currentTask) as string
+    eventType: getDeclarationType(currentTask)
   }
 
   return {
@@ -401,7 +402,7 @@ export async function generateTimeLoggedPoint(
   const tags: ITimeLoggedTags = {
     currentStatus: getDeclarationStatus(currentTask) as string,
     trackingId: getTrackingId(currentTask) as string,
-    eventType: getDeclarationType(currentTask) as string,
+    eventType: getDeclarationType(currentTask),
     practitionerId: getPractionerIdFromTask(currentTask),
     officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))

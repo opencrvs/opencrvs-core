@@ -32,6 +32,7 @@ export interface GQLQuery {
   searchFieldAgents?: GQLSearchFieldAgentResult
   verifyPasswordById?: GQLVerifyPasswordResult
   getTotalMetrics?: GQLTotalMetricsResult
+  getTotalPayments: Array<GQLPaymentMetric>
   getDeclarationsStartedMetrics?: GQLDeclarationsStartedMetrics
   fetchMonthWiseEventMetrics?: GQLMonthWiseEstimationMetrics
   fetchLocationWiseEventMetrics?: GQLLocationWiseEstimationMetrics
@@ -251,6 +252,11 @@ export interface GQLVerifyPasswordResult {
 export interface GQLTotalMetricsResult {
   estimated?: GQLEstimation
   results: Array<GQLEventMetrics>
+}
+
+export interface GQLPaymentMetric {
+  total: number
+  paymentType: string
 }
 
 export interface GQLDeclarationsStartedMetrics {
@@ -1320,6 +1326,7 @@ export interface GQLResolver {
   SearchFieldAgentResult?: GQLSearchFieldAgentResultTypeResolver
   VerifyPasswordResult?: GQLVerifyPasswordResultTypeResolver
   TotalMetricsResult?: GQLTotalMetricsResultTypeResolver
+  PaymentMetric?: GQLPaymentMetricTypeResolver
   DeclarationsStartedMetrics?: GQLDeclarationsStartedMetricsTypeResolver
   MonthWiseEstimationMetrics?: GQLMonthWiseEstimationMetricsTypeResolver
   LocationWiseEstimationMetrics?: GQLLocationWiseEstimationMetricsTypeResolver
@@ -1402,6 +1409,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   searchFieldAgents?: QueryToSearchFieldAgentsResolver<TParent>
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
   getTotalMetrics?: QueryToGetTotalMetricsResolver<TParent>
+  getTotalPayments?: QueryToGetTotalPaymentsResolver<TParent>
   getDeclarationsStartedMetrics?: QueryToGetDeclarationsStartedMetricsResolver<TParent>
   fetchMonthWiseEventMetrics?: QueryToFetchMonthWiseEventMetricsResolver<TParent>
   fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<TParent>
@@ -1731,6 +1739,21 @@ export interface QueryToGetTotalMetricsResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToGetTotalMetricsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetTotalPaymentsArgs {
+  timeStart: string
+  timeEnd: string
+  locationId?: string
+  event: string
+}
+export interface QueryToGetTotalPaymentsResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetTotalPaymentsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3184,6 +3207,22 @@ export interface TotalMetricsResultToEstimatedResolver<
 }
 
 export interface TotalMetricsResultToResultsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLPaymentMetricTypeResolver<TParent = any> {
+  total?: PaymentMetricToTotalResolver<TParent>
+  paymentType?: PaymentMetricToPaymentTypeResolver<TParent>
+}
+
+export interface PaymentMetricToTotalResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface PaymentMetricToPaymentTypeResolver<
   TParent = any,
   TResult = any
 > {

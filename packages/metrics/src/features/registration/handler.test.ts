@@ -1329,7 +1329,7 @@ describe('When an existing declaration is marked certified', () => {
       const declarationEventPoint =
         influxClient.writePoints.mock.calls[0][0].find(
           ({ measurement }: { measurement: string }) =>
-            measurement === 'certification_payment'
+            measurement === 'payment'
         )
 
       expect(declarationEventPoint).toMatchSnapshot()
@@ -1477,7 +1477,7 @@ describe('When an existing declaration requested correction', () => {
       const declarationEventPoint =
         influxClient.writePoints.mock.calls[0][0].find(
           ({ measurement }: { measurement: string }) =>
-            measurement === 'correction_payment'
+            measurement === 'payment'
         )
 
       expect(declarationEventPoint).toMatchSnapshot()

@@ -62,6 +62,12 @@ type Query {
     locationId: String
     event: String!
   ): TotalMetricsResult
+  getTotalPayments(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+  ): [PaymentMetric!]!
   getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
@@ -357,6 +363,11 @@ type VerifyPasswordResult {
 type TotalMetricsResult {
   estimated: Estimation
   results: [EventMetrics!]!
+}
+
+type PaymentMetric {
+  total: Float!
+  paymentType: String!
 }
 
 type DeclarationsStartedMetrics {

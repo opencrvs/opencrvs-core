@@ -18,7 +18,7 @@ import {
 export interface IMetricsParam {
   timeStart: string
   timeEnd: string
-  locationId: string
+  locationId?: string
   event?: string
   practitionerIds?: string[]
   practitionerId?: string
@@ -38,6 +38,22 @@ export const resolvers: GQLResolver = {
     ) {
       return getMetrics(
         '/totalMetrics',
+        {
+          timeStart,
+          timeEnd,
+          locationId,
+          event
+        },
+        authHeader
+      )
+    },
+    async getTotalPayments(
+      _,
+      { timeStart, timeEnd, locationId, event },
+      authHeader
+    ) {
+      return getMetrics(
+        '/totalPayments',
         {
           timeStart,
           timeEnd,

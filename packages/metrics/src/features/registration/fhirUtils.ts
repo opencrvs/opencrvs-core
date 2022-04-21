@@ -155,16 +155,12 @@ export function getTrackingId(task: Task) {
   return trackingIdentifier.value
 }
 
-export function getDeclarationType(task: Task): DECLARATION_TYPE | null {
-  if (!task.code || !task.code.coding) {
-    return null
-  }
-
-  const coding = task.code.coding.find(
+export function getDeclarationType(task: Task): DECLARATION_TYPE {
+  const coding = task.code?.coding?.find(
     ({ system }) => system === 'http://opencrvs.org/specs/types'
   )
   if (!coding) {
-    return null
+    throw new Error('No declaration type found in task')
   }
   return coding.code as DECLARATION_TYPE
 }
