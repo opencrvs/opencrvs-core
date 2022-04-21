@@ -17,9 +17,9 @@ interface IFormMessages
   addressLine1: MessageDescriptor
   addressLine2: MessageDescriptor
   addressLine3: MessageDescriptor
-  addressLine3CityOption: MessageDescriptor
+  addressLine3UrbanOption: MessageDescriptor
   addressLine4: MessageDescriptor
-  addressSameAsMother: MessageDescriptor
+  secondaryAddressSameAsOtherSecondary: MessageDescriptor
   answer: MessageDescriptor
   informantIDProof: MessageDescriptor
   informantName: MessageDescriptor
@@ -83,8 +83,8 @@ interface IFormMessages
   contactDetailsFather: MessageDescriptor
   contactDetailsMother: MessageDescriptor
   country: MessageDescriptor
-  currentAddress: MessageDescriptor
-  currentAddressSameAsPermanent: MessageDescriptor
+  secondaryAddress: MessageDescriptor
+  secondaryAddressSameAsPrimary: MessageDescriptor
   dateOfMarriage: MessageDescriptor
   daughter: MessageDescriptor
   daughterInLaw: MessageDescriptor
@@ -96,12 +96,12 @@ interface IFormMessages
   deathEventName: MessageDescriptor
   deathEventTitle: MessageDescriptor
   deathPlace: MessageDescriptor
-  deathPlaceAddress: MessageDescriptor
-  deathPlaceAddressOther: MessageDescriptor
-  deathPlaceAddressSameAsCurrent: MessageDescriptor
-  deathPlaceAddressSameAsPermanent: MessageDescriptor
-  deathPlaceAddressType: MessageDescriptor
-  deceasedCurrentAddressSameAsPermanent: MessageDescriptor
+  placeOfDeath: MessageDescriptor
+  placeOfDeathOther: MessageDescriptor
+  placeOfDeathSameAsCurrent: MessageDescriptor
+  placeOfDeathSameAsPrimary: MessageDescriptor
+  placeOfDeathType: MessageDescriptor
+  deceasedCurrentAddressSameAsPrimary: MessageDescriptor
   deceasedDateOfBirth: MessageDescriptor
   deceasedDeathProof: MessageDescriptor
   deceasedDoBProof: MessageDescriptor
@@ -113,7 +113,7 @@ interface IFormMessages
   deceasedIdType: MessageDescriptor
   deceasedName: MessageDescriptor
   deceasedParagraph: MessageDescriptor
-  deceasedPermanentAddressProof: MessageDescriptor
+  deceasedPrimaryAddressProof: MessageDescriptor
   deceasedSex: MessageDescriptor
   deceasedSexFemale: MessageDescriptor
   deceasedSexMale: MessageDescriptor
@@ -241,9 +241,9 @@ interface IFormMessages
   paragraphTargetDaysTo5Years: MessageDescriptor
   paragraph: MessageDescriptor
   paragraphAbove5Years: MessageDescriptor
-  permanentAddress: MessageDescriptor
-  permanentAddressSameAsCurrent: MessageDescriptor
-  permanentAddressSameAsMother: MessageDescriptor
+  deceasedPrimaryAddress: MessageDescriptor
+  primaryAddressSameAsCurrent: MessageDescriptor
+  primaryAddressSameAsOtherPrimary: MessageDescriptor
   phoneNumber: MessageDescriptor
   phoneVerificationWarning: MessageDescriptor
   placeOfBirth: MessageDescriptor
@@ -259,7 +259,7 @@ interface IFormMessages
   proofOfEPICardOfChild: MessageDescriptor
   proofOfFathersID: MessageDescriptor
   proofOfMothersID: MessageDescriptor
-  proofOfParentPermanentAddress: MessageDescriptor
+  proofOfParentPrimaryAddress: MessageDescriptor
   registrationName: MessageDescriptor
   registrationOffice: MessageDescriptor
   registrationPhoneLabel: MessageDescriptor
@@ -322,7 +322,7 @@ interface IFormMessages
   firstName: MessageDescriptor
   lastName: MessageDescriptor
   relationship: MessageDescriptor
-  informantPermanentAdress: MessageDescriptor
+  primaryAddress: MessageDescriptor
   primaryCaregiverNameOrTitle: MessageDescriptor
   parentDetailsType: MessageDescriptor
   motherRadioButton: MessageDescriptor
@@ -368,6 +368,10 @@ interface IFormMessages
   nationalIdOption: MessageDescriptor
   brnOption: MessageDescriptor
   helperTextNID: MessageDescriptor
+  deceasedSecondaryAddressSameAsPrimary: MessageDescriptor
+  deceasedSecondaryAddress: MessageDescriptor
+  informantSecondaryAddressSameAsPrimary: MessageDescriptor
+  informantSecondaryAddress: MessageDescriptor
 }
 
 export const formMessageDescriptors: IFormMessages = {
@@ -379,7 +383,7 @@ export const formMessageDescriptors: IFormMessages = {
   addressLine1: {
     defaultMessage: 'Street and house number',
     description: 'Title for the address line 1',
-    id: 'form.field.label.addressLine1'
+    id: 'form.field.label.addressLine5'
   },
   addressLine2: {
     defaultMessage: 'Area / Ward / Mouja / Village',
@@ -391,21 +395,22 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Title for the address line 3 option 1',
     id: 'form.field.label.addressLine3'
   },
-  addressLine3CityOption: {
+  addressLine3UrbanOption: {
     defaultMessage: 'Ward',
     description: 'Title for the address line 3 option 2',
-    id: 'form.field.label.addressLine3CityOption'
+    id: 'form.field.label.addressLine3UrbanOption'
   },
   addressLine4: {
     defaultMessage: 'Upazila (Thana) / City',
     description: 'Title for the address line 4',
     id: 'form.field.label.addressLine4'
   },
-  addressSameAsMother: {
-    defaultMessage: "Is his current address the same as the mother's?",
+  secondaryAddressSameAsOtherSecondary: {
+    defaultMessage:
+      "Is the secondary address the same as the mother's secondary address?",
     description:
-      "Title for the radio button to select that the father's current address is the same as the mother's address",
-    id: 'form.field.label.addressSameAsMother'
+      "Title for the radio button to select that the person's secondary address is the same as the mother's secondary address",
+    id: 'form.field.label.secondaryAddressSameAsOtherSecondary'
   },
   answer: {
     defaultMessage: 'Answer',
@@ -722,21 +727,22 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Title for the country select',
     id: 'form.field.label.country'
   },
-  currentAddress: {
-    defaultMessage: 'Current Address',
-    description: 'Title for the current address fields',
-    id: 'form.field.label.currentAddress'
+  secondaryAddress: {
+    defaultMessage: 'Secondary Address',
+    description: 'Title for the secondary address fields',
+    id: 'form.field.label.secondaryAddress'
   },
-  currentAddressSameAsPermanent: {
-    defaultMessage: 'Is her current address the same as her permanent address?',
+  secondaryAddressSameAsPrimary: {
+    defaultMessage:
+      'Is their secondary address the same as their primary address?',
     description:
-      'Title for the radio button to select that the mothers current address is the same as her permanent address',
-    id: 'form.field.label.currentAddressSameAsPermanent'
+      'Title for the radio button to select that the secondary address is the same as the primary address',
+    id: 'form.field.label.secondaryAddressSameAsPrimary'
   },
-  informantPermanentAdress: {
-    defaultMessage: 'What is their permanent address?',
-    description: 'Title of informant permanent adress ',
-    id: 'form.field.label.informantPermanentAddress'
+  primaryAddress: {
+    defaultMessage: 'Usual place of residence',
+    description: 'Title of the primary adress ',
+    id: 'form.field.label.primaryAddress'
   },
   dateOfMarriage: {
     defaultMessage: 'Date of marriage',
@@ -793,32 +799,32 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Title for place of occurrence of death',
     id: 'form.field.label.deathPlace'
   },
-  deathPlaceAddress: {
+  placeOfDeath: {
     defaultMessage: 'Where did the death occur?',
     description: 'Label for form field: Place of occurrence of death',
-    id: 'form.field.label.deathPlaceAddress'
+    id: 'form.field.label.placeOfDeath'
   },
-  deathPlaceAddressOther: {
+  placeOfDeathOther: {
     defaultMessage: 'Different Address',
     description: 'Option for form field: Place of occurrence of death',
-    id: 'form.field.label.deathPlaceAddressOther'
+    id: 'form.field.label.placeOfDeathOther'
   },
-  deathPlaceAddressSameAsCurrent: {
+  placeOfDeathSameAsCurrent: {
     defaultMessage: 'Current address of the deceased',
     description: 'Option for form field: Place of occurrence of death',
-    id: 'form.field.label.deathPlaceAddressSameAsCurrent'
+    id: 'form.field.label.placeOfDeathSameAsCurrent'
   },
-  deathPlaceAddressSameAsPermanent: {
-    defaultMessage: 'Permanent address of the deceased',
+  placeOfDeathSameAsPrimary: {
+    defaultMessage: 'Primary address of the deceased',
     description: 'Option for form field: Place of occurrence of death',
-    id: 'form.field.label.deathPlaceAddressSameAsPermanent'
+    id: 'form.field.label.placeOfDeathSameAsPrimary'
   },
-  deathPlaceAddressType: {
+  placeOfDeathType: {
     defaultMessage: 'Type of Place',
     description: 'Label for form field: Type of place of death occurrence',
-    id: 'form.field.label.deathPlaceAddressType'
+    id: 'form.field.label.placeOfDeathType'
   },
-  deceasedCurrentAddressSameAsPermanent: {
+  deceasedCurrentAddressSameAsPrimary: {
     defaultMessage:
       'Is deceased’s current address the same as their permanent address?',
     description:
@@ -881,10 +887,10 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Documents Paragraph text',
     id: 'form.field.label.deceasedDocumentParagraph'
   },
-  deceasedPermanentAddressProof: {
+  deceasedPrimaryAddressProof: {
     defaultMessage: 'Proof of permanent address of deceased',
     description: 'Option for radio group field: Type of Document To Upload',
-    id: 'form.field.label.deceasedPermanentAddressProof'
+    id: 'form.field.label.deceasedPrimaryAddressProof'
   },
   deceasedSex: {
     defaultMessage: 'Sex',
@@ -1492,23 +1498,52 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Documents Paragraph text',
     id: 'form.section.documents.paragraphAbove5Years'
   },
-  permanentAddress: {
-    defaultMessage: 'What was their permanent address?',
-    description: 'Title for the permanent address fields',
-    id: 'form.field.label.permanentAddress'
+  deceasedPrimaryAddress: {
+    defaultMessage: 'Usual place of residence',
+    description: 'Title for the primary address fields for the deceased',
+    id: 'form.field.label.deceasedPrimaryAddress'
   },
-  permanentAddressSameAsCurrent: {
+  deceasedSecondaryAddress: {
+    defaultMessage: 'Secondary address?',
+    description: 'Title for the secondary address fields for the deceased',
+    id: 'form.field.label.deceasedSecondaryAddress'
+  },
+  deceasedSecondaryAddressSameAsPrimary: {
     defaultMessage:
-      'Is informant’s permanent address the same as their current address?',
+      'Was their secondary address the same as their primary address?',
+    description:
+      'Title for the checkbox for the deceased secondary address being the same as the primary address',
+    id: 'form.field.label.deceasedSecondaryAddressSameAsPrimary'
+  },
+  informantSecondaryAddressSameAsPrimary: {
+    defaultMessage:
+      'Is their secondary address the same as their primary address?',
+    description:
+      'Title for the checkbox for the informant secondary address being the same as the informant primary address',
+    id: 'form.field.label.informantSecondaryAddressSameAsPrimary'
+  },
+  informantSecondaryAddress: {
+    defaultMessage: 'Secondary Address',
+    description: 'Title for the secondary address fields for the informant',
+    id: 'form.field.label.informantSecondaryAddress'
+  },
+  informantPrimaryAddress: {
+    defaultMessage: 'Usual place of residence',
+    description: 'Title for the primary address fields for the informant',
+    id: 'form.field.label.informantPrimaryAddress'
+  },
+  primaryAddressSameAsCurrent: {
+    defaultMessage:
+      'Is the permanent address the same as their current address?',
     description:
       'Title for the radio button to select that the informants current address is the same as their permanent address',
     id: 'form.field.label.appCurrAddSameAsPerm'
   },
-  permanentAddressSameAsMother: {
-    defaultMessage: "Is his permanent address the same as the mother's?",
+  primaryAddressSameAsOtherPrimary: {
+    defaultMessage: "Same as mother's usual place of residence?",
     description:
-      "Title for the radio button to select that the father's permanent address is the same as the mother's address",
-    id: 'form.field.label.permanentAddressSameAsMother'
+      "Title for the radio button to select that the persons primary address is the same as the mother's primary address",
+    id: 'form.field.label.primaryAddressSameAsOtherPrimary'
   },
   phoneNumber: {
     defaultMessage: 'Phone number',
@@ -1589,10 +1624,10 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for list item Mother ID Proof',
     id: 'form.field.label.proofOfMothersID'
   },
-  proofOfParentPermanentAddress: {
-    defaultMessage: 'Proof of Permanent Address of Parent',
-    description: 'Label for list item Parent Permanent Address Proof',
-    id: 'form.field.label.proofOfParentPermanentAddress'
+  proofOfParentPrimaryAddress: {
+    defaultMessage: 'Proof of Primary Address of Parent',
+    description: 'Label for list item Parent Primary Address Proof',
+    id: 'form.field.label.proofOfParentPrimaryAddress'
   },
   registrationName: {
     defaultMessage: 'Registration',

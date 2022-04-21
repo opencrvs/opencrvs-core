@@ -249,7 +249,7 @@ export default (rates) => {
           multipleBirthInteger: 1,
           address: [
             {
-              type: 'PERMANENT',
+              type: 'PRIMARY_ADDRESS',
               line: [
                 addressNumber,
                 '',
@@ -264,7 +264,7 @@ export default (rates) => {
               country: 'BGD'
             },
             {
-              type: 'CURRENT',
+              type: 'SECONDARY_ADDRESS',
               line: [
                 addressNumber,
                 '',
@@ -330,7 +330,7 @@ export default (rates) => {
           ],
           address: [
             {
-              type: 'CURRENT',
+              type: 'SECONDARY_ADDRESS',
               line: [
                 addressNumber,
                 '',
@@ -345,7 +345,7 @@ export default (rates) => {
               country: 'BGD'
             },
             {
-              type: 'PERMANENT',
+              type: 'PRIMARY_ADDRESS',
               line: [
                 addressNumber,
                 '',

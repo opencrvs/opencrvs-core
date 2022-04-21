@@ -50,7 +50,7 @@ import {
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
-  IFormTag,
+  IPreviewGroup,
   IRadioOption,
   ISelectOption,
   LIST,
@@ -938,7 +938,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         (group.previewGroups &&
           (group.previewGroups.filter(
             (previewGroup) => previewGroup.id === baseTag
-          ) as IFormTag[])) ||
+          ) as IPreviewGroup[])) ||
         []
       const values = taggedFields
         .map((field) =>
