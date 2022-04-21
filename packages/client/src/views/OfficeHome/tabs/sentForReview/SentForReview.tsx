@@ -95,6 +95,47 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     }
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.recordWindowWidth)
+  }
+
+  recordWindowWidth = () => {
+    this.setState({ width: window.innerWidth })
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
+    this.props.declarationsReadyToSend
+      .filter(
+        (declaration: IDeclaration) =>
+          declaration.submissionStatus ===
+            SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED] &&
+          declaration.modifiedOn &&
+          calculateDaysFromToday(
+            new Date(declaration.modifiedOn).toISOString().split('T')[0]
+          ) > DECLARATIONS_DAY_LIMIT
+      )
+      .forEach((declaration) => {
+        this.props.deleteDeclaration(declaration)
+      })
+  }
+
+  onPageChange = (pageNumber: number) => {
+    this.setState({ sentForReviewPageNo: pageNumber })
+  }
+
+  onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+    this.setState({
+      sortOrder: newSortOrder,
+      sortedCol: newSortedCol
+    })
+  }
+
   submissionStatusMap = (
     status: string,
     online: boolean,
@@ -135,23 +176,6 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     return {
       icon
     }
-  }
-
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-    this.props.declarationsReadyToSend
-      .filter(
-        (declaration: IDeclaration) =>
-          declaration.submissionStatus ===
-            SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED] &&
-          declaration.modifiedOn &&
-          calculateDaysFromToday(
-            new Date(declaration.modifiedOn).toISOString().split('T')[0]
-          ) > DECLARATIONS_DAY_LIMIT
-      )
-      .forEach((declaration) => {
-        this.props.deleteDeclaration(declaration)
-      })
   }
 
   transformDeclarationsReadyToSend = () => {
@@ -248,35 +272,11 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     return sortedItems
   }
 
-  onPageChange = (pageNumber: number) => {
-    this.setState({ sentForReviewPageNo: pageNumber })
-  }
-
-  onColumnClick = (columnName: string) => {
-    const { newSortedCol, newSortOrder } = changeSortedColumn(
-      columnName,
-      this.state.sortedCol,
-      this.state.sortOrder
-    )
-    this.setState({
-      sortOrder: newSortOrder,
-      sortedCol: newSortedCol
-    })
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.recordWindowWidth)
-  }
-
-  recordWindowWidth = () => {
-    this.setState({ width: window.innerWidth })
-  }
-
   getColumns = () => {
     if (this.state.width > this.props.theme.grid.breakpoints.lg) {
       return [
         {
-          width: 40,
+          width: 30,
           label: this.props.intl.formatMessage(messages.name),
           key: COLUMNS.ICON_WITH_NAME,
           errorValue: this.props.intl.formatMessage(messages.noNameProvided),
@@ -285,27 +285,27 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         },
         {
           label: this.props.intl.formatMessage(messages.event),
-          width: 10,
+          width: 16,
           key: COLUMNS.EVENT,
           isSorted: this.state.sortedCol === COLUMNS.EVENT,
           sortFunction: this.onColumnClick
         },
         {
           label: this.props.intl.formatMessage(messages.dateOfEvent),
-          width: 20,
+          width: 18,
           key: COLUMNS.DATE_OF_EVENT,
           isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
           sortFunction: this.onColumnClick
         },
         {
           label: this.props.intl.formatMessage(messages.sentForReview),
-          width: 20,
+          width: 18,
           key: COLUMNS.SENT_FOR_REVIEW,
           isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_REVIEW,
           sortFunction: this.onColumnClick
         },
         {
-          width: 10,
+          width: 18,
           alignment: ColumnContentAlignment.RIGHT,
           key: COLUMNS.STATUS_INDICATOR
         }

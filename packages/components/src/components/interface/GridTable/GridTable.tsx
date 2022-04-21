@@ -115,6 +115,8 @@ export enum COLUMNS {
   DATE_OF_EVENT = 'dateOfEvent',
   SENT_FOR_REVIEW = 'sentForReview',
   SENT_FOR_UPDATES = 'sentForUpdates',
+  SENT_FOR_APPROVAL = 'sentForApproval',
+  REGISTERED = 'registered',
   STATUS_INDICATOR = 'statusIndicator',
   LAST_UPDATED = 'lastUpdated',
   ACTIONS = 'actions',

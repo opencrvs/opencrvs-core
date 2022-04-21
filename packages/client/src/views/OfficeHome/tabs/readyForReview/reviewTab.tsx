@@ -25,7 +25,9 @@ import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
   GridTable,
-  IAction
+  IAction,
+  COLUMNS,
+  SORT_ORDER
 } from '@opencrvs/components/lib/interface'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
@@ -49,6 +51,14 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
+import {
+  IconWithName,
+  IconWithNameEvent
+} from '@client/views/OfficeHome/tabs/components'
+import {
+  changeSortedColumn,
+  getSortedItems
+} from '@client/views/OfficeHome/tabs/utils'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -72,6 +82,8 @@ interface IBaseReviewTabProps {
 
 interface IReviewTabState {
   width: number
+  sortedCol: COLUMNS
+  sortOrder: SORT_ORDER
 }
 
 type IReviewTabProps = IntlShapeProps & IBaseReviewTabProps
@@ -84,7 +96,9 @@ class ReviewTabComponent extends React.Component<
   constructor(props: IReviewTabProps) {
     super(props)
     this.state = {
-      width: window.innerWidth
+      width: window.innerWidth,
+      sortedCol: COLUMNS.NAME,
+      sortOrder: SORT_ORDER.ASCENDING
     }
   }
 
@@ -104,13 +118,25 @@ class ReviewTabComponent extends React.Component<
     return this.props.scope && this.props.scope.includes('register')
   }
 
+  onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+    this.setState({
+      sortOrder: newSortOrder,
+      sortedCol: newSortedCol
+    })
+  }
+
   transformDeclaredContent = (data: GQLEventSearchResultSet) => {
     const { intl } = this.props
     if (!data || !data.results) {
       return []
     }
     const transformedData = transformData(data, this.props.intl)
-    return transformedData.map((reg, index) => {
+    const items = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
@@ -183,9 +209,24 @@ class ReviewTabComponent extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
+      const dateOfEvent = reg.dateOfEvent && new Date(reg.dateOfEvent)
+      const createdAt = reg.createdAt && parseInt(reg.createdAt)
       return {
         ...reg,
         event,
+        dateOfEvent,
+        sentForReview: createdAt,
+        name: reg.name && reg.name.toLowerCase(),
+        iconWithName: (
+          <IconWithName status={reg.declarationStatus} name={reg.name} />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={reg.declarationStatus}
+            name={reg.name}
+            event={event}
+          />
+        ),
         eventTimeElapsed:
           (reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))) ||
           '',
@@ -204,63 +245,72 @@ class ReviewTabComponent extends React.Component<
         ]
       }
     })
+    const sortedItems = getSortedItems(
+      items,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+    return sortedItems.map((item) => {
+      return {
+        ...item,
+        dateOfEvent:
+          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
+        sentForReview:
+          item.sentForReview && formattedDuration(item.sentForReview as number)
+      }
+    })
   }
 
   getColumns = () => {
     if (this.state.width > this.props.theme.grid.breakpoints.lg) {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 14,
-          key: 'event'
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 30,
+          key: COLUMNS.ICON_WITH_NAME,
+          sortFunction: this.onColumnClick,
+          isSorted: this.state.sortedCol === COLUMNS.NAME
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 22,
-          key: 'name'
+          width: 16,
+          key: COLUMNS.EVENT,
+          sortFunction: this.onColumnClick,
+          isSorted: this.state.sortedCol === COLUMNS.EVENT
         },
         {
-          label: this.props.intl.formatMessage(
-            messages.listItemDeclarationDate
-          ),
-          width: 19,
-          key: 'declarationTimeElapsed'
+          label: this.props.intl.formatMessage(constantsMessages.dateOfEvent),
+          width: 18,
+          key: COLUMNS.DATE_OF_EVENT,
+          sortFunction: this.onColumnClick,
+          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
-          width: 19,
-          key: 'eventTimeElapsed'
+          label: this.props.intl.formatMessage(constantsMessages.sentForReview),
+          width: 18,
+          key: COLUMNS.SENT_FOR_REVIEW,
+          sortFunction: this.onColumnClick,
+          isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_REVIEW
         },
         {
-          width: 6,
-          key: 'icons',
-          isIconColumn: true
-        },
-        {
-          label: this.props.intl.formatMessage(messages.listItemAction),
-          width: 20,
-          key: 'actions',
+          width: 18,
+          key: COLUMNS.ACTIONS,
           isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
+          alignment: ColumnContentAlignment.RIGHT
         }
       ]
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 30,
-          key: 'event'
-        },
-        {
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 50,
-          key: 'name'
+          width: 70,
+          key: COLUMNS.ICON_WITH_NAME_EVENT
         },
         {
-          width: 20,
-          key: 'icons',
-          isIconColumn: true,
-          alignment: ColumnContentAlignment.RIGHT
+          width: 30,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
         }
       ]
     }

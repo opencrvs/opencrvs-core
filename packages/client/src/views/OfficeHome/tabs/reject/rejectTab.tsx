@@ -23,7 +23,9 @@ import { Scope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
   GridTable,
-  IAction
+  IAction,
+  COLUMNS,
+  SORT_ORDER
 } from '@opencrvs/components/lib/interface'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
@@ -47,7 +49,14 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
-
+import {
+  changeSortedColumn,
+  getSortedItems
+} from '@client/views/OfficeHome/tabs/utils'
+import {
+  IconWithName,
+  IconWithNameEvent
+} from '@client/views/OfficeHome/tabs/components'
 interface IBaseRejectTabProps {
   theme: ITheme
   scope: Scope | null
@@ -67,6 +76,8 @@ interface IBaseRejectTabProps {
 
 interface IRejectTabState {
   width: number
+  sortedCol: COLUMNS
+  sortOrder: SORT_ORDER
 }
 
 type IRejectTabProps = IntlShapeProps & IBaseRejectTabProps
@@ -79,7 +90,9 @@ class RejectTabComponent extends React.Component<
   constructor(props: IRejectTabProps) {
     super(props)
     this.state = {
-      width: window.innerWidth
+      width: window.innerWidth,
+      sortedCol: COLUMNS.NAME,
+      sortOrder: SORT_ORDER.ASCENDING
     }
   }
 
@@ -99,50 +112,70 @@ class RejectTabComponent extends React.Component<
     this.setState({ width: window.innerWidth })
   }
 
+  onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+    this.setState({
+      sortOrder: newSortOrder,
+      sortedCol: newSortedCol
+    })
+  }
+
   getColumns = () => {
     if (this.state.width > this.props.theme.grid.breakpoints.lg) {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 14,
-          key: 'event'
+          width: 30,
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          key: COLUMNS.ICON_WITH_NAME,
+          isSorted: this.state.sortedCol === COLUMNS.NAME,
+          sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 23,
-          key: 'name'
+          label: this.props.intl.formatMessage(constantsMessages.event),
+          width: 16,
+          key: COLUMNS.EVENT,
+          isSorted: this.state.sortedCol === COLUMNS.EVENT,
+          sortFunction: this.onColumnClick
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.dateOfEvent),
+          width: 18,
+          key: COLUMNS.DATE_OF_EVENT,
+          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
+          sortFunction: this.onColumnClick
         },
         {
           label: this.props.intl.formatMessage(
-            constantsMessages.informantContactNumber
+            constantsMessages.sentForUpdates
           ),
-          width: 21,
-          key: 'contactNumber'
+          width: 18,
+          key: COLUMNS.SENT_FOR_UPDATES,
+          isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_UPDATES,
+          sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.sentOn),
-          width: 22,
-          key: 'dateOfRejection'
-        },
-        {
-          label: this.props.intl.formatMessage(messages.listItemAction),
-          width: 20,
-          key: 'actions',
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
+          width: 18,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
         }
       ]
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 30,
-          key: 'event'
-        },
-        {
           label: this.props.intl.formatMessage(constantsMessages.name),
           width: 70,
-          key: 'name'
+          key: COLUMNS.ICON_WITH_NAME_EVENT
+        },
+        {
+          width: 30,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
         }
       ]
     }
@@ -154,7 +187,7 @@ class RejectTabComponent extends React.Component<
       return []
     }
     const transformedData = transformData(data, this.props.intl)
-    return transformedData.map((reg, index) => {
+    const items = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
@@ -210,13 +243,27 @@ class RejectTabComponent extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
+      const sentForUpdates =
+        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
+          ? new Date(reg.modifiedAt)
+          : new Date(Number(reg.modifiedAt))) || ''
+      const dateOfEvent = reg.dateOfEvent && new Date(reg.dateOfEvent)
       return {
         ...reg,
         event,
-        dateOfRejection:
-          (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
-            ? formattedDuration(new Date(reg.modifiedAt))
-            : formattedDuration(new Date(Number(reg.modifiedAt)))) || '',
+        name: reg.name && reg.name.toLowerCase(),
+        iconWithName: (
+          <IconWithName status={reg.declarationStatus} name={reg.name} />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={reg.declarationStatus}
+            name={reg.name}
+            event={reg.event}
+          />
+        ),
+        sentForUpdates,
+        dateOfEvent,
         actions,
         rowClickHandler: [
           {
@@ -225,6 +272,20 @@ class RejectTabComponent extends React.Component<
               this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
           }
         ]
+      }
+    })
+    const sortedItems = getSortedItems(
+      items,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+    return sortedItems.map((item) => {
+      return {
+        ...item,
+        dateOfEvent:
+          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
+        sentForUpdates:
+          item.sentForUpdates && formattedDuration(item.sentForUpdates as Date)
       }
     })
   }

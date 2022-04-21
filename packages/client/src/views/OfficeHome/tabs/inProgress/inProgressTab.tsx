@@ -391,21 +391,21 @@ export class InProgressTabComponent extends React.Component<
       return [
         {
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 35,
+          width: 30,
           key: COLUMNS.ICON_WITH_NAME,
           isSorted: this.state.sortedCol === COLUMNS.NAME,
           sortFunction: this.onColumnClick
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.event),
-          width: 10,
+          width: 16,
           key: COLUMNS.EVENT,
           isSorted: this.state.sortedCol === COLUMNS.EVENT,
           sortFunction: this.onColumnClick
         },
         {
           label: this.props.intl.formatMessage(constantsMessages.dateOfEvent),
-          width: 20,
+          width: 18,
           key: COLUMNS.DATE_OF_EVENT,
           isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
           sortFunction: this.onColumnClick
@@ -414,7 +414,7 @@ export class InProgressTabComponent extends React.Component<
           label: this.isFieldAgent
             ? this.props.intl.formatMessage(constantsMessages.lastUpdated)
             : this.props.intl.formatMessage(constantsMessages.notificationSent),
-          width: 20,
+          width: 18,
           key: this.isFieldAgent
             ? COLUMNS.LAST_UPDATED
             : COLUMNS.NOTIFICATION_SENT,
@@ -422,7 +422,7 @@ export class InProgressTabComponent extends React.Component<
           sortFunction: this.onColumnClick
         },
         {
-          width: 15,
+          width: 18,
           key: COLUMNS.ACTIONS,
           isActionColumn: true,
           alignment: ColumnContentAlignment.RIGHT

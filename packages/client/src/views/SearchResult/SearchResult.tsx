@@ -52,7 +52,8 @@ import {
   ColumnContentAlignment,
   GridTable,
   IAction,
-  Loader
+  Loader,
+  COLUMNS
 } from '@opencrvs/components/lib/interface'
 import {
   GQLEventSearchResultSet,
@@ -70,6 +71,10 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
+import {
+  IconWithName,
+  IconWithNameEvent
+} from '@client/views/OfficeHome/tabs/components'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -201,111 +206,41 @@ export class SearchResultView extends React.Component<
     if (this.state.width > this.props.theme.grid.breakpoints.lg) {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 10,
-          key: 'event'
-        },
-        {
+          width: 35,
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 22,
-          key: 'name'
+          key: COLUMNS.ICON_WITH_NAME
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.status),
-          width: 15,
-          key: 'status'
+          label: this.props.intl.formatMessage(constantsMessages.event),
+          width: 20,
+          key: COLUMNS.EVENT
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.lastUpdated),
-          width: 15,
-          key: 'dateOfModification'
+          label: this.props.intl.formatMessage(constantsMessages.dateOfEvent),
+          width: 20,
+          key: COLUMNS.DATE_OF_EVENT
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.startedAt),
-          width: 15,
-          key: 'startedAt'
-        },
-        {
-          width: 5,
-          key: 'icon',
-          isIconColumns: true
-        },
-        {
-          label: this.props.intl.formatMessage(
-            registrarHomeMessages.listItemAction
-          ),
-          width: 18,
-          key: 'actions',
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
+          width: 25,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
         }
       ]
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 15,
-          key: 'event'
-        },
-        {
           label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 70,
+          key: COLUMNS.ICON_WITH_NAME_EVENT
+        },
+        {
           width: 30,
-          key: 'name'
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.status),
-          width: 20,
-          key: 'status'
-        },
-        {
-          width: 15,
-          key: 'icon',
-          isIconColumns: true
-        },
-        {
-          width: 20,
-          key: 'actions',
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
         }
       ]
-    }
-  }
-
-  getDeclarationStatusLabel = (status: string) => {
-    switch (status) {
-      case 'ARCHIVED':
-        return this.props.intl.formatMessage(recordAuditMessages.archived)
-      case 'IN_PROGRESS':
-        return this.props.intl.formatMessage(registrarHomeMessages.inProgress)
-      case 'DECLARED':
-        return this.props.intl.formatMessage(
-          registrarHomeMessages.readyForReview
-        )
-      case 'REGISTERED':
-        return this.props.intl.formatMessage(registrarHomeMessages.readyToPrint)
-      case 'VALIDATED':
-        return this.props.intl.formatMessage(
-          registrarHomeMessages.sentForApprovals
-        )
-      case 'WAITING_VALIDATION':
-        return this.props.intl.formatMessage(
-          registrarHomeMessages.waitingForExternalValidation
-        )
-      case 'REJECTED':
-        return this.props.intl.formatMessage(
-          registrarHomeMessages.sentForUpdates
-        )
-      case 'CERTIFIED':
-        return this.props.intl.formatMessage(registrarHomeMessages.certified)
-      case 'REQUESTED_CORRECTION':
-        return this.props.intl.formatMessage(
-          registrarHomeMessages.requestedCorrection
-        )
-      default:
-        return this.props.intl.formatMessage(
-          registrarHomeMessages.readyForReview
-        )
     }
   }
 
@@ -423,22 +358,24 @@ export class SearchResultView extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
-
+      const dateOfEvent =
+        reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))
       return {
         ...reg,
         event,
-        name: reg.name,
-        status: this.getDeclarationStatusLabel(reg.declarationStatus),
-        dateOfModification: reg.modifiedAt
-          ? Number.isNaN(Number(reg.modifiedAt))
-            ? formattedDuration(new Date(reg.modifiedAt))
-            : formattedDuration(new Date(Number(reg.modifiedAt)))
-          : '',
-        startedAt:
-          (reg.createdAt &&
-            formattedDuration(new Date(Number(reg.createdAt)))) ||
-          '',
+        name: reg.name && reg.name.toLowerCase(),
+        iconWithName: (
+          <IconWithName status={reg.declarationStatus} name={reg.name} />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={reg.declarationStatus}
+            name={reg.name}
+            event={event}
+          />
+        ),
         icon,
+        dateOfEvent,
         actions,
         rowClickHandler: [
           {

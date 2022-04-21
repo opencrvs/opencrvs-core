@@ -23,7 +23,9 @@ import styled, { ITheme } from '@client/styledComponents'
 import { Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
-  GridTable
+  GridTable,
+  COLUMNS,
+  SORT_ORDER
 } from '@opencrvs/components/lib/interface'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
@@ -39,6 +41,14 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
+import {
+  changeSortedColumn,
+  getSortedItems
+} from '@client/views/OfficeHome/tabs/utils'
+import {
+  IconWithName,
+  IconWithNameEvent
+} from '@client/views/OfficeHome/tabs/components'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -60,6 +70,8 @@ interface IBaseApprovalTabProps {
 
 interface IApprovalTabState {
   width: number
+  sortedCol: COLUMNS
+  sortOrder: SORT_ORDER
 }
 
 type IApprovalTabProps = IntlShapeProps & IBaseApprovalTabProps
@@ -72,7 +84,9 @@ class ApprovalTabComponent extends React.Component<
   constructor(props: IApprovalTabProps) {
     super(props)
     this.state = {
-      width: window.innerWidth
+      width: window.innerWidth,
+      sortedCol: COLUMNS.NAME,
+      sortOrder: SORT_ORDER.ASCENDING
     }
   }
 
@@ -88,57 +102,58 @@ class ApprovalTabComponent extends React.Component<
     this.setState({ width: window.innerWidth })
   }
 
+  onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+    this.setState({
+      sortOrder: newSortOrder,
+      sortedCol: newSortedCol
+    })
+  }
+
   getColumns = () => {
     if (this.state.width > this.props.theme.grid.breakpoints.lg) {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 14,
-          key: 'event'
-        },
-        {
+          width: 30,
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 26,
-          key: 'name'
+          key: COLUMNS.ICON_WITH_NAME,
+          isSorted: this.state.sortedCol === COLUMNS.NAME,
+          sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
-          width: 25,
-          key: 'eventTimeElapsed'
+          label: this.props.intl.formatMessage(constantsMessages.event),
+          width: 16,
+          key: COLUMNS.EVENT,
+          isSorted: this.state.sortedCol === COLUMNS.EVENT,
+          sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(messages.sentForApprovals),
-          width: 25,
-          key: 'dateOfApproval'
+          label: this.props.intl.formatMessage(constantsMessages.dateOfEvent),
+          width: 18,
+          key: COLUMNS.DATE_OF_EVENT,
+          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
+          sortFunction: this.onColumnClick
         },
         {
-          width: 5,
-          key: 'icons',
-          isIconColumn: true
-        },
-        {
-          width: 5,
-          key: 'actions',
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
+          label: this.props.intl.formatMessage(
+            constantsMessages.sentForApproval
+          ),
+          width: 18,
+          key: COLUMNS.SENT_FOR_APPROVAL,
+          isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_APPROVAL,
+          sortFunction: this.onColumnClick
         }
       ]
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 30,
-          key: 'event'
-        },
-        {
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 64,
-          key: 'name'
-        },
-        {
-          width: 6,
-          key: 'icons',
-          isIconColumn: true
+          width: 90,
+          key: COLUMNS.ICON_WITH_NAME_EVENT
         }
       ]
     }
@@ -151,7 +166,7 @@ class ApprovalTabComponent extends React.Component<
     }
     const transformedData = transformData(data, this.props.intl)
 
-    return transformedData.map((reg) => {
+    const items = transformedData.map((reg) => {
       const icon: JSX.Element = (
         <Validate data-tip data-for="validatedTooltip" />
       )
@@ -161,17 +176,30 @@ class ApprovalTabComponent extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
-
+      const sentForApproval =
+        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
+          ? new Date(reg.modifiedAt)
+          : new Date(Number(reg.modifiedAt))) || ''
+      const dateOfEvent = reg.dateOfEvent && new Date(reg.dateOfEvent)
       return {
         ...reg,
         event,
+        name: reg.name && reg.name.toLowerCase(),
+        iconWithName: (
+          <IconWithName status={reg.declarationStatus} name={reg.name} />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={reg.declarationStatus}
+            name={reg.name}
+            event={event}
+          />
+        ),
         eventTimeElapsed:
           (reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))) ||
           '',
-        dateOfApproval:
-          (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
-            ? formattedDuration(new Date(reg.modifiedAt))
-            : formattedDuration(new Date(Number(reg.modifiedAt)))) || '',
+        dateOfEvent,
+        sentForApproval,
         icon,
         rowClickHandler: [
           {
@@ -180,6 +208,21 @@ class ApprovalTabComponent extends React.Component<
               this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
           }
         ]
+      }
+    })
+    const sortedItems = getSortedItems(
+      items,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+    return sortedItems.map((item) => {
+      return {
+        ...item,
+        dateOfEvent:
+          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
+        sentForApproval:
+          item.sentForApproval &&
+          formattedDuration(item.sentForApproval as Date)
       }
     })
   }

@@ -190,7 +190,7 @@ const getRejectedColumns = (
   if (width && width > theme.grid.breakpoints.lg) {
     return [
       {
-        width: 40,
+        width: 30,
         label: intl.formatMessage(constantsMessages.name),
         key: COLUMNS.ICON_WITH_NAME,
         errorValue: intl.formatMessage(constantsMessages.noNameProvided),
@@ -199,27 +199,27 @@ const getRejectedColumns = (
       },
       {
         label: intl.formatMessage(constantsMessages.event),
-        width: 10,
+        width: 16,
         key: COLUMNS.EVENT,
         isSorted: sortedCol === COLUMNS.EVENT,
         sortFunction: onColumnClick
       },
       {
         label: intl.formatMessage(constantsMessages.dateOfEvent),
-        width: 20,
+        width: 18,
         key: COLUMNS.DATE_OF_EVENT,
         isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,
         sortFunction: onColumnClick
       },
       {
         label: intl.formatMessage(constantsMessages.sentForUpdates),
-        width: 20,
+        width: 18,
         key: COLUMNS.SENT_FOR_UPDATES,
         isSorted: sortedCol === COLUMNS.SENT_FOR_UPDATES,
         sortFunction: onColumnClick
       },
       {
-        width: 10,
+        width: 18,
         alignment: ColumnContentAlignment.RIGHT,
         key: COLUMNS.STATUS_INDICATOR
       }

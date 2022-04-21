@@ -60,12 +60,12 @@ export const IconWithName = ({
   status,
   name
 }: {
-  status: string
-  name: string
+  status?: string
+  name?: string
 }) => {
   return (
     <Flex id="flex">
-      <IconComp status={status} />
+      {status && <IconComp status={status} />}
       {name ? <Name id="name">{name}</Name> : <Error>No name provided</Error>}
     </Flex>
   )
@@ -76,13 +76,13 @@ export const IconWithNameEvent = ({
   name,
   event
 }: {
-  status: string
-  name: string
+  status?: string
+  name?: string
   event?: string
 }) => {
   return (
     <Flex id="flex">
-      <IconComp status={status} />
+      {status && <IconComp status={status} />}
       <NameEventContainer id="nameEvent">
         {name ? <Name>{name}</Name> : <Error>No name provided</Error>}
         {event && <Event>{event}</Event>}

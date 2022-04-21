@@ -111,6 +111,7 @@ interface IConstantsMessages
   notificationSent: MessageDescriptor
   sentForReview: MessageDescriptor
   sentForUpdates: MessageDescriptor
+  sentForApproval: MessageDescriptor
   type: MessageDescriptor
   event: MessageDescriptor
   update: MessageDescriptor
@@ -533,7 +534,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.registerConfirmModalDesc'
   },
   registered: {
-    defaultMessage: 'registered',
+    defaultMessage: 'Registered',
     description: 'A label for registered',
     id: 'constants.registered'
   },
@@ -662,6 +663,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Sent for updates',
     description: 'label for sent for updates',
     id: 'constants.sentForUpdates'
+  },
+  sentForApproval: {
+    defaultMessage: 'Sent for approval',
+    description: 'label for sent for approval',
+    id: 'constants.sentForApproval'
   },
   type: {
     defaultMessage: 'Type',

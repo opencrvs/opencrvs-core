@@ -19,7 +19,9 @@ import { ITheme } from '@client/styledComponents'
 import {
   ColumnContentAlignment,
   GridTable,
-  IAction
+  IAction,
+  SORT_ORDER,
+  COLUMNS
 } from '@opencrvs/components/lib/interface'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
@@ -44,7 +46,14 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
-
+import {
+  changeSortedColumn,
+  getSortedItems
+} from '@client/views/OfficeHome/tabs/utils'
+import {
+  IconWithName,
+  IconWithNameEvent
+} from '@client/views/OfficeHome/tabs/components'
 interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
@@ -62,6 +71,8 @@ interface IBasePrintTabProps {
 
 interface IPrintTabState {
   width: number
+  sortedCol: COLUMNS
+  sortOrder: SORT_ORDER
 }
 
 type IPrintTabProps = IntlShapeProps & IBasePrintTabProps
@@ -74,7 +85,9 @@ class PrintTabComponent extends React.Component<
   constructor(props: IPrintTabProps) {
     super(props)
     this.state = {
-      width: window.innerWidth
+      width: window.innerWidth,
+      sortedCol: COLUMNS.NAME,
+      sortOrder: SORT_ORDER.ASCENDING
     }
   }
 
@@ -96,48 +109,68 @@ class PrintTabComponent extends React.Component<
       : false
   }
 
+  onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+    this.setState({
+      sortOrder: newSortOrder,
+      sortedCol: newSortedCol
+    })
+  }
+
   getColumns = () => {
     if (this.state.width > this.props.theme.grid.breakpoints.lg) {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 14,
-          key: 'event'
-        },
-        {
+          width: 30,
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 25,
-          key: 'name'
+          key: COLUMNS.ICON_WITH_NAME,
+          isSorted: this.state.sortedCol === COLUMNS.NAME,
+          sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(messages.listItemRegisteredDate),
+          label: this.props.intl.formatMessage(constantsMessages.event),
           width: 16,
-          key: 'dateOfRegistration'
+          key: COLUMNS.EVENT,
+          isSorted: this.state.sortedCol === COLUMNS.EVENT,
+          sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(messages.registrationNumber),
-          width: 25,
-          key: 'registrationNumber'
+          label: this.props.intl.formatMessage(constantsMessages.dateOfEvent),
+          width: 18,
+          key: COLUMNS.DATE_OF_EVENT,
+          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
+          sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(messages.listItemAction),
-          width: 20,
-          key: 'actions',
-          alignment: ColumnContentAlignment.CENTER,
+          label: this.props.intl.formatMessage(constantsMessages.registered),
+          width: 18,
+          key: COLUMNS.REGISTERED,
+          isSorted: this.state.sortedCol === COLUMNS.REGISTERED,
+          sortFunction: this.onColumnClick
+        },
+        {
+          width: 18,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
           isActionColumn: true
         }
       ]
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 30,
-          key: 'event'
-        },
-        {
           label: this.props.intl.formatMessage(constantsMessages.name),
           width: 70,
-          key: 'name'
+          key: COLUMNS.ICON_WITH_NAME_EVENT
+        },
+        {
+          width: 30,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
         }
       ]
     }
@@ -150,7 +183,7 @@ class PrintTabComponent extends React.Component<
     }
 
     const transformedData = transformData(data, this.props.intl)
-    return transformedData.map((reg, index) => {
+    const items = transformedData.map((reg, index) => {
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
@@ -192,13 +225,27 @@ class PrintTabComponent extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
+      const dateOfEvent = reg.dateOfEvent && new Date(reg.dateOfEvent)
+      const registered =
+        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
+          ? new Date(reg.modifiedAt)
+          : new Date(Number(reg.modifiedAt))) || ''
       return {
         ...reg,
         event,
-        dateOfRegistration:
-          (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
-            ? formattedDuration(new Date(reg.modifiedAt))
-            : formattedDuration(new Date(Number(reg.modifiedAt)))) || '',
+        name: reg.name && reg.name.toLowerCase(),
+        iconWithName: (
+          <IconWithName status={reg.declarationStatus} name={reg.name} />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={reg.declarationStatus}
+            name={reg.name}
+            event={event}
+          />
+        ),
+        dateOfEvent,
+        registered,
         actions,
         rowClickHandler: [
           {
@@ -207,6 +254,21 @@ class PrintTabComponent extends React.Component<
               this.props.goToDeclarationRecordAudit('printTab', reg.id)
           }
         ]
+      }
+    })
+    const sortedItems = getSortedItems(
+      items,
+      this.state.sortedCol,
+      this.state.sortOrder
+    )
+
+    return sortedItems.map((item) => {
+      return {
+        ...item,
+        dateOfEvent:
+          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
+        registered:
+          item.registered && formattedDuration(item.registered as Date)
       }
     })
   }
