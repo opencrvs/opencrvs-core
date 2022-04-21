@@ -46,6 +46,7 @@ export interface IBirthRegistrationTags {
   regStatus: string
   gender: string | undefined
   timeLabel: string | undefined
+  ageLabel: string | undefined
   officeLocation?: string
   locationLevel5?: string
   locationLevel4?: string
@@ -57,6 +58,7 @@ export interface IDeathRegistrationTags {
   regStatus: string
   gender: string | undefined
   timeLabel: string | undefined
+  ageLabel: string | undefined
   mannerOfDeath: string
   causeOfDeath: string
   officeLocation?: string

@@ -154,3 +154,11 @@ export async function getTimeLabel(
     return 'after5Years'
   }
 }
+
+export function getAgeLabel(ageInDays: number) {
+  if (ageInDays < 6574) {
+    return 'under18'
+  } else {
+    return 'over18'
+  }
+}

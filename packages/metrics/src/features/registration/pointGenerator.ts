@@ -56,7 +56,8 @@ import {
   getAgeInYears,
   getDurationInSeconds,
   getDurationInDays,
-  getTimeLabel
+  getTimeLabel,
+  getAgeLabel
 } from '@metrics/features/registration/utils'
 import {
   OPENCRVS_SPECIFICATION_URL,
@@ -159,6 +160,7 @@ export const generateBirthRegPoint = async (
   const tags: IBirthRegistrationTags = {
     regStatus: regStatus,
     gender: child.gender,
+    ageLabel: (ageInDays && getAgeLabel(ageInDays)) || undefined,
     timeLabel:
       (ageInDays && (await getTimeLabel(ageInDays, EVENT_TYPE.BIRTH))) ||
       undefined,
@@ -205,10 +207,15 @@ export const generateDeathRegPoint = async (
       undefined,
     deathDays
   }
-
+  const deceasedAgeInDays =
+    (deceased.birthDate &&
+      getAgeInDays(deceased.birthDate, new Date(composition.date))) ||
+    undefined
   const tags: IDeathRegistrationTags = {
     regStatus: regStatus,
     gender: deceased.gender,
+    ageLabel:
+      (deceasedAgeInDays && getAgeLabel(deceasedAgeInDays)) || undefined,
     timeLabel:
       (deathDays && (await getTimeLabel(deathDays, EVENT_TYPE.DEATH))) ||
       undefined,

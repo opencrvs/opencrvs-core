@@ -67,7 +67,7 @@ type Query {
     timeEnd: String!
     locationId: String!
     event: String!
-  ): [EventMetrics]
+  ): TotalMetricsResult
   getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
@@ -372,7 +372,11 @@ type EventMetrics {
   gender: String
   eventLocationType: String
   timeLabel: String
+}
+
+type TotalMetricsResult {
   estimated: Int
+  results: [EventMetrics]
 }
 
 type DeclarationsStartedMetrics {

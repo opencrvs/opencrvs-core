@@ -122,7 +122,6 @@ type EventMetrics {
   gender: String
   eventLocationType: String
   timeLabel: String
-  estimated: Int
 }
 
 type DeclarationsStartedMetrics {

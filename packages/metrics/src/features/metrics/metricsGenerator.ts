@@ -858,10 +858,10 @@ export async function getTotalMetrics(
       timeTo
     )
 
-  return totalMetrics.map((metrics) => ({
-    ...metrics,
-    estimate: estimationOfTimeRange
-  }))
+  return {
+    estimated: estimationOfTimeRange,
+    results: totalMetrics
+  }
 }
 
 function populateGenderBasisMetrics(

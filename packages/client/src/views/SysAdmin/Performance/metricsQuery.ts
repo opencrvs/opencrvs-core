@@ -100,24 +100,17 @@ export const PERFORMANCE_METRICS_FOR_OFFICE = gql`
 `
 export const PERFORMANCE_METRICS = gql`
   query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
-    getEventEstimationMetrics(
+    getTotalMetrics(
       timeStart: $timeStart
       timeEnd: $timeEnd
       locationId: $locationId
     ) {
-      birthTargetDayMetrics {
-        actualRegistration
-        estimatedRegistration
-        estimatedPercentage
-        malePercentage
-        femalePercentage
-      }
-      deathTargetDayMetrics {
-        actualRegistration
-        estimatedRegistration
-        estimatedPercentage
-        malePercentage
-        femalePercentage
+      estimated
+      results {
+        total
+        gender
+        eventLocationType
+        timeLabel
       }
     }
 

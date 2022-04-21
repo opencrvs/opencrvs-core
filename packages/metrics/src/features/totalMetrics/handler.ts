@@ -31,17 +31,12 @@ export async function totalMetricsHandler(
     Authorization: request.headers.authorization,
     'x-correlation-id': request.headers['x-correlation-id']
   }
-  const fallbackResponse: any[] = []
-  try {
-    const metrics = await getTotalMetrics(
-      timeStart,
-      timeEnd,
-      locationId,
-      event,
-      authHeader
-    )
-    return metrics
-  } catch (error) {
-    return fallbackResponse
-  }
+
+  return await getTotalMetrics(
+    timeStart,
+    timeEnd,
+    locationId,
+    event,
+    authHeader
+  )
 }
