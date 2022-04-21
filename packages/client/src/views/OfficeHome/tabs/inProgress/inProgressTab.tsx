@@ -153,8 +153,6 @@ export class InProgressTabComponent extends React.Component<
   }
 
   pageSize = 10
-  isFieldAgent =
-    !this.props.selectorId || this.props.selectorId === SELECTOR_ID.ownDrafts
 
   onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -411,13 +409,19 @@ export class InProgressTabComponent extends React.Component<
           sortFunction: this.onColumnClick
         },
         {
-          label: this.isFieldAgent
-            ? this.props.intl.formatMessage(constantsMessages.lastUpdated)
-            : this.props.intl.formatMessage(constantsMessages.notificationSent),
+          label:
+            this.props.selectorId &&
+            this.props.selectorId !== SELECTOR_ID.ownDrafts
+              ? this.props.intl.formatMessage(
+                  constantsMessages.notificationSent
+                )
+              : this.props.intl.formatMessage(constantsMessages.lastUpdated),
           width: 18,
-          key: this.isFieldAgent
-            ? COLUMNS.LAST_UPDATED
-            : COLUMNS.NOTIFICATION_SENT,
+          key:
+            this.props.selectorId &&
+            this.props.selectorId !== SELECTOR_ID.ownDrafts
+              ? COLUMNS.NOTIFICATION_SENT
+              : COLUMNS.LAST_UPDATED,
           isSorted: this.state.sortedCol === COLUMNS.LAST_UPDATED,
           sortFunction: this.onColumnClick
         },
@@ -505,6 +509,8 @@ export class InProgressTabComponent extends React.Component<
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
           loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
+          sortOrder={this.state.sortOrder}
+          sortedCol={this.state.sortedCol}
         />
         <LoadingIndicator
           loading={this.props.loading ? true : false}
@@ -534,6 +540,8 @@ export class InProgressTabComponent extends React.Component<
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
           loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
+          sortOrder={this.state.sortOrder}
+          sortedCol={this.state.sortedCol}
         />
         <LoadingIndicator
           loading={this.props.loading ? true : false}

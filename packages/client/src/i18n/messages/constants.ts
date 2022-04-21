@@ -110,6 +110,7 @@ interface IConstantsMessages
   dateOfEvent: MessageDescriptor
   notificationSent: MessageDescriptor
   sentForReview: MessageDescriptor
+  sentForValidation: MessageDescriptor
   sentForUpdates: MessageDescriptor
   sentForApproval: MessageDescriptor
   type: MessageDescriptor
@@ -658,6 +659,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Sent for review',
     description: 'label for sent for review',
     id: 'constants.sentForReview'
+  },
+  sentForValidation: {
+    defaultMessage: 'Sent for validation',
+    description: 'label for sent for validation',
+    id: 'constants.sentForValidation'
   },
   sentForUpdates: {
     defaultMessage: 'Sent for updates',

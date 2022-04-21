@@ -54,6 +54,12 @@ export const changeSortedColumn = (
     case COLUMNS.REGISTERED:
       newSortedCol = COLUMNS.REGISTERED
       break
+    case COLUMNS.SENT_FOR_VALIDATION:
+      newSortedCol = COLUMNS.SENT_FOR_VALIDATION
+      break
+    case COLUMNS.NOTIFICATION_SENT:
+      newSortedCol = COLUMNS.NOTIFICATION_SENT
+      break
     default:
       newSortedCol = COLUMNS.NAME
   }

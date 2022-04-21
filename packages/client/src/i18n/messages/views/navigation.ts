@@ -60,7 +60,7 @@ const messagesToDefine: INavigationMessages = {
     id: 'navigation.approvals'
   },
   waitingValidation: {
-    defaultMessage: 'Waiting for validation',
+    defaultMessage: 'In external validation',
     description: 'Waiting for validation label in navigation',
     id: 'navigation.waitingValidation'
   },

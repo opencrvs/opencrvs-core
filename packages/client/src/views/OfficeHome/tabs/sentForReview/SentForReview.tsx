@@ -314,12 +314,12 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
       return [
         {
           label: this.props.intl.formatMessage(messages.name),
-          width: 90,
+          width: 70,
           key: COLUMNS.ICON_WITH_NAME_EVENT
         },
         {
           label: '',
-          width: 10,
+          width: 30,
           alignment: ColumnContentAlignment.RIGHT,
           key: COLUMNS.STATUS_INDICATOR
         }

@@ -12,7 +12,9 @@
 import * as React from 'react'
 import {
   GridTable,
-  ColumnContentAlignment
+  ColumnContentAlignment,
+  COLUMNS,
+  SORT_ORDER
 } from '@opencrvs/components/lib/interface'
 import { ITheme, withTheme } from '@client/styledComponents'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
@@ -33,6 +35,14 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
+import {
+  getSortedItems,
+  changeSortedColumn
+} from '@client/views/OfficeHome/tabs/utils'
+import {
+  IconWithName,
+  IconWithNameEvent
+} from '@client/views/OfficeHome/tabs/components'
 
 const { useState, useEffect } = React
 
@@ -57,44 +67,13 @@ type IProps = IBaseProps & IntlShapeProps & IDispatchProps
 
 function ExternalValidationTabComponent(props: IProps) {
   const pageSize = 10
-  const transformWaitingValidationContent = (data: GQLEventSearchResultSet) => {
-    const { intl } = props
-    if (!data || !data.results) {
-      return []
-    }
-    const transformedData = transformData(data, props.intl)
-
-    return transformedData.map((reg) => {
-      const event =
-        (reg.event &&
-          intl.formatMessage(
-            dynamicConstantsMessages[reg.event.toLowerCase()]
-          )) ||
-        ''
-      return {
-        ...reg,
-        event,
-        actions: [],
-        eventTimeElapsed:
-          (reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))) ||
-          '',
-        waitingTimeElapsed:
-          (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
-            ? formattedDuration(new Date(reg.modifiedAt))
-            : formattedDuration(new Date(Number(reg.modifiedAt)))) || '',
-
-        rowClickHandler: [
-          {
-            label: 'rowClickHandler',
-            handler: () =>
-              props.goToDeclarationRecordAudit('externalValidationTab', reg.id)
-          }
-        ]
-      }
-    })
-  }
-
+  const [sortedCol, setSortedCOl] = React.useState<COLUMNS>(COLUMNS.NAME)
+  const [sortOrder, setSortOrder] = React.useState<SORT_ORDER>(
+    SORT_ORDER.ASCENDING
+  )
   const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth)
+  const { intl, queryData, page, onPageChange } = props
+  const { data } = queryData
 
   useEffect(() => {
     function recordWindowWidth() {
@@ -106,51 +85,113 @@ function ExternalValidationTabComponent(props: IProps) {
     return () => window.removeEventListener('resize', recordWindowWidth)
   }, [])
 
+  const onColumnClick = (columnName: string) => {
+    const { newSortedCol, newSortOrder } = changeSortedColumn(
+      columnName,
+      sortedCol,
+      sortOrder
+    )
+    setSortedCOl(newSortedCol)
+    setSortOrder(newSortOrder)
+  }
+
+  const transformWaitingValidationContent = (data: GQLEventSearchResultSet) => {
+    const { intl } = props
+    if (!data || !data.results) {
+      return []
+    }
+    const transformedData = transformData(data, props.intl)
+
+    const items = transformedData.map((reg) => {
+      const event =
+        (reg.event &&
+          intl.formatMessage(
+            dynamicConstantsMessages[reg.event.toLowerCase()]
+          )) ||
+        ''
+      const dateOfEvent = reg.dateOfEvent && new Date(reg.dateOfEvent)
+      const sentForValidation =
+        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
+          ? new Date(reg.modifiedAt)
+          : new Date(Number(reg.modifiedAt))) || ''
+      return {
+        ...reg,
+        event,
+        name: reg.name && reg.name.toLowerCase(),
+        iconWithName: (
+          <IconWithName status={reg.declarationStatus} name={reg.name} />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={reg.declarationStatus}
+            name={reg.name}
+            event={event}
+          />
+        ),
+        actions: [],
+        dateOfEvent,
+        sentForValidation,
+        rowClickHandler: [
+          {
+            label: 'rowClickHandler',
+            handler: () =>
+              props.goToDeclarationRecordAudit('externalValidationTab', reg.id)
+          }
+        ]
+      }
+    })
+    const sortedItems = getSortedItems(items, sortedCol, sortOrder)
+    return sortedItems.map((item) => {
+      return {
+        ...item,
+        dateOfEvent:
+          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
+        sentForValidation:
+          item.sentForValidation &&
+          formattedDuration(item.sentForValidation as Date)
+      }
+    })
+  }
+
   const columns =
     viewportWidth > props.theme.grid.breakpoints.lg
       ? [
           {
-            label: props.intl.formatMessage(constantsMessages.type),
-            width: 14,
-            key: 'event'
-          },
-          {
+            width: 30,
             label: props.intl.formatMessage(constantsMessages.name),
-            width: 25,
-            key: 'name'
+            key: COLUMNS.ICON_WITH_NAME,
+            isSorted: sortedCol === COLUMNS.NAME,
+            sortFunction: onColumnClick
           },
           {
-            label: props.intl.formatMessage(messages.sentForExternalValidation),
-            width: 28,
-            key: 'waitingTimeElapsed'
+            label: props.intl.formatMessage(constantsMessages.event),
+            width: 16,
+            key: COLUMNS.EVENT,
+            isSorted: sortedCol === COLUMNS.EVENT,
+            sortFunction: onColumnClick
           },
           {
-            label: props.intl.formatMessage(constantsMessages.eventDate),
-            width: 28,
-            key: 'eventTimeElapsed'
+            label: props.intl.formatMessage(constantsMessages.dateOfEvent),
+            width: 18,
+            key: COLUMNS.DATE_OF_EVENT,
+            isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,
+            sortFunction: onColumnClick
           },
           {
-            width: 5,
-            key: 'actions',
-            isActionColumn: true,
-            alignment: ColumnContentAlignment.CENTER
+            label: props.intl.formatMessage(constantsMessages.sentForReview),
+            width: 18,
+            key: COLUMNS.SENT_FOR_VALIDATION,
+            isSorted: sortedCol === COLUMNS.SENT_FOR_VALIDATION,
+            sortFunction: onColumnClick
           }
         ]
       : [
           {
-            label: props.intl.formatMessage(constantsMessages.type),
-            width: 30,
-            key: 'event'
-          },
-          {
             label: props.intl.formatMessage(constantsMessages.name),
-            width: 70,
-            key: 'name'
+            width: 90,
+            key: COLUMNS.ICON_WITH_NAME_EVENT
           }
         ]
-
-  const { intl, queryData, page, onPageChange } = props
-  const { data } = queryData
 
   return (
     <Content
@@ -169,6 +210,8 @@ function ExternalValidationTabComponent(props: IProps) {
         loading={props.loading}
         loadMoreText={intl.formatMessage(officeHomeMessages.waitingValidation)}
         columns={columns}
+        sortOrder={sortOrder}
+        sortedCol={sortedCol}
       />
       <LoadingIndicator
         loading={Boolean(props.loading)}

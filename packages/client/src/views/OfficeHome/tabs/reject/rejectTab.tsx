@@ -312,6 +312,8 @@ class RejectTabComponent extends React.Component<
           showPaginated={this.props.showPaginated}
           loading={this.props.loading}
           loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
+          sortOrder={this.state.sortOrder}
+          sortedCol={this.state.sortedCol}
         />
         <LoadingIndicator
           loading={this.props.loading ? true : false}
