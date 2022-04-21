@@ -73,10 +73,7 @@ import { FormattedNumber, injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
-import {
-  PERFORMANCE_METRICS,
-  PERFORMANCE_METRICS_FOR_OFFICE
-} from './metricsQuery'
+import { PERFORMANCE_METRICS } from './metricsQuery'
 
 import format from '@client/utils/date-formatting'
 import { getPercentage } from '@client/utils/data-formatting'
@@ -120,6 +117,7 @@ interface State {
   selectedLocation: ISearchLocation
   timeStart: Date
   timeEnd: Date
+  selectedEvent: 'BIRTH' | 'DEATH'
   expandStatusWindow: boolean
   statusWindowWidth: number
   mainWindowLeftMargin: number
@@ -269,6 +267,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
     return {
       sectionId,
       selectedLocation,
+      selectedEvent: 'BIRTH' as const,
       timeStart: new Date(timeStart),
       timeEnd: new Date(timeEnd),
       expandStatusWindow: state ? state.expandStatusWindow : false,
@@ -384,11 +383,13 @@ class OperationalReportComponent extends React.Component<Props, State> {
       sectionId,
       timeStart,
       timeEnd,
+      selectedEvent,
       expandStatusWindow,
       statusWindowWidth,
       mainWindowLeftMargin,
       mainWindowRightMargin
     } = this.state
+
     const role = userDetails && userDetails.role
 
     const { displayLabel: title, id: locationId } = selectedLocation
@@ -464,7 +465,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 timeStart: timeStart.toISOString(),
                 timeEnd: timeEnd.toISOString(),
                 locationId,
-                event: 'BIRTH' // @todo
+                event: selectedEvent
               }}
               fetchPolicy="no-cache"
             >
@@ -493,7 +494,11 @@ class OperationalReportComponent extends React.Component<Props, State> {
                   <>
                     <ListViewSimplified>
                       <ListViewItemSimplified
-                        label={<PerformanceTitle>Total</PerformanceTitle>}
+                        label={
+                          <PerformanceTitle>
+                            {intl.formatMessage(messages.performanceTotalLabel)}
+                          </PerformanceTitle>
+                        }
                         value={
                           <div>
                             <PerformanceValue>
@@ -504,7 +509,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
                             </PerformanceValue>
                             <Breakdown>
                               <BreakdownRow>
-                                <BreakdownLabel>Male: </BreakdownLabel>
+                                <BreakdownLabel>
+                                  {intl.formatMessage(
+                                    messages.performanceMaleLabel
+                                  )}
+                                  :{' '}
+                                </BreakdownLabel>
                                 <BreakdownValue>
                                   {
                                     <PercentageDisplay
@@ -521,7 +531,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
                                 </BreakdownValue>
                               </BreakdownRow>
                               <BreakdownRow>
-                                <BreakdownLabel>Female: </BreakdownLabel>
+                                <BreakdownLabel>
+                                  {intl.formatMessage(
+                                    messages.performanceFemaleLabel
+                                  )}
+                                  :{' '}
+                                </BreakdownLabel>
                                 <BreakdownValue>
                                   {
                                     <PercentageDisplay
@@ -540,12 +555,13 @@ class OperationalReportComponent extends React.Component<Props, State> {
                             </Breakdown>
                           </div>
                         }
-                        actions={<Link></Link>}
                       />
                       <ListViewItemSimplified
                         label={
                           <PerformanceTitle>
-                            Delayed registrations
+                            {intl.formatMessage(
+                              messages.performanceDelayedRegistrationsLabel
+                            )}
                           </PerformanceTitle>
                         }
                         value={
@@ -570,7 +586,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
                             </PerformanceValue>
                             <Breakdown>
                               <BreakdownRow>
-                                <BreakdownLabel>Male: </BreakdownLabel>
+                                <BreakdownLabel>
+                                  {intl.formatMessage(
+                                    messages.performanceMaleLabel
+                                  )}
+                                  :{' '}
+                                </BreakdownLabel>
                                 <BreakdownValue>
                                   {
                                     <PercentageDisplay
@@ -598,7 +619,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
                                 </BreakdownValue>
                               </BreakdownRow>
                               <BreakdownRow>
-                                <BreakdownLabel>Female: </BreakdownLabel>
+                                <BreakdownLabel>
+                                  {intl.formatMessage(
+                                    messages.performanceFemaleLabel
+                                  )}
+                                  :{' '}
+                                </BreakdownLabel>
                                 <BreakdownValue>
                                   {
                                     <PercentageDisplay
@@ -628,10 +654,23 @@ class OperationalReportComponent extends React.Component<Props, State> {
                             </Breakdown>
                           </div>
                         }
-                        actions={<Link></Link>}
                       />
                       <ListViewItemSimplified
-                        label={<PerformanceTitle>Home</PerformanceTitle>}
+                        label={
+                          selectedEvent === 'BIRTH' ? (
+                            <PerformanceTitle>
+                              {intl.formatMessage(
+                                messages.performanceHomeBirth
+                              )}
+                            </PerformanceTitle>
+                          ) : (
+                            <PerformanceTitle>
+                              {intl.formatMessage(
+                                messages.performanceHomeDeath
+                              )}
+                            </PerformanceTitle>
+                          )
+                        }
                         value={
                           <div>
                             <PerformanceValue>
@@ -651,11 +690,22 @@ class OperationalReportComponent extends React.Component<Props, State> {
                             </PerformanceValue>
                           </div>
                         }
-                        actions={<Link></Link>}
                       />
                       <ListViewItemSimplified
                         label={
-                          <PerformanceTitle>Health Facility</PerformanceTitle>
+                          selectedEvent === 'BIRTH' ? (
+                            <PerformanceTitle>
+                              {intl.formatMessage(
+                                messages.performanceHealthFacilityBirth
+                              )}
+                            </PerformanceTitle>
+                          ) : (
+                            <PerformanceTitle>
+                              {intl.formatMessage(
+                                messages.performanceHealthFacilityDeath
+                              )}
+                            </PerformanceTitle>
+                          )
                         }
                         value={
                           <div>
@@ -677,7 +727,6 @@ class OperationalReportComponent extends React.Component<Props, State> {
                             </PerformanceValue>
                           </div>
                         }
-                        actions={<Link></Link>}
                       />
                     </ListViewSimplified>
                   </>
