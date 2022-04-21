@@ -269,46 +269,10 @@ describe('In Progress tab', () => {
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(TIME_STAMP)
 
       expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-      expect(data[0].name).toBe('Anik Hoque')
-      expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
+      expect(data[0].name).toBe('anik hoque')
+      expect(data[0].lastUpdated).toBe(EXPECTED_DATE_OF_REJECTION)
       expect(data[0].event).toBe('Birth')
       expect(data[0].actions).toBeDefined()
-    })
-
-    it('Should render pagination in progress tab if pagination is used and data is more than 10', async () => {
-      jest.clearAllMocks()
-      const drafts: IDeclaration[] = []
-      for (let i = 0; i < 12; i++) {
-        drafts.push(createDeclaration(Event.BIRTH))
-      }
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <InProgressTab
-          drafts={drafts}
-          selectorId={SELECTOR_ID.ownDrafts}
-          queryData={{
-            inProgressData: {},
-            notificationData: {}
-          }}
-          showPaginated={true}
-        />,
-        { store, history }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.update()
-      const pagiBtn = testComponent.find('#pagination')
-
-      expect(pagiBtn.hostNodes()).toHaveLength(1)
-      testComponent
-        .find('#pagination button')
-        .last()
-        .hostNodes()
-        .simulate('click')
     })
 
     it('redirects user to detail page on update click', async () => {
@@ -347,17 +311,6 @@ describe('In Progress tab', () => {
           }
         },
         {
-          id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be9',
-          event: Event.BIRTH,
-          modifiedOn: TIME_STAMP,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          data: {
-            child: {
-              familyName: 'অনিক'
-            }
-          }
-        },
-        {
           id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
           event: Event.DEATH,
           modifiedOn: TIME_STAMP,
@@ -365,9 +318,7 @@ describe('In Progress tab', () => {
           data: {
             deceased: {
               firstNamesEng: 'Anik',
-              firstNames: 'অনিক',
-              familyNameEng: 'Hoque',
-              familyName: 'অনিক'
+              familyNameEng: 'Hoque'
             }
           }
         },
@@ -379,17 +330,6 @@ describe('In Progress tab', () => {
           data: {
             deceased: {
               familyNameEng: 'Hoque'
-            }
-          }
-        },
-        {
-          id: 'cc66d69c-7f0a-4047-9283-f066571830f3',
-          event: Event.DEATH,
-          modifiedOn: TIME_STAMP,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          data: {
-            deceased: {
-              familyName: 'অনিক'
             }
           }
         },
@@ -435,9 +375,8 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-
       expect(history.location.pathname).toContain(
-        '/drafts/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+        '/drafts/cc66d69c-7f0a-4047-9283-f066571830f4'
       )
     })
   })
@@ -521,45 +460,10 @@ describe('In Progress tab', () => {
       testComponent.update()
       const data = testComponent.find(GridTable).prop('content')
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
-
       expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
-      expect(data[0].name).toBe('K M Abdullah al amin Khan')
-      expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
+      expect(data[0].name).toBe('k m abdullah al amin khan')
+      expect(data[0].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
       expect(data[0].event).toBe('Death')
-    })
-
-    it('Should render pagination in progress tab if pagination is used and data is more than 10', async () => {
-      jest.clearAllMocks()
-      const drafts: IDeclaration[] = []
-      drafts.push(createDeclaration(Event.BIRTH))
-      const testComponent = await createTestComponent(
-        // @ts-ignore
-        <InProgressTab
-          drafts={drafts}
-          selectorId={SELECTOR_ID.fieldAgentDrafts}
-          queryData={{
-            inProgressData: { totalItems: 12 },
-            notificationData: { totalItems: 2 }
-          }}
-          showPaginated={true}
-        />,
-        { store, history }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.update()
-      const pagiBtn = testComponent.find('#pagination')
-
-      expect(pagiBtn.hostNodes()).toHaveLength(1)
-      testComponent
-        .find('#pagination button')
-        .last()
-        .hostNodes()
-        .simulate('click')
     })
 
     it('redirects to recordAudit page when item is clicked', async () => {
@@ -840,8 +744,8 @@ describe('In Progress tab', () => {
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
 
       expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
-      expect(data[0].name).toBe('Anik Hoque')
-      expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
+      expect(data[0].name).toBe('anik hoque')
+      expect(data[0].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
       expect(data[0].event).toBe('Birth')
     })
   })

@@ -287,7 +287,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       dateOfDeath: '2007-01-01',
       deceasedName: [
         {
-          firstNames: 'Iliyas',
+          firstNames: 'Zayed',
           familyName: 'Khan',
           use: 'en'
         },
@@ -318,7 +318,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
-    expect(data[0].dateOfRegistration).toBe(EXPECTED_DATE_OF_DECLARATION)
+    expect(data[0].registered).toBe(EXPECTED_DATE_OF_DECLARATION)
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
@@ -342,51 +342,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
     expect(data.length).toBe(0)
   })
 
-  it('should show pagination bar if pagination is used and items are more than 11 in ready for print tab', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <PrintTab
-        queryData={{
-          data: { totalItems: 14, results: [] }
-        }}
-        showPaginated={true}
-      />,
-      { store, history }
-    )
-
-    const element = await waitForElement(testComponent, '#pagination')
-
-    expect(element.hostNodes()).toHaveLength(1)
-
-    testComponent
-      .find('#pagination button')
-      .last()
-      .hostNodes()
-      .simulate('click')
-  })
-  it('should show loadmore button if loadmore is used and items are more than 11 in ready for print tab', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <PrintTab
-        queryData={{
-          data: { totalItems: 14, results: [] }
-        }}
-        showPaginated={false}
-      />,
-      { store, history }
-    )
-
-    const element = await waitForElement(testComponent, '#load_more_button')
-
-    expect(element.hostNodes()).toHaveLength(1)
-
-    testComponent.find('#load_more_button').last().hostNodes().simulate('click')
-  })
-
   describe('When a row is clicked', () => {
     let expandedRow: any
 
@@ -402,12 +357,13 @@ describe('RegistrarHome ready to print tab related tests', () => {
       )
 
       // wait for mocked data to load mockedProvider
-      await waitForElement(testComponent, '#row_0')
+      // after sorting (by default name) row's order will be changed
+      await waitForElement(testComponent, '#row_1')
 
       testComponent.update()
-      testComponent.find('#row_0').hostNodes().simulate('click')
+      testComponent.find('#row_1').hostNodes().simulate('click')
 
-      await waitForElement(testComponent, '#row_0')
+      await waitForElement(testComponent, '#row_1')
       testComponent.update()
 
       expect(window.location.href).toContain(
@@ -697,7 +653,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
     it('downloads declaration after clicking download button', async () => {
       const downloadButton = await waitForElement(
         testComponent,
-        '#ListItemAction-0-icon'
+        '#ListItemAction-1-icon'
       )
 
       downloadButton.hostNodes().simulate('click')
@@ -705,7 +661,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       testComponent.update()
 
       expect(
-        testComponent.find('#action-loading-ListItemAction-0').hostNodes()
+        testComponent.find('#action-loading-ListItemAction-1').hostNodes()
       ).toHaveLength(1)
 
       await new Promise((resolve) => {
@@ -715,7 +671,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
       const action = await waitForElement(
         testComponent,
-        '#ListItemAction-0-Print'
+        '#ListItemAction-1-Print'
       )
       action.hostNodes().simulate('click')
 
@@ -741,7 +697,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#action-error-ListItemAction-1'
+        '#action-error-ListItemAction-0'
       )
 
       expect(errorIcon.hostNodes()).toHaveLength(1)
@@ -776,7 +732,7 @@ describe('Tablet tests', () => {
     )
 
     testComponent.update()
-    const element = await waitForElement(testComponent, '#row_0')
+    const element = await waitForElement(testComponent, '#row_1')
     element.hostNodes().simulate('click')
 
     await new Promise((resolve) => {

@@ -29,7 +29,7 @@ import { waitForElement, waitFor } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
 import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 import { OfficeHome, EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
-import { Validate } from '@opencrvs/components/lib/icons'
+import { Validate, DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import { ReactWrapper } from 'enzyme'
@@ -249,7 +249,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     expect(data[0].id).toBe('9a55d213-ad9f-4dcd-9418-340f3a7f6269')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')
     expect(data[0].declarationTimeElapsed).toBe(EXPECTED_DATE_OF_DECLARATION)
-    expect(data[0].name).toBe('Iliyas Khan')
+    expect(data[0].name).toBe('iliyas khan')
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
@@ -274,57 +274,6 @@ describe('OfficeHome sent for review tab related tests', () => {
     const gridTable = await waitForElement(testComponent, GridTable)
     const data = gridTable.prop('content')
     expect(data.length).toBe(0)
-  })
-
-  it('should show pagination bar if pagination is used and items more than 11 in ReviewTab', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
-        queryData={{
-          data: {
-            totalItems: 14,
-            results: []
-          }
-        }}
-        showPaginated={true}
-      />,
-      { store, history }
-    )
-
-    const pagination = await waitForElement(testComponent, '#pagination')
-
-    expect(pagination.hostNodes()).toHaveLength(1)
-
-    testComponent
-      .find('#pagination button')
-      .last()
-      .hostNodes()
-      .simulate('click')
-  })
-  it('should show loadmore button if loadmore is used and items more than 11 in ReviewTab', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
-        queryData={{
-          data: {
-            totalItems: 14,
-            results: []
-          }
-        }}
-        showPaginated={false}
-      />,
-      { store, history }
-    )
-
-    const loadmore = await waitForElement(testComponent, '#load_more_button')
-
-    expect(loadmore.hostNodes()).toHaveLength(1)
-
-    testComponent.find('#load_more_button').last().hostNodes().simulate('click')
   })
 
   it('redirects to recordAudit page if row is clicked', async () => {
@@ -702,9 +651,9 @@ describe('OfficeHome sent for review tab related tests', () => {
       { store, history }
     )
 
-    const validate = await waitForElement(testComponent, Validate)
-
-    expect(validate).toHaveLength(1)
+    const component = await waitForElement(testComponent, DeclarationIcon)
+    const props = component.find('#declaration_icon').first().props().color
+    expect(props).toBe('grey')
   })
 
   describe.skip('handles download status for possible duplicate declaration', () => {

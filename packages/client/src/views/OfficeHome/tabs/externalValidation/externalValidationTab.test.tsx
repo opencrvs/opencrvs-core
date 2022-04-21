@@ -97,8 +97,8 @@ describe('Registrar home external validation tab tests', () => {
 
     expect(data.length).toBe(1)
     expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
-    expect(data[0].waitingTimeElapsed).toBe('4 days ago')
-    expect(data[0].eventTimeElapsed).toBe('9 years ago')
+    expect(data[0].sentForValidation).toBe('4 days ago')
+    expect(data[0].dateOfEvent).toBe('9 years ago')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
   })

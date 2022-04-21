@@ -249,7 +249,7 @@ export class InProgressTabComponent extends React.Component<
               dynamicConstantsMessages[event.toLowerCase()]
             )) ||
           '',
-        name: name.toString().toLowerCase(),
+        name: name && name.toString().toLowerCase(),
         iconWithName: (
           <IconWithName
             status={reg.registration?.status || SUBMISSION_STATUS.DRAFT}
@@ -337,7 +337,7 @@ export class InProgressTabComponent extends React.Component<
       return {
         id: draft.id,
         event,
-        name: name.toString().toLowerCase() || '',
+        name: (name && name.toString().toLowerCase()) || '',
         iconWithName: (
           <IconWithName
             status={

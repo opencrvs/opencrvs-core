@@ -53,7 +53,7 @@ export const DeclarationIcon = ({
   }
 
   return (
-    <svg width={24} height={24} fill="none" {...props}>
+    <svg width={24} height={24} fill="none" {...props} id={'declaration_icon'}>
       <path
         d="M3 1C3 0.447716 3.44772 0 4 0L13.804 0L21 7.20903V23C21 23.5523 20.5523 24 20 24H4C3.44772 24 3 23.5523 3 23V1Z"
         fill={fill}

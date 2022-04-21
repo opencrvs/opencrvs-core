@@ -281,33 +281,4 @@ describe('OutBox tests', () => {
       expect(testComp.find('#row_0').exists()).toBeFalsy()
     })
   })
-
-  describe('Pagination/loadmore test for more than 10 declarations', () => {
-    const declarations: IDeclaration[] = []
-    for (let i = 0; i < 16; i++) {
-      declarations.push(birthApp)
-    }
-    it('shows pagination bar when pagination is used', async () => {
-      const testComp = await createTestComponent(
-        <OutBox declaration={declarations} showPaginated={true} />,
-        { store, history }
-      )
-      expect(testComp.exists('#pagination')).toBeTruthy()
-      testComp
-        .find('#pagination')
-        .children()
-        .map((child) => child.simulate('click'))
-    })
-    it('shows loadmore button when loadmore is used', async () => {
-      const testComp = await createTestComponent(
-        <OutBox declaration={declarations} showPaginated={false} />,
-        { store, history }
-      )
-      expect(testComp.exists('#load_more_button')).toBeTruthy()
-      testComp
-        .find('#load_more_button')
-        .children()
-        .map((child) => child.simulate('click'))
-    })
-  })
 })
