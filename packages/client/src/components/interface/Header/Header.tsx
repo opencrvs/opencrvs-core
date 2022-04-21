@@ -20,7 +20,6 @@ import {
   goToHome,
   goToOperationalReport,
   goToPerformanceHome,
-  goToPerformanceReportList,
   goToSearch,
   goToSearchResult,
   goToSettings,
@@ -93,7 +92,6 @@ type IDispatchProps = {
   goForward: typeof goForward
   goToHomeAction: typeof goToHome
   goToPerformanceHomeAction: typeof goToPerformanceHome
-  goToPerformanceReportListAction: typeof goToPerformanceReportList
   goToOperationalReportAction: typeof goToOperationalReport
   goToTeamSearchAction: typeof goToTeamSearch
   goToTeamUserListAction: typeof goToTeamUserList
@@ -541,7 +539,6 @@ export const Header = connect(
     goToHomeAction: goToHome,
     goToPerformanceHomeAction: goToPerformanceHome,
     goToOperationalReportAction: goToOperationalReport,
-    goToPerformanceReportListAction: goToPerformanceReportList,
     goToTeamSearchAction: goToTeamSearch,
     goToTeamUserListAction: goToTeamUserList
   }

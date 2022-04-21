@@ -8,115 +8,6 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-type RegistrationMetrics {
-  genderBasisMetrics: RegistrationGenderBasisMetrics
-  timeFrames: RegistrationTimeFrameMetrics
-  estimatedTargetDayMetrics: RegistrationTargetDayEstimatedMetrics
-  payments: CertificationPaymentMetrics
-}
-
-type RegistrationGenderBasisMetrics {
-  details: [GenderBasisDetailsMetrics!]
-  total: GenderBasisTotalCount
-}
-
-type GenderBasisDetailsMetrics {
-  location: ID!
-  maleUnder18: Int!
-  femaleUnder18: Int!
-  maleOver18: Int!
-  femaleOver18: Int!
-  total: Int!
-}
-
-type GenderBasisTotalCount {
-  maleUnder18: Int!
-  femaleUnder18: Int!
-  maleOver18: Int!
-  femaleOver18: Int!
-  total: Int!
-}
-
-type CertificationPaymentMetrics {
-  details: [CertificationPaymentDetailsMetrics!]
-  total: CertificationPaymentTotalCount
-}
-
-type CertificationPaymentDetailsMetrics {
-  total: Int!
-  locationId: String!
-}
-
-type CertificationPaymentTotalCount {
-  total: Int!
-}
-
-type RegistrationTimeFrameMetrics {
-  details: [TimeFrameDetailMetrics!]
-  total: TimeFrameTotalCount
-}
-
-type RegistrationTargetDayEstimatedMetrics {
-  details: [EstimatedTargetDayMetrics!]
-  total: EstimateTargetDayTotalCount
-}
-
-type EstimateTargetDayTotalCount {
-  estimatedRegistration: Float!
-  registrationInTargetDay: Int!
-  estimationPercentage: Float!
-}
-
-type EstimatedTargetDayMetrics {
-  locationId: String!
-  estimatedRegistration: Float!
-  registrationInTargetDay: Int!
-  estimationYear: Int!
-  estimationLocationLevel: String!
-  estimationPercentage: Float!
-}
-
-type TimeFrameTotalCount {
-  regWithinTargetd: Int!
-  regWithinTargetdTo1yr: Int!
-  regWithin1yrTo5yr: Int!
-  regOver5yr: Int!
-  total: Int!
-}
-
-type TimeFrameDetailMetrics {
-  locationId: String!
-  regWithinTargetd: Int!
-  regWithinTargetdTo1yr: Int!
-  regWithin1yrTo5yr: Int!
-  regOver5yr: Int!
-  total: Int!
-}
-
-type BirthRegistrationByAgeMetrics {
-  label: String
-  value: Int
-}
-
-type BirthRegistrationWithInTargetD {
-  label: String
-  value: Int
-  totalEstimate: Int
-}
-
-type BirthKeyFigures {
-  label: String
-  value: Int
-  total: Int
-  estimate: Int
-  categoricalData: [BirthKeyFiguresData]
-}
-
-type BirthKeyFiguresData {
-  name: String
-  value: Int
-}
-
 type EventMetrics {
   total: Int
   gender: String
@@ -180,12 +71,6 @@ type TimeLoggedMetricsResultSet {
 }
 
 type Query {
-  fetchRegistrationMetrics(
-    timeStart: String!
-    timeEnd: String!
-    locationId: String!
-    event: String!
-  ): RegistrationMetrics
   getTotalMetrics(
     timeStart: String!
     timeEnd: String!

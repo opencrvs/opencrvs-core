@@ -11,7 +11,7 @@
  */
 import { constantsMessages } from '@client/i18n/messages'
 import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
-import { LoaderBox } from '@client/views/SysAdmin/Performance/reports/operational/RegistrationRatesReport'
+
 import {
   Description,
   SubHeader,
@@ -75,6 +75,15 @@ const StatusListFooter = styled.div`
   background: ${({ theme }) => theme.colors.background};
   border-top: 1px solid ${({ theme }) => theme.colors.disabled};
   border-bottom: none;
+`
+
+const LoaderBox = styled.span<{
+  width?: number
+}>`
+  background: ${({ theme }) => theme.colors.background};
+  display: inline-block;
+  height: 24px;
+  width: ${({ width }) => (width ? `${width}%` : '100%')};
 `
 
 class StatusWiseDeclarationCountViewComponent extends React.Component<

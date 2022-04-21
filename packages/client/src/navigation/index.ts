@@ -26,8 +26,6 @@ import {
   OPERATIONAL_REPORT,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
-  PERFORMANCE_REPORT,
-  PERFORMANCE_REPORT_LIST,
   PRINT_CERTIFICATE_PAYMENT,
   REGISTRAR_HOME_TAB,
   REVIEW_CERTIFICATE,
@@ -227,23 +225,6 @@ export function goToPerformanceHome(state?: searchedLocation) {
   return state && state.selectedLocation
     ? push(PERFORMANCE_HOME, { selectedLocation: state.selectedLocation })
     : push(PERFORMANCE_HOME)
-}
-
-export function goToPerformanceReportList() {
-  return push(PERFORMANCE_REPORT_LIST)
-}
-
-export function goToPerformanceReport(
-  selectedLocation: ISearchLocation,
-  eventType: Event,
-  timeStart: Date,
-  timeEnd: Date
-) {
-  return push(PERFORMANCE_REPORT, {
-    selectedLocation,
-    timeRange: { start: timeStart, end: timeEnd },
-    eventType
-  })
 }
 
 export function goToOperationalReport(

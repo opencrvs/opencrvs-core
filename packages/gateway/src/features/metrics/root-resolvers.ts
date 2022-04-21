@@ -12,10 +12,6 @@
 import { GQLResolver } from '@gateway/graphql/schema'
 import {
   getMetrics,
-  timeFrameTotalCalculator,
-  genderBasisTotalCalculator,
-  paymentTotalCalculator,
-  estimatedTargetDayMetricsTotalCalculator,
   eventInTargetDayEstimationCalculator
 } from '@gateway/features/fhir/utils'
 
@@ -31,40 +27,6 @@ export interface IMetricsParam {
 
 export const resolvers: GQLResolver = {
   Query: {
-    async fetchRegistrationMetrics(
-      _,
-      { timeStart, timeEnd, locationId, event },
-      authHeader
-    ) {
-      const params: IMetricsParam = {
-        timeStart,
-        timeEnd,
-        locationId,
-        event
-      }
-      const metricsData = await getMetrics('/metrics', params, authHeader)
-
-      return {
-        timeFrames: {
-          details: metricsData.timeFrames,
-          total: timeFrameTotalCalculator(metricsData.timeFrames)
-        },
-        genderBasisMetrics: {
-          details: metricsData.genderBasisMetrics,
-          total: genderBasisTotalCalculator(metricsData.genderBasisMetrics)
-        },
-        estimatedTargetDayMetrics: {
-          details: metricsData.estimatedTargetDayMetrics,
-          total: estimatedTargetDayMetricsTotalCalculator(
-            metricsData.estimatedTargetDayMetrics
-          )
-        },
-        payments: {
-          details: metricsData.payments,
-          total: paymentTotalCalculator(metricsData.payments)
-        }
-      }
-    },
     /**
      *
      * @deprecated
