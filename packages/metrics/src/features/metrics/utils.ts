@@ -156,7 +156,7 @@ export const fetchEstimateByLocation = async (
       maleEstimation: 0,
       femaleEstimation: 0,
       locationId: locationData.id,
-      estimationYear: toYear,
+      estimationYear: toYear, // TODO: Check if we actually need it
       locationLevel: getLocationLevelFromLocationData(locationData)
     }
   }
@@ -296,7 +296,7 @@ export const fetchEstimateForTargetDaysByLocationId = async (
       maleEstimation: 0,
       femaleEstimation: 0,
       locationId: 'Location/0',
-      estimationYear: new Date(timeTo).getFullYear(),
+      estimationYear: new Date(timeTo).getFullYear(), // TODO: Check if we actually need it
       locationLevel: 'COUNTRY'
     }
 
