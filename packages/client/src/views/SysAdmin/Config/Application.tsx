@@ -35,6 +35,7 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import styled from 'styled-components'
 import { lookup } from 'country-data'
 import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
+import { FormTabs } from '@opencrvs/components/lib/forms'
 
 const ListGroupTitle = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
@@ -436,6 +437,28 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
     return !!!this.state.changeModalName ? false : true
   }
 
+  getTabs = (intl: IntlShape) => {
+    const tabs = {
+      sections: [
+        {
+          id: 'general',
+          title: intl.formatMessage(messages.generalTabTitle)
+        },
+        {
+          id: 'birth',
+          title: intl.formatMessage(messages.birthTabTitle)
+        },
+        {
+          id: 'death',
+          title: intl.formatMessage(messages.deathTabTitle)
+        }
+      ],
+      activeTabId: this.state.activeTabId,
+      onTabClick: (id: string) => this.changeTab(id)
+    }
+    return <FormTabs {...tabs} />
+  }
+
   render() {
     const { intl, offlineCountryConfiguration } = this.props
 
@@ -444,24 +467,7 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
         <Content
           title={intl.formatMessage(messages.applicationSettings)}
           titleColor={'copy'}
-          tabs={{
-            sections: [
-              {
-                id: 'general',
-                title: intl.formatMessage(messages.generalTabTitle)
-              },
-              {
-                id: 'birth',
-                title: intl.formatMessage(messages.birthTabTitle)
-              },
-              {
-                id: 'death',
-                title: intl.formatMessage(messages.deathTabTitle)
-              }
-            ],
-            activeTabId: this.state.activeTabId,
-            onTabClick: (id: string) => this.changeTab(id)
-          }}
+          tabBarContent={this.getTabs(intl)}
         >
           {this.state.activeTabId && this.state.activeTabId === TabId.GENERAL && (
             <GeneralTabContent
