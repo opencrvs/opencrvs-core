@@ -830,7 +830,7 @@ export async function fetchLocationWiseEventEstimations(
 export async function getTotalMetrics(
   timeFrom: string,
   timeTo: string,
-  locationId: string,
+  locationId: string | undefined,
   event: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
@@ -842,11 +842,14 @@ export async function getTotalMetrics(
       FROM ${measurement}
     WHERE time > '${timeFrom}'
       AND time <= '${timeTo}'
-      AND ( locationLevel2 = '${locationId}'
-          OR locationLevel3 = '${locationId}'
-          OR locationLevel4 = '${locationId}'
-          OR locationLevel5 = '${locationId}')
-    GROUP BY gender, timeLabel`
+      ${
+        locationId &&
+        `AND ( locationLevel2 = '${locationId}'
+      OR locationLevel3 = '${locationId}'
+      OR locationLevel4 = '${locationId}'
+      OR locationLevel5 = '${locationId}')`
+      }
+    GROUP BY gender, timeLabel, eventLocationType`
   )
 
   const estimationOfTimeRange: IEstimation =
