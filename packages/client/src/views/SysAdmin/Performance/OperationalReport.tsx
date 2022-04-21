@@ -43,8 +43,7 @@ import {
 } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import {
   ActionContainer,
-  FilterContainer,
-  getMonthDateRange
+  FilterContainer
 } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
@@ -56,10 +55,11 @@ import { colors } from '@opencrvs/components/lib/colors'
 import { Activity } from '@opencrvs/components/lib/icons'
 import {
   ISearchLocation,
-  ColumnContentAlignment,
-  TableView
+  ListViewSimplified,
+  ListViewItemSimplified
 } from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
+import { Link } from '@opencrvs/components/lib/typography'
 import {
   GQLDeclarationsStartedMetrics,
   GQLRegistrationCountResult
@@ -78,6 +78,7 @@ import {
 import { DeclarationsStartedReport } from './reports/operational/DeclarationsStartedReport'
 
 import format from '@client/utils/date-formatting'
+
 interface IConnectProps {
   locations: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
@@ -145,13 +146,6 @@ const Container = styled.div`
   margin-bottom: 160px;
 `
 
-const MonthlyReportsList = styled.div`
-  margin-top: 8px;
-`
-const DeathReportHolder = styled.div`
-  margin-top: 6px;
-`
-
 const StatusTitleContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -165,9 +159,26 @@ const Title = styled.div`
     ${({ theme }) => theme.fonts.bold16}
   }
 `
+const PerformanceTitle = styled.div`
+  ${({ theme }) => theme.fonts.bold16}
+`
 
-const RowLink = styled(LinkButton)`
-  padding-right: 15px !important;
+const PerformanceValue = styled.div`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.reg16};
+`
+
+const Breakdown = styled.div`
+  margin-top: 0.5rem;
+`
+const BreakdownRow = styled.div``
+const BreakdownLabel = styled.span`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.bold12};
+`
+const BreakdownValue = styled.span`
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.reg12};
 `
 
 export const StatusMapping: IStatusMapping = {
@@ -471,6 +482,32 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 } else {
                   return (
                     <>
+                      <ListViewSimplified>
+                        <ListViewItemSimplified
+                          label={<PerformanceTitle>Total</PerformanceTitle>}
+                          value={
+                            <div>
+                              <PerformanceValue>25.0%</PerformanceValue>
+                              <Breakdown>
+                                <BreakdownRow>
+                                  <BreakdownLabel>Male: </BreakdownLabel>
+                                  <BreakdownValue>41%</BreakdownValue>
+                                </BreakdownRow>
+                                <BreakdownRow>
+                                  <BreakdownLabel>Female: </BreakdownLabel>
+                                  <BreakdownValue>41%</BreakdownValue>
+                                </BreakdownRow>
+                              </Breakdown>
+                            </div>
+                          }
+                          actions={<Link></Link>}
+                        />
+                        <ListViewItemSimplified
+                          label="Delayed registrations"
+                          value="400,000"
+                          actions={<button></button>}
+                        />
+                      </ListViewSimplified>
                       <DeclarationsStartedReport
                         loading={loading}
                         locationId={locationId}
