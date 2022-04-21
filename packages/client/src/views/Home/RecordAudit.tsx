@@ -132,6 +132,9 @@ import { goBack } from 'connected-react-router'
 import { getFieldValue } from './utils'
 import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import format, { formatLongDate } from '@client/utils/date-formatting'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+
+const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -229,6 +232,29 @@ const ShowOnMobile = styled.div`
     margin-left: auto;
     margin-bottom: 32px;
     margin-top: 32px;
+  }
+`
+const PaginationDiv = styled.div`
+  display: flex;
+  align-items: center;
+`
+const ShowSmallOnDesktop = styled.div`
+  display: flex;
+  margin-right: 80%;
+  float: left;
+  width: 30%;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+
+const ShowLargeOnMobile = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
   }
 `
 
@@ -907,6 +933,20 @@ const getFormattedDate = (date: Date) => {
   )
 }
 
+const getDisplayItems = (
+  currentPage: number,
+  pageSize: number,
+  allData: IDynamicValues
+) => {
+  if (allData.length <= pageSize) {
+    return allData
+  }
+
+  const offset = (currentPage - 1) * pageSize
+  const displayItems = allData.slice(offset, offset + pageSize)
+  return displayItems
+}
+
 const GetHistory = ({
   intl,
   draft,
@@ -916,6 +956,9 @@ const GetHistory = ({
 }: CMethodParams & {
   toggleActionDetails: (actionItem: IActionDetailsData) => void
 }) => {
+  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const onPageChange = (currentPageNumber: number) =>
+    setCurrentPageNumber(currentPageNumber)
   if (!draft?.data?.history?.length)
     return (
       <>
@@ -924,9 +967,16 @@ const GetHistory = ({
         <LargeGreyedInfo />
       </>
     )
-
+  const allHistoryData = draft.data.history as unknown as {
+    [key: string]: any
+  }[]
+  const historiesForDisplay = getDisplayItems(
+    currentPageNumber,
+    DEFAULT_HISTORY_RECORD_PAGE_SIZE,
+    allHistoryData
+  )
   const historyData = (
-    draft.data.history as unknown as { [key: string]: any }[]
+    historiesForDisplay as unknown as { [key: string]: any }[]
   )
     // TODO: We need to figure out a way to sort the history in backend
     .sort((fe, se) => {
@@ -988,9 +1038,36 @@ const GetHistory = ({
         columns={columns}
         content={historyData}
         alignItemCenter={true}
-        pageSize={100}
+        totalItems={historyData.length}
+        pageSize={historyData.length}
         hideTableHeaderBorder={true}
+        currentPage={currentPageNumber}
+        onPageChange={onPageChange}
       />
+      {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+        <PaginationDiv>
+          <ShowSmallOnDesktop>
+            <PaginationModified
+              size="small"
+              initialPage={currentPageNumber}
+              totalPages={Math.ceil(
+                allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              )}
+              onPageChange={onPageChange}
+            />
+          </ShowSmallOnDesktop>
+          <ShowLargeOnMobile>
+            <PaginationModified
+              size="large"
+              initialPage={currentPageNumber}
+              totalPages={Math.ceil(
+                allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              )}
+              onPageChange={onPageChange}
+            />
+          </ShowLargeOnMobile>
+        </PaginationDiv>
+      )}
     </>
   )
 }

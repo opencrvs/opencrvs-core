@@ -76,7 +76,7 @@ import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
-import { userDetails } from '@client/tests/util'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState, useEffect } = React
@@ -238,6 +238,28 @@ const HideDesktopStatusWrapper = styled.div`
   display: none;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: inline;
+  }
+`
+export const PaginationDiv = styled.div`
+  display: flex;
+  align-items: center;
+`
+export const ShowSmallOnDesktop = styled.div`
+  display: flex;
+  margin-right: 80%;
+  float: left;
+  width: 30%;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+export const ShowLargeOnMobile = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
   }
 `
 interface ISearchParams {
@@ -674,7 +696,8 @@ function UserListComponent(props: IProps) {
         query={SEARCH_USERS}
         variables={{
           primaryOfficeId: locationId,
-          count: recordCount
+          count: DEFAULT_FIELD_AGENT_LIST_SIZE,
+          skip: (currentPageNumber - 1) * DEFAULT_FIELD_AGENT_LIST_SIZE
         }}
         fetchPolicy={'cache-and-network'}
       >
@@ -686,6 +709,8 @@ function UserListComponent(props: IProps) {
               </ErrorText>
             )
           }
+          const totalData =
+            (data && data.searchUsers && data.searchUsers.totalItems) || 0
           return (
             <UserTable id="user_list">
               <TableHeader>
@@ -709,6 +734,34 @@ function UserListComponent(props: IProps) {
                 }
                 noResultText="No result"
               />
+              {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+                <PaginationDiv>
+                  <ShowSmallOnDesktop>
+                    <PaginationModified
+                      size={'small'}
+                      initialPage={currentPageNumber}
+                      totalPages={Math.ceil(
+                        totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                      )}
+                      onPageChange={(currentPage: number) =>
+                        setCurrentPageNumber(currentPage)
+                      }
+                    />
+                  </ShowSmallOnDesktop>
+                  <ShowLargeOnMobile>
+                    <PaginationModified
+                      size={'large'}
+                      initialPage={currentPageNumber}
+                      totalPages={Math.ceil(
+                        totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                      )}
+                      onPageChange={(currentPage: number) =>
+                        setCurrentPageNumber(currentPage)
+                      }
+                    />
+                  </ShowLargeOnMobile>
+                </PaginationDiv>
+              )}
               <UserAuditActionModal
                 show={toggleActivation.modalVisible}
                 user={toggleActivation.selectedUser}

@@ -11,18 +11,21 @@
  */
 import * as React from 'react'
 
-export const Next = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={48} height={40} {...props}>
-    <g fill="none" fillRule="evenodd">
-      <rect fill="#FFF" width={48} height={40} rx={20} />
+export const Next = (props: React.HTMLAttributes<SVGElement>) => {
+  return (
+    <svg
+      width="6"
+      height="11"
+      viewBox="0 0 6 11"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <path
-        stroke="#4C68C1"
-        strokeWidth={2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        fillRule="nonzero"
-        d="M22.343 14.4L28 20.057l-5.657 5.657"
+        fill-rule="evenodd"
+        clip-rule="evenodd"
+        d="M0.21967 0.34467C0.512563 0.0517767 0.987437 0.0517767 1.28033 0.34467L5.78033 4.84467C6.07322 5.13756 6.07322 5.61244 5.78033 5.90533L1.28033 10.4053C0.987437 10.6982 0.512563 10.6982 0.21967 10.4053C-0.0732233 10.1124 -0.0732233 9.63756 0.21967 9.34467L4.18934 5.375L0.21967 1.40533C-0.0732233 1.11244 -0.0732233 0.637563 0.21967 0.34467Z"
+        fill="#A5A5A5"
       />
-    </g>
-  </svg>
-)
+    </svg>
+  )
+}

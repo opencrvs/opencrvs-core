@@ -68,12 +68,36 @@ import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCount
 import format, { formattedDuration } from '@client/utils/date-formatting'
 import subYears from 'date-fns/subYears'
 import differenceInSeconds from 'date-fns/differenceInSeconds'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
 const DoubleLineValueWrapper = styled.div`
   margin: 12px 0px;
+`
+const PaginationDiv = styled.div`
+  display: flex;
+  align-items: center;
+`
+const ShowSmallOnDesktop = styled.div`
+  display: flex;
+  margin-right: 80%;
+  float: left;
+  width: 30%;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+
+const ShowLargeOnMobile = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
 `
 
 const { useState } = React
@@ -721,8 +745,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         query={FETCH_EVENTS_WITH_PROGRESS}
         variables={{
           locationId: locationId,
-          skip: 0,
-          count: recordCount,
+          skip: (currentPageNumber - 1) * DEFAULT_DECLARATION_STATUS_PAGE_SIZE,
+          count: DEFAULT_DECLARATION_STATUS_PAGE_SIZE,
           status: (status && [status]) || undefined,
           type: (event && [`${event.toLowerCase()}-declaration`]) || undefined
         }}
@@ -755,14 +779,36 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 onPageChange={(currentPage: number) => {
                   setCurrentPageNumber(currentPage)
                 }}
-                loadMoreText={intl.formatMessage(
-                  messages.showMoreUsersLinkLabel,
-                  {
-                    pageSize: DEFAULT_DECLARATION_STATUS_PAGE_SIZE
-                  }
-                )}
                 isFullPage
               />
+              {total > DEFAULT_DECLARATION_STATUS_PAGE_SIZE && (
+                <PaginationDiv>
+                  <ShowSmallOnDesktop>
+                    <PaginationModified
+                      size={'small'}
+                      initialPage={currentPageNumber}
+                      totalPages={Math.ceil(
+                        total / DEFAULT_DECLARATION_STATUS_PAGE_SIZE
+                      )}
+                      onPageChange={(currentPage: number) => {
+                        setCurrentPageNumber(currentPage)
+                      }}
+                    />
+                  </ShowSmallOnDesktop>
+                  <ShowLargeOnMobile>
+                    <PaginationModified
+                      size={'large'}
+                      initialPage={currentPageNumber}
+                      totalPages={Math.ceil(
+                        total / DEFAULT_DECLARATION_STATUS_PAGE_SIZE
+                      )}
+                      onPageChange={(currentPage: number) => {
+                        setCurrentPageNumber(currentPage)
+                      }}
+                    />
+                  </ShowLargeOnMobile>
+                </PaginationDiv>
+              )}
               {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
             </>
           )
