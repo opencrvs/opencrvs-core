@@ -189,7 +189,9 @@ This object holds sections for birth declaration forms. All sections are contain
 
 * #### `Address fields`
 
-  The following fields are standard address fields. We have separate inputs for address lines. They maintain a cascading appearance by their own conditional properties. Sometimes we have a configurable primary and seconadry address.
+  The following fields are standard address fields. We have separate inputs for address lines. They maintain a cascading appearance by their own conditional properties. Sometimes we have a configurable primary and secondary address.
+
+  With the exception of state, district, postcodes and city, address lines map into an address lines array in a FHIR Location at the following indexes:
 
   - #### `country`
 
@@ -203,37 +205,35 @@ This object holds sections for birth declaration forms. All sections are contain
 
     District of the place of birth.
 
-  - #### `addressLine4`
+  - #### `ruralOrUrban`
 
-    Highest level of address lines of the place of birth address, i.e. city.
+    This is a conditional field that only appears if the rest of the address is either an urban or rural address.
 
-  - #### `addressLine3`
+    **Urban options**
 
-    This is a conditional field that only appears if the `addressLine4` is not an urban address. It usually stands for municipalities.
+  - #### `numberUrbanOption`
 
-  - #### `addressLine3CityOption`
+    Number of property in an urban street. Array index: 1
 
-    This is a conditional field that only appears if the addressLine4 is an urban address. It usually stands for which ward the address has.
+  - #### `addressLine2UrbanOption`
 
-  - #### `addressLine2`
+    Used for street name. Array index: 2
 
-    This is a conditional field that appears only when addressLine4 is a rural address. Stands for area/region names.
+  - #### `addressLine3UrbanOption`
 
-  - #### `addressLine1CityOption`
+    Used for residential area name. Array index: 3
 
-    Applicable only for urban addresses. Means the primary addresses i.e.plot number or house number.
+    - #### `postCodeUrbanOption`
 
-  - #### `postCodeCityOption`
+    Postcode for urban address.
 
-    Postcode number for urban address.
+    **Rural options**
 
-  - #### `addressLine1`
+  - #### `addressLine5`
 
-    Primary address for rural address. It can be a house name, village name etc.
+    Used for a rural village name. Array index: 5 (4 is available for future development if needed on a rural basis)
 
-  - #### `postCode`
-
-    Postcode for rural address.
+    **International options**
 
     The following address fields function in a similar way as above. When the declaration environment country is not the same as the default country, these fields appear instead of the above-mentioned fields.
 
@@ -245,9 +245,15 @@ This object holds sections for birth declaration forms. All sections are contain
 
     - #### `internationalAddressLine1`
 
+    Array index: 7
+
     - #### `internationalAddressLine2`
 
+    Array index: 8
+
     - #### `internationalAddressLine3`
+
+    Array index: 9
 
     - #### `internationalPostcode`
 

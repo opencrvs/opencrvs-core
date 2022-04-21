@@ -17,7 +17,7 @@ interface IFormMessages
   addressLine1: MessageDescriptor
   addressLine2: MessageDescriptor
   addressLine3: MessageDescriptor
-  addressLine3CityOption: MessageDescriptor
+  addressLine3UrbanOption: MessageDescriptor
   addressLine4: MessageDescriptor
   secondaryAddressSameAsOtherSecondary: MessageDescriptor
   answer: MessageDescriptor
@@ -383,7 +383,7 @@ export const formMessageDescriptors: IFormMessages = {
   addressLine1: {
     defaultMessage: 'Street and house number',
     description: 'Title for the address line 1',
-    id: 'form.field.label.addressLine1'
+    id: 'form.field.label.addressLine5'
   },
   addressLine2: {
     defaultMessage: 'Area / Ward / Mouja / Village',
@@ -395,10 +395,10 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Title for the address line 3 option 1',
     id: 'form.field.label.addressLine3'
   },
-  addressLine3CityOption: {
+  addressLine3UrbanOption: {
     defaultMessage: 'Ward',
     description: 'Title for the address line 3 option 2',
-    id: 'form.field.label.addressLine3CityOption'
+    id: 'form.field.label.addressLine3UrbanOption'
   },
   addressLine4: {
     defaultMessage: 'Upazila (Thana) / City',

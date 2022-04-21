@@ -15,7 +15,12 @@ import {
   mockDeclarationData,
   goToEndOfForm,
   waitForReady,
-  validateScopeToken
+  validateScopeToken,
+  primaryAddressData,
+  primaryInternationalAddressLines,
+  secondaryAddressData,
+  secondaryInternationalAddressLines,
+  eventAddressData
 } from '@client/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
@@ -77,14 +82,16 @@ describe('when user is previewing the form data', () => {
 
     const fatherDetails: IPersonDetails = {
       fathersDetailsExist: true,
-      iD: '23423442342423424',
-      iDType: 'OTHER',
+      iD: '987987987',
+      iDType: 'NATIONAL_ID',
+      nationality: 'FAR',
       iDTypeOther: 'Taxpayer Identification Number',
       secondaryAddressSameAsOtherSecondary: true,
       primaryAddressSameAsOtherPrimary: true,
-      country: 'BGD',
-      countryPrimary: 'BGD',
-      secondaryAddress: '',
+      ...primaryAddressData,
+      ...primaryInternationalAddressLines,
+      ...secondaryAddressData,
+      ...secondaryInternationalAddressLines,
       motherBirthDate: '1999-10-10',
       dateOfMarriage: '2010-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
@@ -92,15 +99,13 @@ describe('when user is previewing the form data', () => {
       familyNameEng: 'Islam',
       firstNames: 'আনোয়ার',
       firstNamesEng: 'Anwar',
-      maritalStatus: 'MARRIED',
-      nationality: 'BGD'
+      maritalStatus: 'MARRIED'
     }
 
     const motherDetails: IPersonDetails = {
-      iD: '2342434534565',
+      iD: '987987987',
       iDType: 'NATIONAL_ID',
-      country: 'BGD',
-      nationality: 'BGD',
+      nationality: 'FAR',
       familyName: 'ইসলাম',
       familyNameEng: 'Islam',
       firstNames: 'রোকেয়া',
@@ -109,24 +114,10 @@ describe('when user is previewing the form data', () => {
       dateOfMarriage: '2010-10-10',
       fatherBirthDate: '1999-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
-      secondaryAddressSameAsPrimary: true,
-      addressLine1: 'Rd #10',
-      addressLine1Primary: 'Rd#10',
-      addressLine2: 'Akua',
-      addressLine2Primary: 'Akua',
-      addressLine3: 'union1',
-      addressLine3Primary: 'union1',
-      addressLine4: 'upazila10',
-      addressLine4Primary: 'upazila10',
-      countryPrimary: 'BGD',
-      secondaryAddress: '',
-      district: 'district2',
-      districtPrimary: 'district2',
-      primaryAddress: '',
-      postCode: '1020',
-      postCodePrimary: '1010',
-      state: 'state4',
-      statePrimary: 'state4'
+      ...primaryAddressData,
+      ...primaryInternationalAddressLines,
+      ...secondaryAddressData,
+      ...secondaryInternationalAddressLines
     }
 
     const registrationDetails = {
@@ -224,13 +215,14 @@ describe('when user is previewing the form data', () => {
 
     const fatherDetails: IPersonDetails = {
       fathersDetailsExist: true,
-      iD: '2342434534565',
+      iD: '432432432',
       iDType: 'NATIONAL_ID',
       secondaryAddressSameAsOtherSecondary: true,
       primaryAddressSameAsOtherPrimary: true,
-      country: 'BGD',
-      countryPrimary: 'BGD',
-      secondaryAddress: '',
+      ...primaryAddressData,
+      ...primaryInternationalAddressLines,
+      ...secondaryAddressData,
+      ...secondaryInternationalAddressLines,
       fatherBirthDate: '1999-10-10',
       dateOfMarriage: '2010-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
@@ -239,15 +231,14 @@ describe('when user is previewing the form data', () => {
       firstNames: 'আনোয়ার',
       firstNamesEng: 'Anwar',
       maritalStatus: 'MARRIED',
-      nationality: 'BGD',
+      nationality: 'FAR',
       _fhirID: '2'
     }
 
     const motherDetails: IPersonDetails = {
-      iD: '2342434534565',
+      iD: '765987987',
       iDType: 'NATIONAL_ID',
-      country: 'BGD',
-      nationality: 'BGD',
+      nationality: 'FAR',
       familyName: 'ইসলাম',
       familyNameEng: 'Islam',
       firstNames: 'রোকেয়া',
@@ -256,35 +247,18 @@ describe('when user is previewing the form data', () => {
       dateOfMarriage: '2010-10-10',
       motherBirthDate: '1999-10-10',
       educationalAttainment: 'PRIMARY_ISCED_1',
-      addressLine1: 'Rd #10',
-      addressLine1Primary: 'Rd#10',
-      addressLine2: 'Akua',
-      addressLine2Primary: 'Akua',
-      addressLine3: 'union1',
-      addressLine3Primary: 'union1',
-      addressLine4: 'upazila10',
-      addressLine4Primary: 'upazila10',
-      countryPrimary: 'BGD',
-      secondaryAddress: '',
-      district: 'district2',
-      districtPrimary: 'district2',
-      primaryAddress: '',
-      secondaryAddressSameAsPrimary: true,
-      postCode: '1020',
-      postCodePrimary: '1010',
-      state: 'state4',
-      statePrimary: 'state4',
+      ...primaryAddressData,
+      ...primaryInternationalAddressLines,
+      ...secondaryAddressData,
+      ...secondaryInternationalAddressLines,
       _fhirID: '3'
     }
 
     const registrationDetails = {
-      commentsOrNotes: 'comments',
-      paperFormNumber: '423424245455',
-      presentAtBirthRegistration: 'MOTHER_ONLY',
-      registrationCertificateLanguage: ['en'],
-      registrationEmail: 'arman@gmail.com',
-      registrationPhone: '01736478884',
-      whoseContactDetails: 'MOTHER',
+      contactPoint: {
+        value: 'DAUGHTER',
+        nestedFields: { registrationPhone: '0787878787' }
+      },
       trackingId: 'B123456',
       registrationNumber: '2019121525B1234568',
       _fhirID: '4'
@@ -355,80 +329,40 @@ describe('when user is previewing the form data', () => {
     let customDraft: IDeclaration
 
     const deceasedDetails = {
-      iDType: 'PASSPORT',
-      iD: '123456789',
+      iD: '987987987',
+      iDType: 'NATIONAL_ID',
+      socialSecurityNo: 'hghjkh',
       firstNames: 'অনিক',
       familyName: 'অনিক',
       firstNamesEng: 'Anik',
       familyNameEng: 'anik',
-      nationality: 'BGD',
+      nationality: 'FAR',
       gender: 'male',
       maritalStatus: 'MARRIED',
       birthDate: '1983-01-01',
-      countryPrimary: 'BGD',
-      statePrimary: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      districtPrimary: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      addressLine4Primary: '34c377a0-2223-4361-851c-5e230a96d957',
-      addressLine3Primary: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-      addressLine3CityOptionPrimary: '',
-      addressLine2Primary: '12',
-      addressLine1CityOptionPrimary: '',
-      postCodeCityOptionPrimary: '12',
-      addressLine1Primary: '121',
-      postCodePrimary: '12',
-      secondaryAddressSameAsPrimary: true,
-      country: 'BGD',
-      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      internationalStatePrimary: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      internationalDistrictPrimary: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      addressLine4: '34c377a0-2223-4361-851c-5e230a96d957',
-      addressLine3: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-      addressLine3CityOption: '',
-      addressLine2: '12',
-      addressLine1CityOption: '',
-      postCodeCityOption: '12',
-      addressLine1: '121',
-      postCode: '12',
+      ...primaryAddressData,
+      ...primaryInternationalAddressLines,
+      ...secondaryAddressData,
+      ...secondaryInternationalAddressLines,
       _fhirID: '50fbd713-c86d-49fe-bc6a-52094b40d8dd'
     }
 
     const informantDetails = {
       iDType: 'PASSPORT',
       informantID: '123456789',
+      socialSecurityNo: 'hghjkh',
       informantFirstNames: 'অনিক',
       informantFamilyName: 'অনিক',
       informantFirstNamesEng: 'Anik',
       informantFamilyNameEng: 'Anik',
-      nationality: 'BGD',
+      nationality: 'FAR',
       informantBirthDate: '1996-01-01',
-      informantPhone: '01622688231',
+      informantPhone: '0787777676',
       relationship: 'OTHER',
-      country: 'BGD',
-      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      internationalState: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      internationalDistrict: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      addressLine4: '34c377a0-2223-4361-851c-5e230a96d957',
-      addressLine3: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-      addressLine3CityOption: '',
-      addressLine2: '12',
-      addressLine1CityOption: '',
-      postCodeCityOption: '12',
-      addressLine1: '12',
-      postCode: '12',
-      informantPrimaryAddressSameAsCurrent: true,
-      countryPrimary: 'BGD',
-      statePrimary: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      districtPrimary: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      addressLine4Primary: '34c377a0-2223-4361-851c-5e230a96d957',
-      addressLine3Primary: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-      addressLine3CityOptionPrimary: '',
-      addressLine2Primary: '12',
-      addressLine1CityOptionPrimary: '',
-      postCodeCityOptionPrimary: '12',
-      addressLine1Primary: '12',
-      postCodePrimary: '12',
+      ...primaryAddressData,
+      ...primaryInternationalAddressLines,
+      ...secondaryAddressData,
+      ...secondaryInternationalAddressLines,
       _fhirIDMap: {
         relatedPerson: 'c9e3e5cb-d483-4db4-afaa-625161826f00',
         individual: 'cabeeea7-0f7d-41c3-84ed-8f88e4d617e1'
@@ -465,36 +399,17 @@ describe('when user is previewing the form data', () => {
       deathDate: '2017-01-01',
       manner: 'ACCIDENT',
       placeOfDeath: 'PRIMARY_ADDRESS',
-      country: 'BGD',
-      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-      addressLine4: '34c377a0-2223-4361-851c-5e230a96d957',
-      addressLine3: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-      addressLine3CityOption: '',
-      addressLine2: '12',
-      addressLine1CityOption: '',
-      postCodeCityOption: '12',
-      addressLine1: '121',
-      postCode: '12'
+      ...eventAddressData
     }
     const causeOfDeathDetails = { causeOfDeathEstablished: false }
 
     const registrationDetails = {
       _fhirID: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
       trackingId: 'DS8QZ0Z',
-      type: 'death',
+      relationship: { value: 'GRANDSON', nestedFields: {} },
       contactPoint: {
-        value: 'OTHER',
-        nestedFields: {
-          registrationPhone: '0799999999',
-          contactRelationshipOther: 'grandma'
-        }
-      },
-      relationship: {
-        value: 'OTHER',
-        nestedFields: {
-          otherRelationship: 'House owner'
-        }
+        value: 'DAUGHTER',
+        nestedFields: { registrationPhone: '0787878787' }
       }
     }
 
@@ -545,7 +460,6 @@ describe('when user is previewing the form data', () => {
     it('successfully submits the review form', async () => {
       jest.setMock('react-apollo', { default: ReactApollo })
       app.update().find('#registerDeclarationBtn').hostNodes().simulate('click')
-
       app.update().find('#submit_confirm').hostNodes().simulate('click')
     })
 

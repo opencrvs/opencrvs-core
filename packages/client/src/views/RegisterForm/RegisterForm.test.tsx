@@ -839,7 +839,7 @@ describe('when user is in the register form for death event', () => {
             params: {
               declarationId: draft.id,
               pageId: 'deathEvent',
-              groupId: 'deathEvent-deathDate'
+              groupId: 'death-event-details'
             },
             isExact: true,
             path: '',
@@ -1236,8 +1236,8 @@ describe('When user is in Preview section death event', () => {
   it('Check if death location partOf is parsed properly', () => {
     expect(
       draftToGqlTransformer(deathForm, mockDeathDeclarationData as IFormData)
-        .eventLocation.partOf
-    ).toBe('Location/1dfc716a-c5f7-4d39-ad71-71d2a359210c')
+        .eventLocation.address.country
+    ).toEqual('FAR')
   })
 
   it('Should be able to submit the form', () => {
@@ -1287,10 +1287,9 @@ describe('When user is in Preview section death event', () => {
   it('Check if death location is deceased parmanent address', () => {
     const mockDeathDeclaration = clone(mockDeathDeclarationData)
     mockDeathDeclaration.deathEvent.placeOfDeath = 'PRIMARY_ADDRESS'
-
     expect(
       draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)
-        .eventLocation.address.type
+        .eventLocation.type
     ).toBe('PRIMARY_ADDRESS')
   })
 })

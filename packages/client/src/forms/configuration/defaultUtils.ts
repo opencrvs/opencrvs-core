@@ -45,17 +45,22 @@ export function getDefaultField(
     selectedSection.section.groups,
     questionIdentifiers.groupId
   )
-  const selectedField = selectedGroup.group.fields.filter(
-    (field) => field.name === questionIdentifiers.fieldName
-  )[0]
-  if (!selectedField) {
+
+  if (selectedGroup.group) {
+    const selectedField = selectedGroup.group.fields.filter(
+      (field) => field.name === questionIdentifiers.fieldName
+    )[0]
+    if (!selectedField) {
+      return undefined
+    }
+    return {
+      index: selectedGroup.group.fields.indexOf(selectedField),
+      field: selectedField,
+      selectedGroupIndex: selectedGroup.index,
+      selectedSectionIndex: selectedSection.index
+    }
+  } else {
     return undefined
-  }
-  return {
-    index: selectedGroup.group.fields.indexOf(selectedField),
-    field: selectedField,
-    selectedGroupIndex: selectedGroup.index,
-    selectedSectionIndex: selectedSection.index
   }
 }
 

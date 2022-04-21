@@ -77,9 +77,12 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     configurations: [{ config: EventLocationAddressCases.PLACE_OF_DEATH }]
   },
   {
-    preceedingFieldId: 'birth.informant.informant-view-group.primaryAddress',
+    preceedingFieldId: 'birth.informant.informant-view-group.familyNameEng',
     configurations: [
-      { config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION },
+      {
+        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.primaryAddress
+      },
       { config: AddressCases.PRIMARY_ADDRESS, informant: true }
     ]
   },
@@ -243,7 +246,7 @@ export function getAddressFields(
         !configuration.yComparisonSection
       ) {
         throw new Error(
-          `Invalid address configuration for: ${configuration.config}`
+          `Invalid address comparison case configuration for: ${configuration.config}`
         )
       }
       return getXAddressSameAsY(
@@ -256,7 +259,7 @@ export function getAddressFields(
     case AddressSubsections.SECONDARY_ADDRESS_SUBSECTION:
       if (!configuration.label) {
         throw new Error(
-          `Invalid address configuration for: ${configuration.config}`
+          `Invalid address subsection configuration for: ${configuration.config}`
         )
       }
       return getAddressSubsection(
@@ -450,54 +453,47 @@ export function populateRegisterFormsWithAddresses(
   const newForm = cloneDeep(defaultEventForm)
   // TODO: will remove this line and add coverage to this function when tests are refactored in this PR: https://github.com/opencrvs/opencrvs-core/pull/2818
   // and when this PR is merged with https://github.com/opencrvs/opencrvs-core/pull/2907
-  if (process.env.NODE_ENV !== 'test') {
-    defaultAddressConfiguration.forEach(
-      (addressConfiguration: IAddressConfiguration) => {
-        if (addressConfiguration.preceedingFieldId.includes(event)) {
-          const preceedingDefaultField: IDefaultField | undefined =
-            getDefaultField(newForm, addressConfiguration.preceedingFieldId)
+  defaultAddressConfiguration.forEach(
+    (addressConfiguration: IAddressConfiguration) => {
+      if (addressConfiguration.preceedingFieldId.includes(event)) {
+        const preceedingDefaultField: IDefaultField | undefined =
+          getDefaultField(newForm, addressConfiguration.preceedingFieldId)
 
-          let addressFields: SerializedFormField[] = []
-          let previewGroups: IPreviewGroup[] = []
-          if (preceedingDefaultField) {
-            addressConfiguration.configurations.forEach((configuration) => {
-              // TODO: At this point we can check the ApplicationConfig from this PR: https://github.com/opencrvs/opencrvs-core/pull/2818 and see if 2 addresses are enabled
-              const tmpAddressFields: SerializedFormField[] =
-                addressFields.concat(getAddressFields(configuration))
-              addressFields = tmpAddressFields
-              const tmpPreviewGroups: IPreviewGroup[] = previewGroups.concat(
-                getPreviewGroups(configuration)
-              )
-              previewGroups = tmpPreviewGroups
-            })
-          }
-          if (preceedingDefaultField && addressFields.length) {
-            newForm.sections[
-              preceedingDefaultField?.selectedSectionIndex
-            ].groups[preceedingDefaultField?.selectedGroupIndex].fields.splice(
-              preceedingDefaultField.index + 1,
-              0,
-              ...addressFields
+        let addressFields: SerializedFormField[] = []
+        let previewGroups: IPreviewGroup[] = []
+        if (preceedingDefaultField) {
+          addressConfiguration.configurations.forEach((configuration) => {
+            // TODO: At this point we can check the ApplicationConfig from this PR: https://github.com/opencrvs/opencrvs-core/pull/2818 and see if 2 addresses are enabled
+            const tmpAddressFields: SerializedFormField[] =
+              addressFields.concat(getAddressFields(configuration))
+            addressFields = tmpAddressFields
+            const tmpPreviewGroups: IPreviewGroup[] = previewGroups.concat(
+              getPreviewGroups(configuration)
             )
-          }
+            previewGroups = tmpPreviewGroups
+          })
+        }
+        if (preceedingDefaultField && addressFields.length) {
+          newForm.sections[preceedingDefaultField?.selectedSectionIndex].groups[
+            preceedingDefaultField?.selectedGroupIndex
+          ].fields.splice(preceedingDefaultField.index + 1, 0, ...addressFields)
+        }
 
-          if (preceedingDefaultField && previewGroups.length) {
-            const group =
-              newForm.sections[preceedingDefaultField?.selectedSectionIndex]
-                .groups[preceedingDefaultField?.selectedGroupIndex]
-            if (group.previewGroups) {
-              const newPreviewGroups: IPreviewGroup[] =
-                group.previewGroups.concat(previewGroups)
-              group.previewGroups = newPreviewGroups
-            } else {
-              group.previewGroups = previewGroups
-            }
+        if (preceedingDefaultField && previewGroups.length) {
+          const group =
+            newForm.sections[preceedingDefaultField?.selectedSectionIndex]
+              .groups[preceedingDefaultField?.selectedGroupIndex]
+          if (group.previewGroups) {
+            const newPreviewGroups: IPreviewGroup[] =
+              group.previewGroups.concat(previewGroups)
+            group.previewGroups = newPreviewGroups
+          } else {
+            group.previewGroups = previewGroups
           }
         }
       }
-    )
-    // TODO: brace to be removed
-  }
+    }
+  )
   return newForm
 }
 
@@ -781,14 +777,14 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
                 'individual',
                 {
                   operation: 'fieldToAddressTransformer',
-                  parameters: [AddressCases.PRIMARY_ADDRESS, 7]
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 6]
                 },
                 'address'
               ]
             }
           : {
               operation: 'fieldToAddressTransformer',
-              parameters: [AddressCases.PRIMARY_ADDRESS, 7]
+              parameters: [AddressCases.PRIMARY_ADDRESS, 6]
             },
         query: informant
           ? {
@@ -797,23 +793,23 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
                 'individual',
                 {
                   operation: 'addressToFieldTransformer',
-                  parameters: [AddressCases.PRIMARY_ADDRESS, 7]
+                  parameters: [AddressCases.PRIMARY_ADDRESS, 6]
                 }
               ]
             }
           : {
               operation: 'addressToFieldTransformer',
-              parameters: [AddressCases.PRIMARY_ADDRESS, 7]
+              parameters: [AddressCases.PRIMARY_ADDRESS, 6]
             }
       }
     },
     {
-      name: 'addressLine4CityOptionPrimary',
+      name: 'cityUrbanOptionPrimary',
       type: 'TEXT',
       label: {
         defaultMessage: 'Town',
         description: 'Title for the address line 4',
-        id: 'form.field.label.addressLine4CityOption'
+        id: 'form.field.label.cityUrbanOption'
       },
       previewGroup: 'primaryAddress',
       required: false,
@@ -876,12 +872,12 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       }
     },
     {
-      name: 'addressLine3CityOptionPrimary',
+      name: 'addressLine3UrbanOptionPrimary',
       type: 'TEXT',
       label: {
         defaultMessage: 'Residential Area',
         description: 'Title for the address line 3 option 2',
-        id: 'form.field.label.addressLine3CityOption'
+        id: 'form.field.label.addressLine3UrbanOption'
       },
       previewGroup: 'primaryAddress',
       required: false,
@@ -944,12 +940,12 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       }
     },
     {
-      name: 'addressLine2CityOptionPrimary',
+      name: 'addressLine2UrbanOptionPrimary',
       type: 'TEXT',
       label: {
         defaultMessage: 'Street / Plot Number',
         description: 'Title for the address line 1',
-        id: 'form.field.label.addressLine2CityOption'
+        id: 'form.field.label.addressLine2UrbanOption'
       },
       previewGroup: 'primaryAddress',
       required: false,
@@ -1012,7 +1008,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       }
     },
     {
-      name: 'numberOptionPrimary',
+      name: 'numberUrbanOptionPrimary',
       type: 'NUMBER',
       label: {
         defaultMessage: 'Number',
@@ -1148,12 +1144,12 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       }
     },
     {
-      name: 'addressLine1Primary',
+      name: 'addressLine5Primary',
       type: 'TEXT',
       label: {
         defaultMessage: 'Village',
         description: 'Title for the address line 1',
-        id: 'form.field.label.addressLine1'
+        id: 'form.field.label.addressLine5'
       },
       previewGroup: 'primaryAddress',
       required: false,
@@ -1831,14 +1827,14 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
                 'individual',
                 {
                   operation: 'fieldToAddressTransformer',
-                  parameters: [AddressCases.SECONDARY_ADDRESS, 7]
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 6]
                 },
                 'address'
               ]
             }
           : {
               operation: 'fieldToAddressTransformer',
-              parameters: [AddressCases.SECONDARY_ADDRESS, 7]
+              parameters: [AddressCases.SECONDARY_ADDRESS, 6]
             },
         query: informant
           ? {
@@ -1847,23 +1843,23 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
                 'individual',
                 {
                   operation: 'addressToFieldTransformer',
-                  parameters: [AddressCases.SECONDARY_ADDRESS, 7]
+                  parameters: [AddressCases.SECONDARY_ADDRESS, 6]
                 }
               ]
             }
           : {
               operation: 'addressToFieldTransformer',
-              parameters: [AddressCases.SECONDARY_ADDRESS, 7]
+              parameters: [AddressCases.SECONDARY_ADDRESS, 6]
             }
       }
     },
     {
-      name: 'addressLine4CityOptionSecondary',
+      name: 'cityUrbanOptionSecondary',
       type: 'TEXT',
       label: {
         defaultMessage: 'Town',
         description: 'Title for the address line 4',
-        id: 'form.field.label.addressLine4CityOption'
+        id: 'form.field.label.cityUrbanOption'
       },
       previewGroup: 'secondaryAddress',
       required: false,
@@ -1926,12 +1922,12 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       }
     },
     {
-      name: 'addressLine3CityOptionSecondary',
+      name: 'addressLine3UrbanOptionSecondary',
       type: 'TEXT',
       label: {
         defaultMessage: 'Residential Area',
         description: 'Title for the address line 3 option 2',
-        id: 'form.field.label.addressLine3CityOption'
+        id: 'form.field.label.addressLine3UrbanOption'
       },
       previewGroup: 'secondaryAddress',
       required: false,
@@ -1994,12 +1990,12 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       }
     },
     {
-      name: 'addressLine2CityOptionSecondary',
+      name: 'addressLine2UrbanOptionSecondary',
       type: 'TEXT',
       label: {
         defaultMessage: 'Street / Plot Number',
         description: 'Title for the address line 1',
-        id: 'form.field.label.addressLine2CityOption'
+        id: 'form.field.label.addressLine2UrbanOption'
       },
       previewGroup: 'secondaryAddress',
       required: false,
@@ -2062,7 +2058,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       }
     },
     {
-      name: 'numberOptionSecondary',
+      name: 'numberUrbanOptionSecondary',
       type: 'NUMBER',
       label: {
         defaultMessage: 'Number',
@@ -2198,12 +2194,12 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       }
     },
     {
-      name: 'addressLine1Secondary',
+      name: 'addressLine5Secondary',
       type: 'TEXT',
       label: {
         defaultMessage: 'Village',
         description: 'Title for the address line 1',
-        id: 'form.field.label.addressLine1'
+        id: 'form.field.label.addressLine5'
       },
       previewGroup: 'secondaryAddress',
       required: false,
@@ -2879,22 +2875,22 @@ export function getPlaceOfEventAddressFields(
             configCase === EventLocationAddressCases.PLACE_OF_BIRTH
               ? 'birthEventLocationMutationTransformer'
               : 'deathEventLocationMutationTransformer',
-          parameters: [7]
+          parameters: [6]
         },
         query: {
           operation: 'eventLocationQueryTransformer',
-          parameters: [7]
+          parameters: [6]
         }
       }
     },
     {
-      name: 'addressLine4CityOption',
+      name: 'cityUrbanOption',
       customisable: false,
       type: 'TEXT',
       label: {
         defaultMessage: 'Town',
         description: 'Title for the address line 4',
-        id: 'form.field.label.addressLine4CityOption'
+        id: 'form.field.label.cityUrbanOption'
       },
       previewGroup: configCase,
       required: false,
@@ -2941,13 +2937,13 @@ export function getPlaceOfEventAddressFields(
       }
     },
     {
-      name: 'addressLine3CityOption',
+      name: 'addressLine3UrbanOption',
       customisable: false,
       type: 'TEXT',
       label: {
         defaultMessage: 'Residential Area',
         description: 'Title for the address line 3 option 2',
-        id: 'form.field.label.addressLine3CityOption'
+        id: 'form.field.label.addressLine3UrbanOption'
       },
       previewGroup: configCase,
       required: false,
@@ -2994,13 +2990,13 @@ export function getPlaceOfEventAddressFields(
       }
     },
     {
-      name: 'addressLine2CityOption',
+      name: 'addressLine2UrbanOption',
       customisable: false,
       type: 'TEXT',
       label: {
         defaultMessage: 'Street / Plot Number',
         description: 'Title for the address line 1',
-        id: 'form.field.label.addressLine2CityOption'
+        id: 'form.field.label.addressLine2UrbanOption'
       },
       previewGroup: configCase,
       required: false,
@@ -3047,7 +3043,7 @@ export function getPlaceOfEventAddressFields(
       }
     },
     {
-      name: 'numberOption',
+      name: 'numberUrbanOption',
       customisable: false,
       type: 'NUMBER',
       label: {
@@ -3153,13 +3149,13 @@ export function getPlaceOfEventAddressFields(
       }
     },
     {
-      name: 'addressLine1',
+      name: 'addressLine5',
       customisable: false,
       type: 'TEXT',
       label: {
         defaultMessage: 'Village',
         description: 'Title for the address line 1',
-        id: 'form.field.label.addressLine1'
+        id: 'form.field.label.addressLine5'
       },
       previewGroup: configCase,
       required: false,
