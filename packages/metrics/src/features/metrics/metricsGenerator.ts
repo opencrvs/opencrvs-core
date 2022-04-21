@@ -843,11 +843,12 @@ export async function getTotalMetrics(
     WHERE time > '${timeFrom}'
       AND time <= '${timeTo}'
       ${
-        locationId &&
-        `AND ( locationLevel2 = '${locationId}'
+        locationId
+          ? `AND ( locationLevel2 = '${locationId}'
       OR locationLevel3 = '${locationId}'
       OR locationLevel4 = '${locationId}'
       OR locationLevel5 = '${locationId}')`
+          : ``
       }
     GROUP BY gender, timeLabel, eventLocationType`
   )
