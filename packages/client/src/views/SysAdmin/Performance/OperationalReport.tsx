@@ -56,7 +56,8 @@ import { Activity } from '@opencrvs/components/lib/icons'
 import {
   ISearchLocation,
   ListViewSimplified,
-  ListViewItemSimplified
+  ListViewItemSimplified,
+  Spinner
 } from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { Link } from '@opencrvs/components/lib/typography'
@@ -183,15 +184,6 @@ const BreakdownLabel = styled.span`
 const BreakdownValue = styled.span`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg12};
-`
-
-const LoaderBox = styled.span<{
-  width?: number
-}>`
-  background: ${({ theme }) => theme.colors.background};
-  display: inline-block;
-  height: 1em;
-  width: ${({ width }) => (width ? `${width}em` : '5em')};
 `
 
 export const StatusMapping: IStatusMapping = {
@@ -467,11 +459,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
           </ActionContainer>
           {sectionId === OPERATIONAL_REPORT_SECTION.OPERATIONAL && (
             <Query
-              query={
-                this.isOfficeSelected()
-                  ? PERFORMANCE_METRICS_FOR_OFFICE
-                  : PERFORMANCE_METRICS
-              }
+              query={PERFORMANCE_METRICS}
               variables={{
                 timeStart: timeStart.toISOString(),
                 timeEnd: timeEnd.toISOString(),
@@ -496,6 +484,11 @@ class OperationalReportComponent extends React.Component<Props, State> {
                     </>
                   )
                 }
+
+                if (loading) {
+                  return <Spinner id="performance-home-loading" />
+                }
+
                 return (
                   <>
                     <ListViewSimplified>
@@ -504,22 +497,16 @@ class OperationalReportComponent extends React.Component<Props, State> {
                         value={
                           <div>
                             <PerformanceValue>
-                              {loading ? (
-                                <LoaderBox width={5} />
-                              ) : (
-                                data!.getTotalMetrics.results.reduce(
-                                  (m, x) => m + x.total,
-                                  0
-                                )
+                              {data!.getTotalMetrics.results.reduce(
+                                (m, x) => m + x.total,
+                                0
                               )}
                             </PerformanceValue>
                             <Breakdown>
                               <BreakdownRow>
                                 <BreakdownLabel>Male: </BreakdownLabel>
                                 <BreakdownValue>
-                                  {loading ? (
-                                    <LoaderBox width={5} />
-                                  ) : (
+                                  {
                                     <PercentageDisplay
                                       total={calculateTotal(
                                         data!.getTotalMetrics.results.filter(
@@ -530,15 +517,13 @@ class OperationalReportComponent extends React.Component<Props, State> {
                                         data!.getTotalMetrics.results
                                       )}
                                     />
-                                  )}
+                                  }
                                 </BreakdownValue>
                               </BreakdownRow>
                               <BreakdownRow>
                                 <BreakdownLabel>Female: </BreakdownLabel>
                                 <BreakdownValue>
-                                  {loading ? (
-                                    <LoaderBox width={5} />
-                                  ) : (
+                                  {
                                     <PercentageDisplay
                                       total={calculateTotal(
                                         data!.getTotalMetrics.results.filter(
@@ -549,7 +534,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                                         data!.getTotalMetrics.results
                                       )}
                                     />
-                                  )}
+                                  }
                                 </BreakdownValue>
                               </BreakdownRow>
                             </Breakdown>
@@ -566,9 +551,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                         value={
                           <div>
                             <PerformanceValue>
-                              {loading ? (
-                                <LoaderBox width={5} />
-                              ) : (
+                              {
                                 <TotalDisplayWithPercentage
                                   total={calculateTotal(
                                     data!.getTotalMetrics.results.filter(
@@ -583,15 +566,13 @@ class OperationalReportComponent extends React.Component<Props, State> {
                                     data!.getTotalMetrics.results
                                   )}
                                 />
-                              )}
+                              }
                             </PerformanceValue>
                             <Breakdown>
                               <BreakdownRow>
                                 <BreakdownLabel>Male: </BreakdownLabel>
                                 <BreakdownValue>
-                                  {loading ? (
-                                    <LoaderBox width={5} />
-                                  ) : (
+                                  {
                                     <PercentageDisplay
                                       total={calculateTotal(
                                         data!.getTotalMetrics.results.filter(
@@ -613,15 +594,13 @@ class OperationalReportComponent extends React.Component<Props, State> {
                                         )
                                       )}
                                     />
-                                  )}
+                                  }
                                 </BreakdownValue>
                               </BreakdownRow>
                               <BreakdownRow>
                                 <BreakdownLabel>Female: </BreakdownLabel>
                                 <BreakdownValue>
-                                  {loading ? (
-                                    <LoaderBox width={5} />
-                                  ) : (
+                                  {
                                     <PercentageDisplay
                                       total={calculateTotal(
                                         data!.getTotalMetrics.results.filter(
@@ -643,7 +622,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                                         )
                                       )}
                                     />
-                                  )}
+                                  }
                                 </BreakdownValue>
                               </BreakdownRow>
                             </Breakdown>
@@ -656,9 +635,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                         value={
                           <div>
                             <PerformanceValue>
-                              {loading ? (
-                                <LoaderBox width={5} />
-                              ) : (
+                              {
                                 <TotalDisplayWithPercentage
                                   total={calculateTotal(
                                     data!.getTotalMetrics.results.filter(
@@ -670,7 +647,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                                     data!.getTotalMetrics.results
                                   )}
                                 />
-                              )}
+                              }
                             </PerformanceValue>
                           </div>
                         }
@@ -683,9 +660,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                         value={
                           <div>
                             <PerformanceValue>
-                              {loading ? (
-                                <LoaderBox width={5} />
-                              ) : (
+                              {
                                 <TotalDisplayWithPercentage
                                   total={calculateTotal(
                                     data!.getTotalMetrics.results.filter(
@@ -698,7 +673,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                                     data!.getTotalMetrics.results
                                   )}
                                 />
-                              )}
+                              }
                             </PerformanceValue>
                           </div>
                         }
