@@ -355,7 +355,7 @@ type VerifyPasswordResult {
 }
 
 type TotalMetricsResult {
-  estimated: Int
+  estimated: Estimation
   results: [EventMetrics]
 }
 
@@ -814,6 +814,15 @@ type SearchFieldAgentResponse {
   totalNumberOfInProgressAppStarted: Int
   totalNumberOfRejectedDeclarations: Int
   averageTimeForDeclaredDeclarations: Int
+}
+
+type Estimation {
+  totalEstimation: Int
+  maleEstimation: Int
+  femaleEstimation: Int
+  locationId: String
+  estimationYear: Int
+  locationLevel: String
 }
 
 type EventMetrics {

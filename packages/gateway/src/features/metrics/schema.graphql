@@ -15,8 +15,17 @@ type EventMetrics {
   timeLabel: String
 }
 
+type Estimation {
+  totalEstimation: Int
+  maleEstimation: Int
+  femaleEstimation: Int
+  locationId: String
+  estimationYear: Int
+  locationLevel: String
+}
+
 type TotalMetricsResult {
-  estimated: Int
+  estimated: Estimation
   results: [EventMetrics]
 }
 

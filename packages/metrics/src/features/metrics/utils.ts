@@ -26,7 +26,12 @@ import {
   JURISDICTION_TYPE_IDENTIFIER
 } from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fetchLocation, fetchFromResource, fetchFHIR } from '@metrics/api'
+import {
+  fetchLocation,
+  fetchFromResource,
+  fetchFHIR,
+  fetchChildLocationsByParentId
+} from '@metrics/api'
 import { getApplicationConfig } from '@metrics/configApi'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
@@ -265,20 +270,50 @@ export const getLocationLevelFromLocationData = (locationData: Location) => {
 }
 
 export const fetchEstimateForTargetDaysByLocationId = async (
-  locationId: string,
+  locationId: string | undefined,
   event: EVENT_TYPE,
   authHeader: IAuthHeader,
   timeFrom: string,
   timeTo: string
 ): Promise<IEstimation> => {
-  const locationData: Location = await fetchFHIR(locationId, authHeader)
-  return await fetchEstimateByLocation(
-    locationData,
-    event,
-    authHeader,
-    timeFrom,
-    timeTo
-  )
+  if (locationId) {
+    const locationData: Location = await fetchFHIR(locationId, authHeader)
+    return await fetchEstimateByLocation(
+      locationData,
+      event,
+      authHeader,
+      timeFrom,
+      timeTo
+    )
+  } else {
+    const locationData = (await fetchChildLocationsByParentId(
+      'Location/0',
+      authHeader
+    )) as Location[]
+
+    const total = {
+      totalEstimation: 0,
+      maleEstimation: 0,
+      femaleEstimation: 0,
+      locationId: 'Location/0',
+      estimationYear: new Date(timeTo).getFullYear(),
+      locationLevel: 'COUNTRY'
+    }
+
+    for (const location of locationData) {
+      const estimate = await fetchEstimateByLocation(
+        location,
+        event,
+        authHeader,
+        timeFrom,
+        timeTo
+      )
+      total.totalEstimation += estimate.totalEstimation || 0
+      total.maleEstimation += estimate.maleEstimation || 0
+      total.femaleEstimation += estimate.femaleEstimation || 0
+    }
+    return total
+  }
 }
 
 export const getDistrictLocation = async (

@@ -249,7 +249,7 @@ export interface GQLVerifyPasswordResult {
 }
 
 export interface GQLTotalMetricsResult {
-  estimated?: number
+  estimated?: GQLEstimation
   results?: Array<GQLEventMetrics | null>
 }
 
@@ -708,6 +708,15 @@ export interface GQLSearchFieldAgentResponse {
   totalNumberOfInProgressAppStarted?: number
   totalNumberOfRejectedDeclarations?: number
   averageTimeForDeclaredDeclarations?: number
+}
+
+export interface GQLEstimation {
+  totalEstimation?: number
+  maleEstimation?: number
+  femaleEstimation?: number
+  locationId?: string
+  estimationYear?: number
+  locationLevel?: string
 }
 
 export interface GQLEventMetrics {
@@ -1342,6 +1351,7 @@ export interface GQLResolver {
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
   Signature?: GQLSignatureTypeResolver
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
+  Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
   MonthWiseTargetDayEstimation?: GQLMonthWiseTargetDayEstimationTypeResolver
   EventInTargetDayEstimationCount?: GQLEventInTargetDayEstimationCountTypeResolver
@@ -4305,6 +4315,54 @@ export interface SearchFieldAgentResponseToTotalNumberOfRejectedDeclarationsReso
 }
 
 export interface SearchFieldAgentResponseToAverageTimeForDeclaredDeclarationsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLEstimationTypeResolver<TParent = any> {
+  totalEstimation?: EstimationToTotalEstimationResolver<TParent>
+  maleEstimation?: EstimationToMaleEstimationResolver<TParent>
+  femaleEstimation?: EstimationToFemaleEstimationResolver<TParent>
+  locationId?: EstimationToLocationIdResolver<TParent>
+  estimationYear?: EstimationToEstimationYearResolver<TParent>
+  locationLevel?: EstimationToLocationLevelResolver<TParent>
+}
+
+export interface EstimationToTotalEstimationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EstimationToMaleEstimationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EstimationToFemaleEstimationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EstimationToLocationIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EstimationToEstimationYearResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface EstimationToLocationLevelResolver<
   TParent = any,
   TResult = any
 > {
