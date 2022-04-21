@@ -285,12 +285,11 @@ export const getDistrictLocation = async (
   locationId: string,
   authHeader: IAuthHeader
 ): Promise<Location> => {
-  let locationBundle: Location
-  let locationType: fhir.Identifier | undefined
   let lId = locationId
 
-  locationBundle = await fetchLocation(lId, authHeader)
-  locationType = getLocationType(locationBundle)
+  let locationBundle = await fetchLocation(lId, authHeader)
+
+  let locationType = getLocationType(locationBundle)
   while (
     locationBundle &&
     (!locationType || locationType.value !== 'DISTRICT')
@@ -309,7 +308,7 @@ export const getDistrictLocation = async (
     throw new Error('No district location found')
   }
 
-  return locationBundle
+  return locationBundle as Location
 }
 
 function getLocationType(locationBundle: fhir.Location) {
