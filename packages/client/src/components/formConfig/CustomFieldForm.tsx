@@ -24,6 +24,7 @@ import {
   TextArea,
   TextInput
 } from '@opencrvs/components/lib/forms'
+import { Tooltip } from '@opencrvs/components/lib/icons'
 import { Box } from '@opencrvs/components/lib/interface'
 import { camelCase } from 'lodash'
 import * as React from 'react'
@@ -61,8 +62,10 @@ const H3 = styled.h3`
 `
 
 const H4 = styled.span`
-  ${({ theme }) => theme.fonts.bold16};
-  display: block;
+  ${({ theme }) => theme.fonts.bold14};
+  display: flex;
+  align-items: center;
+  gap: 4px;
 `
 
 const ListContainer = styled.div`
@@ -87,7 +90,16 @@ const LanguageSelect = styled(Select)`
   width: 175px;
 `
 
-const ListColumn = styled.div``
+const StyledTooltip = styled(Tooltip)`
+  height: 16px;
+  width: 16px;
+`
+
+const ListColumn = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+`
 
 type IFullProps = {
   intl: IntlShape
@@ -238,13 +250,13 @@ class CustomFieldFormsComp extends React.Component<
         <ListRow>
           <ListColumn>
             {intl.formatMessage(customFieldFormMessages.requiredFieldLabel)}
+            <StyledTooltip />
           </ListColumn>
           <ListColumn>
             <RightAlignment>
               <Toggle
                 selected={this.state.requiredField}
                 onChange={() => {
-                  console.log('Required')
                   this.setState({ requiredField: !this.state.requiredField })
                 }}
               />
@@ -441,7 +453,10 @@ class CustomFieldFormsComp extends React.Component<
     const { intl } = this.props
     return (
       <>
-        <H4>{intl.formatMessage(customFieldFormMessages.handleBardHeading)}</H4>
+        <H4>
+          {intl.formatMessage(customFieldFormMessages.handleBardHeading)}
+          <StyledTooltip />
+        </H4>
         <GreyText>{`{{ ${this.state.handleBars} }}`}</GreyText>
       </>
     )

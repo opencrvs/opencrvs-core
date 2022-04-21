@@ -84,6 +84,12 @@ const CanvasContainer = styled.div`
   margin-top: 18px;
 `
 
+const CanvasWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+`
+
 type IRouteProps = {
   event: Event
   section: string
@@ -140,6 +146,13 @@ export function FormConfigWizard() {
     return <Redirect to={HOME} />
   }
 
+  if (
+    selectedField &&
+    undefined === (state as IEventTypes)[event][section][selectedField.fieldId]
+  ) {
+    setSelectedField(null)
+  }
+
   return (
     <Container>
       <EventTopBar
@@ -156,14 +169,16 @@ export function FormConfigWizard() {
             onSectionChange={setSelectedField}
           />
         </NavigationContainer>
-        <CanvasContainer>
-          <Canvas
-            event={event}
-            section={section}
-            selectedField={selectedField}
-            onFieldSelect={(field) => setSelectedField(field)}
-          />
-        </CanvasContainer>
+        <CanvasWrapper onClick={() => setSelectedField(null)}>
+          <CanvasContainer>
+            <Canvas
+              event={event}
+              section={section}
+              selectedField={selectedField}
+              onFieldSelect={(field) => setSelectedField(field)}
+            />
+          </CanvasContainer>
+        </CanvasWrapper>
         <ToolsContainer>
           {selectedField ? (
             !selectedField.custom ? (

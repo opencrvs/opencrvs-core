@@ -14,6 +14,8 @@ import { Event, IFormField, IFormSection, IForm } from '@client/forms'
 import { IConfigFieldsState, IEventTypes } from './reducer'
 import { keys } from 'lodash'
 
+const CUSTOM_FIELD_ID = 'custom-field'
+
 export type IConfigFormField = {
   fieldId: string
   precedingFieldId: string | null
@@ -80,16 +82,31 @@ export function getEventSectionFieldsMap(form: IForm, event: Event) {
   return birthSectionFieldsMap
 }
 
+function determineNextFieldIdNumber(
+  state: IEventTypes,
+  event: keyof IEventTypes,
+  section: string
+): number {
+  const customFieldNumber = keys(state[event][section])
+    .filter((item) => item.includes(CUSTOM_FIELD_ID))
+    .map((item) => {
+      const elemNumber = item.replace(
+        `${event}.${section}.${CUSTOM_FIELD_ID}-`,
+        ''
+      )
+      return parseInt(elemNumber)
+    })
+  return customFieldNumber.length ? Math.max(...customFieldNumber) + 1 : 1
+}
+
 export function prepareCustomFieldConfig(
   state: IEventTypes,
   event: keyof IEventTypes,
   section: string,
   customField: IConfigFormField
 ): IConfigFormField | undefined {
-  const customFieldNumber =
-    keys(state[event][section]).filter((item) => item.includes('custom-field'))
-      .length + 1
-  const customFieldIndex = `${event}.${section}.custom-field-${customFieldNumber}`
+  const customFieldNumber = determineNextFieldIdNumber(state, event, section)
+  const customFieldIndex = `${event}.${section}.${CUSTOM_FIELD_ID}-${customFieldNumber}`
   let customFieldConfig
 
   for (const index in state[event][section]) {

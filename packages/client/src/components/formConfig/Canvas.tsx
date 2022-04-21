@@ -77,7 +77,10 @@ export function Canvas({
         <FormConfigElementCard
           key={configField.fieldId}
           selected={selectedField?.fieldId === configField.fieldId}
-          onClick={() => onFieldSelect(configField)}
+          onClick={(e) => {
+            e.stopPropagation()
+            onFieldSelect(configField)
+          }}
           removable={configField.custom}
           onRemove={() => {
             selectedField && dispatch(RemoveCustomField(selectedField))
