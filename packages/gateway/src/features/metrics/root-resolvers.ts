@@ -27,10 +27,6 @@ export interface IMetricsParam {
 
 export const resolvers: GQLResolver = {
   Query: {
-    /**
-     *
-     * @deprecated
-     */
     async getTotalMetrics(
       _,
       { timeStart, timeEnd, locationId, event },
