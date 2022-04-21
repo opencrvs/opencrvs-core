@@ -32,6 +32,12 @@ import styled from '@client/styledComponents'
 import { Warning } from '@opencrvs/components/lib/interface'
 import { Event } from '@client/forms'
 import { constantsMessages } from '@client/i18n/messages'
+import {
+  ActionState,
+  ActionContext,
+  ActionsModal,
+  defaultActionState
+} from './ActionsModal'
 
 const StyledWarning = styled(Warning)`
   margin: 0 auto 16px;
@@ -76,6 +82,14 @@ export function FormConfiguration() {
   const [selectedTab, setSelectedTab] = React.useState<string>(
     DraftStatus.DRAFT
   )
+  /* This reducer is for ActionsModal and Notifications */
+  const [actionState, setAction] = React.useReducer(
+    (state: ActionState, newState: Partial<ActionState>) => ({
+      ...state,
+      ...newState
+    }),
+    defaultActionState
+  )
 
   return (
     <SysAdminContentWrapper isCertificatesConfigPage>
@@ -108,15 +122,18 @@ export function FormConfiguration() {
           onTabClick: (tabId) => setSelectedTab(tabId)
         }}
       >
-        {formDraftLoaded && selectedTab === DraftStatus.DRAFT ? (
-          <DraftsTab />
-        ) : selectedTab === DraftStatus.PREVIEW ? (
-          <PreviewTab />
-        ) : selectedTab === DraftStatus.PUBLISHED ? (
-          <PublishedTab />
-        ) : (
-          <></>
-        )}
+        <ActionContext.Provider value={{ actionState, setAction }}>
+          {formDraftLoaded && selectedTab === DraftStatus.DRAFT ? (
+            <DraftsTab />
+          ) : selectedTab === DraftStatus.PREVIEW ? (
+            <PreviewTab />
+          ) : selectedTab === DraftStatus.PUBLISHED ? (
+            <PublishedTab />
+          ) : (
+            <></>
+          )}
+          <ActionsModal />
+        </ActionContext.Provider>
       </Content>
     </SysAdminContentWrapper>
   )

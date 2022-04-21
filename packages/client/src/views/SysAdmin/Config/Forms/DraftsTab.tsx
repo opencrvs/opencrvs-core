@@ -19,22 +19,10 @@ import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { Event, BirthSection, DeathSection } from '@client/forms'
 import { useIntl } from 'react-intl'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import {
-  messages,
-  draftStatusMessages
-} from '@client/i18n/messages/views/formConfig'
-import {
-  LinkButton,
-  TertiaryButton,
-  SuccessButton,
-  DangerButton
-} from '@opencrvs/components/lib/buttons'
-import {
-  ToggleMenu,
-  Pill,
-  ResponsiveModal
-} from '@opencrvs/components/lib/interface'
+import { buttonMessages } from '@client/i18n/messages'
+import { draftStatusMessages } from '@client/i18n/messages/views/formConfig'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { ToggleMenu, Pill } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { goToFormConfigWizard } from '@client/navigation'
 import {
@@ -43,10 +31,7 @@ import {
 } from '@client/forms/configuration/formDrafts/reducer'
 import { Value, DraftVersion } from './components'
 import { isDefaultDraft } from './utils'
-import { Mutation } from 'react-apollo'
-import { CHANGE_FORM_DRAFT_STATUS } from './mutations'
-import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
-import { fetchFormDraftSuccessAction } from '@client/forms/configuration/formDrafts/actions'
+import { ActionContext, Actions, ActionStatus } from './ActionsModal'
 
 function ActionButton({ event, status, version }: IDraft) {
   const intl = useIntl()
@@ -73,114 +58,37 @@ function ActionButton({ event, status, version }: IDraft) {
   )
 }
 
-function PreviewButton({
-  event,
-  toggleShow
-}: {
-  event: Event
-  toggleShow: () => void
-}) {
-  const intl = useIntl()
-  const dispatch = useDispatch()
-  return (
-    <Mutation<
-      GQLMutation,
-      {
-        status: string
-        event: string
-      }
-    >
-      mutation={CHANGE_FORM_DRAFT_STATUS}
-      onCompleted={({ createOrUpdateFormDraft: formDrafts }) => {
-        formDrafts && dispatch(fetchFormDraftSuccessAction({ formDrafts }))
-      }}
-    >
-      {(changeStatus) => (
-        <SuccessButton
-          id="preview-btn"
-          key="preview"
-          onClick={() => {
-            changeStatus({
-              variables: {
-                status: DraftStatus.PREVIEW,
-                event: event
-              }
-            })
-            toggleShow()
-          }}
-        >
-          {intl.formatMessage(buttonMessages.preview)}
-        </SuccessButton>
-      )}
-    </Mutation>
-  )
-}
-
 function OptionsMenu({ event }: { event: Event }) {
-  enum Option {
-    PREVIEW,
-    DELETE
-  }
   const intl = useIntl()
-  const [show, setShow] = React.useState(false)
-  const [selectedOption, setSelectedOption] = React.useState<Option>(
-    Option.PREVIEW
-  )
-  const toggleShow = () => setShow((prev) => !prev)
+  const { setAction } = React.useContext(ActionContext)
+
   return (
-    <>
-      <ToggleMenu
-        id="toggleMenu"
-        toggleButton={<VerticalThreeDots />}
-        menuItems={[
-          {
-            label: intl.formatMessage(buttonMessages.preview),
-            handler: () => {
-              toggleShow()
-              setSelectedOption(Option.PREVIEW)
-            }
-          },
-          {
-            label: intl.formatMessage(buttonMessages.delete),
-            handler: () => {
-              toggleShow()
-              setSelectedOption(Option.DELETE)
-            }
+    <ToggleMenu
+      id="toggleMenu"
+      toggleButton={<VerticalThreeDots />}
+      menuItems={[
+        {
+          label: intl.formatMessage(buttonMessages.preview),
+          handler: () => {
+            setAction({
+              action: Actions.PREVIEW,
+              event: event,
+              status: ActionStatus.MODAL
+            })
           }
-        ]}
-      />
-      <ResponsiveModal
-        autoHeight
-        show={show}
-        title={intl.formatMessage(
-          selectedOption === Option.PREVIEW
-            ? messages.previewConfirmationTitle
-            : messages.deleteConfirmationTitle,
-          {
-            event: intl.formatMessage(constantsMessages[event])
+        },
+        {
+          label: intl.formatMessage(buttonMessages.delete),
+          handler: () => {
+            setAction({
+              action: Actions.DELETE,
+              event: event,
+              status: ActionStatus.MODAL
+            })
           }
-        )}
-        handleClose={toggleShow}
-        actions={[
-          <TertiaryButton id="cancel-btn" key="cancel" onClick={toggleShow}>
-            {intl.formatMessage(buttonMessages.cancel)}
-          </TertiaryButton>,
-          selectedOption === Option.PREVIEW ? (
-            <PreviewButton event={event} toggleShow={toggleShow} />
-          ) : (
-            <DangerButton id="delete-btn" key="delete" onClick={toggleShow}>
-              {intl.formatMessage(buttonMessages.delete)}
-            </DangerButton>
-          )
-        ]}
-      >
-        {intl.formatMessage(
-          selectedOption === Option.PREVIEW
-            ? messages.previewConfirmationDescription
-            : messages.deleteConfirmationDescription
-        )}
-      </ResponsiveModal>
-    </>
+        }
+      ]}
+    />
   )
 }
 
@@ -194,7 +102,7 @@ function EventDrafts({ event }: { event: Event }) {
     <>
       <ActionButton {...formDraft} />
       {!isDefaultDraft(formDraft) && status !== DraftStatus.DELETED && (
-        <OptionsMenu key="toggleButton" event={event} />
+        <OptionsMenu event={event} />
       )}
     </>
   )

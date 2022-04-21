@@ -14,89 +14,30 @@ import {
   ListViewSimplified,
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { Event } from '@client/forms'
 import { useIntl } from 'react-intl'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import {
   messages,
   draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
-import {
-  LinkButton,
-  TertiaryButton,
-  PrimaryButton,
-  SuccessButton
-} from '@opencrvs/components/lib/buttons'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
 import { Value, DraftVersion } from './components'
 import formatDate from '@client/utils/date-formatting'
-import { Pill, ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { Pill } from '@opencrvs/components/lib/interface'
 import { isDefaultDraft } from './utils'
-import { Mutation } from 'react-apollo'
-import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
-import { CHANGE_FORM_DRAFT_STATUS } from './mutations'
-import { fetchFormDraftSuccessAction } from '@client/forms/configuration/formDrafts/actions'
-
-function PublishButton({
-  event,
-  toggleShow
-}: {
-  event: Event
-  toggleShow: () => void
-}) {
-  const intl = useIntl()
-  const dispatch = useDispatch()
-  return (
-    <Mutation<
-      GQLMutation,
-      {
-        status: string
-        event: string
-      }
-    >
-      mutation={CHANGE_FORM_DRAFT_STATUS}
-      onCompleted={({ createOrUpdateFormDraft: formDrafts }) => {
-        formDrafts && dispatch(fetchFormDraftSuccessAction({ formDrafts }))
-      }}
-    >
-      {(changeStatus) => (
-        <SuccessButton
-          id="publish-btn"
-          key="publish"
-          onClick={() => {
-            changeStatus({
-              variables: {
-                status: DraftStatus.PUBLISHED,
-                event: event
-              }
-            })
-            toggleShow()
-          }}
-        >
-          {intl.formatMessage(buttonMessages.publish)}
-        </SuccessButton>
-      )}
-    </Mutation>
-  )
-}
+import { ActionContext, Actions, ActionStatus } from './ActionsModal'
 
 function EventDrafts({ event }: { event: Event }) {
-  enum Option {
-    EDIT,
-    PUBLISH
-  }
   const intl = useIntl()
   const formDraft = useSelector((store: IStoreState) =>
     selectFormDraft(store, event)
   )
-  const [show, setShow] = React.useState(false)
-  const [selectedOption, setSelectedOption] = React.useState<Option>(
-    Option.EDIT
-  )
-  const toggleShow = () => setShow((prev) => !prev)
+  const { setAction } = React.useContext(ActionContext)
   const { updatedAt, comment, status, version } = formDraft
 
   if (status === DraftStatus.DRAFT || status === DraftStatus.DELETED) {
@@ -107,16 +48,22 @@ function EventDrafts({ event }: { event: Event }) {
     <>
       <LinkButton
         onClick={() => {
-          setSelectedOption(Option.EDIT)
-          toggleShow()
+          setAction({
+            action: Actions.EDIT,
+            event: event,
+            status: ActionStatus.MODAL
+          })
         }}
       >
         {intl.formatMessage(buttonMessages.edit)}
       </LinkButton>
       <LinkButton
         onClick={() => {
-          setSelectedOption(Option.PUBLISH)
-          toggleShow()
+          setAction({
+            action: Actions.PUBLISH,
+            event: event,
+            status: ActionStatus.MODAL
+          })
         }}
       >
         {intl.formatMessage(buttonMessages.publish)}
@@ -125,63 +72,30 @@ function EventDrafts({ event }: { event: Event }) {
   )
 
   return (
-    <>
-      <ListViewItemSimplified
-        key={version}
-        label={<DraftVersion event={event} version={version} />}
-        value={
-          <Value>
-            {isDefaultDraft(formDraft)
-              ? comment
-              : `${intl.formatMessage(messages.created)} ${formatDate(
-                  updatedAt,
-                  'MMMM yyyy'
-                )}`}
-          </Value>
-        }
-        actions={
-          status === DraftStatus.PREVIEW ? (
-            actions
-          ) : (
-            <Pill
-              label={intl.formatMessage(draftStatusMessages.PUBLISHED)}
-              type="active"
-            />
-          )
-        }
-      />
-      <ResponsiveModal
-        autoHeight
-        show={show}
-        title={intl.formatMessage(
-          selectedOption === Option.EDIT
-            ? messages.editConfirmationTitle
-            : messages.publishConfirmationTitle,
-          {
-            event: intl.formatMessage(constantsMessages[event])
-          }
-        )}
-        handleClose={toggleShow}
-        actions={[
-          <TertiaryButton id="cancel-btn" key="cancel" onClick={toggleShow}>
-            {intl.formatMessage(buttonMessages.cancel)}
-          </TertiaryButton>,
-          selectedOption === Option.EDIT ? (
-            <PrimaryButton id="delete-btn" key="delete" onClick={toggleShow}>
-              {intl.formatMessage(buttonMessages.edit)}
-            </PrimaryButton>
-          ) : (
-            <PublishButton event={event} toggleShow={toggleShow} />
-          )
-        ]}
-      >
-        {intl.formatMessage(
-          selectedOption === Option.EDIT
-            ? messages.editConfirmationDescription
-            : messages.publishConfirmationDescription
-        )}
-      </ResponsiveModal>
-    </>
+    <ListViewItemSimplified
+      key={version}
+      label={<DraftVersion event={event} version={version} />}
+      value={
+        <Value>
+          {isDefaultDraft(formDraft)
+            ? comment
+            : `${intl.formatMessage(messages.created)} ${formatDate(
+                updatedAt,
+                'MMMM yyyy'
+              )}`}
+        </Value>
+      }
+      actions={
+        status === DraftStatus.PREVIEW ? (
+          actions
+        ) : (
+          <Pill
+            label={intl.formatMessage(draftStatusMessages.PUBLISHED)}
+            type="active"
+          />
+        )
+      }
+    />
   )
 }
 

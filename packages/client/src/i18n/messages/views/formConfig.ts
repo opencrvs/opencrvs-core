@@ -12,6 +12,7 @@
 import { defineMessages, MessageDescriptor } from 'react-intl'
 import { DeathSection, BirthSection } from '@client/forms'
 import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
+import { Actions } from '@client/views/SysAdmin/Config/Forms/ActionsModal'
 
 interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
@@ -27,15 +28,7 @@ interface IFormConfigMessages
   pages: MessageDescriptor
   title: MessageDescriptor
   previewDescription: MessageDescriptor
-  previewConfirmationTitle: MessageDescriptor
-  previewConfirmationDescription: MessageDescriptor
   publishedDescription: MessageDescriptor
-  publishConfirmationTitle: MessageDescriptor
-  publishConfirmationDescription: MessageDescriptor
-  editConfirmationTitle: MessageDescriptor
-  editConfirmationDescription: MessageDescriptor
-  deleteConfirmationTitle: MessageDescriptor
-  deleteConfirmationDescription: MessageDescriptor
   publishedWarning: MessageDescriptor
   created: MessageDescriptor
   contentKey: MessageDescriptor
@@ -169,55 +162,11 @@ const messagesToDefine: IFormConfigMessages = {
       'These versions are available to review and test. Log in using the test users acounts for a  Field Agent, Registration Agent or Registrar to test your declaration form.',
     description: 'Description for preview tab'
   },
-  previewConfirmationTitle: {
-    id: 'config.formConfig.preview.confirmation.title',
-    defaultMessage: 'Preview {event} form?',
-    description: 'Title for preview confirmation'
-  },
-  previewConfirmationDescription: {
-    id: 'config.formConfig.preview.confirmation.description',
-    defaultMessage:
-      'This will make the form availble to test users. So that you can test the form and certificate',
-    description: 'Description for preview confirmation'
-  },
   publishedDescription: {
     id: 'config.formConfig.published.description',
     defaultMessage:
       'Your pulished declaration forms will appear here. Once your configuration is published you will no longer be able to make changes.',
     description: 'Description for published tab'
-  },
-  publishConfirmationTitle: {
-    id: 'config.formConfig.publish.confirmation.title',
-    defaultMessage: 'Publish {event} form?',
-    description: 'Title for publish confirmation'
-  },
-  publishConfirmationDescription: {
-    id: 'config.formConfig.publish.confirmation.description',
-    defaultMessage:
-      'By publishing this declaration form you confirm that it is ready to be used by registration offices. You will not be able to make any future edits.',
-    description: 'Description for publish confirmation'
-  },
-  editConfirmationTitle: {
-    id: 'config.formConfig.publish.confirmation.title',
-    defaultMessage: 'Edit declaration form',
-    description: 'Title for edit confirmation'
-  },
-  editConfirmationDescription: {
-    id: 'config.formConfig.publish.confirmation.description',
-    defaultMessage:
-      'This will make a new draft version for you to make updates. Your previewed form will revert to the default configuration.',
-    description: 'Description for edit confirmation'
-  },
-  deleteConfirmationTitle: {
-    id: 'config.formConfig.published.confirmation.title',
-    defaultMessage: 'Delete {event} draft?',
-    description: 'Title for published confirmation'
-  },
-  deleteConfirmationDescription: {
-    id: 'config.formConfig.published.confirmation.description',
-    defaultMessage:
-      'This will delete all draft versions and revert back to the default configuration.',
-    description: 'Description for published confirmation'
   },
   publishedWarning: {
     id: 'config.formConfig.published.warning',
@@ -289,7 +238,66 @@ const draftTabsMessagesToDefine: Record<
   }
 }
 
+const actionsModalTitleMessagesToDefine: Record<Actions, MessageDescriptor> = {
+  PUBLISH: {
+    id: 'config.formConfig.publish.confirmation.title',
+    defaultMessage: 'Publish {event} form?',
+    description: 'Title for publish confirmation'
+  },
+  PREVIEW: {
+    id: 'config.formConfig.preview.confirmation.title',
+    defaultMessage: 'Preview {event} form?',
+    description: 'Title for preview confirmation'
+  },
+  EDIT: {
+    id: 'config.formConfig.edit.confirmation.title',
+    defaultMessage: 'Edit declaration form',
+    description: 'Title for edit confirmation'
+  },
+  DELETE: {
+    id: 'config.formConfig.delete.confirmation.title',
+    defaultMessage: 'Delete {event} draft?',
+    description: 'Title for published confirmation'
+  }
+}
+
+const actionsModalDescriptionMessagesToDefine: Record<
+  Actions,
+  MessageDescriptor
+> = {
+  PUBLISH: {
+    id: 'config.formConfig.publish.confirmation.description',
+    defaultMessage:
+      'By publishing this declaration form you confirm that it is ready to be used by registration offices. You will not be able to make any future edits.',
+    description: 'Description for publish confirmation'
+  },
+  PREVIEW: {
+    id: 'config.formConfig.preview.confirmation.description',
+    defaultMessage:
+      'This will make the form availble to test users. So that you can test the form and certificate',
+    description: 'Description for preview confirmation'
+  },
+  EDIT: {
+    id: 'config.formConfig.edit.confirmation.description',
+    defaultMessage:
+      'This will make a new draft version for you to make updates. Your previewed form will revert to the default configuration.',
+    description: 'Description for edit confirmation'
+  },
+  DELETE: {
+    id: 'config.formConfig.delete.confirmation.description',
+    defaultMessage:
+      'This will delete all draft versions and revert back to the default configuration.',
+    description: 'Description for published confirmation'
+  }
+}
+
 export const messages: IFormConfigMessages = defineMessages(messagesToDefine)
 export const navigationMessages = defineMessages(navigationMessagesToDefine)
 export const draftStatusMessages = defineMessages(draftStatusMessagesToDefine)
 export const draftTabsMessages = defineMessages(draftTabsMessagesToDefine)
+export const actionsModalTitleMessages = defineMessages(
+  actionsModalTitleMessagesToDefine
+)
+export const actionsModalDescriptionMessages = defineMessages(
+  actionsModalDescriptionMessagesToDefine
+)
