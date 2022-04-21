@@ -50,7 +50,8 @@ import {
   getPractionerIdFromTask,
   getTrackingId,
   getRegLastOffice,
-  getEncounterLocationType
+  getEncounterLocationType,
+  getPractitionerIdFromBundle
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -64,7 +65,11 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   Events
 } from '@metrics/features/metrics/constants'
-import { fetchParentLocationByLocationID, fetchTaskHistory } from '@metrics/api'
+import {
+  fetchParentLocationByLocationID,
+  fetchPractitionerRole,
+  fetchTaskHistory
+} from '@metrics/api'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 
 export const generateInCompleteFieldPoints = async (
@@ -145,9 +150,22 @@ export const generateBirthRegPoint = async (
   }
 
   const composition = getComposition(payload)
+
   if (!composition) {
     throw new Error('Composition not found')
   }
+
+  const practitionerId = getPractitionerIdFromBundle(payload)
+
+  if (!practitionerId) {
+    throw new Error('Practitioner id not found')
+  }
+
+  const practitionerRole = await fetchPractitionerRole(
+    practitionerId,
+    authHeader
+  )
+
   const ageInDays =
     (child.birthDate &&
       getAgeInDays(child.birthDate, new Date(composition.date))) ||
@@ -162,6 +180,7 @@ export const generateBirthRegPoint = async (
     regStatus: regStatus,
     eventLocationType: await getEncounterLocationType(payload, authHeader),
     gender: child.gender,
+    practitionerRole,
     ageLabel: (ageInDays && getAgeLabel(ageInDays)) || undefined,
     timeLabel:
       (ageInDays && (await getTimeLabel(ageInDays, EVENT_TYPE.BIRTH))) ||
@@ -194,6 +213,18 @@ export const generateDeathRegPoint = async (
   if (!composition) {
     throw new Error('Composition not found')
   }
+
+  const practitionerId = getPractitionerIdFromBundle(payload)
+
+  if (!practitionerId) {
+    throw new Error('Practitioner id not found')
+  }
+
+  const practitionerRole = await fetchPractitionerRole(
+    practitionerId,
+    authHeader
+  )
+
   const deathDays =
     (deceased.deceasedDateTime &&
       getDurationInDays(
@@ -216,6 +247,7 @@ export const generateDeathRegPoint = async (
   const tags: IDeathRegistrationTags = {
     regStatus: regStatus,
     gender: deceased.gender,
+    practitionerRole,
     ageLabel:
       (deceasedAgeInDays && getAgeLabel(deceasedAgeInDays)) || undefined,
     timeLabel:

@@ -35,7 +35,8 @@ interface IGroupedByGender {
   gender: string
 }
 
-interface IGroupedByGenderTimeLabel extends IGroupedByGender {
+interface IMetricsTotalGroup extends IGroupedByGender {
+  practitionerRole: string
   timeLabel: string
 }
 export interface IBirthKeyFigures {
@@ -837,7 +838,7 @@ export async function getTotalMetrics(
   const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
 
-  const totalMetrics: IGroupedByGenderTimeLabel[] = await query(
+  const totalMetrics: IMetricsTotalGroup[] = await query(
     `SELECT COUNT(${column}) AS total
       FROM ${measurement}
     WHERE time > '${timeFrom}'
@@ -850,7 +851,7 @@ export async function getTotalMetrics(
       OR locationLevel5 = '${locationId}')`
           : ``
       }
-    GROUP BY gender, timeLabel, eventLocationType`
+    GROUP BY gender, timeLabel, eventLocationType, practitionerRole`
   )
 
   const estimationOfTimeRange: IEstimation =

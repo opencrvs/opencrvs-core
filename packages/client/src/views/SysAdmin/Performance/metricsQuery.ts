@@ -36,6 +36,7 @@ export const PERFORMANCE_METRICS = gql`
         total
         gender
         eventLocationType
+        practitionerRole
         timeLabel
       }
     }
