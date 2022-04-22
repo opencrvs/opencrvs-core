@@ -13,11 +13,11 @@ import * as React from 'react'
 
 export const DeclarationIcon = ({
   isArchive,
-  isValidated,
+  isValidatedOnReview,
   ...props
 }: React.HTMLAttributes<SVGElement> & {
   isArchive?: boolean
-  isValidated?: boolean
+  isValidatedOnReview?: boolean
 }) => {
   let fill: string
   let corner: string
@@ -47,9 +47,18 @@ export const DeclarationIcon = ({
       fill = '#BFA4DB'
       corner = '#450487'
       break
+    case 'blue':
+      fill = '#99C4F7'
+      corner = '#0A52AA'
+      break
     default:
       fill = '#CCCCCC'
       corner = '#5B5B5B'
+  }
+
+  if (isValidatedOnReview) {
+    fill = '#F5CE9E'
+    corner = '#C86E00'
   }
 
   return (
@@ -67,7 +76,7 @@ export const DeclarationIcon = ({
           fill="#5B5B5B"
         />
       )}
-      {isValidated && (
+      {isValidatedOnReview && (
         <path
           fillRule="evenodd"
           clipRule="evenodd"

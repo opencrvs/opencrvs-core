@@ -19,7 +19,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { ITheme } from '@client/styledComponents'
-import { Scope } from '@client/utils/authUtils'
+import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import { EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
 import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
 import {
@@ -39,7 +39,11 @@ import {
   dynamicConstantsMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import {
+  IDeclaration,
+  DOWNLOAD_STATUS,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { withTheme } from 'styled-components'
@@ -59,6 +63,7 @@ import {
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/tabs/utils'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -115,7 +120,7 @@ class ReviewTabComponent extends React.Component<
   }
 
   userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
+    return this.props.scope && hasRegisterScope(this.props.scope)
   }
 
   onColumnClick = (columnName: string) => {
@@ -143,65 +148,51 @@ class ReviewTabComponent extends React.Component<
       )
       const downloadStatus =
         (foundDeclaration && foundDeclaration.downloadStatus) || undefined
-      let icon: JSX.Element = <div />
+      const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
-      if (reg.duplicates && reg.duplicates.length > 0) {
-        if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-          actions.push({
-            actionComponent: (
-              <DownloadButton
-                downloadConfigs={{
-                  event: reg.event,
-                  compositionId: reg.id,
-                  action: Action.LOAD_REVIEW_DECLARATION
-                }}
-                key={`DownloadButton-${index}`}
-                status={downloadStatus as DOWNLOAD_STATUS}
-              />
-            )
-          })
-        } else {
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
           actions.push({
             label: this.props.intl.formatMessage(constantsMessages.review),
-            handler: () => this.props.goToReviewDuplicate(reg.id)
+            handler: () => {},
+            disabled: true
           })
         }
-
-        icon = <Duplicate />
+        actions.push({
+          actionComponent: (
+            <DownloadButton
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                action: Action.LOAD_REVIEW_DECLARATION
+              }}
+              key={`DownloadButton-${index}`}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
+          )
+        })
       } else {
-        if (reg.declarationStatus === EVENT_STATUS.VALIDATED) {
-          icon = <Validate data-tip data-for="validateTooltip" />
-        }
-        if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-          actions.push({
-            actionComponent: (
-              <DownloadButton
-                downloadConfigs={{
-                  event: reg.event,
-                  compositionId: reg.id,
-                  action: Action.LOAD_REVIEW_DECLARATION
-                }}
-                key={`DownloadButton-${index}`}
-                status={downloadStatus as DOWNLOAD_STATUS}
-              />
-            )
-          })
-        } else {
+        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
           actions.push({
             label: this.props.intl.formatMessage(constantsMessages.review),
             handler: (
               e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
             ) => {
               e && e.stopPropagation()
-              this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                reg.id,
-                'review',
-                reg.event ? reg.event.toLowerCase() : ''
-              )
+              isDuplicate
+                ? this.props.goToReviewDuplicate(reg.id)
+                : this.props.goToPage(
+                    REVIEW_EVENT_PARENT_FORM_PAGE,
+                    reg.id,
+                    'review',
+                    reg.event ? reg.event.toLowerCase() : ''
+                  )
             }
           })
         }
+        actions.push({
+          actionComponent: <Downloaded />
+        })
       }
       const event =
         (reg.event &&
@@ -209,6 +200,11 @@ class ReviewTabComponent extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
+      const isValidatedOnReview =
+        reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
+        this.userHasRegisterScope()
+          ? true
+          : false
       const dateOfEvent = reg.dateOfEvent && new Date(reg.dateOfEvent)
       const createdAt = reg.createdAt && parseInt(reg.createdAt)
       return {
@@ -218,13 +214,20 @@ class ReviewTabComponent extends React.Component<
         sentForReview: createdAt,
         name: reg.name && reg.name.toLowerCase(),
         iconWithName: (
-          <IconWithName status={reg.declarationStatus} name={reg.name} />
+          <IconWithName
+            status={reg.declarationStatus}
+            name={reg.name}
+            isDuplicate={isDuplicate}
+            isValidatedOnReview={isValidatedOnReview}
+          />
         ),
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.declarationStatus}
             name={reg.name}
             event={event}
+            isValidatedOnReview={isValidatedOnReview}
+            isDuplicate={isDuplicate}
           />
         ),
         eventTimeElapsed:
@@ -235,7 +238,6 @@ class ReviewTabComponent extends React.Component<
             formattedDuration(new Date(parseInt(reg.createdAt)))) ||
           '',
         actions,
-        icon,
         rowClickHandler: [
           {
             label: 'rowClickHandler',

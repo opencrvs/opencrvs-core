@@ -57,6 +57,8 @@ import {
   IconWithName,
   IconWithNameEvent
 } from '@client/views/OfficeHome/tabs/components'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+
 interface IBaseRejectTabProps {
   theme: ITheme
   scope: Scope | null
@@ -194,8 +196,16 @@ class RejectTabComponent extends React.Component<
       )
       const downloadStatus =
         (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+      const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+          actions.push({
+            label: this.props.intl.formatMessage(buttonMessages.update),
+            handler: () => {},
+            disabled: true
+          })
+        }
         actions.push({
           actionComponent: (
             <DownloadButton
@@ -210,32 +220,27 @@ class RejectTabComponent extends React.Component<
           )
         })
       } else {
-        if (reg.duplicates && reg.duplicates.length > 0) {
-          actions.push({
-            label: this.props.intl.formatMessage(constantsMessages.review),
-            handler: (
-              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-            ) => {
-              e && e.stopPropagation()
-              this.props.goToReviewDuplicate(reg.id)
-            }
-          })
-        } else {
+        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
           actions.push({
             label: this.props.intl.formatMessage(buttonMessages.update),
             handler: (
               e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
             ) => {
               e && e.stopPropagation()
-              this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                reg.id,
-                'review',
-                reg.event ? reg.event.toLowerCase() : ''
-              )
+              isDuplicate
+                ? this.props.goToReviewDuplicate(reg.id)
+                : this.props.goToPage(
+                    REVIEW_EVENT_PARENT_FORM_PAGE,
+                    reg.id,
+                    'review',
+                    reg.event ? reg.event.toLowerCase() : ''
+                  )
             }
           })
         }
+        actions.push({
+          actionComponent: <Downloaded />
+        })
       }
       const event =
         (reg.event &&
@@ -253,13 +258,18 @@ class RejectTabComponent extends React.Component<
         event,
         name: reg.name && reg.name.toLowerCase(),
         iconWithName: (
-          <IconWithName status={reg.declarationStatus} name={reg.name} />
+          <IconWithName
+            status={reg.declarationStatus}
+            name={reg.name}
+            isDuplicate={isDuplicate}
+          />
         ),
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.declarationStatus}
             name={reg.name}
             event={reg.event}
+            isDuplicate={isDuplicate}
           />
         ),
         sentForUpdates,

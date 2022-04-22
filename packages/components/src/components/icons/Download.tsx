@@ -10,16 +10,25 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
+import { colors } from '../colors'
 
-export const Download = (props: React.HTMLAttributes<SVGElement>) => (
-  <svg width={40} height={40} viewBox="0 0 40 40" fill="none" {...props}>
-    <circle cx={20} cy={20} r={11} stroke="#4C68C1" strokeWidth={2} />
+export const Download = ({
+  isFailed
+}: React.HTMLAttributes<SVGElement> & {
+  isFailed?: boolean
+}) => (
+  <svg
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <path
-      d="M16 22l4 4 4-4M20 14v12"
-      stroke="#4C68C1"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3ZM1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12ZM12 7C12.5523 7 13 7.44771 13 8L13 13.5858L15.2929 11.2929C15.6834 10.9024 16.3166 10.9024 16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L12.7071 16.7071C12.5196 16.8946 12.2652 17 12 17C11.7348 17 11.4804 16.8946 11.2929 16.7071L7.29289 12.7071C6.90237 12.3166 6.90237 11.6834 7.29289 11.2929C7.68342 10.9024 8.31658 10.9024 8.70711 11.2929L11 13.5858L11 8C11 7.44772 11.4477 7 12 7Z"
+      fill={isFailed ? colors.negative : colors.primary}
     />
   </svg>
 )

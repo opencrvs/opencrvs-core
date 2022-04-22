@@ -35,6 +35,8 @@ const ListItemActionsContainer = styled.div<{
 }>`
   display: flex;
   flex: 1;
+  align-items: center;
+  gap: 20px;
   justify-content: ${({ alignment }) => {
     if (alignment === ColumnContentAlignment.LEFT) {
       return 'flex-start'
@@ -87,7 +89,7 @@ export function ListItemAction(props: IListItemActionProps) {
   } = props
   return (
     <Container id={id}>
-      <ListItemActionsContainer alignment={alignment}>
+      <ListItemActionsContainer alignment={alignment} id="2ndContainer">
         {actions &&
           actions.map((action: IAction) =>
             isActionComponent(action) ? (
@@ -100,6 +102,7 @@ export function ListItemAction(props: IListItemActionProps) {
                 size={'medium'}
                 onClick={action.handler}
                 icon={action.icon}
+                disabled={action.disabled}
               >
                 {action.label}
               </ListItemSingleAction>

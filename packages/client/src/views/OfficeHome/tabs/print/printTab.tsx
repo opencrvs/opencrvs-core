@@ -54,6 +54,7 @@ import {
   IconWithName,
   IconWithNameEvent
 } from '@client/views/OfficeHome/tabs/components'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
@@ -192,6 +193,13 @@ class PrintTabComponent extends React.Component<
         (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+          actions.push({
+            label: this.props.intl.formatMessage(buttonMessages.print),
+            handler: () => {},
+            disabled: true
+          })
+        }
         actions.push({
           actionComponent: (
             <DownloadButton
@@ -206,18 +214,21 @@ class PrintTabComponent extends React.Component<
           )
         })
       } else {
-        actions.push({
-          label: this.props.intl.formatMessage(buttonMessages.print),
-          handler: (
-            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-          ) => {
-            e && e.stopPropagation()
-            this.props.goToPrintCertificate(
-              reg.id,
-              reg.event.toLocaleLowerCase() || ''
-            )
-          }
-        })
+        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+          actions.push({
+            label: this.props.intl.formatMessage(buttonMessages.print),
+            handler: (
+              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+            ) => {
+              e && e.stopPropagation()
+              this.props.goToPrintCertificate(
+                reg.id,
+                reg.event.toLocaleLowerCase() || ''
+              )
+            }
+          })
+        }
+        actions.push({ actionComponent: <Downloaded /> })
       }
       const event =
         (reg.event &&
