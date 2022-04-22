@@ -163,7 +163,10 @@ export interface IBirthRegistrationPoints {
 
 export interface IPaymentPoints {
   measurement: string
-  tags: ILocationTags
+  tags: ILocationTags & {
+    eventType: 'BIRTH' | 'DEATH'
+    paymentType: 'certification' | 'correction'
+  }
   fields: IPaymentFields
   timestamp: number | undefined
 }
