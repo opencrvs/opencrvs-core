@@ -261,7 +261,6 @@ const RequiresUpdateComponent = (props: IFullProps) => {
     <Content
       size={ContentSize.LARGE}
       title={intl.formatMessage(navigationMessages.requiresUpdate)}
-      hideBackground={true}
     >
       <Query
         query={SEARCH_DECLARATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS

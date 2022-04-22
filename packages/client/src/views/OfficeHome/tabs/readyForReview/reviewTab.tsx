@@ -323,7 +323,6 @@ class ReviewTabComponent extends React.Component<
       <Content
         size={ContentSize.LARGE}
         title={intl.formatMessage(navigationMessages.readyForReview)}
-        hideBackground={true}
       >
         <ReactTooltip id="validateTooltip">
           <ToolTipContainer>

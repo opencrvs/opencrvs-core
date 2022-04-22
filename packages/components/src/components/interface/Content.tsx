@@ -15,22 +15,21 @@ import styled from 'styled-components'
 import { colors } from '../colors'
 import { Box } from './Box'
 
-const Container = styled(Box)<{ size: string; hideBackground?: boolean }>`
+const Container = styled(Box)<{ size: string }>`
   position: relative;
   margin: 24px auto;
   max-width: ${({ size }) => (size === 'large' ? '1140px' : '778px')};
   height: 100%;
   box-sizing: border-box;
 
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin: 24px;
+  }
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 0;
     border: 0;
     border-radius: 0;
-    ${({ hideBackground }) =>
-      hideBackground &&
-      `
-        background: none;
-      `}
   }
 `
 const Header = styled.div`
@@ -42,6 +41,7 @@ const Header = styled.div`
   padding: 0 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     border: 0;
     padding: 0;
@@ -77,7 +77,7 @@ const TopTabBar = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 24px 16px 0;
+    padding: 8px 16px 0;
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   }
 `
@@ -131,7 +131,6 @@ interface IProps {
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   size?: ContentSize
-  hideBackground?: boolean
 }
 
 export class Content extends React.Component<IProps> {
@@ -145,11 +144,10 @@ export class Content extends React.Component<IProps> {
       subtitle,
       children,
       bottomActionButtons,
-      size,
-      hideBackground
+      size
     } = this.props
     return (
-      <Container size={size as string} hideBackground={hideBackground}>
+      <Container size={size as string}>
         <Header>
           <TopBar>
             <TitleContainer titleColor={titleColor}>

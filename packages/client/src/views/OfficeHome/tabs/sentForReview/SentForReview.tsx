@@ -334,7 +334,6 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
       <Content
         size={ContentSize.LARGE}
         title={intl.formatMessage(navigationMessages.sentForReview)}
-        hideBackground={true}
       >
         <GridTable
           content={this.transformDeclarationsReadyToSend()}

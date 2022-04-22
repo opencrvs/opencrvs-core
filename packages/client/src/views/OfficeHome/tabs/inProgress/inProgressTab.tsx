@@ -67,7 +67,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { IFormTabProps } from '@opencrvs/components/lib/forms'
+import { FormTabs } from '@opencrvs/components/lib/forms'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
 import {
@@ -454,13 +454,13 @@ export class InProgressTabComponent extends React.Component<
     drafts: IDeclaration[],
     fieldAgentCount: number,
     hospitalCount: number
-  ): IFormTabProps | undefined {
+  ) {
     if (this.props.isFieldAgent) {
       return undefined
     }
-    return {
+    const tabs = {
       activeTabId: selectorId || SELECTOR_ID.ownDrafts,
-      onTabClick: (tabId) => {
+      onTabClick: (tabId: string) => {
         this.props.goToRegistrarHomeTab(TAB_ID.inProgress, tabId)
       },
       sections: [
@@ -487,6 +487,14 @@ export class InProgressTabComponent extends React.Component<
         }
       ]
     }
+
+    return (
+      <FormTabs
+        sections={tabs.sections}
+        activeTabId={tabs.activeTabId}
+        onTabClick={(id: string) => tabs.onTabClick(id)}
+      />
+    )
   }
 
   renderFieldAgentTable = (
@@ -556,8 +564,7 @@ export class InProgressTabComponent extends React.Component<
       <Content
         size={ContentSize.LARGE}
         title={intl.formatMessage(navigationMessages.progress)}
-        hideBackground={true}
-        tabs={this.getTabs(
+        tabBarContent={this.getTabs(
           selectorId,
           drafts,
           inProgressData.totalItems || 0,

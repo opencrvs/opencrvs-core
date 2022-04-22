@@ -281,7 +281,6 @@ class PrintTabComponent extends React.Component<
       <Content
         size={ContentSize.LARGE}
         title={intl.formatMessage(navigationMessages.print)}
-        hideBackground={true}
       >
         <GridTable
           content={this.transformRegisteredContent(data)}
