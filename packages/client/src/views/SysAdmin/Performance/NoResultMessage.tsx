@@ -20,7 +20,6 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { generatePilotLocations } from '@client/utils/locationUtils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { MessageRow } from '@client/views/SysAdmin/Performance/PerformanceHome'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 
 const MessageContainer = styled.div`
@@ -39,6 +38,10 @@ interface NoResultMessageProps {
 interface DispatchProps {
   goToOperationalReport: typeof goToOperationalReport
 }
+
+const MessageRow = styled.div`
+  margin-bottom: 10px;
+`
 
 type Props = NoResultMessageProps &
   WrappedComponentProps &
