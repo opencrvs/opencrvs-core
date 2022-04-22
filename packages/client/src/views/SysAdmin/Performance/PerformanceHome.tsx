@@ -9,154 +9,235 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { messages } from '@client/i18n/messages/views/performance'
-import { messages as messagesSearch } from '@client/i18n/messages/views/search'
-import { goToOperationalReport } from '@client/navigation'
-import { IOfflineData } from '@client/offline/reducer'
+import { goToPerformanceHome } from '@client/navigation'
+import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import {
-  generateLocations,
-  generatePilotLocations
-} from '@client/utils/locationUtils'
-import {
-  ISearchLocation,
-  LocationSearch
-} from '@opencrvs/components/lib/interface'
+import { generateLocations } from '@client/utils/locationUtils'
+import { Box, ISearchLocation } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
+import { parse } from 'query-string'
+import { ITheme } from '@opencrvs/components/lib/theme'
 import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { Header } from './utils'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
+import { DateRangePicker } from '@client/components/DateRangePicker'
+import subYears from 'date-fns/subYears'
+import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
+import { Event } from '@client/forms'
+import { LocationPicker } from '@client/components/LocationPicker'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { IUserDetails } from '@client/utils/userUtils'
 
-const MessageContainer = styled.div`
-  margin-top: 50px;
+const Layout = styled.div`
+  display: flex;
+  gap: 16px;
+`
+const LayoutLeft = styled.div`
+  flex-grow: 1;
+`
+const LayoutRight = styled.div`
+  margin-top: 24px;
+  width: 300px;
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    position: absolute;
+    display: none;
+  }
 `
 
-export const MessageHeader = styled.div`
-  ${({ theme }) => theme.fonts.reg16};
-  margin-bottom: 15px;
+const Stats = styled(Box)`
+  width: 100%;
+  height: auto;
+`
+const H4 = styled.div`
+  ${({ theme }) => theme.fonts.h4}
+  color: ${({ theme }) => theme.colors.copy};
+`
+const RegistrationStatus = styled(Box)`
+  width: 100%;
+  height: auto;
 `
 
-export const MessageRow = styled.div`
-  margin-bottom: 10px;
+const PerformanceActions = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 16px;
 `
-
-interface BaseProps {
-  goToOperationalReport: typeof goToOperationalReport
+interface IConnectProps {
+  locations: { [key: string]: ILocation }
+  offices: { [key: string]: ILocation }
 }
 
-type Props = BaseProps &
-  WrappedComponentProps &
-  Pick<RouteComponentProps, 'history'> & {
-    offlineCountryConfiguration: IOfflineData
-  }
+interface ISearchParams {
+  event: Event
+  locationId: string
+  timeStart: string
+  timeEnd: string
+}
+
+interface IDispatchProps {
+  goToPerformanceHome: typeof goToPerformanceHome
+}
 
 interface State {
-  selectedLocation: ISearchLocation | undefined
+  selectedLocation: ISearchLocation
+  event: Event
+  timeStart: Date
+  timeEnd: Date
 }
 
+type Props = WrappedComponentProps &
+  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps &
+  IDispatchProps & { theme: ITheme }
+
+const selectLocation = (
+  locationId: string,
+  searchableLocations: ISearchLocation[]
+) => {
+  return searchableLocations.find(
+    ({ id }) => id === locationId
+  ) as ISearchLocation
+}
 class PerformanceHomeComponent extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    const historyState = props.history.location.state as any
-    this.state = {
-      selectedLocation:
-        (historyState && historyState.selectedLocation) || undefined
+  static transformPropsToState(props: Props, state?: State) {
+    const {
+      location: { search },
+      locations,
+      offices
+    } = props
+    const { timeStart, timeEnd, locationId, event } = parse(
+      search
+    ) as unknown as ISearchParams
+    const selectedLocation = selectLocation(
+      locationId,
+      generateLocations({ ...locations, ...offices }, props.intl)
+    )
+
+    return {
+      selectedLocation,
+      timeStart:
+        (timeStart && new Date(timeStart)) || subYears(new Date(Date.now()), 1),
+      timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
+      event: event || Event.BIRTH
     }
   }
 
-  searchHandler = (item: ISearchLocation) => {
-    this.setState({
-      selectedLocation: item
-    })
+  constructor(props: Props) {
+    super(props)
+    window.__localeId__ = this.props.intl.locale
+
+    this.state = PerformanceHomeComponent.transformPropsToState(
+      props,
+      undefined
+    )
   }
 
-  searchButtonHandler = () => {
-    this.state.selectedLocation &&
-      this.props.goToOperationalReport(
-        this.state.selectedLocation.id,
-        OPERATIONAL_REPORT_SECTION.OPERATIONAL
-      )
-  }
-
-  renderPilotLocations(intl: IntlShape) {
+  getTabContent = (intl: IntlShape, selectedLocation: ISearchLocation) => {
+    const { id: locationId } = selectedLocation || {}
     return (
-      (this.props.offlineCountryConfiguration.pilotLocations &&
-        Object.keys(this.props.offlineCountryConfiguration.pilotLocations)
-          .length > 0 && (
-          <MessageContainer>
-            <MessageHeader>
-              {this.props.intl.formatMessage(messages.pilotAreaListHeader)}
-            </MessageHeader>
-            {generatePilotLocations(
-              this.props.offlineCountryConfiguration.pilotLocations,
-              this.props.offlineCountryConfiguration.locations,
-              intl
-            ).map((pilotLocation, index) => (
-              <MessageRow key={index}>
-                <LinkButton
-                  id={`pilot-location-link-${index}`}
-                  key={index}
-                  onClick={() =>
-                    this.props.goToOperationalReport(
-                      pilotLocation.id,
-                      OPERATIONAL_REPORT_SECTION.OPERATIONAL
-                    )
-                  }
-                >
-                  {pilotLocation.displayLabel}
-                </LinkButton>
-              </MessageRow>
-            ))}
-          </MessageContainer>
-        )) || <></>
+      <PerformanceActions>
+        <LocationPicker
+          selectedLocationId={locationId}
+          onChangeLocation={(newLocationId) => {
+            const newLocation = selectLocation(
+              newLocationId,
+              generateLocations(
+                { ...this.props.locations, ...this.props.offices },
+                this.props.intl
+              )
+            )
+            this.setState({ selectedLocation: newLocation })
+          }}
+        />
+        <PerformanceSelect
+          onChange={(option) => this.setState({ event: option.value as Event })}
+          id="event-select"
+          withLightTheme={true}
+          defaultWidth={100}
+          value={this.state.event}
+          options={[
+            {
+              label: intl.formatMessage(messages.eventOptionForBirths),
+              value: Event.BIRTH
+            },
+            {
+              label: intl.formatMessage(messages.eventOptionForDeaths),
+              value: Event.DEATH
+            }
+          ]}
+        />
+        <DateRangePicker
+          startDate={this.state.timeStart}
+          endDate={this.state.timeEnd}
+          onDatesChange={({ startDate, endDate }) => {
+            this.setState({
+              timeStart: startDate,
+              timeEnd: endDate
+            })
+          }}
+        />
+      </PerformanceActions>
     )
   }
 
   render() {
-    const { intl, offlineCountryConfiguration } = this.props
-
-    const offlineLocations = generateLocations(
-      offlineCountryConfiguration.locations,
-      intl
-    )
-
-    const offlineOffices = generateLocations(
-      offlineCountryConfiguration.offices,
-      intl
-    )
+    const { intl, userDetails } = this.props
 
     return (
-      <SysAdminContentWrapper>
-        <Header>
-          {intl.formatMessage(messages.sysAdminPerformanceHomeHeader)}
-        </Header>
-
-        <LocationSearch
-          selectedLocation={this.state.selectedLocation}
-          locationList={[...offlineLocations, ...offlineOffices]}
-          searchHandler={this.searchHandler}
-          searchButtonHandler={this.searchButtonHandler}
-          errorMessage={intl.formatMessage(messagesSearch.locationNotFound)}
-        />
-
-        {this.renderPilotLocations(intl)}
+      <SysAdminContentWrapper
+        id="performance-home"
+        profilePageStyle={{
+          paddingTopMd: 0,
+          horizontalPaddingMd: 0
+        }}
+      >
+        <Layout>
+          <LayoutLeft>
+            <Content
+              title={intl.formatMessage(navigationMessages.performance)}
+              size={ContentSize.LARGE}
+              tabBarContent={this.getTabContent(
+                intl,
+                this.state.selectedLocation
+              )}
+              noTabBarBorder={true}
+            ></Content>
+          </LayoutLeft>
+          <LayoutRight>
+            <Stats>
+              <H4>Stats</H4>
+            </Stats>
+            <RegistrationStatus>
+              <H4>Registration by status</H4>
+            </RegistrationStatus>
+          </LayoutRight>
+        </Layout>
       </SysAdminContentWrapper>
     )
   }
 }
 
 function mapStateToProps(state: IStoreState) {
+  const offlineCountryConfiguration = getOfflineData(state)
   return {
-    offlineCountryConfiguration: getOfflineData(state)
+    locations: offlineCountryConfiguration.locations,
+    offices: offlineCountryConfiguration.offices,
+    userDetails: getUserDetails(state)
   }
 }
 
 export const PerformanceHome = connect(mapStateToProps, {
-  goToOperationalReport
+  goToPerformanceHome
 })(injectIntl(PerformanceHomeComponent))

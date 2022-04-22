@@ -38,7 +38,7 @@ const Content = styled(BodyContent)<{
   profilePageStyle?: IprofilePageStyle
 }>`
   padding: 0px 24px;
-  margin: 32px auto 0;
+  margin: 0 auto;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 0px 16px;
 

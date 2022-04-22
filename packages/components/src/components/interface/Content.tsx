@@ -60,7 +60,9 @@ const Footer = styled.div`
   height: 72px;
   padding-top: 24px;
 `
-const TopTabBar = styled.div`
+const TopTabBar = styled.div<{
+  noTabBarBorder?: boolean
+}>`
   display: flex;
   gap: 28px;
   width: 100%;
@@ -69,10 +71,17 @@ const TopTabBar = styled.div`
   & > div {
     bottom: -1px;
   }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    padding: 16px 16px 0;
+  }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 24px 16px 0;
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+    ${({ noTabBarBorder }) =>
+      noTabBarBorder &&
+      `
+      border-bottom: 0;
+    `};
   }
 `
 const TopBar = styled.div`
@@ -121,9 +130,11 @@ interface IProps {
   titleColor?: keyof typeof colors
   topActionButtons?: ReactElement[]
   tabBarContent?: React.ReactNode
+  actionBarContent?: React.ReactNode
   subtitle?: string
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
+  noTabBarBorder?: boolean
   size?: ContentSize
 }
 
@@ -138,6 +149,7 @@ export class Content extends React.Component<IProps> {
       subtitle,
       children,
       bottomActionButtons,
+      noTabBarBorder,
       size
     } = this.props
     return (
@@ -152,7 +164,11 @@ export class Content extends React.Component<IProps> {
               <TopActionBar>{topActionButtons}</TopActionBar>
             )}
           </TopBar>
-          {tabBarContent && <TopTabBar>{tabBarContent}</TopTabBar>}
+          {tabBarContent && (
+            <TopTabBar noTabBarBorder={noTabBarBorder}>
+              {tabBarContent}
+            </TopTabBar>
+          )}
         </Header>
         {subtitle && <SubHeader>{subtitle}</SubHeader>}
         {children && <Body>{children}</Body>}

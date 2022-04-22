@@ -42,7 +42,7 @@ interface IConnectProps {
 }
 
 interface IBaseProps {
-  selectedLocationId: string
+  selectedLocationId?: string
   onChangeLocation: (locationId: string) => void
   requiredJurisdictionTypes?: string
 }
@@ -146,7 +146,11 @@ function LocationPickerComponent(props: LocationPickerProps) {
         onClick={() => setModalVisible(true)}
       >
         <ContentWrapper>
-          <span>{selectedSearchedLocation.displayLabel}</span>
+          <span>
+            {(selectedSearchedLocation &&
+              selectedSearchedLocation.displayLabel) ||
+              ''}
+          </span>
           <MapPin />
         </ContentWrapper>
       </PickerButton>
