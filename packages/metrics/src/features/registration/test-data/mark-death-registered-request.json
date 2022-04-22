@@ -202,7 +202,7 @@
         },
         "address": [
           {
-            "type": "PERMANENT",
+            "type": "PRIMARY_ADDRESS",
             "line": [
               "",
               "",
@@ -216,7 +216,7 @@
             "country": "BGD"
           },
           {
-            "type": "CURRENT",
+            "type": "SECONDARY_ADDRESS",
             "line": [
               "",
               "",
@@ -302,7 +302,7 @@
         "birthDate": "1994-12-12",
         "address": [
           {
-            "type": "CURRENT",
+            "type": "SECONDARY_ADDRESS",
             "line": [
               "",
               "",
@@ -316,7 +316,7 @@
             "country": "BGD"
           },
           {
-            "type": "PERMANENT",
+            "type": "PRIMARY_ADDRESS",
             "line": [
               "",
               "",
@@ -383,12 +383,12 @@
           "coding": [
             {
               "system": "http://opencrvs.org/specs/location-type",
-              "code": "PERMANENT"
+              "code": "PRIMARY_ADDRESS"
             }
           ]
         },
         "address": {
-          "type": "PERMANENT",
+          "type": "PRIMARY_ADDRESS",
           "line": ["", "", "", "", "", "b6bc6cef-5930-4d39-ae70-aa73a484ad72"],
           "district": "e3935295-6e18-4354-a4d2-3309dd1d6db9",
           "state": "2e9b295d-c866-4726-88d5-9fa2ec090564",

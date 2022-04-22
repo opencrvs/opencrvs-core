@@ -130,7 +130,6 @@ interface IProps {
   titleColor?: keyof typeof colors
   topActionButtons?: ReactElement[]
   tabBarContent?: React.ReactNode
-  actionBarContent?: React.ReactNode
   subtitle?: string
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]

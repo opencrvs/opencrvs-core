@@ -64,7 +64,7 @@ const dummyBirthRegistrationResponse = {
     ],
     address: [
       {
-        type: 'PLACE_OF_HERITAGE',
+        type: 'SECONDARY_ADDRESS',
         line: ['', '', '', '', '', ''],
         district: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
         state: 'df669feb-61a3-4984-ab24-4b28511b472a',
@@ -74,7 +74,7 @@ const dummyBirthRegistrationResponse = {
         __typename: 'Address'
       },
       {
-        type: 'PERMANENT',
+        type: 'PRIMARY_ADDRESS',
         line: ['', '', '', '', '', '', 'URBAN'],
         district: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
         state: 'df669feb-61a3-4984-ab24-4b28511b472a',
@@ -84,7 +84,7 @@ const dummyBirthRegistrationResponse = {
         __typename: 'Address'
       },
       {
-        type: 'CURRENT',
+        type: 'SECONDARY_ADDRESS',
         line: ['', '', '', '', '', '', 'URBAN'],
         district: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
         state: 'df669feb-61a3-4984-ab24-4b28511b472a',
@@ -926,7 +926,7 @@ const dummyDeathRegistrationResponse = {
     },
     address: [
       {
-        type: 'PERMANENT',
+        type: 'PRIMARY_ADDRESS',
         line: ['', '', '', '', '', '', 'URBAN'],
         district: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
         state: 'df669feb-61a3-4984-ab24-4b28511b472a',
@@ -966,7 +966,7 @@ const dummyDeathRegistrationResponse = {
       telecom: null,
       address: [
         {
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           line: ['', '', '', '', '', '', 'URBAN'],
           district: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
           state: 'df669feb-61a3-4984-ab24-4b28511b472a',
@@ -1084,9 +1084,9 @@ const dummyDeathRegistrationResponse = {
   questionnaire: null,
   eventLocation: {
     id: 'f0517084-664e-434c-8ed3-2dc58ceabcfb',
-    type: 'PERMANENT',
+    type: 'PRIMARY_ADDRESS',
     address: {
-      type: 'PERMANENT',
+      type: 'PRIMARY_ADDRESS',
       line: ['', '', '', '', '', '', 'URBAN'],
       district: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
       state: 'df669feb-61a3-4984-ab24-4b28511b472a',

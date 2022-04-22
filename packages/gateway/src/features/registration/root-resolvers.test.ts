@@ -1091,7 +1091,7 @@ describe('Registration root resolvers', () => {
           maritalStatus: 'MARRIED',
           address: [
             {
-              type: 'PERMANENT',
+              type: 'PRIMARY_ADDRESS',
               line: [
                 '',
                 '',
@@ -1105,7 +1105,7 @@ describe('Registration root resolvers', () => {
               district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
             },
             {
-              type: 'CURRENT',
+              type: 'SECONDARY_ADDRESS',
               line: [
                 '',
                 '',
@@ -1351,7 +1351,7 @@ describe('Registration root resolvers', () => {
           birthDate: '1940-01-01',
           address: [
             {
-              type: 'PERMANENT',
+              type: 'PRIMARY_ADDRESS',
               line: [
                 '',
                 '',
@@ -1365,7 +1365,7 @@ describe('Registration root resolvers', () => {
               district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
             },
             {
-              type: 'CURRENT',
+              type: 'SECONDARY_ADDRESS',
               line: [
                 '',
                 '',
@@ -1393,7 +1393,7 @@ describe('Registration root resolvers', () => {
             telecom: [{ system: 'phone', value: '01711111111' }],
             address: [
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -1407,7 +1407,7 @@ describe('Registration root resolvers', () => {
                 district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
               },
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -1429,13 +1429,13 @@ describe('Registration root resolvers', () => {
         mannerOfDeath: 'NATURAL_CAUSES',
         eventLocation: {
           address: {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'f8816522-0a1a-49ca-aa4e-a886a9b056ec'],
             country: 'BGD',
             state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
             district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
           },
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           partOf: 'Location/f8816522-0a1a-49ca-aa4e-a886a9b056ec'
         },
         registration: {
@@ -1462,7 +1462,7 @@ describe('Registration root resolvers', () => {
                   birthDate: '1940-01-01',
                   address: [
                     {
-                      type: 'PERMANENT',
+                      type: 'PRIMARY_ADDRESS',
                       line: [
                         '',
                         '',
@@ -1476,7 +1476,7 @@ describe('Registration root resolvers', () => {
                       district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
                     },
                     {
-                      type: 'CURRENT',
+                      type: 'SECONDARY_ADDRESS',
                       line: [
                         '',
                         '',

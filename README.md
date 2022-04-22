@@ -68,10 +68,11 @@ Read review our [documentation](http://documentation.opencrvs.org/opencrvs-core/
 
 Dependencies are required. Ensure you have satisfied all the following requirements before continuing:
 
-- **Operation system**: Linux or Unix operating system is required: e.g. Ubuntu or Mac OSX: If you do not have Ubuntu or MacOSX, investigate installing a [virtual](https://www.virtualbox.org/) [Ubuntu](https://ubuntu.com/download/desktop) environment on your computer.
+- **Operation system**: Linux or Unix operating system is required: OpenCRVS has been tested on Ubuntu 18.04.6, 20.04.3, Mac OSX BigSur & Mac OSX Monterey: If you do not have Ubuntu or MacOSX, investigate installing a [virtual](https://www.virtualbox.org/) [Ubuntu](https://ubuntu.com/download/desktop) environment on your computer.
+- **Admin rights**: You must have admin rights over your computer and a sudo password
 - **Disk space and RAM:** A minimum of 10GB of hard drive space available and at least 8GB of RAM. If you are using virtualisation, ensure this is dedicated to the environment.
-- **Docker**: On Ubuntu, install [Docker](https://docs.docker.com/engine/install/ubuntu/) & [Docker Compose](https://docs.docker.com/compose/install/). On Mac, install [Docker for Mac](https://docs.docker.com/desktop/mac/install/). On Mac, in Docker for Mac preferences, assign 4 CPUs, at least 8GB Memory or more, Swap 4GB and 4 CPUs if your system allows. Elastic search needs a lot of memory to run. On Ubuntu we set enough RAM automatically.
-- **Nodejs:** Install [Node](https://nodejs.org/en/download/) v.14.15.0, v14.15.4, 14.17.0 or v14.18.1 (this release has been tested on those versions). You can manage the Node version of your choice using [Node Version Manager](https://nodejs.org/en/download/package-manager/#nvm).
+- **Docker**: On Ubuntu, install [Docker](https://docs.docker.com/engine/install/ubuntu/) & [Docker Compose](https://docs.docker.com/compose/install/). On Mac, install [Docker for Mac](https://docs.docker.com/desktop/mac/install/). On Mac, in Docker for Mac preferences, assign 4 CPUs, at least 8GB Memory or more, Swap 4GB and 4 CPUs if your system allows. Elastic search needs a lot of memory to run. On Ubuntu we set enough RAM automatically. OpenCRVS has been tested on Docker version 20.10.11 and docker-compose version 1.29.2
+- **Nodejs:** You must install Node v.14.15.0, v14.15.4, 14.17.0 or v14.18.1 (this release has been tested on those versions) using [Node Version Manager](https://nodejs.org/en/download/package-manager/#nvm). OpenCRVS has not been tested on newer versions of Node and you may experience issues if you are using an untested Node version.
 - **Yarn:** Install the [Yarn Package Manager](https://classic.yarnpkg.com/en/docs/install) for Node
 - **Chrome:** Install [Google Chrome](https://www.google.com/chrome). The OpenCRVS client application is a progressive web application.
 - **tmux:** Install [tmux](https://github.com/tmux/tmux/wiki). Multiple terminal windows are required to run OpenCRVS Core alongside the default country configuration. On Ubuntu run: `sudo apt-get install tmux` to install. On Mac, you can install tmux using Homebrew or MacPorts.
@@ -108,13 +109,13 @@ Open the url **[`http://localhost:3020/`](http://localhost:3020/)**
 
 Use one of the following authentication details for your user of choice. To learn about these user roles and to perform civil registration tasks, read our [documentation](http://documentation.opencrvs.org/)
 
-### **Field Agent**
+### Field Agent
 
 Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
 Username: **patrick.gondwe** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
-### **Registration Agent**
+### Registration Agent
 
 Username: **felix.katongo** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
@@ -174,7 +175,7 @@ Our UI component styleguide, available here: **[http://localhost:6060/](http://l
 
 This is a work in progress
 
-### **OpenHIM**
+### OpenHIM
 
 OpenHIM is designed to ease interoperability between OpenCRVS and external systems such as Health & National ID. It provides external access to the system via secure APIs. OpenHIM channels and governs internal transactions, routing, orchestrating and translating requests into [FHIR](https://www.hl7.org/fhir/) between services and the database layer.
 
@@ -395,7 +396,7 @@ So you have contributed to core and want to make a new release as an OpenCRVS co
 
 3. Run `yarn test` and ensure all passed.
 
-4. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.3.1`
+4. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.3.2`
 
 5. Run `git push origin v<version_number>`
 

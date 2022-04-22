@@ -19,8 +19,13 @@ export const birthEventLocationMutationTransformer =
     sectionId: string,
     field: IFormField
   ) => {
-    if (!transformedData.eventLocation) {
-      transformedData.eventLocation = {
+    let defaultLocation: fhir.Location = {}
+    if (
+      (transformedData.eventLocation &&
+        !transformedData.eventLocation.address) ||
+      !transformedData.eventLocation
+    ) {
+      defaultLocation = {
         address: {
           country: '',
           state: '',
@@ -30,12 +35,16 @@ export const birthEventLocationMutationTransformer =
           line: ['', '', '', '', '', '']
         }
       } as fhir.Location
+      if (transformedData.eventLocation && transformedData.eventLocation.type) {
+        defaultLocation['type'] = transformedData.eventLocation.type
+      }
+      transformedData.eventLocation = defaultLocation
     }
     if (lineNumber > 0) {
       transformedData.eventLocation.address.line[lineNumber - 1] = `${
         draftData[sectionId][field.name]
       }`
-    } else if (field.name === 'placeOfBirth') {
+    } else if (field.name === 'placeOfBirth' && transformedData.eventLocation) {
       transformedData.eventLocation.type = `${draftData[sectionId][field.name]}`
     } else if (field.name === 'birthLocation') {
       transformedData.eventLocation._fhirID = draftData[sectionId][field.name]

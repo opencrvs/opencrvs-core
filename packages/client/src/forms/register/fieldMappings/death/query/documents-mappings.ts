@@ -25,8 +25,8 @@ const fieldNameMapping = {
     'uploadDocForInformant',
   [deathDocumentForWhomFhirMapping["Proof of informant's authority to apply"]]:
     'uploadDocForInformantAthorityToApply',
-  [deathDocumentForWhomFhirMapping['Proof Deceased Permanent Address']]:
-    'uploadDocForDeceasedPermanentAddress',
+  [deathDocumentForWhomFhirMapping['Proof Deceased Primary Address']]:
+    'uploadDocForDeceasedPrimaryAddress',
   [deathDocumentForWhomFhirMapping['Proof of Date of Birth of Deceased']]:
     'uploadDocForDeceasedDOB',
   [deathDocumentForWhomFhirMapping['Proof of Death of Deceased']]:

@@ -241,21 +241,21 @@ export const testBundle = {
       ],
       address: [
         {
-          type: 'PLACE_OF_HERITAGE',
+          type: 'SECONDARY_ADDRESS',
           line: ['', '', '', '', '', ''],
           district: '06230f8f-1bf6-420f-9d1f-37551fa2f790',
           state: '3e4239cd-9912-49bf-b41d-296e5cea5bc7',
           country: 'ZMB'
         },
         {
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           line: ['', '', '', '', '', '', 'URBAN'],
           district: 'ba930475-9828-4ab0-9a8b-ed6fb77108f8',
           state: 'd1b2c88a-d178-45b1-9f98-6bec75dbe590',
           country: 'ZMB'
         },
         {
-          type: 'CURRENT',
+          type: 'SECONDARY_ADDRESS',
           line: ['', '', '', '', '', '', 'URBAN'],
           district: 'ba930475-9828-4ab0-9a8b-ed6fb77108f8',
           state: 'd1b2c88a-d178-45b1-9f98-6bec75dbe590',
@@ -307,7 +307,7 @@ export const testBundle = {
       ],
       address: [
         {
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           line: ['', '', '', '', '', '', 'URBAN'],
           district: 'a2cde683-f423-47f5-93c4-2effa5c31f86',
           state: 'cd5e34cb-abe0-4900-9509-28f378b8d8e8',
