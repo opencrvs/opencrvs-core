@@ -10,11 +10,21 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event, IFormField, IFormSection, IForm } from '@client/forms'
+import { Event, IFormField, IFormSection, IForm, IMessage } from '@client/forms'
 import { IConfigFieldsState, IEventTypes } from './reducer'
-import { keys } from 'lodash'
+import { camelCase, keys } from 'lodash'
+import { getDefaultLanguage } from '@client/i18n/utils'
 
 const CUSTOM_FIELD_ID = 'custom-field'
+
+export interface ICustomFieldAttribute {
+  label: IMessage[]
+  placeholder?: IMessage[]
+  description?: IMessage[]
+  tooltip?: IMessage[]
+  errorMessage?: IMessage[]
+  maxLength?: number
+}
 
 export type IConfigFormField = {
   fieldId: string
@@ -23,6 +33,7 @@ export type IConfigFormField = {
   required: boolean
   enabled: string
   custom: boolean
+  customizedFieldAttributes?: ICustomFieldAttribute
   definition: IFormField
 }
 
@@ -107,6 +118,13 @@ export function prepareNewCustomFieldConfig(
 ): IConfigFormField | undefined {
   const customFieldNumber = determineNextFieldIdNumber(state, event, section)
   const customFieldIndex = `${event}.${section}.${CUSTOM_FIELD_ID}-${customFieldNumber}`
+  const defaultMessage = `Custom text input ${customFieldNumber}`
+  const defaultLanguage = getDefaultLanguage()
+  const defaultLabel = {
+    id: `${customField.definition.label.id}${customFieldNumber}`,
+    description: defaultMessage,
+    defaultMessage
+  }
   let customFieldConfig
 
   for (const index in state[event][section]) {
@@ -117,22 +135,25 @@ export function prepareNewCustomFieldConfig(
         ...customField,
         precedingFieldId: state[event][section][index].fieldId,
         fieldId: customFieldIndex,
+        customizedFieldAttributes: {
+          label: [
+            {
+              lang: defaultLanguage,
+              descriptor: defaultLabel
+            }
+          ]
+        },
         definition: {
           ...customField.definition,
           name: customFieldIndex,
-          label: {
-            ...customField.definition.label,
-            id: `${customField.definition.label.id}${customFieldNumber}`,
-            defaultMessage: 'Custom text input'
-          },
+          label: defaultLabel,
           mapping: {
-            ...customField.definition.mapping
-            // template: ['some', () => {}]
+            template: [camelCase(defaultMessage), () => {}]
           }
         }
       }
     }
   }
 
-  return customFieldConfig
+  return customFieldConfig as IConfigFormField
 }

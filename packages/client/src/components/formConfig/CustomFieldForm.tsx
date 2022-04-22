@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
+import { IMessage } from '@client/forms'
+import {
+  getCertificateHandlebar,
+  IConfigFormField
+} from '@client/forms/configuration/configFields/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
 import { ILanguageState, initLanguages } from '@client/i18n/reducer'
@@ -112,7 +116,7 @@ interface ICustomField {
   description: string
   tooltip: string
   errorMessage: string
-  maxLength: string
+  maxLength: number | undefined
 }
 
 interface ICustomFieldForms {
@@ -141,36 +145,51 @@ class CustomFieldFormsComp extends React.Component<
   _initialize() {
     const defaultLanguage = getDefaultLanguage()
     const languages = this._getLanguages()
-    const {
-      intl,
-      selectedField: { definition }
-    } = this.props
+    const { selectedField } = this.props
 
     const fieldForms: { [key: string]: ICustomField } = {}
 
     Object.keys(languages).map((lang) => {
       fieldForms[lang] = {
-        label: this._getIntlMessage(definition.label),
-        placeholder: this._getIntlMessage(definition.placeholder),
-        description: this._getIntlMessage(definition.description),
-        tooltip: this._getIntlMessage(definition.tooltip),
-        errorMessage: '',
-        maxLength: ''
+        label: this._getIntlMessage(
+          selectedField.customizedFieldAttributes?.label,
+          lang
+        ),
+        placeholder: this._getIntlMessage(
+          selectedField.customizedFieldAttributes?.placeholder,
+          lang
+        ),
+        description: this._getIntlMessage(
+          selectedField.customizedFieldAttributes?.description,
+          lang
+        ),
+        tooltip: this._getIntlMessage(
+          selectedField.customizedFieldAttributes?.tooltip,
+          lang
+        ),
+        errorMessage: this._getIntlMessage(
+          selectedField.customizedFieldAttributes?.errorMessage,
+          lang
+        ),
+        maxLength: selectedField.customizedFieldAttributes?.maxLength
       }
     })
 
     this.state = {
-      handleBars: camelCase(DEFAULTS.HANDLEBARS),
+      handleBars:
+        getCertificateHandlebar(selectedField) ||
+        camelCase(fieldForms[defaultLanguage].label),
       selectedLanguage: defaultLanguage,
-      hideField: false,
-      requiredField: false,
+      hideField: selectedField.definition.hidden || false,
+      requiredField: selectedField.definition.required || false,
       fieldForms
     }
   }
 
-  _getIntlMessage(message: MessageDescriptor | undefined) {
-    const { intl } = this.props
-    return message ? intl.formatMessage(message) : ''
+  _getIntlMessage(messages: IMessage[] | undefined, lang: string) {
+    if (!messages) return ''
+    const message = messages.find((message) => message.lang === lang)
+    return message ? this.props.intl.formatMessage(message.descriptor) : ''
   }
 
   _getLanguages(): ILanguageState {
@@ -179,9 +198,6 @@ class CustomFieldFormsComp extends React.Component<
 
   _setValue(field: string, value: string) {
     const language = this.state.selectedLanguage
-
-    console.log(this.props.selectedField)
-
     this.setState({
       fieldForms: {
         ...this.state.fieldForms,
@@ -268,7 +284,7 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   inputFields() {
-    const { intl } = this.props
+    const { intl, selectedField } = this.props
     const languages = this._getLanguages()
     const defaultLanguage = getDefaultLanguage()
 
@@ -295,7 +311,9 @@ class CustomFieldFormsComp extends React.Component<
                       this.setState({
                         handleBars:
                           defaultLanguage === this.state.selectedLanguage
-                            ? camelCase(value || DEFAULTS.HANDLEBARS)
+                            ? camelCase(
+                                value || getCertificateHandlebar(selectedField)
+                              )
                             : this.state.handleBars,
                         fieldForms: {
                           ...this.state.fieldForms,

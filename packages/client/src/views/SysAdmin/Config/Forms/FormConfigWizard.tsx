@@ -184,7 +184,10 @@ export function FormConfigWizard() {
             !selectedField.custom ? (
               <DefaultFieldTools configField={selectedField} />
             ) : (
-              <CustomFieldForms selectedField={selectedField} />
+              <CustomFieldForms
+                key={selectedField.fieldId}
+                selectedField={selectedField}
+              />
             )
           ) : (
             <FormTools

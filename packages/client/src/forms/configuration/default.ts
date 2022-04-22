@@ -12732,8 +12732,9 @@ export const DEFAULT_TEXT: IFormField = {
   },
   validate: [],
   required: false,
+  hidden: false,
   initialValue: '',
   mapping: {
-    template: ['testHandlebars', () => {}]
+    template: ['', () => {}]
   }
 }

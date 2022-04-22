@@ -10,10 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
+import {
+  IConfigFormField,
+  ICustomFieldAttribute
+} from '@client/forms/configuration/configFields/utils'
 import { DEFAULT_TEXT } from '@client/forms/configuration/default'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
+import { getDefaultLanguage } from '@client/i18n/utils'
 import styled from '@client/styledComponents'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
@@ -43,6 +47,15 @@ interface IFormToolsProps {
   onAddClickListener: (fieldMap: IConfigFormField) => void
 }
 
+const DEFAULT_CUSTOM_FIELD_ATTRIBUTE: ICustomFieldAttribute = {
+  label: [
+    {
+      lang: getDefaultLanguage(),
+      descriptor: DEFAULT_TEXT.label
+    }
+  ]
+}
+
 const customField: IConfigFormField = {
   fieldId: 'customField',
   precedingFieldId: null,
@@ -50,6 +63,7 @@ const customField: IConfigFormField = {
   required: false,
   enabled: '',
   custom: true,
+  customizedFieldAttributes: DEFAULT_CUSTOM_FIELD_ATTRIBUTE,
   definition: {
     ...DEFAULT_TEXT
   }
