@@ -28,10 +28,15 @@ import {
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/performance'
 import { useIntl } from 'react-intl'
+import styled from 'styled-components'
 interface RegistrationsReportProps {
   data: GQLTotalMetricsResult
   selectedEvent: 'BIRTH' | 'DEATH'
 }
+
+const Container = styled(ListViewSimplified)`
+  grid-template-columns: auto 1fr minmax(5em, auto);
+`
 
 export function RegistrationsReport({
   data,
@@ -39,7 +44,7 @@ export function RegistrationsReport({
 }: RegistrationsReportProps) {
   const intl = useIntl()
   return (
-    <ListViewSimplified>
+    <Container>
       <ListViewItemSimplified
         label={
           <PerformanceTitle>
@@ -305,6 +310,6 @@ export function RegistrationsReport({
           </div>
         }
       />
-    </ListViewSimplified>
+    </Container>
   )
 }

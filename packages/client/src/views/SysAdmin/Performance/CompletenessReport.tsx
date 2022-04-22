@@ -27,14 +27,19 @@ import {
   calculateTotal
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import styled from 'styled-components'
 
 interface CompletenessReportProps {
   data: GQLTotalMetricsResult
 }
 
+const Container = styled(ListViewSimplified)`
+  grid-template-columns: auto 1fr minmax(5em, auto);
+`
+
 export function CompletenessReport({ data }: CompletenessReportProps) {
   return (
-    <ListViewSimplified>
+    <Container>
       <ListViewItemSimplified
         label={
           <PerformanceTitle>{`Registered within ${window.config.BIRTH.REGISTRATION_TARGET} days`}</PerformanceTitle>
@@ -199,6 +204,6 @@ export function CompletenessReport({ data }: CompletenessReportProps) {
         }
         actions={<LinkButton>View</LinkButton>}
       />
-    </ListViewSimplified>
+    </Container>
   )
 }
