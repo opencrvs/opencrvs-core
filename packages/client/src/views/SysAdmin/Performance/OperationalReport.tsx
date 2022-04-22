@@ -43,16 +43,7 @@ import {
 } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import {
   ActionContainer,
-  FilterContainer,
-  PerformanceTitle,
-  PerformanceValue,
-  Breakdown,
-  BreakdownRow,
-  BreakdownLabel,
-  BreakdownValue,
-  PercentageDisplay,
-  calculateTotal,
-  TotalDisplayWithPercentage
+  FilterContainer
 } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
@@ -62,31 +53,26 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { colors } from '@opencrvs/components/lib/colors'
 import { Activity } from '@opencrvs/components/lib/icons'
-import {
-  ISearchLocation,
-  ListViewSimplified,
-  ListViewItemSimplified,
-  Spinner
-} from '@opencrvs/components/lib/interface'
+import { ISearchLocation, Spinner } from '@opencrvs/components/lib/interface'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { Link } from '@opencrvs/components/lib/typography'
+
 import {
-  GQLEventMetrics,
   GQLRegistrationCountResult,
   GQLTotalMetricsResult
 } from '@opencrvs/gateway/src/graphql/schema'
 import { ApolloError } from 'apollo-client'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { FormattedNumber, injectIntl, WrappedComponentProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
 import { PERFORMANCE_METRICS } from './metricsQuery'
 
 import format from '@client/utils/date-formatting'
-import { getPercentage } from '@client/utils/data-formatting'
+
 import { CompletenessReport } from './CompletenessReport'
+import { RegistrationsReport } from './RegistrationsReport'
 
 interface IConnectProps {
   locations: { [key: string]: ILocation }
@@ -459,243 +445,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
                 return (
                   <>
                     <CompletenessReport data={data!.getTotalMetrics} />
-                    <ListViewSimplified>
-                      <ListViewItemSimplified
-                        label={
-                          <PerformanceTitle>
-                            {intl.formatMessage(messages.performanceTotalLabel)}
-                          </PerformanceTitle>
-                        }
-                        value={
-                          <div>
-                            <PerformanceValue>
-                              {data!.getTotalMetrics.results.reduce(
-                                (m, x) => m + x.total,
-                                0
-                              )}
-                            </PerformanceValue>
-                            <Breakdown>
-                              <BreakdownRow>
-                                <BreakdownLabel>
-                                  {intl.formatMessage(
-                                    messages.performanceMaleLabel
-                                  )}
-                                  :{' '}
-                                </BreakdownLabel>
-                                <BreakdownValue>
-                                  {
-                                    <PercentageDisplay
-                                      total={calculateTotal(
-                                        data!.getTotalMetrics.results.filter(
-                                          (x) => x.gender === 'male'
-                                        )
-                                      )}
-                                      ofNumber={calculateTotal(
-                                        data!.getTotalMetrics.results
-                                      )}
-                                    />
-                                  }
-                                </BreakdownValue>
-                              </BreakdownRow>
-                              <BreakdownRow>
-                                <BreakdownLabel>
-                                  {intl.formatMessage(
-                                    messages.performanceFemaleLabel
-                                  )}
-                                  :{' '}
-                                </BreakdownLabel>
-                                <BreakdownValue>
-                                  {
-                                    <PercentageDisplay
-                                      total={calculateTotal(
-                                        data!.getTotalMetrics.results.filter(
-                                          (x) => x.gender === 'female'
-                                        )
-                                      )}
-                                      ofNumber={calculateTotal(
-                                        data!.getTotalMetrics.results
-                                      )}
-                                    />
-                                  }
-                                </BreakdownValue>
-                              </BreakdownRow>
-                            </Breakdown>
-                          </div>
-                        }
-                      />
-                      <ListViewItemSimplified
-                        label={
-                          <PerformanceTitle>
-                            {intl.formatMessage(
-                              messages.performanceDelayedRegistrationsLabel
-                            )}
-                          </PerformanceTitle>
-                        }
-                        value={
-                          <div>
-                            <PerformanceValue>
-                              {
-                                <TotalDisplayWithPercentage
-                                  total={calculateTotal(
-                                    data!.getTotalMetrics.results.filter(
-                                      (x) =>
-                                        ![
-                                          'withinLate',
-                                          'withinTarget'
-                                        ].includes(x.timeLabel)
-                                    )
-                                  )}
-                                  ofNumber={calculateTotal(
-                                    data!.getTotalMetrics.results
-                                  )}
-                                />
-                              }
-                            </PerformanceValue>
-                            <Breakdown>
-                              <BreakdownRow>
-                                <BreakdownLabel>
-                                  {intl.formatMessage(
-                                    messages.performanceMaleLabel
-                                  )}
-                                  :{' '}
-                                </BreakdownLabel>
-                                <BreakdownValue>
-                                  {
-                                    <PercentageDisplay
-                                      total={calculateTotal(
-                                        data!.getTotalMetrics.results.filter(
-                                          (x) =>
-                                            x.gender === 'male' &&
-                                            ![
-                                              'withinLate',
-                                              'withinTarget'
-                                            ].includes(x.timeLabel)
-                                        )
-                                      )}
-                                      ofNumber={calculateTotal(
-                                        data!.getTotalMetrics.results.filter(
-                                          (x) =>
-                                            ![
-                                              'withinLate',
-                                              'withinTarget'
-                                            ].includes(x.timeLabel)
-                                        )
-                                      )}
-                                    />
-                                  }
-                                </BreakdownValue>
-                              </BreakdownRow>
-                              <BreakdownRow>
-                                <BreakdownLabel>
-                                  {intl.formatMessage(
-                                    messages.performanceFemaleLabel
-                                  )}
-                                  :{' '}
-                                </BreakdownLabel>
-                                <BreakdownValue>
-                                  {
-                                    <PercentageDisplay
-                                      total={calculateTotal(
-                                        data!.getTotalMetrics.results.filter(
-                                          (x) =>
-                                            x.gender === 'female' &&
-                                            ![
-                                              'withinLate',
-                                              'withinTarget'
-                                            ].includes(x.timeLabel)
-                                        )
-                                      )}
-                                      ofNumber={calculateTotal(
-                                        data!.getTotalMetrics.results.filter(
-                                          (x) =>
-                                            ![
-                                              'withinLate',
-                                              'withinTarget'
-                                            ].includes(x.timeLabel)
-                                        )
-                                      )}
-                                    />
-                                  }
-                                </BreakdownValue>
-                              </BreakdownRow>
-                            </Breakdown>
-                          </div>
-                        }
-                      />
-                      <ListViewItemSimplified
-                        label={
-                          selectedEvent === 'BIRTH' ? (
-                            <PerformanceTitle>
-                              {intl.formatMessage(
-                                messages.performanceHomeBirth
-                              )}
-                            </PerformanceTitle>
-                          ) : (
-                            <PerformanceTitle>
-                              {intl.formatMessage(
-                                messages.performanceHomeDeath
-                              )}
-                            </PerformanceTitle>
-                          )
-                        }
-                        value={
-                          <div>
-                            <PerformanceValue>
-                              {
-                                <TotalDisplayWithPercentage
-                                  total={calculateTotal(
-                                    data!.getTotalMetrics.results.filter(
-                                      (x) =>
-                                        x.eventLocationType === 'PRIVATE_HOME'
-                                    )
-                                  )}
-                                  ofNumber={calculateTotal(
-                                    data!.getTotalMetrics.results
-                                  )}
-                                />
-                              }
-                            </PerformanceValue>
-                          </div>
-                        }
-                      />
-                      <ListViewItemSimplified
-                        label={
-                          selectedEvent === 'BIRTH' ? (
-                            <PerformanceTitle>
-                              {intl.formatMessage(
-                                messages.performanceHealthFacilityBirth
-                              )}
-                            </PerformanceTitle>
-                          ) : (
-                            <PerformanceTitle>
-                              {intl.formatMessage(
-                                messages.performanceHealthFacilityDeath
-                              )}
-                            </PerformanceTitle>
-                          )
-                        }
-                        value={
-                          <div>
-                            <PerformanceValue>
-                              {
-                                <TotalDisplayWithPercentage
-                                  total={calculateTotal(
-                                    data!.getTotalMetrics.results.filter(
-                                      (x) =>
-                                        x.eventLocationType ===
-                                        'HEALTH_FACILITY'
-                                    )
-                                  )}
-                                  ofNumber={calculateTotal(
-                                    data!.getTotalMetrics.results
-                                  )}
-                                />
-                              }
-                            </PerformanceValue>
-                          </div>
-                        }
-                      />
-                    </ListViewSimplified>
+                    <RegistrationsReport
+                      data={data!.getTotalMetrics}
+                      selectedEvent={selectedEvent}
+                    />
                   </>
                 )
               }}

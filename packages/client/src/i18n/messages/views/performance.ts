@@ -22,6 +22,11 @@ const messagesToDefine = {
     defaultMessage: 'Delayed registrations',
     description: 'Label text for display showing delayed registrations'
   },
+  performanceLateRegistrationsLabel: {
+    id: 'performance.values.labels.late',
+    defaultMessage: 'Late registrations',
+    description: 'Label text for display showing late registrations'
+  },
   performanceHealthFacilityBirth: {
     id: 'performance.values.labels.birth.healthFacility',
     defaultMessage: 'Health facility birth',
