@@ -9,7 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Button } from '@opencrvs/components/lib/buttons'
+import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+
 import {
   ColumnContentAlignment,
   GridTable,
@@ -37,7 +39,7 @@ import {
   DRAFT_DEATH_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
-import styled, { ITheme, withTheme } from '@client/styledComponents'
+import { ITheme, withTheme } from '@client/styledComponents'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import * as React from 'react'
@@ -56,8 +58,7 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { Action, Event, IFormFieldValue } from '@client/forms'
-import { get } from 'lodash'
+import { Action, Event } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
@@ -214,6 +215,13 @@ export class InProgressTabComponent extends React.Component<
         (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+          actions.push({
+            label: intl.formatMessage(buttonMessages.update),
+            handler: () => {},
+            disabled: true
+          })
+        }
         actions.push({
           actionComponent: (
             <DownloadButton
@@ -228,15 +236,20 @@ export class InProgressTabComponent extends React.Component<
           )
         })
       } else {
+        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+          actions.push({
+            label: intl.formatMessage(buttonMessages.update),
+            handler: () =>
+              this.props.goToPage(
+                pageRoute,
+                regId,
+                'review',
+                (event && event.toLowerCase()) || ''
+              )
+          })
+        }
         actions.push({
-          label: intl.formatMessage(buttonMessages.update),
-          handler: () =>
-            this.props.goToPage(
-              pageRoute,
-              regId,
-              'review',
-              (event && event.toLowerCase()) || ''
-            )
+          actionComponent: <Downloaded />
         })
       }
 
@@ -308,11 +321,15 @@ export class InProgressTabComponent extends React.Component<
       }
       const name = getDraftInformantFullName(draft, locale)
       const lastModificationDate = draft.modifiedOn || draft.savedOn
-      const actions = [
-        {
+      const actions: IAction[] = []
+
+      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+        actions.push({
           label: this.props.intl.formatMessage(buttonMessages.update),
-          handler: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-            e.stopPropagation()
+          handler: (
+            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+          ) => {
+            e && e.stopPropagation()
             this.props.goToPage(
               pageRoute,
               draft.id,
@@ -320,8 +337,11 @@ export class InProgressTabComponent extends React.Component<
               (draft.event && draft.event.toString()) || ''
             )
           }
-        }
-      ]
+        })
+      }
+      actions.push({
+        actionComponent: <Uploaded />
+      })
       const event =
         (draft.event &&
           intl.formatMessage(

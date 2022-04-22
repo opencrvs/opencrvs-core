@@ -167,9 +167,6 @@ class ApprovalTabComponent extends React.Component<
     const transformedData = transformData(data, this.props.intl)
 
     const items = transformedData.map((reg) => {
-      const icon: JSX.Element = (
-        <Validate data-tip data-for="validatedTooltip" />
-      )
       const event =
         (reg.event &&
           intl.formatMessage(
@@ -200,7 +197,6 @@ class ApprovalTabComponent extends React.Component<
           '',
         dateOfEvent,
         sentForApproval,
-        icon,
         rowClickHandler: [
           {
             label: 'rowClickHandler',

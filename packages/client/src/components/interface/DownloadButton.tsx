@@ -48,7 +48,7 @@ const StatusIndicator = styled.div<{
   isLoading?: boolean
 }>`
   display: flex;
-  flex-grow: 1;
+  flex-grow: 0;
   align-items: center;
   max-width: 152px;
   justify-content: ${({ isLoading }) =>
@@ -85,7 +85,6 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   ) {
     return (
       <StatusIndicator isLoading={true} className={className}>
-        {intl.formatMessage(constantsMessages.downloading)}
         <Spinner id={`action-loading-${id}`} size={24} />
       </StatusIndicator>
     )
@@ -97,7 +96,6 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   ) {
     return (
       <StatusIndicator className={className}>
-        <Warning id={`action-error-${id}`} />
         <DownloadAction
           isFullHeight={false}
           id={`${id}-icon`}
@@ -105,7 +103,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
             initiateDownload()
             e.stopPropagation()
           }}
-          icon={() => <Download />}
+          icon={() => <Download isFailed={true} />}
         />
       </StatusIndicator>
     )

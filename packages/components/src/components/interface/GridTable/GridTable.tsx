@@ -11,16 +11,13 @@
  */
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { Pagination } from '..'
 import { ListItemAction } from '../../buttons'
 import { grid } from '../../grid'
 import { IDynamicValues, IActionObject, IAction, IColumn } from './types'
-import { LoadMore } from './LoadMore'
 import { GridTableRowDesktop } from './GridTableRowDeskop'
 import { ITheme } from 'src/components/theme'
 import { SortIcon } from '../../icons/SortIcon'
 import { connect } from 'react-redux'
-import { orderBy } from 'lodash'
 import { GridTableRowMobile } from './GridTableRowMobile'
 
 const Wrapper = styled.div`
@@ -51,19 +48,6 @@ const ErrorText = styled.div`
     top: 50%;
     text-align: center;
   }
-`
-
-const RowWrapper = styled.div<{
-  expandable?: boolean
-  clickable?: boolean
-}>`
-  width: 100%;
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  min-height: 64px;
-  cursor: ${({ expandable, clickable }) =>
-    expandable || clickable ? 'pointer' : 'default'};
 `
 
 const ContentWrapper = styled.span<{

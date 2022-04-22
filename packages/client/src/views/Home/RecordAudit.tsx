@@ -344,7 +344,7 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   REJECTED: 'red',
   VALIDATED: 'grey',
   REGISTERED: 'green',
-  CERTIFIED: 'green',
+  CERTIFIED: 'blue',
   WAITING_VALIDATION: 'teal',
   SUBMITTED: 'orange'
 }

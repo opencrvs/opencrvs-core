@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { DOWNLOAD_STATUS, IDeclaration } from '@client/declarations'
+import {
+  DOWNLOAD_STATUS,
+  IDeclaration,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { Header } from '@client/components/interface/Header/Header'
 import { Query } from '@client/components/Query'
@@ -75,6 +79,7 @@ import {
   IconWithName,
   IconWithNameEvent
 } from '@client/views/OfficeHome/tabs/components'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -102,15 +107,6 @@ export const ActionPageWrapper = styled.div`
   width: 100%;
   height: 100%;
   overflow-y: scroll;
-`
-const SearchResultText = styled.div`
-  left: 268px;
-  ${({ theme }) => theme.fonts.h2};
-  color: ${({ theme }) => theme.colors.copy};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 24px;
-    margin-top: 24px;
-  }
 `
 
 export function getRejectionReasonDisplayValue(reason: string) {
@@ -284,6 +280,47 @@ export class SearchResultView extends React.Component<
       const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
       const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
+      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+        if (
+          (declarationIsRegistered || declarationIsCertified) &&
+          this.userHasCertifyScope()
+        ) {
+          actions.push({
+            label: this.props.intl.formatMessage(buttonMessages.print),
+            handler: (
+              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+            ) => {
+              e && e.stopPropagation()
+              this.props.goToPrintCertificate(reg.id, reg.event)
+            },
+            disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+          })
+        } else if (
+          (declarationIsValidated && this.userHasRegisterScope()) ||
+          (!declarationIsValidated &&
+            !declarationIsRegistered &&
+            !declarationIsCertified &&
+            !declarationIsArchived &&
+            this.userHasValidateOrRegistrarScope())
+        ) {
+          actions.push({
+            label:
+              declarationIsRejected || declarationIsInProgress
+                ? this.props.intl.formatMessage(constantsMessages.update)
+                : this.props.intl.formatMessage(constantsMessages.review),
+            handler: () =>
+              !isDuplicate
+                ? this.props.goToPage(
+                    REVIEW_EVENT_PARENT_FORM_PAGE,
+                    reg.id,
+                    'review',
+                    reg.event.toLowerCase()
+                  )
+                : this.props.goToReviewDuplicate(reg.id),
+            disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+          })
+        }
+      }
       if (
         downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED &&
         ((!declarationIsValidated && this.userHasValidateOrRegistrarScope()) ||
@@ -307,49 +344,10 @@ export class SearchResultView extends React.Component<
             />
           )
         })
-      } else if (
-        (declarationIsRegistered || declarationIsCertified) &&
-        this.userHasCertifyScope()
-      ) {
+      } else {
         actions.push({
-          label: this.props.intl.formatMessage(buttonMessages.print),
-          handler: (
-            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-          ) => {
-            e && e.stopPropagation()
-            this.props.goToPrintCertificate(reg.id, reg.event)
-          }
+          actionComponent: <Downloaded />
         })
-      } else if (
-        (declarationIsValidated && this.userHasRegisterScope()) ||
-        (!declarationIsValidated &&
-          !declarationIsRegistered &&
-          !declarationIsCertified &&
-          !declarationIsArchived &&
-          this.userHasValidateOrRegistrarScope())
-      ) {
-        actions.push({
-          label:
-            declarationIsRejected || declarationIsInProgress
-              ? this.props.intl.formatMessage(constantsMessages.update)
-              : this.props.intl.formatMessage(constantsMessages.review),
-          handler: () =>
-            !isDuplicate
-              ? this.props.goToPage(
-                  REVIEW_EVENT_PARENT_FORM_PAGE,
-                  reg.id,
-                  'review',
-                  reg.event.toLowerCase()
-                )
-              : this.props.goToReviewDuplicate(reg.id)
-        })
-      }
-
-      let icon: JSX.Element = <div />
-      if (isDuplicate && !declarationIsRegistered && !declarationIsCertified) {
-        icon = <Duplicate />
-      } else if (declarationIsValidated) {
-        icon = <Validate data-tip data-for="validateTooltip" />
       }
 
       const event =
@@ -360,21 +358,32 @@ export class SearchResultView extends React.Component<
         ''
       const dateOfEvent =
         reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))
+      const isValidatedOnReview =
+        reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
+        this.userHasRegisterScope()
+          ? true
+          : false
       return {
         ...reg,
         event,
         name: reg.name && reg.name.toLowerCase(),
         iconWithName: (
-          <IconWithName status={reg.declarationStatus} name={reg.name} />
+          <IconWithName
+            status={reg.declarationStatus}
+            name={reg.name}
+            isValidatedOnReview={isValidatedOnReview}
+            isDuplicate={isDuplicate}
+          />
         ),
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.declarationStatus}
             name={reg.name}
             event={event}
+            isDuplicate={isDuplicate}
+            isValidatedOnReview={isValidatedOnReview}
           />
         ),
-        icon,
         dateOfEvent,
         actions,
         rowClickHandler: [

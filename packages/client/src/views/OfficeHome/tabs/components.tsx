@@ -13,6 +13,8 @@ import * as React from 'react'
 import styled from '@client/styledComponents'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
 import { STATUSTOCOLOR } from '@client/views/Home/RecordAudit'
+import { StringifyOptions } from 'querystring'
+import { Duplicate } from '@opencrvs/components/lib/icons'
 
 const Flex = styled.div`
   display: flex;
@@ -47,25 +49,52 @@ const Icon = styled.div`
   flex-shrink: 0;
   width: 24px;
 `
+interface IIconWith {
+  status?: string
+  name?: string
+  event?: string
+  isDuplicate?: boolean
+  isValidatedOnReview?: boolean
+}
 
-const IconComp = ({ status }: { status: string }) => {
+const IconComp = ({
+  status,
+  isDuplicateIcon,
+  isValidatedOnReview
+}: {
+  status: string
+  isDuplicateIcon?: boolean
+  isValidatedOnReview?: boolean
+}) => {
   return (
     <Icon>
-      <DeclarationIcon color={STATUSTOCOLOR[status]} />
+      {isDuplicateIcon ? (
+        <Duplicate />
+      ) : (
+        <DeclarationIcon
+          color={STATUSTOCOLOR[status]}
+          isValidatedOnReview={isValidatedOnReview}
+        />
+      )}
     </Icon>
   )
 }
 
 export const IconWithName = ({
   status,
-  name
-}: {
-  status?: string
-  name?: string
-}) => {
+  name,
+  isDuplicate,
+  isValidatedOnReview
+}: IIconWith) => {
   return (
     <Flex id="flex">
-      {status && <IconComp status={status} />}
+      {status && (
+        <IconComp
+          status={status}
+          isDuplicateIcon={isDuplicate}
+          isValidatedOnReview={isValidatedOnReview}
+        />
+      )}
       {name ? <Name id="name">{name}</Name> : <Error>No name provided</Error>}
     </Flex>
   )
@@ -74,15 +103,19 @@ export const IconWithName = ({
 export const IconWithNameEvent = ({
   status,
   name,
-  event
-}: {
-  status?: string
-  name?: string
-  event?: string
-}) => {
+  event,
+  isDuplicate,
+  isValidatedOnReview
+}: IIconWith) => {
   return (
     <Flex id="flex">
-      {status && <IconComp status={status} />}
+      {status && (
+        <IconComp
+          status={status}
+          isDuplicateIcon={isDuplicate}
+          isValidatedOnReview={isValidatedOnReview}
+        />
+      )}
       <NameEventContainer id="nameEvent">
         {name ? <Name>{name}</Name> : <Error>No name provided</Error>}
         {event && <Event>{event}</Event>}
