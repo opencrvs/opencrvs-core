@@ -29,7 +29,13 @@ import {
   mockUserResponseWithName,
   getReviewFormFromStore,
   mockOfflineData,
-  createTestStore
+  createTestStore,
+  graphQLPersonAddressMock,
+  graphQLEventLocationAddressMock,
+  primaryAddressData,
+  primaryInternationalAddressLines,
+  secondaryAddressData,
+  secondaryInternationalAddressLines
 } from '@client/tests/util'
 import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from '@client/views/DataProvider/birth/queries'
 import { GET_DEATH_REGISTRATION_FOR_REVIEW } from '@client/views/DataProvider/death/queries'
@@ -192,26 +198,7 @@ describe('ReviewForm tests', () => {
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],
                 identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
-                address: [
-                  {
-                    type: 'PERMANENT',
-                    line: ['12', '', 'union1', 'upazila10'],
-                    district: 'district2',
-                    state: 'state2',
-                    city: '',
-                    postalCode: '',
-                    country: 'BGD'
-                  },
-                  {
-                    type: 'CURRENT',
-                    line: ['12', '', 'union1', 'upazila10'],
-                    district: 'district2',
-                    state: 'state2',
-                    city: '',
-                    postalCode: '',
-                    country: 'BGD'
-                  }
-                ],
+                address: graphQLPersonAddressMock,
                 telecom: [
                   {
                     system: 'phone',
@@ -299,17 +286,16 @@ describe('ReviewForm tests', () => {
       gender: 'male',
       placeOfBirth: 'PRIVATE_HOME',
       country: 'FAR',
-      addressLine1: 'Rd #10',
-      addressLine1CityOption: '',
-      addressLine2: 'Akua',
-      addressLine3: 'union1',
-      addressLine3CityOption: '',
-      addressLine4: 'upazila10',
+      addressLine5: '',
+      numberUrbanOption: 'Rd #10',
+      addressLine2UrbanOption: '',
+      addressLine3UrbanOption: 'Akua',
       internationalAddressLine1: undefined,
       internationalAddressLine2: undefined,
       internationalAddressLine3: undefined,
       internationalDistrict: 'district2',
       internationalState: 'state4',
+      ruralOrUrban: 'upazila10',
       multipleBirth: 1,
       birthType: 'SINGLE',
       weightAtBirth: 2
@@ -362,26 +348,7 @@ describe('ReviewForm tests', () => {
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],
                 identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
-                address: [
-                  {
-                    type: 'PERMANENT',
-                    line: ['12', '', 'union1', 'upazila10'],
-                    district: 'district2',
-                    state: 'state2',
-                    city: '',
-                    postalCode: '',
-                    country: 'BGD'
-                  },
-                  {
-                    type: 'CURRENT',
-                    line: ['12', '', 'union1', 'upazila10'],
-                    district: 'district2',
-                    state: 'state2',
-                    city: '',
-                    postalCode: '',
-                    country: 'BGD'
-                  }
-                ],
+                address: graphQLPersonAddressMock,
                 telecom: [
                   {
                     system: 'phone',
@@ -404,19 +371,7 @@ describe('ReviewForm tests', () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
-              eventLocation: {
-                address: {
-                  country: 'BGD',
-                  state: 'state4',
-                  city: '',
-                  district: 'district2',
-                  postalCode: '',
-                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
-                  postCode: '1020'
-                },
-                type: 'PRIVATE_HOME',
-                partOf: 'Location/upazila10'
-              },
+              eventLocation: graphQLEventLocationAddressMock,
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -511,19 +466,7 @@ describe('ReviewForm tests', () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
-              eventLocation: {
-                address: {
-                  country: 'BGD',
-                  state: 'state4',
-                  city: '',
-                  district: 'district2',
-                  postalCode: '',
-                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
-                  postCode: '1020'
-                },
-                type: 'PRIVATE_HOME',
-                partOf: 'Location/upazila10'
-              },
+              eventLocation: graphQLEventLocationAddressMock,
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -621,26 +564,7 @@ describe('ReviewForm tests', () => {
                 nationality: ['BGD'],
                 identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
                 multipleBirth: 1,
-                address: [
-                  {
-                    type: 'PERMANENT',
-                    line: ['12', '', 'union1', 'upazila10'],
-                    district: 'district2',
-                    state: 'state2',
-                    city: '',
-                    postalCode: '',
-                    country: 'BGD'
-                  },
-                  {
-                    type: 'CURRENT',
-                    line: ['12', '', 'union1', 'upazila10'],
-                    district: 'district2',
-                    state: 'state2',
-                    city: '',
-                    postalCode: '',
-                    country: 'BGD'
-                  }
-                ],
+                address: graphQLPersonAddressMock,
                 telecom: [
                   {
                     system: 'phone',
@@ -674,19 +598,7 @@ describe('ReviewForm tests', () => {
               attendantAtBirth: 'NURSE',
               weightAtBirth: 2,
               birthType: 'SINGLE',
-              eventLocation: {
-                address: {
-                  country: 'BGD',
-                  state: 'state4',
-                  city: '',
-                  district: 'district2',
-                  postalCode: '',
-                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
-                  postCode: '1020'
-                },
-                type: 'PRIVATE_HOME',
-                partOf: 'Location/upazila10'
-              },
+              eventLocation: graphQLEventLocationAddressMock,
               presentAtBirthRegistration: 'MOTHER_ONLY'
             }
           }
@@ -1216,219 +1128,435 @@ describe('ReviewForm tests', () => {
           result: {
             data: {
               fetchDeathRegistration: {
-                id: '4f5ff6f7-cf61-42e1-9e1e-dc4b73517aa6',
                 _fhirIDMap: {
-                  composition: '4f5ff6f7-cf61-42e1-9e1e-dc4b73517aa6'
+                  composition: '3f94a554-69d8-4a71-80b5-ac4ba07e10bb',
+                  encounter: 'aa3ca6f2-255c-4dd9-a33b-24304392a92d',
+                  eventLocation: 'd3225149-d28a-4cc6-be41-4ba89d165ad3',
+                  observation: {
+                    mannerOfDeath: '3f26d040-6cb9-4c11-9829-3253d4c39f35'
+                  }
                 },
+                id: '3f94a554-69d8-4a71-80b5-ac4ba07e10bb',
                 deceased: {
-                  id: '50fbd713-c86d-49fe-bc6a-52094b40d8dd',
+                  id: 'e34c0bb4-bdc8-4333-976d-4d7a4a3b6d9a',
                   name: [
                     {
-                      use: 'bn',
-                      firstNames: 'অনিক',
-                      familyName: 'অনিক'
-                    },
-                    {
                       use: 'en',
-                      firstNames: 'Anik',
-                      familyName: 'anik'
+                      firstNames: 'aegrst',
+                      familyName: 'seths',
+                      __typename: 'HumanName'
                     }
                   ],
-                  birthDate: '1983-01-01',
+                  birthDate: '1990-03-20',
+                  age: null,
+                  gender: 'female',
                   maritalStatus: 'MARRIED',
-                  nationality: ['BGD'],
+                  nationality: ['FAR'],
                   identifier: [
                     {
-                      id: '123456789',
-                      type: 'PASSPORT',
-                      otherType: null
-                    }
-                  ],
-                  gender: 'male',
-                  deceased: {
-                    deathDate: '2019-01-01'
-                  },
-                  address: [
-                    {
-                      type: 'PERMANENT',
-                      line: [
-                        '121',
-                        '',
-                        '12',
-                        '1f06d980-e254-4e6b-b049-a9b4e7155180',
-                        '',
-                        '34c377a0-2223-4361-851c-5e230a96d957'
-                      ],
-                      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-                      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-                      city: '',
-                      postalCode: '12',
-                      country: 'BGD'
+                      id: '321951357',
+                      type: 'NATIONAL_ID',
+                      otherType: null,
+                      __typename: 'IdentityType'
                     },
                     {
-                      type: 'CURRENT',
-                      line: [
-                        '121',
-                        '',
-                        '12',
-                        '1f06d980-e254-4e6b-b049-a9b4e7155180',
-                        '',
-                        '34c377a0-2223-4361-851c-5e230a96d957'
-                      ],
-                      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-                      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-                      city: '',
-                      postalCode: '12',
-                      country: 'BGD'
+                      id: 'sgtsr',
+                      type: 'SOCIAL_SECURITY_NO',
+                      otherType: null,
+                      __typename: 'IdentityType'
+                    },
+                    {
+                      id: '2022DBVWELM',
+                      type: 'DEATH_REGISTRATION_NUMBER',
+                      otherType: null,
+                      __typename: 'IdentityType'
                     }
-                  ]
+                  ],
+                  deceased: { deathDate: '2022-04-04', __typename: 'Deceased' },
+                  address: [
+                    {
+                      type: 'PRIMARY_ADDRESS',
+                      line: ['', '', '', '', '', '', 'URBAN'],
+                      district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+                      state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+                      city: null,
+                      postalCode: null,
+                      country: 'FAR',
+                      __typename: 'Address'
+                    },
+                    {
+                      type: 'SECONDARY_ADDRESS',
+                      line: ['', '', '', '', '', '', 'URBAN'],
+                      district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+                      state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+                      city: null,
+                      postalCode: null,
+                      country: 'FAR',
+                      __typename: 'Address'
+                    }
+                  ],
+                  __typename: 'Person'
                 },
                 informant: {
-                  id: 'c9e3e5cb-d483-4db4-afaa-625161826f00',
-                  relationship: 'OTHER',
-                  otherRelationship: 'Patternal uncle',
+                  id: 'd596de54-9aaa-42a6-8783-27a6ae084a84',
+                  relationship: 'DAUGHTER',
+                  otherRelationship: null,
                   individual: {
-                    id: 'cabeeea7-0f7d-41c3-84ed-8f88e4d617e1',
+                    id: 'c2d07312-8568-458f-b46a-42d39667f6e3',
                     identifier: [
                       {
-                        id: '123456789',
-                        type: 'PASSPORT',
-                        otherType: null
+                        id: '321987654',
+                        type: 'NATIONAL_ID',
+                        otherType: null,
+                        __typename: 'IdentityType'
                       }
                     ],
                     name: [
                       {
-                        use: 'bn',
-                        firstNames: 'অনিক',
-                        familyName: 'অনিক'
-                      },
-                      {
                         use: 'en',
-                        firstNames: 'Anik',
-                        familyName: 'Anik'
+                        firstNames: 'srtndrtgy',
+                        familyName: 'srtnr',
+                        __typename: 'HumanName'
                       }
                     ],
-                    nationality: ['BGD'],
-                    birthDate: '1996-01-01',
-                    telecom: [
-                      {
-                        system: 'phone',
-                        value: '01622688231'
-                      }
-                    ],
+                    nationality: ['FAR'],
+                    occupation: null,
+                    birthDate: null,
+                    telecom: null,
                     address: [
                       {
-                        type: 'CURRENT',
-                        line: [
-                          '12',
-                          '',
-                          '12',
-                          '1f06d980-e254-4e6b-b049-a9b4e7155180',
-                          '',
-                          '34c377a0-2223-4361-851c-5e230a96d957'
-                        ],
-                        district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-                        state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-                        city: '',
-                        postalCode: '12',
-                        country: 'BGD'
+                        type: 'PRIMARY_ADDRESS',
+                        line: ['', '', '', '', '', '', 'URBAN'],
+                        district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+                        state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+                        city: null,
+                        postalCode: null,
+                        country: 'FAR',
+                        __typename: 'Address'
                       },
                       {
-                        type: 'PERMANENT',
-                        line: [
-                          '12',
-                          '',
-                          '12',
-                          '1f06d980-e254-4e6b-b049-a9b4e7155180',
-                          '',
-                          '34c377a0-2223-4361-851c-5e230a96d957'
-                        ],
-                        district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-                        state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-                        city: '',
-                        postalCode: '12',
-                        country: 'BGD'
+                        type: 'SECONDARY_ADDRESS',
+                        line: ['', '', '', '', '', '', 'URBAN'],
+                        district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+                        state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+                        city: null,
+                        postalCode: null,
+                        country: 'FAR',
+                        __typename: 'Address'
                       }
-                    ]
-                  }
+                    ],
+                    __typename: 'Person'
+                  },
+                  __typename: 'RelatedPerson'
                 },
                 father: {
-                  id: '7ac8d0a6-a391-42f9-add4-dec272asaa',
+                  id: '89aaafc6-5737-4e49-8d37-8cecb2d546ae',
                   name: [
                     {
-                      use: 'bn',
-                      firstNames: 'মোক্তার',
-                      familyName: 'আলী'
-                    },
-                    {
                       use: 'en',
-                      firstNames: 'Moktar',
-                      familyName: 'Ali'
+                      firstNames: '',
+                      familyName: 'dndtndt',
+                      __typename: 'HumanName'
                     }
-                  ]
+                  ],
+                  __typename: 'Person'
                 },
                 mother: {
-                  id: '7ac8d0a6-a391-42f9-add4-dec2727asdf',
+                  id: 'efe9c750-1d84-4aa5-9a2f-a69e0d42c4f5',
                   name: [
                     {
-                      use: 'bn',
-                      firstNames: 'মরিউম',
-                      familyName: 'আলী'
-                    },
-                    {
                       use: 'en',
-                      firstNames: 'Morium',
-                      familyName: 'Ali'
+                      firstNames: '',
+                      familyName: 'drdtngydtyn',
+                      __typename: 'HumanName'
                     }
-                  ]
+                  ],
+                  __typename: 'Person'
                 },
-                spouse: {
-                  id: '7ac8d0a6-a391-42f9-add4-dec27279589',
-                  name: [
-                    {
-                      use: 'bn',
-                      firstNames: 'রেহানা',
-                      familyName: 'আলী'
-                    },
-                    {
-                      use: 'en',
-                      firstNames: 'Rehana',
-                      familyName: 'Ali'
-                    }
-                  ]
-                },
+                spouse: null,
+                medicalPractitioner: null,
                 registration: {
-                  id: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
+                  id: 'e921e161-b91b-4019-ad60-99687a4404dd',
+                  contact: 'SON',
+                  contactRelationship: null,
+                  contactPhoneNumber: '+260787878787',
                   attachments: null,
                   status: [
                     {
+                      type: 'REGISTERED',
+                      timestamp: '2022-04-21T14:10:34.192Z',
+                      __typename: 'RegWorkflow'
+                    },
+                    {
+                      type: 'REGISTERED',
+                      timestamp: '2022-04-21T14:10:34.192Z',
+                      __typename: 'RegWorkflow'
+                    },
+                    {
+                      type: 'REGISTERED',
+                      timestamp: '2022-04-21T14:10:34.192Z',
+                      __typename: 'RegWorkflow'
+                    },
+                    {
+                      type: 'WAITING_VALIDATION',
+                      timestamp: '2022-04-21T14:10:34.192Z',
+                      __typename: 'RegWorkflow'
+                    },
+                    {
                       type: 'DECLARED',
-                      timestamp: null
+                      timestamp: '2022-04-21T14:07:45.427Z',
+                      __typename: 'RegWorkflow'
+                    },
+                    {
+                      type: 'DECLARED',
+                      timestamp: '2022-04-21T14:07:45.427Z',
+                      __typename: 'RegWorkflow'
                     }
                   ],
                   type: 'DEATH',
-                  contact: 'OTHER',
-                  contactPhoneNumber: '+8801671010143',
-                  contactRelationship: 'Friend',
-                  trackingId: 'DS8QZ0Z',
-                  registrationNumber: null
+                  trackingId: 'DBVWELM',
+                  registrationNumber: '2022DBVWELM',
+                  __typename: 'Registration'
                 },
                 eventLocation: {
-                  id: 'fccf6eac-4dae-43d3-af33-2c977d1daf99',
-                  type: 'CURRENT',
+                  id: 'd3225149-d28a-4cc6-be41-4ba89d165ad3',
+                  type: 'PRIVATE_HOME',
                   address: {
-                    type: '',
-                    line: ['', '', '', '', '', ''],
-                    district: '',
-                    state: '',
-                    city: '',
+                    type: null,
+                    line: ['', '', '', '', '', '', 'dryn', 'drtny', 'rynd'],
+                    district: 'srnthd',
+                    state: 'stehdsr',
+                    city: 'drny',
                     postalCode: '',
-                    country: 'BGD'
-                  }
+                    country: 'SLV',
+                    __typename: 'Address'
+                  },
+                  __typename: 'Location'
                 },
-                mannerOfDeath: 'ACCIDENT',
-                causeOfDeathMethod: null,
-                causeOfDeath: null
+                questionnaire: null,
+                mannerOfDeath: 'NATURAL_CAUSES',
+                causeOfDeath: null,
+                maleDependentsOfDeceased: null,
+                femaleDependentsOfDeceased: null,
+                history: [
+                  {
+                    date: '2022-04-21T14:15:09.055+00:00',
+                    action: 'DOWNLOADED',
+                    reinstated: false,
+                    statusReason: null,
+                    location: {
+                      id: '852b103f-2fe0-4871-a323-51e51c6d9198',
+                      name: 'Ibombo',
+                      __typename: 'Location'
+                    },
+                    office: {
+                      id: '204f706f-e097-4394-9d12-bd50f057f923',
+                      name: 'Ibombo District Office',
+                      __typename: 'Location'
+                    },
+                    user: {
+                      id: '6241918dd6dc544f60d8f73a',
+                      type: 'CHAIRMAN',
+                      role: 'LOCAL_REGISTRAR',
+                      name: [
+                        {
+                          firstNames: 'Kennedy',
+                          familyName: 'Mweene',
+                          use: 'en',
+                          __typename: 'HumanName'
+                        }
+                      ],
+                      avatar: null,
+                      __typename: 'User'
+                    },
+                    comments: [],
+                    input: [],
+                    output: [],
+                    certificates: null,
+                    __typename: 'History'
+                  },
+                  {
+                    date: '2022-04-21T14:10:50.699+00:00',
+                    action: 'DOWNLOADED',
+                    reinstated: false,
+                    statusReason: null,
+                    location: {
+                      id: '852b103f-2fe0-4871-a323-51e51c6d9198',
+                      name: 'Ibombo',
+                      __typename: 'Location'
+                    },
+                    office: {
+                      id: '204f706f-e097-4394-9d12-bd50f057f923',
+                      name: 'Ibombo District Office',
+                      __typename: 'Location'
+                    },
+                    user: {
+                      id: '6241918dd6dc544f60d8f73a',
+                      type: 'CHAIRMAN',
+                      role: 'LOCAL_REGISTRAR',
+                      name: [
+                        {
+                          firstNames: 'Kennedy',
+                          familyName: 'Mweene',
+                          use: 'en',
+                          __typename: 'HumanName'
+                        }
+                      ],
+                      avatar: null,
+                      __typename: 'User'
+                    },
+                    comments: [],
+                    input: [],
+                    output: [],
+                    certificates: null,
+                    __typename: 'History'
+                  },
+                  {
+                    date: '2022-04-21T14:10:34.714+00:00',
+                    action: 'REGISTERED',
+                    reinstated: false,
+                    statusReason: null,
+                    location: {
+                      id: '852b103f-2fe0-4871-a323-51e51c6d9198',
+                      name: 'Ibombo',
+                      __typename: 'Location'
+                    },
+                    office: {
+                      id: '204f706f-e097-4394-9d12-bd50f057f923',
+                      name: 'Ibombo District Office',
+                      __typename: 'Location'
+                    },
+                    user: {
+                      id: '6241918dd6dc544f60d8f73a',
+                      type: 'CHAIRMAN',
+                      role: 'LOCAL_REGISTRAR',
+                      name: [
+                        {
+                          firstNames: 'Kennedy',
+                          familyName: 'Mweene',
+                          use: 'en',
+                          __typename: 'HumanName'
+                        }
+                      ],
+                      avatar: null,
+                      __typename: 'User'
+                    },
+                    comments: [],
+                    input: [],
+                    output: [],
+                    certificates: null,
+                    __typename: 'History'
+                  },
+                  {
+                    date: '2022-04-21T14:10:34.605+00:00',
+                    action: 'WAITING_VALIDATION',
+                    reinstated: false,
+                    statusReason: null,
+                    location: {
+                      id: '852b103f-2fe0-4871-a323-51e51c6d9198',
+                      name: 'Ibombo',
+                      __typename: 'Location'
+                    },
+                    office: {
+                      id: '204f706f-e097-4394-9d12-bd50f057f923',
+                      name: 'Ibombo District Office',
+                      __typename: 'Location'
+                    },
+                    user: {
+                      id: '6241918dd6dc544f60d8f73a',
+                      type: 'CHAIRMAN',
+                      role: 'LOCAL_REGISTRAR',
+                      name: [
+                        {
+                          firstNames: 'Kennedy',
+                          familyName: 'Mweene',
+                          use: 'en',
+                          __typename: 'HumanName'
+                        }
+                      ],
+                      avatar: null,
+                      __typename: 'User'
+                    },
+                    comments: [],
+                    input: [],
+                    output: [],
+                    certificates: null,
+                    __typename: 'History'
+                  },
+                  {
+                    date: '2022-04-21T14:10:15.617+00:00',
+                    action: 'DOWNLOADED',
+                    reinstated: false,
+                    statusReason: null,
+                    location: {
+                      id: '852b103f-2fe0-4871-a323-51e51c6d9198',
+                      name: 'Ibombo',
+                      __typename: 'Location'
+                    },
+                    office: {
+                      id: '204f706f-e097-4394-9d12-bd50f057f923',
+                      name: 'Ibombo District Office',
+                      __typename: 'Location'
+                    },
+                    user: {
+                      id: '6241918dd6dc544f60d8f73a',
+                      type: 'CHAIRMAN',
+                      role: 'LOCAL_REGISTRAR',
+                      name: [
+                        {
+                          firstNames: 'Kennedy',
+                          familyName: 'Mweene',
+                          use: 'en',
+                          __typename: 'HumanName'
+                        }
+                      ],
+                      avatar: null,
+                      __typename: 'User'
+                    },
+                    comments: [],
+                    input: [],
+                    output: [],
+                    certificates: null,
+                    __typename: 'History'
+                  },
+                  {
+                    date: '2022-04-21T14:07:45.960+00:00',
+                    action: 'DECLARED',
+                    reinstated: false,
+                    statusReason: null,
+                    location: {
+                      id: '852b103f-2fe0-4871-a323-51e51c6d9198',
+                      name: 'Ibombo',
+                      __typename: 'Location'
+                    },
+                    office: {
+                      id: '204f706f-e097-4394-9d12-bd50f057f923',
+                      name: 'Ibombo District Office',
+                      __typename: 'Location'
+                    },
+                    user: {
+                      id: '6241918dd6dc544f60d8f738',
+                      type: 'CHA',
+                      role: 'FIELD_AGENT',
+                      name: [
+                        {
+                          firstNames: 'Kalusha',
+                          familyName: 'Bwalya',
+                          use: 'en',
+                          __typename: 'HumanName'
+                        }
+                      ],
+                      avatar: null,
+                      __typename: 'User'
+                    },
+                    comments: [],
+                    input: [],
+                    output: [],
+                    certificates: null,
+                    __typename: 'History'
+                  }
+                ],
+                __typename: 'DeathRegistration'
               }
             }
           }
@@ -1468,54 +1596,50 @@ describe('ReviewForm tests', () => {
         .prop('declaration') as IDeclaration
 
       expect(data.data.deceased).toEqual({
-        iDType: 'PASSPORT',
-        iD: '123456789',
-        firstNames: 'অনিক',
-        familyName: 'অনিক',
-        firstNamesEng: 'Anik',
-        familyNameEng: 'anik',
-        nationality: 'BGD',
-        gender: 'male',
+        _fhirID: 'e34c0bb4-bdc8-4333-976d-4d7a4a3b6d9a',
+        addressLine2UrbanOptionPrimary: '',
+        addressLine2UrbanOptionSecondary: '',
+        addressLine3UrbanOptionPrimary: '',
+        addressLine3UrbanOptionSecondary: '',
+        addressLine5Primary: '',
+        addressLine5Secondary: '',
+        birthDate: '1990-03-20',
+        cityUrbanOptionPrimary: null,
+        cityUrbanOptionSecondary: null,
+        countryPrimary: 'FAR',
+        countrySecondary: 'FAR',
+        districtPrimary: '852b103f-2fe0-4871-a323-51e51c6d9198',
+        districtSecondary: '852b103f-2fe0-4871-a323-51e51c6d9198',
+        familyNameEng: 'seths',
+        firstNamesEng: 'aegrst',
+        gender: 'female',
+        iD: '321951357',
+        iDType: 'NATIONAL_ID',
+        internationalAddressLine1Primary: 'URBAN',
+        internationalAddressLine1Secondary: 'URBAN',
+        internationalAddressLine2Primary: '',
+        internationalAddressLine2Secondary: '',
+        internationalAddressLine3Primary: '',
+        internationalAddressLine3Secondary: '',
+        internationalCityPrimary: null,
+        internationalCitySecondary: null,
+        internationalDistrictPrimary: '852b103f-2fe0-4871-a323-51e51c6d9198',
+        internationalDistrictSecondary: '852b103f-2fe0-4871-a323-51e51c6d9198',
+        internationalPostcodePrimary: null,
+        internationalPostcodeSecondary: null,
+        internationalStatePrimary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+        internationalStateSecondary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
         maritalStatus: 'MARRIED',
-        birthDate: '1983-01-01',
-        countryPermanent: 'BGD',
-        statePermanent: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-        districtPermanent: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-        addressLine4Permanent: '34c377a0-2223-4361-851c-5e230a96d957',
-        addressLine3Permanent: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-        addressLine3CityOptionPermanent: '',
-        addressLine2Permanent: '12',
-        addressLine1CityOptionPermanent: '',
-        postCodeCityOptionPermanent: '12',
-        addressLine1Permanent: '121',
-        postCodePermanent: '12',
-        currentAddressSameAsPermanent: true,
-        country: 'BGD',
-        state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-        district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-        addressLine4: '34c377a0-2223-4361-851c-5e230a96d957',
-        addressLine3: '1f06d980-e254-4e6b-b049-a9b4e7155180',
-        addressLine3CityOption: '',
-        addressLine2: '12',
-        addressLine1CityOption: '',
-        postCodeCityOption: '12',
-        addressLine1: '121',
-        postCode: '12',
-        internationalAddressLine1: '',
-        internationalAddressLine1Permanent: '',
-        internationalAddressLine2: '',
-        internationalAddressLine2Permanent: '',
-        internationalAddressLine3: '',
-        internationalAddressLine3Permanent: '',
-        internationalCity: '',
-        internationalCityPermanent: '',
-        internationalDistrict: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-        internationalDistrictPermanent: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-        internationalPostcode: '12',
-        internationalPostcodePermanent: '12',
-        internationalState: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-        internationalStatePermanent: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-        _fhirID: '50fbd713-c86d-49fe-bc6a-52094b40d8dd'
+        nationality: 'FAR',
+        numberUrbanOptionPrimary: '',
+        numberUrbanOptionSecondary: '',
+        postcodePrimary: null,
+        postcodeSecondary: null,
+        ruralOrUrbanPrimary: '',
+        ruralOrUrbanSecondary: '',
+        secondaryAddressSameAsPrimary: true,
+        statePrimary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+        stateSecondary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c'
       })
     })
     it('populates proper casue of death section', async () => {
@@ -1561,40 +1685,7 @@ describe('ReviewForm tests', () => {
                   deceased: {
                     deathDate: '2019-01-01'
                   },
-                  address: [
-                    {
-                      type: 'PERMANENT',
-                      line: [
-                        '121',
-                        '',
-                        '12',
-                        '1f06d980-e254-4e6b-b049-a9b4e7155180',
-                        '',
-                        '34c377a0-2223-4361-851c-5e230a96d957'
-                      ],
-                      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-                      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-                      city: '',
-                      postalCode: '12',
-                      country: 'BGD'
-                    },
-                    {
-                      type: 'CURRENT',
-                      line: [
-                        '121',
-                        '',
-                        '12',
-                        '1f06d980-e254-4e6b-b049-a9b4e7155180',
-                        '',
-                        '34c377a0-2223-4361-851c-5e230a96d957'
-                      ],
-                      district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-                      state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-                      city: '',
-                      postalCode: '12',
-                      country: 'BGD'
-                    }
-                  ]
+                  address: graphQLPersonAddressMock
                 },
                 informant: {
                   id: 'c9e3e5cb-d483-4db4-afaa-625161826f00',
@@ -1629,40 +1720,7 @@ describe('ReviewForm tests', () => {
                         value: '01622688231'
                       }
                     ],
-                    address: [
-                      {
-                        type: 'CURRENT',
-                        line: [
-                          '12',
-                          '',
-                          '12',
-                          '1f06d980-e254-4e6b-b049-a9b4e7155180',
-                          '',
-                          '34c377a0-2223-4361-851c-5e230a96d957'
-                        ],
-                        district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-                        state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-                        city: '',
-                        postalCode: '12',
-                        country: 'BGD'
-                      },
-                      {
-                        type: 'PERMANENT',
-                        line: [
-                          '12',
-                          '',
-                          '12',
-                          '1f06d980-e254-4e6b-b049-a9b4e7155180',
-                          '',
-                          '34c377a0-2223-4361-851c-5e230a96d957'
-                        ],
-                        district: '0d6af8ef-2d24-4e7d-93a7-6c0085df2760',
-                        state: 'ae181035-fbb4-472a-9222-ecd35b8bae31',
-                        city: '',
-                        postalCode: '12',
-                        country: 'BGD'
-                      }
-                    ]
+                    address: graphQLPersonAddressMock
                   }
                 },
                 father: {
@@ -1726,19 +1784,7 @@ describe('ReviewForm tests', () => {
                   trackingId: 'DS8QZ0Z',
                   registrationNumber: '2019123223DS8QZ0Z1'
                 },
-                eventLocation: {
-                  id: 'fccf6eac-4dae-43d3-af33-2c977d1daf99',
-                  type: 'CURRENT',
-                  address: {
-                    type: '',
-                    line: ['', '', '', '', '', ''],
-                    district: '',
-                    state: '',
-                    city: '',
-                    postalCode: '',
-                    country: 'BGD'
-                  }
-                },
+                eventLocation: graphQLEventLocationAddressMock,
                 mannerOfDeath: 'ACCIDENT',
                 causeOfDeath: 'Internal injury in head'
               }
@@ -1820,19 +1866,7 @@ describe('ReviewForm tests', () => {
                 attendantAtBirth: 'NURSE',
                 weightAtBirth: 2,
                 birthType: 'SINGLE',
-                eventLocation: {
-                  address: {
-                    country: 'BGD',
-                    state: 'state4',
-                    city: '',
-                    district: 'district2',
-                    postalCode: '',
-                    line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
-                    postCode: '1020'
-                  },
-                  type: 'PRIVATE_HOME',
-                  partOf: 'Location/upazila10'
-                },
+                eventLocation: graphQLEventLocationAddressMock,
                 presentAtBirthRegistration: 'MOTHER_ONLY'
               }
             }

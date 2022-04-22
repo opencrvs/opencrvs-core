@@ -74,8 +74,8 @@ describe('Registrar home external validation tab tests', () => {
   let history: History<any>
 
   beforeEach(async () => {
-    const CURRENT_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
-    Date.now = jest.fn(() => CURRENT_TIME)
+    const SECONDARY_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
+    Date.now = jest.fn(() => SECONDARY_TIME)
     const { store: testStore, history: testHistory } = await createTestStore()
     getItem.mockReturnValue(registerScopeToken)
     testStore.dispatch(checkAuth({ '?token': registerScopeToken }))

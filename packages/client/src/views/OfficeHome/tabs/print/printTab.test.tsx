@@ -426,7 +426,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
                 },
                 address: [
                   {
-                    type: 'PERMANENT',
+                    type: 'PRIMARY_ADDRESS',
                     line: [
                       '40 Ward',
                       '',
@@ -442,7 +442,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
                     country: 'BGD'
                   },
                   {
-                    type: 'CURRENT',
+                    type: 'SECONDARY_ADDRESS',
                     line: [
                       '40',
                       '',
@@ -489,7 +489,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
                   telecom: null,
                   address: [
                     {
-                      type: 'CURRENT',
+                      type: 'SECONDARY_ADDRESS',
                       line: [
                         '48',
                         '',
@@ -505,7 +505,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
                       country: 'BGD'
                     },
                     {
-                      type: 'PERMANENT',
+                      type: 'PRIMARY_ADDRESS',
                       line: [
                         '40 Ward',
                         '',

@@ -21,7 +21,7 @@ import { MessageDescriptor } from 'react-intl'
 import { IDefaultField } from '@client/forms/configuration/defaultUtils'
 import {
   getGroup,
-  getQuestionsIdentifiersFromFieldId,
+  getIdentifiersFromFieldId,
   getSection,
   IGroup,
   ISection
@@ -49,9 +49,7 @@ export function createCustomGroup(
   preceedingDefaultField: IDefaultField | null,
   positionTop?: boolean
 ) {
-  const customQuestionIdentifiers = getQuestionsIdentifiersFromFieldId(
-    question.fieldId
-  )
+  const customQuestionIdentifiers = getIdentifiersFromFieldId(question.fieldId)
   const section: ISection = getSection(
     form.sections,
     customQuestionIdentifiers.sectionId

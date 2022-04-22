@@ -1085,14 +1085,14 @@ export const motherMock = JSON.stringify({
   multipleBirthInteger: 1,
   address: [
     {
-      type: 'PERMANENT',
+      type: 'PRIMARY_ADDRESS',
       line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
       district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
       state: '9a236522-0c3d-40eb-83ad-e8567518c763',
       country: 'BGD'
     },
     {
-      type: 'CURRENT',
+      type: 'SECONDARY_ADDRESS',
       line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
       district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
       state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1329,7 +1329,7 @@ export const testDeathFhirBundle = {
         address: [
           {
             use: 'home',
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['2760 Mlosi Street', 'Wallacedene'],
             city: 'Cape Town',
             district: 'Kraaifontein',
@@ -1339,7 +1339,7 @@ export const testDeathFhirBundle = {
           },
           {
             use: 'home',
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             text: 'Optional address text',
             line: ['40 Orbis Wharf', 'Wallacedene'],
             city: 'Cape Town',

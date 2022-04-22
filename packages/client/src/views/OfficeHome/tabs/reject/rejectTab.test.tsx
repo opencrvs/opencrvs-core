@@ -578,7 +578,7 @@ describe('OfficeHome sent for update tab related tests', () => {
                 multipleBirth: 1,
                 address: [
                   {
-                    type: 'PERMANENT',
+                    type: 'PRIMARY_ADDRESS',
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',
@@ -587,7 +587,7 @@ describe('OfficeHome sent for update tab related tests', () => {
                     country: 'BGD'
                   },
                   {
-                    type: 'CURRENT',
+                    type: 'SECONDARY_ADDRESS',
                     line: ['12', '', 'union1', 'upazila10'],
                     district: 'district2',
                     state: 'state2',

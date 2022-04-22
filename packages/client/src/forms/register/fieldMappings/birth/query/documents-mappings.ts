@@ -20,8 +20,7 @@ const fieldNameMapping = {
   [birthDocumentForWhomFhirMapping.Mother]: 'uploadDocForMother',
   [birthDocumentForWhomFhirMapping.Father]: 'uploadDocForFather',
   [birthDocumentForWhomFhirMapping.Child]: 'uploadDocForChildDOB',
-  [birthDocumentForWhomFhirMapping.Parent]:
-    'uploadDocForParentPermanentAddress',
+  [birthDocumentForWhomFhirMapping.Parent]: 'uploadDocForParentPrimaryAddress',
   [birthDocumentForWhomFhirMapping.Informant]: 'uploadDocForInformant',
   [birthDocumentForWhomFhirMapping.ChildAge]: 'uploadDocForChildAge',
   [birthDocumentForWhomFhirMapping.AssignedResponsibilityProof]:
