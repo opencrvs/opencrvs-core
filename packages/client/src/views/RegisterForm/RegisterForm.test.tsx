@@ -110,7 +110,7 @@ describe('when user is in the register form for birth event', () => {
     it('changes the country select', async () => {
       const select = selectOption(
         component,
-        '#countryPermanent',
+        '#countryPrimary',
         'United States of America'
       )
       expect(select.text()).toEqual('United States of America')
@@ -839,7 +839,7 @@ describe('when user is in the register form for death event', () => {
             params: {
               declarationId: draft.id,
               pageId: 'deathEvent',
-              groupId: 'deathEvent-deathDate'
+              groupId: 'death-event-details'
             },
             isExact: true,
             path: '',
@@ -1236,8 +1236,8 @@ describe('When user is in Preview section death event', () => {
   it('Check if death location partOf is parsed properly', () => {
     expect(
       draftToGqlTransformer(deathForm, mockDeathDeclarationData as IFormData)
-        .eventLocation.partOf
-    ).toBe('Location/1dfc716a-c5f7-4d39-ad71-71d2a359210c')
+        .eventLocation.address.country
+    ).toEqual('FAR')
   })
 
   it('Should be able to submit the form', () => {
@@ -1255,16 +1255,15 @@ describe('When user is in Preview section death event', () => {
     const hospitalLocatioMockDeathDeclarationData = clone(
       mockDeathDeclarationData
     )
-    hospitalLocatioMockDeathDeclarationData.deathEvent.deathPlaceAddress =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.placeOfDeath =
       'HEALTH_FACILITY'
     hospitalLocatioMockDeathDeclarationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
-
     expect(
       draftToGqlTransformer(
         deathForm,
         hospitalLocatioMockDeathDeclarationData as IFormData
-      ).eventLocation.type
+      ).eventLocation.address
     ).toBe(undefined)
   })
 
@@ -1272,7 +1271,7 @@ describe('When user is in Preview section death event', () => {
     const hospitalLocatioMockDeathDeclarationData = clone(
       mockDeathDeclarationData
     )
-    hospitalLocatioMockDeathDeclarationData.deathEvent.deathPlaceAddress =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.placeOfDeath =
       'HEALTH_FACILITY'
     hospitalLocatioMockDeathDeclarationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
@@ -1287,35 +1286,11 @@ describe('When user is in Preview section death event', () => {
 
   it('Check if death location is deceased parmanent address', () => {
     const mockDeathDeclaration = clone(mockDeathDeclarationData)
-    mockDeathDeclaration.deathEvent.deathPlaceAddress = 'PERMANENT'
-
+    mockDeathDeclaration.deathEvent.placeOfDeath = 'PRIMARY_ADDRESS'
     expect(
       draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)
-        .eventLocation.address.type
-    ).toBe('PERMANENT')
-  })
-
-  it('Death location should be undefined if no decased address is found', () => {
-    const mockDeathDeclaration = cloneDeep(mockDeathDeclarationData)
-    // @ts-ignore
-    mockDeathDeclaration.deceased = {
-      iDType: 'NATIONAL_ID',
-      iD: '1230000000000',
-      firstNames: 'মকবুল',
-      familyName: 'ইসলাম',
-      firstNamesEng: 'Mokbul',
-      familyNameEng: 'Islam',
-      nationality: 'BGD',
-      gender: 'male',
-      maritalStatus: 'MARRIED',
-      birthDate: '1987-02-16'
-    }
-    mockDeathDeclaration.deathEvent.deathPlaceAddress = 'CURRENT'
-
-    expect(
-      draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)
-        .eventLocation
-    ).toBe(undefined)
+        .eventLocation.type
+    ).toBe('PRIMARY_ADDRESS')
   })
 })
 

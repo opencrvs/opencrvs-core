@@ -19,7 +19,7 @@ import { fieldToAttachmentTransformer } from '@client/forms/mappings/mutation/fi
 
 export const deathDocumentForWhomFhirMapping = {
   "Proof of Deceased's ID": 'DECEASED_ID_PROOF',
-  'Proof Deceased Permanent Address': 'DECEASED_PARMANENT_ADDRESS_PROOF',
+  'Proof Deceased Primary Address': 'DECEASED_PARMANENT_ADDRESS_PROOF',
   'Proof of Death of Deceased': 'DECEASED_DEATH_PROOF',
   'Proof of Date of Birth of Deceased': 'DECEASED_BIRTH_PROOF',
   'Cuase of Death': 'CAUSE_OF_DEATH',
@@ -34,7 +34,7 @@ export const deathSectionMapping = {
   [DeathSection.Deceased]: [
     deathDocumentForWhomFhirMapping['Cuase of Death'],
     deathDocumentForWhomFhirMapping["Proof of Deceased's ID"],
-    deathDocumentForWhomFhirMapping['Proof Deceased Permanent Address'],
+    deathDocumentForWhomFhirMapping['Proof Deceased Primary Address'],
     deathDocumentForWhomFhirMapping['Proof of Death of Deceased'],
     deathDocumentForWhomFhirMapping['Proof of Date of Birth of Deceased'],
     deathDocumentForWhomFhirMapping['Letter from ward councillor'],

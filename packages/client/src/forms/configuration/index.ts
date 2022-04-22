@@ -13,11 +13,12 @@
 import {
   IFormConfig,
   ISerializedForm,
-  IQuestionIdentifiers,
+  IIdentifiers,
   IQuestionConfig,
   SerializedFormField,
   ISerializedFormSection,
-  IFormSectionGroup
+  IFormSectionGroup,
+  Event
 } from '@client/forms/index'
 import {
   configureCustomQuestions,
@@ -31,6 +32,7 @@ import {
   IDefaultField,
   IDefaultFieldCustomisation
 } from '@client/forms/configuration/defaultUtils'
+import { populateRegisterFormsWithAddresses } from './administrative/addresses'
 
 // THIS FILE SORTS & COMBINES CONFIGURATIONS WITH THE DEFAULT CONFIGURATION FOR RENDERING IN THE APPLICATION
 
@@ -74,9 +76,7 @@ export function getGroup(groups: IGroups, id: string): IGroup {
   }
 }
 
-export function getQuestionsIdentifiersFromFieldId(
-  fieldId: string
-): IQuestionIdentifiers {
+export function getIdentifiersFromFieldId(fieldId: string): IIdentifiers {
   const splitIds = fieldId.split('.')
   return {
     event: splitIds[0],
@@ -219,11 +219,16 @@ export function filterQuestionsByEventType(
 
 export function configureRegistrationForm(
   formCustomisations: IFormConfigurations,
-  defaultEventForm: ISerializedForm
+  defaultEventForm: ISerializedForm,
+  event: Event
 ): ISerializedForm {
+  const formWithAddresses = populateRegisterFormsWithAddresses(
+    defaultEventForm,
+    event
+  )
   const defaultFormWithCustomisations = configureDefaultQuestions(
     formCustomisations.defaultFieldCustomisations,
-    defaultEventForm
+    formWithAddresses
   )
   return configureCustomQuestions(
     formCustomisations.customQuestionConfigurations,

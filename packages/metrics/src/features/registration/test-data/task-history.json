@@ -50,7 +50,7 @@
           },
           {
             "url": "http://opencrvs.org/specs/extension/in-complete-fields",
-            "valueString": "child/child-view-group/placeOfBirth,child/child-view-group/multipleBirth,mother/mother-view-group/statePermanent"
+            "valueString": "child/child-view-group/placeOfBirth,child/child-view-group/multipleBirth,mother/mother-view-group/statePrimary"
           },
           {
             "url": "http://opencrvs.org/specs/extension/regLastUser",
@@ -140,7 +140,7 @@
           },
           {
             "url": "http://opencrvs.org/specs/extension/in-complete-fields",
-            "valueString": "child/child-view-group/placeOfBirth,child/child-view-group/multipleBirth,mother/mother-view-group/statePermanent"
+            "valueString": "child/child-view-group/placeOfBirth,child/child-view-group/multipleBirth,mother/mother-view-group/statePrimary"
           },
           {
             "url": "http://opencrvs.org/specs/extension/regLastUser",
