@@ -23,7 +23,7 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import styled from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
   Content,
@@ -163,7 +163,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
         />
         <PerformanceSelect
           onChange={(option) => this.setState({ event: option.value as Event })}
-          id="event-select"
+          id="eventSelect"
           withLightTheme={true}
           defaultWidth={100}
           value={this.state.event}
@@ -197,7 +197,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
     return (
       <SysAdminContentWrapper
-        id="performance-home"
+        id="performanceHome"
         profilePageStyle={{
           paddingTopMd: 0,
           horizontalPaddingMd: 0
@@ -240,4 +240,4 @@ function mapStateToProps(state: IStoreState) {
 
 export const PerformanceHome = connect(mapStateToProps, {
   goToPerformanceHome
-})(injectIntl(PerformanceHomeComponent))
+})(withTheme(injectIntl(PerformanceHomeComponent)))
