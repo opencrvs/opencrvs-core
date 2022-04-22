@@ -13,7 +13,8 @@ import styled from '@client/styledComponents'
 import {
   GQLLocation,
   GQLIdentifier,
-  GQLEventMetrics
+  GQLEventMetrics,
+  GQLPaymentMetric
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from '@client/utils/userUtils'
 import { ILocation } from '@client/offline/reducer'
@@ -82,7 +83,9 @@ export const FilterContainer = styled.div`
 export const PerformanceTitle = styled.div`
   ${({ theme }) => theme.fonts.bold16}
 `
-
+export const PerformanceListHeader = styled.div`
+  ${({ theme }) => theme.fonts.h3}
+`
 export const PerformanceValue = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
@@ -118,6 +121,12 @@ export function TotalDisplayWithPercentage(props: {
 }
 
 export function calculateTotal(metrics: GQLEventMetrics[]) {
+  return metrics
+    .map((metric) => metric.total)
+    .reduce((m, metric) => m + metric, 0)
+}
+
+export function calculateTotalPaymentAmount(metrics: GQLPaymentMetric[]) {
   return metrics
     .map((metric) => metric.total)
     .reduce((m, metric) => m + metric, 0)

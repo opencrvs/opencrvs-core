@@ -16,7 +16,7 @@ import {
   LOCATION_ID,
   EVENT
 } from '@metrics/features/metrics/constants'
-import { getTotalPayments } from './service'
+import { getTotalPayments } from '@metrics/features/payments/service'
 
 export async function totalPaymentsHandler(
   request: Hapi.Request,
