@@ -502,13 +502,8 @@ export class InProgressTabComponent extends React.Component<
           columns={this.getColumns()}
           noResultText={intl.formatMessage(officeHomeMessages.progress)}
           onPageChange={onPageChange}
-          pageSize={this.pageSize}
-          totalItems={(data && data.totalItems) || 0}
-          currentPage={page}
           clickable={true}
-          showPaginated={this.props.showPaginated}
           loading={this.props.loading}
-          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
         />
@@ -533,13 +528,8 @@ export class InProgressTabComponent extends React.Component<
           columns={this.getColumns()}
           noResultText={intl.formatMessage(officeHomeMessages.progress)}
           onPageChange={onPageChange}
-          pageSize={this.pageSize}
-          totalItems={(data && data.totalItems) || 0}
-          currentPage={page}
           clickable={true}
-          showPaginated={this.props.showPaginated}
           loading={this.props.loading}
-          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
         />
@@ -581,13 +571,8 @@ export class InProgressTabComponent extends React.Component<
               columns={this.getColumns()}
               noResultText={intl.formatMessage(officeHomeMessages.progress)}
               onPageChange={onPageChange}
-              pageSize={this.pageSize}
-              totalItems={drafts && drafts.length}
-              currentPage={page}
               clickable={true}
-              showPaginated={this.props.showPaginated}
               loading={isFieldAgent ? false : this.props.loading}
-              loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
               sortedCol={this.state.sortedCol}
               sortOrder={this.state.sortOrder}
             />

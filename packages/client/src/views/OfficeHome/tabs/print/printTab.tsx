@@ -288,13 +288,8 @@ class PrintTabComponent extends React.Component<
           columns={this.getColumns()}
           noResultText={intl.formatMessage(officeHomeMessages.print)}
           onPageChange={onPageChange}
-          pageSize={this.pageSize}
-          totalItems={(data && data.totalItems) || 0}
-          currentPage={page}
           clickable={true}
-          showPaginated={this.props.showPaginated}
           loading={this.props.loading}
-          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
         />

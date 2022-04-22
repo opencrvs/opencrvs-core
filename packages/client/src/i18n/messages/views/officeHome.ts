@@ -21,6 +21,7 @@ interface IOfficeHomeMessages
   approvals: MessageDescriptor
   waitingValidation: MessageDescriptor
   print: MessageDescriptor
+  requireUpdatesLoading: MessageDescriptor
 }
 const messagesToDefine: IOfficeHomeMessages = {
   progress: {
@@ -62,6 +63,11 @@ const messagesToDefine: IOfficeHomeMessages = {
     defaultMessage: 'No records ready to print',
     description: 'No Application in Ready to print tab in officeHome',
     id: 'officeHome.print'
+  },
+  requireUpdatesLoading: {
+    id: 'fieldAgentHome.requireUpdatesCountLoading',
+    defaultMessage: 'Checking your declarations',
+    description: 'The text when all rejected declarations are loading'
   }
 }
 export const officeHomeMessages: IOfficeHomeMessages =

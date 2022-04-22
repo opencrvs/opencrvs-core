@@ -337,13 +337,8 @@ class ReviewTabComponent extends React.Component<
           columns={this.getColumns()}
           noResultText={intl.formatMessage(officeHomeMessages.readyForReview)}
           onPageChange={onPageChange}
-          pageSize={this.pageSize}
-          totalItems={(data && data.totalItems) || 0}
-          currentPage={page}
           clickable={true}
-          showPaginated={this.props.showPaginated}
           loading={this.props.loading}
-          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
         />

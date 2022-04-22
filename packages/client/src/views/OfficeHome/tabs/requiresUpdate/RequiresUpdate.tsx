@@ -16,7 +16,6 @@ import {
   dynamicConstantsMessages,
   errorMessages
 } from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/fieldAgentHome'
 import { goToDeclarationRecordAudit } from '@client/navigation'
 import { SEARCH_DECLARATIONS_USER_WISE } from '@client/search/queries'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
@@ -288,7 +287,9 @@ const RequiresUpdateComponent = (props: IFullProps) => {
               <Loader
                 id="require_updates_loader"
                 marginPercent={20}
-                loadingText={intl.formatMessage(messages.requireUpdatesLoading)}
+                loadingText={intl.formatMessage(
+                  officeHomeMessages.requireUpdatesLoading
+                )}
               />
             )
           }
@@ -321,13 +322,8 @@ const RequiresUpdateComponent = (props: IFullProps) => {
                 onPageChange={(currentPage: number) => {
                   onPageChange(currentPage)
                 }}
-                pageSize={pageSize}
-                totalItems={data.searchEvents && data.searchEvents.totalItems}
-                currentPage={requireUpdatesPage}
                 clickable={props.isOnline}
-                showPaginated={showPaginated}
                 loading={loading}
-                loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
                 sortedCol={sortedCol}
                 sortOrder={sortOrder}
               />

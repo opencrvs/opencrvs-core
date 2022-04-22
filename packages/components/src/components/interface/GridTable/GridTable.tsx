@@ -138,14 +138,8 @@ interface IGridTableProps {
   noResultText: string
   hideTableHeader?: boolean
   onPageChange?: (currentPage: number) => void
-  pageSize?: number
-  totalItems: number
-  currentPage?: number
-  expandable?: boolean
   clickable?: boolean
-  showPaginated?: boolean
   loading?: boolean
-  loadMoreText: string
   sortedCol?: COLUMNS
   sortOrder?: SORT_ORDER
   formattedDuration?: (fromDate: Date | number) => string
@@ -185,55 +179,11 @@ export class GridTableComp extends React.Component<
     idKey: number,
     alignment?: ColumnContentAlignment
   ) => {
-    if (this.props.expandable) {
-      return (
-        <ActionWrapper
-          key={idKey}
-          width={width}
-          alignment={alignment}
-          id="ActionWrapper"
-        >
-          <ListItemAction
-            actions={actions}
-            expanded={
-              this.state.expanded.findIndex((id) => id === itemId) >= 0 || false
-            }
-            alignment={alignment}
-            arrowExpansion={true}
-            id={`ListItemAction-${key}`}
-            onExpand={() => this.toggleExpanded(itemId)}
-          />
-        </ActionWrapper>
-      )
-    } else {
-      return (
-        <ActionWrapper key={idKey} width={width} alignment={alignment}>
-          <ListItemAction id={`ListItemAction-${key}`} actions={actions} />
-        </ActionWrapper>
-      )
-    }
-  }
-
-  toggleExpanded = (itemId: string) => {
-    if (!this.props.expandable) {
-      return
-    }
-    const toggledExpandedList = [] as string[]
-    const { expanded } = this.state
-    const index = expanded.findIndex((id) => id === itemId)
-    if (index < 0) {
-      toggledExpandedList.push(itemId)
-    }
-    expanded.forEach((id) => {
-      if (itemId !== id) {
-        toggledExpandedList.push(id)
-      }
-    })
-    this.setState({ expanded: toggledExpandedList })
-  }
-
-  showExpandedSection = (itemId: string) => {
-    return this.state.expanded.findIndex((id) => id === itemId) >= 0
+    return (
+      <ActionWrapper key={idKey} width={width} alignment={alignment}>
+        <ListItemAction id={`ListItemAction-${key}`} actions={actions} />
+      </ActionWrapper>
+    )
   }
 
   onPageChange = (currentPage: number) => {

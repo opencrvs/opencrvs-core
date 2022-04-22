@@ -340,12 +340,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           content={this.transformDeclarationsReadyToSend()}
           columns={this.getColumns()}
           noResultText={intl.formatMessage(officeHomeMessages.sentForReview)}
-          totalItems={declarationsReadyToSend && declarationsReadyToSend.length}
           onPageChange={this.onPageChange}
-          pageSize={this.pageSize}
-          currentPage={this.state.sentForReviewPageNo}
-          showPaginated={this.props.showPaginated}
-          loadMoreText={intl.formatMessage(messages.loadMore)}
           sortedCol={this.state.sortedCol}
           sortOrder={this.state.sortOrder}
         />

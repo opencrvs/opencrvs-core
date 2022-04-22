@@ -202,13 +202,8 @@ function ExternalValidationTabComponent(props: IProps) {
         content={transformWaitingValidationContent(data)}
         noResultText={intl.formatMessage(constantsMessages.noResults)}
         onPageChange={onPageChange}
-        pageSize={pageSize}
-        totalItems={(data && data.totalItems) || 0}
-        currentPage={page}
         clickable={true}
-        showPaginated={props.showPaginated}
         loading={props.loading}
-        loadMoreText={intl.formatMessage(officeHomeMessages.waitingValidation)}
         columns={columns}
         sortOrder={sortOrder}
         sortedCol={sortedCol}

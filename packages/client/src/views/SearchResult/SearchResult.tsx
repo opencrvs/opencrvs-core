@@ -487,19 +487,7 @@ export class SearchResultView extends React.Component<
                               constantsMessages.noResults
                             )}
                             onPageChange={this.onPageChange}
-                            pageSize={this.pageSize}
-                            totalItems={
-                              (data &&
-                                data.searchEvents &&
-                                data.searchEvents.totalItems) ||
-                              0
-                            }
-                            currentPage={this.state.currentPage}
                             clickable={true}
-                            showPaginated={this.showPaginated}
-                            loadMoreText={intl.formatMessage(
-                              constantsMessages.loadMore
-                            )}
                           />
                         </>
                       )}
