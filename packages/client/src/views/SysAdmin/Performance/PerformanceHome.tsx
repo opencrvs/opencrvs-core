@@ -16,7 +16,11 @@ import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
-import { Box, ISearchLocation } from '@opencrvs/components/lib/interface'
+import {
+  Box,
+  ISearchLocation,
+  Spinner
+} from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -36,6 +40,16 @@ import { Event } from '@client/forms'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
+import { Query } from '@client/components/Query'
+import { PERFORMANCE_METRICS } from './metricsQuery'
+import { ApolloError } from 'apollo-client'
+import {
+  ToastNotification,
+  NOTIFICATION_TYPE
+} from '@client/components/interface/ToastNotification'
+import { CompletenessReport } from './CompletenessReport'
+import { RegistrationsReport } from './RegistrationsReport'
+import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 
 const Layout = styled.div`
   display: flex;
@@ -87,6 +101,9 @@ interface ISearchParams {
   timeEnd: string
 }
 
+interface IMetricsQueryResult {
+  getTotalMetrics: GQLTotalMetricsResult
+}
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
 }
@@ -194,7 +211,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
   render() {
     const { intl, userDetails } = this.props
-
+    const { timeStart, timeEnd, event } = this.state
     return (
       <SysAdminContentWrapper
         id="performanceHome"
@@ -213,7 +230,53 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 this.state.selectedLocation
               )}
               noTabBarBorder={true}
-            ></Content>
+            >
+              <Query
+                query={PERFORMANCE_METRICS}
+                variables={{
+                  timeStart: timeStart.toISOString(),
+                  timeEnd: timeEnd.toISOString(),
+                  locationId: this.state.selectedLocation?.id || undefined,
+                  event: event.toUpperCase()
+                }}
+                fetchPolicy="no-cache"
+              >
+                {({
+                  loading,
+                  error,
+                  data
+                }: {
+                  loading: boolean
+                  error?: ApolloError
+                  data?: IMetricsQueryResult
+                }) => {
+                  if (error) {
+                    return (
+                      <>
+                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                      </>
+                    )
+                  }
+
+                  if (loading) {
+                    return <Spinner id="performance-home-loading" />
+                  }
+
+                  return (
+                    <>
+                      <CompletenessReport
+                        data={data!.getTotalMetrics}
+                        selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
+                      />
+                      <RegistrationsReport
+                        data={data!.getTotalMetrics}
+                        selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
+                      />
+                    </>
+                  )
+                }}
+              </Query>
+            </Content>
           </LayoutLeft>
           <LayoutRight>
             <Stats>
