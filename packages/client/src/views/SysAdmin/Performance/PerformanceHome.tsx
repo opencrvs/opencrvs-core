@@ -36,6 +36,7 @@ import { Event } from '@client/forms'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
+import { constantsMessages } from '@client/i18n/messages/constants'
 
 const Layout = styled.div`
   display: flex;
@@ -110,6 +111,8 @@ const selectLocation = (
     ({ id }) => id === locationId
   ) as ISearchLocation
 }
+
+const NATIONAL_ADMINISTRATIVE_LEVEL = 'NATIONAL_ADMINISTRATIVE_LEVEL'
 class PerformanceHomeComponent extends React.Component<Props, State> {
   static transformPropsToState(props: Props, state?: State) {
     const {
@@ -146,10 +149,18 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
   getTabContent = (intl: IntlShape, selectedLocation: ISearchLocation) => {
     const { id: locationId } = selectedLocation || {}
+
     return (
       <PerformanceActions>
         <LocationPicker
-          selectedLocationId={locationId}
+          additionalLocations={[
+            {
+              id: NATIONAL_ADMINISTRATIVE_LEVEL,
+              searchableText: intl.formatMessage(constantsMessages.countryName),
+              displayLabel: intl.formatMessage(constantsMessages.countryName)
+            }
+          ]}
+          selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
           onChangeLocation={(newLocationId) => {
             const newLocation = selectLocation(
               newLocationId,

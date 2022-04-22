@@ -42,6 +42,7 @@ interface IConnectProps {
 }
 
 interface IBaseProps {
+  additionalLocations?: ISearchLocation[]
   selectedLocationId?: string
   onChangeLocation: (locationId: string) => void
   requiredJurisdictionTypes?: string
@@ -103,6 +104,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
     offlineOffices,
     jurisidictionTypeFilter,
     selectedLocationId,
+    additionalLocations = [],
     intl
   } = props
   const [modalVisible, setModalVisible] = useState<boolean>(false)
@@ -116,6 +118,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
   const offlineSearchableOffices = generateLocations(offlineOffices, intl)
 
   const searchableLocations = [
+    ...additionalLocations,
     ...offlineSearchableLocations,
     ...offlineSearchableOffices
   ]
