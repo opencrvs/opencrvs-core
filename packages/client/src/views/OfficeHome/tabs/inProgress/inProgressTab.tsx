@@ -68,7 +68,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { FormTabs } from '@opencrvs/components/lib/forms'
+import { IFormTabProps, FormTabs } from '@opencrvs/components/lib/forms'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
 import {
@@ -468,7 +468,6 @@ export class InProgressTabComponent extends React.Component<
       ]
     }
   }
-
   getTabs(
     selectorId: string,
     drafts: IDeclaration[],
@@ -507,7 +506,6 @@ export class InProgressTabComponent extends React.Component<
         }
       ]
     }
-
     return (
       <FormTabs
         sections={tabs.sections}
@@ -580,43 +578,102 @@ export class InProgressTabComponent extends React.Component<
       isFieldAgent
     } = this.props
     const { inProgressData, notificationData } = queryData
-    return (
-      <Content
-        size={ContentSize.LARGE}
-        title={intl.formatMessage(navigationMessages.progress)}
-        tabBarContent={this.getTabs(
-          selectorId,
-          drafts,
-          inProgressData.totalItems || 0,
-          notificationData.totalItems || 0
-        )}
-      >
-        {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
-          <>
-            <GridTable
-              content={this.transformDraftContent()}
-              columns={this.getColumns()}
-              noResultText={intl.formatMessage(officeHomeMessages.progress)}
-              onPageChange={onPageChange}
-              clickable={true}
-              loading={isFieldAgent ? false : this.props.loading}
-              sortedCol={this.state.sortedCol}
-              sortOrder={this.state.sortOrder}
-            />
-            <LoadingIndicator
-              loading={this.props.loading && !isFieldAgent ? true : false}
-              hasError={false}
-            />
-          </>
-        )}
-        {selectorId === SELECTOR_ID.fieldAgentDrafts &&
-          !isFieldAgent &&
-          this.renderFieldAgentTable(inProgressData, intl, page, onPageChange)}
-        {selectorId === SELECTOR_ID.hospitalDrafts &&
-          !isFieldAgent &&
-          this.renderHospitalTable(notificationData, intl, page, onPageChange)}
-      </Content>
-    )
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      return (
+        <Content
+          size={ContentSize.LARGE}
+          title={intl.formatMessage(navigationMessages.progress)}
+        >
+          {!isFieldAgent &&
+            this.getTabs(
+              selectorId,
+              drafts,
+              inProgressData.totalItems || 0,
+              notificationData.totalItems || 0
+            )}
+          {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
+            <>
+              <GridTable
+                content={this.transformDraftContent()}
+                columns={this.getColumns()}
+                noResultText={intl.formatMessage(officeHomeMessages.progress)}
+                onPageChange={onPageChange}
+                clickable={true}
+                loading={isFieldAgent ? false : this.props.loading}
+                sortedCol={this.state.sortedCol}
+                sortOrder={this.state.sortOrder}
+              />
+              <LoadingIndicator
+                loading={this.props.loading && !isFieldAgent ? true : false}
+                hasError={false}
+              />
+            </>
+          )}
+          {selectorId === SELECTOR_ID.fieldAgentDrafts &&
+            !isFieldAgent &&
+            this.renderFieldAgentTable(
+              inProgressData,
+              intl,
+              page,
+              onPageChange
+            )}
+          {selectorId === SELECTOR_ID.hospitalDrafts &&
+            !isFieldAgent &&
+            this.renderHospitalTable(
+              notificationData,
+              intl,
+              page,
+              onPageChange
+            )}
+        </Content>
+      )
+    } else {
+      return (
+        <>
+          {!isFieldAgent &&
+            this.getTabs(
+              selectorId,
+              drafts,
+              inProgressData.totalItems || 0,
+              notificationData.totalItems || 0
+            )}
+          {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
+            <>
+              <GridTable
+                content={this.transformDraftContent()}
+                columns={this.getColumns()}
+                noResultText={intl.formatMessage(officeHomeMessages.progress)}
+                onPageChange={onPageChange}
+                clickable={true}
+                loading={isFieldAgent ? false : this.props.loading}
+                sortedCol={this.state.sortedCol}
+                sortOrder={this.state.sortOrder}
+              />
+              <LoadingIndicator
+                loading={this.props.loading && !isFieldAgent ? true : false}
+                hasError={false}
+              />
+            </>
+          )}
+          {selectorId === SELECTOR_ID.fieldAgentDrafts &&
+            !isFieldAgent &&
+            this.renderFieldAgentTable(
+              inProgressData,
+              intl,
+              page,
+              onPageChange
+            )}
+          {selectorId === SELECTOR_ID.hospitalDrafts &&
+            !isFieldAgent &&
+            this.renderHospitalTable(
+              notificationData,
+              intl,
+              page,
+              onPageChange
+            )}
+        </>
+      )
+    }
   }
 }
 

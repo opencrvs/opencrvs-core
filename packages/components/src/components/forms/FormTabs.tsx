@@ -10,15 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Tab, Tabs } from '../interface/Tabs'
+import { Tab, Tabs } from '@opencrvs/components/lib/interface'
+import { IFormSection } from '@client/forms'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
-export interface IFormTabs {
-  id: string
-  title: string
-  disabled?: boolean
-}
-export interface IFormTabProps {
-  sections: IFormTabs[]
+interface IFormTabProps {
+  sections: IFormSection[]
   activeTabId: string
   onTabClick: (tabId: string) => void
 }
@@ -26,8 +23,9 @@ export interface IFormTabProps {
 function FormTabsComponent({
   sections,
   activeTabId,
-  onTabClick
-}: IFormTabProps) {
+  onTabClick,
+  intl
+}: IFormTabProps & IntlShapeProps) {
   return (
     <Tabs>
       {sections.map(({ title, id, disabled }) => (
@@ -38,6 +36,7 @@ function FormTabsComponent({
           active={activeTabId === id}
           disabled={disabled}
         >
+          {/* {intl.formatMessage(name)} */}
           {title}
         </Tab>
       ))}
@@ -45,4 +44,4 @@ function FormTabsComponent({
   )
 }
 
-export const FormTabs = FormTabsComponent
+export const FormTabs = injectIntl(FormTabsComponent)

@@ -102,7 +102,6 @@ export enum COLUMNS {
   SENT_FOR_APPROVAL = 'sentForApproval',
   SENT_FOR_VALIDATION = 'sentForValidation',
   REGISTERED = 'registered',
-  STATUS_INDICATOR = 'statusIndicator',
   LAST_UPDATED = 'lastUpdated',
   ACTIONS = 'actions',
   NOTIFICATION_SENT = 'notificationSent',

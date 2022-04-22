@@ -14,7 +14,12 @@ import styled from '@client/styledComponents'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
 import { STATUSTOCOLOR } from '@client/views/Home/RecordAudit'
 import { StringifyOptions } from 'querystring'
-import { Duplicate } from '@opencrvs/components/lib/icons'
+import { Duplicate, StatusFailed } from '@opencrvs/components/lib/icons'
+import { SUBMISSION_STATUS } from '@client/declarations'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
+import { WaitingToSent } from '@opencrvs/components/lib/icons/WaitingToSent'
+import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 
 const Flex = styled.div`
   display: flex;
@@ -122,4 +127,51 @@ export const IconWithNameEvent = ({
       </NameEventContainer>
     </Flex>
   )
+}
+
+export const SubmissionStatusMap = ({
+  status,
+  online,
+  index
+}: {
+  status: string
+  online: boolean
+  index: number
+}) => {
+  console.log(status)
+  let icon: React.ReactNode
+  let overwriteStatusIfOffline = true
+  let iconId: string
+  switch (status) {
+    case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]:
+      iconId = `submitting${index}`
+      icon = <Spinner id={iconId} key={iconId} size={24} />
+      break
+    case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]:
+    case SUBMISSION_STATUS[SUBMISSION_STATUS.DECLARED]:
+      overwriteStatusIfOffline = false
+      iconId = `submitted${index}`
+      icon = <Uploaded id={iconId} key={iconId} />
+      break
+    case SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]:
+      overwriteStatusIfOffline = false
+      iconId = `failed${index}`
+      icon = <StatusFailed id={iconId} key={iconId} />
+      break
+    case SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]:
+      iconId = `waiting${index}`
+      icon = <WaitingToSent id={iconId} key={iconId} />
+      break
+    default:
+      iconId = `waiting${index}`
+      icon = <WaitingToSent id={iconId} key={iconId} />
+      break
+  }
+
+  if (!online && overwriteStatusIfOffline) {
+    iconId = `offline${index}`
+    icon = <ConnectionError id={iconId} key={iconId} />
+  }
+
+  return <>{icon}</>
 }

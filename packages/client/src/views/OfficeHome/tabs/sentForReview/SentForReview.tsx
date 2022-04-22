@@ -13,7 +13,8 @@ import * as React from 'react'
 import {
   GridTable,
   ColumnContentAlignment,
-  Spinner
+  Spinner,
+  IAction
 } from '@opencrvs/components/lib/interface'
 import {
   COLUMNS,
@@ -33,6 +34,8 @@ import {
   StatusWaiting,
   StatusPendingOffline
 } from '@opencrvs/components/lib/icons'
+import { WaitingToSent } from '@opencrvs/components/lib/icons/WaitingToSent'
+import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import { calculateDaysFromToday } from '@client/views/PrintCertificate/utils'
 import { goToDeclarationRecordAudit } from '@client/navigation'
 import {
@@ -56,8 +59,10 @@ import {
 } from '@client/views/OfficeHome/tabs/utils'
 import {
   IconWithName,
-  IconWithNameEvent
+  IconWithNameEvent,
+  SubmissionStatusMap
 } from '@client/views/OfficeHome/tabs/components'
+import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
 
 const DECLARATIONS_DAY_LIMIT = 7
 
@@ -136,48 +141,6 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     })
   }
 
-  submissionStatusMap = (
-    status: string,
-    online: boolean,
-    index: number,
-    id?: string
-  ) => {
-    let icon: () => React.ReactNode
-    let overwriteStatusIfOffline = true
-    let iconId: string
-    switch (status) {
-      case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTING]:
-        iconId = `submitting${index}`
-        icon = () => <Spinner id={iconId} key={iconId} size={24} />
-        break
-      case SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED]:
-      case SUBMISSION_STATUS[SUBMISSION_STATUS.DECLARED]:
-        overwriteStatusIfOffline = false
-        iconId = `submitted${index}`
-        icon = () => <StatusSubmitted id={iconId} key={iconId} />
-        break
-      case SUBMISSION_STATUS[SUBMISSION_STATUS.FAILED]:
-        overwriteStatusIfOffline = false
-        iconId = `failed${index}`
-        icon = () => <StatusFailed id={iconId} key={iconId} />
-        break
-      case SUBMISSION_STATUS[SUBMISSION_STATUS.READY_TO_SUBMIT]:
-      default:
-        iconId = `waiting${index}`
-        icon = () => <StatusWaiting id={iconId} key={iconId} />
-        break
-    }
-
-    if (!online && overwriteStatusIfOffline) {
-      iconId = `offline${index}`
-      icon = () => <StatusPendingOffline id={iconId} key={iconId} />
-    }
-
-    return {
-      icon
-    }
-  }
-
   transformDeclarationsReadyToSend = () => {
     if (
       !this.props.declarationsReadyToSend ||
@@ -196,12 +159,12 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
               dynamicConstantsMessages[draft.event.toLowerCase()]
             )) ||
           ''
-        const { icon } = this.submissionStatusMap(
-          draft.submissionStatus || '',
-          navigator.onLine,
-          index,
-          draft.trackingId
-        )
+        // const { icon } = this.SubmissionStatusMap(
+        //   draft.submissionStatus || '',
+        //   navigator.onLine,
+        //   index,
+        //   draft.trackingId
+        // )
         const date =
           draft &&
           (draft.event === Event.BIRTH
@@ -212,6 +175,12 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           draft && draft.savedOn
             ? new Date(draft.savedOn)
             : draft.createdAt && parseInt(draft.createdAt)
+        const actions = [] as IAction[]
+        // if (icon) {
+        //   actions.push({
+        //     actionComponent: icon()
+        //   })
+        // }
         return {
           id: draft.id,
           event: event || '',
@@ -235,7 +204,18 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           ),
           dateOfEvent: date ? new Date(date as string) : '',
           sentForReview: savedDate ? savedDate : '',
-          statusIndicator: icon ? [icon()] : null,
+          actions: [
+            {
+              actionComponent: (
+                <SubmissionStatusMap
+                  status={draft.submissionStatus || ''}
+                  online={navigator.onLine}
+                  index={index}
+                />
+              )
+            }
+          ],
+
           rowClickable: Boolean(draft.compositionId),
           rowClickHandler: [
             {
@@ -307,7 +287,8 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         {
           width: 18,
           alignment: ColumnContentAlignment.RIGHT,
-          key: COLUMNS.STATUS_INDICATOR
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
         }
       ]
     } else {
@@ -321,7 +302,8 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           label: '',
           width: 30,
           alignment: ColumnContentAlignment.RIGHT,
-          key: COLUMNS.STATUS_INDICATOR
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
         }
       ]
     }
