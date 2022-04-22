@@ -26,11 +26,12 @@ import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { Event, BirthSection, DeathSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
-import { selectFormDraftVersion } from '@client/forms/configuration/formDrafts/selectors'
+import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
-import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
+import { useHasNatlSysAdminScope } from './hooks'
 import { constantsMessages } from '@client/i18n/messages/constants'
+import { messages } from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
 import { goToFormConfig } from '@client/navigation'
 
@@ -108,15 +109,14 @@ function isValidSection(
 }
 
 export function FormConfigWizard() {
-  useLoadFormDraft()
   const [selectedField, setSelectedField] =
     React.useState<IConfigFormField | null>(null)
   const hasNatlSysAdminScope = useHasNatlSysAdminScope()
   const dispatch = useDispatch()
   const intl = useIntl()
   const { event, section } = useParams<IRouteProps>()
-  const currentVersion = useSelector((store: IStoreState) =>
-    selectFormDraftVersion(store, event)
+  const { version } = useSelector((store: IStoreState) =>
+    selectFormDraft(store, event)
   )
 
   if (
@@ -130,9 +130,10 @@ export function FormConfigWizard() {
   return (
     <Container>
       <EventTopBar
-        title={`${intl.formatMessage(constantsMessages[event])} v${
-          currentVersion + 1
-        }`}
+        title={intl.formatMessage(messages.draftLabel, {
+          event: intl.formatMessage(constantsMessages[event]),
+          version: version + 1
+        })}
         pageIcon={<></>}
         topBarActions={topBarActions(intl)}
         goHome={() => dispatch(goToFormConfig())}

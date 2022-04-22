@@ -19,13 +19,9 @@ import {
   messages,
   draftTabsMessages
 } from '@client/i18n/messages/views/formConfig'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
+import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
 import { DraftsTab } from './DraftsTab'
-import {
-  selectFormDraftLoaded,
-  selectFormDraft
-} from '@client/forms/configuration/formDrafts/selectors'
-import { useLoadFormDraft } from './hooks'
+import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { PreviewTab } from './PreviewTab'
 import { PublishedTab } from './PublishedTab'
 import styled from '@client/styledComponents'
@@ -75,11 +71,7 @@ function UnbuplishedWarning() {
 }
 
 export function FormConfiguration() {
-  useLoadFormDraft()
   const intl = useIntl()
-  const formDraftLoaded = useSelector((store: IStoreState) =>
-    selectFormDraftLoaded(store)
-  )
   const [selectedTab, setSelectedTab] = React.useState<string>(
     DraftStatus.DRAFT
   )
@@ -94,7 +86,7 @@ export function FormConfiguration() {
 
   return (
     <SysAdminContentWrapper isCertificatesConfigPage>
-      {formDraftLoaded && <UnbuplishedWarning />}
+      <UnbuplishedWarning />
       <Content
         title={intl.formatMessage(messages.title)}
         subtitle={
@@ -124,7 +116,7 @@ export function FormConfiguration() {
         }}
       >
         <ActionContext.Provider value={{ actionState, setAction }}>
-          {formDraftLoaded && selectedTab === DraftStatus.DRAFT ? (
+          {selectedTab === DraftStatus.DRAFT ? (
             <DraftsTab />
           ) : selectedTab === DraftStatus.PREVIEW ? (
             <PreviewTab />
@@ -134,7 +126,7 @@ export function FormConfiguration() {
             <></>
           )}
           <ActionsModal />
-          {formDraftLoaded && <ActionsNotification />}
+          <ActionsNotification />
         </ActionContext.Provider>
       </Content>
     </SysAdminContentWrapper>

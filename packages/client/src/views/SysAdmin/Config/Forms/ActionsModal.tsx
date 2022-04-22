@@ -27,11 +27,11 @@ import { useDispatch } from 'react-redux'
 import { Mutation } from 'react-apollo'
 import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
 import { CHANGE_FORM_DRAFT_STATUS } from './mutations'
-import { modifyFormDraftAction } from '@client/forms/configuration/formDrafts/actions'
+import { modifyFormDraftAction } from '@client/offline/actions'
 import {
   DraftStatus,
   IDraft
-} from '@client/forms/configuration/formDrafts/reducer'
+} from '@client/forms/configuration/formDrafts/utils'
 import { Event } from '@client/forms'
 
 export enum Actions {

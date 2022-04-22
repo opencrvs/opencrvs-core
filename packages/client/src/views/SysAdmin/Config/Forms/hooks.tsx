@@ -9,18 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { loadStorageFormDraft } from '@client/forms/configuration/formDrafts/actions'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import { getScope } from '@client/profile/profileSelectors'
 import { hasNatlSysAdminScope } from '@client/utils/authUtils'
-
-export function useLoadFormDraft() {
-  const dispatch = useDispatch()
-  React.useEffect(() => {
-    dispatch(loadStorageFormDraft())
-  }, [dispatch])
-}
 
 export function useHasNatlSysAdminScope() {
   return hasNatlSysAdminScope(useSelector(getScope))

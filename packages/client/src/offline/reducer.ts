@@ -41,7 +41,7 @@ import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 import {
   IFormDraft,
   getOfflineFormDraftData
-} from '@client/forms/configuration/formDrafts/reducer'
+} from '@client/forms/configuration/formDrafts/utils'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -357,12 +357,24 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
+    case actions.MODIFY_OFFLINE_FORM_DRAFT: {
+      if (!state.offlineData.formDraft) return state
+      const { formDraft } = action.payload
+      const newOfflineData = {
+        ...state.offlineData,
+        formDraft: {
+          ...state.offlineData.formDraft,
+          [formDraft.event]: formDraft
+        }
+      }
+      return {
+        ...state,
+        offlineData: newOfflineData
+      }
+    }
     /*
      * Configurations
      */
-    case actions.APPLICATION_CONFIG_LOAD: {
-      return loop(state, CONFIG_CMD)
-    }
     case actions.APPLICATION_CONFIG_LOADED: {
       const { certificates, config, formConfig, formDrafts } = action.payload
       merge(window.config, config)

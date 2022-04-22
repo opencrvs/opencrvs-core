@@ -20,6 +20,7 @@ import {
   IApplicationConfig
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
+import { IDraft } from '@client/forms/configuration/formDrafts/utils'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -85,11 +86,6 @@ export const ASSETS_FAILED = 'OFFLINE/ASSETS_FAILED'
 export type AssetsFailedAction = {
   type: typeof ASSETS_FAILED
   payload: Error
-}
-
-export const APPLICATION_CONFIG_LOAD = 'OFFLINE/APPLICATION_CONFIG_LOAD'
-export type ApplicationConfigLoadAction = {
-  type: typeof APPLICATION_CONFIG_LOAD
 }
 
 export const APPLICATION_CONFIG_LOADED = 'OFFLINE/APPLICATION_CONFIG_LOADED'
@@ -221,10 +217,6 @@ export const offlineDataUpdated = (state: IOfflineData) => ({
   payload: state
 })
 
-export const configLoad = (): ApplicationConfigLoadAction => ({
-  type: APPLICATION_CONFIG_LOAD
-})
-
 export const configLoaded = (
   payload: IApplicationConfigResponse
 ): ApplicationConfigLoadedAction => ({
@@ -249,6 +241,22 @@ export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
 })
 
+export const MODIFY_OFFLINE_FORM_DRAFT = 'OFFLINE/MODIFY_FORM_DRAFT'
+export type ModifyFormDraftAction = {
+  type: typeof MODIFY_OFFLINE_FORM_DRAFT
+  payload: {
+    formDraft: IDraft
+  }
+}
+
+export const modifyFormDraftAction = (
+  formDraft: IDraft
+): ModifyFormDraftAction => ({
+  type: MODIFY_OFFLINE_FORM_DRAFT,
+  payload: {
+    formDraft
+  }
+})
 export type Action =
   | GetLocations
   | LocationsFailedAction
@@ -264,10 +272,10 @@ export type Action =
   | ContentLoadedAction
   | AssetsLoadedAction
   | AssetsFailedAction
-  | ApplicationConfigLoadAction
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
+  | ModifyFormDraftAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>

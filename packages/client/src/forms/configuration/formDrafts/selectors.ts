@@ -10,32 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IStoreState } from '@client/store'
-import { IFormDraftState } from './reducer'
 import { Event } from '@client/forms'
+import { IFormDraft } from './utils'
 
-export const selectFormDraftData = (store: IStoreState): IFormDraftState =>
-  store.formDraft
-
-function getKey<K extends keyof IFormDraftState>(store: IStoreState, key: K) {
-  return selectFormDraftData(store)[key]
-}
-
-export function selectFormDraftLoaded(store: IStoreState) {
-  return getKey(store, 'state') !== 'LOADING'
+export const selectFormDraftData = (store: IStoreState): IFormDraft => {
+  if (!store.offline.offlineData.formDraft) {
+    throw new Error('Offline formDraft not loaded yet')
+  }
+  return store.offline.offlineData.formDraft
 }
 
 export function selectFormDraft(store: IStoreState, event: Event) {
-  const formDraftState = selectFormDraftData(store)
-  if (formDraftState.state === 'LOADING') {
-    throw new Error('FormDraft not loaded yet')
-  }
-  return formDraftState.formDraftData[event]
-}
-
-export function selectFormDraftVersion(store: IStoreState, event: Event) {
-  const formDraftState = selectFormDraftData(store)
-  if (formDraftState.state === 'LOADING') {
-    return 0
-  }
-  return formDraftState.formDraftData[event].version
+  const formDraft = selectFormDraftData(store)
+  return formDraft[event]
 }

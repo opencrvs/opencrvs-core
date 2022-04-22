@@ -13,7 +13,7 @@ import { IFormConfig } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
-import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
+import { IDraft } from '@client/forms/configuration/formDrafts/utils'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation

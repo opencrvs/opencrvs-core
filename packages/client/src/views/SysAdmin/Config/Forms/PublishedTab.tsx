@@ -23,9 +23,8 @@ import {
   messages,
   draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
+import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
 import { Value, DraftVersion } from './components'
-import formatDate from '@client/utils/date-formatting'
 import { Pill } from '@opencrvs/components/lib/interface'
 import { isDefaultDraft } from './utils'
 
