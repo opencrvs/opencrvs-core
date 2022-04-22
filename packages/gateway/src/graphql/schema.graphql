@@ -25,8 +25,8 @@ type Query {
   fetchRegistration(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
   fetchRegistrationCountByStatus(
-    locationId: String!
     status: [String]!
+    locationId: String
   ): RegistrationCountResult
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location

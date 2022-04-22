@@ -199,12 +199,13 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'sysadmin')
       ) {
         const payload: {
-          declarationLocationHirarchyId: string
+          declarationLocationHirarchyId?: string
           status: string[]
         } = {
           declarationLocationHirarchyId: locationId,
           status: status as string[]
         }
+
         const results: GQLStatusWiseRegistrationCount[] = await fetch(
           `${SEARCH_URL}statusWiseRegistrationCount`,
           {
@@ -216,6 +217,7 @@ export const resolvers: GQLResolver = {
             }
           }
         ).then((data) => data.json())
+
         let total = 0
         if (results && results.length > 0) {
           total = results.reduce(
