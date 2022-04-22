@@ -444,7 +444,10 @@ class OperationalReportComponent extends React.Component<Props, State> {
 
                 return (
                   <>
-                    <CompletenessReport data={data!.getTotalMetrics} />
+                    <CompletenessReport
+                      data={data!.getTotalMetrics}
+                      selectedEvent={selectedEvent}
+                    />
                     <RegistrationsReport
                       data={data!.getTotalMetrics}
                       selectedEvent={selectedEvent}

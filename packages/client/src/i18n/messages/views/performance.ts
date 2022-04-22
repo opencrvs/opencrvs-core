@@ -57,6 +57,21 @@ const messagesToDefine = {
     defaultMessage: 'Female',
     description: 'Label text for displays showing the number of females'
   },
+  performanceWithinTargetDaysLabel: {
+    id: 'performance.values.labels.withinTargetDays',
+    defaultMessage: 'Registered within {target} days',
+    description: 'Label text for displays showing registered within target days'
+  },
+  performanceWithin1YearLabel: {
+    id: 'performance.values.labels.within1Year',
+    defaultMessage: 'Within 1 year',
+    description: 'Label text for displays showing registered within 1 year'
+  },
+  performanceWithin5YearsLabel: {
+    id: 'performance.values.labels.within5Years',
+    defaultMessage: 'Within 5 years',
+    description: 'Label text for displays showing registered within 5 years'
+  },
   sysAdminPerformanceHomeHeader: {
     id: 'performance.header.sysadmin.home',
     defaultMessage: 'Search for an administrative area or office',
