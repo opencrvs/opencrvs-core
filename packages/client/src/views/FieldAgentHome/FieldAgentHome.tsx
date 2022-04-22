@@ -88,6 +88,7 @@ import {
 import subYears from 'date-fns/subYears'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { ISearchInputProps } from '@client/views/SearchResult/SearchResult'
+import { Event } from '@client/forms'
 
 const FABContainer = styled.div`
   position: fixed;
@@ -444,16 +445,8 @@ class FieldAgentHomeView extends React.Component<
         {role && SYS_ADMIN_ROLES.includes(role) && (
           <Redirect
             to={{
-              pathname: OPERATIONAL_REPORT,
-              search:
-                '?locationId=' +
-                jurisdictionLocationId +
-                '&sectionId=' +
-                OPERATIONAL_REPORT_SECTION.OPERATIONAL +
-                '&timeStart=' +
-                subYears(new Date(Date.now()), 1).toISOString() +
-                '&timeEnd=' +
-                new Date(Date.now()).toISOString()
+              pathname: PERFORMANCE_HOME,
+              search: `?locationId=${jurisdictionLocationId}`
             }}
           />
         )}

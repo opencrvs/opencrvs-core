@@ -110,6 +110,7 @@ interface MonthSelectorProps {
 }
 
 export const PickerButton = styled.button`
+  min-width: 200px;
   border: 2px solid ${({ theme }) => theme.colors.secondary};
   border-radius: 2px;
   &:focus {
@@ -136,6 +137,7 @@ export const PickerButton = styled.button`
 
 export const ContentWrapper = styled.div`
   display: flex;
+  justify-content: space-between;
   width: 100%;
   align-items: center;
   ${({ theme }) => theme.fonts.reg14};
