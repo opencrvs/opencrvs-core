@@ -2570,22 +2570,23 @@ export const mockConfigResponse = {
   formConfig: mockOfflineData.formConfig
 }
 
+const offlineData = {
+  languages: mockOfflineData.languages,
+  forms: mockOfflineData.forms,
+  templates: mockOfflineData.templates,
+  locations: mockOfflineData.locations,
+  facilities: mockOfflineData.facilities,
+  pilotLocations: mockOfflineData.pilotLocations,
+  offices: mockOfflineData.offices,
+  assets: mockOfflineData.assets,
+  config: mockOfflineData.config,
+  formConfig: mockOfflineData.formConfig,
+  formDraft: mockOfflineData.formDraft
+}
+
 export async function createTestStore() {
   const { store, history } = createStore()
-  await store.dispatch(
-    offlineDataReady({
-      languages: mockOfflineData.languages,
-      forms: mockOfflineData.forms,
-      templates: mockOfflineData.templates,
-      locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities,
-      pilotLocations: mockOfflineData.pilotLocations,
-      offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets,
-      config: mockOfflineData.config,
-      formConfig: mockOfflineData.formConfig
-    })
-  )
+  await store.dispatch(offlineDataReady(offlineData))
   return { store, history }
 }
 
@@ -2604,20 +2605,7 @@ export async function createTestComponent(
   },
   options?: MountRendererProps
 ) {
-  await store.dispatch(
-    offlineDataReady({
-      languages: mockOfflineData.languages,
-      forms: mockOfflineData.forms,
-      templates: mockOfflineData.templates,
-      locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities,
-      pilotLocations: mockOfflineData.pilotLocations,
-      offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets,
-      config: mockOfflineData.config,
-      formConfig: mockOfflineData.formConfig
-    })
-  )
+  await store.dispatch(offlineDataReady(offlineData))
 
   const withGraphQL = (node: JSX.Element) => {
     if (apolloClient) {

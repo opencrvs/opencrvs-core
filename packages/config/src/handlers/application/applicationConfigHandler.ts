@@ -19,23 +19,27 @@ import * as Joi from 'joi'
 import { merge } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getQuestionsHandler from '@config/handlers/getQuestions/handler'
+import getFormDrafts from '@config/handlers/getFormDraft/handler'
 
 export default async function applicationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const certificateResponse = await getActiveCertificatesHandler(request, h)
-    const questionsResponse = await getQuestionsHandler(request, h)
-    let appConfig: IApplicationConfigurationModel | null
-    // tslint:disable-next-line
-    appConfig = await ApplicationConfig.findOne({})
+    const [certificates, questionConfig, formDrafts, config] =
+      await Promise.all([
+        getActiveCertificatesHandler(request, h),
+        getQuestionsHandler(request, h),
+        getFormDrafts(request, h),
+        ApplicationConfig.findOne({})
+      ])
     return {
-      config: appConfig,
-      certificates: certificateResponse,
+      config,
+      certificates,
       formConfig: {
-        questionConfig: questionsResponse
-      }
+        questionConfig
+      },
+      formDrafts
     }
   } catch (ex) {
     logger.error(ex)

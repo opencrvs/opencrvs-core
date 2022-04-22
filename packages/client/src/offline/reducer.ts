@@ -38,6 +38,10 @@ import {
 import { find, merge } from 'lodash'
 import { registerForms } from '@client/forms/configuration/default'
 import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
+import {
+  IFormDraft,
+  getOfflineFormDraftData
+} from '@client/forms/configuration/formDrafts/reducer'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -95,6 +99,7 @@ export interface IOfflineData {
 
   config: IApplicationConfig
   formConfig: IFormConfig
+  formDraft: IFormDraft
 }
 
 export type IOfflineDataState = {
@@ -359,13 +364,14 @@ function reducer(
       return loop(state, CONFIG_CMD)
     }
     case actions.APPLICATION_CONFIG_LOADED: {
-      merge(window.config, action.payload.config)
-      const birthCertificateTemplate = find(action.payload.certificates, {
+      const { certificates, config, formConfig, formDrafts } = action.payload
+      merge(window.config, config)
+      const birthCertificateTemplate = find(certificates, {
         event: 'birth',
         status: 'ACTIVE'
       }) as ICertificateTemplateData
 
-      const deathCertificateTemplate = find(action.payload.certificates, {
+      const deathCertificateTemplate = find(certificates, {
         event: 'death',
         status: 'ACTIVE'
       }) as ICertificateTemplateData
@@ -377,8 +383,9 @@ function reducer(
 
       const newOfflineData = {
         ...state.offlineData,
-        config: action.payload.config,
-        formConfig: action.payload.formConfig,
+        config,
+        formConfig,
+        formDraft: getOfflineFormDraftData(formDrafts),
         templates: {
           certificates: {
             birth: {

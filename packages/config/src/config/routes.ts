@@ -34,7 +34,7 @@ import {
   updateFormDraftHandler,
   requestSchema as updateFormDraftReqSchema
 } from '@config/handlers/updateFormDraft/handler'
-import getFormDraft from '@config/handlers/getFormDraft/handler'
+import getFormDrafts from '@config/handlers/getFormDraft/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -169,7 +169,7 @@ export default function getRoutes() {
     {
       method: 'GET',
       path: '/formDraft',
-      handler: getFormDraft,
+      handler: getFormDrafts,
       config: {
         tags: ['api'],
         description: 'Get form draft',

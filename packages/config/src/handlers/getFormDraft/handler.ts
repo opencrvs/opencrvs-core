@@ -13,15 +13,15 @@ import * as Hapi from '@hapi/hapi'
 import FormDraft, { IFormDraft } from '@config/models/formDraft'
 import { internal } from '@hapi/boom'
 
-export default async function getFormDraft(
+export default async function getFormDrafts(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  let formDraft: IFormDraft[]
+  let formDrafts: IFormDraft[]
   try {
-    formDraft = await FormDraft.find().exec()
+    formDrafts = await FormDraft.find().exec()
   } catch (error) {
     throw internal(error.message)
   }
-  return formDraft
+  return formDrafts
 }

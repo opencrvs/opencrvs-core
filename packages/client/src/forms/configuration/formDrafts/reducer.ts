@@ -63,6 +63,23 @@ export const initialState: IFormDraftState = {
   error: false
 }
 
+function getEventFormDraftData(formDrafts: IDraft[], event: Event) {
+  const formDraft = find(formDrafts, { event })
+  if (!formDraft) {
+    throw new Error(`Default ${event} formDraft not found`)
+  }
+  return formDraft
+}
+
+export function getOfflineFormDraftData(formDrafts: IDraft[]) {
+  const birthFormDraft = getEventFormDraftData(formDrafts, Event.BIRTH)
+  const deathFormDraft = getEventFormDraftData(formDrafts, Event.DEATH)
+  return {
+    birth: birthFormDraft,
+    death: deathFormDraft
+  }
+}
+
 async function saveFormDraftData(formDraftData: IFormDraft) {
   return storage.setItem('formDraft', JSON.stringify(formDraftData))
 }

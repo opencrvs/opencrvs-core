@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormConfig, ISerializedForm } from '@client/forms'
+import { IFormConfig } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
-import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
+import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -24,17 +24,6 @@ export interface IFacilitiesDataResponse {
 export interface IContentResponse {
   formConfig?: IFormConfig
   languages: ILanguage[]
-  forms: {
-    registerForm: { birth: ISerializedForm; death: ISerializedForm }
-    userForm: ISerializedForm
-  }
-  templates: {
-    receipt?: IPDFTemplate
-    certificates: {
-      birth: IPDFTemplate
-      death: IPDFTemplate
-    }
-  }
 }
 
 export interface IAssetResponse {
@@ -105,6 +94,7 @@ export interface IApplicationConfigResponse {
   config: IApplicationConfig
   certificates: ICertificateTemplateData[]
   formConfig: IFormConfig
+  formDrafts: IDraft[]
 }
 
 async function loadConfig(): Promise<IApplicationConfigResponse> {
