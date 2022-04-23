@@ -114,7 +114,7 @@ const selectLocation = (
 
 const NATIONAL_ADMINISTRATIVE_LEVEL = 'NATIONAL_ADMINISTRATIVE_LEVEL'
 class PerformanceHomeComponent extends React.Component<Props, State> {
-  static transformPropsToState(props: Props, state?: State) {
+  transformPropsToState(props: Props) {
     const {
       location: { search },
       locations,
@@ -125,7 +125,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     ) as unknown as ISearchParams
     const selectedLocation = selectLocation(
       locationId,
-      generateLocations({ ...locations, ...offices }, props.intl)
+      generateLocations({ ...locations, ...offices }, props.intl).concat(
+        this.getAdditionalLocations()
+      )
     )
 
     return {
@@ -141,10 +143,18 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     super(props)
     window.__localeId__ = this.props.intl.locale
 
-    this.state = PerformanceHomeComponent.transformPropsToState(
-      props,
-      undefined
-    )
+    this.state = this.transformPropsToState(props)
+  }
+
+  getAdditionalLocations() {
+    const { intl } = this.props
+    return [
+      {
+        id: NATIONAL_ADMINISTRATIVE_LEVEL,
+        searchableText: intl.formatMessage(constantsMessages.countryName),
+        displayLabel: intl.formatMessage(constantsMessages.countryName)
+      }
+    ]
   }
 
   getTabContent = (intl: IntlShape, selectedLocation: ISearchLocation) => {
@@ -153,21 +163,18 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     return (
       <PerformanceActions>
         <LocationPicker
-          additionalLocations={[
-            {
-              id: NATIONAL_ADMINISTRATIVE_LEVEL,
-              searchableText: intl.formatMessage(constantsMessages.countryName),
-              displayLabel: intl.formatMessage(constantsMessages.countryName)
-            }
-          ]}
+          additionalLocations={this.getAdditionalLocations()}
           selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
           onChangeLocation={(newLocationId) => {
             const newLocation = selectLocation(
               newLocationId,
               generateLocations(
-                { ...this.props.locations, ...this.props.offices },
+                {
+                  ...this.props.locations,
+                  ...this.props.offices
+                },
                 this.props.intl
-              )
+              ).concat(this.getAdditionalLocations())
             )
             this.setState({ selectedLocation: newLocation })
           }}
@@ -204,7 +211,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl, userDetails } = this.props
+    const { intl } = this.props
 
     return (
       <SysAdminContentWrapper
