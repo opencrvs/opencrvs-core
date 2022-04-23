@@ -51,11 +51,10 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
 ): IReviewFormState | Loop<IReviewFormState, Action> => {
   switch (action.type) {
     case offlineActions.READY:
-    case offlineActions.CONTENT_LOADED:
       const configuredBirthForm: ISerializedForm = configureRegistrationForm(
         sortFormCustomisations(
           filterQuestionsByEventType(
-            action.payload.formConfig?.questionConfig,
+            action.payload.formConfig.questionConfig,
             Event.BIRTH
           ),
           registerForms.birth
@@ -65,7 +64,7 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
       const configuredDeathForm: ISerializedForm = configureRegistrationForm(
         sortFormCustomisations(
           filterQuestionsByEventType(
-            action.payload.formConfig?.questionConfig,
+            action.payload.formConfig.questionConfig,
             Event.DEATH
           ),
           registerForms.death

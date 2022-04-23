@@ -16,14 +16,13 @@ import {
   SELECT_WITH_OPTIONS,
   SIMPLE_DOCUMENT_UPLOADER,
   TEXT,
-  IFormSection,
-  IFormSectionGroup,
-  UserSection
+  UserSection,
+  ISerializedFormSection
 } from '@client/forms/index'
 import { NATIONAL_ID } from '@client/forms/identity'
 import { messages as userMessages } from '@client/i18n/messages/views/userForm'
 
-export const userSectionFormType = {
+export const userSectionFormType: ISerializedFormSection = {
   id: UserSection.User,
   viewType: 'form',
   name: userMessages.user,
@@ -243,10 +242,10 @@ const getPreviewGroups = () => {
       id: `preview-${group.id}`,
       fields: group.fields
     }
-  }) as IFormSectionGroup[]
+  })
 }
 
-export const userSectionPreviewType: IFormSection = {
+export const userSectionPreviewType: ISerializedFormSection = {
   id: UserSection.Preview,
   viewType: 'preview',
   name: userMessages.userFormReviewTitle,

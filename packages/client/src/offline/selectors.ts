@@ -26,14 +26,14 @@ export function isOfflineDataLoaded(
   state: Partial<IOfflineData>
 ): state is IOfflineData {
   const hasAllRequiredData =
-    state.locations &&
     state.facilities &&
-    state.forms &&
-    state.forms.registerForm &&
-    state.forms.userForm &&
-    state.languages &&
+    state.locations &&
+    state.pilotLocations &&
+    state.config &&
+    state.formConfig &&
+    state.formDraft &&
     state.templates &&
-    state.config
+    state.languages
 
   const isOfflineDataLoaded = Boolean(hasAllRequiredData)
   if (isOfflineDataLoaded) merge(window.config, state.config)
