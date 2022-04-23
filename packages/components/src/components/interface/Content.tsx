@@ -11,13 +11,14 @@
  */
 import * as React from 'react'
 import { ReactElement } from 'react'
-import styled, { ThemeConsumer } from 'styled-components'
+import styled from 'styled-components'
 import { colors } from '../colors'
 import { Box } from './Box'
 
 const Container = styled(Box)<{ size: string }>`
   position: relative;
   margin: 24px auto;
+  padding: 32px;
   max-width: ${({ size }) => (size === 'large' ? '1140px' : '778px')};
   height: 100%;
   box-sizing: border-box;
@@ -31,10 +32,10 @@ const Container = styled(Box)<{ size: string }>`
 const Header = styled.div`
   position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   flex-direction: column;
-  margin: -24px -24px 24px;
-  padding: 0 24px;
+  margin: -32px -32px 32px;
+  padding: 0 32px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     border: 0;
@@ -77,7 +78,7 @@ const TopTabBar = styled.div`
 `
 const TopBar = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   width: 100%;
   padding: 16px 0;
@@ -108,6 +109,7 @@ const Title = styled.div`
 `
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
+  height: 24px;
 `
 
 export enum ContentSize {

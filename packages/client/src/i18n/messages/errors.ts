@@ -57,12 +57,12 @@ const messagesToDefine: IErrorMessages = {
     id: 'error.somethingWentWrong'
   },
   unknownErrorDescription: {
-    defaultMessage: "It's not you, it's us. This is our fault.",
+    defaultMessage: 'This page could not be found.',
     description: 'Error description',
     id: 'error.weAreTryingToFixThisError'
   },
   errorTitle: {
-    defaultMessage: 'Whoops!',
+    defaultMessage: 'Oops!',
     description: 'Error title',
     id: 'error.title'
   },

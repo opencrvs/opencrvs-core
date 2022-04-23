@@ -39,17 +39,17 @@ const options = {
 }
 
 const UploaderWrapper = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 `
 const Label = styled.label`
   position: relative;
-  top: -2px;
+  top: -6px;
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
 `
 const Flex = styled.div<{ splitView?: boolean }>`
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin-bottom: ${({ splitView }) => {
     return splitView ? '10px' : '0px'
   }};
@@ -58,20 +58,10 @@ export const ErrorMessage = styled.div`
   margin-bottom: 20px;
 `
 const DocumentUploader = styled(ImageUploader)`
-  color: ${({ theme }) => theme.colors.primary};
-  background: ${({ theme }) => theme.colors.white};
-  border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
-  border-radius: 2px;
-  ${({ theme }) => theme.fonts.bold14};
-  height: 40px;
-  text-transform: initial;
-  margin-left: 10px;
-  padding: 0px 30px;
+  margin-left: 16px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-left: 0px;
-    margin-top: 10px;
+    margin-left: 8px;
   }
 `
 
