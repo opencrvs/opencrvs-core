@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { SearchBlue, ClearText } from '../../icons'
-import { Button, CircleButton, TertiaryButton } from '../../buttons'
+import { Button } from '../../buttons'
 import styled from 'styled-components'
 
 const Wrapper = styled.form`
@@ -86,7 +86,7 @@ const Label = styled.span`
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
-const SelectedSearchCriteria = styled(TertiaryButton)`
+const SelectedSearchCriteria = styled.span`
   display: flex;
   margin-right: 16px;
   &:hover:enabled {
