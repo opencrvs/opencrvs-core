@@ -96,13 +96,24 @@ Use the `-b` option if your servers require sudo to perform the ansible tasks. I
 Ansible playbooks are run like this:
 
 ```
-ansible-playbook -i <inventory_file> <playbook_file> -e "dockerhub_username=your_username dockerhub_password=your_password papertrail_token=your_papertrail_token external_backup_server_ip=your_external_backup_server_ip external_backup_server_user=your_external_backup_server_user external_backup_server_ssh_port=your_external_backup_server_ssh_port manager_production_server_ip=your_manager_production_server_ip external_backup_server_remote_directory=your_external_backup_server_remote_directory"
+ansible-playbook -i <inventory_file> <playbook_file> -e " \
+dockerhub_username=<your_username> \
+dockerhub_password=<your_password> \
+papertrail_token=<your_papertrail_token> \
+external_backup_server_ip=<your_external_backup_server_ip> \
+external_backup_server_user=<your_external_backup_server_user> \
+external_backup_server_ssh_port=<your_external_backup_server_ssh_port> \
+manager_production_server_ip=<your_manager_production_server_ip> \
+external_backup_server_remote_directory=<your_external_backup_server_remote_directory> \
+mongodb_admin_username=<opencrvs-admin> \
+mongodb_admin_password=<secure password you generated> \
+elasticsearch_superuser_password=<secure password you generated>"
 ```
 
 E.G.:
 
 ```
-ansible-playbook -i example-3.ini playbook-3.yml -e "dockerhub_username=your_username dockerhub_password=your_password"
+ansible-playbook -i example-3.ini playbook-3.yml -e "dockerhub_username=your_username dockerhub_password=your_password ..."
 ```
 
 ## Enabling encryption
@@ -110,7 +121,7 @@ ansible-playbook -i example-3.ini playbook-3.yml -e "dockerhub_username=your_use
 For production servers we offer the ability to setup an encrypted /data folder for the docker containers to use. This allows us to support encryption at rest. To do this run the ansible script with these extra variables. Note, if the server is already setup the docker stack must be stopped and ALL DATA WILL BE LOST when switching to an ecrypted folder. It is useful to set this up from the beginning.
 
 ```
-ansible-playbook -i <inventory_file> <playbook_file> -e "dockerhub_username=your_username dockerhub_password=your_password papertrail_token=your_papertrail_token encrypt_passphrase=<a_strong_passphrase> encrypt_data=True"
+ansible-playbook -i <inventory_file> <playbook_file> -e "encrypt_passphrase=<a_strong_passphrase> encrypt_data=True"
 ```
 
 Once this command is finished the servers are now prepared for an OpenCRVS deployment.

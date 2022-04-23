@@ -198,7 +198,7 @@ test('should build a minimal FHIR registration document without error', async ()
           postalCode: 'sw11',
           line: [
             'addressLine1',
-            'addressLine1CityOption',
+            'addressLine1UrbanOption',
             'addressLine2',
             '123',
             '456',

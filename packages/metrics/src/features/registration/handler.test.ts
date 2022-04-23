@@ -258,6 +258,34 @@ describe('When a new registration event is received', () => {
         {
           fullUrl: 'urn:uuid:97de26f7-a9ea-4c46-a974-9be38cac41ca',
           resource: {
+            _id: '625baca6c347200032c3b72b',
+            resourceType: 'Encounter',
+            status: 'finished',
+            location: [
+              {
+                location: {
+                  reference: 'Location/f05c6382-4781-4fa4-98f2-72c4433dc2f7'
+                }
+              }
+            ],
+            meta: {
+              lastUpdated: '2022-04-17T05:59:02.686+00:00',
+              versionId: '3484c5eb-20c0-46df-82dc-2c138ff3c800'
+            },
+            _transforms: {
+              meta: {
+                lastUpdated: '2022-04-17T05:59:02.686Z'
+              }
+            },
+            _request: {
+              method: 'POST'
+            },
+            id: '039bcc8e-bb36-4ab1-97fb-95b92b07b7c1'
+          }
+        },
+        {
+          fullUrl: 'urn:uuid:97de26f7-a9ea-4c46-a974-9be38cac41ca',
+          resource: {
             resourceType: 'Patient',
             active: true,
             id: '6e33c50b-7e68-405e-a3a4-c8337c04a2f3',
@@ -286,7 +314,7 @@ describe('When a new registration event is received', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -300,7 +328,7 @@ describe('When a new registration event is received', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -433,6 +461,34 @@ describe('When a new registration event is received', () => {
           }
         },
         {
+          fullUrl: 'urn:uuid:97de26f7-a9ea-4c46-a974-9be38cac41ca',
+          resource: {
+            _id: '625baca6c347200032c3b72b',
+            resourceType: 'Encounter',
+            status: 'finished',
+            location: [
+              {
+                location: {
+                  reference: 'Location/f05c6382-4781-4fa4-98f2-72c4433dc2f7'
+                }
+              }
+            ],
+            meta: {
+              lastUpdated: '2022-04-17T05:59:02.686+00:00',
+              versionId: '3484c5eb-20c0-46df-82dc-2c138ff3c800'
+            },
+            _transforms: {
+              meta: {
+                lastUpdated: '2022-04-17T05:59:02.686Z'
+              }
+            },
+            _request: {
+              method: 'POST'
+            },
+            id: '039bcc8e-bb36-4ab1-97fb-95b92b07b7c1'
+          }
+        },
+        {
           fullUrl: 'urn:uuid:c690e34b-6fd2-42e4-90d5-639946fc039f',
           resource: {
             resourceType: 'Task',
@@ -542,7 +598,7 @@ describe('When a new registration event is received', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -556,7 +612,7 @@ describe('When a new registration event is received', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -782,7 +838,7 @@ describe('When a new registration event is received', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -796,7 +852,7 @@ describe('When a new registration event is received', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -1022,7 +1078,7 @@ describe('When a new registration event is received', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -1036,7 +1092,7 @@ describe('When a new registration event is received', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',

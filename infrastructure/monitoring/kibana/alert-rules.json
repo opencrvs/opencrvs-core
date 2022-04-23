@@ -75,5 +75,30 @@
         }
       }
     ]
+  },
+  {
+    "params": {
+      "threshold": 1,
+      "windowSize": 1,
+      "windowUnit": "m",
+      "environment": "ENVIRONMENT_ALL"
+    },
+    "consumer": "alerts",
+    "schedule": { "interval": "1m" },
+    "tags": [],
+    "name": "Error in service",
+    "rule_type_id": "apm.error_rate",
+    "notify_when": "onActionGroupChange",
+    "actions": [
+      {
+        "group": "threshold_met",
+        "id": "preconfigured-alert-history-es-index",
+        "params": {
+          "documents": [
+            "{\"@timestamp\":\"2022-04-18T07:05:33.819Z\",\"tags\":\"{{rule.tags}}\",\"rule\":{\"id\":\"{{rule.id}}\",\"name\":\"{{rule.name}}\",\"params\":{\"{{rule__type}}\":\"{{params}}\"},\"space\":\"{{rule.spaceId}}\",\"type\":\"{{rule.type}}\"},\"kibana\":{\"alert\":{\"id\":\"{{alert.id}}\",\"context\":{\"{{rule__type}}\":\"{{context}}\"},\"actionGroup\":\"{{alert.actionGroup}}\",\"actionGroupName\":\"{{alert.actionGroupName}}\"}},\"event\":{\"kind\":\"alert\"}}"
+          ]
+        }
+      }
+    ]
   }
 ]

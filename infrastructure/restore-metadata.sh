@@ -11,6 +11,9 @@ set -e
 
 print_usage_and_exit () {
     echo 'Usage: ./restore-metadata.sh REPLICAS ENV'
+    echo ""
+    echo "If your MongoDB is password protected, an admin user's credentials can be given as environment variables:"
+    echo "MONGODB_ADMIN_USER=your_user MONGODB_ADMIN_PASSWORD=your_pass"
     exit 1
 }
 
@@ -51,12 +54,28 @@ else
   exit 1
 fi
 
-if [[ "$ENV" != "qa" ]] ; then docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:4.4 bash -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/hearth-dev.gz" ; fi
+mongo_credentials() {
+  if [ ! -z ${MONGODB_ADMIN_USER+x} ] || [ ! -z ${MONGODB_ADMIN_PASSWORD+x} ]; then
+    echo "--username $MONGODB_ADMIN_USER --password $MONGODB_ADMIN_PASSWORD --authenticationDatabase admin";
+  else
+    echo "";
+  fi
+}
 
-docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:4.4 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/openhim-dev.gz"
+restore_metadata () {
+  local zip_file=${1}
+  COMMAND="mongorestore $(mongo_credentials) --host $HOST --drop --gzip --archive=$zip_file"
+  docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:4.4 bash -c "$COMMAND"
+}
 
-if [[ "$ENV" != "qa" ]] ; then docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:4.4 bash -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/user-mgnt.gz" ; fi
+if [[ "$ENV" != "qa" ]] ; then
+  restore_metadata "/default_backups/hearth-dev.gz";
+fi
 
-docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:4.4 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/default_backups/application-config.gz"
+restore_metadata "/default_backups/openhim-dev.gz"
+
+if [[ "$ENV" != "qa" ]] ; then
+  restore_metadata "/default_backups/user-mgnt.gz";
+fi
+
+restore_metadata "/default_backups/application-config.gz"

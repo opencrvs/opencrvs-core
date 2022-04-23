@@ -11,6 +11,9 @@ set -e
 
 print_usage_and_exit () {
     echo 'Usage: ./restore-metadata-updates.sh REPLICAS'
+    echo ""
+    echo "If your MongoDB is password protected, an admin user's credentials can be given as environment variables:"
+    echo "MONGODB_ADMIN_USER=your_user MONGODB_ADMIN_PASSWORD=your_pass"
     exit 1
 }
 
@@ -44,6 +47,14 @@ else
   exit 1
 fi
 
+mongo_credentials() {
+  if [ ! -z ${MONGODB_ADMIN_USER+x} ] || [ ! -z ${MONGODB_ADMIN_PASSWORD+x} ]; then
+    echo "--username $MONGODB_ADMIN_USER --password $MONGODB_ADMIN_PASSWORD --authenticationDatabase admin";
+  else
+    echo "";
+  fi
+}
+
 echo
 echo "Restoring metadata updates..."
 echo
@@ -55,5 +66,5 @@ do
   COLLECTION=${NAMES[1]}
   echo "Updating collection: $COLLECTION of db: $DB"
   docker run --rm -v /tmp/compose/infrastructure/default_updates:/default_updates --network=$NETWORK mongo:4.4 bash \
- -c "mongoimport -h=$HOST -d=$DB -c=$COLLECTION --mode=upsert --file=/default_updates/$FILE"
+ -c "mongoimport $(mongo_credentials) -h=$HOST -d=$DB -c=$COLLECTION --mode=upsert --file=/default_updates/$FILE"
 done
