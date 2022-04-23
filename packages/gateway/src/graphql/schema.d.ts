@@ -1602,8 +1602,8 @@ export interface QueryToQueryPersonByNidIdentifierResolver<
 }
 
 export interface QueryToFetchRegistrationCountByStatusArgs {
-  locationId: string
   status: Array<string | null>
+  locationId?: string
 }
 export interface QueryToFetchRegistrationCountByStatusResolver<
   TParent = any,
