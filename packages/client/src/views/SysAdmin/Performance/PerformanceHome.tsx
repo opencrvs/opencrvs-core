@@ -212,6 +212,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   render() {
     const { intl, userDetails } = this.props
     const { timeStart, timeEnd, event } = this.state
+    const queryVariablesWithoutLocationId = {
+      timeStart: timeStart.toISOString(),
+      timeEnd: timeEnd.toISOString(),
+      event: event.toUpperCase()
+    }
     return (
       <SysAdminContentWrapper
         id="performanceHome"
@@ -233,12 +238,14 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             >
               <Query
                 query={PERFORMANCE_METRICS}
-                variables={{
-                  timeStart: timeStart.toISOString(),
-                  timeEnd: timeEnd.toISOString(),
-                  locationId: this.state.selectedLocation?.id || undefined,
-                  event: event.toUpperCase()
-                }}
+                variables={
+                  this.state.selectedLocation
+                    ? {
+                        ...queryVariablesWithoutLocationId,
+                        locationId: this.state.selectedLocation.id
+                      }
+                    : queryVariablesWithoutLocationId
+                }
                 fetchPolicy="no-cache"
               >
                 {({
