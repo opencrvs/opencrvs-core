@@ -134,13 +134,13 @@ import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import format, { formatLongDate } from '@client/utils/date-formatting'
 
 const DesktopHeader = styled(Header)`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
 
 const MobileHeader = styled(PageHeader)`
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
@@ -171,10 +171,7 @@ const IconDiv = styled.div`
   }
 `
 const BackButtonDiv = styled.div`
-  display: none;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: inline;
-  }
+  display: inline;
 `
 
 const BackButton = styled(CircleButton)`

@@ -40,12 +40,9 @@ const Header = styled.div`
   margin: -24px -24px 24px;
   padding: 0 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     border: 0;
     padding: 0;
-    margin: -24px -16px 24px;
   }
 `
 const TopActionBar = styled.div`
@@ -71,14 +68,20 @@ const TopTabBar = styled.div`
   gap: 28px;
   width: 100%;
   padding: 0;
+  margin-top: -16px;
   position: relative;
   & > div {
     bottom: -1px;
   }
 
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 8px 16px 0;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-top: 0;
+    padding: 0 24px;
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding-top: 8px;
   }
 `
 const TopBar = styled.div`
