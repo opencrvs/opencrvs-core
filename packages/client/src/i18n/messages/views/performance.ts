@@ -103,6 +103,11 @@ const messagesToDefine = {
     defaultMessage: 'Reports',
     description: 'Label for select option Reports'
   },
+  otherCorrectionReason: {
+    id: 'performance.reports.corrections.other.label',
+    defaultMessage: 'Other',
+    description: 'Label "Other" category in corrections'
+  },
   declarationsStartedTitle: {
     id: 'performance.reports.declarationsStarted.title',
     defaultMessage: 'Declarations started',
