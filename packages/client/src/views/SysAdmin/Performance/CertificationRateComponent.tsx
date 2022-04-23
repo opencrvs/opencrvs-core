@@ -30,7 +30,7 @@ interface ICertificationRateProps {
   data: ICertificationRateData[]
 }
 
-export function CertificationRatesComponent(props: ICertificationRateProps) {
+export function CertificationRateComponent(props: ICertificationRateProps) {
   return (
     <ListContainer>
       <ListViewSimplified>

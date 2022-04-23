@@ -109,7 +109,7 @@ describe('Certificate collector test for a birth registration without father det
               ],
               address: [
                 {
-                  type: 'PERMANENT',
+                  type: 'PRIMARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -125,7 +125,7 @@ describe('Certificate collector test for a birth registration without father det
                   __typename: 'Address'
                 },
                 {
-                  type: 'CURRENT',
+                  type: 'SECONDARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -562,7 +562,7 @@ describe('Test for a free birth registration', () => {
               ],
               address: [
                 {
-                  type: 'PERMANENT',
+                  type: 'PRIMARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -578,7 +578,7 @@ describe('Test for a free birth registration', () => {
                   __typename: 'Address'
                 },
                 {
-                  type: 'CURRENT',
+                  type: 'SECONDARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -775,7 +775,7 @@ describe('Certificate collector test for a birth registration with father detail
               ],
               address: [
                 {
-                  type: 'PERMANENT',
+                  type: 'PRIMARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -791,7 +791,7 @@ describe('Certificate collector test for a birth registration with father detail
                   __typename: 'Address'
                 },
                 {
-                  type: 'CURRENT',
+                  type: 'SECONDARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -841,7 +841,7 @@ describe('Certificate collector test for a birth registration with father detail
               ],
               address: [
                 {
-                  type: 'CURRENT',
+                  type: 'SECONDARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -857,7 +857,7 @@ describe('Certificate collector test for a birth registration with father detail
                   __typename: 'Address'
                 },
                 {
-                  type: 'PERMANENT',
+                  type: 'PRIMARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -996,7 +996,7 @@ describe('Certificate collector test for a death registration', () => {
               deceased: { deathDate: '2010-01-01', __typename: 'Deceased' },
               address: [
                 {
-                  type: 'PERMANENT',
+                  type: 'PRIMARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -1012,7 +1012,7 @@ describe('Certificate collector test for a death registration', () => {
                   __typename: 'Address'
                 },
                 {
-                  type: 'CURRENT',
+                  type: 'SECONDARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -1069,7 +1069,7 @@ describe('Certificate collector test for a death registration', () => {
                 ],
                 address: [
                   {
-                    type: 'CURRENT',
+                    type: 'SECONDARY_ADDRESS',
                     line: [
                       '',
                       '',
@@ -1085,7 +1085,7 @@ describe('Certificate collector test for a death registration', () => {
                     __typename: 'Address'
                   },
                   {
-                    type: 'PERMANENT',
+                    type: 'PRIMARY_ADDRESS',
                     line: [
                       '',
                       '',
@@ -1140,9 +1140,9 @@ describe('Certificate collector test for a death registration', () => {
             },
             eventLocation: {
               id: '0b3f4aef-588b-4e18-9185-b8346337ad7d',
-              type: 'PERMANENT',
+              type: 'PRIMARY_ADDRESS',
               address: {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -1309,7 +1309,7 @@ describe('Certificate collector test for a birth registration without father and
               ],
               address: [
                 {
-                  type: 'PERMANENT',
+                  type: 'PRIMARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -1325,7 +1325,7 @@ describe('Certificate collector test for a birth registration without father and
                   __typename: 'Address'
                 },
                 {
-                  type: 'CURRENT',
+                  type: 'SECONDARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -1393,7 +1393,7 @@ describe('Certificate collector test for a birth registration without father and
               ],
               address: [
                 {
-                  type: 'PERMANENT',
+                  type: 'PRIMARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -1409,7 +1409,7 @@ describe('Certificate collector test for a birth registration without father and
                   __typename: 'Address'
                 },
                 {
-                  type: 'CURRENT',
+                  type: 'SECONDARY_ADDRESS',
                   line: [
                     '',
                     '',

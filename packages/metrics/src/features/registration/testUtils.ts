@@ -183,14 +183,14 @@ export const testDeclaration = {
         },
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', '0644dd0d-9d91-4e35-ba6e-922486e5859d'],
             district: '8a268726-375d-4919-abb4-b43ef1296261',
             state: '35d2b632-e920-4ea5-afde-5d2b8a607b19',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', '0644dd0d-9d91-4e35-ba6e-922486e5859d'],
             district: '8a268726-375d-4919-abb4-b43ef1296261',
             state: '35d2b632-e920-4ea5-afde-5d2b8a607b19',
@@ -438,14 +438,14 @@ export const testPayload = {
         multipleBirthInteger: 1,
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -677,14 +677,14 @@ export const testDeathPayload = {
         },
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', '11e737ab-1569-4f0a-8100-669cd3f461e7'],
             district: '1091de2f-5368-41fc-83da-a8a145f191fc',
             state: '35d2b632-e920-4ea5-afde-5d2b8a607b19',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', '11e737ab-1569-4f0a-8100-669cd3f461e7'],
             district: '1091de2f-5368-41fc-83da-a8a145f191fc',
             state: '35d2b632-e920-4ea5-afde-5d2b8a607b19',
@@ -739,14 +739,14 @@ export const testDeathPayload = {
         ],
         address: [
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'f79c57a5-6249-4a88-adff-699f6170f956'],
             district: '866781e6-de24-417d-99b5-d6b2e37f8f70',
             state: 'd247df4f-ff82-4c64-8899-1628d30bd8a0',
             country: 'BGD'
           },
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'f79c57a5-6249-4a88-adff-699f6170f956'],
             district: '866781e6-de24-417d-99b5-d6b2e37f8f70',
             state: 'd247df4f-ff82-4c64-8899-1628d30bd8a0',
@@ -795,12 +795,12 @@ export const testDeathPayload = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/location-type',
-              code: 'PERMANENT'
+              code: 'PRIMARY_ADDRESS'
             }
           ]
         },
         address: {
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           line: ['', '', '', '', '', '11e737ab-1569-4f0a-8100-669cd3f461e7'],
           district: '1091de2f-5368-41fc-83da-a8a145f191fc',
           state: '35d2b632-e920-4ea5-afde-5d2b8a607b19',
@@ -1157,14 +1157,14 @@ export const testDeathCertPayload = {
         },
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', '11e737ab-1569-4f0a-8100-669cd3f461e7'],
             district: '1091de2f-5368-41fc-83da-a8a145f191fc',
             state: '35d2b632-e920-4ea5-afde-5d2b8a607b19',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', '11e737ab-1569-4f0a-8100-669cd3f461e7'],
             district: '1091de2f-5368-41fc-83da-a8a145f191fc',
             state: '35d2b632-e920-4ea5-afde-5d2b8a607b19',
@@ -1221,14 +1221,14 @@ export const testDeathCertPayload = {
         ],
         address: [
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'f79c57a5-6249-4a88-adff-699f6170f956'],
             district: '866781e6-de24-417d-99b5-d6b2e37f8f70',
             state: 'd247df4f-ff82-4c64-8899-1628d30bd8a0',
             country: 'BGD'
           },
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'f79c57a5-6249-4a88-adff-699f6170f956'],
             district: '866781e6-de24-417d-99b5-d6b2e37f8f70',
             state: 'd247df4f-ff82-4c64-8899-1628d30bd8a0',
@@ -1277,12 +1277,12 @@ export const testDeathCertPayload = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/location-type',
-              code: 'PERMANENT'
+              code: 'PRIMARY_ADDRESS'
             }
           ]
         },
         address: {
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           line: ['', '', '', '', '', '11e737ab-1569-4f0a-8100-669cd3f461e7'],
           district: '1091de2f-5368-41fc-83da-a8a145f191fc',
           state: '35d2b632-e920-4ea5-afde-5d2b8a607b19',

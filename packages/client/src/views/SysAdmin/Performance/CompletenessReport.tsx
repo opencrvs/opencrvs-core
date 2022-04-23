@@ -27,17 +27,34 @@ import {
   calculateTotal
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import styled from 'styled-components'
+import { useIntl } from 'react-intl'
+import { messages } from '@client/i18n/messages/views/performance'
+import { buttonMessages } from '@client/i18n/messages/buttons'
 
 interface CompletenessReportProps {
   data: GQLTotalMetricsResult
+  selectedEvent: 'BIRTH' | 'DEATH'
 }
 
-export function CompletenessReport({ data }: CompletenessReportProps) {
+const Container = styled(ListViewSimplified)`
+  grid-template-columns: auto 1fr minmax(5em, auto);
+`
+
+export function CompletenessReport({
+  data,
+  selectedEvent
+}: CompletenessReportProps) {
+  const intl = useIntl()
   return (
-    <ListViewSimplified>
+    <Container>
       <ListViewItemSimplified
         label={
-          <PerformanceTitle>{`Registered within ${window.config.BIRTH.REGISTRATION_TARGET} days`}</PerformanceTitle>
+          <PerformanceTitle>
+            {intl.formatMessage(messages.performanceWithinTargetDaysLabel, {
+              target: window.config[selectedEvent].REGISTRATION_TARGET
+            })}
+          </PerformanceTitle>
         }
         value={
           <div>
@@ -52,7 +69,9 @@ export function CompletenessReport({ data }: CompletenessReportProps) {
             </PerformanceValue>
             <Breakdown>
               <BreakdownRow>
-                <BreakdownLabel>Male: </BreakdownLabel>
+                <BreakdownLabel>
+                  {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
+                </BreakdownLabel>
                 <BreakdownValue>
                   {
                     <PercentageDisplay
@@ -69,7 +88,9 @@ export function CompletenessReport({ data }: CompletenessReportProps) {
                 </BreakdownValue>
               </BreakdownRow>
               <BreakdownRow>
-                <BreakdownLabel>Female: </BreakdownLabel>
+                <BreakdownLabel>
+                  {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
+                </BreakdownLabel>
                 <BreakdownValue>
                   {
                     <PercentageDisplay
@@ -88,10 +109,16 @@ export function CompletenessReport({ data }: CompletenessReportProps) {
             </Breakdown>
           </div>
         }
-        actions={<LinkButton>View</LinkButton>}
+        actions={
+          <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+        }
       />
       <ListViewItemSimplified
-        label={<PerformanceTitle>Within 1 year</PerformanceTitle>}
+        label={
+          <PerformanceTitle>
+            {intl.formatMessage(messages.performanceWithin1YearLabel)}
+          </PerformanceTitle>
+        }
         value={
           <div>
             <PerformanceValue>
@@ -110,7 +137,9 @@ export function CompletenessReport({ data }: CompletenessReportProps) {
             </PerformanceValue>
             <Breakdown>
               <BreakdownRow>
-                <BreakdownLabel>Male: </BreakdownLabel>
+                <BreakdownLabel>
+                  {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
+                </BreakdownLabel>
                 <BreakdownValue>
                   {
                     <PercentageDisplay
@@ -129,7 +158,9 @@ export function CompletenessReport({ data }: CompletenessReportProps) {
                 </BreakdownValue>
               </BreakdownRow>
               <BreakdownRow>
-                <BreakdownLabel>Female: </BreakdownLabel>
+                <BreakdownLabel>
+                  {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
+                </BreakdownLabel>
                 <BreakdownValue>
                   {
                     <PercentageDisplay
@@ -150,10 +181,16 @@ export function CompletenessReport({ data }: CompletenessReportProps) {
             </Breakdown>
           </div>
         }
-        actions={<LinkButton>View</LinkButton>}
+        actions={
+          <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+        }
       />
       <ListViewItemSimplified
-        label={<PerformanceTitle>Within 5 years</PerformanceTitle>}
+        label={
+          <PerformanceTitle>
+            {intl.formatMessage(messages.performanceWithin5YearsLabel)}
+          </PerformanceTitle>
+        }
         value={
           <div>
             <PerformanceValue>
@@ -167,7 +204,9 @@ export function CompletenessReport({ data }: CompletenessReportProps) {
             </PerformanceValue>
             <Breakdown>
               <BreakdownRow>
-                <BreakdownLabel>Male: </BreakdownLabel>
+                <BreakdownLabel>
+                  {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
+                </BreakdownLabel>
                 <BreakdownValue>
                   <PercentageDisplay
                     ofNumber={data.estimated.maleEstimation}
@@ -181,7 +220,9 @@ export function CompletenessReport({ data }: CompletenessReportProps) {
                 </BreakdownValue>
               </BreakdownRow>
               <BreakdownRow>
-                <BreakdownLabel>Female: </BreakdownLabel>
+                <BreakdownLabel>
+                  {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
+                </BreakdownLabel>
                 <BreakdownValue>
                   <PercentageDisplay
                     ofNumber={data.estimated.femaleEstimation}
@@ -197,8 +238,10 @@ export function CompletenessReport({ data }: CompletenessReportProps) {
             </Breakdown>
           </div>
         }
-        actions={<LinkButton>View</LinkButton>}
+        actions={
+          <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+        }
       />
-    </ListViewSimplified>
+    </Container>
   )
 }

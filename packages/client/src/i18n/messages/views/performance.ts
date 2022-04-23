@@ -22,6 +22,11 @@ const messagesToDefine = {
     defaultMessage: 'Delayed registrations',
     description: 'Label text for display showing delayed registrations'
   },
+  performanceLateRegistrationsLabel: {
+    id: 'performance.values.labels.late',
+    defaultMessage: 'Late registrations',
+    description: 'Label text for display showing late registrations'
+  },
   performanceHealthFacilityBirth: {
     id: 'performance.values.labels.birth.healthFacility',
     defaultMessage: 'Health facility birth',
@@ -51,6 +56,21 @@ const messagesToDefine = {
     id: 'performance.values.labels.female',
     defaultMessage: 'Female',
     description: 'Label text for displays showing the number of females'
+  },
+  performanceWithinTargetDaysLabel: {
+    id: 'performance.values.labels.withinTargetDays',
+    defaultMessage: 'Registered within {target} days',
+    description: 'Label text for displays showing registered within target days'
+  },
+  performanceWithin1YearLabel: {
+    id: 'performance.values.labels.within1Year',
+    defaultMessage: 'Within 1 year',
+    description: 'Label text for displays showing registered within 1 year'
+  },
+  performanceWithin5YearsLabel: {
+    id: 'performance.values.labels.within5Years',
+    defaultMessage: 'Within 5 years',
+    description: 'Label text for displays showing registered within 5 years'
   },
   sysAdminPerformanceHomeHeader: {
     id: 'performance.header.sysadmin.home',

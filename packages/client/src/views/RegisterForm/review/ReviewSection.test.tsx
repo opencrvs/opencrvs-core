@@ -76,7 +76,10 @@ const rejectedDraftDeath = createReviewDeclaration(
 
 draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
-  father: { fathersDetailsExist: true, addressSameAsMother: false },
+  father: {
+    fathersDetailsExist: true,
+    secondaryAddressSameAsOtherSecondary: false
+  },
   documents: {
     imageUploader: { title: 'dummy', description: 'dummy', data: '' }
   },
@@ -182,10 +185,10 @@ describe('when in device of large viewport', () => {
       expect(
         renderSelectDynamicLabel(
           '8cbc862a-b817-4c29-a490-4a8767ff023c',
-          { resource: 'locations', dependency: 'countryPermanent' },
+          { resource: 'locations', dependency: 'countryPrimary' },
           {
-            countryPermanent: 'BGD',
-            statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
+            countryPrimary: 'BGD',
+            statePrimary: '8cbc862a-b817-4c29-a490-4a8767ff023c'
           },
           intl,
           mockOfflineData,
@@ -197,10 +200,10 @@ describe('when in device of large viewport', () => {
       expect(
         renderSelectDynamicLabel(
           '8cbc862a-b817-4c29-a490-4a8767ff023c',
-          { resource: 'locations', dependency: 'countryPermanent' },
+          { resource: 'locations', dependency: 'countryPrimary' },
           {
-            countryPermanent: 'BGD',
-            statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
+            countryPrimary: 'BGD',
+            statePrimary: '8cbc862a-b817-4c29-a490-4a8767ff023c'
           },
           intl,
           mockOfflineData,
