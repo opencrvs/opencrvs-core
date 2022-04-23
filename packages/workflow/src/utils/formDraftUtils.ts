@@ -12,7 +12,7 @@
 import fetch from 'node-fetch'
 import { logger } from '@workflow/logger'
 import { APPLICATION_CONFIG_URL } from '@workflow/constants'
-import { setupTestExtention } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
+import { setupTestExtension } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',
@@ -41,16 +41,16 @@ export async function getFormDraft(token: string) {
   }
 }
 
-export async function checkFormDraftStatusToAddTestExtention(
+export async function checkFormDraftStatusToAddTestExtension(
   taskResource: fhir.Task,
   token: string
 ) {
   const formDraft = (await getFormDraft(token)) as IDraft[]
-  const isformDraftStatusInPreview = Object.values(formDraft).some(
-    (draft) => draft.status === DraftStatus.IN_PREVIEW
+  const isNotPublished = Object.values(formDraft).every(
+    (draft) => draft.status !== DraftStatus.PUBLISHED
   )
 
-  if (isformDraftStatusInPreview) {
-    setupTestExtention(taskResource)
+  if (isNotPublished) {
+    setupTestExtension(taskResource)
   }
 }

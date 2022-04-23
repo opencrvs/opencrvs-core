@@ -20,9 +20,29 @@ import FormDraft, {
 import Question from '@config/models/question'
 import { Event } from '@config/models/certificate'
 import { isValidFormDraftOperation } from '@config/handlers/formDraft/createOrupdateFormDraft/handler'
+import { getHearthDb } from '@config/config/database'
+import { every } from 'lodash'
+import { OPENCRVS_SPECIFICATION_URL } from '@config/config/constants'
 
 export interface IDeleteFormDraftPayload {
   event: Event
+}
+
+enum HearthCollectionsName {
+  Composition = 'Composition',
+  Composition_history = 'Composition_history',
+  DocumentReference = 'DocumentReference',
+  Encounter = 'Encounter',
+  Encounter_history = 'Encounter_history',
+  Observation = 'Observation',
+  Observation_history = 'Observation_history',
+  Patient = 'Patient',
+  Patient_history = 'Patient_history',
+  PaymentReconciliation = 'PaymentReconciliation',
+  RelatedPerson = 'RelatedPerson',
+  RelatedPerson_history = 'RelatedPerson_history',
+  Task = 'Task',
+  Task_history = 'Task_history'
 }
 
 export async function deleteFormDraftHandler(
@@ -35,6 +55,7 @@ export async function deleteFormDraftHandler(
     event: formDraft.event
   })) as IFormDraftModel
 
+  //check if requested operation is valid or invalid
   if (!isValidFormDraftOperation(draft.status, DraftStatus.DELETED)) {
     return h
       .response(`Invalid Operation. Can not delete ${draft.status} form draft.`)
@@ -42,25 +63,77 @@ export async function deleteFormDraftHandler(
   }
 
   if (draft) {
-    try {
-      const eventRegex = new RegExp(`^(${formDraft.event}\.)`)
-      await Question.deleteMany({ fieldId: eventRegex })
-    } catch (err) {
-      return h.response(`Failed to delete question. ${err}`).code(400)
-    }
+    //get hearthDB connection
+    const hearthDBConn = await getHearthDb()
+    const tasks = (await hearthDBConn.db
+      .collection('Task')
+      .find()
+      .toArray()) as fhir.Task[]
 
-    draft.status = DraftStatus.DELETED
-    draft.version = 0
-    draft.updatedAt = Date.now()
-    draft.history = []
+    //check if all the available tasks have configuration exrension
+    const hasTestExtensionOnAllTasks = every(tasks, {
+      extension: [
+        { url: `${OPENCRVS_SPECIFICATION_URL}extension/configuration` }
+      ]
+    })
 
-    try {
-      await FormDraft.updateOne({ _id: draft._id }, draft)
-      return h.response(draft).code(201)
-    } catch (err) {
-      logger.error(err)
+    if (hasTestExtensionOnAllTasks) {
+      hearthDBConn.db.listCollections().toArray((err, collections) => {
+        if (err) {
+          logger.info(
+            `Error occured getting list of hearthDB collections: ${err}`
+          )
+        } else {
+          Promise.all(
+            collections.map(async (collection) => {
+              if (
+                Object.values(HearthCollectionsName).includes(collection.name)
+              ) {
+                try {
+                  await hearthDBConn.dropCollection(collection.name)
+                  logger.info(
+                    `Droped hearthDB collection :: ${collection.name} `
+                  )
+                } catch (err) {
+                  logger.info(
+                    `Error occured droping collection name (${collection.name}) : ${err}`
+                  )
+                }
+              }
+            })
+          ).then(() => {
+            logger.info('Successfully droped all listed hearthDB collections')
+          })
+        }
+      })
+
+      //deleting question for requested event type
+      try {
+        const eventRegex = new RegExp(`^(${formDraft.event}\.)`)
+        await Question.deleteMany({ fieldId: eventRegex })
+      } catch (err) {
+        return h.response(`Failed to delete question. ${err}`).code(400)
+      }
+
+      //updating form draft status
+      draft.status = DraftStatus.DELETED
+      draft.version = 0
+      draft.updatedAt = Date.now()
+      draft.history = []
+      try {
+        await FormDraft.updateOne({ _id: draft._id }, draft)
+        return h.response(draft).code(201)
+      } catch (err) {
+        logger.error(err)
+        return h
+          .response(`Could not delete draft for ${draft.event} event`)
+          .code(400)
+      }
+    } else {
       return h
-        .response(`Could not delete draft for ${draft.event} event`)
+        .response(
+          `Could not delete draft for ${draft.event} event. Other task found without configuration extension`
+        )
         .code(400)
     }
   } else {
