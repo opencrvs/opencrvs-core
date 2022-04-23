@@ -29,7 +29,8 @@ import {
   IPoints,
   IPaymentPoints,
   IDeclarationsStartedPoints,
-  IRejectedPoints
+  IRejectedPoints,
+  ICorrectionPoint
 } from '@metrics/features/registration'
 import {
   getSectionBySectionCode,
@@ -294,6 +295,42 @@ const generatePointLocations = async (
   return locations
 }
 
+export async function generateCorrectionReasonPoint(
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader
+): Promise<ICorrectionPoint> {
+  const composition = getComposition(payload)
+  const task = getTask(payload)
+  if (!task) {
+    throw new Error('Task not found')
+  }
+  if (!composition) {
+    throw new Error('Composition not found')
+  }
+  if (!task.reason) {
+    throw new Error("Tasks didn't include a reason field")
+  }
+
+  const reason = task.reason.text
+
+  const fields = {
+    compositionId: composition.id
+  }
+
+  const tags = {
+    eventType: getDeclarationType(task),
+    officeLocation: getRegLastOffice(payload),
+    reason: reason || 'UNKNOWN',
+    ...(await generatePointLocations(payload, authHeader))
+  }
+
+  return {
+    measurement: 'correction',
+    tags,
+    fields,
+    timestamp: toInfluxTimestamp(task.lastModified)
+  }
+}
 export async function generatePaymentPoint(
   payload: fhir.Bundle,
   authHeader: IAuthHeader,

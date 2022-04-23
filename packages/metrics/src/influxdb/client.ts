@@ -114,6 +114,21 @@ export const influx = new Influx.InfluxDB({
       tags: ['currentStatus', 'previousStatus', 'eventType']
     },
     {
+      measurement: 'correction',
+      fields: {
+        compositionId: Influx.FieldType.STRING
+      },
+      tags: [
+        'eventType',
+        'reason',
+        'officeLocation',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
+    },
+    {
       measurement: 'payment',
       fields: {
         total: Influx.FieldType.FLOAT,

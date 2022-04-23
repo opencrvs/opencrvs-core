@@ -19,7 +19,8 @@ import {
   generatePaymentPoint,
   generateDeclarationStartedPoint,
   generateTimeLoggedPoint,
-  generateRejectedPoints
+  generateRejectedPoints,
+  generateCorrectionReasonPoint
 } from '@metrics/features/registration/pointGenerator'
 import { internal } from '@hapi/boom'
 import { populateBundleFromPayload } from '@metrics/features/registration/utils'
@@ -424,6 +425,9 @@ export async function requestCorrectionHandler(
         },
         'correction'
       ),
+      generateCorrectionReasonPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      }),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED', 'CERTIFIED'],
