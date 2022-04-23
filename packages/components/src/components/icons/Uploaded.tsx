@@ -10,8 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
+import { colors } from '../colors'
 
-export const Uploaded = (props: React.HTMLAttributes<SVGElement>) => {
+export const Uploaded = ({
+  isFailed
+}: React.HTMLAttributes<SVGElement> & { isFailed?: boolean }) => {
   return (
     <svg
       width="24"
@@ -24,7 +27,7 @@ export const Uploaded = (props: React.HTMLAttributes<SVGElement>) => {
         fillRule="evenodd"
         clipRule="evenodd"
         d="M1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12Z"
-        fill="#49B78D"
+        fill={isFailed ? colors.negative : colors.positive}
       />
       <path
         d="M12 7C12.2652 7 12.5196 7.10536 12.7071 7.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071C16.3166 13.0976 15.6834 13.0976 15.2929 12.7071L13 10.4142L13 16C13 16.5523 12.5523 17 12 17C11.4477 17 11 16.5523 11 16L11 10.4142L8.70711 12.7071C8.31658 13.0976 7.68342 13.0976 7.29289 12.7071C6.90237 12.3166 6.90237 11.6834 7.29289 11.2929L11.2929 7.29289C11.4804 7.10536 11.7348 7 12 7Z"

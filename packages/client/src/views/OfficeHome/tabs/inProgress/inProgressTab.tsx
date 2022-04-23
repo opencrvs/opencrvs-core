@@ -584,12 +584,15 @@ export class InProgressTabComponent extends React.Component<
       <Content
         size={ContentSize.LARGE}
         title={intl.formatMessage(navigationMessages.progress)}
-        tabBarContent={this.getTabs(
-          selectorId,
-          drafts,
-          inProgressData.totalItems || 0,
-          notificationData.totalItems || 0
-        )}
+        tabBarContent={
+          !isFieldAgent &&
+          this.getTabs(
+            selectorId,
+            drafts,
+            inProgressData.totalItems || 0,
+            notificationData.totalItems || 0
+          )
+        }
       >
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
           <>

@@ -220,7 +220,7 @@ const getRejectedColumns = (
       {
         width: 18,
         alignment: ColumnContentAlignment.RIGHT,
-        key: COLUMNS.STATUS_INDICATOR
+        key: COLUMNS.ACTIONS
       }
     ]
   } else {
