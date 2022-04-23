@@ -38,4 +38,5 @@ export interface IApplicationConfigPayload {
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: string
   NID_NUMBER_PATTERN: string
+  ADDRESSES: number
 }

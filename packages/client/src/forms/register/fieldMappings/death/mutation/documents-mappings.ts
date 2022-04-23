@@ -40,7 +40,7 @@ export const deathSectionMapping = {
     deathDocumentForWhomFhirMapping['Letter from ward councillor'],
     deathDocumentForWhomFhirMapping['Coroner Report']
   ],
-  [DeathSection.Informants]: [
+  [DeathSection.Informant]: [
     deathDocumentForWhomFhirMapping["Proof of Informant's ID"],
     deathDocumentForWhomFhirMapping["Proof of informant's authority to apply"]
   ]
@@ -48,7 +48,7 @@ export const deathSectionMapping = {
 
 export const deathSectionTitle = {
   [DeathSection.Deceased]: 'Deceased',
-  [DeathSection.Informants]: 'Informant'
+  [DeathSection.Informant]: 'Informant'
 }
 
 export const deathDocumentTypeFhirMapping = {

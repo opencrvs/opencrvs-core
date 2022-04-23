@@ -112,5 +112,6 @@ export const updateApplicationConfig = Joi.object({
   PHONE_NUMBER_PATTERN: Joi.string(),
   BIRTH_REGISTRATION_TARGET: Joi.number(),
   DEATH_REGISTRATION_TARGET: Joi.number(),
-  NID_NUMBER_PATTERN: Joi.string()
+  NID_NUMBER_PATTERN: Joi.string(),
+  ADDRESSES: Joi.number().valid(...[1, 2])
 })

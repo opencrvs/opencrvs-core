@@ -14,26 +14,16 @@ import { createStore } from '@client/store'
 import {
   createTestComponent,
   flushPromises,
-  getFileFromBase64String,
-  mockConfigResponse
+  getFileFromBase64String
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ApplicationConfig } from '@client/views/SysAdmin/Config/Application'
-import { configApplicationMutations } from '@client/views/SysAdmin/Config/mutations'
-import * as fetchMock from 'jest-fetch-mock'
+import { configApplicationMutations } from './mutations'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { referenceApi } from '@client/utils/referenceApi'
-import { IAttachmentValue } from '@client/forms'
 
 const { store, history } = createStore()
-const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-const file: IAttachmentValue = {
-  name: 'img.png',
-  type: 'image/png',
-  data: `data:image;base64,${validImageB64String}`
-}
 let testComponent: ReactWrapper
 beforeEach(async () => {
   configApplicationMutations.mutateApplicationConfig = jest.fn(

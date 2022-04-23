@@ -39,6 +39,12 @@ describe('Verify handler', () => {
   beforeEach(async () => {
     fetch.resetMocks()
     server = await createServer()
+    jest
+      .spyOn(
+        require('../../utils/formDraftUtils'),
+        'checkFormDraftStatusToAddTestExtension'
+      )
+      .mockReturnValue('')
     fetch.mockResponses(
       [taskResouceMock, { status: 200 }],
       [userMock, { status: 200 }],
@@ -124,12 +130,6 @@ describe('Verify handler', () => {
   })
 
   it('updateTaskHandler returns OK for an archived task for birth', async () => {
-    jest
-      .spyOn(
-        require('../../utils/formDraftUtils'),
-        'checkFormDraftStatusToAddTestExtension'
-      )
-      .mockReturnValue('')
     fetch.mockResponses(
       [
         JSON.stringify({

@@ -206,7 +206,7 @@ type Mutation {
   ): CertificateSVG
   createOrUpdateQuestion(question: QuestionInput!): Question
   createOrUpdateFormDraft(formDraft: formDraftInput!): formDraft
-  deleteFormDraft(event: String!): FormDraft
+  deleteFormDraft(event: String!): formDraft
   updateApplicationConfig(
     applicationConfig: ApplicationConfigurationInput
   ): ApplicationConfiguration
@@ -631,6 +631,7 @@ type ApplicationConfiguration {
   LOGROCKET: String
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
+  ADDRESSES: Int
 }
 
 input ApplicationConfigurationInput {
@@ -654,6 +655,7 @@ input ApplicationConfigurationInput {
   LOGROCKET: String
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
+  ADDRESSES: Int
 }
 
 scalar Map

@@ -110,7 +110,7 @@ describe('Form draft reducer tests', () => {
     }
     store.dispatch(action)
     await flushPromises()
-    expect(store.getState().formDraft).toEqual(expectedState)
+    expect(store.getState().formDraft).toMatchObject(expectedState)
   })
 
   it('return loadingError true if any rejected by graphql', async () => {
@@ -130,6 +130,6 @@ describe('Form draft reducer tests', () => {
     }
     store.dispatch(action)
     await flushPromises()
-    expect(store.getState().formDraft).toEqual(expectedState)
+    expect(store.getState().formDraft).toMatchObject(expectedState)
   })
 })

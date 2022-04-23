@@ -28,13 +28,13 @@ type GetLocations = {
 }
 
 export const CONTENT_LOADED = 'OFFLINE/CONTENT_LOADED'
-export type contentLoadedAction = {
+export type ContentLoadedAction = {
   type: typeof CONTENT_LOADED
   payload: IContentResponse
 }
 
 export const CONTENT_FAILED = 'OFFLINE/CONTENT_FAILED'
-export type contentFailedAction = {
+export type ContentFailedAction = {
   type: typeof CONTENT_FAILED
   payload: Error
 }
@@ -191,12 +191,12 @@ export const getOfflineDataFailed = (): IGetOfflineDataFailedAction => ({
 
 export const contentLoaded = (
   payload: IContentResponse
-): contentLoadedAction => ({
+): ContentLoadedAction => ({
   type: CONTENT_LOADED,
   payload: payload
 })
 
-export const contentFailed = (error: Error): contentFailedAction => ({
+export const contentFailed = (error: Error): ContentFailedAction => ({
   type: CONTENT_FAILED,
   payload: error
 })
@@ -260,8 +260,8 @@ export type Action =
   | FacilitiesFailedAction
   | PilotLocationsLoadedAction
   | PilotLocationsFailedAction
-  | contentFailedAction
-  | contentLoadedAction
+  | ContentFailedAction
+  | ContentLoadedAction
   | AssetsLoadedAction
   | AssetsFailedAction
   | ApplicationConfigLoadAction
