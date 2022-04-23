@@ -55,7 +55,8 @@ import {
   BreakdownValue,
   PercentageDisplay,
   calculateTotal,
-  TotalDisplayWithPercentage
+  TotalDisplayWithPercentage,
+  certificationRatesDummyData
 } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
@@ -91,6 +92,7 @@ import format from '@client/utils/date-formatting'
 import { getPercentage } from '@client/utils/data-formatting'
 import { CompletenessReport } from './CompletenessReport'
 import { PaymentsAmountComponent } from './PaymentsAmountComponent'
+import { CertificationRatesComponent } from './CertificationRateComponent'
 
 interface IConnectProps {
   locations: { [key: string]: ILocation }
@@ -707,6 +709,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                   )
                 }}
               </Query>
+              <CertificationRatesComponent data={certificationRatesDummyData} />
               <Query
                 query={GET_TOTAL_PAYMENTS}
                 variables={{

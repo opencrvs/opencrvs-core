@@ -107,6 +107,21 @@ export function PercentageDisplay(props: { total: number; ofNumber: number }) {
   return <span>{getPercentage(props.ofNumber, props.total)}%</span>
 }
 
+export const ListContainer = styled.div`
+  margin-top: 36px;
+`
+
+export const certificationRatesDummyData = [
+  {
+    label: 'Total',
+    value: 4000
+  },
+  {
+    label: 'Certification Rate',
+    value: 25
+  }
+]
+
 export function TotalDisplayWithPercentage(props: {
   total: number
   ofNumber: number

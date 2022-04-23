@@ -18,7 +18,8 @@ import {
   PerformanceTitle,
   PerformanceValue,
   calculateTotalPaymentAmount,
-  PerformanceListHeader
+  PerformanceListHeader,
+  ListContainer
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLPaymentMetric } from '@opencrvs/gateway/src/graphql/schema'
 
@@ -29,27 +30,31 @@ interface PaymentsAmountProps {
 export function PaymentsAmountComponent(props: PaymentsAmountProps) {
   const { data } = props
   return (
-    <ListViewSimplified>
-      <ListViewItemSimplified
-        label={<PerformanceListHeader>Fees collected</PerformanceListHeader>}
-      />
-      <ListViewItemSimplified
-        label={<PerformanceTitle>Total</PerformanceTitle>}
-        value={
-          <PerformanceValue>
-            {calculateTotalPaymentAmount(data)}
-          </PerformanceValue>
-        }
-      />
-      {data &&
-        data.map((payment) => {
-          return (
-            <ListViewItemSimplified
-              label={<PerformanceTitle>{payment.paymentType}</PerformanceTitle>}
-              value={<PerformanceValue>{payment.total}</PerformanceValue>}
-            />
-          )
-        })}
-    </ListViewSimplified>
+    <ListContainer>
+      <ListViewSimplified>
+        <ListViewItemSimplified
+          label={<PerformanceListHeader>Fees collected</PerformanceListHeader>}
+        />
+        <ListViewItemSimplified
+          label={<PerformanceTitle>Total</PerformanceTitle>}
+          value={
+            <PerformanceValue>
+              {calculateTotalPaymentAmount(data)}
+            </PerformanceValue>
+          }
+        />
+        {data &&
+          data.map((payment) => {
+            return (
+              <ListViewItemSimplified
+                label={
+                  <PerformanceTitle>{payment.paymentType}</PerformanceTitle>
+                }
+                value={<PerformanceValue>{payment.total}</PerformanceValue>}
+              />
+            )
+          })}
+      </ListViewSimplified>
+    </ListContainer>
   )
 }
