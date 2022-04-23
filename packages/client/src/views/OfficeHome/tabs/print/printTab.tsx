@@ -40,10 +40,6 @@ import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { formattedDuration } from '@client/utils/date-formatting'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import {
@@ -54,6 +50,7 @@ import {
   IconWithName,
   IconWithNameEvent
 } from '@client/views/OfficeHome/tabs/components'
+import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 interface IBasePrintTabProps {
   theme: ITheme
@@ -289,9 +286,9 @@ class PrintTabComponent extends React.Component<
     const { data } = queryData
 
     return (
-      <Content
-        size={ContentSize.LARGE}
+      <WQContentWrapper
         title={intl.formatMessage(navigationMessages.print)}
+        isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
       >
         <GridTable
           content={this.transformRegisteredContent(data)}
@@ -307,7 +304,7 @@ class PrintTabComponent extends React.Component<
           loading={this.props.loading ? true : false}
           hasError={this.props.error ? true : false}
         />
-      </Content>
+      </WQContentWrapper>
     )
   }
 }

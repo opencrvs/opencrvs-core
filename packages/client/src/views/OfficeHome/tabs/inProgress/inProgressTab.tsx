@@ -63,10 +63,6 @@ import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { FormTabs } from '@opencrvs/components/lib/forms'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
@@ -79,6 +75,7 @@ import {
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/tabs/utils'
+import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -581,9 +578,11 @@ export class InProgressTabComponent extends React.Component<
     } = this.props
     const { inProgressData, notificationData } = queryData
     return (
-      <Content
-        size={ContentSize.LARGE}
+      <WQContentWrapper
         title={intl.formatMessage(navigationMessages.progress)}
+        isMobileSize={
+          this.state.width < this.props.theme.grid.breakpoints.lg ? true : false
+        }
         tabBarContent={
           !isFieldAgent &&
           this.getTabs(
@@ -618,7 +617,7 @@ export class InProgressTabComponent extends React.Component<
         {selectorId === SELECTOR_ID.hospitalDrafts &&
           !isFieldAgent &&
           this.renderHospitalTable(notificationData, intl, page, onPageChange)}
-      </Content>
+      </WQContentWrapper>
     )
   }
 }

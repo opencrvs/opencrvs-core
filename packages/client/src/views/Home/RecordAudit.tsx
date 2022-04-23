@@ -346,7 +346,8 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   REGISTERED: 'green',
   CERTIFIED: 'blue',
   WAITING_VALIDATION: 'teal',
-  SUBMITTED: 'orange'
+  SUBMITTED: 'orange',
+  SUBMITTING: 'orange'
 }
 
 const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]

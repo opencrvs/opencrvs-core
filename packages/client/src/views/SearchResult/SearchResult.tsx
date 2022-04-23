@@ -72,13 +72,10 @@ import { convertToMSISDN } from '@client/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { Navigation } from '@client/components/interface/Navigation'
 import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
-import {
   IconWithName,
   IconWithNameEvent
 } from '@client/views/OfficeHome/tabs/components'
+import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 const ErrorText = styled.div`
@@ -471,12 +468,14 @@ export class SearchResultView extends React.Component<
                       data.searchEvents.results.length) ||
                     0
                   return (
-                    <Content
-                      size={ContentSize.LARGE}
+                    <WQContentWrapper
                       title={intl.formatMessage(messages.searchResultFor, {
                         total,
                         param: searchText
                       })}
+                      isMobileSize={
+                        this.state.width < this.props.theme.grid.breakpoints.lg
+                      }
                     >
                       {total > 0 && (
                         <>
@@ -500,7 +499,7 @@ export class SearchResultView extends React.Component<
                           />
                         </>
                       )}
-                    </Content>
+                    </WQContentWrapper>
                   )
                 }}
               </Query>

@@ -20,8 +20,6 @@ import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { ITheme } from '@client/styledComponents'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
-import { EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
-import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
 import {
   ColumnContentAlignment,
   GridTable,
@@ -49,10 +47,6 @@ import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { withTheme } from 'styled-components'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import {
@@ -64,6 +58,7 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/tabs/utils'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -322,9 +317,11 @@ class ReviewTabComponent extends React.Component<
     const { intl, queryData, page, onPageChange } = this.props
     const { data } = queryData
     return (
-      <Content
-        size={ContentSize.LARGE}
+      <WQContentWrapper
         title={intl.formatMessage(navigationMessages.readyForReview)}
+        isMobileSize={
+          this.state.width < this.props.theme.grid.breakpoints.lg ? true : false
+        }
       >
         <ReactTooltip id="validateTooltip">
           <ToolTipContainer>
@@ -347,7 +344,7 @@ class ReviewTabComponent extends React.Component<
           loading={this.props.loading ? true : false}
           hasError={this.props.error ? true : false}
         />
-      </Content>
+      </WQContentWrapper>
     )
   }
 }

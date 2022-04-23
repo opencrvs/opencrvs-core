@@ -35,10 +35,6 @@ import {
 import { withTheme, ITheme } from '@client/styledComponents'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -52,8 +48,7 @@ import {
   IconWithNameEvent,
   SubmissionStatusMap
 } from '@client/views/OfficeHome/tabs/components'
-import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
-
+import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
 const DECLARATIONS_DAY_LIMIT = 7
 
 interface ISentForReviewProps {
@@ -160,6 +155,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           draft && draft.savedOn
             ? new Date(draft.savedOn)
             : draft.createdAt && parseInt(draft.createdAt)
+
         return {
           id: draft.id,
           event: event || '',
@@ -292,9 +288,9 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     const { intl, declarationsReadyToSend } = this.props
 
     return (
-      <Content
-        size={ContentSize.LARGE}
+      <WQContentWrapper
         title={intl.formatMessage(navigationMessages.sentForReview)}
+        isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
       >
         <GridTable
           content={this.transformDeclarationsReadyToSend()}
@@ -305,7 +301,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           sortOrder={this.state.sortOrder}
         />
         <LoadingIndicator loading={false} hasError={false} />
-      </Content>
+      </WQContentWrapper>
     )
   }
 }

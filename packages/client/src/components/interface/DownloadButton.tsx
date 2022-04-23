@@ -54,12 +54,10 @@ const StatusIndicator = styled.div<{
   justify-content: ${({ isLoading }) =>
     isLoading ? `space-between` : `flex-end`};
 `
-const DownloadAction = styled(TertiaryButton)<{
-  isFullHeight?: boolean
-}>`
-  ${({ isFullHeight }) => isFullHeight && `height: 100%;`}
+const DownloadAction = styled(TertiaryButton)`
   border-radius: 50%;
   height: 40px;
+  /* width: 100%; */
   & > div {
     padding: 0px 0px;
   }
@@ -97,7 +95,6 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     return (
       <StatusIndicator className={className}>
         <DownloadAction
-          isFullHeight={false}
           id={`${id}-icon`}
           onClick={(e) => {
             initiateDownload()
@@ -111,7 +108,6 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 
   return (
     <DownloadAction
-      isFullHeight={false}
       id={`${id}-icon`}
       onClick={(e) => {
         initiateDownload()

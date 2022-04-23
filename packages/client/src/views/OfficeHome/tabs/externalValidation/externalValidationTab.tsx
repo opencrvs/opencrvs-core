@@ -28,13 +28,8 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import { connect } from 'react-redux'
 import { goToPage, goToDeclarationRecordAudit } from '@client/navigation'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
-import { formattedDuration } from '@client/utils/date-formatting'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
+import { formattedDuration } from '@client/utils/date-formatting'
 import {
   getSortedItems,
   changeSortedColumn
@@ -43,6 +38,7 @@ import {
   IconWithName,
   IconWithNameEvent
 } from '@client/views/OfficeHome/tabs/components'
+import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
 
 const { useState, useEffect } = React
 
@@ -194,9 +190,9 @@ function ExternalValidationTabComponent(props: IProps) {
         ]
 
   return (
-    <Content
-      size={ContentSize.LARGE}
+    <WQContentWrapper
       title={intl.formatMessage(navigationMessages.waitingValidation)}
+      isMobileSize={viewportWidth < props.theme.grid.breakpoints.lg}
     >
       <GridTable
         content={transformWaitingValidationContent(data)}
@@ -212,7 +208,7 @@ function ExternalValidationTabComponent(props: IProps) {
         loading={Boolean(props.loading)}
         hasError={Boolean(props.error)}
       />
-    </Content>
+    </WQContentWrapper>
   )
 }
 

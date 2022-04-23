@@ -137,7 +137,6 @@ export const SubmissionStatusMap = ({
   online: boolean
   index: number
 }) => {
-  console.log(status)
   let icon: React.ReactNode
   let overwriteStatusIfOffline = true
   let iconId: string

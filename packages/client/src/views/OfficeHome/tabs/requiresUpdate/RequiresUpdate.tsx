@@ -50,10 +50,6 @@ import {
 } from 'react-intl'
 import { connect } from 'react-redux'
 import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import {
@@ -64,6 +60,7 @@ import {
   IconWithName,
   IconWithNameEvent
 } from '@client/views/OfficeHome/tabs/components'
+import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
 import { SUBMISSION_STATUS } from '@client/declarations'
 
 interface IProps {
@@ -258,9 +255,11 @@ const RequiresUpdateComponent = (props: IFullProps) => {
   }
 
   return (
-    <Content
-      size={ContentSize.LARGE}
+    <WQContentWrapper
       title={intl.formatMessage(navigationMessages.requiresUpdate)}
+      isMobileSize={
+        width && width < props.theme.grid.breakpoints.lg ? true : false
+      }
     >
       <Query
         query={SEARCH_DECLARATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
@@ -331,7 +330,7 @@ const RequiresUpdateComponent = (props: IFullProps) => {
           )
         }}
       </Query>
-    </Content>
+    </WQContentWrapper>
   )
 }
 

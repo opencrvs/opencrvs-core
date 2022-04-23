@@ -35,10 +35,6 @@ import ReactTooltip from 'react-tooltip'
 import { withTheme } from 'styled-components'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import {
@@ -49,6 +45,7 @@ import {
   IconWithName,
   IconWithNameEvent
 } from '@client/views/OfficeHome/tabs/components'
+import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -228,9 +225,9 @@ class ApprovalTabComponent extends React.Component<
     const { data } = queryData
 
     return (
-      <Content
-        size={ContentSize.LARGE}
+      <WQContentWrapper
         title={intl.formatMessage(navigationMessages.approvals)}
+        isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
       >
         <ReactTooltip id="validatedTooltip">
           <ToolTipContainer>
@@ -253,7 +250,7 @@ class ApprovalTabComponent extends React.Component<
           loading={this.props.loading ? true : false}
           hasError={this.props.error ? true : false}
         />
-      </Content>
+      </WQContentWrapper>
     )
   }
 }
