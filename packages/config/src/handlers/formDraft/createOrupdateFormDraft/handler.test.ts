@@ -29,38 +29,37 @@ const token = jwt.sign(
 
 const fetch = fetchMock as fetchMock.FetchMock
 
-const mockFormDraft = [
-  {
-    status: 'DRAFT',
-    _id: '623f30a18aef60124a72df14',
-    event: 'death',
-    comment: 'Modified previous death question',
-    version: 2,
-    createdAt: 1648308385612,
-    updatedAt: 1648308396432,
-    history: [
-      {
-        status: 'DRAFT',
-        _id: '623f30ac8aef60124a72df1c',
-        version: 1,
-        comment: 'Added new death question',
-        lastUpdateAt: 1648308385612
-      }
-    ],
-    __v: 0
-  },
-  {
-    status: 'DRAFT',
-    _id: '623f30c18aef60124a72df28',
-    event: 'birth',
-    comment: 'Added new birth question',
-    version: 1,
-    createdAt: 1648308417889,
-    updatedAt: 1648308457121,
-    history: [],
-    __v: 0
-  }
-]
+const birthBockFormDraft = {
+  status: 'DRAFT',
+  _id: '623f30a18aef60124a72df14',
+  event: 'death',
+  comment: 'Modified previous death question',
+  version: 2,
+  createdAt: 1648308385612,
+  updatedAt: 1648308396432,
+  history: [
+    {
+      status: 'DRAFT',
+      _id: '623f30ac8aef60124a72df1c',
+      version: 1,
+      comment: 'Added new death question',
+      lastUpdateAt: 1648308385612
+    }
+  ],
+  __v: 0
+}
+
+const deathMockFormDraft = {
+  status: 'DRAFT',
+  _id: '623f30c18aef60124a72df28',
+  event: 'death',
+  comment: 'Added new birth question',
+  version: 1,
+  createdAt: 1648308417889,
+  updatedAt: 1648308457121,
+  history: [],
+  __v: 0
+}
 
 const mockQuestion = [
   {
@@ -96,26 +95,10 @@ describe('updateFormDraftHandler handler', () => {
     fetch.mockReject(new Error())
   })
 
-  it('should return error if no question and deleted param is provied', async () => {
-    mockingoose(FormDraft).toReturn(null, 'findOne')
-    const res = await server.server.inject({
-      method: 'PUT',
-      url: '/draftQuestions',
-      payload: {
-        event: 'birth',
-        status: 'DRAFT'
-      },
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(400)
-  })
-
   it('should delete question using mongoose', async () => {
-    mockingoose(FormDraft).toReturn(mockFormDraft, 'findOne')
+    mockingoose(FormDraft).toReturn(birthBockFormDraft, 'findOne')
     mockingoose(Question).toReturn(mockQuestion, 'findOne')
-    mockingoose(FormDraft).toReturn(mockFormDraft, 'updateOne')
+    mockingoose(FormDraft).toReturn(birthBockFormDraft, 'updateOne')
     mockingoose(Question).toReturn(mockQuestion, 'updateOne')
     mockingoose(Question).toReturn(mockQuestion, 'findOneAndRemove')
 
@@ -135,11 +118,34 @@ describe('updateFormDraftHandler handler', () => {
     expect(res.statusCode).toBe(201)
   })
 
+  it('should return error if wrong operation requested using mongoose', async () => {
+    mockingoose(FormDraft).toReturn(birthBockFormDraft, 'findOne')
+    mockingoose(Question).toReturn(mockQuestion, 'findOne')
+    mockingoose(FormDraft).toReturn(birthBockFormDraft, 'updateOne')
+    mockingoose(Question).toReturn(mockQuestion, 'updateOne')
+    mockingoose(Question).toReturn(mockQuestion, 'findOneAndRemove')
+
+    const res = await server.server.inject({
+      method: 'PUT',
+      url: '/draftQuestions',
+      payload: {
+        event: 'birth',
+        comment: 'Modified question',
+        status: 'PUBLISHED',
+        deleted: ['birth.myField']
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(400)
+  })
+
   it('should update question using mongoose', async () => {
-    mockingoose(FormDraft).toReturn(mockFormDraft, 'findOne')
+    mockingoose(FormDraft).toReturn(birthBockFormDraft, 'findOne')
     mockingoose(Question).toReturn(mockQuestion, 'find')
     mockingoose(Question).toReturn(mockQuestion, 'updateOne')
-    mockingoose(FormDraft).toReturn(mockFormDraft, 'updateOne')
+    mockingoose(FormDraft).toReturn(birthBockFormDraft, 'updateOne')
     const res = await server.server.inject({
       method: 'PUT',
       url: '/draftQuestions',
@@ -166,8 +172,8 @@ describe('updateFormDraftHandler handler', () => {
   })
 
   it('should return error if any error occured on delete question', async () => {
-    mockingoose(FormDraft).toReturn(mockFormDraft, 'findOne')
-    mockingoose(FormDraft).toReturn(mockFormDraft, 'updateOne')
+    mockingoose(FormDraft).toReturn(birthBockFormDraft, 'findOne')
+    mockingoose(FormDraft).toReturn(birthBockFormDraft, 'updateOne')
     mockingoose(Question).toReturn(mockQuestion, 'findOne')
     mockingoose(Question).toReturn(mockQuestion, 'updateOne')
     mockingoose(Question).toReturn(new Error('boom'), 'deleteMany')
@@ -188,17 +194,17 @@ describe('updateFormDraftHandler handler', () => {
   })
 
   it('should return error if any error occured on update question', async () => {
-    mockingoose(FormDraft).toReturn(mockFormDraft, 'findOne')
+    mockingoose(FormDraft).toReturn(deathMockFormDraft, 'findOne')
     mockingoose(FormDraft).toReturn(new Error('boom'), 'updateOne')
     mockingoose(Question).toReturn(mockQuestion, 'findOne')
     const res = await server.server.inject({
       method: 'PUT',
       url: '/draftQuestions',
       payload: {
-        event: 'birth',
+        event: 'death',
         comment: 'Modified question',
         status: 'DRAFT',
-        deleted: ['birth.wrongId']
+        deleted: ['death.wrongId']
       },
       headers: {
         Authorization: `Bearer ${token}`

@@ -65,7 +65,7 @@ export async function deleteFormDraftHandler(
   if (draft) {
     //get hearthDB connection
     const hearthDBConn = await getHearthDb()
-    const tasks = (await hearthDBConn.db
+    const tasks = (await hearthDBConn
       .collection('Task')
       .find()
       .toArray()) as fhir.Task[]
