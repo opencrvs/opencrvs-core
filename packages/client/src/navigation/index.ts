@@ -14,8 +14,7 @@ import {
   Event,
   UserSection,
   CorrectionSection,
-  BirthSection,
-  DeathSection
+  WizardSection
 } from '@client/forms'
 import {
   CERTIFICATE_COLLECTOR,
@@ -426,10 +425,7 @@ export function goToFieldAgentHomeTab(tabId: string) {
   }
 }
 
-export function goToFormConfigWizard(
-  event: Event,
-  section: BirthSection | DeathSection
-) {
+export function goToFormConfigWizard(event: Event, section: WizardSection) {
   return push(
     formatUrl(FORM_CONFIG_WIZARD, {
       event: event,

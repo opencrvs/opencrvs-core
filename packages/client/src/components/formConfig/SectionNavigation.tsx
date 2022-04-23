@@ -16,7 +16,7 @@ import {
   NavigationSubItem,
   LabelContainer
 } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
-import { Event, BirthSection, DeathSection } from '@client/forms'
+import { Event, BirthSection, DeathSection, WizardSection } from '@client/forms'
 import { useIntl } from 'react-intl'
 import {
   messages,
@@ -39,7 +39,7 @@ const OrderedList = styled.ol`
 `
 
 interface IPageNavigationProps {
-  section: BirthSection | DeathSection
+  section: WizardSection
   event: Event
 }
 

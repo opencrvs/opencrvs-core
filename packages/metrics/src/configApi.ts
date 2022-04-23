@@ -58,6 +58,7 @@ export interface IApplicationConfig {
   SENTRY: string
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: string
+  ADDRESSES: number
 }
 
 export async function getApplicationConfig(): Promise<IApplicationConfig> {

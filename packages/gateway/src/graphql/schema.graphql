@@ -579,6 +579,7 @@ type ApplicationConfiguration {
   LOGROCKET: String
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
+  ADDRESSES: Int
 }
 
 input ApplicationConfigurationInput {
@@ -602,6 +603,7 @@ input ApplicationConfigurationInput {
   LOGROCKET: String
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
+  ADDRESSES: Int
 }
 
 input QuestionInput {

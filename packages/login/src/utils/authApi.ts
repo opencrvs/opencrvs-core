@@ -75,6 +75,7 @@ export interface IApplicationConfig {
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: string
   NID_NUMBER_PATTERN: string
+  ADDRESSES: number
 }
 
 export interface IApplicationConfigResponse {

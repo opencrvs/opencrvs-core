@@ -70,6 +70,7 @@ import {
   FormConfiguration,
   FormConfigWizard
 } from './views/SysAdmin/Config/Forms'
+import { FormConfigSettings } from './views/SysAdmin/Config/Forms/FormConfigSettings'
 
 interface IAppProps {
   client?: ApolloClient<{}>
