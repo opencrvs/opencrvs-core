@@ -38,6 +38,7 @@ import {
   goToTeamUserList,
   IDynamicValues
 } from '@client/navigation'
+import { Divider } from '@opencrvs/components/lib/interface/Divider'
 import {
   injectIntl,
   IntlShape,
@@ -157,7 +158,9 @@ const BodyContainer = styled.div`
   margin-left: 0px;
   margin-top: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 265px;
+    margin-left: 274px;
+    margin-top: 24px;
+    margin-right: 24px;
   }
 `
 
@@ -248,7 +251,8 @@ const NameAvatar = styled.div`
   }
 `
 
-const Heading = styled.h4`
+const Heading = styled.h3`
+  ${({ theme }) => theme.fonts.h3}
   margin-bottom: 0px !important;
 `
 
@@ -701,6 +705,7 @@ const showReviewButton = ({
       <PrimaryButton
         key={id}
         id={`review-btn-${id}`}
+        size={'medium'}
         onClick={() => {
           goToPage &&
             goToPage(REVIEW_EVENT_PARENT_FORM_PAGE, id, 'review', type)
@@ -851,6 +856,7 @@ const showPrintButton = ({
       <PrimaryButton
         key={id}
         id={`print-${id}`}
+        size={'medium'}
         onClick={() => {
           goToPrintCertificate &&
             goToPrintCertificate(id, type.toLocaleLowerCase())
@@ -950,7 +956,7 @@ const GetHistory = ({
   if (!draft?.data?.history?.length)
     return (
       <>
-        <hr />
+        <Divider />
         <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
         <LargeGreyedInfo />
       </>
@@ -1016,7 +1022,7 @@ const GetHistory = ({
   ]
   return (
     <>
-      <hr />
+      <Divider />
       <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
       <TableView
         id="task-history"
@@ -1604,6 +1610,7 @@ function RecordAuditBody({
             <PrimaryButton
               id="continue"
               key="continue"
+              size={'medium'}
               onClick={() => {
                 reinstateDeclaration(declaration.id)
                 toggleDisplayDialog()
@@ -1617,6 +1624,7 @@ function RecordAuditBody({
             <DangerButton
               id="archive_confirm"
               key="archive_confirm"
+              size={'medium'}
               onClick={() => {
                 archiveDeclaration(declaration.id)
                 toggleDisplayDialog()
