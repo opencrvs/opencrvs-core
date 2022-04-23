@@ -34,8 +34,7 @@ export async function getFormDraft(token: string) {
         Authorization: `Bearer ${token}`
       }
     })
-    const result = await res.json()
-    return result
+    return await res.json()
   } catch (err) {
     logger.error(`Unable to check form draft status for error : ${err}`)
   }

@@ -124,6 +124,12 @@ describe('Verify handler', () => {
   })
 
   it('updateTaskHandler returns OK for an archived task for birth', async () => {
+    jest
+      .spyOn(
+        require('../../utils/formDraftUtils'),
+        'checkFormDraftStatusToAddTestExtension'
+      )
+      .mockReturnValue('')
     fetch.mockResponses(
       [
         JSON.stringify({

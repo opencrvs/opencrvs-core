@@ -19,12 +19,10 @@ import { FORM_CONFIG } from '@client/navigation/routes'
 const { store, history } = createStore()
 let testComponent: ReactWrapper
 beforeEach(async () => {
-  testComponent = await createTestComponent(
-    <FormConfiguration
-      {...createRouterProps(FORM_CONFIG, { isNavigatedInsideApp: false })}
-    />,
-    { store, history }
-  )
+  testComponent = await createTestComponent(<FormConfiguration />, {
+    store,
+    history
+  })
 })
 
 describe('form config page test', () => {
