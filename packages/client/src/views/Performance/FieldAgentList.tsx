@@ -48,34 +48,15 @@ import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
 import format from '@client/utils/date-formatting'
 import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
-const PaginationDiv = styled.div`
-  display: flex;
-  align-items: center;
-`
-const ShowSmallOnDesktop = styled.div`
-  display: flex;
-  margin-right: 80%;
-  float: left;
-  width: 30%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none;
-  }
-`
-
-const ShowLargeOnMobile = styled.div`
-  display: none;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: inline-flex;
-    align-items: center;
-    margin-left: auto;
-    margin-right: auto;
-  }
-`
-
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 25
 const { useState } = React
 interface SortMap {
@@ -536,8 +517,8 @@ function FieldAgentListComponent(props: IProps) {
                   highlightRowOnMouseOver
                 />
                 {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
-                  <PaginationDiv>
-                    <ShowSmallOnDesktop>
+                  <PaginationWrapper>
+                    <DesktopWrapper>
                       <PaginationModified
                         size="small"
                         initialPage={currentPageNumber}
@@ -548,8 +529,8 @@ function FieldAgentListComponent(props: IProps) {
                           setCurrentPageNumber(currentPage)
                         }}
                       />
-                    </ShowSmallOnDesktop>
-                    <ShowLargeOnMobile>
+                    </DesktopWrapper>
+                    <MobileWrapper>
                       <PaginationModified
                         size="large"
                         initialPage={currentPageNumber}
@@ -560,8 +541,8 @@ function FieldAgentListComponent(props: IProps) {
                           setCurrentPageNumber(currentPage)
                         }}
                       />
-                    </ShowLargeOnMobile>
-                  </PaginationDiv>
+                    </MobileWrapper>
+                  </PaginationWrapper>
                 )}
               </>
             )

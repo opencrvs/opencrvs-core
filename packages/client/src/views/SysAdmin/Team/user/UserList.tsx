@@ -77,6 +77,11 @@ import styled from 'styled-components'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
 import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState, useEffect } = React
@@ -238,28 +243,6 @@ const HideDesktopStatusWrapper = styled.div`
   display: none;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: inline;
-  }
-`
-export const PaginationDiv = styled.div`
-  display: flex;
-  align-items: center;
-`
-export const ShowSmallOnDesktop = styled.div`
-  display: flex;
-  margin-right: 80%;
-  float: left;
-  width: 30%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none;
-  }
-`
-export const ShowLargeOnMobile = styled.div`
-  display: none;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: inline-flex;
-    align-items: center;
-    margin-left: auto;
-    margin-right: auto;
   }
 `
 interface ISearchParams {
@@ -735,8 +718,8 @@ function UserListComponent(props: IProps) {
                 noResultText="No result"
               />
               {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
-                <PaginationDiv>
-                  <ShowSmallOnDesktop>
+                <PaginationWrapper>
+                  <DesktopWrapper>
                     <PaginationModified
                       size={'small'}
                       initialPage={currentPageNumber}
@@ -747,8 +730,8 @@ function UserListComponent(props: IProps) {
                         setCurrentPageNumber(currentPage)
                       }
                     />
-                  </ShowSmallOnDesktop>
-                  <ShowLargeOnMobile>
+                  </DesktopWrapper>
+                  <MobileWrapper>
                     <PaginationModified
                       size={'large'}
                       initialPage={currentPageNumber}
@@ -759,8 +742,8 @@ function UserListComponent(props: IProps) {
                         setCurrentPageNumber(currentPage)
                       }
                     />
-                  </ShowLargeOnMobile>
-                </PaginationDiv>
+                  </MobileWrapper>
+                </PaginationWrapper>
               )}
               <UserAuditActionModal
                 show={toggleActivation.modalVisible}

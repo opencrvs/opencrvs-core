@@ -69,35 +69,17 @@ import format, { formattedDuration } from '@client/utils/date-formatting'
 import subYears from 'date-fns/subYears'
 import differenceInSeconds from 'date-fns/differenceInSeconds'
 import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
 const DoubleLineValueWrapper = styled.div`
   margin: 12px 0px;
-`
-const PaginationDiv = styled.div`
-  display: flex;
-  align-items: center;
-`
-const ShowSmallOnDesktop = styled.div`
-  display: flex;
-  margin-right: 80%;
-  float: left;
-  width: 30%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none;
-  }
-`
-
-const ShowLargeOnMobile = styled.div`
-  display: none;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: inline-flex;
-    align-items: center;
-    margin-left: auto;
-    margin-right: auto;
-  }
 `
 
 const { useState } = React
@@ -782,8 +764,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 isFullPage
               />
               {total > DEFAULT_DECLARATION_STATUS_PAGE_SIZE && (
-                <PaginationDiv>
-                  <ShowSmallOnDesktop>
+                <PaginationWrapper>
+                  <DesktopWrapper>
                     <PaginationModified
                       size={'small'}
                       initialPage={currentPageNumber}
@@ -794,8 +776,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                         setCurrentPageNumber(currentPage)
                       }}
                     />
-                  </ShowSmallOnDesktop>
-                  <ShowLargeOnMobile>
+                  </DesktopWrapper>
+                  <MobileWrapper>
                     <PaginationModified
                       size={'large'}
                       initialPage={currentPageNumber}
@@ -806,8 +788,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                         setCurrentPageNumber(currentPage)
                       }}
                     />
-                  </ShowLargeOnMobile>
-                </PaginationDiv>
+                  </MobileWrapper>
+                </PaginationWrapper>
               )}
               {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
             </>

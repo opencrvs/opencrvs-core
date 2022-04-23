@@ -133,6 +133,11 @@ import { getFieldValue } from './utils'
 import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import format, { formatLongDate } from '@client/utils/date-formatting'
 import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
 
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
@@ -232,29 +237,6 @@ const ShowOnMobile = styled.div`
     margin-left: auto;
     margin-bottom: 32px;
     margin-top: 32px;
-  }
-`
-const PaginationDiv = styled.div`
-  display: flex;
-  align-items: center;
-`
-const ShowSmallOnDesktop = styled.div`
-  display: flex;
-  margin-right: 80%;
-  float: left;
-  width: 30%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none;
-  }
-`
-
-const ShowLargeOnMobile = styled.div`
-  display: none;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: inline-flex;
-    align-items: center;
-    margin-left: auto;
-    margin-right: auto;
   }
 `
 
@@ -1045,8 +1027,8 @@ const GetHistory = ({
         onPageChange={onPageChange}
       />
       {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
-        <PaginationDiv>
-          <ShowSmallOnDesktop>
+        <PaginationWrapper>
+          <DesktopWrapper>
             <PaginationModified
               size="small"
               initialPage={currentPageNumber}
@@ -1055,8 +1037,8 @@ const GetHistory = ({
               )}
               onPageChange={onPageChange}
             />
-          </ShowSmallOnDesktop>
-          <ShowLargeOnMobile>
+          </DesktopWrapper>
+          <MobileWrapper>
             <PaginationModified
               size="large"
               initialPage={currentPageNumber}
@@ -1065,8 +1047,8 @@ const GetHistory = ({
               )}
               onPageChange={onPageChange}
             />
-          </ShowLargeOnMobile>
-        </PaginationDiv>
+          </MobileWrapper>
+        </PaginationWrapper>
       )}
     </>
   )
