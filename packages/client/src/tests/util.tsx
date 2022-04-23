@@ -53,7 +53,7 @@ import { stringify } from 'query-string'
 import { match as Match } from 'react-router'
 import { ConnectedRouter } from 'connected-react-router'
 import { IVerifyIDCertificateCollectorDefinition } from '@client/forms/certificate/fieldDefinitions/collectorSection'
-import { mockOfflineData } from './mock-offline-data'
+import { mockOfflineData, mockFormDrafts } from './mock-offline-data'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -2567,12 +2567,12 @@ export const mockFetchCertificatesTemplatesDefinition = [
 export const mockConfigResponse = {
   config: mockOfflineData.config,
   certificates: mockFetchCertificatesTemplatesDefinition,
-  formConfig: mockOfflineData.formConfig
+  formConfig: mockOfflineData.formConfig,
+  formDrafts: mockFormDrafts
 }
 
-const offlineData = {
+export const mockOfflineDataDispatch = {
   languages: mockOfflineData.languages,
-  forms: mockOfflineData.forms,
   templates: mockOfflineData.templates,
   locations: mockOfflineData.locations,
   facilities: mockOfflineData.facilities,
@@ -2586,7 +2586,7 @@ const offlineData = {
 
 export async function createTestStore() {
   const { store, history } = createStore()
-  await store.dispatch(offlineDataReady(offlineData))
+  await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   return { store, history }
 }
 
@@ -2605,7 +2605,7 @@ export async function createTestComponent(
   },
   options?: MountRendererProps
 ) {
-  await store.dispatch(offlineDataReady(offlineData))
+  await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
 
   const withGraphQL = (node: JSX.Element) => {
     if (apolloClient) {

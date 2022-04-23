@@ -14,13 +14,30 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import {
   IFormDraft,
-  DraftStatus
+  DraftStatus,
+  IDraft
 } from '@client/forms/configuration/formDrafts/utils'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
-const formDraft: IFormDraft = {
+export const mockFormDrafts: IDraft[] = [
+  {
+    event: Event.BIRTH,
+    status: DraftStatus.DRAFT,
+    version: 0,
+    updatedAt: 1649395100098,
+    createdAt: 1649395100098
+  },
+  {
+    event: Event.DEATH,
+    status: DraftStatus.DRAFT,
+    version: 0,
+    updatedAt: 1649395100098,
+    createdAt: 1649395100098
+  }
+]
+export const offlineFormDraft: IFormDraft = {
   birth: {
     event: Event.BIRTH,
     status: DraftStatus.DRAFT,
@@ -744,5 +761,5 @@ export const mockOfflineData = {
     LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
   },
   formConfig,
-  formDraft
+  formDraft: offlineFormDraft
 }
