@@ -18,11 +18,10 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToFieldAgentList, goToOperationalReport } from '@client/navigation'
+import { goToFieldAgentList, goToPerformanceHome } from '@client/navigation'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
@@ -86,7 +85,7 @@ interface IConnectProps {
 }
 
 interface IDispatchProps {
-  goToOperationalReport: typeof goToOperationalReport
+  goToPerformanceHome: typeof goToPerformanceHome
   goToFieldAgentList: typeof goToFieldAgentList
 }
 type IProps = RouteComponentProps &
@@ -143,7 +142,7 @@ function FieldAgentListComponent(props: IProps) {
   const {
     intl,
     location: { search },
-    goToOperationalReport,
+    goToPerformanceHome,
     offlineOffices
   } = props
   const { locationId, timeStart, timeEnd } = parse(
@@ -362,12 +361,7 @@ function FieldAgentListComponent(props: IProps) {
       id="field-agent-list"
       type={SysAdminPageVariant.SUBPAGE}
       backActionHandler={() =>
-        goToOperationalReport(
-          locationId,
-          OPERATIONAL_REPORT_SECTION.OPERATIONAL,
-          dateStart,
-          dateEnd
-        )
+        goToPerformanceHome(dateStart, dateEnd, locationId)
       }
       fixedWidth={1500}
       headerTitle={intl.formatMessage(messages.fieldAgentsTitle)}
@@ -522,5 +516,5 @@ export const FieldAgentList = connect(
       offlineOffices
     }
   },
-  { goToOperationalReport, goToFieldAgentList }
+  { goToPerformanceHome, goToFieldAgentList }
 )(injectIntl(FieldAgentListComponent))

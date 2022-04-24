@@ -49,6 +49,10 @@ const Content = styled(BodyContent)<{
       padding: ${0}px ${profilePageStyle.horizontalPaddingMd}px
     `}
   }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 0;
+  }
 `
 const SubPageContent = styled(Content)`
   max-width: 100%;
@@ -69,6 +73,10 @@ interface BasePage {
   mapPinClickHandler?: () => void
   profilePageStyle?: IprofilePageStyle
   subMenuComponent?: React.ReactNode
+  /*
+  FIXME: This prop should be removed at some point.
+  It only toggle background between gray and white.
+  */
   isCertificatesConfigPage?: boolean
 }
 

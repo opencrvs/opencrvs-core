@@ -16,7 +16,11 @@ import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
-import { Box, ISearchLocation } from '@opencrvs/components/lib/interface'
+import {
+  Box,
+  ISearchLocation,
+  Spinner
+} from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -36,6 +40,16 @@ import { Event } from '@client/forms'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
+import { Query } from '@client/components/Query'
+import { PERFORMANCE_METRICS } from './metricsQuery'
+import { ApolloError } from 'apollo-client'
+import {
+  ToastNotification,
+  NOTIFICATION_TYPE
+} from '@client/components/interface/ToastNotification'
+import { CompletenessReport } from './CompletenessReport'
+import { RegistrationsReport } from './RegistrationsReport'
+import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 
 const Layout = styled.div`
   display: flex;
@@ -43,6 +57,12 @@ const Layout = styled.div`
 `
 const LayoutLeft = styled.div`
   flex-grow: 1;
+
+  .performance-block {
+    &:not(:last-child) {
+      margin-bottom: 40px;
+    }
+  }
 `
 const LayoutRight = styled.div`
   margin-top: 24px;
@@ -73,7 +93,6 @@ const PerformanceActions = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding-bottom: 16px;
 `
 interface IConnectProps {
   locations: { [key: string]: ILocation }
@@ -87,6 +106,9 @@ interface ISearchParams {
   timeEnd: string
 }
 
+interface IMetricsQueryResult {
+  getTotalMetrics: GQLTotalMetricsResult
+}
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
 }
@@ -194,10 +216,16 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
   render() {
     const { intl, userDetails } = this.props
-
+    const { timeStart, timeEnd, event } = this.state
+    const queryVariablesWithoutLocationId = {
+      timeStart: timeStart.toISOString(),
+      timeEnd: timeEnd.toISOString(),
+      event: event.toUpperCase()
+    }
     return (
       <SysAdminContentWrapper
         id="performanceHome"
+        isCertificatesConfigPage={true}
         profilePageStyle={{
           paddingTopMd: 0,
           horizontalPaddingMd: 0
@@ -208,12 +236,59 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             <Content
               title={intl.formatMessage(navigationMessages.performance)}
               size={ContentSize.LARGE}
-              tabBarContent={this.getTabContent(
+              filterContent={this.getTabContent(
                 intl,
                 this.state.selectedLocation
               )}
-              noTabBarBorder={true}
-            ></Content>
+            >
+              <Query
+                query={PERFORMANCE_METRICS}
+                variables={
+                  this.state.selectedLocation
+                    ? {
+                        ...queryVariablesWithoutLocationId,
+                        locationId: this.state.selectedLocation.id
+                      }
+                    : queryVariablesWithoutLocationId
+                }
+                fetchPolicy="no-cache"
+              >
+                {({
+                  loading,
+                  error,
+                  data
+                }: {
+                  loading: boolean
+                  error?: ApolloError
+                  data?: IMetricsQueryResult
+                }) => {
+                  if (error) {
+                    return (
+                      <>
+                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                      </>
+                    )
+                  }
+
+                  if (loading) {
+                    return <Spinner id="performance-home-loading" />
+                  }
+
+                  return (
+                    <>
+                      <CompletenessReport
+                        data={data!.getTotalMetrics}
+                        selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
+                      />
+                      <RegistrationsReport
+                        data={data!.getTotalMetrics}
+                        selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
+                      />
+                    </>
+                  )
+                }}
+              </Query>
+            </Content>
           </LayoutLeft>
           <LayoutRight>
             <Stats>

@@ -18,7 +18,6 @@ import {
   goForward,
   goToEvents as goToEventsAction,
   goToHome,
-  goToOperationalReport,
   goToPerformanceHome,
   goToSearch,
   goToSearchResult,
@@ -72,7 +71,6 @@ import { Avatar } from '@client/components/Avatar'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
   HOME,
-  OPERATIONAL_REPORT,
   PERFORMANCE_HOME,
   REGISTRAR_HOME
 } from '@client/navigation/routes'
@@ -92,7 +90,7 @@ type IDispatchProps = {
   goForward: typeof goForward
   goToHomeAction: typeof goToHome
   goToPerformanceHomeAction: typeof goToPerformanceHome
-  goToOperationalReportAction: typeof goToOperationalReport
+
   goToTeamSearchAction: typeof goToTeamSearch
   goToTeamUserListAction: typeof goToTeamUserList
 }
@@ -315,7 +313,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       (NATL_ADMIN_ROLES.includes(role as string) &&
         PERFORMANCE_HOME.includes(location)) ||
       (SYS_ADMIN_ROLES.includes(role as string) &&
-        OPERATIONAL_REPORT.includes(location)) ||
+        PERFORMANCE_HOME.includes(location)) ||
       (REGISTRAR_ROLES.includes(role as string) &&
         REGISTRAR_HOME.includes(location))
     ) {
@@ -398,18 +396,15 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   }
 
   goToPerformanceView(props: IFullProps) {
-    const {
-      userDetails,
-      goToPerformanceHomeAction,
-      goToOperationalReportAction
-    } = props
+    const { userDetails, goToPerformanceHomeAction } = props
     if (userDetails && userDetails.role) {
       if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
         return goToPerformanceHomeAction()
       } else {
         const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
         return (
-          (locationId && goToOperationalReportAction(locationId)) ||
+          (locationId &&
+            goToPerformanceHomeAction(undefined, undefined, locationId)) ||
           goToPerformanceHomeAction()
         )
       }
@@ -538,7 +533,7 @@ export const Header = connect(
     goToEvents: goToEventsAction,
     goToHomeAction: goToHome,
     goToPerformanceHomeAction: goToPerformanceHome,
-    goToOperationalReportAction: goToOperationalReport,
+
     goToTeamSearchAction: goToTeamSearch,
     goToTeamUserListAction: goToTeamUserList
   }

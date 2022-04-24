@@ -27,11 +27,7 @@ import {
   goToEvents as goToEventsAction,
   goToFieldAgentHomeTab as goToFieldAgentHomeTabAction
 } from '@client/navigation'
-import {
-  OPERATIONAL_REPORT,
-  PERFORMANCE_HOME,
-  REGISTRAR_HOME
-} from '@client/navigation/routes'
+import { PERFORMANCE_HOME, REGISTRAR_HOME } from '@client/navigation/routes'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SEARCH_DECLARATIONS_USER_WISE } from '@client/search/queries'
 import styled, { ITheme, withTheme } from '@client/styledComponents'
@@ -80,7 +76,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { Redirect, RouteComponentProps } from 'react-router'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
+
 import {
   Navigation,
   WORKQUEUE_TABS

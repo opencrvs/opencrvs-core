@@ -19,11 +19,8 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { Event } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/performance'
-import {
-  goToOperationalReport,
-  goToRegistrationRates
-} from '@client/navigation'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
+import { goToPerformanceHome, goToRegistrationRates } from '@client/navigation'
+
 import {
   FilterContainer,
   getJurisidictionType
@@ -64,7 +61,7 @@ interface ISearchParams {
   timeEnd: string
 }
 interface IDispatchProps {
-  goToOperationalReport: typeof goToOperationalReport
+  goToPerformanceHome: typeof goToPerformanceHome
   goToRegistrationRates: typeof goToRegistrationRates
 }
 type IRegistrationRateProps = RouteComponentProps<{ eventType: string }> &
@@ -118,7 +115,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
     match: {
       params: { eventType }
     },
-    goToOperationalReport
+    goToPerformanceHome
   } = props
   const { locationId, timeStart, timeEnd, title } = parse(
     search
@@ -132,12 +129,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
       id="reg-rates"
       type={SysAdminPageVariant.SUBPAGE_CENTERED}
       backActionHandler={() =>
-        goToOperationalReport(
-          locationId,
-          OPERATIONAL_REPORT_SECTION.OPERATIONAL,
-          dateStart,
-          dateEnd
-        )
+        goToPerformanceHome(dateStart, dateEnd, locationId)
       }
       headerTitle={title}
       toolbarComponent={
@@ -269,6 +261,6 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
 }
 
 export const RegistrationRates = connect(null, {
-  goToOperationalReport,
+  goToPerformanceHome,
   goToRegistrationRates
 })(injectIntl(RegistrationRatesComponent))
