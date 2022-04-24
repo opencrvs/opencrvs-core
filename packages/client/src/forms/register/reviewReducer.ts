@@ -13,13 +13,7 @@ import { LoopReducer, Loop } from 'redux-loop'
 import { IForm, ReviewSection, ISerializedForm, Event } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/review'
 import * as offlineActions from '@client/offline/actions'
-import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { registerForms } from '@client/forms/configuration/default'
-import {
-  configureRegistrationForm,
-  filterQuestionsByEventType,
-  sortFormCustomisations
-} from '@client/forms/configuration'
+import { getConfiguredOrDefaultForm } from '@client/forms/configuration'
 
 export type IReviewFormState =
   | {
@@ -51,28 +45,9 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
 ): IReviewFormState | Loop<IReviewFormState, Action> => {
   switch (action.type) {
     case offlineActions.READY:
-      const configuredBirthForm: ISerializedForm = configureRegistrationForm(
-        sortFormCustomisations(
-          filterQuestionsByEventType(
-            action.payload.formConfig.questionConfig,
-            Event.BIRTH
-          ),
-          registerForms.birth
-        ),
-        registerForms.birth
-      )
-      const configuredDeathForm: ISerializedForm = configureRegistrationForm(
-        sortFormCustomisations(
-          filterQuestionsByEventType(
-            action.payload.formConfig.questionConfig,
-            Event.DEATH
-          ),
-          registerForms.death
-        ),
-        registerForms.death
-      )
-      const birth = deserializeForm(configuredBirthForm)
-      const death = deserializeForm(configuredDeathForm)
+      const { formConfig } = action.payload
+      const birth = getConfiguredOrDefaultForm(formConfig, Event.BIRTH)
+      const death = getConfiguredOrDefaultForm(formConfig, Event.DEATH)
 
       const review = {
         id: ReviewSection.Review,

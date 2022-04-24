@@ -13,14 +13,8 @@ import { loop, Cmd, Loop, LoopReducer } from 'redux-loop'
 import { storage } from '@client/storage'
 import * as actions from '@client/forms/configuration/configFields/actions'
 import * as offlineActions from '@client/offline/actions'
-import { Event, ISerializedForm, IQuestionConfig } from '@client/forms'
-import {
-  configureRegistrationForm,
-  sortFormCustomisations,
-  filterQuestionsByEventType
-} from '@client/forms/configuration'
-import { registerForms } from '@client/forms/configuration/default'
-import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { Event, IQuestionConfig } from '@client/forms'
+import { getConfiguredForm } from '@client/forms/configuration'
 import { ISectionFieldMap, getEventSectionFieldsMap } from './utils'
 
 export type IConfigFieldsState =
@@ -78,24 +72,9 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         const configFieldsState: IConfigFieldsState = JSON.parse(action.payload)
         return { ...configFieldsState }
       }
-      const configuredBirthForm: ISerializedForm = configureRegistrationForm(
-        sortFormCustomisations(
-          filterQuestionsByEventType(state.questions, Event.BIRTH),
-          registerForms.birth
-        ),
-        registerForms.birth
-      )
 
-      const configuredDeathForm: ISerializedForm = configureRegistrationForm(
-        sortFormCustomisations(
-          filterQuestionsByEventType(state.questions, Event.DEATH),
-          registerForms.death
-        ),
-        registerForms.death
-      )
-
-      const birthForm = deserializeForm(configuredBirthForm)
-      const deathForm = deserializeForm(configuredDeathForm)
+      const birthForm = getConfiguredForm(state.questions, Event.BIRTH)
+      const deathForm = getConfiguredForm(state.questions, Event.DEATH)
 
       const newState: IConfigFieldsState = {
         ...state,

@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Loop, LoopReducer, loop, Cmd } from 'redux-loop'
-import { find } from 'lodash'
 import * as actions from './actions'
 import * as offlineActions from '@client/offline/actions'
 import { Event } from '@client/forms'
+import { getFormDraft } from './utils'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',
@@ -57,23 +57,6 @@ export type IFormDraftState =
 export const initialState: IFormDraftState = {
   state: 'LOADING',
   formDraft: null
-}
-
-function getEventDraft(formDrafts: IDraft[], event: Event) {
-  const formDraft = find(formDrafts, { event })
-  if (!formDraft) {
-    throw new Error(`${event} formDraft not found`)
-  }
-  return formDraft
-}
-
-function getFormDraft(formDrafts: IDraft[]) {
-  const birthDraft = getEventDraft(formDrafts, Event.BIRTH)
-  const deathDraft = getEventDraft(formDrafts, Event.DEATH)
-  return {
-    birth: birthDraft,
-    death: deathDraft
-  }
 }
 
 function getOfflineFormDrafts(formDraft: IFormDraft) {

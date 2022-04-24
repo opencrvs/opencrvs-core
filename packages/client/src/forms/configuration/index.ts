@@ -17,7 +17,8 @@ import {
   IQuestionConfig,
   SerializedFormField,
   ISerializedFormSection,
-  IFormSectionGroup
+  IFormSectionGroup,
+  Event
 } from '@client/forms/index'
 import {
   configureCustomQuestions,
@@ -31,6 +32,10 @@ import {
   IDefaultField,
   IDefaultFieldCustomisation
 } from '@client/forms/configuration/defaultUtils'
+import { getEventDraft } from '@client/forms/configuration/formDrafts/utils'
+import { registerForms } from './default'
+import { DraftStatus } from './formDrafts/reducer'
+import { deserializeForm } from '@client/forms/mappings/deserializer'
 
 // THIS FILE SORTS & COMBINES CONFIGURATIONS WITH THE DEFAULT CONFIGURATION FOR RENDERING IN THE APPLICATION
 
@@ -217,4 +222,40 @@ export function configureRegistrationForm(
     formCustomisations.customQuestionConfigurations,
     defaultFormWithCustomisations
   )
+}
+
+export function getConfiguredForm(
+  questionConfig: IQuestionConfig[],
+  event: Event
+) {
+  const form: ISerializedForm = configureRegistrationForm(
+    sortFormCustomisations(
+      filterQuestionsByEventType(questionConfig, event),
+      registerForms[event]
+    ),
+    registerForms[event]
+  )
+  return deserializeForm(form)
+}
+
+function isConfigured(status: DraftStatus) {
+  return status === DraftStatus.PUBLISHED || DraftStatus.PREVIEW
+}
+
+export function getConfiguredOrDefaultForm(
+  formConfig: IFormConfig,
+  event: Event
+) {
+  const { status } = getEventDraft(formConfig.formDrafts, event)
+
+  const form: ISerializedForm = isConfigured(status)
+    ? configureRegistrationForm(
+        sortFormCustomisations(
+          filterQuestionsByEventType(formConfig.questionConfig, event),
+          registerForms[event]
+        ),
+        registerForms[event]
+      )
+    : registerForms[event]
+  return deserializeForm(form)
 }
