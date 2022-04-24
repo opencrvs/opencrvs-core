@@ -57,6 +57,12 @@ const Layout = styled.div`
 `
 const LayoutLeft = styled.div`
   flex-grow: 1;
+
+  .performance-block {
+    &:not(:last-child) {
+      margin-bottom: 40px;
+    }
+  }
 `
 const LayoutRight = styled.div`
   margin-top: 24px;

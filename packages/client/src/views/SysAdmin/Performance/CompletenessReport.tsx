@@ -31,6 +31,7 @@ import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
 import { buttonMessages } from '@client/i18n/messages/buttons'
+import { PerformanceBlock } from '@client/views/SysAdmin/Performance/PerformanceBlock'
 
 interface CompletenessReportProps {
   data: GQLTotalMetricsResult
@@ -47,201 +48,207 @@ export function CompletenessReport({
 }: CompletenessReportProps) {
   const intl = useIntl()
   return (
-    <Container>
-      <ListViewItemSimplified
-        label={
-          <PerformanceTitle>
-            {intl.formatMessage(messages.performanceWithinTargetDaysLabel, {
-              target: window.config[selectedEvent].REGISTRATION_TARGET
-            })}
-          </PerformanceTitle>
-        }
-        value={
-          <div>
-            <PerformanceValue>
-              {Number(
-                data.results
-                  .filter((p) => p.timeLabel === 'withinTarget')
-                  .reduce((t, x) => t + x.total, 0) /
-                  data.estimated.totalEstimation
-              ).toFixed(2)}
-              %
-            </PerformanceValue>
-            <Breakdown>
-              <BreakdownRow>
-                <BreakdownLabel>
-                  {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
-                </BreakdownLabel>
-                <BreakdownValue>
-                  {
-                    <PercentageDisplay
-                      total={calculateTotal(
-                        data.results.filter(
-                          (x) =>
-                            x.gender === 'male' &&
-                            x.timeLabel === 'withinTarget'
-                        )
-                      )}
-                      ofNumber={data.estimated.maleEstimation}
-                    />
-                  }
-                </BreakdownValue>
-              </BreakdownRow>
-              <BreakdownRow>
-                <BreakdownLabel>
-                  {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
-                </BreakdownLabel>
-                <BreakdownValue>
-                  {
-                    <PercentageDisplay
-                      total={calculateTotal(
-                        data.results.filter(
-                          (x) =>
-                            x.gender === 'female' &&
-                            x.timeLabel === 'withinTarget'
-                        )
-                      )}
-                      ofNumber={data.estimated.femaleEstimation}
-                    />
-                  }
-                </BreakdownValue>
-              </BreakdownRow>
-            </Breakdown>
-          </div>
-        }
-        actions={
-          <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
-        }
-      />
-      <ListViewItemSimplified
-        label={
-          <PerformanceTitle>
-            {intl.formatMessage(messages.performanceWithin1YearLabel)}
-          </PerformanceTitle>
-        }
-        value={
-          <div>
-            <PerformanceValue>
-              {getPercentage(
-                data.estimated.totalEstimation,
-                calculateTotal(
-                  data.results.filter(
-                    (x) =>
-                      x.timeLabel === 'withinTarget' ||
-                      x.timeLabel === 'withinLate' ||
-                      x.timeLabel === 'within1Year'
+    <PerformanceBlock
+      title="Completeness rates"
+      description="The no. of registrations, expressed as a % of the total estimated no. of births occurring"
+    >
+      <Container>
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceWithinTargetDaysLabel, {
+                target: window.config[selectedEvent].REGISTRATION_TARGET
+              })}
+            </PerformanceTitle>
+          }
+          value={
+            <div>
+              <PerformanceValue>
+                {Number(
+                  data.results
+                    .filter((p) => p.timeLabel === 'withinTarget')
+                    .reduce((t, x) => t + x.total, 0) /
+                    data.estimated.totalEstimation
+                ).toFixed(2)}
+                %
+              </PerformanceValue>
+              <Breakdown>
+                <BreakdownRow>
+                  <BreakdownLabel>
+                    {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
+                  </BreakdownLabel>
+                  <BreakdownValue>
+                    {
+                      <PercentageDisplay
+                        total={calculateTotal(
+                          data.results.filter(
+                            (x) =>
+                              x.gender === 'male' &&
+                              x.timeLabel === 'withinTarget'
+                          )
+                        )}
+                        ofNumber={data.estimated.maleEstimation}
+                      />
+                    }
+                  </BreakdownValue>
+                </BreakdownRow>
+                <BreakdownRow>
+                  <BreakdownLabel>
+                    {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
+                  </BreakdownLabel>
+                  <BreakdownValue>
+                    {
+                      <PercentageDisplay
+                        total={calculateTotal(
+                          data.results.filter(
+                            (x) =>
+                              x.gender === 'female' &&
+                              x.timeLabel === 'withinTarget'
+                          )
+                        )}
+                        ofNumber={data.estimated.femaleEstimation}
+                      />
+                    }
+                  </BreakdownValue>
+                </BreakdownRow>
+              </Breakdown>
+            </div>
+          }
+          actions={
+            <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+          }
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceWithin1YearLabel)}
+            </PerformanceTitle>
+          }
+          value={
+            <div>
+              <PerformanceValue>
+                {getPercentage(
+                  data.estimated.totalEstimation,
+                  calculateTotal(
+                    data.results.filter(
+                      (x) =>
+                        x.timeLabel === 'withinTarget' ||
+                        x.timeLabel === 'withinLate' ||
+                        x.timeLabel === 'within1Year'
+                    )
                   )
-                )
-              )}
-              %
-            </PerformanceValue>
-            <Breakdown>
-              <BreakdownRow>
-                <BreakdownLabel>
-                  {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
-                </BreakdownLabel>
-                <BreakdownValue>
-                  {
+                )}
+                %
+              </PerformanceValue>
+              <Breakdown>
+                <BreakdownRow>
+                  <BreakdownLabel>
+                    {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
+                  </BreakdownLabel>
+                  <BreakdownValue>
+                    {
+                      <PercentageDisplay
+                        total={calculateTotal(
+                          data.results.filter(
+                            (x) =>
+                              x.gender === 'male' &&
+                              (x.timeLabel === 'withinTarget' ||
+                                x.timeLabel === 'withinLate' ||
+                                x.timeLabel === 'within1Year')
+                          )
+                        )}
+                        ofNumber={data.estimated.maleEstimation}
+                      />
+                    }
+                  </BreakdownValue>
+                </BreakdownRow>
+                <BreakdownRow>
+                  <BreakdownLabel>
+                    {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
+                  </BreakdownLabel>
+                  <BreakdownValue>
+                    {
+                      <PercentageDisplay
+                        total={calculateTotal(
+                          data.results.filter(
+                            (x) =>
+                              x.gender === 'female' &&
+                              (x.timeLabel === 'withinTarget' ||
+                                x.timeLabel === 'withinLate' ||
+                                x.timeLabel === 'within1Year')
+                          )
+                        )}
+                        ofNumber={data.estimated.femaleEstimation}
+                      />
+                    }
+                  </BreakdownValue>
+                </BreakdownRow>
+              </Breakdown>
+            </div>
+          }
+          actions={
+            <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+          }
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceWithin5YearsLabel)}
+            </PerformanceTitle>
+          }
+          value={
+            <div>
+              <PerformanceValue>
+                {getPercentage(
+                  data.estimated.totalEstimation,
+                  calculateTotal(
+                    data.results.filter((x) => x.timeLabel !== 'after5Years')
+                  )
+                )}
+                %
+              </PerformanceValue>
+              <Breakdown>
+                <BreakdownRow>
+                  <BreakdownLabel>
+                    {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
+                  </BreakdownLabel>
+                  <BreakdownValue>
                     <PercentageDisplay
+                      ofNumber={data.estimated.maleEstimation}
                       total={calculateTotal(
                         data.results.filter(
                           (x) =>
-                            x.gender === 'male' &&
-                            (x.timeLabel === 'withinTarget' ||
-                              x.timeLabel === 'withinLate' ||
-                              x.timeLabel === 'within1Year')
+                            x.gender === 'male' && x.timeLabel !== 'after5Years'
                         )
                       )}
-                      ofNumber={data.estimated.maleEstimation}
                     />
-                  }
-                </BreakdownValue>
-              </BreakdownRow>
-              <BreakdownRow>
-                <BreakdownLabel>
-                  {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
-                </BreakdownLabel>
-                <BreakdownValue>
-                  {
+                  </BreakdownValue>
+                </BreakdownRow>
+                <BreakdownRow>
+                  <BreakdownLabel>
+                    {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
+                  </BreakdownLabel>
+                  <BreakdownValue>
                     <PercentageDisplay
+                      ofNumber={data.estimated.femaleEstimation}
                       total={calculateTotal(
                         data.results.filter(
                           (x) =>
                             x.gender === 'female' &&
-                            (x.timeLabel === 'withinTarget' ||
-                              x.timeLabel === 'withinLate' ||
-                              x.timeLabel === 'within1Year')
+                            x.timeLabel !== 'after5Years'
                         )
                       )}
-                      ofNumber={data.estimated.femaleEstimation}
                     />
-                  }
-                </BreakdownValue>
-              </BreakdownRow>
-            </Breakdown>
-          </div>
-        }
-        actions={
-          <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
-        }
-      />
-      <ListViewItemSimplified
-        label={
-          <PerformanceTitle>
-            {intl.formatMessage(messages.performanceWithin5YearsLabel)}
-          </PerformanceTitle>
-        }
-        value={
-          <div>
-            <PerformanceValue>
-              {getPercentage(
-                data.estimated.totalEstimation,
-                calculateTotal(
-                  data.results.filter((x) => x.timeLabel !== 'after5Years')
-                )
-              )}
-              %
-            </PerformanceValue>
-            <Breakdown>
-              <BreakdownRow>
-                <BreakdownLabel>
-                  {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
-                </BreakdownLabel>
-                <BreakdownValue>
-                  <PercentageDisplay
-                    ofNumber={data.estimated.maleEstimation}
-                    total={calculateTotal(
-                      data.results.filter(
-                        (x) =>
-                          x.gender === 'male' && x.timeLabel !== 'after5Years'
-                      )
-                    )}
-                  />
-                </BreakdownValue>
-              </BreakdownRow>
-              <BreakdownRow>
-                <BreakdownLabel>
-                  {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
-                </BreakdownLabel>
-                <BreakdownValue>
-                  <PercentageDisplay
-                    ofNumber={data.estimated.femaleEstimation}
-                    total={calculateTotal(
-                      data.results.filter(
-                        (x) =>
-                          x.gender === 'female' && x.timeLabel !== 'after5Years'
-                      )
-                    )}
-                  />
-                </BreakdownValue>
-              </BreakdownRow>
-            </Breakdown>
-          </div>
-        }
-        actions={
-          <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
-        }
-      />
-    </Container>
+                  </BreakdownValue>
+                </BreakdownRow>
+              </Breakdown>
+            </div>
+          }
+          actions={
+            <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+          }
+        />
+      </Container>
+    </PerformanceBlock>
   )
 }
