@@ -144,7 +144,7 @@ export function TotalDisplayWithPercentage(props: {
   )
 }
 
-export function calculateTotal(metrics: GQLEventMetrics[]) {
+export function calculateTotal<T extends Array<{ total: number }>>(metrics: T) {
   return metrics
     .map((metric) => metric.total)
     .reduce((m, metric) => m + metric, 0)

@@ -54,6 +54,8 @@ import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
 import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
 import { CertificationRateComponent } from '@client/views/SysAdmin/Performance/CertificationRateComponent'
 import { certificationRatesDummyData } from '@client/views/SysAdmin/Performance/utils'
+import { constantsMessages } from '@client/i18n/messages/constants'
+import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
 
 const Layout = styled.div`
   display: flex;
@@ -136,8 +138,10 @@ const selectLocation = (
     ({ id }) => id === locationId
   ) as ISearchLocation
 }
+
+const NATIONAL_ADMINISTRATIVE_LEVEL = 'NATIONAL_ADMINISTRATIVE_LEVEL'
 class PerformanceHomeComponent extends React.Component<Props, State> {
-  static transformPropsToState(props: Props, state?: State) {
+  transformPropsToState(props: Props) {
     const {
       location: { search },
       locations,
@@ -148,7 +152,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     ) as unknown as ISearchParams
     const selectedLocation = selectLocation(
       locationId,
-      generateLocations({ ...locations, ...offices }, props.intl)
+      generateLocations({ ...locations, ...offices }, props.intl).concat(
+        this.getAdditionalLocations()
+      )
     )
 
     return {
@@ -164,25 +170,38 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     super(props)
     window.__localeId__ = this.props.intl.locale
 
-    this.state = PerformanceHomeComponent.transformPropsToState(
-      props,
-      undefined
-    )
+    this.state = this.transformPropsToState(props)
+  }
+
+  getAdditionalLocations() {
+    const { intl } = this.props
+    return [
+      {
+        id: NATIONAL_ADMINISTRATIVE_LEVEL,
+        searchableText: intl.formatMessage(constantsMessages.countryName),
+        displayLabel: intl.formatMessage(constantsMessages.countryName)
+      }
+    ]
   }
 
   getTabContent = (intl: IntlShape, selectedLocation: ISearchLocation) => {
     const { id: locationId } = selectedLocation || {}
+
     return (
       <PerformanceActions>
         <LocationPicker
-          selectedLocationId={locationId}
+          additionalLocations={this.getAdditionalLocations()}
+          selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
           onChangeLocation={(newLocationId) => {
             const newLocation = selectLocation(
               newLocationId,
               generateLocations(
-                { ...this.props.locations, ...this.props.offices },
+                {
+                  ...this.props.locations,
+                  ...this.props.offices
+                },
                 this.props.intl
-              )
+              ).concat(this.getAdditionalLocations())
             )
             this.setState({ selectedLocation: newLocation })
           }}
@@ -293,6 +312,16 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 }}
               </Query>
               <CertificationRateComponent data={certificationRatesDummyData} />
+              <CorrectionsReport
+                timeStart={timeStart}
+                timeEnd={timeEnd}
+                locationId={
+                  this.state.selectedLocation
+                    ? this.state.selectedLocation.id
+                    : undefined
+                }
+                selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
+              />
               <Query
                 query={GET_TOTAL_PAYMENTS}
                 variables={

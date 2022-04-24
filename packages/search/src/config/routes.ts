@@ -136,7 +136,7 @@ export const getRoutes = () => {
         },
         validate: {
           payload: Joi.object({
-            declarationLocationHirarchyId: Joi.string().required(),
+            declarationLocationHirarchyId: Joi.string(),
             status: Joi.array().required()
           })
         },

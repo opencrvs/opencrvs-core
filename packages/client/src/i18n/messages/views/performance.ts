@@ -39,6 +39,11 @@ const messagesToDefine = {
       'Certification rate is the no. of certificates issues, expressed as a percentage of the total number of registrations',
     description: 'Sub header for report total certificates'
   },
+  performanceTotalCorrectionsHeader: {
+    id: 'performance.reports.header.totalCorrections',
+    defaultMessage: 'Corrections',
+    description: 'Header for report total corrections'
+  },
   performanceTotalPaymentsHeader: {
     id: 'performance.reports.header.totalPayments',
     defaultMessage: 'Fees collected',
@@ -134,6 +139,11 @@ const messagesToDefine = {
     id: 'performance.reports.select.item.reports',
     defaultMessage: 'Reports',
     description: 'Label for select option Reports'
+  },
+  otherCorrectionReason: {
+    id: 'performance.reports.corrections.other.label',
+    defaultMessage: 'Other',
+    description: 'Label "Other" category in corrections'
   },
   declarationsStartedTitle: {
     id: 'performance.reports.declarationsStarted.title',
