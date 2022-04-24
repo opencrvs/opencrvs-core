@@ -11,7 +11,7 @@
  */
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { IntlShape, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { Redirect, useParams } from 'react-router'
 import { HOME } from '@client/navigation/routes'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
@@ -32,9 +32,12 @@ import { DefaultFieldTools } from '@client/components/formConfig/formTools/Defau
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
-import { goToFormConfig } from '@client/navigation'
+import { goToFormConfigHome } from '@client/navigation'
 import { getScope } from '@client/profile/profileSelectors'
 import { AuthScope } from '@client/utils/authUtils'
+import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+import { SaveActionModal, SaveActionContext } from './SaveActionModal'
+import { SaveActionNotification } from './SaveActionNotification'
 
 const Container = styled.div`
   display: flex;
@@ -84,18 +87,6 @@ type IRouteProps = {
   section: string
 }
 
-const topBarActions = (intl: IntlShape) => {
-  return [
-    <SettingsBlue key="settings" onClick={() => {}} />,
-    <SecondaryButton key="save" size="small" onClick={() => {}}>
-      {intl.formatMessage(buttonMessages.save)}
-    </SecondaryButton>,
-    <SuccessButton key="publish" size="small" onClick={() => {}}>
-      {intl.formatMessage(buttonMessages.publish)}
-    </SuccessButton>
-  ]
-}
-
 function isValidEvent(event: string): event is Event {
   return Object.values<string>(Event).includes(event)
 }
@@ -124,6 +115,7 @@ export function FormConfigWizard() {
   const { version } = useSelector((store: IStoreState) =>
     selectFormDraft(store, event)
   )
+  const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
 
   if (
     !hasNatlSysAdminScope ||
@@ -141,8 +133,20 @@ export function FormConfigWizard() {
           version: version + 1
         })}
         pageIcon={<></>}
-        topBarActions={topBarActions(intl)}
-        goHome={() => dispatch(goToFormConfig())}
+        topBarActions={[
+          <SettingsBlue key="settings" onClick={() => {}} />,
+          <SecondaryButton
+            key="save"
+            size="small"
+            onClick={() => setStatus(ActionStatus.MODAL)}
+          >
+            {intl.formatMessage(buttonMessages.save)}
+          </SecondaryButton>,
+          <SuccessButton key="publish" size="small" onClick={() => {}}>
+            {intl.formatMessage(buttonMessages.publish)}
+          </SuccessButton>
+        ]}
+        goHome={() => dispatch(goToFormConfigHome())}
       />
       <WizardContainer>
         <NavigationContainer>
@@ -165,6 +169,10 @@ export function FormConfigWizard() {
             <FormTools />
           )}
         </ToolsContainer>
+        <SaveActionContext.Provider value={{ status, setStatus }}>
+          <SaveActionModal />
+          <SaveActionNotification />
+        </SaveActionContext.Provider>
       </WizardContainer>
     </Container>
   )

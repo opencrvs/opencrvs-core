@@ -32,7 +32,7 @@ import {
   goToSettings,
   goToPerformanceView,
   goToTeamView,
-  goToFormConfig,
+  goToFormConfigHome,
   goToApplicationConfig
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -166,7 +166,7 @@ interface IDispatchProps {
   goToFieldAgentHomeTab: typeof goToFieldAgentHomeTabAction
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToConfigAction: typeof goToConfig
-  goToFormConfigAction: typeof goToFormConfig
+  goToFormConfigAction: typeof goToFormConfigHome
   goToApplicationConfigAction: typeof goToApplicationConfig
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
@@ -629,7 +629,7 @@ export const Navigation = connect<
   goToFieldAgentHomeTab: goToFieldAgentHomeTabAction,
   goToRegistrarHomeTab,
   goToConfigAction: goToConfig,
-  goToFormConfigAction: goToFormConfig,
+  goToFormConfigAction: goToFormConfigHome,
   goToApplicationConfigAction: goToApplicationConfig,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,

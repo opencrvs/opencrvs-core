@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Actions, ActionContext, ActionStatus } from './ActionsModal'
+import { Actions, ActionContext } from './ActionsModal'
+import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import {
   FloatingNotification,
   NOTIFICATION_TYPE
@@ -22,6 +23,7 @@ import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { constantsMessages } from '@client/i18n/messages'
 
+/* TODO: use the mappings defined in utils */
 export function ActionsNotification() {
   const {
     actionState: { action, event, status },
@@ -33,7 +35,6 @@ export function ActionsNotification() {
   )
 
   return (
-    /* TODO: handle the PROCESSING status */
     <FloatingNotification
       type={
         status === ActionStatus.ERROR

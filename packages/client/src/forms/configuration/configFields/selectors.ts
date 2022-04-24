@@ -11,17 +11,22 @@
  */
 
 import { IStoreState } from '@client/store'
-import { Event } from '@client/forms'
+import { Event, IQuestionConfig } from '@client/forms'
+import { ISectionFieldMap } from './utils'
 
+export function selectConfigFieldsState(store: IStoreState) {
+  if (store.configFields.state === 'LOADING') {
+    throw new Error('ConfigFields not loaded yet')
+  }
+  return store.configFields
+}
 export function selectConfigFields(
   store: IStoreState,
   event: Event,
   section: string
 ) {
-  if (store.configFields.state === 'LOADING') {
-    throw new Error('ConfigFields not loaded yet')
-  }
-  return store.configFields[event][section]
+  const configFields = selectConfigFieldsState(store)
+  return configFields[event][section]
 }
 
 export function selectConfigField(
@@ -31,4 +36,17 @@ export function selectConfigField(
   fieldId: string
 ) {
   return selectConfigFields(store, event, section)[fieldId]
+}
+
+function generateQuestionConfigs(
+  oldQuestions: IQuestionConfig[],
+  configFields: ISectionFieldMap
+) {
+  // TODO: create newQuestionConfigs using configFields
+  return oldQuestions
+}
+
+export function selectNewQuestionConfigs(store: IStoreState, event: Event) {
+  const configFields = selectConfigFieldsState(store)
+  return generateQuestionConfigs(configFields.questions, configFields[event])
 }

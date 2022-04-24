@@ -61,7 +61,7 @@ import {
   VERIFY_CORRECTOR,
   DECLARATION_RECORD_AUDIT,
   FORM_CONFIG_WIZARD,
-  FORM_CONFIG
+  FORM_CONFIG_HOME
 } from '@client/navigation/routes'
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
@@ -210,8 +210,8 @@ export function goToConfig() {
   return push(CERTIFICATE_CONFIG)
 }
 
-export function goToFormConfig() {
-  return push(FORM_CONFIG)
+export function goToFormConfigHome() {
+  return push(FORM_CONFIG_HOME)
 }
 
 export function goToApplicationConfig() {

@@ -12,7 +12,8 @@
 import { defineMessages, MessageDescriptor } from 'react-intl'
 import { DeathSection, BirthSection } from '@client/forms'
 import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
-import { Actions } from '@client/views/SysAdmin/Config/Forms/ActionsModal'
+import { Actions } from '@client/views/SysAdmin/Config/Forms/Home/ActionsModal'
+import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 
 interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
@@ -40,6 +41,10 @@ interface IFormConfigMessages
   draftLabel: MessageDescriptor
   previewDate: MessageDescriptor
   publishedDate: MessageDescriptor
+  saveDraftTitle: MessageDescriptor
+  saveDraftCommentLabel: MessageDescriptor
+  saveDraftCommentError: MessageDescriptor
+  saveDraftDescription: MessageDescriptor
 }
 
 type INavigationMessages = Record<
@@ -229,6 +234,27 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.formConfig.publish.published',
     defaultMessage: 'Published {updatedAt, date, ::MMMM yyyy}',
     description: 'FormDraft label'
+  },
+  saveDraftTitle: {
+    id: 'config.formConfig.draft.save.title',
+    defaultMessage: 'Save draft?',
+    description: 'Title for save draft modal'
+  },
+  saveDraftDescription: {
+    id: 'config.formConfig.draft.save.description',
+    defaultMessage:
+      'A version of this declaration form will be saved as a draft.',
+    description: 'Description for save draft modal'
+  },
+  saveDraftCommentLabel: {
+    id: 'config.formConfig.draft.save.comment.label',
+    defaultMessage: 'Description of changes',
+    description: 'Comment area label for save draft modal'
+  },
+  saveDraftCommentError: {
+    id: 'config.formConfig.draft.save.comment.error',
+    defaultMessage: 'You must provide a description of your changes',
+    description: 'Comment area error message for save draft modal'
   }
 }
 
@@ -322,6 +348,27 @@ const actionsModalDescriptionMessagesToDefine: Record<
   }
 }
 
+const saveActionMessagesToDefine: Record<
+  ActionStatus.ERROR | ActionStatus.COMPLETED | ActionStatus.PROCESSING,
+  MessageDescriptor
+> = {
+  [ActionStatus.ERROR]: {
+    id: 'config.formConfig.save.error',
+    defaultMessage: messagesToDefine.statusChangeError.defaultMessage,
+    description: 'Save draft error notification label'
+  },
+  [ActionStatus.PROCESSING]: {
+    id: 'config.formConfig.save.inProgress',
+    defaultMessage: 'Saving your new draft...',
+    description: 'Save draft in progress notification label'
+  },
+  [ActionStatus.COMPLETED]: {
+    id: 'config.formConfig.save.success',
+    defaultMessage: 'Draft saved successfully. Redirecting...',
+    description: 'Save draft success notification label'
+  }
+}
+
 export const messages: IFormConfigMessages = defineMessages(messagesToDefine)
 export const navigationMessages = defineMessages(navigationMessagesToDefine)
 export const draftStatusMessages = defineMessages(draftStatusMessagesToDefine)
@@ -332,3 +379,4 @@ export const actionsModalTitleMessages = defineMessages(
 export const actionsModalDescriptionMessages = defineMessages(
   actionsModalDescriptionMessagesToDefine
 )
+export const saveActionMessages = defineMessages(saveActionMessagesToDefine)

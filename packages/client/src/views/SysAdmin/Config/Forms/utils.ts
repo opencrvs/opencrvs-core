@@ -9,6 +9,34 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { NOTIFICATION_TYPE } from '@opencrvs/components/lib/interface'
+
+export const REDIRECT_DELAY = 2000
+
+export enum ActionStatus {
+  IDLE = 'IDLE',
+  MODAL = 'MODAL',
+  PROCESSING = 'PROCESSING',
+  COMPLETED = 'COMPLETED',
+  ERROR = 'ERROR'
+}
+
+export type INotifiableStatus =
+  | ActionStatus.ERROR
+  | ActionStatus.COMPLETED
+  | ActionStatus.PROCESSING
+
+export const NOTIFIABLE_STATUSES = [
+  ActionStatus.ERROR,
+  ActionStatus.PROCESSING,
+  ActionStatus.COMPLETED
+]
+
+export const NOTIFICATION_TYPE_MAP = {
+  [ActionStatus.ERROR]: NOTIFICATION_TYPE.ERROR,
+  [ActionStatus.PROCESSING]: NOTIFICATION_TYPE.IN_PROGRESS,
+  [ActionStatus.COMPLETED]: NOTIFICATION_TYPE.SUCCESS
+}
 
 export function isDefaultDraft({ version }: { version: number }) {
   return version === 0

@@ -30,8 +30,11 @@ import {
   IDraft
 } from '@client/forms/configuration/formDrafts/reducer'
 import { Value, DraftVersion } from './components'
-import { isDefaultDraft } from './utils'
-import { ActionContext, Actions, ActionStatus } from './ActionsModal'
+import {
+  ActionStatus,
+  isDefaultDraft
+} from '@client/views/SysAdmin/Config/Forms/utils'
+import { ActionContext, Actions } from './ActionsModal'
 
 function ActionButton({ event, status, version }: IDraft) {
   const intl = useIntl()

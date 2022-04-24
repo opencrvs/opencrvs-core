@@ -26,7 +26,7 @@ import {
 import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
 import { Value, DraftVersion } from './components'
 import { Pill } from '@opencrvs/components/lib/interface'
-import { isDefaultDraft } from './utils'
+import { isDefaultDraft } from '@client/views/SysAdmin/Config/Forms/utils'
 
 function EventDrafts({ event }: { event: Event }) {
   const intl = useIntl()

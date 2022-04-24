@@ -70,7 +70,7 @@ function UnbuplishedWarning() {
   )
 }
 
-export function FormConfiguration() {
+export function FormConfigHome() {
   const intl = useIntl()
   const [selectedTab, setSelectedTab] = React.useState<string>(
     DraftStatus.DRAFT

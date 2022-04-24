@@ -26,27 +26,20 @@ import {
 import { useDispatch } from 'react-redux'
 import { Mutation } from 'react-apollo'
 import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
-import { CHANGE_FORM_DRAFT_STATUS } from './mutations'
+import { CHANGE_FORM_DRAFT_STATUS } from '@client/views/SysAdmin/Config/Forms/mutations'
 import { modifyFormDraft } from '@client/forms/configuration/formDrafts/actions'
 import {
   DraftStatus,
   IDraft
 } from '@client/forms/configuration/formDrafts/reducer'
 import { Event } from '@client/forms'
+import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 
 export enum Actions {
   PUBLISH = 'PUBLISH',
   PREVIEW = 'PREVIEW',
   EDIT = 'EDIT',
   DELETE = 'DELETE'
-}
-
-export enum ActionStatus {
-  IDLE = 'IDLE',
-  MODAL = 'MODAL',
-  PROCESSING = 'PROCESSING',
-  COMPLETED = 'COMPLETED',
-  ERROR = 'ERROR'
 }
 
 export const defaultActionState = {
