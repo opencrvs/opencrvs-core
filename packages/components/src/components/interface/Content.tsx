@@ -44,6 +44,9 @@ const Header = styled.div`
     border: 0;
     padding: 0;
   }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: -16px;
+  }
 `
 const TopActionBar = styled.div`
   display: flex;
@@ -63,27 +66,31 @@ const Footer = styled.div`
   height: 72px;
   padding-top: 24px;
 `
+const HeaderBottom = styled.div`
+  display: flex;
+  padding: 0 0 24px;
+  width: 100%;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    padding: 24px;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 16px;
+  }
+`
 const TopTabBar = styled.div`
   display: flex;
   gap: 28px;
   width: 100%;
+  margin: -24px 0;
   padding: 0;
-  margin-top: -16px;
   position: relative;
-  & > div {
-    bottom: -1px;
-  }
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-top: 0;
-    padding: 0 24px;
-    border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  }
-
+  bottom: -1px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding-top: 8px;
+    margin: -16px 0;
   }
 `
+
 const TopBar = styled.div`
   display: flex;
   align-items: center;
@@ -130,6 +137,7 @@ interface IProps {
   titleColor?: keyof typeof colors
   topActionButtons?: ReactElement[]
   tabBarContent?: React.ReactNode
+  filterContent?: React.ReactNode
   subtitle?: string
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
@@ -144,6 +152,7 @@ export class Content extends React.Component<IProps> {
       titleColor,
       topActionButtons,
       tabBarContent,
+      filterContent,
       subtitle,
       children,
       bottomActionButtons,
@@ -161,7 +170,12 @@ export class Content extends React.Component<IProps> {
               <TopActionBar>{topActionButtons}</TopActionBar>
             )}
           </TopBar>
-          {tabBarContent && <TopTabBar>{tabBarContent}</TopTabBar>}
+          {(filterContent || tabBarContent) && (
+            <HeaderBottom>
+              {tabBarContent && <TopTabBar>{tabBarContent}</TopTabBar>}
+              {filterContent}
+            </HeaderBottom>
+          )}
         </Header>
         {subtitle && <SubHeader>{subtitle}</SubHeader>}
         {children && <Body>{children}</Body>}
