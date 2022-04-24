@@ -41,7 +41,8 @@ describe('Field agent list tests', () => {
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString(),
             count: 25,
-            sort: 'asc'
+            sort: 'asc',
+            skip: 0
           }
         },
         result: {
