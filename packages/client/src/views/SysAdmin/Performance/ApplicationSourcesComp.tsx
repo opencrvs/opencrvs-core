@@ -18,27 +18,15 @@ import {
   PerformanceTitle,
   PerformanceValue,
   PerformanceListHeader,
-  ListContainer
+  ListContainer,
+  calculateTotal,
+  TotalDisplayWithPercentage
 } from '@client/views/SysAdmin/Performance/utils'
+import { GQLTotalMetricsResult } from '@client/../../gateway/src/graphql/schema'
 
 interface ApplicationSourcesProps {
-  data: { label: string; value: number }[]
+  data: GQLTotalMetricsResult
 }
-
-const applicationSrcDummy = [
-  {
-    label: 'Field Agents',
-    value: 100
-  },
-  {
-    label: 'Registrars',
-    value: 100
-  },
-  {
-    label: 'Registration Agents',
-    value: 100
-  }
-]
 
 export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
   const { data } = props
@@ -52,15 +40,57 @@ export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
             </PerformanceListHeader>
           }
         />
-        {data &&
-          data.map((source) => {
-            return (
-              <ListViewItemSimplified
-                label={<PerformanceTitle>{source.label}</PerformanceTitle>}
-                value={<PerformanceValue>{source.value}</PerformanceValue>}
-              />
-            )
-          })}
+        <ListViewItemSimplified
+          label={<PerformanceTitle>Total</PerformanceTitle>}
+          value={
+            <PerformanceValue>{calculateTotal(data.results)}</PerformanceValue>
+          }
+        />
+        <ListViewItemSimplified
+          label={<PerformanceTitle>Field Agents</PerformanceTitle>}
+          value={
+            <PerformanceValue>
+              <TotalDisplayWithPercentage
+                total={calculateTotal(
+                  data.results.filter(
+                    (item) => item.practitionerRole === 'FIELD_AGENT'
+                  )
+                )}
+                ofNumber={calculateTotal(data.results)}
+              ></TotalDisplayWithPercentage>
+            </PerformanceValue>
+          }
+        />
+        <ListViewItemSimplified
+          label={<PerformanceTitle>Registration Agents</PerformanceTitle>}
+          value={
+            <PerformanceValue>
+              <TotalDisplayWithPercentage
+                total={calculateTotal(
+                  data.results.filter(
+                    (item) => item.practitionerRole === 'REGISTRATION_AGENT'
+                  )
+                )}
+                ofNumber={calculateTotal(data.results)}
+              ></TotalDisplayWithPercentage>
+            </PerformanceValue>
+          }
+        />
+        <ListViewItemSimplified
+          label={<PerformanceTitle>Registrars</PerformanceTitle>}
+          value={
+            <PerformanceValue>
+              <TotalDisplayWithPercentage
+                total={calculateTotal(
+                  data.results.filter(
+                    (item) => item.practitionerRole === 'REGISTRAR'
+                  )
+                )}
+                ofNumber={calculateTotal(data.results)}
+              ></TotalDisplayWithPercentage>
+            </PerformanceValue>
+          }
+        />
       </ListViewSimplified>
     </ListContainer>
   )

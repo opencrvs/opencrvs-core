@@ -79,6 +79,7 @@ import { CompletenessReport } from './CompletenessReport'
 import { PaymentsAmountComponent } from './PaymentsAmountComponent'
 import { CertificationRateComponent } from './CertificationRateComponent'
 import { RegistrationsReport } from './RegistrationsReport'
+import { ApplicationSourcesComp } from './ApplicationSourcesComp'
 
 interface IConnectProps {
   locations: { [key: string]: ILocation }
@@ -459,6 +460,7 @@ class OperationalReportComponent extends React.Component<Props, State> {
                         data={data!.getTotalMetrics}
                         selectedEvent={selectedEvent}
                       />
+                      <ApplicationSourcesComp data={data!.getTotalMetrics} />
                     </>
                   )
                 }}
