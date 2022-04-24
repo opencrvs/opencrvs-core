@@ -47,11 +47,16 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
 import format from '@client/utils/date-formatting'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
-
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 25
 const { useState } = React
 interface SortMap {
@@ -170,7 +175,8 @@ function FieldAgentListComponent(props: IProps) {
         status: status.toString(),
         event: event === '' ? undefined : event.toUpperCase(),
         count: recordCount,
-        sort: 'asc'
+        sort: 'asc',
+        skip: 0
       }
     : {
         timeStart: timeStart,
@@ -179,7 +185,8 @@ function FieldAgentListComponent(props: IProps) {
         status: status.toString(),
         event: event === '' ? undefined : event.toUpperCase(),
         count: recordCount,
-        sort: 'asc'
+        sort: 'asc',
+        skip: 0
       }
 
   function toggleSort(key: keyof SortMap) {
@@ -356,7 +363,8 @@ function FieldAgentListComponent(props: IProps) {
       []
     )
   }
-
+  const skip = (currentPageNumber - 1) * 1
+  queryVariables.skip = skip
   return (
     <SysAdminContentWrapper
       id="field-agent-list"
@@ -480,33 +488,63 @@ function FieldAgentListComponent(props: IProps) {
               </>
             )
           } else {
+            const totalData =
+              data &&
+              data.searchFieldAgents &&
+              data.searchFieldAgents.totalItems
             return (
-              <TableView
-                id={'field-agent-list'}
-                noResultText={intl.formatMessage(messages.fieldAgentsNoResult)}
-                isLoading={loading}
-                fixedWidth={1500}
-                columns={getColumns(data && data.searchFieldAgents)}
-                content={getContent(data && data.searchFieldAgents)}
-                totalItems={
-                  data &&
-                  data.searchFieldAgents &&
-                  data.searchFieldAgents.totalItems
-                }
-                currentPage={currentPageNumber}
-                pageSize={recordCount}
-                onPageChange={(currentPage: number) => {
-                  setCurrentPageNumber(currentPage)
-                }}
-                loadMoreText={intl.formatMessage(
-                  messages.showMoreUsersLinkLabel,
-                  {
-                    pageSize: DEFAULT_FIELD_AGENT_LIST_SIZE
+              <>
+                <TableView
+                  id={'field-agent-list'}
+                  noResultText={intl.formatMessage(
+                    messages.fieldAgentsNoResult
+                  )}
+                  isLoading={loading}
+                  fixedWidth={1500}
+                  columns={getColumns(data && data.searchFieldAgents)}
+                  content={getContent(data && data.searchFieldAgents)}
+                  totalItems={
+                    data &&
+                    data.searchFieldAgents &&
+                    data.searchFieldAgents.totalItems
                   }
+                  currentPage={currentPageNumber}
+                  pageSize={recordCount}
+                  onPageChange={(currentPage: number) => {
+                    setCurrentPageNumber(currentPage)
+                  }}
+                  isFullPage
+                  highlightRowOnMouseOver
+                />
+                {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+                  <PaginationWrapper>
+                    <DesktopWrapper>
+                      <PaginationModified
+                        size="small"
+                        initialPage={currentPageNumber}
+                        totalPages={Math.ceil(
+                          totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                        )}
+                        onPageChange={(currentPage: number) => {
+                          setCurrentPageNumber(currentPage)
+                        }}
+                      />
+                    </DesktopWrapper>
+                    <MobileWrapper>
+                      <PaginationModified
+                        size="large"
+                        initialPage={currentPageNumber}
+                        totalPages={Math.ceil(
+                          totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                        )}
+                        onPageChange={(currentPage: number) => {
+                          setCurrentPageNumber(currentPage)
+                        }}
+                      />
+                    </MobileWrapper>
+                  </PaginationWrapper>
                 )}
-                isFullPage
-                highlightRowOnMouseOver
-              />
+              </>
             )
           }
         }}

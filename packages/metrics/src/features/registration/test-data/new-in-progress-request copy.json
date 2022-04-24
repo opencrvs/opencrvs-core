@@ -98,7 +98,7 @@
           },
           {
             "url": "http://opencrvs.org/specs/extension/in-complete-fields",
-            "valueString": "child/child-view-group/placeOfBirth,mother/mother-view-group/iDType,mother/mother-view-group/iD,mother/mother-view-group/familyName,mother/mother-view-group/familyNameEng,mother/mother-view-group/statePermanent"
+            "valueString": "child/child-view-group/placeOfBirth,mother/mother-view-group/iDType,mother/mother-view-group/iD,mother/mother-view-group/familyName,mother/mother-view-group/familyNameEng,mother/mother-view-group/statePrimary"
           },
           {
             "url": "http://opencrvs.org/specs/extension/regLastLocation",

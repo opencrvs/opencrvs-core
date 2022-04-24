@@ -133,6 +133,14 @@ import { goBack } from 'connected-react-router'
 import { getFieldValue } from './utils'
 import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import format, { formatLongDate } from '@client/utils/date-formatting'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
+
+const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -475,14 +483,13 @@ const getLocation = (
   let locationType = ''
   let locationId = ''
   let locationDistrict = ''
-  let locationPermanent = ''
+  let locationPrimary = ''
   if (declaration.event === 'death') {
-    locationType =
-      declaration.data?.deathEvent?.deathPlaceAddress?.toString() || ''
+    locationType = declaration.data?.deathEvent?.placeOfDeath?.toString() || ''
     locationId = declaration.data?.deathEvent?.deathLocation?.toString() || ''
     locationDistrict = declaration.data?.deathEvent?.district?.toString() || ''
-    locationPermanent =
-      declaration.data?.deceased?.districtPermanent?.toString() || ''
+    locationPrimary =
+      declaration.data?.deceased?.districtPrimary?.toString() || ''
   } else {
     locationType = declaration.data?.child?.placeOfBirth?.toString() || ''
     locationId = declaration.data?.child?.birthLocation?.toString() || ''
@@ -497,8 +504,8 @@ const getLocation = (
     const location = resources.locations[locationDistrict]
     return generateLocationName(location, intl)
   }
-  if (locationType === 'PERMANENT') {
-    const district = resources.locations[locationPermanent]
+  if (locationType === 'PRIMARY_ADDRESS') {
+    const district = resources.locations[locationPrimary]
     return generateLocationName(district, intl)
   }
   return ''
@@ -919,6 +926,20 @@ const getFormattedDate = (date: Date) => {
   )
 }
 
+const getDisplayItems = (
+  currentPage: number,
+  pageSize: number,
+  allData: IDynamicValues
+) => {
+  if (allData.length <= pageSize) {
+    return allData
+  }
+
+  const offset = (currentPage - 1) * pageSize
+  const displayItems = allData.slice(offset, offset + pageSize)
+  return displayItems
+}
+
 const GetHistory = ({
   intl,
   draft,
@@ -928,6 +949,9 @@ const GetHistory = ({
 }: CMethodParams & {
   toggleActionDetails: (actionItem: IActionDetailsData) => void
 }) => {
+  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const onPageChange = (currentPageNumber: number) =>
+    setCurrentPageNumber(currentPageNumber)
   if (!draft?.data?.history?.length)
     return (
       <>
@@ -936,9 +960,16 @@ const GetHistory = ({
         <LargeGreyedInfo />
       </>
     )
-
+  const allHistoryData = draft.data.history as unknown as {
+    [key: string]: any
+  }[]
+  const historiesForDisplay = getDisplayItems(
+    currentPageNumber,
+    DEFAULT_HISTORY_RECORD_PAGE_SIZE,
+    allHistoryData
+  )
   const historyData = (
-    draft.data.history as unknown as { [key: string]: any }[]
+    historiesForDisplay as unknown as { [key: string]: any }[]
   )
     // TODO: We need to figure out a way to sort the history in backend
     .sort((fe, se) => {
@@ -1000,9 +1031,32 @@ const GetHistory = ({
         columns={columns}
         content={historyData}
         alignItemCenter={true}
-        pageSize={100}
-        hideTableHeaderBorder={true}
+        pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
       />
+      {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+        <PaginationWrapper>
+          <DesktopWrapper>
+            <PaginationModified
+              size="small"
+              initialPage={currentPageNumber}
+              totalPages={Math.ceil(
+                allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              )}
+              onPageChange={onPageChange}
+            />
+          </DesktopWrapper>
+          <MobileWrapper>
+            <PaginationModified
+              size="large"
+              initialPage={currentPageNumber}
+              totalPages={Math.ceil(
+                allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              )}
+              onPageChange={onPageChange}
+            />
+          </MobileWrapper>
+        </PaginationWrapper>
+      )}
     </>
   )
 }

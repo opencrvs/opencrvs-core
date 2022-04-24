@@ -803,7 +803,7 @@ export const eventLocationAddressOfflineTransformer =
     if (
       queryData.eventLocation?.type &&
       queryData.eventLocation.type !== 'PRIVATE_HOME' &&
-      queryData.eventLocation.type !== 'PERMANENT' &&
+      queryData.eventLocation.type !== 'PRIMARY_ADDRESS' &&
       queryData.eventLocation.type !== 'OTHER'
     ) {
       return

@@ -712,7 +712,7 @@
           }
         },
         {
-          "field": "motherPermanentAddress",
+          "field": "motherPrimaryAddress",
           "operation": "OfflineAddress",
           "parameters": {
             "language": "en",
@@ -721,9 +721,9 @@
                 "addressType": "locations",
                 "addressKey": "name",
                 "addresses": {
-                  "countryCode": "mother.countryPermanent",
-                  "localAddress": "{mother.addressLine4Permanent}, {mother.districtPermanent}, {mother.statePermanent}",
-                  "internationalAddress": "{mother.internationalDistrictPermanent}, {mother.internationalStatePermanent}, {mother.countryPermanent}"
+                  "countryCode": "mother.countryPrimary",
+                  "localAddress": "{mother.addressLine4Primary}, {mother.districtPrimary}, {mother.statePrimary}",
+                  "internationalAddress": "{mother.internationalDistrictPrimary}, {mother.internationalStatePrimary}, {mother.countryPrimary}"
                 }
               }
             ]
@@ -1093,9 +1093,9 @@
                 "addressType": "locations",
                 "addressKey": "name",
                 "addresses": {
-                  "countryCode": "father.countryPermanent",
+                  "countryCode": "father.countryPrimary",
                   "localAddress": "",
-                  "internationalAddress": "{father.countryPermanent}"
+                  "internationalAddress": "{father.countryPrimary}"
                 }
               }
             ]
@@ -1465,9 +1465,9 @@
                 "addressType": "locations",
                 "addressKey": "name",
                 "addresses": {
-                  "countryCode": "mother.countryPermanent",
+                  "countryCode": "mother.countryPrimary",
                   "localAddress": "",
-                  "internationalAddress": "{mother.countryPermanent}"
+                  "internationalAddress": "{mother.countryPrimary}"
                 }
               }
             ]
@@ -1904,21 +1904,21 @@
             "conditions": [
               {
                 "condition": {
-                  "key": "deathEvent.deathPlaceAddress",
-                  "values": ["PERMANENT"]
+                  "key": "deathEvent.placeOfDeath",
+                  "values": ["PRIMARY_ADDRESS"]
                 },
                 "addressType": "locations",
                 "addressKey": "name",
                 "addresses": {
-                  "countryCode": "deceased.countryPermanent",
-                  "localAddress": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}, {deceased.countryPermanent}",
-                  "internationalAddress": "{deceased.internationalDistrictPermanent}, {deceased.internationalStatePermanent}, {deceased.countryPermanent}"
+                  "countryCode": "deceased.countryPrimary",
+                  "localAddress": "{deceased.addressLine4Primary}, {deceased.districtPrimary}, {deceased.statePrimary}, {deceased.countryPrimary}",
+                  "internationalAddress": "{deceased.internationalDistrictPrimary}, {deceased.internationalStatePrimary}, {deceased.countryPrimary}"
                 }
               },
               {
                 "condition": {
-                  "key": "deathEvent.deathPlaceAddress",
-                  "values": ["CURRENT"]
+                  "key": "deathEvent.placeOfDeath",
+                  "values": ["SECONDARY_ADDRESS"]
                 },
                 "addressType": "locations",
                 "addressKey": "name",
@@ -1930,7 +1930,7 @@
               },
               {
                 "condition": {
-                  "key": "deathEvent.deathPlaceAddress",
+                  "key": "deathEvent.placeOfDeath",
                   "values": ["PRIVATE_HOME", "OTHER"]
                 },
                 "addressType": "locations",
@@ -1943,7 +1943,7 @@
               },
               {
                 "condition": {
-                  "key": "deathEvent.deathPlaceAddress",
+                  "key": "deathEvent.placeOfDeath",
                   "values": ["HEALTH_FACILITY"]
                 },
                 "addressType": "facilities",
@@ -1957,7 +1957,7 @@
           }
         },
         {
-          "field": "deceasedPermanentAddress",
+          "field": "deceasedPrimaryAddress",
           "operation": "OfflineAddress",
           "parameters": {
             "language": "en",
@@ -1966,9 +1966,9 @@
                 "addressType": "locations",
                 "addressKey": "name",
                 "addresses": {
-                  "countryCode": "deceased.countryPermanent",
-                  "localAddress": "{deceased.addressLine4Permanent}, {deceased.districtPermanent}, {deceased.statePermanent}, {deceased.countryPermanent}",
-                  "internationalAddress": "{deceased.internationalDistrictPermanent}, {deceased.internationalStatePermanent}, {deceased.countryPermanent}"
+                  "countryCode": "deceased.countryPrimary",
+                  "localAddress": "{deceased.addressLine4Primary}, {deceased.districtPrimary}, {deceased.statePrimary}, {deceased.countryPrimary}",
+                  "internationalAddress": "{deceased.internationalDistrictPrimary}, {deceased.internationalStatePrimary}, {deceased.countryPrimary}"
                 }
               }
             ]

@@ -8,17 +8,28 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 ---
+- hosts: localhost
+  tasks:
+    - name: Create MongoDB replicate key file locally
+      local_action: shell openssl rand -base64 755 > /tmp/mongodb-keyfile
 - hosts: all
   become: yes
   become_method: sudo
   tasks:
+    - name: 'Check mandatory variables are defined'
+      assert:
+        that:
+          - mongodb_admin_username is defined
+          - mongodb_admin_password is defined
+          - elasticsearch_superuser_password is defined
     - name: 'Add docker repository key'
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
         state: present
-
+    - debug:
+        msg: "repo='deb [arch=arm64] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} edge' state=present"
     - name: 'Add docker repository'
-      apt_repository: repo='deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable' state=present
+      apt_repository: repo='deb [arch=arm64] https://download.docker.com/linux/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} edge' state=present
       when: ansible_distribution == "Ubuntu"
 
     - name: 'Install docker'
@@ -60,6 +71,34 @@
         hour: '0'
         job: '/usr/bin/docker system prune -af >> /var/log/docker-prune.log'
 
+    - name: Inserts Elasticsearch super user username environment variable to crontab
+      cron:
+        name: ELASTICSEARCH_ADMIN_USER
+        env: yes
+        job: 'elastic'
+      when: elasticsearch_superuser_password is defined
+
+    - name: Inserts Elasticsearch super user password environment variable to crontab
+      cron:
+        name: ELASTICSEARCH_ADMIN_PASSWORD
+        env: yes
+        job: '{{ elasticsearch_superuser_password }}'
+      when: elasticsearch_superuser_password is defined
+
+    - name: Inserts MongoDB username environment variable to crontab
+      cron:
+        name: MONGODB_ADMIN_USER
+        env: yes
+        job: '{{ mongodb_admin_username }}'
+      when: mongodb_admin_username is defined
+
+    - name: Inserts MongoDB password environment variable to crontab
+      cron:
+        name: MONGODB_ADMIN_PASSWORD
+        env: yes
+        job: '{{ mongodb_admin_password }}'
+      when: mongodb_admin_password is defined
+
     - name: 'Setup crontab to backup the opencrvs data'
       cron:
         name: 'backup opencrvs'
@@ -67,6 +106,16 @@
         hour: '0'
         job: 'cd / && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh {{ external_backup_server_user }} {{ external_backup_server_ip }} {{ external_backup_server_ssh_port }} {{ manager_production_server_ip }} {{ external_backup_server_remote_directory }} 1 >> /var/log/opencrvs-backup.log 2>&1'
       when: external_backup_server_ip is defined
+
+    - name: Copy MongoDB replication security key file to nodes
+      copy: src=/tmp/mongodb-keyfile dest=/mongodb-keyfile mode=0400 force=no
+
+    - name: Change access right of key file
+      file:
+        path: /mongodb-keyfile
+        state: file
+        owner: 1000
+        group: 1000
 
     - name: 'Check file for encrypted file system exists'
       stat:
