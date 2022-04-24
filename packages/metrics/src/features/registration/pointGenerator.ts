@@ -530,6 +530,7 @@ export async function generateDeclarationStartedPoint(
 
   const tags = {
     eventType: getDeclarationType(task),
+    role,
     practitionerId: getPractionerIdFromTask(task),
     officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))

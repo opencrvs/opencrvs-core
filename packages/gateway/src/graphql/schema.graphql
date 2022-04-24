@@ -385,6 +385,7 @@ type DeclarationsStartedMetrics {
   fieldAgentDeclarations: Int!
   hospitalDeclarations: Int!
   officeDeclarations: Int!
+  totalWithRole: [TotalAndRole]
 }
 
 type MonthWiseEstimationMetrics {
@@ -853,6 +854,11 @@ type EventMetrics {
   eventLocationType: String!
   timeLabel: String!
   practitionerRole: String!
+}
+
+type TotalAndRole {
+  role: String!
+  total: Int!
 }
 
 type MonthWiseTargetDayEstimation {

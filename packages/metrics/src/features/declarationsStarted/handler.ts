@@ -41,7 +41,8 @@ export async function declarationsStartedHandler(
     declarationsStartedMetrics = {
       fieldAgentDeclarations: 0,
       hospitalDeclarations: 0,
-      officeDeclarations: 0
+      officeDeclarations: 0,
+      totalWithRole: []
     }
   }
 

@@ -164,6 +164,7 @@ export async function generateDeclarationStartedPoint(
 
   const tags = {
     eventType: searchResult._source.event.toUpperCase(),
+    role,
     ...(await generatePointLocationsFromID(
       `Location/${searchResult._source.declarationLocationId}`,
       authHeader

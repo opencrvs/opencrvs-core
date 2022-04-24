@@ -155,6 +155,7 @@ export const influx = new Influx.InfluxDB({
         'eventType',
         'practitionerId',
         'officeLocation',
+        'role',
         'locationLevel5',
         'locationLevel4',
         'locationLevel3',

@@ -61,12 +61,24 @@ export async function fetchLocationWiseDeclarationsStarted(
           AND ( role = 'NOTIFICATION_API_USER' OR role = 'API_USER' )`
   )
 
+  const totalWithRole: { role: string; total: number }[] =
+    await query(`SELECT COUNT(compositionId) AS total
+  FROM declarations_started WHERE time > '${timeFrom}'
+  AND time <= '${timeTo}'
+  AND ( officeLocation = '${locationId}'
+      OR locationLevel2 = '${locationId}'
+      OR locationLevel3 = '${locationId}'
+      OR locationLevel4 = '${locationId}'
+      OR locationLevel5 = '${locationId}')
+      GROUP BY role`)
+
   return {
     fieldAgentDeclarations:
       (fieldAgent && fieldAgent.length > 0 && fieldAgent[0].count) || 0,
     hospitalDeclarations:
       (hospital && hospital.length > 0 && hospital[0].count) || 0,
-    officeDeclarations: (office && office.length > 0 && office[0].count) || 0
+    officeDeclarations: (office && office.length > 0 && office[0].count) || 0,
+    totalWithRole
   }
 }
 

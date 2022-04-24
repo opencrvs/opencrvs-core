@@ -269,6 +269,7 @@ export interface GQLDeclarationsStartedMetrics {
   fieldAgentDeclarations: number
   hospitalDeclarations: number
   officeDeclarations: number
+  totalWithRole?: Array<GQLTotalAndRole | null>
 }
 
 export interface GQLMonthWiseEstimationMetrics {
@@ -737,6 +738,11 @@ export interface GQLEventMetrics {
   eventLocationType: string
   timeLabel: string
   practitionerRole: string
+}
+
+export interface GQLTotalAndRole {
+  role: string
+  total: number
 }
 
 export interface GQLMonthWiseTargetDayEstimation {
@@ -1367,6 +1373,7 @@ export interface GQLResolver {
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
+  TotalAndRole?: GQLTotalAndRoleTypeResolver
   MonthWiseTargetDayEstimation?: GQLMonthWiseTargetDayEstimationTypeResolver
   EventInTargetDayEstimationCount?: GQLEventInTargetDayEstimationCountTypeResolver
   LocationWiseTargetDayEstimation?: GQLLocationWiseTargetDayEstimationTypeResolver
@@ -3275,6 +3282,7 @@ export interface GQLDeclarationsStartedMetricsTypeResolver<TParent = any> {
   fieldAgentDeclarations?: DeclarationsStartedMetricsToFieldAgentDeclarationsResolver<TParent>
   hospitalDeclarations?: DeclarationsStartedMetricsToHospitalDeclarationsResolver<TParent>
   officeDeclarations?: DeclarationsStartedMetricsToOfficeDeclarationsResolver<TParent>
+  totalWithRole?: DeclarationsStartedMetricsToTotalWithRoleResolver<TParent>
 }
 
 export interface DeclarationsStartedMetricsToFieldAgentDeclarationsResolver<
@@ -3292,6 +3300,13 @@ export interface DeclarationsStartedMetricsToHospitalDeclarationsResolver<
 }
 
 export interface DeclarationsStartedMetricsToOfficeDeclarationsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeclarationsStartedMetricsToTotalWithRoleResolver<
   TParent = any,
   TResult = any
 > {
@@ -4481,6 +4496,19 @@ export interface EventMetricsToPractitionerRoleResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLTotalAndRoleTypeResolver<TParent = any> {
+  role?: TotalAndRoleToRoleResolver<TParent>
+  total?: TotalAndRoleToTotalResolver<TParent>
+}
+
+export interface TotalAndRoleToRoleResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface TotalAndRoleToTotalResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

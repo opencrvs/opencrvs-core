@@ -43,6 +43,12 @@ type DeclarationsStartedMetrics {
   fieldAgentDeclarations: Int!
   hospitalDeclarations: Int!
   officeDeclarations: Int!
+  totalWithRole: [TotalAndRole]
+}
+
+type TotalAndRole {
+  role: String!
+  total: Int!
 }
 
 type MonthWiseEstimationMetrics {

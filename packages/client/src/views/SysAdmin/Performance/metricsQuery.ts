@@ -49,6 +49,10 @@ export const PERFORMANCE_METRICS = gql`
       fieldAgentDeclarations
       hospitalDeclarations
       officeDeclarations
+      totalWithRole {
+        role
+        total
+      }
     }
   }
 `
