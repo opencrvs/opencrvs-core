@@ -33,6 +33,7 @@ import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { IUserDetails } from '@client/utils/userUtils'
+import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -128,6 +129,7 @@ export interface IQuestionConfig {
 
 export interface IFormConfig {
   questionConfig: IQuestionConfig[]
+  formDrafts: IDraft[]
 }
 
 export interface ISelectOption {

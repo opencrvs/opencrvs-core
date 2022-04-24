@@ -25,7 +25,7 @@ import {
   draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
 import { Value, DraftVersion } from './components'
 import { Pill } from '@opencrvs/components/lib/interface'
 import { isDefaultDraft } from './utils'

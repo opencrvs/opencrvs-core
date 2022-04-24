@@ -20,7 +20,7 @@ import {
   IApplicationConfig
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
-import { IDraft } from '@client/forms/configuration/formDrafts/utils'
+import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -241,20 +241,20 @@ export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
 })
 
-export const MODIFY_OFFLINE_FORM_DRAFT = 'OFFLINE/MODIFY_FORM_DRAFT'
-export type ModifyFormDraftAction = {
-  type: typeof MODIFY_OFFLINE_FORM_DRAFT
+export const UPDATE_OFFLINE_FORM_DRAFT = 'OFFLINE/UPDATE_FORM_DRAFT'
+export type UpdateFormDraftAction = {
+  type: typeof UPDATE_OFFLINE_FORM_DRAFT
   payload: {
-    formDraft: IDraft
+    formDrafts: IDraft[]
   }
 }
 
-export const modifyFormDraftAction = (
-  formDraft: IDraft
-): ModifyFormDraftAction => ({
-  type: MODIFY_OFFLINE_FORM_DRAFT,
+export const updateFormDraft = (
+  formDrafts: IDraft[]
+): UpdateFormDraftAction => ({
+  type: UPDATE_OFFLINE_FORM_DRAFT,
   payload: {
-    formDraft
+    formDrafts
   }
 })
 export type Action =
@@ -275,7 +275,7 @@ export type Action =
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
-  | ModifyFormDraftAction
+  | UpdateFormDraftAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>

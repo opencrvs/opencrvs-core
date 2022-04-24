@@ -19,7 +19,7 @@ import {
   messages,
   draftTabsMessages
 } from '@client/i18n/messages/views/formConfig'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
 import { DraftsTab } from './DraftsTab'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { PreviewTab } from './PreviewTab'

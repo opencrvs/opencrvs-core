@@ -37,9 +37,9 @@ export default async function applicationHandler(
       config,
       certificates,
       formConfig: {
-        questionConfig
-      },
-      formDrafts
+        questionConfig,
+        formDrafts
+      }
     }
   } catch (ex) {
     logger.error(ex)

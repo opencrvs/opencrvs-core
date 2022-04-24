@@ -9,18 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IStoreState } from '@client/store'
-import { Event } from '@client/forms'
-import { IFormDraft } from './reducer'
+import { IDraft } from './reducer'
 
-export const selectFormDraftData = (store: IStoreState): IFormDraft => {
-  if (store.formDraft.state === 'LOADING') {
-    throw new Error('FormDraft not loaded yet')
+export const MODIFY_FORM_DRAFT = 'FORM/MODIFY_FORM_DRAFT'
+export type ModifyFormDraftAction = {
+  type: typeof MODIFY_FORM_DRAFT
+  payload: {
+    formDraft: IDraft
   }
-  return store.formDraft.formDraft
 }
 
-export function selectFormDraft(store: IStoreState, event: Event) {
-  const formDraft = selectFormDraftData(store)
-  return formDraft[event]
-}
+export const modifyFormDraft = (formDraft: IDraft): ModifyFormDraftAction => ({
+  type: MODIFY_FORM_DRAFT,
+  payload: {
+    formDraft
+  }
+})
+
+export type FormDraftActions = ModifyFormDraftAction

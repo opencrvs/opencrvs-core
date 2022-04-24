@@ -13,7 +13,6 @@ import { IFormConfig } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
-import { IDraft } from '@client/forms/configuration/formDrafts/utils'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -22,7 +21,6 @@ export interface IFacilitiesDataResponse {
   [facilityId: string]: ILocation
 }
 export interface IContentResponse {
-  formConfig?: IFormConfig
   languages: ILanguage[]
 }
 
@@ -94,7 +92,6 @@ export interface IApplicationConfigResponse {
   config: IApplicationConfig
   certificates: ICertificateTemplateData[]
   formConfig: IFormConfig
-  formDrafts: IDraft[]
 }
 
 async function loadConfig(): Promise<IApplicationConfigResponse> {
@@ -113,9 +110,7 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
   return response
 }
 
-async function loadContent(
-  formConfig?: IFormConfig
-): Promise<IContentResponse> {
+async function loadContent(): Promise<IContentResponse> {
   const url = `${window.config.COUNTRY_CONFIG_URL}/content/client`
 
   const res = await fetch(url, {
@@ -132,7 +127,6 @@ async function loadContent(
   const response = await res.json()
 
   return {
-    formConfig,
     ...response
   }
 }

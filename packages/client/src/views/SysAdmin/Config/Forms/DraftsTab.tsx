@@ -28,7 +28,7 @@ import { goToFormConfigWizard } from '@client/navigation'
 import {
   DraftStatus,
   IDraft
-} from '@client/forms/configuration/formDrafts/utils'
+} from '@client/forms/configuration/formDrafts/reducer'
 import { Value, DraftVersion } from './components'
 import { isDefaultDraft } from './utils'
 import { ActionContext, Actions, ActionStatus } from './ActionsModal'

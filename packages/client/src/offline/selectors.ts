@@ -28,10 +28,8 @@ export function isOfflineDataLoaded(
   const hasAllRequiredData =
     state.facilities &&
     state.locations &&
-    state.pilotLocations &&
     state.config &&
     state.formConfig &&
-    state.formDraft &&
     state.templates &&
     state.languages
 

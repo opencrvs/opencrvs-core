@@ -27,11 +27,11 @@ import { useDispatch } from 'react-redux'
 import { Mutation } from 'react-apollo'
 import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
 import { CHANGE_FORM_DRAFT_STATUS } from './mutations'
-import { modifyFormDraftAction } from '@client/offline/actions'
+import { modifyFormDraft } from '@client/forms/configuration/formDrafts/actions'
 import {
   DraftStatus,
   IDraft
-} from '@client/forms/configuration/formDrafts/utils'
+} from '@client/forms/configuration/formDrafts/reducer'
 import { Event } from '@client/forms'
 
 export enum Actions {
@@ -106,7 +106,7 @@ function ActionButton() {
       mutation={CHANGE_FORM_DRAFT_STATUS}
       onCompleted={({ createOrUpdateFormDraft: formDraft }) => {
         if (formDraft) {
-          dispatch(modifyFormDraftAction(formDraft as IDraft))
+          dispatch(modifyFormDraft(formDraft as IDraft))
           setAction({ status: ActionStatus.COMPLETED })
         }
       }}

@@ -36,10 +36,6 @@ import {
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
 import { find, merge } from 'lodash'
-import {
-  IFormDraft,
-  getOfflineFormDraftData
-} from '@client/forms/configuration/formDrafts/utils'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -88,7 +84,6 @@ export interface IOfflineData {
 
   config: IApplicationConfig
   formConfig: IFormConfig
-  formDraft: IFormDraft
 }
 
 export type IOfflineDataState = {
@@ -347,14 +342,14 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
-    case actions.MODIFY_OFFLINE_FORM_DRAFT: {
-      if (!state.offlineData.formDraft) return state
-      const { formDraft } = action.payload
+    case actions.UPDATE_OFFLINE_FORM_DRAFT: {
+      if (!state.offlineData.formConfig?.questionConfig) return state
+      const { formDrafts } = action.payload
       const newOfflineData = {
         ...state.offlineData,
-        formDraft: {
-          ...state.offlineData.formDraft,
-          [formDraft.event]: formDraft
+        formConfig: {
+          ...state.offlineData.formConfig,
+          formDrafts
         }
       }
       return {
@@ -366,7 +361,7 @@ function reducer(
      * Configurations
      */
     case actions.APPLICATION_CONFIG_LOADED: {
-      const { certificates, config, formConfig, formDrafts } = action.payload
+      const { certificates, config, formConfig } = action.payload
       merge(window.config, config)
       const birthCertificateTemplate = find(certificates, {
         event: 'birth',
@@ -387,7 +382,6 @@ function reducer(
         ...state.offlineData,
         config,
         formConfig,
-        formDraft: getOfflineFormDraftData(formDrafts),
         templates: {
           certificates: {
             birth: {
