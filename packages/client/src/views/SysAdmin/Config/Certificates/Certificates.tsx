@@ -26,6 +26,7 @@ import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWr
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
+import { buttonMessages } from '@client/i18n/messages/buttons'
 import {
   FloatingNotification,
   ListView,
@@ -42,7 +43,7 @@ import {
 import { GET_ACTIVE_CERTIFICATES } from '@client/certificate/queries'
 import { Query } from '@client/components/Query'
 import { errorMessages } from '@client/i18n/messages/errors'
-import * as _ from 'lodash'
+import _ from 'lodash'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
@@ -188,7 +189,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
   ) {
     const menuItems = [
       {
-        label: intl.formatMessage(messages.previewTemplate),
+        label: intl.formatMessage(buttonMessages.preview),
         handler: async () => {
           const dummyTemplateData = getDummyCertificateTemplateData(
             event,
@@ -213,7 +214,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         }
       },
       {
-        label: intl.formatMessage(messages.printTemplate),
+        label: intl.formatMessage(buttonMessages.print),
         handler: () => {
           printFile(svgCode, svgFilename)
         }
@@ -225,7 +226,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         }
       },
       {
-        label: intl.formatMessage(messages.uploadTemplate),
+        label: intl.formatMessage(buttonMessages.upload),
         handler: () => {
           this.setState({
             eventName: event
