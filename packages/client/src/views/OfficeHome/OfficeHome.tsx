@@ -77,7 +77,10 @@ export interface IProps extends IButtonProps {
   disabled?: boolean
   id: string
 }
-type IOwnProps = RouteComponentProps<{ tabId: string; selectorId?: string }>
+type IOwnProps = RouteComponentProps<{
+  tabId: string
+  selectorId?: string
+}>
 export interface IQueryData {
   inProgressTab: GQLEventSearchResultSet
   notificationTab: GQLEventSearchResultSet
@@ -164,7 +167,7 @@ export class OfficeHomeView extends React.Component<
   IOfficeHomeProps,
   IOfficeHomeState
 > {
-  pageSize = 10
+  pageSize = 2
   showPaginated = false
   interval: any = undefined
   role = this.props.userDetails && this.props.userDetails.role
@@ -201,18 +204,18 @@ export class OfficeHomeView extends React.Component<
 
   syncWorkqueueRegistrationClerk() {
     this.props.updateRegistrarWorkqueue(
-      this.state.progressCurrentPage * this.pageSize,
-      this.state.reviewCurrentPage * this.pageSize,
-      this.state.updatesCurrentPage * this.pageSize,
-      this.state.approvalCurrentPage * this.pageSize,
-      this.state.externalValidationCurrentPage * this.pageSize,
-      this.state.printCurrentPage * this.pageSize,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0
+      this.pageSize,
+      this.pageSize,
+      this.pageSize,
+      this.pageSize,
+      this.pageSize,
+      this.pageSize,
+      Math.max(this.state.progressCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.reviewCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.updatesCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.approvalCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.externalValidationCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.printCurrentPage - 1, 0) * this.pageSize
     )
   }
 
@@ -393,7 +396,8 @@ export class OfficeHomeView extends React.Component<
                     data: filteredData.rejectTab
                   }}
                   showPaginated={this.showPaginated}
-                  page={updatesCurrentPage}
+                  paginationId={updatesCurrentPage}
+                  pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
                   loading={loading}
                   error={error}
@@ -419,7 +423,8 @@ export class OfficeHomeView extends React.Component<
                     data: filteredData.approvalTab
                   }}
                   showPaginated={this.showPaginated}
-                  page={approvalCurrentPage}
+                  paginationId={approvalCurrentPage}
+                  pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
                   loading={loading}
                   error={error}
@@ -431,7 +436,8 @@ export class OfficeHomeView extends React.Component<
                     data: filteredData.printTab
                   }}
                   showPaginated={this.showPaginated}
-                  page={printCurrentPage}
+                  paginationId={printCurrentPage}
+                  pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
                   loading={loading}
                   error={error}
@@ -517,13 +523,15 @@ export class OfficeHomeView extends React.Component<
 
 function mapStateToProps(
   state: IStoreState,
-  props: RouteComponentProps<{ tabId: string; selectorId?: string }>
+  props: RouteComponentProps<{
+    tabId: string
+    selectorId?: string
+  }>
 ): IBaseOfficeHomeStateProps {
   const { match } = props
   const userDetails = getUserDetails(state)
   const userLocationId = (userDetails && getUserLocation(userDetails).id) || ''
   const scope = getScope(state)
-
   return {
     declarations: state.declarationsState.declarations,
     workqueue: state.workqueueState.workqueue,

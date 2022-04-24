@@ -57,7 +57,7 @@ const StatusIndicator = styled.div<{
 const DownloadAction = styled(TertiaryButton)`
   border-radius: 50%;
   height: 40px;
-  /* width: 100%; */
+  width: 36px;
   & > div {
     padding: 0px 0px;
   }

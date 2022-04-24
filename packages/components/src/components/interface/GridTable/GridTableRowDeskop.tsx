@@ -37,9 +37,6 @@ const StyledBox = styled.div`
   display: flex;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey100};
-  &:last-child {
-    border: 0px;
-  }
   height: 72px;
 `
 

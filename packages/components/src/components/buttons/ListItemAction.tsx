@@ -36,7 +36,7 @@ const ListItemActionsContainer = styled.div<{
   display: flex;
   flex: 1;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
   justify-content: ${({ alignment }) => {
     if (alignment === ColumnContentAlignment.LEFT) {
       return 'flex-start'
@@ -63,6 +63,17 @@ const ArrowExpansionSecion = styled(ArrowExpansionButton)<{
 }>`
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
 `
+const ActionButtonContainer = styled.div`
+  width: 36px;
+  display: flex;
+`
+
+const ActionButton = styled.div`
+  margin: auto;
+  display: flex;
+  align-items: center;
+`
+
 interface IListItemActionProps {
   actions: IAction[]
   id?: string
@@ -93,7 +104,11 @@ export function ListItemAction(props: IListItemActionProps) {
         {actions &&
           actions.map((action: IAction) =>
             isActionComponent(action) ? (
-              React.cloneElement(action.actionComponent, { id })
+              <ActionButtonContainer>
+                <ActionButton>
+                  {React.cloneElement(action.actionComponent, { id })}
+                </ActionButton>
+              </ActionButtonContainer>
             ) : (
               <ListItemSingleAction
                 isFullHeight={isFullHeight}
