@@ -73,6 +73,7 @@ import format from '@client/utils/date-formatting'
 
 import { CompletenessReport } from './CompletenessReport'
 import { RegistrationsReport } from './RegistrationsReport'
+import { CorrectionsReport } from './CorrectionsReport'
 
 interface IConnectProps {
   locations: { [key: string]: ILocation }
@@ -450,6 +451,12 @@ class OperationalReportComponent extends React.Component<Props, State> {
                     />
                     <RegistrationsReport
                       data={data!.getTotalMetrics}
+                      selectedEvent={selectedEvent}
+                    />
+                    <CorrectionsReport
+                      timeStart={timeStart}
+                      timeEnd={timeEnd}
+                      locationId={locationId}
                       selectedEvent={selectedEvent}
                     />
                   </>

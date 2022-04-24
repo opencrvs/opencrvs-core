@@ -59,6 +59,22 @@ export const resolvers: GQLResolver = {
         authHeader
       )
     },
+    async getTotalCorrections(
+      _,
+      { timeStart, timeEnd, locationId, event },
+      authHeader
+    ) {
+      return getMetrics(
+        '/totalCorrections',
+        {
+          timeStart,
+          timeEnd,
+          locationId,
+          event
+        },
+        authHeader
+      )
+    },
     async getDeclarationsStartedMetrics(
       _,
       { timeStart, timeEnd, locationId },
