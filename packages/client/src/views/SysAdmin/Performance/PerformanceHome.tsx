@@ -87,7 +87,6 @@ const PerformanceActions = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding-bottom: 16px;
 `
 interface IConnectProps {
   locations: { [key: string]: ILocation }
@@ -215,6 +214,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     return (
       <SysAdminContentWrapper
         id="performanceHome"
+        isCertificatesConfigPage={true}
         profilePageStyle={{
           paddingTopMd: 0,
           horizontalPaddingMd: 0
@@ -225,11 +225,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             <Content
               title={intl.formatMessage(navigationMessages.performance)}
               size={ContentSize.LARGE}
-              tabBarContent={this.getTabContent(
+              filterContent={this.getTabContent(
                 intl,
                 this.state.selectedLocation
               )}
-              noTabBarBorder={true}
             >
               <Query
                 query={PERFORMANCE_METRICS}
