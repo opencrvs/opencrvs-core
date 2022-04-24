@@ -187,6 +187,29 @@ export const query = <T = any>(q: string): Promise<T> => {
   }
 }
 
+export function deleteMeasurements() {
+  try {
+    return Promise.all([
+      influx.dropMeasurement('birth_reg', INFLUX_DB),
+      influx.dropMeasurement('death_reg', INFLUX_DB),
+      influx.dropMeasurement('in_complete_fields', INFLUX_DB),
+      influx.dropMeasurement('declaration_time_logged', INFLUX_DB),
+      influx.dropMeasurement('declaration_event_duration', INFLUX_DB),
+      influx.dropMeasurement('certification_payment', INFLUX_DB),
+      influx.dropMeasurement('correction_payment', INFLUX_DB),
+      influx.dropMeasurement('declarations_started', INFLUX_DB),
+      influx.dropMeasurement('declarations_rejected', INFLUX_DB)
+    ]).then(() => {
+      return {
+        status: `Successfully deleted all the measurements form ${INFLUX_DB} database`
+      }
+    })
+  } catch (err) {
+    logger.error(`Error deleting ${INFLUX_DB} database from InfluxDB! ${err}`)
+    throw err
+  }
+}
+
 export async function getCSV(measurement: string) {
   // This is done with a plain HTTP request so the result can be streamed
   const res = await fetch(

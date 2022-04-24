@@ -27,6 +27,18 @@ jest.mock('./utils', () => {
   }
 })
 
+jest.mock('../../influxdb/client', () => {
+  const originalModule = jest.requireActual('../../influxdb/client')
+  return {
+    __esModule: true,
+    ...originalModule,
+    deleteMeasurements: () =>
+      Promise.resolve({
+        status: 'ok'
+      })
+  }
+})
+
 const mockLocationBundle = {
   entry: [{ resource: { id: '1490d3dd-71a9-47e8-b143-f9fc64f71294' } }]
 }
@@ -181,5 +193,35 @@ describe('verify metrics handler', () => {
     })
 
     expect(res.statusCode).toBe(400)
+  })
+})
+
+describe('delete metrics measurement handler', () => {
+  let server: any
+  const token = jwt.sign(
+    { scope: ['declare', 'natlsysadmin'] },
+    readFileSync('../auth/test/cert.key'),
+    {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:metrics-user'
+    }
+  )
+
+  beforeEach(async () => {
+    server = await createServer()
+    jest.clearAllMocks()
+  })
+
+  it('returns ok when scope is NATLSYSADMIN and Successfully drop all measurement', async () => {
+    const res = await server.server.inject({
+      method: 'DELETE',
+      url: '/influxMeasurement',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    expect(res.statusCode).toBe(200)
   })
 })
