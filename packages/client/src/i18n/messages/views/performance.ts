@@ -12,6 +12,43 @@
 import { defineMessages } from 'react-intl'
 
 const messagesToDefine = {
+  performanceCompletenessRatesHeader: {
+    id: 'performance.reports.header.completenessRates',
+    defaultMessage: 'Completeness rates',
+    description: 'Header for report completeness rates'
+  },
+  performanceCompletenessRatesSubHeader: {
+    id: 'performance.reports.subHeader.completenessRates',
+    defaultMessage:
+      'The no. of registrations, expressed as a % of the total estimated no. of {event, select, BIRTH{birth} DEATH{death} other{birth}}s occurring',
+    description: 'Sub header for report completeness rates'
+  },
+  performanceTotalRegitrationsHeader: {
+    id: 'performance.reports.header.totalRegistrations',
+    defaultMessage: 'Registrations',
+    description: 'Header for report total registrations'
+  },
+  performanceTotalCertificatesHeader: {
+    id: 'performance.reports.header.totalCertificates',
+    defaultMessage: 'Certificates issued',
+    description: 'Header for report total certificates'
+  },
+  performanceTotalCertificatesSubHeader: {
+    id: 'performance.reports.subHeader.totalCertificates',
+    defaultMessage:
+      'Certification rate is the no. of certificates issues, expressed as a percentage of the total number of registrations',
+    description: 'Sub header for report total certificates'
+  },
+  performanceTotalCorrectionsHeader: {
+    id: 'performance.reports.header.totalCorrections',
+    defaultMessage: 'Corrections',
+    description: 'Header for report total corrections'
+  },
+  performanceTotalPaymentsHeader: {
+    id: 'performance.reports.header.totalPayments',
+    defaultMessage: 'Fees collected',
+    description: 'Header for report total payments'
+  },
   performanceTotalLabel: {
     id: 'performance.values.labels.total',
     defaultMessage: 'Total',
@@ -102,6 +139,11 @@ const messagesToDefine = {
     id: 'performance.reports.select.item.reports',
     defaultMessage: 'Reports',
     description: 'Label for select option Reports'
+  },
+  otherCorrectionReason: {
+    id: 'performance.reports.corrections.other.label',
+    defaultMessage: 'Other',
+    description: 'Label "Other" category in corrections'
   },
   declarationsStartedTitle: {
     id: 'performance.reports.declarationsStarted.title',

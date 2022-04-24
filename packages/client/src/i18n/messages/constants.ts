@@ -13,6 +13,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IConstantsMessages
   extends Record<string | number | symbol, MessageDescriptor> {
+  countryName: MessageDescriptor
   address: MessageDescriptor
   allEvents: MessageDescriptor
   allStatuses: MessageDescriptor
@@ -145,6 +146,11 @@ interface IConstantsMessages
   history: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
+  countryName: {
+    defaultMessage: 'Farajaland',
+    description: 'Name of the OpenCRVS implementation country',
+    id: 'constants.countryName'
+  },
   address: {
     defaultMessage: 'Address',
     description: 'Label for address',

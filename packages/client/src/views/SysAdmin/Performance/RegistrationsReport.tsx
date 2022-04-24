@@ -23,12 +23,14 @@ import {
   BreakdownValue,
   PercentageDisplay,
   calculateTotal,
-  TotalDisplayWithPercentage
+  TotalDisplayWithPercentage,
+  PerformanceListHeader
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/performance'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
+
 interface RegistrationsReportProps {
   data: GQLTotalMetricsResult
   selectedEvent: 'BIRTH' | 'DEATH'
@@ -45,6 +47,15 @@ export function RegistrationsReport({
   const intl = useIntl()
   return (
     <Container>
+      <ListViewItemSimplified
+        label={
+          <div>
+            <PerformanceListHeader>
+              {intl.formatMessage(messages.performanceTotalRegitrationsHeader)}
+            </PerformanceListHeader>
+          </div>
+        }
+      />
       <ListViewItemSimplified
         label={
           <PerformanceTitle>

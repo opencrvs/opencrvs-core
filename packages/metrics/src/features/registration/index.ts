@@ -170,6 +170,16 @@ export interface IPaymentPoints {
   fields: IPaymentFields
   timestamp: number | undefined
 }
+export interface ICorrectionPoint {
+  measurement: string
+  tags: ILocationTags & {
+    eventType: 'BIRTH' | 'DEATH'
+    // CLERICAL_ERROR, MATERIAL_ERROR, MATERIAL_OMISSION, JUDICIAL_ORDER, OTHER
+    reason: string
+  }
+  fields: { compositionId: string }
+  timestamp: number | undefined
+}
 
 export interface IPaymentFields {
   total: number

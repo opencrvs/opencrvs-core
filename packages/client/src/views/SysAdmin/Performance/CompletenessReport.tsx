@@ -24,7 +24,9 @@ import {
   BreakdownLabel,
   BreakdownValue,
   PercentageDisplay,
-  calculateTotal
+  calculateTotal,
+  PerformanceListHeader,
+  PerformanceListSubHeader
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import styled from 'styled-components'
@@ -48,6 +50,23 @@ export function CompletenessReport({
   const intl = useIntl()
   return (
     <Container>
+      <ListViewItemSimplified
+        label={
+          <div>
+            <PerformanceListHeader>
+              {intl.formatMessage(messages.performanceCompletenessRatesHeader)}
+            </PerformanceListHeader>
+            <PerformanceListSubHeader>
+              {intl.formatMessage(
+                messages.performanceCompletenessRatesSubHeader,
+                {
+                  event: selectedEvent
+                }
+              )}
+            </PerformanceListSubHeader>
+          </div>
+        }
+      />
       <ListViewItemSimplified
         label={
           <PerformanceTitle>

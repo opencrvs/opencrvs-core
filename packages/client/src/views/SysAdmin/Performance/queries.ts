@@ -197,3 +197,21 @@ export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
     }
   }
 `
+export const GET_TOTAL_PAYMENTS = gql`
+  query data(
+    $timeStart: String!
+    $timeEnd: String!
+    $locationId: String!
+    $event: String!
+  ) {
+    getTotalPayments(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+      event: $event
+    ) {
+      total
+      paymentType
+    }
+  }
+`

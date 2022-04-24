@@ -47,9 +47,15 @@ import {
   ToastNotification,
   NOTIFICATION_TYPE
 } from '@client/components/interface/ToastNotification'
-import { CompletenessReport } from './CompletenessReport'
-import { RegistrationsReport } from './RegistrationsReport'
+import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
+import { RegistrationsReport } from '@client/views/SysAdmin/Performance/RegistrationsReport'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
+import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
+import { CertificationRateComponent } from '@client/views/SysAdmin/Performance/CertificationRateComponent'
+import { certificationRatesDummyData } from '@client/views/SysAdmin/Performance/utils'
+import { constantsMessages } from '@client/i18n/messages/constants'
+import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
 
 const Layout = styled.div`
   display: flex;
@@ -57,6 +63,12 @@ const Layout = styled.div`
 `
 const LayoutLeft = styled.div`
   flex-grow: 1;
+
+  .performance-block {
+    &:not(:last-child) {
+      margin-bottom: 40px;
+    }
+  }
 `
 const LayoutRight = styled.div`
   margin-top: 24px;
@@ -126,8 +138,10 @@ const selectLocation = (
     ({ id }) => id === locationId
   ) as ISearchLocation
 }
+
+const NATIONAL_ADMINISTRATIVE_LEVEL = 'NATIONAL_ADMINISTRATIVE_LEVEL'
 class PerformanceHomeComponent extends React.Component<Props, State> {
-  static transformPropsToState(props: Props, state?: State) {
+  transformPropsToState(props: Props) {
     const {
       location: { search },
       locations,
@@ -138,7 +152,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     ) as unknown as ISearchParams
     const selectedLocation = selectLocation(
       locationId,
-      generateLocations({ ...locations, ...offices }, props.intl)
+      generateLocations({ ...locations, ...offices }, props.intl).concat(
+        this.getAdditionalLocations()
+      )
     )
 
     return {
@@ -154,10 +170,18 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     super(props)
     window.__localeId__ = this.props.intl.locale
 
-    this.state = PerformanceHomeComponent.transformPropsToState(
-      props,
-      undefined
-    )
+    this.state = this.transformPropsToState(props)
+  }
+
+  getAdditionalLocations() {
+    const { intl } = this.props
+    return [
+      {
+        id: NATIONAL_ADMINISTRATIVE_LEVEL,
+        searchableText: intl.formatMessage(constantsMessages.countryName),
+        displayLabel: intl.formatMessage(constantsMessages.countryName)
+      }
+    ]
   }
 
   togglePerformanceStatus = () => {
@@ -166,17 +190,22 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
   getTabContent = (intl: IntlShape, selectedLocation: ISearchLocation) => {
     const { id: locationId } = selectedLocation || {}
+
     return (
       <PerformanceActions>
         <LocationPicker
-          selectedLocationId={locationId}
+          additionalLocations={this.getAdditionalLocations()}
+          selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
           onChangeLocation={(newLocationId) => {
             const newLocation = selectLocation(
               newLocationId,
               generateLocations(
-                { ...this.props.locations, ...this.props.offices },
+                {
+                  ...this.props.locations,
+                  ...this.props.offices
+                },
                 this.props.intl
-              )
+              ).concat(this.getAdditionalLocations())
             )
             this.setState({ selectedLocation: newLocation })
           }}
@@ -285,6 +314,46 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       />
                     </>
                   )
+                }}
+              </Query>
+              <CertificationRateComponent data={certificationRatesDummyData} />
+              <CorrectionsReport
+                timeStart={timeStart}
+                timeEnd={timeEnd}
+                locationId={
+                  this.state.selectedLocation
+                    ? this.state.selectedLocation.id
+                    : undefined
+                }
+                selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
+              />
+              <Query
+                query={GET_TOTAL_PAYMENTS}
+                variables={
+                  this.state.selectedLocation
+                    ? {
+                        ...queryVariablesWithoutLocationId,
+                        locationId: this.state.selectedLocation.id
+                      }
+                    : queryVariablesWithoutLocationId
+                }
+              >
+                {({ loading, data, error }) => {
+                  if (data && data.getTotalPayments) {
+                    return (
+                      <PaymentsAmountComponent data={data!.getTotalPayments} />
+                    )
+                  }
+                  if (loading) {
+                    return <Spinner id="fees-collected-loading" />
+                  }
+                  if (error) {
+                    return (
+                      <>
+                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                      </>
+                    )
+                  }
                 }}
               </Query>
             </Content>

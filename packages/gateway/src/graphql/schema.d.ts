@@ -33,6 +33,7 @@ export interface GQLQuery {
   verifyPasswordById?: GQLVerifyPasswordResult
   getTotalMetrics?: GQLTotalMetricsResult
   getTotalPayments?: Array<GQLPaymentMetric>
+  getTotalCorrections?: Array<GQLCorrectionMetric>
   getDeclarationsStartedMetrics?: GQLDeclarationsStartedMetrics
   fetchMonthWiseEventMetrics?: GQLMonthWiseEstimationMetrics
   fetchLocationWiseEventMetrics?: GQLLocationWiseEstimationMetrics
@@ -257,6 +258,11 @@ export interface GQLTotalMetricsResult {
 export interface GQLPaymentMetric {
   total: number
   paymentType: string
+}
+
+export interface GQLCorrectionMetric {
+  total: number
+  reason: string
 }
 
 export interface GQLDeclarationsStartedMetrics {
@@ -1327,6 +1333,7 @@ export interface GQLResolver {
   VerifyPasswordResult?: GQLVerifyPasswordResultTypeResolver
   TotalMetricsResult?: GQLTotalMetricsResultTypeResolver
   PaymentMetric?: GQLPaymentMetricTypeResolver
+  CorrectionMetric?: GQLCorrectionMetricTypeResolver
   DeclarationsStartedMetrics?: GQLDeclarationsStartedMetricsTypeResolver
   MonthWiseEstimationMetrics?: GQLMonthWiseEstimationMetricsTypeResolver
   LocationWiseEstimationMetrics?: GQLLocationWiseEstimationMetricsTypeResolver
@@ -1410,6 +1417,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
   getTotalMetrics?: QueryToGetTotalMetricsResolver<TParent>
   getTotalPayments?: QueryToGetTotalPaymentsResolver<TParent>
+  getTotalCorrections?: QueryToGetTotalCorrectionsResolver<TParent>
   getDeclarationsStartedMetrics?: QueryToGetDeclarationsStartedMetricsResolver<TParent>
   fetchMonthWiseEventMetrics?: QueryToFetchMonthWiseEventMetricsResolver<TParent>
   fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<TParent>
@@ -1602,8 +1610,8 @@ export interface QueryToQueryPersonByNidIdentifierResolver<
 }
 
 export interface QueryToFetchRegistrationCountByStatusArgs {
-  locationId: string
   status: Array<string | null>
+  locationId?: string
 }
 export interface QueryToFetchRegistrationCountByStatusResolver<
   TParent = any,
@@ -1754,6 +1762,24 @@ export interface QueryToGetTotalPaymentsResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToGetTotalPaymentsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetTotalCorrectionsArgs {
+  timeStart: string
+  timeEnd: string
+  locationId?: string
+  event: string
+}
+export interface QueryToGetTotalCorrectionsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToGetTotalCorrectionsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3223,6 +3249,22 @@ export interface PaymentMetricToTotalResolver<TParent = any, TResult = any> {
 }
 
 export interface PaymentMetricToPaymentTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLCorrectionMetricTypeResolver<TParent = any> {
+  total?: CorrectionMetricToTotalResolver<TParent>
+  reason?: CorrectionMetricToReasonResolver<TParent>
+}
+
+export interface CorrectionMetricToTotalResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface CorrectionMetricToReasonResolver<
   TParent = any,
   TResult = any
 > {
