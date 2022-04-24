@@ -29,11 +29,12 @@ import { Canvas } from '@client/components/formConfig/Canvas'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
-import { useHasNatlSysAdminScope } from './hooks'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
 import { goToFormConfig } from '@client/navigation'
+import { getScope } from '@client/profile/profileSelectors'
+import { AuthScope } from '@client/utils/authUtils'
 
 const Container = styled.div`
   display: flex;
@@ -106,6 +107,11 @@ function isValidSection(
     ...Object.values<string>(BirthSection),
     ...Object.values<string>(DeathSection)
   ].includes(section)
+}
+
+function useHasNatlSysAdminScope() {
+  const scope = useSelector(getScope)
+  return scope?.includes(AuthScope.NATLSYSADMIN)
 }
 
 export function FormConfigWizard() {
