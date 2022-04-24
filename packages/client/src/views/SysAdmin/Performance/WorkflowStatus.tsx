@@ -24,14 +24,11 @@ import {
   userMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToOperationalReport, goToWorkflowStatus } from '@client/navigation'
+import { goToPerformanceHome, goToWorkflowStatus } from '@client/navigation'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
-import {
-  OPERATIONAL_REPORT_SECTION,
-  StatusMapping
-} from '@client/views/SysAdmin/Performance/OperationalReport'
+
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
@@ -68,6 +65,8 @@ import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCount
 import format, { formattedDuration } from '@client/utils/date-formatting'
 import subYears from 'date-fns/subYears'
 import differenceInSeconds from 'date-fns/differenceInSeconds'
+import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
+import { colors } from '@opencrvs/components/lib/colors'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -114,6 +113,45 @@ const INITIAL_SORT_MAP = {
 
 const DEFAULT_DECLARATION_STATUS_PAGE_SIZE = 25
 
+export const StatusMapping: IStatusMapping = {
+  IN_PROGRESS: {
+    labelDescriptor: statusMessages.inProgress,
+    color: colors.purple
+  },
+  DECLARED: {
+    labelDescriptor: statusMessages.readyForReview,
+    color: colors.orange
+  },
+  REJECTED: {
+    labelDescriptor: statusMessages.sentForUpdates,
+    color: colors.red
+  },
+  VALIDATED: {
+    labelDescriptor: statusMessages.sentForApprovals,
+    color: colors.grey300
+  },
+  WAITING_VALIDATION: {
+    labelDescriptor: statusMessages.sentForExternalValidation,
+    color: colors.grey500
+  },
+  REGISTERED: {
+    labelDescriptor: statusMessages.readyToPrint,
+    color: colors.green
+  },
+  CERTIFIED: {
+    labelDescriptor: statusMessages.certified,
+    color: colors.blue
+  },
+  REQUESTED_CORRECTION: {
+    labelDescriptor: statusMessages.requestedCorrection,
+    color: colors.blue
+  },
+  ARCHIVED: {
+    labelDescriptor: statusMessages.archived,
+    color: colors.blue
+  }
+}
+
 const statusOptions = [
   {
     label: constantsMessages.allStatuses,
@@ -141,7 +179,7 @@ function isPrimaryContact(contact: string): contact is PrimaryContact {
 }
 
 interface DispatchProps {
-  goToOperationalReport: typeof goToOperationalReport
+  goToPerformanceHome: typeof goToPerformanceHome
   goToWorkflowStatus: typeof goToWorkflowStatus
 }
 interface ISearchParams {
@@ -150,7 +188,6 @@ interface ISearchParams {
   event?: Event
 }
 export interface IHistoryStateProps {
-  sectionId: OPERATIONAL_REPORT_SECTION
   timeStart: Date | string
   timeEnd: Date | string
 }
@@ -169,13 +206,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     'declarationStartedOn'
   )
   const recordCount = DEFAULT_DECLARATION_STATUS_PAGE_SIZE * currentPageNumber
-  let sectionId = OPERATIONAL_REPORT_SECTION.OPERATIONAL
+
   let timeStart: string | Date = subYears(new Date(Date.now()), 1)
   let timeEnd: string | Date = new Date(Date.now())
   const historyState = props.history.location.state
 
   if (props.location.state) {
-    sectionId = historyState.sectionId
     timeStart = historyState.timeStart
     timeEnd = historyState.timeEnd
   }
@@ -639,11 +675,10 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       type={SysAdminPageVariant.SUBPAGE}
       headerTitle={intl.formatMessage(messages.workflowStatusHeader)}
       backActionHandler={() =>
-        props.goToOperationalReport(
-          locationId,
-          sectionId,
+        props.goToPerformanceHome(
           new Date(timeStart),
-          new Date(timeEnd)
+          new Date(timeEnd),
+          locationId
         )
       }
       toolbarComponent={
@@ -652,7 +687,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             selectedLocationId={locationId}
             onChangeLocation={(newLocationId: string) => {
               props.goToWorkflowStatus(
-                sectionId,
                 newLocationId,
                 new Date(timeStart),
                 new Date(timeEnd),
@@ -667,7 +701,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           <PerformanceSelect
             onChange={({ value }) => {
               props.goToWorkflowStatus(
-                sectionId,
                 locationId,
                 new Date(timeStart),
                 new Date(timeEnd),
@@ -697,7 +730,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           <PerformanceSelect
             onChange={({ value }) => {
               props.goToWorkflowStatus(
-                sectionId,
                 locationId,
                 new Date(timeStart),
                 new Date(timeEnd),
@@ -773,6 +805,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
 }
 
 export const WorkflowStatus = connect(null, {
-  goToOperationalReport,
+  goToPerformanceHome,
   goToWorkflowStatus
 })(injectIntl(WorkflowStatusComponent))
