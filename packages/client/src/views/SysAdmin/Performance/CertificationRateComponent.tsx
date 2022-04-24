@@ -39,12 +39,15 @@ export function CertificationRateComponent(props: ICertificationRateProps) {
             <PerformanceListHeader>Certificates issued</PerformanceListHeader>
           }
         />
-        {props.data.map((item) => (
-          <ListViewItemSimplified
-            label={<PerformanceTitle>{item.label}</PerformanceTitle>}
-            value={<PerformanceValue>{item.value}</PerformanceValue>}
-          />
-        ))}
+        <ListViewItemSimplified
+          label={<PerformanceTitle>Total</PerformanceTitle>}
+          value={<PerformanceValue>{props.data[0].value}</PerformanceValue>}
+        />
+
+        <ListViewItemSimplified
+          label={<PerformanceTitle>Certification rate</PerformanceTitle>}
+          value={<PerformanceValue>{props.data[1].value}%</PerformanceValue>}
+        />
       </ListViewSimplified>
     </ListContainer>
   )

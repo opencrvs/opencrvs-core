@@ -39,21 +39,34 @@ export function PaymentsAmountComponent(props: PaymentsAmountProps) {
           label={<PerformanceTitle>Total</PerformanceTitle>}
           value={
             <PerformanceValue>
-              {calculateTotalPaymentAmount(data)}
+              $ {calculateTotalPaymentAmount(data)}
             </PerformanceValue>
           }
         />
-        {data &&
-          data.map((payment) => {
-            return (
-              <ListViewItemSimplified
-                label={
-                  <PerformanceTitle>{payment.paymentType}</PerformanceTitle>
-                }
-                value={<PerformanceValue>{payment.total}</PerformanceValue>}
-              />
-            )
-          })}
+        <ListViewItemSimplified
+          label={<PerformanceTitle>Certification fee</PerformanceTitle>}
+          value={
+            <PerformanceValue>
+              ${' '}
+              {calculateTotalPaymentAmount(
+                data.filter(
+                  (payment) => payment.paymentType === 'certification'
+                )
+              )}
+            </PerformanceValue>
+          }
+        />
+        <ListViewItemSimplified
+          label={<PerformanceTitle>Correction fee</PerformanceTitle>}
+          value={
+            <PerformanceValue>
+              ${' '}
+              {calculateTotalPaymentAmount(
+                data.filter((payment) => payment.paymentType === 'correction')
+              )}
+            </PerformanceValue>
+          }
+        />
       </ListViewSimplified>
     </ListContainer>
   )
