@@ -45,7 +45,7 @@ const Header = styled.div`
     padding: 0;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: -16px;
+    margin: 0 -16px;
   }
 `
 const TopActionBar = styled.div`
@@ -75,7 +75,7 @@ const HeaderBottom = styled.div`
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 16px;
+    padding: 0 16px 16px;
   }
 `
 const TopTabBar = styled.div`
