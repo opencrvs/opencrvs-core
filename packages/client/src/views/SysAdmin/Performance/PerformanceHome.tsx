@@ -160,6 +160,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     )
   }
 
+  togglePerformanceStatus = () => {
+    alert()
+  }
+
   getTabContent = (intl: IntlShape, selectedLocation: ISearchLocation) => {
     const { id: locationId } = selectedLocation || {}
     return (
@@ -220,6 +224,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       <SysAdminContentWrapper
         id="performanceHome"
         isCertificatesConfigPage={true}
+        mapPerformanceClickHandler={this.togglePerformanceStatus}
         profilePageStyle={{
           paddingTopMd: 0,
           horizontalPaddingMd: 0

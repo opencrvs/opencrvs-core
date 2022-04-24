@@ -52,7 +52,8 @@ import {
   Plus,
   SearchDark,
   TrackingID,
-  User
+  User,
+  Activity
 } from '@opencrvs/components/lib/icons'
 import {
   AppHeader,
@@ -64,7 +65,7 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
+import styled, { ThemeConsumer } from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Avatar } from '@client/components/Avatar'
@@ -104,6 +105,7 @@ interface IProps extends RouteComponentProps {
   mobileSearchBar?: boolean
   enableMenuSelection?: boolean
   mapPinClickHandler?: () => void
+  mapPerformanceClickHandler?: () => void
 }
 
 type IFullProps = IntlShapeProps &
@@ -242,10 +244,22 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     )
   }
 
-  getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM) {
-    if (
-      (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE ||
-        activeMenuItem === ACTIVE_MENU_ITEM.TEAM) &&
+  getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM, theme: ITheme) {
+    if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
+      return {
+        mobileLeft: {
+          icon: () => this.hamburger(),
+          handler: this.toggleMenu
+        },
+        mobileRight: {
+          icon: () => <Activity stroke={theme.colors.primary} />,
+          handler: () =>
+            this.props.mapPerformanceClickHandler &&
+            this.props.mapPerformanceClickHandler()
+        }
+      }
+    } else if (
+      activeMenuItem === ACTIVE_MENU_ITEM.TEAM &&
       (NATL_ADMIN_ROLES.includes(this.props.userDetails?.role as string) ||
         SYS_ADMIN_ROLES.includes(this.props.userDetails?.role as string))
     ) {
@@ -438,7 +452,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   }
 
   render() {
-    const { intl, activeMenuItem } = this.props
+    const { intl, activeMenuItem, theme } = this.props
     const headerProps: React.HTMLAttributes<HTMLDivElement> = this
       .props as React.HTMLAttributes<HTMLDivElement>
     const title =
@@ -495,8 +509,10 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       ]
     }
 
-    const mobileHeaderActionProps =
-      this.getMobileHeaderActionProps(activeMenuItem)
+    const mobileHeaderActionProps = this.getMobileHeaderActionProps(
+      activeMenuItem,
+      theme
+    )
 
     return (
       <div {...headerProps}>

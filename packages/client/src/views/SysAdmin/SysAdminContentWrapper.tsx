@@ -71,6 +71,7 @@ interface BasePage {
   marginRight?: number
   fixedWidth?: number
   mapPinClickHandler?: () => void
+  mapPerformanceClickHandler?: () => void
   profilePageStyle?: IprofilePageStyle
   subMenuComponent?: React.ReactNode
   /*
@@ -226,7 +227,12 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
       </DynamicContainer>
     )
   } else {
-    pageHeader = <Header mapPinClickHandler={props.mapPinClickHandler} />
+    pageHeader = (
+      <Header
+        mapPinClickHandler={props.mapPinClickHandler}
+        mapPerformanceClickHandler={props.mapPerformanceClickHandler}
+      />
+    )
     pageContent = (
       <>
         <Navigation />
