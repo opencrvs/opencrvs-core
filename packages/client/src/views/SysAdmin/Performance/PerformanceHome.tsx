@@ -47,9 +47,13 @@ import {
   ToastNotification,
   NOTIFICATION_TYPE
 } from '@client/components/interface/ToastNotification'
-import { CompletenessReport } from './CompletenessReport'
-import { RegistrationsReport } from './RegistrationsReport'
+import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
+import { RegistrationsReport } from '@client/views/SysAdmin/Performance/RegistrationsReport'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
+import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
+import { CertificationRateComponent } from '@client/views/SysAdmin/Performance/CertificationRateComponent'
+import { certificationRatesDummyData } from '@client/views/SysAdmin/Performance/utils'
 
 const Layout = styled.div`
   display: flex;
@@ -286,6 +290,36 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       />
                     </>
                   )
+                }}
+              </Query>
+              <CertificationRateComponent data={certificationRatesDummyData} />
+              <Query
+                query={GET_TOTAL_PAYMENTS}
+                variables={
+                  this.state.selectedLocation
+                    ? {
+                        ...queryVariablesWithoutLocationId,
+                        locationId: this.state.selectedLocation.id
+                      }
+                    : queryVariablesWithoutLocationId
+                }
+              >
+                {({ loading, data, error }) => {
+                  if (data && data.getTotalPayments) {
+                    return (
+                      <PaymentsAmountComponent data={data!.getTotalPayments} />
+                    )
+                  }
+                  if (loading) {
+                    return <Spinner id="fees-collected-loading" />
+                  }
+                  if (error) {
+                    return (
+                      <>
+                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                      </>
+                    )
+                  }
                 }}
               </Query>
             </Content>

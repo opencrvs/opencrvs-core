@@ -83,8 +83,17 @@ export const FilterContainer = styled.div`
 export const PerformanceTitle = styled.div`
   ${({ theme }) => theme.fonts.bold16}
 `
-export const PerformanceListHeader = styled.div`
+export const PerformanceListHeader = styled.h4`
   ${({ theme }) => theme.fonts.h3}
+  color: ${({ theme }) => theme.colors.copy};
+  margin: 0;
+  margin-bottom: 8px;
+`
+
+export const PerformanceListSubHeader = styled.p`
+  ${({ theme }) => theme.fonts.reg16}
+  color:  ${({ theme }) => theme.colors.supportingCopy};
+  margin: 0;
 `
 export const PerformanceValue = styled.div`
   color: ${({ theme }) => theme.colors.copy};

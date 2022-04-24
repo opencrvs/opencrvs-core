@@ -18,8 +18,9 @@ import {
   ListContainer,
   PerformanceListHeader,
   PerformanceTitle,
-  PerformanceValue
-} from './utils'
+  PerformanceValue,
+  PerformanceListSubHeader
+} from '@client/views/SysAdmin/Performance/utils'
 
 interface ICertificationRateData {
   label: string
@@ -36,9 +37,16 @@ export function CertificationRateComponent(props: ICertificationRateProps) {
       <ListViewSimplified>
         <ListViewItemSimplified
           label={
-            <PerformanceListHeader>Certificates issued</PerformanceListHeader>
+            <div>
+              <PerformanceListHeader>Certificates issued</PerformanceListHeader>
+              <PerformanceListSubHeader>
+                Certification rate is the no. of certificates issues, expressed
+                as a percentage of the total number of registrations
+              </PerformanceListSubHeader>
+            </div>
           }
         />
+
         <ListViewItemSimplified
           label={<PerformanceTitle>Total</PerformanceTitle>}
           value={<PerformanceValue>{props.data[0].value}</PerformanceValue>}

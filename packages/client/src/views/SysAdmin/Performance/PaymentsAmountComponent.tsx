@@ -33,7 +33,11 @@ export function PaymentsAmountComponent(props: PaymentsAmountProps) {
     <ListContainer>
       <ListViewSimplified>
         <ListViewItemSimplified
-          label={<PerformanceListHeader>Fees collected</PerformanceListHeader>}
+          label={
+            <div>
+              <PerformanceListHeader>Fees collected</PerformanceListHeader>
+            </div>
+          }
         />
         <ListViewItemSimplified
           label={<PerformanceTitle>Total</PerformanceTitle>}

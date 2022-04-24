@@ -23,13 +23,14 @@ import {
   BreakdownValue,
   PercentageDisplay,
   calculateTotal,
-  TotalDisplayWithPercentage
+  TotalDisplayWithPercentage,
+  PerformanceListHeader
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/performance'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { PerformanceBlock } from './PerformanceBlock'
+
 interface RegistrationsReportProps {
   data: GQLTotalMetricsResult
   selectedEvent: 'BIRTH' | 'DEATH'
@@ -45,139 +46,65 @@ export function RegistrationsReport({
 }: RegistrationsReportProps) {
   const intl = useIntl()
   return (
-    <PerformanceBlock title="Registrations">
-      <Container>
-        <ListViewItemSimplified
-          label={
-            <PerformanceTitle>
-              {intl.formatMessage(messages.performanceTotalLabel)}
-            </PerformanceTitle>
-          }
-          value={
-            <div>
-              <PerformanceValue>
-                {data.results.reduce((m, x) => m + x.total, 0)}
-              </PerformanceValue>
-              <Breakdown>
-                <BreakdownRow>
-                  <BreakdownLabel>
-                    {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
-                  </BreakdownLabel>
-                  <BreakdownValue>
-                    {
-                      <PercentageDisplay
-                        total={calculateTotal(
-                          data.results.filter((x) => x.gender === 'male')
-                        )}
-                        ofNumber={calculateTotal(data.results)}
-                      />
-                    }
-                  </BreakdownValue>
-                </BreakdownRow>
-                <BreakdownRow>
-                  <BreakdownLabel>
-                    {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
-                  </BreakdownLabel>
-                  <BreakdownValue>
-                    {
-                      <PercentageDisplay
-                        total={calculateTotal(
-                          data.results.filter((x) => x.gender === 'female')
-                        )}
-                        ofNumber={calculateTotal(data.results)}
-                      />
-                    }
-                  </BreakdownValue>
-                </BreakdownRow>
-              </Breakdown>
-            </div>
-          }
-        />
-        {selectedEvent === 'BIRTH' && (
-          <ListViewItemSimplified
-            label={
-              <PerformanceTitle>
-                {intl.formatMessage(messages.performanceLateRegistrationsLabel)}
-              </PerformanceTitle>
-            }
-            value={
-              <div>
-                <PerformanceValue>
+    <Container>
+      <ListViewItemSimplified
+        label={
+          <div>
+            <PerformanceListHeader>Registrations</PerformanceListHeader>
+          </div>
+        }
+      />
+      <ListViewItemSimplified
+        label={
+          <PerformanceTitle>
+            {intl.formatMessage(messages.performanceTotalLabel)}
+          </PerformanceTitle>
+        }
+        value={
+          <div>
+            <PerformanceValue>
+              {data.results.reduce((m, x) => m + x.total, 0)}
+            </PerformanceValue>
+            <Breakdown>
+              <BreakdownRow>
+                <BreakdownLabel>
+                  {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
+                </BreakdownLabel>
+                <BreakdownValue>
                   {
-                    <TotalDisplayWithPercentage
+                    <PercentageDisplay
                       total={calculateTotal(
-                        data.results.filter(
-                          (x) => !['withinLate'].includes(x.timeLabel)
-                        )
+                        data.results.filter((x) => x.gender === 'male')
                       )}
                       ofNumber={calculateTotal(data.results)}
                     />
                   }
-                </PerformanceValue>
-                <Breakdown>
-                  <BreakdownRow>
-                    <BreakdownLabel>
-                      {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
-                    </BreakdownLabel>
-                    <BreakdownValue>
-                      {
-                        <PercentageDisplay
-                          total={calculateTotal(
-                            data.results.filter(
-                              (x) =>
-                                x.gender === 'male' &&
-                                !['withinLate'].includes(x.timeLabel)
-                            )
-                          )}
-                          ofNumber={calculateTotal(
-                            data.results.filter(
-                              (x) => !['withinLate'].includes(x.timeLabel)
-                            )
-                          )}
-                        />
-                      }
-                    </BreakdownValue>
-                  </BreakdownRow>
-                  <BreakdownRow>
-                    <BreakdownLabel>
-                      {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
-                    </BreakdownLabel>
-                    <BreakdownValue>
-                      {
-                        <PercentageDisplay
-                          total={calculateTotal(
-                            data.results.filter(
-                              (x) =>
-                                x.gender === 'female' &&
-                                !['withinLate', 'withinTarget'].includes(
-                                  x.timeLabel
-                                )
-                            )
-                          )}
-                          ofNumber={calculateTotal(
-                            data.results.filter(
-                              (x) =>
-                                !['withinLate', 'withinTarget'].includes(
-                                  x.timeLabel
-                                )
-                            )
-                          )}
-                        />
-                      }
-                    </BreakdownValue>
-                  </BreakdownRow>
-                </Breakdown>
-              </div>
-            }
-          />
-        )}
-
+                </BreakdownValue>
+              </BreakdownRow>
+              <BreakdownRow>
+                <BreakdownLabel>
+                  {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
+                </BreakdownLabel>
+                <BreakdownValue>
+                  {
+                    <PercentageDisplay
+                      total={calculateTotal(
+                        data.results.filter((x) => x.gender === 'female')
+                      )}
+                      ofNumber={calculateTotal(data.results)}
+                    />
+                  }
+                </BreakdownValue>
+              </BreakdownRow>
+            </Breakdown>
+          </div>
+        }
+      />
+      {selectedEvent === 'BIRTH' && (
         <ListViewItemSimplified
           label={
             <PerformanceTitle>
-              {intl.formatMessage(
-                messages.performanceDelayedRegistrationsLabel
-              )}
+              {intl.formatMessage(messages.performanceLateRegistrationsLabel)}
             </PerformanceTitle>
           }
           value={
@@ -187,8 +114,7 @@ export function RegistrationsReport({
                   <TotalDisplayWithPercentage
                     total={calculateTotal(
                       data.results.filter(
-                        (x) =>
-                          !['withinLate', 'withinTarget'].includes(x.timeLabel)
+                        (x) => !['withinLate'].includes(x.timeLabel)
                       )
                     )}
                     ofNumber={calculateTotal(data.results)}
@@ -207,17 +133,12 @@ export function RegistrationsReport({
                           data.results.filter(
                             (x) =>
                               x.gender === 'male' &&
-                              !['withinLate', 'withinTarget'].includes(
-                                x.timeLabel
-                              )
+                              !['withinLate'].includes(x.timeLabel)
                           )
                         )}
                         ofNumber={calculateTotal(
                           data.results.filter(
-                            (x) =>
-                              !['withinLate', 'withinTarget'].includes(
-                                x.timeLabel
-                              )
+                            (x) => !['withinLate'].includes(x.timeLabel)
                           )
                         )}
                       />
@@ -256,65 +177,148 @@ export function RegistrationsReport({
             </div>
           }
         />
-        <ListViewItemSimplified
-          label={
-            selectedEvent === 'BIRTH' ? (
-              <PerformanceTitle>
-                {intl.formatMessage(messages.performanceHomeBirth)}
-              </PerformanceTitle>
-            ) : (
-              <PerformanceTitle>
-                {intl.formatMessage(messages.performanceHomeDeath)}
-              </PerformanceTitle>
-            )
-          }
-          value={
-            <div>
-              <PerformanceValue>
-                {
-                  <TotalDisplayWithPercentage
-                    total={calculateTotal(
-                      data.results.filter(
-                        (x) => x.eventLocationType === 'PRIVATE_HOME'
-                      )
-                    )}
-                    ofNumber={calculateTotal(data.results)}
-                  />
-                }
-              </PerformanceValue>
-            </div>
-          }
-        />
-        <ListViewItemSimplified
-          label={
-            selectedEvent === 'BIRTH' ? (
-              <PerformanceTitle>
-                {intl.formatMessage(messages.performanceHealthFacilityBirth)}
-              </PerformanceTitle>
-            ) : (
-              <PerformanceTitle>
-                {intl.formatMessage(messages.performanceHealthFacilityDeath)}
-              </PerformanceTitle>
-            )
-          }
-          value={
-            <div>
-              <PerformanceValue>
-                {
-                  <TotalDisplayWithPercentage
-                    total={calculateTotal(
-                      data.results.filter(
-                        (x) => x.eventLocationType === 'HEALTH_FACILITY'
-                      )
-                    )}
-                    ofNumber={calculateTotal(data.results)}
-                  />
-                }
-              </PerformanceValue>
-            </div>
-          }
-        />
-      </Container>
-    </PerformanceBlock>
+      )}
+
+      <ListViewItemSimplified
+        label={
+          <PerformanceTitle>
+            {intl.formatMessage(messages.performanceDelayedRegistrationsLabel)}
+          </PerformanceTitle>
+        }
+        value={
+          <div>
+            <PerformanceValue>
+              {
+                <TotalDisplayWithPercentage
+                  total={calculateTotal(
+                    data.results.filter(
+                      (x) =>
+                        !['withinLate', 'withinTarget'].includes(x.timeLabel)
+                    )
+                  )}
+                  ofNumber={calculateTotal(data.results)}
+                />
+              }
+            </PerformanceValue>
+            <Breakdown>
+              <BreakdownRow>
+                <BreakdownLabel>
+                  {intl.formatMessage(messages.performanceMaleLabel)}:{' '}
+                </BreakdownLabel>
+                <BreakdownValue>
+                  {
+                    <PercentageDisplay
+                      total={calculateTotal(
+                        data.results.filter(
+                          (x) =>
+                            x.gender === 'male' &&
+                            !['withinLate', 'withinTarget'].includes(
+                              x.timeLabel
+                            )
+                        )
+                      )}
+                      ofNumber={calculateTotal(
+                        data.results.filter(
+                          (x) =>
+                            !['withinLate', 'withinTarget'].includes(
+                              x.timeLabel
+                            )
+                        )
+                      )}
+                    />
+                  }
+                </BreakdownValue>
+              </BreakdownRow>
+              <BreakdownRow>
+                <BreakdownLabel>
+                  {intl.formatMessage(messages.performanceFemaleLabel)}:{' '}
+                </BreakdownLabel>
+                <BreakdownValue>
+                  {
+                    <PercentageDisplay
+                      total={calculateTotal(
+                        data.results.filter(
+                          (x) =>
+                            x.gender === 'female' &&
+                            !['withinLate', 'withinTarget'].includes(
+                              x.timeLabel
+                            )
+                        )
+                      )}
+                      ofNumber={calculateTotal(
+                        data.results.filter(
+                          (x) =>
+                            !['withinLate', 'withinTarget'].includes(
+                              x.timeLabel
+                            )
+                        )
+                      )}
+                    />
+                  }
+                </BreakdownValue>
+              </BreakdownRow>
+            </Breakdown>
+          </div>
+        }
+      />
+      <ListViewItemSimplified
+        label={
+          selectedEvent === 'BIRTH' ? (
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceHomeBirth)}
+            </PerformanceTitle>
+          ) : (
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceHomeDeath)}
+            </PerformanceTitle>
+          )
+        }
+        value={
+          <div>
+            <PerformanceValue>
+              {
+                <TotalDisplayWithPercentage
+                  total={calculateTotal(
+                    data.results.filter(
+                      (x) => x.eventLocationType === 'PRIVATE_HOME'
+                    )
+                  )}
+                  ofNumber={calculateTotal(data.results)}
+                />
+              }
+            </PerformanceValue>
+          </div>
+        }
+      />
+      <ListViewItemSimplified
+        label={
+          selectedEvent === 'BIRTH' ? (
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceHealthFacilityBirth)}
+            </PerformanceTitle>
+          ) : (
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceHealthFacilityDeath)}
+            </PerformanceTitle>
+          )
+        }
+        value={
+          <div>
+            <PerformanceValue>
+              {
+                <TotalDisplayWithPercentage
+                  total={calculateTotal(
+                    data.results.filter(
+                      (x) => x.eventLocationType === 'HEALTH_FACILITY'
+                    )
+                  )}
+                  ofNumber={calculateTotal(data.results)}
+                />
+              }
+            </PerformanceValue>
+          </div>
+        }
+      />
+    </Container>
   )
 }
