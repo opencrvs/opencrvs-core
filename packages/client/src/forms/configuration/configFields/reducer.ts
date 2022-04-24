@@ -12,7 +12,7 @@
 import { loop, Cmd, Loop, LoopReducer } from 'redux-loop'
 import { storage } from '@client/storage'
 import * as actions from '@client/forms/configuration/configFields/actions'
-import { APPLICATION_CONFIG_LOADED } from '@client/offline/actions'
+import * as offlineActions from '@client/offline/actions'
 import { Event, ISerializedForm, IQuestionConfig } from '@client/forms'
 import {
   configureRegistrationForm,
@@ -52,17 +52,14 @@ async function loadConfigFields() {
   return storage.getItem('configFields')
 }
 
-export const configFieldsReducer: LoopReducer<
-  IConfigFieldsState,
-  actions.ConfigFieldsActions
-> = (
+type Actions = actions.ConfigFieldsActions | offlineActions.Action
+
+export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
   state: IConfigFieldsState = initialState,
-  action: actions.ConfigFieldsActions
-):
-  | IConfigFieldsState
-  | Loop<IConfigFieldsState, actions.ConfigFieldsActions> => {
+  action: Actions
+): IConfigFieldsState | Loop<IConfigFieldsState, Actions> => {
   switch (action.type) {
-    case APPLICATION_CONFIG_LOADED:
+    case offlineActions.READY:
       return loop(
         {
           ...state,

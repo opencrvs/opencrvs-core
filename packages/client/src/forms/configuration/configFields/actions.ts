@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ApplicationConfigLoadedAction } from '@client/offline/actions'
 import { IConfigFieldsState } from './reducer'
 
 export const GET_STORAGE_CONFIG_FIELDS_SUCCESS =
@@ -80,7 +79,6 @@ export const storeConfigFieldsFailed = (
 })
 
 export type ConfigFieldsActions =
-  | ApplicationConfigLoadedAction
   | StoreConfigFieldsAction
   | StoreConfigFieldsSuccessAction
   | GetStorageConfigFieldsSuccessAction
