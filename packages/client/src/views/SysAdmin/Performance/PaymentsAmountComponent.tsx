@@ -22,6 +22,8 @@ import {
   ListContainer
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLPaymentMetric } from '@opencrvs/gateway/src/graphql/schema'
+import { useIntl } from 'react-intl'
+import { messages } from '@client/i18n/messages/views/performance'
 
 interface PaymentsAmountProps {
   data: Array<GQLPaymentMetric>
@@ -29,13 +31,16 @@ interface PaymentsAmountProps {
 
 export function PaymentsAmountComponent(props: PaymentsAmountProps) {
   const { data } = props
+  const intl = useIntl()
   return (
     <ListContainer>
       <ListViewSimplified>
         <ListViewItemSimplified
           label={
             <div>
-              <PerformanceListHeader>Fees collected</PerformanceListHeader>
+              <PerformanceListHeader>
+                {intl.formatMessage(messages.performanceTotalPaymentsHeader)}
+              </PerformanceListHeader>
             </div>
           }
         />

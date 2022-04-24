@@ -21,6 +21,8 @@ import {
   PerformanceValue,
   PerformanceListSubHeader
 } from '@client/views/SysAdmin/Performance/utils'
+import { useIntl } from 'react-intl'
+import { messages } from '@client/i18n/messages/views/performance'
 
 interface ICertificationRateData {
   label: string
@@ -32,16 +34,22 @@ interface ICertificationRateProps {
 }
 
 export function CertificationRateComponent(props: ICertificationRateProps) {
+  const intl = useIntl()
   return (
     <ListContainer>
       <ListViewSimplified>
         <ListViewItemSimplified
           label={
             <div>
-              <PerformanceListHeader>Certificates issued</PerformanceListHeader>
+              <PerformanceListHeader>
+                {intl.formatMessage(
+                  messages.performanceTotalCertificatesHeader
+                )}
+              </PerformanceListHeader>
               <PerformanceListSubHeader>
-                Certification rate is the no. of certificates issues, expressed
-                as a percentage of the total number of registrations
+                {intl.formatMessage(
+                  messages.performanceTotalCertificatesSubHeader
+                )}
               </PerformanceListSubHeader>
             </div>
           }

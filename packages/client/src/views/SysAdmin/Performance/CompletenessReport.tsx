@@ -53,10 +53,16 @@ export function CompletenessReport({
       <ListViewItemSimplified
         label={
           <div>
-            <PerformanceListHeader>Completeness rates</PerformanceListHeader>
+            <PerformanceListHeader>
+              {intl.formatMessage(messages.performanceCompletenessRatesHeader)}
+            </PerformanceListHeader>
             <PerformanceListSubHeader>
-              The no. of registrations, expressed as a % of the total estimated
-              no. of births occurring
+              {intl.formatMessage(
+                messages.performanceCompletenessRatesSubHeader,
+                {
+                  event: selectedEvent
+                }
+              )}
             </PerformanceListSubHeader>
           </div>
         }

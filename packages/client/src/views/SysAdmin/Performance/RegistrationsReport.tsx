@@ -50,7 +50,9 @@ export function RegistrationsReport({
       <ListViewItemSimplified
         label={
           <div>
-            <PerformanceListHeader>Registrations</PerformanceListHeader>
+            <PerformanceListHeader>
+              {intl.formatMessage(messages.performanceTotalRegitrationsHeader)}
+            </PerformanceListHeader>
           </div>
         }
       />
