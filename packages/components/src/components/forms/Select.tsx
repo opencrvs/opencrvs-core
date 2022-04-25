@@ -45,12 +45,10 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
 
 const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   width: 100%;
-
   ${({ theme }) => theme.fonts.reg16};
   .react-select__control {
-    background: ${({ theme, color }) =>
-      color ? color : theme.colors.background};
-    border-radius: 0;
+    background: ${({ theme }) => theme.colors.white};
+    border-radius: 2px;
     height: 40px;
     box-shadow: none;
     ${({ theme }) => theme.fonts.reg16};

@@ -24,21 +24,22 @@ export interface IProps extends IButtonProps {
 export const Tab = styled(Button)<IProps>`
   margin-right: 24px;
   padding: 0;
-  color: ${({ theme }) => theme.colors.indigo500};
-  opacity: ${({ disabled }) => (disabled ? 0.3 : 1)};
+  color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme, disabled }) => (disabled ? theme.colors.grey300 : 'none')};
   cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')};
   border-bottom: ${({ theme, active }) =>
-    active ? `2px solid ${theme.colors.indigo500}` : 'none'};
+    active ? `2px solid ${theme.colors.primary}` : 'none'};
   & div {
-    padding-left: 0px;
-    padding-right: 20px;
+    ${({ theme }) => theme.fonts.bold14};
     -webkit-justify-content: normal !important;
     display: contents;
     justify-content: normal !important;
     width: max-content;
   }
+  &:hover:enabled {
+    border-bottom: 2px solid ${({ theme }) => theme.colors.grey200};
+  }
   &:disabled {
     background: transparent;
   }
-  ${({ theme }) => theme.fonts.bold16};
 `
