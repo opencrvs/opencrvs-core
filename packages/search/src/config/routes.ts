@@ -160,7 +160,7 @@ export const getRoutes = () => {
     },
     {
       method: 'DELETE',
-      path: '/indexOCRVS',
+      path: '/elasticIndex',
       handler: deleteOCRVSIndexHandler,
       config: {
         tags: ['api'],

@@ -22,8 +22,12 @@ import { Event } from '@config/models/certificate'
 import { isValidFormDraftOperation } from '@config/handlers/formDraft/createOrupdateFormDraft/handler'
 import { getHearthDb } from '@config/config/database'
 import { every } from 'lodash'
-import { OPENCRVS_SPECIFICATION_URL } from '@config/config/constants'
-
+import {
+  OPENCRVS_SPECIFICATION_URL,
+  SEARCH_URL,
+  METRICS_URL
+} from '@config/config/constants'
+import fetch from 'node-fetch'
 export interface IDeleteFormDraftPayload {
   event: Event
 }
@@ -76,8 +80,40 @@ export async function deleteFormDraftHandler(
         { url: `${OPENCRVS_SPECIFICATION_URL}extension/configuration` }
       ]
     })
-
     if (hasTestExtensionOnAllTasks) {
+      //deleting all elastic and influx data
+      try {
+        const token = request.headers.authorization.replace('Bearer ', '')
+        Promise.all([
+          await fetch(`${SEARCH_URL}elasticIndex`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            }
+          }),
+          await fetch(`${METRICS_URL}/influxMeasurement`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`
+            }
+          })
+        ])
+      } catch (err) {
+        return h
+          .response(`Failed to delete elastic, influx data. ${err}`)
+          .code(400)
+      }
+
+      //deleting question for requested event type
+      try {
+        const eventRegex = new RegExp(`^(${formDraft.event}\.)`)
+        await Question.deleteMany({ fieldId: eventRegex })
+      } catch (err) {
+        return h.response(`Failed to delete questions. ${err}`).code(400)
+      }
+
       hearthDBConn.db.listCollections().toArray((err, collections) => {
         if (err) {
           logger.info(
@@ -107,14 +143,6 @@ export async function deleteFormDraftHandler(
         }
       })
 
-      //deleting question for requested event type
-      try {
-        const eventRegex = new RegExp(`^(${formDraft.event}\.)`)
-        await Question.deleteMany({ fieldId: eventRegex })
-      } catch (err) {
-        return h.response(`Failed to delete question. ${err}`).code(400)
-      }
-
       //updating form draft status
       draft.status = DraftStatus.DELETED
       draft.version = 0
@@ -122,13 +150,13 @@ export async function deleteFormDraftHandler(
       draft.history = []
       try {
         await FormDraft.updateOne({ _id: draft._id }, draft)
-        return h.response(draft).code(201)
       } catch (err) {
         logger.error(err)
         return h
-          .response(`Could not delete draft for ${draft.event} event`)
+          .response(`Could not update draft for ${draft.event} event`)
           .code(400)
       }
+      return h.response(draft).code(201)
     } else {
       return h
         .response(
