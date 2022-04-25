@@ -27,6 +27,7 @@ import {
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import React from 'react'
 import { IntlShape, useIntl } from 'react-intl'
+import { NUMBER, TEL, TEXT, TEXTAREA } from '@client/forms'
 
 const TitleContainer = styled.div`
   margin-top: 24px;
@@ -44,7 +45,7 @@ const CenteredToggle = styled(Toggle)`
 `
 
 interface IFormToolsProps {
-  onAddClickListener: (fieldMap: IConfigFormField) => void
+  onAddClickListener: (fieldType: string) => void
 }
 
 const DEFAULT_CUSTOM_FIELD_ATTRIBUTE: ICustomFieldAttribute = {
@@ -74,43 +75,43 @@ const listViewItems = (intl: IntlShape) => {
     {
       label: intl.formatMessage(messages.textInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction({ ...customField })
+      handler: (dispatchAction: (fieldType: string) => void) => {
+        dispatchAction(TEXT)
       }
     },
     {
       label: intl.formatMessage(messages.textAreaInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction({ ...customField })
+      handler: (dispatchAction: (fieldType: string) => void) => {
+        dispatchAction(TEXTAREA)
       }
     },
     {
       label: intl.formatMessage(messages.numberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction({ ...customField })
+      handler: (dispatchAction: (fieldType: string) => void) => {
+        dispatchAction(NUMBER)
       }
     },
     {
       label: intl.formatMessage(messages.phoneNumberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction({ ...customField })
+      handler: (dispatchAction: (fieldType: string) => void) => {
+        dispatchAction(TEL)
       }
     },
     {
       label: intl.formatMessage(messages.heading),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction({ ...customField })
+      handler: (dispatchAction: (fieldType: string) => void) => {
+        dispatchAction(TEXT)
       }
     },
     {
       label: intl.formatMessage(messages.supportingCopy),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (dispatchAction: (fieldMap: IConfigFormField) => void) => {
-        dispatchAction({ ...customField })
+      handler: (dispatchAction: (fieldType: string) => void) => {
+        dispatchAction(TEXT)
       }
     }
   ]

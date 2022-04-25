@@ -9,36 +9,39 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { IntlShape, useIntl } from 'react-intl'
-import { Redirect, useParams } from 'react-router'
+import { Canvas } from '@client/components/formConfig/Canvas'
+import { CustomFieldForms } from '@client/components/formConfig/CustomFieldForm'
+import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
+import { FormTools } from '@client/components/formConfig/formTools/FormTools'
+import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
+import { BirthSection, DeathSection, Event, IFormField } from '@client/forms'
+import { AddCustomField } from '@client/forms/configuration/configFields/actions'
+import { IEventTypes } from '@client/forms/configuration/configFields/reducer'
+import {
+  IConfigFormField,
+  ICustomFieldAttribute,
+  prepareNewCustomFieldConfig
+} from '@client/forms/configuration/configFields/utils'
+import { DEFAULT_TEXT } from '@client/forms/configuration/default'
+import { selectEventFormDraft } from '@client/forms/configuration/selector'
+import { buttonMessages } from '@client/i18n/messages'
+import { constantsMessages } from '@client/i18n/messages/constants'
+import { getDefaultLanguage } from '@client/i18n/utils'
+import { goToFormConfig } from '@client/navigation'
 import { HOME } from '@client/navigation/routes'
-import { EventTopBar } from '@opencrvs/components/lib/interface'
-import { SettingsBlue } from '@opencrvs/components/lib/icons'
+import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
 import {
   SecondaryButton,
   SuccessButton
 } from '@opencrvs/components/lib/buttons'
-import styled from '@client/styledComponents'
-import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
-import { FormTools } from '@client/components/formConfig/formTools/FormTools'
-import { Event, BirthSection, DeathSection } from '@client/forms'
-import { buttonMessages } from '@client/i18n/messages'
-import { Canvas } from '@client/components/formConfig/Canvas'
-import { selectEventFormDraft } from '@client/forms/configuration/selector'
-import {
-  IConfigFormField,
-  prepareNewCustomFieldConfig
-} from '@client/forms/configuration/configFields/utils'
-import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
-import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
-import { constantsMessages } from '@client/i18n/messages/constants'
-import { IStoreState } from '@client/store'
-import { goToFormConfig } from '@client/navigation'
-import { AddCustomField } from '@client/forms/configuration/configFields/actions'
-import { IEventTypes } from '@client/forms/configuration/configFields/reducer'
-import { CustomFieldForms } from '@client/components/formConfig/CustomFieldForm'
+import { SettingsBlue } from '@opencrvs/components/lib/icons'
+import { EventTopBar } from '@opencrvs/components/lib/interface'
+import React from 'react'
+import { IntlShape, useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
+import { Redirect, useParams } from 'react-router'
+import { useHasNatlSysAdminScope, useLoadFormDraft } from './hooks'
 
 const Container = styled.div`
   display: flex;
@@ -93,6 +96,28 @@ const CanvasWrapper = styled.div`
 type IRouteProps = {
   event: Event
   section: string
+}
+
+const DEFAULT_CUSTOM_FIELD_ATTRIBUTE: ICustomFieldAttribute = {
+  label: [
+    {
+      lang: getDefaultLanguage(),
+      descriptor: DEFAULT_TEXT.label
+    }
+  ]
+}
+
+const customField: IConfigFormField = {
+  fieldId: 'customField',
+  precedingFieldId: null,
+  foregoingFieldId: null,
+  required: false,
+  enabled: 'enabled',
+  custom: true,
+  customizedFieldAttributes: DEFAULT_CUSTOM_FIELD_ATTRIBUTE,
+  definition: {
+    ...DEFAULT_TEXT
+  }
 }
 
 const topBarActions = (intl: IntlShape) => {
@@ -191,12 +216,20 @@ export function FormConfigWizard() {
             )
           ) : (
             <FormTools
-              onAddClickListener={(fieldMap: IConfigFormField) => {
+              onAddClickListener={(fieldType: string) => {
+                const modifiedFieldMap = {
+                  ...customField,
+                  definition: {
+                    ...customField.definition,
+                    type: fieldType as IFormField['type']
+                  }
+                } as IConfigFormField
+
                 const customFieldConfig = prepareNewCustomFieldConfig(
                   state as IEventTypes,
                   event,
                   section,
-                  fieldMap
+                  modifiedFieldMap
                 )
                 if (!customFieldConfig) {
                   return
