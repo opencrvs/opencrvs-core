@@ -48,28 +48,6 @@ interface IFormToolsProps {
   onAddClickListener: (fieldType: string) => void
 }
 
-const DEFAULT_CUSTOM_FIELD_ATTRIBUTE: ICustomFieldAttribute = {
-  label: [
-    {
-      lang: getDefaultLanguage(),
-      descriptor: DEFAULT_TEXT.label
-    }
-  ]
-}
-
-const customField: IConfigFormField = {
-  fieldId: 'customField',
-  precedingFieldId: null,
-  foregoingFieldId: null,
-  required: false,
-  enabled: 'enabled',
-  custom: true,
-  customizedFieldAttributes: DEFAULT_CUSTOM_FIELD_ATTRIBUTE,
-  definition: {
-    ...DEFAULT_TEXT
-  }
-}
-
 const listViewItems = (intl: IntlShape) => {
   const items = [
     {
@@ -104,14 +82,14 @@ const listViewItems = (intl: IntlShape) => {
       label: intl.formatMessage(messages.heading),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: (dispatchAction: (fieldType: string) => void) => {
-        dispatchAction(TEXT)
+        // dispatchAction(TEXT)
       }
     },
     {
       label: intl.formatMessage(messages.supportingCopy),
       actionLabel: intl.formatMessage(buttonMessages.add),
       handler: (dispatchAction: (fieldType: string) => void) => {
-        dispatchAction(TEXT)
+        // dispatchAction(TEXT)
       }
     }
   ]
