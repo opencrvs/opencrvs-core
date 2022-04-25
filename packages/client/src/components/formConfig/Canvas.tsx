@@ -9,14 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import React from 'react'
 import { Box } from '@opencrvs/components/lib/interface'
 import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormConfigElementCard'
 import styled from '@client/styledComponents'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { Event, DeathSection, BirthSection } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
 import {
@@ -26,6 +24,9 @@ import {
 } from '@client/forms/configuration/configFields/utils'
 import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
 import { FieldPosition } from '@client/forms/configuration'
+import { IPageNavigationProps } from './SectionNavigation'
+import { useParams } from 'react-router'
+
 const CanvasBox = styled(Box)`
   display: flex;
   flex-direction: column;
@@ -55,21 +56,15 @@ function generateConfigFields(formFieldMap: IConfigFieldMap) {
 }
 
 type ICanvasProps = {
-  event: Event
   selectedField: IConfigField | null
-  section: BirthSection | DeathSection
   onFieldSelect: (field: IConfigField) => void
 }
 
-export function Canvas({
-  event,
-  section,
-  selectedField,
-  onFieldSelect
-}: ICanvasProps) {
+export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
+  const { event, section } = useParams<IPageNavigationProps>()
   const formSection = useSelector((store: IStoreState) =>
     getRegisterFormSection(store, section, event)
   )

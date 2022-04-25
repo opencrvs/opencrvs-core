@@ -121,11 +121,15 @@ export function FormConfigWizard() {
   )
   const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
 
+  /*
+   * We need to clear the selected field if section changes
+   * as the changed section won't have the previously selected field
+   */
   React.useEffect(() => {
     if (selectedField && !selectedField.fieldId.includes(section)) {
       setSelectedField(null)
     }
-    // only run when section changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [section])
 
   if (
@@ -162,12 +166,10 @@ export function FormConfigWizard() {
       />
       <WizardContainer>
         <NavigationContainer>
-          <SectionNavigation event={event} section={section} />
+          <SectionNavigation />
         </NavigationContainer>
         <CanvasContainer>
           <Canvas
-            event={event}
-            section={section}
             selectedField={selectedField}
             onFieldSelect={(field) => setSelectedField(field)}
           />
