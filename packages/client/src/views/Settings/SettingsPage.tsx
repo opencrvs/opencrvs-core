@@ -57,9 +57,12 @@ import { Content } from '@opencrvs/components/lib/interface/Content'
 import { ImageLoader } from './ImageLoader'
 
 const BodyContainer = styled.div`
+  margin-left: 0px;
+  margin-top: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 249px;
-    margin-top: 48px;
+    margin-left: 274px;
+    margin-top: 24px;
+    margin-right: 24px;
   }
 `
 
@@ -326,7 +329,7 @@ class SettingsView extends React.Component<IProps, IState> {
                     key={item.label}
                     label={<LabelContainer>{item.label}</LabelContainer>}
                     value={<ValueContainer>{item.value}</ValueContainer>}
-                    actions={[
+                    actions={
                       <LinkButton
                         id={item.action.id}
                         onClick={item.action.handler}
@@ -334,7 +337,7 @@ class SettingsView extends React.Component<IProps, IState> {
                       >
                         {item.action.label}
                       </LinkButton>
-                    ]}
+                    }
                   />
                 )
               })}
@@ -350,7 +353,7 @@ class SettingsView extends React.Component<IProps, IState> {
                     <Avatar avatar={userDetails?.avatar} name={englishName} />
                   </ValueContainer>
                 }
-                actions={[
+                actions={
                   <ImageLoader
                     onImageLoaded={this.handleImageLoaded}
                     onLoadingStarted={this.toggleAvatarChangeModal}
@@ -362,7 +365,7 @@ class SettingsView extends React.Component<IProps, IState> {
                       {intl.formatMessage(buttonMessages.change)}
                     </LinkButton>
                   </ImageLoader>
-                ]}
+                }
               />
             </ListViewSimplified>
           </Content>

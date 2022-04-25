@@ -93,17 +93,15 @@ const StyledSpinner = styled(Spinner)`
   width: 40px;
   height: 40px;
 `
-const StyledText = styled.span`
+export const StyledText = styled.div`
   position: absolute;
   top: 44%;
-  left: 42%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 251px;
   height: 32px;
   ${({ theme }) => theme.fonts.h3};
   color: ${({ theme }) => theme.colors.grey600};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    left: 24%;
-  }
 `
 
 interface IPageProps {

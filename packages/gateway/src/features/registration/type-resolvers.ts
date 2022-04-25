@@ -858,8 +858,66 @@ export const typeResolvers: GQLResolver = {
   DeathRegistration: {
     // tslint:disable-next-line
     async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
+      // Preparing Encounter
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+
+      const encounterReference =
+        encounterSection &&
+        encounterSection.entry &&
+        encounterSection.entry[0].reference
+
+      if (!encounterReference) {
+        return {
+          composition: composition.id
+        }
+      }
+
+      const observation = {}
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${encounterReference}`,
+        authHeader
+      )
+
+      const encounter = await fetchFHIR(`/${encounterReference}`, authHeader)
+
+      if (observations) {
+        const observationKeys = {
+          maleDependentsOfDeceased: MALE_DEPENDENTS_ON_DECEASED_CODE,
+          femaleDependentsOfDeceased: FEMALE_DEPENDENTS_ON_DECEASED_CODE,
+          mannerOfDeath: MANNER_OF_DEATH_CODE,
+          causeOfDeathMethod: CAUSE_OF_DEATH_METHOD_CODE,
+          causeOfDeath: CAUSE_OF_DEATH_CODE
+        }
+        observations.entry.map(
+          (item: fhir.Observation & { resource: fhir.Observation }) => {
+            if (
+              item.resource &&
+              item.resource.code.coding &&
+              item.resource.code.coding[0] &&
+              item.resource.code.coding[0].code
+            ) {
+              const itemCode = item.resource.code.coding[0].code
+              const observationKey = Object.keys(observationKeys).find(
+                (key) => observationKeys[key] === itemCode
+              )
+              if (observationKey) {
+                observation[observationKey] = item.resource.id
+              }
+            }
+          }
+        )
+      }
+
       return {
-        composition: composition.id
+        composition: composition.id,
+        encounter: encounterReference.split('/')[1],
+        eventLocation:
+          encounter.location &&
+          encounter.location[0].location.reference.split('/')[1],
+        observation
       }
     },
     createdAt(composition: ITemplatedComposition) {

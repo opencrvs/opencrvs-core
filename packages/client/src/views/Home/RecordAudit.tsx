@@ -18,6 +18,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
+import { Divider } from '@opencrvs/components/lib/interface/Divider'
 import styled from '@client/styledComponents'
 import {
   RotateLeft,
@@ -132,6 +133,14 @@ import { goBack } from 'connected-react-router'
 import { getFieldValue } from './utils'
 import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import format, { formatLongDate } from '@client/utils/date-formatting'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
+
+const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -149,7 +158,9 @@ const BodyContainer = styled.div`
   margin-left: 0px;
   margin-top: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 265px;
+    margin-left: 274px;
+    margin-top: 24px;
+    margin-right: 24px;
   }
 `
 
@@ -240,7 +251,8 @@ const NameAvatar = styled.div`
   }
 `
 
-const Heading = styled.h4`
+const Heading = styled.h3`
+  ${({ theme }) => theme.fonts.h3}
   margin-bottom: 0px !important;
 `
 
@@ -417,6 +429,15 @@ const getCaptitalizedWord = (word: string | undefined): string => {
   return word.toUpperCase()[0] + word.toLowerCase().slice(1)
 }
 
+const removeUnderscore = (word: string): string => {
+  const wordArray = word.split('_')
+  const finalWord = wordArray.reduce(
+    (accum, cur, idx) => (idx > 0 ? accum + ' ' + cur : cur),
+    ''
+  )
+  return finalWord
+}
+
 const isBirthDeclaration = (
   declaration: GQLEventSearchSet | null
 ): declaration is GQLBirthEventSearchSet => {
@@ -462,14 +483,13 @@ const getLocation = (
   let locationType = ''
   let locationId = ''
   let locationDistrict = ''
-  let locationPermanent = ''
+  let locationPrimary = ''
   if (declaration.event === 'death') {
-    locationType =
-      declaration.data?.deathEvent?.deathPlaceAddress?.toString() || ''
+    locationType = declaration.data?.deathEvent?.placeOfDeath?.toString() || ''
     locationId = declaration.data?.deathEvent?.deathLocation?.toString() || ''
     locationDistrict = declaration.data?.deathEvent?.district?.toString() || ''
-    locationPermanent =
-      declaration.data?.deceased?.districtPermanent?.toString() || ''
+    locationPrimary =
+      declaration.data?.deceased?.districtPrimary?.toString() || ''
   } else {
     locationType = declaration.data?.child?.placeOfBirth?.toString() || ''
     locationId = declaration.data?.child?.birthLocation?.toString() || ''
@@ -484,8 +504,8 @@ const getLocation = (
     const location = resources.locations[locationDistrict]
     return generateLocationName(location, intl)
   }
-  if (locationType === 'PERMANENT') {
-    const district = resources.locations[locationPermanent]
+  if (locationType === 'PRIMARY_ADDRESS') {
+    const district = resources.locations[locationPrimary]
     return generateLocationName(district, intl)
   }
   return ''
@@ -494,7 +514,8 @@ const getLocation = (
 const getDraftDeclarationData = (
   declaration: IDeclaration,
   resources: IOfflineData,
-  intl: IntlShape
+  intl: IntlShape,
+  trackingId: string
 ): IDeclarationData => {
   return {
     id: declaration.id,
@@ -506,7 +527,7 @@ const getDraftDeclarationData = (
     type: declaration.event || '',
     brnDrn:
       declaration.data?.registration?.registrationNumber?.toString() || '',
-    trackingId: declaration.data?.registration?.trackingId?.toString() || '',
+    trackingId: trackingId,
     dateOfBirth: declaration.data?.child?.childBirthDate?.toString() || '',
     dateOfDeath: declaration.data?.deathEvent?.deathDate?.toString() || '',
     placeOfBirth: getLocation(declaration, resources, intl) || '',
@@ -524,7 +545,8 @@ const getDraftDeclarationData = (
 
 const getWQDeclarationData = (
   workqueueDeclaration: GQLEventSearchSet,
-  language: string
+  language: string,
+  trackingId: string
 ) => {
   let name = ''
   if (
@@ -543,7 +565,7 @@ const getWQDeclarationData = (
     name,
     type: (workqueueDeclaration?.type && workqueueDeclaration.type) || '',
     status: workqueueDeclaration?.registration?.status || '',
-    trackingId: workqueueDeclaration?.registration?.trackingId || '',
+    trackingId: trackingId,
     dateOfBirth: '',
     placeOfBirth: '',
     informant: ''
@@ -580,14 +602,10 @@ const getDeclarationInfo = (
 ) => {
   let informant = getCaptitalizedWord(declaration?.informant)
 
-  const status = getCaptitalizedWord(declaration?.status).split('_')
-  const finalStatus = status.reduce(
-    (accum, cur, idx) => (idx > 0 ? accum + ' ' + cur : cur),
-    ''
-  )
+  const finalStatus = removeUnderscore(getCaptitalizedWord(declaration?.status))
 
-  if (declaration?.informantContact) {
-    informant = informant + ' . ' + declaration.informantContact
+  if (declaration?.informantContact && informant) {
+    informant = informant + ' · ' + declaration.informantContact
   }
 
   let info: ILabel = {
@@ -606,7 +624,7 @@ const getDeclarationInfo = (
       ...info,
       dateOfBirth: declaration?.dateOfBirth,
       placeOfBirth: declaration?.placeOfBirth,
-      informant: informant
+      informant: removeUnderscore(informant)
     }
   } else if (info.type === 'Death') {
     if (declaration?.brnDrn) {
@@ -618,7 +636,7 @@ const getDeclarationInfo = (
       ...info,
       dateOfDeath: declaration?.dateOfDeath,
       placeOfDeath: declaration?.placeOfDeath,
-      informant: informant
+      informant: removeUnderscore(informant)
     }
   }
   const mobileActions = actions.map((action, index) => (
@@ -836,6 +854,7 @@ const showPrintButton = ({
     return (
       <PrimaryButton
         key={id}
+        size={'medium'}
         id={`print-${id}`}
         onClick={() => {
           goToPrintCertificate &&
@@ -907,6 +926,20 @@ const getFormattedDate = (date: Date) => {
   )
 }
 
+const getDisplayItems = (
+  currentPage: number,
+  pageSize: number,
+  allData: IDynamicValues
+) => {
+  if (allData.length <= pageSize) {
+    return allData
+  }
+
+  const offset = (currentPage - 1) * pageSize
+  const displayItems = allData.slice(offset, offset + pageSize)
+  return displayItems
+}
+
 const GetHistory = ({
   intl,
   draft,
@@ -916,17 +949,27 @@ const GetHistory = ({
 }: CMethodParams & {
   toggleActionDetails: (actionItem: IActionDetailsData) => void
 }) => {
+  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const onPageChange = (currentPageNumber: number) =>
+    setCurrentPageNumber(currentPageNumber)
   if (!draft?.data?.history?.length)
     return (
       <>
-        <hr />
+        <Divider />
         <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
         <LargeGreyedInfo />
       </>
     )
-
+  const allHistoryData = draft.data.history as unknown as {
+    [key: string]: any
+  }[]
+  const historiesForDisplay = getDisplayItems(
+    currentPageNumber,
+    DEFAULT_HISTORY_RECORD_PAGE_SIZE,
+    allHistoryData
+  )
   const historyData = (
-    draft.data.history as unknown as { [key: string]: any }[]
+    historiesForDisplay as unknown as { [key: string]: any }[]
   )
     // TODO: We need to figure out a way to sort the history in backend
     .sort((fe, se) => {
@@ -978,7 +1021,7 @@ const GetHistory = ({
   ]
   return (
     <>
-      <hr />
+      <Divider />
       <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
       <TableView
         id="task-history"
@@ -988,9 +1031,32 @@ const GetHistory = ({
         columns={columns}
         content={historyData}
         alignItemCenter={true}
-        pageSize={100}
-        hideTableHeaderBorder={true}
+        pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
       />
+      {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+        <PaginationWrapper>
+          <DesktopWrapper>
+            <PaginationModified
+              size="small"
+              initialPage={currentPageNumber}
+              totalPages={Math.ceil(
+                allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              )}
+              onPageChange={onPageChange}
+            />
+          </DesktopWrapper>
+          <MobileWrapper>
+            <PaginationModified
+              size="large"
+              initialPage={currentPageNumber}
+              totalPages={Math.ceil(
+                allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              )}
+              onPageChange={onPageChange}
+            />
+          </MobileWrapper>
+        </PaginationWrapper>
+      )}
     </>
   )
 }
@@ -1543,6 +1609,7 @@ function RecordAuditBody({
             <PrimaryButton
               id="continue"
               key="continue"
+              size={'medium'}
               onClick={() => {
                 reinstateDeclaration(declaration.id)
                 toggleDisplayDialog()
@@ -1556,6 +1623,7 @@ function RecordAuditBody({
             <DangerButton
               id="archive_confirm"
               key="archive_confirm"
+              size={'medium'}
               onClick={() => {
                 archiveDeclaration(declaration.id)
                 toggleDisplayDialog()
@@ -1629,11 +1697,17 @@ function getBodyContent({
     )
   }
 
+  const trackingId =
+    draft?.data?.registration?.trackingId?.toString() ||
+    workqueueDeclaration?.registration?.trackingId ||
+    ''
+
   const declaration = draft
-    ? getDraftDeclarationData(draft, resources, intl)
+    ? getDraftDeclarationData(draft, resources, intl, trackingId)
     : getWQDeclarationData(
         workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
-        language
+        language,
+        trackingId
       )
   return (
     <RecordAuditBody

@@ -14,27 +14,37 @@ const alertRules = require('./alert-rules.json')
 
 const KIBANA_HOST = process.env.KIBANA_HOST || 'localhost'
 const KIBANA_PORT = process.env.KIBANA_PORT || 5601
+const KIBANA_USERNAME = process.env.KIBANA_USERNAME
+const KIBANA_PASSWORD = process.env.KIBANA_PASSWORD
 
 function makeRequest(options, body) {
   return new Promise((resolve, reject) => {
-    const req = http.request(options, (res) => {
-      let data = ''
+    const auth = `Basic ${Buffer.from(
+      KIBANA_USERNAME + ':' + KIBANA_PASSWORD
+    ).toString('base64')}`
+    const req = http.request(
+      { ...options, headers: { ...options.headers, Authorization: auth } },
+      (res) => {
+        let data = ''
 
-      if (res.statusCode.toString().charAt(0) !== '2') {
-        reject(
-          new Error(
-            `${options.method} ${options.path} returned status ${res.statusCode}`
+        if (res.statusCode.toString().charAt(0) !== '2') {
+          reject(
+            new Error(
+              `${options.method} ${options.path} returned status ${res.statusCode}`
+            )
           )
+          return
+        }
+
+        res.on('data', (d) => {
+          data += d.toString()
+        })
+
+        res.on('end', () =>
+          data === '' ? resolve() : resolve(JSON.parse(data))
         )
-        return
       }
-
-      res.on('data', (d) => {
-        data += d.toString()
-      })
-
-      res.on('end', () => (data === '' ? resolve() : resolve(JSON.parse(data))))
-    })
+    )
 
     req.on('error', reject)
     if (body) {

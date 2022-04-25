@@ -16,7 +16,12 @@ import {
   goToEndOfForm,
   waitForReady,
   validateScopeToken,
-  registerScopeToken
+  registerScopeToken,
+  primaryAddressData,
+  primaryInternationalAddressLines,
+  secondaryAddressData,
+  secondaryInternationalAddressLines,
+  eventAddressData
 } from '@client/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
@@ -39,7 +44,7 @@ import { v4 as uuid } from 'uuid'
 import * as ReactApollo from 'react-apollo'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 
-import { waitForElement, waitForSeconds } from '@client/tests/wait-for-element'
+import { waitForElement } from '@client/tests/wait-for-element'
 import {
   birthDraftData,
   birthReviewDraftData,
@@ -65,6 +70,81 @@ describe('when user is previewing the form data', () => {
 
   describe('when user is in the preview section', () => {
     let customDraft: IDeclaration
+
+    const childDetails: IPersonDetails = {
+      attendantAtBirth: 'NURSE',
+      childBirthDate: '1999-10-10',
+      familyName: 'ইসলাম',
+      familyNameEng: 'Islam',
+      firstNames: 'নাইম',
+      firstNamesEng: 'Naim',
+      gender: 'male',
+      placeOfBirth: 'HOSPITAL',
+      birthLocation: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
+      multipleBirth: '2',
+      birthType: 'SINGLE',
+      weightAtBirth: '5'
+    }
+
+    const fatherDetails: IPersonDetails = {
+      fathersDetailsExist: true,
+      iD: '987987987',
+      iDType: 'NATIONAL_ID',
+      nationality: 'FAR',
+      iDTypeOther: 'Taxpayer Identification Number',
+      secondaryAddressSameAsOtherSecondary: true,
+      primaryAddressSameAsOtherPrimary: true,
+      ...primaryAddressData,
+      ...primaryInternationalAddressLines,
+      ...secondaryAddressData,
+      ...secondaryInternationalAddressLines,
+      motherBirthDate: '1999-10-10',
+      dateOfMarriage: '2010-10-10',
+      educationalAttainment: 'PRIMARY_ISCED_1',
+      familyName: 'ইসলাম',
+      familyNameEng: 'Islam',
+      firstNames: 'আনোয়ার',
+      firstNamesEng: 'Anwar',
+      maritalStatus: 'MARRIED'
+    }
+
+    const motherDetails: IPersonDetails = {
+      iD: '987987987',
+      iDType: 'NATIONAL_ID',
+      nationality: 'FAR',
+      familyName: 'ইসলাম',
+      familyNameEng: 'Islam',
+      firstNames: 'রোকেয়া',
+      firstNamesEng: 'Rokeya',
+      maritalStatus: 'MARRIED',
+      dateOfMarriage: '2010-10-10',
+      fatherBirthDate: '1999-10-10',
+      educationalAttainment: 'PRIMARY_ISCED_1',
+      ...primaryAddressData,
+      ...primaryInternationalAddressLines,
+      ...secondaryAddressData,
+      ...secondaryInternationalAddressLines
+    }
+
+    const registrationDetails = {
+      commentsOrNotes: 'comments',
+      presentAtBirthRegistration: 'MOTHER',
+      registrationCertificateLanguage: ['en'],
+      whoseContactDetails: 'MOTHER',
+      informant: {
+        value: 'OTHER',
+        nestedFields: {
+          otherRelationShip: 'Friend'
+        }
+      },
+      contactPoint: {
+        value: 'OTHER',
+        nestedFields: {
+          registrationPhone: '01717000000',
+          contactRelationshipOther: 'grandma'
+        }
+      }
+    }
 
     beforeEach(async () => {
       const data = birthDraftData
@@ -120,6 +200,72 @@ describe('when user is previewing the form data', () => {
   })
   describe('when user is in the birth review section', () => {
     let customDraft: IDeclaration
+
+    const childDetails: IPersonDetails = {
+      attendantAtBirth: 'NURSE',
+      childBirthDate: '1999-10-10',
+      familyName: 'ইসলাম',
+      familyNameEng: 'Islam',
+      firstNames: 'নাইম',
+      firstNamesEng: 'Naim',
+      gender: 'male',
+      multipleBirth: '2',
+      birthType: 'SINGLE',
+      weightAtBirth: '6',
+      _fhirID: '1'
+    }
+
+    const fatherDetails: IPersonDetails = {
+      fathersDetailsExist: true,
+      iD: '432432432',
+      iDType: 'NATIONAL_ID',
+      secondaryAddressSameAsOtherSecondary: true,
+      primaryAddressSameAsOtherPrimary: true,
+      ...primaryAddressData,
+      ...primaryInternationalAddressLines,
+      ...secondaryAddressData,
+      ...secondaryInternationalAddressLines,
+      fatherBirthDate: '1999-10-10',
+      dateOfMarriage: '2010-10-10',
+      educationalAttainment: 'PRIMARY_ISCED_1',
+      familyName: 'ইসলাম',
+      familyNameEng: 'Islam',
+      firstNames: 'আনোয়ার',
+      firstNamesEng: 'Anwar',
+      maritalStatus: 'MARRIED',
+      nationality: 'FAR',
+      _fhirID: '2'
+    }
+
+    const motherDetails: IPersonDetails = {
+      iD: '765987987',
+      iDType: 'NATIONAL_ID',
+      nationality: 'FAR',
+      familyName: 'ইসলাম',
+      familyNameEng: 'Islam',
+      firstNames: 'রোকেয়া',
+      firstNamesEng: 'Rokeya',
+      maritalStatus: 'MARRIED',
+      dateOfMarriage: '2010-10-10',
+      motherBirthDate: '1999-10-10',
+      educationalAttainment: 'PRIMARY_ISCED_1',
+      ...primaryAddressData,
+      ...primaryInternationalAddressLines,
+      ...secondaryAddressData,
+      ...secondaryInternationalAddressLines,
+      _fhirID: '3'
+    }
+
+    const registrationDetails = {
+      contactPoint: {
+        value: 'DAUGHTER',
+        nestedFields: { registrationPhone: '0787878787' }
+      },
+      trackingId: 'B123456',
+      registrationNumber: '2019121525B1234568',
+      _fhirID: '4'
+    }
+
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
       await store.dispatch(checkAuth({ '?token': registerScopeToken }))
@@ -162,6 +308,94 @@ describe('when user is previewing the form data', () => {
   })
   describe('when user is in the death review section', () => {
     let customDraft: IDeclaration
+
+    const deceasedDetails = {
+      iD: '987987987',
+      iDType: 'NATIONAL_ID',
+      socialSecurityNo: 'hghjkh',
+      firstNames: 'অনিক',
+      familyName: 'অনিক',
+      firstNamesEng: 'Anik',
+      familyNameEng: 'anik',
+      nationality: 'FAR',
+      gender: 'male',
+      maritalStatus: 'MARRIED',
+      birthDate: '1983-01-01',
+      ...primaryAddressData,
+      ...primaryInternationalAddressLines,
+      ...secondaryAddressData,
+      ...secondaryInternationalAddressLines,
+      _fhirID: '50fbd713-c86d-49fe-bc6a-52094b40d8dd'
+    }
+
+    const informantDetails = {
+      iDType: 'PASSPORT',
+      informantID: '123456789',
+      socialSecurityNo: 'hghjkh',
+      informantFirstNames: 'অনিক',
+      informantFamilyName: 'অনিক',
+      informantFirstNamesEng: 'Anik',
+      informantFamilyNameEng: 'Anik',
+      nationality: 'FAR',
+      informantBirthDate: '1996-01-01',
+      informantPhone: '0787777676',
+      relationship: 'OTHER',
+      ...primaryAddressData,
+      ...primaryInternationalAddressLines,
+      ...secondaryAddressData,
+      ...secondaryInternationalAddressLines,
+      _fhirIDMap: {
+        relatedPerson: 'c9e3e5cb-d483-4db4-afaa-625161826f00',
+        individual: 'cabeeea7-0f7d-41c3-84ed-8f88e4d617e1'
+      }
+    }
+
+    const fatherDetails = {
+      fatherFirstNames: 'মোক্তার',
+      fatherFamilyName: 'আলী',
+      fatherFirstNamesEng: 'Moktar',
+      fatherFamilyNameEng: 'Ali'
+    }
+
+    const motherDetails = {
+      motherFirstNames: 'মরিউম',
+      motherFamilyName: 'আলী',
+      motherFirstNamesEng: 'Morium',
+      motherFamilyNameEng: 'Ali'
+    }
+
+    const spouseDetails = {
+      hasDetails: {
+        value: 'Yes',
+        nestedFields: {
+          spouseFirstNames: 'রেহানা',
+          spouseFamilyName: 'আলী',
+          spouseFirstNamesEng: 'Rehana',
+          spouseFamilyNameEng: 'Ali'
+        }
+      }
+    }
+
+    const deathEventDetails = {
+      deathDate: '2017-01-01',
+      manner: 'ACCIDENT',
+      placeOfDeath: 'PRIMARY_ADDRESS',
+      ...eventAddressData
+    }
+    const causeOfDeathDetails = { causeOfDeathEstablished: false }
+
+    const registrationDetails = {
+      _fhirID: 'fccf6eac-4dae-43d3-af33-2c977d1daf08',
+      trackingId: 'DS8QZ0Z',
+      relationship: { value: 'GRANDSON', nestedFields: {} },
+      contactPoint: {
+        value: 'DAUGHTER',
+        nestedFields: { registrationPhone: '0787878787' }
+      }
+    }
+
+    const registerScopeToken =
+      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
 
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)

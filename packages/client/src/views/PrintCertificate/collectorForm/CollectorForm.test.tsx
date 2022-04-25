@@ -573,7 +573,7 @@ describe('Certificate collector test for a birth registration without father and
               ],
               address: [
                 {
-                  type: 'PERMANENT',
+                  type: 'PRIMARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -589,7 +589,7 @@ describe('Certificate collector test for a birth registration without father and
                   __typename: 'Address'
                 },
                 {
-                  type: 'CURRENT',
+                  type: 'SECONDARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -657,7 +657,7 @@ describe('Certificate collector test for a birth registration without father and
               ],
               address: [
                 {
-                  type: 'PERMANENT',
+                  type: 'PRIMARY_ADDRESS',
                   line: [
                     '',
                     '',
@@ -673,7 +673,7 @@ describe('Certificate collector test for a birth registration without father and
                   __typename: 'Address'
                 },
                 {
-                  type: 'CURRENT',
+                  type: 'SECONDARY_ADDRESS',
                   line: [
                     '',
                     '',

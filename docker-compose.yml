@@ -48,7 +48,7 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - NOTIFICATION_URL=http://notification:2020/
       - WORKFLOW_URL=http://workflow:5050/
-      - APPLICATION_CONFIG_URL=http://config:2021
+      - APPLICATION_CONFIG_URL=http://config:2021/
       - CHECK_INVALID_TOKEN=true
   # User facing services
   workflow:
@@ -155,6 +155,7 @@ services:
       dockerfile: ./packages/config/Dockerfile
     restart: unless-stopped
     environment:
+      - AUTH_URL=http://auth:4040
       - HOST=0.0.0.0
       - PORT=2021
       - MONGO_URL=mongodb://mongo1/application-config

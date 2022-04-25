@@ -906,6 +906,66 @@ export const builders: IFieldBuilders = {
       return false
     },
     observation: {
+      maleDependentsOfDeceased: (fhirBundle, fieldValue, context) => {
+        const observation = selectOrCreateObservationResource(
+          DEATH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_DESC,
+          MALE_DEPENDENTS_ON_DECEASED_CODE,
+          'Number of male dependents on Deceased',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
+      femaleDependentsOfDeceased: (fhirBundle, fieldValue, context) => {
+        const observation = selectOrCreateObservationResource(
+          DEATH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_CODE,
+          OBSERVATION_CATEGORY_PROCEDURE_DESC,
+          FEMALE_DEPENDENTS_ON_DECEASED_CODE,
+          'Number of female dependents on Deceased',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
+      mannerOfDeath: (fhirBundle, fieldValue, context) => {
+        const observation = selectOrCreateObservationResource(
+          DEATH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_VSIGN_CODE,
+          OBSERVATION_CATEGORY_VSIGN_DESC,
+          MANNER_OF_DEATH_CODE,
+          'Uncertified manner of death',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
+      causeOfDeathMethod: (fhirBundle, fieldValue, context) => {
+        const observation = selectOrCreateObservationResource(
+          DEATH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_VSIGN_CODE,
+          OBSERVATION_CATEGORY_VSIGN_DESC,
+          CAUSE_OF_DEATH_METHOD_CODE,
+          'Cause of death method',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
+      causeOfDeath: (fhirBundle, fieldValue, context) => {
+        const observation = selectOrCreateObservationResource(
+          DEATH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_VSIGN_CODE,
+          OBSERVATION_CATEGORY_VSIGN_DESC,
+          CAUSE_OF_DEATH_CODE,
+          'Cause of death',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
       birthType: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           BIRTH_ENCOUNTER_CODE,

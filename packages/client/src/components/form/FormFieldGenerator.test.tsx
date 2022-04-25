@@ -57,7 +57,7 @@ describe('form component', () => {
         setAllFieldsDirty={false}
         fields={[
           {
-            name: 'countryPermanent',
+            name: 'countryPrimary',
             type: SELECT_WITH_OPTIONS,
             label: formMessages.country,
             required: true,
@@ -66,7 +66,7 @@ describe('form component', () => {
             options: countries
           },
           {
-            name: 'statePermanent',
+            name: 'statePrimary',
             type: SELECT_WITH_DYNAMIC_OPTIONS,
             label: formMessages.state,
             required: true,
@@ -74,11 +74,11 @@ describe('form component', () => {
             validate: [],
             dynamicOptions: {
               resource: OFFLINE_LOCATIONS_KEY,
-              dependency: 'countryPermanent'
+              dependency: 'countryPrimary'
             }
           },
           {
-            name: 'districtPermanent',
+            name: 'districtPrimary',
             type: SELECT_WITH_DYNAMIC_OPTIONS,
             label: formMessages.district,
             required: true,
@@ -87,7 +87,7 @@ describe('form component', () => {
             validate: [],
             dynamicOptions: {
               resource: OFFLINE_LOCATIONS_KEY,
-              dependency: 'statePermanent'
+              dependency: 'statePrimary'
             }
           },
           {
@@ -116,16 +116,16 @@ describe('form component', () => {
   })
   describe('when user is in the moth​​er section', () => {
     it('renders the page', async () => {
-      const label = await waitForElement(component, '#countryPermanent_label')
+      const label = await waitForElement(component, '#countryPrimary_label')
       expect(label.hostNodes()).toHaveLength(1)
     })
     it('changes the state select', async () => {
-      const select = selectOption(component, '#statePermanent', 'Barisal')
+      const select = selectOption(component, '#statePrimary', 'Barisal')
       expect(select.text()).toEqual('Barisal')
     })
     it('changes the district select', async () => {
-      selectOption(component, '#statePermanent', 'Barisal')
-      const select = selectOption(component, '#districtPermanent', 'BARGUNA')
+      selectOption(component, '#statePrimary', 'Barisal')
+      const select = selectOption(component, '#districtPrimary', 'BARGUNA')
       expect(select.text()).toEqual('BARGUNA')
     })
     describe('when resetDependentSelectValues is called', () => {
@@ -133,15 +133,15 @@ describe('form component', () => {
         const instance = component
           .find('FormSectionComponent')
           .instance() as any
-        instance.resetDependentSelectValues('statePermanent')
+        instance.resetDependentSelectValues('statePrimary')
       })
       it('resets dependent select fields', () => {
-        expect(component.find('#districtPermanent').hostNodes().text()).toEqual(
+        expect(component.find('#districtPrimary').hostNodes().text()).toEqual(
           'Select'
         )
       })
       it('doesnt reset non dependent select fields', () => {
-        expect(component.find('#countryPermanent').hostNodes().text()).toEqual(
+        expect(component.find('#countryPrimary').hostNodes().text()).toEqual(
           'Bangladesh'
         )
       })
@@ -531,7 +531,7 @@ describe('when field definition has select field on mobile device', () => {
         onChange={modifyDraftMock}
         fields={[
           {
-            name: 'countryPermanent',
+            name: 'countryPrimary',
             type: SELECT_WITH_OPTIONS,
             label: formMessages.country,
             required: true,
@@ -550,7 +550,7 @@ describe('when field definition has select field on mobile device', () => {
   })
 
   it('triggers scroll up when focus so that soft keyboard does not block options', async () => {
-    const input = component.find('#countryPermanent').hostNodes()
+    const input = component.find('#countryPrimary').hostNodes()
 
     input.find('input').simulate('focus').update()
 

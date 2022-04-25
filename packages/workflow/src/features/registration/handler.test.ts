@@ -1881,21 +1881,21 @@ describe('populateCompositionWithID', () => {
             },
             address: [
               {
-                type: 'PLACE_OF_HERITAGE',
+                type: 'SECONDARY_ADDRESS',
                 line: ['', '', '', '', '', ''],
                 district: '394e6ec9-5db7-4ce7-aa5e-6686f7a74081',
                 state: '88e8ef3f-2649-49f2-9d84-6ae7101af84e',
                 country: 'ZMB'
               },
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: ['', '', '', '', '', '', 'URBAN'],
                 district: '394e6ec9-5db7-4ce7-aa5e-6686f7a74081',
                 state: '88e8ef3f-2649-49f2-9d84-6ae7101af84e',
                 country: 'ZMB'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: ['', '', '', '', '', '', 'URBAN'],
                 district: '394e6ec9-5db7-4ce7-aa5e-6686f7a74081',
                 state: '88e8ef3f-2649-49f2-9d84-6ae7101af84e',
@@ -2265,21 +2265,21 @@ describe('populateCompositionWithID', () => {
             },
             address: [
               {
-                type: 'PLACE_OF_HERITAGE',
+                type: 'SECONDARY_ADDRESS',
                 line: ['', '', '', '', '', ''],
                 district: '394e6ec9-5db7-4ce7-aa5e-6686f7a74081',
                 state: '88e8ef3f-2649-49f2-9d84-6ae7101af84e',
                 country: 'ZMB'
               },
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: ['', '', '', '', '', '', 'URBAN'],
                 district: '394e6ec9-5db7-4ce7-aa5e-6686f7a74081',
                 state: '88e8ef3f-2649-49f2-9d84-6ae7101af84e',
                 country: 'ZMB'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: ['', '', '', '', '', '', 'URBAN'],
                 district: '394e6ec9-5db7-4ce7-aa5e-6686f7a74081',
                 state: '88e8ef3f-2649-49f2-9d84-6ae7101af84e',
@@ -2643,21 +2643,21 @@ describe('populateCompositionWithID', () => {
             },
             address: [
               {
-                type: 'PLACE_OF_HERITAGE',
+                type: 'SECONDARY_ADDRESS',
                 line: ['', '', '', '', '', ''],
                 district: '394e6ec9-5db7-4ce7-aa5e-6686f7a74081',
                 state: '88e8ef3f-2649-49f2-9d84-6ae7101af84e',
                 country: 'ZMB'
               },
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: ['', '', '', '', '', '', 'URBAN'],
                 district: '394e6ec9-5db7-4ce7-aa5e-6686f7a74081',
                 state: '88e8ef3f-2649-49f2-9d84-6ae7101af84e',
                 country: 'ZMB'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: ['', '', '', '', '', '', 'URBAN'],
                 district: '394e6ec9-5db7-4ce7-aa5e-6686f7a74081',
                 state: '88e8ef3f-2649-49f2-9d84-6ae7101af84e',
@@ -3035,21 +3035,21 @@ describe('populateCompositionWithID', () => {
             },
             address: [
               {
-                type: 'PLACE_OF_HERITAGE',
+                type: 'SECONDARY_ADDRESS',
                 line: ['', '', '', '', '', ''],
                 district: '394e6ec9-5db7-4ce7-aa5e-6686f7a74081',
                 state: '88e8ef3f-2649-49f2-9d84-6ae7101af84e',
                 country: 'ZMB'
               },
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: ['', '', '', '', '', '', 'URBAN'],
                 district: '394e6ec9-5db7-4ce7-aa5e-6686f7a74081',
                 state: '88e8ef3f-2649-49f2-9d84-6ae7101af84e',
                 country: 'ZMB'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: ['', '', '', '', '', '', 'URBAN'],
                 district: '394e6ec9-5db7-4ce7-aa5e-6686f7a74081',
                 state: '88e8ef3f-2649-49f2-9d84-6ae7101af84e',

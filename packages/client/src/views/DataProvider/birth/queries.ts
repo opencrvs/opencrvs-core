@@ -170,6 +170,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       weightAtBirth
       birthType
       eventLocation {
+        id
         type
         address {
           line
@@ -425,6 +426,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         value
       }
       eventLocation {
+        id
         type
         address {
           line

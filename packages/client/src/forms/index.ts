@@ -94,7 +94,7 @@ export enum QuestionConfigFieldType {
   PARAGRAPH = 'PARAGRAPH'
 }
 
-export interface IQuestionIdentifiers {
+export interface IIdentifiers {
   event: string
   sectionId: string
   groupId: string
@@ -678,7 +678,7 @@ export type IFormField =
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
 
-export interface IFormTag {
+export interface IPreviewGroup {
   id: string
   label: MessageDescriptor
   fieldToRedirect?: string
@@ -703,13 +703,13 @@ export interface IConditionals {
   iDType: IConditional
   isOfficePreSelected: IConditional
   fathersDetailsExist: IConditional
-  permanentAddressSameAsMother: IConditional
-  addressSameAsMother: IConditional
-  countryPermanent: IConditional
-  statePermanent: IConditional
-  districtPermanent: IConditional
-  addressLine4Permanent: IConditional
-  addressLine3Permanent: IConditional
+  primaryAddressSameAsOtherPrimary: IConditional
+  secondaryAddressSameAsOtherSecondary: IConditional
+  countryPrimary: IConditional
+  statePrimary: IConditional
+  districtPrimary: IConditional
+  addressLine4Primary: IConditional
+  addressLine3Primary: IConditional
   country: IConditional
   state: IConditional
   district: IConditional
@@ -722,17 +722,17 @@ export interface IConditionals {
   otherPersonCollectsCertificate: IConditional
   birthCertificateCollectorNotVerified: IConditional
   deathCertificateCollectorNotVerified: IConditional
-  currentAddressSameAsPermanent: IConditional
+  secondaryAddressSameAsPrimary: IConditional
   placeOfBirthHospital: IConditional
-  deathPlaceAddressTypeHeathInstitue: IConditional
+  placeOfDeathTypeHeathInstitue: IConditional
   otherBirthEventLocation: IConditional
   isNotCityLocation: IConditional
   isCityLocation: IConditional
   isDefaultCountry: IConditional
-  isNotCityLocationPermanent: IConditional
-  isDefaultCountryPermanent: IConditional
-  isCityLocationPermanent: IConditional
-  informantPermanentAddressSameAsCurrent: IConditional
+  isNotCityLocationPrimary: IConditional
+  isDefaultCountryPrimary: IConditional
+  isCityLocationPrimary: IConditional
+  informantPrimaryAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
   deathPlaceOther: IConditional
   deathPlaceAtPrivateHome: IConditional
@@ -980,7 +980,7 @@ export interface IFormSectionGroup {
   id: string
   title?: MessageDescriptor
   fields: IFormField[]
-  previewGroups?: IFormTag[]
+  previewGroups?: IPreviewGroup[]
   disabled?: boolean
   ignoreSingleFieldView?: boolean
   conditionals?: IConditional[]

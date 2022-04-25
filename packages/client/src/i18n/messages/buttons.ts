@@ -152,7 +152,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.forgottenPIN'
   },
   goToHomepage: {
-    defaultMessage: 'Go to Homepage',
+    defaultMessage: 'Back to home',
     description: 'Label for Go to Homepage button',
     id: 'buttons.goToHomePage'
   },
