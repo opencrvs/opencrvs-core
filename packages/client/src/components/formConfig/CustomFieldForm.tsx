@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IMessage } from '@client/forms'
+import { IMessage, NUMBER, TEL, TEXT, TEXTAREA } from '@client/forms'
 import { ModifyCustomField } from '@client/forms/configuration/configFields/actions'
 import { IEventTypes } from '@client/forms/configuration/configFields/reducer'
 import {
@@ -223,7 +223,7 @@ class CustomFieldFormsComp extends React.Component<
     })
   }
 
-  _isFormValid() {
+  _isFormValid(): boolean {
     for (const lang in this._getLanguages()) {
       if (Boolean(this.state.fieldForms[lang].label) === false) return false
     }
@@ -353,6 +353,31 @@ class CustomFieldFormsComp extends React.Component<
     )
   }
 
+  _getHeadingText(): string {
+    const { selectedField, intl } = this.props
+
+    switch (selectedField.definition.type) {
+      case TEXT:
+        return intl.formatMessage(
+          customFieldFormMessages.customTextFieldHeading
+        )
+      case TEXTAREA:
+        return intl.formatMessage(customFieldFormMessages.customTextAreaHeading)
+      case NUMBER:
+        return intl.formatMessage(
+          customFieldFormMessages.customNumberFieldHeading
+        )
+      case TEL:
+        return intl.formatMessage(
+          customFieldFormMessages.customPhoneFieldHeading
+        )
+      default:
+        return intl.formatMessage(
+          customFieldFormMessages.customTextFieldHeading
+        )
+    }
+  }
+
   getLanguageDropDown() {
     const initializeLanguages = this._getLanguages()
     const languageOptions = []
@@ -382,9 +407,7 @@ class CustomFieldFormsComp extends React.Component<
     const { intl } = this.props
     return (
       <ListContainer>
-        <H3>
-          {intl.formatMessage(customFieldFormMessages.customFieldFormHeading)}
-        </H3>
+        <H3>{this._getHeadingText()}</H3>
         <ListRow>
           <ListColumn>
             {intl.formatMessage(customFieldFormMessages.hideFieldLabel)}
