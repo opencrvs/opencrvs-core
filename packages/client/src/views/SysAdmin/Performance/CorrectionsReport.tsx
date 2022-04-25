@@ -45,6 +45,10 @@ interface CorrectionsReportProps {
 
 const Container = styled(ListViewSimplified)`
   grid-template-columns: auto 1fr minmax(5em, auto);
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    grid-template-columns: none;
+  }
 `
 
 export const CORRECTION_TOTALS = gql`
