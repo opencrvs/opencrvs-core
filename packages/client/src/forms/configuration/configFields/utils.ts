@@ -10,70 +10,169 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event, IFormField, IFormSection, IForm } from '@client/forms'
+import {
+  Event,
+  IFormField,
+  IForm,
+  IQuestionConfig,
+  IFormSection
+} from '@client/forms'
+import { deserializeFormField } from '@client/forms/mappings/deserializer'
+import { createCustomField } from '@client/forms/configuration/customUtils'
+import { FieldPosition } from '@client/forms/configuration'
 
-export type IConfigFormField = {
-  fieldId: string
-  precedingFieldId: string | null
-  foregoingFieldId: string | null
-  required: boolean
-  enabled: string
-  custom: boolean
-  definition: IFormField
+type IDefaultConfigField = Pick<
+  IQuestionConfig,
+  'fieldId' | 'enabled' | 'required' | 'preceedingFieldId' | 'custom'
+> & {
+  foregoingFieldId: string
+  identifiers: {
+    sectionIndex: number
+    groupIndex: number
+    fieldIndex: number
+  }
 }
 
-type IFormFieldMap = Record<string, IConfigFormField>
-
-export type ISectionFieldMap = Record<string, IFormFieldMap>
-
-export function getContentKey(field: IConfigFormField) {
-  return field.definition.label.id
+type ICustomConfigField = IQuestionConfig & {
+  foregoingFieldId: string
 }
 
-export function getCertificateHandlebar(field: IConfigFormField) {
-  return field.definition.mapping?.template?.[0]
+export type IConfigField = IDefaultConfigField | ICustomConfigField
+
+export type IConfigFieldMap = Record<string, IConfigField>
+
+export type ISectionFieldMap = Record<string, IConfigFieldMap>
+
+function defaultFieldToQuestionConfig(
+  fieldId: string,
+  preceedingFieldId: string,
+  sectionIndex: number,
+  groupIndex: number,
+  fieldIndex: number,
+  field: IFormField
+): IDefaultConfigField {
+  return {
+    fieldId,
+    enabled: field.enabled ?? '',
+    required: field.required,
+    preceedingFieldId,
+    foregoingFieldId: FieldPosition.BOTTOM,
+    identifiers: {
+      sectionIndex,
+      groupIndex,
+      fieldIndex
+    }
+  }
 }
 
-export function getSectionFieldsMap(event: Event, section: IFormSection) {
-  let precedingFieldId: string | null = null
-  return section.groups.reduce<IFormFieldMap>(
-    (groupFieldMap, group) =>
-      group.fields.reduce((fieldMap, field) => {
-        const fieldId = [
-          event.toLowerCase(),
-          section.id,
-          group.id,
-          field.name
-        ].join('.')
-        /* We need to build the field regardless of the conditionals */
-        delete field.conditionals
-        fieldMap[fieldId] = {
-          fieldId,
-          precedingFieldId: precedingFieldId ? precedingFieldId : null,
-          foregoingFieldId: null,
-          required: field.required || false,
-          enabled: field.enabled || 'enabled',
-          custom: field.custom || false,
-          definition: field
-        }
-        if (precedingFieldId) {
-          fieldMap[precedingFieldId].foregoingFieldId = fieldId
-        }
-        precedingFieldId = fieldId
-        return fieldMap
-      }, groupFieldMap),
+function customFieldToQuestionConfig(
+  fieldId: string,
+  preceedingFieldId: string,
+  field: IFormField
+): ICustomConfigField {
+  const messageProperties = [
+    'label',
+    'placeholder',
+    'tooltip',
+    'description'
+  ] as const
+  return {
+    fieldId,
+    preceedingFieldId,
+    enabled: field.enabled ?? '',
+    foregoingFieldId: FieldPosition.BOTTOM,
+    ...messageProperties.reduce(
+      (accum, prop) => ({
+        ...accum,
+        [prop]: [{ lang: 'en', descriptor: field[prop] }]
+      }),
+      {}
+    )
+  }
+}
+
+export function fieldToQuestionConfig(
+  fieldId: string,
+  preceedingFieldId: string,
+  sectionIndex: number,
+  groupIndex: number,
+  fieldIndex: number,
+  field: IFormField
+): IConfigField {
+  if (!field.custom) {
+    return defaultFieldToQuestionConfig(
+      fieldId,
+      preceedingFieldId,
+      sectionIndex,
+      groupIndex,
+      fieldIndex,
+      field
+    )
+  }
+  return customFieldToQuestionConfig(fieldId, preceedingFieldId, field)
+}
+
+export function getFieldDefinition(
+  formSection: IFormSection,
+  configField: IConfigField
+) {
+  let formField: IFormField
+  if (isDefaultField(configField)) {
+    const { groupIndex, fieldIndex } = configField.identifiers
+    formField = formSection.groups[groupIndex].fields[fieldIndex]
+  } else {
+    formField = deserializeFormField(createCustomField(configField))
+  }
+  /* We need to build the field regardless of the conditionals */
+  delete formField.conditionals
+  return formField
+}
+
+export function getContentKey(formField: IFormField) {
+  return formField.label.id
+}
+
+export function getCertificateHandlebar(formField: IFormField) {
+  return formField.mapping?.template?.[0]
+}
+
+export function isDefaultField(
+  configField: IDefaultConfigField | ICustomConfigField
+): configField is IDefaultConfigField {
+  return !configField.custom
+}
+
+export function getSectionFieldsMap(event: Event, form: IForm) {
+  return form.sections.reduce<ISectionFieldMap>(
+    (sectionFieldMap, section, sectionIndex) => {
+      let precedingFieldId: string = FieldPosition.TOP
+      sectionFieldMap[section.id] = section.groups.reduce<IConfigFieldMap>(
+        (groupFieldMap, group, groupIndex) =>
+          group.fields.reduce((fieldMap, field, fieldIndex) => {
+            const fieldId = [
+              event.toLowerCase(),
+              section.id,
+              group.id,
+              field.name
+            ].join('.')
+            fieldMap[fieldId] = fieldToQuestionConfig(
+              fieldId,
+              precedingFieldId,
+              sectionIndex,
+              groupIndex,
+              fieldIndex,
+              field
+            )
+            if (precedingFieldId in fieldMap) {
+              fieldMap[precedingFieldId]!.foregoingFieldId = fieldId
+            }
+            precedingFieldId = fieldId
+            return fieldMap
+          }, groupFieldMap),
+        {}
+      )
+      return sectionFieldMap
+    },
     {}
   )
-}
-
-export function getEventSectionFieldsMap(form: IForm, event: Event) {
-  const birthSectionFieldsMap = form.sections.reduce<ISectionFieldMap>(
-    (sectionFieldsMap, section) => ({
-      ...sectionFieldsMap,
-      [section.id]: getSectionFieldsMap(event, section)
-    }),
-    {}
-  )
-
-  return birthSectionFieldsMap
 }

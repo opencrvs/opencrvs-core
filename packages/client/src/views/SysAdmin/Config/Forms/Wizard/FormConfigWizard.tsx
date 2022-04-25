@@ -27,7 +27,10 @@ import { Event, BirthSection, DeathSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
-import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
+import {
+  IConfigField,
+  isDefaultField
+} from '@client/forms/configuration/configFields/utils'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { messages } from '@client/i18n/messages/views/formConfig'
@@ -106,8 +109,9 @@ function useHasNatlSysAdminScope() {
 }
 
 export function FormConfigWizard() {
-  const [selectedField, setSelectedField] =
-    React.useState<IConfigFormField | null>(null)
+  const [selectedField, setSelectedField] = React.useState<IConfigField | null>(
+    null
+  )
   const hasNatlSysAdminScope = useHasNatlSysAdminScope()
   const dispatch = useDispatch()
   const intl = useIntl()
@@ -116,6 +120,13 @@ export function FormConfigWizard() {
     selectFormDraft(store, event)
   )
   const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
+
+  React.useEffect(() => {
+    if (selectedField && !selectedField.fieldId.includes(section)) {
+      setSelectedField(null)
+    }
+    // only run when section changes
+  }, [section])
 
   if (
     !hasNatlSysAdminScope ||
@@ -163,7 +174,7 @@ export function FormConfigWizard() {
         </CanvasContainer>
         <ToolsContainer>
           {selectedField ? (
-            !selectedField.definition.custom && (
+            isDefaultField(selectedField) && (
               <DefaultFieldTools configField={selectedField} />
             )
           ) : (

@@ -264,8 +264,8 @@ function deserializeQueryMap(queryMap: ISerializedQueryMap) {
   }, {})
 }
 
-function deserializeFormField(field: SerializedFormField) {
-  return {
+export function deserializeFormField(field: SerializedFormField): IFormField {
+  const baseFields = {
     ...field,
     validate: field.validate.map(fieldValidationDescriptorToValidationFunction),
     mapping: field.mapping && {
@@ -281,6 +281,53 @@ function deserializeFormField(field: SerializedFormField) {
       ]
     }
   }
+  if (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS) {
+    return {
+      ...baseFields,
+      dynamicDefinitions: deserializeDynamicDefinitions(
+        field.dynamicDefinitions
+      )
+    } as IFormFieldWithDynamicDefinitions
+  }
+
+  if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
+    const deserializedNestedFields = Object.keys(field.nestedFields).reduce(
+      (fields, key) => {
+        return {
+          ...fields,
+          [key]: field.nestedFields[key].map(deserializeFormField)
+        }
+      },
+      {}
+    )
+    return {
+      ...baseFields,
+      nestedFields: deserializedNestedFields
+    } as IRadioGroupWithNestedFieldsFormField
+  }
+
+  if (field.type === SELECT_WITH_OPTIONS) {
+    return {
+      ...baseFields,
+      options:
+        !Array.isArray(field.options) && field.options.resource
+          ? // Dummy implementation for now as there's only one resource
+            countries
+          : field.options
+    } as ISelectFormFieldWithOptions
+  }
+
+  if (field.type === FETCH_BUTTON) {
+    return {
+      ...baseFields,
+      queryMap: deserializeQueryMap(field.queryMap)
+    } as ILoaderButton
+  }
+
+  return baseFields as Exclude<
+    IFormField,
+    IFormFieldWithDynamicDefinitions | ILoaderButton
+  >
 }
 
 export function deserializeFormSection(
@@ -308,55 +355,7 @@ export function deserializeFormSection(
   const groups = section.groups.map((group) => ({
     ...group,
     fields: group.fields.map((field) => {
-      const baseFields = deserializeFormField(field)
-
-      if (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS) {
-        return {
-          ...baseFields,
-          dynamicDefinitions: deserializeDynamicDefinitions(
-            field.dynamicDefinitions
-          )
-        } as IFormFieldWithDynamicDefinitions
-      }
-
-      if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
-        const deserializedNestedFields = Object.keys(field.nestedFields).reduce(
-          (fields, key) => {
-            return {
-              ...fields,
-              [key]: field.nestedFields[key].map(deserializeFormField)
-            }
-          },
-          {}
-        )
-        return {
-          ...baseFields,
-          nestedFields: deserializedNestedFields
-        } as IRadioGroupWithNestedFieldsFormField
-      }
-
-      if (field.type === SELECT_WITH_OPTIONS) {
-        return {
-          ...baseFields,
-          options:
-            !Array.isArray(field.options) && field.options.resource
-              ? // Dummy implementation for now as there's only one resource
-                countries
-              : field.options
-        } as ISelectFormFieldWithOptions
-      }
-
-      if (field.type === FETCH_BUTTON) {
-        return {
-          ...baseFields,
-          queryMap: deserializeQueryMap(field.queryMap)
-        } as ILoaderButton
-      }
-
-      return baseFields as Exclude<
-        IFormField,
-        IFormFieldWithDynamicDefinitions | ILoaderButton
-      >
+      return deserializeFormField(field)
     })
   }))
 

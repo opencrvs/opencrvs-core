@@ -15,7 +15,7 @@ import * as actions from '@client/forms/configuration/configFields/actions'
 import * as offlineActions from '@client/offline/actions'
 import { Event, IQuestionConfig } from '@client/forms'
 import { getConfiguredForm } from '@client/forms/configuration'
-import { ISectionFieldMap, getEventSectionFieldsMap } from './utils'
+import { ISectionFieldMap, getSectionFieldsMap } from './utils'
 
 export type IConfigFieldsState =
   | {
@@ -79,8 +79,8 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
       const newState: IConfigFieldsState = {
         ...state,
         state: 'READY',
-        birth: getEventSectionFieldsMap(birthForm, Event.BIRTH),
-        death: getEventSectionFieldsMap(deathForm, Event.DEATH)
+        birth: getSectionFieldsMap(Event.BIRTH, birthForm),
+        death: getSectionFieldsMap(Event.DEATH, deathForm)
       }
 
       return loop(newState, Cmd.action(actions.storeConfigFields(newState)))

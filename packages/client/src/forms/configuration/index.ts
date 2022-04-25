@@ -39,6 +39,11 @@ import { deserializeForm } from '@client/forms/mappings/deserializer'
 
 // THIS FILE SORTS & COMBINES CONFIGURATIONS WITH THE DEFAULT CONFIGURATION FOR RENDERING IN THE APPLICATION
 
+export enum FieldPosition {
+  TOP = 'TOP',
+  BOTTOM = 'BOTTOM'
+}
+
 export interface IFormConfigurations {
   defaultFieldCustomisations: IDefaultFieldCustomisation[]
   customQuestionConfigurations: ISortedCustomGroup[]
@@ -157,7 +162,7 @@ export function sortFormCustomisations(
           preceedingDefaultField,
           false
         )
-      } else if (question.preceedingFieldId === 'TOP') {
+      } else if (question.preceedingFieldId === FieldPosition.TOP) {
         createCustomGroup(
           defaultEventForm,
           formCustomisations.customQuestionConfigurations,
