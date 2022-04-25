@@ -41,7 +41,9 @@ export enum AddressComparisonCases {
   // the below are camelCase because they map to fieldNames used in conditionals
   SECONDARY_ADDRESS_SAME_AS_PRIMARY = 'secondaryAddressSameAsPrimary',
   PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY = 'primaryAddressSameAsOtherPrimary',
-  SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY = 'secondaryAddressSameAsOtherSecondary'
+  SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY = 'secondaryAddressSameAsOtherSecondary',
+  MOTHER_PRIMARY_CAREGIVER = "!values.mothersDetailsExist && draftData.registration.informantType && selectedInformantType && selectedInformantType !== 'MOTHER'",
+  MOTHER_PRIMARY_CAREGIVER_SECONDARY_ADDRESS = "values.secondaryAddressSameAsPrimary || (!values.mothersDetailsExist && draftData.registration.informantType && selectedInformantType && selectedInformantType !== 'MOTHER')"
 }
 
 export enum AddressSubsections {
@@ -83,7 +85,23 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.primaryAddress
       },
-      { config: AddressCases.PRIMARY_ADDRESS, informant: true }
+      { config: AddressCases.PRIMARY_ADDRESS, informant: true },
+      {
+        config: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY,
+        label: formMessageDescriptors.informantSecondaryAddressSameAsPrimary,
+        xComparisonSection: DeathSection.Informants,
+        yComparisonSection: DeathSection.Informants
+      },
+      {
+        config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.informantSecondaryAddress,
+        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+      },
+      {
+        config: AddressCases.SECONDARY_ADDRESS,
+        informant: true,
+        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+      }
     ]
   },
   {
@@ -91,24 +109,33 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
-        label: formMessageDescriptors.primaryAddress
+        label: formMessageDescriptors.primaryAddress,
+        comparisonCase: AddressComparisonCases.MOTHER_PRIMARY_CAREGIVER
       },
-      { config: AddressCases.PRIMARY_ADDRESS, informant: false },
+      {
+        config: AddressCases.PRIMARY_ADDRESS,
+        informant: false,
+        comparisonCase: AddressComparisonCases.MOTHER_PRIMARY_CAREGIVER
+      },
       {
         config: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY,
         label: formMessageDescriptors.secondaryAddressSameAsPrimary,
         xComparisonSection: BirthSection.Mother,
-        yComparisonSection: BirthSection.Mother
+        yComparisonSection: BirthSection.Mother,
+        comparisonCase:
+          AddressComparisonCases.MOTHER_PRIMARY_CAREGIVER_SECONDARY_ADDRESS
       },
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.secondaryAddress,
-        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+        comparisonCase:
+          AddressComparisonCases.MOTHER_PRIMARY_CAREGIVER_SECONDARY_ADDRESS
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
         informant: false,
-        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+        comparisonCase:
+          AddressComparisonCases.MOTHER_PRIMARY_CAREGIVER_SECONDARY_ADDRESS
       }
     ]
   },
@@ -344,11 +371,29 @@ export const getAddressSubsection = (
     initialValue: '',
     validate: []
   }
-  if (comparisonCase) {
+
+  if (
+    comparisonCase &&
+    comparisonCase !== AddressComparisonCases.MOTHER_PRIMARY_CAREGIVER &&
+    comparisonCase !==
+      AddressComparisonCases.MOTHER_PRIMARY_CAREGIVER_SECONDARY_ADDRESS
+  ) {
     subsection['conditionals'] = [
       {
         action: 'hide',
         expression: `values.${comparisonCase}`
+      }
+    ]
+  } else if (
+    comparisonCase &&
+    (comparisonCase === AddressComparisonCases.MOTHER_PRIMARY_CAREGIVER ||
+      comparisonCase ===
+        AddressComparisonCases.MOTHER_PRIMARY_CAREGIVER_SECONDARY_ADDRESS)
+  ) {
+    subsection['conditionals'] = [
+      {
+        action: 'hide',
+        expression: `${comparisonCase}`
       }
     ]
   }
@@ -398,7 +443,15 @@ export const getXAddressSameAsY = (
               {
                 action: 'hide',
                 expression:
-                  '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && draftData.primaryCaregiver.parentDetailsType ===  "FATHER_ONLY")'
+                  "(draftData && draftData.registration.informantType && selectedInformantType && selectedInformantType !== 'MOTHER')"
+              }
+            ]
+          : xComparisonSection === BirthSection.Mother
+          ? [
+              {
+                action: 'hide',
+                expression:
+                  "!values.mothersDetailsExist && draftData && draftData.registration.informantType && selectedInformantType && selectedInformantType !== 'MOTHER'"
               }
             ]
           : [],
@@ -508,14 +561,29 @@ export function getAddress(
       : getSecondaryAddressFields(informant)
   if (comparisonCase) {
     defaultFields.forEach((field) => {
-      const newConditional = {
-        action: 'hide',
-        expression: `values.${comparisonCase}`
+      let newConditional
+      let expression = ''
+      if (
+        comparisonCase !== AddressComparisonCases.MOTHER_PRIMARY_CAREGIVER &&
+        comparisonCase !==
+          AddressComparisonCases.MOTHER_PRIMARY_CAREGIVER_SECONDARY_ADDRESS
+      ) {
+        expression = `values.${comparisonCase}`
+        newConditional = {
+          action: 'hide',
+          expression
+        }
+      } else {
+        expression = `(${comparisonCase})`
+        newConditional = {
+          action: 'hide',
+          expression
+        }
       }
       if (
         field.conditionals &&
         field.conditionals.filter(
-          (conditional) => conditional.expression === `values.${comparisonCase}`
+          (conditional) => conditional.expression === expression
         ).length === 0
       ) {
         field.conditionals.push(newConditional)

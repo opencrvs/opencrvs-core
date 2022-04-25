@@ -39,6 +39,7 @@ interface IFormMessages
   attendantAtBirth: MessageDescriptor
   attendantAtBirthLayperson: MessageDescriptor
   attendantAtBirthMidwife: MessageDescriptor
+  attendantAtBirthTraditionalBirthAttendant: MessageDescriptor
   attendantAtBirthNone: MessageDescriptor
   attendantAtBirthNurse: MessageDescriptor
   attendantAtBirthOther: MessageDescriptor
@@ -117,6 +118,7 @@ interface IFormMessages
   deceasedSex: MessageDescriptor
   deceasedSexFemale: MessageDescriptor
   deceasedSexMale: MessageDescriptor
+  childNameInEnglishPreviewGroup: MessageDescriptor
   deceasedSexOther: MessageDescriptor
   deceasedSexUnknown: MessageDescriptor
   deceasedTitle: MessageDescriptor
@@ -164,6 +166,7 @@ interface IFormMessages
   fatherFirstNamesEng: MessageDescriptor
   fatherName: MessageDescriptor
   fathersDetailsExist: MessageDescriptor
+  mothersDetailsExist: MessageDescriptor
   fatherTitle: MessageDescriptor
   fetchDeceasedDetails: MessageDescriptor
   fetchFatherDetails: MessageDescriptor
@@ -260,6 +263,7 @@ interface IFormMessages
   proofOfFathersID: MessageDescriptor
   proofOfMothersID: MessageDescriptor
   proofOfParentPrimaryAddress: MessageDescriptor
+  placeOfBirthPreview: MessageDescriptor
   registrationName: MessageDescriptor
   registrationOffice: MessageDescriptor
   registrationPhoneLabel: MessageDescriptor
@@ -375,6 +379,7 @@ interface IFormMessages
   deceasedSecondaryAddress: MessageDescriptor
   informantSecondaryAddressSameAsPrimary: MessageDescriptor
   informantSecondaryAddress: MessageDescriptor
+  emptyStringForSubSection: MessageDescriptor
 }
 
 export const formMessageDescriptors: IFormMessages = {
@@ -519,6 +524,11 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Midwife',
     description: 'Label for form field: Attendant at birth',
     id: 'form.field.label.attendantAtBirthMidwife'
+  },
+  attendantAtBirthTraditionalBirthAttendant: {
+    defaultMessage: 'Traditional birth attendant',
+    description: 'Label for form field: Attendant at birth',
+    id: 'form.field.label.attendantAtBirthTraditionalBirthAttendant'
   },
   attendantAtBirthNone: {
     defaultMessage: 'None',
@@ -1150,6 +1160,11 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Form section name for Father',
     id: 'form.section.father.name'
   },
+  mothersDetailsExist: {
+    defaultMessage: "Do you have the mother's details?",
+    description: "Question to ask the user if they have the mother's details",
+    id: 'form.field.label.mothersDetailsExist'
+  },
   fathersDetailsExist: {
     defaultMessage: "Do you have the father's details?",
     description: "Question to ask the user if they have the father's details",
@@ -1443,8 +1458,8 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.section.mother.title'
   },
   multipleBirth: {
-    defaultMessage: 'Order of birth (number)',
-    description: 'Label for form field: Order of birth',
+    defaultMessage: 'No. of previous births',
+    description: 'Label for form field: multipleBirth',
     id: 'form.field.label.multipleBirth'
   },
   nationality: {
@@ -1573,6 +1588,11 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Location',
     description: 'Label for form field: Place of delivery',
     id: 'form.field.label.placeOfBirth'
+  },
+  childNameInEnglishPreviewGroup: {
+    defaultMessage: 'English name',
+    description: 'Label for child name in english',
+    id: 'form.preview.group.label.english.name'
   },
   postCode: {
     defaultMessage: 'Postcode',
@@ -1941,6 +1961,11 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for form field: Weight at birth',
     id: 'form.field.label.weightAtBirth'
   },
+  placeOfBirthPreview: {
+    defaultMessage: 'Place of delivery',
+    description: 'Title for place of birth sub section',
+    id: 'form.field.label.placeOfBirthPreview'
+  },
   whatDocToUpload: {
     defaultMessage: 'Which document type are you uploading?',
     description:
@@ -2240,6 +2265,11 @@ export const formMessageDescriptors: IFormMessages = {
       'If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.',
     description: 'Helper text for nid input field',
     id: 'form.field.helpertext.nid'
+  },
+  emptyStringForSubSection: {
+    defaultMessage: ' ',
+    description: 'empty string',
+    id: 'form.field.label.empty'
   }
 }
 

@@ -717,7 +717,7 @@
         "form.field.label.name": "Name",
         "form.field.label.ReasonNotApplying": "Reason not applying",
         "form.field.label.motherFirstNamesEng": "First Name(s) in English",
-        "form.field.label.multipleBirth": "Order of birth (number)",
+        "form.field.label.multipleBirth": "No. of previous births",
         "form.field.label.NID": "NID",
         "form.field.label.optionalLabel": "Optional",
         "form.field.label.otherHealthInstitution": "Other Health Institution",
