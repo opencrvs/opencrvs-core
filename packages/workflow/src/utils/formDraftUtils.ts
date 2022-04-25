@@ -37,6 +37,7 @@ export async function getFormDraft(token: string) {
     return await res.json()
   } catch (err) {
     logger.error(`Unable to check form draft status for error : ${err}`)
+    throw err
   }
 }
 
@@ -44,12 +45,12 @@ export async function checkFormDraftStatusToAddTestExtension(
   taskResource: fhir.Task,
   token: string
 ) {
-  const formDraft = (await getFormDraft(token)) as IDraft[]
-  const isNotPublished = Object.values(formDraft).every(
-    (draft) => draft.status !== DraftStatus.PUBLISHED
+  const formDraft: IDraft[] = await getFormDraft(token)
+  const isPublished = Object.values(formDraft).every(
+    (draft) => draft.status === DraftStatus.PUBLISHED
   )
 
-  if (isNotPublished) {
+  if (!isPublished) {
     setupTestExtension(taskResource)
   }
 }

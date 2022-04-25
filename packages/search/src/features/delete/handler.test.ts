@@ -13,16 +13,14 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { createServer } from '@search/server'
 import { client } from '@search/elasticsearch/client'
-import { mockTestDeleteIndex } from '@search/test/utils'
-
 let server: any
+
+// @ts-ignore
+jest.spyOn(client.indices, 'delete').mockResolvedValue(() => mockDataTable)
 
 describe('Delete Handler', () => {
   beforeEach(async () => {
     server = await createServer()
-    jest
-      .spyOn(client.indices, 'delete')
-      .mockResolvedValueOnce(mockTestDeleteIndex)
   })
   it('should return status code 403 if the token does not hold any of the Nation System Admin scope', async () => {
     const token = jwt.sign(

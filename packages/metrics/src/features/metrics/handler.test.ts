@@ -14,6 +14,7 @@ import { createServer } from '@metrics/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as fetchMock from 'jest-fetch-mock'
+import { influx } from '@metrics/influxdb/client'
 
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
@@ -22,11 +23,7 @@ jest.mock('../../influxdb/client', () => {
   return {
     __esModule: true,
     ...originalModule,
-    readPoints: jest.fn(),
-    deleteMeasurements: () =>
-      Promise.resolve({
-        status: 'ok'
-      })
+    readPoints: jest.fn()
   }
 })
 
@@ -216,6 +213,7 @@ describe('delete metrics measurement handler', () => {
   })
 
   it('returns ok when scope is NATLSYSADMIN and Successfully drop all measurement', async () => {
+    jest.spyOn(influx, 'dropMeasurement').mockResolvedValue({})
     const res = await server.server.inject({
       method: 'DELETE',
       url: '/influxMeasurement',
