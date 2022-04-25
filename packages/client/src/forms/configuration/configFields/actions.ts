@@ -9,8 +9,25 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IConfigFieldsState } from './reducer'
 import { IQuestionConfig } from '@client/forms'
+import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
+
+export const UPDATE_CONFIG_FIELDS = 'FORM/UPDATE_CONFIG_FIELDS'
+export type UpdateConfigFieldsAction = {
+  type: typeof UPDATE_CONFIG_FIELDS
+  payload: {
+    questionConfig: IQuestionConfig[]
+  }
+}
+
+export const updateConfigFields = (
+  questionConfig: IQuestionConfig[]
+): UpdateConfigFieldsAction => ({
+  type: UPDATE_CONFIG_FIELDS,
+  payload: {
+    questionConfig
+  }
+})
 
 export const GET_STORAGE_CONFIG_FIELDS_SUCCESS =
   'FORM/GET_STORAGE_CONFIG_FIELDS_SUCCESS'
@@ -38,19 +55,6 @@ export const getStorageConfigFieldsFailed = (
 ): GetStorageConfigFieldsFailedAction => ({
   type: GET_STORAGE_CONFIG_FIELDS_FAILED,
   payload: response
-})
-
-export const STORE_CONFIG_FIELDS = 'FORM/STORE_CONFIG_FIELDS'
-export type StoreConfigFieldsAction = {
-  type: typeof STORE_CONFIG_FIELDS
-  payload: IConfigFieldsState
-}
-
-export const storeConfigFields = (
-  configFields: IConfigFieldsState
-): StoreConfigFieldsAction => ({
-  type: STORE_CONFIG_FIELDS,
-  payload: configFields
 })
 
 export const STORE_CONFIG_FIELDS_SUCCESS = 'FORM/STORE_CONFIG_FIELDS_SUCCESS'
@@ -82,20 +86,25 @@ export const storeConfigFieldsFailed = (
 export const UPDATE_QUESTION_CONFIG = 'FORM/UPDATE_QUESTION_CONFIG'
 export type UpdateQuestionsAction = {
   type: typeof UPDATE_QUESTION_CONFIG
-  payload: { questionConfig: IQuestionConfig[] }
+  payload: {
+    formDraft: IDraft
+    questionConfig: IQuestionConfig[]
+  }
 }
 
 export const updateQuestionConfig = (
+  formDraft: IDraft,
   questionConfig: IQuestionConfig[]
 ): UpdateQuestionsAction => ({
   type: UPDATE_QUESTION_CONFIG,
   payload: {
+    formDraft,
     questionConfig
   }
 })
 
 export type ConfigFieldsActions =
-  | StoreConfigFieldsAction
+  | UpdateConfigFieldsAction
   | StoreConfigFieldsSuccessAction
   | GetStorageConfigFieldsSuccessAction
   | GetStorageConfigFieldsFailedAction

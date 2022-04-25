@@ -263,15 +263,18 @@ export const UPDATE_OFFLINE_QUESTION_CONFIG = 'OFFLINE/UPDATE_QUESTION_CONFIG'
 export type UpdateOfflineQuestionConfigAction = {
   type: typeof UPDATE_OFFLINE_QUESTION_CONFIG
   payload: {
+    formDraft: IDraft
     questionConfig: IQuestionConfig[]
   }
 }
 
 export const updateOfflineQuestionConfig = (
+  formDraft: IDraft,
   questionConfig: IQuestionConfig[]
 ): UpdateOfflineQuestionConfigAction => ({
   type: UPDATE_OFFLINE_QUESTION_CONFIG,
   payload: {
+    formDraft,
     questionConfig
   }
 })

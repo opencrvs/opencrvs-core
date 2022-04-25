@@ -26,7 +26,6 @@ import {
   IDraft,
   DraftStatus
 } from '@client/forms/configuration/formDrafts/reducer'
-import { modifyFormDraft } from '@client/forms/configuration/formDrafts/actions'
 import {
   SecondaryButton,
   PrimaryButton
@@ -67,9 +66,8 @@ function SaveActionButton({ comment }: { comment: string }) {
       onError={() => setStatus(ActionStatus.ERROR)}
       onCompleted={({ createOrUpdateFormDraft: formDraft }) => {
         if (formDraft) {
-          dispatch(modifyFormDraft(formDraft as IDraft))
+          dispatch(updateQuestionConfig(formDraft as IDraft, questions))
           setStatus(ActionStatus.COMPLETED)
-          dispatch(updateQuestionConfig(questions))
           setTimeout(() => dispatch(goToFormConfigHome()), REDIRECT_DELAY)
         }
       }}

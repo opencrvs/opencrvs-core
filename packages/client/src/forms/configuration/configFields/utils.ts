@@ -119,7 +119,7 @@ export function getFieldDefinition(
   let formField: IFormField
   if (isDefaultField(configField)) {
     const { groupIndex, fieldIndex } = configField.identifiers
-    formField = formSection.groups[groupIndex].fields[fieldIndex]
+    formField = { ...formSection.groups[groupIndex].fields[fieldIndex] }
   } else {
     formField = deserializeFormField(createCustomField(configField))
   }
