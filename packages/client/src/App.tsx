@@ -29,6 +29,7 @@ import { createClient } from '@client/utils/apolloClient'
 import { ReviewDuplicates } from '@client/views/Duplicates/ReviewDuplicates'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
 import { FieldAgentHome } from '@client/views/FieldAgentHome/FieldAgentHome'
+import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
@@ -36,7 +37,6 @@ import { ReviewCertificateAction } from '@client/views/PrintCertificate/ReviewCe
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
 import { DeclarationForm } from '@client/views/RegisterForm/DeclarationForm'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
-import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { SelectInformant } from '@client/views/SelectInformant/SelectInformant'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
@@ -59,18 +59,17 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
+import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
+import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { RecordAudit } from './views/Home/RecordAudit'
 import { ChangePhonePage } from './views/Settings/ChangePhonePage'
-import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
-import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { ApplicationConfig } from './views/SysAdmin/Config/Application'
-import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
-import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
-import { CustomFieldForms } from './components/formConfig/CustomFieldForm'
+import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import {
   FormConfiguration,
   FormConfigWizard
 } from './views/SysAdmin/Config/Forms'
+import { UserList } from './views/SysAdmin/Team/user/UserList'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -386,11 +385,6 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.USER_PROFILE}
                                             component={UserProfile}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={'/form-config'}
-                                            component={CustomFieldForms}
                                           />
                                         </Switch>
                                       </TransitionWrapper>
