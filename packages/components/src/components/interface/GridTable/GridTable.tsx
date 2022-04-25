@@ -120,7 +120,6 @@ interface IGridTableProps {
   renderExpandedComponent?: (eventId: string) => React.ReactNode
   noResultText: string
   hideTableHeader?: boolean
-  onPageChange?: (currentPage: number) => void
   clickable?: boolean
   loading?: boolean
   sortedCol?: COLUMNS
@@ -167,12 +166,6 @@ export class GridTableComp extends React.Component<
         <ListItemAction id={`ListItemAction-${key}`} actions={actions} />
       </ActionWrapper>
     )
-  }
-
-  onPageChange = (currentPage: number) => {
-    if (this.props.onPageChange) {
-      this.props.onPageChange(currentPage)
-    }
   }
 
   getRowClickHandler = (itemRowClickHandler: IActionObject[]) => {

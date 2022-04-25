@@ -250,7 +250,6 @@ class Outbox extends React.Component<IFullProps, IState> {
             }
           ]}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
-          onPageChange={this.onPageChange}
         />
       </Container>
     )

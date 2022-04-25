@@ -190,6 +190,7 @@ interface IWorkqueuePaginationParams {
   pageSize: number
 
   inProgressSkip: number
+  healthSystemSkip: number
   reviewSkip: number
   rejectSkip: number
   approvalSkip: number
@@ -378,6 +379,7 @@ interface UpdateRegistrarWorkqueueAction {
     pageSize: number
 
     inProgressSkip: number
+    healthSystemSkip: number
     reviewSkip: number
     rejectSkip: number
     approvalSkip: number
@@ -1007,6 +1009,7 @@ async function getWorkqueueData(
   const {
     pageSize,
     inProgressSkip,
+    healthSystemSkip,
     reviewSkip,
     rejectSkip,
     approvalSkip,
@@ -1019,6 +1022,7 @@ async function getWorkqueueData(
     reviewStatuses,
     pageSize,
     inProgressSkip,
+    healthSystemSkip,
     reviewSkip,
     rejectSkip,
     approvalSkip,
@@ -1127,6 +1131,7 @@ export function updateRegistrarWorkqueue(
   pageSize = 10,
 
   inProgressSkip = 0,
+  healthSystemSkip = 0,
   reviewSkip = 0,
   rejectSkip = 0,
   approvalSkip = 0,
@@ -1139,6 +1144,7 @@ export function updateRegistrarWorkqueue(
       pageSize,
 
       inProgressSkip,
+      healthSystemSkip,
       reviewSkip,
       rejectSkip,
       approvalSkip,

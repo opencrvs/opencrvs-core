@@ -73,7 +73,6 @@ interface IBaseRejectTabProps {
   paginationId: number
   pageSize: number
   onPageChange: (newPageNumber: number) => void
-  showPaginated?: boolean
   loading?: boolean
   error?: boolean
 }
@@ -319,7 +318,6 @@ class RejectTabComponent extends React.Component<
           content={this.transformRejectedContent(data)}
           columns={this.getColumns()}
           noResultText={intl.formatMessage(officeHomeMessages.sentForUpdates)}
-          onPageChange={onPageChange}
           clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}

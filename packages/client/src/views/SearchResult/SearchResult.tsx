@@ -160,7 +160,6 @@ type ISearchResultProps = IntlShapeProps &
 
 interface ISearchResultState {
   width: number
-  currentPage: number
 }
 
 export class SearchResultView extends React.Component<
@@ -172,7 +171,6 @@ export class SearchResultView extends React.Component<
   constructor(props: ISearchResultProps) {
     super(props)
     this.state = {
-      currentPage: 1,
       width: window.innerWidth
     }
   }
@@ -396,10 +394,6 @@ export class SearchResultView extends React.Component<
     })
   }
 
-  onPageChange = (newPageNumber: number) => {
-    this.setState({ currentPage: newPageNumber })
-  }
-
   render() {
     const { intl, match, userDetails } = this.props
     const { searchText, searchType } = match.params
@@ -494,7 +488,6 @@ export class SearchResultView extends React.Component<
                             noResultText={intl.formatMessage(
                               constantsMessages.noResults
                             )}
-                            onPageChange={this.onPageChange}
                             clickable={true}
                           />
                         </>

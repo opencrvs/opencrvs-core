@@ -76,10 +76,15 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/tabs/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
+import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
+import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
+import { he } from 'date-fns/locale'
 
 interface IQueryData {
-  inProgressData: GQLEventSearchResultSet
-  notificationData: GQLEventSearchResultSet
+  fieldAgentData: GQLEventSearchResultSet
+  healthSystemData: GQLEventSearchResultSet
 }
 
 type QueryDataKey = 'inProgressData' | 'notificationData'
@@ -93,9 +98,14 @@ interface IBaseRegistrarHomeProps {
   drafts: IDeclaration[]
   outboxDeclarations: IDeclaration[]
   queryData: IQueryData
-  page: number
   isFieldAgent: boolean
   onPageChange: (newPageNumber: number) => void
+  paginationId: {
+    draftId: number
+    fieldAgentId: number
+    healthSystemId: number
+  }
+  pageSize: number
 }
 
 interface IRegistrarHomeState {
@@ -106,7 +116,6 @@ interface IRegistrarHomeState {
 
 interface IProps {
   offlineCountryConfig: IOfflineData
-  showPaginated?: boolean
   loading?: boolean
   error?: boolean
 }
@@ -149,8 +158,6 @@ export class InProgressTabComponent extends React.Component<
   recordWindowWidth = () => {
     this.setState({ width: window.innerWidth })
   }
-
-  pageSize = 10
 
   onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -303,13 +310,24 @@ export class InProgressTabComponent extends React.Component<
     })
   }
 
+  getDraftsPaginatedData = (drafts: IDeclaration[], pageId: number) => {
+    return drafts.slice(
+      (pageId - 1) * this.props.pageSize,
+      pageId * this.props.pageSize
+    )
+  }
+
   transformDraftContent = () => {
     const { intl } = this.props
     const { locale } = intl
     if (!this.props.drafts || this.props.drafts.length <= 0) {
       return []
     }
-    const items = this.props.drafts.map((draft: IDeclaration) => {
+    const paginatedDrafts = this.getDraftsPaginatedData(
+      this.props.drafts,
+      this.props.paginationId.draftId
+    )
+    const items = paginatedDrafts.map((draft: IDeclaration) => {
       let pageRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
         pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
@@ -517,25 +535,49 @@ export class InProgressTabComponent extends React.Component<
   renderFieldAgentTable = (
     data: GQLEventSearchResultSet,
     intl: IntlShape,
-    page: number,
     onPageChange: (newPageNumber: number) => void
   ) => {
+    const totalPages = this.props.queryData.fieldAgentData.totalItems
+      ? Math.ceil(
+          this.props.queryData.fieldAgentData.totalItems / this.props.pageSize
+        )
+      : 0
+    const isShowPagination =
+      this.props.queryData.fieldAgentData.totalItems &&
+      this.props.queryData.fieldAgentData.totalItems > this.props.pageSize
     return (
       <>
         <GridTable
           content={this.transformRemoteDraftsContent(data)}
           columns={this.getColumns()}
           noResultText={intl.formatMessage(officeHomeMessages.progress)}
-          onPageChange={onPageChange}
           clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
         />
-        <LoadingIndicator
-          loading={this.props.loading ? true : false}
-          hasError={this.props.error ? true : false}
-        />
+        {isShowPagination ? (
+          <PaginationWrapper>
+            <DesktopWrapper>
+              <PaginationModified
+                size="small"
+                initialPage={this.props.paginationId.fieldAgentId}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </DesktopWrapper>
+            <MobileWrapper>
+              <PaginationModified
+                size="large"
+                initialPage={this.props.paginationId.fieldAgentId}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </MobileWrapper>
+          </PaginationWrapper>
+        ) : (
+          <></>
+        )}
       </>
     )
   }
@@ -543,40 +585,60 @@ export class InProgressTabComponent extends React.Component<
   renderHospitalTable = (
     data: GQLEventSearchResultSet,
     intl: IntlShape,
-    page: number,
     onPageChange: (newPageNumber: number) => void
   ) => {
+    const totalPages = this.props.queryData.healthSystemData.totalItems
+      ? Math.ceil(
+          this.props.queryData.healthSystemData.totalItems / this.props.pageSize
+        )
+      : 0
+    const isShowPagination =
+      this.props.queryData.healthSystemData.totalItems &&
+      this.props.queryData.healthSystemData.totalItems > this.props.pageSize
     return (
       <>
         <GridTable
           content={this.transformRemoteDraftsContent(data)}
           columns={this.getColumns()}
           noResultText={intl.formatMessage(officeHomeMessages.progress)}
-          onPageChange={onPageChange}
           clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
         />
-        <LoadingIndicator
-          loading={this.props.loading ? true : false}
-          hasError={this.props.error ? true : false}
-        />
+        {isShowPagination ? (
+          <PaginationWrapper>
+            <DesktopWrapper>
+              <PaginationModified
+                size="small"
+                initialPage={this.props.paginationId.healthSystemId}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </DesktopWrapper>
+            <MobileWrapper>
+              <PaginationModified
+                size="large"
+                initialPage={this.props.paginationId.healthSystemId}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </MobileWrapper>
+          </PaginationWrapper>
+        ) : (
+          <></>
+        )}
       </>
     )
   }
 
   render() {
-    const {
-      intl,
-      selectorId,
-      drafts,
-      queryData,
-      page,
-      onPageChange,
-      isFieldAgent
-    } = this.props
-    const { inProgressData, notificationData } = queryData
+    const { intl, selectorId, drafts, queryData, onPageChange, isFieldAgent } =
+      this.props
+    const { fieldAgentData, healthSystemData } = queryData
+    const totalPages = Math.ceil(this.props.drafts.length / this.props.pageSize)
+
+    const isShowPagination = this.props.drafts.length > this.props.pageSize
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.progress)}
@@ -588,8 +650,8 @@ export class InProgressTabComponent extends React.Component<
           this.getTabs(
             selectorId,
             drafts,
-            inProgressData.totalItems || 0,
-            notificationData.totalItems || 0
+            fieldAgentData.totalItems || 0,
+            healthSystemData.totalItems || 0
           )
         }
       >
@@ -599,24 +661,41 @@ export class InProgressTabComponent extends React.Component<
               content={this.transformDraftContent()}
               columns={this.getColumns()}
               noResultText={intl.formatMessage(officeHomeMessages.progress)}
-              onPageChange={onPageChange}
               clickable={true}
               loading={isFieldAgent ? false : this.props.loading}
               sortedCol={this.state.sortedCol}
               sortOrder={this.state.sortOrder}
             />
-            <LoadingIndicator
-              loading={this.props.loading && !isFieldAgent ? true : false}
-              hasError={false}
-            />
+            {isShowPagination ? (
+              <PaginationWrapper>
+                <DesktopWrapper>
+                  <PaginationModified
+                    size="small"
+                    initialPage={this.props.paginationId.healthSystemId}
+                    totalPages={totalPages}
+                    onPageChange={onPageChange}
+                  />
+                </DesktopWrapper>
+                <MobileWrapper>
+                  <PaginationModified
+                    size="large"
+                    initialPage={this.props.paginationId.healthSystemId}
+                    totalPages={totalPages}
+                    onPageChange={onPageChange}
+                  />
+                </MobileWrapper>
+              </PaginationWrapper>
+            ) : (
+              <></>
+            )}
           </>
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts &&
           !isFieldAgent &&
-          this.renderFieldAgentTable(inProgressData, intl, page, onPageChange)}
+          this.renderFieldAgentTable(fieldAgentData, intl, onPageChange)}
         {selectorId === SELECTOR_ID.hospitalDrafts &&
           !isFieldAgent &&
-          this.renderHospitalTable(notificationData, intl, page, onPageChange)}
+          this.renderHospitalTable(healthSystemData, intl, onPageChange)}
       </WQContentWrapper>
     )
   }

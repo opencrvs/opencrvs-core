@@ -49,6 +49,10 @@ import {
   SubmissionStatusMap
 } from '@client/views/OfficeHome/tabs/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
+import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
+import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
 const DECLARATIONS_DAY_LIMIT = 7
 
 interface ISentForReviewProps {
@@ -56,13 +60,12 @@ interface ISentForReviewProps {
   declarationsReadyToSend: IDeclaration[]
   deleteDeclaration: typeof deleteDeclaration
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-  showPaginated?: boolean
-  loading?: boolean
-  error?: boolean
+  paginationId: number
+  pageSize: number
+  onPageChange: (newPageNumber: number) => void
 }
 
 interface IState {
-  sentForReviewPageNo: number
   width: number
   sortedCol: COLUMNS
   sortOrder: SORT_ORDER
@@ -79,7 +82,6 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     this.pageSize = 10
     this.state = {
       width: window.innerWidth,
-      sentForReviewPageNo: 1,
       sortedCol: COLUMNS.NAME,
       sortOrder: SORT_ORDER.ASCENDING
     }
@@ -110,10 +112,6 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
       })
   }
 
-  onPageChange = (pageNumber: number) => {
-    this.setState({ sentForReviewPageNo: pageNumber })
-  }
-
   onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
@@ -126,6 +124,13 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     })
   }
 
+  getReadyToSendPaginatedData = (drafts: IDeclaration[], pageId: number) => {
+    return drafts.slice(
+      (pageId - 1) * this.props.pageSize,
+      pageId * this.props.pageSize
+    )
+  }
+
   transformDeclarationsReadyToSend = () => {
     if (
       !this.props.declarationsReadyToSend ||
@@ -133,84 +138,83 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     ) {
       return []
     }
-    const items = this.props.declarationsReadyToSend.map(
-      (draft: IDeclaration, index) => {
-        const { intl } = this.props
-        const { locale } = intl
-        const name = getDraftInformantFullName(draft, locale)
-        const event =
-          (draft.event &&
-            intl.formatMessage(
-              dynamicConstantsMessages[draft.event.toLowerCase()]
-            )) ||
-          ''
+    const paginatedDeclarations = this.getReadyToSendPaginatedData(
+      this.props.declarationsReadyToSend,
+      this.props.paginationId
+    )
+    const items = paginatedDeclarations.map((draft: IDeclaration, index) => {
+      const { intl } = this.props
+      const { locale } = intl
+      const name = getDraftInformantFullName(draft, locale)
+      const event =
+        (draft.event &&
+          intl.formatMessage(
+            dynamicConstantsMessages[draft.event.toLowerCase()]
+          )) ||
+        ''
 
-        const date =
-          draft &&
-          (draft.event === Event.BIRTH
-            ? draft.data.child?.childBirthDate
-            : draft.data.deathEvent?.deathDate ||
-              draft.data.deceased?.deathDate)
-        const savedDate =
-          draft && draft.savedOn
-            ? new Date(draft.savedOn)
-            : draft.createdAt && parseInt(draft.createdAt)
+      const date =
+        draft &&
+        (draft.event === Event.BIRTH
+          ? draft.data.child?.childBirthDate
+          : draft.data.deathEvent?.deathDate || draft.data.deceased?.deathDate)
+      const savedDate =
+        draft && draft.savedOn
+          ? new Date(draft.savedOn)
+          : draft.createdAt && parseInt(draft.createdAt)
 
-        return {
-          id: draft.id,
-          event: event || '',
-          name: name && name.toLowerCase(),
-          iconWithName: (
-            <IconWithName
-              status={
-                (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
+      return {
+        id: draft.id,
+        event: event || '',
+        name: name && name.toLowerCase(),
+        iconWithName: (
+          <IconWithName
+            status={
+              (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
+            }
+            name={name}
+          />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={
+              (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
+            }
+            name={name}
+            event={event}
+          />
+        ),
+        dateOfEvent: date ? new Date(date as string) : '',
+        sentForReview: savedDate ? savedDate : '',
+        actions: [
+          {
+            actionComponent: (
+              <SubmissionStatusMap
+                status={draft.submissionStatus || ''}
+                online={navigator.onLine}
+                index={index}
+              />
+            )
+          }
+        ],
+
+        rowClickable: Boolean(draft.compositionId),
+        rowClickHandler: [
+          {
+            label: 'rowClickHandler',
+            handler: () => {
+              if (!draft.compositionId) {
+                throw new Error('No composition id found for this declaration')
               }
-              name={name}
-            />
-          ),
-          iconWithNameEvent: (
-            <IconWithNameEvent
-              status={
-                (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
-              }
-              name={name}
-              event={event}
-            />
-          ),
-          dateOfEvent: date ? new Date(date as string) : '',
-          sentForReview: savedDate ? savedDate : '',
-          actions: [
-            {
-              actionComponent: (
-                <SubmissionStatusMap
-                  status={draft.submissionStatus || ''}
-                  online={navigator.onLine}
-                  index={index}
-                />
+              this.props.goToDeclarationRecordAudit(
+                'reviewTab',
+                draft.compositionId
               )
             }
-          ],
-
-          rowClickable: Boolean(draft.compositionId),
-          rowClickHandler: [
-            {
-              label: 'rowClickHandler',
-              handler: () => {
-                if (!draft.compositionId) {
-                  throw new Error(
-                    'No composition id found for this declaration'
-                  )
-                }
-                this.props.goToDeclarationRecordAudit(
-                  'reviewTab',
-                  draft.compositionId
-                )
-              }
-            }
-          ]
-        }
+          }
+        ]
       }
-    )
+    })
     const sortedItems = getSortedItems(
       items,
       this.state.sortedCol,
@@ -285,7 +289,13 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
   }
 
   render() {
-    const { intl, declarationsReadyToSend } = this.props
+    const { intl, paginationId, pageSize } = this.props
+    const totalPages = Math.ceil(
+      this.props.declarationsReadyToSend.length / pageSize
+    )
+
+    const isShowPagination =
+      this.props.declarationsReadyToSend.length > pageSize
 
     return (
       <WQContentWrapper
@@ -296,11 +306,31 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           content={this.transformDeclarationsReadyToSend()}
           columns={this.getColumns()}
           noResultText={intl.formatMessage(officeHomeMessages.sentForReview)}
-          onPageChange={this.onPageChange}
           sortedCol={this.state.sortedCol}
           sortOrder={this.state.sortOrder}
         />
-        <LoadingIndicator loading={false} hasError={false} />
+        {isShowPagination ? (
+          <PaginationWrapper>
+            <DesktopWrapper>
+              <PaginationModified
+                size="small"
+                initialPage={paginationId}
+                totalPages={totalPages}
+                onPageChange={this.props.onPageChange}
+              />
+            </DesktopWrapper>
+            <MobileWrapper>
+              <PaginationModified
+                size="large"
+                initialPage={paginationId}
+                totalPages={totalPages}
+                onPageChange={this.props.onPageChange}
+              />
+            </MobileWrapper>
+          </PaginationWrapper>
+        ) : (
+          <></>
+        )}
       </WQContentWrapper>
     )
   }

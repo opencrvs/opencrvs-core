@@ -55,7 +55,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
 import { ApprovalTab } from './tabs/approvals/approvalTab'
-import { InProgressTab } from './tabs/inProgress/inProgressTab'
+import { InProgressTab, SELECTOR_ID } from './tabs/inProgress/inProgressTab'
 import { PrintTab } from './tabs/print/printTab'
 import { RejectTab } from './tabs/reject/rejectTab'
 import { ReviewTab } from './tabs/readyForReview/reviewTab'
@@ -141,12 +141,15 @@ interface IBaseOfficeHomeStateProps {
 }
 
 interface IOfficeHomeState {
+  draftCurrentPage: number
+  healthSystemCurrentPage: number
   progressCurrentPage: number
   reviewCurrentPage: number
   updatesCurrentPage: number
   approvalCurrentPage: number
   printCurrentPage: number
   externalValidationCurrentPage: number
+  sentForReviewCurrentPage: number
   requireUpdatePage: number
   showCertificateToast: boolean
 }
@@ -183,11 +186,14 @@ export class OfficeHomeView extends React.Component<
   constructor(props: IOfficeHomeProps) {
     super(props)
     this.state = {
+      draftCurrentPage: 1,
+      healthSystemCurrentPage: 1,
       progressCurrentPage: 1,
       reviewCurrentPage: 1,
       updatesCurrentPage: 1,
       approvalCurrentPage: 1,
       printCurrentPage: 1,
+      sentForReviewCurrentPage: 1,
       requireUpdatePage: 1,
       externalValidationCurrentPage: 1,
       showCertificateToast: Boolean(
@@ -206,6 +212,7 @@ export class OfficeHomeView extends React.Component<
     this.props.updateRegistrarWorkqueue(
       this.pageSize,
       Math.max(this.state.progressCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.healthSystemCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.reviewCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.updatesCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.approvalCurrentPage - 1, 0) * this.pageSize,
@@ -241,11 +248,14 @@ export class OfficeHomeView extends React.Component<
   componentDidUpdate(prevProps: IOfficeHomeProps, prevState: IOfficeHomeState) {
     if (prevProps.tabId !== this.props.tabId) {
       this.setState({
+        draftCurrentPage: 1,
+        healthSystemCurrentPage: 1,
         progressCurrentPage: 1,
         reviewCurrentPage: 1,
         updatesCurrentPage: 1,
         approvalCurrentPage: 1,
         printCurrentPage: 1,
+        sentForReviewCurrentPage: 1,
         requireUpdatePage: 1
       })
       if (!this.isFieldAgent) {
@@ -272,9 +282,26 @@ export class OfficeHomeView extends React.Component<
   onPageChange = (newPageNumber: number) => {
     switch (this.props.tabId) {
       case WORKQUEUE_TABS.inProgress:
-        this.setState({ progressCurrentPage: newPageNumber }, () => {
-          this.syncWorkqueue()
-        })
+        if (
+          this.props.selectorId &&
+          this.props.selectorId === SELECTOR_ID.fieldAgentDrafts
+        ) {
+          this.setState({ progressCurrentPage: newPageNumber }, () => {
+            this.syncWorkqueue()
+          })
+        } else if (
+          this.props.selectorId &&
+          this.props.selectorId === SELECTOR_ID.hospitalDrafts
+        ) {
+          this.setState({ healthSystemCurrentPage: newPageNumber }, () => {
+            this.syncWorkqueue()
+          })
+        } else {
+          this.setState({ draftCurrentPage: newPageNumber }, () => {
+            this.syncWorkqueue()
+          })
+        }
+
         break
       case WORKQUEUE_TABS.readyForReview:
         this.setState({ reviewCurrentPage: newPageNumber }, () => {
@@ -305,18 +332,24 @@ export class OfficeHomeView extends React.Component<
       case WORKQUEUE_TABS.requiresUpdate:
         this.setState({ requireUpdatePage: newPageNumber })
         break
+      case WORKQUEUE_TABS.sentForReview:
+        this.setState({ sentForReviewCurrentPage: newPageNumber })
+        break
       default:
         throw new Error(`Unknown tab id when changing page ${this.props.tabId}`)
     }
   }
 
   getData = (
+    draftCurrentPage: number,
+    healthSystemCurrentPage: number,
     progressCurrentPage: number,
     reviewCurrentPage: number,
     updatesCurrentPage: number,
     approvalCurrentPage: number,
     printCurrentPage: number,
     externalValidationCurrentPage: number,
+    sentForReviewCurrentPage: number,
     requireUpdatePage: number
   ) => {
     const {
@@ -361,11 +394,15 @@ export class OfficeHomeView extends React.Component<
               selectorId={selectorId}
               isFieldAgent={this.isFieldAgent}
               queryData={{
-                inProgressData: filteredData.inProgressTab,
-                notificationData: filteredData.notificationTab
+                fieldAgentData: filteredData.inProgressTab,
+                healthSystemData: filteredData.notificationTab
               }}
-              showPaginated={this.showPaginated}
-              page={progressCurrentPage}
+              paginationId={{
+                draftId: draftCurrentPage,
+                fieldAgentId: progressCurrentPage,
+                healthSystemId: healthSystemCurrentPage
+              }}
+              pageSize={this.pageSize}
               onPageChange={this.onPageChange}
               loading={loading}
               error={error}
@@ -378,7 +415,6 @@ export class OfficeHomeView extends React.Component<
                   queryData={{
                     data: filteredData.reviewTab
                   }}
-                  showPaginated={this.showPaginated}
                   paginationId={reviewCurrentPage}
                   pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
@@ -391,7 +427,6 @@ export class OfficeHomeView extends React.Component<
                   queryData={{
                     data: filteredData.rejectTab
                   }}
-                  showPaginated={this.showPaginated}
                   paginationId={updatesCurrentPage}
                   pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
@@ -406,7 +441,6 @@ export class OfficeHomeView extends React.Component<
                     queryData={{
                       data: filteredData.externalValidationTab
                     }}
-                    showPaginated={this.showPaginated}
                     paginationId={externalValidationCurrentPage}
                     pageSize={this.pageSize}
                     onPageChange={this.onPageChange}
@@ -419,7 +453,6 @@ export class OfficeHomeView extends React.Component<
                   queryData={{
                     data: filteredData.approvalTab
                   }}
-                  showPaginated={this.showPaginated}
                   paginationId={approvalCurrentPage}
                   pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
@@ -432,7 +465,6 @@ export class OfficeHomeView extends React.Component<
                   queryData={{
                     data: filteredData.printTab
                   }}
-                  showPaginated={this.showPaginated}
                   paginationId={printCurrentPage}
                   pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
@@ -446,7 +478,9 @@ export class OfficeHomeView extends React.Component<
               {tabId === WORKQUEUE_TABS.sentForReview && (
                 <SentForReview
                   declarationsReadyToSend={declarationsReadyToSend}
-                  showPaginated={this.showPaginated}
+                  paginationId={sentForReviewCurrentPage}
+                  pageSize={this.pageSize}
+                  onPageChange={this.onPageChange}
                 />
               )}
               {tabId === WORKQUEUE_TABS.requiresUpdate && (
@@ -468,11 +502,14 @@ export class OfficeHomeView extends React.Component<
   render() {
     const { intl } = this.props
     const {
+      draftCurrentPage,
+      healthSystemCurrentPage,
       progressCurrentPage,
       reviewCurrentPage,
       updatesCurrentPage,
       approvalCurrentPage,
       printCurrentPage,
+      sentForReviewCurrentPage,
       externalValidationCurrentPage,
       requireUpdatePage
     } = this.state
@@ -483,12 +520,15 @@ export class OfficeHomeView extends React.Component<
           title={intl.formatMessage(navigationMessages[this.props.tabId])}
         />
         {this.getData(
+          draftCurrentPage,
+          healthSystemCurrentPage,
           progressCurrentPage,
           reviewCurrentPage,
           updatesCurrentPage,
           approvalCurrentPage,
           printCurrentPage,
           externalValidationCurrentPage,
+          sentForReviewCurrentPage,
           requireUpdatePage
         )}
 
@@ -541,13 +581,14 @@ function mapStateToProps(
     selectorId: (match && match.params && match.params.selectorId) || '',
     storedDeclarations: state.declarationsState.declarations,
     drafts:
-      (state.declarationsState.declarations &&
+      (
+        state.declarationsState.declarations &&
         state.declarationsState.declarations.filter(
           (declaration: IDeclaration) =>
             declaration.submissionStatus ===
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-        )) ||
-      [],
+        )
+      ).reverse() || [],
     declarationsReadyToSend: (
       (state.declarationsState.declarations &&
         state.declarationsState.declarations.filter(

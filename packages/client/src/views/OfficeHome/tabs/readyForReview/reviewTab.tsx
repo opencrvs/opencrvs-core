@@ -80,7 +80,6 @@ interface IBaseReviewTabProps {
   paginationId: number
   pageSize: number
   onPageChange: (newPageNumber: number) => void
-  showPaginated?: boolean
   loading?: boolean
   error?: boolean
 }
@@ -345,7 +344,6 @@ class ReviewTabComponent extends React.Component<
           content={this.transformDeclaredContent(data)}
           columns={this.getColumns()}
           noResultText={intl.formatMessage(officeHomeMessages.readyForReview)}
-          onPageChange={onPageChange}
           clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}

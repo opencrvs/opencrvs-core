@@ -66,7 +66,6 @@ interface IBasePrintTabProps {
   }
   paginationId: number
   onPageChange: (newPageNumber: number) => void
-  showPaginated?: boolean
   loading?: boolean
   error?: boolean
   pageSize: number
@@ -303,7 +302,6 @@ class PrintTabComponent extends React.Component<
           content={this.transformRegisteredContent(data)}
           columns={this.getColumns()}
           noResultText={intl.formatMessage(officeHomeMessages.print)}
-          onPageChange={onPageChange}
           clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}

@@ -317,9 +317,6 @@ const RequiresUpdateComponent = (props: IFullProps) => {
                 noResultText={intl.formatMessage(
                   officeHomeMessages.requiresUpdate
                 )}
-                onPageChange={(currentPage: number) => {
-                  onPageChange(currentPage)
-                }}
                 clickable={props.isOnline}
                 loading={loading}
                 sortedCol={sortedCol}

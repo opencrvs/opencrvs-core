@@ -49,6 +49,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     $locationIds: [String]
     $pageSize: Int
     $inProgressSkip: Int
+    $healthSystemSkip: Int
     $reviewStatuses: [String]
     $reviewSkip: Int
     $rejectSkip: Int
@@ -73,7 +74,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       status: ["IN_PROGRESS"]
       type: ["birth-notification", "death-notification"]
       count: $pageSize
-      skip: $inProgressSkip
+      skip: $healthSystemSkip
     ) {
       totalItems
       results {

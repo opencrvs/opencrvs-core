@@ -54,7 +54,6 @@ interface IBaseProps {
   paginationId: number
   pageSize: number
   onPageChange: (newPageNumber: number) => void
-  showPaginated?: boolean
   loading?: boolean
   error?: boolean
 }
@@ -207,7 +206,6 @@ function ExternalValidationTabComponent(props: IProps) {
       <GridTable
         content={transformWaitingValidationContent(data)}
         noResultText={intl.formatMessage(constantsMessages.noResults)}
-        onPageChange={onPageChange}
         clickable={true}
         loading={props.loading}
         columns={columns}
