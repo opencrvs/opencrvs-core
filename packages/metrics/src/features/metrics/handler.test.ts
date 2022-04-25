@@ -10,13 +10,25 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createServer } from '@metrics/server'
-import * as influx from '@metrics/influxdb/client'
+
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as fetchMock from 'jest-fetch-mock'
 
-const readPoints = influx.query as jest.Mock
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+
+jest.mock('../../influxdb/client', () => {
+  const originalModule = jest.requireActual('../../influxdb/client')
+  return {
+    __esModule: true,
+    ...originalModule,
+    readPoints: jest.fn(),
+    deleteMeasurements: () =>
+      Promise.resolve({
+        status: 'ok'
+      })
+  }
+})
 
 jest.mock('./utils', () => {
   const originalModule = jest.requireActual('./utils')
@@ -24,18 +36,6 @@ jest.mock('./utils', () => {
     __esModule: true,
     ...originalModule,
     getRegistrationTargetDays: () => 45
-  }
-})
-
-jest.mock('../../influxdb/client', () => {
-  const originalModule = jest.requireActual('../../influxdb/client')
-  return {
-    __esModule: true,
-    ...originalModule,
-    deleteMeasurements: () =>
-      Promise.resolve({
-        status: 'ok'
-      })
   }
 })
 
@@ -61,6 +61,7 @@ describe('verify metrics handler', () => {
 
   it('returns ok for valid request for birth', async () => {
     fetch.mockResponseOnce(JSON.stringify(mockLocationBundle))
+    const { readPoints } = require('../../influxdb/client')
     readPoints.mockResolvedValueOnce([
       {
         locationLevel2: 'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294',
@@ -123,6 +124,7 @@ describe('verify metrics handler', () => {
   })
 
   it('returns ok for valid request for death', async () => {
+    const { readPoints } = require('../../influxdb/client')
     readPoints.mockResolvedValueOnce([
       {
         locationLevel2: 'Location/1490d3dd-71a9-47e8-b143-f9fc64f71294',

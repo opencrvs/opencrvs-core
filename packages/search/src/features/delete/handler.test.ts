@@ -12,11 +12,8 @@
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { createServer } from '@search/server'
-import * as fetchMock from 'jest-fetch-mock'
 import { client } from '@search/elasticsearch/client'
 import { mockTestDeleteIndex } from '@search/test/utils'
-
-const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 
 let server: any
 
@@ -42,7 +39,7 @@ describe('Delete Handler', () => {
 
     const res = await server.server.inject({
       method: 'DELETE',
-      url: '/indexOCRVS',
+      url: '/elasticIndex',
       payload: {},
       headers: {
         Authorization: `Bearer ${token}`
@@ -66,7 +63,7 @@ describe('Delete Handler', () => {
 
     const res = await server.server.inject({
       method: 'DELETE',
-      url: '/indexOCRVS',
+      url: '/elasticIndex',
       payload: {},
       headers: {
         Authorization: `Bearer ${token}`
