@@ -46,6 +46,10 @@ async function loadConfigFields() {
   return storage.getItem('configFields')
 }
 
+async function clearConfigFields() {
+  return storage.removeItem('configFields')
+}
+
 type Actions = actions.ConfigFieldsActions | offlineActions.Action
 
 export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
@@ -54,6 +58,7 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
 ): IConfigFieldsState | Loop<IConfigFieldsState, Actions> => {
   switch (action.type) {
     case offlineActions.READY:
+    case offlineActions.UPDATED:
       return loop(
         {
           ...state,
@@ -106,6 +111,15 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         }
       }
       return state
+    case actions.UPDATE_QUESTION_CONFIG:
+      const { questionConfig } = action.payload
+      return loop(
+        state,
+        Cmd.list([
+          Cmd.run(clearConfigFields),
+          Cmd.action(offlineActions.updateOfflineQuestionConfig(questionConfig))
+        ])
+      )
     default:
       return state
   }

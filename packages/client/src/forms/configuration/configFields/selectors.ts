@@ -12,7 +12,8 @@
 
 import { IStoreState } from '@client/store'
 import { Event, IQuestionConfig } from '@client/forms'
-import { ISectionFieldMap } from './utils'
+import { ISectionFieldMap, isDefaultField, IDefaultConfigField } from './utils'
+import { registerForms } from '@client/forms/configuration/default'
 
 export function selectConfigFieldsState(store: IStoreState) {
   if (store.configFields.state === 'LOADING') {
@@ -38,15 +39,45 @@ export function selectConfigField(
   return selectConfigFields(store, event, section)[fieldId]
 }
 
-function generateQuestionConfigs(
-  oldQuestions: IQuestionConfig[],
-  configFields: ISectionFieldMap
-) {
-  // TODO: create newQuestionConfigs using configFields
-  return oldQuestions
+function getIdentifiers(defaultConfigField: IDefaultConfigField) {
+  const { sectionIndex, groupIndex, fieldIndex } =
+    defaultConfigField.identifiers
+  return {
+    event: defaultConfigField.fieldId.split('.')[0] as Event,
+    sectionIndex,
+    groupIndex,
+    fieldIndex
+  }
+}
+
+function hasDefaultFieldChanged(defaultConfigField: IDefaultConfigField) {
+  const { event, sectionIndex, groupIndex, fieldIndex } =
+    getIdentifiers(defaultConfigField)
+  const defaultFormField =
+    registerForms[event].sections[sectionIndex].groups[groupIndex].fields[
+      fieldIndex
+    ]
+  return (
+    defaultConfigField.enabled === 'DISABLED' ||
+    !!defaultFormField.required !== !!defaultConfigField.required
+  )
+}
+
+function generateQuestionConfigs(configFields: ISectionFieldMap) {
+  const newQuestions: IQuestionConfig[] = []
+  Object.values(configFields).forEach((sectionConfigFields) => {
+    Object.values(sectionConfigFields).forEach((configField) => {
+      if (!isDefaultField(configField)) {
+        newQuestions.push(configField)
+      } else if (hasDefaultFieldChanged(configField)) {
+        newQuestions.push(configField)
+      }
+    })
+  })
+  return newQuestions
 }
 
 export function selectNewQuestionConfigs(store: IStoreState, event: Event) {
   const configFields = selectConfigFieldsState(store)
-  return generateQuestionConfigs(configFields.questions, configFields[event])
+  return generateQuestionConfigs(configFields[event])
 }

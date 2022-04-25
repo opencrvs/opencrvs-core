@@ -37,6 +37,7 @@ import { messages } from '@client/i18n/messages/views/formConfig'
 import { InputField, TextArea } from '@opencrvs/components/lib/forms'
 import { useParams } from 'react-router'
 import { goToFormConfigHome } from '@client/navigation'
+import { updateQuestionConfig } from '@client/forms/configuration/configFields/actions'
 
 export const SaveActionContext = React.createContext({
   status: ActionStatus.IDLE,
@@ -68,6 +69,7 @@ function SaveActionButton({ comment }: { comment: string }) {
         if (formDraft) {
           dispatch(modifyFormDraft(formDraft as IDraft))
           setStatus(ActionStatus.COMPLETED)
+          dispatch(updateQuestionConfig(questions))
           setTimeout(() => dispatch(goToFormConfigHome()), REDIRECT_DELAY)
         }
       }}

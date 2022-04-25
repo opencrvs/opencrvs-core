@@ -357,6 +357,21 @@ function reducer(
         offlineData: newOfflineData
       }
     }
+    case actions.UPDATE_OFFLINE_QUESTION_CONFIG: {
+      if (!state.offlineData.formConfig?.formDrafts) return state
+      const { questionConfig } = action.payload
+      const newOfflineData = {
+        ...state.offlineData,
+        formConfig: {
+          ...state.offlineData.formConfig,
+          questionConfig
+        }
+      }
+      return {
+        ...state,
+        offlineData: newOfflineData
+      }
+    }
     /*
      * Configurations
      */

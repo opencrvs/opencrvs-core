@@ -21,7 +21,7 @@ import { deserializeFormField } from '@client/forms/mappings/deserializer'
 import { createCustomField } from '@client/forms/configuration/customUtils'
 import { FieldPosition } from '@client/forms/configuration'
 
-type IDefaultConfigField = Pick<
+export type IDefaultConfigField = Pick<
   IQuestionConfig,
   'fieldId' | 'enabled' | 'required' | 'preceedingFieldId' | 'custom'
 > & {

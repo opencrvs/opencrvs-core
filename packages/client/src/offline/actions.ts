@@ -21,6 +21,7 @@ import {
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
+import { IQuestionConfig } from '@client/forms'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -242,21 +243,39 @@ export const refreshOfflineData = () => ({
 })
 
 export const UPDATE_OFFLINE_FORM_DRAFT = 'OFFLINE/UPDATE_FORM_DRAFT'
-export type UpdateFormDraftAction = {
+export type UpdateOfflineFormDraftAction = {
   type: typeof UPDATE_OFFLINE_FORM_DRAFT
   payload: {
     formDrafts: IDraft[]
   }
 }
 
-export const updateFormDraft = (
+export const updateOfflineFormDraft = (
   formDrafts: IDraft[]
-): UpdateFormDraftAction => ({
+): UpdateOfflineFormDraftAction => ({
   type: UPDATE_OFFLINE_FORM_DRAFT,
   payload: {
     formDrafts
   }
 })
+
+export const UPDATE_OFFLINE_QUESTION_CONFIG = 'OFFLINE/UPDATE_QUESTION_CONFIG'
+export type UpdateOfflineQuestionConfigAction = {
+  type: typeof UPDATE_OFFLINE_QUESTION_CONFIG
+  payload: {
+    questionConfig: IQuestionConfig[]
+  }
+}
+
+export const updateOfflineQuestionConfig = (
+  questionConfig: IQuestionConfig[]
+): UpdateOfflineQuestionConfigAction => ({
+  type: UPDATE_OFFLINE_QUESTION_CONFIG,
+  payload: {
+    questionConfig
+  }
+})
+
 export type Action =
   | GetLocations
   | LocationsFailedAction
@@ -275,7 +294,8 @@ export type Action =
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
-  | UpdateFormDraftAction
+  | UpdateOfflineFormDraftAction
+  | UpdateOfflineQuestionConfigAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>

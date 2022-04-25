@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IConfigFieldsState } from './reducer'
+import { IQuestionConfig } from '@client/forms'
 
 export const GET_STORAGE_CONFIG_FIELDS_SUCCESS =
   'FORM/GET_STORAGE_CONFIG_FIELDS_SUCCESS'
@@ -78,8 +79,24 @@ export const storeConfigFieldsFailed = (
   payload: response
 })
 
+export const UPDATE_QUESTION_CONFIG = 'FORM/UPDATE_QUESTION_CONFIG'
+export type UpdateQuestionsAction = {
+  type: typeof UPDATE_QUESTION_CONFIG
+  payload: { questionConfig: IQuestionConfig[] }
+}
+
+export const updateQuestionConfig = (
+  questionConfig: IQuestionConfig[]
+): UpdateQuestionsAction => ({
+  type: UPDATE_QUESTION_CONFIG,
+  payload: {
+    questionConfig
+  }
+})
+
 export type ConfigFieldsActions =
   | StoreConfigFieldsAction
   | StoreConfigFieldsSuccessAction
   | GetStorageConfigFieldsSuccessAction
   | GetStorageConfigFieldsFailedAction
+  | UpdateQuestionsAction

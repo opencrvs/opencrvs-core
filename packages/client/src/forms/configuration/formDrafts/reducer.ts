@@ -94,7 +94,9 @@ export const formDraftReducer: LoopReducer<IFormDraftState, Actions> = (
           formDraft: newFormDraft
         },
         Cmd.action(
-          offlineActions.updateFormDraft(getOfflineFormDrafts(newFormDraft))
+          offlineActions.updateOfflineFormDraft(
+            getOfflineFormDrafts(newFormDraft)
+          )
         )
       )
     default:
