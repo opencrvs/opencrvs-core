@@ -18,7 +18,7 @@ import {
   REDIRECT_DELAY
 } from '@client/views/SysAdmin/Config/Forms/utils'
 import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
-import { selectNewQuestionConfigs } from '@client/forms/configuration/configFields/selectors'
+import { selectQuestionConfigs } from '@client/forms/configuration/configFields/selectors'
 import { Event, IQuestionConfig } from '@client/forms'
 import { Mutation } from 'react-apollo'
 import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
@@ -47,7 +47,7 @@ function SaveActionButton({ comment }: { comment: string }) {
   const intl = useIntl()
   const { event } = useParams<{ event: Event }>()
   const questions = useSelector((store: IStoreState) =>
-    selectNewQuestionConfigs(store, event)
+    selectQuestionConfigs(store, event)
   )
   const { setStatus } = React.useContext(SaveActionContext)
   const dispatch = useDispatch()
@@ -129,7 +129,7 @@ export function SaveActionModal() {
       >
         <TextArea
           key="save_modal_comment"
-          // Text Area currently doesn't accept basic input props
+          /* Text Area currently doesn't accept basic input props */
           {...{
             onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) =>
               setComment(event.target.value),

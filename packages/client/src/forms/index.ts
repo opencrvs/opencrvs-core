@@ -958,13 +958,15 @@ export interface IFormSection {
   hasDocumentSection?: boolean
 }
 
+export type ISerializedFormSectionGroup = Omit<IFormSectionGroup, 'fields'> & {
+  fields: SerializedFormField[]
+}
+
 export type ISerializedFormSection = Omit<
   IFormSection,
   'groups' | 'mapping'
 > & {
-  groups: Array<
-    Omit<IFormSectionGroup, 'fields'> & { fields: SerializedFormField[] }
-  >
+  groups: ISerializedFormSectionGroup[]
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
