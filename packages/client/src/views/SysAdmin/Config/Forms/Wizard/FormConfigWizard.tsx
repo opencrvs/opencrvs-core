@@ -138,6 +138,7 @@ export function FormConfigWizard() {
           <SecondaryButton
             key="save"
             size="small"
+            disabled={status === ActionStatus.PROCESSING}
             onClick={() => setStatus(ActionStatus.MODAL)}
           >
             {intl.formatMessage(buttonMessages.save)}
