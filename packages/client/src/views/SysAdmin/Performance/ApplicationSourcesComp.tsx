@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
 import React from 'react'
 import {
   PerformanceTitle,
@@ -20,11 +17,14 @@ import {
   PerformanceListHeader,
   ListContainer,
   calculateTotal,
-  TotalDisplayWithPercentage
+  TotalDisplayWithPercentage,
+  Container
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLTotalMetricsResult } from '@client/../../gateway/src/graphql/schema'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
+import { buttonMessages } from '@client/i18n/messages/buttons'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult
@@ -35,7 +35,7 @@ export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
   const intl = useIntl()
   return (
     <ListContainer>
-      <ListViewSimplified>
+      <Container>
         <ListViewItemSimplified
           label={
             <PerformanceListHeader>
@@ -72,6 +72,9 @@ export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
                 ofNumber={calculateTotal(data.results)}
               ></TotalDisplayWithPercentage>
             </PerformanceValue>
+          }
+          actions={
+            <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
           }
         />
         <ListViewItemSimplified
@@ -118,7 +121,7 @@ export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
             </PerformanceValue>
           }
         />
-      </ListViewSimplified>
+      </Container>
     </ListContainer>
   )
 }

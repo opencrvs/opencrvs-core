@@ -24,7 +24,8 @@ import {
   PercentageDisplay,
   calculateTotal,
   TotalDisplayWithPercentage,
-  PerformanceListHeader
+  PerformanceListHeader,
+  Container
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/performance'
@@ -35,14 +36,6 @@ interface RegistrationsReportProps {
   data: GQLTotalMetricsResult
   selectedEvent: 'BIRTH' | 'DEATH'
 }
-
-const Container = styled(ListViewSimplified)`
-  grid-template-columns: auto 1fr minmax(5em, auto);
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    grid-template-columns: none;
-  }
-`
 
 export function RegistrationsReport({
   data,

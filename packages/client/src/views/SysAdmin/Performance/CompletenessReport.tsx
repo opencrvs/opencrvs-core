@@ -26,7 +26,8 @@ import {
   PercentageDisplay,
   calculateTotal,
   PerformanceListHeader,
-  PerformanceListSubHeader
+  PerformanceListSubHeader,
+  Container
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import styled from 'styled-components'
@@ -38,14 +39,6 @@ interface CompletenessReportProps {
   data: GQLTotalMetricsResult
   selectedEvent: 'BIRTH' | 'DEATH'
 }
-
-const Container = styled(ListViewSimplified)`
-  grid-template-columns: auto 1fr minmax(5em, auto);
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    grid-template-columns: none;
-  }
-`
 
 export function CompletenessReport({
   data,

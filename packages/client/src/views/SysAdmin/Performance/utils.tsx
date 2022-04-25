@@ -23,6 +23,7 @@ import endOfMonth from 'date-fns/endOfMonth'
 import React from 'react'
 import { getPercentage } from '@client/utils/data-formatting'
 import { FormattedNumber } from 'react-intl'
+import { ListViewSimplified } from '@opencrvs/components/lib/interface'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
@@ -58,6 +59,14 @@ export const ActionContainer = styled.div`
   margin: 0 -24px 0 -24px;
   padding: 12px 24px 11px 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+`
+
+export const Container = styled(ListViewSimplified)`
+  grid-template-columns: auto 1fr minmax(5em, auto);
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    grid-template-columns: none;
+  }
 `
 
 export const FilterContainer = styled.div`
