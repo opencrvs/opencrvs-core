@@ -77,7 +77,7 @@ export const resolvers: GQLResolver = {
     },
     async getDeclarationsStartedMetrics(
       _,
-      { timeStart, timeEnd, locationId },
+      { timeStart, timeEnd, locationId, event },
       authHeader
     ) {
       return getMetrics(
@@ -85,7 +85,8 @@ export const resolvers: GQLResolver = {
         {
           timeStart,
           timeEnd,
-          locationId
+          locationId,
+          event
         },
         authHeader
       )

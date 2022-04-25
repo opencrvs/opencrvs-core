@@ -20,7 +20,8 @@ export interface IPractitionerMetrics {
 export async function fetchLocationWiseDeclarationsStarted(
   timeFrom: string,
   timeTo: string,
-  locationId: string
+  locationId: string,
+  event: EVENT_TYPE
 ) {
   const fieldAgent = await query(
     `SELECT COUNT(role)
@@ -70,7 +71,8 @@ export async function fetchLocationWiseDeclarationsStarted(
       OR locationLevel3 = '${locationId}'
       OR locationLevel4 = '${locationId}'
       OR locationLevel5 = '${locationId}')
-      GROUP BY role`)
+  AND eventType = '${event}'
+  GROUP BY role`)
 
   return {
     fieldAgentDeclarations:

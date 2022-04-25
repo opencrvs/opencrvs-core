@@ -13,7 +13,8 @@ import * as Hapi from '@hapi/hapi'
 import {
   TIME_FROM,
   TIME_TO,
-  LOCATION_ID
+  LOCATION_ID,
+  EVENT
 } from '@metrics/features/metrics/constants'
 import {
   fetchLocationWiseDeclarationsStarted,
@@ -30,12 +31,14 @@ export async function declarationsStartedHandler(
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
   const locationId = 'Location/' + request.query[LOCATION_ID]
+  const event = request.query[EVENT]
   let declarationsStartedMetrics
   try {
     declarationsStartedMetrics = await fetchLocationWiseDeclarationsStarted(
       timeStart,
       timeEnd,
-      locationId
+      locationId,
+      event
     )
   } catch (error) {
     declarationsStartedMetrics = {

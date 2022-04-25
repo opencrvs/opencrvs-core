@@ -45,6 +45,7 @@ export const PERFORMANCE_METRICS = gql`
       timeStart: $timeStart
       timeEnd: $timeEnd
       locationId: $locationId
+      event: $event
     ) {
       fieldAgentDeclarations
       hospitalDeclarations

@@ -1796,6 +1796,7 @@ export interface QueryToGetDeclarationsStartedMetricsArgs {
   timeStart: string
   timeEnd: string
   locationId: string
+  event: string
 }
 export interface QueryToGetDeclarationsStartedMetricsResolver<
   TParent = any,

@@ -123,6 +123,7 @@ type Query {
     timeStart: String!
     timeEnd: String!
     locationId: String!
+    event: String!
   ): DeclarationsStartedMetrics
   fetchMonthWiseEventMetrics(
     timeStart: String!
