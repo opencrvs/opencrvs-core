@@ -46,8 +46,6 @@ export const colors = {
   grey500: '#5B5B5B', // supporting copy
   grey600: '#222222', // copy
 
-  indigo500: '#4972BB',
-
   // Opacity
   opacity24: 'rgba(41, 47, 51, 0.24)',
   opacity54: 'rgba(41, 47, 51, 0.54)',

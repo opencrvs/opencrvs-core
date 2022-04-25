@@ -18,6 +18,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
+import { Divider } from '@opencrvs/components/lib/interface/Divider'
 import styled from '@client/styledComponents'
 import {
   RotateLeft,
@@ -157,7 +158,9 @@ const BodyContainer = styled.div`
   margin-left: 0px;
   margin-top: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 265px;
+    margin-left: 274px;
+    margin-top: 24px;
+    margin-right: 24px;
   }
 `
 
@@ -245,7 +248,8 @@ const NameAvatar = styled.div`
   }
 `
 
-const Heading = styled.h4`
+const Heading = styled.h3`
+  ${({ theme }) => theme.fonts.h3}
   margin-bottom: 0px !important;
 `
 
@@ -850,6 +854,7 @@ const showPrintButton = ({
     return (
       <PrimaryButton
         key={id}
+        size={'medium'}
         id={`print-${id}`}
         onClick={() => {
           goToPrintCertificate &&
@@ -950,7 +955,7 @@ const GetHistory = ({
   if (!draft?.data?.history?.length)
     return (
       <>
-        <hr />
+        <Divider />
         <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
         <LargeGreyedInfo />
       </>
@@ -1016,7 +1021,7 @@ const GetHistory = ({
   ]
   return (
     <>
-      <hr />
+      <Divider />
       <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
       <TableView
         id="task-history"
@@ -1604,6 +1609,7 @@ function RecordAuditBody({
             <PrimaryButton
               id="continue"
               key="continue"
+              size={'medium'}
               onClick={() => {
                 reinstateDeclaration(declaration.id)
                 toggleDisplayDialog()
@@ -1617,6 +1623,7 @@ function RecordAuditBody({
             <DangerButton
               id="archive_confirm"
               key="archive_confirm"
+              size={'medium'}
               onClick={() => {
                 archiveDeclaration(declaration.id)
                 toggleDisplayDialog()
