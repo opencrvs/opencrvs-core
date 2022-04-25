@@ -205,11 +205,6 @@ export class OfficeHomeView extends React.Component<
   syncWorkqueueRegistrationClerk() {
     this.props.updateRegistrarWorkqueue(
       this.pageSize,
-      this.pageSize,
-      this.pageSize,
-      this.pageSize,
-      this.pageSize,
-      this.pageSize,
       Math.max(this.state.progressCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.reviewCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.updatesCurrentPage - 1, 0) * this.pageSize,
@@ -384,7 +379,8 @@ export class OfficeHomeView extends React.Component<
                     data: filteredData.reviewTab
                   }}
                   showPaginated={this.showPaginated}
-                  page={reviewCurrentPage}
+                  paginationId={reviewCurrentPage}
+                  pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
                   loading={loading}
                   error={error}
@@ -411,7 +407,8 @@ export class OfficeHomeView extends React.Component<
                       data: filteredData.externalValidationTab
                     }}
                     showPaginated={this.showPaginated}
-                    page={externalValidationCurrentPage}
+                    paginationId={externalValidationCurrentPage}
+                    pageSize={this.pageSize}
                     onPageChange={this.onPageChange}
                     loading={loading}
                     error={error}

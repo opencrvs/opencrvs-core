@@ -291,6 +291,9 @@ class PrintTabComponent extends React.Component<
     const totalPages = this.props.queryData.data.totalItems
       ? Math.ceil(this.props.queryData.data.totalItems / pageSize)
       : 0
+    const isShowPagination =
+      this.props.queryData.data.totalItems &&
+      this.props.queryData.data.totalItems > pageSize
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.print)}
@@ -306,24 +309,28 @@ class PrintTabComponent extends React.Component<
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
         />
-        <PaginationWrapper>
-          <DesktopWrapper>
-            <PaginationModified
-              size="small"
-              initialPage={paginationId}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-            />
-          </DesktopWrapper>
-          <MobileWrapper>
-            <PaginationModified
-              size="large"
-              initialPage={paginationId}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-            />
-          </MobileWrapper>
-        </PaginationWrapper>
+        {isShowPagination ? (
+          <PaginationWrapper>
+            <DesktopWrapper>
+              <PaginationModified
+                size="small"
+                initialPage={paginationId}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </DesktopWrapper>
+            <MobileWrapper>
+              <PaginationModified
+                size="large"
+                initialPage={paginationId}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </MobileWrapper>
+          </PaginationWrapper>
+        ) : (
+          <></>
+        )}
       </WQContentWrapper>
     )
   }

@@ -39,6 +39,10 @@ import {
   IconWithNameEvent
 } from '@client/views/OfficeHome/tabs/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
+import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
+import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
 
 const { useState, useEffect } = React
 
@@ -47,7 +51,8 @@ interface IBaseProps {
   queryData: {
     data: GQLEventSearchResultSet
   }
-  page: number
+  paginationId: number
+  pageSize: number
   onPageChange: (newPageNumber: number) => void
   showPaginated?: boolean
   loading?: boolean
@@ -62,14 +67,19 @@ interface IDispatchProps {
 type IProps = IBaseProps & IntlShapeProps & IDispatchProps
 
 function ExternalValidationTabComponent(props: IProps) {
-  const pageSize = 10
   const [sortedCol, setSortedCOl] = React.useState<COLUMNS>(COLUMNS.NAME)
   const [sortOrder, setSortOrder] = React.useState<SORT_ORDER>(
     SORT_ORDER.ASCENDING
   )
   const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth)
-  const { intl, queryData, page, onPageChange } = props
+  const { intl, queryData, paginationId, pageSize, onPageChange } = props
   const { data } = queryData
+  const totalPages = props.queryData.data.totalItems
+    ? Math.ceil(props.queryData.data.totalItems / pageSize)
+    : 0
+  const isShowPagination =
+    props.queryData.data.totalItems &&
+    props.queryData.data.totalItems > pageSize
 
   useEffect(() => {
     function recordWindowWidth() {
@@ -204,10 +214,28 @@ function ExternalValidationTabComponent(props: IProps) {
         sortOrder={sortOrder}
         sortedCol={sortedCol}
       />
-      <LoadingIndicator
-        loading={Boolean(props.loading)}
-        hasError={Boolean(props.error)}
-      />
+      {isShowPagination ? (
+        <PaginationWrapper>
+          <DesktopWrapper>
+            <PaginationModified
+              size="small"
+              initialPage={paginationId}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
+          </DesktopWrapper>
+          <MobileWrapper>
+            <PaginationModified
+              size="large"
+              initialPage={paginationId}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
+          </MobileWrapper>
+        </PaginationWrapper>
+      ) : (
+        <></>
+      )}
     </WQContentWrapper>
   )
 }

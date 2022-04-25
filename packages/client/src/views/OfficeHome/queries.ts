@@ -47,13 +47,7 @@ const allSearchFields = `
 export const REGISTRATION_HOME_QUERY = gql`
   query registrationHome(
     $locationIds: [String]
-    $count: Int
-    $inProgressCount: Int
-    $reviewCount: Int
-    $rejectCount: Int
-    $approvalCount: Int
-    $externalValidationCount: Int
-    $printCount: Int
+    $pageSize: Int
     $inProgressSkip: Int
     $reviewStatuses: [String]
     $reviewSkip: Int
@@ -66,7 +60,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       locationIds: $locationIds
       status: ["IN_PROGRESS"]
       type: ["birth-declaration", "death-declaration"]
-      count: $inProgressCount
+      count: $pageSize
       skip: $inProgressSkip
     ) {
       totalItems
@@ -78,7 +72,7 @@ export const REGISTRATION_HOME_QUERY = gql`
       locationIds: $locationIds
       status: ["IN_PROGRESS"]
       type: ["birth-notification", "death-notification"]
-      count: $count
+      count: $pageSize
       skip: $inProgressSkip
     ) {
       totalItems
@@ -89,7 +83,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     reviewTab: searchEvents(
       locationIds: $locationIds
       status: $reviewStatuses
-      count: $reviewCount
+      count: $pageSize
       skip: $reviewSkip
     ) {
       totalItems
@@ -100,7 +94,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     rejectTab: searchEvents(
       locationIds: $locationIds
       status: ["REJECTED"]
-      count: $rejectCount
+      count: $pageSize
       skip: $rejectSkip
       sortColumn: "createdAt.keyword"
       sort: "asc"
@@ -113,7 +107,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     approvalTab: searchEvents(
       locationIds: $locationIds
       status: ["VALIDATED"]
-      count: $approvalCount
+      count: $pageSize
       skip: $approvalSkip
     ) {
       totalItems
@@ -124,7 +118,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     externalValidationTab: searchEvents(
       locationIds: $locationIds
       status: ["WAITING_VALIDATION"]
-      count: $externalValidationCount
+      count: $pageSize
       skip: $externalValidationSkip
     ) {
       totalItems
@@ -135,7 +129,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     printTab: searchEvents(
       locationIds: $locationIds
       status: ["REGISTERED"]
-      count: $printCount
+      count: $pageSize
       skip: $printSkip
     ) {
       totalItems

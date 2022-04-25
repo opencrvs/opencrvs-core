@@ -187,12 +187,7 @@ export interface IWorkqueue {
 }
 
 interface IWorkqueuePaginationParams {
-  inProgressCount: number
-  reviewCount: number
-  rejectCount: number
-  approvalCount: number
-  externalValidationCount: number
-  printCount: number
+  pageSize: number
 
   inProgressSkip: number
   reviewSkip: number
@@ -380,12 +375,7 @@ interface IDownloadDeclarationFail {
 interface UpdateRegistrarWorkqueueAction {
   type: typeof UPDATE_REGISTRAR_WORKQUEUE
   payload: {
-    inProgressCount: number
-    reviewCount: number
-    rejectCount: number
-    approvalCount: number
-    externalValidationCount: number
-    printCount: number
+    pageSize: number
 
     inProgressSkip: number
     reviewSkip: number
@@ -1015,12 +1005,7 @@ async function getWorkqueueData(
       : [EVENT_STATUS.DECLARED]
 
   const {
-    inProgressCount,
-    reviewCount,
-    rejectCount,
-    approvalCount,
-    externalValidationCount,
-    printCount,
+    pageSize,
     inProgressSkip,
     reviewSkip,
     rejectSkip,
@@ -1032,12 +1017,7 @@ async function getWorkqueueData(
   const result = await syncRegistrarWorkqueue(
     registrationLocationId,
     reviewStatuses,
-    inProgressCount,
-    reviewCount,
-    rejectCount,
-    approvalCount,
-    externalValidationCount,
-    printCount,
+    pageSize,
     inProgressSkip,
     reviewSkip,
     rejectSkip,
@@ -1144,12 +1124,7 @@ export function downloadDeclaration(
 }
 
 export function updateRegistrarWorkqueue(
-  inProgressCount = 10,
-  reviewCount = 10,
-  rejectCount = 10,
-  approvalCount = 10,
-  externalValidationCount = 10,
-  printCount = 10,
+  pageSize = 10,
 
   inProgressSkip = 0,
   reviewSkip = 0,
@@ -1161,12 +1136,7 @@ export function updateRegistrarWorkqueue(
   return {
     type: UPDATE_REGISTRAR_WORKQUEUE,
     payload: {
-      inProgressCount,
-      reviewCount,
-      rejectCount,
-      approvalCount,
-      externalValidationCount,
-      printCount,
+      pageSize,
 
       inProgressSkip,
       reviewSkip,
