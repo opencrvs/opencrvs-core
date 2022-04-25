@@ -12720,21 +12720,3 @@ export const registerForms: IDefaultRegisterForms = {
     ]
   }
 }
-
-export const DEFAULT_TEXT: IFormField = {
-  name: 'customField',
-  previewGroup: '',
-  type: 'TEXT',
-  label: {
-    defaultMessage: 'Custom text input',
-    description: 'Custom field label',
-    id: 'form.customField.label.customField'
-  },
-  validate: [],
-  required: false,
-  hidden: false,
-  initialValue: '',
-  mapping: {
-    template: ['', () => {}]
-  }
-}

@@ -22,7 +22,6 @@ import {
   ICustomFieldAttribute,
   prepareNewCustomFieldConfig
 } from '@client/forms/configuration/configFields/utils'
-import { DEFAULT_TEXT } from '@client/forms/configuration/default'
 import { selectEventFormDraft } from '@client/forms/configuration/selector'
 import { buttonMessages } from '@client/i18n/messages'
 import { constantsMessages } from '@client/i18n/messages/constants'
@@ -96,6 +95,24 @@ const CanvasWrapper = styled.div`
 type IRouteProps = {
   event: Event
   section: string
+}
+
+const DEFAULT_TEXT: IFormField = {
+  name: 'customField',
+  previewGroup: '',
+  type: 'TEXT',
+  label: {
+    defaultMessage: 'Custom text input',
+    description: 'Custom field label',
+    id: 'form.customField.label.customField'
+  },
+  validate: [],
+  required: false,
+  hidden: false,
+  initialValue: '',
+  mapping: {
+    template: ['', () => {}]
+  }
 }
 
 const DEFAULT_CUSTOM_FIELD_ATTRIBUTE: ICustomFieldAttribute = {

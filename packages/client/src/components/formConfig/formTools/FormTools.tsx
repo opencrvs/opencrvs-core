@@ -10,14 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import {
-  IConfigFormField,
-  ICustomFieldAttribute
-} from '@client/forms/configuration/configFields/utils'
-import { DEFAULT_TEXT } from '@client/forms/configuration/default'
+import { NUMBER, TEL, TEXT, TEXTAREA } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import { getDefaultLanguage } from '@client/i18n/utils'
 import styled from '@client/styledComponents'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
@@ -27,7 +22,6 @@ import {
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import React from 'react'
 import { IntlShape, useIntl } from 'react-intl'
-import { NUMBER, TEL, TEXT, TEXTAREA } from '@client/forms'
 
 const TitleContainer = styled.div`
   margin-top: 24px;
