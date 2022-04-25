@@ -576,7 +576,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#action-error-ListItemAction-1'
+        '#ListItemAction-1-download-failed'
       )
 
       expect(errorIcon.hostNodes()).toHaveLength(1)
@@ -753,7 +753,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#action-error-ListItemAction-1'
+        '#ListItemAction-1-download-failed'
       )
 
       expect(errorIcon.hostNodes()).toHaveLength(1)

@@ -83,11 +83,9 @@ import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/Mobil
 import { he } from 'date-fns/locale'
 
 interface IQueryData {
-  fieldAgentData: GQLEventSearchResultSet
-  healthSystemData: GQLEventSearchResultSet
+  inProgressData: GQLEventSearchResultSet
+  notificationData: GQLEventSearchResultSet
 }
-
-type QueryDataKey = 'inProgressData' | 'notificationData'
 
 interface IBaseRegistrarHomeProps {
   theme: ITheme
@@ -537,14 +535,14 @@ export class InProgressTabComponent extends React.Component<
     intl: IntlShape,
     onPageChange: (newPageNumber: number) => void
   ) => {
-    const totalPages = this.props.queryData.fieldAgentData.totalItems
+    const totalPages = this.props.queryData.inProgressData.totalItems
       ? Math.ceil(
-          this.props.queryData.fieldAgentData.totalItems / this.props.pageSize
+          this.props.queryData.inProgressData.totalItems / this.props.pageSize
         )
       : 0
     const isShowPagination =
-      this.props.queryData.fieldAgentData.totalItems &&
-      this.props.queryData.fieldAgentData.totalItems > this.props.pageSize
+      this.props.queryData.inProgressData.totalItems &&
+      this.props.queryData.inProgressData.totalItems > this.props.pageSize
     return (
       <>
         <GridTable
@@ -587,14 +585,14 @@ export class InProgressTabComponent extends React.Component<
     intl: IntlShape,
     onPageChange: (newPageNumber: number) => void
   ) => {
-    const totalPages = this.props.queryData.healthSystemData.totalItems
+    const totalPages = this.props.queryData.notificationData.totalItems
       ? Math.ceil(
-          this.props.queryData.healthSystemData.totalItems / this.props.pageSize
+          this.props.queryData.notificationData.totalItems / this.props.pageSize
         )
       : 0
     const isShowPagination =
-      this.props.queryData.healthSystemData.totalItems &&
-      this.props.queryData.healthSystemData.totalItems > this.props.pageSize
+      this.props.queryData.notificationData.totalItems &&
+      this.props.queryData.notificationData.totalItems > this.props.pageSize
     return (
       <>
         <GridTable
@@ -635,7 +633,7 @@ export class InProgressTabComponent extends React.Component<
   render() {
     const { intl, selectorId, drafts, queryData, onPageChange, isFieldAgent } =
       this.props
-    const { fieldAgentData, healthSystemData } = queryData
+    const { inProgressData, notificationData } = queryData
     const totalPages = Math.ceil(this.props.drafts.length / this.props.pageSize)
 
     const isShowPagination = this.props.drafts.length > this.props.pageSize
@@ -650,8 +648,8 @@ export class InProgressTabComponent extends React.Component<
           this.getTabs(
             selectorId,
             drafts,
-            fieldAgentData.totalItems || 0,
-            healthSystemData.totalItems || 0
+            inProgressData.totalItems || 0,
+            notificationData.totalItems || 0
           )
         }
       >
@@ -692,10 +690,10 @@ export class InProgressTabComponent extends React.Component<
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts &&
           !isFieldAgent &&
-          this.renderFieldAgentTable(fieldAgentData, intl, onPageChange)}
+          this.renderFieldAgentTable(inProgressData, intl, onPageChange)}
         {selectorId === SELECTOR_ID.hospitalDrafts &&
           !isFieldAgent &&
-          this.renderHospitalTable(healthSystemData, intl, onPageChange)}
+          this.renderHospitalTable(notificationData, intl, onPageChange)}
       </WQContentWrapper>
     )
   }

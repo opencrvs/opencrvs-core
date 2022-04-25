@@ -71,7 +71,7 @@ export const WORKQUEUE_TABS = {
   team: 'team',
   config: 'config',
   application: 'application',
-  certificates: 'certificates',
+  certificate: 'certificate',
   settings: 'settings',
   logout: 'logout'
 }
@@ -246,7 +246,7 @@ export const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-  const configTab = [WORKQUEUE_TABS.application, WORKQUEUE_TABS.certificates]
+  const configTab = [WORKQUEUE_TABS.application, WORKQUEUE_TABS.certificate]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -577,13 +577,13 @@ export const NavigationView = (props: IFullProps) => {
                           />
                           <NavigationSubItem
                             label={intl.formatMessage(
-                              navigationMessages[WORKQUEUE_TABS.certificates]
+                              navigationMessages[WORKQUEUE_TABS.certificate]
                             )}
-                            id={`navigation_${WORKQUEUE_TABS.certificates}`}
+                            id={`navigation_${WORKQUEUE_TABS.certificate}`}
                             onClick={goToCertificateConfigAction}
                             isSelected={
                               enableMenuSelection &&
-                              activeMenuItem === WORKQUEUE_TABS.certificates
+                              activeMenuItem === WORKQUEUE_TABS.certificate
                             }
                           />
                         </>
@@ -629,8 +629,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.application
       : window.location.href.includes(WORKQUEUE_TABS.settings)
       ? WORKQUEUE_TABS.settings
-      : window.location.href.includes(WORKQUEUE_TABS.certificates)
-      ? WORKQUEUE_TABS.certificates
+      : window.location.href.includes(WORKQUEUE_TABS.certificate)
+      ? WORKQUEUE_TABS.certificate
       : ''
   }
 }

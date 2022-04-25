@@ -723,7 +723,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#action-error-ListItemAction-1'
+        '#ListItemAction-1-download-failed'
       )
 
       expect(errorIcon.hostNodes()).toHaveLength(1)

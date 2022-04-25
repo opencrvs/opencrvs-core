@@ -25,7 +25,7 @@ interface INavigationMessages
   performance: MessageDescriptor
   team: MessageDescriptor
   config: MessageDescriptor
-  certificates: MessageDescriptor //'Certificates',pplication',
+  certificate: MessageDescriptor //'Certificates',pplication',
 }
 
 const messagesToDefine: INavigationMessages = {
@@ -89,10 +89,10 @@ const messagesToDefine: INavigationMessages = {
     description: 'Config label in navigation',
     id: 'navigation.config'
   },
-  certificates: {
-    defaultMessage: 'Certificates',
+  certificate: {
+    defaultMessage: 'Certificate',
     description: 'Certificates label in navigation',
-    id: 'navigation.certificates'
+    id: 'navigation.certificate'
   }
 }
 

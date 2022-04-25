@@ -76,13 +76,16 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 
     props.downloadDeclaration(downloadableDeclaration, props.client)
   }
-
   if (
     status === DOWNLOAD_STATUS.READY_TO_DOWNLOAD ||
     status === DOWNLOAD_STATUS.DOWNLOADING
   ) {
     return (
-      <StatusIndicator isLoading={true} className={className}>
+      <StatusIndicator
+        isLoading={true}
+        className={className}
+        id={`${id}-download-loading`}
+      >
         <Spinner id={`action-loading-${id}`} size={24} />
       </StatusIndicator>
     )
@@ -93,7 +96,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     status === DOWNLOAD_STATUS.FAILED_NETWORK
   ) {
     return (
-      <StatusIndicator className={className}>
+      <StatusIndicator className={className} id={`${id}-download-failed`}>
         <DownloadAction
           id={`${id}-icon`}
           onClick={(e) => {

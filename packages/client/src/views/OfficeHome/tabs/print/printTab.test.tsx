@@ -697,7 +697,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#action-error-ListItemAction-0'
+        '#ListItemAction-0-download-failed'
       )
 
       expect(errorIcon.hostNodes()).toHaveLength(1)

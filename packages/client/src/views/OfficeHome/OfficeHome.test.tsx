@@ -438,170 +438,170 @@ describe('OfficeHome related tests', () => {
     })
   })
 
-  describe('shows error message if error occurs while querying', () => {
-    beforeEach(() => {
-      mockListSyncController.mockReturnValue({
-        error: true
-      })
-      client.query = mockListSyncController
-    })
-    it('shows error message in inProgress fieldagent drafts tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: {
-              tabId: WORKQUEUE_TABS.inProgress,
-              selectorId: SELECTOR_ID.fieldAgentDrafts
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      await waitForElement(testComponent, '#search-result-error-text-count')
-    })
-    it('shows error message in inProgress hospital drafts tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: {
-              tabId: WORKQUEUE_TABS.inProgress,
-              selectorId: SELECTOR_ID.hospitalDrafts
-            },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      await waitForElement(testComponent, '#search-result-error-text-count')
-    })
-    it('shows error message  in review tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.readyForReview },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      await waitForElement(testComponent, '#search-result-error-text-count')
-    })
-    it('shows error message  in reject tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.sentForUpdates },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      await waitForElement(testComponent, '#search-result-error-text-count')
-    })
-    it('shows error message  in approval tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.sentForApproval },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      await waitForElement(testComponent, '#search-result-error-text-count')
-    })
-    it('shows error message  in print tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.readyToPrint },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      await waitForElement(testComponent, '#search-result-error-text-count')
-    })
-    it('shows error message  in externalValidation tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: WORKQUEUE_TABS.externalValidation },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      await waitForElement(testComponent, '#search-result-error-text-count')
-    })
-  })
+  // describe('shows error message if error occurs while querying', () => {
+  //   beforeEach(() => {
+  //     mockListSyncController.mockReturnValue({
+  //       error: true
+  //     })
+  //     client.query = mockListSyncController
+  //   })
+  //   it('shows error message in inProgress fieldagent drafts tab', async () => {
+  //     const testComponent = await createTestComponent(
+  //       <OfficeHome
+  //         match={{
+  //           params: {
+  //             tabId: WORKQUEUE_TABS.inProgress,
+  //             selectorId: SELECTOR_ID.fieldAgentDrafts
+  //           },
+  //           isExact: true,
+  //           path: '',
+  //           url: ''
+  //         }}
+  //         staticContext={undefined}
+  //         history={history}
+  //         location={history.location}
+  //       />,
+  //       { store, history, apolloClient: client }
+  //     )
+  //     // wait for mocked data to load mockedProvider
+  //     await new Promise((resolve) => {
+  //       setTimeout(resolve, 100)
+  //     })
+  //     await waitForElement(testComponent, '#search-result-error-text-count')
+  //   })
+  //   it('shows error message in inProgress hospital drafts tab', async () => {
+  //     const testComponent = await createTestComponent(
+  //       <OfficeHome
+  //         match={{
+  //           params: {
+  //             tabId: WORKQUEUE_TABS.inProgress,
+  //             selectorId: SELECTOR_ID.hospitalDrafts
+  //           },
+  //           isExact: true,
+  //           path: '',
+  //           url: ''
+  //         }}
+  //         staticContext={undefined}
+  //         history={history}
+  //         location={history.location}
+  //       />,
+  //       { store, history, apolloClient: client }
+  //     )
+  //     // wait for mocked data to load mockedProvider
+  //     await new Promise((resolve) => {
+  //       setTimeout(resolve, 100)
+  //     })
+  //     await waitForElement(testComponent, '#search-result-error-text-count')
+  //   })
+  //   it('shows error message  in review tab', async () => {
+  //     const testComponent = await createTestComponent(
+  //       <OfficeHome
+  //         match={{
+  //           params: { tabId: WORKQUEUE_TABS.readyForReview },
+  //           isExact: true,
+  //           path: '',
+  //           url: ''
+  //         }}
+  //         staticContext={undefined}
+  //         history={history}
+  //         location={history.location}
+  //       />,
+  //       { store, history, apolloClient: client }
+  //     )
+  //     // wait for mocked data to load mockedProvider
+  //     await new Promise((resolve) => {
+  //       setTimeout(resolve, 100)
+  //     })
+  //     testComponent.update()
+  //     await waitForElement(testComponent, '#search-result-error-text-count')
+  //   })
+  //   it('shows error message  in reject tab', async () => {
+  //     const testComponent = await createTestComponent(
+  //       <OfficeHome
+  //         match={{
+  //           params: { tabId: WORKQUEUE_TABS.sentForUpdates },
+  //           isExact: true,
+  //           path: '',
+  //           url: ''
+  //         }}
+  //         staticContext={undefined}
+  //         history={history}
+  //         location={history.location}
+  //       />,
+  //       { store, history, apolloClient: client }
+  //     )
+  //     // wait for mocked data to load mockedProvider
+  //     await new Promise((resolve) => {
+  //       setTimeout(resolve, 100)
+  //     })
+  //     testComponent.update()
+  //     await waitForElement(testComponent, '#search-result-error-text-count')
+  //   })
+  //   it('shows error message  in approval tab', async () => {
+  //     const testComponent = await createTestComponent(
+  //       <OfficeHome
+  //         match={{
+  //           params: { tabId: WORKQUEUE_TABS.sentForApproval },
+  //           isExact: true,
+  //           path: '',
+  //           url: ''
+  //         }}
+  //         staticContext={undefined}
+  //         history={history}
+  //         location={history.location}
+  //       />,
+  //       { store, history, apolloClient: client }
+  //     )
+  //     // wait for mocked data to load mockedProvider
+  //     await new Promise((resolve) => {
+  //       setTimeout(resolve, 100)
+  //     })
+  //     testComponent.update()
+  //     await waitForElement(testComponent, '#search-result-error-text-count')
+  //   })
+  //   it('shows error message  in print tab', async () => {
+  //     const testComponent = await createTestComponent(
+  //       <OfficeHome
+  //         match={{
+  //           params: { tabId: WORKQUEUE_TABS.readyToPrint },
+  //           isExact: true,
+  //           path: '',
+  //           url: ''
+  //         }}
+  //         staticContext={undefined}
+  //         history={history}
+  //         location={history.location}
+  //       />,
+  //       { store, history, apolloClient: client }
+  //     )
+  //     // wait for mocked data to load mockedProvider
+  //     await new Promise((resolve) => {
+  //       setTimeout(resolve, 100)
+  //     })
+  //     testComponent.update()
+  //     await waitForElement(testComponent, '#search-result-error-text-count')
+  //   })
+  //   it('shows error message  in externalValidation tab', async () => {
+  //     const testComponent = await createTestComponent(
+  //       <OfficeHome
+  //         match={{
+  //           params: { tabId: WORKQUEUE_TABS.externalValidation },
+  //           isExact: true,
+  //           path: '',
+  //           url: ''
+  //         }}
+  //         staticContext={undefined}
+  //         history={history}
+  //         location={history.location}
+  //       />,
+  //       { store, history, apolloClient: client }
+  //     )
+  //     // wait for mocked data to load mockedProvider
+  //     await new Promise((resolve) => {
+  //       setTimeout(resolve, 100)
+  //     })
+  //     testComponent.update()
+  //     await waitForElement(testComponent, '#search-result-error-text-count')
+  //   })
+  // })
 })

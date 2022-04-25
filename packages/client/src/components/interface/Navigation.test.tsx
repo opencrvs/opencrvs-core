@@ -110,7 +110,7 @@ describe('Navigation for national system admin related tests', () => {
     testComponent.find('#navigation_config_main').hostNodes().simulate('click')
     testComponent.update()
     expect(testComponent.exists('#navigation_application')).toBeTruthy()
-    expect(testComponent.exists('#navigation_certificates')).toBeTruthy()
+    expect(testComponent.exists('#navigation_certificate')).toBeTruthy()
   })
 
   it('No application related tabs', async () => {

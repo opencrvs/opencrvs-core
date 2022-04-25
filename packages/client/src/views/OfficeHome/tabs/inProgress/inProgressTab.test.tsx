@@ -94,13 +94,23 @@ describe('In Progress tab', () => {
       }
     ]
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <InProgressTab
         drafts={localDrafts}
+        selectorId={SELECTOR_ID.ownDrafts}
+        isFieldAgent={false}
         queryData={{
           inProgressData: {},
           notificationData: {}
         }}
+        paginationId={{
+          draftId: 1,
+          fieldAgentId: 1,
+          healthSystemId: 1
+        }}
+        pageSize={10}
+        onPageChange={(pageId: number) => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -153,14 +163,21 @@ describe('In Progress tab', () => {
     ]
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <InProgressTab
         drafts={localDrafts}
-        selectorId={'you'}
+        selectorId={SELECTOR_ID.ownDrafts}
         queryData={{
           inProgressData: { totalItems: 5 },
           notificationData: { totalItems: 3 }
         }}
+        isFieldAgent={false}
+        paginationId={{
+          draftId: 1,
+          fieldAgentId: 1,
+          healthSystemId: 1
+        }}
+        pageSize={10}
+        onPageChange={(pageId: number) => {}}
       />,
       { store, history }
     )
@@ -248,7 +265,6 @@ describe('In Progress tab', () => {
       ]
       // @ts-ignore
       const testComponent = await createTestComponent(
-        // @ts-ignore
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
@@ -256,6 +272,14 @@ describe('In Progress tab', () => {
             inProgressData: {},
             notificationData: {}
           }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
         />,
         { store, history }
       )
@@ -346,7 +370,6 @@ describe('In Progress tab', () => {
       // @ts-ignore
       store.dispatch(storeDeclaration(drafts))
       const testComponent = await createTestComponent(
-        // @ts-ignore
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
@@ -354,6 +377,14 @@ describe('In Progress tab', () => {
             inProgressData: {},
             notificationData: {}
           }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
         />,
         { store, history }
       )
@@ -387,7 +418,6 @@ describe('In Progress tab', () => {
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.BIRTH))
       const testComponent = await createTestComponent(
-        // @ts-ignore
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
@@ -449,6 +479,14 @@ describe('In Progress tab', () => {
             },
             notificationData: {}
           }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
         />,
         { store, history }
       )
@@ -473,7 +511,6 @@ describe('In Progress tab', () => {
       drafts.push(createDeclaration(Event.BIRTH))
       // @ts-ignore
       const testComponent = await createTestComponent(
-        // @ts-ignore
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
@@ -540,6 +577,14 @@ describe('In Progress tab', () => {
               ]
             }
           }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
         />,
         { store, history }
       )
@@ -588,7 +633,15 @@ describe('In Progress tab', () => {
             ]
           },
           notificationData: {}
-        }
+        },
+        isFieldAgent: false,
+        paginationId: {
+          draftId: 1,
+          fieldAgentId: 1,
+          healthSystemId: 1
+        },
+        pageSize: 10,
+        onPageChange: (pageId: number) => {}
       }
       it('renders download button when not downloaded', async () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
@@ -599,7 +652,6 @@ describe('In Progress tab', () => {
         downloadableDeclaration.downloadStatus = undefined
         store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
-          // @ts-ignore
           <InProgressTab {...inprogressProps} />,
           { store, history }
         )
@@ -617,7 +669,6 @@ describe('In Progress tab', () => {
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
         store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
-          // @ts-ignore
           <InProgressTab {...inprogressProps} />,
           { store, history }
         )
@@ -635,7 +686,6 @@ describe('In Progress tab', () => {
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
         store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
-          // @ts-ignore
           <InProgressTab {...inprogressProps} />,
           { store, history }
         )
@@ -671,13 +721,11 @@ describe('In Progress tab', () => {
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
         store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
-          // @ts-ignore
           <InProgressTab {...inprogressProps} />,
           { store, history }
         )
-
         expect(
-          testComponent.find('#action-error-ListItemAction-0').hostNodes()
+          testComponent.find('#ListItemAction-0-download-failed').hostNodes()
         ).toHaveLength(1)
       })
     })
@@ -689,7 +737,6 @@ describe('In Progress tab', () => {
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.BIRTH))
       const testComponent = await createTestComponent(
-        // @ts-ignore
         <InProgressTab
           drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
@@ -731,6 +778,14 @@ describe('In Progress tab', () => {
             },
             inProgressData: {}
           }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
         />,
         { store, history }
       )
@@ -773,7 +828,6 @@ describe('Tablet tests', () => {
 
     // @ts-ignore
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <InProgressTab
         drafts={drafts}
         selectorId={SELECTOR_ID.fieldAgentDrafts}
@@ -800,6 +854,14 @@ describe('Tablet tests', () => {
           },
           notificationData: {}
         }}
+        isFieldAgent={false}
+        paginationId={{
+          draftId: 1,
+          fieldAgentId: 1,
+          healthSystemId: 1
+        }}
+        pageSize={10}
+        onPageChange={(pageId: number) => {}}
       />,
       { store, history }
     )

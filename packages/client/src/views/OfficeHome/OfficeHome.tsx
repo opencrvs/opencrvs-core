@@ -170,7 +170,7 @@ export class OfficeHomeView extends React.Component<
   IOfficeHomeProps,
   IOfficeHomeState
 > {
-  pageSize = 2
+  pageSize = 10
   showPaginated = false
   interval: any = undefined
   role = this.props.userDetails && this.props.userDetails.role
@@ -394,8 +394,8 @@ export class OfficeHomeView extends React.Component<
               selectorId={selectorId}
               isFieldAgent={this.isFieldAgent}
               queryData={{
-                fieldAgentData: filteredData.inProgressTab,
-                healthSystemData: filteredData.notificationTab
+                inProgressData: filteredData.inProgressTab,
+                notificationData: filteredData.notificationTab
               }}
               paginationId={{
                 draftId: draftCurrentPage,
@@ -486,9 +486,8 @@ export class OfficeHomeView extends React.Component<
               {tabId === WORKQUEUE_TABS.requiresUpdate && (
                 <RequiresUpdate
                   userDetails={this.props.userDetails}
-                  showPaginated={this.showPaginated}
                   pageSize={this.pageSize}
-                  requireUpdatesPage={requireUpdatePage}
+                  paginationId={requireUpdatePage}
                   onPageChange={this.onPageChange}
                 />
               )}

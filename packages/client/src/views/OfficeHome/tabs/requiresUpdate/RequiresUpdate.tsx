@@ -62,12 +62,15 @@ import {
 } from '@client/views/OfficeHome/tabs/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
 import { SUBMISSION_STATUS } from '@client/declarations'
+import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
+import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
 
 interface IProps {
   userDetails: IUserDetails | null
-  showPaginated: boolean
   pageSize: number
-  requireUpdatesPage: number
+  paginationId: number
   theme: ITheme
   onPageChange: (newPageNumber: number) => void
 }
@@ -232,15 +235,8 @@ const getRejectedColumns = (
 }
 
 const RequiresUpdateComponent = (props: IFullProps) => {
-  const {
-    userDetails,
-    showPaginated,
-    pageSize,
-    requireUpdatesPage,
-    onPageChange,
-    intl,
-    theme
-  } = props
+  const { userDetails, pageSize, onPageChange, paginationId, intl, theme } =
+    props
   const width = useWindowWidth()
   const [sortedCol, setSortedCol] = React.useState(COLUMNS.NAME)
   const [sortOrder, setSortOrder] = React.useState(SORT_ORDER.ASCENDING)
@@ -267,8 +263,8 @@ const RequiresUpdateComponent = (props: IFullProps) => {
           userId: userDetails!.practitionerId,
           status: [EVENT_STATUS.REJECTED],
           locationIds: (userDetails && getUserLocation(userDetails).id) || '',
-          count: showPaginated ? pageSize : pageSize * requireUpdatesPage,
-          skip: showPaginated ? (requireUpdatesPage - 1) * pageSize : 0
+          count: pageSize,
+          skip: (paginationId - 1) * pageSize
         }}
       >
         {({
@@ -322,7 +318,39 @@ const RequiresUpdateComponent = (props: IFullProps) => {
                 sortedCol={sortedCol}
                 sortOrder={sortOrder}
               />
-              <LoadingIndicator loading={loading} hasError={error} />
+              {data?.searchEvents?.totalItems &&
+              data?.searchEvents?.totalItems > pageSize ? (
+                <PaginationWrapper>
+                  <DesktopWrapper>
+                    <PaginationModified
+                      size="small"
+                      initialPage={paginationId}
+                      totalPages={
+                        Math.ceil(
+                          data?.searchEvents?.totalItems &&
+                            data?.searchEvents?.totalItems / pageSize
+                        ) || 0
+                      }
+                      onPageChange={onPageChange}
+                    />
+                  </DesktopWrapper>
+                  <MobileWrapper>
+                    <PaginationModified
+                      size="large"
+                      initialPage={paginationId}
+                      totalPages={
+                        Math.ceil(
+                          data?.searchEvents?.totalItems &&
+                            data?.searchEvents?.totalItems / pageSize
+                        ) || 0
+                      }
+                      onPageChange={onPageChange}
+                    />
+                  </MobileWrapper>
+                </PaginationWrapper>
+              ) : (
+                <></>
+              )}
             </>
           )
         }}
