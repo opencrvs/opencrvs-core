@@ -19,7 +19,10 @@ import { IStoreState } from '@client/store'
 import { Event, DeathSection, BirthSection } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
-import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
+import {
+  generateKeyFromObj,
+  IConfigFormField
+} from '@client/forms/configuration/configFields/utils'
 import { RemoveCustomField } from '@client/forms/configuration/configFields/actions'
 
 const CanvasBox = styled(Box)`
@@ -87,6 +90,7 @@ export function Canvas({
           }}
         >
           <FormFieldGenerator
+            key={generateKeyFromObj(configField.customizedFieldAttributes)}
             id={configField.fieldId}
             onChange={() => {}}
             fields={[configField.definition]}

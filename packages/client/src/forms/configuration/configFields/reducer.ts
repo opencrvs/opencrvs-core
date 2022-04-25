@@ -21,7 +21,11 @@ import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { APPLICATION_CONFIG_LOADED } from '@client/offline/actions'
 import { storage } from '@client/storage'
 import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
-import { getEventSectionFieldsMap, ISectionFieldMap } from './utils'
+import {
+  getEventSectionFieldsMap,
+  getEventSectionGroupFromFieldID,
+  ISectionFieldMap
+} from './utils'
 
 export interface IEventTypes {
   birth: ISectionFieldMap
@@ -147,6 +151,35 @@ export const configFieldsReducer: LoopReducer<
           }
         }
       }
+    case actions.MODIFY_CUSTOM_FIELD: {
+      const { event, section } = getEventSectionGroupFromFieldID(
+        action.payload.originalField.fieldId
+      )
+      const eventName = event as keyof IEventTypes
+
+      delete (state as IEventTypes)[eventName][section][
+        action.payload.originalField.fieldId
+      ]
+      ;(state as IEventTypes)[eventName][section][
+        action.payload.modifiedField.fieldId
+      ] = action.payload.modifiedField
+
+      // Adjusting precedingFieldId & foregoingFieldId
+      if (action.payload.modifiedField.precedingFieldId) {
+        ;(state as IEventTypes)[eventName][section][
+          action.payload.modifiedField.precedingFieldId
+        ].foregoingFieldId = action.payload.modifiedField.fieldId
+      }
+
+      if (action.payload.modifiedField.foregoingFieldId)
+        (state as IEventTypes)[eventName][section][
+          action.payload.modifiedField.foregoingFieldId
+        ].precedingFieldId = action.payload.modifiedField.fieldId
+
+      return {
+        ...state
+      }
+    }
     case actions.REMOVE_CUSTOM_FIELD:
       const { selectedField } = action.payload
       const [selectedFieldEvent, selectedFieldSection] =

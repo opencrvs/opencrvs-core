@@ -12728,7 +12728,7 @@ export const DEFAULT_TEXT: IFormField = {
   label: {
     defaultMessage: 'Custom text input',
     description: 'Custom field label',
-    id: 'form.field.label.customField'
+    id: 'form.customField.label.customField'
   },
   validate: [],
   required: false,

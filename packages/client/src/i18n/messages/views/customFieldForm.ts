@@ -23,6 +23,7 @@ interface ICustomFieldFormMessages
   tooltipLabel: MessageDescriptor
   errorMessage: MessageDescriptor
   maxLengthLabel: MessageDescriptor
+  duplicateField: MessageDescriptor
 }
 
 const messagesToDefine: ICustomFieldFormMessages = {
@@ -75,6 +76,12 @@ const messagesToDefine: ICustomFieldFormMessages = {
     id: 'custom.field.form.maxLength',
     defaultMessage: 'Max length',
     description: 'Heading of Custom FieldForm'
+  },
+  duplicateField: {
+    id: 'custom.field.form.duplicateField',
+    defaultMessage:
+      'Sorry that certificate handlebar already exists. Please change the English label.',
+    description: 'Duplicate field error message'
   }
 }
 

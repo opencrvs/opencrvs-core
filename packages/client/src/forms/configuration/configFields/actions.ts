@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { IFormField } from '@client/forms'
 import { ApplicationConfigLoadedAction } from '@client/offline/actions'
 import { IConfigFieldsState } from './reducer'
 import { IConfigFormField } from './utils'
@@ -102,6 +103,25 @@ export const AddCustomField = (
   }
 })
 
+export const MODIFY_CUSTOM_FIELD = 'FORM/MODIFY_CUSTOM_FIELD'
+export type ModifyCustomFieldAction = {
+  type: typeof MODIFY_CUSTOM_FIELD
+  payload: {
+    originalField: IConfigFormField
+    modifiedField: IConfigFormField
+  }
+}
+export const ModifyCustomField = (
+  originalField: IConfigFormField,
+  modifiedField: IConfigFormField
+): ModifyCustomFieldAction => ({
+  type: MODIFY_CUSTOM_FIELD,
+  payload: {
+    originalField,
+    modifiedField
+  }
+})
+
 export const REMOVE_CUSTOM_FIELD = 'FORM/REMOVE_CUSTOM_FIELD'
 export type RemoveCustomFieldAction = {
   type: typeof REMOVE_CUSTOM_FIELD
@@ -125,4 +145,5 @@ export type ConfigFieldsActions =
   | GetStorageConfigFieldsSuccessAction
   | GetStorageConfigFieldsFailedAction
   | AddCustomFieldAction
+  | ModifyCustomFieldAction
   | RemoveCustomFieldAction

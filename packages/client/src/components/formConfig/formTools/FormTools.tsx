@@ -61,7 +61,7 @@ const customField: IConfigFormField = {
   precedingFieldId: null,
   foregoingFieldId: null,
   required: false,
-  enabled: '',
+  enabled: 'enabled',
   custom: true,
   customizedFieldAttributes: DEFAULT_CUSTOM_FIELD_ATTRIBUTE,
   definition: {

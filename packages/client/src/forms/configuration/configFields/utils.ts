@@ -15,7 +15,14 @@ import { IConfigFieldsState, IEventTypes } from './reducer'
 import { camelCase, keys } from 'lodash'
 import { getDefaultLanguage } from '@client/i18n/utils'
 
-const CUSTOM_FIELD_ID = 'custom-field'
+const CUSTOM_FIELD_LABEL = 'Custom Field'
+export const CUSTOM_GROUP_NAME = 'custom-view-group'
+
+export type EventSectionGroup = {
+  event: string
+  section: string
+  group: string
+}
 
 export interface ICustomFieldAttribute {
   label: IMessage[]
@@ -98,16 +105,28 @@ function determineNextFieldIdNumber(
   event: keyof IEventTypes,
   section: string
 ): number {
+  const partialHandleBar = camelCase(CUSTOM_FIELD_LABEL)
   const customFieldNumber = keys(state[event][section])
-    .filter((item) => item.includes(CUSTOM_FIELD_ID))
+    .filter((item) => item.includes(partialHandleBar))
     .map((item) => {
       const elemNumber = item.replace(
-        `${event}.${section}.${CUSTOM_FIELD_ID}-`,
+        `${event}.${section}.${CUSTOM_GROUP_NAME}.${partialHandleBar}`,
         ''
       )
       return parseInt(elemNumber)
     })
   return customFieldNumber.length ? Math.max(...customFieldNumber) + 1 : 1
+}
+
+export function generateKeyFromObj(obj: any) {
+  return btoa(JSON.stringify(obj))
+}
+
+export function getEventSectionGroupFromFieldID(
+  fieldID: string
+): EventSectionGroup {
+  const [event, section, group] = fieldID.split('.')
+  return { event, section, group }
 }
 
 export function prepareNewCustomFieldConfig(
@@ -117,12 +136,12 @@ export function prepareNewCustomFieldConfig(
   customField: IConfigFormField
 ): IConfigFormField | undefined {
   const customFieldNumber = determineNextFieldIdNumber(state, event, section)
-  const customFieldIndex = `${event}.${section}.${CUSTOM_FIELD_ID}-${customFieldNumber}`
-  const defaultMessage = `Custom text input ${customFieldNumber}`
+  const defaultMessage = `${CUSTOM_FIELD_LABEL} ${customFieldNumber}`
+  const handlebars = camelCase(defaultMessage)
+  const customFieldIndex = `${event}.${section}.${CUSTOM_GROUP_NAME}.${handlebars}`
   const defaultLanguage = getDefaultLanguage()
   const defaultLabel = {
     id: `${customField.definition.label.id}${customFieldNumber}`,
-    description: defaultMessage,
     defaultMessage
   }
   let customFieldConfig

@@ -10,8 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IMessage } from '@client/forms'
+import { ModifyCustomField } from '@client/forms/configuration/configFields/actions'
+import { IEventTypes } from '@client/forms/configuration/configFields/reducer'
 import {
+  CUSTOM_GROUP_NAME,
   getCertificateHandlebar,
+  getEventSectionGroupFromFieldID,
   IConfigFormField
 } from '@client/forms/configuration/configFields/utils'
 import { buttonMessages } from '@client/i18n/messages'
@@ -28,11 +32,12 @@ import {
   TextArea,
   TextInput
 } from '@opencrvs/components/lib/forms'
+import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { Tooltip } from '@opencrvs/components/lib/icons'
 import { Box } from '@opencrvs/components/lib/interface'
 import { camelCase } from 'lodash'
 import * as React from 'react'
-import { injectIntl, IntlShape, MessageDescriptor } from 'react-intl'
+import { injectIntl, IntlShape } from 'react-intl'
 import { connect } from 'react-redux'
 
 const CustomFieldFormContainer = styled(Box)`
@@ -105,9 +110,16 @@ const ListColumn = styled.div`
   gap: 4px;
 `
 
+const CErrorText = styled(ErrorText)`
+  width: 200px;
+`
+
 type IFullProps = {
   intl: IntlShape
   selectedField: IConfigFormField
+  configFields: IEventTypes
+} & {
+  ModifyCustomField: typeof ModifyCustomField
 }
 
 interface ICustomField {
@@ -116,26 +128,27 @@ interface ICustomField {
   description: string
   tooltip: string
   errorMessage: string
-  maxLength: number | undefined
 }
 
-interface ICustomFieldForms {
+interface ICustomFieldState {
+  isFieldDuplicate: boolean
   selectedLanguage: string
   handleBars: string
-  hideField: boolean
+  hideField: string
   requiredField: boolean
+  maxLength: number | undefined
   fieldForms: {
     [key: string]: ICustomField
   }
 }
 
 const DEFAULTS = {
-  HANDLEBARS: 'Custom Text Field'
+  DISABLED: 'disabled'
 }
 
 class CustomFieldFormsComp extends React.Component<
   IFullProps,
-  ICustomFieldForms
+  ICustomFieldState
 > {
   constructor(props: IFullProps) {
     super(props)
@@ -170,18 +183,19 @@ class CustomFieldFormsComp extends React.Component<
         errorMessage: this._getIntlMessage(
           selectedField.customizedFieldAttributes?.errorMessage,
           lang
-        ),
-        maxLength: selectedField.customizedFieldAttributes?.maxLength
+        )
       }
     })
 
     this.state = {
+      isFieldDuplicate: false,
       handleBars:
         getCertificateHandlebar(selectedField) ||
         camelCase(fieldForms[defaultLanguage].label),
       selectedLanguage: defaultLanguage,
-      hideField: selectedField.definition.hidden || false,
-      requiredField: selectedField.definition.required || false,
+      hideField: selectedField.enabled,
+      requiredField: selectedField.required || false,
+      maxLength: selectedField.customizedFieldAttributes?.maxLength,
       fieldForms
     }
   }
@@ -214,6 +228,129 @@ class CustomFieldFormsComp extends React.Component<
       if (Boolean(this.state.fieldForms[lang].label) === false) return false
     }
     return true
+  }
+
+  _prepareCustomizedFieldAttributes(modifiedFormField: IConfigFormField) {
+    const languages = this._getLanguages()
+
+    if (modifiedFormField.customizedFieldAttributes === undefined) {
+      modifiedFormField.customizedFieldAttributes = {
+        label: []
+      }
+    }
+
+    modifiedFormField.customizedFieldAttributes.label = Object.keys(
+      languages
+    ).map((lang) => ({
+      lang,
+      descriptor: {
+        ...modifiedFormField.definition.label,
+        defaultMessage: this.state.fieldForms[lang].label
+      }
+    }))
+
+    modifiedFormField.customizedFieldAttributes.placeholder = Object.keys(
+      languages
+    ).map((lang) => ({
+      lang,
+      descriptor: {
+        ...modifiedFormField.definition.placeholder,
+        defaultMessage: this.state.fieldForms[lang].placeholder || ' '
+      }
+    }))
+
+    modifiedFormField.customizedFieldAttributes.description = Object.keys(
+      languages
+    ).map((lang) => ({
+      lang,
+      descriptor: {
+        ...modifiedFormField.definition.description,
+        defaultMessage: this.state.fieldForms[lang].description || ' '
+      }
+    }))
+
+    modifiedFormField.customizedFieldAttributes.tooltip = Object.keys(
+      languages
+    ).map((lang) => ({
+      lang,
+      descriptor: {
+        ...modifiedFormField.definition.tooltip,
+        defaultMessage: this.state.fieldForms[lang].tooltip || ' '
+      }
+    }))
+
+    modifiedFormField.customizedFieldAttributes.errorMessage = Object.keys(
+      languages
+    ).map((lang) => ({
+      lang,
+      descriptor: {
+        id: `form.customField.errorMessage.${getCertificateHandlebar(
+          modifiedFormField
+        )}`,
+        description: 'Custom field attribute',
+        defaultMessage: this.state.fieldForms[lang].errorMessage || ' '
+      }
+    }))
+
+    modifiedFormField.customizedFieldAttributes.maxLength = this.state.maxLength
+    return { ...modifiedFormField }
+  }
+
+  _prepareModifiedFormField(): IConfigFormField {
+    const { selectedField } = this.props
+    const { event, section } = getEventSectionGroupFromFieldID(
+      selectedField.fieldId
+    )
+    const { fieldForms, handleBars } = this.state
+    const dl = getDefaultLanguage()
+
+    const newFieldID = `${event}.${section}.${CUSTOM_GROUP_NAME}.${handleBars}`
+
+    const modifiedField = { ...selectedField }
+    modifiedField.required = this.state.requiredField
+    modifiedField.enabled = this.state.hideField
+    modifiedField.fieldId = newFieldID
+    modifiedField.definition.name = newFieldID
+    modifiedField.definition.label.defaultMessage = fieldForms[dl].label
+
+    modifiedField.definition.placeholder = {
+      id: `form.customField.placeholder.${handleBars}`,
+      description: 'Custom field attribute',
+      defaultMessage: fieldForms[dl].placeholder || ' '
+    }
+
+    modifiedField.definition.description = {
+      id: `form.customField.description.${handleBars}`,
+      description: 'Custom field attribute',
+      defaultMessage: fieldForms[dl].description || ' '
+    }
+
+    modifiedField.definition.tooltip = {
+      id: `form.customField.tooltip.${handleBars}`,
+      description: 'Custom field attribute',
+      defaultMessage: fieldForms[dl].tooltip || ' '
+    }
+
+    if (modifiedField.definition.mapping?.template?.length !== undefined) {
+      modifiedField.definition.mapping.template[0] = handleBars
+    }
+
+    return this._prepareCustomizedFieldAttributes(modifiedField)
+  }
+
+  _isFieldNameDuplicate(modifiedField: IConfigFormField): boolean {
+    const { configFields, selectedField } = this.props
+    const { event, section } = getEventSectionGroupFromFieldID(
+      selectedField.fieldId
+    )
+
+    if (selectedField.fieldId === modifiedField.fieldId) {
+      return false
+    }
+
+    return (
+      modifiedField.fieldId in configFields[event as keyof IEventTypes][section]
+    )
   }
 
   getLanguageDropDown() {
@@ -255,9 +392,14 @@ class CustomFieldFormsComp extends React.Component<
           <ListColumn>
             <RightAlignment>
               <Toggle
-                selected={this.state.hideField}
+                selected={this.state.hideField !== DEFAULTS.DISABLED}
                 onChange={() =>
-                  this.setState({ hideField: !this.state.hideField })
+                  this.setState({
+                    hideField:
+                      this.state.hideField === DEFAULTS.DISABLED
+                        ? ''
+                        : DEFAULTS.DISABLED
+                  })
                 }
               />
             </RightAlignment>
@@ -284,7 +426,7 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   inputFields() {
-    const { intl, selectedField } = this.props
+    const { intl, selectedField, ModifyCustomField } = this.props
     const languages = this._getLanguages()
     const defaultLanguage = getDefaultLanguage()
 
@@ -372,7 +514,8 @@ class CustomFieldFormsComp extends React.Component<
                     {...{
                       onChange: (event: any) => {
                         this._setValue('description', event.target.value)
-                      }
+                      },
+                      value: this.state.fieldForms[language].description
                     }}
                   />
                 </InputField>
@@ -420,7 +563,8 @@ class CustomFieldFormsComp extends React.Component<
                     {...{
                       onChange: (event: any) => {
                         this._setValue('errorMessage', event.target.value)
-                      }
+                      },
+                      value: this.state.fieldForms[language].errorMessage
                     }}
                   />
                 </InputField>
@@ -441,9 +585,11 @@ class CustomFieldFormsComp extends React.Component<
                   touched={false}
                 >
                   <TextInput
-                    value={this.state.fieldForms[language].maxLength}
+                    value={this.state.maxLength}
                     onChange={(event: any) =>
-                      this._setValue('maxLength', event.target.value)
+                      this.setState({
+                        maxLength: event.target.value
+                      })
                     }
                   />
                 </InputField>
@@ -455,7 +601,16 @@ class CustomFieldFormsComp extends React.Component<
           <ListRow>
             <ListColumn>
               <CPrimaryButton
-                onClick={() => {}}
+                onClick={() => {
+                  const modifiedField = this._prepareModifiedFormField()
+                  if (this._isFieldNameDuplicate(modifiedField)) {
+                    this.setState({
+                      isFieldDuplicate: true
+                    })
+                    return
+                  }
+                  ModifyCustomField(selectedField, modifiedField)
+                }}
                 disabled={!this._isFormValid()}
               >
                 {intl.formatMessage(buttonMessages.save)}
@@ -470,33 +625,43 @@ class CustomFieldFormsComp extends React.Component<
   certificate() {
     const { intl } = this.props
     return (
-      <>
+      <FieldContainer>
         <H4>
           {intl.formatMessage(customFieldFormMessages.handleBardHeading)}
           <StyledTooltip />
         </H4>
         <GreyText>{`{{ ${this.state.handleBars} }}`}</GreyText>
-      </>
+      </FieldContainer>
     )
   }
 
   render(): React.ReactNode {
+    const { intl } = this.props
     return (
       <CustomFieldFormContainer>
         {this.toggleButtons()}
         {this.getLanguageDropDown()}
         {this.inputFields()}
+        {this.state.isFieldDuplicate && (
+          <CErrorText>
+            {intl.formatMessage(customFieldFormMessages.duplicateField)}
+          </CErrorText>
+        )}
         {this.certificate()}
       </CustomFieldFormContainer>
     )
   }
 }
 
-const mapStateToProps = (state: IStoreState) => {
-  return {}
+const mapStateToProps = (store: IStoreState) => {
+  return {
+    configFields: store.configFields as IEventTypes
+  }
 }
 
-const mapDispatchToProps = {}
+const mapDispatchToProps = {
+  ModifyCustomField
+}
 
 export const CustomFieldForms = connect(
   mapStateToProps,
