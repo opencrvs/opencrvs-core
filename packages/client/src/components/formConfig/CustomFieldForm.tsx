@@ -37,7 +37,7 @@ import { Tooltip } from '@opencrvs/components/lib/icons'
 import { Box } from '@opencrvs/components/lib/interface'
 import { camelCase } from 'lodash'
 import * as React from 'react'
-import { injectIntl, IntlShape } from 'react-intl'
+import { injectIntl, IntlShape, MessageDescriptor } from 'react-intl'
 import { connect } from 'react-redux'
 
 const CustomFieldFormContainer = styled(Box)`
@@ -230,72 +230,6 @@ class CustomFieldFormsComp extends React.Component<
     return true
   }
 
-  _prepareCustomizedFieldAttributes(modifiedFormField: IConfigFormField) {
-    const languages = this._getLanguages()
-
-    if (modifiedFormField.customizedFieldAttributes === undefined) {
-      modifiedFormField.customizedFieldAttributes = {
-        label: []
-      }
-    }
-
-    modifiedFormField.customizedFieldAttributes.label = Object.keys(
-      languages
-    ).map((lang) => ({
-      lang,
-      descriptor: {
-        ...modifiedFormField.definition.label,
-        defaultMessage: this.state.fieldForms[lang].label
-      }
-    }))
-
-    modifiedFormField.customizedFieldAttributes.placeholder = Object.keys(
-      languages
-    ).map((lang) => ({
-      lang,
-      descriptor: {
-        ...modifiedFormField.definition.placeholder,
-        defaultMessage: this.state.fieldForms[lang].placeholder || ' '
-      }
-    }))
-
-    modifiedFormField.customizedFieldAttributes.description = Object.keys(
-      languages
-    ).map((lang) => ({
-      lang,
-      descriptor: {
-        ...modifiedFormField.definition.description,
-        defaultMessage: this.state.fieldForms[lang].description || ' '
-      }
-    }))
-
-    modifiedFormField.customizedFieldAttributes.tooltip = Object.keys(
-      languages
-    ).map((lang) => ({
-      lang,
-      descriptor: {
-        ...modifiedFormField.definition.tooltip,
-        defaultMessage: this.state.fieldForms[lang].tooltip || ' '
-      }
-    }))
-
-    modifiedFormField.customizedFieldAttributes.errorMessage = Object.keys(
-      languages
-    ).map((lang) => ({
-      lang,
-      descriptor: {
-        id: `form.customField.errorMessage.${getCertificateHandlebar(
-          modifiedFormField
-        )}`,
-        description: 'Custom field attribute',
-        defaultMessage: this.state.fieldForms[lang].errorMessage || ' '
-      }
-    }))
-
-    modifiedFormField.customizedFieldAttributes.maxLength = this.state.maxLength
-    return { ...modifiedFormField }
-  }
-
   _prepareModifiedFormField(): IConfigFormField {
     const { selectedField } = this.props
     const { event, section } = getEventSectionGroupFromFieldID(
@@ -303,39 +237,108 @@ class CustomFieldFormsComp extends React.Component<
     )
     const { fieldForms, handleBars } = this.state
     const dl = getDefaultLanguage()
-
+    const languages = this._getLanguages()
     const newFieldID = `${event}.${section}.${CUSTOM_GROUP_NAME}.${handleBars}`
-
     const modifiedField = { ...selectedField }
+
+    if (modifiedField.customizedFieldAttributes === undefined) {
+      modifiedField.customizedFieldAttributes = {
+        label: []
+      }
+    }
+
     modifiedField.required = this.state.requiredField
     modifiedField.enabled = this.state.hideField
     modifiedField.fieldId = newFieldID
+
+    modifiedField.customizedFieldAttributes.label = Object.keys(languages).map(
+      (lang) => ({
+        lang,
+        descriptor: {
+          ...modifiedField.definition.label,
+          defaultMessage: this.state.fieldForms[lang].label
+        }
+      })
+    )
+
+    modifiedField.customizedFieldAttributes.placeholder = Object.keys(
+      languages
+    ).map((lang) => ({
+      lang,
+      descriptor: {
+        id: `form.customField.placeholder.${handleBars}`,
+        description: 'Custom field attribute',
+        defaultMessage: fieldForms[lang].placeholder || ' '
+      }
+    }))
+
+    modifiedField.customizedFieldAttributes.description = Object.keys(
+      languages
+    ).map((lang) => ({
+      lang,
+      descriptor: {
+        id: `form.customField.description.${handleBars}`,
+        description: 'Custom field attribute',
+        defaultMessage: fieldForms[dl].description || ' '
+      }
+    }))
+
+    modifiedField.customizedFieldAttributes.tooltip = Object.keys(
+      languages
+    ).map((lang) => ({
+      lang,
+      descriptor: {
+        id: `form.customField.tooltip.${handleBars}`,
+        description: 'Custom field attribute',
+        defaultMessage: fieldForms[dl].tooltip || ' '
+      }
+    }))
+
+    modifiedField.customizedFieldAttributes.errorMessage = Object.keys(
+      languages
+    ).map((lang) => ({
+      lang,
+      descriptor: {
+        id: `form.customField.errorMessage.${getCertificateHandlebar(
+          modifiedField
+        )}`,
+        description: 'Custom field attribute',
+        defaultMessage: fieldForms[lang].errorMessage || ' '
+      }
+    }))
+
+    modifiedField.customizedFieldAttributes.maxLength = this.state.maxLength
+
     modifiedField.definition.name = newFieldID
-    modifiedField.definition.label.defaultMessage = fieldForms[dl].label
+    modifiedField.definition.label =
+      modifiedField.customizedFieldAttributes.label.find(
+        (item) => item.lang === dl
+      )?.descriptor as MessageDescriptor
 
-    modifiedField.definition.placeholder = {
-      id: `form.customField.placeholder.${handleBars}`,
-      description: 'Custom field attribute',
-      defaultMessage: fieldForms[dl].placeholder || ' '
-    }
+    modifiedField.definition.placeholder =
+      modifiedField.customizedFieldAttributes.placeholder.find(
+        (item) => item.lang === dl
+      )?.descriptor as MessageDescriptor
 
-    modifiedField.definition.description = {
-      id: `form.customField.description.${handleBars}`,
-      description: 'Custom field attribute',
-      defaultMessage: fieldForms[dl].description || ' '
-    }
+    modifiedField.definition.description =
+      modifiedField.customizedFieldAttributes.description.find(
+        (item) => item.lang === dl
+      )?.descriptor as MessageDescriptor
 
-    modifiedField.definition.tooltip = {
-      id: `form.customField.tooltip.${handleBars}`,
-      description: 'Custom field attribute',
-      defaultMessage: fieldForms[dl].tooltip || ' '
+    modifiedField.definition.tooltip =
+      modifiedField.customizedFieldAttributes.tooltip.find(
+        (item) => item.lang === dl
+      )?.descriptor as MessageDescriptor
+
+    if (fieldForms[dl].tooltip.trim() === '') {
+      delete modifiedField.definition.tooltip
     }
 
     if (modifiedField.definition.mapping?.template?.length !== undefined) {
       modifiedField.definition.mapping.template[0] = handleBars
     }
 
-    return this._prepareCustomizedFieldAttributes(modifiedField)
+    return modifiedField
   }
 
   _isFieldNameDuplicate(modifiedField: IConfigFormField): boolean {
