@@ -896,6 +896,8 @@ export enum DeathSection {
   Preview = 'preview'
 }
 
+export type WizardSection = BirthSection | DeathSection | 'settings'
+
 export enum UserSection {
   User = 'user',
   Preview = 'preview'

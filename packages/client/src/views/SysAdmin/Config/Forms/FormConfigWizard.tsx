@@ -9,12 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Canvas } from '@client/components/formConfig/Canvas'
+
 import { CustomFieldForms } from '@client/components/formConfig/CustomFieldForm'
-import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
-import { FormTools } from '@client/components/formConfig/formTools/FormTools'
-import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
-import { BirthSection, DeathSection, Event, IFormField } from '@client/forms'
 import { AddCustomField } from '@client/forms/configuration/configFields/actions'
 import { IEventTypes } from '@client/forms/configuration/configFields/reducer'
 import {
@@ -22,17 +18,15 @@ import {
   ICustomFieldAttribute,
   prepareNewCustomFieldConfig
 } from '@client/forms/configuration/configFields/utils'
-import { selectEventFormDraft } from '@client/forms/configuration/selector'
-import { buttonMessages } from '@client/i18n/messages'
-import { constantsMessages } from '@client/i18n/messages/constants'
 import { getDefaultLanguage } from '@client/i18n/utils'
-import { goToFormConfig } from '@client/navigation'
+
 import { HOME } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import {
   SecondaryButton,
-  SuccessButton
+  SuccessButton,
+  TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { SettingsBlue } from '@opencrvs/components/lib/icons'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
@@ -41,6 +35,23 @@ import { IntlShape, useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import { Redirect, useParams } from 'react-router'
 import { useHasNatlSysAdminScope, useLoadFormDraft } from './hooks'
+import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
+import { FormTools } from '@client/components/formConfig/formTools/FormTools'
+import {
+  Event,
+  BirthSection,
+  DeathSection,
+  WizardSection,
+  IFormField
+} from '@client/forms'
+import { buttonMessages } from '@client/i18n/messages'
+import { Canvas } from '@client/components/formConfig/Canvas'
+import { selectEventFormDraft } from '@client/forms/configuration/selector'
+import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
+import { constantsMessages } from '@client/i18n/messages/constants'
+import { goToFormConfig, goToFormConfigWizard } from '@client/navigation'
+import { Dispatch } from 'redux'
+import { FormConfigSettings } from './FormConfigSettings'
 
 const Container = styled.div`
   display: flex;
@@ -137,9 +148,13 @@ const customField: IConfigFormField = {
   }
 }
 
-const topBarActions = (intl: IntlShape) => {
+const topBarActions = (event: Event, intl: IntlShape, dispatch: Dispatch) => {
   return [
-    <SettingsBlue key="settings" onClick={() => {}} />,
+    <TertiaryButton
+      id="settings"
+      icon={() => <SettingsBlue />}
+      onClick={() => dispatch(goToFormConfigWizard(event, 'settings'))}
+    ></TertiaryButton>,
     <SecondaryButton key="save" size="small" onClick={() => {}}>
       {intl.formatMessage(buttonMessages.save)}
     </SecondaryButton>,
@@ -153,12 +168,11 @@ function isValidEvent(event: string): event is Event {
   return Object.values<string>(Event).includes(event)
 }
 
-function isValidSection(
-  section: string
-): section is BirthSection | DeathSection {
+function isValidSection(section: string): section is WizardSection {
   return [
     ...Object.values<string>(BirthSection),
-    ...Object.values<string>(DeathSection)
+    ...Object.values<string>(DeathSection),
+    'settings'
   ].includes(section)
 }
 
@@ -200,7 +214,7 @@ export function FormConfigWizard() {
       <EventTopBar
         title={`${intl.formatMessage(constantsMessages[event])} v${version}`}
         pageIcon={<></>}
-        topBarActions={topBarActions(intl)}
+        topBarActions={topBarActions(event, intl, dispatch)}
         goHome={() => dispatch(goToFormConfig())}
       />
       <WizardContainer>
@@ -211,57 +225,63 @@ export function FormConfigWizard() {
             onSectionChange={setSelectedField}
           />
         </NavigationContainer>
-        <CanvasWrapper onClick={() => setSelectedField(null)}>
-          <CanvasContainer>
-            <Canvas
-              event={event}
-              section={section}
-              selectedField={selectedField}
-              onFieldSelect={(field) => setSelectedField(field)}
-            />
-          </CanvasContainer>
-        </CanvasWrapper>
-        <ToolsContainer>
-          {selectedField ? (
-            !selectedField.custom ? (
-              <DefaultFieldTools configField={selectedField} />
-            ) : (
-              <CustomFieldForms
-                key={selectedField.fieldId}
-                selectedField={selectedField}
-              />
-            )
-          ) : (
-            <FormTools
-              onAddClickListener={(fieldType: string) => {
-                const modifiedFieldMap = {
-                  ...customField,
-                  definition: {
-                    ...customField.definition,
-                    type: fieldType as IFormField['type']
-                  }
-                } as IConfigFormField
-
-                const customFieldConfig = prepareNewCustomFieldConfig(
-                  state as IEventTypes,
-                  event,
-                  section,
-                  modifiedFieldMap
+        {section !== 'settings' ? (
+          <>
+            <CanvasWrapper onClick={() => setSelectedField(null)}>
+              <CanvasContainer>
+                <Canvas
+                  event={event}
+                  section={section}
+                  selectedField={selectedField}
+                  onFieldSelect={(field) => setSelectedField(field)}
+                />
+              </CanvasContainer>
+            </CanvasWrapper>
+            <ToolsContainer>
+              {selectedField ? (
+                !selectedField.custom ? (
+                  <DefaultFieldTools configField={selectedField} />
+                ) : (
+                  <CustomFieldForms
+                    key={selectedField.fieldId}
+                    selectedField={selectedField}
+                  />
                 )
-                if (!customFieldConfig) {
-                  return
-                }
-                dispatch(AddCustomField(event, section, customFieldConfig))
-                setSelectedField(customFieldConfig)
-                setTimeout(() => {
-                  document
-                    .getElementById(customFieldConfig.fieldId)
-                    ?.scrollIntoView()
-                }, 300)
-              }}
-            />
-          )}
-        </ToolsContainer>
+              ) : (
+                <FormTools
+                  onAddClickListener={(fieldType: string) => {
+                    const modifiedFieldMap = {
+                      ...customField,
+                      definition: {
+                        ...customField.definition,
+                        type: fieldType as IFormField['type']
+                      }
+                    } as IConfigFormField
+
+                    const customFieldConfig = prepareNewCustomFieldConfig(
+                      state as IEventTypes,
+                      event,
+                      section,
+                      modifiedFieldMap
+                    )
+                    if (!customFieldConfig) {
+                      return
+                    }
+                    dispatch(AddCustomField(event, section, customFieldConfig))
+                    setSelectedField(customFieldConfig)
+                    setTimeout(() => {
+                      document
+                        .getElementById(customFieldConfig.fieldId)
+                        ?.scrollIntoView()
+                    }, 300)
+                  }}
+                />
+              )}
+            </ToolsContainer>
+          </>
+        ) : (
+          <FormConfigSettings />
+        )}
       </WizardContainer>
     </Container>
   )

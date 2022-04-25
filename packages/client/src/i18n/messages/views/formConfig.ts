@@ -28,6 +28,18 @@ interface IFormConfigMessages
   certificateHandlebars: MessageDescriptor
   hideField: MessageDescriptor
   requiredForRegistration: MessageDescriptor
+  settingsTitle: MessageDescriptor
+  introductionSettings: MessageDescriptor
+  addressesSettings: MessageDescriptor
+  enable: MessageDescriptor
+  disable: MessageDescriptor
+  introductionPageSettingsDialogTitle: MessageDescriptor
+  introductionPageSettingsDialogDesc: MessageDescriptor
+  addressesSettingsDialogTitle: MessageDescriptor
+  addressesSettingsDialogDesc: MessageDescriptor
+  showIntroductionPage: MessageDescriptor
+  introductionPageSuccessNotification: MessageDescriptor
+  noOfAddressesSuccessNotification: MessageDescriptor
 }
 
 type INavigationMessages = Record<
@@ -145,24 +157,86 @@ const messagesToDefine: IFormConfigMessages = {
     description: 'Label for Add input/content in form tools'
   },
   contentKey: {
-    id: 'config.formConfig.formTools.contentKey',
+    id: 'form.config.formTools.contentKey',
     defaultMessage: 'Content Key',
     description: 'Content key label for formTools'
   },
   certificateHandlebars: {
-    id: 'config.formConfig.formTools.certificateHandlebars',
+    id: 'form.config.formTools.certificateHandlebars',
     defaultMessage: 'Certificate handlebars',
     description: 'Certificate handlebars label for formTools'
   },
   hideField: {
-    id: 'config.formConfig.formTools.hideField',
+    id: 'form.config.formTools.hideField',
     defaultMessage: 'Hide field',
     description: 'Hide field label for formTools'
   },
   requiredForRegistration: {
-    id: 'config.formConfig.formTools.requiredForRegistration',
+    id: 'form.config.formTools.requiredForRegistration',
     defaultMessage: 'Required for registration',
     description: 'Required for registration label for formTools'
+  },
+  settingsTitle: {
+    id: 'form.config.settings.title',
+    defaultMessage: 'Settings',
+    description: 'Title of the settings page'
+  },
+  introductionSettings: {
+    id: 'form.config.introductionSettings',
+    defaultMessage: 'Introduction page',
+    description: 'Label for introduction page settings'
+  },
+  addressesSettings: {
+    id: 'form.config.addressesSettings',
+    defaultMessage: 'No. of addresses',
+    description: 'Label for addresses settings'
+  },
+  enable: {
+    id: 'form.config.settings.enable',
+    defaultMessage: 'Enabled',
+    description: 'Label for enable intorduction page settings'
+  },
+  disable: {
+    id: 'form.config.settings.disable',
+    defaultMessage: 'Disabled',
+    description: 'Label for disable intorduction page settings'
+  },
+  introductionPageSettingsDialogTitle: {
+    id: 'form.config.settings.introductionPage.dialogTitle',
+    defaultMessage: 'Introduction page?',
+    description: 'Title for intorduction page settings dialog'
+  },
+  introductionPageSettingsDialogDesc: {
+    id: 'form.config.settings.introductionPage.dialogDesc',
+    defaultMessage:
+      'An introduction page can be used to describe the registration process to an informant.',
+    description: 'Description for intorduction page settings dialog'
+  },
+  addressesSettingsDialogTitle: {
+    id: 'form.config.settings.addresses.dialogTitle',
+    defaultMessage: 'No. of addresses?',
+    description: 'Title for addresses settings dialog'
+  },
+  addressesSettingsDialogDesc: {
+    id: 'form.config.settings.addresses.dialogDesc',
+    defaultMessage:
+      'How many address do you want to capture for the parents, informant and deceased?',
+    description: 'Description for addresses settings dialog'
+  },
+  showIntroductionPage: {
+    id: 'form.config.settings.showIntroductionPage',
+    defaultMessage: 'Show introduction page',
+    description: 'Label for introduction page toggle settings'
+  },
+  introductionPageSuccessNotification: {
+    id: 'form.config.settings.introductionPage.successNotification',
+    defaultMessage: 'Introduction page has been {action}',
+    description: 'Success notification label for introduction page settings'
+  },
+  noOfAddressesSuccessNotification: {
+    id: 'form.config.settings.addresses.successNotification',
+    defaultMessage: 'The number of address has been updated',
+    description: 'Success notification label for number of addresses settings'
   }
 }
 
