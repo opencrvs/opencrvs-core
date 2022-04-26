@@ -862,6 +862,7 @@ export async function getTotalMetrics(
       timeFrom,
       timeTo
     )
+  console.log({ estimationOfTimeRange })
 
   return {
     estimated: estimationOfTimeRange,
