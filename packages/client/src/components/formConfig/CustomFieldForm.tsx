@@ -230,15 +230,20 @@ class CustomFieldFormsComp extends React.Component<
     return true
   }
 
+  _generateNewFieldID() {
+    const { event, section } = getEventSectionGroupFromFieldID(
+      this.props.selectedField.fieldId
+    )
+
+    return `${event}.${section}.${CUSTOM_GROUP_NAME}.${this.state.handleBars}`
+  }
+
   _prepareModifiedFormField(): IConfigFormField {
     const { selectedField } = this.props
-    const { event, section } = getEventSectionGroupFromFieldID(
-      selectedField.fieldId
-    )
     const { fieldForms, handleBars } = this.state
     const dl = getDefaultLanguage()
     const languages = this._getLanguages()
-    const newFieldID = `${event}.${section}.${CUSTOM_GROUP_NAME}.${handleBars}`
+    const newFieldID = this._generateNewFieldID()
     const modifiedField = { ...selectedField }
 
     if (modifiedField.customizedFieldAttributes === undefined) {
@@ -341,18 +346,19 @@ class CustomFieldFormsComp extends React.Component<
     return modifiedField
   }
 
-  _isFieldNameDuplicate(modifiedField: IConfigFormField): boolean {
+  _isFieldNameDuplicate(): boolean {
     const { configFields, selectedField } = this.props
     const { event, section } = getEventSectionGroupFromFieldID(
       selectedField.fieldId
     )
+    const newGeneratedFieldID = this._generateNewFieldID()
 
-    if (selectedField.fieldId === modifiedField.fieldId) {
+    if (selectedField.fieldId === newGeneratedFieldID) {
       return false
     }
 
     return (
-      modifiedField.fieldId in configFields[event as keyof IEventTypes][section]
+      newGeneratedFieldID in configFields[event as keyof IEventTypes][section]
     )
   }
 
@@ -418,7 +424,7 @@ class CustomFieldFormsComp extends React.Component<
           <ListColumn>
             <RightAlignment>
               <Toggle
-                selected={this.state.hideField !== DEFAULTS.DISABLED}
+                selected={this.state.hideField === DEFAULTS.DISABLED}
                 onChange={() =>
                   this.setState({
                     hideField:
@@ -628,13 +634,13 @@ class CustomFieldFormsComp extends React.Component<
             <ListColumn>
               <CPrimaryButton
                 onClick={() => {
-                  const modifiedField = this._prepareModifiedFormField()
-                  if (this._isFieldNameDuplicate(modifiedField)) {
+                  if (this._isFieldNameDuplicate()) {
                     this.setState({
                       isFieldDuplicate: true
                     })
                     return
                   }
+                  const modifiedField = this._prepareModifiedFormField()
                   ModifyCustomField(selectedField, modifiedField)
                 }}
                 disabled={!this._isFormValid()}
@@ -669,7 +675,7 @@ class CustomFieldFormsComp extends React.Component<
         {this.getLanguageDropDown()}
         {this.inputFields()}
         {this.state.isFieldDuplicate && (
-          <CErrorText>
+          <CErrorText ignoreMediaQuery={true}>
             {intl.formatMessage(customFieldFormMessages.duplicateField)}
           </CErrorText>
         )}
