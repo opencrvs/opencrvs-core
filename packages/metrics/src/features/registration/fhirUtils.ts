@@ -371,3 +371,40 @@ export function getObservationValueByCode(
 
   return value
 }
+
+export async function fetchDeclarationsBeginnerRole(
+  fhirBundle: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
+  let startedByRole = ''
+  const currentTask = getTask(fhirBundle)
+
+  if (currentTask) {
+    const bundle = await fetchTaskHistory(currentTask.id, authHeader)
+
+    const task =
+      bundle.entry &&
+      bundle.entry
+        .map((entry) => entry.resource)
+        .filter((resource): resource is fhir.Task =>
+          Boolean(resource && isTaskResource(resource))
+        )
+
+    if (task) {
+      const status =
+        task[0].businessStatus &&
+        task[0].businessStatus.coding &&
+        task[0].businessStatus.coding[0] &&
+        task[0].businessStatus.coding[0].code
+
+      if (status === 'DECLARED') {
+        startedByRole = 'FIELD_AGENT'
+      } else if (status === 'WAITING_VALIDATION') {
+        startedByRole = 'REGISTRATION_AGENT'
+      } else if (status === 'VALIDATED') {
+        startedByRole = 'REGISTRAR'
+      }
+    }
+  }
+  return startedByRole
+}
