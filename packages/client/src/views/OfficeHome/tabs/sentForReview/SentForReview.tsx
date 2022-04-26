@@ -30,13 +30,12 @@ import { calculateDaysFromToday } from '@client/views/PrintCertificate/utils'
 import { goToDeclarationRecordAudit } from '@client/navigation'
 import {
   constantsMessages as messages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  constantsMessages
 } from '@client/i18n/messages'
 import { withTheme, ITheme } from '@client/styledComponents'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { Event } from '@client/forms'
 import {
@@ -49,10 +48,6 @@ import {
   SubmissionStatusMap
 } from '@client/views/OfficeHome/tabs/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
-import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
-import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
-import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
 const DECLARATIONS_DAY_LIMIT = 7
 
 interface ISentForReviewProps {
@@ -301,36 +296,22 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.sentForReview)}
         isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
+        isShowPagination={isShowPagination}
+        paginationId={paginationId}
+        totalPages={totalPages}
+        onPageChange={this.props.onPageChange}
+        loading={false}
+        error={false}
       >
         <GridTable
           content={this.transformDeclarationsReadyToSend()}
           columns={this.getColumns()}
-          noResultText={intl.formatMessage(officeHomeMessages.sentForReview)}
+          noResultText={intl.formatMessage(constantsMessages.noRecords, {
+            tab: 'sent for review'
+          })}
           sortedCol={this.state.sortedCol}
           sortOrder={this.state.sortOrder}
         />
-        {isShowPagination ? (
-          <PaginationWrapper>
-            <DesktopWrapper>
-              <PaginationModified
-                size="small"
-                initialPage={paginationId}
-                totalPages={totalPages}
-                onPageChange={this.props.onPageChange}
-              />
-            </DesktopWrapper>
-            <MobileWrapper>
-              <PaginationModified
-                size="large"
-                initialPage={paginationId}
-                totalPages={totalPages}
-                onPageChange={this.props.onPageChange}
-              />
-            </MobileWrapper>
-          </PaginationWrapper>
-        ) : (
-          <></>
-        )}
       </WQContentWrapper>
     )
   }

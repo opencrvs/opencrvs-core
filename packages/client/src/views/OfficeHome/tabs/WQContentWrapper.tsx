@@ -15,12 +15,25 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import styled from 'styled-components'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 interface IContentWrapper {
   isMobileSize: boolean
   title: string
   children: React.ReactNode | React.ReactNode[]
   tabBarContent?: React.ReactNode
+  isShowPagination?: boolean
+  paginationId?: number
+  totalPages?: number
+  onPageChange?: (newPageNumber: number) => void
+  loading?: boolean
+  error?: boolean
 }
 
 const TabBarContainer = styled.div`
@@ -33,28 +46,67 @@ const MobileChildrenContainer = styled.div`
   margin: 20px 16px 0;
 `
 
-export const WQContentWrapper = ({
-  tabBarContent,
-  isMobileSize,
-  title,
-  children
-}: IContentWrapper) => {
-  if (isMobileSize) {
-    return (
-      <>
-        {tabBarContent && <TabBarContainer>{tabBarContent}</TabBarContainer>}
-        <MobileChildrenContainer>{children}</MobileChildrenContainer>
-      </>
-    )
-  } else {
-    return (
-      <Content
-        title={title}
-        size={ContentSize.LARGE}
-        tabBarContent={tabBarContent}
-      >
-        {children}
-      </Content>
-    )
-  }
+const Body = (props: IContentWrapper) => {
+  const {
+    isShowPagination,
+    paginationId,
+    totalPages,
+    onPageChange,
+    loading,
+    error
+  } = props
+  return (
+    <>
+      {props.children}
+      {isShowPagination && paginationId && totalPages && onPageChange && (
+        <PaginationWrapper>
+          <DesktopWrapper>
+            <PaginationModified
+              size="small"
+              initialPage={paginationId}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
+          </DesktopWrapper>
+          <MobileWrapper>
+            <PaginationModified
+              size="large"
+              initialPage={paginationId}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
+          </MobileWrapper>
+        </PaginationWrapper>
+      )}
+      <LoadingIndicator
+        loading={loading ? true : false}
+        hasError={error ? true : false}
+      />
+    </>
+  )
+}
+
+export const WQContentWrapper = (props: IContentWrapper) => {
+  return (
+    <>
+      {props.isMobileSize ? (
+        <>
+          {props.tabBarContent && (
+            <TabBarContainer>{props.tabBarContent}</TabBarContainer>
+          )}
+          <MobileChildrenContainer>
+            <Body {...props} />
+          </MobileChildrenContainer>
+        </>
+      ) : (
+        <Content
+          title={props.title}
+          size={ContentSize.LARGE}
+          tabBarContent={props.tabBarContent}
+        >
+          <Body {...props} />
+        </Content>
+      )}
+    </>
+  )
 }

@@ -124,7 +124,6 @@ interface IGridTableProps {
   loading?: boolean
   sortedCol?: COLUMNS
   sortOrder?: SORT_ORDER
-  formattedDuration?: (fromDate: Date | number) => string
 }
 
 interface IGridTableState {

@@ -45,10 +45,8 @@ import {
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { withTheme } from 'styled-components'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import {
   IconWithName,
   IconWithNameEvent
@@ -59,10 +57,6 @@ import {
 } from '@client/views/OfficeHome/tabs/utils'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
-import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
-import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
-import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -204,8 +198,13 @@ class ReviewTabComponent extends React.Component<
         this.userHasRegisterScope()
           ? true
           : false
-      const dateOfEvent = reg.dateOfEvent && new Date(reg.dateOfEvent)
-      const createdAt = reg.createdAt && parseInt(reg.createdAt)
+      const dateOfEvent =
+        (reg.dateOfEvent &&
+          reg.dateOfEvent.length > 0 &&
+          new Date(reg.dateOfEvent)) ||
+        ''
+      const createdAt = (reg.createdAt && parseInt(reg.createdAt)) || ''
+      console.log(reg)
       return {
         ...reg,
         event,
@@ -229,13 +228,6 @@ class ReviewTabComponent extends React.Component<
             isDuplicate={isDuplicate}
           />
         ),
-        eventTimeElapsed:
-          (reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))) ||
-          '',
-        declarationTimeElapsed:
-          (reg.createdAt &&
-            formattedDuration(new Date(parseInt(reg.createdAt)))) ||
-          '',
         actions,
         rowClickHandler: [
           {
@@ -326,12 +318,20 @@ class ReviewTabComponent extends React.Component<
     const isShowPagination =
       this.props.queryData.data.totalItems &&
       this.props.queryData.data.totalItems > pageSize
+        ? true
+        : false
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.readyForReview)}
         isMobileSize={
           this.state.width < this.props.theme.grid.breakpoints.lg ? true : false
         }
+        isShowPagination={isShowPagination}
+        paginationId={paginationId}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+        loading={this.props.loading}
+        error={this.props.error}
       >
         <ReactTooltip id="validateTooltip">
           <ToolTipContainer>
@@ -343,34 +343,14 @@ class ReviewTabComponent extends React.Component<
         <GridTable
           content={this.transformDeclaredContent(data)}
           columns={this.getColumns()}
-          noResultText={intl.formatMessage(officeHomeMessages.readyForReview)}
+          noResultText={intl.formatMessage(constantsMessages.noRecords, {
+            tab: 'ready for review'
+          })}
           clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
         />
-        {isShowPagination ? (
-          <PaginationWrapper>
-            <DesktopWrapper>
-              <PaginationModified
-                size="small"
-                initialPage={paginationId}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-              />
-            </DesktopWrapper>
-            <MobileWrapper>
-              <PaginationModified
-                size="large"
-                initialPage={paginationId}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-              />
-            </MobileWrapper>
-          </PaginationWrapper>
-        ) : (
-          <></>
-        )}
       </WQContentWrapper>
     )
   }

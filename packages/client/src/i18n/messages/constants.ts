@@ -150,6 +150,8 @@ interface IConstantsMessages
   viewAll: MessageDescriptor
   notAvailable: MessageDescriptor
   history: MessageDescriptor
+  requireUpdatesLoading: MessageDescriptor
+  noRecords: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   address: {
@@ -851,6 +853,16 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.history',
     defaultMessage: 'History',
     description: 'History heading'
+  },
+  requireUpdatesLoading: {
+    id: 'constants.requireUpdatesLoading',
+    defaultMessage: 'Checking your declarations',
+    description: 'The text when all rejected declarations are loading'
+  },
+  noRecords: {
+    defaultMessage: 'No records {tab}',
+    description: 'No Application in{tab} tab in officeHome',
+    id: 'constants.noRecords'
   }
 }
 

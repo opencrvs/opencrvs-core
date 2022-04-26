@@ -61,11 +61,9 @@ import { IStoreState } from '@client/store'
 import { Action, Event } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { FormTabs } from '@opencrvs/components/lib/forms'
-import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
 import {
   IconWithName,
@@ -76,11 +74,7 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/tabs/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
-import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
-import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
-import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
-import { he } from 'date-fns/locale'
+import { constant } from 'lodash'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -530,103 +524,35 @@ export class InProgressTabComponent extends React.Component<
     )
   }
 
-  renderFieldAgentTable = (
-    data: GQLEventSearchResultSet,
-    intl: IntlShape,
-    onPageChange: (newPageNumber: number) => void
-  ) => {
-    const totalPages = this.props.queryData.inProgressData.totalItems
-      ? Math.ceil(
-          this.props.queryData.inProgressData.totalItems / this.props.pageSize
-        )
-      : 0
-    const isShowPagination =
-      this.props.queryData.inProgressData.totalItems &&
-      this.props.queryData.inProgressData.totalItems > this.props.pageSize
+  renderFieldAgentTable = (data: GQLEventSearchResultSet, intl: IntlShape) => {
     return (
-      <>
-        <GridTable
-          content={this.transformRemoteDraftsContent(data)}
-          columns={this.getColumns()}
-          noResultText={intl.formatMessage(officeHomeMessages.progress)}
-          clickable={true}
-          loading={this.props.loading}
-          sortOrder={this.state.sortOrder}
-          sortedCol={this.state.sortedCol}
-        />
-        {isShowPagination ? (
-          <PaginationWrapper>
-            <DesktopWrapper>
-              <PaginationModified
-                size="small"
-                initialPage={this.props.paginationId.fieldAgentId}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-              />
-            </DesktopWrapper>
-            <MobileWrapper>
-              <PaginationModified
-                size="large"
-                initialPage={this.props.paginationId.fieldAgentId}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-              />
-            </MobileWrapper>
-          </PaginationWrapper>
-        ) : (
-          <></>
-        )}
-      </>
+      <GridTable
+        content={this.transformRemoteDraftsContent(data)}
+        columns={this.getColumns()}
+        noResultText={intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'in progress'
+        })}
+        clickable={true}
+        loading={this.props.loading}
+        sortOrder={this.state.sortOrder}
+        sortedCol={this.state.sortedCol}
+      />
     )
   }
 
-  renderHospitalTable = (
-    data: GQLEventSearchResultSet,
-    intl: IntlShape,
-    onPageChange: (newPageNumber: number) => void
-  ) => {
-    const totalPages = this.props.queryData.notificationData.totalItems
-      ? Math.ceil(
-          this.props.queryData.notificationData.totalItems / this.props.pageSize
-        )
-      : 0
-    const isShowPagination =
-      this.props.queryData.notificationData.totalItems &&
-      this.props.queryData.notificationData.totalItems > this.props.pageSize
+  renderHospitalTable = (data: GQLEventSearchResultSet, intl: IntlShape) => {
     return (
-      <>
-        <GridTable
-          content={this.transformRemoteDraftsContent(data)}
-          columns={this.getColumns()}
-          noResultText={intl.formatMessage(officeHomeMessages.progress)}
-          clickable={true}
-          loading={this.props.loading}
-          sortOrder={this.state.sortOrder}
-          sortedCol={this.state.sortedCol}
-        />
-        {isShowPagination ? (
-          <PaginationWrapper>
-            <DesktopWrapper>
-              <PaginationModified
-                size="small"
-                initialPage={this.props.paginationId.healthSystemId}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-              />
-            </DesktopWrapper>
-            <MobileWrapper>
-              <PaginationModified
-                size="large"
-                initialPage={this.props.paginationId.healthSystemId}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-              />
-            </MobileWrapper>
-          </PaginationWrapper>
-        ) : (
-          <></>
-        )}
-      </>
+      <GridTable
+        content={this.transformRemoteDraftsContent(data)}
+        columns={this.getColumns()}
+        noResultText={intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'in progress'
+        })}
+        clickable={true}
+        loading={this.props.loading}
+        sortOrder={this.state.sortOrder}
+        sortedCol={this.state.sortedCol}
+      />
     )
   }
 
@@ -634,9 +560,43 @@ export class InProgressTabComponent extends React.Component<
     const { intl, selectorId, drafts, queryData, onPageChange, isFieldAgent } =
       this.props
     const { inProgressData, notificationData } = queryData
-    const totalPages = Math.ceil(this.props.drafts.length / this.props.pageSize)
 
-    const isShowPagination = this.props.drafts.length > this.props.pageSize
+    const paginationId =
+      !selectorId || selectorId === SELECTOR_ID.ownDrafts
+        ? this.props.paginationId.draftId
+        : selectorId === SELECTOR_ID.fieldAgentDrafts
+        ? this.props.paginationId.fieldAgentId
+        : this.props.paginationId.healthSystemId
+
+    const totalPages =
+      !selectorId || selectorId === SELECTOR_ID.ownDrafts
+        ? Math.ceil(this.props.drafts.length / this.props.pageSize)
+        : selectorId === SELECTOR_ID.fieldAgentDrafts
+        ? this.props.queryData.inProgressData.totalItems &&
+          Math.ceil(
+            this.props.queryData.inProgressData.totalItems / this.props.pageSize
+          )
+        : this.props.queryData.notificationData.totalItems &&
+          Math.ceil(
+            this.props.queryData.notificationData.totalItems /
+              this.props.pageSize
+          )
+
+    const isShowPagination =
+      !selectorId || selectorId === SELECTOR_ID.ownDrafts
+        ? this.props.drafts.length > this.props.pageSize
+          ? true
+          : false
+        : selectorId === SELECTOR_ID.fieldAgentDrafts
+        ? this.props.queryData.inProgressData.totalItems &&
+          this.props.queryData.inProgressData.totalItems > this.props.pageSize
+          ? true
+          : false
+        : this.props.queryData.notificationData.totalItems &&
+          this.props.queryData.notificationData.totalItems > this.props.pageSize
+        ? true
+        : false
+
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.progress)}
@@ -652,48 +612,36 @@ export class InProgressTabComponent extends React.Component<
             notificationData.totalItems || 0
           )
         }
+        isShowPagination={isShowPagination}
+        paginationId={paginationId}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+        loading={isFieldAgent ? false : this.props.loading}
+        error={
+          !selectorId || selectorId === SELECTOR_ID.ownDrafts || isFieldAgent
+            ? false
+            : this.props.error
+        }
       >
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
-          <>
-            <GridTable
-              content={this.transformDraftContent()}
-              columns={this.getColumns()}
-              noResultText={intl.formatMessage(officeHomeMessages.progress)}
-              clickable={true}
-              loading={isFieldAgent ? false : this.props.loading}
-              sortedCol={this.state.sortedCol}
-              sortOrder={this.state.sortOrder}
-            />
-            {isShowPagination ? (
-              <PaginationWrapper>
-                <DesktopWrapper>
-                  <PaginationModified
-                    size="small"
-                    initialPage={this.props.paginationId.healthSystemId}
-                    totalPages={totalPages}
-                    onPageChange={onPageChange}
-                  />
-                </DesktopWrapper>
-                <MobileWrapper>
-                  <PaginationModified
-                    size="large"
-                    initialPage={this.props.paginationId.healthSystemId}
-                    totalPages={totalPages}
-                    onPageChange={onPageChange}
-                  />
-                </MobileWrapper>
-              </PaginationWrapper>
-            ) : (
-              <></>
-            )}
-          </>
+          <GridTable
+            content={this.transformDraftContent()}
+            columns={this.getColumns()}
+            noResultText={intl.formatMessage(constantsMessages.noRecords, {
+              tab: 'in progress'
+            })}
+            clickable={true}
+            loading={isFieldAgent ? false : this.props.loading}
+            sortedCol={this.state.sortedCol}
+            sortOrder={this.state.sortOrder}
+          />
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts &&
           !isFieldAgent &&
-          this.renderFieldAgentTable(inProgressData, intl, onPageChange)}
+          this.renderFieldAgentTable(inProgressData, intl)}
         {selectorId === SELECTOR_ID.hospitalDrafts &&
           !isFieldAgent &&
-          this.renderHospitalTable(notificationData, intl, onPageChange)}
+          this.renderHospitalTable(notificationData, intl)}
       </WQContentWrapper>
     )
   }

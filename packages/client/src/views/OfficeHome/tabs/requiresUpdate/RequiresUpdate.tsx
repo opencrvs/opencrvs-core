@@ -51,7 +51,6 @@ import {
 import { connect } from 'react-redux'
 import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import {
   changeSortedColumn,
   getSortedItems
@@ -62,11 +61,6 @@ import {
 } from '@client/views/OfficeHome/tabs/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
 import { SUBMISSION_STATUS } from '@client/declarations'
-import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
-import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
-import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
-
 interface IProps {
   userDetails: IUserDetails | null
   pageSize: number
@@ -145,7 +139,9 @@ const transformRejectedContent = (
         iconWithName: (
           <IconWithName status={SUBMISSION_STATUS.REJECTED} name={name} />
         ),
-        dateOfEvent: (dateOfEvent && new Date(dateOfEvent)) || '',
+        dateOfEvent:
+          (dateOfEvent && dateOfEvent.length > 0 && new Date(dateOfEvent)) ||
+          '',
         iconWithNameEvent: (
           <IconWithNameEvent
             status={SUBMISSION_STATUS.DRAFT}
@@ -251,51 +247,51 @@ const RequiresUpdateComponent = (props: IFullProps) => {
   }
 
   return (
-    <WQContentWrapper
-      title={intl.formatMessage(navigationMessages.requiresUpdate)}
-      isMobileSize={
-        width && width < props.theme.grid.breakpoints.lg ? true : false
-      }
+    <Query
+      query={SEARCH_DECLARATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
+      variables={{
+        userId: userDetails!.practitionerId,
+        status: [EVENT_STATUS.REJECTED],
+        locationIds: (userDetails && getUserLocation(userDetails).id) || '',
+        count: pageSize,
+        skip: (paginationId - 1) * pageSize
+      }}
     >
-      <Query
-        query={SEARCH_DECLARATIONS_USER_WISE} // TODO can this be changed to use SEARCH_EVENTS
-        variables={{
-          userId: userDetails!.practitionerId,
-          status: [EVENT_STATUS.REJECTED],
-          locationIds: (userDetails && getUserLocation(userDetails).id) || '',
-          count: pageSize,
-          skip: (paginationId - 1) * pageSize
-        }}
-      >
-        {({
-          loading,
-          error,
-          data
-        }: {
-          loading: any
-          data?: any
-          error?: any
-        }) => {
-          if (loading) {
-            return (
-              <Loader
-                id="require_updates_loader"
-                marginPercent={20}
-                loadingText={intl.formatMessage(
-                  officeHomeMessages.requireUpdatesLoading
-                )}
-              />
-            )
-          }
-          if (error) {
-            return (
-              <ErrorText id="require_updates_loading_error">
-                {intl.formatMessage(errorMessages.fieldAgentQueryError)}
-              </ErrorText>
-            )
-          }
-          return (
-            <>
+      {({
+        loading,
+        error,
+        data
+      }: {
+        loading: any
+        data?: any
+        error?: any
+      }) => {
+        return (
+          <WQContentWrapper
+            title={intl.formatMessage(navigationMessages.requiresUpdate)}
+            isMobileSize={
+              width && width < props.theme.grid.breakpoints.lg ? true : false
+            }
+            isShowPagination={
+              !loading &&
+              !error &&
+              data?.searchEvents?.totalItems &&
+              data?.searchEvents?.totalItems > pageSize
+                ? true
+                : false
+            }
+            totalPages={
+              Math.ceil(
+                data?.searchEvents?.totalItems &&
+                  data?.searchEvents?.totalItems / pageSize
+              ) || 0
+            }
+            paginationId={paginationId}
+            onPageChange={onPageChange}
+            loading={loading}
+            error={error}
+          >
+            {!loading && !error && (
               <GridTable
                 content={transformRejectedContent(
                   data,
@@ -310,52 +306,19 @@ const RequiresUpdateComponent = (props: IFullProps) => {
                   sortedCol,
                   onColumnClick
                 )}
-                noResultText={intl.formatMessage(
-                  officeHomeMessages.requiresUpdate
-                )}
+                noResultText={intl.formatMessage(constantsMessages.noRecords, {
+                  tab: 'requires update'
+                })}
                 clickable={props.isOnline}
                 loading={loading}
                 sortedCol={sortedCol}
                 sortOrder={sortOrder}
               />
-              {data?.searchEvents?.totalItems &&
-              data?.searchEvents?.totalItems > pageSize ? (
-                <PaginationWrapper>
-                  <DesktopWrapper>
-                    <PaginationModified
-                      size="small"
-                      initialPage={paginationId}
-                      totalPages={
-                        Math.ceil(
-                          data?.searchEvents?.totalItems &&
-                            data?.searchEvents?.totalItems / pageSize
-                        ) || 0
-                      }
-                      onPageChange={onPageChange}
-                    />
-                  </DesktopWrapper>
-                  <MobileWrapper>
-                    <PaginationModified
-                      size="large"
-                      initialPage={paginationId}
-                      totalPages={
-                        Math.ceil(
-                          data?.searchEvents?.totalItems &&
-                            data?.searchEvents?.totalItems / pageSize
-                        ) || 0
-                      }
-                      onPageChange={onPageChange}
-                    />
-                  </MobileWrapper>
-                </PaginationWrapper>
-              ) : (
-                <></>
-              )}
-            </>
-          )
-        }}
-      </Query>
-    </WQContentWrapper>
+            )}
+          </WQContentWrapper>
+        )
+      }}
+    </Query>
   )
 }
 

@@ -79,6 +79,8 @@ function ExternalValidationTabComponent(props: IProps) {
   const isShowPagination =
     props.queryData.data.totalItems &&
     props.queryData.data.totalItems > pageSize
+      ? true
+      : false
 
   useEffect(() => {
     function recordWindowWidth() {
@@ -114,7 +116,10 @@ function ExternalValidationTabComponent(props: IProps) {
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
-      const dateOfEvent = reg.dateOfEvent && new Date(reg.dateOfEvent)
+      const dateOfEvent =
+        reg.dateOfEvent &&
+        reg.dateOfEvent.length > 0 &&
+        new Date(reg.dateOfEvent)
       const sentForValidation =
         (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
           ? new Date(reg.modifiedAt)
@@ -202,38 +207,24 @@ function ExternalValidationTabComponent(props: IProps) {
     <WQContentWrapper
       title={intl.formatMessage(navigationMessages.waitingValidation)}
       isMobileSize={viewportWidth < props.theme.grid.breakpoints.lg}
+      isShowPagination={isShowPagination}
+      paginationId={paginationId}
+      totalPages={totalPages}
+      onPageChange={onPageChange}
+      loading={props.loading}
+      error={props.error}
     >
       <GridTable
         content={transformWaitingValidationContent(data)}
-        noResultText={intl.formatMessage(constantsMessages.noResults)}
+        noResultText={intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'in external validation '
+        })}
         clickable={true}
         loading={props.loading}
         columns={columns}
         sortOrder={sortOrder}
         sortedCol={sortedCol}
       />
-      {isShowPagination ? (
-        <PaginationWrapper>
-          <DesktopWrapper>
-            <PaginationModified
-              size="small"
-              initialPage={paginationId}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-            />
-          </DesktopWrapper>
-          <MobileWrapper>
-            <PaginationModified
-              size="large"
-              initialPage={paginationId}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-            />
-          </MobileWrapper>
-        </PaginationWrapper>
-      ) : (
-        <></>
-      )}
     </WQContentWrapper>
   )
 }

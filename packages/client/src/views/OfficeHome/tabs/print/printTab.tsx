@@ -28,20 +28,17 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { withTheme } from 'styled-components'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import {
   buttonMessages,
   constantsMessages,
   dynamicConstantsMessages
 } from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IStoreState } from '@client/store'
 import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { officeHomeMessages } from '@client/i18n/messages/views/officeHome'
 import {
   changeSortedColumn,
   getSortedItems
@@ -52,10 +49,6 @@ import {
 } from '@client/views/OfficeHome/tabs/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
-import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
-import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
 interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
@@ -236,7 +229,10 @@ class PrintTabComponent extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
-      const dateOfEvent = reg.dateOfEvent && new Date(reg.dateOfEvent)
+      const dateOfEvent =
+        reg.dateOfEvent &&
+        reg.dateOfEvent.length > 0 &&
+        new Date(reg.dateOfEvent)
       const registered =
         (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
           ? new Date(reg.modifiedAt)
@@ -293,42 +289,30 @@ class PrintTabComponent extends React.Component<
     const isShowPagination =
       this.props.queryData.data.totalItems &&
       this.props.queryData.data.totalItems > pageSize
+        ? true
+        : false
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.print)}
         isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
+        isShowPagination={isShowPagination}
+        paginationId={paginationId}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
+        loading={this.props.loading}
+        error={this.props.error}
       >
         <GridTable
           content={this.transformRegisteredContent(data)}
           columns={this.getColumns()}
-          noResultText={intl.formatMessage(officeHomeMessages.print)}
+          noResultText={intl.formatMessage(constantsMessages.noRecords, {
+            tab: 'ready to print'
+          })}
           clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
         />
-        {isShowPagination ? (
-          <PaginationWrapper>
-            <DesktopWrapper>
-              <PaginationModified
-                size="small"
-                initialPage={paginationId}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-              />
-            </DesktopWrapper>
-            <MobileWrapper>
-              <PaginationModified
-                size="large"
-                initialPage={paginationId}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-              />
-            </MobileWrapper>
-          </PaginationWrapper>
-        ) : (
-          <></>
-        )}
       </WQContentWrapper>
     )
   }
