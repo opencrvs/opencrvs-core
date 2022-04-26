@@ -70,8 +70,8 @@ export const formDraftReducer: LoopReducer<IFormDraftState, Actions> = (
   action: Actions
 ): IFormDraftState | Loop<IFormDraftState, Actions> => {
   switch (action.type) {
-    case offlineActions.UPDATED:
     case offlineActions.READY:
+    case offlineActions.UPDATED:
       const {
         formConfig: { formDrafts }
       } = action.payload

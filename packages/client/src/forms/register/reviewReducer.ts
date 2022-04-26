@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm, ReviewSection, ISerializedForm, Event } from '@client/forms'
+import { IForm, ReviewSection, Event } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/review'
 import * as offlineActions from '@client/offline/actions'
 import { getConfiguredOrDefaultForm } from '@client/forms/configuration'
@@ -45,6 +45,7 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
 ): IReviewFormState | Loop<IReviewFormState, Action> => {
   switch (action.type) {
     case offlineActions.READY:
+    case offlineActions.APPLICATION_CONFIG_LOADED:
       const { formConfig } = action.payload
       const birth = getConfiguredOrDefaultForm(formConfig, Event.BIRTH)
       const death = getConfiguredOrDefaultForm(formConfig, Event.DEATH)

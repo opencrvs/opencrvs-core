@@ -45,6 +45,7 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
 ): IRegisterFormState | Loop<IRegisterFormState, Action> => {
   switch (action.type) {
     case offlineActions.READY:
+    case offlineActions.APPLICATION_CONFIG_LOADED:
       const { formConfig } = action.payload
       const birth = getConfiguredOrDefaultForm(formConfig, Event.BIRTH)
       const death = getConfiguredOrDefaultForm(formConfig, Event.DEATH)
