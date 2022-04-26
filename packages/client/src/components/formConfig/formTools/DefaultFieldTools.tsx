@@ -18,12 +18,13 @@ import {
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
 import { Tooltip } from '@opencrvs/components/lib/icons'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import { useIntl } from 'react-intl'
+import { MessageDescriptor, useIntl } from 'react-intl'
 import {
   IConfigFormField,
   getContentKey,
   getCertificateHandlebar
 } from '@client/forms/configuration/configFields/utils'
+import { fieldTypeLabel } from '@client/forms'
 
 const Container = styled.div`
   display: flex;
@@ -84,9 +85,10 @@ export function DefaultFieldTools({
   const intl = useIntl()
   const handleBar = getCertificateHandlebar(configField)
   const contentKey = getContentKey(configField)
+  const fieldLabel = fieldTypeLabel(configField.definition.type)
   return (
     <Container>
-      <Title>{configField.definition.type}</Title>
+      <Title>{intl.formatMessage(fieldLabel as MessageDescriptor)}</Title>
       <ListViewSimplified bottomBorder>
         <ListViewItemSimplified
           label={<Label>{intl.formatMessage(messages.hideField)}</Label>}

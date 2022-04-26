@@ -40,6 +40,27 @@ interface IFormConfigMessages
   showIntroductionPage: MessageDescriptor
   introductionPageSuccessNotification: MessageDescriptor
   noOfAddressesSuccessNotification: MessageDescriptor
+  fieldGroup: MessageDescriptor
+  documents: MessageDescriptor
+  list: MessageDescriptor
+  paragraph: MessageDescriptor
+  imageUploader: MessageDescriptor
+  documentUploader: MessageDescriptor
+  simpleDocumentUploader: MessageDescriptor
+  locationSearch: MessageDescriptor
+  warning: MessageDescriptor
+  link: MessageDescriptor
+  fetchButton: MessageDescriptor
+  tel: MessageDescriptor
+  selectWithOption: MessageDescriptor
+  selectWithDynamicOption: MessageDescriptor
+  fieldWithDynamicDefinition: MessageDescriptor
+  radioGroup: MessageDescriptor
+  radioGroupWithNestedField: MessageDescriptor
+  informativeRadioGroup: MessageDescriptor
+  checkboxGroup: MessageDescriptor
+  date: MessageDescriptor
+  dynamicList: MessageDescriptor
 }
 
 type INavigationMessages = Record<
@@ -236,6 +257,111 @@ const messagesToDefine: IFormConfigMessages = {
   noOfAddressesSuccessNotification: {
     id: 'form.config.settings.addresses.successNotification',
     defaultMessage: 'The number of address has been updated',
+    description: 'Success notification label for number of addresses settings'
+  },
+  fieldGroup: {
+    id: 'form.config.settings.fieldGroup',
+    defaultMessage: 'Field Group',
+    description: 'Success notification label for number of addresses settings'
+  },
+  documents: {
+    id: 'form.config.settings.document',
+    defaultMessage: 'Document',
+    description: 'Success notification label for number of addresses settings'
+  },
+  list: {
+    id: 'form.config.settings.list',
+    defaultMessage: 'List',
+    description: 'Success notification label for number of addresses settings'
+  },
+  paragraph: {
+    id: 'form.config.settings.paragraph',
+    defaultMessage: 'Paragraph',
+    description: 'Success notification label for number of addresses settings'
+  },
+  imageUploader: {
+    id: 'form.config.settings.imageUploader',
+    defaultMessage: 'Image Uploader',
+    description: 'Success notification label for number of addresses settings'
+  },
+  documentUploader: {
+    id: 'form.config.settings.documentUploader',
+    defaultMessage: 'Document Uploader',
+    description: 'Success notification label for number of addresses settings'
+  },
+  simpleDocumentUploader: {
+    id: 'form.config.settings.simpleDocumentUploader',
+    defaultMessage: 'Simple document Uploader',
+    description: 'Success notification label for number of addresses settings'
+  },
+  locationSearch: {
+    id: 'form.config.settings.locationSearch',
+    defaultMessage: 'Location Search',
+    description: 'Success notification label for number of addresses settings'
+  },
+  warning: {
+    id: 'form.config.settings.warning',
+    defaultMessage: 'Warning',
+    description: 'Success notification label for number of addresses settings'
+  },
+  link: {
+    id: 'form.config.settings.link',
+    defaultMessage: 'Link',
+    description: 'Success notification label for number of addresses settings'
+  },
+  fetchButton: {
+    id: 'form.config.settings.fetchButton',
+    defaultMessage: 'Fetch Button',
+    description: 'Success notification label for number of addresses settings'
+  },
+  tel: {
+    id: 'form.config.settings.tel',
+    defaultMessage: 'Phone Input',
+    description: 'Success notification label for number of addresses settings'
+  },
+  selectWithOption: {
+    id: 'form.config.settings.selectWithOption',
+    defaultMessage: 'Select with Option',
+    description: 'Success notification label for number of addresses settings'
+  },
+  selectWithDynamicOption: {
+    id: 'form.config.settings.selectWithDynamicOption',
+    defaultMessage: 'Select with dynamic option',
+    description: 'Success notification label for number of addresses settings'
+  },
+  fieldWithDynamicDefinition: {
+    id: 'form.config.settings.fieldWithDynamicDef',
+    defaultMessage: 'Field with dynamic definition',
+    description: 'Success notification label for number of addresses settings'
+  },
+  radioGroup: {
+    id: 'form.config.settings.radioGroup',
+    defaultMessage: 'Radio Group',
+    description: 'Success notification label for number of addresses settings'
+  },
+  radioGroupWithNestedField: {
+    id: 'form.config.settings.radioGroupWithNestedField',
+    defaultMessage: 'Radio group with nested field',
+    description: 'Success notification label for number of addresses settings'
+  },
+  informativeRadioGroup: {
+    id: 'form.config.settings.informativeRadio',
+    defaultMessage: 'Informative radio group',
+    description: 'Success notification label for number of addresses settings'
+  },
+  checkboxGroup: {
+    id: 'form.config.settings.checkbox',
+    defaultMessage: 'Checkbox',
+    description: 'Success notification label for number of addresses settings'
+  },
+  date: {
+    id: 'form.config.settings.date',
+    defaultMessage: 'Date input',
+    description: 'Success notification label for number of addresses settings'
+  },
+  dynamicList: {
+    id: 'form.config.settings.dynamicList',
+    defaultMessage: 'Dynamic List',
     description: 'Success notification label for number of addresses settings'
   }
 }
