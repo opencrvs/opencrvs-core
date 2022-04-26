@@ -43,7 +43,8 @@ import {
   IFormFieldValue,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   IRadioGroupWithNestedFieldsFormField,
-  IInformant
+  IInformant,
+  IContactPoint
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -490,13 +491,14 @@ export function getQueryData(
   return queryData
 }
 
-function getSelectedInformantType(draftData?: IFormData) {
+function getSelectedInformantAndContactType(draftData?: IFormData) {
   // IFormFieldValue is a union with primitives - usually a top-level string in this function like this section.fieldValue
   // informantType is a special case where both the nested field and the selected parent are required
   // this means an object was required for the fieldValue
   // TypeScript throws an error as the IFormFieldValue type cannot access the object prop of what it things could be a string
   // creating selectedInformantType to be a value which will be used in the conditional
   let selectedInformantType = ''
+  let selectedContactType = ''
   if (
     draftData &&
     draftData.registration &&
@@ -505,7 +507,15 @@ function getSelectedInformantType(draftData?: IFormData) {
     const informantType = draftData.registration.informantType as IInformant
     selectedInformantType = informantType.value
   }
-  return selectedInformantType
+  if (
+    draftData &&
+    draftData.registration &&
+    draftData.registration.contactPoint
+  ) {
+    const contactPoint = draftData.registration.contactPoint as IContactPoint
+    selectedContactType = contactPoint.value
+  }
+  return { selectedInformantType, selectedContactType }
 }
 
 export const getConditionalActionsForField = (
@@ -518,10 +528,25 @@ export const getConditionalActionsForField = (
   draftData?: IFormData
 ): string[] => {
   // set some constants that are used in conditionals
+  const selectedInformantAndContactType =
+    getSelectedInformantAndContactType(draftData)
   // eslint-disable-next-line no-unused-vars
-  const selectedInformantType = getSelectedInformantType(draftData)
+  const mothersDetailsExistBasedOnContactAndInformant =
+    selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||
+    selectedInformantAndContactType.selectedContactType === 'MOTHER'
+      ? true
+      : false
+  // eslint-disable-next-line no-unused-vars
+  const fathersDetailsExistBasedOnContactAndInformant =
+    selectedInformantAndContactType.selectedInformantType === 'FATHER' ||
+    selectedInformantAndContactType.selectedContactType === 'FATHER'
+      ? true
+      : false
   if (!field.conditionals) {
     return []
+  }
+  if (field.name === 'countryPrimary') {
+    // console.log('values: ', JSON.stringify(values))
   }
   return (
     field.conditionals
@@ -537,8 +562,20 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   draftData?: IFormData
 ): IFormSectionGroup[] => {
   // set some constants that are used in conditionals
+  const selectedInformantAndContactType =
+    getSelectedInformantAndContactType(draftData)
   // eslint-disable-next-line no-unused-vars
-  const selectedInformantType = getSelectedInformantType(draftData)
+  const mothersDetailsExistBasedOnContactAndInformant =
+    selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||
+    selectedInformantAndContactType.selectedContactType === 'MOTHER'
+      ? true
+      : false
+  // eslint-disable-next-line no-unused-vars
+  const fathersDetailsExistBasedOnContactAndInformant =
+    selectedInformantAndContactType.selectedInformantType === 'FATHER' ||
+    selectedInformantAndContactType.selectedContactType === 'FATHER'
+      ? true
+      : false
   // handling all possible group visibility conditionals
   return section.groups.filter((group) => {
     if (!group.conditionals) {
@@ -715,14 +752,6 @@ export const conditionals: IConditionals = {
   primaryAddressSameAsOtherPrimary: {
     action: 'hide',
     expression: 'values.primaryAddressSameAsOtherPrimary'
-  },
-  secondaryAddressSameAsOtherSecondary: {
-    action: 'hide',
-    expression: 'values.secondaryAddressSameAsOtherSecondary'
-  },
-  secondaryAddressSameAsPrimary: {
-    action: 'hide',
-    expression: 'values.secondaryAddressSameAsPrimary'
   },
   countryPrimary: {
     action: 'hide',

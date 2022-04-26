@@ -588,6 +588,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             label: intl.formatMessage(buttonMessages.closeDeclaration),
             handler: () => this.onCloseDeclaration()
           }
+    console.log('DECLARATION: ', JSON.stringify(declaration))
     return (
       <>
         <TimeMounted

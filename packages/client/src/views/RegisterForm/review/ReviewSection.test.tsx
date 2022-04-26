@@ -77,8 +77,7 @@ const rejectedDraftDeath = createReviewDeclaration(
 draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
   father: {
-    fathersDetailsExist: true,
-    secondaryAddressSameAsOtherSecondary: false
+    fathersDetailsExist: true
   },
   documents: {
     imageUploader: { title: 'dummy', description: 'dummy', data: '' }

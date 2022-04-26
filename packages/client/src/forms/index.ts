@@ -249,7 +249,7 @@ export type IFormFieldValue =
   | IAttachmentValue
   | FieldValueArray
   | FieldValueMap
-  | IRegistration
+  | IContactPoint
   | IInformant
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
@@ -271,8 +271,7 @@ export interface IFileValue {
   data: string
 }
 
-export interface IContactPoint {
-  contactRelationship: string
+export interface IContactPointPhone {
   registrationPhone: string
 }
 
@@ -284,8 +283,9 @@ export interface IInformant {
   nestedFields: IInformantOtherInformantType
 }
 
-export interface IRegistration {
-  nestedFields: IContactPoint
+export interface IContactPoint {
+  value: string
+  nestedFields: IContactPointPhone
 }
 
 export interface IAttachmentValue {
@@ -704,7 +704,6 @@ export interface IConditionals {
   isOfficePreSelected: IConditional
   fathersDetailsExist: IConditional
   primaryAddressSameAsOtherPrimary: IConditional
-  secondaryAddressSameAsOtherSecondary: IConditional
   countryPrimary: IConditional
   statePrimary: IConditional
   districtPrimary: IConditional
@@ -722,7 +721,6 @@ export interface IConditionals {
   otherPersonCollectsCertificate: IConditional
   birthCertificateCollectorNotVerified: IConditional
   deathCertificateCollectorNotVerified: IConditional
-  secondaryAddressSameAsPrimary: IConditional
   placeOfBirthHospital: IConditional
   placeOfDeathTypeHeathInstitue: IConditional
   otherBirthEventLocation: IConditional

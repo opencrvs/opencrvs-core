@@ -15,7 +15,7 @@ import {
   IForm,
   IFormData,
   IFormFieldValue,
-  IRegistration,
+  IContactPoint,
   Sort
 } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -856,7 +856,7 @@ async function updateWorkqueueData(
     (declaration.data &&
       declaration.data.registration &&
       declaration.data.registration.contactPoint &&
-      (declaration.data.registration.contactPoint as IRegistration).nestedFields
+      (declaration.data.registration.contactPoint as IContactPoint).nestedFields
         .registrationPhone) ||
     ''
 

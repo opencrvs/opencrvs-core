@@ -12,6 +12,7 @@
 export * from './field-mappings'
 export * from '@client/forms/register/fieldMappings/birth/query/documents-mappings'
 export * from '@client/forms/register/fieldMappings/birth/query/father-mappings'
+export * from '@client/forms/register/fieldMappings/birth/query/mother-mappings'
 export * from '@client/forms/register/fieldMappings/birth/query/registration-mappings'
 export * from '@client/forms/register/fieldMappings/death/query/declaration-mappings'
 export * from '@client/forms/register/fieldMappings/death/query/cause-of-death-mappings'

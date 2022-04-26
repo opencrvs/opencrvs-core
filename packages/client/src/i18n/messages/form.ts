@@ -19,7 +19,6 @@ interface IFormMessages
   addressLine3: MessageDescriptor
   addressLine3UrbanOption: MessageDescriptor
   addressLine4: MessageDescriptor
-  secondaryAddressSameAsOtherSecondary: MessageDescriptor
   answer: MessageDescriptor
   informantIDProof: MessageDescriptor
   informantName: MessageDescriptor
@@ -85,7 +84,6 @@ interface IFormMessages
   contactDetailsMother: MessageDescriptor
   country: MessageDescriptor
   secondaryAddress: MessageDescriptor
-  secondaryAddressSameAsPrimary: MessageDescriptor
   dateOfMarriage: MessageDescriptor
   daughter: MessageDescriptor
   daughterInLaw: MessageDescriptor
@@ -423,13 +421,6 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Title for the address line 4',
     id: 'form.field.label.addressLine4'
   },
-  secondaryAddressSameAsOtherSecondary: {
-    defaultMessage:
-      "Is the secondary address the same as the mother's secondary address?",
-    description:
-      "Title for the radio button to select that the person's secondary address is the same as the mother's secondary address",
-    id: 'form.field.label.secondaryAddressSameAsOtherSecondary'
-  },
   answer: {
     defaultMessage: 'Answer',
     description: 'Label to show answer to a security question',
@@ -754,13 +745,6 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Secondary Address',
     description: 'Title for the secondary address fields',
     id: 'form.field.label.secondaryAddress'
-  },
-  secondaryAddressSameAsPrimary: {
-    defaultMessage:
-      'Is their secondary address the same as their primary address?',
-    description:
-      'Title for the radio button to select that the secondary address is the same as the primary address',
-    id: 'form.field.label.secondaryAddressSameAsPrimary'
   },
   primaryAddress: {
     defaultMessage: 'Usual place of residence',

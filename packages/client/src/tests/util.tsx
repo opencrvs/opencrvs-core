@@ -275,7 +275,6 @@ export const primaryAddressData = {
 }
 
 export const secondaryAddressData = {
-  secondaryAddressSameAsPrimary: false,
   secondaryAddress: '',
   countrySecondary: 'FAR',
   stateSecondary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
@@ -365,7 +364,6 @@ export const currentUserDeclarations = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -482,7 +480,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -555,7 +552,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -628,7 +624,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -700,7 +695,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -773,7 +767,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -846,7 +839,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -979,7 +971,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -1052,7 +1043,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -1688,8 +1678,7 @@ export const mockDeclarationData = {
     ...primaryInternationalAddressLines,
     ...secondaryAddressData,
     ...secondaryInternationalAddressLines,
-    primaryAddressSameAsOtherPrimary: true,
-    secondaryAddressSameAsOtherSecondary: true
+    primaryAddressSameAsOtherPrimary: true
   },
   registration: {
     whoseContactDetails: {
@@ -2018,7 +2007,6 @@ export const mockDeathDeclarationDataWithoutFirstNames = {
     addressLine1Primary: '193 Kalibari Road',
     postCodePrimary: '2200',
     secondaryAddress: '',
-    secondaryAddressSameAsPrimary: true,
     country: 'BGD',
     state: '',
     district: '',

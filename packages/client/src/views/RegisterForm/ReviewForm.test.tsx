@@ -1635,7 +1635,6 @@ describe('ReviewForm tests', () => {
         postcodeSecondary: null,
         ruralOrUrbanPrimary: '',
         ruralOrUrbanSecondary: '',
-        secondaryAddressSameAsPrimary: true,
         statePrimary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
         stateSecondary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c'
       })

@@ -11,19 +11,18 @@
  */
 import { IFormData } from '@client/forms'
 
-export function emptyFatherSectionTransformer(
+export function emptyMotherSectionTransformer(
   transformedData: IFormData,
   queryData: any,
   sectionId: string
 ) {
   if (!queryData[sectionId]) {
     transformedData[sectionId] = {
-      fathersDetailsExist: false,
-      primaryAddressSameAsOtherPrimary: true
+      mothersDetailsExist: false
     }
   } else {
     transformedData[sectionId] = {
-      fathersDetailsExist: true,
+      mothersDetailsExist: true,
       ...transformedData[sectionId]
     }
   }

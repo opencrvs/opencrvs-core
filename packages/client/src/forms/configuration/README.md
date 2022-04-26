@@ -443,9 +443,6 @@ This object holds sections for birth declaration forms. All sections are contain
 
   The level of the educational qualification of the father.
 
-  - #### `secondaryAddressSameAsOtherSecondary`
-    This is a radio option field, which checks whether the father’s address is the same as mother’s. If so, then the mother's address is copied into the father’s address.
-
 7.  ### documents
     This section is responsible for taking input of the supporting documents. It has only one view group.
 

@@ -49,7 +49,6 @@ describe('OutBox tests', () => {
         districtPrimary: '23b3bb18-20e4-4b05-897d-3c14cb3d374e',
         addressLine4Primary: 'e2fc9415-8492-4220-a1a2-c130630d2234',
         addressLine3Primary: 'a26bd41e-0363-4cd1-b358-243f8c7a85da',
-        secondaryAddressSameAsPrimary: true,
         country: 'BGD'
       },
       father: {
@@ -80,7 +79,6 @@ describe('OutBox tests', () => {
         statePrimary: '61f745b4-5e97-4b06-9560-429df5ca511b',
         districtPrimary: 'e4eab1dc-42dd-4b34-84e8-a81e08bc8966',
         addressLine4Primary: '9d0ff3fa-d9b6-4cb6-92ba-72bbb157d430',
-        secondaryAddressSameAsPrimary: true,
         country: 'BGD'
       },
       informant: {
