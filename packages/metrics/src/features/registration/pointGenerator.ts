@@ -52,7 +52,8 @@ import {
   getTrackingId,
   getRegLastOffice,
   getEncounterLocationType,
-  getPractitionerIdFromBundle
+  getPractitionerIdFromBundle,
+  fetchDeclarationsBeginnerRole
 } from '@metrics/features/registration/fhirUtils'
 import {
   getAgeInDays,
@@ -66,11 +67,7 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   Events
 } from '@metrics/features/metrics/constants'
-import {
-  fetchParentLocationByLocationID,
-  fetchPractitionerRole,
-  fetchTaskHistory
-} from '@metrics/api'
+import { fetchParentLocationByLocationID, fetchTaskHistory } from '@metrics/api'
 import { EVENT_TYPE } from '@metrics/features/metrics/utils'
 
 export const generateInCompleteFieldPoints = async (
@@ -162,8 +159,13 @@ export const generateBirthRegPoint = async (
     throw new Error('Practitioner id not found')
   }
 
-  const practitionerRole = await fetchPractitionerRole(
-    practitionerId,
+  // const practitionerRole = await fetchPractitionerRole(
+  //   practitionerId,
+  //   authHeader
+  // )
+
+  const practitionerRole = await fetchDeclarationsBeginnerRole(
+    payload,
     authHeader
   )
 
@@ -221,8 +223,13 @@ export const generateDeathRegPoint = async (
     throw new Error('Practitioner id not found')
   }
 
-  const practitionerRole = await fetchPractitionerRole(
-    practitionerId,
+  // const practitionerRole = await fetchPractitionerRole(
+  //   practitionerId,
+  //   authHeader
+  // )
+
+  const practitionerRole = await fetchDeclarationsBeginnerRole(
+    payload,
     authHeader
   )
 

@@ -382,6 +382,8 @@ export async function fetchDeclarationsBeginnerRole(
   if (currentTask) {
     const bundle = await fetchTaskHistory(currentTask.id, authHeader)
 
+    const length = bundle.entry ? bundle.entry.length : 0
+
     const task =
       bundle.entry &&
       bundle.entry
@@ -390,19 +392,22 @@ export async function fetchDeclarationsBeginnerRole(
           Boolean(resource && isTaskResource(resource))
         )
 
-    if (task) {
+    if (task && length > 0) {
+      const startedTask = task[length - 1] //the last task in entries of history bundle
       const status =
-        task[0].businessStatus &&
-        task[0].businessStatus.coding &&
-        task[0].businessStatus.coding[0] &&
-        task[0].businessStatus.coding[0].code
+        startedTask.businessStatus &&
+        startedTask.businessStatus.coding &&
+        startedTask.businessStatus.coding[0] &&
+        startedTask.businessStatus.coding[0].code
 
       if (status === 'DECLARED') {
         startedByRole = 'FIELD_AGENT'
       } else if (status === 'WAITING_VALIDATION') {
-        startedByRole = 'REGISTRATION_AGENT'
-      } else if (status === 'VALIDATED') {
         startedByRole = 'REGISTRAR'
+      } else if (status === 'VALIDATED') {
+        startedByRole = 'REGISTRATION AGENT'
+      } else {
+        startedByRole = 'No role found'
       }
     }
   }
