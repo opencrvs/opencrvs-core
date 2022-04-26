@@ -26,6 +26,7 @@ import { createCustomField } from '@client/forms/configuration/customUtils'
 import { FieldPosition } from '@client/forms/configuration'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import { registerForms } from '@client/forms/configuration/default'
+import { getDefaultLanguage } from '@client/i18n/utils'
 
 export type IDefaultConfigField = Pick<
   IQuestionConfig,
@@ -82,6 +83,9 @@ function customFieldToQuestionConfig(
     'tooltip',
     'description'
   ] as const
+
+  const lang = getDefaultLanguage()
+
   return {
     fieldId,
     preceedingFieldId,
@@ -90,7 +94,7 @@ function customFieldToQuestionConfig(
     ...messageProperties.reduce(
       (accum, prop) => ({
         ...accum,
-        [prop]: [{ lang: 'en', descriptor: field[prop] }]
+        [prop]: [{ lang, descriptor: field[prop] }]
       }),
       {}
     )

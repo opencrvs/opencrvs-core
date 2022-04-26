@@ -20,6 +20,7 @@ import { getGroup, getQuestionsIdentifiersFromFieldId, getSection } from '.'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE THE DEFAULT CONFIGURATION
 
+/* For the enabled field in FormFields */
 export enum FieldEnabled {
   DISABLED = 'DISABLED'
 }
