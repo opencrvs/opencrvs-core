@@ -243,64 +243,131 @@ describe('deleteFormDraft mutation', () => {
     }
   })
 
-  const eventPayload = {
-    event: 'birth'
+  const modifyPayload = {
+    event: 'birth',
+    status: 'DELETED'
   }
 
-  it('delete birth form draft history and all questions for natlsysadmin', async () => {
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        History: [],
-        status: 'DELETED'
-      }),
-      { status: 201 }
-    )
+  it('change birth form draft status to DELETED and delete all questions for natlsysadmin', async () => {
+    fetch.mockResponseOnce(JSON.stringify(modifyPayload), { status: 201 })
 
     const response = await resolvers.Mutation.deleteFormDraft(
       {},
-      { eventPayload },
+      { formDraft: modifyPayload },
       authHeaderSysAdmin
     )
 
     expect(response).toEqual({
-      History: [],
+      event: 'birth',
       status: 'DELETED'
     })
   })
 
   it('should throw error for register', async () => {
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        statusCode: '201'
-      }),
-      { status: 400 }
-    )
+    fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
 
     expect(
       resolvers.Mutation.deleteFormDraft(
         {},
-        { eventPayload },
+        { formDraft: modifyPayload },
         authHeaderRegister
       )
     ).rejects.toThrowError('Delete form draft is only allowed for natlsysadmin')
   })
 
   it('should throw error when /deleteFormDraft sends anything but 201', async () => {
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        statusCode: '201'
-      }),
-      { status: 400 }
-    )
+    fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
 
     expect(
       resolvers.Mutation.deleteFormDraft(
         {},
-        { eventPayload },
+        { formDraft: modifyPayload },
         authHeaderSysAdmin
       )
     ).rejects.toThrowError(
       "Something went wrong on config service. Couldn't delete form draft"
+    )
+  })
+})
+
+describe('modifyDraftStatus mutation', () => {
+  let authHeaderSysAdmin: { Authorization: string }
+  let authHeaderRegister: { Authorization: string }
+  beforeEach(() => {
+    fetch.resetMocks()
+    const sysAdminToken = jwt.sign(
+      { scope: ['natlsysadmin'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderSysAdmin = {
+      Authorization: `Bearer ${sysAdminToken}`
+    }
+    const regsiterToken = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderRegister = {
+      Authorization: `Bearer ${regsiterToken}`
+    }
+  })
+
+  const modifyPayload = {
+    event: 'birth',
+    status: 'IN_PREVIEW'
+  }
+
+  it('modify birth form draft status to IN_PREVIEW for natlsysadmin', async () => {
+    fetch.mockResponseOnce(JSON.stringify(modifyPayload), { status: 201 })
+
+    const response = await resolvers.Mutation.modifyDraftStatus(
+      {},
+      { formDraft: modifyPayload },
+      authHeaderSysAdmin
+    )
+
+    expect(response).toEqual({
+      event: 'birth',
+      status: 'IN_PREVIEW'
+    })
+  })
+
+  it('should throw error for register', async () => {
+    fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
+
+    expect(
+      resolvers.Mutation.modifyDraftStatus(
+        {},
+        { formDraft: modifyPayload },
+        authHeaderRegister
+      )
+    ).rejects.toThrowError(
+      'Update form draft status is only allowed for natlsysadmin'
+    )
+  })
+
+  it('should throw error when /formDraftStatus sends anything but 201', async () => {
+    fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
+
+    expect(
+      resolvers.Mutation.modifyDraftStatus(
+        {},
+        { formDraft: modifyPayload },
+        authHeaderSysAdmin
+      )
+    ).rejects.toThrowError(
+      "Something went wrong on config service. Couldn't update form draft status"
     )
   })
 })

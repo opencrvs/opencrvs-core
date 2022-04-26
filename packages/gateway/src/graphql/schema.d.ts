@@ -78,6 +78,7 @@ export interface GQLMutation {
   updateApplicationConfig?: GQLApplicationConfiguration
   createOrUpdateQuestion?: GQLQuestion
   createOrUpdateFormDraft?: GQLFormDraft
+  modifyDraftStatus?: GQLFormDraft
   deleteFormDraft?: GQLFormDraft
 }
 
@@ -517,10 +518,14 @@ export interface GQLQuestionInput {
 
 export interface GQLFormDraftInput {
   questions?: Array<GQLQuestionInput | null>
-  deleted?: Array<string | null>
   event: string
   status: string
   comment?: string
+}
+
+export interface GQLFormDraftStatusModify {
+  event: string
+  status: string
 }
 
 export type GQLMap = any
@@ -2094,6 +2099,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
   createOrUpdateQuestion?: MutationToCreateOrUpdateQuestionResolver<TParent>
   createOrUpdateFormDraft?: MutationToCreateOrUpdateFormDraftResolver<TParent>
+  modifyDraftStatus?: MutationToModifyDraftStatusResolver<TParent>
   deleteFormDraft?: MutationToDeleteFormDraftResolver<TParent>
 }
 
@@ -2573,8 +2579,23 @@ export interface MutationToCreateOrUpdateFormDraftResolver<
   ): TResult
 }
 
+export interface MutationToModifyDraftStatusArgs {
+  formDraft: GQLFormDraftStatusModify
+}
+export interface MutationToModifyDraftStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToModifyDraftStatusArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
 export interface MutationToDeleteFormDraftArgs {
-  event: string
+  formDraft: GQLFormDraftStatusModify
 }
 export interface MutationToDeleteFormDraftResolver<
   TParent = any,

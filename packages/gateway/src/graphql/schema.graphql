@@ -199,7 +199,8 @@ type Mutation {
   ): ApplicationConfiguration
   createOrUpdateQuestion(question: QuestionInput!): Question
   createOrUpdateFormDraft(formDraft: FormDraftInput!): FormDraft
-  deleteFormDraft(event: String!): FormDraft
+  modifyDraftStatus(formDraft: FormDraftStatusModify!): FormDraft
+  deleteFormDraft(formDraft: FormDraftStatusModify!): FormDraft
 }
 
 type Dummy {
@@ -627,10 +628,14 @@ input QuestionInput {
 
 input FormDraftInput {
   questions: [QuestionInput]
-  deleted: [String]
   event: String!
   status: String!
   comment: String
+}
+
+input FormDraftStatusModify {
+  event: String!
+  status: String!
 }
 
 scalar Map
