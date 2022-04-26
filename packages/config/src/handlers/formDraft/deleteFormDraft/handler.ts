@@ -30,6 +30,7 @@ import {
 import fetch from 'node-fetch'
 export interface IDeleteFormDraftPayload {
   event: Event
+  status: DraftStatus
 }
 
 enum HearthCollectionsName {
@@ -60,7 +61,7 @@ export async function deleteFormDraftHandler(
   })) as IFormDraftModel
 
   //check if requested operation is valid or invalid
-  if (!isValidFormDraftOperation(draft.status, DraftStatus.DELETED)) {
+  if (!isValidFormDraftOperation(draft.status, formDraft.status)) {
     return h
       .response(`Invalid Operation. Can not delete ${draft.status} form draft.`)
       .code(400)
@@ -145,9 +146,7 @@ export async function deleteFormDraftHandler(
 
       //updating form draft status
       draft.status = DraftStatus.DELETED
-      draft.version = 0
       draft.updatedAt = Date.now()
-      draft.history = []
       try {
         await FormDraft.updateOne({ _id: draft._id }, draft)
       } catch (err) {
@@ -172,5 +171,6 @@ export async function deleteFormDraftHandler(
 export const requestSchema = Joi.object({
   event: Joi.string()
     .valid(...validEvent)
-    .required()
+    .required(),
+  status: Joi.string().valid(DraftStatus.DELETED).required()
 })
