@@ -108,6 +108,13 @@ function useHasNatlSysAdminScope() {
   return scope?.includes(AuthScope.NATLSYSADMIN)
 }
 
+function isSelectedFieldValid(
+  selectedField: IConfigField | null,
+  section: string
+): selectedField is IConfigField {
+  return !!selectedField?.fieldId.includes(section)
+}
+
 export function FormConfigWizard() {
   const [selectedField, setSelectedField] = React.useState<IConfigField | null>(
     null
@@ -175,7 +182,14 @@ export function FormConfigWizard() {
           />
         </CanvasContainer>
         <ToolsContainer>
-          {selectedField ? (
+          {/*
+           *  The useEffect hook for clearing the selectedField takes
+           *  effect after the render for when the section changes so
+           *  for that particular render where the section has changed
+           *  but the selectedField is still from the previous section
+           *  we need to make sure that the selectedField is valid
+           */}
+          {isSelectedFieldValid(selectedField, section) ? (
             isDefaultField(selectedField) && (
               <DefaultFieldTools configField={selectedField} />
             )

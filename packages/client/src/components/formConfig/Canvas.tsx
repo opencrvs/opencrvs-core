@@ -61,10 +61,10 @@ type ICanvasProps = {
 }
 
 export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
+  const { event, section } = useParams<IPageNavigationProps>()
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
-  const { event, section } = useParams<IPageNavigationProps>()
   const formSection = useSelector((store: IStoreState) =>
     getRegisterFormSection(store, section, event)
   )
