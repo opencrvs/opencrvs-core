@@ -21,6 +21,7 @@ import {
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
+import { birthDocumentTypeFhirMapping } from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
 
 // THIS FILE CONTAINS THE DEFAULT, FACTORY RESET FORM CONFIGURATIONS
 
@@ -2820,44 +2821,22 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'paragraph',
                 type: 'PARAGRAPH',
-                label: {
-                  defaultMessage:
-                    'For birth registration of birth the following documents are required:',
-                  description: 'Documents Paragraph text',
-                  id: 'form.section.documents.birth.requirements'
-                },
+                label: formMessageDescriptors.documentsParagraph,
                 initialValue: '',
                 validate: []
               },
               {
                 name: 'uploadDocForChildDOB',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: 'Proof of Place and Date of Birth of Child',
-                  description: 'Label for list item Child Birth Proof',
-                  id: 'form.field.label.proofOfBirthPlaceAndDate'
-                },
+                label: formMessageDescriptors.proofOfBirth,
                 initialValue: '',
                 extraValue: 'CHILD',
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'Original Birth Record',
-                    label: {
-                      defaultMessage: 'Original birth record',
-                      description:
-                        'Label for select option original Birth Record',
-                      id: 'form.field.label.docTypeChildBirthProof'
-                    }
-                  },
-                  {
-                    value: 'Under Five Card',
-                    label: {
-                      defaultMessage: 'Under five card',
-                      description: 'Label for select option Under five card',
-                      id: 'form.field.label.docTypeChildUnderFiveCard'
-                    }
+                    value: birthDocumentTypeFhirMapping.NOTIFICATION_OF_BIRTH,
+                    label: formMessageDescriptors.docTypeChildBirthProof
                   }
                 ],
                 mapping: {
@@ -2872,33 +2851,27 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'uploadDocForMother',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: "Proof of Mother's ID",
-                  description: 'Label for list item Mother ID Proof',
-                  id: 'form.field.label.proofOfMothersID'
-                },
+                label: formMessageDescriptors.proofOfMothersID,
                 initialValue: '',
                 extraValue: 'MOTHER',
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'National ID (front)',
-                    label: {
-                      defaultMessage: 'Front of national ID',
-                      description:
-                        'Label for select option front of national ID',
-                      id: 'form.field.label.docTypeNIDFront'
-                    }
+                    value: birthDocumentTypeFhirMapping.NATIONAL_ID,
+                    label: formMessageDescriptors.docTypeNID
                   },
                   {
-                    value: 'National ID (back)',
-                    label: {
-                      defaultMessage: "Back of national ID'",
-                      description:
-                        "Label for select option back of national ID'",
-                      id: 'form.field.label.docTypeNIDBack'
-                    }
+                    value: birthDocumentTypeFhirMapping.PASSPORT,
+                    label: formMessageDescriptors.docTypePassport
+                  },
+                  {
+                    value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
+                    label: formMessageDescriptors.docTypeBirthCert
+                  },
+                  {
+                    value: birthDocumentTypeFhirMapping.OTHER,
+                    label: formMessageDescriptors.docTypeOther
                   }
                 ],
                 conditionals: [
@@ -2907,7 +2880,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'Hidden for Parent Details none or Mother only',
                     action: 'hide',
                     expression:
-                      '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === "NONE") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === "FATHER_ONLY")'
+                      '!draftData.mother.mothersDetailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2922,33 +2895,27 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'uploadDocForFather',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: "Proof of Father's ID",
-                  description: 'Label for list item Father ID Proof',
-                  id: 'form.field.label.proofOfFathersID'
-                },
+                label: formMessageDescriptors.proofOfFathersID,
                 initialValue: '',
                 extraValue: 'FATHER',
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'National ID (front)',
-                    label: {
-                      defaultMessage: 'Front of national ID',
-                      description:
-                        'Label for select option front of national ID',
-                      id: 'form.field.label.docTypeNIDFront'
-                    }
+                    value: birthDocumentTypeFhirMapping.NATIONAL_ID,
+                    label: formMessageDescriptors.docTypeNID
                   },
                   {
-                    value: 'National ID (back)',
-                    label: {
-                      defaultMessage: 'Back of national ID',
-                      description:
-                        "Label for select option back of national ID'",
-                      id: 'form.field.label.docTypeNIDBack'
-                    }
+                    value: birthDocumentTypeFhirMapping.PASSPORT,
+                    label: formMessageDescriptors.docTypePassport
+                  },
+                  {
+                    value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
+                    label: formMessageDescriptors.docTypeBirthCert
+                  },
+                  {
+                    value: birthDocumentTypeFhirMapping.OTHER,
+                    label: formMessageDescriptors.docTypeOther
                   }
                 ],
                 conditionals: [
@@ -2957,7 +2924,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'Hidden for Parent Details none or Father only',
                     action: 'hide',
                     expression:
-                      '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === "NONE") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === "MOTHER_ONLY") || (draftData && draftData.father && draftData.father.fathersDetailsExist === false)'
+                      '!draftData.father.fathersDetailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2972,50 +2939,27 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'uploadDocForInformant',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: "Proof of informant's ID",
-                  description:
-                    'Option for radio group field: Type of Document To Upload',
-                  id: 'form.field.label.informantIDProof'
-                },
+                label: formMessageDescriptors.proofOfInformantsID,
                 initialValue: '',
                 extraValue: 'INFORMANT_ID_PROOF',
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'National ID (front)',
-                    label: {
-                      defaultMessage: 'National ID (Front)',
-                      description:
-                        'Label for select option radio option NID front',
-                      id: 'form.field.label.docTypeNIDFront'
-                    }
+                    value: birthDocumentTypeFhirMapping.NATIONAL_ID,
+                    label: formMessageDescriptors.docTypeNID
                   },
                   {
-                    value: 'National ID (back)',
-                    label: {
-                      defaultMessage: 'National ID (Back)',
-                      description:
-                        'Label for select option radio option NID back',
-                      id: 'form.field.label.docTypeNIDBack'
-                    }
+                    value: birthDocumentTypeFhirMapping.PASSPORT,
+                    label: formMessageDescriptors.docTypePassport
                   },
                   {
-                    value: 'Birth Registration',
-                    label: {
-                      defaultMessage: 'Birth registration certificate',
-                      description: 'Label for select option Birth Registration',
-                      id: 'form.field.label.docTypeBR'
-                    }
+                    value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
+                    label: formMessageDescriptors.docTypeBirthCert
                   },
                   {
-                    value: 'Passport',
-                    label: {
-                      defaultMessage: 'Passport',
-                      description: 'Label for radio option Passport',
-                      id: 'form.field.label.docTypePassport'
-                    }
+                    value: birthDocumentTypeFhirMapping.OTHER,
+                    label: formMessageDescriptors.docTypeOther
                   }
                 ],
                 conditionals: [
@@ -3027,75 +2971,30 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 mapping: {
                   mutation: {
-                    operation: 'deathFieldToAttachmentTransformer'
+                    operation: 'birthFieldToAttachmentTransformer'
                   },
                   query: {
-                    operation: 'deathAttachmentToFieldTransformer'
+                    operation: 'birthAttachmentToFieldTransformer'
                   }
                 }
               },
               {
                 name: 'uploadDocForProofOfLegarGuardian',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: 'Proof of legal guardianship',
-                  description:
-                    'Option for radio group field: Type of Document To Upload',
-                  id: 'form.field.label.legalGuardianProof'
-                },
+                label: formMessageDescriptors.otherBirthSupportingDocuments,
                 initialValue: '',
                 extraValue: 'LEGAL_GUARDIAN_PROOF',
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'Proof of legal guardianship',
-                    label: {
-                      defaultMessage: 'Proof of legal guardianship',
-                      description:
-                        'Label for select option radio option NID front',
-                      id: 'form.field.label.legalGuardianProof'
-                    }
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType !== 'LEGAL_GUARDIAN'))"
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'deathFieldToAttachmentTransformer'
+                    value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
+                    label: formMessageDescriptors.legalGuardianProof
                   },
-                  query: {
-                    operation: 'deathAttachmentToFieldTransformer'
-                  }
-                }
-              },
-              {
-                name: 'uploadDocForProofOfAssignedResponsibility',
-                type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: 'Proof of assigned responsibility',
-                  description:
-                    'Option for radio group field: Type of Document To Upload',
-                  id: 'form.field.label.assignedResponsibilityProof'
-                },
-                initialValue: '',
-                extraValue: 'ASSIGNED_RESPONSIBILITY_PROOF',
-                hideAsterisk: true,
-                validate: [],
-                options: [
                   {
-                    value: 'Proof of assigned responsibility',
-                    label: {
-                      defaultMessage: 'Proof of assigned responsibility',
-                      description:
-                        'Label for select option radio option NID front',
-                      id: 'form.field.label.assignedResponsibilityProof'
-                    }
+                    value:
+                      birthDocumentTypeFhirMapping.PROOF_OF_ASSIGNED_RESPONSIBILITY,
+                    label: formMessageDescriptors.assignedResponsibilityProof
                   }
                 ],
                 conditionals: [
@@ -3107,10 +3006,10 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 mapping: {
                   mutation: {
-                    operation: 'deathFieldToAttachmentTransformer'
+                    operation: 'birthFieldToAttachmentTransformer'
                   },
                   query: {
-                    operation: 'deathAttachmentToFieldTransformer'
+                    operation: 'birthAttachmentToFieldTransformer'
                   }
                 }
               }
@@ -5199,7 +5098,7 @@ export const registerForms: IDefaultRegisterForms = {
                       defaultMessage: 'National ID (Front)',
                       description:
                         'Label for select option radio option NID front',
-                      id: 'form.field.label.docTypeNIDFront'
+                      id: 'form.field.label.docTypeNID'
                     }
                   },
                   {
@@ -5244,7 +5143,7 @@ export const registerForms: IDefaultRegisterForms = {
                   defaultMessage: 'Informant ID',
                   description:
                     'Option for radio group field: Type of Document To Upload',
-                  id: 'form.field.label.informantIDProof'
+                  id: 'form.field.label.proofOfInformantsID'
                 },
                 initialValue: '',
                 extraValue: 'INFORMANT_ID_PROOF',
@@ -5257,7 +5156,7 @@ export const registerForms: IDefaultRegisterForms = {
                       defaultMessage: 'Front of national ID',
                       description:
                         'Label for select option radio option NID front',
-                      id: 'form.field.label.docTypeNIDFront'
+                      id: 'form.field.label.docTypeNID'
                     }
                   },
                   {

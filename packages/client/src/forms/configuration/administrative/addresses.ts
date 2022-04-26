@@ -41,25 +41,9 @@ export enum AddressCopyConfigCases {
   PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY = 'primaryAddressSameAsOtherPrimary'
 }
 
-// if the informant is not mother AND contact point is not mother
-const informantNotMotherContactNotMother =
-  '(draftData.registration.informantType && draftData.registration.informantType.value !== "MOTHER" && draftData.registration.contactPoint.value !== "MOTHER")'
-
-// either the informant or contact is mother
-const eitherInformantOrContactIsMother =
-  '(draftData.registration.informantType && (draftData.registration.informantType.value === "MOTHER" || draftData.registration.contactPoint.value === "MOTHER"))'
-
-// either the informant or contact is father
-const eitherInformantOrContactIsFather =
-  '(draftData.registration.informantType && (draftData.registration.informantType.value === "FATHER" || draftData.registration.contactPoint.value === "FATHER"))'
-
-// if the informant is not mother or father, but contact point is father
-const informantNotMotherOrFatherContactFather =
-  '(draftData.registration.informantType && (draftData.registration.informantType.value !== "MOTHER" && draftData.registration.informantType.value !== "FATHER") && draftData.registration.contactPoint.value === "FATHER")'
-
-// if the informant is not mother or father AND contact point is not mother or father
-const informantNotMotherOrFatherContactNotMotherOrFather =
-  '(draftData.registration.informantType && draftData.registration.informantType.value !== "MOTHER" && draftData.registration.informantType.value !== "FATHER" && draftData.registration.contactPoint.value !== "FATHER" && draftData.registration.contactPoint.value !== "MOTHER")'
+// if the informant or contact is mother
+const mothersDetailsExistBasedOnContactAndInformant =
+  '!mothersDetailsExistBasedOnContactAndInformant'
 
 // if mothers details do not exist on other page
 const mothersDetailsDontExistOnOtherPage =
@@ -101,12 +85,6 @@ export type AllowedAddressConfigurations = {
   informant?: boolean
 }
 
-/*
-(((true && true) || (true && true) && true) || (true && draftData.registration.contactPoint.value !== \"FATHER\"&& draftData.registration.contactPoint.value !== \"MOTHER\")) && !draftData.mother.mothersDetailsExist) || (((draftData.registration.informantType && draftData.registration.informantType !== \"MOTHER\" && draftData.registration.contactPoint.value !== \"MOTHER\") || (draftData.registration.informantType && (draftData.registration.informantType !== \"MOTHER\" && draftData.registration.informantType !== \"FATHER\") && draftData.registration.contactPoint.value === \"FATHER\") || (draftData.registration.informantType && draftData.registration.informantType !== \"MOTHER\" && draftData.registration.informantType !== \"FATHER\" && draftData.registration.contactPoint.value !== \"FATHER\"&& draftData.registration.contactPoint.value !== \"MOTHER\") && !draftData.mother.mothersDetailsExist) && !values.fathersDetailsExist)
-
-
-*/
-
 export const defaultAddressConfiguration: IAddressConfiguration[] = [
   {
     preceedingFieldId: 'birth.child.child-view-group.birthLocation',
@@ -142,22 +120,22 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.primaryAddress,
-        conditionalCase: `(${informantNotMotherContactNotMother} || ${informantNotMotherOrFatherContactFather} || ${informantNotMotherOrFatherContactNotMotherOrFather}) && ${mothersDetailsDontExist}`
+        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant})`
       },
       {
         config: AddressCases.PRIMARY_ADDRESS,
         informant: false,
-        conditionalCase: `(${informantNotMotherContactNotMother} || ${informantNotMotherOrFatherContactFather} || ${informantNotMotherOrFatherContactNotMotherOrFather}) && ${mothersDetailsDontExist}`
+        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant})`
       },
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.secondaryAddress,
-        conditionalCase: `((${informantNotMotherContactNotMother} || ${informantNotMotherOrFatherContactFather} || ${informantNotMotherOrFatherContactNotMotherOrFather}) && ${mothersDetailsDontExist}) || ((${informantNotMotherContactNotMother} || ${informantNotMotherOrFatherContactFather} || ${informantNotMotherOrFatherContactNotMotherOrFather}) && ${secondaryAddressesDisabled}) || (${eitherInformantOrContactIsMother} && ${secondaryAddressesDisabled})`
+        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant} && ${secondaryAddressesDisabled}) || (${secondaryAddressesDisabled})`
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
         informant: false,
-        conditionalCase: `((${informantNotMotherContactNotMother} || ${informantNotMotherOrFatherContactFather} || ${informantNotMotherOrFatherContactNotMotherOrFather}) && ${mothersDetailsDontExist}) || ((${informantNotMotherContactNotMother} || ${informantNotMotherOrFatherContactFather} || ${informantNotMotherOrFatherContactNotMotherOrFather}) && ${secondaryAddressesDisabled}) || (${eitherInformantOrContactIsMother} && ${secondaryAddressesDisabled})`
+        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant} && ${secondaryAddressesDisabled}) || (${secondaryAddressesDisabled})`
       }
     ]
   },

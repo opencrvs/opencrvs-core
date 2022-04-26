@@ -145,7 +145,7 @@ test('should build a minimal FHIR registration document without error', async ()
             status: 'final',
             originalFileName: 'original.jpg',
             systemFileName: 'system.jpg',
-            type: 'NATIONAL_ID_FRONT',
+            type: 'NATIONAL_ID',
             createdAt: '2018-10-21'
           },
           {
@@ -416,7 +416,7 @@ test('should build a minimal FHIR registration document without error', async ()
     coding: [
       {
         system: 'http://opencrvs.org/specs/supporting-doc-type',
-        code: 'NATIONAL_ID_FRONT'
+        code: 'NATIONAL_ID'
       }
     ]
   })
@@ -826,7 +826,7 @@ test('creates task with contact other relationship', async () => {
             status: 'final',
             originalFileName: 'original.jpg',
             systemFileName: 'system.jpg',
-            type: 'NATIONAL_ID_FRONT',
+            type: 'NATIONAL_ID',
             createdAt: '2018-10-21'
           },
           {

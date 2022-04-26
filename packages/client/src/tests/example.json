@@ -7651,7 +7651,7 @@
                   "label": {
                     "defaultMessage": "Proof of Place and Date of Birth of Child",
                     "description": "Label for list item Child Birth Proof",
-                    "id": "form.field.label.proofOfBirthPlaceAndDate"
+                    "id": "form.field.label.proofOfBirth"
                   },
                   "initialValue": "",
                   "extraValue": "CHILD",
@@ -7782,7 +7782,7 @@
                   "label": {
                     "defaultMessage": "Proof of informant's ID",
                     "description": "Option for radio group field: Type of Document To Upload",
-                    "id": "form.field.label.informantIDProof"
+                    "id": "form.field.label.proofOfInformantsID"
                   },
                   "initialValue": "",
                   "extraValue": "INFORMANT_ID_PROOF",
@@ -12393,7 +12393,7 @@
                   "label": {
                     "defaultMessage": "Informant ID",
                     "description": "Option for radio group field: Type of Document To Upload",
-                    "id": "form.field.label.informantIDProof"
+                    "id": "form.field.label.proofOfInformantsID"
                   },
                   "initialValue": "",
                   "extraValue": "INFORMANT_ID_PROOF",

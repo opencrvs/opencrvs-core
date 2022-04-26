@@ -4032,7 +4032,7 @@
                   "label": {
                     "defaultMessage": "Proof of informant's ID",
                     "description": "Option for radio group field: Type of Document To Upload",
-                    "id": "form.field.label.informantIDProof"
+                    "id": "form.field.label.proofOfInformantsID"
                   },
                   "initialValue": "",
                   "extraValue": "INFORMANT_ID_PROOF",
@@ -7001,7 +7001,7 @@
                   "label": {
                     "defaultMessage": "Proof of informant's ID",
                     "description": "Option for radio group field: Type of Document To Upload",
-                    "id": "form.field.label.informantIDProof"
+                    "id": "form.field.label.proofOfInformantsID"
                   },
                   "initialValue": "",
                   "extraValue": "INFORMANT_ID_PROOF",

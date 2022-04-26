@@ -53,8 +53,7 @@ export const deathSectionTitle = {
 
 export const deathDocumentTypeFhirMapping = {
   'Birth Registration': 'BIRTH_REGISTRATION',
-  'National ID (front)': 'NATIONAL_ID_FRONT',
-  'National ID (back)': 'NATIONAL_ID_BACK',
+  NATIONAL_ID: 'NATIONAL_ID',
   'Cuase of Death': 'CAUSE_OF_DEATH',
   'Proof of Death of Deceased': 'DECEASED_DEATH_PROOF',
   'Certified Post Mortem Report': 'POST_MORTEM_CERTIFICATE',

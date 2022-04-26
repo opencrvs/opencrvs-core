@@ -452,7 +452,7 @@ describe('ReviewForm tests', () => {
                   {
                     contentType: 'image/jpeg',
                     subject: 'MOTHER',
-                    type: 'BIRTH_REGISTRATION',
+                    type: 'BIRTH_CERTIFICATE',
                     data: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQECWAJYAAD'
                   }
                 ],

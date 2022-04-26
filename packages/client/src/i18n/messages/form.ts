@@ -20,7 +20,7 @@ interface IFormMessages
   addressLine3UrbanOption: MessageDescriptor
   addressLine4: MessageDescriptor
   answer: MessageDescriptor
-  informantIDProof: MessageDescriptor
+  proofOfInformantsID: MessageDescriptor
   informantName: MessageDescriptor
   otherInformantType: MessageDescriptor
   informantsDateOfBirth: MessageDescriptor
@@ -127,10 +127,9 @@ interface IFormMessages
   dischargeCertificate: MessageDescriptor
   district: MessageDescriptor
   docTaxReceipt: MessageDescriptor
-  docTypeBR: MessageDescriptor
+  docTypeBirthCert: MessageDescriptor
   docTypeChildAgeProof: MessageDescriptor
   docTypeChildBirthProof: MessageDescriptor
-  docTypeChildUnderFiveCard: MessageDescriptor
   docTypeCopyOfBurialReceipt: MessageDescriptor
   docTypeDeathCertificate: MessageDescriptor
   docTypeDoctorCertificate: MessageDescriptor
@@ -139,8 +138,7 @@ interface IFormMessages
   docTypeFuneralReceipt: MessageDescriptor
   docTypeHospitalDischargeCertificate: MessageDescriptor
   docTypeLetterOfDeath: MessageDescriptor
-  docTypeNIDBack: MessageDescriptor
-  docTypeNIDFront: MessageDescriptor
+  docTypeNID: MessageDescriptor
   docTypeOther: MessageDescriptor
   docTypePassport: MessageDescriptor
   docTypePostMortemReport: MessageDescriptor
@@ -240,7 +238,7 @@ interface IFormMessages
   otherInstitution: MessageDescriptor
   otherOption: MessageDescriptor
   paragraphTargetDaysTo5Years: MessageDescriptor
-  paragraph: MessageDescriptor
+  documentsParagraph: MessageDescriptor
   paragraphAbove5Years: MessageDescriptor
   deceasedPrimaryAddress: MessageDescriptor
   primaryAddressSameAsCurrent: MessageDescriptor
@@ -255,10 +253,12 @@ interface IFormMessages
   presentOther: MessageDescriptor
   privateHome: MessageDescriptor
   prompt: MessageDescriptor
-  proofOfBirthPlaceAndDate: MessageDescriptor
+  proofOfBirth: MessageDescriptor
   proofOfDocCertificateOfChild: MessageDescriptor
   proofOfEPICardOfChild: MessageDescriptor
   proofOfFathersID: MessageDescriptor
+  otherBirthSupportingDocuments: MessageDescriptor
+  legalGuardianProof: MessageDescriptor
   proofOfMothersID: MessageDescriptor
   proofOfParentPrimaryAddress: MessageDescriptor
   placeOfBirthPreview: MessageDescriptor
@@ -378,9 +378,25 @@ interface IFormMessages
   informantSecondaryAddressSameAsPrimary: MessageDescriptor
   informantSecondaryAddress: MessageDescriptor
   emptyStringForSubSection: MessageDescriptor
+  assignedResponsibilityProof: MessageDescriptor
 }
 
 export const formMessageDescriptors: IFormMessages = {
+  assignedResponsibilityProof: {
+    defaultMessage: 'Proof of assigned responsibility',
+    description: 'Label for docuemnt option Proof of assigned responsibility',
+    id: 'form.field.label.assignedResponsibilityProof'
+  },
+  legalGuardianProof: {
+    defaultMessage: 'Proof of legal guardianship',
+    description: 'Label for document option Proof of legal guardianship',
+    id: 'form.field.label.legalGuardianProof'
+  },
+  otherBirthSupportingDocuments: {
+    defaultMessage: 'Other',
+    description: 'Option for other supporting documents',
+    id: 'form.field.label.otherBirthSupportingDocuments'
+  },
   reviewLabelMainContact: {
     defaultMessage: 'Main Contact',
     description: 'Label for point of contact on the review page',
@@ -426,10 +442,10 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label to show answer to a security question',
     id: 'user.form.securityquestion.answer'
   },
-  informantIDProof: {
+  proofOfInformantsID: {
     defaultMessage: "Proof of informant's ID",
     description: 'Option for radio group field: Type of Document To Upload',
-    id: 'form.field.label.informantIDProof'
+    id: 'form.field.label.proofOfInformantsID'
   },
   informantName: {
     defaultMessage: 'Informant',
@@ -964,10 +980,10 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Document type label for tax receipt',
     id: 'form.field.label.docTypeTaxReceipt'
   },
-  docTypeBR: {
-    defaultMessage: 'Birth registration certificate',
-    description: 'Label for select option Birth Registration',
-    id: 'form.field.label.docTypeBR'
+  docTypeBirthCert: {
+    defaultMessage: 'Birth certificate',
+    description: 'Label for select option birth certificate',
+    id: 'form.field.label.docTypeBirthCert'
   },
   docTypeChildAgeProof: {
     defaultMessage: 'Proof of child age',
@@ -975,14 +991,9 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.docTypeChildAgeProof'
   },
   docTypeChildBirthProof: {
-    defaultMessage: 'Proof of place and date of birth',
-    description: 'Label for select option Child Birth Proof',
+    defaultMessage: 'Notification of birth',
+    description: 'Label for select option Notification of birth',
     id: 'form.field.label.docTypeChildBirthProof'
-  },
-  docTypeChildUnderFiveCard: {
-    defaultMessage: 'Under five card',
-    description: 'Label for select option Under five card',
-    id: 'form.field.label.docTypeChildUnderFiveCard'
   },
   docTypeCopyOfBurialReceipt: {
     defaultMessage: 'Certified copy of burial receipt',
@@ -1024,15 +1035,10 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for select option Attested Letter of Death',
     id: 'form.field.label.docTypeLetterOfDeath'
   },
-  docTypeNIDBack: {
-    defaultMessage: 'National ID (back)',
-    description: 'Label for select option radio option NID back',
-    id: 'form.field.label.docTypeNIDBack'
-  },
-  docTypeNIDFront: {
-    defaultMessage: 'National ID (front)',
-    description: 'Label for select option radio option NID front',
-    id: 'form.field.label.docTypeNIDFront'
+  docTypeNID: {
+    defaultMessage: 'National ID',
+    description: 'Label for select option radio option NID',
+    id: 'form.field.label.docTypeNID'
   },
   docTypeOther: {
     defaultMessage: 'Other',
@@ -1492,7 +1498,7 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Other option for select',
     id: 'form.field.label.otherOption'
   },
-  paragraph: {
+  documentsParagraph: {
     defaultMessage:
       'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
     description: 'Documents Paragraph text',
@@ -1615,10 +1621,10 @@ export const formMessageDescriptors: IFormMessages = {
       'Labal for prompt in case of other person collects certificate',
     id: 'form.field.label.print.otherPersonPrompt'
   },
-  proofOfBirthPlaceAndDate: {
-    defaultMessage: 'Proof of place and date of birth of child',
-    description: 'Label for list item Child Birth Proof',
-    id: 'form.field.label.proofOfBirthPlaceAndDate'
+  proofOfBirth: {
+    defaultMessage: 'Proof of birth',
+    description: 'Label for list item Proof of birth',
+    id: 'form.field.label.proofOfBirth'
   },
   proofOfDocCertificateOfChild: {
     defaultMessage:
@@ -1632,12 +1638,12 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.proofOfEPICardOfChild'
   },
   proofOfFathersID: {
-    defaultMessage: "Proof of Father's ID",
+    defaultMessage: "Father's identity",
     description: 'Label for list item Father ID Proof',
     id: 'form.field.label.proofOfFathersID'
   },
   proofOfMothersID: {
-    defaultMessage: "Proof of Mother's ID",
+    defaultMessage: "Mother's identity",
     description: 'Label for list item Mother ID Proof',
     id: 'form.field.label.proofOfMothersID'
   },
