@@ -34,6 +34,7 @@ export interface GQLQuery {
   getTotalMetrics?: GQLTotalMetricsResult
   getTotalPayments?: Array<GQLPaymentMetric>
   getTotalCorrections?: Array<GQLCorrectionMetric>
+  getLocationStatistics?: GQLLocationStatisticsResponse
   getDeclarationsStartedMetrics?: GQLDeclarationsStartedMetrics
   fetchMonthWiseEventMetrics?: GQLMonthWiseEstimationMetrics
   fetchLocationWiseEventMetrics?: GQLLocationWiseEstimationMetrics
@@ -263,6 +264,12 @@ export interface GQLPaymentMetric {
 export interface GQLCorrectionMetric {
   total: number
   reason: string
+}
+
+export interface GQLLocationStatisticsResponse {
+  population?: number
+  registrars: number
+  offices: number
 }
 
 export interface GQLDeclarationsStartedMetrics {
@@ -1334,6 +1341,7 @@ export interface GQLResolver {
   TotalMetricsResult?: GQLTotalMetricsResultTypeResolver
   PaymentMetric?: GQLPaymentMetricTypeResolver
   CorrectionMetric?: GQLCorrectionMetricTypeResolver
+  LocationStatisticsResponse?: GQLLocationStatisticsResponseTypeResolver
   DeclarationsStartedMetrics?: GQLDeclarationsStartedMetricsTypeResolver
   MonthWiseEstimationMetrics?: GQLMonthWiseEstimationMetricsTypeResolver
   LocationWiseEstimationMetrics?: GQLLocationWiseEstimationMetricsTypeResolver
@@ -1418,6 +1426,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   getTotalMetrics?: QueryToGetTotalMetricsResolver<TParent>
   getTotalPayments?: QueryToGetTotalPaymentsResolver<TParent>
   getTotalCorrections?: QueryToGetTotalCorrectionsResolver<TParent>
+  getLocationStatistics?: QueryToGetLocationStatisticsResolver<TParent>
   getDeclarationsStartedMetrics?: QueryToGetDeclarationsStartedMetricsResolver<TParent>
   fetchMonthWiseEventMetrics?: QueryToFetchMonthWiseEventMetricsResolver<TParent>
   fetchLocationWiseEventMetrics?: QueryToFetchLocationWiseEventMetricsResolver<TParent>
@@ -1780,6 +1789,22 @@ export interface QueryToGetTotalCorrectionsResolver<
   (
     parent: TParent,
     args: QueryToGetTotalCorrectionsArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetLocationStatisticsArgs {
+  locationId?: string
+  populationYear: number
+}
+export interface QueryToGetLocationStatisticsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: QueryToGetLocationStatisticsArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -3265,6 +3290,33 @@ export interface CorrectionMetricToTotalResolver<TParent = any, TResult = any> {
 }
 
 export interface CorrectionMetricToReasonResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLLocationStatisticsResponseTypeResolver<TParent = any> {
+  population?: LocationStatisticsResponseToPopulationResolver<TParent>
+  registrars?: LocationStatisticsResponseToRegistrarsResolver<TParent>
+  offices?: LocationStatisticsResponseToOfficesResolver<TParent>
+}
+
+export interface LocationStatisticsResponseToPopulationResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface LocationStatisticsResponseToRegistrarsResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface LocationStatisticsResponseToOfficesResolver<
   TParent = any,
   TResult = any
 > {

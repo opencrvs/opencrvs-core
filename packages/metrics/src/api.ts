@@ -11,7 +11,12 @@
  */
 import fetch from 'node-fetch'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fhirUrl, COUNTRY_CONFIG_URL, SEARCH_URL } from '@metrics/constants'
+import {
+  fhirUrl,
+  COUNTRY_CONFIG_URL,
+  SEARCH_URL,
+  USER_MANAGEMENT_URL
+} from '@metrics/constants'
 
 export function fetchFHIR<T = any>(
   suffix: string,
@@ -50,6 +55,14 @@ export const fetchLocation = async (
   )
 }
 
+export async function fetchLocationsByType(
+  type: string,
+  authHeader: IAuthHeader
+): Promise<fhir.Location[]> {
+  const bundle = await fetchFHIR(`Location?_count=0&type=${type}`, authHeader)
+  return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
+}
+
 export async function fetchParentLocationByLocationID(
   locationID: string,
   authHeader: IAuthHeader
@@ -82,6 +95,19 @@ export async function fetchChildLocationsByParentId(
   )
   return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
 }
+
+export async function fetchChildLocationsWithTypeByParentId(
+  locationId: string,
+  locationType: string,
+  authHeader: IAuthHeader
+): Promise<fhir.Location[]> {
+  const bundle = await fetchFHIR(
+    `Location?_count=0&type=${locationType}&partof=${locationId}`,
+    authHeader
+  )
+  return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
+}
+
 export function fetchFromResource(
   suffix: string,
   authHeader: IAuthHeader,
@@ -151,4 +177,27 @@ export const fetchPractitionerRole = async (
   } else {
     return Promise.reject(new Error(`Role code cannot be found`))
   }
+}
+
+interface IUserCountSearchCriteria {
+  primaryOfficeId: string
+  role: string
+}
+
+export async function countUsers(
+  searchCriteria: Partial<IUserCountSearchCriteria>,
+  authHeader: IAuthHeader
+) {
+  const { primaryOfficeId, role } = searchCriteria
+  const res = await fetch(
+    `${USER_MANAGEMENT_URL}/countUsers?primaryOfficeId=${primaryOfficeId}&role=${role}`,
+    {
+      method: 'GET',
+      headers: {
+        ...authHeader
+      }
+    }
+  )
+  const count = await res.text()
+  return Number(count)
 }

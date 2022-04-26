@@ -346,7 +346,7 @@ export const getDistrictLocation = async (
   return locationBundle as Location
 }
 
-function getLocationType(locationBundle: fhir.Location) {
+export function getLocationType(locationBundle: fhir.Location) {
   return (
     locationBundle &&
     locationBundle.identifier &&
@@ -456,4 +456,29 @@ export function getPercentage(value: number, total: number, decimalPoint = 2) {
   return value === 0 || total === 0
     ? 0
     : Number(((value / total) * 100).toFixed(decimalPoint))
+}
+
+export function getPopulation(
+  location: fhir.Location,
+  populationYear: number
+): number {
+  const totalPopulationExtension = location.extension?.find(
+    (ext) => ext.url === OPENCRVS_SPECIFICATION_URL + TOTAL_POPULATION_SEC
+  )
+
+  if (!totalPopulationExtension) {
+    throw new Error(
+      `Total population extension not found for location, location ID: ${location.id}`
+    )
+  }
+
+  const totalPopulation = totalPopulationExtension.valueString
+    ? (
+        JSON.parse(totalPopulationExtension.valueString) as Array<
+          Record<string, number>
+        >
+      ).find((record) => record.hasOwnProperty(populationYear.toString()))
+    : undefined
+
+  return totalPopulation ? totalPopulation[populationYear] : 0
 }

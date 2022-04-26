@@ -94,6 +94,12 @@ type TimeLoggedMetricsResultSet {
   totalItems: Int
 }
 
+type LocationStatisticsResponse {
+  population: Int
+  registrars: Int!
+  offices: Int!
+}
+
 type Query {
   getTotalMetrics(
     timeStart: String!
@@ -113,6 +119,10 @@ type Query {
     locationId: String
     event: String!
   ): [CorrectionMetric!]
+  getLocationStatistics(
+    locationId: String
+    populationYear: Int!
+  ): LocationStatisticsResponse
   getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!

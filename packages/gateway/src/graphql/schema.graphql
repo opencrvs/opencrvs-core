@@ -74,6 +74,10 @@ type Query {
     locationId: String
     event: String!
   ): [CorrectionMetric!]
+  getLocationStatistics(
+    locationId: String
+    populationYear: Int!
+  ): LocationStatisticsResponse
   getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
@@ -379,6 +383,12 @@ type PaymentMetric {
 type CorrectionMetric {
   total: Float!
   reason: String!
+}
+
+type LocationStatisticsResponse {
+  population: Int
+  registrars: Int!
+  offices: Int!
 }
 
 type DeclarationsStartedMetrics {
