@@ -52,7 +52,8 @@ import {
   SPOUSE_CODE,
   SPOUSE_TITLE,
   BIRTH_CORRECTION_ENCOUNTER_CODE,
-  DEATH_CORRECTION_ENCOUNTER_CODE
+  DEATH_CORRECTION_ENCOUNTER_CODE,
+  DEATH_DESCRIPTION_CODE
 } from '@gateway/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
@@ -3496,6 +3497,22 @@ export const builders: IFieldBuilders = {
         }
       ]
     }
+  },
+  deathDescription: (
+    fhirBundle: ITemplatedBundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = selectOrCreateObservationResource(
+      DEATH_ENCOUNTER_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_DESC,
+      DEATH_DESCRIPTION_CODE,
+      'Lay reported or verbal autopsy description',
+      fhirBundle,
+      context
+    )
+    observation.valueString = fieldValue
   },
   causeOfDeathMethod: (
     fhirBundle: ITemplatedBundle,

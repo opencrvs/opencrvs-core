@@ -1035,7 +1035,7 @@
                       "label": {
                         "defaultMessage": "Physician",
                         "description": "Label for form field: Attendant at birth",
-                        "id": "form.field.label.attendantAtBirthPhysician"
+                        "id": "form.field.label.physician"
                       }
                     },
                     {
@@ -5606,7 +5606,7 @@
                       "operation": "ignoreFieldTransformer"
                     },
                     "query": {
-                      "operation": "hasCaseOfDeathSectionTransformer"
+                      "operation": "hasCauseOfDeathSectionTransformer"
                     }
                   }
                 }

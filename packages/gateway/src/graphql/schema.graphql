@@ -252,6 +252,7 @@ type DeathRegistration implements EventRegistration {
   eventLocation: Location
   questionnaire: [QuestionnaireQuestion]
   mannerOfDeath: MannerOfDeath
+  deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
   maleDependentsOfDeceased: Float
@@ -488,6 +489,7 @@ input DeathRegistrationInput {
   eventLocation: LocationInput
   questionnaire: [QuestionnaireQuestionInput]
   mannerOfDeath: MannerOfDeath
+  deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
   maleDependentsOfDeceased: Float
@@ -693,6 +695,8 @@ enum MannerOfDeath {
 }
 
 enum CauseOfDeathMethodType {
+  PHYSICIAN
+  LAY_REPORTED
   VERBAL_AUTOPSY
   MEDICALLY_CERTIFIED
 }
@@ -1166,6 +1170,7 @@ enum AddressType {
   ADMIN_STRUCTURE
   CRVS_OFFICE
   PRIVATE_HOME
+  DECEASED_USUAL_RESIDENCE
   SECONDARY_ADDRESS
   PRIMARY_ADDRESS
   MILITARY_BASE_OR_CANTONMENT
@@ -1177,7 +1182,6 @@ enum AddressType {
 enum AttachmentType {
   PASSPORT
   NATIONAL_ID
-  NOTIFICATION_OF_BIRTH
   IMMUNISATION_CERTIFICATE
   PAPER_FORM
   PASSPORT_PHOTO

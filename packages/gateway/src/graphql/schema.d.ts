@@ -131,6 +131,7 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   eventLocation?: GQLLocation
   questionnaire?: Array<GQLQuestionnaireQuestion | null>
   mannerOfDeath?: GQLMannerOfDeath
+  deathDescription?: string
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
   maleDependentsOfDeceased?: number
@@ -378,6 +379,7 @@ export interface GQLDeathRegistrationInput {
   eventLocation?: GQLLocationInput
   questionnaire?: Array<GQLQuestionnaireQuestionInput | null>
   mannerOfDeath?: GQLMannerOfDeath
+  deathDescription?: string
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
   causeOfDeath?: string
   maleDependentsOfDeceased?: number
@@ -583,6 +585,8 @@ export const enum GQLMannerOfDeath {
 }
 
 export const enum GQLCauseOfDeathMethodType {
+  PHYSICIAN = 'PHYSICIAN',
+  LAY_REPORTED = 'LAY_REPORTED',
   VERBAL_AUTOPSY = 'VERBAL_AUTOPSY',
   MEDICALLY_CERTIFIED = 'MEDICALLY_CERTIFIED'
 }
@@ -1067,6 +1071,7 @@ export const enum GQLAddressType {
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
   CRVS_OFFICE = 'CRVS_OFFICE',
   PRIVATE_HOME = 'PRIVATE_HOME',
+  DECEASED_USUAL_RESIDENCE = 'DECEASED_USUAL_RESIDENCE',
   SECONDARY_ADDRESS = 'SECONDARY_ADDRESS',
   PRIMARY_ADDRESS = 'PRIMARY_ADDRESS',
   MILITARY_BASE_OR_CANTONMENT = 'MILITARY_BASE_OR_CANTONMENT',
@@ -1078,7 +1083,6 @@ export const enum GQLAddressType {
 export const enum GQLAttachmentType {
   PASSPORT = 'PASSPORT',
   NATIONAL_ID = 'NATIONAL_ID',
-  NOTIFICATION_OF_BIRTH = 'NOTIFICATION_OF_BIRTH',
   IMMUNISATION_CERTIFICATE = 'IMMUNISATION_CERTIFICATE',
   PAPER_FORM = 'PAPER_FORM',
   PASSPORT_PHOTO = 'PASSPORT_PHOTO',
@@ -2749,6 +2753,7 @@ export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   eventLocation?: DeathRegistrationToEventLocationResolver<TParent>
   questionnaire?: DeathRegistrationToQuestionnaireResolver<TParent>
   mannerOfDeath?: DeathRegistrationToMannerOfDeathResolver<TParent>
+  deathDescription?: DeathRegistrationToDeathDescriptionResolver<TParent>
   causeOfDeathMethod?: DeathRegistrationToCauseOfDeathMethodResolver<TParent>
   causeOfDeath?: DeathRegistrationToCauseOfDeathResolver<TParent>
   maleDependentsOfDeceased?: DeathRegistrationToMaleDependentsOfDeceasedResolver<TParent>
@@ -2827,6 +2832,13 @@ export interface DeathRegistrationToQuestionnaireResolver<
 }
 
 export interface DeathRegistrationToMannerOfDeathResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathRegistrationToDeathDescriptionResolver<
   TParent = any,
   TResult = any
 > {

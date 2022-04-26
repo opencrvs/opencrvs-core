@@ -43,7 +43,7 @@ interface IFormMessages
   attendantAtBirthNurse: MessageDescriptor
   attendantAtBirthOther: MessageDescriptor
   attendantAtBirthOtherParamedicalPersonnel: MessageDescriptor
-  attendantAtBirthPhysician: MessageDescriptor
+  physician: MessageDescriptor
   attestedBirthRecord: MessageDescriptor
   attestedVaccination: MessageDescriptor
   birthAttendant: MessageDescriptor
@@ -56,6 +56,7 @@ interface IFormMessages
   birthTypeTriplet: MessageDescriptor
   birthTypeTwin: MessageDescriptor
   causeOfDeathCode: MessageDescriptor
+  causeOfDeathMethod: MessageDescriptor
   causeOfDeathEstablished: MessageDescriptor
   causeOfDeathName: MessageDescriptor
   causeOfDeathNotice: MessageDescriptor
@@ -116,7 +117,7 @@ interface IFormMessages
   deceasedSex: MessageDescriptor
   deceasedSexFemale: MessageDescriptor
   deceasedSexMale: MessageDescriptor
-  childNameInEnglishPreviewGroup: MessageDescriptor
+  nameInEnglishPreviewGroup: MessageDescriptor
   deceasedSexOther: MessageDescriptor
   deceasedSexUnknown: MessageDescriptor
   deceasedTitle: MessageDescriptor
@@ -217,6 +218,7 @@ interface IFormMessages
   maritalStatusSingle: MessageDescriptor
   maritalStatusWidowed: MessageDescriptor
   medicallyCertified: MessageDescriptor
+  deathDescription: MessageDescriptor
   methodOfCauseOfDeath: MessageDescriptor
   mother: MessageDescriptor
   motherDateOfBirth: MessageDescriptor
@@ -382,6 +384,17 @@ interface IFormMessages
 }
 
 export const formMessageDescriptors: IFormMessages = {
+  deathDescription: {
+    defaultMessage: 'Description',
+    description:
+      'Description of cause of death by lay person or verbal autopsy',
+    id: 'form.field.label.deathDescription'
+  },
+  causeOfDeathMethod: {
+    defaultMessage: 'Source of cause of death',
+    description: 'Source of cause of death',
+    id: 'form.field.label.causeOfDeathMethod'
+  },
   assignedResponsibilityProof: {
     defaultMessage: 'Proof of assigned responsibility',
     description: 'Label for docuemnt option Proof of assigned responsibility',
@@ -557,10 +570,15 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for form field: Attendant at birth',
     id: 'form.field.label.attBirthOtherParaPers'
   },
-  attendantAtBirthPhysician: {
+  physician: {
     defaultMessage: 'Physician',
-    description: 'Label for form field: Attendant at birth',
-    id: 'form.field.label.attendantAtBirthPhysician'
+    description: 'Label for form field: physician',
+    id: 'form.field.label.physician'
+  },
+  layReported: {
+    defaultMessage: 'Lay reported',
+    description: 'Label for form field: Lay reported',
+    id: 'form.field.label.layReported'
   },
   attestedBirthRecord: {
     defaultMessage: 'Attested copy of hospital document or birth record, or',
@@ -624,7 +642,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.causeOfDeathCode'
   },
   causeOfDeathEstablished: {
-    defaultMessage: 'Has an official cause of death been established ?',
+    defaultMessage: 'Has a cause of death been established ?',
     description: 'Label for form field: Cause of Death Established',
     id: 'form.field.label.causeOfDeathEstablished'
   },
@@ -808,12 +826,17 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.deathDate'
   },
   deathEventName: {
-    defaultMessage: 'When did the death occur?',
+    defaultMessage: 'Death event details',
     description: 'Form section name for Death Event',
     id: 'form.section.deathEvent.name'
   },
+  deathEventDate: {
+    defaultMessage: 'Date of death',
+    description: 'Form section title for date of Death Event',
+    id: 'form.section.deathEvent.date'
+  },
   deathEventTitle: {
-    defaultMessage: 'When did the death occur?',
+    defaultMessage: 'Death details?',
     description: 'Form section title for Death Event',
     id: 'form.section.deathEvent.title'
   },
@@ -838,8 +861,9 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.placeOfDeathSameAsCurrent'
   },
   placeOfDeathSameAsPrimary: {
-    defaultMessage: 'Primary address of the deceased',
-    description: 'Option for form field: Place of occurrence of death',
+    defaultMessage: "Deceased's usual place of residence",
+    description:
+      'Option for place of occurrence of death same as deceased primary address  ',
     id: 'form.field.label.placeOfDeathSameAsPrimary'
   },
   placeOfDeathType: {
@@ -1328,7 +1352,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.lastNameEN'
   },
   manner: {
-    defaultMessage: 'What was the manner of death?',
+    defaultMessage: 'Manner of death',
     description: 'Label for form field: Manner of death',
     id: 'form.field.label.mannerOfDeath'
   },
@@ -1489,8 +1513,8 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.otherHealthInstitution'
   },
   otherInstitution: {
-    defaultMessage: 'Other Institution',
-    description: 'Select item for Other Institution',
+    defaultMessage: 'Other',
+    description: 'Select item for Other location',
     id: 'form.field.label.otherInstitution'
   },
   otherOption: {
@@ -1579,7 +1603,7 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for form field: Place of delivery',
     id: 'form.field.label.placeOfBirth'
   },
-  childNameInEnglishPreviewGroup: {
+  nameInEnglishPreviewGroup: {
     defaultMessage: 'English name',
     description: 'Label for child name in english',
     id: 'form.preview.group.label.english.name'

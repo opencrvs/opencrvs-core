@@ -17,7 +17,8 @@ import {
   ISerializedForm,
   Event,
   IConditionals,
-  DeathSection
+  DeathSection,
+  TEXTAREA
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
@@ -216,7 +217,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -252,7 +253,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -288,7 +289,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -324,7 +325,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -360,7 +361,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -396,7 +397,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -432,7 +433,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -468,7 +469,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -706,7 +707,7 @@ export const registerForms: IDefaultRegisterForms = {
                 options: [
                   {
                     value: 'PHYSICIAN',
-                    label: formMessageDescriptors.attendantAtBirthPhysician
+                    label: formMessageDescriptors.physician
                   },
                   {
                     value: 'NURSE',
@@ -908,7 +909,7 @@ export const registerForms: IDefaultRegisterForms = {
             previewGroups: [
               {
                 id: 'childNameInEnglish',
-                label: formMessageDescriptors.childNameInEnglishPreviewGroup,
+                label: formMessageDescriptors.nameInEnglishPreviewGroup,
                 fieldToRedirect: 'familyNameEng',
                 delimiter: ' '
               }
@@ -3214,7 +3215,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -3250,7 +3251,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -3286,7 +3287,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -3322,7 +3323,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -3358,7 +3359,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -3394,7 +3395,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -3430,7 +3431,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -3466,7 +3467,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -3502,7 +3503,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -3538,7 +3539,7 @@ export const registerForms: IDefaultRegisterForms = {
                       name: 'registrationPhone',
                       type: 'TEL',
                       label: formMessageDescriptors.phoneNumber,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -3623,26 +3624,42 @@ export const registerForms: IDefaultRegisterForms = {
       {
         id: DeathSection.Deceased,
         viewType: 'form',
-        name: {
-          defaultMessage: 'Deceased',
-          description: 'Form section name for Deceased',
-          id: 'form.section.deceased.name'
-        },
-        title: {
-          defaultMessage: 'What are the deceased details?',
-          description: 'Form section title for Deceased',
-          id: 'form.section.deceased.title'
-        },
+        name: formMessageDescriptors.deceasedName,
+        title: formMessageDescriptors.deceasedTitle,
         hasDocumentSection: true,
         groups: [
           {
             id: 'deceased-view-group',
             fields: [
               {
+                name: 'nationality',
+                type: 'SELECT_WITH_OPTIONS',
+                label: formMessageDescriptors.nationality,
+                required: true,
+                initialValue: window.config.COUNTRY.toUpperCase(),
+                validate: [],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                options: {
+                  resource: 'countries'
+                },
+                mapping: {
+                  template: {
+                    fieldName: 'deceasedNationality',
+                    operation: 'selectTransformer'
+                  },
+                  mutation: {
+                    operation: 'fieldToArrayTransformer'
+                  },
+                  query: {
+                    operation: 'arrayToFieldTransformer'
+                  }
+                }
+              },
+              {
                 name: 'iD',
                 type: 'TEXT',
                 label: formMessageDescriptors.iDTypeNationalID,
-                required: true,
+                required: false,
                 initialValue: '',
                 validate: [
                   {
@@ -3672,49 +3689,25 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'socialSecurityNo',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Social security no./NAPSA',
-                  description: 'text for social security number form field',
-                  id: 'form.field.label.socialSecurityNumber'
-                },
+                name: 'birthDate',
+                type: 'DATE',
+                label: formMessageDescriptors.deceasedDateOfBirth,
                 required: true,
                 initialValue: '',
-                validate: [],
-                conditionals: [],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToIdentityTransformer',
-                    parameters: ['id', 'SOCIAL_SECURITY_NO']
-                  },
-                  query: {
-                    operation: 'identityToFieldTransformer',
-                    parameters: ['id', 'SOCIAL_SECURITY_NO']
+                validate: [
+                  {
+                    operation: 'isValidBirthDate'
                   }
-                }
-              },
-              {
-                name: 'nationality',
-                type: 'SELECT_WITH_OPTIONS',
-                label: formMessageDescriptors.nationality,
-                required: false,
-                initialValue: window.config.COUNTRY.toUpperCase(),
-                validate: [],
-                placeholder: formMessageDescriptors.formSelectPlaceholder,
-                options: {
-                  resource: 'countries'
-                },
+                ],
                 mapping: {
                   template: {
-                    fieldName: 'deceasedNationality',
-                    operation: 'selectTransformer'
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'deceasedBirthDate',
+                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
                   },
                   mutation: {
-                    operation: 'fieldToArrayTransformer'
-                  },
-                  query: {
-                    operation: 'arrayToFieldTransformer'
+                    operation: 'longDateTransformer',
+                    parameters: []
                   }
                 }
               },
@@ -3722,11 +3715,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'firstNamesEng',
                 previewGroup: 'deceasedNameInEnglish',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'First name(s)',
-                  description: 'Label for form field: Given names',
-                  id: 'form.field.label.deceasedGivenNamesEng'
-                },
+                label: formMessageDescriptors.deceasedGivenNamesEng,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -3755,11 +3744,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'familyNameEng',
                 previewGroup: 'deceasedNameInEnglish',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'Last name',
-                  description: 'Label for form field: Last name in english',
-                  id: 'form.field.label.deceasedFamilyNameEng'
-                },
+                label: formMessageDescriptors.deceasedFamilyNameEng,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -3785,40 +3770,9 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'birthDate',
-                type: 'DATE',
-                label: {
-                  defaultMessage: 'Date of Birth',
-                  description: 'Label for form field: Date of birth',
-                  id: 'form.field.label.deceasedDateOfBirth'
-                },
-                required: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'isValidBirthDate'
-                  }
-                ],
-                mapping: {
-                  template: {
-                    operation: 'dateFormatTransformer',
-                    fieldName: 'deceasedBirthDate',
-                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
-                  },
-                  mutation: {
-                    operation: 'longDateTransformer',
-                    parameters: []
-                  }
-                }
-              },
-              {
                 name: 'gender',
                 type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Sex',
-                  description: 'Label for form field: Sex name',
-                  id: 'form.field.label.deceasedSex'
-                },
+                label: formMessageDescriptors.deceasedSex,
                 required: true,
                 initialValue: '',
                 validate: [],
@@ -3832,35 +3786,15 @@ export const registerForms: IDefaultRegisterForms = {
                 options: [
                   {
                     value: 'male',
-                    label: {
-                      defaultMessage: 'Male',
-                      description: 'Option for form field: Sex name',
-                      id: 'form.field.label.deceasedSexMale'
-                    }
+                    label: formMessageDescriptors.deceasedSexMale
                   },
                   {
                     value: 'female',
-                    label: {
-                      defaultMessage: 'Female',
-                      description: 'Option for form field: Sex name',
-                      id: 'form.field.label.deceasedSexFemale'
-                    }
-                  },
-                  {
-                    value: 'other',
-                    label: {
-                      defaultMessage: 'Other',
-                      description: 'Option for form field: Sex name',
-                      id: 'form.field.label.deceasedSexOther'
-                    }
+                    label: formMessageDescriptors.deceasedSexFemale
                   },
                   {
                     value: 'unknown',
-                    label: {
-                      defaultMessage: 'Unknown',
-                      description: 'Option for form field: Sex name',
-                      id: 'form.field.label.deceasedSexUnknown'
-                    }
+                    label: formMessageDescriptors.deceasedSexUnknown
                   }
                 ]
               },
@@ -3879,13 +3813,9 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'maritalStatus',
                 type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Marital status',
-                  description: 'Label for form field: Marital status',
-                  id: 'form.field.label.maritalStatus'
-                },
+                label: formMessageDescriptors.maritalStatus,
                 required: false,
-                initialValue: 'MARRIED',
+                initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
@@ -3944,19 +3874,6 @@ export const registerForms: IDefaultRegisterForms = {
                     }
                   }
                 ]
-              },
-              {
-                name: 'occupation',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Occupation',
-                  description: 'text for occupation form field',
-                  id: 'form.field.label.occupation'
-                },
-                required: false,
-                initialValue: '',
-                validate: [],
-                conditionals: []
               }
               // PRIMARY ADDRESS SUBSECTION
               // PRIMARY ADDRESS
@@ -3967,11 +3884,7 @@ export const registerForms: IDefaultRegisterForms = {
             previewGroups: [
               {
                 id: 'deceasedNameInEnglish',
-                label: {
-                  defaultMessage: 'English name',
-                  description: 'Label for deceased name in english',
-                  id: 'form.preview.group.label.english.name'
-                },
+                label: formMessageDescriptors.nameInEnglishPreviewGroup,
                 fieldToRedirect: 'familyNameEng',
                 delimiter: ' '
               }
@@ -3982,16 +3895,8 @@ export const registerForms: IDefaultRegisterForms = {
       {
         id: DeathSection.Event,
         viewType: 'form',
-        name: {
-          defaultMessage: 'When did the death occur?',
-          description: 'Form section name for Death Event',
-          id: 'form.section.deathEvent.name'
-        },
-        title: {
-          defaultMessage: 'When did the death occur?',
-          description: 'Form section title for Death Event',
-          id: 'form.section.deathEvent.title'
-        },
+        name: formMessageDescriptors.deathEventName,
+        title: formMessageDescriptors.deathEventTitle,
         groups: [
           {
             id: 'death-event-details',
@@ -3999,18 +3904,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'deathDate',
                 type: 'DATE',
-                label: {
-                  defaultMessage: 'When did the death occur?',
-                  description: 'Form section title for Death Event',
-                  id: 'form.section.deathEvent.title'
-                },
-                notice: {
-                  defaultMessage:
-                    'Enter the date as: day, month, year e.g. 24 10 2020',
-                  description: 'Label for form field: Date of occurrence',
-                  id: 'form.field.label.deathDate'
-                },
-                ignorePlaceHolder: true,
+                label: formMessageDescriptors.deathEventDate,
                 required: true,
                 initialValue: '',
                 validate: [
@@ -4042,57 +3936,32 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'manner',
-                type: 'RADIO_GROUP',
-                label: {
-                  defaultMessage: 'What was the manner of death?',
-                  description: 'Label for form field: Manner of death',
-                  id: 'form.field.label.mannerOfDeath'
-                },
+                type: 'SELECT_WITH_OPTIONS',
+                label: formMessageDescriptors.manner,
                 required: false,
                 initialValue: '',
                 validate: [],
-                size: RadioSize.LARGE,
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'NATURAL_CAUSES',
-                    label: {
-                      defaultMessage: 'Natural causes',
-                      description: 'Option for form field: Manner of death',
-                      id: 'form.field.label.mannerOfDeathNatural'
-                    }
+                    label: formMessageDescriptors.mannerNatural
                   },
                   {
                     value: 'ACCIDENT',
-                    label: {
-                      defaultMessage: 'Accident',
-                      description: 'Option for form field: Manner of death',
-                      id: 'form.field.label.mannerOfDeathAccident'
-                    }
+                    label: formMessageDescriptors.mannerAccident
                   },
                   {
                     value: 'SUICIDE',
-                    label: {
-                      defaultMessage: 'Suicide',
-                      description: 'Option for form field: Manner of death',
-                      id: 'form.field.label.mannerOfDeathSuicide'
-                    }
+                    label: formMessageDescriptors.mannerSuicide
                   },
                   {
                     value: 'HOMICIDE',
-                    label: {
-                      defaultMessage: 'Homicide',
-                      description: 'Option for form field: Manner of death',
-                      id: 'form.field.label.mannerOfDeathHomicide'
-                    }
+                    label: formMessageDescriptors.mannerHomicide
                   },
                   {
                     value: 'MANNER_UNDETERMINED',
-                    label: {
-                      defaultMessage: 'Manner undetermined',
-                      description: 'Option for form field: Manner of death',
-                      id: 'form.field.label.mannerOfDeathUndetermined'
-                    }
+                    label: formMessageDescriptors.mannerUndetermined
                   }
                 ],
                 mapping: {
@@ -4107,16 +3976,114 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
+                name: 'causeOfDeathEstablished',
+                type: 'RADIO_GROUP',
+                label: formMessageDescriptors.causeOfDeathEstablished,
+                required: false,
+                initialValue: true,
+                size: RadioSize.NORMAL,
+                validate: [],
+                options: [
+                  {
+                    value: true,
+                    label: formMessageDescriptors.confirm
+                  },
+                  {
+                    value: false,
+                    label: formMessageDescriptors.deny
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'sectionFieldToBundleFieldTransformer',
+                    parameters: ['causeOfDeathEstablished']
+                  },
+                  query: {
+                    operation: 'bundleFieldToSectionFieldTransformer',
+                    parameters: ['causeOfDeathEstablished']
+                  }
+                }
+              },
+              {
+                name: 'causeOfDeathMethod',
+                type: 'SELECT_WITH_OPTIONS',
+                label: formMessageDescriptors.causeOfDeathMethod,
+                required: true,
+                initialValue: '',
+                validate: [],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!values.causeOfDeathEstablished'
+                  }
+                ],
+                options: [
+                  {
+                    value: 'PHYSICIAN',
+                    label: formMessageDescriptors.physician
+                  },
+                  {
+                    value: 'LAY_REPORTED',
+                    label: formMessageDescriptors.layReported
+                  },
+                  {
+                    value: 'VERBAL_AUTOPSY',
+                    label: formMessageDescriptors.verbalAutopsy
+                  },
+                  {
+                    value: 'MEDICALLY_CERTIFIED',
+                    label: formMessageDescriptors.medicallyCertified
+                  }
+                ],
+                mapping: {
+                  mapping: {
+                    mutation: {
+                      operation: 'sectionFieldToBundleFieldTransformer',
+                      parameters: ['causeOfDeathMethod']
+                    },
+                    query: {
+                      operation: 'bundleFieldToSectionFieldTransformer',
+                      parameters: ['causeOfDeathMethod']
+                    }
+                  }
+                }
+              },
+              {
+                name: 'deathDescription',
+                type: TEXTAREA,
+                label: formMessageDescriptors.deathDescription,
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      'values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
+                  }
+                ],
+                initialValue: '',
+                validate: [],
+                required: true,
+                maxLength: 500,
+                mapping: {
+                  mapping: {
+                    mutation: {
+                      operation: 'sectionFieldToBundleFieldTransformer',
+                      parameters: ['deathDescription']
+                    },
+                    query: {
+                      operation: 'bundleFieldToSectionFieldTransformer',
+                      parameters: ['deathDescription']
+                    }
+                  }
+                }
+              },
+              {
                 name: 'placeOfDeath',
                 customisable: false,
                 type: 'SELECT_WITH_OPTIONS',
                 previewGroup: 'placeOfDeath',
                 ignoreFieldLabelOnErrorMessage: true,
-                label: {
-                  defaultMessage: 'Location',
-                  description: 'Label for form field: Place of delivery',
-                  id: 'form.field.label.placeOfDeath'
-                },
+                label: formMessageDescriptors.placeOfDeath,
                 required: true,
                 initialValue: '',
                 validate: [],
@@ -4124,27 +4091,15 @@ export const registerForms: IDefaultRegisterForms = {
                 options: [
                   {
                     value: 'HEALTH_FACILITY',
-                    label: {
-                      defaultMessage: 'Health Institution',
-                      description: 'Select item for Health Institution',
-                      id: 'form.field.label.healthInstitution'
-                    }
+                    label: formMessageDescriptors.healthInstitution
                   },
                   {
-                    value: 'PRIVATE_HOME',
-                    label: {
-                      defaultMessage: 'Private Home',
-                      description: 'Select item for Private Home',
-                      id: 'form.field.label.privateHome'
-                    }
+                    value: 'DECEASED_USUAL_RESIDENCE',
+                    label: formMessageDescriptors.placeOfDeathSameAsPrimary
                   },
                   {
                     value: 'OTHER',
-                    label: {
-                      defaultMessage: 'Other Institution',
-                      description: 'Select item for Other Institution',
-                      id: 'form.field.label.otherInstitution'
-                    }
+                    label: formMessageDescriptors.otherInstitution
                   }
                 ],
                 mapping: {
@@ -4158,6 +4113,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 }
               },
+
               {
                 name: 'deathLocation',
                 customisable: false,
@@ -4213,117 +4169,6 @@ export const registerForms: IDefaultRegisterForms = {
             operation: 'getDeathRegistrationSectionTransformer'
           }
         }
-      },
-      {
-        id: DeathSection.CauseOfDeath,
-        viewType: 'form',
-        name: {
-          defaultMessage: 'What is the official cause of death?',
-          description: 'Form section name for Cause of Death',
-          id: 'form.section.causeOfDeath.name'
-        },
-        title: {
-          defaultMessage: 'What is the official cause of death?',
-          description: 'Form section title for Cause of Death',
-          id: 'form.section.causeOfDeath.title'
-        },
-        groups: [
-          {
-            id: 'causeOfDeath-causeOfDeathEstablished',
-            fields: [
-              {
-                name: 'causeOfDeathEstablished',
-                type: 'RADIO_GROUP',
-                label: {
-                  defaultMessage:
-                    'Has an official cause of death been established ?',
-                  description:
-                    'Label for form field: Cause of Death Established',
-                  id: 'form.field.label.causeOfDeathEstablished'
-                },
-                notice: {
-                  defaultMessage:
-                    'A Medically Certified Cause of Death is not mandatory to submit the declaration. This can be added at a later date.',
-                  description: 'Form section notice for Cause of Death',
-                  id: 'form.section.causeOfDeathNotice'
-                },
-                required: false,
-                initialValue: '',
-                size: RadioSize.LARGE,
-                validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: formMessageDescriptors.confirm
-                  },
-                  {
-                    value: false,
-                    label: formMessageDescriptors.deny
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'ignoreFieldTransformer'
-                  },
-                  query: {
-                    operation: 'hasCaseOfDeathSectionTransformer'
-                  }
-                }
-              }
-            ]
-          },
-          {
-            id: 'causeOfDeath-methodOfCauseOfDeathSection',
-            title: {
-              defaultMessage: 'What is the medically certified cause of death?',
-              description: 'Form section title for Cause of Death',
-              id: 'form.section.causeOfDeath.title'
-            },
-            conditionals: [
-              {
-                action: 'hide',
-                expression: '!values.causeOfDeathEstablished'
-              }
-            ],
-            fields: [
-              {
-                name: 'paragraph',
-                type: 'PARAGRAPH',
-                hidden: true,
-                label: {
-                  defaultMessage: ' ',
-                  description: 'No Label',
-                  id: 'print.certificate.noLabel'
-                },
-                initialValue: '',
-                validate: []
-              },
-              {
-                name: 'causeOfDeathCode',
-                type: 'TEXT',
-                initialValue: '',
-                label: {
-                  defaultMessage: 'Underlying cause of death',
-                  description:
-                    'Label for form field: Underlying cause of death',
-                  id: 'form.field.label.causeOfDeathCode'
-                },
-                required: false,
-                validate: [],
-                mapping: {
-                  mutation: {
-                    operation: 'sectionFieldToBundleFieldTransformer',
-                    parameters: ['causeOfDeath']
-                  },
-                  query: {
-                    operation: 'bundleFieldToSectionFieldTransformer',
-                    parameters: ['causeOfDeath']
-                  }
-                }
-              }
-            ]
-          }
-        ]
       },
       {
         id: DeathSection.Informants,

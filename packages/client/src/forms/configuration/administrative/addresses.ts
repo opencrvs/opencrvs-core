@@ -485,7 +485,6 @@ export function populateRegisterFormsWithAddresses(
       }
     }
   )
-  console.log(JSON.stringify(newForm))
   return newForm
 }
 

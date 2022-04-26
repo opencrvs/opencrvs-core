@@ -431,6 +431,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { preventContinueIfError } = this.props.activeSectionGroup
     let groupHasError = false
     if (preventContinueIfError) {
+      console.log(
+        'DATA: ',
+        JSON.stringify(this.props.declaration.data[this.props.activeSection.id])
+      )
       if (!this.props.declaration.data[this.props.activeSection.id]) {
         groupHasError = true
       } else {

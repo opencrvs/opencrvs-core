@@ -46,7 +46,8 @@ import {
   PARENT_DETAILS,
   SPOUSE_CODE,
   MALE_DEPENDENTS_ON_DECEASED_CODE,
-  FEMALE_DEPENDENTS_ON_DECEASED_CODE
+  FEMALE_DEPENDENTS_ON_DECEASED_CODE,
+  DEATH_DESCRIPTION_CODE
 } from '@gateway/features/fhir/templates'
 import {
   GQLQuestionnaireQuestion,
@@ -889,6 +890,7 @@ export const typeResolvers: GQLResolver = {
           femaleDependentsOfDeceased: FEMALE_DEPENDENTS_ON_DECEASED_CODE,
           mannerOfDeath: MANNER_OF_DEATH_CODE,
           causeOfDeathMethod: CAUSE_OF_DEATH_METHOD_CODE,
+          deathDescription: DEATH_DESCRIPTION_CODE,
           causeOfDeath: CAUSE_OF_DEATH_CODE
         }
         observations.entry.map(
@@ -1005,6 +1007,26 @@ export const typeResolvers: GQLResolver = {
       return await fetchFHIR(
         `/${data.location[0].location.reference}`,
         authHeader
+      )
+    },
+    async deathDescription(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${DEATH_DESCRIPTION_CODE}`,
+        authHeader
+      )
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueString) ||
+        null
       )
     },
     async mannerOfDeath(composition: ITemplatedComposition, _, authHeader) {
