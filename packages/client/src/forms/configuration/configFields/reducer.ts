@@ -162,24 +162,25 @@ export const configFieldsReducer: LoopReducer<
         action.payload.originalField.fieldId
       )
 
-      delete state[event][section][action.payload.originalField.fieldId]
-      state[event][section][action.payload.modifiedField.fieldId] =
+      const newState = { ...state }
+      delete newState[event][section][action.payload.originalField.fieldId]
+      newState[event][section][action.payload.modifiedField.fieldId] =
         action.payload.modifiedField
 
       // Adjusting precedingFieldId & foregoingFieldId
       if (action.payload.modifiedField.precedingFieldId) {
-        state[event][section][
+        newState[event][section][
           action.payload.modifiedField.precedingFieldId
         ].foregoingFieldId = action.payload.modifiedField.fieldId
       }
 
       if (action.payload.modifiedField.foregoingFieldId)
-        state[event][section][
+        newState[event][section][
           action.payload.modifiedField.foregoingFieldId
         ].precedingFieldId = action.payload.modifiedField.fieldId
 
       return {
-        ...state
+        ...newState
       }
     }
     case actions.REMOVE_CUSTOM_FIELD: {
