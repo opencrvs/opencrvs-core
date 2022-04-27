@@ -20,6 +20,7 @@ import {
   MobileWrapper,
   DesktopWrapper
 } from '@opencrvs/components/lib/styleForPagination'
+import { NoResultText } from '@opencrvs/components/lib/interface/GridTable/GridTable'
 import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
 import {
   LoadingIndicator,
@@ -36,6 +37,8 @@ interface IContentWrapper {
   paginationId?: number
   totalPages?: number
   onPageChange?: (newPageNumber: number) => void
+  noResultText?: string
+  noContent?: boolean
   loading?: boolean
   error?: boolean
 }
@@ -52,6 +55,10 @@ const MobileChildrenContainer = styled.div`
   margin: 20px 16px 0;
 `
 
+const PaginationLoaderContainer = styled.div<{ isShowPagination?: boolean }>`
+  height: ${({ isShowPagination }) => (isShowPagination ? 110 : 48)}px;
+`
+
 const Body = (props: IProps) => {
   const {
     isShowPagination,
@@ -60,41 +67,45 @@ const Body = (props: IProps) => {
     onPageChange,
     loading,
     error,
-    isOnline
+    isOnline,
+    noContent
   } = props
   return (
     <>
       {props.children}
-      {isShowPagination &&
-        paginationId &&
-        totalPages &&
-        onPageChange &&
-        !loading &&
-        !error &&
-        isOnline && (
-          <PaginationWrapper>
-            <DesktopWrapper>
-              <PaginationModified
-                size="small"
-                initialPage={paginationId}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-              />
-            </DesktopWrapper>
-            <MobileWrapper>
-              <PaginationModified
-                size="large"
-                initialPage={paginationId}
-                totalPages={totalPages}
-                onPageChange={onPageChange}
-              />
-            </MobileWrapper>
-          </PaginationWrapper>
+      <PaginationLoaderContainer isShowPagination={isShowPagination}>
+        {noContent && !loading && !error && (
+          <NoResultText>{props.noResultText}</NoResultText>
         )}
-      <LoadingIndicator
-        loading={loading ? true : false}
-        hasError={error ? true : false}
-      />
+        {isShowPagination &&
+          paginationId &&
+          totalPages &&
+          onPageChange &&
+          isOnline && (
+            <PaginationWrapper>
+              <DesktopWrapper>
+                <PaginationModified
+                  size="small"
+                  initialPage={paginationId}
+                  totalPages={totalPages}
+                  onPageChange={onPageChange}
+                />
+              </DesktopWrapper>
+              <MobileWrapper>
+                <PaginationModified
+                  size="large"
+                  initialPage={paginationId}
+                  totalPages={totalPages}
+                  onPageChange={onPageChange}
+                />
+              </MobileWrapper>
+            </PaginationWrapper>
+          )}
+        <LoadingIndicator
+          loading={loading ? true : false}
+          hasError={error ? true : false}
+        />
+      </PaginationLoaderContainer>
     </>
   )
 }

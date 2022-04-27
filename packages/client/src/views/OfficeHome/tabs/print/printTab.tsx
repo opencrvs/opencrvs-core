@@ -301,13 +301,14 @@ class PrintTabComponent extends React.Component<
         onPageChange={onPageChange}
         loading={this.props.loading}
         error={this.props.error}
+        noResultText={intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'ready to print'
+        })}
+        noContent={this.transformRegisteredContent(data).length <= 0}
       >
         <GridTable
           content={this.transformRegisteredContent(data)}
           columns={this.getColumns()}
-          noResultText={intl.formatMessage(constantsMessages.noRecords, {
-            tab: 'ready to print'
-          })}
           clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}

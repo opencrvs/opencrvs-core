@@ -288,8 +288,15 @@ const RequiresUpdateComponent = (props: IFullProps) => {
             }
             paginationId={paginationId}
             onPageChange={onPageChange}
+            noResultText={intl.formatMessage(constantsMessages.noRecords, {
+              tab: 'requires update'
+            })}
             loading={loading}
             error={error}
+            noContent={
+              transformRejectedContent(data, props, sortedCol, sortOrder)
+                .length <= 0
+            }
           >
             {!loading && !error && (
               <GridTable
@@ -306,9 +313,6 @@ const RequiresUpdateComponent = (props: IFullProps) => {
                   sortedCol,
                   onColumnClick
                 )}
-                noResultText={intl.formatMessage(constantsMessages.noRecords, {
-                  tab: 'requires update'
-                })}
                 clickable={props.isOnline}
                 loading={loading}
                 sortedCol={sortedCol}

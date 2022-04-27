@@ -37,7 +37,7 @@ const TableHeader = styled.div`
   }
 `
 
-const ErrorText = styled.div`
+export const NoResultText = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.bold16}
   text-align: left;
@@ -118,7 +118,7 @@ interface IGridTableProps {
   content: IDynamicValues[]
   columns: IColumn[]
   renderExpandedComponent?: (eventId: string) => React.ReactNode
-  noResultText: string
+  noResultText?: string
   hideTableHeader?: boolean
   clickable?: boolean
   loading?: boolean
@@ -220,8 +220,8 @@ export class GridTableComp extends React.Component<
             renderActionBlock={this.renderActionBlock}
           />
         )}
-        {!this.props.loading && content.length <= 0 && (
-          <ErrorText id="no-record">{noResultText}</ErrorText>
+        {!this.props.loading && noResultText && content.length <= 0 && (
+          <NoResultText id="no-record">{noResultText}</NoResultText>
         )}
       </Wrapper>
     )

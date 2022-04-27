@@ -332,6 +332,10 @@ class ReviewTabComponent extends React.Component<
         onPageChange={onPageChange}
         loading={this.props.loading}
         error={this.props.error}
+        noResultText={intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'ready for review'
+        })}
+        noContent={this.transformDeclaredContent(data).length <= 0}
       >
         <ReactTooltip id="validateTooltip">
           <ToolTipContainer>
@@ -343,9 +347,6 @@ class ReviewTabComponent extends React.Component<
         <GridTable
           content={this.transformDeclaredContent(data)}
           columns={this.getColumns()}
-          noResultText={intl.formatMessage(constantsMessages.noRecords, {
-            tab: 'ready for review'
-          })}
           clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}

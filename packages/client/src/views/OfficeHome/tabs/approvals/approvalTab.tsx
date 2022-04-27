@@ -237,8 +237,12 @@ class ApprovalTabComponent extends React.Component<
         paginationId={paginationId}
         totalPages={totalPages}
         onPageChange={onPageChange}
+        noResultText={intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'sent for approval'
+        })}
         loading={this.props.loading}
         error={this.props.error}
+        noContent={this.transformValidatedContent(data).length <= 0}
       >
         <ReactTooltip id="validatedTooltip">
           <ToolTipContainer>
@@ -250,9 +254,6 @@ class ApprovalTabComponent extends React.Component<
         <GridTable
           content={this.transformValidatedContent(data)}
           columns={this.getColumns()}
-          noResultText={intl.formatMessage(constantsMessages.noRecords, {
-            tab: 'sent for approval'
-          })}
           clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}

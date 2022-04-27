@@ -211,14 +211,15 @@ function ExternalValidationTabComponent(props: IProps) {
       paginationId={paginationId}
       totalPages={totalPages}
       onPageChange={onPageChange}
+      noResultText={intl.formatMessage(constantsMessages.noRecords, {
+        tab: 'in external validation '
+      })}
       loading={props.loading}
       error={props.error}
+      noContent={transformWaitingValidationContent(data).length <= 0}
     >
       <GridTable
         content={transformWaitingValidationContent(data)}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'in external validation '
-        })}
         clickable={true}
         loading={props.loading}
         columns={columns}

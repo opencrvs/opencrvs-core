@@ -300,15 +300,16 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         paginationId={paginationId}
         totalPages={totalPages}
         onPageChange={this.props.onPageChange}
+        noResultText={intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'sent for review'
+        })}
+        noContent={this.transformDeclarationsReadyToSend().length <= 0}
         loading={false}
         error={false}
       >
         <GridTable
           content={this.transformDeclarationsReadyToSend()}
           columns={this.getColumns()}
-          noResultText={intl.formatMessage(constantsMessages.noRecords, {
-            tab: 'sent for review'
-          })}
           sortedCol={this.state.sortedCol}
           sortOrder={this.state.sortOrder}
         />

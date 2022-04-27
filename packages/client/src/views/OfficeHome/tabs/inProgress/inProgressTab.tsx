@@ -529,9 +529,6 @@ export class InProgressTabComponent extends React.Component<
       <GridTable
         content={this.transformRemoteDraftsContent(data)}
         columns={this.getColumns()}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'in progress'
-        })}
         clickable={true}
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
@@ -545,9 +542,6 @@ export class InProgressTabComponent extends React.Component<
       <GridTable
         content={this.transformRemoteDraftsContent(data)}
         columns={this.getColumns()}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'in progress'
-        })}
         clickable={true}
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
@@ -596,7 +590,12 @@ export class InProgressTabComponent extends React.Component<
           this.props.queryData.notificationData.totalItems > this.props.pageSize
         ? true
         : false
-
+    const noContent =
+      !selectorId || selectorId === SELECTOR_ID.ownDrafts
+        ? this.transformDraftContent().length <= 0
+        : selectorId === SELECTOR_ID.fieldAgentDrafts
+        ? this.transformRemoteDraftsContent(inProgressData).length <= 0
+        : this.transformRemoteDraftsContent(notificationData).length <= 0
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.progress)}
@@ -622,14 +621,15 @@ export class InProgressTabComponent extends React.Component<
             ? false
             : this.props.error
         }
+        noResultText={intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'in progress'
+        })}
+        noContent={noContent}
       >
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
           <GridTable
             content={this.transformDraftContent()}
             columns={this.getColumns()}
-            noResultText={intl.formatMessage(constantsMessages.noRecords, {
-              tab: 'in progress'
-            })}
             clickable={true}
             loading={isFieldAgent ? false : this.props.loading}
             sortedCol={this.state.sortedCol}

@@ -317,13 +317,14 @@ class RejectTabComponent extends React.Component<
         onPageChange={onPageChange}
         loading={this.props.loading}
         error={this.props.error}
+        noResultText={intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'sent for updates'
+        })}
+        noContent={this.transformRejectedContent(data).length <= 0}
       >
         <GridTable
           content={this.transformRejectedContent(data)}
           columns={this.getColumns()}
-          noResultText={intl.formatMessage(constantsMessages.noRecords, {
-            tab: 'sent for updates'
-          })}
           clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
