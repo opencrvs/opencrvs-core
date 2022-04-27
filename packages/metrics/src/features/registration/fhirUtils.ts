@@ -378,6 +378,7 @@ export async function fetchDeclarationsBeginnerRole(
 ) {
   let startedByRole = ''
   const currentTask = getTask(fhirBundle)
+  const composition = getComposition(fhirBundle)
 
   if (currentTask) {
     const bundle = await fetchTaskHistory(currentTask.id, authHeader)
@@ -406,9 +407,10 @@ export async function fetchDeclarationsBeginnerRole(
         startedByRole = 'REGISTRAR'
       } else if (status === 'VALIDATED') {
         startedByRole = 'REGISTRATION AGENT'
-      } else {
-        startedByRole = 'No role found'
       }
+    }
+    if (isNotification(composition as fhir.Composition)) {
+      startedByRole = 'HOSPITAL NOTIFICATION'
     }
   }
   return startedByRole

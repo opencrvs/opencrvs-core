@@ -159,11 +159,6 @@ export const generateBirthRegPoint = async (
     throw new Error('Practitioner id not found')
   }
 
-  // const practitionerRole = await fetchPractitionerRole(
-  //   practitionerId,
-  //   authHeader
-  // )
-
   const practitionerRole = await fetchDeclarationsBeginnerRole(
     payload,
     authHeader
@@ -222,11 +217,6 @@ export const generateDeathRegPoint = async (
   if (!practitionerId) {
     throw new Error('Practitioner id not found')
   }
-
-  // const practitionerRole = await fetchPractitionerRole(
-  //   practitionerId,
-  //   authHeader
-  // )
 
   const practitionerRole = await fetchDeclarationsBeginnerRole(
     payload,
