@@ -56,8 +56,11 @@ const CPrimaryButton = styled(PrimaryButton)`
   }
 `
 
-const FieldContainer = styled.div`
+const FieldContainer = styled.div<{ hide?: boolean }>`
   margin-bottom: 30px;
+  ${({ hide }) => {
+    return hide ? 'display: none' : 'display: block'
+  }}
 `
 
 const RightAlignment = styled.div`
@@ -357,9 +360,7 @@ class CustomFieldFormsComp extends React.Component<
       return false
     }
 
-    return (
-      newGeneratedFieldID in configFields[event as keyof IEventTypes][section]
-    )
+    return newGeneratedFieldID in configFields[event][section]
   }
 
   _getHeadingText(): string {
@@ -467,12 +468,7 @@ class CustomFieldFormsComp extends React.Component<
         {Object.keys(languages).map((language, index) => {
           return (
             <React.Fragment key={index}>
-              <FieldContainer
-                style={{
-                  display:
-                    language === this.state.selectedLanguage ? 'block' : 'none'
-                }}
-              >
+              <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <InputField
                   id={`custom-form-label-${language}`}
                   label={intl.formatMessage(customFieldFormMessages.label)}
@@ -504,12 +500,7 @@ class CustomFieldFormsComp extends React.Component<
                 </InputField>
               </FieldContainer>
 
-              <FieldContainer
-                style={{
-                  display:
-                    language === this.state.selectedLanguage ? 'block' : 'none'
-                }}
-              >
+              <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <InputField
                   required={false}
                   id={`custom-form-placeholder-${language}`}
@@ -527,12 +518,7 @@ class CustomFieldFormsComp extends React.Component<
                 </InputField>
               </FieldContainer>
 
-              <FieldContainer
-                style={{
-                  display:
-                    language === this.state.selectedLanguage ? 'block' : 'none'
-                }}
-              >
+              <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <InputField
                   id={`custom-form-description-${language}`}
                   label={intl.formatMessage(
@@ -553,12 +539,7 @@ class CustomFieldFormsComp extends React.Component<
                 </InputField>
               </FieldContainer>
 
-              <FieldContainer
-                style={{
-                  display:
-                    language === this.state.selectedLanguage ? 'block' : 'none'
-                }}
-              >
+              <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <InputField
                   required={false}
                   id={`custom-form-tooltip-${language}`}
@@ -576,12 +557,7 @@ class CustomFieldFormsComp extends React.Component<
                 </InputField>
               </FieldContainer>
 
-              <FieldContainer
-                style={{
-                  display:
-                    language === this.state.selectedLanguage ? 'block' : 'none'
-                }}
-              >
+              <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <InputField
                   required={false}
                   id={`custom-form-error-message-${language}`}
@@ -602,12 +578,7 @@ class CustomFieldFormsComp extends React.Component<
                 </InputField>
               </FieldContainer>
 
-              <FieldContainer
-                style={{
-                  display:
-                    language === this.state.selectedLanguage ? 'block' : 'none'
-                }}
-              >
+              <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <InputField
                   required={false}
                   id={`custom-form-max-length-${language}`}

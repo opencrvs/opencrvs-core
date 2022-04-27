@@ -138,6 +138,9 @@ export const configFieldsReducer: LoopReducer<
       }
       return state
     case actions.ADD_CUSTOM_FIELD:
+      if (state.state === 'LOADING') {
+        return state
+      }
       const { event, section, customField } = action.payload
       const eventName = event as keyof IEventTypes
 
@@ -146,33 +149,32 @@ export const configFieldsReducer: LoopReducer<
         [eventName]: {
           ...state[eventName],
           [section]: {
-            ...(state as IEventTypes)[eventName][section],
+            ...state[eventName][section],
             [customField.fieldId]: customField
           }
         }
       }
     case actions.MODIFY_CUSTOM_FIELD: {
+      if (state.state === 'LOADING') {
+        return state
+      }
       const { event, section } = getEventSectionGroupFromFieldID(
         action.payload.originalField.fieldId
       )
-      const eventName = event as keyof IEventTypes
 
-      delete (state as IEventTypes)[eventName][section][
-        action.payload.originalField.fieldId
-      ]
-      ;(state as IEventTypes)[eventName][section][
-        action.payload.modifiedField.fieldId
-      ] = action.payload.modifiedField
+      delete state[event][section][action.payload.originalField.fieldId]
+      state[event][section][action.payload.modifiedField.fieldId] =
+        action.payload.modifiedField
 
       // Adjusting precedingFieldId & foregoingFieldId
       if (action.payload.modifiedField.precedingFieldId) {
-        ;(state as IEventTypes)[eventName][section][
+        state[event][section][
           action.payload.modifiedField.precedingFieldId
         ].foregoingFieldId = action.payload.modifiedField.fieldId
       }
 
       if (action.payload.modifiedField.foregoingFieldId)
-        (state as IEventTypes)[eventName][section][
+        state[event][section][
           action.payload.modifiedField.foregoingFieldId
         ].precedingFieldId = action.payload.modifiedField.fieldId
 
@@ -180,7 +182,7 @@ export const configFieldsReducer: LoopReducer<
         ...state
       }
     }
-    case actions.REMOVE_CUSTOM_FIELD:
+    case actions.REMOVE_CUSTOM_FIELD: {
       const { selectedField } = action.payload
       const [selectedFieldEvent, selectedFieldSection] =
         selectedField.fieldId.split('.') as [keyof IEventTypes, string]
@@ -207,6 +209,7 @@ export const configFieldsReducer: LoopReducer<
           [selectedFieldSection]: fields
         }
       }
+    }
     default:
       return state
   }

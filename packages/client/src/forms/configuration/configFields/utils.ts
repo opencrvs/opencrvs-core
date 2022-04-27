@@ -19,7 +19,7 @@ const CUSTOM_FIELD_LABEL = 'Custom Field'
 export const CUSTOM_GROUP_NAME = 'custom-view-group'
 
 export type EventSectionGroup = {
-  event: string
+  event: Event
   section: string
   group: string
 }
@@ -126,7 +126,7 @@ export function getEventSectionGroupFromFieldID(
   fieldID: string
 ): EventSectionGroup {
   const [event, section, group] = fieldID.split('.')
-  return { event, section, group }
+  return { event: event as Event, section, group }
 }
 
 export function prepareNewCustomFieldConfig(

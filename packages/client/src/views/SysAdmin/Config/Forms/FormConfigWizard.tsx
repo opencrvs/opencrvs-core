@@ -52,6 +52,7 @@ import { constantsMessages } from '@client/i18n/messages/constants'
 import { goToFormConfig, goToFormConfigWizard } from '@client/navigation'
 import { Dispatch } from 'redux'
 import { FormConfigSettings } from './FormConfigSettings'
+import { flushSync } from 'react-dom'
 
 const Container = styled.div`
   display: flex;
@@ -183,6 +184,38 @@ function useNewDraftVersion(event: Event) {
   return (formDraft?.version || 0) + 1
 }
 
+function formToolClickListener(
+  fieldType: string,
+  state: IEventTypes,
+  event: Event,
+  section: string,
+  setSelectedField: React.Dispatch<
+    React.SetStateAction<IConfigFormField | null>
+  >,
+  dispatch: Dispatch
+) {
+  const modifiedFieldMap = {
+    ...customField,
+    definition: {
+      ...customField.definition,
+      type: fieldType as IFormField['type']
+    }
+  } as IConfigFormField
+
+  const customFieldConfig = prepareNewCustomFieldConfig(
+    state,
+    event,
+    section,
+    modifiedFieldMap
+  )
+  if (!customFieldConfig) {
+    return
+  }
+  dispatch(AddCustomField(event, section, customFieldConfig))
+  flushSync(() => setSelectedField(customFieldConfig))
+  document.getElementById(customFieldConfig.fieldId)?.scrollIntoView()
+}
+
 export function FormConfigWizard() {
   useLoadFormDraft()
   const [selectedField, setSelectedField] =
@@ -249,32 +282,16 @@ export function FormConfigWizard() {
                 )
               ) : (
                 <FormTools
-                  onAddClickListener={(fieldType: string) => {
-                    const modifiedFieldMap = {
-                      ...customField,
-                      definition: {
-                        ...customField.definition,
-                        type: fieldType as IFormField['type']
-                      }
-                    } as IConfigFormField
-
-                    const customFieldConfig = prepareNewCustomFieldConfig(
+                  onAddClickListener={(fieldType: string) =>
+                    formToolClickListener(
+                      fieldType,
                       state as IEventTypes,
                       event,
                       section,
-                      modifiedFieldMap
+                      setSelectedField,
+                      dispatch
                     )
-                    if (!customFieldConfig) {
-                      return
-                    }
-                    dispatch(AddCustomField(event, section, customFieldConfig))
-                    setSelectedField(customFieldConfig)
-                    setTimeout(() => {
-                      document
-                        .getElementById(customFieldConfig.fieldId)
-                        ?.scrollIntoView()
-                    }, 300)
-                  }}
+                  }
                 />
               )}
             </ToolsContainer>
