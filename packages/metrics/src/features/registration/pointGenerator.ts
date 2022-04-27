@@ -153,12 +153,6 @@ export const generateBirthRegPoint = async (
     throw new Error('Composition not found')
   }
 
-  const practitionerId = getPractitionerIdFromBundle(payload)
-
-  if (!practitionerId) {
-    throw new Error('Practitioner id not found')
-  }
-
   const practitionerRole = await fetchDeclarationsBeginnerRole(
     payload,
     authHeader

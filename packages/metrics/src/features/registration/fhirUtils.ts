@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IAuthHeader } from '@metrics/features/registration'
-import { fetchLocation, fetchTaskHistory } from '@metrics/api'
+import {
+  fetchLocation,
+  fetchPractitionerRole,
+  fetchTaskHistory
+} from '@metrics/api'
 
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
@@ -379,12 +383,12 @@ export async function fetchDeclarationsBeginnerRole(
   let startedByRole = ''
   const currentTask = getTask(fhirBundle)
   const composition = getComposition(fhirBundle)
-
+  if (isNotification(composition as fhir.Composition)) {
+    return 'HOSPITAL_NOTIFICATION'
+  }
   if (currentTask) {
     const bundle = await fetchTaskHistory(currentTask.id, authHeader)
-
     const length = bundle.entry ? bundle.entry.length : 0
-
     const task =
       bundle.entry &&
       bundle.entry
@@ -394,23 +398,12 @@ export async function fetchDeclarationsBeginnerRole(
         )
 
     if (task && length > 0) {
-      const startedTask = task[length - 1] //the last task in entries of history bundle
-      const status =
-        startedTask.businessStatus &&
-        startedTask.businessStatus.coding &&
-        startedTask.businessStatus.coding[0] &&
-        startedTask.businessStatus.coding[0].code
-
-      if (status === 'DECLARED') {
-        startedByRole = 'FIELD_AGENT'
-      } else if (status === 'WAITING_VALIDATION') {
-        startedByRole = 'REGISTRAR'
-      } else if (status === 'VALIDATED') {
-        startedByRole = 'REGISTRATION AGENT'
+      const startedTask = task[length - 1] //the last task in the entries of history bundle
+      const practitionerId = getPractionerIdFromTask(startedTask)
+      if (!practitionerId) {
+        throw new Error('Practitioner id not found')
       }
-    }
-    if (isNotification(composition as fhir.Composition)) {
-      startedByRole = 'HOSPITAL NOTIFICATION'
+      startedByRole = await fetchPractitionerRole(practitionerId, authHeader)
     }
   }
   return startedByRole
