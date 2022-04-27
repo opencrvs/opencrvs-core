@@ -23,7 +23,6 @@ import {
   EVENT_REGISTRATION_RATES,
   FIELD_AGENT_HOME_TAB,
   HOME,
-  OPERATIONAL_REPORT,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
   PRINT_CERTIFICATE_PAYMENT,
@@ -56,7 +55,6 @@ import {
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
@@ -221,22 +219,14 @@ export function goToTeamSearch(searchedLocation?: searchedLocation) {
     : push(TEAM_SEARCH)
 }
 
-export function goToPerformanceHome(state?: searchedLocation) {
-  return state && state.selectedLocation
-    ? push(PERFORMANCE_HOME, { selectedLocation: state.selectedLocation })
-    : push(PERFORMANCE_HOME)
-}
-
-export function goToOperationalReport(
-  locationId: string,
-  sectionId: OPERATIONAL_REPORT_SECTION = OPERATIONAL_REPORT_SECTION.OPERATIONAL,
+export function goToPerformanceHome(
   timeStart: Date = subYears(new Date(Date.now()), 1),
-  timeEnd: Date = new Date(Date.now())
+  timeEnd: Date = new Date(Date.now()),
+  locationId?: string
 ) {
   return push({
-    pathname: OPERATIONAL_REPORT,
+    pathname: PERFORMANCE_HOME,
     search: stringify({
-      sectionId,
       locationId,
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString()
@@ -464,7 +454,6 @@ export function goToFieldAgentList(
 }
 
 export function goToWorkflowStatus(
-  sectionId: string,
   locationId: string,
   timeStart: Date,
   timeEnd: Date,
@@ -479,7 +468,6 @@ export function goToWorkflowStatus(
       event
     }),
     state: {
-      sectionId,
       timeStart,
       timeEnd
     }
@@ -613,7 +601,7 @@ export function goToPerformanceView(userDetails: IUserDetails) {
     } else {
       const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
       return (
-        (locationId && goToOperationalReport(locationId)) ||
+        (locationId && goToPerformanceHome(undefined, undefined, locationId)) ||
         goToPerformanceHome()
       )
     }

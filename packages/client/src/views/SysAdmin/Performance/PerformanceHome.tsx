@@ -11,12 +11,16 @@
  */
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToPerformanceHome } from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
-import { Box, ISearchLocation } from '@opencrvs/components/lib/interface'
+import {
+  Box,
+  ISearchLocation,
+  ResponsiveModal,
+  Spinner
+} from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -36,45 +40,93 @@ import { Event } from '@client/forms'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
+import { Query } from '@client/components/Query'
+import { PERFORMANCE_METRICS } from './metricsQuery'
+import { ApolloError } from 'apollo-client'
+import {
+  ToastNotification,
+  NOTIFICATION_TYPE
+} from '@client/components/interface/ToastNotification'
+import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
+import { RegistrationsReport } from '@client/views/SysAdmin/Performance/RegistrationsReport'
+import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
+import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
+import { CertificationRateComponent } from '@client/views/SysAdmin/Performance/CertificationRateComponent'
+import {
+  certificationRatesDummyData,
+  Description
+} from '@client/views/SysAdmin/Performance/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
+import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
+import { PerformanceStats } from './PerformanceStats'
+import { SubHeader } from './utils'
 
 const Layout = styled.div`
   display: flex;
+  width: 100%;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
+    flex-direction: column;
+  }
   gap: 16px;
 `
 const LayoutLeft = styled.div`
   flex-grow: 1;
+
+  & > div {
+    flex-grow: 1;
+    @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
+      width: auto;
+      max-width: 720px;
+      margin-bottom: 0;
+    }
+    @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+      max-width: none;
+      margin-bottom: 24px;
+    }
+  }
+
+  .performance-block {
+    &:not(:last-child) {
+      margin-bottom: 40px;
+    }
+  }
 `
 const LayoutRight = styled.div`
-  margin-top: 24px;
-  width: 300px;
+  margin: 24px auto;
+  width: 360px;
   display: flex;
   gap: 16px;
   flex-direction: column;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
+    width: 100%;
+    max-width: 720px;
+    margin-top: 0;
+  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    position: absolute;
     display: none;
   }
 `
 
-const Stats = styled(Box)`
-  width: 100%;
-  height: auto;
-`
-const H4 = styled.div`
-  ${({ theme }) => theme.fonts.h4}
-  color: ${({ theme }) => theme.colors.copy};
+const ResponsiveModalContent = styled.div`
+  display: flex;
+  gap: 16px;
+  flex-direction: column;
 `
 const RegistrationStatus = styled(Box)`
   width: 100%;
   height: auto;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    border: 0;
+    padding: 0;
+  }
 `
 
 const PerformanceActions = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding-bottom: 16px;
 `
 interface IConnectProps {
   locations: { [key: string]: ILocation }
@@ -88,8 +140,8 @@ interface ISearchParams {
   timeEnd: string
 }
 
-interface IDispatchProps {
-  goToPerformanceHome: typeof goToPerformanceHome
+interface IMetricsQueryResult {
+  getTotalMetrics: GQLTotalMetricsResult
 }
 
 interface State {
@@ -97,11 +149,13 @@ interface State {
   event: Event
   timeStart: Date
   timeEnd: Date
+  toggleStatus: boolean
 }
 
 type Props = WrappedComponentProps &
-  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps &
-  IDispatchProps & { theme: ITheme }
+  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps & {
+    theme: ITheme
+  }
 
 const selectLocation = (
   locationId: string,
@@ -135,7 +189,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       timeStart:
         (timeStart && new Date(timeStart)) || subYears(new Date(Date.now()), 1),
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
-      event: event || Event.BIRTH
+      event: event || Event.BIRTH,
+      toggleStatus: false
     }
   }
 
@@ -157,7 +212,13 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     ]
   }
 
-  getTabContent = (intl: IntlShape, selectedLocation: ISearchLocation) => {
+  togglePerformanceStatus = () => {
+    this.setState({
+      toggleStatus: !this.state.toggleStatus
+    })
+  }
+
+  getFilter = (intl: IntlShape, selectedLocation: ISearchLocation) => {
     const { id: locationId } = selectedLocation || {}
 
     return (
@@ -211,11 +272,18 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   }
 
   render() {
-    const { intl } = this.props
-
+    const { intl, userDetails } = this.props
+    const { timeStart, timeEnd, event, toggleStatus } = this.state
+    const queryVariablesWithoutLocationId = {
+      timeStart: timeStart.toISOString(),
+      timeEnd: timeEnd.toISOString(),
+      event: event.toUpperCase()
+    }
     return (
       <SysAdminContentWrapper
         id="performanceHome"
+        isCertificatesConfigPage={true}
+        mapPerformanceClickHandler={this.togglePerformanceStatus}
         profilePageStyle={{
           paddingTopMd: 0,
           horizontalPaddingMd: 0
@@ -226,19 +294,135 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             <Content
               title={intl.formatMessage(navigationMessages.performance)}
               size={ContentSize.LARGE}
-              tabBarContent={this.getTabContent(
-                intl,
-                this.state.selectedLocation
-              )}
-              noTabBarBorder={true}
-            ></Content>
+              filterContent={this.getFilter(intl, this.state.selectedLocation)}
+            >
+              <Query
+                query={PERFORMANCE_METRICS}
+                variables={
+                  this.state.selectedLocation
+                    ? {
+                        ...queryVariablesWithoutLocationId,
+                        locationId: this.state.selectedLocation.id
+                      }
+                    : queryVariablesWithoutLocationId
+                }
+                fetchPolicy="no-cache"
+              >
+                {({
+                  loading,
+                  error,
+                  data
+                }: {
+                  loading: boolean
+                  error?: ApolloError
+                  data?: IMetricsQueryResult
+                }) => {
+                  if (error) {
+                    return (
+                      <>
+                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                      </>
+                    )
+                  }
+
+                  if (loading) {
+                    return <Spinner id="performance-home-loading" />
+                  }
+
+                  return (
+                    <>
+                      <CompletenessReport
+                        data={data!.getTotalMetrics}
+                        selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
+                      />
+                      <RegistrationsReport
+                        data={data!.getTotalMetrics}
+                        selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
+                      />
+                    </>
+                  )
+                }}
+              </Query>
+              <CertificationRateComponent data={certificationRatesDummyData} />
+              <CorrectionsReport
+                timeStart={timeStart}
+                timeEnd={timeEnd}
+                locationId={
+                  this.state.selectedLocation
+                    ? this.state.selectedLocation.id
+                    : undefined
+                }
+                selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
+              />
+              <Query
+                query={GET_TOTAL_PAYMENTS}
+                variables={
+                  this.state.selectedLocation
+                    ? {
+                        ...queryVariablesWithoutLocationId,
+                        locationId: this.state.selectedLocation.id
+                      }
+                    : queryVariablesWithoutLocationId
+                }
+              >
+                {({ loading, data, error }) => {
+                  if (data && data.getTotalPayments) {
+                    return (
+                      <PaymentsAmountComponent data={data!.getTotalPayments} />
+                    )
+                  }
+                  if (loading) {
+                    return <Spinner id="fees-collected-loading" />
+                  }
+                  if (error) {
+                    return (
+                      <>
+                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                      </>
+                    )
+                  }
+                }}
+              </Query>
+            </Content>
           </LayoutLeft>
+          <ResponsiveModal
+            title={intl.formatMessage(constantsMessages.status)}
+            show={toggleStatus}
+            handleClose={this.togglePerformanceStatus}
+            actions={[]}
+          >
+            <ResponsiveModalContent>
+              <RegistrationStatus>
+                <SubHeader>
+                  {intl.formatMessage(messages.registrationByStatus)}
+                </SubHeader>
+                <Description>
+                  Current status of death records being processed
+                </Description>
+              </RegistrationStatus>
+              <PerformanceStats
+                registrationOffices={5}
+                totalRegistrars={200}
+                registrarsRatio={2}
+                citizen={50}
+              />
+            </ResponsiveModalContent>
+          </ResponsiveModal>
           <LayoutRight>
-            <Stats>
-              <H4>Stats</H4>
-            </Stats>
+            <PerformanceStats
+              registrationOffices={5}
+              totalRegistrars={200}
+              registrarsRatio={2}
+              citizen={50}
+            />
+            {/* TODO: RegistrationStatus could be replaced by the StatusWiseDeclarationCountView component */}
             <RegistrationStatus>
-              <H4>Registration by status</H4>
+              <SubHeader>
+                {intl.formatMessage(messages.registrationByStatus)}
+              </SubHeader>
+              <Description>
+                Current status of death records being processed
+              </Description>
             </RegistrationStatus>
           </LayoutRight>
         </Layout>
@@ -256,6 +440,6 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const PerformanceHome = connect(mapStateToProps, {
-  goToPerformanceHome
-})(withTheme(injectIntl(PerformanceHomeComponent)))
+export const PerformanceHome = connect(mapStateToProps)(
+  withTheme(injectIntl(PerformanceHomeComponent))
+)

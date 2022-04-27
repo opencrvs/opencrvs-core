@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
 import React from 'react'
 import {
   PerformanceTitle,
@@ -21,22 +18,20 @@ import {
   BreakdownRow,
   BreakdownLabel,
   BreakdownValue,
+  ReportContainer,
   PercentageDisplay,
   calculateTotal,
-  TotalDisplayWithPercentage
+  TotalDisplayWithPercentage,
+  PerformanceListHeader
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/performance'
 import { useIntl } from 'react-intl'
-import styled from 'styled-components'
+
 interface RegistrationsReportProps {
   data: GQLTotalMetricsResult
   selectedEvent: 'BIRTH' | 'DEATH'
 }
-
-const Container = styled(ListViewSimplified)`
-  grid-template-columns: auto 1fr minmax(5em, auto);
-`
 
 export function RegistrationsReport({
   data,
@@ -44,7 +39,16 @@ export function RegistrationsReport({
 }: RegistrationsReportProps) {
   const intl = useIntl()
   return (
-    <Container>
+    <ReportContainer>
+      <ListViewItemSimplified
+        label={
+          <div>
+            <PerformanceListHeader>
+              {intl.formatMessage(messages.performanceTotalRegitrationsHeader)}
+            </PerformanceListHeader>
+          </div>
+        }
+      />
       <ListViewItemSimplified
         label={
           <PerformanceTitle>
@@ -310,6 +314,6 @@ export function RegistrationsReport({
           </div>
         }
       />
-    </Container>
+    </ReportContainer>
   )
 }

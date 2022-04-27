@@ -11,7 +11,7 @@
  */
 import { messages } from '@client/i18n/messages/views/performance'
 import styled from '@client/styledComponents'
-import { goToOperationalReport } from '@client/navigation'
+import { goToPerformanceHome } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
@@ -20,7 +20,6 @@ import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { generatePilotLocations } from '@client/utils/locationUtils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 
 const MessageContainer = styled.div`
   margin: 0;
@@ -36,7 +35,7 @@ interface NoResultMessageProps {
 }
 
 interface DispatchProps {
-  goToOperationalReport: typeof goToOperationalReport
+  goToPerformanceHome: typeof goToPerformanceHome
 }
 
 const MessageRow = styled.div`
@@ -72,9 +71,10 @@ class NoResultMessageComponent extends React.Component<Props> {
                   id={`pilot-location-link-${index}`}
                   key={index}
                   onClick={() =>
-                    this.props.goToOperationalReport(
-                      pilotLocation.id,
-                      OPERATIONAL_REPORT_SECTION.OPERATIONAL
+                    this.props.goToPerformanceHome(
+                      undefined,
+                      undefined,
+                      pilotLocation.id
                     )
                   }
                 >
@@ -103,5 +103,5 @@ function mapStateToProps(state: IStoreState) {
 }
 
 export const NoResultMessage = connect(mapStateToProps, {
-  goToOperationalReport
+  goToPerformanceHome
 })(injectIntl(NoResultMessageComponent))

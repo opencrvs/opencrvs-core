@@ -28,21 +28,8 @@ export interface IMetricsParam {
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getTotalMetrics(
-      _,
-      { timeStart, timeEnd, locationId, event },
-      authHeader
-    ) {
-      return getMetrics(
-        '/totalMetrics',
-        {
-          timeStart,
-          timeEnd,
-          locationId,
-          event
-        },
-        authHeader
-      )
+    async getTotalMetrics(_, variables, authHeader) {
+      return getMetrics('/totalMetrics', variables, authHeader)
     },
     async getTotalPayments(
       _,

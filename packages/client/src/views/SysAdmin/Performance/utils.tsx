@@ -13,7 +13,7 @@ import styled from '@client/styledComponents'
 import {
   GQLLocation,
   GQLIdentifier,
-  GQLEventMetrics
+  GQLPaymentMetric
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from '@client/utils/userUtils'
 import { ILocation } from '@client/offline/reducer'
@@ -22,6 +22,7 @@ import endOfMonth from 'date-fns/endOfMonth'
 import React from 'react'
 import { getPercentage } from '@client/utils/data-formatting'
 import { FormattedNumber } from 'react-intl'
+import { ListViewSimplified } from '@opencrvs/components/lib/interface'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
@@ -46,7 +47,7 @@ export const SubHeader = styled.div`
 export const Description = styled.div`
   margin: 8px 0px;
   color: ${({ theme }) => theme.colors.supportingCopy};
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.reg14};
 `
 
 export const ActionContainer = styled.div`
@@ -82,7 +83,19 @@ export const FilterContainer = styled.div`
 export const PerformanceTitle = styled.div`
   ${({ theme }) => theme.fonts.bold16}
 `
+export const PerformanceListHeader = styled.h4`
+  ${({ theme }) => theme.fonts.h3}
+  color: ${({ theme }) => theme.colors.copy};
+  margin: 0;
+  margin-bottom: 8px;
+`
 
+export const PerformanceListSubHeader = styled.p`
+  ${({ theme }) => theme.fonts.reg16}
+  color:  ${({ theme }) => theme.colors.supportingCopy};
+  margin: 0;
+  margin-bottom: 0.5em;
+`
 export const PerformanceValue = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
@@ -91,18 +104,44 @@ export const PerformanceValue = styled.div`
 export const Breakdown = styled.div`
   margin-top: 0.5rem;
 `
-export const BreakdownRow = styled.div``
-export const BreakdownLabel = styled.span`
+export const BreakdownRow = styled.div`
   color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.reg12}
+`
+export const BreakdownLabel = styled.span`
   ${({ theme }) => theme.fonts.bold12};
 `
-export const BreakdownValue = styled.span`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg12};
+export const BreakdownValue = styled.span``
+
+export const ReportContainer = styled(ListViewSimplified)`
+  :not(:last-of-type) {
+    margin-bottom: 2em;
+  }
+  grid-template-columns: auto 1fr minmax(5em, auto);
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    grid-template-columns: none;
+  }
 `
+
 export function PercentageDisplay(props: { total: number; ofNumber: number }) {
   return <span>{getPercentage(props.ofNumber, props.total)}%</span>
 }
+
+export const ListContainer = styled.div`
+  margin-top: 36px;
+`
+
+export const certificationRatesDummyData = [
+  {
+    label: 'Total',
+    value: 4000
+  },
+  {
+    label: 'Certification Rate',
+    value: 25
+  }
+]
 
 export function TotalDisplayWithPercentage(props: {
   total: number
@@ -118,6 +157,12 @@ export function TotalDisplayWithPercentage(props: {
 }
 
 export function calculateTotal<T extends Array<{ total: number }>>(metrics: T) {
+  return metrics
+    .map((metric) => metric.total)
+    .reduce((m, metric) => m + metric, 0)
+}
+
+export function calculateTotalPaymentAmount(metrics: GQLPaymentMetric[]) {
   return metrics
     .map((metric) => metric.total)
     .reduce((m, metric) => m + metric, 0)

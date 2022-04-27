@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  ListViewSimplified,
   ListViewItemSimplified,
   Spinner
 } from '@opencrvs/components/lib/interface'
@@ -18,14 +17,16 @@ import React from 'react'
 import {
   calculateTotal,
   PerformanceTitle,
-  PerformanceValue
+  PerformanceValue,
+  PerformanceListHeader,
+  ReportContainer
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLCorrectionMetric } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/performance'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { useIntl } from 'react-intl'
-import styled from 'styled-components'
+
 import { Query } from '@client/components/Query'
 import gql from 'graphql-tag'
 import { ApolloError } from 'apollo-client'
@@ -41,10 +42,6 @@ interface CorrectionsReportProps {
   timeEnd: Date
   locationId?: string
 }
-
-const Container = styled(ListViewSimplified)`
-  grid-template-columns: auto 1fr minmax(5em, auto);
-`
 
 export const CORRECTION_TOTALS = gql`
   query data(
@@ -108,9 +105,20 @@ export function CorrectionsReport({
         }
 
         return (
-          <Container>
+          <ReportContainer>
             <ListViewItemSimplified
-              label={<PerformanceTitle>Total</PerformanceTitle>}
+              label={
+                <div>
+                  <PerformanceListHeader>Corrections</PerformanceListHeader>
+                </div>
+              }
+            />
+            <ListViewItemSimplified
+              label={
+                <PerformanceTitle>
+                  {intl.formatMessage(messages.performanceTotalLabel)}
+                </PerformanceTitle>
+              }
               value={
                 <div>
                   <PerformanceValue>
@@ -200,7 +208,7 @@ export function CorrectionsReport({
                 </PerformanceValue>
               }
             />
-          </Container>
+          </ReportContainer>
         )
       }}
     </Query>

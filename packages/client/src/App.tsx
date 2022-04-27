@@ -63,7 +63,6 @@ import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
-import { OperationalReport } from './views/SysAdmin/Performance/OperationalReport'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -328,11 +327,6 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.PERFORMANCE_HOME}
                                             component={PerformanceHome}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.OPERATIONAL_REPORT}
-                                            component={OperationalReport}
                                           />
                                           <ProtectedRoute
                                             exact

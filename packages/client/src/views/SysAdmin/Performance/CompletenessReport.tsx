@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
 import React from 'react'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { getPercentage } from '@client/utils/data-formatting'
@@ -24,10 +21,12 @@ import {
   BreakdownLabel,
   BreakdownValue,
   PercentageDisplay,
-  calculateTotal
+  calculateTotal,
+  PerformanceListHeader,
+  PerformanceListSubHeader,
+  ReportContainer
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
-import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
 import { buttonMessages } from '@client/i18n/messages/buttons'
@@ -37,17 +36,30 @@ interface CompletenessReportProps {
   selectedEvent: 'BIRTH' | 'DEATH'
 }
 
-const Container = styled(ListViewSimplified)`
-  grid-template-columns: auto 1fr minmax(5em, auto);
-`
-
 export function CompletenessReport({
   data,
   selectedEvent
 }: CompletenessReportProps) {
   const intl = useIntl()
   return (
-    <Container>
+    <ReportContainer>
+      <ListViewItemSimplified
+        label={
+          <div>
+            <PerformanceListHeader>
+              {intl.formatMessage(messages.performanceCompletenessRatesHeader)}
+            </PerformanceListHeader>
+            <PerformanceListSubHeader>
+              {intl.formatMessage(
+                messages.performanceCompletenessRatesSubHeader,
+                {
+                  event: selectedEvent
+                }
+              )}
+            </PerformanceListSubHeader>
+          </div>
+        }
+      />
       <ListViewItemSimplified
         label={
           <PerformanceTitle>
@@ -242,6 +254,6 @@ export function CompletenessReport({
           <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
         }
       />
-    </Container>
+    </ReportContainer>
   )
 }

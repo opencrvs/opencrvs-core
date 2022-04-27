@@ -16,7 +16,7 @@ export const PERFORMANCE_METRICS = gql`
     $event: String!
     $timeStart: String!
     $timeEnd: String!
-    $locationId: String!
+    $locationId: String
   ) {
     getTotalMetrics(
       timeStart: $timeStart
@@ -39,16 +39,6 @@ export const PERFORMANCE_METRICS = gql`
         practitionerRole
         timeLabel
       }
-    }
-
-    getDeclarationsStartedMetrics(
-      timeStart: $timeStart
-      timeEnd: $timeEnd
-      locationId: $locationId
-    ) {
-      fieldAgentDeclarations
-      hospitalDeclarations
-      officeDeclarations
     }
   }
 `
