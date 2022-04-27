@@ -9,17 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  ListViewItemSimplified,
-  ListViewSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import * as React from 'react'
 import {
   ListContainer,
   PerformanceListHeader,
   PerformanceTitle,
   PerformanceValue,
-  PerformanceListSubHeader
+  PerformanceListSubHeader,
+  ReportContainer
 } from '@client/views/SysAdmin/Performance/utils'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
@@ -37,7 +35,7 @@ export function CertificationRateComponent(props: ICertificationRateProps) {
   const intl = useIntl()
   return (
     <ListContainer>
-      <ListViewSimplified>
+      <ReportContainer>
         <ListViewItemSimplified
           label={
             <div>
@@ -72,7 +70,7 @@ export function CertificationRateComponent(props: ICertificationRateProps) {
           }
           value={<PerformanceValue>{props.data[1].value}%</PerformanceValue>}
         />
-      </ListViewSimplified>
+      </ReportContainer>
     </ListContainer>
   )
 }

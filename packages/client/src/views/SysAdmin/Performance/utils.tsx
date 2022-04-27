@@ -13,7 +13,6 @@ import styled from '@client/styledComponents'
 import {
   GQLLocation,
   GQLIdentifier,
-  GQLEventMetrics,
   GQLPaymentMetric
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from '@client/utils/userUtils'
@@ -23,6 +22,7 @@ import endOfMonth from 'date-fns/endOfMonth'
 import React from 'react'
 import { getPercentage } from '@client/utils/data-formatting'
 import { FormattedNumber } from 'react-intl'
+import { ListViewSimplified } from '@opencrvs/components/lib/interface'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
@@ -94,6 +94,7 @@ export const PerformanceListSubHeader = styled.p`
   ${({ theme }) => theme.fonts.reg16}
   color:  ${({ theme }) => theme.colors.supportingCopy};
   margin: 0;
+  margin-bottom: 0.5em;
 `
 export const PerformanceValue = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -103,15 +104,26 @@ export const PerformanceValue = styled.div`
 export const Breakdown = styled.div`
   margin-top: 0.5rem;
 `
-export const BreakdownRow = styled.div``
-export const BreakdownLabel = styled.span`
+export const BreakdownRow = styled.div`
   color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.reg12}
+`
+export const BreakdownLabel = styled.span`
   ${({ theme }) => theme.fonts.bold12};
 `
-export const BreakdownValue = styled.span`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg12};
+export const BreakdownValue = styled.span``
+
+export const ReportContainer = styled(ListViewSimplified)`
+  :not(:last-of-type) {
+    margin-bottom: 2em;
+  }
+  grid-template-columns: auto 1fr minmax(5em, auto);
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    grid-template-columns: none;
+  }
 `
+
 export function PercentageDisplay(props: { total: number; ofNumber: number }) {
   return <span>{getPercentage(props.ofNumber, props.total)}%</span>
 }

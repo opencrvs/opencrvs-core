@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  ListViewSimplified,
   ListViewItemSimplified,
   Spinner
 } from '@opencrvs/components/lib/interface'
@@ -19,14 +18,15 @@ import {
   calculateTotal,
   PerformanceTitle,
   PerformanceValue,
-  PerformanceListHeader
+  PerformanceListHeader,
+  ReportContainer
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLCorrectionMetric } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/performance'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { useIntl } from 'react-intl'
-import styled from 'styled-components'
+
 import { Query } from '@client/components/Query'
 import gql from 'graphql-tag'
 import { ApolloError } from 'apollo-client'
@@ -42,14 +42,6 @@ interface CorrectionsReportProps {
   timeEnd: Date
   locationId?: string
 }
-
-const Container = styled(ListViewSimplified)`
-  grid-template-columns: auto 1fr minmax(5em, auto);
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    grid-template-columns: none;
-  }
-`
 
 export const CORRECTION_TOTALS = gql`
   query data(
@@ -113,7 +105,7 @@ export function CorrectionsReport({
         }
 
         return (
-          <Container>
+          <ReportContainer>
             <ListViewItemSimplified
               label={
                 <div>
@@ -216,7 +208,7 @@ export function CorrectionsReport({
                 </PerformanceValue>
               }
             />
-          </Container>
+          </ReportContainer>
         )
       }}
     </Query>
