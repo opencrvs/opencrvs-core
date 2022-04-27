@@ -19,8 +19,7 @@ import {
   calculateTotal,
   PerformanceTitle,
   PerformanceValue,
-  PerformanceListHeader,
-  Container
+  PerformanceListHeader
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLCorrectionMetric } from '@opencrvs/gateway/src/graphql/schema'
 import { messages } from '@client/i18n/messages/views/performance'
@@ -43,6 +42,14 @@ interface CorrectionsReportProps {
   timeEnd: Date
   locationId?: string
 }
+
+const Container = styled(ListViewSimplified)`
+  grid-template-columns: auto 1fr minmax(5em, auto);
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    grid-template-columns: none;
+  }
+`
 
 export const CORRECTION_TOTALS = gql`
   query data(

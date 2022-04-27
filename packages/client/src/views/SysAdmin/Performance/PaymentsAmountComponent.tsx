@@ -9,15 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
+import {
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface'
 import React from 'react'
 import {
   PerformanceTitle,
   PerformanceValue,
   calculateTotalPaymentAmount,
   PerformanceListHeader,
-  ListContainer,
-  Container
+  ListContainer
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLPaymentMetric } from '@opencrvs/gateway/src/graphql/schema'
 import { useIntl } from 'react-intl'
@@ -37,7 +39,7 @@ export function PaymentsAmountComponent(props: PaymentsAmountProps) {
   const intl = useIntl()
   return (
     <ListContainer>
-      <Container>
+      <ListViewSimplified>
         <ListViewItemSimplified
           label={
             <div>
@@ -94,7 +96,7 @@ export function PaymentsAmountComponent(props: PaymentsAmountProps) {
             </PerformanceValue>
           }
         />
-      </Container>
+      </ListViewSimplified>
     </ListContainer>
   )
 }
