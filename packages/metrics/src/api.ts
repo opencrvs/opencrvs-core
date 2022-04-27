@@ -180,24 +180,28 @@ export const fetchPractitionerRole = async (
 }
 
 interface IUserCountSearchCriteria {
-  primaryOfficeId: string
   role: string
 }
 
-export async function countUsers(
+export interface ICountByLocation {
+  total: number
+  locationId: string
+}
+
+export async function countUsersByLocation(
   searchCriteria: Partial<IUserCountSearchCriteria>,
   authHeader: IAuthHeader
-) {
-  const { primaryOfficeId, role } = searchCriteria
+): Promise<ICountByLocation[]> {
+  const { role } = searchCriteria
   const res = await fetch(
-    `${USER_MANAGEMENT_URL}/countUsers?primaryOfficeId=${primaryOfficeId}&role=${role}`,
+    `${USER_MANAGEMENT_URL}/countUsersByLocation?role=${role}`,
     {
       method: 'GET',
       headers: {
+        'Content-Type': 'application/json',
         ...authHeader
       }
     }
   )
-  const count = await res.text()
-  return Number(count)
+  return res.json()
 }

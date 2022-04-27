@@ -324,7 +324,7 @@ export const getDistrictLocation = async (
 
   let locationBundle = await fetchLocation(lId, authHeader)
 
-  let locationType = getLocationType(locationBundle)
+  let locationType = getJurisdictionType(locationBundle)
   while (
     locationBundle &&
     (!locationType || locationType.value !== 'DISTRICT')
@@ -336,7 +336,7 @@ export const getDistrictLocation = async (
         locationBundle.partOf.reference.split('/')[1]) ||
       ''
     locationBundle = await fetchLocation(lId, authHeader)
-    locationType = getLocationType(locationBundle)
+    locationType = getJurisdictionType(locationBundle)
   }
 
   if (!locationBundle) {
@@ -346,7 +346,7 @@ export const getDistrictLocation = async (
   return locationBundle as Location
 }
 
-export function getLocationType(locationBundle: fhir.Location) {
+export function getJurisdictionType(locationBundle: fhir.Location) {
   return (
     locationBundle &&
     locationBundle.identifier &&
@@ -357,6 +357,15 @@ export function getLocationType(locationBundle: fhir.Location) {
   )
 }
 
+export function getLocationType(location: fhir.Location): string {
+  if (location.type?.coding?.[0]?.code) {
+    return location.type?.coding?.[0]?.code
+  } else {
+    throw new Error(
+      `Location type could not found for location, location id ${location.id}`
+    )
+  }
+}
 export function fillEmptyDataArrayByKey(
   dataArray: Array<any>,
   emptyDataArray: Array<any>,

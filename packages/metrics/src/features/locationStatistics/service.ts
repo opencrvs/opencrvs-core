@@ -14,7 +14,8 @@ import {
   fetchChildLocationsWithTypeByParentId,
   fetchChildLocationsByParentId,
   fetchLocationsByType,
-  countUsers
+  countUsersByLocation,
+  ICountByLocation
 } from '@metrics/api'
 import { getPopulation, getLocationType } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
@@ -25,15 +26,14 @@ interface ILocationStatisticsResponse {
   offices: number
 }
 
-async function getCRVSOfficeStatistics(
+function getCRVSOfficeStatistics(
   location: fhir.Location,
-  authHeader: IAuthHeader
-): Promise<ILocationStatisticsResponse> {
+  registrarsCountByLocation: Array<ICountByLocation>
+) {
   const registrars =
-    (await countUsers(
-      { primaryOfficeId: location.id, role: 'LOCAL_REGISTRAR' },
-      authHeader
-    )) || 0
+    registrarsCountByLocation.find(
+      ({ locationId }) => locationId === location.id
+    )?.total || 0
   return {
     registrars,
     offices: 1
@@ -42,6 +42,7 @@ async function getCRVSOfficeStatistics(
 
 async function getAdminLocationStatistics(
   location: fhir.Location,
+  registrarsCountByLocation: Array<ICountByLocation>,
   populationYear: number,
   authHeader: IAuthHeader
 ): Promise<ILocationStatisticsResponse> {
@@ -56,10 +57,9 @@ async function getAdminLocationStatistics(
   for (const office of locationOffices) {
     offices += 1
     registrars +=
-      (await countUsers(
-        { primaryOfficeId: office.id, role: 'LOCAL_REGISTRAR' },
-        authHeader
-      )) || 0
+      registrarsCountByLocation.find(
+        ({ locationId }) => locationId === office.id
+      )?.total || 0
   }
   return {
     population,
@@ -70,6 +70,7 @@ async function getAdminLocationStatistics(
 
 async function getCountryWideLocationStatistics(
   populationYear: number,
+  registrarsCountByLocation: Array<ICountByLocation>,
   authHeader: IAuthHeader
 ): Promise<ILocationStatisticsResponse> {
   let population = 0
@@ -86,10 +87,9 @@ async function getCountryWideLocationStatistics(
   for (const office of locationOffices) {
     offices += 1
     registrars +=
-      (await countUsers(
-        { primaryOfficeId: office.id, role: 'LOCAL_REGISTRAR' },
-        authHeader
-      )) || 0
+      registrarsCountByLocation.find(
+        ({ locationId }) => locationId === office.id
+      )?.total || 0
   }
   return {
     population,
@@ -103,14 +103,27 @@ export async function getLocationStatistics(
   populationYear: number,
   authHeader: IAuthHeader
 ): Promise<ILocationStatisticsResponse> {
+  const registrarsCountByLocation = await countUsersByLocation(
+    { role: 'LOCAL_REGISTRAR' },
+    authHeader
+  )
   if (locationId) {
     const location = await fetchLocation(locationId, authHeader)
     if (getLocationType(location) !== 'CRVS_OFFICE') {
-      return getAdminLocationStatistics(location, populationYear, authHeader)
+      return getAdminLocationStatistics(
+        location,
+        registrarsCountByLocation,
+        populationYear,
+        authHeader
+      )
     } else {
-      return getCRVSOfficeStatistics(location, authHeader)
+      return getCRVSOfficeStatistics(location, registrarsCountByLocation)
     }
   } else {
-    return getCountryWideLocationStatistics(populationYear, authHeader)
+    return getCountryWideLocationStatistics(
+      populationYear,
+      registrarsCountByLocation,
+      authHeader
+    )
   }
 }

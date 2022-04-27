@@ -75,7 +75,7 @@ import changePhoneHandler, {
   changePhoneRequestSchema
 } from '@user-mgnt/features/changePhone/handler'
 import * as Joi from 'joi'
-import { countUsersHandler } from '@user-mgnt/features/countUsers/handler'
+import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -512,12 +512,11 @@ export const getRoutes = () => {
     },
     {
       method: 'GET',
-      path: '/countUsers',
-      handler: countUsersHandler,
+      path: '/countUsersByLocation',
+      handler: countUsersByLocationHandler,
       config: {
         tags: ['api'],
-        description:
-          'Gets count of specified office id and with specified role',
+        description: 'Gets count of users group by office ids',
         auth: {
           scope: [
             RouteScope.REGISTER,
@@ -529,7 +528,6 @@ export const getRoutes = () => {
         },
         validate: {
           query: Joi.object({
-            primaryOfficeId: Joi.string().required(),
             role: Joi.string().required()
           })
         }
