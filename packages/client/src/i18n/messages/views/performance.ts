@@ -334,6 +334,26 @@ const messagesToDefine = {
     id: 'performance.pilotArea.header',
     defaultMessage: 'Pilot Areas',
     description: 'Label for pilot area list header'
+  },
+  stats: {
+    id: 'performance.stats.header',
+    defaultMessage: 'Stats',
+    description: 'Title for perforamce stats'
+  },
+  registrarsToCitizen: {
+    id: 'performance.registrarsToCitizen',
+    defaultMessage: 'Registrars to citizens',
+    description: 'Title for Registrars to citizens'
+  },
+  registrarsToCitizenValue: {
+    id: 'performance.registrarsToCitizenValue',
+    defaultMessage: '{registrar} of {citizen}',
+    description: 'Value for Registrars to citizens'
+  },
+  registrationByStatus: {
+    id: 'performance.registrationByStatus.header',
+    defaultMessage: 'Registration by status',
+    description: 'Title for Registration by status'
   }
 }
 
