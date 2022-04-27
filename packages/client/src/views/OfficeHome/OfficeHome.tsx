@@ -39,7 +39,7 @@ import {
 import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import { PAGE_TRANSITIONS_ENTER_TIME } from '@client/utils/constants'
 import {
-  FloatingNotification,
+  Toast,
   NOTIFICATION_TYPE,
   Spinner
 } from '@opencrvs/components/lib/interface'
@@ -410,7 +410,7 @@ export class OfficeHomeView extends React.Component<
         <NotificationToast showPaginated={this.showPaginated} />
 
         {this.state.showCertificateToast && (
-          <FloatingNotification
+          <Toast
             id="print-cert-notification"
             type={NOTIFICATION_TYPE.SUCCESS}
             show={this.state.showCertificateToast}
@@ -419,7 +419,7 @@ export class OfficeHomeView extends React.Component<
             }}
           >
             {intl.formatMessage(certificateMessage.toastMessage)}
-          </FloatingNotification>
+          </Toast>
         )}
       </>
     )

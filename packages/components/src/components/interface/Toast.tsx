@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled, { keyframes, withTheme } from 'styled-components'
-import { CrossLarge, Error, Success, Warning } from '../icons'
+import { Cross, Error, Success, Warning } from '../icons'
 import { Spinner } from './Spinner'
 import { ITheme } from '../theme'
 
@@ -43,15 +43,14 @@ const easeInFromTop = keyframes`
   to { top: 56px; }
 `
 
-const NotificationContainer = styled.div`
+const Wrapper = styled.div`
   position: fixed;
-  padding: 4px 8px;
+  padding: 16px 24px;
   width: 50%;
-  transform: translateX(-50%);
-  left: 50%;
+  border-radius: 4px;
+  left: 250px;
   display: flex;
-  box-shadow: rgba(53, 67, 93, 0.54) 0px 2px 8px;
-  background: ${({ theme }) => theme.colors.secondary};
+  box-shadow: ${({ theme }) => theme.shadows.light};
   z-index: 1;
   justify-content: space-between;
   align-items: center;
@@ -93,32 +92,28 @@ const Content = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  gap: 16px;
 `
-const Cancel = styled.div`
-  padding: 8px;
-
-  transform: scale(0.8);
-
+const Close = styled.div`
+  align-items: center;
   &.clickable {
     cursor: pointer;
   }
 `
 
-const NotificationMessage = styled.div`
+const ToastMessage = styled.div`
   position: relative;
   ${({ theme }) => theme.fonts.reg16};
-  padding: 8px 16px;
-  margin: 8px;
   color: ${({ theme }) => theme.colors.white};
   min-width: 160px;
 `
 
-class FloatingNotificationComp extends React.Component<FullProps> {
+class ToastComp extends React.Component<FullProps> {
   render() {
     const { id, type, show, children, callback, className, theme } = this.props
 
     return (
-      <NotificationContainer
+      <Wrapper
         id={id}
         className={
           (type ? type : '') + (show ? ' show' : ' hide') + ' ' + className
@@ -132,22 +127,19 @@ class FloatingNotificationComp extends React.Component<FullProps> {
             <Spinner
               id="in-progress-floating-notification"
               baseColor={theme.colors.white}
+              size={24}
             />
           )}
-          <NotificationMessage>{children}</NotificationMessage>
+          <ToastMessage>{children}</ToastMessage>
         </Content>
         {callback && (
-          <Cancel
-            id={`${id}Cancel`}
-            onClick={callback}
-            className={' clickable'}
-          >
-            <CrossLarge />
-          </Cancel>
+          <Close id={`${id}Cancel`} onClick={callback} className={' clickable'}>
+            <Cross color={white} />
+          </Close>
         )}
-      </NotificationContainer>
+      </Wrapper>
     )
   }
 }
 
-export const FloatingNotification = withTheme(FloatingNotificationComp)
+export const Toast = withTheme(ToastComp)

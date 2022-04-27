@@ -27,7 +27,7 @@ import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import {
-  FloatingNotification,
+  Toast,
   ListView,
   NOTIFICATION_TYPE,
   ResponsiveModal,
@@ -485,7 +485,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                       <ListView items={CertificateSection.items} />
                     </Content>
                   )}
-                  <FloatingNotification
+                  <Toast
                     type={
                       imageLoadingError
                         ? NOTIFICATION_TYPE.ERROR
@@ -513,7 +513,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                           : eventName
                       }}
                     />
-                  </FloatingNotification>
+                  </Toast>
                   <ResponsiveModal
                     id="withoutVerificationPrompt"
                     show={showPrompt}

@@ -50,7 +50,7 @@ import {
   ColumnContentAlignment,
   ListTable,
   ToggleMenu,
-  FloatingNotification,
+  Toast,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 import {
@@ -797,24 +797,24 @@ function UserListComponent(props: IProps) {
       </LocationInfo>
       {renderUserList(locationId, userDetails)}
       {showResendSMSSuccess && (
-        <FloatingNotification
+        <Toast
           id="resend_invite_success"
           type={NOTIFICATION_TYPE.SUCCESS}
           show={showResendSMSSuccess}
           callback={() => setShowResendSMSSuccess(false)}
         >
           {intl.formatMessage(messages.resendSMSSuccess)}
-        </FloatingNotification>
+        </Toast>
       )}
       {showResendSMSError && (
-        <FloatingNotification
+        <Toast
           id="resend_invite_error"
           type={NOTIFICATION_TYPE.ERROR}
           show={showResendSMSError}
           callback={() => setShowResendSMSError(false)}
         >
           {intl.formatMessage(messages.resendSMSError)}
-        </FloatingNotification>
+        </Toast>
       )}
     </SysAdminContentWrapper>
   )

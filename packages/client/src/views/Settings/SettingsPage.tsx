@@ -30,7 +30,7 @@ import {
 import {
   ResponsiveModal,
   NOTIFICATION_TYPE,
-  FloatingNotification
+  Toast
 } from '@opencrvs/components/lib/interface'
 import { Select } from '@opencrvs/components/lib/forms'
 import {
@@ -427,7 +427,7 @@ class SettingsView extends React.Component<IProps, IState> {
           showPasswordChange={this.state.showPasswordChange}
           passwordChanged={this.changePassword}
         />
-        <FloatingNotification
+        <Toast
           type={
             this.state.imageUploading
               ? NOTIFICATION_TYPE.IN_PROGRESS
@@ -467,7 +467,7 @@ class SettingsView extends React.Component<IProps, IState> {
                 : messages.avatarUpdated)}
             />
           )}
-        </FloatingNotification>
+        </Toast>
       </>
     )
   }

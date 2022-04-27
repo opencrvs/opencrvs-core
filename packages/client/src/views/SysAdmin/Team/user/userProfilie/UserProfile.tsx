@@ -34,7 +34,7 @@ import {
   ISearchLocation,
   ToggleMenu,
   LoadingGrey,
-  FloatingNotification,
+  Toast,
   NOTIFICATION_TYPE as FLOATING_NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 
@@ -426,7 +426,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                       ]}
                     />
                     {showResendSMSSuccess && (
-                      <FloatingNotification
+                      <Toast
                         id="resend_invite_success"
                         type={FLOATING_NOTIFICATION_TYPE.SUCCESS}
                         show={showResendSMSSuccess}
@@ -435,10 +435,10 @@ class UserProfileComponent extends React.Component<Props, State> {
                         }
                       >
                         {intl.formatMessage(sysMessages.resendSMSSuccess)}
-                      </FloatingNotification>
+                      </Toast>
                     )}
                     {showResendSMSError && (
-                      <FloatingNotification
+                      <Toast
                         id="resend_invite_error"
                         type={FLOATING_NOTIFICATION_TYPE.ERROR}
                         show={showResendSMSError}
@@ -447,7 +447,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                         }
                       >
                         {intl.formatMessage(sysMessages.resendSMSError)}
-                      </FloatingNotification>
+                      </Toast>
                     )}
                     <UserAuditList user={user} />
                   </ContentWrapper>

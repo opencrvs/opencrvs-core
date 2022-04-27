@@ -24,7 +24,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
   ListView,
-  FloatingNotification,
+  Toast,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 import { Content } from '@opencrvs/components/lib/interface/Content'
@@ -511,7 +511,7 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
             valueChanged={this.changeValue}
           />
         )}
-        <FloatingNotification
+        <Toast
           id="print-cert-notification"
           type={this.state.notificationStatus}
           show={this.state.showNotification}
@@ -520,7 +520,7 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
           }}
         >
           {this.state.notificationMessages}
-        </FloatingNotification>
+        </Toast>
       </SysAdminContentWrapper>
     )
   }

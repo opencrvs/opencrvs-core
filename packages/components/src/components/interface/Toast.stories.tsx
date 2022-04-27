@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { FloatingNotification, NOTIFICATION_TYPE } from './FloatingNotification'
+import { Toast, NOTIFICATION_TYPE } from './Toast'
 import React from 'react'
 
 interface IProps {
@@ -21,16 +21,17 @@ interface IProps {
   className?: string
 }
 
-const Template: Story<IProps> = (args) => (
-  <FloatingNotification {...args}>Test</FloatingNotification>
-)
-export const FloatingNotificationView = Template.bind({})
-FloatingNotificationView.args = {
+const Template: Story<IProps> = (args) => <Toast {...args}>Test</Toast>
+export const ToastView = Template.bind({})
+ToastView.args = {
   show: true,
-  type: NOTIFICATION_TYPE.SUCCESS
+  type: NOTIFICATION_TYPE.SUCCESS,
+  callback: () => {
+    alert('closed')
+  }
 }
 
 export default {
-  title: 'Components/Interface/FloatingNotification',
-  component: FloatingNotification
+  title: 'Components/Interface/Toast',
+  component: Toast
 } as Meta
