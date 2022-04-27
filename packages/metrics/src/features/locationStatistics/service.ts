@@ -19,68 +19,98 @@ import {
 import { getPopulation, getLocationType } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
 
+interface ILocationStatisticsResponse {
+  registrars: number
+  population?: number
+  offices: number
+}
+
+async function getCRVSOfficeStatistics(
+  location: fhir.Location,
+  authHeader: IAuthHeader
+): Promise<ILocationStatisticsResponse> {
+  const registrars =
+    (await countUsers(
+      { primaryOfficeId: location.id, role: 'LOCAL_REGISTRAR' },
+      authHeader
+    )) || 0
+  return {
+    registrars,
+    offices: 1
+  }
+}
+
+async function getAdminLocationStatistics(
+  location: fhir.Location,
+  populationYear: number,
+  authHeader: IAuthHeader
+): Promise<ILocationStatisticsResponse> {
+  const population = getPopulation(location, populationYear)
+  let offices = 0
+  let registrars = 0
+  const locationOffices = await fetchChildLocationsWithTypeByParentId(
+    location.id as string,
+    'CRVS_OFFICE',
+    authHeader
+  )
+  for (const office of locationOffices) {
+    offices += 1
+    registrars +=
+      (await countUsers(
+        { primaryOfficeId: office.id, role: 'LOCAL_REGISTRAR' },
+        authHeader
+      )) || 0
+  }
+  return {
+    population,
+    offices,
+    registrars
+  }
+}
+
+async function getCountryWideLocationStatistics(
+  populationYear: number,
+  authHeader: IAuthHeader
+): Promise<ILocationStatisticsResponse> {
+  let population = 0
+  let offices = 0
+  let registrars = 0
+  const childLocations = await fetchChildLocationsByParentId(
+    'Location/0',
+    authHeader
+  )
+  for (const each of childLocations) {
+    population += getPopulation(each, populationYear) || 0
+  }
+  const locationOffices = await fetchLocationsByType('CRVS_OFFICE', authHeader)
+  for (const office of locationOffices) {
+    offices += 1
+    registrars +=
+      (await countUsers(
+        { primaryOfficeId: office.id, role: 'LOCAL_REGISTRAR' },
+        authHeader
+      )) || 0
+  }
+  return {
+    population,
+    offices,
+    registrars
+  }
+}
+
 export async function getLocationStatistics(
   locationId: string | undefined,
   populationYear: number,
   authHeader: IAuthHeader
-) {
-  const response: Record<string, number> = {
-    registrars: 0,
-    offices: 0
-  }
-
+): Promise<ILocationStatisticsResponse> {
   if (locationId) {
     const location = await fetchLocation(locationId, authHeader)
-
     if (getLocationType(location) !== 'CRVS_OFFICE') {
-      response.population = getPopulation(location, populationYear)
-      const locationOffices = await fetchChildLocationsWithTypeByParentId(
-        locationId,
-        'CRVS_OFFICE',
-        authHeader
-      )
-
-      for (const office of locationOffices) {
-        response.offices += 1
-        response.registrars +=
-          (await countUsers(
-            { primaryOfficeId: office.id, role: 'LOCAL_REGISTRAR' },
-            authHeader
-          )) || 0
-      }
+      return getAdminLocationStatistics(location, populationYear, authHeader)
     } else {
-      // if crvs office
-      response.registrars +=
-        (await countUsers(
-          { primaryOfficeId: location.id, role: 'LOCAL_REGISTRAR' },
-          authHeader
-        )) || 0
+      return getCRVSOfficeStatistics(location, authHeader)
     }
   } else {
-    // country wide
-    response.population = 0
-
-    const childLocations = await fetchChildLocationsByParentId(
-      'Location/0',
-      authHeader
-    )
-
-    for (const each of childLocations) {
-      response.population += getPopulation(each, populationYear) || 0
-    }
-    const locationOffices = await fetchLocationsByType(
-      'CRVS_OFFICE',
-      authHeader
-    )
-
-    for (const office of locationOffices) {
-      response.offices += 1
-      response.registrars +=
-        (await countUsers(
-          { primaryOfficeId: office.id, role: 'LOCAL_REGISTRAR' },
-          authHeader
-        )) || 0
-    }
+    return getCountryWideLocationStatistics(populationYear, authHeader)
   }
-  return response
 }
