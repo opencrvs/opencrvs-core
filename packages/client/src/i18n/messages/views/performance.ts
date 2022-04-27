@@ -49,6 +49,11 @@ const messagesToDefine = {
     defaultMessage: 'Fees collected',
     description: 'Header for report total payments'
   },
+  performanceApplicationSourcesHeader: {
+    id: 'performance.reports.header.applicationSources',
+    defaultMessage: 'Sources of applications',
+    description: 'Header for sources of applications'
+  },
   performanceTotalLabel: {
     id: 'performance.values.labels.total',
     defaultMessage: 'Total',
@@ -108,6 +113,41 @@ const messagesToDefine = {
     id: 'performance.values.labels.within5Years',
     defaultMessage: 'Within 5 years',
     description: 'Label text for displays showing registered within 5 years'
+  },
+  performanceCertificationFeeLabel: {
+    id: 'performance.payments.label.certificationFee',
+    defaultMessage: 'Certification fee',
+    description: 'Label for certification fee'
+  },
+  performanceCorrectionFeeLabel: {
+    id: 'performance.payments.label.correctionFee',
+    defaultMessage: 'Correction fee',
+    description: 'Label for correction fee'
+  },
+  performanceHospitalApplicationsLabel: {
+    id: 'performance.appSrc.labels.hospitalApplications',
+    defaultMessage: 'Health system (integration)',
+    description: 'Label for hospital applications'
+  },
+  performanceFieldAgentsApplicationsLabel: {
+    id: 'performance.appSrc.labels.fieldAgents',
+    defaultMessage: 'Field agents',
+    description: 'Label for field agents in application sources'
+  },
+  performanceRegistrarsApplicationsLabel: {
+    id: 'performance.appSrc.labels.registrars',
+    defaultMessage: 'Registrars',
+    description: 'Label for registrars in application sources'
+  },
+  performanceRegistrationAgentsApplicationsLabel: {
+    id: 'performance.appSrc.labels.registrarAgents',
+    defaultMessage: 'Registrar agents',
+    description: 'Label for registrar agents in application sources'
+  },
+  performanceCertificationRateLabel: {
+    id: 'performance.labels.certificationRate',
+    defaultMessage: 'Certification rate',
+    descrption: 'Label for certification rate'
   },
   sysAdminPerformanceHomeHeader: {
     id: 'performance.header.sysadmin.home',

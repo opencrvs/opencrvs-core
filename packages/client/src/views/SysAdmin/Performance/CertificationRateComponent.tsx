@@ -54,12 +54,20 @@ export function CertificationRateComponent(props: ICertificationRateProps) {
         />
 
         <ListViewItemSimplified
-          label={<PerformanceTitle>Total</PerformanceTitle>}
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceTotalLabel)}
+            </PerformanceTitle>
+          }
           value={<PerformanceValue>{props.data[0].value}</PerformanceValue>}
         />
 
         <ListViewItemSimplified
-          label={<PerformanceTitle>Certification rate</PerformanceTitle>}
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceCertificationRateLabel)}
+            </PerformanceTitle>
+          }
           value={<PerformanceValue>{props.data[1].value}%</PerformanceValue>}
         />
       </ReportContainer>

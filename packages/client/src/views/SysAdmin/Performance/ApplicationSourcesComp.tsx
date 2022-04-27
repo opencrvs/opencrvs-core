@@ -20,6 +20,8 @@ import {
   ReportContainer,
   TotalDisplayWithPercentage
 } from '@client/views/SysAdmin/Performance/utils'
+import { useIntl } from 'react-intl'
+import { messages } from '@client/i18n/messages/views/performance'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 
 interface ApplicationSourcesProps {
@@ -28,24 +30,35 @@ interface ApplicationSourcesProps {
 
 export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
   const { data } = props
+  const intl = useIntl()
   return (
     <ListContainer>
       <ReportContainer>
         <ListViewItemSimplified
           label={
             <PerformanceListHeader>
-              Sources of applications
+              {intl.formatMessage(messages.performanceApplicationSourcesHeader)}
             </PerformanceListHeader>
           }
         />
         <ListViewItemSimplified
-          label={<PerformanceTitle>Total</PerformanceTitle>}
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceTotalLabel)}
+            </PerformanceTitle>
+          }
           value={
             <PerformanceValue>{calculateTotal(data.results)}</PerformanceValue>
           }
         />
         <ListViewItemSimplified
-          label={<PerformanceTitle>Field Agents</PerformanceTitle>}
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(
+                messages.performanceFieldAgentsApplicationsLabel
+              )}
+            </PerformanceTitle>
+          }
           value={
             <PerformanceValue>
               <TotalDisplayWithPercentage
@@ -60,7 +73,14 @@ export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
           }
         />
         <ListViewItemSimplified
-          label={<PerformanceTitle>Registration Agents</PerformanceTitle>}
+          label={
+            <PerformanceTitle>
+              {' '}
+              {intl.formatMessage(
+                messages.performanceRegistrationAgentsApplicationsLabel
+              )}
+            </PerformanceTitle>
+          }
           value={
             <PerformanceValue>
               <TotalDisplayWithPercentage
@@ -75,7 +95,14 @@ export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
           }
         />
         <ListViewItemSimplified
-          label={<PerformanceTitle>Registrars</PerformanceTitle>}
+          label={
+            <PerformanceTitle>
+              {' '}
+              {intl.formatMessage(
+                messages.performanceRegistrarsApplicationsLabel
+              )}
+            </PerformanceTitle>
+          }
           value={
             <PerformanceValue>
               <TotalDisplayWithPercentage

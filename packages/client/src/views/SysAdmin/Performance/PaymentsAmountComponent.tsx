@@ -27,6 +27,11 @@ interface PaymentsAmountProps {
   data: Array<GQLPaymentMetric>
 }
 
+const enum PAYMENT_TYPE {
+  CERTIFICATION = 'certification',
+  CORRECTION = 'correction'
+}
+
 export function PaymentsAmountComponent(props: PaymentsAmountProps) {
   const { data } = props
   const intl = useIntl()
@@ -43,7 +48,11 @@ export function PaymentsAmountComponent(props: PaymentsAmountProps) {
           }
         />
         <ListViewItemSimplified
-          label={<PerformanceTitle>Total</PerformanceTitle>}
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceTotalLabel)}
+            </PerformanceTitle>
+          }
           value={
             <PerformanceValue>
               $ {calculateTotalPaymentAmount(data)}
@@ -51,25 +60,36 @@ export function PaymentsAmountComponent(props: PaymentsAmountProps) {
           }
         />
         <ListViewItemSimplified
-          label={<PerformanceTitle>Certification fee</PerformanceTitle>}
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceCertificationFeeLabel)}
+            </PerformanceTitle>
+          }
           value={
             <PerformanceValue>
               ${' '}
               {calculateTotalPaymentAmount(
                 data.filter(
-                  (payment) => payment.paymentType === 'certification'
+                  (payment) =>
+                    payment.paymentType === PAYMENT_TYPE.CERTIFICATION
                 )
               )}
             </PerformanceValue>
           }
         />
         <ListViewItemSimplified
-          label={<PerformanceTitle>Correction fee</PerformanceTitle>}
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceCorrectionFeeLabel)}
+            </PerformanceTitle>
+          }
           value={
             <PerformanceValue>
               ${' '}
               {calculateTotalPaymentAmount(
-                data.filter((payment) => payment.paymentType === 'correction')
+                data.filter(
+                  (payment) => payment.paymentType === PAYMENT_TYPE.CORRECTION
+                )
               )}
             </PerformanceValue>
           }
