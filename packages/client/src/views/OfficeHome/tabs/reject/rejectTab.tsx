@@ -137,7 +137,7 @@ class RejectTabComponent extends React.Component<
           sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.dateOfEvent),
+          label: this.props.intl.formatMessage(constantsMessages.eventDate),
           width: 18,
           key: COLUMNS.DATE_OF_EVENT,
           isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,

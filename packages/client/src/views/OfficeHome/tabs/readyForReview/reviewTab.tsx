@@ -272,7 +272,7 @@ class ReviewTabComponent extends React.Component<
           isSorted: this.state.sortedCol === COLUMNS.EVENT
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.dateOfEvent),
+          label: this.props.intl.formatMessage(constantsMessages.eventDate),
           width: 18,
           key: COLUMNS.DATE_OF_EVENT,
           sortFunction: this.onColumnClick,

@@ -107,7 +107,6 @@ interface IConstantsMessages
   to: MessageDescriptor
   toCapitalized: MessageDescriptor
   trackingId: MessageDescriptor
-  dateOfEvent: MessageDescriptor
   notificationSent: MessageDescriptor
   sentForReview: MessageDescriptor
   sentForValidation: MessageDescriptor
@@ -646,11 +645,6 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Tracking ID',
     description: 'Search menu tracking id type',
     id: 'constants.trackingId'
-  },
-  dateOfEvent: {
-    defaultMessage: 'Date of event',
-    description: 'label for Date of event',
-    id: 'constants.dateOfEvent'
   },
   notificationSent: {
     defaultMessage: 'Notification sent',

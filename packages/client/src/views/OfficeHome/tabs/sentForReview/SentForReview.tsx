@@ -245,7 +245,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(messages.dateOfEvent),
+          label: this.props.intl.formatMessage(messages.eventDate),
           width: 18,
           key: COLUMNS.DATE_OF_EVENT,
           isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,

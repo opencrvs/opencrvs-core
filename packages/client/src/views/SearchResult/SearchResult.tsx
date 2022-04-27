@@ -207,7 +207,7 @@ export class SearchResultView extends React.Component<
           key: COLUMNS.EVENT
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.dateOfEvent),
+          label: this.props.intl.formatMessage(constantsMessages.eventDate),
           width: 20,
           key: COLUMNS.DATE_OF_EVENT
         },

@@ -181,7 +181,7 @@ function ExternalValidationTabComponent(props: IProps) {
             sortFunction: onColumnClick
           },
           {
-            label: props.intl.formatMessage(constantsMessages.dateOfEvent),
+            label: props.intl.formatMessage(constantsMessages.eventDate),
             width: 18,
             key: COLUMNS.DATE_OF_EVENT,
             isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,

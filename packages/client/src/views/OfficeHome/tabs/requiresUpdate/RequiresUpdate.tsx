@@ -200,7 +200,7 @@ const getRejectedColumns = (
         sortFunction: onColumnClick
       },
       {
-        label: intl.formatMessage(constantsMessages.dateOfEvent),
+        label: intl.formatMessage(constantsMessages.eventDate),
         width: 18,
         key: COLUMNS.DATE_OF_EVENT,
         isSorted: sortedCol === COLUMNS.DATE_OF_EVENT,

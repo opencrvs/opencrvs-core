@@ -52,6 +52,10 @@ import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import {
+  showDownloadDeclarationFailedToast,
+  ShowDownloadDeclarationFailedToast
+} from '@client/notification/actions'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -423,6 +427,7 @@ export type Action =
   | UpdateFieldAgentDeclaredDeclarationsAction
   | UpdateFieldAgentDeclaredDeclarationsSuccessAction
   | UpdateFieldAgentDeclaredDeclarationsFailAction
+  | ShowDownloadDeclarationFailedToast
 
 export interface IUserData {
   userID: string
@@ -1672,9 +1677,12 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
             ...state,
             declarations: declarationsAfterError
           },
-          Cmd.run(writeDeclarationByUser, {
-            args: [Cmd.getState, state.userID, erroredDeclaration]
-          })
+          Cmd.list([
+            Cmd.action(showDownloadDeclarationFailedToast()),
+            Cmd.run(writeDeclarationByUser, {
+              args: [Cmd.getState, state.userID, erroredDeclaration]
+            })
+          ])
         )
       }
 

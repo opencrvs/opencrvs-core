@@ -21,7 +21,11 @@ import {
   DesktopWrapper
 } from '@opencrvs/components/lib/styleForPagination'
 import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import {
+  LoadingIndicator,
+  withOnlineStatus,
+  IOnlineStatusProps
+} from '@client/views/OfficeHome/LoadingIndicator'
 
 interface IContentWrapper {
   isMobileSize: boolean
@@ -36,6 +40,8 @@ interface IContentWrapper {
   error?: boolean
 }
 
+type IProps = IContentWrapper & IOnlineStatusProps
+
 const TabBarContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
   padding-left: 20px;
@@ -46,38 +52,45 @@ const MobileChildrenContainer = styled.div`
   margin: 20px 16px 0;
 `
 
-const Body = (props: IContentWrapper) => {
+const Body = (props: IProps) => {
   const {
     isShowPagination,
     paginationId,
     totalPages,
     onPageChange,
     loading,
-    error
+    error,
+    isOnline
   } = props
   return (
     <>
       {props.children}
-      {isShowPagination && paginationId && totalPages && onPageChange && (
-        <PaginationWrapper>
-          <DesktopWrapper>
-            <PaginationModified
-              size="small"
-              initialPage={paginationId}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-            />
-          </DesktopWrapper>
-          <MobileWrapper>
-            <PaginationModified
-              size="large"
-              initialPage={paginationId}
-              totalPages={totalPages}
-              onPageChange={onPageChange}
-            />
-          </MobileWrapper>
-        </PaginationWrapper>
-      )}
+      {isShowPagination &&
+        paginationId &&
+        totalPages &&
+        onPageChange &&
+        !loading &&
+        !error &&
+        isOnline && (
+          <PaginationWrapper>
+            <DesktopWrapper>
+              <PaginationModified
+                size="small"
+                initialPage={paginationId}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </DesktopWrapper>
+            <MobileWrapper>
+              <PaginationModified
+                size="large"
+                initialPage={paginationId}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </MobileWrapper>
+          </PaginationWrapper>
+        )}
       <LoadingIndicator
         loading={loading ? true : false}
         hasError={error ? true : false}
@@ -86,7 +99,7 @@ const Body = (props: IContentWrapper) => {
   )
 }
 
-export const WQContentWrapper = (props: IContentWrapper) => {
+const WQContentWrapperComp = (props: IProps) => {
   return (
     <>
       {props.isMobileSize ? (
@@ -110,3 +123,5 @@ export const WQContentWrapper = (props: IContentWrapper) => {
     </>
   )
 }
+
+export const WQContentWrapper = withOnlineStatus(WQContentWrapperComp)
