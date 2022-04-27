@@ -54,6 +54,7 @@ const dummyBirthRegistrationResponse = {
     educationalAttainment: null,
     nationality: ['FAR'],
     occupation: null,
+    reasonNotApplying: null,
     identifier: [
       {
         id: '123456879',
@@ -99,19 +100,6 @@ const dummyBirthRegistrationResponse = {
   },
   father: null,
   informant: null,
-  primaryCaregiver: {
-    parentDetailsType: null,
-    primaryCaregiver: null,
-    reasonsNotApplying: [
-      {
-        primaryCaregiverType: null,
-        reasonNotApplying: null,
-        isDeceased: null,
-        __typename: 'ReasonsNotApplying'
-      }
-    ],
-    __typename: 'PrimaryCaregiver'
-  },
   registration: {
     id: 'f2580a50-58d7-4946-b15b-ed638c87bf30',
     contact: 'MOTHER',

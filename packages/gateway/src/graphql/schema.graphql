@@ -234,7 +234,6 @@ type BirthRegistration implements EventRegistration {
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
-  primaryCaregiver: PrimaryCaregiver
   createdAt: Date
   updatedAt: Date
   history: [History]
@@ -274,6 +273,8 @@ type Person {
   age: Float
   maritalStatus: MaritalStatusType
   occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
   dateOfMarriage: Date
   multipleBirth: Int
   address: [Address]
@@ -468,7 +469,6 @@ input BirthRegistrationInput {
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
-  primaryCaregiver: PrimaryCaregiverInput
   createdAt: Date
   updatedAt: Date
 }
@@ -664,12 +664,6 @@ enum BirthRegType {
   INFORMANT_ONLY
   MOTHER_ONLY
   FATHER_ONLY
-}
-
-type PrimaryCaregiver {
-  primaryCaregiver: Person
-  reasonsNotApplying: [ReasonsNotApplying]
-  parentDetailsType: ParentDetailsType
 }
 
 type History {
@@ -926,6 +920,8 @@ input PersonInput {
   age: Float
   maritalStatus: MaritalStatusType
   occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
   dateOfMarriage: Date
   multipleBirth: Int
   address: [AddressInput]
@@ -986,12 +982,6 @@ input RelatedPersonInput {
 input QuestionnaireQuestionInput {
   fieldId: String
   value: String
-}
-
-input PrimaryCaregiverInput {
-  primaryCaregiver: PersonInput
-  reasonsNotApplying: [ReasonsNotApplyingInput]
-  parentDetailsType: ParentDetailsType
 }
 
 enum RegStatus {
@@ -1120,19 +1110,6 @@ type Certificate {
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
   data: String
-}
-
-type ReasonsNotApplying {
-  primaryCaregiverType: PrimaryCaregiverType
-  reasonNotApplying: String
-  isDeceased: Boolean
-}
-
-enum ParentDetailsType {
-  MOTHER_AND_FATHER
-  MOTHER_ONLY
-  FATHER_ONLY
-  NONE
 }
 
 type StatusReason {
@@ -1389,12 +1366,6 @@ input CorrectionInput {
   note: String
 }
 
-input ReasonsNotApplyingInput {
-  primaryCaregiverType: PrimaryCaregiverType
-  reasonNotApplying: String
-  isDeceased: Boolean
-}
-
 type BirthFee {
   ON_TIME: Float
   LATE: Float
@@ -1424,15 +1395,6 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
-}
-
-enum PrimaryCaregiverType {
-  MOTHER_AND_FATHER
-  MOTHER
-  FATHER
-  INFORMANT
-  LEGAL_GUARDIAN
-  OTHER
 }
 
 input CommentInput {

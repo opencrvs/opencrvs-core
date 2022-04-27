@@ -608,23 +608,6 @@ describe('Certificate collector test for a birth registration without father and
               telecom: null,
               __typename: 'Person'
             },
-            primaryCaregiver: {
-              reasonsNotApplying: [
-                {
-                  primaryCaregiverType: 'MOTHER',
-                  reasonNotApplying: '',
-                  isDeceased: true,
-                  __typename: 'ReasonsNotApplying'
-                },
-                {
-                  primaryCaregiverType: 'FATHER',
-                  reasonNotApplying: '',
-                  isDeceased: true,
-                  __typename: 'ReasonsNotApplying'
-                }
-              ],
-              __typename: 'PrimaryCaregiver'
-            },
             father: {
               id: '22aa4ca0-e5ec-49ec-8574-39a799f57aw5',
               name: [

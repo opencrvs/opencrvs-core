@@ -58,26 +58,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           }
         }
       }
-      primaryCaregiver {
-        parentDetailsType
-        primaryCaregiver {
-          name {
-            use
-            firstNames
-            familyName
-          }
-          telecom {
-            system
-            value
-            use
-          }
-        }
-        reasonsNotApplying {
-          primaryCaregiverType
-          reasonNotApplying
-          isDeceased
-        }
-      }
       mother {
         id
         name {
@@ -88,6 +68,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         birthDate
         maritalStatus
         occupation
+        detailsExist
+        reasonNotApplying
         dateOfMarriage
         educationalAttainment
         nationality
@@ -120,6 +102,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         birthDate
         maritalStatus
         occupation
+        detailsExist
+        reasonNotApplying
         dateOfMarriage
         educationalAttainment
         nationality
@@ -289,6 +273,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         educationalAttainment
         nationality
         occupation
+        detailsExist
+        reasonNotApplying
         identifier {
           id
           type
@@ -321,6 +307,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         educationalAttainment
         nationality
         occupation
+        detailsExist
+        reasonNotApplying
         identifier {
           id
           type
@@ -368,26 +356,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
             postalCode
             country
           }
-        }
-      }
-      primaryCaregiver {
-        parentDetailsType
-        primaryCaregiver {
-          name {
-            use
-            firstNames
-            familyName
-          }
-          telecom {
-            system
-            value
-            use
-          }
-        }
-        reasonsNotApplying {
-          primaryCaregiverType
-          reasonNotApplying
-          isDeceased
         }
       }
       registration {

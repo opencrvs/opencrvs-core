@@ -242,7 +242,6 @@ type BirthRegistration implements EventRegistration {
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
-  primaryCaregiver: PrimaryCaregiver
   createdAt: Date
   updatedAt: Date
 }
@@ -278,6 +277,8 @@ type Person {
   age: Float
   maritalStatus: MaritalStatusType
   occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
   dateOfMarriage: Date
   multipleBirth: Int
   address: [Address]
@@ -456,7 +457,6 @@ input BirthRegistrationInput {
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
-  primaryCaregiver: PrimaryCaregiverInput
   createdAt: Date
   updatedAt: Date
 }
@@ -620,12 +620,6 @@ enum BirthRegType {
   INFORMANT_ONLY
   MOTHER_ONLY
   FATHER_ONLY
-}
-
-type PrimaryCaregiver {
-  primaryCaregiver: Person
-  reasonsNotApplying: [ReasonsNotApplying]
-  parentDetailsType: ParentDetailsType
 }
 
 enum MannerOfDeath {
@@ -872,6 +866,8 @@ input PersonInput {
   age: Float
   maritalStatus: MaritalStatusType
   occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
   dateOfMarriage: Date
   multipleBirth: Int
   address: [AddressInput]
@@ -927,12 +923,6 @@ input RelatedPersonInput {
   otherRelationship: String
   affidavit: [AttachmentInput]
   individual: PersonInput
-}
-
-input PrimaryCaregiverInput {
-  primaryCaregiver: PersonInput
-  reasonsNotApplying: [ReasonsNotApplyingInput]
-  parentDetailsType: ParentDetailsType
 }
 
 input MedicalPractitionerInput {
@@ -1044,12 +1034,6 @@ type Certificate {
   hasShowedVerifiedDocument: Boolean
   payments: [Payment]
   data: String
-}
-
-type ReasonsNotApplying {
-  primaryCaregiverType: PrimaryCaregiverType
-  reasonNotApplying: String
-  isDeceased: Boolean
 }
 
 enum InformantType {
@@ -1333,12 +1317,6 @@ input CorrectionInput {
   note: String
 }
 
-input ReasonsNotApplyingInput {
-  primaryCaregiverType: PrimaryCaregiverType
-  reasonNotApplying: String
-  isDeceased: Boolean
-}
-
 enum RegStatus {
   IN_PROGRESS
   DECLARED
@@ -1363,15 +1341,6 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
-}
-
-enum PrimaryCaregiverType {
-  MOTHER_AND_FATHER
-  MOTHER
-  FATHER
-  INFORMANT
-  LEGAL_GUARDIAN
-  OTHER
 }
 
 input CommentInput {

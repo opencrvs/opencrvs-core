@@ -173,44 +173,11 @@ type MedicalPractitioner { # -> Encounter.participant
   lastVisitDate: Date # -> Encounter.participant.preriod.start
 }
 
-enum PrimaryCaregiverType {
-  MOTHER_AND_FATHER
-  MOTHER
-  FATHER
-  INFORMANT
-  LEGAL_GUARDIAN
-  OTHER
-}
-
 enum ParentDetailsType {
   MOTHER_AND_FATHER
   MOTHER_ONLY
   FATHER_ONLY
   NONE
-}
-
-input ReasonsNotApplyingInput {
-  primaryCaregiverType: PrimaryCaregiverType # -> Observation.valueString
-  reasonNotApplying: String # -> Observation.valueString
-  isDeceased: Boolean
-}
-
-input PrimaryCaregiverInput {
-  primaryCaregiver: PersonInput # -> Use for Observation.subject.reference
-  reasonsNotApplying: [ReasonsNotApplyingInput]
-  parentDetailsType: ParentDetailsType # -> Observation.valueString
-}
-
-type ReasonsNotApplying {
-  primaryCaregiverType: PrimaryCaregiverType
-  reasonNotApplying: String
-  isDeceased: Boolean
-}
-
-type PrimaryCaregiver {
-  primaryCaregiver: Person
-  reasonsNotApplying: [ReasonsNotApplying]
-  parentDetailsType: ParentDetailsType
 }
 
 input CommentInput {
@@ -296,7 +263,6 @@ input BirthRegistrationInput {
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
   lastPreviousLiveBirth: Date # Not in BDRIS2
-  primaryCaregiver: PrimaryCaregiverInput # Not in BDRIS2
   createdAt: Date
   updatedAt: Date
 }
@@ -319,7 +285,6 @@ type BirthRegistration implements EventRegistration { # -> Composition
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime
-  primaryCaregiver: PrimaryCaregiver
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
   history: [History]

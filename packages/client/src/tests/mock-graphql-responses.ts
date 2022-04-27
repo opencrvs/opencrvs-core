@@ -56,19 +56,6 @@ export const lateBirthCertificationResponse = [
             individual: null,
             __typename: 'RelatedPerson'
           },
-          primaryCaregiver: {
-            parentDetailsType: null,
-            primaryCaregiver: null,
-            reasonsNotApplying: [
-              {
-                primaryCaregiverType: null,
-                reasonNotApplying: null,
-                isDeceased: null,
-                __typename: 'ReasonsNotApplying'
-              }
-            ],
-            __typename: 'PrimaryCaregiver'
-          },
           mother: {
             id: 'e62684c0-be5c-45d7-a89f-c0f01f165aa1',
             name: [
@@ -82,6 +69,8 @@ export const lateBirthCertificationResponse = [
             birthDate: '1990-02-02',
             maritalStatus: 'MARRIED',
             occupation: null,
+            detailsExist: true,
+            reasonNotApplying: null,
             dateOfMarriage: null,
             educationalAttainment: 'POST_SECONDARY_ISCED_4',
             nationality: ['FAR'],
@@ -339,19 +328,6 @@ export const lateBirthCertificationResponseWithFather = [
             individual: null,
             __typename: 'RelatedPerson'
           },
-          primaryCaregiver: {
-            parentDetailsType: null,
-            primaryCaregiver: null,
-            reasonsNotApplying: [
-              {
-                primaryCaregiverType: null,
-                reasonNotApplying: null,
-                isDeceased: null,
-                __typename: 'ReasonsNotApplying'
-              }
-            ],
-            __typename: 'PrimaryCaregiver'
-          },
           mother: {
             id: 'e62684c0-be5c-45d7-a89f-c0f01f165aa1',
             name: [
@@ -365,6 +341,8 @@ export const lateBirthCertificationResponseWithFather = [
             birthDate: '1990-02-02',
             maritalStatus: 'MARRIED',
             occupation: null,
+            detailsExist: true,
+            reasonNotApplying: null,
             dateOfMarriage: null,
             educationalAttainment: 'POST_SECONDARY_ISCED_4',
             nationality: ['FAR'],
@@ -424,6 +402,8 @@ export const lateBirthCertificationResponseWithFather = [
             birthDate: '1990-02-02',
             maritalStatus: 'MARRIED',
             occupation: null,
+            detailsExist: true,
+            reasonNotApplying: null,
             dateOfMarriage: null,
             educationalAttainment: 'POST_SECONDARY_ISCED_4',
             nationality: ['FAR'],
@@ -679,19 +659,6 @@ export const onTimeBirthCertificationResponse = [
             individual: null,
             __typename: 'RelatedPerson'
           },
-          primaryCaregiver: {
-            parentDetailsType: null,
-            primaryCaregiver: null,
-            reasonsNotApplying: [
-              {
-                primaryCaregiverType: null,
-                reasonNotApplying: null,
-                isDeceased: null,
-                __typename: 'ReasonsNotApplying'
-              }
-            ],
-            __typename: 'PrimaryCaregiver'
-          },
           mother: {
             id: 'e62684c0-be5c-45d7-a89f-c0f01f165aa1',
             name: [
@@ -705,6 +672,8 @@ export const onTimeBirthCertificationResponse = [
             birthDate: '1990-02-02',
             maritalStatus: 'MARRIED',
             occupation: null,
+            detailsExist: true,
+            reasonNotApplying: null,
             dateOfMarriage: null,
             educationalAttainment: 'POST_SECONDARY_ISCED_4',
             nationality: ['FAR'],
@@ -1012,6 +981,7 @@ export const deathCertificationResponse = [
               ],
               nationality: ['FAR'],
               occupation: null,
+              reasonNotApplying: null,
               birthDate: null,
               telecom: null,
               address: [

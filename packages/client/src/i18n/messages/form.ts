@@ -328,16 +328,14 @@ interface IFormMessages
   lastName: MessageDescriptor
   relationship: MessageDescriptor
   primaryAddress: MessageDescriptor
-  primaryCaregiverNameOrTitle: MessageDescriptor
   parentDetailsType: MessageDescriptor
   motherRadioButton: MessageDescriptor
   fatherRadioButton: MessageDescriptor
-  reasonMotherNotApplying: MessageDescriptor
-  reasonFatherNotApplying: MessageDescriptor
+  reasonMNA: MessageDescriptor
+  reasonFNA: MessageDescriptor
   reasonParentsNotApplying: MessageDescriptor
   motherDeceasedLabel: MessageDescriptor
   fatherDeceasedLabel: MessageDescriptor
-  primaryCaregiverTypeLabel: MessageDescriptor
   motherCaregiverTypeLabel: MessageDescriptor
   fatherCaregiverTypeLabel: MessageDescriptor
   legalGuardianCaregiverTypeLabel: MessageDescriptor
@@ -346,8 +344,8 @@ interface IFormMessages
   otherCaregiverTypeLabel: MessageDescriptor
   nameFieldLabel: MessageDescriptor
   reasonNotApplyingFieldLabel: MessageDescriptor
-  reasonMotherNotApplyingPreview: MessageDescriptor
-  reasonFatherNotApplyingPreview: MessageDescriptor
+  reasonMNAPreview: MessageDescriptor
+  reasonFNAPreview: MessageDescriptor
   tooltipNationalID: MessageDescriptor
   deceasedFatherSectionName: MessageDescriptor
   deceasedFatherSectionTitle: MessageDescriptor
@@ -1419,7 +1417,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.maritalStatusNotStated'
   },
   maritalStatusSingle: {
-    defaultMessage: 'Unmarried',
+    defaultMessage: 'Single',
     description: 'Option for form field: Marital status',
     id: 'form.field.label.maritalStatusSingle'
   },
@@ -1646,7 +1644,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.declaration.whoIsPresent.other'
   },
   privateHome: {
-    defaultMessage: 'Private Home',
+    defaultMessage: 'Residential address',
     description: 'Select item for Private Home',
     id: 'form.field.label.privateHome'
   },
@@ -2070,11 +2068,6 @@ export const formMessageDescriptors: IFormMessages = {
       "Input label for certificate collector's relationship to the subject",
     id: 'form.field.label.relationship'
   },
-  primaryCaregiverNameOrTitle: {
-    defaultMessage: 'Parents details',
-    description: 'Form section name or title for primary caregiver',
-    id: 'form.section.primaryCaregiver.nameOrTitle'
-  },
   parentDetailsType: {
     defaultMessage: "Do you have the mother and father's details?",
     description: 'Question to ask the user if they have the parents details',
@@ -2090,22 +2083,22 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'confirmation label for father radio button',
     id: 'form.field.label.radio.father'
   },
-  reasonMotherNotApplying: {
+  reasonMNA: {
     defaultMessage: 'Reason for mother',
     description: 'Label for form field: reasonMotherNotApplying',
     id: 'form.field.label.reasonMotherNotApplying'
   },
-  reasonFatherNotApplying: {
+  reasonFNA: {
     defaultMessage: 'Reason for father',
     description: 'Label for form field: reasonFatherNotApplying',
     id: 'form.field.label.reasonFatherNotApplying'
   },
-  reasonMotherNotApplyingPreview: {
+  reasonMNAPreview: {
     defaultMessage: 'Reason for mother not applying',
     description: 'Label for form field: reasonMotherNotApplyingPreview',
     id: 'form.field.label.reasonMotherNotApplyingPreview'
   },
-  reasonFatherNotApplyingPreview: {
+  reasonFNAPreview: {
     defaultMessage: 'Reason for father not applying',
     description: 'Label for form field: reasonFatherNotApplyingPreview',
     id: 'form.field.label.reasonFatherNotApplyingPreview'
@@ -2124,11 +2117,6 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Father has died',
     description: 'Label for form field: fatherIsDeceased',
     id: 'form.field.label.fatherIsDeceased'
-  },
-  primaryCaregiverTypeLabel: {
-    defaultMessage: 'Who is looking after the child?',
-    description: 'Question to ask the user about caregiver',
-    id: 'form.field.label.primaryCaregiverType'
   },
   motherCaregiverTypeLabel: {
     defaultMessage: 'Mother',

@@ -175,7 +175,6 @@ describe('ReviewForm tests', () => {
                 gender: 'male'
               },
               informant: null,
-              primaryCaregiver: null,
               mother: {
                 name: [
                   {
@@ -192,6 +191,7 @@ describe('ReviewForm tests', () => {
                 birthDate: '2001-01-01',
                 maritalStatus: 'MARRIED',
                 occupation: 'Mother Occupation',
+                reasonNotApplying: '',
                 dateOfMarriage: '2001-01-01',
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],
@@ -324,7 +324,6 @@ describe('ReviewForm tests', () => {
               child: null,
               mother: null,
               informant: null,
-              primaryCaregiver: null,
               father: {
                 name: [
                   {
@@ -341,6 +340,7 @@ describe('ReviewForm tests', () => {
                 birthDate: '2001-01-01',
                 maritalStatus: 'MARRIED',
                 occupation: 'Father Occupation',
+                reasonNotApplying: '',
                 dateOfMarriage: '2001-01-01',
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],
@@ -441,7 +441,6 @@ describe('ReviewForm tests', () => {
               mother: null,
               father: null,
               informant: null,
-              primaryCaregiver: null,
               registration: {
                 id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
                 informantType: 'MOTHER',
@@ -539,7 +538,6 @@ describe('ReviewForm tests', () => {
               },
               child: null,
               informant: null,
-              primaryCaregiver: null,
               mother: {
                 name: [
                   {
@@ -556,6 +554,7 @@ describe('ReviewForm tests', () => {
                 birthDate: '2001-01-01',
                 maritalStatus: 'MARRIED',
                 occupation: 'Mother Occupation',
+                reasonNotApplying: '',
                 dateOfMarriage: '2001-01-01',
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],

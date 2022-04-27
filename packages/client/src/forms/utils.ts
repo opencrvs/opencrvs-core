@@ -747,7 +747,7 @@ export const conditionals: IConditionals = {
   },
   fathersDetailsExist: {
     action: 'hide',
-    expression: '!values.fathersDetailsExist'
+    expression: '!values.detailsExist'
   },
   primaryAddressSameAsOtherPrimary: {
     action: 'hide',

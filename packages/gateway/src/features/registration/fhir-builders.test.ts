@@ -50,7 +50,8 @@ test('should build a minimal FHIR registration document without error', async ()
         dateOfMarriage: '2014-01-28',
         nationality: ['BGD'],
         educationalAttainment: 'UPPER_SECONDARY_ISCED_3',
-        occupation: 'Mother Occupation'
+        occupation: 'Mother Occupation',
+        reasonNotApplying: ''
       },
       father: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb40',
@@ -94,7 +95,8 @@ test('should build a minimal FHIR registration document without error', async ()
         dateOfMarriage: '2014-01-28',
         nationality: ['BGD'],
         educationalAttainment: 'UPPER_SECONDARY_ISCED_3',
-        occupation: 'Father Occupation'
+        occupation: 'Father Occupation',
+        reasonNotApplying: ''
       },
       child: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb41',
@@ -899,47 +901,6 @@ test('creates task with contact other relationship', async () => {
       })
     )
   ).toBe(true)
-})
-
-test('build bundle for primaryCaregive', async () => {
-  const fhir: fhir.Bundle = await buildFHIRBundle(
-    {
-      primaryCaregiver: {
-        parentDetailsType: 'MOTHER_AND_FATHER',
-        primaryCaregiver: {
-          _fhirID: '8f18a6ea-89d1-4b03-xxxx-xxxxxxxxx',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Sahriar',
-              familyName: 'Toufiq'
-            }
-          ]
-        },
-        reasonsNotApplying: [
-          {
-            primaryCaregiverType: 'MOTHER',
-            isDeceased: true
-          },
-          {
-            reasonNotApplying: 'Sick',
-            primaryCaregiverType: 'FATHER'
-          },
-          {
-            primaryCaregiverType: 'LEGAL_GUARDIAN',
-            reasonNotApplying: 'Not present'
-          }
-        ]
-      }
-    },
-    'BIRTH' as EVENT_TYPE
-  )
-
-  expect(fhir).toBeDefined()
-  expect(fhir.entry.length).toBe(7)
-  expect(fhir.entry[2].resource.resourceType).toBe('Observation')
-  const observation = fhir.entry[2].resource as fhir.Observation
-  expect(observation.valueString).toBe('MOTHER_AND_FATHER')
 })
 
 test('should build bundle for correction fhir builders', async () => {

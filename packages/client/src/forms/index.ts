@@ -887,7 +887,6 @@ export enum BirthSection {
   Mother = 'mother',
   Father = 'father',
   Informant = 'informant',
-  Parent = 'primaryCaregiver',
   Registration = 'registration',
   Documents = 'documents',
   Preview = 'preview'

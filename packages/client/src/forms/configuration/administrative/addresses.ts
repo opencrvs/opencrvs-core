@@ -44,16 +44,18 @@ export enum AddressCopyConfigCases {
 // if the informant or contact is mother
 const mothersDetailsExistBasedOnContactAndInformant =
   '!mothersDetailsExistBasedOnContactAndInformant'
+// if the informant or contact is father
+const fathersDetailsExistBasedOnContactAndInformant =
+  '!fathersDetailsExistBasedOnContactAndInformant'
 
 // if mothers details do not exist on other page
-const mothersDetailsDontExistOnOtherPage =
-  '!draftData.mother.mothersDetailsExist'
+const mothersDetailsDontExistOnOtherPage = '!draftData.mother.detailsExist'
 
 // if mothers details do not exist
-const mothersDetailsDontExist = '!values.mothersDetailsExist'
+const mothersDetailsDontExist = '!values.detailsExist'
 
 // if fathers details do not exist
-const fathersDetailsDontExist = '!values.fathersDetailsExist'
+const fathersDetailsDontExist = '!values.detailsExist'
 
 // primary address same as other primary
 const primaryAddressSameAsOtherPrimaryAddress =
@@ -143,16 +145,16 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     preceedingFieldId: 'birth.father.father-view-group.educationalAttainment',
     configurations: [
       {
+        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.primaryAddress,
+        conditionalCase: `(${fathersDetailsDontExist} && ${fathersDetailsExistBasedOnContactAndInformant})`
+      },
+      {
         config: AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
         label: formMessageDescriptors.primaryAddressSameAsOtherPrimary,
         xComparisonSection: BirthSection.Father,
         yComparisonSection: BirthSection.Mother,
         conditionalCase: `(${fathersDetailsDontExist} || ${mothersDetailsDontExistOnOtherPage})`
-      },
-      {
-        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
-        label: formMessageDescriptors.primaryAddress,
-        conditionalCase: `((${fathersDetailsDontExist} || ${primaryAddressSameAsOtherPrimaryAddress}) && !${mothersDetailsDontExistOnOtherPage}) || (${fathersDetailsDontExist} && ${mothersDetailsDontExistOnOtherPage}) `
       },
       {
         config: AddressCases.PRIMARY_ADDRESS,
@@ -943,7 +945,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       name: 'addressLine2UrbanOptionPrimary',
       type: 'TEXT',
       label: {
-        defaultMessage: 'Street / Plot Number',
+        defaultMessage: 'Street',
         description: 'Title for the address line 1',
         id: 'form.field.label.addressLine2UrbanOption'
       },
@@ -1009,7 +1011,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
     },
     {
       name: 'numberUrbanOptionPrimary',
-      type: 'NUMBER',
+      type: 'TEXT',
       label: {
         defaultMessage: 'Number',
         description: 'Title for the number field',
@@ -1993,7 +1995,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       name: 'addressLine2UrbanOptionSecondary',
       type: 'TEXT',
       label: {
-        defaultMessage: 'Street / Plot Number',
+        defaultMessage: 'Street',
         description: 'Title for the address line 1',
         id: 'form.field.label.addressLine2UrbanOption'
       },
@@ -2059,7 +2061,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
     },
     {
       name: 'numberUrbanOptionSecondary',
-      type: 'NUMBER',
+      type: 'TEXT',
       label: {
         defaultMessage: 'Number',
         description: 'Title for the number field',
@@ -2994,7 +2996,7 @@ export function getPlaceOfEventAddressFields(
       customisable: false,
       type: 'TEXT',
       label: {
-        defaultMessage: 'Street / Plot Number',
+        defaultMessage: 'Street',
         description: 'Title for the address line 1',
         id: 'form.field.label.addressLine2UrbanOption'
       },
@@ -3045,7 +3047,7 @@ export function getPlaceOfEventAddressFields(
     {
       name: 'numberUrbanOption',
       customisable: false,
-      type: 'NUMBER',
+      type: 'TEXT',
       label: {
         defaultMessage: 'Number',
         description: 'Title for the number field',

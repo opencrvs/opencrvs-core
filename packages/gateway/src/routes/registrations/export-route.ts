@@ -148,26 +148,6 @@ export default {
                 }
               }
             }
-            primaryCaregiver {
-              parentDetailsType
-              primaryCaregiver {
-                name {
-                  use
-                  firstNames
-                  familyName
-                }
-                telecom {
-                  system
-                  value
-                  use
-                }
-              }
-              reasonsNotApplying {
-                primaryCaregiverType
-                reasonNotApplying
-                isDeceased
-              }
-            }
             registration {
               id
               contact
@@ -389,14 +369,6 @@ export default {
         if (result.informant && result.informant.individual) {
           result.informant.individual = flattenPerson(
             result.informant.individual
-          )
-        }
-        if (
-          result.primaryCaregiver &&
-          result.primaryCaregiver.primaryCaregiver
-        ) {
-          result.primaryCaregiver.primaryCaregiver = flattenPerson(
-            result.primaryCaregiver.primaryCaregiver
           )
         }
         result.registration = flattenRegistration(result.registration)

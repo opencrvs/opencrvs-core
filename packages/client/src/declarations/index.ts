@@ -237,8 +237,12 @@ export type ICertificate = {
  */
 export interface IPrintableDeclaration extends Omit<IDeclaration, 'data'> {
   data: {
+    mother: {
+      detailsExist: boolean
+      [key: string]: IFormFieldValue
+    }
     father: {
-      fathersDetailsExist: boolean
+      detailsExist: boolean
       [key: string]: IFormFieldValue
     }
     registration: {
@@ -251,7 +255,7 @@ export interface IPrintableDeclaration extends Omit<IDeclaration, 'data'> {
       certificates: ICertificate[]
       [key: string]: IFormFieldValue
     }
-  } & Exclude<IDeclaration['data'], 'father' | 'registration'>
+  } & Exclude<IDeclaration['data'], 'mother' | 'father' | 'registration'>
 }
 
 type PaymentType = 'MANUAL'

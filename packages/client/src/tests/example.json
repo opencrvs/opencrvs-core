@@ -1581,7 +1581,7 @@
                   "customisable": false,
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Street / Plot Number",
+                    "defaultMessage": "Street",
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine2CityOption"
                   },
@@ -2601,7 +2601,7 @@
                   "name": "addressLine2CityOptionPermanent",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Street / Plot Number",
+                    "defaultMessage": "Street",
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine2CityOption"
                   },
@@ -4040,7 +4040,7 @@
                   },
                   "customisable": true,
                   "required": false,
-                  "initialValue": "MARRIED",
+                  "initialValue": "",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -4998,7 +4998,7 @@
                   "name": "addressLine2CityOptionPermanent",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Street / Plot Number",
+                    "defaultMessage": "Street",
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine2CityOption"
                   },
@@ -5798,7 +5798,7 @@
                   "name": "addressLine2CityOption",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Street / Plot Number",
+                    "defaultMessage": "Street",
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine2CityOption"
                   },
@@ -6383,7 +6383,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -6417,7 +6417,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -6453,7 +6453,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -6489,7 +6489,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -6528,7 +6528,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -6574,7 +6574,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -6606,7 +6606,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ]
                 },
@@ -6630,7 +6630,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -6705,7 +6705,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ]
                 },
@@ -6729,7 +6729,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "options": [
@@ -6799,7 +6799,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -6841,7 +6841,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -6872,7 +6872,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -6923,7 +6923,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -6978,7 +6978,7 @@
                     },
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -7044,7 +7044,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -7089,7 +7089,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -7138,7 +7138,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -7187,7 +7187,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -7225,7 +7225,7 @@
                   "name": "addressLine2CityOptionPermanent",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Street / Plot Number",
+                    "defaultMessage": "Street",
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine2CityOption"
                   },
@@ -7236,7 +7236,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -7285,7 +7285,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -7334,7 +7334,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -7764,7 +7764,7 @@
                     {
                       "description": "Hidden for Parent Details none or Father only",
                       "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\") || (draftData && draftData.father && draftData.father.fathersDetailsExist === false)"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\") || (draftData && draftData.father && draftData.father.detailsExist === false)"
                     }
                   ],
                   "mapping": {
@@ -8996,7 +8996,7 @@
                     "id": "form.field.label.maritalStatus"
                   },
                   "required": false,
-                  "initialValue": "MARRIED",
+                  "initialValue": "",
                   "validate": [],
                   "placeholder": {
                     "defaultMessage": "Select",
@@ -9403,7 +9403,7 @@
                   "name": "addressLine2CityOptionPermanent",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Street / Plot Number",
+                    "defaultMessage": "Street",
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine2CityOption"
                   },
@@ -10391,7 +10391,7 @@
                   "type": "TEXT",
                   "previewGroup": "deathPlaceAddress",
                   "label": {
-                    "defaultMessage": "Street / Plot Number",
+                    "defaultMessage": "Street",
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine2CityOption"
                   },
@@ -11465,7 +11465,7 @@
                   "name": "addressLine2CityOptionPermanent",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Street / Plot Number",
+                    "defaultMessage": "Street",
                     "description": "Title for the address line 1",
                     "id": "form.field.label.addressLine2CityOption"
                   },

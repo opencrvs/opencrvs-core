@@ -87,7 +87,7 @@ describe('when user is previewing the form data', () => {
     }
 
     const fatherDetails: IPersonDetails = {
-      fathersDetailsExist: true,
+      detailsExist: true,
       iD: '987987987',
       iDType: 'NATIONAL_ID',
       nationality: 'FAR',
@@ -215,7 +215,7 @@ describe('when user is previewing the form data', () => {
     }
 
     const fatherDetails: IPersonDetails = {
-      fathersDetailsExist: true,
+      detailsExist: true,
       iD: '432432432',
       iDType: 'NATIONAL_ID',
       primaryAddressSameAsOtherPrimary: true,

@@ -3207,7 +3207,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -3258,7 +3258,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -3321,7 +3321,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -3421,7 +3421,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -3470,7 +3470,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -3501,7 +3501,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -3534,7 +3534,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -3567,7 +3567,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -3600,7 +3600,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ],
                   "mapping": {
@@ -3683,7 +3683,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ]
                 },
@@ -3742,7 +3742,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     },
                     {
                       "action": "hide",
@@ -3803,7 +3803,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.fathersDetailsExist"
+                      "expression": "!values.detailsExist"
                     }
                   ]
                 }
@@ -4014,7 +4014,7 @@
                     {
                       "description": "Hidden for Parent Details none or Father only",
                       "action": "hide",
-                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\") || (draftData && draftData.father && draftData.father.fathersDetailsExist === false)"
+                      "expression": "(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"NONE\") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === \"MOTHER_ONLY\") || (draftData && draftData.father && draftData.father.detailsExist === false)"
                     }
                   ],
                   "mapping": {

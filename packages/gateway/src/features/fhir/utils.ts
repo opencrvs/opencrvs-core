@@ -733,26 +733,6 @@ export async function setCertificateCollectorReference(
   }
 }
 
-export async function setPrimaryCaregiverReference(
-  sectionCode: string,
-  observation: fhir.Observation,
-  fhirBundle: ITemplatedBundle
-) {
-  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
-  if (section && section.entry) {
-    const personSectionEntry = section.entry[0]
-    const personEntry = fhirBundle.entry.find(
-      (entry) => entry.fullUrl === personSectionEntry.reference
-    )
-    if (!personEntry) {
-      throw new Error('Expected person entry not found on the bundle')
-    }
-    observation.subject = {
-      reference: personEntry.fullUrl
-    }
-  }
-}
-
 export function selectOrCreatePaymentReconciliationResource(
   fhirBundle: ITemplatedBundle,
   context: any,

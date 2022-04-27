@@ -41,8 +41,7 @@ export const birthSectionTitle = {
   [BirthSection.Child]: 'Child',
   [BirthSection.Mother]: 'Mother',
   [BirthSection.Father]: 'Father',
-  [BirthSection.Informant]: 'Informant',
-  [BirthSection.Parent]: 'Parent'
+  [BirthSection.Informant]: 'Informant'
 }
 
 export const birthDocumentTypeFhirMapping = {

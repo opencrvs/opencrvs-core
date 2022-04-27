@@ -532,20 +532,8 @@ const mapStateToProps = (
   const clonedFormSection = cloneDeep(formSection)
   if (event === Event.BIRTH && groupId === 'certCollector') {
     const declarationData = declaration && declaration.data
-
-    const isMotherDeceased = isEqual(
-      get(declarationData, 'primaryCaregiver.motherIsDeceased'),
-      ['deceased']
-    )
-    const isFatherDeceased = isEqual(
-      get(declarationData, 'primaryCaregiver.fatherIsDeceased'),
-      ['deceased']
-    )
-
-    const motherDataExist =
-      declarationData && declarationData.mother && !isMotherDeceased
-    let fatherDataExist =
-      declarationData && declarationData.father && !isFatherDeceased
+    let motherDataExist: boolean | undefined
+    let fatherDataExist: boolean | undefined
 
     //TODO: This needs to be dynamic.
     // We shouldn't hardcode 'fathersDetailsExist' field check here
@@ -554,15 +542,20 @@ const mapStateToProps = (
     if (
       declarationData &&
       declarationData.father &&
-      declarationData.father.fathersDetailsExist !== undefined
+      declarationData.father.detailsExist !== undefined
     ) {
-      fatherDataExist =
-        fatherDataExist && declarationData.father.fathersDetailsExist
+      fatherDataExist = fatherDataExist && declarationData.father.detailsExist
+    }
+
+    if (
+      declarationData &&
+      declarationData.mother &&
+      declarationData.mother.detailsExist !== undefined
+    ) {
+      motherDataExist = motherDataExist && declarationData.mother.detailsExist
     }
 
     if (motherDataExist && fatherDataExist) {
-      //  !!declarationData.father.fathersDetailsExist &&
-
       clonedFormSection.groups.unshift(
         certCollectorGroupForBirthAppWithParentDetails
       )

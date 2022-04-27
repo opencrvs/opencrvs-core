@@ -52,7 +52,7 @@ describe('OutBox tests', () => {
         country: 'BGD'
       },
       father: {
-        fathersDetailsExist: false
+        detailsExist: false
       },
       documents: {}
     },

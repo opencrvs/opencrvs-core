@@ -681,10 +681,6 @@ export const registerForms: IDefaultRegisterForms = {
                     label: formMessageDescriptors.childSexFemale
                   },
                   {
-                    value: 'other',
-                    label: formMessageDescriptors.childSexOther
-                  },
-                  {
                     value: 'unknown',
                     label: formMessageDescriptors.childSexUnknown
                   }
@@ -1038,18 +1034,26 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
-                  template: {
-                    operation: 'dateFormatTransformer',
-                    fieldName: 'informantBirthDate',
-                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
-                  },
                   mutation: {
-                    operation: 'longDateTransformer',
-                    parameters: ['birthDate']
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'longDateTransformer',
+                        parameters: ['birthDate']
+                      },
+                      'birthDate'
+                    ]
                   },
                   query: {
-                    operation: 'fieldValueTransformer',
-                    parameters: ['birthDate']
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldValueTransformer',
+                        parameters: ['birthDate']
+                      }
+                    ]
                   }
                 }
               },
@@ -1162,734 +1166,6 @@ export const registerForms: IDefaultRegisterForms = {
         }
       },
       {
-        id: BirthSection.Parent,
-        hasDocumentSection: true,
-        viewType: 'form',
-        name: {
-          defaultMessage: 'Parents details',
-          description: 'Form section name or title for primary caregiver',
-          id: 'form.section.primaryCaregiver.nameOrTitle'
-        },
-        title: {
-          defaultMessage: 'Parents details',
-          description: 'Form section name or title for primary caregiver',
-          id: 'form.section.primaryCaregiver.nameOrTitle'
-        },
-        groups: [
-          {
-            id: 'parent-details-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(!draftData || !draftData.registration || !((draftData.informantType && (draftData.informantType === "LEGAL_GUARDIAN" || draftData.informantType === "OTHER")) || (draftData.registration.informantType && (draftData.registration.informantType === "LEGAL_GUARDIAN" || draftData.registration.informantType === "OTHER") )))'
-              }
-            ],
-            fields: [
-              {
-                name: 'parentDetailsType',
-                type: 'RADIO_GROUP',
-                size: RadioSize.LARGE,
-                label: {
-                  defaultMessage:
-                    "Do you have the mother and father's details?",
-                  description:
-                    'Question to ask the user if they have the parents details',
-                  id: 'form.field.label.parentDetailsType'
-                },
-                initialValue: '',
-                required: true,
-                validate: [],
-                options: [
-                  {
-                    value: 'MOTHER_AND_FATHER',
-                    label: {
-                      defaultMessage: 'Yes',
-                      description:
-                        'confirmation label for parents radio button',
-                      id: 'buttons.yes'
-                    }
-                  },
-                  {
-                    value: 'MOTHER_ONLY',
-                    label: {
-                      defaultMessage: "Only the mother's",
-                      description: 'deny label for mother radio button',
-                      id: 'form.field.label.radio.mother'
-                    }
-                  },
-                  {
-                    value: 'FATHER_ONLY',
-                    label: {
-                      defaultMessage: "Only the father's",
-                      description: 'deny label for father radio button',
-                      id: 'form.field.label.radio.father'
-                    }
-                  },
-                  {
-                    value: 'NONE',
-                    label: {
-                      defaultMessage: 'No',
-                      description: 'confirmation label for No radio button',
-                      id: 'buttons.no'
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            id: 'parent-not-applying-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(!draftData || !draftData.registration || !((draftData.informantType && (draftData.informantType === "LEGAL_GUARDIAN" || draftData.informantType === "OTHER")) || (draftData.registration.informantType && (draftData.registration.informantType === "LEGAL_GUARDIAN" || draftData.registration.informantType === "OTHER") )))'
-              }
-            ],
-            title: {
-              defaultMessage: 'Why are the mother and father not applying?',
-              description:
-                'Form group name for reason parents are not applying',
-              id: 'form.group.reasonNotApplying.parents'
-            },
-            fields: [
-              {
-                name: 'reasonMotherNotApplying',
-                conditionals: [
-                  {
-                    action: 'disable',
-                    expression:
-                      '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.motherIsDeceased && draftData.primaryCaregiver.motherIsDeceased.toString() === ["deceased"].toString())'
-                  }
-                ],
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Reason for mother',
-                  description: 'Label for form field: reasonMotherNotApplying',
-                  id: 'form.field.label.reasonMotherNotApplying'
-                },
-                validate: [],
-                initialValue: '',
-                ignoreBottomMargin: true,
-                required: true,
-                extraValue: 'MOTHER',
-                previewGroup: 'reasonMotherNotApplying',
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToReasonsNotApplyingTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'reasonNotApplying',
-                      'primaryCaregiverType'
-                    ]
-                  },
-                  query: {
-                    operation: 'reasonsNotApplyingToFieldValueTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'reasonNotApplying',
-                      'primaryCaregiverType'
-                    ]
-                  }
-                }
-              },
-              {
-                name: 'motherIsDeceased',
-                type: 'CHECKBOX_GROUP',
-                label: {
-                  defaultMessage: ' ',
-                  description: 'Label for form field: motherIsDeceased',
-                  id: 'print.certificate.noLabel'
-                },
-                validate: [],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '(draftData && draftData.registration && draftData.registration.contactPoint && draftData.registration.contactPoint.value && draftData.registration.contactPoint.value === "MOTHER")'
-                  }
-                ],
-                initialValue: [],
-                extraValue: 'MOTHER',
-                required: false,
-                previewGroup: 'reasonMotherNotApplying',
-                options: [
-                  {
-                    value: 'deceased',
-                    label: {
-                      defaultMessage: 'Mother has died',
-                      description: 'Label for form field: motherIsDeceased',
-                      id: 'form.field.label.motherIsDeceased'
-                    }
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToReasonsNotApplyingTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'isDeceased',
-                      'primaryCaregiverType',
-                      true
-                    ]
-                  },
-                  query: {
-                    operation: 'reasonsNotApplyingToFieldValueTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'isDeceased',
-                      'primaryCaregiverType',
-                      undefined,
-                      ['deceased']
-                    ]
-                  }
-                }
-              },
-              {
-                name: 'reasonFatherNotApplying',
-                conditionals: [
-                  {
-                    action: 'disable',
-                    expression:
-                      '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.fatherIsDeceased && draftData.primaryCaregiver.fatherIsDeceased.toString() === ["deceased"].toString())'
-                  }
-                ],
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Reason for father',
-                  description: 'Label for form field: reasonFatherNotApplying',
-                  id: 'form.field.label.reasonFatherNotApplying'
-                },
-                validate: [],
-                initialValue: '',
-                ignoreBottomMargin: true,
-                required: true,
-                previewGroup: 'reasonFatherNotApplying',
-                extraValue: 'FATHER',
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToReasonsNotApplyingTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'reasonNotApplying',
-                      'primaryCaregiverType'
-                    ]
-                  },
-                  query: {
-                    operation: 'reasonsNotApplyingToFieldValueTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'reasonNotApplying',
-                      'primaryCaregiverType'
-                    ]
-                  }
-                }
-              },
-              {
-                name: 'fatherIsDeceased',
-                type: 'CHECKBOX_GROUP',
-                label: {
-                  defaultMessage: '',
-                  description: 'Label for form field: fatherIsDeceased',
-                  id: 'print.certificate.noLabel'
-                },
-                validate: [],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '(draftData && draftData.registration && draftData.registration.contactPoint && draftData.registration.contactPoint.value && draftData.registration.contactPoint.value === "FATHER")'
-                  }
-                ],
-                initialValue: [],
-                extraValue: 'FATHER',
-                required: false,
-                previewGroup: 'reasonFatherNotApplying',
-                options: [
-                  {
-                    value: 'deceased',
-                    label: {
-                      defaultMessage: 'Father has died',
-                      description: 'Label for form field: fatherIsDeceased',
-                      id: 'form.field.label.fatherIsDeceased'
-                    }
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToReasonsNotApplyingTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'isDeceased',
-                      'primaryCaregiverType',
-                      true
-                    ]
-                  },
-                  query: {
-                    operation: 'reasonsNotApplyingToFieldValueTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'isDeceased',
-                      'primaryCaregiverType',
-                      undefined,
-                      ['deceased']
-                    ]
-                  }
-                }
-              }
-            ],
-            previewGroups: [
-              {
-                id: 'reasonMotherNotApplying',
-                label: {
-                  defaultMessage: 'Reason for mother not applying',
-                  description:
-                    'Label for form field: reasonMotherNotApplyingPreview',
-                  id: 'form.field.label.reasonMotherNotApplyingPreview'
-                },
-                fieldToRedirect: 'reasonMotherNotApplying'
-              },
-              {
-                id: 'reasonFatherNotApplying',
-                label: {
-                  defaultMessage: 'Reason for father not applying',
-                  description:
-                    'Label for form field: reasonFatherNotApplyingPreview',
-                  id: 'form.field.label.reasonFatherNotApplyingPreview'
-                },
-                fieldToRedirect: 'reasonFatherNotApplying'
-              }
-            ]
-          },
-          {
-            id: 'caregiver-details-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(!draftData || !draftData.registration || !((draftData.informantType && (draftData.informantType === "LEGAL_GUARDIAN" || draftData.informantType === "OTHER")) || (draftData.registration.informantType && (draftData.registration.informantType === "LEGAL_GUARDIAN" || draftData.registration.informantType === "OTHER") )))'
-              }
-            ],
-            fields: [
-              {
-                name: 'primaryCaregiverType',
-                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                size: RadioSize.LARGE,
-                label: {
-                  defaultMessage: 'Who is looking after the child?',
-                  description: 'Question to ask the user about caregiver',
-                  id: 'form.field.label.primaryCaregiverType'
-                },
-                initialValue: '',
-                required: true,
-                validate: [],
-                options: [
-                  {
-                    value: 'MOTHER_AND_FATHER',
-                    label: {
-                      defaultMessage: 'Mother and father',
-                      description: 'label for parents radio button',
-                      id: 'form.field.label.caregiver.parents'
-                    },
-                    conditionals: [
-                      {
-                        action: 'hide',
-                        expression:
-                          '(draftData && draftData.primaryCaregiver && ((draftData.primaryCaregiver.motherIsDeceased && draftData.primaryCaregiver.motherIsDeceased.toString() === ["deceased"].toString()) || (draftData.primaryCaregiver.fatherIsDeceased && draftData.primaryCaregiver.fatherIsDeceased.toString() === ["deceased"].toString())))'
-                      }
-                    ]
-                  },
-                  {
-                    value: 'MOTHER',
-                    label: {
-                      defaultMessage: 'Mother',
-                      description: 'label for mother radio button',
-                      id: 'form.field.label.caregiver.mother'
-                    },
-                    conditionals: [
-                      {
-                        action: 'hide',
-                        expression:
-                          '(draftData && draftData.primaryCaregiver && (draftData.primaryCaregiver.motherIsDeceased && draftData.primaryCaregiver.motherIsDeceased.toString() === ["deceased"].toString()))'
-                      }
-                    ]
-                  },
-                  {
-                    value: 'FATHER',
-                    label: {
-                      defaultMessage: 'Father',
-                      description: 'label for father radio button',
-                      id: 'form.field.label.caregiver.father'
-                    },
-                    conditionals: [
-                      {
-                        action: 'hide',
-                        expression:
-                          '(draftData && draftData.primaryCaregiver &&  (draftData.primaryCaregiver.fatherIsDeceased && draftData.primaryCaregiver.fatherIsDeceased.toString() === ["deceased"].toString()))'
-                      }
-                    ]
-                  },
-                  {
-                    value: 'LEGAL_GUARDIAN',
-                    label: {
-                      defaultMessage: 'Legal guardian',
-                      description: 'label for Legal guardian radio button',
-                      id: 'form.field.label.caregiver.legalGuardian'
-                    },
-                    conditionals: [
-                      {
-                        action: 'hide',
-                        expression:
-                          '(draftData && draftData.registration && draftData.registration.informant && draftData.registration.informant.value === "LEGAL_GUARDIAN")'
-                      }
-                    ]
-                  },
-                  {
-                    value: 'INFORMANT',
-                    label: {
-                      defaultMessage: 'Informant is the primary caregiver',
-                      description: 'label for informant radio button',
-                      id: 'form.field.label.caregiver.informant'
-                    }
-                  },
-                  {
-                    value: 'OTHER',
-                    label: {
-                      defaultMessage: 'Other caregiver',
-                      description: 'label for Other caregiver radio button',
-                      id: 'form.field.label.caregiver.other'
-                    }
-                  }
-                ],
-                nestedFields: {
-                  MOTHER_AND_FATHER: [],
-                  MOTHER: [],
-                  FATHER: [],
-                  LEGAL_GUARDIAN: [
-                    {
-                      name: 'name',
-                      type: 'TEXT',
-                      label: {
-                        id: 'form.field.label.name',
-                        defaultMessage: 'Name',
-                        description: 'field label for name'
-                      },
-                      initialValue: '',
-                      validate: [],
-                      required: true,
-                      maxLength: 32,
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldValueNestingTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'fieldToNameTransformer',
-                                  parameters: ['en', 'familyName']
-                                },
-                                'name'
-                              ]
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'nestedValueToFieldTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'nameToFieldTransformer',
-                                  parameters: ['en', 'familyName']
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    {
-                      name: 'phone',
-                      type: 'TEL',
-                      label: {
-                        id: 'form.field.label.declaration.phone',
-                        defaultMessage: 'Phone number',
-                        description: 'field label for phone'
-                      },
-                      initialValue: '',
-                      required: true,
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldValueNestingTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'fieldToPhoneNumberTransformer',
-                                  parameters: []
-                                },
-                                'phone'
-                              ]
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'nestedValueToFieldTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'phoneNumberToFieldTransformer'
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    {
-                      name: 'reasonNotApplying',
-                      type: 'TEXT',
-                      label: {
-                        id: 'form.field.label.reasonNotApplying',
-                        defaultMessage: 'Reason not applying',
-                        description: 'field label for reasonNotApplying'
-                      },
-                      initialValue: '',
-                      validate: [],
-                      extraValue: 'LEGAL_GUARDIAN',
-                      required: false,
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldToReasonsNotApplyingTransformer',
-                              parameters: [
-                                'reasonsNotApplying',
-                                'reasonNotApplying',
-                                'primaryCaregiverType'
-                              ]
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation:
-                                'reasonsNotApplyingToFieldValueTransformer',
-                              parameters: [
-                                'reasonsNotApplying',
-                                'reasonNotApplying',
-                                'primaryCaregiverType',
-                                ['LEGAL_GUARDIAN']
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  INFORMANT: [],
-                  OTHER: [
-                    {
-                      name: 'name',
-                      type: 'TEXT',
-                      label: {
-                        id: 'form.field.label.name',
-                        defaultMessage: 'Name',
-                        description: 'field label for name'
-                      },
-                      initialValue: '',
-                      required: true,
-                      maxLength: 32,
-                      validate: [],
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldValueNestingTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'fieldToNameTransformer',
-                                  parameters: ['en', 'familyName']
-                                },
-                                'name'
-                              ]
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'nestedValueToFieldTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'nameToFieldTransformer',
-                                  parameters: ['en', 'familyName']
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    {
-                      name: 'phone',
-                      type: 'TEL',
-                      label: {
-                        id: 'form.field.label.declaration.phone',
-                        defaultMessage: 'Phone number',
-                        description: 'field label for phone'
-                      },
-                      initialValue: '',
-                      required: true,
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldValueNestingTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'fieldToPhoneNumberTransformer',
-                                  parameters: []
-                                },
-                                'phone'
-                              ]
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'nestedValueToFieldTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'phoneNumberToFieldTransformer'
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    {
-                      name: 'reasonNotApplying',
-                      type: 'TEXT',
-                      label: {
-                        id: 'form.field.label.reasonNotApplying',
-                        defaultMessage: 'Reason not applying',
-                        description: 'field label for reasonNotApplying'
-                      },
-                      initialValue: '',
-                      validate: [],
-                      required: false,
-                      extraValue: 'OTHER',
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldToReasonsNotApplyingTransformer',
-                              parameters: [
-                                'reasonsNotApplying',
-                                'reasonNotApplying',
-                                'primaryCaregiverType'
-                              ]
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation:
-                                'reasonsNotApplyingToFieldValueTransformer',
-                              parameters: [
-                                'reasonsNotApplying',
-                                'reasonNotApplying',
-                                'primaryCaregiverType',
-                                ['OTHER']
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ]
-                },
-                mapping: {
-                  mutation: {
-                    operation: 'nestedRadioFieldTransformer',
-                    parameters: [
-                      {
-                        operation: 'fieldToReasonsNotApplyingTransformer',
-                        parameters: [
-                          'reasonsNotApplying',
-                          'primaryCaregiverType',
-                          '',
-                          false,
-                          true
-                        ]
-                      }
-                    ]
-                  },
-                  query: {
-                    operation: 'valueToNestedRadioFieldTransformer',
-                    parameters: [
-                      {
-                        operation: 'reasonsNotApplyingToFieldValueTransformer',
-                        parameters: [
-                          'reasonsNotApplying',
-                          'primaryCaregiverType',
-                          '',
-                          [
-                            'MOTHER_AND_FATHER',
-                            'MOTHER',
-                            'FATHER',
-                            'INFORMANT',
-                            'OTHER',
-                            'LEGAL_GUARDIAN'
-                          ]
-                        ]
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
         id: BirthSection.Mother,
         viewType: 'form',
         name: formMessageDescriptors.motherName,
@@ -1900,7 +1176,7 @@ export const registerForms: IDefaultRegisterForms = {
             id: 'mother-view-group',
             fields: [
               {
-                name: 'mothersDetailsExist',
+                name: 'detailsExist',
                 type: 'RADIO_GROUP',
                 label: formMessageDescriptors.mothersDetailsExist,
                 required: true,
@@ -1921,13 +1197,22 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression: 'mothersDetailsExistBasedOnContactAndInformant'
                   }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'sectionRemoveTransformer',
-                    parameters: []
+                ]
+              },
+              {
+                name: 'reasonNotApplying',
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      'mothersDetailsExistBasedOnContactAndInformant || values.detailsExist'
                   }
-                }
+                ],
+                type: 'TEXT',
+                label: formMessageDescriptors.reasonMNA,
+                validate: [],
+                initialValue: '',
+                required: true
               },
               {
                 name: 'nationality',
@@ -1944,7 +1229,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.mothersDetailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -1980,7 +1265,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.mothersDetailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2011,7 +1296,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.mothersDetailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 required: true,
@@ -2066,9 +1351,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-
                     expression:
-                      '!values.mothersDetailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2099,9 +1383,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-
                     expression:
-                      '!values.mothersDetailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 maxLength: 32,
@@ -2141,9 +1424,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-
                     expression:
-                      '!values.mothersDetailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
               },
@@ -2157,6 +1439,7 @@ export const registerForms: IDefaultRegisterForms = {
                 },
                 customisable: true,
                 required: false,
+                initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
@@ -2168,16 +1451,15 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-
                     expression:
-                      '!values.mothersDetailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 options: [
                   {
                     value: 'SINGLE',
                     label: {
-                      defaultMessage: 'Unmarried',
+                      defaultMessage: 'Single',
                       description: 'Option for form field: Marital status',
                       id: 'form.field.label.maritalStatusSingle'
                     }
@@ -2235,9 +1517,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-
                     expression:
-                      '!values.mothersDetailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 customisable: false,
@@ -2268,9 +1549,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-
                     expression:
-                      '!values.mothersDetailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
               },
@@ -2288,9 +1568,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-
                     expression:
-                      '!values.mothersDetailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -2374,7 +1653,7 @@ export const registerForms: IDefaultRegisterForms = {
             id: 'father-view-group',
             fields: [
               {
-                name: 'fathersDetailsExist',
+                name: 'detailsExist',
                 type: 'RADIO_GROUP',
                 label: {
                   defaultMessage: "Do you have the father's details?",
@@ -2383,7 +1662,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.fathersDetailsExist'
                 },
                 required: true,
-                initialValue: false,
+                initialValue: true,
                 validate: [],
                 options: [
                   {
@@ -2400,13 +1679,22 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression: 'fathersDetailsExistBasedOnContactAndInformant'
                   }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'sectionRemoveTransformer',
-                    parameters: []
+                ]
+              },
+              {
+                name: 'reasonNotApplying',
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      'fathersDetailsExistBasedOnContactAndInformant || values.detailsExist'
                   }
-                }
+                ],
+                type: 'TEXT',
+                label: formMessageDescriptors.reasonFNA,
+                validate: [],
+                initialValue: '',
+                required: true
               },
               {
                 name: 'nationality',
@@ -2423,7 +1711,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.fathersDetailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2459,7 +1747,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.fathersDetailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2506,7 +1794,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.fathersDetailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2546,7 +1834,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.fathersDetailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2586,7 +1874,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.fathersDetailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2619,7 +1907,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.fathersDetailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
               },
@@ -2633,13 +1921,14 @@ export const registerForms: IDefaultRegisterForms = {
                 },
                 customisable: true,
                 required: false,
+                initialValue: '',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 conditionals: [
                   {
                     action: 'hide',
                     expression:
-                      '!values.fathersDetailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2715,7 +2004,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.fathersDetailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
               },
@@ -2736,7 +2025,7 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     action: 'hide',
                     expression:
-                      '!values.fathersDetailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 options: [
@@ -2884,7 +2173,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'Hidden for Parent Details none or Mother only',
                     action: 'hide',
                     expression:
-                      '!draftData.mother.mothersDetailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      '!draftData.mother.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2928,7 +2217,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'Hidden for Parent Details none or Father only',
                     action: 'hide',
                     expression:
-                      '!draftData.father.fathersDetailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      '!draftData.father.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {

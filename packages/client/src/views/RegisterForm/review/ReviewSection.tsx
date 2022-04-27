@@ -1340,9 +1340,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     } = this.props
     return (
       event === Event.BIRTH &&
-      (section.id === BirthSection.Mother ||
-        (section.id === BirthSection.Father &&
-          !!data.father?.fathersDetailsExist))
+      ((section.id === BirthSection.Mother && !!data.mother?.detailsExist) ||
+        (section.id === BirthSection.Father && !!data.father?.detailsExist))
     )
   }
 
@@ -1355,7 +1354,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       this.getOverriddenFieldsListForPreview(formSections)
     let tempItem: any
 
-    const initialTransformedSection = formSections.map((section) => {
+    return formSections.map((section) => {
       let items: any[] = []
       const visitedTags: string[] = []
       const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
@@ -1426,12 +1425,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             }
           : undefined
       }
-    })
-
-    return initialTransformedSection.map((sec) => {
-      if (sec.id === 'father' && sec.items[0].value === 'No') {
-        return { ...sec, items: [sec.items[0]] }
-      } else return { ...sec }
     })
   }
 

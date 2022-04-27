@@ -41,7 +41,7 @@ const childDetails = {
 }
 
 const fatherDetailsForBirth = {
-  fathersDetailsExist: true,
+  detailsExist: true,
   iD: '654654654',
   socialSecurityNo: '65454984',
   nationality: 'FAR',
@@ -51,6 +51,7 @@ const fatherDetailsForBirth = {
   seperator: '',
   maritalStatus: 'MARRIED',
   occupation: 'Teacher',
+  reasonNotApplying: '',
   educationalAttainment: 'FIRST_STAGE_TERTIARY_ISCED_5',
   permanentAddressSameAsMother: true,
   permanentAddress: '',
@@ -83,6 +84,8 @@ const motherDetailsForBirth = {
   seperator: '',
   maritalStatus: 'MARRIED',
   occupation: 'Teacher',
+  detailsExist: true,
+  reasonNotApplying: '',
   educationalAttainment: 'FIRST_STAGE_TERTIARY_ISCED_5',
   placeOfHeritage: '',
   countryPlaceOfHeritage: 'FAR',

@@ -470,7 +470,6 @@ describe('OfficeHome sent for review tab related tests', () => {
               },
               child: null,
               informant: null,
-              primaryCaregiver: null,
               mother: {
                 name: [
                   {
@@ -487,6 +486,7 @@ describe('OfficeHome sent for review tab related tests', () => {
                 birthDate: '2001-01-01',
                 maritalStatus: 'MARRIED',
                 occupation: 'Mother Occupation',
+                reasonNotApplying: '',
                 dateOfMarriage: '2001-01-01',
                 educationalAttainment: 'PRIMARY_ISCED_1',
                 nationality: ['BGD'],

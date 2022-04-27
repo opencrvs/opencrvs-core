@@ -548,7 +548,7 @@ export const reasonsNotApplyingToFieldValueTransformer =
       return transformedData
     }
 
-    const transformedArray = sectionData[
+    /* const transformedArray = sectionData[
       transformedArrayName
     ] as IFormSectionData[]
 
@@ -570,7 +570,7 @@ export const reasonsNotApplyingToFieldValueTransformer =
       ) {
         fieldValue = value
       }
-    })
+    })*/
 
     if (fieldValue) {
       transformedData[sectionId][field.name] =

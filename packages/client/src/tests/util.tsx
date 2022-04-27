@@ -350,7 +350,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -467,7 +467,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -539,7 +539,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -611,7 +611,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -682,7 +682,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -754,7 +754,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -826,7 +826,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -958,7 +958,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -1030,7 +1030,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -1662,7 +1662,7 @@ export const mockDeclarationData = {
     ...secondaryInternationalAddressLines
   },
   father: {
-    fathersDetailsExist: true,
+    detailsExist: true,
     firstNames: 'গায়ত্রী',
     familyName: 'স্পিভক',
     firstNamesEng: 'Jeff',

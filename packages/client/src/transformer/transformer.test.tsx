@@ -66,7 +66,7 @@ describe('when draft data is transformed to graphql', () => {
   }
 
   const fatherDetails: IPersonDetails = {
-    fathersDetailsExist: true,
+    detailsExist: true,
     iD: '23423442342423424',
     iDType: 'OTHER',
     iDTypeOther: 'Taxpayer Identification Number',
@@ -137,18 +137,6 @@ describe('when draft data is transformed to graphql', () => {
     }
   }
 
-  const primaryCaregiver = {
-    parentDetailsType: 'MOTHER_ONLY',
-    reasonMotherNotApplying: '',
-    motherIsDeceased: [],
-    reasonFatherNotApplying: '',
-    fatherIsDeceased: [],
-    primaryCaregiverType: {
-      value: 'INFORMANT',
-      nestedFields: { name: '', phone: '', reasonNotApplying: '' }
-    }
-  }
-
   beforeEach(async () => {
     getItem.mockReturnValue(validToken)
     setItem.mockClear()
@@ -170,7 +158,6 @@ describe('when draft data is transformed to graphql', () => {
       father: fatherDetails,
       mother: motherDetails,
       registration: registrationDetails,
-      primaryCaregiver,
       documents: { imageUploader: '' }
     }
 
@@ -209,7 +196,6 @@ describe('when draft data is transformed to graphql', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration: registrationDetails,
-        primaryCaregiver,
         documents: { imageUploader: '' }
       }
 
@@ -229,23 +215,21 @@ describe('when draft data is transformed to graphql', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration,
-        primaryCaregiver,
         documents: { imageUploader: '' }
       }
       expect(
         draftToGqlTransformer(form, data).registration.contactPhoneNumber
       ).toBe('+2601736478884')
     })
-    it('Pass false as fathersDetailsExist on father section', () => {
+    it('Pass false as detailsExist on father section', () => {
       const clonedFather = clone(fatherDetails)
-      clonedFather.fathersDetailsExist = false
+      clonedFather.detailsExist = false
 
       const data = {
         child: childDetails,
         father: clonedFather,
         mother: motherDetails,
         registration: registrationDetails,
-        primaryCaregiver,
         documents: { imageUploader: '' }
       }
 
@@ -264,7 +248,6 @@ describe('when draft data is transformed to graphql', () => {
           registrationPhone: '01736478884',
           whoseContactDetails: 'MOTHER'
         },
-        primaryCaregiver,
         documents: {}
       }
       expect(
@@ -277,245 +260,11 @@ describe('when draft data is transformed to graphql', () => {
         father: {},
         mother: {},
         documents: {},
-        registration: {},
-        primaryCaregiver: {}
+        registration: {}
       }
       expect(
         draftToGqlTransformer(form, data).registration.inCompleteFields
       ).toBeDefined()
-    })
-
-    it('transform primary caregiver data to gql data', () => {
-      const data = {
-        child: {},
-        father: {},
-        mother: {},
-        registration: {
-          informantType: 'OTHER',
-          registrationPhone: '01736478884',
-          whoseContactDetails: 'MOTHER'
-        },
-        primaryCaregiver: {
-          parentDetailsType: 'MOTHER_AND_FATHER',
-          primaryCaregiverType: {
-            value: 'LEGAL_GUARDIAN',
-            nestedFields: {
-              name: 'Alex',
-              phone: '01686942106',
-              reasonNotApplying: 'sick'
-            }
-          },
-          reasonFatherNotApplying: '',
-          reasonMotherNotApplying: 'sick',
-          fatherIsDeceased: ['deceased']
-        },
-        documents: {}
-      }
-      const transformedData = {
-        parentDetailsType: 'MOTHER_AND_FATHER',
-        primaryCaregiver: {
-          name: [
-            {
-              use: 'en',
-              familyName: 'Alex'
-            }
-          ],
-          telecom: [
-            {
-              system: 'phone',
-              value: '01686942106'
-            }
-          ]
-        },
-        reasonsNotApplying: [
-          {
-            primaryCaregiverType: 'MOTHER',
-            reasonNotApplying: 'sick'
-          },
-          {
-            primaryCaregiverType: 'FATHER',
-            isDeceased: true
-          },
-          {
-            primaryCaregiverType: 'LEGAL_GUARDIAN',
-            reasonNotApplying: 'sick'
-          }
-        ]
-      }
-
-      expect(draftToGqlTransformer(form, data).primaryCaregiver).toEqual(
-        transformedData
-      )
-    })
-
-    it('transform gql data to primary caregiver form data', () => {
-      const data = {
-        id: '70773af0-68e3-4b08-aace-e28f4809d9c1',
-        child: null,
-        informant: {
-          individual: null,
-          relationship: null,
-          otherRelationship: null
-        },
-        primaryCaregiver: {
-          parentDetailsType: 'MOTHER_AND_FATHER',
-          primaryCaregiver: {
-            name: [
-              {
-                use: 'en',
-                firstNames: '',
-                familyName: 'Alex'
-              }
-            ],
-            telecom: [
-              {
-                system: 'phone',
-                value: '01686942106',
-                use: null
-              }
-            ]
-          },
-          reasonsNotApplying: [
-            {
-              primaryCaregiverType: 'MOTHER',
-              reasonNotApplying: '',
-              isDeceased: true
-            },
-            {
-              primaryCaregiverType: 'FATHER',
-              reasonNotApplying: 'sick',
-              isDeceased: false
-            },
-            {
-              primaryCaregiverType: 'OTHER',
-              reasonNotApplying: 'sick',
-              isDeceased: null
-            }
-          ]
-        },
-        mother: null,
-        father: null,
-        registration: {
-          contact: 'MOTHER',
-          contactRelationship: null,
-          contactPhoneNumber: '01555555555',
-          attachments: null,
-          status: [
-            {
-              comments: null,
-              type: 'DECLARED'
-            }
-          ],
-          type: 'BIRTH',
-          trackingId: 'BWH1TVW',
-          registrationNumber: null
-        },
-        attendantAtBirth: null,
-        weightAtBirth: null,
-        birthType: null,
-        eventLocation: null,
-        informantType: 'OTHER'
-      }
-
-      const primaryCaregiverData = {
-        parentDetailsType: 'MOTHER_AND_FATHER',
-        motherIsDeceased: ['deceased'],
-        reasonFatherNotApplying: 'sick',
-        primaryCaregiverType: {
-          value: 'OTHER',
-          nestedFields: {
-            name: 'Alex',
-            phone: '01686942106',
-            reasonNotApplying: 'sick'
-          }
-        }
-      }
-
-      expect(gqlToDraftTransformer(form, data).primaryCaregiver).toEqual(
-        primaryCaregiverData
-      )
-    })
-
-    it('transform gql data to primary caregiver form data', () => {
-      const data = {
-        id: '70773af0-68e3-4b08-aace-e28f4809d9c1',
-        child: null,
-        informant: {
-          individual: null,
-          relationship: null,
-          otherRelationship: null
-        },
-        primaryCaregiver: {
-          parentDetailsType: 'MOTHER_AND_FATHER',
-          primaryCaregiver: {
-            name: [
-              {
-                use: 'en',
-                firstNames: '',
-                familyName: 'Alex'
-              }
-            ],
-            telecom: [
-              {
-                system: 'phone',
-                value: '01686942106',
-                use: null
-              }
-            ]
-          },
-          reasonsNotApplying: [
-            {
-              primaryCaregiverType: 'MOTHER',
-              reasonNotApplying: '',
-              isDeceased: true
-            },
-            {
-              primaryCaregiverType: 'OTHER',
-              reasonNotApplying: 'sick',
-              isDeceased: null
-            }
-          ]
-        },
-        mother: null,
-        father: null,
-        registration: {
-          contact: 'MOTHER',
-          contactRelationship: null,
-          contactPhoneNumber: '01555555555',
-          attachments: null,
-          status: [
-            {
-              comments: null,
-              type: 'DECLARED'
-            }
-          ],
-          type: 'BIRTH',
-          trackingId: 'BWH1TVW',
-          registrationNumber: null
-        },
-        attendantAtBirth: null,
-        weightAtBirth: null,
-        birthType: null,
-        eventLocation: null,
-        informantType: 'OTHER'
-      }
-
-      const primaryCaregiverData = {
-        motherIsDeceased: ['deceased'],
-        parentDetailsType: 'MOTHER_AND_FATHER',
-        primaryCaregiverType: {
-          value: 'OTHER',
-          nestedFields: {
-            name: 'Alex',
-            phone: '01686942106',
-            reasonNotApplying: 'sick'
-          }
-        }
-      }
-
-      expect(gqlToDraftTransformer(form, data).primaryCaregiver).toEqual(
-        primaryCaregiverData
-      )
     })
 
     it('transform gql data from form correction data', () => {
@@ -535,7 +284,6 @@ describe('when draft data is transformed to graphql', () => {
             }
           }
         },
-        primaryCaregiver,
         documents: { imageUploader: '' }
       }
 
@@ -547,7 +295,6 @@ describe('when draft data is transformed to graphql', () => {
         father: fatherDetails,
         mother: motherDetails,
         registration: registrationDetails,
-        primaryCaregiver,
         documents: { imageUploader: '' }
       }
 

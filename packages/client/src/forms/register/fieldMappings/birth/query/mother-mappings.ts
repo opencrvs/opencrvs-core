@@ -18,11 +18,11 @@ export function emptyMotherSectionTransformer(
 ) {
   if (!queryData[sectionId]) {
     transformedData[sectionId] = {
-      mothersDetailsExist: false
+      detailsExist: false
     }
   } else {
     transformedData[sectionId] = {
-      mothersDetailsExist: true,
+      detailsExist: true,
       ...transformedData[sectionId]
     }
   }
