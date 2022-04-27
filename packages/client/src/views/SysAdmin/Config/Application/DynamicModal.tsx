@@ -50,7 +50,7 @@ import {
   getCurrency,
   callUpdatePhoneNumberPatternMutation,
   callUpdateGovtLogoMutation
-} from './utils'
+} from '@client/views/SysAdmin/Config/Application/utils'
 
 const Message = styled.div`
   margin-bottom: 16px;
@@ -151,6 +151,8 @@ export type IApplicationConfig = {
   CURRENCY?: ICurrency
   BIRTH?: IBirth
   DEATH?: IDeath
+  HIDE_EVENT_REGISTER_INFORMATION?: boolean
+  ADDRESSES?: number
 }
 
 export type IState = {
@@ -489,12 +491,9 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
             this.props.intl.formatMessage(messages.govtLogoChangeNotification)
           )
         } catch {
-          this.setState({
-            errorOccured: true,
-            errorMessages: this.props.intl.formatMessage(
-              messages.govtLogoChangeError
-            )
-          })
+          this.setError(
+            this.props.intl.formatMessage(messages.govtLogoChangeError)
+          )
           valueChanged(
             NOTIFICATION_TYPE.ERROR,
             this.props.intl.formatMessage(messages.govtLogoChangeError)

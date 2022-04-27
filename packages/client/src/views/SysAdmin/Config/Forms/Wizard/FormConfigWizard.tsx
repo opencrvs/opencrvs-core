@@ -18,12 +18,13 @@ import { EventTopBar } from '@opencrvs/components/lib/interface'
 import { SettingsBlue } from '@opencrvs/components/lib/icons'
 import {
   SecondaryButton,
-  SuccessButton
+  SuccessButton,
+  TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import styled from '@client/styledComponents'
 import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
-import { Event, BirthSection, DeathSection } from '@client/forms'
+import { Event, BirthSection, DeathSection, WizardSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
@@ -35,12 +36,13 @@ import { DefaultFieldTools } from '@client/components/formConfig/formTools/Defau
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
-import { goToFormConfigHome } from '@client/navigation'
+import { goToFormConfigHome, goToFormConfigWizard } from '@client/navigation'
 import { getScope } from '@client/profile/profileSelectors'
 import { AuthScope } from '@client/utils/authUtils'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import { SaveActionModal, SaveActionContext } from './SaveActionModal'
 import { SaveActionNotification } from './SaveActionNotification'
+import { FormConfigSettings } from './FormConfigSettings'
 
 const Container = styled.div`
   display: flex;
@@ -94,12 +96,11 @@ function isValidEvent(event: string): event is Event {
   return Object.values<string>(Event).includes(event)
 }
 
-function isValidSection(
-  section: string
-): section is BirthSection | DeathSection {
+function isValidSection(section: string): section is WizardSection {
   return [
     ...Object.values<string>(BirthSection),
-    ...Object.values<string>(DeathSection)
+    ...Object.values<string>(DeathSection),
+    'settings'
   ].includes(section)
 }
 
@@ -156,7 +157,11 @@ export function FormConfigWizard() {
         })}
         pageIcon={<></>}
         topBarActions={[
-          <SettingsBlue key="settings" onClick={() => {}} />,
+          <TertiaryButton
+            id="settings"
+            icon={() => <SettingsBlue />}
+            onClick={() => dispatch(goToFormConfigWizard(event, 'settings'))}
+          ></TertiaryButton>,
           <SecondaryButton
             key="save"
             size="small"
@@ -175,32 +180,38 @@ export function FormConfigWizard() {
         <NavigationContainer>
           <SectionNavigation />
         </NavigationContainer>
-        <CanvasContainer>
-          <Canvas
-            selectedField={selectedField}
-            onFieldSelect={(field) => setSelectedField(field)}
-          />
-        </CanvasContainer>
-        <ToolsContainer>
-          {/*
-           *  The useEffect hook for clearing the selectedField takes
-           *  effect after the render for when the section changes so
-           *  for that particular render where the section has changed
-           *  but the selectedField is still from the previous section
-           *  we need to make sure that the selectedField is valid
-           */}
-          {isSelectedFieldValid(selectedField, section) ? (
-            isDefaultField(selectedField) && (
-              <DefaultFieldTools configField={selectedField} />
-            )
-          ) : (
-            <FormTools />
-          )}
-        </ToolsContainer>
-        <SaveActionContext.Provider value={{ status, setStatus }}>
-          <SaveActionModal />
-          <SaveActionNotification />
-        </SaveActionContext.Provider>
+        {section !== 'settings' ? (
+          <>
+            <CanvasContainer>
+              <Canvas
+                selectedField={selectedField}
+                onFieldSelect={(field) => setSelectedField(field)}
+              />
+            </CanvasContainer>
+            <ToolsContainer>
+              {/*
+               *  The useEffect hook for clearing the selectedField takes
+               *  effect after the render for when the section changes so
+               *  for that particular render where the section has changed
+               *  but the selectedField is still from the previous section
+               *  we need to make sure that the selectedField is valid
+               */}
+              {isSelectedFieldValid(selectedField, section) ? (
+                isDefaultField(selectedField) && (
+                  <DefaultFieldTools configField={selectedField} />
+                )
+              ) : (
+                <FormTools />
+              )}
+            </ToolsContainer>
+            <SaveActionContext.Provider value={{ status, setStatus }}>
+              <SaveActionModal />
+              <SaveActionNotification />
+            </SaveActionContext.Provider>
+          </>
+        ) : (
+          <FormConfigSettings />
+        )}
       </WizardContainer>
     </Container>
   )

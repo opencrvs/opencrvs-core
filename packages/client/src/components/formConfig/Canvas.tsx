@@ -24,8 +24,8 @@ import {
 } from '@client/forms/configuration/configFields/utils'
 import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
 import { FieldPosition } from '@client/forms/configuration'
-import { IPageNavigationProps } from './SectionNavigation'
 import { useParams } from 'react-router'
+import { BirthSection, DeathSection, Event } from '@client/forms'
 
 const CanvasBox = styled(Box)`
   display: flex;
@@ -55,13 +55,18 @@ function generateConfigFields(formFieldMap: IConfigFieldMap) {
   return configFields
 }
 
+type IRouteProps = {
+  event: Event
+  section: BirthSection | DeathSection
+}
+
 type ICanvasProps = {
   selectedField: IConfigField | null
   onFieldSelect: (field: IConfigField) => void
 }
 
 export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
-  const { event, section } = useParams<IPageNavigationProps>()
+  const { event, section } = useParams<IRouteProps>()
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )

@@ -86,6 +86,7 @@ export interface IApplicationConfig {
   BIRTH_REGISTRATION_TARGET: number
   DEATH_REGISTRATION_TARGET: number
   NID_NUMBER_PATTERN: RegExp
+  ADDRESSES: number
 }
 
 export interface IApplicationConfigResponse {

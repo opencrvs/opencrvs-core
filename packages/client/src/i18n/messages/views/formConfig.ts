@@ -44,6 +44,18 @@ interface IFormConfigMessages
   saveDraftCommentLabel: MessageDescriptor
   saveDraftCommentError: MessageDescriptor
   saveDraftDescription: MessageDescriptor
+  settingsTitle: MessageDescriptor
+  introductionSettings: MessageDescriptor
+  addressesSettings: MessageDescriptor
+  enable: MessageDescriptor
+  disable: MessageDescriptor
+  introductionPageSettingsDialogTitle: MessageDescriptor
+  introductionPageSettingsDialogDesc: MessageDescriptor
+  addressesSettingsDialogTitle: MessageDescriptor
+  addressesSettingsDialogDesc: MessageDescriptor
+  showIntroductionPage: MessageDescriptor
+  introductionPageSuccessNotification: MessageDescriptor
+  noOfAddressesSuccessNotification: MessageDescriptor
 }
 
 type INavigationMessages = Record<
@@ -197,6 +209,68 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.form.tools.requiredForRegistration',
     defaultMessage: 'Required for registration',
     description: 'Required for registration label for formTools'
+  },
+  settingsTitle: {
+    id: 'config.form.settings.title',
+    defaultMessage: 'Settings',
+    description: 'Title of the settings page'
+  },
+  introductionSettings: {
+    id: 'config.form.introductionSettings',
+    defaultMessage: 'Introduction page',
+    description: 'Label for introduction page settings'
+  },
+  addressesSettings: {
+    id: 'config.form.addressesSettings',
+    defaultMessage: 'No. of addresses',
+    description: 'Label for addresses settings'
+  },
+  enable: {
+    id: 'config.form.settings.enable',
+    defaultMessage: 'Enabled',
+    description: 'Label for enable intorduction page settings'
+  },
+  disable: {
+    id: 'config.form.settings.disable',
+    defaultMessage: 'Disabled',
+    description: 'Label for disable intorduction page settings'
+  },
+  introductionPageSettingsDialogTitle: {
+    id: 'config.form.settings.introductionPage.dialogTitle',
+    defaultMessage: 'Introduction page?',
+    description: 'Title for intorduction page settings dialog'
+  },
+  introductionPageSettingsDialogDesc: {
+    id: 'config.form.settings.introductionPage.dialogDesc',
+    defaultMessage:
+      'An introduction page can be used to describe the registration process to an informant.',
+    description: 'Description for intorduction page settings dialog'
+  },
+  addressesSettingsDialogTitle: {
+    id: 'config.form.settings.addresses.dialogTitle',
+    defaultMessage: 'No. of addresses?',
+    description: 'Title for addresses settings dialog'
+  },
+  addressesSettingsDialogDesc: {
+    id: 'config.form.settings.addresses.dialogDesc',
+    defaultMessage:
+      'How many address do you want to capture for the parents, informant and deceased?',
+    description: 'Description for addresses settings dialog'
+  },
+  showIntroductionPage: {
+    id: 'config.form.settings.showIntroductionPage',
+    defaultMessage: 'Show introduction page',
+    description: 'Label for introduction page toggle settings'
+  },
+  introductionPageSuccessNotification: {
+    id: 'config.form.settings.introductionPage.successNotification',
+    defaultMessage: 'Introduction page has been {action}',
+    description: 'Success notification label for introduction page settings'
+  },
+  noOfAddressesSuccessNotification: {
+    id: 'config.form.settings.addresses.successNotification',
+    defaultMessage: 'The number of address has been updated',
+    description: 'Success notification label for number of addresses settings'
   },
   statusChangeError: {
     id: 'config.form.statusChange.error',

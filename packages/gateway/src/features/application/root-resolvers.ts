@@ -61,7 +61,8 @@ export const resolvers: GQLResolver = {
         SENTRY: applicationConfig.SENTRY as string,
         LOGROCKET: applicationConfig.LOGROCKET as string,
         PHONE_NUMBER_PATTERN: applicationConfig.PHONE_NUMBER_PATTERN as string,
-        NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string
+        NID_NUMBER_PATTERN: applicationConfig.NID_NUMBER_PATTERN as string,
+        ADDRESSES: applicationConfig.ADDRESSES as number
       }
 
       const res = await fetch(

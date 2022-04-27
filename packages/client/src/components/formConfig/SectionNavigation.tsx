@@ -16,7 +16,7 @@ import {
   NavigationSubItem,
   LabelContainer
 } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
-import { Event, BirthSection, DeathSection } from '@client/forms'
+import { Event, BirthSection, DeathSection, WizardSection } from '@client/forms'
 import { useIntl } from 'react-intl'
 import {
   messages,
@@ -39,8 +39,8 @@ const OrderedList = styled.ol`
   padding: 0px;
 `
 
-export interface IPageNavigationProps {
-  section: BirthSection | DeathSection
+interface IRouteProps {
+  section: WizardSection
   event: Event
 }
 
@@ -54,7 +54,7 @@ const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
 export function SectionNavigation() {
   const intl = useIntl()
   const dispatch = useDispatch()
-  const { event, section } = useParams<IPageNavigationProps>()
+  const { event, section } = useParams<IRouteProps>()
   const tabs = event === Event.BIRTH ? BirthSection : DeathSection
 
   return (
