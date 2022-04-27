@@ -480,14 +480,19 @@ export function getPopulation(
       `Total population extension not found for location, location ID: ${location.id}`
     )
   }
+  const populationDataArray: Record<string, number>[] =
+    totalPopulationExtension.valueString
+      ? JSON.parse(totalPopulationExtension.valueString)
+      : []
+  const populationYears = populationDataArray.map((data) =>
+    Number(Object.keys(data)[0])
+  )
+  const latestAvailableYear = Math.max(...populationYears)
+  const populationYearToConsider =
+    populationYear > latestAvailableYear ? latestAvailableYear : populationYear
+  const totalPopulation = populationDataArray.find((record) =>
+    record.hasOwnProperty(populationYearToConsider.toString())
+  )
 
-  const totalPopulation = totalPopulationExtension.valueString
-    ? (
-        JSON.parse(totalPopulationExtension.valueString) as Array<
-          Record<string, number>
-        >
-      ).find((record) => record.hasOwnProperty(populationYear.toString()))
-    : undefined
-
-  return totalPopulation ? totalPopulation[populationYear] : 0
+  return totalPopulation ? totalPopulation[populationYearToConsider] : 0
 }
