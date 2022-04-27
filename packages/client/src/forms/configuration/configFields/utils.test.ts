@@ -38,7 +38,7 @@ const configFormField: IConfigFormField = {
 
 describe('getContentKey', () => {
   it('should return the key if available', () => {
-    expect(getContentKey(configFormField)).toBe('test.dummy')
+    expect(getContentKey(configFormField)).toEqual(['test.dummy'])
   })
 })
 

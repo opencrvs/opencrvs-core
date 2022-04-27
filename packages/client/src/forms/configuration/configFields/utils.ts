@@ -10,7 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event, IFormField, IFormSection, IForm } from '@client/forms'
+import {
+  Event,
+  IFormField,
+  IFormSection,
+  IForm,
+  IRadioOption
+} from '@client/forms'
 
 export type IConfigFormField = {
   fieldId: string
@@ -27,7 +33,21 @@ type IFormFieldMap = Record<string, IConfigFormField>
 export type ISectionFieldMap = Record<string, IFormFieldMap>
 
 export function getContentKey(field: IConfigFormField) {
-  return field.definition.label.id
+  if (
+    (field.definition.type === 'RADIO_GROUP' ||
+      field.definition.type === 'RADIO_GROUP_WITH_NESTED_FIELDS' ||
+      field.definition.type === 'SELECT_WITH_OPTIONS' ||
+      field.definition.type === 'DOCUMENT_UPLOADER_WITH_OPTION') &&
+    !['country', 'countryPermanent', 'nationality'].includes(
+      field.definition.name
+    )
+  ) {
+    const listedOptions = field.definition.options as IRadioOption[]
+    const listedContentKey = listedOptions.map((option) => option.label.id)
+    return listedContentKey
+  } else {
+    return [field.definition.label.id]
+  }
 }
 
 export function getCertificateHandlebar(field: IConfigFormField) {
