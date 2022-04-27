@@ -201,7 +201,7 @@ export const GET_TOTAL_PAYMENTS = gql`
   query data(
     $timeStart: String!
     $timeEnd: String!
-    $locationId: String!
+    $locationId: String
     $event: String!
   ) {
     getTotalPayments(

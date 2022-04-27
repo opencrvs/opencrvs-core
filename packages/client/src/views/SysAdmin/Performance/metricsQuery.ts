@@ -42,3 +42,16 @@ export const PERFORMANCE_METRICS = gql`
     }
   }
 `
+
+export const LOCATION_STATS = gql`
+  query data($locationId: String, $populationYear: Int!) {
+    getLocationStatistics(
+      locationId: $locationId
+      populationYear: $populationYear
+    ) {
+      population
+      offices
+      registrars
+    }
+  }
+`

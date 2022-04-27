@@ -41,7 +41,7 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
-import { PERFORMANCE_METRICS } from './metricsQuery'
+import { PERFORMANCE_METRICS, LOCATION_STATS } from './metricsQuery'
 import { ApolloError } from 'apollo-client'
 import {
   ToastNotification,
@@ -409,12 +409,41 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             </ResponsiveModalContent>
           </ResponsiveModal>
           <LayoutRight>
-            <PerformanceStats
-              registrationOffices={5}
-              totalRegistrars={200}
-              registrarsRatio={2}
-              citizen={50}
-            />
+            <Query
+              query={LOCATION_STATS}
+              variables={{
+                locationId: this.state.selectedLocation
+                  ? this.state.selectedLocation.id
+                  : undefined,
+                populationYear: timeEnd.getFullYear()
+              }}
+              fetchPolicy="no-cache"
+            >
+              {({ loading, data, error }) => {
+                if (error) {
+                  return (
+                    <>
+                      <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                    </>
+                  )
+                }
+
+                if (loading) {
+                  return <Spinner id="location-stats-loading" />
+                }
+                return (
+                  <PerformanceStats
+                    registrationOffices={data.getLocationStatistics!.offices}
+                    totalRegistrars={data.getLocationStatistics!.registrars}
+                    registrarsRatio={1}
+                    citizen={
+                      Math.round(data.getLocationStatistics!.population) /
+                      Math.round(data.getLocationStatistics!.registrars)
+                    }
+                  />
+                )
+              }}
+            </Query>
             {/* TODO: RegistrationStatus could be replaced by the StatusWiseDeclarationCountView component */}
             <RegistrationStatus>
               <SubHeader>
