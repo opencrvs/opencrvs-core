@@ -187,9 +187,9 @@ export const query = <T = any>(q: string): Promise<T> => {
   }
 }
 
-export function deleteMeasurements() {
+export async function deleteMeasurements() {
   try {
-    return Promise.all([
+    await Promise.all([
       influx.dropMeasurement('birth_reg', INFLUX_DB),
       influx.dropMeasurement('death_reg', INFLUX_DB),
       influx.dropMeasurement('in_complete_fields', INFLUX_DB),
@@ -199,11 +199,10 @@ export function deleteMeasurements() {
       influx.dropMeasurement('correction_payment', INFLUX_DB),
       influx.dropMeasurement('declarations_started', INFLUX_DB),
       influx.dropMeasurement('declarations_rejected', INFLUX_DB)
-    ]).then(() => {
-      return {
-        status: `Successfully deleted all the measurements form ${INFLUX_DB} database`
-      }
-    })
+    ])
+    return {
+      status: `Successfully deleted all the measurements form ${INFLUX_DB} database`
+    }
   } catch (err) {
     logger.error(`Error deleting ${INFLUX_DB} database from InfluxDB! ${err}`)
     throw err

@@ -72,59 +72,61 @@ export async function createOrUpdateFormDraftHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const questionsDraft = request.payload as IQuestionsDraft
-  const eventRegex = new RegExp(`^(${questionsDraft.event}\.)`)
-  let draft: IFormDraftModel | null = await FormDraft.findOne({
-    event: questionsDraft.event
+  const newDraft = request.payload as IQuestionsDraft
+  const eventRegex = new RegExp(`^(${newDraft.event}\.)`)
+  let oldDraft: IFormDraftModel | null = await FormDraft.findOne({
+    event: newDraft.event
   })
 
   //update draft
-  if (draft) {
-    if (!isValidFormDraftOperation(draft.status, questionsDraft.status)) {
+  if (oldDraft) {
+    if (!isValidFormDraftOperation(oldDraft.status, newDraft.status)) {
       return h
         .response(
-          `Invalid Operation. Can not update form draft status from ${draft.status} to ${questionsDraft.status}`
+          `Invalid Operation. Can not update form draft status from ${oldDraft.status} to ${newDraft.status}`
         )
         .code(400)
     }
 
     const history: IHistory = {
-      version: draft.version,
-      status: draft.status,
-      comment: draft.comment,
-      updatedAt: draft.updatedAt
+      version: oldDraft.version,
+      status: oldDraft.status,
+      comment: oldDraft.comment,
+      updatedAt: oldDraft.updatedAt
     }
-    draft.history?.unshift(history)
-    draft.status = DraftStatus.DRAFT
-    draft.version = draft.version + 1
-    draft.comment = questionsDraft.comment
-    draft.updatedAt = Date.now()
+    oldDraft.history?.unshift(history)
+    oldDraft.status = DraftStatus.DRAFT
+    oldDraft.version = oldDraft.version + 1
+    oldDraft.comment = newDraft.comment
+    oldDraft.updatedAt = Date.now()
 
     try {
-      await FormDraft.updateOne({ _id: draft._id }, draft)
+      await FormDraft.updateOne({ _id: oldDraft._id }, oldDraft)
     } catch (err) {
       logger.error(err)
       return h
-        .response(`Could not update draft for ${draft.event} event`)
+        .response(`Could not update draft for ${oldDraft.event} event`)
         .code(400)
     }
 
     //create/update/delete questions
-    if (!isEmpty(questionsDraft.questions)) {
+    if (!isEmpty(newDraft.questions)) {
       const existingQuestions: IQuestionModel[] = await Question.find({
         fieldId: eventRegex
       }).exec()
 
-      const allQuestion = partition(questionsDraft.questions, (question) => {
-        return find(existingQuestions, { fieldId: question.fieldId })
-      })
+      const [modifiedQuestions, newQuestions] = partition(
+        newDraft.questions,
+        (question) => {
+          return find(existingQuestions, { fieldId: question.fieldId })
+        }
+      )
 
       //update existing questions
-      //allQuestion[0] contains list of modifying questions
-      if (allQuestion[0]) {
+      if (modifiedQuestions) {
         try {
-          Promise.all(
-            allQuestion[0].map(async (question) => {
+          await Promise.all(
+            modifiedQuestions.map(async (question) => {
               await Question.updateOne({ fieldId: question.fieldId }, question)
             })
           )
@@ -136,10 +138,9 @@ export async function createOrUpdateFormDraftHandler(
       }
 
       //create new questions
-      //allQuestion[1] contains list of new questions
-      if (allQuestion[1]) {
+      if (newQuestions) {
         try {
-          await Question.insertMany(allQuestion[1])
+          await Question.insertMany(newQuestions)
         } catch (err) {
           return h.response(`Failed to create new questions. ${err}`).code(400)
         }
@@ -150,7 +151,7 @@ export async function createOrUpdateFormDraftHandler(
         const deletedQuestionList = existingQuestions
           .filter(
             ({ fieldId: existQuestion }) =>
-              !allQuestion[0].find(
+              !modifiedQuestions.find(
                 ({ fieldId: newQuestion }) => newQuestion === existQuestion
               )
           )
@@ -171,20 +172,20 @@ export async function createOrUpdateFormDraftHandler(
     //create draft
     try {
       const formDraft: IFormDraft = {
-        event: questionsDraft.event,
-        status: questionsDraft.status,
-        comment: questionsDraft.comment,
+        event: newDraft.event,
+        status: newDraft.status,
+        comment: newDraft.comment,
         version: 0,
         createdAt: Date.now(),
         updatedAt: Date.now()
       }
-      draft = await FormDraft.create(formDraft)
+      oldDraft = await FormDraft.create(formDraft)
     } catch (e) {
       throw internal(e.message)
     }
   }
 
-  return h.response(draft).code(201)
+  return h.response(oldDraft).code(201)
 }
 
 export async function modifyDraftStatusHandler(
