@@ -192,19 +192,24 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     ]
   },
   {
-    preceedingFieldId: 'death.informant.informant-view-group.relationship',
+    preceedingFieldId: 'death.informant.informant-view-group.familyNameEng',
     configurations: [
       {
         config: AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
-        label: formMessageDescriptors.primaryAddressSameAsOtherPrimary,
+        label: formMessageDescriptors.primaryAddressSameAsDeceasedsPrimary,
         xComparisonSection: DeathSection.Informants,
         yComparisonSection: DeathSection.Deceased
       },
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
-        label: formMessageDescriptors.informantPrimaryAddress
+        label: formMessageDescriptors.informantPrimaryAddress,
+        conditionalCase: `${primaryAddressSameAsOtherPrimaryAddress}`
       },
-      { config: AddressCases.PRIMARY_ADDRESS, informant: true },
+      {
+        config: AddressCases.PRIMARY_ADDRESS,
+        informant: true,
+        conditionalCase: `${primaryAddressSameAsOtherPrimaryAddress}`
+      },
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.informantSecondaryAddress,

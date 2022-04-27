@@ -55,7 +55,6 @@ interface IFormMessages
   birthTypeSingle: MessageDescriptor
   birthTypeTriplet: MessageDescriptor
   birthTypeTwin: MessageDescriptor
-  causeOfDeathCode: MessageDescriptor
   causeOfDeathMethod: MessageDescriptor
   causeOfDeathEstablished: MessageDescriptor
   causeOfDeathName: MessageDescriptor
@@ -125,7 +124,6 @@ interface IFormMessages
   deliveryAddress: MessageDescriptor
   deliveryInstitution: MessageDescriptor
   deny: MessageDescriptor
-  dischargeCertificate: MessageDescriptor
   district: MessageDescriptor
   docTaxReceipt: MessageDescriptor
   docTypeBirthCert: MessageDescriptor
@@ -133,11 +131,11 @@ interface IFormMessages
   docTypeChildBirthProof: MessageDescriptor
   docTypeCopyOfBurialReceipt: MessageDescriptor
   docTypeDeathCertificate: MessageDescriptor
+  docTypePoliceCertificate: MessageDescriptor
   docTypeDoctorCertificate: MessageDescriptor
   docTypeEPICard: MessageDescriptor
   docTypeEPIStaffCertificate: MessageDescriptor
   docTypeFuneralReceipt: MessageDescriptor
-  docTypeHospitalDischargeCertificate: MessageDescriptor
   docTypeLetterOfDeath: MessageDescriptor
   docTypeNID: MessageDescriptor
   docTypeOther: MessageDescriptor
@@ -245,6 +243,7 @@ interface IFormMessages
   deceasedPrimaryAddress: MessageDescriptor
   primaryAddressSameAsCurrent: MessageDescriptor
   primaryAddressSameAsOtherPrimary: MessageDescriptor
+  primaryAddressSameAsDeceasedsPrimary: MessageDescriptor
   phoneNumber: MessageDescriptor
   phoneVerificationWarning: MessageDescriptor
   placeOfBirth: MessageDescriptor
@@ -309,6 +308,7 @@ interface IFormMessages
   userFormSecurityQuestionsTitle: MessageDescriptor
   userFormTitle: MessageDescriptor
   verbalAutopsy: MessageDescriptor
+  verbalAutopsyReport: MessageDescriptor
   warningNotVerified: MessageDescriptor
   weightAtBirth: MessageDescriptor
   whatDocToUpload: MessageDescriptor
@@ -316,6 +316,7 @@ interface IFormMessages
   whoseContactDetailsLabel: MessageDescriptor
   uploadedList: MessageDescriptor
   userSignatureAttachmentTitle: MessageDescriptor
+  docTypeCoronersReport: MessageDescriptor
   userSignatureAttachment: MessageDescriptor
   userAttachmentSection: MessageDescriptor
   userSignatureAttachmentDesc: MessageDescriptor
@@ -384,6 +385,22 @@ interface IFormMessages
 }
 
 export const formMessageDescriptors: IFormMessages = {
+  docTypeCoronersReport: {
+    defaultMessage: "Coroner's report",
+    description: "Label for select option Coroner's report",
+    id: 'form.field.label.docTypeCoronersReport'
+  },
+  docTypePoliceCertificate: {
+    defaultMessage: 'Police certificate of death',
+    description: 'Label for select option Police death certificate',
+    id: 'form.field.label.docTypePoliceCertificate'
+  },
+  primaryAddressSameAsDeceasedsPrimary: {
+    defaultMessage: "Same as deceased's usual place of residence",
+    description:
+      "Label for informant's address to be same as deceased's usual place of residence",
+    id: 'form.field.label.primaryAddressSameAsDeceasedsPrimary'
+  },
   deathDescription: {
     defaultMessage: 'Description',
     description:
@@ -636,10 +653,10 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for form field: Type of birth',
     id: 'form.field.label.birthTypeTwin'
   },
-  causeOfDeathCode: {
-    defaultMessage: 'Cause of Death Code',
-    description: 'Label for form field: Cause of Death Code',
-    id: 'form.field.label.causeOfDeathCode'
+  causeOfDeathProof: {
+    defaultMessage: 'Proof of cause of death',
+    description: 'Label for doc section: Proof of cause of death',
+    id: 'form.field.label.causeOfDeathProof'
   },
   causeOfDeathEstablished: {
     defaultMessage: 'Has a cause of death been established ?',
@@ -989,11 +1006,6 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'deny label for yes / no radio button',
     id: 'form.field.label.deny'
   },
-  dischargeCertificate: {
-    defaultMessage: 'Discharge Certificate',
-    description: 'Document type label for Discharge Certificate',
-    id: 'form.field.label.docHospDischCert'
-  },
   district: {
     defaultMessage: 'District',
     description: 'Title for the district select',
@@ -1049,10 +1061,10 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Label for select option Certified Copy of Funeral Receipt',
     id: 'form.field.label.docTypeFuneralReceipt'
   },
-  docTypeHospitalDischargeCertificate: {
-    defaultMessage: 'Hospital discharge certificate',
-    description: 'Label for select option Hospital Discharge Certificate',
-    id: 'form.field.label.docHospDischCert'
+  docTypeHospitalDeathCertificate: {
+    defaultMessage: 'Hospital certificate of death',
+    description: 'Label for select option Hospital certificate of death',
+    id: 'form.field.label.docTypeHospitalDeathCertificate'
   },
   docTypeLetterOfDeath: {
     defaultMessage: 'Attested letter of death',
@@ -1959,9 +1971,14 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'The title of user form',
     id: 'form.section.user.title'
   },
+  verbalAutopsyReport: {
+    defaultMessage: 'Verbal autopsy report',
+    description: 'Option for form field: verbalAutopsyReport',
+    id: 'form.field.label.verbalAutopsyReport'
+  },
   verbalAutopsy: {
     defaultMessage: 'Verbal autopsy',
-    description: 'Option for form field: Method of Cause of Death',
+    description: 'Option for form field: verbalAutopsy',
     id: 'form.field.label.verbalAutopsy'
   },
   warningNotVerified: {

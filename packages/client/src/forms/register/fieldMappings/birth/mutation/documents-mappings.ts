@@ -18,31 +18,22 @@ import {
 } from '@client/forms'
 
 export const birthDocumentForWhomFhirMapping = {
-  Child: 'CHILD',
-  Father: 'FATHER',
-  Mother: 'MOTHER',
-  Parent: 'PARENT',
-  Other: 'OTHER',
-  ChildAge: 'CHILD_AGE',
-  Informant: 'INFORMANT_ID_PROOF',
-  AssignedResponsibilityProof: 'ASSIGNED_RESPONSIBILITY_PROOF',
-  LegalGuardianProof: 'LEGAL_GUARDIAN_PROOF',
-  WardCouncillorProof: 'WARD_COUNCILLOR_PROOF'
+  CHILD: 'CHILD',
+  FATHER: 'FATHER',
+  MOTHER: 'MOTHER',
+  PARENT: 'PARENT',
+  OTHER: 'OTHER',
+  INFORMANT_ID_PROOF: 'INFORMANT_ID_PROOF',
+  LEGAL_GUARDIAN_PROOF: 'LEGAL_GUARDIAN_PROOF'
 }
 
 export const birthSectionMapping = {
-  [BirthSection.Child]: [
-    birthDocumentForWhomFhirMapping.Child,
-    birthDocumentForWhomFhirMapping.ChildAge,
-    birthDocumentForWhomFhirMapping.WardCouncillorProof
-  ],
-  [BirthSection.Mother]: [birthDocumentForWhomFhirMapping.Mother],
-  [BirthSection.Father]: [birthDocumentForWhomFhirMapping.Father],
-  [BirthSection.Informant]: [birthDocumentForWhomFhirMapping.Informant],
-  [BirthSection.Parent]: [
-    birthDocumentForWhomFhirMapping.Parent,
-    birthDocumentForWhomFhirMapping.AssignedResponsibilityProof,
-    birthDocumentForWhomFhirMapping.LegalGuardianProof
+  [BirthSection.Child]: [birthDocumentForWhomFhirMapping.CHILD],
+  [BirthSection.Mother]: [birthDocumentForWhomFhirMapping.MOTHER],
+  [BirthSection.Father]: [birthDocumentForWhomFhirMapping.FATHER],
+  [BirthSection.Informant]: [
+    birthDocumentForWhomFhirMapping.INFORMANT_ID_PROOF,
+    birthDocumentForWhomFhirMapping.LEGAL_GUARDIAN_PROOF
   ]
 }
 
