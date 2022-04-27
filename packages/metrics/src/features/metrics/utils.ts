@@ -359,10 +359,10 @@ export function getJurisdictionType(locationBundle: fhir.Location) {
 
 export function getLocationType(location: fhir.Location): string {
   if (location.type?.coding?.[0]?.code) {
-    return location.type?.coding?.[0]?.code
+    return location.type.coding[0].code
   } else {
     throw new Error(
-      `Location type could not found for location, location id ${location.id}`
+      `Location type could not be found for location, location id ${location.id}`
     )
   }
 }
