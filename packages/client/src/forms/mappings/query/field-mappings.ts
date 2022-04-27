@@ -528,55 +528,17 @@ export const nestedValueToFieldTransformer =
     return transformedData
   }
 
-export const reasonsNotApplyingToFieldValueTransformer =
-  (
-    transformedArrayName: string,
-    transformedFieldName: string,
-    extraField?: string,
-    extraValues?: string[],
-    transformedFieldValue?: string[]
-  ) =>
-  (
-    transformedData: IFormData,
-    queryData: TransformedData,
-    sectionId: string,
-    field: IFormField
-  ) => {
-    const sectionData = queryData[sectionId]
-    let fieldValue
-    if (!sectionData) {
-      return transformedData
-    }
-
-    /* const transformedArray = sectionData[
-      transformedArrayName
-    ] as IFormSectionData[]
-
-    transformedArray.forEach((arrayField, index) => {
-      const value = arrayField[transformedFieldName]
-      if (
-        value &&
-        extraField &&
-        (arrayField[extraField] === field.extraValue ||
-          (extraValues &&
-            extraValues.includes(arrayField[extraField] as string)))
-      ) {
-        fieldValue = value
-        transformedArray.splice(index, 1)
-      } else if (
-        value &&
-        extraValues &&
-        extraValues.includes(value as string)
-      ) {
-        fieldValue = value
-      }
-    })*/
-
-    if (fieldValue) {
-      transformedData[sectionId][field.name] =
-        transformedFieldValue || fieldValue
-    }
+export const booleanTransformer = (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) => {
+  // graphql boolean ignored unless forced like this
+  if (queryData && queryData[sectionId] && field && field.name) {
+    transformedData[sectionId][field.name] = queryData[sectionId][field.name]
   }
+}
 
 export const valueToNestedRadioFieldTransformer =
   (transformMethod: IFormFieldQueryMapFunction) =>

@@ -1197,7 +1197,12 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression: 'mothersDetailsExistBasedOnContactAndInformant'
                   }
-                ]
+                ],
+                mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
+                  }
+                }
               },
               {
                 name: 'reasonNotApplying',
@@ -1679,7 +1684,12 @@ export const registerForms: IDefaultRegisterForms = {
                     action: 'hide',
                     expression: 'fathersDetailsExistBasedOnContactAndInformant'
                   }
-                ]
+                ],
+                mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
+                  }
+                }
               },
               {
                 name: 'reasonNotApplying',
