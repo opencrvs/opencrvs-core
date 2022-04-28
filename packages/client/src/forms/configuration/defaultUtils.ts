@@ -20,6 +20,11 @@ import { getGroup, getQuestionsIdentifiersFromFieldId, getSection } from '.'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE THE DEFAULT CONFIGURATION
 
+/* For the enabled field in FormFields */
+export enum FieldEnabled {
+  DISABLED = 'DISABLED'
+}
+
 export interface IDefaultField {
   index: number
   selectedSectionIndex: number
@@ -67,7 +72,7 @@ export function configureDefaultQuestions(
   defaultFieldCustomisations.forEach((defaultFieldCustomisation) => {
     // this is a customisation to a default field
     // default fields can only be enabled or disabled at present
-    if (defaultFieldCustomisation.question.enabled === 'DISABLED') {
+    if (defaultFieldCustomisation.question.enabled === FieldEnabled.DISABLED) {
       newForm.sections[
         defaultFieldCustomisation.defaultField.selectedSectionIndex
       ].groups[

@@ -357,6 +357,27 @@ function reducer(
         offlineData: newOfflineData
       }
     }
+    case actions.UPDATE_OFFLINE_QUESTION_CONFIG: {
+      if (!state.offlineData.formConfig?.formDrafts) return state
+      const { formDraft: newFormDraft, questionConfig } = action.payload
+      const newFormDrafts = state.offlineData.formConfig.formDrafts.map(
+        (formDraft) => {
+          if (formDraft.event === newFormDraft.event) return newFormDraft
+          return formDraft
+        }
+      )
+      const newOfflineData = {
+        ...state.offlineData,
+        formConfig: {
+          formDrafts: newFormDrafts,
+          questionConfig
+        }
+      }
+      return {
+        ...state,
+        offlineData: newOfflineData
+      }
+    }
     /*
      * Configurations
      */

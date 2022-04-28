@@ -20,10 +20,16 @@ import { Tooltip } from '@opencrvs/components/lib/icons'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { useIntl } from 'react-intl'
 import {
-  IConfigFormField,
   getContentKey,
-  getCertificateHandlebar
+  getCertificateHandlebar,
+  IConfigField,
+  getFieldDefinition
 } from '@client/forms/configuration/configFields/utils'
+import { useSelector } from 'react-redux'
+import { IStoreState } from '@client/store'
+import { useParams } from 'react-router'
+import { Event, BirthSection, DeathSection } from '@client/forms'
+import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
 
 const Container = styled.div`
   display: flex;
@@ -79,14 +85,20 @@ const Body = styled.span`
 export function DefaultFieldTools({
   configField
 }: {
-  configField: IConfigFormField
+  configField: IConfigField
 }) {
   const intl = useIntl()
-  const handleBar = getCertificateHandlebar(configField)
-  const contentKey = getContentKey(configField)
+  const { event, section } =
+    useParams<{ event: Event; section: BirthSection | DeathSection }>()
+  const formSection = useSelector((store: IStoreState) =>
+    getRegisterFormSection(store, section, event)
+  )
+  const formField = getFieldDefinition(formSection, configField)
+  const handleBar = getCertificateHandlebar(formField)
+  const contentKey = getContentKey(formField)
   return (
     <Container>
-      <Title>{configField.definition.type}</Title>
+      <Title>{formField.type}</Title>
       <ListViewSimplified bottomBorder>
         <ListViewItemSimplified
           label={<Label>{intl.formatMessage(messages.hideField)}</Label>}
@@ -102,7 +114,7 @@ export function DefaultFieldTools({
           actions={[
             <CenteredToggle
               key="requiredForRegistration"
-              selected={configField.definition.required}
+              selected={configField.required}
             />
           ]}
         />

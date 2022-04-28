@@ -903,6 +903,8 @@ export enum DeathSection {
   Preview = 'preview'
 }
 
+export type WizardSection = BirthSection | DeathSection | 'settings'
+
 export enum UserSection {
   User = 'user',
   Preview = 'preview'
@@ -958,13 +960,15 @@ export interface IFormSection {
   hasDocumentSection?: boolean
 }
 
+export type ISerializedFormSectionGroup = Omit<IFormSectionGroup, 'fields'> & {
+  fields: SerializedFormField[]
+}
+
 export type ISerializedFormSection = Omit<
   IFormSection,
   'groups' | 'mapping'
 > & {
-  groups: Array<
-    Omit<IFormSectionGroup, 'fields'> & { fields: SerializedFormField[] }
-  >
+  groups: ISerializedFormSectionGroup[]
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor

@@ -18,7 +18,7 @@ import {
   REDIRECT_DELAY
 } from '@client/views/SysAdmin/Config/Forms/utils'
 import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
-import { selectNewQuestionConfigs } from '@client/forms/configuration/configFields/selectors'
+import { selectQuestionConfigs } from '@client/forms/configuration/configFields/selectors'
 import { Event, IQuestionConfig } from '@client/forms'
 import { Mutation } from 'react-apollo'
 import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
@@ -26,7 +26,6 @@ import {
   IDraft,
   DraftStatus
 } from '@client/forms/configuration/formDrafts/reducer'
-import { modifyFormDraft } from '@client/forms/configuration/formDrafts/actions'
 import {
   SecondaryButton,
   PrimaryButton
@@ -37,6 +36,7 @@ import { messages } from '@client/i18n/messages/views/formConfig'
 import { InputField, TextArea } from '@opencrvs/components/lib/forms'
 import { useParams } from 'react-router'
 import { goToFormConfigHome } from '@client/navigation'
+import { updateQuestionConfig } from '@client/forms/configuration/configFields/actions'
 
 export const SaveActionContext = React.createContext({
   status: ActionStatus.IDLE,
@@ -47,7 +47,7 @@ function SaveActionButton({ comment }: { comment: string }) {
   const intl = useIntl()
   const { event } = useParams<{ event: Event }>()
   const questions = useSelector((store: IStoreState) =>
-    selectNewQuestionConfigs(store, event)
+    selectQuestionConfigs(store, event)
   )
   const { setStatus } = React.useContext(SaveActionContext)
   const dispatch = useDispatch()
@@ -66,7 +66,7 @@ function SaveActionButton({ comment }: { comment: string }) {
       onError={() => setStatus(ActionStatus.ERROR)}
       onCompleted={({ createOrUpdateFormDraft: formDraft }) => {
         if (formDraft) {
-          dispatch(modifyFormDraft(formDraft as IDraft))
+          dispatch(updateQuestionConfig(formDraft as IDraft, questions))
           setStatus(ActionStatus.COMPLETED)
           setTimeout(() => dispatch(goToFormConfigHome()), REDIRECT_DELAY)
         }
@@ -129,7 +129,7 @@ export function SaveActionModal() {
       >
         <TextArea
           key="save_modal_comment"
-          // Text Area currently doesn't accept basic input props
+          /* Text Area currently doesn't accept basic input props */
           {...{
             onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) =>
               setComment(event.target.value),

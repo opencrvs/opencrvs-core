@@ -13,27 +13,24 @@ import { loop, Cmd, Loop, LoopReducer } from 'redux-loop'
 import { storage } from '@client/storage'
 import * as actions from '@client/forms/configuration/configFields/actions'
 import * as offlineActions from '@client/offline/actions'
-import { Event, IQuestionConfig } from '@client/forms'
+import { Event } from '@client/forms'
 import { getConfiguredForm } from '@client/forms/configuration'
-import { ISectionFieldMap, getEventSectionFieldsMap } from './utils'
+import { ISectionFieldMap, getSectionFieldsMap } from './utils'
 
 export type IConfigFieldsState =
   | {
       state: 'LOADING'
-      questions: IQuestionConfig[]
       birth: null
       death: null
     }
   | {
       state: 'READY'
-      questions: IQuestionConfig[]
       birth: ISectionFieldMap
       death: ISectionFieldMap
     }
 
 export const initialState: IConfigFieldsState = {
   state: 'LOADING',
-  questions: [],
   birth: null,
   death: null
 }
@@ -46,6 +43,10 @@ async function loadConfigFields() {
   return storage.getItem('configFields')
 }
 
+async function clearConfigFields() {
+  return storage.removeItem('configFields')
+}
+
 type Actions = actions.ConfigFieldsActions | offlineActions.Action
 
 export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
@@ -53,12 +54,24 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
   action: Actions
 ): IConfigFieldsState | Loop<IConfigFieldsState, Actions> => {
   switch (action.type) {
-    case offlineActions.READY:
+    case offlineActions.READY: {
+      const { questionConfig } = action.payload.formConfig
+      return loop(state, Cmd.action(actions.updateConfigFields(questionConfig)))
+    }
+
+    case actions.UPDATE_CONFIG_FIELDS: {
+      const { questionConfig } = action.payload
+      const birthForm = getConfiguredForm(questionConfig, Event.BIRTH)
+      const deathForm = getConfiguredForm(questionConfig, Event.DEATH)
+
+      const newState: IConfigFieldsState = {
+        ...state,
+        state: 'READY',
+        birth: getSectionFieldsMap(Event.BIRTH, birthForm),
+        death: getSectionFieldsMap(Event.DEATH, deathForm)
+      }
       return loop(
-        {
-          ...state,
-          questions: action.payload.formConfig.questionConfig
-        },
+        newState,
         Cmd.run<
           actions.GetStorageConfigFieldsFailedAction,
           actions.GetStorageConfigFieldsSuccessAction
@@ -67,25 +80,13 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
           failActionCreator: actions.getStorageConfigFieldsFailed
         })
       )
+    }
+
     case actions.GET_STORAGE_CONFIG_FIELDS_SUCCESS:
       if (action.payload) {
         const configFieldsState: IConfigFieldsState = JSON.parse(action.payload)
         return { ...configFieldsState }
       }
-
-      const birthForm = getConfiguredForm(state.questions, Event.BIRTH)
-      const deathForm = getConfiguredForm(state.questions, Event.DEATH)
-
-      const newState: IConfigFieldsState = {
-        ...state,
-        state: 'READY',
-        birth: getEventSectionFieldsMap(birthForm, Event.BIRTH),
-        death: getEventSectionFieldsMap(deathForm, Event.DEATH)
-      }
-
-      return loop(newState, Cmd.action(actions.storeConfigFields(newState)))
-
-    case actions.STORE_CONFIG_FIELDS:
       return loop(
         state,
         Cmd.run<
@@ -94,7 +95,7 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         >(saveConfigFields, {
           successActionCreator: actions.storeConfigFieldsSuccess,
           failActionCreator: actions.storeConfigFieldsFailed,
-          args: [action.payload]
+          args: [state]
         })
       )
 
@@ -106,6 +107,24 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         }
       }
       return state
+
+    case actions.UPDATE_QUESTION_CONFIG: {
+      const { formDraft, questionConfig } = action.payload
+      return loop(
+        state,
+        Cmd.list([
+          Cmd.run(clearConfigFields),
+          Cmd.action(actions.updateConfigFields(questionConfig)),
+          Cmd.action(
+            offlineActions.updateOfflineQuestionConfig(
+              formDraft,
+              questionConfig
+            )
+          )
+        ])
+      )
+    }
+
     default:
       return state
   }
