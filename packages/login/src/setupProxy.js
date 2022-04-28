@@ -12,7 +12,8 @@
 
 const https = require('https')
 
-const PROXY_TO_HOST = process.env.PROXY_TO_HOST || 'farajaland-qa.opencrvs.org'
+const PROXY_TO_HOST =
+  process.env.PROXY_TO_HOST || 'farajaland-staging.opencrvs.org'
 
 function makeRequest(options) {
   return new Promise((resolve, reject) => {
