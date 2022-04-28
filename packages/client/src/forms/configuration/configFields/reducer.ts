@@ -99,6 +99,8 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         })
       )
 
+    /* TODO: Add action handler for GET_STORAGE_CONFIG_FIELDS_FAILED */
+
     case actions.STORE_CONFIG_FIELDS_SUCCESS:
       if (action.payload) {
         const configFieldsState: IConfigFieldsState = JSON.parse(action.payload)

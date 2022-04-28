@@ -77,6 +77,7 @@ function customFieldToQuestionConfig(
   preceedingFieldId: string,
   field: IFormField
 ): ICustomConfigField {
+  /* TODO: add errorMessage when implemented for FormFields */
   const messageProperties = [
     'label',
     'placeholder',

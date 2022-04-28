@@ -20,7 +20,7 @@ import {
 
 export function selectConfigFieldsState(store: IStoreState) {
   if (store.configFields.state === 'LOADING') {
-    throw new Error('ConfigFields not loaded yet')
+    throw new Error('Offline data not loaded yet')
   }
   return store.configFields
 }
