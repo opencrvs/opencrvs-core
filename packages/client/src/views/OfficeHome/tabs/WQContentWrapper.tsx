@@ -82,7 +82,7 @@ const Body = (props: IProps) => {
           totalPages &&
           onPageChange &&
           isOnline && (
-            <PaginationWrapper>
+            <PaginationWrapper id="pagination_container">
               <DesktopWrapper>
                 <PaginationModified
                   size="small"

@@ -224,6 +224,42 @@ describe('OfficeHome sent for review tab related tests', () => {
     await store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
+  it('should show pagination bar if items more than 11 in ReviewTab', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <ReviewTab
+        queryData={{
+          data: {
+            totalItems: 24,
+            results: []
+          }
+        }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+      />,
+      { store, history }
+    )
+
+    const pagination = await waitForElement(
+      testComponent,
+      '#pagination_container'
+    )
+
+    expect(pagination.hostNodes()).toHaveLength(1)
+
+    testComponent
+      .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
+    expect(testComponent.exists('#page-number-2')).toBeTruthy()
+  })
+
   it('renders all items returned from graphql query in ready for review', async () => {
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)

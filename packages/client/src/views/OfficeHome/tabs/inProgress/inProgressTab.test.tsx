@@ -299,6 +299,48 @@ describe('In Progress tab', () => {
       expect(data[0].actions).toBeDefined()
     })
 
+    it('Should render pagination in progress tab if data is more than 10', async () => {
+      jest.clearAllMocks()
+      const drafts: IDeclaration[] = []
+      for (let i = 0; i < 12; i++) {
+        drafts.push(createDeclaration(Event.BIRTH))
+      }
+      const testComponent = await createTestComponent(
+        <InProgressTab
+          drafts={drafts}
+          selectorId={SELECTOR_ID.ownDrafts}
+          queryData={{
+            inProgressData: {},
+            notificationData: {}
+          }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
+        />,
+        { store, history }
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
+
+      testComponent.update()
+      const pagiBtn = testComponent.find('#pagination_container')
+
+      expect(pagiBtn.hostNodes()).toHaveLength(1)
+      testComponent
+        .find('#pagination button')
+        .last()
+        .hostNodes()
+        .simulate('click')
+    })
+
     it('redirects user to detail page on update click', async () => {
       const TIME_STAMP = 1562912635549
       const drafts: IDeclaration[] = [
@@ -502,6 +544,47 @@ describe('In Progress tab', () => {
       expect(data[0].name).toBe('k m abdullah al amin khan')
       expect(data[0].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
       expect(data[0].event).toBe('Death')
+    })
+
+    it('Should render pagination in progress tab if data is more than 10', async () => {
+      jest.clearAllMocks()
+      const drafts: IDeclaration[] = []
+      drafts.push(createDeclaration(Event.BIRTH))
+      const testComponent = await createTestComponent(
+        // @ts-ignore
+        <InProgressTab
+          drafts={drafts}
+          selectorId={SELECTOR_ID.fieldAgentDrafts}
+          queryData={{
+            inProgressData: { totalItems: 12 },
+            notificationData: { totalItems: 2 }
+          }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
+        />,
+        { store, history }
+      )
+
+      // wait for mocked data to load mockedProvider
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
+
+      testComponent.update()
+      const pagiBtn = testComponent.find('#pagination_container')
+
+      expect(pagiBtn.hostNodes()).toHaveLength(1)
+      testComponent
+        .find('#pagination button')
+        .last()
+        .hostNodes()
+        .simulate('click')
     })
 
     it('redirects to recordAudit page when item is clicked', async () => {

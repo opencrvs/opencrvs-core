@@ -342,6 +342,36 @@ describe('RegistrarHome ready to print tab related tests', () => {
     expect(data.length).toBe(0)
   })
 
+  it('should show pagination bar if items are more than 11 in ready for print tab', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+
+    const testComponent = await createTestComponent(
+      <PrintTab
+        queryData={{
+          data: { totalItems: 24, results: [] }
+        }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+      />,
+      { store, history }
+    )
+
+    const element = await waitForElement(testComponent, '#pagination_container')
+
+    expect(element.hostNodes()).toHaveLength(1)
+
+    testComponent
+      .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
+
+    expect(testComponent.exists('#page-number-2')).toBeTruthy()
+  })
+
   describe('When a row is clicked', () => {
     let expandedRow: any
 

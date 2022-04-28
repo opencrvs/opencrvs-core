@@ -254,6 +254,63 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     expect(data.length).toBe(0)
   })
 
+  it('should show pagination if items more than 10 in Approval Tab', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+
+    const testComponent = await createTestComponent(
+      <ApprovalTab
+        queryData={{
+          data: {
+            totalItems: 14,
+            results: []
+          }
+        }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+      />,
+      { store, history }
+    )
+
+    expect(
+      testComponent.find('#pagination_container').hostNodes()
+    ).toHaveLength(1)
+
+    testComponent
+      .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
+  })
+
+  it('should show pagination and page number as per need ', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+
+    const testComponent = await createTestComponent(
+      <ApprovalTab
+        queryData={{
+          data: {
+            totalItems: 24,
+            results: []
+          }
+        }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+      />,
+      { store, history }
+    )
+
+    expect(
+      testComponent.find('#pagination_container').hostNodes()
+    ).toHaveLength(1)
+    expect(testComponent.exists('#page-number-2')).toBeTruthy()
+  })
+
   it('redirect to recordAudit page if item is clicked on desktop view ', async () => {
     Date.now = jest.fn(() => 1554055200000)
 
