@@ -22,6 +22,7 @@ import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
 import { ApiResponse } from '@elastic/elasticsearch'
 import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
 import { updateComposition } from '@search/elasticsearch/dbhelper'
+import { capitalize } from '@search/features/search/utils'
 
 export async function searchDeclaration(
   request: Hapi.Request,
@@ -85,6 +86,7 @@ export async function getAllDocumentsHandler(
 interface ICountQueryParam {
   declarationLocationHirarchyId: string
   status: string[]
+  event?: string
 }
 
 export async function getStatusWiseRegistrationCountHandler(
@@ -97,7 +99,8 @@ export async function getStatusWiseRegistrationCountHandler(
     for (const regStatus of payload.status) {
       const searchResult = await searchComposition({
         declarationLocationHirarchyId: payload.declarationLocationHirarchyId,
-        status: [regStatus]
+        status: [regStatus],
+        event: payload.event ? capitalize(payload.event) : ''
       })
       countResult.push({
         status: regStatus,

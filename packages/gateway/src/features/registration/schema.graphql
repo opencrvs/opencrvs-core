@@ -568,6 +568,7 @@ type Query {
   fetchRegistrationCountByStatus(
     status: [String]!
     locationId: String
+    event: String
   ): RegistrationCountResult
 }
 
