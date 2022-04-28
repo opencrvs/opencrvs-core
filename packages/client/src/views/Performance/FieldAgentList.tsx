@@ -120,10 +120,10 @@ const NameAvatar = styled.div`
   }
 `
 
-function getNameWithAvatar(userName: string, avatar: IAvatar) {
+function getNameWithAvatar(userName: string, avatar?: IAvatar) {
   return (
     <NameAvatar>
-      <AvatarSmall name={userName} avatar={avatar as IAvatar} />
+      <AvatarSmall name={userName} avatar={avatar} />
       <span>{userName}</span>
     </NameAvatar>
   )
@@ -333,7 +333,7 @@ function FieldAgentListComponent(props: IProps) {
           row.primaryOfficeId &&
           offices.find(({ id }) => id === row.primaryOfficeId)
         return {
-          name: getNameWithAvatar(row.fullName || '', row.avatar as IAvatar),
+          name: getNameWithAvatar(row.fullName || '', row.avatar),
           type: row.type,
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
