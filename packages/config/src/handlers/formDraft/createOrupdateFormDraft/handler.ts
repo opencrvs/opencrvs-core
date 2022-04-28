@@ -241,7 +241,7 @@ export const questionReqSchema = Joi.object({
   fieldType: Joi.string().valid(...validFieldType),
   preceedingFieldId: Joi.string(),
   required: Joi.boolean(),
-  enabled: Joi.string(),
+  enabled: Joi.string().allow(''),
   custom: Joi.boolean(),
   initialValue: Joi.string()
 })

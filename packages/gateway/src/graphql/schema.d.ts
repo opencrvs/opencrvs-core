@@ -511,7 +511,7 @@ export interface GQLQuestionInput {
   fieldType?: string
   preceedingFieldId?: string
   required?: boolean
-  enabled?: boolean
+  enabled?: string
   custom?: boolean
   initialValue?: string
 }
