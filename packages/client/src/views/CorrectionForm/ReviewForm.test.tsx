@@ -42,10 +42,13 @@ declaration.data.mother = {
 
 declaration.data.registration = {
   ...declaration.data.registration,
-  informantType: 'MOTHER',
+  informantType: {
+    value: 'MOTHER',
+    nestedFields: { otherInformantType: '' }
+  },
   contactPoint: {
     value: 'MOTHER',
-    nestedFields: { registrationPhone: '01557394986' }
+    nestedFields: { registrationPhone: '01733333333' }
   }
 }
 
@@ -113,7 +116,6 @@ describe('Review form for an declaration', () => {
       })
     )
     wrapper.update()
-
     expect(
       wrapper.find('#continue_button').hostNodes().props().disabled
     ).toBeFalsy()

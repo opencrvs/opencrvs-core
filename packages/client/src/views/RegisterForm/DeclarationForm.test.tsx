@@ -22,7 +22,7 @@ import {
   selectOption,
   goToSection
 } from '@client/tests/util'
-import { DRAFT_BIRTH_PARENT_FORM } from '@client/navigation/routes'
+import { SELECT_BIRTH_INFORMANT } from '@client/navigation/routes'
 import {
   storeDeclaration,
   createDeclaration,
@@ -72,7 +72,7 @@ describe('when user has starts a new declaration', () => {
 
     it('renders unlock screen', async () => {
       history.replace(
-        DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
+        SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
       )
       await waitForElement(app, '#unlockPage')
     })
@@ -95,25 +95,34 @@ describe('when user has starts a new declaration', () => {
       beforeEach(async () => {
         const data = {
           registration: {
-            informantType: 'MOTHER'
+            informantType: {
+              value: '',
+              nestedFields: { otherInformantType: '' }
+            }
           }
         }
         draft = createDeclaration(Event.BIRTH, data)
         store.dispatch(storeDeclaration(draft))
         history.replace(
-          DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
+          SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
         )
         await waitForElement(app, '#register_form')
       })
-      describe('when user clicks continue without choosing point of contact', () => {
+      describe('when user clicks continue without choosing informantType', () => {
         it('prevents from continuing and show radio button error', async () => {
           app.find('#next_section').hostNodes().simulate('click')
-          await waitForElement(app, '#contactPoint_error')
-          expect(app.find('#contactPoint_error').hostNodes()).toHaveLength(1)
+          await waitForElement(app, '#informantType_error')
+          expect(app.find('#informantType_error').hostNodes()).toHaveLength(1)
         })
       })
-      describe('when user clicks continue without entering invalid phone number of contact point ', () => {
+      describe('when user enters informantType, clicks to contact page, then clicks continue without entering valid phone number of contact point ', () => {
         it('prevents from continuing and shows phone inputfield error', async () => {
+          app
+            .find('#informantType_MOTHER')
+            .hostNodes()
+            .simulate('change', { target: { checked: true } })
+          app.find('#next_section').hostNodes().simulate('click')
+          await waitForElement(app, '#contactPoint_MOTHER')
           app
             .find('#contactPoint_MOTHER')
             .hostNodes()
@@ -152,7 +161,14 @@ describe('when user has starts a new declaration', () => {
       beforeEach(async () => {
         const data = {
           registration: {
-            informantType: 'MOTHER'
+            informantType: {
+              value: '',
+              nestedFields: { otherInformantType: '' }
+            },
+            contactPoint: {
+              value: '',
+              nestedFields: { registrationPhone: '' }
+            }
           }
         }
         draft = createDeclaration(Event.BIRTH, data)
@@ -163,9 +179,16 @@ describe('when user has starts a new declaration', () => {
          */
         store.dispatch(storeDeclaration(draft))
         history.replace(
-          DRAFT_BIRTH_PARENT_FORM.replace(':declarationId', draft.id.toString())
+          SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
         )
         await waitForElement(app, '#register_form')
+
+        app
+          .find('#informantType_MOTHER')
+          .hostNodes()
+          .simulate('change', { target: { checked: true } })
+        app.find('#next_section').hostNodes().simulate('click')
+        await waitForElement(app, '#contactPoint_MOTHER')
         app
           .find('#contactPoint_MOTHER')
           .hostNodes()
@@ -174,6 +197,7 @@ describe('when user has starts a new declaration', () => {
           app,
           'input[name="contactPoint.nestedFields.registrationPhone"]'
         )
+
         app
           .find('input[name="contactPoint.nestedFields.registrationPhone"]')
           .simulate('change', {
@@ -190,10 +214,10 @@ describe('when user has starts a new declaration', () => {
         beforeEach(async () => {
           await waitForElement(app, '#informant_parent_view')
           app
-            .find('#firstNames')
+            .find('#firstNamesEng')
             .hostNodes()
             .simulate('change', {
-              target: { id: 'firstNames', value: 'hello' }
+              target: { id: 'firstNamesEng', value: 'hello' }
             })
 
           app.find('#next_section').hostNodes().simulate('click')
@@ -205,7 +229,9 @@ describe('when user has starts a new declaration', () => {
           const storedDeclarations = JSON.parse(
             userData[userData.length - 1]
           )[0].declarations
-          expect(storedDeclarations[0].data.child.firstNames).toEqual('hello')
+          expect(storedDeclarations[0].data.child.firstNamesEng).toEqual(
+            'hello'
+          )
           expect(window.location.href).toContain('mother')
         })
         it('redirect to home when pressed save and exit button', async () => {
@@ -278,7 +304,7 @@ describe('when user has starts a new declaration', () => {
               .find('section')
               .children().length
 
-            expect(fileInputs).toEqual(6)
+            expect(fileInputs).toEqual(4)
           })
           it('still renders list of document upload field even when page is hidden - allows use of camera', async () => {
             setPageVisibility(false)
@@ -288,15 +314,11 @@ describe('when user has starts a new declaration', () => {
               .find('#form_section_id_documents-view-group')
               .find('section')
               .children().length
-            expect(fileInputs).toEqual(6)
+            expect(fileInputs).toEqual(4)
           })
 
           it('No error while uploading valid file', async () => {
-            selectOption(
-              app,
-              '#uploadDocForMother',
-              'Birth registration certificate'
-            )
+            selectOption(app, '#uploadDocForMother', 'Birth certificate')
             app.update()
             app
               .find('#image_file_uploader_field')
@@ -322,11 +344,7 @@ describe('when user has starts a new declaration', () => {
           })
 
           it('Error while uploading invalid file', async () => {
-            selectOption(
-              app,
-              '#uploadDocForMother',
-              'Birth registration certificate'
-            )
+            selectOption(app, '#uploadDocForMother', 'Birth certificate')
             app.update()
             app
               .find('#image_file_uploader_field')
@@ -355,7 +373,10 @@ describe('when user has starts a new declaration', () => {
       describe('when user goes to preview page', () => {
         beforeEach(async () => {
           await goToSection(app, 4)
-          app.find('#btn_change_child_familyName').hostNodes().simulate('click')
+          app
+            .find('#btn_change_child_familyNameEng')
+            .hostNodes()
+            .simulate('click')
         })
 
         it('renders preview page', async () => {
@@ -365,7 +386,7 @@ describe('when user has starts a new declaration', () => {
 
           const changeNameButton = await waitForElement(
             app,
-            '#btn_change_child_familyName'
+            '#btn_change_child_familyNameEng'
           )
           expect(changeNameButton.hostNodes()).toHaveLength(1)
         })
@@ -380,7 +401,7 @@ describe('when user has starts a new declaration', () => {
 
           const changeNameButton = await waitForElement(
             app,
-            '#btn_change_child_familyName'
+            '#btn_change_child_familyNameEng'
           )
 
           changeNameButton.hostNodes().simulate('click')
@@ -416,7 +437,7 @@ describe('when user has starts a new declaration', () => {
       describe('when user is in document page', () => {
         beforeEach(() => goToDocumentsSection(app))
         it('image upload field is rendered', () => {
-          expect(app.find('#upload_document').hostNodes()).toHaveLength(5)
+          expect(app.find('#upload_document').hostNodes()).toHaveLength(3)
         })
       })
     })

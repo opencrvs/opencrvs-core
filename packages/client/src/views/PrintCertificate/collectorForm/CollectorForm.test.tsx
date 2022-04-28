@@ -557,6 +557,7 @@ describe('Certificate collector test for a birth registration without father and
                   __typename: 'HumanName'
                 }
               ],
+              detailsExist: false,
               birthDate: null,
               maritalStatus: 'MARRIED',
               dateOfMarriage: null,
@@ -625,6 +626,7 @@ describe('Certificate collector test for a birth registration without father and
                 }
               ],
               birthDate: null,
+              detailsExist: false,
               maritalStatus: 'MARRIED',
               dateOfMarriage: null,
               educationalAttainment: null,

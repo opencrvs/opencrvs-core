@@ -946,7 +946,10 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'SELECT_WITH_OPTIONS',
                 label: formMessageDescriptors.nationality,
                 required: true,
-                initialValue: window.config.COUNTRY.toUpperCase(),
+                initialValue:
+                  typeof window !== 'undefined'
+                    ? window.config.COUNTRY.toUpperCase()
+                    : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
@@ -1224,7 +1227,10 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'SELECT_WITH_OPTIONS',
                 label: formMessageDescriptors.nationality,
                 required: true,
-                initialValue: window.config.COUNTRY.toUpperCase(),
+                initialValue:
+                  typeof window !== 'undefined'
+                    ? window.config.COUNTRY.toUpperCase()
+                    : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
@@ -1711,7 +1717,10 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'SELECT_WITH_OPTIONS',
                 label: formMessageDescriptors.nationality,
                 required: true,
-                initialValue: window.config.COUNTRY.toUpperCase(),
+                initialValue:
+                  typeof window !== 'undefined'
+                    ? window.config.COUNTRY.toUpperCase()
+                    : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
@@ -2939,7 +2948,10 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'SELECT_WITH_OPTIONS',
                 label: formMessageDescriptors.nationality,
                 required: true,
-                initialValue: window.config.COUNTRY.toUpperCase(),
+                initialValue:
+                  typeof window !== 'undefined'
+                    ? window.config.COUNTRY.toUpperCase()
+                    : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
@@ -3476,7 +3488,10 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'SELECT_WITH_OPTIONS',
                 label: formMessageDescriptors.nationality,
                 required: true,
-                initialValue: window.config.COUNTRY.toUpperCase(),
+                initialValue:
+                  typeof window !== 'undefined'
+                    ? window.config.COUNTRY.toUpperCase()
+                    : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {

@@ -1667,7 +1667,7 @@ export const mockDeclarationData = {
     familyName: 'স্পিভক',
     firstNamesEng: 'Jeff',
     familyNameEng: 'Test',
-    iD: '43A8ZU817',
+    iD: '123456789',
     iDType: 'PASSPORT',
     fatherBirthDate: '1950-05-19',
     dateOfMarriage: '1972-09-19',

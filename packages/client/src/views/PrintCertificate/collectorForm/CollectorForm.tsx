@@ -544,7 +544,7 @@ const mapStateToProps = (
       declarationData.father &&
       declarationData.father.detailsExist !== undefined
     ) {
-      fatherDataExist = fatherDataExist && declarationData.father.detailsExist
+      fatherDataExist = declarationData.father.detailsExist
     }
 
     if (
@@ -552,7 +552,7 @@ const mapStateToProps = (
       declarationData.mother &&
       declarationData.mother.detailsExist !== undefined
     ) {
-      motherDataExist = motherDataExist && declarationData.mother.detailsExist
+      motherDataExist = declarationData.mother.detailsExist
     }
 
     if (motherDataExist && fatherDataExist) {

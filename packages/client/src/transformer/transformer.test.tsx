@@ -36,6 +36,7 @@ import { getOfflineDataSuccess } from '@client/offline/actions'
 import { Event, IForm } from '@opencrvs/client/src/forms'
 import { clone } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
+import { birthDraftData } from '@client/tests/mock-drafts'
 
 const fetch = fetchAny as any
 
@@ -49,93 +50,6 @@ describe('when draft data is transformed to graphql', () => {
   let store: Store
   let customDraft: IDeclaration
   let form: IForm
-
-  const childDetails: IPersonDetails = {
-    attendantAtBirth: 'NURSE',
-    childBirthDate: '1999-10-10',
-    familyName: 'ইসলাম',
-    familyNameEng: 'Islam',
-    firstNames: 'নাইম',
-    firstNamesEng: 'Naim',
-    gender: 'male',
-    placeOfBirth: 'HOSPITAL',
-    birthLocation: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
-    multipleBirth: '2',
-    birthType: 'SINGLE',
-    weightAtBirth: '5'
-  }
-
-  const fatherDetails: IPersonDetails = {
-    detailsExist: true,
-    iD: '23423442342423424',
-    iDType: 'OTHER',
-    iDTypeOther: 'Taxpayer Identification Number',
-    primaryAddressSameAsOtherPrimary: true,
-    country: 'BGD',
-    countryPrimary: 'BGD',
-    secondaryAddress: '',
-    motherBirthDate: '1999-10-10',
-    dateOfMarriage: '2010-10-10',
-    educationalAttainment: 'PRIMARY_ISCED_1',
-    familyName: 'ইসলাম',
-    familyNameEng: 'Islam',
-    firstNames: 'আনোয়ার',
-    firstNamesEng: 'Anwar',
-    maritalStatus: 'MARRIED',
-    nationality: 'BGD'
-  }
-
-  const motherDetails: IPersonDetails = {
-    iD: '2342434534565',
-    iDType: 'NATIONAL_ID',
-    country: 'BGD',
-    nationality: 'BGD',
-    familyName: 'ইসলাম',
-    familyNameEng: 'Islam',
-    firstNames: 'রোকেয়া',
-    firstNamesEng: 'Rokeya',
-    maritalStatus: 'MARRIED',
-    dateOfMarriage: '2010-10-10',
-    fatherBirthDate: '1999-10-10',
-    educationalAttainment: 'PRIMARY_ISCED_1',
-    addressLine1: 'Rd #10',
-    addressLine1Primary: 'Rd#10',
-    addressLine2: 'Akua',
-    addressLine2Primary: 'Akua',
-    addressLine3: 'union1',
-    addressLine3Primary: 'union1',
-    addressLine4: 'upazila10',
-    addressLine4Primary: 'upazila10',
-    countryPrimary: 'BGD',
-    secondaryAddress: '',
-    district: 'district2',
-    districtPrimary: 'district2',
-    primaryAddress: '',
-    postCode: '1020',
-    postCodePrimary: '1010',
-    state: 'state4',
-    statePrimary: 'state4'
-  }
-
-  const registrationDetails = {
-    commentsOrNotes: 'comments',
-    registrationCertificateLanguage: ['en'],
-    registrationPhone: '01736478884',
-    whoseContactDetails: 'MOTHER',
-    informantType: {
-      value: 'MOTHER',
-      nestedFields: {
-        otherInformantType: ''
-      }
-    },
-    contactPoint: {
-      value: 'OTHER',
-      nestedFields: {
-        contactRelationshipOther: 'grandma',
-        registrationPhone: '01736478884'
-      }
-    }
-  }
 
   beforeEach(async () => {
     getItem.mockReturnValue(validToken)
@@ -153,17 +67,9 @@ describe('when draft data is transformed to graphql', () => {
     store = testApp.store
     store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
 
-    const data = {
-      child: childDetails,
-      father: fatherDetails,
-      mother: motherDetails,
-      registration: registrationDetails,
-      documents: { imageUploader: '' }
-    }
-
     customDraft = {
       id: uuid(),
-      data,
+      data: birthDraftData,
       event: Event.BIRTH,
       submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     }
@@ -181,21 +87,16 @@ describe('when draft data is transformed to graphql', () => {
 
   describe('when user is in birth registration by parent informant view', () => {
     it('Check if new place of birth location address is parsed properly', () => {
-      const clonedChild = clone(childDetails)
+      const clonedChild = clone(birthDraftData.child)
       clonedChild.placeOfBirth = 'PRIVATE_HOME'
-      clonedChild.addressLine1 = 'Rd #10'
-      clonedChild.addressLine2 = 'Akua'
-      clonedChild.addressLine3 = 'union1'
-      clonedChild.addressLine4 = 'upazila10'
       clonedChild.country = 'BGD'
-      clonedChild.district = 'district2'
-      clonedChild.postCode = '1020'
-      clonedChild.state = 'state4'
+      clonedChild.district = 'district'
+      clonedChild.state = 'state'
       const data = {
         child: clonedChild,
-        father: fatherDetails,
-        mother: motherDetails,
-        registration: registrationDetails,
+        father: birthDraftData.father,
+        mother: birthDraftData.mother,
+        registration: birthDraftData.registration,
         documents: { imageUploader: '' }
       }
 
@@ -208,46 +109,36 @@ describe('when draft data is transformed to graphql', () => {
       ).toBe('PRIVATE_HOME')
     })
     it('Check if contactNumber is found properly', () => {
-      const registration = clone(registrationDetails)
-
-      const data = {
-        child: childDetails,
-        father: fatherDetails,
-        mother: motherDetails,
-        registration,
-        documents: { imageUploader: '' }
-      }
       expect(
-        draftToGqlTransformer(form, data).registration.contactPhoneNumber
-      ).toBe('+2601736478884')
+        draftToGqlTransformer(form, birthDraftData).registration
+          .contactPhoneNumber
+      ).toBe('+8801733333333')
     })
     it('Pass false as detailsExist on father section', () => {
-      const clonedFather = clone(fatherDetails)
+      const clonedFather = clone(birthDraftData.father)
       clonedFather.detailsExist = false
 
       const data = {
-        child: childDetails,
+        child: birthDraftData.child,
         father: clonedFather,
-        mother: motherDetails,
-        registration: registrationDetails,
+        mother: birthDraftData.mother,
+        registration: birthDraftData.registration,
         documents: { imageUploader: '' }
       }
 
-      expect(draftToGqlTransformer(form, data).father).toBeUndefined()
+      expect(draftToGqlTransformer(form, data).father).toEqual({
+        detailsExist: false
+      })
       expect(
         draftToGqlTransformer(form, data).registration.inCompleteFields
-      ).toBeUndefined()
+      ).toEqual('father/father-view-group/reasonNotApplying')
     })
     it('Sends inCompleteFields if in-complete data is given', () => {
       const data = {
         child: {},
         father: {},
         mother: {},
-        registration: {
-          informantType: 'MOTHER',
-          registrationPhone: '01736478884',
-          whoseContactDetails: 'MOTHER'
-        },
+        registration: birthDraftData.registration,
         documents: {}
       }
       expect(
@@ -269,39 +160,36 @@ describe('when draft data is transformed to graphql', () => {
 
     it('transform gql data from form correction data', () => {
       const data = {
-        child: childDetails,
-        father: fatherDetails,
-        mother: motherDetails,
+        child: birthDraftData.child,
+        father: birthDraftData.father,
+        mother: birthDraftData.mother,
         registration: {
-          ...registrationDetails,
-          informantType: 'FATHER',
-          otherInformantType: '',
+          commentsOrNotes: 'comments',
+          registrationCertificateLanguage: ['en'],
+          informantType: {
+            value: 'FATHER',
+            nestedFields: { otherInformantType: '' }
+          },
           contactPoint: {
-            value: 'OTHER',
-            nestedFields: {
-              contactRelationshipOther: 'grandma',
-              registrationPhone: '01736478896'
-            }
+            value: 'FATHER',
+            nestedFields: { registrationPhone: '01736478896' }
           }
         },
         documents: { imageUploader: '' }
       }
 
-      const originalData = {
-        child: {
-          ...childDetails,
-          familyNameEng: 'Khan'
-        },
-        father: fatherDetails,
-        mother: motherDetails,
-        registration: registrationDetails,
-        documents: { imageUploader: '' }
-      }
+      const originalData = birthDraftData
 
       const transformedCorrectionData = {
         values: [
           {
-            fieldName: 'informant',
+            fieldName: 'informantType',
+            newValue: 'FATHER',
+            oldValue: 'MOTHER',
+            section: 'registration'
+          },
+          {
+            fieldName: 'contactPoint',
             newValue: 'FATHER',
             oldValue: 'MOTHER',
             section: 'registration'
@@ -309,14 +197,8 @@ describe('when draft data is transformed to graphql', () => {
           {
             fieldName: 'contactPoint.nestedFields.registrationPhone',
             newValue: '01736478896',
-            oldValue: '01736478884',
+            oldValue: '01733333333',
             section: 'registration'
-          },
-          {
-            section: 'child',
-            fieldName: 'familyNameEng',
-            oldValue: 'Khan',
-            newValue: 'Islam'
           }
         ]
       }

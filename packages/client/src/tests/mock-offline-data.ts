@@ -10,10 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IFormConfig, QuestionConfigFieldType } from '@client/forms'
-import { conditionals } from '@client/forms/utils'
-import { IApplicationConfig } from '@client/utils/referenceApi'
 import { readFileSync } from 'fs'
 import { join } from 'path'
+import { IApplicationConfig } from '@client/utils/referenceApi'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -64,56 +63,238 @@ export const formConfig: IFormConfig = {
 }
 
 export const mockConditionals = {
-  ...conditionals
+  presentAtBirthRegistration: {
+    action: 'hide',
+    expression:
+      '(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== "OTHER" || draftData.registration.presentAtBirthRegistration === "BOTH_PARENTS" )'
+  },
+  isRegistrarRoleSelected: {
+    action: 'hide',
+    expression: 'values.role!=="LOCAL_REGISTRAR"'
+  },
+  isOfficePreSelected: {
+    action: 'hide',
+    expression: 'values.skippedOfficeSelction && values.registrationOffice'
+  },
+  iDType: {
+    action: 'hide',
+    expression: "!values.iDType || (values.iDType !== 'OTHER')"
+  },
+  fathersDetailsExist: {
+    action: 'hide',
+    expression: '!values.fathersDetailsExist'
+  },
+  primaryAddressSameAsOtherPrimary: {
+    action: 'hide',
+    expression: 'values.primaryAddressSameAsOtherPrimary'
+  },
+  secondaryAddressSameAsOtherSecondary: {
+    action: 'hide',
+    expression: 'values.secondaryAddressSameAsOtherSecondary'
+  },
+  secondaryAddressSameAsPrimary: {
+    action: 'hide',
+    expression: 'values.secondaryAddressSameAsPrimary'
+  },
+  countryPrimary: {
+    action: 'hide',
+    expression: '!values.countryPrimary'
+  },
+  isDefaultCountryPrimary: {
+    action: 'hide',
+    expression: 'isDefaultCountry(values.countryPrimary)'
+  },
+  statePrimary: {
+    action: 'hide',
+    expression: '!values.statePrimary'
+  },
+  districtPrimary: {
+    action: 'hide',
+    expression: '!values.districtPrimary'
+  },
+  addressLine4Primary: {
+    action: 'hide',
+    expression: '!values.addressLine4Primary'
+  },
+  addressLine3Primary: {
+    action: 'hide',
+    expression: '!values.addressLine3Primary'
+  },
+  country: {
+    action: 'hide',
+    expression: '!values.country'
+  },
+  isDefaultCountry: {
+    action: 'hide',
+    expression: 'isDefaultCountry(values.country)'
+  },
+  state: {
+    action: 'hide',
+    expression: '!values.state'
+  },
+  district: {
+    action: 'hide',
+    expression: '!values.district'
+  },
+  addressLine4: {
+    action: 'hide',
+    expression: '!values.addressLine4'
+  },
+  addressLine3: {
+    action: 'hide',
+    expression: '!values.addressLine3'
+  },
+  uploadDocForWhom: {
+    action: 'hide',
+    expression: '!values.uploadDocForWhom'
+  },
+  motherCollectsCertificate: {
+    action: 'hide',
+    expression: 'values.personCollectingCertificate!="MOTHER"'
+  },
+  fatherCollectsCertificate: {
+    action: 'hide',
+    expression: 'values.personCollectingCertificate!="FATHER"'
+  },
+  informantCollectsCertificate: {
+    action: 'hide',
+    expression: 'values.personCollectingCertificate!="INFORMANT"'
+  },
+  otherPersonCollectsCertificate: {
+    action: 'hide',
+    expression: 'values.personCollectingCertificate!="OTHER"'
+  },
+  birthCertificateCollectorNotVerified: {
+    action: 'hide',
+    expression:
+      '!(values.personCollectingCertificate=="MOTHER" && values.motherDetails===false) && !(values.personCollectingCertificate=="FATHER" && values.fatherDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
+  },
+  deathCertificateCollectorNotVerified: {
+    action: 'hide',
+    expression:
+      '!(values.personCollectingCertificate=="INFORMANT" && values.informantDetails===false) && !(values.personCollectingCertificate =="OTHER" && values.otherPersonSignedAffidavit===false)'
+  },
+  placeOfBirthHospital: {
+    action: 'hide',
+    expression:
+      '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
+  },
+  placeOfDeathTypeHeathInstitue: {
+    action: 'hide',
+    expression: 'values.placeOfDeath!="HEALTH_FACILITY"'
+  },
+  otherBirthEventLocation: {
+    action: 'hide',
+    expression:
+      '(values.placeOfBirth!="OTHER" && values.placeOfBirth!="PRIVATE_HOME")'
+  },
+  isNotCityLocation: {
+    action: 'hide',
+    expression:
+      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
+  },
+  isCityLocation: {
+    action: 'hide',
+    expression:
+      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
+  },
+  isNotCityLocationPrimary: {
+    action: 'hide',
+    expression:
+      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Primary))'
+  },
+  isCityLocationPrimary: {
+    action: 'hide',
+    expression:
+      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Primary))'
+  },
+  iDAvailable: {
+    action: 'hide',
+    expression: '!values.iDType || values.iDType === "NO_ID"'
+  },
+  informantPrimaryAddressSameAsCurrent: {
+    action: 'hide',
+    expression: 'values.informantPrimaryAddressSameAsCurrent'
+  },
+  deathPlaceOther: {
+    action: 'hide',
+    expression: 'values.placeOfDeath !== "OTHER"'
+  },
+  deathPlaceAtPrivateHome: {
+    action: 'hide',
+    expression: 'values.placeOfDeath !== "PRIVATE_HOME"'
+  },
+  deathPlaceAtOtherLocation: {
+    action: 'hide',
+    expression: 'values.placeOfDeath !== "OTHER"'
+  },
+  causeOfDeathEstablished: {
+    action: 'hide',
+    expression: '!values.causeOfDeathEstablished'
+  },
+  isMarried: {
+    action: 'hide',
+    expression: '(!values.maritalStatus || values.maritalStatus !== "MARRIED")'
+  },
+  identifierIDSelected: {
+    action: 'hide',
+    expression:
+      '(!values.iDType || (values.iDType !== "BIRTH_REGISTRATION_NUMBER" && values.iDType !== "NATIONAL_ID"))'
+  },
+  otherRelationship: {
+    action: 'hide',
+    expression: 'values.informantsRelationToDeceased !== "OTHER"'
+  },
+  fatherContactDetailsRequired: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
+  },
+  withInTargetDays: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "withinTargetdays") || !draftData.child || !draftData.child.childBirthDate'
+  },
+  between46daysTo5yrs: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "between46daysTo5yrs") || !draftData.child || !draftData.child.childBirthDate'
+  },
+  after5yrs: {
+    action: 'hide',
+    expression:
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "after5yrs")  || !draftData.child || !draftData.child.childBirthDate'
+  },
+  deceasedNationIdSelected: {
+    action: 'hide',
+    expression:
+      '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1]) > -1))'
+  },
+  certCollectorOther: {
+    action: 'hide',
+    expression: 'values.type !== "OTHER"'
+  },
+  userAuditReasonSpecified: {
+    action: 'hide',
+    expression: 'values.reason === "OTHER"'
+  },
+  userAuditReasonOther: {
+    action: 'hide',
+    expression: 'values.reason !== "OTHER"'
+  },
+  isAuditActionDeactivate: {
+    action: 'hide',
+    expression: 'draftData.formValues.action !== "DEACTIVATE"'
+  },
+  isAuditActionReactivate: {
+    action: 'hide',
+    expression: 'draftData.formValues.action !== "REACTIVATE"'
+  }
 }
 
-export const applicationConfig: IApplicationConfig = {
-  APPLICATION_NAME: 'OpenCRVS',
-  BIRTH: {
-    REGISTRATION_TARGET: 30,
-    LATE_REGISTRATION_TARGET: 365,
-    FEE: {
-      ON_TIME: 0,
-      LATE: 5.5,
-      DELAYED: 15.0
-    }
-  },
-  DEATH: {
-    REGISTRATION_TARGET: 30,
-    FEE: {
-      ON_TIME: 0,
-      DELAYED: 5.0
-    }
-  },
-  COUNTRY_LOGO_RENDER_WIDTH: 104,
-  COUNTRY_LOGO_RENDER_HEIGHT: 104,
-  DESKTOP_TIME_OUT_MILLISECONDS: 900000,
-  UI_POLLING_INTERVAL: 5000,
-  FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
-  DECLARATION_AUDIT_LOCATIONS: 'DISTRICT',
-  INFORMANT_MINIMUM_AGE: 16,
-  HIDE_EVENT_REGISTER_INFORMATION: false,
-  EXTERNAL_VALIDATION_WORKQUEUE: false,
-  BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
-  COUNTRY: 'FAR',
-  COUNTRY_LOGO: {
-    fileName: 'logo.png',
-    file: 'data:image/png;base64,iVBORw0K'
-  },
-  PHONE_NUMBER_PATTERN: /^0(7|9)[0-9]{1}[0-9]{7}$/,
-  SENTRY:
-    'https://f892d643aab642108f44e2d1795706bc@o309867.ingest.sentry.io/1774604',
-  LOGROCKET: 'opencrvs-foundation/opencrvs-farajaland',
-  NID_NUMBER_PATTERN: /^[0-9]{9}$/,
-  CURRENCY: {
-    languagesAndCountry: ['en-ZM'],
-    isoCode: 'ZMW'
-  },
-  LANGUAGES: 'en,fr'
-}
 export const mockOfflineData = {
   forms: JSON.parse(
-    readFileSync(join(__dirname, './example.json')).toString()
+    readFileSync(join(__dirname, './default.json')).toString()
   ) as any,
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
@@ -415,6 +596,53 @@ export const mockOfflineData = {
   assets: {
     logo: `data:image;base64,${validImageB64String}`
   },
-  config: applicationConfig,
+  config: {
+    APPLICATION_NAME: 'Farajaland CRVS',
+    BIRTH: {
+      REGISTRATION_TARGET: 45,
+      LATE_REGISTRATION_TARGET: 365,
+      FEE: {
+        ON_TIME: 0,
+        LATE: 15,
+        DELAYED: 20
+      }
+    },
+    COUNTRY_LOGO_RENDER_WIDTH: 104,
+    COUNTRY_LOGO_RENDER_HEIGHT: 104,
+    DESKTOP_TIME_OUT_MILLISECONDS: 900000,
+    DEATH: {
+      REGISTRATION_TARGET: 45,
+      FEE: {
+        ON_TIME: 0,
+        DELAYED: 0
+      }
+    },
+    HEALTH_FACILITY_FILTER: 'DISTRICT',
+    LANGUAGES: 'en,bn',
+    UI_POLLING_INTERVAL: 5000,
+    FIELD_AGENT_AUDIT_LOCATIONS:
+      'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
+    DECLARATION_AUDIT_LOCATIONS: 'WARD,UNION',
+    INFORMANT_MINIMUM_AGE: 16,
+    HIDE_EVENT_REGISTER_INFORMATION: false,
+    EXTERNAL_VALIDATION_WORKQUEUE: true,
+    _id: '61a8c105c04ac94fe46ceb27',
+    BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
+    COUNTRY: 'bgd',
+    COUNTRY_LOGO: {
+      fileName: 'logo.png',
+      file: `data:image;base64,${validImageB64String}`
+    },
+    CURRENCY: {
+      isoCode: 'ZMW',
+      languagesAndCountry: ['en-ZM']
+    },
+    PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/,
+    BIRTH_REGISTRATION_TARGET: 45,
+    DEATH_REGISTRATION_TARGET: 45,
+    NID_NUMBER_PATTERN: /^[0-9]{9}$/,
+    SENTRY: 'https://sentry.com',
+    LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
+  },
   formConfig
 }
