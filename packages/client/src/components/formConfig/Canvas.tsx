@@ -30,6 +30,7 @@ import {
   shiftConfigFieldUp,
   shiftConfigFieldDown
 } from '@client/forms/configuration/configFields/actions'
+import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 
 const CanvasBox = styled(Box)`
   display: flex;
@@ -65,11 +66,16 @@ type IRouteProps = {
 }
 
 type ICanvasProps = {
+  showHiddenFields: boolean
   selectedFieldId: string | null
   setSelectedFieldId: React.Dispatch<React.SetStateAction<string | null>>
 }
 
-export function Canvas({ selectedFieldId, setSelectedFieldId }: ICanvasProps) {
+export function Canvas({
+  showHiddenFields,
+  selectedFieldId,
+  setSelectedFieldId
+}: ICanvasProps) {
   const { event, section } = useParams<IRouteProps>()
   const dispatch = useDispatch()
   const fieldsMap = useSelector((store: IStoreState) =>
@@ -83,7 +89,12 @@ export function Canvas({ selectedFieldId, setSelectedFieldId }: ICanvasProps) {
 
   return (
     <CanvasBox>
-      {configFields.map((configField) => {
+      {(showHiddenFields
+        ? configFields
+        : configFields.filter(
+            ({ enabled }) => enabled !== FieldEnabled.DISABLED
+          )
+      ).map((configField) => {
         const { fieldId, preceedingFieldId, foregoingFieldId } = configField
         const isSelected = selectedField?.fieldId === fieldId
 

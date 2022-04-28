@@ -211,6 +211,29 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
       )
     }
 
+    case actions.MODIFY_CONFIG_FIELD:
+      if (state.state === 'LOADING') return state
+
+      const { fieldId, modifiedProps } = action.payload
+      const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
+
+      return loop(
+        {
+          ...state,
+          [event]: {
+            ...state[event],
+            [sectionId]: {
+              ...state[event][sectionId],
+              [fieldId]: {
+                ...state[event][sectionId][fieldId],
+                ...modifiedProps
+              }
+            }
+          }
+        },
+        Cmd.action(actions.storeConfigFields())
+      )
+
     default:
       return state
   }

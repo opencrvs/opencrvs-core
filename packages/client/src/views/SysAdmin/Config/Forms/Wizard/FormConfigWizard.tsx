@@ -44,6 +44,7 @@ import { SaveActionModal, SaveActionContext } from './SaveActionModal'
 import { SaveActionNotification } from './SaveActionNotification'
 import { FormConfigSettings } from './FormConfigSettings'
 import { selectConfigField } from '@client/forms/configuration/configFields/selectors'
+import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 
 const Container = styled.div`
   display: flex;
@@ -132,6 +133,7 @@ export function FormConfigWizard() {
   const selectedField = useSelector((store: IStoreState) =>
     selectConfigField(store, event, section, selectedFieldId)
   )
+  const [showHiddenFields, setShowHiddenFields] = React.useState(true)
 
   /*
    * We need to clear the selected field if section changes
@@ -143,6 +145,16 @@ export function FormConfigWizard() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [section])
+
+  /*
+   * We need to clear the selected field if the selected field is made
+   * hidden and we have the showHiddenFields set to false
+   */
+  React.useEffect(() => {
+    if (!showHiddenFields && selectedField?.enabled === FieldEnabled.DISABLED) {
+      setSelectedFieldId(null)
+    }
+  }, [showHiddenFields, selectedField?.enabled])
 
   if (
     !hasNatlSysAdminScope ||
@@ -163,6 +175,7 @@ export function FormConfigWizard() {
         topBarActions={[
           <TertiaryButton
             id="settings"
+            key="settings"
             icon={() => <SettingsBlue />}
             onClick={() => dispatch(goToFormConfigWizard(event, 'settings'))}
           ></TertiaryButton>,
@@ -190,6 +203,7 @@ export function FormConfigWizard() {
               <Canvas
                 selectedFieldId={selectedFieldId}
                 setSelectedFieldId={setSelectedFieldId}
+                showHiddenFields={showHiddenFields}
               />
             </CanvasContainer>
             <ToolsContainer>
@@ -205,7 +219,10 @@ export function FormConfigWizard() {
                   <DefaultFieldTools configField={selectedField} />
                 )
               ) : (
-                <FormTools />
+                <FormTools
+                  showHiddenFields={showHiddenFields}
+                  setShowHiddenFields={setShowHiddenFields}
+                />
               )}
             </ToolsContainer>
             <SaveActionContext.Provider value={{ status, setStatus }}>

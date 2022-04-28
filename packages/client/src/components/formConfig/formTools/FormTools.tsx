@@ -73,13 +73,18 @@ const listViewItems = (intl: IntlShape) => {
   return items
 }
 
-export const FormTools = () => {
-  const [toggleSelected, setToggleSelected] = React.useState(false)
+type IFormToolsProps = {
+  showHiddenFields: boolean
+  setShowHiddenFields: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export const FormTools = ({
+  showHiddenFields,
+  setShowHiddenFields
+}: IFormToolsProps) => {
   const intl = useIntl()
 
-  const toggleOnChange = () => {
-    setToggleSelected(!toggleSelected)
-  }
+  const toggleShowHiddenFields = () => setShowHiddenFields((prev) => !prev)
 
   return (
     <>
@@ -89,8 +94,8 @@ export const FormTools = () => {
           actions={[
             <CenteredToggle
               key="toggle"
-              selected={toggleSelected}
-              onChange={toggleOnChange}
+              selected={showHiddenFields}
+              onChange={toggleShowHiddenFields}
             />
           ]}
         />

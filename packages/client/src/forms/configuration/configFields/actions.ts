@@ -11,6 +11,7 @@
  */
 import { IQuestionConfig } from '@client/forms'
 import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
+import { IConfigField } from './utils'
 
 export const UPDATE_CONFIG_FIELDS = 'FORM/UPDATE_CONFIG_FIELDS'
 export type UpdateConfigFieldsAction = {
@@ -144,6 +145,26 @@ export const shiftConfigFieldDown = (
   }
 })
 
+export const MODIFY_CONFIG_FIELD = 'FORM/MODIFY_CONFIG_FIELD'
+export type ModifyConfigField = {
+  type: typeof MODIFY_CONFIG_FIELD
+  payload: {
+    fieldId: string
+    modifiedProps: Partial<IConfigField>
+  }
+}
+
+export const modifyConfigField = (
+  fieldId: string,
+  modifiedProps: Partial<IConfigField>
+) => ({
+  type: MODIFY_CONFIG_FIELD,
+  payload: {
+    fieldId,
+    modifiedProps
+  }
+})
+
 export type ConfigFieldsActions =
   | UpdateConfigFieldsAction
   | StoreConfigFields
@@ -153,3 +174,4 @@ export type ConfigFieldsActions =
   | UpdateQuestionsAction
   | ShiftConfigFieldUp
   | ShiftConfigFieldDown
+  | ModifyConfigField
