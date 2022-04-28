@@ -31,6 +31,8 @@ import {
   shiftConfigFieldDown
 } from '@client/forms/configuration/configFields/actions'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
+import { useIntl } from 'react-intl'
+import { messages } from '@client/i18n/messages/views/formConfig'
 
 const CanvasBox = styled(Box)`
   display: flex;
@@ -78,6 +80,7 @@ export function Canvas({
 }: ICanvasProps) {
   const { event, section } = useParams<IRouteProps>()
   const dispatch = useDispatch()
+  const intl = useIntl()
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
@@ -95,8 +98,15 @@ export function Canvas({
             ({ enabled }) => enabled !== FieldEnabled.DISABLED
           )
       ).map((configField) => {
-        const { fieldId, preceedingFieldId, foregoingFieldId } = configField
+        const {
+          fieldId,
+          preceedingFieldId,
+          foregoingFieldId,
+          enabled,
+          custom
+        } = configField
         const isSelected = selectedField?.fieldId === fieldId
+        const isHidden = !custom && enabled === FieldEnabled.DISABLED
 
         return (
           <FormConfigElementCard
@@ -104,6 +114,7 @@ export function Canvas({
             selected={isSelected}
             onClick={() => setSelectedFieldId(fieldId)}
             movable={isSelected}
+            status={isHidden ? intl.formatMessage(messages.hidden) : undefined}
             isUpDisabled={preceedingFieldId === FieldPosition.TOP}
             isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}
             onMoveUp={() => dispatch(shiftConfigFieldUp(fieldId))}
