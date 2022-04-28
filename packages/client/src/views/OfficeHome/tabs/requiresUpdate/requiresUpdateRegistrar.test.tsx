@@ -34,7 +34,7 @@ import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { Store } from 'redux'
-import { RejectTab } from './rejectTab'
+import { RequiresUpdateRegistrar } from './RequiresUpdateRegistrar'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
@@ -162,7 +162,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RejectTab
+      <RequiresUpdateRegistrar
         queryData={{
           data: {
             totalItems: 2,
@@ -247,7 +247,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RejectTab
+      <RequiresUpdateRegistrar
         queryData={{
           data: {
             totalItems: 2,
@@ -348,7 +348,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RejectTab
+      <RequiresUpdateRegistrar
         queryData={{
           data: {
             totalItems: 2,
@@ -750,7 +750,7 @@ describe('Tablet tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RejectTab
+      <RequiresUpdateRegistrar
         queryData={{
           data: {
             totalItems: 2,

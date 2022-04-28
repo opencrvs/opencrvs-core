@@ -32,7 +32,7 @@ import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { Store } from 'redux'
-import { PrintTab } from './printTab'
+import { ReadyToPrint } from './ReadyToPrint'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
@@ -301,7 +301,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <PrintTab
+      <ReadyToPrint
         queryData={{
           data: {
             totalItems: 2,
@@ -329,7 +329,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <PrintTab
+      <ReadyToPrint
         queryData={{
           data: { totalItems: 0, results: [] }
         }}
@@ -346,7 +346,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      <PrintTab
+      <ReadyToPrint
         queryData={{
           data: { totalItems: 24, results: [] }
         }}
@@ -378,7 +378,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
     it('renders expanded area for ready to print', async () => {
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <PrintTab
+        <ReadyToPrint
           queryData={{
             data: mockPrintTabData
           }}
@@ -753,7 +753,7 @@ describe('Tablet tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <PrintTab
+      <ReadyToPrint
         queryData={{
           data: mockPrintTabData
         }}

@@ -35,8 +35,7 @@ import ApolloClient from 'apollo-client'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { Store } from 'redux'
-import { ReviewTab } from './reviewTab'
+import { ReadyForReview } from './ReadyForReview'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
@@ -228,8 +227,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
+      <ReadyForReview
         queryData={{
           data: {
             totalItems: 24,
@@ -265,11 +263,15 @@ describe('OfficeHome sent for review tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
+      <ReadyForReview
         queryData={{
           data: mockReviewTabData
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -295,14 +297,18 @@ describe('OfficeHome sent for review tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
+      <ReadyForReview
         queryData={{
           data: {
             totalItems: 12,
             results: []
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -316,8 +322,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
+      <ReadyForReview
         queryData={{
           data: {
             totalItems: 2,
@@ -402,6 +407,11 @@ describe('OfficeHome sent for review tab related tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -624,8 +634,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
+      <ReadyForReview
         queryData={{
           data: {
             totalItems: 2,
@@ -683,6 +692,11 @@ describe('OfficeHome sent for review tab related tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -816,8 +830,7 @@ describe('Tablet tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
+      <ReadyForReview
         queryData={{
           data: {
             totalItems: 2,
@@ -881,6 +894,11 @@ describe('Tablet tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )

@@ -54,19 +54,19 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
-import { ApprovalTab } from './tabs/approvals/approvalTab'
-import { InProgressTab, SELECTOR_ID } from './tabs/inProgress/inProgressTab'
-import { PrintTab } from './tabs/print/printTab'
-import { RejectTab } from './tabs/reject/rejectTab'
-import { ReviewTab } from './tabs/readyForReview/reviewTab'
-import { ExternalValidationTab } from './tabs/externalValidation/externalValidationTab'
+import { SentForApproval } from './tabs/sentForApproval/SentForApproval'
+import { InProgress, SELECTOR_ID } from './tabs/inProgress/InProgress'
+import { ReadyToPrint } from './tabs/readyToPrint/ReadyToPrint'
+import { RequiresUpdateRegistrar } from './tabs/requiresUpdate/RequiresUpdateRegistrar'
+import { ReadyForReview } from './tabs/readyForReview/ReadyForReview'
+import { InExternalValidationTab } from './tabs/inExternalValidation/InExternalValidationTab'
 import {
   Navigation,
   WORKQUEUE_TABS
 } from '@client/components/interface/Navigation'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { SentForReview } from './tabs/sentForReview/SentForReview'
-import { RequiresUpdate } from './tabs/requiresUpdate/RequiresUpdate'
+import { RequiresUpdateFieldAgent } from './tabs/requiresUpdate/RequiresUpdateFieldAgent'
 import { PERFORMANCE_HOME, OPERATIONAL_REPORT } from '@client/navigation/routes'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -389,7 +389,7 @@ export class OfficeHomeView extends React.Component<
         <Navigation />
         <BodyContainer>
           {tabId === WORKQUEUE_TABS.inProgress && (
-            <InProgressTab
+            <InProgress
               drafts={drafts}
               selectorId={selectorId}
               isFieldAgent={this.isFieldAgent}
@@ -411,7 +411,7 @@ export class OfficeHomeView extends React.Component<
           {!this.isFieldAgent ? (
             <>
               {tabId === WORKQUEUE_TABS.readyForReview && (
-                <ReviewTab
+                <ReadyForReview
                   queryData={{
                     data: filteredData.reviewTab
                   }}
@@ -423,7 +423,7 @@ export class OfficeHomeView extends React.Component<
                 />
               )}
               {tabId === WORKQUEUE_TABS.sentForUpdates && (
-                <RejectTab
+                <RequiresUpdateRegistrar
                   queryData={{
                     data: filteredData.rejectTab
                   }}
@@ -437,7 +437,7 @@ export class OfficeHomeView extends React.Component<
 
               {tabId === WORKQUEUE_TABS.externalValidation &&
                 window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
-                  <ExternalValidationTab
+                  <InExternalValidationTab
                     queryData={{
                       data: filteredData.externalValidationTab
                     }}
@@ -449,7 +449,7 @@ export class OfficeHomeView extends React.Component<
                   />
                 )}
               {tabId === WORKQUEUE_TABS.sentForApproval && (
-                <ApprovalTab
+                <SentForApproval
                   queryData={{
                     data: filteredData.approvalTab
                   }}
@@ -461,7 +461,7 @@ export class OfficeHomeView extends React.Component<
                 />
               )}
               {tabId === WORKQUEUE_TABS.readyToPrint && (
-                <PrintTab
+                <ReadyToPrint
                   queryData={{
                     data: filteredData.printTab
                   }}
@@ -484,7 +484,7 @@ export class OfficeHomeView extends React.Component<
                 />
               )}
               {tabId === WORKQUEUE_TABS.requiresUpdate && (
-                <RequiresUpdate
+                <RequiresUpdateFieldAgent
                   userDetails={this.props.userDetails}
                   pageSize={this.pageSize}
                   paginationId={requireUpdatePage}

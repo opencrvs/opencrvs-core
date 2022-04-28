@@ -126,7 +126,7 @@ export const SELECTOR_ID = {
   hospitalDrafts: 'hospitals'
 }
 
-export class InProgressTabComponent extends React.Component<
+export class InProgressComponent extends React.Component<
   IRegistrarHomeProps,
   IRegistrarHomeState
 > {
@@ -596,6 +596,13 @@ export class InProgressTabComponent extends React.Component<
         : selectorId === SELECTOR_ID.fieldAgentDrafts
         ? this.transformRemoteDraftsContent(inProgressData).length <= 0
         : this.transformRemoteDraftsContent(notificationData).length <= 0
+
+    const noResultMessage =
+      !selectorId || selectorId === SELECTOR_ID.ownDrafts
+        ? 'in progress'
+        : selectorId === SELECTOR_ID.fieldAgentDrafts
+        ? 'from field agents'
+        : 'from health system'
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.progress)}
@@ -622,7 +629,7 @@ export class InProgressTabComponent extends React.Component<
             : this.props.error
         }
         noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'in progress'
+          tab: noResultMessage
         })}
         noContent={noContent}
       >
@@ -654,8 +661,8 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const InProgressTab = connect(mapStateToProps, {
+export const InProgress = connect(mapStateToProps, {
   goToPage: goToPageAction,
   goToRegistrarHomeTab: goToRegistrarHomeTabAction,
   goToDeclarationRecordAudit
-})(injectIntl(withTheme(InProgressTabComponent)))
+})(injectIntl(withTheme(InProgressComponent)))

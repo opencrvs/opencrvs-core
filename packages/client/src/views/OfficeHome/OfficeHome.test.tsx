@@ -32,7 +32,7 @@ import { merge } from 'lodash'
 import * as React from 'react'
 
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
-import { SELECTOR_ID } from './tabs/inProgress/inProgressTab'
+import { SELECTOR_ID } from './tabs/inProgress/InProgress'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const registerScopeToken =
@@ -84,27 +84,6 @@ const declaration = {
       use: 'bn'
     }
   ]
-}
-const currentUserData: IUserData = {
-  userID: '123',
-  declarations: [],
-  workqueue: {
-    loading: false,
-    error: false,
-    initialSyncDone: true,
-    data: {
-      inProgressTab: {
-        totalItems: 1,
-        results: [declaration]
-      },
-      notificationTab: { totalItems: 0, results: [] },
-      reviewTab: { totalItems: 0, results: [] },
-      rejectTab: { totalItems: 0, results: [] },
-      approvalTab: { totalItems: 0, results: [] },
-      printTab: { totalItems: 0, results: [] },
-      externalValidationTab: { totalItems: 0, results: [] }
-    }
-  }
 }
 
 const nameObj = {

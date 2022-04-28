@@ -230,7 +230,7 @@ const getRejectedColumns = (
   }
 }
 
-const RequiresUpdateComponent = (props: IFullProps) => {
+const RequiresUpdateFieldAgentComponent = (props: IFullProps) => {
   const { userDetails, pageSize, onPageChange, paginationId, intl, theme } =
     props
   const width = useWindowWidth()
@@ -289,7 +289,7 @@ const RequiresUpdateComponent = (props: IFullProps) => {
             paginationId={paginationId}
             onPageChange={onPageChange}
             noResultText={intl.formatMessage(constantsMessages.noRecords, {
-              tab: 'requires update'
+              tab: 'require update'
             })}
             loading={loading}
             error={error}
@@ -326,6 +326,6 @@ const RequiresUpdateComponent = (props: IFullProps) => {
   )
 }
 
-export const RequiresUpdate = connect(null, {
+export const RequiresUpdateFieldAgent = connect(null, {
   goToDeclarationRecordAudit
-})(injectIntl(withTheme(withOnlineStatus(RequiresUpdateComponent))))
+})(injectIntl(withTheme(withOnlineStatus(RequiresUpdateFieldAgentComponent))))

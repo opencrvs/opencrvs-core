@@ -37,7 +37,7 @@ import {
 } from '@client/tests/util'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { InProgressTab, SELECTOR_ID, TAB_ID } from './inProgressTab'
+import { InProgress, SELECTOR_ID, TAB_ID } from './InProgress'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
@@ -94,7 +94,7 @@ describe('In Progress tab', () => {
       }
     ]
     const testComponent = await createTestComponent(
-      <InProgressTab
+      <InProgress
         drafts={localDrafts}
         selectorId={SELECTOR_ID.ownDrafts}
         isFieldAgent={false}
@@ -163,7 +163,7 @@ describe('In Progress tab', () => {
     ]
 
     const testComponent = await createTestComponent(
-      <InProgressTab
+      <InProgress
         drafts={localDrafts}
         selectorId={SELECTOR_ID.ownDrafts}
         queryData={{
@@ -265,7 +265,7 @@ describe('In Progress tab', () => {
       ]
       // @ts-ignore
       const testComponent = await createTestComponent(
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
           queryData={{
@@ -306,7 +306,7 @@ describe('In Progress tab', () => {
         drafts.push(createDeclaration(Event.BIRTH))
       }
       const testComponent = await createTestComponent(
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
           queryData={{
@@ -412,7 +412,7 @@ describe('In Progress tab', () => {
       // @ts-ignore
       store.dispatch(storeDeclaration(drafts))
       const testComponent = await createTestComponent(
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
           queryData={{
@@ -460,7 +460,7 @@ describe('In Progress tab', () => {
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.BIRTH))
       const testComponent = await createTestComponent(
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           queryData={{
@@ -551,8 +551,7 @@ describe('In Progress tab', () => {
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.BIRTH))
       const testComponent = await createTestComponent(
-        // @ts-ignore
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
           queryData={{
@@ -594,7 +593,7 @@ describe('In Progress tab', () => {
       drafts.push(createDeclaration(Event.BIRTH))
       // @ts-ignore
       const testComponent = await createTestComponent(
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
           queryData={{
@@ -735,7 +734,7 @@ describe('In Progress tab', () => {
         downloadableDeclaration.downloadStatus = undefined
         store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
-          <InProgressTab {...inprogressProps} />,
+          <InProgress {...inprogressProps} />,
           { store, history }
         )
 
@@ -752,7 +751,7 @@ describe('In Progress tab', () => {
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
         store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
-          <InProgressTab {...inprogressProps} />,
+          <InProgress {...inprogressProps} />,
           { store, history }
         )
 
@@ -769,7 +768,7 @@ describe('In Progress tab', () => {
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
         store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
-          <InProgressTab {...inprogressProps} />,
+          <InProgress {...inprogressProps} />,
           { store, history }
         )
 
@@ -804,7 +803,7 @@ describe('In Progress tab', () => {
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
         store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
-          <InProgressTab {...inprogressProps} />,
+          <InProgress {...inprogressProps} />,
           { store, history }
         )
         expect(
@@ -820,7 +819,7 @@ describe('In Progress tab', () => {
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.BIRTH))
       const testComponent = await createTestComponent(
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
           queryData={{
@@ -911,7 +910,7 @@ describe('Tablet tests', () => {
 
     // @ts-ignore
     const testComponent = await createTestComponent(
-      <InProgressTab
+      <InProgress
         drafts={drafts}
         selectorId={SELECTOR_ID.fieldAgentDrafts}
         queryData={{
