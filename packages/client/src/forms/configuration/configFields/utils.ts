@@ -20,7 +20,11 @@ import {
   ISerializedFormSectionGroup,
   IFormSectionGroup,
   SerializedFormField,
-  IRadioOption
+  IRadioOption,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  RADIO_GROUP,
+  SELECT_WITH_OPTIONS,
+  DOCUMENT_UPLOADER_WITH_OPTION
 } from '@client/forms'
 import { deserializeFormField } from '@client/forms/mappings/deserializer'
 import { createCustomField } from '@client/forms/configuration/customUtils'
@@ -141,10 +145,10 @@ export function getFieldDefinition(
 
 export function getContentKey(formField: IFormField) {
   if (
-    (formField.type === 'RADIO_GROUP' ||
-      formField.type === 'RADIO_GROUP_WITH_NESTED_FIELDS' ||
-      formField.type === 'SELECT_WITH_OPTIONS' ||
-      formField.type === 'DOCUMENT_UPLOADER_WITH_OPTION') &&
+    (formField.type === RADIO_GROUP ||
+      formField.type === RADIO_GROUP_WITH_NESTED_FIELDS ||
+      formField.type === SELECT_WITH_OPTIONS ||
+      formField.type === DOCUMENT_UPLOADER_WITH_OPTION) &&
     !['country', 'countryPermanent', 'nationality'].includes(formField.name)
   ) {
     const listedOptions = formField.options as IRadioOption[]

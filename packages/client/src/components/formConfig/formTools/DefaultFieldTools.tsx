@@ -126,7 +126,7 @@ export function DefaultFieldTools({
         </Subtitle>
         <Body>
           {contentKey.map((content, index) => (
-            <div key={index}>{content}</div>
+            <span key={index}>{content}</span>
           ))}
         </Body>
       </Content>
