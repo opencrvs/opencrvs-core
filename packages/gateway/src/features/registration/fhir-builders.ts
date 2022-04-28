@@ -49,7 +49,8 @@ import {
   SPOUSE_TITLE,
   BIRTH_CORRECTION_ENCOUNTER_CODE,
   DEATH_CORRECTION_ENCOUNTER_CODE,
-  DEATH_DESCRIPTION_CODE
+  DEATH_DESCRIPTION_CODE,
+  CAUSE_OF_DEATH_ESTABLISHED_CODE
 } from '@gateway/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
@@ -954,6 +955,30 @@ export const builders: IFieldBuilders = {
           OBSERVATION_CATEGORY_VSIGN_DESC,
           MANNER_OF_DEATH_CODE,
           'Uncertified manner of death',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
+      deathDescription: (fhirBundle, fieldValue, context) => {
+        const observation = selectOrCreateObservationResource(
+          DEATH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_VSIGN_CODE,
+          OBSERVATION_CATEGORY_VSIGN_DESC,
+          DEATH_DESCRIPTION_CODE,
+          'Lay reported or verbal autopsy description',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
+      causeOfDeathEstablished: (fhirBundle, fieldValue, context) => {
+        const observation = selectOrCreateObservationResource(
+          DEATH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_VSIGN_CODE,
+          OBSERVATION_CATEGORY_VSIGN_DESC,
+          CAUSE_OF_DEATH_ESTABLISHED_CODE,
+          'Cause of death established',
           fhirBundle,
           context
         )
@@ -3410,7 +3435,7 @@ export const builders: IFieldBuilders = {
     observation.valueCodeableConcept = {
       coding: [
         {
-          system: 'http://hl7.org/fhir/ValueSet/icd-10',
+          system: `${OPENCRVS_SPECIFICATION_URL}manner-of-death`,
           code: fieldValue
         }
       ]
@@ -3432,6 +3457,29 @@ export const builders: IFieldBuilders = {
     )
     observation.valueString = fieldValue
   },
+  causeOfDeathEstablished: (
+    fhirBundle: ITemplatedBundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = selectOrCreateObservationResource(
+      DEATH_ENCOUNTER_CODE,
+      OBSERVATION_CATEGORY_VSIGN_CODE,
+      OBSERVATION_CATEGORY_VSIGN_DESC,
+      CAUSE_OF_DEATH_ESTABLISHED_CODE,
+      'Cause of death established',
+      fhirBundle,
+      context
+    )
+    observation.valueCodeableConcept = {
+      coding: [
+        {
+          system: `${OPENCRVS_SPECIFICATION_URL}cause-of-death-established`,
+          code: fieldValue
+        }
+      ]
+    }
+  },
   causeOfDeathMethod: (
     fhirBundle: ITemplatedBundle,
     fieldValue: string,
@@ -3449,7 +3497,7 @@ export const builders: IFieldBuilders = {
     observation.valueCodeableConcept = {
       coding: [
         {
-          system: 'http://hl7.org/fhir/ValueSet/icd-10',
+          system: `${OPENCRVS_SPECIFICATION_URL}cause-of-death-method`,
           code: fieldValue
         }
       ]
@@ -3472,7 +3520,7 @@ export const builders: IFieldBuilders = {
     observation.valueCodeableConcept = {
       coding: [
         {
-          system: 'http://hl7.org/fhir/ValueSet/icd-10',
+          system: `${OPENCRVS_SPECIFICATION_URL}cause-of-death`,
           code: fieldValue
         }
       ]

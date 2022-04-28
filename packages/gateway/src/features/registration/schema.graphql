@@ -304,6 +304,7 @@ input DeathRegistrationInput {
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
+  causeOfDeathEstablished: String
   causeOfDeath: String # need to store ICD-10? More types of cause of death
   maleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
   femaleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
@@ -328,6 +329,7 @@ type DeathRegistration implements EventRegistration { # -> Composition
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
   deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
+  causeOfDeathEstablished: String
   causeOfDeath: String # -> Observation.valueCodeableConcept
   maleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
   femaleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept

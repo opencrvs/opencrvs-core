@@ -53,6 +53,7 @@ export const CERTIFICATE_CONTEXT_KEY = 'certificates'
 export const DEATH_ENCOUNTER_CODE = 'death-encounter'
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const CAUSE_OF_DEATH_METHOD_CODE = 'cause-of-death-method'
+export const CAUSE_OF_DEATH_ESTABLISHED_CODE = 'cause-of-death-established'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
 export const DEATH_DESCRIPTION_CODE =
   'lay-reported-or-verbal-autopsy-description'

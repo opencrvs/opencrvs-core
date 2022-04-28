@@ -3283,16 +3283,16 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'RADIO_GROUP',
                 label: formMessageDescriptors.causeOfDeathEstablished,
                 required: false,
-                initialValue: true,
+                initialValue: 'true',
                 size: RadioSize.NORMAL,
                 validate: [],
                 options: [
                   {
-                    value: true,
+                    value: 'true',
                     label: formMessageDescriptors.confirm
                   },
                   {
-                    value: false,
+                    value: 'false',
                     label: formMessageDescriptors.deny
                   }
                 ],
@@ -3340,15 +3340,13 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 ],
                 mapping: {
-                  mapping: {
-                    mutation: {
-                      operation: 'sectionFieldToBundleFieldTransformer',
-                      parameters: ['causeOfDeathMethod']
-                    },
-                    query: {
-                      operation: 'bundleFieldToSectionFieldTransformer',
-                      parameters: ['causeOfDeathMethod']
-                    }
+                  mutation: {
+                    operation: 'sectionFieldToBundleFieldTransformer',
+                    parameters: ['causeOfDeathMethod']
+                  },
+                  query: {
+                    operation: 'bundleFieldToSectionFieldTransformer',
+                    parameters: ['causeOfDeathMethod']
                   }
                 }
               },
@@ -3368,15 +3366,13 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 maxLength: 500,
                 mapping: {
-                  mapping: {
-                    mutation: {
-                      operation: 'sectionFieldToBundleFieldTransformer',
-                      parameters: ['deathDescription']
-                    },
-                    query: {
-                      operation: 'bundleFieldToSectionFieldTransformer',
-                      parameters: ['deathDescription']
-                    }
+                  mutation: {
+                    operation: 'sectionFieldToBundleFieldTransformer',
+                    parameters: ['deathDescription']
+                  },
+                  query: {
+                    operation: 'bundleFieldToSectionFieldTransformer',
+                    parameters: ['deathDescription']
                   }
                 }
               },
@@ -3463,15 +3459,7 @@ export const registerForms: IDefaultRegisterForms = {
               }
             ]
           }
-        ],
-        mapping: {
-          mutation: {
-            operation: 'setDeathRegistrationSectionTransformer'
-          },
-          query: {
-            operation: 'getDeathRegistrationSectionTransformer'
-          }
-        }
+        ]
       },
       {
         id: DeathSection.Informants,

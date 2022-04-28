@@ -41,7 +41,8 @@ import {
   SPOUSE_CODE,
   MALE_DEPENDENTS_ON_DECEASED_CODE,
   FEMALE_DEPENDENTS_ON_DECEASED_CODE,
-  DEATH_DESCRIPTION_CODE
+  DEATH_DESCRIPTION_CODE,
+  CAUSE_OF_DEATH_ESTABLISHED_CODE
 } from '@gateway/features/fhir/templates'
 import {
   GQLQuestionnaireQuestion,
@@ -803,6 +804,7 @@ export const typeResolvers: GQLResolver = {
           femaleDependentsOfDeceased: FEMALE_DEPENDENTS_ON_DECEASED_CODE,
           mannerOfDeath: MANNER_OF_DEATH_CODE,
           causeOfDeathMethod: CAUSE_OF_DEATH_METHOD_CODE,
+          causeOfDeathEstablished: CAUSE_OF_DEATH_ESTABLISHED_CODE,
           deathDescription: DEATH_DESCRIPTION_CODE,
           causeOfDeath: CAUSE_OF_DEATH_CODE
         }
@@ -952,6 +954,33 @@ export const typeResolvers: GQLResolver = {
       }
       const observations = await fetchFHIR(
         `/Observation?encounter=${encounterSection.entry[0].reference}&code=${MANNER_OF_DEATH_CODE}`,
+        authHeader
+      )
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueCodeableConcept &&
+          observations.entry[0].resource.valueCodeableConcept.coding &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0] &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0].code) ||
+        null
+      )
+    },
+    async causeOfDeathEstablished(
+      composition: ITemplatedComposition,
+      _,
+      authHeader
+    ) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${CAUSE_OF_DEATH_ESTABLISHED_CODE}`,
         authHeader
       )
       return (

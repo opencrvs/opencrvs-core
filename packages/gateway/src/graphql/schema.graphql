@@ -253,6 +253,7 @@ type DeathRegistration implements EventRegistration {
   mannerOfDeath: MannerOfDeath
   deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType
+  causeOfDeathEstablished: String
   causeOfDeath: String
   maleDependentsOfDeceased: Float
   femaleDependentsOfDeceased: Float
@@ -491,6 +492,7 @@ input DeathRegistrationInput {
   mannerOfDeath: MannerOfDeath
   deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType
+  causeOfDeathEstablished: String
   causeOfDeath: String
   maleDependentsOfDeceased: Float
   femaleDependentsOfDeceased: Float
@@ -792,6 +794,7 @@ enum LocationType {
   ADMIN_STRUCTURE
   CRVS_OFFICE
   PRIVATE_HOME
+  DECEASED_USUAL_RESIDENCE
   SECONDARY_ADDRESS
   PRIMARY_ADDRESS
   MILITARY_BASE_OR_CANTONMENT

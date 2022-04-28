@@ -431,10 +431,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { preventContinueIfError } = this.props.activeSectionGroup
     let groupHasError = false
     if (preventContinueIfError) {
-      console.log(
-        'DATA: ',
-        JSON.stringify(this.props.declaration.data[this.props.activeSection.id])
-      )
       if (!this.props.declaration.data[this.props.activeSection.id]) {
         groupHasError = true
       } else {
@@ -592,7 +588,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
             label: intl.formatMessage(buttonMessages.closeDeclaration),
             handler: () => this.onCloseDeclaration()
           }
-    console.log('DECLARATION: ', JSON.stringify(declaration))
     return (
       <>
         <TimeMounted

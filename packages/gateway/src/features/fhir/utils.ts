@@ -30,9 +30,6 @@ import {
   DEATH_ENCOUNTER_CODE,
   INFORMANT_CODE,
   INFORMANT_TITLE,
-  REASON_MOTHER_NOT_APPLYING,
-  REASON_FATHER_NOT_APPLYING,
-  REASON_CAREGIVER_NOT_APPLYING,
   createPractitionerEntryTemplate,
   BIRTH_CORRECTION_ENCOUNTER_CODE,
   DEATH_CORRECTION_ENCOUNTER_CODE,
@@ -312,26 +309,6 @@ export async function removeObservationResource(
       }
     }
   })
-}
-
-export function getReasonCodeAndDesc(type: string) {
-  switch (type) {
-    case 'MOTHER':
-      return {
-        code: REASON_MOTHER_NOT_APPLYING,
-        desc: 'Reason mother not applying'
-      }
-    case 'FATHER':
-      return {
-        code: REASON_FATHER_NOT_APPLYING,
-        desc: 'Reason father not applying'
-      }
-    default:
-      return {
-        code: REASON_CAREGIVER_NOT_APPLYING,
-        desc: 'Reason caregiver not applying'
-      }
-  }
 }
 
 export function createObservationResource(

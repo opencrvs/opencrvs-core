@@ -258,6 +258,7 @@ type DeathRegistration implements EventRegistration {
   eventLocation: Location
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
+  causeOfDeathEstablished: String
   causeOfDeath: String
   maleDependentsOfDeceased: Float
   femaleDependentsOfDeceased: Float
@@ -471,6 +472,7 @@ input DeathRegistrationInput {
   spouse: PersonInput
   eventLocation: LocationInput
   mannerOfDeath: MannerOfDeath
+  causeOfDeathEstablished: String
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
   maleDependentsOfDeceased: Float

@@ -132,6 +132,7 @@ export interface GQLDeathRegistration extends GQLEventRegistration {
   mannerOfDeath?: GQLMannerOfDeath
   deathDescription?: string
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
+  causeOfDeathEstablished?: string
   causeOfDeath?: string
   maleDependentsOfDeceased?: number
   femaleDependentsOfDeceased?: number
@@ -381,6 +382,7 @@ export interface GQLDeathRegistrationInput {
   mannerOfDeath?: GQLMannerOfDeath
   deathDescription?: string
   causeOfDeathMethod?: GQLCauseOfDeathMethodType
+  causeOfDeathEstablished?: string
   causeOfDeath?: string
   maleDependentsOfDeceased?: number
   femaleDependentsOfDeceased?: number
@@ -682,6 +684,7 @@ export const enum GQLLocationType {
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE',
   CRVS_OFFICE = 'CRVS_OFFICE',
   PRIVATE_HOME = 'PRIVATE_HOME',
+  DECEASED_USUAL_RESIDENCE = 'DECEASED_USUAL_RESIDENCE',
   SECONDARY_ADDRESS = 'SECONDARY_ADDRESS',
   PRIMARY_ADDRESS = 'PRIMARY_ADDRESS',
   MILITARY_BASE_OR_CANTONMENT = 'MILITARY_BASE_OR_CANTONMENT',
@@ -2687,6 +2690,7 @@ export interface GQLDeathRegistrationTypeResolver<TParent = any> {
   mannerOfDeath?: DeathRegistrationToMannerOfDeathResolver<TParent>
   deathDescription?: DeathRegistrationToDeathDescriptionResolver<TParent>
   causeOfDeathMethod?: DeathRegistrationToCauseOfDeathMethodResolver<TParent>
+  causeOfDeathEstablished?: DeathRegistrationToCauseOfDeathEstablishedResolver<TParent>
   causeOfDeath?: DeathRegistrationToCauseOfDeathResolver<TParent>
   maleDependentsOfDeceased?: DeathRegistrationToMaleDependentsOfDeceasedResolver<TParent>
   femaleDependentsOfDeceased?: DeathRegistrationToFemaleDependentsOfDeceasedResolver<TParent>
@@ -2778,6 +2782,13 @@ export interface DeathRegistrationToDeathDescriptionResolver<
 }
 
 export interface DeathRegistrationToCauseOfDeathMethodResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface DeathRegistrationToCauseOfDeathEstablishedResolver<
   TParent = any,
   TResult = any
 > {
