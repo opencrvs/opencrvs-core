@@ -75,5 +75,4 @@ type Query {
 type Mutation {
   createOrUpdateFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModify!): FormDraft
-  deleteFormDraft(formDraft: FormDraftStatusModify!): FormDraft
 }
