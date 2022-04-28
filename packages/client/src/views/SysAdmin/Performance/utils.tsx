@@ -47,7 +47,7 @@ export const SubHeader = styled.div`
 export const Description = styled.div`
   margin: 8px 0px;
   color: ${({ theme }) => theme.colors.supportingCopy};
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.reg14};
 `
 
 export const ActionContainer = styled.div`

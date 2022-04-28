@@ -45,6 +45,7 @@ import { getEventDurationHandler } from '@metrics/features/getEventDuration/hand
 import { totalMetricsHandler } from '@metrics/features/totalMetrics/handler'
 import { totalPaymentsHandler } from '@metrics/features/payments/handler'
 import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
+import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -320,6 +321,20 @@ export const getRoutes = () => {
             timeEnd: Joi.string().required(),
             locationId: Joi.string(),
             event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'GET',
+      path: '/locationStatistics',
+      handler: locationStatisticsHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            locationId: Joi.string(),
+            populationYear: Joi.string()
           })
         },
         tags: ['api']

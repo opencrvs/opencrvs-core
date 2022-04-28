@@ -324,7 +324,7 @@ export const getDistrictLocation = async (
 
   let locationBundle = await fetchLocation(lId, authHeader)
 
-  let locationType = getLocationType(locationBundle)
+  let locationType = getJurisdictionType(locationBundle)
   while (
     locationBundle &&
     (!locationType || locationType.value !== 'DISTRICT')
@@ -336,7 +336,7 @@ export const getDistrictLocation = async (
         locationBundle.partOf.reference.split('/')[1]) ||
       ''
     locationBundle = await fetchLocation(lId, authHeader)
-    locationType = getLocationType(locationBundle)
+    locationType = getJurisdictionType(locationBundle)
   }
 
   if (!locationBundle) {
@@ -346,7 +346,7 @@ export const getDistrictLocation = async (
   return locationBundle as Location
 }
 
-function getLocationType(locationBundle: fhir.Location) {
+export function getJurisdictionType(locationBundle: fhir.Location) {
   return (
     locationBundle &&
     locationBundle.identifier &&
@@ -357,6 +357,15 @@ function getLocationType(locationBundle: fhir.Location) {
   )
 }
 
+export function getLocationType(location: fhir.Location): string {
+  if (location.type?.coding?.[0]?.code) {
+    return location.type.coding[0].code
+  } else {
+    throw new Error(
+      `Location type could not be found for location, location id ${location.id}`
+    )
+  }
+}
 export function fillEmptyDataArrayByKey(
   dataArray: Array<any>,
   emptyDataArray: Array<any>,
@@ -456,4 +465,34 @@ export function getPercentage(value: number, total: number, decimalPoint = 2) {
   return value === 0 || total === 0
     ? 0
     : Number(((value / total) * 100).toFixed(decimalPoint))
+}
+
+export function getPopulation(
+  location: fhir.Location,
+  populationYear: number
+): number {
+  const totalPopulationExtension = location.extension?.find(
+    (ext) => ext.url === OPENCRVS_SPECIFICATION_URL + TOTAL_POPULATION_SEC
+  )
+
+  if (!totalPopulationExtension) {
+    throw new Error(
+      `Total population extension not found for location, location ID: ${location.id}`
+    )
+  }
+  const populationDataArray: Record<string, number>[] =
+    totalPopulationExtension.valueString
+      ? JSON.parse(totalPopulationExtension.valueString)
+      : []
+  const populationYears = populationDataArray.map((data) =>
+    Number(Object.keys(data)[0])
+  )
+  const latestAvailableYear = Math.max(...populationYears)
+  const populationYearToConsider =
+    populationYear > latestAvailableYear ? latestAvailableYear : populationYear
+  const totalPopulation = populationDataArray.find((record) =>
+    record.hasOwnProperty(populationYearToConsider.toString())
+  )
+
+  return totalPopulation ? totalPopulation[populationYearToConsider] : 0
 }

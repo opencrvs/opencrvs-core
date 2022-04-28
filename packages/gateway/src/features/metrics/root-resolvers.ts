@@ -16,13 +16,14 @@ import {
 } from '@gateway/features/fhir/utils'
 
 export interface IMetricsParam {
-  timeStart: string
-  timeEnd: string
+  timeStart?: string
+  timeEnd?: string
   locationId?: string
   event?: string
   practitionerIds?: string[]
   practitionerId?: string
   count?: number
+  populationYear?: number
 }
 
 export const resolvers: GQLResolver = {
@@ -131,6 +132,13 @@ export const resolvers: GQLResolver = {
           locationId,
           count
         },
+        authHeader
+      )
+    },
+    async getLocationStatistics(_, { locationId, populationYear }, authHeader) {
+      return getMetrics(
+        '/locationStatistics',
+        locationId ? { locationId, populationYear } : { populationYear },
         authHeader
       )
     }
