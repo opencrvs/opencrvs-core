@@ -25,7 +25,6 @@ import {
   BODY_WEIGHT_CODE,
   BIRTH_ATTENDANT_CODE,
   BIRTH_REG_TYPE_CODE,
-  INFORMANT_TYPE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE
@@ -212,7 +211,6 @@ test('should build a minimal FHIR registration document without error', async ()
       weightAtBirth: 3,
       attendantAtBirth: 'NURSE',
       birthRegistrationType: 'INFORMANT_ONLY',
-      informantType: 'INFORMANT_ONLY',
       childrenBornAliveToMother: 2,
       foetalDeathsToMother: 0,
       lastPreviousLiveBirth: '2014-01-28',
@@ -226,7 +224,6 @@ test('should build a minimal FHIR registration document without error', async ()
           attendantAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203',
           birthRegistrationType:
             '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes',
-          informantType: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586',
           childrenBornAliveToMother:
             '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe',
           foetalDeathsToMother: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324',
@@ -672,55 +669,41 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   expect(fhir.entry[18].resource.id).toBe(
-    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586'
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe'
   )
-  expect(fhir.entry[18].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[18].resource.valueQuantity.value).toBe(2)
   expect(fhir.entry[18].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
   expect(fhir.entry[18].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
-      code: INFORMANT_TYPE,
-      display: 'Present at birth registration'
+      code: NUMBER_BORN_ALIVE_CODE,
+      display: 'Number born alive to mother'
     }
   ])
   expect(fhir.entry[19].resource.id).toBe(
-    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe'
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324'
   )
-  expect(fhir.entry[19].resource.valueQuantity.value).toBe(2)
+  expect(fhir.entry[19].resource.valueQuantity.value).toBe(0)
   expect(fhir.entry[19].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
   expect(fhir.entry[19].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
-      code: NUMBER_BORN_ALIVE_CODE,
-      display: 'Number born alive to mother'
-    }
-  ])
-  expect(fhir.entry[20].resource.id).toBe(
-    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324'
-  )
-  expect(fhir.entry[20].resource.valueQuantity.value).toBe(0)
-  expect(fhir.entry[20].resource.context.reference).toEqual(
-    fhir.entry[12].fullUrl
-  )
-  expect(fhir.entry[20].resource.code.coding).toEqual([
-    {
-      system: 'http://loinc.org',
       code: NUMBER_FOEATAL_DEATH_CODE,
       display: 'Number foetal deaths to mother'
     }
   ])
-  expect(fhir.entry[21].resource.id).toBe(
+  expect(fhir.entry[20].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
   )
-  expect(fhir.entry[21].resource.valueDateTime).toBe('2014-01-28')
-  expect(fhir.entry[21].resource.context.reference).toEqual(
+  expect(fhir.entry[20].resource.valueDateTime).toBe('2014-01-28')
+  expect(fhir.entry[20].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[21].resource.code.coding).toEqual([
+  expect(fhir.entry[20].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: LAST_LIVE_BIRTH_CODE,

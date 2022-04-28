@@ -1172,31 +1172,6 @@ export const mockObservations = {
       }
     ]
   },
-  informantType: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'present-at-birth-reg',
-                display: 'Present at birth registration'
-              }
-            ]
-          },
-          effectiveDateTime: '2016-03-28', // same as registration date
-          valueString: 'BOTH_PARENTS'
-        }
-      }
-    ]
-  },
   childrenBornAliveToMother: {
     entry: [
       {

@@ -1133,7 +1133,7 @@ describe('Registration root resolvers', () => {
           composition: '20703e32-0e2f-4685-8371-e7448d18de82',
           encounter: '04cd7da2-89b6-4d68-b3c6-b158ce83b0e8',
           observation: {
-            informantType: 'c7879d8e-d094-42ed-804a-aeea8aaa7ef8'
+            birthType: 'c7879d8e-d094-42ed-804a-aeea8aaa7ef8'
           }
         }
       }

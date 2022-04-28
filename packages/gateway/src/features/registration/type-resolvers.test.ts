@@ -444,25 +444,6 @@ describe('Registration type resolvers', () => {
                   valueString: 'PHYSICIAN',
                   id: '305cf792-dd96-40b7-bdad-909861faa4b4'
                 }
-              },
-              {
-                resource: {
-                  resourceType: 'Observation',
-                  context: {
-                    reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
-                  },
-                  code: {
-                    coding: [
-                      {
-                        system: 'http://loinc.org',
-                        code: 'present-at-birth-reg',
-                        display: 'Present at birth registration'
-                      }
-                    ]
-                  },
-                  valueString: 'MOTHER_ONLY',
-                  id: '0280e498-5d70-4666-ae4e-12431dcea163'
-                }
               }
             ]
           }),
@@ -502,8 +483,7 @@ describe('Registration type resolvers', () => {
         observation: {
           birthType: 'aef33762-c5a3-4642-8d03-6e21c0ef6445',
           weightAtBirth: '5f761077-9623-4626-8ce6-648724614485',
-          attendantAtBirth: '305cf792-dd96-40b7-bdad-909861faa4b4',
-          informantType: '0280e498-5d70-4666-ae4e-12431dcea163'
+          attendantAtBirth: '305cf792-dd96-40b7-bdad-909861faa4b4'
         }
       })
     })
@@ -545,15 +525,6 @@ describe('Registration type resolvers', () => {
           mockComposition
         )
       expect(birthRegistrationType).toEqual('BOTH_PARENTS')
-    })
-    it('returns informantType', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockObservations.informantType))
-
-      // @ts-ignore
-      const informantType = await typeResolvers.BirthRegistration.informantType(
-        mockComposition
-      )
-      expect(informantType).toEqual('BOTH_PARENTS')
     })
     it('returns lastPreviousLiveBirth', async () => {
       fetch.mockResponseOnce(
@@ -681,24 +652,6 @@ describe('Registration type resolvers', () => {
           section: []
         })
       expect(birthRegistrationType).toEqual(null)
-    })
-    it('returns informantType null', async () => {
-      // @ts-ignore
-      const informantType = await typeResolvers.BirthRegistration.informantType(
-        {
-          section: []
-        }
-      )
-      expect(informantType).toEqual(null)
-    })
-    it('returns informantType null', async () => {
-      // @ts-ignore
-      const informantType = await typeResolvers.BirthRegistration.informantType(
-        {
-          section: []
-        }
-      )
-      expect(informantType).toEqual(null)
     })
     it('returns childrenBornAliveToMother null', async () => {
       // @ts-ignore
