@@ -385,75 +385,90 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               </Query>
             </Content>
           </LayoutLeft>
-          <ResponsiveModal
-            title={intl.formatMessage(constantsMessages.status)}
-            show={toggleStatus}
-            handleClose={this.togglePerformanceStatus}
-            actions={[]}
+          <Query
+            query={LOCATION_STATS}
+            variables={{
+              locationId: this.state.selectedLocation
+                ? this.state.selectedLocation.id
+                : undefined,
+              populationYear: timeEnd.getFullYear()
+            }}
+            fetchPolicy="no-cache"
           >
-            <ResponsiveModalContent>
-              <RegistrationStatus>
-                <SubHeader>
-                  {intl.formatMessage(messages.registrationByStatus)}
-                </SubHeader>
-                <Description>
-                  Current status of death records being processed
-                </Description>
-              </RegistrationStatus>
-              <PerformanceStats
-                registrationOffices={5}
-                totalRegistrars={200}
-                registrarsRatio={2}
-                citizen={50}
-              />
-            </ResponsiveModalContent>
-          </ResponsiveModal>
-          <LayoutRight>
-            <Query
-              query={LOCATION_STATS}
-              variables={{
-                locationId: this.state.selectedLocation
-                  ? this.state.selectedLocation.id
-                  : undefined,
-                populationYear: timeEnd.getFullYear()
-              }}
-              fetchPolicy="no-cache"
-            >
-              {({ loading, data, error }) => {
-                if (error) {
-                  return (
-                    <>
-                      <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                    </>
-                  )
-                }
+            {({ loading, data, error }) => {
+              return (
+                <>
+                  <ResponsiveModal
+                    title={intl.formatMessage(constantsMessages.status)}
+                    show={toggleStatus}
+                    handleClose={this.togglePerformanceStatus}
+                    actions={[]}
+                  >
+                    <ResponsiveModalContent>
+                      <RegistrationStatus>
+                        <SubHeader>
+                          {intl.formatMessage(messages.registrationByStatus)}
+                        </SubHeader>
+                        <Description>
+                          Current status of death records being processed
+                        </Description>
+                      </RegistrationStatus>
+                      {error ? (
+                        <>
+                          <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                        </>
+                      ) : loading ? (
+                        <Spinner id="location-stats-loading" />
+                      ) : (
+                        <PerformanceStats
+                          registrationOffices={
+                            data.getLocationStatistics!.offices
+                          }
+                          totalRegistrars={
+                            data.getLocationStatistics!.registrars
+                          }
+                          citizen={
+                            Math.round(data.getLocationStatistics!.population) /
+                            Math.round(data.getLocationStatistics!.registrars)
+                          }
+                        />
+                      )}
+                    </ResponsiveModalContent>
+                  </ResponsiveModal>
+                  <LayoutRight>
+                    {error ? (
+                      <>
+                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                      </>
+                    ) : loading ? (
+                      <Spinner id="location-stats-loading" />
+                    ) : (
+                      <PerformanceStats
+                        registrationOffices={
+                          data.getLocationStatistics!.offices
+                        }
+                        totalRegistrars={data.getLocationStatistics!.registrars}
+                        citizen={
+                          Math.round(data.getLocationStatistics!.population) /
+                          Math.round(data.getLocationStatistics!.registrars)
+                        }
+                      />
+                    )}
 
-                if (loading) {
-                  return <Spinner id="location-stats-loading" />
-                }
-                return (
-                  <PerformanceStats
-                    registrationOffices={data.getLocationStatistics!.offices}
-                    totalRegistrars={data.getLocationStatistics!.registrars}
-                    registrarsRatio={1}
-                    citizen={
-                      Math.round(data.getLocationStatistics!.population) /
-                      Math.round(data.getLocationStatistics!.registrars)
-                    }
-                  />
-                )
-              }}
-            </Query>
-            {/* TODO: RegistrationStatus could be replaced by the StatusWiseDeclarationCountView component */}
-            <RegistrationStatus>
-              <SubHeader>
-                {intl.formatMessage(messages.registrationByStatus)}
-              </SubHeader>
-              <Description>
-                Current status of death records being processed
-              </Description>
-            </RegistrationStatus>
-          </LayoutRight>
+                    {/* TODO: RegistrationStatus could be replaced by the StatusWiseDeclarationCountView component */}
+                    <RegistrationStatus>
+                      <SubHeader>
+                        {intl.formatMessage(messages.registrationByStatus)}
+                      </SubHeader>
+                      <Description>
+                        Current status of death records being processed
+                      </Description>
+                    </RegistrationStatus>
+                  </LayoutRight>
+                </>
+              )
+            }}
+          </Query>
         </Layout>
       </SysAdminContentWrapper>
     )
