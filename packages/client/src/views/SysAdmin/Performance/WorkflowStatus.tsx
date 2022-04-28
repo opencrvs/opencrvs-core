@@ -67,6 +67,11 @@ import subYears from 'date-fns/subYears'
 import differenceInSeconds from 'date-fns/differenceInSeconds'
 import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
 import { colors } from '@opencrvs/components/lib/colors'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
+import { DateRangePicker } from '@client/components/DateRangePicker'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -670,136 +675,139 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   }
 
   return (
-    <SysAdminContentWrapper
-      id="workflow-status"
-      type={SysAdminPageVariant.SUBPAGE}
-      headerTitle={intl.formatMessage(messages.workflowStatusHeader)}
-      backActionHandler={() =>
-        props.goToPerformanceHome(
-          new Date(timeStart),
-          new Date(timeEnd),
-          locationId
-        )
-      }
-      toolbarComponent={
-        <FilterContainer>
-          <LocationPicker
-            selectedLocationId={locationId}
-            onChangeLocation={(newLocationId: string) => {
-              props.goToWorkflowStatus(
-                newLocationId,
-                new Date(timeStart),
-                new Date(timeEnd),
-                status,
-                event
-              )
-            }}
-            requiredJurisdictionTypes={
-              window.config.DECLARATION_AUDIT_LOCATIONS
-            }
-          />
-          <PerformanceSelect
-            onChange={({ value }) => {
-              props.goToWorkflowStatus(
-                locationId,
-                new Date(timeStart),
-                new Date(timeEnd),
-                status,
-                value as Event
-              )
-            }}
-            id="event-select"
-            withLightTheme={true}
-            defaultWidth={175}
-            value={(event as unknown as EVENT_OPTIONS) || EVENT_OPTIONS.ALL}
-            options={[
-              {
-                label: intl.formatMessage(constantsMessages.allEvents),
-                value: EVENT_OPTIONS.ALL
-              },
-              {
-                label: intl.formatMessage(messages.eventOptionForBirths),
-                value: EVENT_OPTIONS.BIRTH
-              },
-              {
-                label: intl.formatMessage(messages.eventOptionForDeaths),
-                value: EVENT_OPTIONS.DEATH
+    <SysAdminContentWrapper id="workflow-status" isCertificatesConfigPage>
+      <Content
+        title={'Registration by Status'}
+        size={ContentSize.LARGE}
+        filterContent={
+          <FilterContainer>
+            <LocationPicker
+              selectedLocationId={locationId}
+              onChangeLocation={(newLocationId: string) => {
+                props.goToWorkflowStatus(
+                  newLocationId,
+                  new Date(timeStart),
+                  new Date(timeEnd),
+                  status,
+                  event
+                )
+              }}
+              requiredJurisdictionTypes={
+                window.config.DECLARATION_AUDIT_LOCATIONS
               }
-            ]}
-          />
-          <PerformanceSelect
-            onChange={({ value }) => {
-              props.goToWorkflowStatus(
-                locationId,
-                new Date(timeStart),
-                new Date(timeEnd),
-                value,
-                event
-              )
-            }}
-            id="status-select"
-            withLightTheme={true}
-            defaultWidth={175}
-            value={(status as string) || ''}
-            options={statusOptions.map((option) => ({
-              ...option,
-              label: intl.formatMessage(option.label)
-            }))}
-          />
-        </FilterContainer>
-      }
-    >
-      <Query
-        query={FETCH_EVENTS_WITH_PROGRESS}
-        variables={{
-          locationId: locationId,
-          skip: 0,
-          count: recordCount,
-          status: (status && [status]) || undefined,
-          type: (event && [`${event.toLowerCase()}-declaration`]) || undefined
-        }}
-        fetchPolicy={'no-cache'}
+            />
+            <PerformanceSelect
+              onChange={({ value }) => {
+                props.goToWorkflowStatus(
+                  locationId,
+                  new Date(timeStart),
+                  new Date(timeEnd),
+                  status,
+                  value as Event
+                )
+              }}
+              id="event-select"
+              withLightTheme={true}
+              defaultWidth={100}
+              value={(event as unknown as EVENT_OPTIONS) || EVENT_OPTIONS.BIRTH}
+              options={[
+                {
+                  label: intl.formatMessage(messages.eventOptionForBirths),
+                  value: EVENT_OPTIONS.BIRTH
+                },
+                {
+                  label: intl.formatMessage(messages.eventOptionForDeaths),
+                  value: EVENT_OPTIONS.DEATH
+                }
+              ]}
+            />
+            <DateRangePicker
+              startDate={new Date(timeStart)}
+              endDate={new Date(timeEnd)}
+              onDatesChange={({ startDate, endDate }) => {
+                props.goToWorkflowStatus(
+                  locationId,
+                  startDate,
+                  endDate,
+                  status,
+                  event
+                )
+              }}
+            />
+            <PerformanceSelect
+              onChange={({ value }) => {
+                props.goToWorkflowStatus(
+                  locationId,
+                  new Date(timeStart),
+                  new Date(timeEnd),
+                  value,
+                  event
+                )
+              }}
+              id="status-select"
+              withLightTheme={true}
+              defaultWidth={175}
+              value={(status as string) || ''}
+              options={statusOptions.map((option) => ({
+                ...option,
+                label: intl.formatMessage(option.label)
+              }))}
+            />
+          </FilterContainer>
+        }
       >
-        {({ data, loading, error }) => {
-          let total = 0
-          if (
-            data &&
-            data.getEventsWithProgress &&
-            data.getEventsWithProgress.totalItems
-          ) {
-            total = data.getEventsWithProgress.totalItems
-          }
-          return (
-            <>
-              <ListTable
-                id="declaration-status-list"
-                content={getContent(data)}
-                columns={getColumns(total)}
-                isLoading={loading || Boolean(error)}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-                hideBoxShadow
-                fixedWidth={2791}
-                tableHeight={150}
-                currentPage={currentPageNumber}
-                pageSize={recordCount}
-                totalItems={total}
-                highlightRowOnMouseOver
-                onPageChange={(currentPage: number) => {
-                  setCurrentPageNumber(currentPage)
-                }}
-                loadMoreText={intl.formatMessage(
-                  messages.showMoreUsersLinkLabel,
-                  {
-                    pageSize: DEFAULT_DECLARATION_STATUS_PAGE_SIZE
-                  }
-                )}
-                isFullPage
-              />
-              {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
-            </>
-          )
-        }}
-      </Query>
+        <Query
+          query={FETCH_EVENTS_WITH_PROGRESS}
+          variables={{
+            locationId: locationId,
+            skip: 0,
+            count: recordCount,
+            status: (status && [status]) || undefined,
+            type: (event && [`${event.toLowerCase()}-declaration`]) || undefined
+          }}
+          fetchPolicy={'no-cache'}
+        >
+          {({ data, loading, error }) => {
+            let total = 0
+            if (
+              data &&
+              data.getEventsWithProgress &&
+              data.getEventsWithProgress.totalItems
+            ) {
+              total = data.getEventsWithProgress.totalItems
+            }
+            return (
+              <>
+                <ListTable
+                  id="declaration-status-list"
+                  content={getContent(data)}
+                  columns={getColumns(total)}
+                  isLoading={loading || Boolean(error)}
+                  noResultText={intl.formatMessage(constantsMessages.noResults)}
+                  hideBoxShadow
+                  fixedWidth={2791}
+                  tableHeight={150}
+                  currentPage={currentPageNumber}
+                  pageSize={recordCount}
+                  totalItems={total}
+                  highlightRowOnMouseOver
+                  onPageChange={(currentPage: number) => {
+                    setCurrentPageNumber(currentPage)
+                  }}
+                  loadMoreText={intl.formatMessage(
+                    messages.showMoreUsersLinkLabel,
+                    {
+                      pageSize: DEFAULT_DECLARATION_STATUS_PAGE_SIZE
+                    }
+                  )}
+                  isFullPage
+                />
+                {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
+              </>
+            )
+          }}
+        </Query>
+      </Content>
     </SysAdminContentWrapper>
   )
 }
