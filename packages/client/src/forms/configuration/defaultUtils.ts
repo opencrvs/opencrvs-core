@@ -11,9 +11,14 @@
  */
 
 import {
+  BirthSection,
+  DeathSection,
   ISerializedForm,
   IQuestionConfig,
-  SerializedFormField
+  SerializedFormField,
+  Event,
+  REVIEW_OVERRIDE_POSITION,
+  ISerializedFormSection
 } from '@client/forms/index'
 import { cloneDeep } from 'lodash'
 import { getGroup, getIdentifiersFromFieldId, getSection } from '.'

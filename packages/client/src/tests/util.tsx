@@ -275,7 +275,6 @@ export const primaryAddressData = {
 }
 
 export const secondaryAddressData = {
-  secondaryAddressSameAsPrimary: false,
   secondaryAddress: '',
   countrySecondary: 'FAR',
   stateSecondary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
@@ -351,7 +350,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -365,7 +364,6 @@ export const currentUserDeclarations = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -373,7 +371,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -469,7 +467,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -482,7 +480,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -490,7 +487,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -542,7 +539,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -555,7 +552,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -563,7 +559,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -615,7 +611,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -628,7 +624,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -636,7 +631,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -687,7 +682,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -700,7 +695,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -708,7 +702,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -760,7 +754,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -773,7 +767,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -781,7 +774,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -833,7 +826,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -846,7 +839,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -854,7 +846,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -901,7 +893,6 @@ export const currentUserDeclarations = {
           nationality: 'BGD',
           informantBirthDate: '2000-01-01',
           relationship: 'OTHER',
-          otherRelationship: 'Friend',
           informantPhone: '01711111111',
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -967,7 +958,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -980,7 +971,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -988,7 +978,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -1040,7 +1030,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -1053,7 +1043,6 @@ export const currentUserDeclarations = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          secondaryAddressSameAsOtherSecondary: true,
           primaryAddressSameAsOtherPrimary: true,
           ...primaryAddressData,
           ...primaryInternationalAddressLines,
@@ -1061,7 +1050,7 @@ export const currentUserDeclarations = {
           ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -1673,12 +1662,12 @@ export const mockDeclarationData = {
     ...secondaryInternationalAddressLines
   },
   father: {
-    fathersDetailsExist: true,
+    detailsExist: true,
     firstNames: 'গায়ত্রী',
     familyName: 'স্পিভক',
     firstNamesEng: 'Jeff',
     familyNameEng: 'Test',
-    iD: '43A8ZU817',
+    iD: '123456789',
     iDType: 'PASSPORT',
     fatherBirthDate: '1950-05-19',
     dateOfMarriage: '1972-09-19',
@@ -1689,15 +1678,17 @@ export const mockDeclarationData = {
     ...primaryInternationalAddressLines,
     ...secondaryAddressData,
     ...secondaryInternationalAddressLines,
-    primaryAddressSameAsOtherPrimary: true,
-    secondaryAddressSameAsOtherSecondary: true
+    primaryAddressSameAsOtherPrimary: true
   },
   registration: {
     whoseContactDetails: {
       value: 'MOTHER',
       nestedFields: { registrationPhone: '01557394986' }
     },
-    presentAtBirthRegistration: 'BOTH_PARENTS',
+    informantType: {
+      value: 'MOTHER',
+      nestedFields: { otherInformantType: '' }
+    },
     registrationNumber: '201908122365BDSS0SE1',
     regStatus: {
       type: 'REGISTERED',
@@ -1812,7 +1803,10 @@ export const mockBirthRegistrationSectionData = {
     value: 'MOTHER',
     nestedFields: { registrationPhone: '01557394986' }
   },
-  presentAtBirthRegistration: 'BOTH_PARENTS',
+  informantType: {
+    value: 'MOTHER',
+    nestedFields: { otherInformantType: '' }
+  },
   registrationPhone: '01557394986',
   trackingId: 'BDSS0SE',
   registrationNumber: '201908122365BDSS0SE1',
@@ -1844,7 +1838,10 @@ export const mockBirthRegistrationSectionData = {
 
 export const mockDeathRegistrationSectionData = {
   whoseContactDetails: 'MOTHER',
-  presentAtBirthRegistration: 'BOTH_PARENTS',
+  informantType: {
+    value: 'MOTHER',
+    nestedFields: { otherInformantType: '' }
+  },
   registrationPhone: '01557394986',
   trackingId: 'DDSS0SE',
   registrationNumber: '201908122365DDSS0SE1',
@@ -2010,7 +2007,6 @@ export const mockDeathDeclarationDataWithoutFirstNames = {
     addressLine1Primary: '193 Kalibari Road',
     postCodePrimary: '2200',
     secondaryAddress: '',
-    secondaryAddressSameAsPrimary: true,
     country: 'BGD',
     state: '',
     district: '',
@@ -2112,15 +2108,16 @@ export const getFileFromBase64String = (
 
 export async function goToSection(component: ReactWrapper, nth: number) {
   for (let i = 0; i < nth; i++) {
+    await waitForElement(component, '#next_section')
     component.find('#next_section').hostNodes().simulate('click')
-
     await flushPromises()
-    component.update()
+    await component.update()
   }
 }
 
 export async function goToEndOfForm(component: ReactWrapper) {
-  await goToSection(component, 5)
+  await goToSection(component, 6)
+  //console.log(component.debug())
   await waitForElement(component, '#review_header')
 }
 

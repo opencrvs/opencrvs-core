@@ -37,9 +37,7 @@ import {
   SEARCH,
   SEARCH_RESULT,
   SELECT_BIRTH_INFORMANT,
-  SELECT_BIRTH_MAIN_CONTACT_POINT,
   SELECT_DEATH_INFORMANT,
-  SELECT_DEATH_MAIN_CONTACT_POINT,
   SELECT_VITAL_EVENT,
   SETTINGS,
   SYS_ADMIN_HOME_TAB,
@@ -162,24 +160,8 @@ export function goToDeathInformant(declarationId: string) {
   )
 }
 
-export function goToBirthContactPoint(declarationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_MAIN_CONTACT_POINT, {
-      declarationId
-    })
-  )
-}
-
 export function goToEventInfo(eventType: Event) {
   return push(formatUrl(EVENT_INFO, { eventType }))
-}
-
-export function goToDeathContactPoint(declarationId: string) {
-  return push(
-    formatUrl(SELECT_DEATH_MAIN_CONTACT_POINT, {
-      declarationId
-    })
-  )
 }
 
 export function goToEvents() {

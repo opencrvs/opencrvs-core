@@ -190,7 +190,7 @@ describe('In Progress tab', () => {
           id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
           data: {
             registration: {
-              presentAtBirthRegistration: 'MOTHER_ONLY',
+              informantType: 'MOTHER',
               informant: 'MOTHER_ONLY',
               registrationPhone: '01722222222',
               whoseContactDetails: 'MOTHER'
@@ -211,7 +211,7 @@ describe('In Progress tab', () => {
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
             registration: {
-              presentAtBirthRegistration: 'MOTHER_ONLY',
+              informantType: 'MOTHER',
               informant: 'MOTHER_ONLY',
               registrationPhone: '01722222222',
               whoseContactDetails: 'MOTHER'

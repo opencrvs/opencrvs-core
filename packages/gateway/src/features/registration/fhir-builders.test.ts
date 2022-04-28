@@ -25,7 +25,6 @@ import {
   BODY_WEIGHT_CODE,
   BIRTH_ATTENDANT_CODE,
   BIRTH_REG_TYPE_CODE,
-  BIRTH_REG_PRESENT_CODE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE
@@ -50,7 +49,8 @@ test('should build a minimal FHIR registration document without error', async ()
         dateOfMarriage: '2014-01-28',
         nationality: ['BGD'],
         educationalAttainment: 'UPPER_SECONDARY_ISCED_3',
-        occupation: 'Mother Occupation'
+        occupation: 'Mother Occupation',
+        reasonNotApplying: ''
       },
       father: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb40',
@@ -94,7 +94,8 @@ test('should build a minimal FHIR registration document without error', async ()
         dateOfMarriage: '2014-01-28',
         nationality: ['BGD'],
         educationalAttainment: 'UPPER_SECONDARY_ISCED_3',
-        occupation: 'Father Occupation'
+        occupation: 'Father Occupation',
+        reasonNotApplying: ''
       },
       child: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb41',
@@ -145,7 +146,7 @@ test('should build a minimal FHIR registration document without error', async ()
             status: 'final',
             originalFileName: 'original.jpg',
             systemFileName: 'system.jpg',
-            type: 'NATIONAL_ID_FRONT',
+            type: 'NATIONAL_ID',
             createdAt: '2018-10-21'
           },
           {
@@ -210,7 +211,6 @@ test('should build a minimal FHIR registration document without error', async ()
       weightAtBirth: 3,
       attendantAtBirth: 'NURSE',
       birthRegistrationType: 'INFORMANT_ONLY',
-      presentAtBirthRegistration: 'INFORMANT_ONLY',
       childrenBornAliveToMother: 2,
       foetalDeathsToMother: 0,
       lastPreviousLiveBirth: '2014-01-28',
@@ -224,8 +224,6 @@ test('should build a minimal FHIR registration document without error', async ()
           attendantAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203',
           birthRegistrationType:
             '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes',
-          presentAtBirthRegistration:
-            '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586',
           childrenBornAliveToMother:
             '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe',
           foetalDeathsToMother: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324',
@@ -417,7 +415,7 @@ test('should build a minimal FHIR registration document without error', async ()
     coding: [
       {
         system: 'http://opencrvs.org/specs/supporting-doc-type',
-        code: 'NATIONAL_ID_FRONT'
+        code: 'NATIONAL_ID'
       }
     ]
   })
@@ -671,55 +669,41 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   expect(fhir.entry[18].resource.id).toBe(
-    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586'
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe'
   )
-  expect(fhir.entry[18].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[18].resource.valueQuantity.value).toBe(2)
   expect(fhir.entry[18].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
   expect(fhir.entry[18].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
-      code: BIRTH_REG_PRESENT_CODE,
-      display: 'Present at birth registration'
+      code: NUMBER_BORN_ALIVE_CODE,
+      display: 'Number born alive to mother'
     }
   ])
   expect(fhir.entry[19].resource.id).toBe(
-    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe'
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324'
   )
-  expect(fhir.entry[19].resource.valueQuantity.value).toBe(2)
+  expect(fhir.entry[19].resource.valueQuantity.value).toBe(0)
   expect(fhir.entry[19].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
   expect(fhir.entry[19].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
-      code: NUMBER_BORN_ALIVE_CODE,
-      display: 'Number born alive to mother'
-    }
-  ])
-  expect(fhir.entry[20].resource.id).toBe(
-    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324'
-  )
-  expect(fhir.entry[20].resource.valueQuantity.value).toBe(0)
-  expect(fhir.entry[20].resource.context.reference).toEqual(
-    fhir.entry[12].fullUrl
-  )
-  expect(fhir.entry[20].resource.code.coding).toEqual([
-    {
-      system: 'http://loinc.org',
       code: NUMBER_FOEATAL_DEATH_CODE,
       display: 'Number foetal deaths to mother'
     }
   ])
-  expect(fhir.entry[21].resource.id).toBe(
+  expect(fhir.entry[20].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
   )
-  expect(fhir.entry[21].resource.valueDateTime).toBe('2014-01-28')
-  expect(fhir.entry[21].resource.context.reference).toEqual(
+  expect(fhir.entry[20].resource.valueDateTime).toBe('2014-01-28')
+  expect(fhir.entry[20].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[21].resource.code.coding).toEqual([
+  expect(fhir.entry[20].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: LAST_LIVE_BIRTH_CODE,
@@ -827,7 +811,7 @@ test('creates task with contact other relationship', async () => {
             status: 'final',
             originalFileName: 'original.jpg',
             systemFileName: 'system.jpg',
-            type: 'NATIONAL_ID_FRONT',
+            type: 'NATIONAL_ID',
             createdAt: '2018-10-21'
           },
           {
@@ -900,47 +884,6 @@ test('creates task with contact other relationship', async () => {
       })
     )
   ).toBe(true)
-})
-
-test('build bundle for primaryCaregive', async () => {
-  const fhir: fhir.Bundle = await buildFHIRBundle(
-    {
-      primaryCaregiver: {
-        parentDetailsType: 'MOTHER_AND_FATHER',
-        primaryCaregiver: {
-          _fhirID: '8f18a6ea-89d1-4b03-xxxx-xxxxxxxxx',
-          name: [
-            {
-              use: 'en',
-              firstNames: 'Sahriar',
-              familyName: 'Toufiq'
-            }
-          ]
-        },
-        reasonsNotApplying: [
-          {
-            primaryCaregiverType: 'MOTHER',
-            isDeceased: true
-          },
-          {
-            reasonNotApplying: 'Sick',
-            primaryCaregiverType: 'FATHER'
-          },
-          {
-            primaryCaregiverType: 'LEGAL_GUARDIAN',
-            reasonNotApplying: 'Not present'
-          }
-        ]
-      }
-    },
-    'BIRTH' as EVENT_TYPE
-  )
-
-  expect(fhir).toBeDefined()
-  expect(fhir.entry.length).toBe(7)
-  expect(fhir.entry[2].resource.resourceType).toBe('Observation')
-  const observation = fhir.entry[2].resource as fhir.Observation
-  expect(observation.valueString).toBe('MOTHER_AND_FATHER')
 })
 
 test('should build bundle for correction fhir builders', async () => {
