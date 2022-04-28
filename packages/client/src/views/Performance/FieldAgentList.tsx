@@ -28,6 +28,7 @@ import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrat
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
+import { AvatarSmall } from '@client/components/Avatar'
 import {
   ColumnContentAlignment,
   TableView
@@ -47,6 +48,7 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
+import { IAvatar } from '@client/utils/userUtils'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -109,6 +111,23 @@ enum STATUS_OPTIONS {
 const TableDiv = styled.div`
   overflow: auto;
 `
+
+const NameAvatar = styled.div`
+  display: flex;
+  align-items: center;
+  img {
+    margin-right: 10px;
+  }
+`
+
+function getNameWithAvatar(userName: string, avatar: IAvatar) {
+  return (
+    <NameAvatar>
+      <AvatarSmall name={userName} avatar={avatar as IAvatar} />
+      <span>{userName}</span>
+    </NameAvatar>
+  )
+}
 
 function getPercentage(total: number | undefined, current: number | undefined) {
   if (!total || total <= 0 || !current || current <= 0) {
@@ -314,7 +333,7 @@ function FieldAgentListComponent(props: IProps) {
           row.primaryOfficeId &&
           offices.find(({ id }) => id === row.primaryOfficeId)
         return {
-          name: row.fullName,
+          name: getNameWithAvatar(row.fullName || '', row.avatar as IAvatar),
           type: row.type,
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
