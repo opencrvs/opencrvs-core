@@ -43,8 +43,13 @@ export const PERFORMANCE_METRICS = gql`
   }
 `
 
-export const LOCATION_STATS = gql`
-  query data($locationId: String, $populationYear: Int!) {
+export const PERFORMANCE_STATS = gql`
+  query data(
+    $locationId: String
+    $populationYear: Int!
+    $status: [String]!
+    $event: String
+  ) {
     getLocationStatistics(
       locationId: $locationId
       populationYear: $populationYear
@@ -52,6 +57,18 @@ export const LOCATION_STATS = gql`
       population
       offices
       registrars
+    }
+
+    fetchRegistrationCountByStatus(
+      locationId: $locationId
+      status: $status
+      event: $event
+    ) {
+      results {
+        status
+        count
+      }
+      total
     }
   }
 `

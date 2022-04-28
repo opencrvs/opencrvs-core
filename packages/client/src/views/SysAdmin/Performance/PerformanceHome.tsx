@@ -41,7 +41,7 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
-import { PERFORMANCE_METRICS, LOCATION_STATS } from './metricsQuery'
+import { PERFORMANCE_METRICS, PERFORMANCE_STATS } from './metricsQuery'
 import { ApolloError } from 'apollo-client'
 import {
   ToastNotification,
@@ -386,12 +386,21 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             </Content>
           </LayoutLeft>
           <Query
-            query={LOCATION_STATS}
+            query={PERFORMANCE_STATS}
             variables={{
               locationId: this.state.selectedLocation
                 ? this.state.selectedLocation.id
                 : undefined,
-              populationYear: timeEnd.getFullYear()
+              populationYear: timeEnd.getFullYear(),
+              event: this.state.event,
+              status: [
+                'IN_PROGRESS',
+                'DECLARED',
+                'REJECTED',
+                'VALIDATED',
+                'WAITING_VALIDATION',
+                'REGISTERED'
+              ]
             }}
             fetchPolicy="no-cache"
           >
