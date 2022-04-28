@@ -11,6 +11,9 @@
  */
 const proxy = require('http-proxy-middleware')
 const https = require('https')
+
+const PROXY_TO_HOST = process.env.PROXY_TO_HOST || 'farajaland-qa.opencrvs.org'
+
 function makeRequest(options) {
   return new Promise((resolve, reject) => {
     const req = https.request(options, (res) => {
@@ -43,6 +46,7 @@ module.exports = function (app) {
     app.use((req, res, next) => {
       const isIndexHTMLPath = !req.path.includes('.')
       if (isIndexHTMLPath) {
+        console.log(`Proxying to ${PROXY_TO_HOST}`)
         replaceBody(res, (body) => {
           return body.replace('http://localhost:3040', '')
         })
@@ -50,7 +54,7 @@ module.exports = function (app) {
       if (req.path === '/client-config.js') {
         replaceBody(res, async () => {
           const config = await makeRequest({
-            hostname: 'countryconfig.farajaland-qa.opencrvs.org',
+            hostname: `countryconfig.${PROXY_TO_HOST}`,
             path: '/client-config.js',
             method: 'GET',
             headers: {
@@ -59,7 +63,7 @@ module.exports = function (app) {
           })
 
           return config.replace(
-            'https://login.farajaland-qa.opencrvs.org',
+            `https://login.${PROXY_TO_HOST}`,
             'http://localhost:3020/'
           )
         })

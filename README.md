@@ -165,6 +165,12 @@ To start and stop opencrvs-core and the country configuration server, use the fo
 1. Press Ctrl+c in the opencrvs-core terminal
 2. Press Ctrl+c in the opencrvs-farajaland terminal
 
+### Starting in frontend-only mode
+
+When doing core development, it's sometimes desirable to only start the frontend applications (client, login) and use an already deployed environment as a backend. Using this, you don't need to have the docker-compose stack or countryconfig running when working on the frontends.
+
+You can do this by running `yarn dev:frontend-only` or `PROXY_TO_HOST=host-of-deployed-environment.com yarn dev:frontend`, which enables you to use any deployed environment you want.
+
 ## Other servers
 
 When OpenCRVS is running, you can browse to other interesting servers such as:
