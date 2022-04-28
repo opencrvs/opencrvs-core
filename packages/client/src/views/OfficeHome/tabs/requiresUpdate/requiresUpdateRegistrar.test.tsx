@@ -662,7 +662,7 @@ describe('OfficeHome sent for update tab related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: WORKQUEUE_TABS.sentForUpdates
+              tabId: WORKQUEUE_TABS.requiresUpdateRegistrar
             },
             isExact: true,
             path: '',

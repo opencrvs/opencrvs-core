@@ -268,7 +268,7 @@ const RequiresUpdateFieldAgentComponent = (props: IFullProps) => {
       }) => {
         return (
           <WQContentWrapper
-            title={intl.formatMessage(navigationMessages.requiresUpdate)}
+            title={intl.formatMessage(navigationMessages.requiresUpdateAgent)}
             isMobileSize={
               width && width < props.theme.grid.breakpoints.lg ? true : false
             }
@@ -317,6 +317,12 @@ const RequiresUpdateFieldAgentComponent = (props: IFullProps) => {
                 loading={loading}
                 sortedCol={sortedCol}
                 sortOrder={sortOrder}
+                hideLastBorder={
+                  data?.searchEvents?.totalItems &&
+                  data?.searchEvents?.totalItems > pageSize
+                    ? false
+                    : true
+                }
               />
             )}
           </WQContentWrapper>

@@ -225,6 +225,7 @@ function InExternalValidationComponent(props: IProps) {
         columns={columns}
         sortOrder={sortOrder}
         sortedCol={sortedCol}
+        hideLastBorder={!isShowPagination}
       />
     </WQContentWrapper>
   )

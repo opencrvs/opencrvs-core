@@ -489,6 +489,7 @@ export class SearchResultView extends React.Component<
                               constantsMessages.noResults
                             )}
                             clickable={true}
+                            hideLastBorder={true}
                           />
                         </>
                       )}

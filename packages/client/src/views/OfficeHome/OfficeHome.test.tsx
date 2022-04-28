@@ -174,7 +174,7 @@ describe('OfficeHome related tests', () => {
 
       await waitForElement(testComponent, '#navigation_progress')
       await waitForElement(testComponent, '#navigation_readyForReview')
-      await waitForElement(testComponent, '#navigation_sentForUpdates')
+      await waitForElement(testComponent, '#navigation_requiresUpdateRegistrar')
       await waitForElement(testComponent, '#navigation_print')
       await waitForElement(testComponent, '#navigation_waitingValidation')
     })
@@ -209,8 +209,8 @@ describe('OfficeHome related tests', () => {
         app.find('#navigation_readyForReview').hostNodes().text()
       ).toContain('Ready for review3')
       expect(
-        app.find('#navigation_sentForUpdates').hostNodes().text()
-      ).toContain('Sent for updates4')
+        app.find('#navigation_requiresUpdateRegistrar').hostNodes().text()
+      ).toContain('Requires update4')
       expect(
         app.find('#navigation_waitingValidation').hostNodes().text()
       ).toContain('In external validation6')
@@ -329,7 +329,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TABS.sentForUpdates },
+            params: { tabId: WORKQUEUE_TABS.requiresUpdateRegistrar },
             isExact: true,
             path: '',
             url: ''
@@ -498,7 +498,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: WORKQUEUE_TABS.sentForUpdates },
+            params: { tabId: WORKQUEUE_TABS.requiresUpdateRegistrar },
             isExact: true,
             path: '',
             url: ''

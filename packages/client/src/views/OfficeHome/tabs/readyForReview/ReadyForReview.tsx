@@ -204,7 +204,6 @@ class ReadyForReviewComponent extends React.Component<
           new Date(reg.dateOfEvent)) ||
         ''
       const createdAt = (reg.createdAt && parseInt(reg.createdAt)) || ''
-      console.log(reg)
       return {
         ...reg,
         event,
@@ -351,6 +350,7 @@ class ReadyForReviewComponent extends React.Component<
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
+          hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>
     )

@@ -308,7 +308,7 @@ export class OfficeHomeView extends React.Component<
           this.syncWorkqueue()
         })
         break
-      case WORKQUEUE_TABS.sentForUpdates:
+      case WORKQUEUE_TABS.requiresUpdateRegistrar:
         this.setState({ updatesCurrentPage: newPageNumber }, () => {
           this.syncWorkqueue()
         })
@@ -329,7 +329,7 @@ export class OfficeHomeView extends React.Component<
           this.syncWorkqueue
         )
         break
-      case WORKQUEUE_TABS.requiresUpdate:
+      case WORKQUEUE_TABS.requiresUpdateAgent:
         this.setState({ requireUpdatePage: newPageNumber })
         break
       case WORKQUEUE_TABS.sentForReview:
@@ -422,7 +422,7 @@ export class OfficeHomeView extends React.Component<
                   error={error}
                 />
               )}
-              {tabId === WORKQUEUE_TABS.sentForUpdates && (
+              {tabId === WORKQUEUE_TABS.requiresUpdateRegistrar && (
                 <RequiresUpdateRegistrar
                   queryData={{
                     data: filteredData.rejectTab
@@ -483,7 +483,7 @@ export class OfficeHomeView extends React.Component<
                   onPageChange={this.onPageChange}
                 />
               )}
-              {tabId === WORKQUEUE_TABS.requiresUpdate && (
+              {tabId === WORKQUEUE_TABS.requiresUpdateAgent && (
                 <RequiresUpdateFieldAgent
                   userDetails={this.props.userDetails}
                   pageSize={this.pageSize}

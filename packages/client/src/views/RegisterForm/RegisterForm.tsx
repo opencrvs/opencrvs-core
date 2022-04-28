@@ -67,7 +67,11 @@ import { HOME } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled, { keyframes } from '@client/styledComponents'
-import { Scope } from '@client/utils/authUtils'
+import {
+  Scope,
+  hasRegisterScope,
+  hasRegistrationClerkScope
+} from '@client/utils/authUtils'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import {
   getVisibleSectionGroupsBasedOnConditions,
@@ -483,7 +487,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
       case 'IN_PROGRESS':
         return 'progress/field-agents'
       case 'REJECTED':
-        return WORKQUEUE_TABS.sentForUpdates
+        if (
+          hasRegisterScope(this.props.scope) ||
+          hasRegistrationClerkScope(this.props.scope)
+        ) {
+          return WORKQUEUE_TABS.requiresUpdateRegistrar
+        }
+        return WORKQUEUE_TABS.requiresUpdateAgent
       case 'VALIDATED':
         return WORKQUEUE_TABS.readyForReview
       default:

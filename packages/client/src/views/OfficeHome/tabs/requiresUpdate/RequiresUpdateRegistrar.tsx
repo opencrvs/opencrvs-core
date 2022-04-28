@@ -309,7 +309,7 @@ class RequiresUpdateRegistrarComponent extends React.Component<
         : false
     return (
       <WQContentWrapper
-        title={intl.formatMessage(navigationMessages.sentForUpdates)}
+        title={intl.formatMessage(navigationMessages.requiresUpdateRegistrar)}
         isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
         paginationId={paginationId}
@@ -329,6 +329,7 @@ class RequiresUpdateRegistrarComponent extends React.Component<
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
+          hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>
     )

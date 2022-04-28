@@ -917,7 +917,9 @@ describe('ReviewForm tests', () => {
     const exitButton = await waitForElement(testComponent, '#save_draft')
     exitButton.hostNodes().simulate('click')
     testComponent.update()
-    expect(window.location.href).toContain(WORKQUEUE_TABS.sentForUpdates)
+    expect(window.location.href).toContain(
+      WORKQUEUE_TABS.requiresUpdateRegistrar
+    )
   })
 
   it('redirect to progress tab when exit button is clicked', async () => {

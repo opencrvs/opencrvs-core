@@ -533,6 +533,7 @@ export class InProgressComponent extends React.Component<
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
         sortedCol={this.state.sortedCol}
+        hideLastBorder={!this.isShowPagination}
       />
     )
   }
@@ -546,9 +547,25 @@ export class InProgressComponent extends React.Component<
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
         sortedCol={this.state.sortedCol}
+        hideLastBorder={!this.isShowPagination}
       />
     )
   }
+
+  isShowPagination =
+    !this.props.selectorId || this.props.selectorId === SELECTOR_ID.ownDrafts
+      ? this.props.drafts.length > this.props.pageSize
+        ? true
+        : false
+      : this.props.selectorId === SELECTOR_ID.fieldAgentDrafts
+      ? this.props.queryData.inProgressData.totalItems &&
+        this.props.queryData.inProgressData.totalItems > this.props.pageSize
+        ? true
+        : false
+      : this.props.queryData.notificationData.totalItems &&
+        this.props.queryData.notificationData.totalItems > this.props.pageSize
+      ? true
+      : false
 
   render() {
     const { intl, selectorId, drafts, queryData, onPageChange, isFieldAgent } =
@@ -576,20 +593,6 @@ export class InProgressComponent extends React.Component<
               this.props.pageSize
           )
 
-    const isShowPagination =
-      !selectorId || selectorId === SELECTOR_ID.ownDrafts
-        ? this.props.drafts.length > this.props.pageSize
-          ? true
-          : false
-        : selectorId === SELECTOR_ID.fieldAgentDrafts
-        ? this.props.queryData.inProgressData.totalItems &&
-          this.props.queryData.inProgressData.totalItems > this.props.pageSize
-          ? true
-          : false
-        : this.props.queryData.notificationData.totalItems &&
-          this.props.queryData.notificationData.totalItems > this.props.pageSize
-        ? true
-        : false
     const noContent =
       !selectorId || selectorId === SELECTOR_ID.ownDrafts
         ? this.transformDraftContent().length <= 0
@@ -618,7 +621,7 @@ export class InProgressComponent extends React.Component<
             notificationData.totalItems || 0
           )
         }
-        isShowPagination={isShowPagination}
+        isShowPagination={this.isShowPagination}
         paginationId={paginationId}
         totalPages={totalPages}
         onPageChange={onPageChange}
@@ -641,6 +644,7 @@ export class InProgressComponent extends React.Component<
             loading={isFieldAgent ? false : this.props.loading}
             sortedCol={this.state.sortedCol}
             sortOrder={this.state.sortOrder}
+            hideLastBorder={!this.isShowPagination}
           />
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts &&

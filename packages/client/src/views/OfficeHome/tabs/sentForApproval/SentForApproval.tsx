@@ -258,6 +258,7 @@ class SentForApprovalComponent extends React.Component<
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
+          hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>
     )
