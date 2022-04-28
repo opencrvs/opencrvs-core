@@ -28,6 +28,7 @@ import FormDraft, {
 import { messageSchema } from '@config/handlers/question/createQuestion/handler'
 import { find, partition, isEmpty } from 'lodash'
 import { Event } from '@config/models/certificate'
+import { clearHearthElasticInfluxData } from '@config/services/formDraftService'
 
 export function isValidFormDraftOperation(
   currentStatus: string,
@@ -213,17 +214,22 @@ export async function modifyDraftStatusHandler(
     draft.updatedAt = Date.now()
 
     try {
+      if (formDraftStatusPayload.status === DraftStatus.DELETED) {
+        await clearHearthElasticInfluxData(request)
+      }
       await FormDraft.updateOne({ _id: draft._id }, draft)
     } catch (err) {
       logger.error(err)
       return h
-        .response(`Could not update draft for ${draft.event} event`)
+        .response(
+          `Could not able to update draft for ${draft.event} event. Error : ${err}`
+        )
         .code(400)
     }
   } else {
     return h
       .response(
-        `Could not found any form draft for ${formDraftStatusPayload.status}`
+        `Could not found any form draft for ${formDraftStatusPayload.event} event`
       )
       .code(400)
   }
@@ -262,6 +268,6 @@ export const modifyFormDraftStatus = Joi.object({
     .valid(...validEvent)
     .required(),
   status: Joi.string()
-    .valid(DraftStatus.IN_PREVIEW, DraftStatus.PUBLISHED)
+    .valid(DraftStatus.IN_PREVIEW, DraftStatus.PUBLISHED, DraftStatus.DELETED)
     .required()
 })

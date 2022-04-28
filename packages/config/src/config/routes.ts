@@ -37,10 +37,6 @@ import {
   modifyFormDraftStatus
 } from '@config/handlers/formDraft/createOrupdateFormDraft/handler'
 import getFormDraft from '@config/handlers/formDraft/getFormDraft/handler'
-import {
-  deleteFormDraftHandler,
-  requestSchema as deleteFormDraftReqSchema
-} from '@config/handlers/formDraft/deleteFormDraft/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -204,21 +200,6 @@ export default function getRoutes() {
         },
         validate: {
           payload: updateFormDraftReqSchema
-        }
-      }
-    },
-    {
-      method: 'DELETE',
-      path: '/draftQuestions',
-      handler: deleteFormDraftHandler,
-      config: {
-        tags: ['api'],
-        description: 'Delete form draft history & questions',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
-        },
-        validate: {
-          payload: deleteFormDraftReqSchema
         }
       }
     },
