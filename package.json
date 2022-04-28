@@ -16,6 +16,7 @@
     "start:prod": "yarn build && lerna run --parallel --ignore @opencrvs/mobile-proxy --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start:prod",
     "demo": "bash demo.sh",
     "dev": "bash dev.sh",
+    "dev:frontend": "lerna run build --scope @opencrvs/components && lerna run --scope @opencrvs/client --scope @opencrvs/login start:frontend",
     "dev:secrets:gen": "openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem",
     "open": "opener 'http://localhost:6060/' && opener 'http://localhost:3020/'",
     "lint": "lerna run lint",
