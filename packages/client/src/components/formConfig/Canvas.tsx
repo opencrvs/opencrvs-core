@@ -65,11 +65,11 @@ type IRouteProps = {
 }
 
 type ICanvasProps = {
-  selectedField: IConfigField | null
-  onFieldSelect: (field: IConfigField) => void
+  selectedFieldId: string | null
+  setSelectedFieldId: React.Dispatch<React.SetStateAction<string | null>>
 }
 
-export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
+export function Canvas({ selectedFieldId, setSelectedFieldId }: ICanvasProps) {
   const { event, section } = useParams<IRouteProps>()
   const dispatch = useDispatch()
   const fieldsMap = useSelector((store: IStoreState) =>
@@ -79,6 +79,7 @@ export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
     getRegisterFormSection(store, section, event)
   )
   const configFields = generateConfigFields(fieldsMap)
+  const selectedField = selectedFieldId ? fieldsMap[selectedFieldId] : null
 
   return (
     <CanvasBox>
@@ -90,7 +91,7 @@ export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
           <FormConfigElementCard
             key={fieldId}
             selected={isSelected}
-            onClick={() => onFieldSelect(configField)}
+            onClick={() => setSelectedFieldId(fieldId)}
             movable={isSelected}
             isUpDisabled={preceedingFieldId === FieldPosition.TOP}
             isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}

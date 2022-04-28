@@ -37,9 +37,9 @@ export function selectConfigField(
   store: IStoreState,
   event: Event,
   section: string,
-  fieldId: string
+  fieldId: string | null
 ) {
-  return selectConfigFields(store, event, section)[fieldId]
+  return fieldId ? selectConfigFields(store, event, section)[fieldId] : null
 }
 
 function generateQuestionConfigs(configFields: ISectionFieldMap) {

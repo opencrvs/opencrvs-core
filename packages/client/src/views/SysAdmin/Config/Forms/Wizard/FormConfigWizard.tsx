@@ -43,6 +43,7 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import { SaveActionModal, SaveActionContext } from './SaveActionModal'
 import { SaveActionNotification } from './SaveActionNotification'
 import { FormConfigSettings } from './FormConfigSettings'
+import { selectConfigField } from '@client/forms/configuration/configFields/selectors'
 
 const Container = styled.div`
   display: flex;
@@ -117,7 +118,7 @@ function isSelectedFieldValid(
 }
 
 export function FormConfigWizard() {
-  const [selectedField, setSelectedField] = React.useState<IConfigField | null>(
+  const [selectedFieldId, setSelectedFieldId] = React.useState<string | null>(
     null
   )
   const hasNatlSysAdminScope = useHasNatlSysAdminScope()
@@ -128,14 +129,17 @@ export function FormConfigWizard() {
     selectFormDraft(store, event)
   )
   const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
+  const selectedField = useSelector((store: IStoreState) =>
+    selectConfigField(store, event, section, selectedFieldId)
+  )
 
   /*
    * We need to clear the selected field if section changes
    * as the changed section won't have the previously selected field
    */
   React.useEffect(() => {
-    if (selectedField && !selectedField.fieldId.includes(section)) {
-      setSelectedField(null)
+    if (selectedFieldId && !selectedFieldId.includes(section)) {
+      setSelectedFieldId(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [section])
@@ -184,16 +188,16 @@ export function FormConfigWizard() {
           <>
             <CanvasContainer>
               <Canvas
-                selectedField={selectedField}
-                onFieldSelect={(field) => setSelectedField(field)}
+                selectedFieldId={selectedFieldId}
+                setSelectedFieldId={setSelectedFieldId}
               />
             </CanvasContainer>
             <ToolsContainer>
               {/*
-               *  The useEffect hook for clearing the selectedField takes
+               *  The useEffect hook for clearing the selectedFieldId takes
                *  effect after the render for when the section changes so
                *  for that particular render where the section has changed
-               *  but the selectedField is still from the previous section
+               *  but the selectedFieldId is still from the previous section,
                *  we need to make sure that the selectedField is valid
                */}
               {isSelectedFieldValid(selectedField, section) ? (

@@ -96,6 +96,7 @@ export function DefaultFieldTools({
   const formField = getFieldDefinition(formSection, configField)
   const handleBar = getCertificateHandlebar(formField)
   const contentKey = getContentKey(formField)
+
   return (
     <Container>
       <Title>{formField.type}</Title>
