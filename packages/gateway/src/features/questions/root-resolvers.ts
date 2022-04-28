@@ -82,7 +82,7 @@ function createOrUpdateQuestionPayload(
     fieldType: question.fieldType as FieldType,
     preceedingFieldId: question.preceedingFieldId as string,
     required: question.required as boolean,
-    enabled: question.enabled as boolean,
+    enabled: question.enabled as string,
     custom: question.custom as boolean,
     initialValue: question.initialValue as string
   }
@@ -114,7 +114,7 @@ interface IQuestionPayload {
   fieldType?: FieldType
   preceedingFieldId?: string
   required?: boolean
-  enabled: boolean
+  enabled: string
   custom?: boolean
   initialValue?: string
 }
