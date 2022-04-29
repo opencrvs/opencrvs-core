@@ -100,15 +100,17 @@ export function FormConfigHome() {
           sections: [
             {
               id: DraftStatus.DRAFT,
-              title: intl.formatMessage(draftTabsMessages.DRAFT)
+              title: intl.formatMessage(draftTabsMessages[DraftStatus.DRAFT])
             },
             {
               id: DraftStatus.PREVIEW,
-              title: intl.formatMessage(draftTabsMessages.PREVIEW)
+              title: intl.formatMessage(draftTabsMessages[DraftStatus.PREVIEW])
             },
             {
               id: DraftStatus.PUBLISHED,
-              title: intl.formatMessage(draftTabsMessages.PUBLISHED)
+              title: intl.formatMessage(
+                draftTabsMessages[DraftStatus.PUBLISHED]
+              )
             }
           ],
           activeTabId: selectedTab,

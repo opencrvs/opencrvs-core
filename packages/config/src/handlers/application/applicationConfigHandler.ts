@@ -18,8 +18,8 @@ import { badRequest } from '@hapi/boom'
 import * as Joi from 'joi'
 import { merge } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
-import getQuestionsHandler from '@config/handlers/getQuestions/handler'
-import getFormDrafts from '@config/handlers/getFormDraft/handler'
+import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
+import getFormDrafts from '@config/handlers/formDraft/getFormDraft/handler'
 
 export default async function applicationHandler(
   request: Hapi.Request,

@@ -58,7 +58,7 @@ function SaveActionButton({ comment }: { comment: string }) {
       {
         event: Event
         status: DraftStatus
-        comment?: string
+        comment: string
         questions: IQuestionConfig[]
       }
     >

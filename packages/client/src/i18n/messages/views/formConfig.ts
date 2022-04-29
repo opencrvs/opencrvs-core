@@ -34,6 +34,7 @@ interface IFormConfigMessages
   certificateHandlebars: MessageDescriptor
   hideField: MessageDescriptor
   requiredForRegistration: MessageDescriptor
+  statusChangeDelete: MessageDescriptor
   statusChangeError: MessageDescriptor
   statusChangeInPreview: MessageDescriptor
   statusChangePublish: MessageDescriptor
@@ -272,6 +273,12 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage: 'The number of address has been updated',
     description: 'Success notification label for number of addresses settings'
   },
+  statusChangeDelete: {
+    id: 'config.form.statusChange.delete',
+    defaultMessage:
+      '{event} declaration form v{version} has been deleted successfully',
+    description: 'Delete toast description for status change to deleted'
+  },
   statusChangeError: {
     id: 'config.form.statusChange.error',
     defaultMessage: 'Something went wrong. Please try again',
@@ -330,12 +337,12 @@ const draftStatusMessagesToDefine: Record<
   Exclude<DraftStatus, 'DRAFT' | 'DELETED'>,
   MessageDescriptor
 > = {
-  PREVIEW: {
+  [DraftStatus.PREVIEW]: {
     id: 'config.form.status.preview',
     defaultMessage: 'In Preview',
     description: 'Label for in preview tab of form config page'
   },
-  PUBLISHED: {
+  [DraftStatus.PUBLISHED]: {
     id: 'config.form.status.published',
     defaultMessage: 'Published',
     description: 'Label for published tab of form config page'
@@ -346,17 +353,17 @@ const draftTabsMessagesToDefine: Record<
   Exclude<DraftStatus, 'DELETED'>,
   MessageDescriptor
 > = {
-  DRAFT: {
+  [DraftStatus.DRAFT]: {
     id: 'config.form.tab.drafts',
     defaultMessage: 'Drafts',
     description: 'Label for drafts tab of form config page'
   },
-  PREVIEW: {
+  [DraftStatus.PREVIEW]: {
     id: 'config.form.tab.inPreview',
     defaultMessage: 'In Preview',
     description: 'Label for in preview tab of form config page'
   },
-  PUBLISHED: {
+  [DraftStatus.PUBLISHED]: {
     id: 'config.form.tab.published',
     defaultMessage: 'Published',
     description: 'Label for published tab of form config page'

@@ -128,7 +128,7 @@ describe('createOrUpdateFormDraft mutation', () => {
     status: 'DRAFT'
   }
 
-  it('creates birth form question draft for sysadmin', async () => {
+  it('creates birth form question draft for natlsysadmin', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
         fieldId: 'birth.myField'
@@ -147,7 +147,7 @@ describe('createOrUpdateFormDraft mutation', () => {
     })
   })
 
-  it('published birth form draft for sysadmin', async () => {
+  it('published birth form draft for natlsysadmin', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
         status: 'PUBLISHED'
@@ -206,6 +206,88 @@ describe('createOrUpdateFormDraft mutation', () => {
       )
     ).rejects.toThrowError(
       "Something went wrong on config service. Couldn't mofify form draft"
+    )
+  })
+})
+
+describe('modifyDraftStatus mutation', () => {
+  let authHeaderSysAdmin: { Authorization: string }
+  let authHeaderRegister: { Authorization: string }
+  beforeEach(() => {
+    fetch.resetMocks()
+    const sysAdminToken = jwt.sign(
+      { scope: ['natlsysadmin'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderSysAdmin = {
+      Authorization: `Bearer ${sysAdminToken}`
+    }
+    const regsiterToken = jwt.sign(
+      { scope: ['register'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        subject: 'ba7022f0ff4822',
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:gateway-user'
+      }
+    )
+    authHeaderRegister = {
+      Authorization: `Bearer ${regsiterToken}`
+    }
+  })
+
+  const modifyPayload = {
+    event: 'birth',
+    status: 'IN_PREVIEW'
+  }
+
+  it('modify birth form draft status to IN_PREVIEW for natlsysadmin', async () => {
+    fetch.mockResponseOnce(JSON.stringify(modifyPayload), { status: 201 })
+
+    const response = await resolvers.Mutation.modifyDraftStatus(
+      {},
+      { formDraft: modifyPayload },
+      authHeaderSysAdmin
+    )
+
+    expect(response).toEqual({
+      event: 'birth',
+      status: 'IN_PREVIEW'
+    })
+  })
+
+  it('should throw error for register', async () => {
+    fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
+
+    expect(
+      resolvers.Mutation.modifyDraftStatus(
+        {},
+        { formDraft: modifyPayload },
+        authHeaderRegister
+      )
+    ).rejects.toThrowError(
+      'Update form draft status is only allowed for natlsysadmin'
+    )
+  })
+
+  it('should throw error when /formDraftStatus sends anything but 201', async () => {
+    fetch.mockResponseOnce(JSON.stringify({}), { status: 400 })
+
+    expect(
+      resolvers.Mutation.modifyDraftStatus(
+        {},
+        { formDraft: modifyPayload },
+        authHeaderSysAdmin
+      )
+    ).rejects.toThrowError(
+      "Something went wrong on config service. Couldn't update form draft status"
     )
   })
 })

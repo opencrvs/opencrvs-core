@@ -121,12 +121,16 @@ function EventDrafts({ event }: { event: Event }) {
             actions
           ) : status === DraftStatus.PREVIEW ? (
             <Pill
-              label={intl.formatMessage(draftStatusMessages.PREVIEW)}
+              label={intl.formatMessage(
+                draftStatusMessages[DraftStatus.PREVIEW]
+              )}
               type="active"
             />
           ) : (
             <Pill
-              label={intl.formatMessage(draftStatusMessages.PUBLISHED)}
+              label={intl.formatMessage(
+                draftStatusMessages[DraftStatus.PUBLISHED]
+              )}
               type="active"
             />
           )

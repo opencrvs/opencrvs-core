@@ -49,6 +49,8 @@ export function ActionsNotification() {
         : intl.formatMessage(
             action === Actions.PREVIEW
               ? messages.statusChangeInPreview
+              : action === Actions.DELETE
+              ? messages.statusChangeDelete
               : messages.statusChangePublish,
             { event: intl.formatMessage(constantsMessages[event]), version }
           )}

@@ -97,7 +97,7 @@ function ActionButton() {
       }
     >
       mutation={CHANGE_FORM_DRAFT_STATUS}
-      onCompleted={({ createOrUpdateFormDraft: formDraft }) => {
+      onCompleted={({ modifyDraftStatus: formDraft }) => {
         if (formDraft) {
           dispatch(modifyFormDraft(formDraft as IDraft))
           setAction({ status: ActionStatus.COMPLETED })
