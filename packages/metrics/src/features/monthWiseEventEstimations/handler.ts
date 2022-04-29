@@ -28,6 +28,8 @@ import { IAuthHeader } from '@metrics/features/registration/'
 interface IMonthWiseEstimation {
   actualTotalRegistration: number
   actualTargetDayRegistration: number
+  actualWithin1YearRegistration: number
+  actualWithin5YearsRegistration: number
   estimatedRegistration: number
   estimatedTargetDayPercentage: number
   month: string
@@ -52,7 +54,7 @@ export async function monthWiseEventEstimationsHandler(
     timeStart,
     timeEnd
   )
-  const registrationsGroupByEventDates = await fetchEventsGroupByMonthDates(
+  const registrationsGroupByMonthDates = await fetchEventsGroupByMonthDates(
     timeStart,
     timeEnd,
     locationId,
@@ -69,17 +71,34 @@ export async function monthWiseEventEstimationsHandler(
         monthFilter.endOfMonthTime
       )
 
-    const totalRegistrationWithinMonth = registrationsGroupByEventDates
+    const totalRegistrationWithinMonth = registrationsGroupByMonthDates
       .filter(
         (p) => p.dateLabel === `${monthFilter.year}-${monthFilter.monthIndex}`
       )
       .reduce((t, p) => t + p.total, 0)
 
-    const totalWithinTargetInMonth = registrationsGroupByEventDates
+    const totalWithinTargetInMonth = registrationsGroupByMonthDates
       .filter(
         (p) =>
           p.dateLabel === `${monthFilter.year}-${monthFilter.monthIndex}` &&
           p.timeLabel === 'withinTarget'
+      )
+      .reduce((t, p) => t + p.total, 0)
+
+    const totalWithin1YearInMonth = registrationsGroupByMonthDates
+      .filter(
+        (p) =>
+          (p.dateLabel === `${monthFilter.year}-${monthFilter.monthIndex}` &&
+            p.timeLabel === 'withinTarget') ||
+          p.timeLabel === 'withinLate' ||
+          p.timeLabel === 'within1Year'
+      )
+      .reduce((t, p) => t + p.total, 0)
+    const totalWithin5YearsInMonth = registrationsGroupByMonthDates
+      .filter(
+        (p) =>
+          p.dateLabel === `${monthFilter.year}-${monthFilter.monthIndex}` &&
+          p.timeLabel !== 'after5Years'
       )
       .reduce((t, p) => t + p.total, 0)
 
@@ -88,6 +107,8 @@ export async function monthWiseEventEstimationsHandler(
       endOfMonth: monthFilter.endOfMonthTime,
       actualTotalRegistration: totalRegistrationWithinMonth,
       actualTargetDayRegistration: totalWithinTargetInMonth,
+      actualWithin1YearRegistration: totalWithin1YearInMonth,
+      actualWithin5YearsRegistration: totalWithin5YearsInMonth,
       estimatedRegistration: estimatedTargetDayMetrics.totalEstimation,
       estimatedTargetDayPercentage: getPercentage(
         totalWithinTargetInMonth,
