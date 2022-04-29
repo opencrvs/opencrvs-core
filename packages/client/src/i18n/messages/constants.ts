@@ -143,6 +143,7 @@ interface IConstantsMessages
   viewAll: MessageDescriptor
   notAvailable: MessageDescriptor
   history: MessageDescriptor
+  noResult: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   address: {
@@ -499,6 +500,11 @@ const messagesToDefine: IConstantsMessages = {
     description:
       'Text to display if the search return no results for the current filters',
     id: 'constants.noResults'
+  },
+  noResult: {
+    defaultMessage: 'No result',
+    description: 'Text to display if the search return no results',
+    id: 'constants.noResult'
   },
   over5Years: {
     defaultMessage: 'Over 5 years',

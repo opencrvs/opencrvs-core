@@ -388,11 +388,14 @@ describe('User list tests', () => {
         })
 
         testComponent.update()
-        component = testComponent
-
+        component = await waitForElement(
+          testComponent,
+          '#name-link-5d08e102542c7a19fc55b790'
+        )
         component
           .find('#name-link-5d08e102542c7a19fc55b790')
           .hostNodes()
+          .first()
           .simulate('click')
 
         // wait for mocked data to load mockedProvider
@@ -623,8 +626,9 @@ describe('User list tests', () => {
           '#user-item-1-menuItem2'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Deactivate')
-        menuOptionButton.hostNodes().simulate('click')
-        await waitForElement(component, '#user-audit-modal')
+        menuOptionButton.first().simulate('click')
+        component.update()
+        expect(component.exists('#user-audit-modal')).toBeTruthy()
       })
 
       it('clicking on menu options reactivate to user pops up audit action modal', async () => {
@@ -639,8 +643,9 @@ describe('User list tests', () => {
           '#user-item-3-menuItem1'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Reactivate')
-        menuOptionButton.hostNodes().simulate('click')
-        await waitForElement(component, '#user-audit-modal')
+        menuOptionButton.first().simulate('click')
+        component.update()
+        expect(component.exists('#user-audit-modal')).toBeTruthy()
       })
 
       it('clicking on name link takes to user preview page', async () => {
@@ -649,7 +654,7 @@ describe('User list tests', () => {
           '#name-link-5d08e102542c7a19fc55b790'
         )
 
-        nameLink.hostNodes().simulate('click')
+        nameLink.first().simulate('click')
         await flushPromises()
         expect(history.location.pathname).toBe(
           '/userProfile/5d08e102542c7a19fc55b790'
