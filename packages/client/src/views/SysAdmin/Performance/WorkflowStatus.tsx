@@ -230,12 +230,10 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     setColumnToBeSort(key)
   }
 
-  function getColumns(totalItems = 0): IColumn[] {
+  function getColumns(): IColumn[] {
     const keys = [
       {
-        label: intl.formatMessage(constantsMessages.declarations, {
-          totalItems
-        }),
+        label: intl.formatMessage(constantsMessages.trackingId),
         key: 'id',
         width: 14,
         isSortable: true,
@@ -262,27 +260,13 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         isSorted: columnToBeSort === 'eventType' ? true : false
       },
       {
-        label: intl.formatMessage(constantsMessages.eventDate),
-        key: 'dateOfEvent',
-        width: 12,
-        isSortable: true,
-        sortFunction: () => toggleSort('dateOfEvent'),
-        icon: columnToBeSort === 'dateOfEvent' ? <ArrowDownBlue /> : <></>,
-        isSorted: columnToBeSort === 'dateOfEvent' ? true : false
-      },
-      {
-        label: intl.formatMessage(constantsMessages.nameDefaultLocale),
+        label: intl.formatMessage(constantsMessages.name),
         key: 'nameIntl',
         width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('nameIntl'),
         icon: columnToBeSort === 'nameIntl' ? <ArrowDownBlue /> : <></>,
         isSorted: columnToBeSort === 'nameIntl' ? true : false
-      },
-      {
-        label: intl.formatMessage(constantsMessages.nameRegionalLocale),
-        key: 'nameLocal',
-        width: 12
       },
       {
         label: intl.formatMessage(formMessages.informantName),
@@ -312,6 +296,15 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         icon:
           columnToBeSort === 'declarationStartedBy' ? <ArrowDownBlue /> : <></>,
         isSorted: columnToBeSort === 'declarationStartedBy' ? true : false
+      },
+      {
+        label: intl.formatMessage(constantsMessages.eventDate),
+        key: 'dateOfEvent',
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('dateOfEvent'),
+        icon: columnToBeSort === 'dateOfEvent' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'dateOfEvent' ? true : false
       },
       {
         label: intl.formatMessage(constantsMessages.timeInProgress),
@@ -383,7 +376,10 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       }
     ] as IColumn[]
     return keys.filter((item) => {
-      return !(!checkIfLocalLanguageProvided() && item.key === 'nameLocal')
+      return !(
+        !window.config.EXTERNAL_VALIDATION_WORKQUEUE &&
+        item.key === 'timeLoggedWaitingValidation'
+      )
     })
   }
 
@@ -781,7 +777,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 <ListTable
                   id="declaration-status-list"
                   content={getContent(data)}
-                  columns={getColumns(total)}
+                  columns={getColumns()}
                   isLoading={loading || Boolean(error)}
                   noResultText={intl.formatMessage(constantsMessages.noResults)}
                   hideBoxShadow
