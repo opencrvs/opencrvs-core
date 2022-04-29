@@ -161,4 +161,5 @@ services:
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - AUTH_URL=http://auth:4040
       - SEARCH_URL=http://search:9090/
+      - METRICS_URL=http://metrics:1050
       - CHECK_INVALID_TOKEN=true
