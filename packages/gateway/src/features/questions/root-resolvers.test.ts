@@ -96,7 +96,7 @@ describe('getQuestions()', () => {
       fieldType: 'TEXT',
       preceedingFieldId: 'myPreviousFieldId',
       required: true,
-      enabled: true,
+      enabled: 'true',
       custom: true,
       initialValue: 'myValue'
     },
@@ -157,7 +157,7 @@ describe('getQuestions()', () => {
       fieldType: 'TEXT',
       preceedingFieldId: 'myPreviousFieldId',
       required: true,
-      enabled: true,
+      enabled: 'true',
       custom: true,
       initialValue: 'myValue'
     }
@@ -231,7 +231,7 @@ describe('createOrUpdateQuestion mutation', () => {
     fieldType: 'TEXT',
     preceedingFieldId: 'myPreviousFieldId',
     required: true,
-    enabled: true,
+    enabled: 'true',
     custom: true,
     initialValue: 'myValue'
   }

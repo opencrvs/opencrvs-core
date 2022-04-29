@@ -13,6 +13,8 @@ export const HOST = process.env.HOST || '0.0.0.0'
 export const PORT = process.env.PORT || 5050
 export const HEARTH_URL = process.env.HEARTH_URL || 'http://localhost:3447/fhir'
 export const OPENHIM_URL = process.env.OPENHIM_URL || 'http://localhost:5001'
+export const APPLICATION_CONFIG_URL =
+  process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'
 export const VALIDATING_EXTERNALLY = process.env.VALIDATING_EXTERNALLY || false
 export const NOTIFICATION_SERVICE_URL =
   process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'

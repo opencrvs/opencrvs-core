@@ -14,9 +14,9 @@ import { Event } from '@config/models/certificate'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',
-  PREVIEW = 'PREVIEW',
+  IN_PREVIEW = 'IN_PREVIEW',
   PUBLISHED = 'PUBLISHED',
-  FINALISED = 'FINALISED'
+  DELETED = 'DELETED'
 }
 
 export const validStatus = Object.values(DraftStatus)
@@ -26,7 +26,7 @@ export interface IHistory {
   version: number
   status: DraftStatus
   comment?: string
-  lastUpdateAt: number
+  updatedAt: number
 }
 
 export interface IFormDraft {
@@ -49,7 +49,7 @@ const historySchema = new Schema<IHistory>({
     default: DraftStatus.DRAFT
   },
   comment: String,
-  lastUpdateAt: Number
+  updatedAt: Number
 })
 
 const formDraftSchema = new Schema({
