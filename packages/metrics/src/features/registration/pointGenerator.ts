@@ -176,13 +176,16 @@ export const generateBirthRegPoint = async (
     compositionId: composition.id,
     ageInDays
   }
-
+  const compositionDate = new Date(composition.date)
   const tags: IBirthRegistrationTags = {
     regStatus: regStatus,
     eventLocationType: await getEncounterLocationType(payload, authHeader),
     gender: child.gender,
     practitionerRole,
     ageLabel: (ageInDays && getAgeLabel(ageInDays)) || undefined,
+    dateLabel: !Number.isNaN(compositionDate.getTime())
+      ? `${compositionDate.getFullYear()}-${compositionDate.getMonth()}`
+      : undefined,
     timeLabel:
       (ageInDays && (await getTimeLabel(ageInDays, EVENT_TYPE.BIRTH))) ||
       undefined,
@@ -245,6 +248,7 @@ export const generateDeathRegPoint = async (
     (deceased.birthDate &&
       getAgeInDays(deceased.birthDate, new Date(composition.date))) ||
     undefined
+  const compositionDate = new Date(composition.date)
   const tags: IDeathRegistrationTags = {
     regStatus: regStatus,
     gender: deceased.gender,
@@ -254,6 +258,9 @@ export const generateDeathRegPoint = async (
     timeLabel:
       (deathDays && (await getTimeLabel(deathDays, EVENT_TYPE.DEATH))) ||
       undefined,
+    dateLabel: !Number.isNaN(compositionDate.getTime())
+      ? `${compositionDate.getFullYear()}-${compositionDate.getMonth()}`
+      : undefined,
     eventLocationType: await getEncounterLocationType(payload, authHeader),
     mannerOfDeath: getObservationValueByCode(payload, MANNER_OF_DEATH_CODE),
     causeOfDeath: getObservationValueByCode(payload, CAUSE_OF_DEATH_CODE),

@@ -10,13 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import {
-  fetchLocationWiseEventEstimations,
-  getTotalNumberOfRegistrations
-} from '@metrics/features/metrics/metricsGenerator'
+import { fetchEventsGroupByMonthDates } from '@metrics/features/metrics/metricsGenerator'
 import {
   getMonthRangeFilterListFromTimeRage,
-  IMonthRangeFilter
+  IMonthRangeFilter,
+  fetchEstimateForTargetDaysByLocationId,
+  getPercentage
 } from '@metrics/features/metrics/utils'
 import {
   TIME_FROM,
@@ -53,29 +52,47 @@ export async function monthWiseEventEstimationsHandler(
     timeStart,
     timeEnd
   )
+  const registrationsGroupByEventDates = await fetchEventsGroupByMonthDates(
+    timeStart,
+    timeEnd,
+    locationId,
+    event
+  )
   const estimations: IMonthWiseEstimation[] = []
   for (const monthFilter of monthFilters) {
-    const estimatedTargetDayMetrics = await fetchLocationWiseEventEstimations(
-      monthFilter.startOfMonthTime,
-      monthFilter.endOfMonthTime,
-      locationId,
-      event,
-      authHeader
-    )
+    const estimatedTargetDayMetrics =
+      await fetchEstimateForTargetDaysByLocationId(
+        locationId,
+        event,
+        authHeader,
+        monthFilter.startOfMonthTime,
+        monthFilter.endOfMonthTime
+      )
+
+    const totalRegistrationWithinMonth = registrationsGroupByEventDates
+      .filter(
+        (p) => p.dateLabel === `${monthFilter.year}-${monthFilter.monthIndex}`
+      )
+      .reduce((t, p) => t + p.total, 0)
+
+    const totalWithinTargetInMonth = registrationsGroupByEventDates
+      .filter(
+        (p) =>
+          p.dateLabel === `${monthFilter.year}-${monthFilter.monthIndex}` &&
+          p.timeLabel === 'withinTarget'
+      )
+      .reduce((t, p) => t + p.total, 0)
 
     estimations.push({
       startOfMonth: monthFilter.startOfMonthTime,
       endOfMonth: monthFilter.endOfMonthTime,
-      actualTotalRegistration: await getTotalNumberOfRegistrations(
-        monthFilter.startOfMonthTime,
-        monthFilter.endOfMonthTime,
-        locationId,
-        event
+      actualTotalRegistration: totalRegistrationWithinMonth,
+      actualTargetDayRegistration: totalWithinTargetInMonth,
+      estimatedRegistration: estimatedTargetDayMetrics.totalEstimation,
+      estimatedTargetDayPercentage: getPercentage(
+        totalWithinTargetInMonth,
+        estimatedTargetDayMetrics.totalEstimation
       ),
-      actualTargetDayRegistration: estimatedTargetDayMetrics.actualRegistration,
-      estimatedRegistration: estimatedTargetDayMetrics.estimatedRegistration,
-      estimatedTargetDayPercentage:
-        estimatedTargetDayMetrics.estimatedPercentage,
       month: monthFilter.month,
       year: monthFilter.year
     })
