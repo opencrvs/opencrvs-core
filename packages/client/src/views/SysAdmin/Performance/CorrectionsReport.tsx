@@ -48,7 +48,7 @@ export const CORRECTION_TOTALS = gql`
     $event: String!
     $timeStart: String!
     $timeEnd: String!
-    $locationId: String!
+    $locationId: String
   ) {
     getTotalCorrections(
       timeStart: $timeStart

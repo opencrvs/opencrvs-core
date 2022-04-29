@@ -347,7 +347,7 @@ const messagesToDefine = {
   },
   registrarsToCitizenValue: {
     id: 'performance.registrarsToCitizenValue',
-    defaultMessage: '{registrar} of {citizen}',
+    defaultMessage: '1 to {citizen}',
     description: 'Value for Registrars to citizens'
   },
   registrationByStatus: {

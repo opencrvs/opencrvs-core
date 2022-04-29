@@ -41,7 +41,7 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
-import { PERFORMANCE_METRICS } from './metricsQuery'
+import { PERFORMANCE_METRICS, PERFORMANCE_STATS } from './metricsQuery'
 import { ApolloError } from 'apollo-client'
 import {
   ToastNotification,
@@ -385,46 +385,99 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               </Query>
             </Content>
           </LayoutLeft>
-          <ResponsiveModal
-            title={intl.formatMessage(constantsMessages.status)}
-            show={toggleStatus}
-            handleClose={this.togglePerformanceStatus}
-            actions={[]}
+          <Query
+            query={PERFORMANCE_STATS}
+            variables={{
+              locationId: this.state.selectedLocation
+                ? this.state.selectedLocation.id
+                : undefined,
+              populationYear: timeEnd.getFullYear(),
+              event: this.state.event,
+              status: [
+                'IN_PROGRESS',
+                'DECLARED',
+                'REJECTED',
+                'VALIDATED',
+                'WAITING_VALIDATION',
+                'REGISTERED'
+              ]
+            }}
+            fetchPolicy="no-cache"
           >
-            <ResponsiveModalContent>
-              <RegistrationStatus>
-                <SubHeader>
-                  {intl.formatMessage(messages.registrationByStatus)}
-                </SubHeader>
-                <Description>
-                  Current status of death records being processed
-                </Description>
-              </RegistrationStatus>
-              <PerformanceStats
-                registrationOffices={5}
-                totalRegistrars={200}
-                registrarsRatio={2}
-                citizen={50}
-              />
-            </ResponsiveModalContent>
-          </ResponsiveModal>
-          <LayoutRight>
-            <PerformanceStats
-              registrationOffices={5}
-              totalRegistrars={200}
-              registrarsRatio={2}
-              citizen={50}
-            />
-            {/* TODO: RegistrationStatus could be replaced by the StatusWiseDeclarationCountView component */}
-            <RegistrationStatus>
-              <SubHeader>
-                {intl.formatMessage(messages.registrationByStatus)}
-              </SubHeader>
-              <Description>
-                Current status of death records being processed
-              </Description>
-            </RegistrationStatus>
-          </LayoutRight>
+            {({ loading, data, error }) => {
+              return (
+                <>
+                  <ResponsiveModal
+                    title={intl.formatMessage(constantsMessages.status)}
+                    show={toggleStatus}
+                    handleClose={this.togglePerformanceStatus}
+                    actions={[]}
+                  >
+                    <ResponsiveModalContent>
+                      <RegistrationStatus>
+                        <SubHeader>
+                          {intl.formatMessage(messages.registrationByStatus)}
+                        </SubHeader>
+                        <Description>
+                          Current status of death records being processed
+                        </Description>
+                      </RegistrationStatus>
+                      {error ? (
+                        <>
+                          <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                        </>
+                      ) : loading ? (
+                        <Spinner id="location-stats-loading" />
+                      ) : (
+                        <PerformanceStats
+                          registrationOffices={
+                            data.getLocationStatistics!.offices
+                          }
+                          totalRegistrars={
+                            data.getLocationStatistics!.registrars
+                          }
+                          citizen={
+                            Math.round(data.getLocationStatistics!.population) /
+                            Math.round(data.getLocationStatistics!.registrars)
+                          }
+                        />
+                      )}
+                    </ResponsiveModalContent>
+                  </ResponsiveModal>
+                  <LayoutRight>
+                    {error ? (
+                      <>
+                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                      </>
+                    ) : loading ? (
+                      <Spinner id="location-stats-loading" />
+                    ) : (
+                      <PerformanceStats
+                        registrationOffices={
+                          data.getLocationStatistics!.offices
+                        }
+                        totalRegistrars={data.getLocationStatistics!.registrars}
+                        citizen={
+                          Math.round(data.getLocationStatistics!.population) /
+                          Math.round(data.getLocationStatistics!.registrars)
+                        }
+                      />
+                    )}
+
+                    {/* TODO: RegistrationStatus could be replaced by the StatusWiseDeclarationCountView component */}
+                    <RegistrationStatus>
+                      <SubHeader>
+                        {intl.formatMessage(messages.registrationByStatus)}
+                      </SubHeader>
+                      <Description>
+                        Current status of death records being processed
+                      </Description>
+                    </RegistrationStatus>
+                  </LayoutRight>
+                </>
+              )
+            }}
+          </Query>
         </Layout>
       </SysAdminContentWrapper>
     )

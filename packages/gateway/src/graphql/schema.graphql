@@ -27,6 +27,7 @@ type Query {
   fetchRegistrationCountByStatus(
     status: [String]!
     locationId: String
+    event: String
   ): RegistrationCountResult
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
@@ -840,6 +841,7 @@ type SearchFieldAgentResponse {
   fullName: String
   type: String
   status: String
+  avatar: Avatar
   primaryOfficeId: String
   creationDate: String
   totalNumberOfDeclarationStarted: Int

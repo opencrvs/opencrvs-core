@@ -721,6 +721,7 @@ export interface GQLSearchFieldAgentResponse {
   fullName?: string
   type?: string
   status?: string
+  avatar?: GQLAvatar
   primaryOfficeId?: string
   creationDate?: string
   totalNumberOfDeclarationStarted?: number
@@ -1621,6 +1622,7 @@ export interface QueryToQueryPersonByNidIdentifierResolver<
 export interface QueryToFetchRegistrationCountByStatusArgs {
   status: Array<string | null>
   locationId?: string
+  event?: string
 }
 export interface QueryToFetchRegistrationCountByStatusResolver<
   TParent = any,
@@ -4376,6 +4378,7 @@ export interface GQLSearchFieldAgentResponseTypeResolver<TParent = any> {
   fullName?: SearchFieldAgentResponseToFullNameResolver<TParent>
   type?: SearchFieldAgentResponseToTypeResolver<TParent>
   status?: SearchFieldAgentResponseToStatusResolver<TParent>
+  avatar?: SearchFieldAgentResponseToAvatarResolver<TParent>
   primaryOfficeId?: SearchFieldAgentResponseToPrimaryOfficeIdResolver<TParent>
   creationDate?: SearchFieldAgentResponseToCreationDateResolver<TParent>
   totalNumberOfDeclarationStarted?: SearchFieldAgentResponseToTotalNumberOfDeclarationStartedResolver<TParent>
@@ -4406,6 +4409,13 @@ export interface SearchFieldAgentResponseToTypeResolver<
 }
 
 export interface SearchFieldAgentResponseToStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SearchFieldAgentResponseToAvatarResolver<
   TParent = any,
   TResult = any
 > {

@@ -44,7 +44,6 @@ const StatsRow = styled.div`
 export interface IPerformanceStatsProps {
   registrationOffices: number
   totalRegistrars: number
-  registrarsRatio: number
   citizen: number
 }
 
@@ -64,7 +63,7 @@ class PerformanceStatsComponent extends React.Component<Props> {
       intl,
       registrationOffices,
       totalRegistrars,
-      registrarsRatio,
+
       citizen
     } = this.props
 
@@ -87,7 +86,6 @@ class PerformanceStatsComponent extends React.Component<Props> {
           <span>{intl.formatMessage(messages.registrarsToCitizen)}</span>
           <span>
             {intl.formatMessage(messages.registrarsToCitizenValue, {
-              registrar: registrarsRatio || 0,
               citizen: citizen || 0
             })}
           </span>

@@ -189,7 +189,7 @@ export const resolvers: GQLResolver = {
     },
     async fetchRegistrationCountByStatus(
       _,
-      { locationId, status },
+      { locationId, status, event },
       authHeader
     ) {
       if (
@@ -201,9 +201,11 @@ export const resolvers: GQLResolver = {
         const payload: {
           declarationLocationHirarchyId?: string
           status: string[]
+          event?: string
         } = {
           declarationLocationHirarchyId: locationId,
-          status: status as string[]
+          status: status as string[],
+          event
         }
 
         const results: GQLStatusWiseRegistrationCount[] = await fetch(

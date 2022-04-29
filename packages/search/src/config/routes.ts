@@ -137,7 +137,8 @@ export const getRoutes = () => {
         validate: {
           payload: Joi.object({
             declarationLocationHirarchyId: Joi.string(),
-            status: Joi.array().required()
+            status: Joi.array().required(),
+            event: Joi.string()
           })
         },
         description: 'Returns all the documents in the index'
