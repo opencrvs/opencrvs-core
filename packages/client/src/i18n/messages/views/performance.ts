@@ -234,7 +234,7 @@ const messagesToDefine = {
   declarationCountByStatusDescription: {
     id: 'performance.ops.statCount.desc',
     defaultMessage:
-      'Current status of all declarations being processed for your selected administrative area.',
+      'Current status of {event, select, BIRTH{birth} DEATH{death} records being processed.',
     description: 'Description of the status wise declaration count view'
   },
   workflowStatusHeader: {
