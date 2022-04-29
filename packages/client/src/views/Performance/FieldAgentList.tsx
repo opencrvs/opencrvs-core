@@ -97,7 +97,6 @@ type IProps = RouteComponentProps &
   IDispatchProps
 
 export enum EVENT_OPTIONS {
-  ALL = '',
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'
 }
@@ -173,7 +172,7 @@ function FieldAgentListComponent(props: IProps) {
     search
   ) as unknown as ISearchParams
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
-  const [event, setEvent] = useState<EVENT_OPTIONS>(EVENT_OPTIONS.ALL)
+  const [event, setEvent] = useState<EVENT_OPTIONS>(EVENT_OPTIONS.BIRTH)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [columnToBeSort, setColumnToBeSort] =
@@ -191,7 +190,7 @@ function FieldAgentListComponent(props: IProps) {
         timeEnd: timeEnd,
         primaryOfficeId: locationId,
         status: status.toString(),
-        event: event === '' ? undefined : event.toUpperCase(),
+        event: (event && event.toUpperCase()) || undefined,
         count: recordCount,
         sort: 'asc'
       }
@@ -200,7 +199,7 @@ function FieldAgentListComponent(props: IProps) {
         timeEnd: timeEnd,
         locationId: locationId,
         status: status.toString(),
-        event: event === '' ? undefined : event.toUpperCase(),
+        event: (event && event.toUpperCase()) || undefined,
         count: recordCount,
         sort: 'asc'
       }
@@ -409,18 +408,14 @@ function FieldAgentListComponent(props: IProps) {
                 setEvent(
                   Object.values(EVENT_OPTIONS).find(
                     (val) => val === option.value
-                  ) || EVENT_OPTIONS.ALL
+                  ) || EVENT_OPTIONS.BIRTH
                 )
               }}
               id="event-select"
               withLightTheme={true}
-              defaultWidth={110}
+              defaultWidth={100}
               value={event}
               options={[
-                {
-                  label: intl.formatMessage(messages.eventOptionForBoth),
-                  value: EVENT_OPTIONS.ALL
-                },
                 {
                   label: intl.formatMessage(messages.eventOptionForBirths),
                   value: EVENT_OPTIONS.BIRTH
