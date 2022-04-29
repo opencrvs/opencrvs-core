@@ -189,6 +189,7 @@ export const resolvers: GQLResolver = {
             fullName: getFullName(user, language),
             type: user.type,
             status: user.status,
+            avatar: user.avatar,
             primaryOfficeId: user.primaryOfficeId,
             creationDate: user?.creationDate,
             totalNumberOfDeclarationStarted:

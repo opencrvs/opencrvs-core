@@ -841,6 +841,7 @@ type SearchFieldAgentResponse {
   fullName: String
   type: String
   status: String
+  avatar: Avatar
   primaryOfficeId: String
   creationDate: String
   totalNumberOfDeclarationStarted: Int
