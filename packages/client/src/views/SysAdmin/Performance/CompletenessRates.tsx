@@ -19,7 +19,7 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { Event } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToPerformanceHome, goToRegistrationRates } from '@client/navigation'
+import { goToPerformanceHome, goToCompletenessRates } from '@client/navigation'
 
 import {
   FilterContainer,
@@ -47,7 +47,7 @@ import {
   FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
   HAS_CHILD_LOCATION
 } from './queries'
-import { WithinTargetDaysTable } from './reports/registrationRates/WithinTargetDaysTable'
+import { WithinTargetDaysTable } from './reports/completenessRates/WithinTargetDaysTable'
 const { useState } = React
 
 export enum REG_RATE_BASE {
@@ -62,9 +62,9 @@ interface ISearchParams {
 }
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
-  goToRegistrationRates: typeof goToRegistrationRates
+  goToCompletenessRates: typeof goToCompletenessRates
 }
-type IRegistrationRateProps = RouteComponentProps<{ eventType: string }> &
+type ICompletenessRateProps = RouteComponentProps<{ eventType: string }> &
   WrappedComponentProps &
   IDispatchProps
 
@@ -104,7 +104,7 @@ function prepareChartData(data: GQLMonthWiseEstimationMetrics) {
   )
 }
 
-function RegistrationRatesComponent(props: IRegistrationRateProps) {
+function CompletenessRatesComponent(props: ICompletenessRateProps) {
   const [base, setBase] = useState<IEstimationBase>({
     baseType: REG_RATE_BASE.TIME
   })
@@ -175,7 +175,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                 <LocationPicker
                   selectedLocationId={locationId}
                   onChangeLocation={(newLocationId) => {
-                    props.goToRegistrationRates(
+                    props.goToCompletenessRates(
                       eventType as Event,
                       title,
                       newLocationId,
@@ -189,7 +189,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
                   endDate={dateEnd}
                   onDatesChange={({ startDate, endDate }) => {
                     startDate.setDate(startDate.getDate() + 1)
-                    props.goToRegistrationRates(
+                    props.goToCompletenessRates(
                       eventType as Event,
                       title,
                       locationId as string,
@@ -260,7 +260,7 @@ function RegistrationRatesComponent(props: IRegistrationRateProps) {
   )
 }
 
-export const RegistrationRates = connect(null, {
+export const CompletenessRates = connect(null, {
   goToPerformanceHome,
-  goToRegistrationRates
-})(injectIntl(RegistrationRatesComponent))
+  goToCompletenessRates
+})(injectIntl(CompletenessRatesComponent))

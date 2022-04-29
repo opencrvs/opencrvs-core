@@ -17,7 +17,7 @@ import { createTestStore, createTestComponent } from '@client/tests/util'
 import { WithinTargetDaysTable } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
 import { Event } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { REG_RATE_BASE } from '@client/views/SysAdmin/Performance/RegistrationRates'
+import { REG_RATE_BASE } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { History } from 'history'
 
 describe('WithinTargetDaysTable tests for over time option', () => {

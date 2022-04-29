@@ -20,7 +20,7 @@ import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   EVENT_INFO,
-  EVENT_REGISTRATION_RATES,
+  EVENT_COMPLETENESS_RATES,
   FIELD_AGENT_HOME_TAB,
   HOME,
   PERFORMANCE_FIELD_AGENT_LIST,
@@ -419,7 +419,7 @@ export function goToCreateNewUserWithLocationId(locationId: string) {
   return push(formatUrl(CREATE_USER_ON_LOCATION, { locationId }))
 }
 
-export function goToRegistrationRates(
+export function goToCompletenessRates(
   eventType: Event,
   title: string,
   locationId: string,
@@ -427,7 +427,7 @@ export function goToRegistrationRates(
   timeEnd: Date
 ) {
   return push({
-    pathname: formatUrl(EVENT_REGISTRATION_RATES, { eventType }),
+    pathname: formatUrl(EVENT_COMPLETENESS_RATES, { eventType }),
     search: stringify({
       locationId,
       title,

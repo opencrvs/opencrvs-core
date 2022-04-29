@@ -15,7 +15,7 @@ import { messages } from '@client/i18n/messages/views/performance'
 import {
   IEstimationBase,
   REG_RATE_BASE
-} from '@client/views/SysAdmin/Performance/RegistrationRates'
+} from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import {
   ListTable,

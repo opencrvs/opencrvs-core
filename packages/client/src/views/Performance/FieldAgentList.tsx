@@ -24,7 +24,7 @@ import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
+import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/WithinTargetDaysTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
 import {
   SysAdminContentWrapper,
