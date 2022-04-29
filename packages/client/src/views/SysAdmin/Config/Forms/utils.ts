@@ -38,6 +38,12 @@ export const NOTIFICATION_TYPE_MAP = {
   [ActionStatus.COMPLETED]: NOTIFICATION_TYPE.SUCCESS
 }
 
+export function isNotifiable(
+  status: ActionStatus
+): status is INotifiableStatus {
+  return NOTIFIABLE_STATUSES.includes(status)
+}
+
 export function isDefaultDraft({ version }: { version: number }) {
   return version === 0
 }

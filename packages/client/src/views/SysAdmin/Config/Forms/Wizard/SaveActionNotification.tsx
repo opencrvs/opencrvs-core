@@ -13,9 +13,8 @@ import React from 'react'
 import { SaveActionContext } from './SaveActionModal'
 import {
   ActionStatus,
-  NOTIFIABLE_STATUSES,
   NOTIFICATION_TYPE_MAP,
-  INotifiableStatus
+  isNotifiable
 } from '@client/views/SysAdmin/Config/Forms/utils'
 import {
   FloatingNotification,
@@ -23,10 +22,6 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { useIntl } from 'react-intl'
 import { saveActionMessages } from '@client/i18n/messages/views/formConfig'
-
-function isNotifiable(status: ActionStatus): status is INotifiableStatus {
-  return NOTIFIABLE_STATUSES.includes(status)
-}
 
 export function SaveActionNotification() {
   const intl = useIntl()

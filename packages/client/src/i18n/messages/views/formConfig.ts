@@ -371,22 +371,22 @@ const draftTabsMessagesToDefine: Record<
 }
 
 const actionsModalTitleMessagesToDefine: Record<Actions, MessageDescriptor> = {
-  PUBLISH: {
+  [Actions.PUBLISH]: {
     id: 'config.form.publish.confirmation.title',
     defaultMessage: 'Publish {event} form?',
     description: 'Title for publish confirmation'
   },
-  PREVIEW: {
+  [Actions.PREVIEW]: {
     id: 'config.form.preview.confirmation.title',
     defaultMessage: 'Preview {event} form?',
     description: 'Title for preview confirmation'
   },
-  EDIT: {
+  [Actions.EDIT]: {
     id: 'config.form.edit.confirmation.title',
     defaultMessage: 'Edit declaration form',
     description: 'Title for edit confirmation'
   },
-  DELETE: {
+  [Actions.DELETE]: {
     id: 'config.form.delete.confirmation.title',
     defaultMessage: 'Delete {event} draft?',
     description: 'Title for delete confirmation'
@@ -397,25 +397,25 @@ const actionsModalDescriptionMessagesToDefine: Record<
   Actions,
   MessageDescriptor
 > = {
-  PUBLISH: {
+  [Actions.PUBLISH]: {
     id: 'config.form.publish.confirmation.description',
     defaultMessage:
       'By publishing this declaration form you confirm that it is ready to be used by registration offices. You will not be able to make any future edits.',
     description: 'Description for publish confirmation'
   },
-  PREVIEW: {
+  [Actions.PREVIEW]: {
     id: 'config.form.preview.confirmation.description',
     defaultMessage:
       'This will make the form availble to test users. So that you can test the form and certificate',
     description: 'Description for preview confirmation'
   },
-  EDIT: {
+  [Actions.EDIT]: {
     id: 'config.form.edit.confirmation.description',
     defaultMessage:
       'This will make a new draft version for you to make updates. Your previewed form will revert to the default configuration.',
     description: 'Description for edit confirmation'
   },
-  DELETE: {
+  [Actions.DELETE]: {
     id: 'config.form.delete.confirmation.description',
     defaultMessage:
       'This will delete all draft versions and revert back to the default configuration.',
@@ -423,15 +423,19 @@ const actionsModalDescriptionMessagesToDefine: Record<
   }
 }
 
-const saveActionMessagesToDefine: Record<
+type IActionMessage = Record<
   ActionStatus.ERROR | ActionStatus.COMPLETED | ActionStatus.PROCESSING,
   MessageDescriptor
-> = {
-  [ActionStatus.ERROR]: {
-    id: 'config.form.save.error',
-    defaultMessage: 'Something went wrong. Please try again',
-    description: 'Save draft error notification label'
-  },
+>
+
+const errorMessage = {
+  id: 'config.form.error',
+  defaultMessage: 'Something went wrong. Please try again',
+  description: 'Error notification label'
+}
+
+const saveActionMessagesToDefine: IActionMessage = {
+  [ActionStatus.ERROR]: errorMessage,
   [ActionStatus.PROCESSING]: {
     id: 'config.form.save.inProgress',
     defaultMessage: 'Saving your new draft...',
@@ -442,6 +446,55 @@ const saveActionMessagesToDefine: Record<
     defaultMessage: 'Draft saved successfully. Redirecting...',
     description: 'Save draft success notification label'
   }
+}
+
+const publishActionMessagesToDefine: IActionMessage = {
+  [ActionStatus.ERROR]: errorMessage,
+  [ActionStatus.PROCESSING]: {
+    id: 'config.form.publish.inProgress',
+    defaultMessage: 'Publishing your draft...',
+    description: 'Publish draft in progress notification label'
+  },
+  [ActionStatus.COMPLETED]: {
+    id: 'config.form.publish.success',
+    defaultMessage: '{event} draft v{version} has been published successfully',
+    description: 'Publish draft success notification label'
+  }
+}
+
+const previewActionMessagesToDefine: IActionMessage = {
+  [ActionStatus.ERROR]: errorMessage,
+  [ActionStatus.PROCESSING]: {
+    id: 'config.form.preview.inProgress',
+    defaultMessage: 'Sending your draft in preview...',
+    description: 'Preview draft in progress notification label'
+  },
+  [ActionStatus.COMPLETED]: {
+    id: 'config.form.preview.success',
+    defaultMessage: '{event} draft v{version} is now in preview',
+    description: 'Preview draft success notification label'
+  }
+}
+
+const deleteActionMessagesToDefine: IActionMessage = {
+  [ActionStatus.ERROR]: errorMessage,
+  [ActionStatus.PROCESSING]: {
+    id: 'config.form.delete.inProgress',
+    defaultMessage: 'Deleting your new draft...',
+    description: 'Delete draft in progress notification label'
+  },
+  [ActionStatus.COMPLETED]: {
+    id: 'config.form.delete.success',
+    defaultMessage: '{event} draft v{version} has been deleted successfully',
+    description: 'Delete draft success notification label'
+  }
+}
+
+const statusChangeActionMessagesToDefine = {
+  [Actions.PREVIEW]: previewActionMessagesToDefine,
+  [Actions.PUBLISH]: publishActionMessagesToDefine,
+  [Actions.DELETE]: deleteActionMessagesToDefine,
+  [Actions.EDIT]: deleteActionMessagesToDefine
 }
 
 export const messages: IFormConfigMessages = defineMessages(messagesToDefine)
@@ -455,3 +508,5 @@ export const actionsModalDescriptionMessages = defineMessages(
   actionsModalDescriptionMessagesToDefine
 )
 export const saveActionMessages = defineMessages(saveActionMessagesToDefine)
+export const statusChangeActionMessages = (action: Actions) =>
+  defineMessages(statusChangeActionMessagesToDefine[action])
