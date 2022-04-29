@@ -66,11 +66,7 @@ import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
-import {
-  FormConfiguration,
-  FormConfigWizard
-} from './views/SysAdmin/Config/Forms'
-import { FormConfigSettings } from './views/SysAdmin/Config/Forms/FormConfigSettings'
+import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -236,8 +232,8 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={routes.FORM_CONFIG}
-                                            component={FormConfiguration}
+                                            path={routes.FORM_CONFIG_HOME}
+                                            component={FormConfigHome}
                                           />
                                           <ProtectedRoute
                                             path={

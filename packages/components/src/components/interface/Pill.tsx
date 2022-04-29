@@ -11,6 +11,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
+import { IFonts } from '../fonts'
 
 type IPillType = 'active' | 'inactive' | 'pending' | 'default'
 
@@ -22,24 +23,24 @@ export interface IPillProps {
   size?: IPillSize
 }
 
-const heightMap = {
+const heightMap: Record<IPillSize, string> = {
   small: '24px',
   medium: '32px'
 }
 
-const colorMap = {
+const colorMap: Record<IPillType, string> = {
   active: 'rgba(73, 183, 141, 0.3)',
   default: 'rgba(206, 206, 206, 0.3)',
   inactive: 'rgba(245, 209, 209, 1)',
   pending: 'rgba(252, 236, 217, 1)'
 }
 
-const fontMap = {
-  small: 'captionBold',
-  medium: 'subtitleStyle'
+const fontMap: Record<IPillSize, keyof IFonts> = {
+  small: 'bold12',
+  medium: 'bold14'
 }
 
-const paddingMap = {
+const paddingMap: Record<IPillSize, string> = {
   small: '10px',
   medium: '14px'
 }

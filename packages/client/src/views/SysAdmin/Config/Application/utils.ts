@@ -23,7 +23,7 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { IBirth, ICurrency, IDeath, IFullProps, IState } from './DynamicModal'
 import { configApplicationMutations } from './mutations'
 import { IOfflineData } from '@client/offline/reducer'
-import { IFormConfigSettingsProps } from '@client/views/SysAdmin/Config/Forms/FormConfigSettings'
+import { IFormConfigSettingsProps } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
 
 interface ICurrencyOptions {
   [key: string]: string

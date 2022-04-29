@@ -11,17 +11,26 @@
  */
 
 import { IStoreState } from '@client/store'
-import { Event } from '@client/forms'
+import { Event, IQuestionConfig } from '@client/forms'
+import {
+  ISectionFieldMap,
+  isDefaultField,
+  hasDefaultFieldChanged
+} from './utils'
 
+export function selectConfigFieldsState(store: IStoreState) {
+  if (store.configFields.state === 'LOADING') {
+    throw new Error('Offline data not loaded yet')
+  }
+  return store.configFields
+}
 export function selectConfigFields(
   store: IStoreState,
   event: Event,
   section: string
 ) {
-  if (store.configFields.state === 'LOADING') {
-    throw new Error('ConfigFields not loaded yet')
-  }
-  return store.configFields[event][section]
+  const configFields = selectConfigFieldsState(store)
+  return configFields[event][section]
 }
 
 export function selectConfigField(
@@ -31,4 +40,23 @@ export function selectConfigField(
   fieldId: string
 ) {
   return selectConfigFields(store, event, section)[fieldId]
+}
+
+function generateQuestionConfigs(configFields: ISectionFieldMap) {
+  const questionConfigs: IQuestionConfig[] = []
+  Object.values(configFields).forEach((sectionConfigFields) => {
+    Object.values(sectionConfigFields).forEach((configField) => {
+      if (!isDefaultField(configField)) {
+        questionConfigs.push(configField)
+      } else if (hasDefaultFieldChanged(configField)) {
+        questionConfigs.push(configField)
+      }
+    })
+  })
+  return questionConfigs
+}
+
+export function selectQuestionConfigs(store: IStoreState, event: Event) {
+  const configFields = selectConfigFieldsState(store)
+  return generateQuestionConfigs(configFields[event])
 }

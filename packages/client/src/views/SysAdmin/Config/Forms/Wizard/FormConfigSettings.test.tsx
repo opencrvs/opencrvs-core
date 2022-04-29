@@ -11,15 +11,10 @@
  */
 import * as React from 'react'
 import { createStore } from '@client/store'
-import {
-  createTestComponent,
-  flushPromises,
-  getFileFromBase64String
-} from '@client/tests/util'
+import { createTestComponent, flushPromises } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
-import { waitForElement } from '@client/tests/wait-for-element'
-import { FormConfigSettings } from '@client/views/SysAdmin/Config/Forms/FormConfigSettings'
+import { FormConfigSettings } from './FormConfigSettings'
 
 const { store, history } = createStore()
 let testComponent: ReactWrapper

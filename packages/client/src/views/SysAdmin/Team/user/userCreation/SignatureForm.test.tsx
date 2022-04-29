@@ -16,7 +16,8 @@ import {
   flushPromises,
   getFileFromBase64String,
   mockOfflineData,
-  validImageB64String
+  validImageB64String,
+  mockOfflineDataDispatch
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { modifyUserFormData } from '@client/user/userReducer'
@@ -28,27 +29,13 @@ import {
 } from '@client/views/SysAdmin/Team/utils'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { formConfig } from '@client/tests/mock-offline-data'
 
 describe('signature upload tests', () => {
   const { store, history } = createStore()
   let testComponent: ReactWrapper
 
   beforeEach(async () => {
-    await store.dispatch(
-      offlineDataReady({
-        languages: mockOfflineData.languages,
-        forms: mockOfflineData.forms,
-        templates: mockOfflineData.templates,
-        locations: mockOfflineData.locations,
-        facilities: mockOfflineData.facilities,
-        pilotLocations: mockOfflineData.pilotLocations,
-        assets: mockOfflineData.assets,
-        offices: mockOfflineData.offices,
-        config: mockOfflineData.config,
-        formConfig
-      })
-    )
+    await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   })
 
   describe('when user is in signature upload form page', () => {

@@ -9,17 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import React from 'react'
 import { Box } from '@opencrvs/components/lib/interface'
 import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormConfigElementCard'
 import styled from '@client/styledComponents'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { Event, DeathSection, BirthSection } from '@client/forms'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
-import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
+import {
+  IConfigField,
+  IConfigFieldMap,
+  getFieldDefinition
+} from '@client/forms/configuration/configFields/utils'
+import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
+import { FieldPosition } from '@client/forms/configuration'
+import { useParams } from 'react-router'
+import { BirthSection, DeathSection, Event } from '@client/forms'
 
 const CanvasBox = styled(Box)`
   display: flex;
@@ -29,19 +35,17 @@ const CanvasBox = styled(Box)`
   border-radius: 4px;
 `
 
-type IFormFieldMap = Record<string, IConfigFormField>
-
-function generateConfigFields(formFieldMap: IFormFieldMap) {
+function generateConfigFields(formFieldMap: IConfigFieldMap) {
   const firstField = Object.values(formFieldMap).find(
-    (formField) => !formField.precedingFieldId
+    (formField) => formField.preceedingFieldId === FieldPosition.TOP
   )
 
   if (!firstField) {
-    throw new Error(`No field found in section`)
+    throw new Error(`No starting field found in section`)
   }
 
-  const configFields: IConfigFormField[] = []
-  let currentField: IConfigFormField | null = firstField
+  const configFields: IConfigField[] = []
+  let currentField: IConfigField | null = firstField
   while (currentField) {
     configFields.push(currentField)
     currentField = currentField.foregoingFieldId
@@ -51,21 +55,23 @@ function generateConfigFields(formFieldMap: IFormFieldMap) {
   return configFields
 }
 
-type ICanvasProps = {
+type IRouteProps = {
   event: Event
-  selectedField: IConfigFormField | null
   section: BirthSection | DeathSection
-  onFieldSelect: (field: IConfigFormField) => void
 }
 
-export function Canvas({
-  event,
-  section,
-  selectedField,
-  onFieldSelect
-}: ICanvasProps) {
+type ICanvasProps = {
+  selectedField: IConfigField | null
+  onFieldSelect: (field: IConfigField) => void
+}
+
+export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
+  const { event, section } = useParams<IRouteProps>()
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
+  )
+  const formSection = useSelector((store: IStoreState) =>
+    getRegisterFormSection(store, section, event)
   )
   const configFields = generateConfigFields(fieldsMap)
 
@@ -80,7 +86,7 @@ export function Canvas({
           <FormFieldGenerator
             id={configField.fieldId}
             onChange={() => {}}
-            fields={[configField.definition]}
+            fields={[getFieldDefinition(formSection, configField)]}
             setAllFieldsDirty={false}
           />
         </FormConfigElementCard>

@@ -103,7 +103,7 @@ export function refreshToken() {
   }
 }
 
-const enum RouteScope {
+export const enum AuthScope {
   DECLARE = 'declare',
   REGISTER = 'register',
   CERTIFY = 'certify',
@@ -114,7 +114,7 @@ const enum RouteScope {
 }
 
 export const hasNatlSysAdminScope = (scope: Scope | null): boolean => {
-  if (scope?.includes(RouteScope.NATLSYSADMIN)) {
+  if (scope?.includes(AuthScope.NATLSYSADMIN)) {
     return true
   }
   return false

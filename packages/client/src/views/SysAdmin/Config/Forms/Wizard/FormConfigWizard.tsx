@@ -11,7 +11,7 @@
  */
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { IntlShape, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { Redirect, useParams } from 'react-router'
 import { HOME } from '@client/navigation/routes'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
@@ -27,14 +27,21 @@ import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { Event, BirthSection, DeathSection, WizardSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
-import { selectEventFormDraft } from '@client/forms/configuration/selector'
-import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
+import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
+import {
+  IConfigField,
+  isDefaultField
+} from '@client/forms/configuration/configFields/utils'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
-import { useLoadFormDraft, useHasNatlSysAdminScope } from './hooks'
 import { constantsMessages } from '@client/i18n/messages/constants'
+import { messages } from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
-import { goToFormConfig, goToFormConfigWizard } from '@client/navigation'
-import { Dispatch } from 'redux'
+import { goToFormConfigHome, goToFormConfigWizard } from '@client/navigation'
+import { getScope } from '@client/profile/profileSelectors'
+import { AuthScope } from '@client/utils/authUtils'
+import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+import { SaveActionModal, SaveActionContext } from './SaveActionModal'
+import { SaveActionNotification } from './SaveActionNotification'
 import { FormConfigSettings } from './FormConfigSettings'
 
 const Container = styled.div`
@@ -85,22 +92,6 @@ type IRouteProps = {
   section: string
 }
 
-const topBarActions = (event: Event, intl: IntlShape, dispatch: Dispatch) => {
-  return [
-    <TertiaryButton
-      id="settings"
-      icon={() => <SettingsBlue />}
-      onClick={() => dispatch(goToFormConfigWizard(event, 'settings'))}
-    ></TertiaryButton>,
-    <SecondaryButton key="save" size="small" onClick={() => {}}>
-      {intl.formatMessage(buttonMessages.save)}
-    </SecondaryButton>,
-    <SuccessButton key="publish" size="small" onClick={() => {}}>
-      {intl.formatMessage(buttonMessages.publish)}
-    </SuccessButton>
-  ]
-}
-
 function isValidEvent(event: string): event is Event {
   return Object.values<string>(Event).includes(event)
 }
@@ -113,22 +104,41 @@ function isValidSection(section: string): section is WizardSection {
   ].includes(section)
 }
 
-function useNewDraftVersion(event: Event) {
-  const formDraft = useSelector((store: IStoreState) =>
-    selectEventFormDraft(store, event)
-  )
-  return (formDraft?.version || 0) + 1
+function useHasNatlSysAdminScope() {
+  const scope = useSelector(getScope)
+  return scope?.includes(AuthScope.NATLSYSADMIN)
+}
+
+function isSelectedFieldValid(
+  selectedField: IConfigField | null,
+  section: string
+): selectedField is IConfigField {
+  return !!selectedField?.fieldId.includes(section)
 }
 
 export function FormConfigWizard() {
-  useLoadFormDraft()
-  const [selectedField, setSelectedField] =
-    React.useState<IConfigFormField | null>(null)
+  const [selectedField, setSelectedField] = React.useState<IConfigField | null>(
+    null
+  )
   const hasNatlSysAdminScope = useHasNatlSysAdminScope()
   const dispatch = useDispatch()
   const intl = useIntl()
   const { event, section } = useParams<IRouteProps>()
-  const version = useNewDraftVersion(event)
+  const { version } = useSelector((store: IStoreState) =>
+    selectFormDraft(store, event)
+  )
+  const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
+
+  /*
+   * We need to clear the selected field if section changes
+   * as the changed section won't have the previously selected field
+   */
+  React.useEffect(() => {
+    if (selectedField && !selectedField.fieldId.includes(section)) {
+      setSelectedField(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section])
 
   if (
     !hasNatlSysAdminScope ||
@@ -141,34 +151,63 @@ export function FormConfigWizard() {
   return (
     <Container>
       <EventTopBar
-        title={`${intl.formatMessage(constantsMessages[event])} v${version}`}
+        title={intl.formatMessage(messages.draftLabel, {
+          event: intl.formatMessage(constantsMessages[event]),
+          version: version + 1
+        })}
         pageIcon={<></>}
-        topBarActions={topBarActions(event, intl, dispatch)}
-        goHome={() => dispatch(goToFormConfig())}
+        topBarActions={[
+          <TertiaryButton
+            id="settings"
+            icon={() => <SettingsBlue />}
+            onClick={() => dispatch(goToFormConfigWizard(event, 'settings'))}
+          ></TertiaryButton>,
+          <SecondaryButton
+            key="save"
+            size="small"
+            disabled={status === ActionStatus.PROCESSING}
+            onClick={() => setStatus(ActionStatus.MODAL)}
+          >
+            {intl.formatMessage(buttonMessages.save)}
+          </SecondaryButton>,
+          <SuccessButton key="publish" size="small" onClick={() => {}}>
+            {intl.formatMessage(buttonMessages.publish)}
+          </SuccessButton>
+        ]}
+        goHome={() => dispatch(goToFormConfigHome())}
       />
       <WizardContainer>
         <NavigationContainer>
-          <SectionNavigation event={event} section={section} />
+          <SectionNavigation />
         </NavigationContainer>
         {section !== 'settings' ? (
           <>
             <CanvasContainer>
               <Canvas
-                event={event}
-                section={section}
                 selectedField={selectedField}
                 onFieldSelect={(field) => setSelectedField(field)}
               />
             </CanvasContainer>
             <ToolsContainer>
-              {selectedField ? (
-                !selectedField.definition.custom && (
+              {/*
+               *  The useEffect hook for clearing the selectedField takes
+               *  effect after the render for when the section changes so
+               *  for that particular render where the section has changed
+               *  but the selectedField is still from the previous section
+               *  we need to make sure that the selectedField is valid
+               */}
+              {isSelectedFieldValid(selectedField, section) ? (
+                isDefaultField(selectedField) && (
                   <DefaultFieldTools configField={selectedField} />
                 )
               ) : (
                 <FormTools />
               )}
             </ToolsContainer>
+            <SaveActionContext.Provider value={{ status, setStatus }}>
+              <SaveActionModal />
+              <SaveActionNotification />
+            </SaveActionContext.Provider>
           </>
         ) : (
           <FormConfigSettings />

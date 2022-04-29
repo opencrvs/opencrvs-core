@@ -43,7 +43,7 @@ const birthMockFormDraft = {
       _id: '623f30ac8aef60124a72df1c',
       version: 1,
       comment: 'Added new death question',
-      lastUpdateAt: 1648308385612
+      updatedAt: 1648308385612
     }
   ],
   __v: 0
@@ -63,7 +63,7 @@ const birthUpdatedMockFormDraft = {
       _id: '623f30ac8aef60124a72df1c',
       version: 1,
       comment: 'Added new death question',
-      lastUpdateAt: 1648308385612
+      updatedAt: 1648308385612
     }
   ],
   __v: 0
