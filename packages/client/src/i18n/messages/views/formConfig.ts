@@ -428,14 +428,12 @@ type IActionMessage = Record<
   MessageDescriptor
 >
 
-const errorMessage = {
-  id: 'config.form.error',
-  defaultMessage: 'Something went wrong. Please try again',
-  description: 'Error notification label'
-}
-
 const saveActionMessagesToDefine: IActionMessage = {
-  [ActionStatus.ERROR]: errorMessage,
+  [ActionStatus.ERROR]: {
+    id: 'config.form.save.error',
+    defaultMessage: 'Something went wrong. Please try again',
+    description: 'Error notification label'
+  },
   [ActionStatus.PROCESSING]: {
     id: 'config.form.save.inProgress',
     defaultMessage: 'Saving your new draft...',
@@ -449,7 +447,11 @@ const saveActionMessagesToDefine: IActionMessage = {
 }
 
 const publishActionMessagesToDefine: IActionMessage = {
-  [ActionStatus.ERROR]: errorMessage,
+  [ActionStatus.ERROR]: {
+    id: 'config.form.publish.error',
+    defaultMessage: 'Something went wrong. Please try again',
+    description: 'Publish error notification label'
+  },
   [ActionStatus.PROCESSING]: {
     id: 'config.form.publish.inProgress',
     defaultMessage: 'Publishing your draft...',
@@ -463,7 +465,11 @@ const publishActionMessagesToDefine: IActionMessage = {
 }
 
 const previewActionMessagesToDefine: IActionMessage = {
-  [ActionStatus.ERROR]: errorMessage,
+  [ActionStatus.ERROR]: {
+    id: 'config.form.preview.error',
+    defaultMessage: 'Something went wrong. Please try again',
+    description: 'Preview error notification label'
+  },
   [ActionStatus.PROCESSING]: {
     id: 'config.form.preview.inProgress',
     defaultMessage: 'Sending your draft in preview...',
@@ -477,10 +483,14 @@ const previewActionMessagesToDefine: IActionMessage = {
 }
 
 const deleteActionMessagesToDefine: IActionMessage = {
-  [ActionStatus.ERROR]: errorMessage,
+  [ActionStatus.ERROR]: {
+    id: 'config.form.delete.error',
+    defaultMessage: 'Something went wrong. Please try again',
+    description: 'Delete error notification label'
+  },
   [ActionStatus.PROCESSING]: {
     id: 'config.form.delete.inProgress',
-    defaultMessage: 'Deleting your new draft...',
+    defaultMessage: 'Deleting your draft...',
     description: 'Delete draft in progress notification label'
   },
   [ActionStatus.COMPLETED]: {
