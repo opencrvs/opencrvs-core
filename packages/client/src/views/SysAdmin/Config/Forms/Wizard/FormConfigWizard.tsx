@@ -106,11 +106,6 @@ function isValidSection(section: string): section is WizardSection {
   ].includes(section)
 }
 
-function useHasNatlSysAdminScope() {
-  const scope = useSelector(getScope)
-  return scope?.includes(AuthScope.NATLSYSADMIN)
-}
-
 function isSelectedFieldValid(
   selectedField: IConfigField | null,
   section: string
@@ -118,22 +113,19 @@ function isSelectedFieldValid(
   return !!selectedField?.fieldId.includes(section)
 }
 
-export function FormConfigWizard() {
+function useHasNatlSysAdminScope() {
+  const scope = useSelector(getScope)
+  return scope?.includes(AuthScope.NATLSYSADMIN)
+}
+
+function useSelectedField() {
+  const { event, section } = useParams<IRouteProps>()
   const [selectedFieldId, setSelectedFieldId] = React.useState<string | null>(
     null
   )
-  const hasNatlSysAdminScope = useHasNatlSysAdminScope()
-  const dispatch = useDispatch()
-  const intl = useIntl()
-  const { event, section } = useParams<IRouteProps>()
-  const { version } = useSelector((store: IStoreState) =>
-    selectFormDraft(store, event)
-  )
-  const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
   const selectedField = useSelector((store: IStoreState) =>
     selectConfigField(store, event, section, selectedFieldId)
   )
-  const [showHiddenFields, setShowHiddenFields] = React.useState(true)
 
   /*
    * We need to clear the selected field if section changes
@@ -146,15 +138,42 @@ export function FormConfigWizard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [section])
 
+  return { selectedField, setSelectedField: setSelectedFieldId }
+}
+
+function useHiddenFields({
+  selectedField,
+  setSelectedField
+}: ReturnType<typeof useSelectedField>) {
+  const [showHiddenFields, setShowHiddenFields] = React.useState(true)
+
   /*
    * We need to clear the selected field if the selected field is made
    * hidden and we have the showHiddenFields set to false
    */
   React.useEffect(() => {
     if (!showHiddenFields && selectedField?.enabled === FieldEnabled.DISABLED) {
-      setSelectedFieldId(null)
+      setSelectedField(null)
     }
-  }, [showHiddenFields, selectedField?.enabled])
+  }, [showHiddenFields, selectedField?.enabled, setSelectedField])
+
+  return { showHiddenFields, setShowHiddenFields }
+}
+
+export function FormConfigWizard() {
+  const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
+  const { selectedField, setSelectedField } = useSelectedField()
+  const { showHiddenFields, setShowHiddenFields } = useHiddenFields({
+    selectedField,
+    setSelectedField
+  })
+  const { event, section } = useParams<IRouteProps>()
+  const { version } = useSelector((store: IStoreState) =>
+    selectFormDraft(store, event)
+  )
+  const dispatch = useDispatch()
+  const hasNatlSysAdminScope = useHasNatlSysAdminScope()
+  const intl = useIntl()
 
   if (
     !hasNatlSysAdminScope ||
@@ -201,8 +220,8 @@ export function FormConfigWizard() {
           <>
             <CanvasContainer>
               <Canvas
-                selectedFieldId={selectedFieldId}
-                setSelectedFieldId={setSelectedFieldId}
+                selectedField={selectedField}
+                setSelectedField={setSelectedField}
                 showHiddenFields={showHiddenFields}
               />
             </CanvasContainer>

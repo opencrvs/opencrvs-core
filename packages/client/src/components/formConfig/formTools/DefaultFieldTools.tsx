@@ -89,7 +89,6 @@ function HideToggleAction({ fieldId, enabled }: IConfigField) {
 
   return (
     <CenteredToggle
-      key="hideField"
       selected={enabled === FieldEnabled.DISABLED}
       onChange={() =>
         dispatch(

@@ -69,14 +69,14 @@ type IRouteProps = {
 
 type ICanvasProps = {
   showHiddenFields: boolean
-  selectedFieldId: string | null
-  setSelectedFieldId: React.Dispatch<React.SetStateAction<string | null>>
+  selectedField: IConfigField | null
+  setSelectedField: React.Dispatch<React.SetStateAction<string | null>>
 }
 
 export function Canvas({
   showHiddenFields,
-  selectedFieldId,
-  setSelectedFieldId
+  selectedField,
+  setSelectedField
 }: ICanvasProps) {
   const { event, section } = useParams<IRouteProps>()
   const dispatch = useDispatch()
@@ -88,7 +88,6 @@ export function Canvas({
     getRegisterFormSection(store, section, event)
   )
   const configFields = generateConfigFields(fieldsMap)
-  const selectedField = selectedFieldId ? fieldsMap[selectedFieldId] : null
 
   return (
     <CanvasBox>
@@ -112,7 +111,7 @@ export function Canvas({
           <FormConfigElementCard
             key={fieldId}
             selected={isSelected}
-            onClick={() => setSelectedFieldId(fieldId)}
+            onClick={() => setSelectedField(fieldId)}
             movable={isSelected}
             status={isHidden ? intl.formatMessage(messages.hidden) : undefined}
             isUpDisabled={preceedingFieldId === FieldPosition.TOP}
