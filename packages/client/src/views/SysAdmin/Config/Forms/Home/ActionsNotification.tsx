@@ -11,19 +11,25 @@
  */
 import React from 'react'
 import { Actions, ActionContext } from './ActionsModal'
-import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+import {
+  ActionStatus,
+  isNotifiable,
+  NOTIFICATION_TYPE_MAP
+} from '@client/views/SysAdmin/Config/Forms/utils'
 import {
   FloatingNotification,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/formConfig'
+import {
+  messages,
+  statusChangeActionMessages
+} from '@client/i18n/messages/views/formConfig'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { constantsMessages } from '@client/i18n/messages'
 
-/* TODO: use the mappings defined in utils */
 export function ActionsNotification() {
   const {
     actionState: { action, event, status },
@@ -37,21 +43,22 @@ export function ActionsNotification() {
   return (
     <FloatingNotification
       type={
-        status === ActionStatus.ERROR
-          ? NOTIFICATION_TYPE.ERROR
-          : NOTIFICATION_TYPE.SUCCESS
+        isNotifiable(status)
+          ? NOTIFICATION_TYPE_MAP[status]
+          : NOTIFICATION_TYPE.ERROR
       }
-      show={status === ActionStatus.ERROR || status === ActionStatus.COMPLETED}
-      callback={() => setAction({ status: ActionStatus.IDLE })}
+      show={isNotifiable(status)}
+      callback={
+        status !== ActionStatus.PROCESSING
+          ? () => setAction({ status: ActionStatus.IDLE })
+          : undefined
+      }
     >
-      {status === ActionStatus.ERROR
-        ? intl.formatMessage(messages.statusChangeError)
-        : intl.formatMessage(
-            action === Actions.PREVIEW
-              ? messages.statusChangeInPreview
-              : messages.statusChangePublish,
-            { event: intl.formatMessage(constantsMessages[event]), version }
-          )}
+      {isNotifiable(status) &&
+        intl.formatMessage(statusChangeActionMessages(action)[status], {
+          event: intl.formatMessage(constantsMessages[event]),
+          version
+        })}
     </FloatingNotification>
   )
 }

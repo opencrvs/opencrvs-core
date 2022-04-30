@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import {
   Event,
   IFormField,
@@ -19,14 +18,25 @@ import {
   ISerializedFormSection,
   ISerializedFormSectionGroup,
   IFormSectionGroup,
-  SerializedFormField
+  SerializedFormField,
+  QuestionConfigFieldType
 } from '@client/forms'
+import { camelCase, keys } from 'lodash'
 import { deserializeFormField } from '@client/forms/mappings/deserializer'
 import { createCustomField } from '@client/forms/configuration/customUtils'
 import { FieldPosition } from '@client/forms/configuration'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import { registerForms } from '@client/forms/configuration/default'
 import { getDefaultLanguage } from '@client/i18n/utils'
+
+const CUSTOM_FIELD_LABEL = 'Custom Field'
+export const CUSTOM_GROUP_NAME = 'custom-view-group'
+
+export type EventSectionGroup = {
+  event: Event
+  section: string
+  group: string
+}
 
 export type IDefaultConfigField = Pick<
   IQuestionConfig,
@@ -40,7 +50,7 @@ export type IDefaultConfigField = Pick<
   }
 }
 
-type ICustomConfigField = IQuestionConfig & {
+export type ICustomConfigField = IQuestionConfig & {
   foregoingFieldId: string
 }
 
@@ -77,6 +87,7 @@ function customFieldToQuestionConfig(
   preceedingFieldId: string,
   field: IFormField
 ): ICustomConfigField {
+  /* TODO: add errorMessage when implemented for FormFields */
   const messageProperties = [
     'label',
     'placeholder',
@@ -241,4 +252,70 @@ export function hasDefaultFieldChanged(
     /* These can be undefined so need to be converted to boolean */
     !!defaultFormField.required !== !!defaultConfigField.required
   )
+}
+
+function determineNextFieldIdNumber(
+  fieldsMap: IConfigFieldMap,
+  event: Event,
+  section: string
+): number {
+  const partialHandleBar = camelCase(CUSTOM_FIELD_LABEL)
+  const customFieldNumber = keys(fieldsMap)
+    .filter((item) => item.includes(partialHandleBar))
+    .map((item) => {
+      const elemNumber = item.replace(
+        `${event}.${section}.${CUSTOM_GROUP_NAME}.${partialHandleBar}`,
+        ''
+      )
+      return parseInt(elemNumber)
+    })
+  return customFieldNumber.length ? Math.max(...customFieldNumber) + 1 : 1
+}
+
+export function generateKeyFromObj(obj: any) {
+  return btoa(JSON.stringify(obj))
+}
+
+function getLastConfigField(fieldsMap: IConfigFieldMap) {
+  return Object.values(fieldsMap).find(
+    ({ foregoingFieldId }) => foregoingFieldId === FieldPosition.BOTTOM
+  )
+}
+
+export function prepareNewCustomFieldConfig(
+  fieldsMap: IConfigFieldMap,
+  event: Event,
+  section: string,
+  fieldType: QuestionConfigFieldType
+): ICustomConfigField {
+  const customFieldNumber = determineNextFieldIdNumber(
+    fieldsMap,
+    event,
+    section
+  )
+  const defaultMessage = `${CUSTOM_FIELD_LABEL} ${customFieldNumber}`
+  const customFieldIndex = `${event}.${section}.${CUSTOM_GROUP_NAME}.${camelCase(
+    defaultMessage
+  )}`
+  const lastField = getLastConfigField(fieldsMap)
+
+  return {
+    fieldId: customFieldIndex,
+    fieldName: customFieldIndex,
+    fieldType,
+    preceedingFieldId: lastField ? lastField.fieldId : FieldPosition.TOP,
+    foregoingFieldId: FieldPosition.BOTTOM,
+    required: false,
+    enabled: '',
+    custom: true,
+    label: [
+      {
+        lang: getDefaultLanguage(),
+        descriptor: {
+          id: `form.customField.label.customField${customFieldNumber}`,
+          defaultMessage
+        }
+      }
+    ]
+  }
 }

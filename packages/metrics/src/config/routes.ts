@@ -25,7 +25,10 @@ import {
   requestForRegistrarValidationHandler,
   requestCorrectionHandler
 } from '@metrics/features/registration/handler'
-import { metricsHandler } from '@metrics/features/metrics/handler'
+import {
+  metricsDeleteMeasurementHandler,
+  metricsHandler
+} from '@metrics/features/metrics/handler'
 import { eventEstimationsHandler } from '@metrics/features/eventEstimations/handler'
 import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
 import { locationWiseEventEstimationsHandler } from '@metrics/features/locationWiseEventEstimations/handler'
@@ -43,6 +46,10 @@ import {
   generateLegacyEventDurationHandler
 } from '@metrics/features/legacy/handler'
 import { getEventDurationHandler } from '@metrics/features/getEventDuration/handler'
+
+const enum RouteScope {
+  NATLSYSADMIN = 'natlsysadmin'
+}
 
 export const getRoutes = () => {
   const routes = [
@@ -465,6 +472,18 @@ export const getRoutes = () => {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
+      }
+    },
+    // delete all measurements ocrvs database from influx
+    {
+      method: 'DELETE',
+      path: '/influxMeasurement',
+      handler: metricsDeleteMeasurementHandler,
+      config: {
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        tags: ['api']
       }
     }
   ]

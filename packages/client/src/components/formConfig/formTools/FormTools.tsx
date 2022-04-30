@@ -10,17 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import React from 'react'
-import styled from '@client/styledComponents'
-import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
-import { IntlShape, useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/formConfig'
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { QuestionConfigFieldType } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/formConfig'
+import styled from '@client/styledComponents'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import React from 'react'
+import { IntlShape, useIntl } from 'react-intl'
 
 const TitleContainer = styled.div`
   margin-top: 24px;
@@ -37,43 +38,71 @@ const CenteredToggle = styled(Toggle)`
   align-self: center;
 `
 
+interface IFormToolsProps {
+  onAddClickListener: (fieldType: QuestionConfigFieldType) => void
+}
+
 const listViewItems = (intl: IntlShape) => {
   const items = [
     {
       label: intl.formatMessage(messages.textInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: () => {}
+      handler: (
+        dispatchAction: (fieldType: QuestionConfigFieldType) => void
+      ) => {
+        dispatchAction(QuestionConfigFieldType.TEXT)
+      }
     },
     {
       label: intl.formatMessage(messages.textAreaInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: () => {}
+      handler: (
+        dispatchAction: (fieldType: QuestionConfigFieldType) => void
+      ) => {
+        dispatchAction(QuestionConfigFieldType.TEXTAREA)
+      }
     },
     {
       label: intl.formatMessage(messages.numberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: () => {}
+      handler: (
+        dispatchAction: (fieldType: QuestionConfigFieldType) => void
+      ) => {
+        dispatchAction(QuestionConfigFieldType.NUMBER)
+      }
     },
     {
       label: intl.formatMessage(messages.phoneNumberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: () => {}
+      handler: (
+        dispatchAction: (fieldType: QuestionConfigFieldType) => void
+      ) => {
+        dispatchAction(QuestionConfigFieldType.TEL)
+      }
     },
     {
       label: intl.formatMessage(messages.heading),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: () => {}
+      handler: (
+        dispatchAction: (fieldType: QuestionConfigFieldType) => void
+      ) => {
+        // dispatchAction(TEXT)
+      }
     },
     {
       label: intl.formatMessage(messages.supportingCopy),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: () => {}
+      handler: (
+        dispatchAction: (fieldType: QuestionConfigFieldType) => void
+      ) => {
+        // dispatchAction(TEXT)
+      }
     }
   ]
   return items
 }
 
-export const FormTools = () => {
+export const FormTools = ({ onAddClickListener }: IFormToolsProps) => {
   const [toggleSelected, setToggleSelected] = React.useState(false)
   const intl = useIntl()
 
@@ -104,7 +133,10 @@ export const FormTools = () => {
             key={idx}
             label={<Label key={idx}>{item.label}</Label>}
             actions={[
-              <LinkButton key={idx} onClick={item.handler}>
+              <LinkButton
+                key={idx}
+                onClick={() => item.handler(onAddClickListener)}
+              >
                 {item.actionLabel}
               </LinkButton>
             ]}

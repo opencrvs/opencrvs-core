@@ -13,7 +13,7 @@ type DraftHistory {
   version: Int
   status: String
   comment: String
-  lastUpdateAt: Date
+  updatedAt: Date
 }
 
 type FormDraft {
@@ -58,10 +58,14 @@ input QuestionInput {
 
 input FormDraftInput {
   questions: [QuestionInput]
-  deleted: [String]
   event: String!
   status: String!
   comment: String
+}
+
+input FormDraftStatusModify {
+  event: String!
+  status: String!
 }
 
 type Query {
@@ -70,4 +74,5 @@ type Query {
 
 type Mutation {
   createOrUpdateFormDraft(formDraft: FormDraftInput!): FormDraft
+  modifyDraftStatus(formDraft: FormDraftStatusModify!): FormDraft
 }

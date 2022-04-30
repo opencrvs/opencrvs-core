@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { loop, Cmd, Loop, LoopReducer } from 'redux-loop'
-import { storage } from '@client/storage'
 import * as actions from '@client/forms/configuration/configFields/actions'
+import { storage } from '@client/storage'
+import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import * as offlineActions from '@client/offline/actions'
 import { Event } from '@client/forms'
 import { getConfiguredForm, FieldPosition } from '@client/forms/configuration'
@@ -127,6 +127,8 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         })
       )
 
+    /* TODO: Add action handler for GET_STORAGE_CONFIG_FIELDS_FAILED */
+
     case actions.STORE_CONFIG_FIELDS_SUCCESS:
       if (action.payload) {
         const configFieldsState: IConfigFieldsState = JSON.parse(action.payload)
@@ -135,6 +137,119 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         }
       }
       return state
+
+    case actions.ADD_CUSTOM_FIELD: {
+      if (state.state === 'LOADING') {
+        return state
+      }
+      const { event, section, customField } = action.payload
+      const fields = {
+        ...state[event][section],
+        [customField.fieldId]: customField
+      }
+
+      if (
+        customField.preceedingFieldId &&
+        customField.preceedingFieldId !== FieldPosition.TOP
+      ) {
+        fields[customField.preceedingFieldId] = {
+          ...fields[customField.preceedingFieldId],
+          foregoingFieldId: customField.fieldId
+        }
+      }
+
+      return {
+        ...state,
+        [event]: {
+          ...state[event],
+          [section]: fields
+        }
+      }
+    }
+
+    case actions.MODIFY_CONFIG_FIELD: {
+      if (state.state === 'LOADING') return state
+      const { fieldId, props } = action.payload
+      const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
+      const { [fieldId]: originalField, ...fields } = state[event][sectionId]
+
+      /* Adjusting preceedingFieldId & foregoingFieldId */
+      if (props.fieldId && fieldId !== props.fieldId) {
+        if (
+          originalField.preceedingFieldId &&
+          originalField.preceedingFieldId !== FieldPosition.TOP
+        ) {
+          fields[originalField.preceedingFieldId] = {
+            ...fields[originalField.preceedingFieldId],
+            foregoingFieldId: props.fieldId
+          }
+        }
+
+        if (originalField.foregoingFieldId !== FieldPosition.BOTTOM)
+          fields[originalField.foregoingFieldId] = {
+            ...fields[originalField.foregoingFieldId],
+            preceedingFieldId: props.fieldId
+          }
+
+        fields[props.fieldId] = {
+          ...originalField,
+          ...props
+        }
+
+        return {
+          ...state,
+          [event]: {
+            ...state[event],
+            [sectionId]: fields
+          }
+        }
+      }
+
+      fields[fieldId] = {
+        ...originalField,
+        ...props
+      }
+
+      return {
+        ...state,
+        [event]: {
+          ...state[event],
+          [sectionId]: fields
+        }
+      }
+    }
+
+    case actions.REMOVE_CUSTOM_FIELD: {
+      if (state.state === 'LOADING') return state
+      const { fieldId } = action.payload
+      const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
+
+      const { [fieldId]: fieldToRemove, ...fields } = state[event][sectionId]
+
+      if (
+        fieldToRemove.preceedingFieldId &&
+        fieldToRemove.preceedingFieldId !== FieldPosition.TOP
+      ) {
+        fields[fieldToRemove.preceedingFieldId] = {
+          ...fields[fieldToRemove.preceedingFieldId],
+          foregoingFieldId: fieldToRemove.foregoingFieldId
+        }
+      }
+      if (fieldToRemove.foregoingFieldId !== FieldPosition.BOTTOM) {
+        fields[fieldToRemove.foregoingFieldId] = {
+          ...fields[fieldToRemove.foregoingFieldId],
+          preceedingFieldId: fieldToRemove.preceedingFieldId
+        }
+      }
+
+      return {
+        ...state,
+        [event]: {
+          ...state[event],
+          [sectionId]: fields
+        }
+      }
+    }
 
     case actions.UPDATE_QUESTION_CONFIG: {
       const { formDraft, questionConfig } = action.payload

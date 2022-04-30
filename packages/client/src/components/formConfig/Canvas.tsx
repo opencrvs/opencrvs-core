@@ -13,7 +13,7 @@ import React from 'react'
 import { Box } from '@opencrvs/components/lib/interface'
 import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormConfigElementCard'
 import styled from '@client/styledComponents'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
@@ -28,7 +28,8 @@ import { useParams } from 'react-router'
 import { BirthSection, DeathSection, Event } from '@client/forms'
 import {
   shiftConfigFieldUp,
-  shiftConfigFieldDown
+  shiftConfigFieldDown,
+  removeCustomField
 } from '@client/forms/configuration/configFields/actions'
 
 const CanvasBox = styled(Box)`
@@ -90,12 +91,20 @@ export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
           <FormConfigElementCard
             key={fieldId}
             selected={isSelected}
-            onClick={() => onFieldSelect(configField)}
+            onClick={(event) => {
+              event.stopPropagation()
+              onFieldSelect(configField)
+            }}
             movable={isSelected}
+            removable={configField.custom}
             isUpDisabled={preceedingFieldId === FieldPosition.TOP}
             isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}
             onMoveUp={() => dispatch(shiftConfigFieldUp(fieldId))}
             onMoveDown={() => dispatch(shiftConfigFieldDown(fieldId))}
+            onRemove={() => {
+              selectedField &&
+                dispatch(removeCustomField(selectedField.fieldId))
+            }}
           >
             <FormFieldGenerator
               id={fieldId}

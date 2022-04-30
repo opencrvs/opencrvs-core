@@ -63,7 +63,7 @@ export function SectionNavigation() {
       <OrderedList>
         {Object.values<BirthSection | DeathSection>(tabs).map((tab, idx) => {
           if (tab === BirthSection.Preview || tab === DeathSection.Preview) {
-            return <></>
+            return <React.Fragment key={idx}></React.Fragment>
           }
           return (
             <li key={idx}>

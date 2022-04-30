@@ -63,6 +63,7 @@ services:
       - RESOURCE_SERVICE_URL=http://countryconfig:3040/
       - HEARTH_URL=http://hearth:3447/fhir
       - OPENHIM_URL=http://openhim-core:5001
+      - APPLICATION_CONFIG_URL=http://config:2021/
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true
@@ -157,4 +158,8 @@ services:
       - HOST=0.0.0.0
       - PORT=2021
       - MONGO_URL=mongodb://mongo1/application-config
+      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
+      - AUTH_URL=http://auth:4040
+      - SEARCH_URL=http://search:9090/
+      - METRICS_URL=http://metrics:1050
       - CHECK_INVALID_TOKEN=true

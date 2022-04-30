@@ -34,6 +34,7 @@ interface IFormConfigMessages
   certificateHandlebars: MessageDescriptor
   hideField: MessageDescriptor
   requiredForRegistration: MessageDescriptor
+  statusChangeDelete: MessageDescriptor
   statusChangeError: MessageDescriptor
   statusChangeInPreview: MessageDescriptor
   statusChangePublish: MessageDescriptor
@@ -56,6 +57,29 @@ interface IFormConfigMessages
   showIntroductionPage: MessageDescriptor
   introductionPageSuccessNotification: MessageDescriptor
   noOfAddressesSuccessNotification: MessageDescriptor
+  fieldGroup: MessageDescriptor
+  documents: MessageDescriptor
+  list: MessageDescriptor
+  paragraph: MessageDescriptor
+  imageUploader: MessageDescriptor
+  documentUploader: MessageDescriptor
+  simpleDocumentUploader: MessageDescriptor
+  locationSearch: MessageDescriptor
+  warning: MessageDescriptor
+  link: MessageDescriptor
+  fetchButton: MessageDescriptor
+  tel: MessageDescriptor
+  selectWithOption: MessageDescriptor
+  selectWithDynamicOption: MessageDescriptor
+  fieldWithDynamicDefinition: MessageDescriptor
+  radioGroup: MessageDescriptor
+  radioGroupWithNestedField: MessageDescriptor
+  informativeRadioGroup: MessageDescriptor
+  checkboxGroup: MessageDescriptor
+  date: MessageDescriptor
+  dynamicList: MessageDescriptor
+  formConfigMobileModalTitle: MessageDescriptor
+  formConfigMobileModalDesc: MessageDescriptor
 }
 
 type INavigationMessages = Record<
@@ -272,6 +296,117 @@ const messagesToDefine: IFormConfigMessages = {
     defaultMessage: 'The number of address has been updated',
     description: 'Success notification label for number of addresses settings'
   },
+  fieldGroup: {
+    id: 'config.form.settings.fieldGroup',
+    defaultMessage: 'Field Group',
+    description: 'Success notification label for number of addresses settings'
+  },
+  documents: {
+    id: 'config.form.settings.document',
+    defaultMessage: 'Document',
+    description: 'Success notification label for number of addresses settings'
+  },
+  list: {
+    id: 'config.form.settings.list',
+    defaultMessage: 'List',
+    description: 'Success notification label for number of addresses settings'
+  },
+  paragraph: {
+    id: 'config.form.settings.paragraph',
+    defaultMessage: 'Paragraph',
+    description: 'Success notification label for number of addresses settings'
+  },
+  imageUploader: {
+    id: 'config.form.settings.imageUploader',
+    defaultMessage: 'Image Uploader',
+    description: 'Success notification label for number of addresses settings'
+  },
+  documentUploader: {
+    id: 'config.form.settings.documentUploader',
+    defaultMessage: 'Document Uploader',
+    description: 'Success notification label for number of addresses settings'
+  },
+  simpleDocumentUploader: {
+    id: 'config.form.settings.simpleDocumentUploader',
+    defaultMessage: 'Simple document Uploader',
+    description: 'Success notification label for number of addresses settings'
+  },
+  locationSearch: {
+    id: 'config.form.settings.locationSearch',
+    defaultMessage: 'Location Search',
+    description: 'Success notification label for number of addresses settings'
+  },
+  warning: {
+    id: 'config.form.settings.warning',
+    defaultMessage: 'Warning',
+    description: 'Success notification label for number of addresses settings'
+  },
+  link: {
+    id: 'config.form.settings.link',
+    defaultMessage: 'Link',
+    description: 'Success notification label for number of addresses settings'
+  },
+  fetchButton: {
+    id: 'config.form.settings.fetchButton',
+    defaultMessage: 'Fetch Button',
+    description: 'Success notification label for number of addresses settings'
+  },
+  tel: {
+    id: 'config.form.settings.tel',
+    defaultMessage: 'Phone Input',
+    description: 'Success notification label for number of addresses settings'
+  },
+  selectWithOption: {
+    id: 'config.form.settings.selectWithOption',
+    defaultMessage: 'Select with Option',
+    description: 'Success notification label for number of addresses settings'
+  },
+  selectWithDynamicOption: {
+    id: 'config.form.settings.selectWithDynamicOption',
+    defaultMessage: 'Select with dynamic option',
+    description: 'Success notification label for number of addresses settings'
+  },
+  fieldWithDynamicDefinition: {
+    id: 'config.form.settings.fieldWithDynamicDef',
+    defaultMessage: 'Field with dynamic definition',
+    description: 'Success notification label for number of addresses settings'
+  },
+  radioGroup: {
+    id: 'config.form.settings.radioGroup',
+    defaultMessage: 'Radio Group',
+    description: 'Success notification label for number of addresses settings'
+  },
+  radioGroupWithNestedField: {
+    id: 'config.form.settings.radioGroupWithNestedField',
+    defaultMessage: 'Radio group with nested field',
+    description: 'Success notification label for number of addresses settings'
+  },
+  informativeRadioGroup: {
+    id: 'config.form.settings.informativeRadio',
+    defaultMessage: 'Informative radio group',
+    description: 'Success notification label for number of addresses settings'
+  },
+  checkboxGroup: {
+    id: 'config.form.settings.checkbox',
+    defaultMessage: 'Checkbox',
+    description: 'Success notification label for number of addresses settings'
+  },
+  date: {
+    id: 'config.form.settings.date',
+    defaultMessage: 'Date input',
+    description: 'Success notification label for number of addresses settings'
+  },
+  dynamicList: {
+    id: 'config.form.settings.dynamicList',
+    defaultMessage: 'Dynamic List',
+    description: 'Success notification label for number of addresses settings'
+  },
+  statusChangeDelete: {
+    id: 'config.form.statusChange.delete',
+    defaultMessage:
+      '{event} declaration form v{version} has been deleted successfully',
+    description: 'Delete toast description for status change to deleted'
+  },
   statusChangeError: {
     id: 'config.form.statusChange.error',
     defaultMessage: 'Something went wrong. Please try again',
@@ -323,6 +458,17 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.form.draft.save.comment.error',
     defaultMessage: 'You must provide a description of your changes',
     description: 'Comment area error message for save draft modal'
+  },
+  formConfigMobileModalTitle: {
+    id: 'config.form.mobile.modal.title',
+    defaultMessage: 'Configuration on mobile unavailble',
+    description: 'Modal title for mobile form configuration'
+  },
+  formConfigMobileModalDesc: {
+    id: 'config.form.mobile.modal.desc',
+    defaultMessage:
+      'Please use a laptop or desktop to configure a declaration form',
+    description: 'Modal description for mobile form configuration'
   }
 }
 
@@ -330,12 +476,12 @@ const draftStatusMessagesToDefine: Record<
   Exclude<DraftStatus, 'DRAFT' | 'DELETED'>,
   MessageDescriptor
 > = {
-  PREVIEW: {
+  [DraftStatus.PREVIEW]: {
     id: 'config.form.status.preview',
     defaultMessage: 'In Preview',
     description: 'Label for in preview tab of form config page'
   },
-  PUBLISHED: {
+  [DraftStatus.PUBLISHED]: {
     id: 'config.form.status.published',
     defaultMessage: 'Published',
     description: 'Label for published tab of form config page'
@@ -346,17 +492,17 @@ const draftTabsMessagesToDefine: Record<
   Exclude<DraftStatus, 'DELETED'>,
   MessageDescriptor
 > = {
-  DRAFT: {
+  [DraftStatus.DRAFT]: {
     id: 'config.form.tab.drafts',
     defaultMessage: 'Drafts',
     description: 'Label for drafts tab of form config page'
   },
-  PREVIEW: {
+  [DraftStatus.PREVIEW]: {
     id: 'config.form.tab.inPreview',
     defaultMessage: 'In Preview',
     description: 'Label for in preview tab of form config page'
   },
-  PUBLISHED: {
+  [DraftStatus.PUBLISHED]: {
     id: 'config.form.tab.published',
     defaultMessage: 'Published',
     description: 'Label for published tab of form config page'
@@ -364,22 +510,22 @@ const draftTabsMessagesToDefine: Record<
 }
 
 const actionsModalTitleMessagesToDefine: Record<Actions, MessageDescriptor> = {
-  PUBLISH: {
+  [Actions.PUBLISH]: {
     id: 'config.form.publish.confirmation.title',
     defaultMessage: 'Publish {event} form?',
     description: 'Title for publish confirmation'
   },
-  PREVIEW: {
+  [Actions.PREVIEW]: {
     id: 'config.form.preview.confirmation.title',
     defaultMessage: 'Preview {event} form?',
     description: 'Title for preview confirmation'
   },
-  EDIT: {
+  [Actions.EDIT]: {
     id: 'config.form.edit.confirmation.title',
     defaultMessage: 'Edit declaration form',
     description: 'Title for edit confirmation'
   },
-  DELETE: {
+  [Actions.DELETE]: {
     id: 'config.form.delete.confirmation.title',
     defaultMessage: 'Delete {event} draft?',
     description: 'Title for delete confirmation'
@@ -390,25 +536,25 @@ const actionsModalDescriptionMessagesToDefine: Record<
   Actions,
   MessageDescriptor
 > = {
-  PUBLISH: {
+  [Actions.PUBLISH]: {
     id: 'config.form.publish.confirmation.description',
     defaultMessage:
       'By publishing this declaration form you confirm that it is ready to be used by registration offices. You will not be able to make any future edits.',
     description: 'Description for publish confirmation'
   },
-  PREVIEW: {
+  [Actions.PREVIEW]: {
     id: 'config.form.preview.confirmation.description',
     defaultMessage:
       'This will make the form availble to test users. So that you can test the form and certificate',
     description: 'Description for preview confirmation'
   },
-  EDIT: {
+  [Actions.EDIT]: {
     id: 'config.form.edit.confirmation.description',
     defaultMessage:
       'This will make a new draft version for you to make updates. Your previewed form will revert to the default configuration.',
     description: 'Description for edit confirmation'
   },
-  DELETE: {
+  [Actions.DELETE]: {
     id: 'config.form.delete.confirmation.description',
     defaultMessage:
       'This will delete all draft versions and revert back to the default configuration.',
@@ -416,14 +562,16 @@ const actionsModalDescriptionMessagesToDefine: Record<
   }
 }
 
-const saveActionMessagesToDefine: Record<
+type IActionMessage = Record<
   ActionStatus.ERROR | ActionStatus.COMPLETED | ActionStatus.PROCESSING,
   MessageDescriptor
-> = {
+>
+
+const saveActionMessagesToDefine: IActionMessage = {
   [ActionStatus.ERROR]: {
     id: 'config.form.save.error',
     defaultMessage: 'Something went wrong. Please try again',
-    description: 'Save draft error notification label'
+    description: 'Error notification label'
   },
   [ActionStatus.PROCESSING]: {
     id: 'config.form.save.inProgress',
@@ -437,6 +585,67 @@ const saveActionMessagesToDefine: Record<
   }
 }
 
+const publishActionMessagesToDefine: IActionMessage = {
+  [ActionStatus.ERROR]: {
+    id: 'config.form.publish.error',
+    defaultMessage: 'Something went wrong. Please try again',
+    description: 'Publish error notification label'
+  },
+  [ActionStatus.PROCESSING]: {
+    id: 'config.form.publish.inProgress',
+    defaultMessage: 'Publishing your draft...',
+    description: 'Publish draft in progress notification label'
+  },
+  [ActionStatus.COMPLETED]: {
+    id: 'config.form.publish.success',
+    defaultMessage: '{event} draft v{version} has been published successfully',
+    description: 'Publish draft success notification label'
+  }
+}
+
+const previewActionMessagesToDefine: IActionMessage = {
+  [ActionStatus.ERROR]: {
+    id: 'config.form.preview.error',
+    defaultMessage: 'Something went wrong. Please try again',
+    description: 'Preview error notification label'
+  },
+  [ActionStatus.PROCESSING]: {
+    id: 'config.form.preview.inProgress',
+    defaultMessage: 'Sending your draft in preview...',
+    description: 'Preview draft in progress notification label'
+  },
+  [ActionStatus.COMPLETED]: {
+    id: 'config.form.preview.success',
+    defaultMessage: '{event} draft v{version} is now in preview',
+    description: 'Preview draft success notification label'
+  }
+}
+
+const deleteActionMessagesToDefine: IActionMessage = {
+  [ActionStatus.ERROR]: {
+    id: 'config.form.delete.error',
+    defaultMessage: 'Something went wrong. Please try again',
+    description: 'Delete error notification label'
+  },
+  [ActionStatus.PROCESSING]: {
+    id: 'config.form.delete.inProgress',
+    defaultMessage: 'Deleting your draft...',
+    description: 'Delete draft in progress notification label'
+  },
+  [ActionStatus.COMPLETED]: {
+    id: 'config.form.delete.success',
+    defaultMessage: '{event} draft v{version} has been deleted successfully',
+    description: 'Delete draft success notification label'
+  }
+}
+
+const statusChangeActionMessagesToDefine = {
+  [Actions.PREVIEW]: previewActionMessagesToDefine,
+  [Actions.PUBLISH]: publishActionMessagesToDefine,
+  [Actions.DELETE]: deleteActionMessagesToDefine,
+  [Actions.EDIT]: deleteActionMessagesToDefine
+}
+
 export const messages: IFormConfigMessages = defineMessages(messagesToDefine)
 export const navigationMessages = defineMessages(navigationMessagesToDefine)
 export const draftStatusMessages = defineMessages(draftStatusMessagesToDefine)
@@ -448,3 +657,5 @@ export const actionsModalDescriptionMessages = defineMessages(
   actionsModalDescriptionMessagesToDefine
 )
 export const saveActionMessages = defineMessages(saveActionMessagesToDefine)
+export const statusChangeActionMessages = (action: Actions) =>
+  defineMessages(statusChangeActionMessagesToDefine[action])
