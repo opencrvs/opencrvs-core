@@ -13,7 +13,7 @@ import React from 'react'
 import { Box } from '@opencrvs/components/lib/interface'
 import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormConfigElementCard'
 import styled from '@client/styledComponents'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
@@ -26,6 +26,14 @@ import { getRegisterFormSection } from '@client/forms/register/declaration-selec
 import { FieldPosition } from '@client/forms/configuration'
 import { useParams } from 'react-router'
 import { BirthSection, DeathSection, Event } from '@client/forms'
+import {
+  shiftConfigFieldUp,
+  shiftConfigFieldDown,
+  removeCustomField
+} from '@client/forms/configuration/configFields/actions'
+import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
+import { useIntl } from 'react-intl'
+import { messages } from '@client/i18n/messages/views/formConfig'
 
 const CanvasBox = styled(Box)`
   display: flex;
@@ -61,12 +69,19 @@ type IRouteProps = {
 }
 
 type ICanvasProps = {
+  showHiddenFields: boolean
   selectedField: IConfigField | null
-  onFieldSelect: (field: IConfigField) => void
+  setSelectedField: React.Dispatch<React.SetStateAction<string | null>>
 }
 
-export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
+export function Canvas({
+  showHiddenFields,
+  selectedField,
+  setSelectedField
+}: ICanvasProps) {
   const { event, section } = useParams<IRouteProps>()
+  const dispatch = useDispatch()
+  const intl = useIntl()
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
@@ -77,20 +92,51 @@ export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
 
   return (
     <CanvasBox>
-      {configFields.map((configField) => (
-        <FormConfigElementCard
-          key={configField.fieldId}
-          selected={selectedField?.fieldId === configField.fieldId}
-          onClick={() => onFieldSelect(configField)}
-        >
-          <FormFieldGenerator
-            id={configField.fieldId}
-            onChange={() => {}}
-            fields={[getFieldDefinition(formSection, configField)]}
-            setAllFieldsDirty={false}
-          />
-        </FormConfigElementCard>
-      ))}
+      {(showHiddenFields
+        ? configFields
+        : configFields.filter(
+            ({ enabled }) => enabled !== FieldEnabled.DISABLED
+          )
+      ).map((configField) => {
+        const {
+          fieldId,
+          preceedingFieldId,
+          foregoingFieldId,
+          enabled,
+          custom
+        } = configField
+        const isSelected = selectedField?.fieldId === fieldId
+        const isHidden = !custom && enabled === FieldEnabled.DISABLED
+
+        return (
+          <FormConfigElementCard
+            key={fieldId}
+            selected={isSelected}
+            onClick={(event) => {
+              event.stopPropagation()
+              setSelectedField(fieldId)
+            }}
+            movable={isSelected}
+            status={isHidden ? intl.formatMessage(messages.hidden) : undefined}
+            removable={configField.custom}
+            isUpDisabled={preceedingFieldId === FieldPosition.TOP}
+            isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}
+            onMoveUp={() => dispatch(shiftConfigFieldUp(fieldId))}
+            onMoveDown={() => dispatch(shiftConfigFieldDown(fieldId))}
+            onRemove={() => {
+              selectedField &&
+                dispatch(removeCustomField(selectedField.fieldId))
+            }}
+          >
+            <FormFieldGenerator
+              id={fieldId}
+              onChange={() => {}}
+              fields={[getFieldDefinition(formSection, configField)]}
+              setAllFieldsDirty={false}
+            />
+          </FormConfigElementCard>
+        )
+      })}
     </CanvasBox>
   )
 }

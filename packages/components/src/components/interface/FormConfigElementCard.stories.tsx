@@ -58,6 +58,17 @@ Movable.args = {
   movable: true
 }
 
+export const WithStatus = Template.bind({})
+WithStatus.args = {
+  status: 'Hidden'
+}
+
+export const MovableWithStatus = Template.bind({})
+MovableWithStatus.args = {
+  ...Movable.args,
+  ...WithStatus.args
+}
+
 export const MoveUpDisabled = Template.bind({})
 MoveUpDisabled.args = {
   ...Movable.args,
@@ -76,8 +87,8 @@ Removable.args = {
   removable: true
 }
 
-export const TotalView = Template.bind({})
-TotalView.args = {
+export const MovableAndRemovable = Template.bind({})
+MovableAndRemovable.args = {
   ...Selected.args,
   ...Movable.args,
   ...Removable.args

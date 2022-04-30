@@ -26,7 +26,7 @@ export const FORM_DRAFT_FIELDS = gql`
       status
       version
       comment
-      lastUpdateAt
+      updatedAt
     }
   }
 `

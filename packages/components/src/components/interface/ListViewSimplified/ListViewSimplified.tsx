@@ -11,6 +11,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
+import { StyledPill } from '../Pill'
 
 const Grid = styled.div<{ bottomBorder: boolean }>`
   display: grid;
@@ -81,6 +82,9 @@ const ActionsContainer = styled.div`
   padding: 8px 0;
   gap: 8px;
   justify-content: right;
+  ${StyledPill} {
+    margin-top: 8px;
+  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }

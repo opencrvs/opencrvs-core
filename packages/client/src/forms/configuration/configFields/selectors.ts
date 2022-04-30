@@ -37,9 +37,9 @@ export function selectConfigField(
   store: IStoreState,
   event: Event,
   section: string,
-  fieldId: string
+  fieldId: string | null
 ) {
-  return selectConfigFields(store, event, section)[fieldId]
+  return fieldId ? selectConfigFields(store, event, section)[fieldId] : null
 }
 
 function generateQuestionConfigs(configFields: ISectionFieldMap) {
@@ -47,9 +47,11 @@ function generateQuestionConfigs(configFields: ISectionFieldMap) {
   Object.values(configFields).forEach((sectionConfigFields) => {
     Object.values(sectionConfigFields).forEach((configField) => {
       if (!isDefaultField(configField)) {
-        questionConfigs.push(configField)
+        const { foregoingFieldId, ...rest } = configField
+        questionConfigs.push(rest)
       } else if (hasDefaultFieldChanged(configField)) {
-        questionConfigs.push(configField)
+        const { foregoingFieldId, identifiers, ...rest } = configField
+        questionConfigs.push(rest)
       }
     })
   })

@@ -131,29 +131,30 @@ function extractMessages(questions: IQuestionConfig[], language: string) {
     const errorMessage = find(question.errorMessage, {
       lang: language
     })
-    if (labelMessage) {
-      messages[labelMessage.descriptor.id] =
-        labelMessage.descriptor.defaultMessage
+    if (labelMessage?.descriptor?.id) {
+      const labelID: string = labelMessage.descriptor.id as string
+      messages[labelID] = labelMessage?.descriptor?.defaultMessage as string
     }
 
-    if (placeholderMessage) {
-      messages[placeholderMessage.descriptor.id] =
-        placeholderMessage.descriptor.defaultMessage
+    if (placeholderMessage?.descriptor?.id) {
+      const placeholderID: string = placeholderMessage.descriptor.id as string
+      messages[placeholderID] = placeholderMessage.descriptor
+        .defaultMessage as string
     }
 
-    if (descriptionMessage) {
-      messages[descriptionMessage.descriptor.id] =
-        descriptionMessage.descriptor.defaultMessage
+    if (descriptionMessage?.descriptor?.id) {
+      const descID = descriptionMessage.descriptor.id as string
+      messages[descID] = descriptionMessage.descriptor.defaultMessage as string
     }
 
-    if (tooltipMessage) {
-      messages[tooltipMessage.descriptor.id] =
-        tooltipMessage.descriptor.defaultMessage
+    if (tooltipMessage?.descriptor?.id) {
+      const tooltipID = tooltipMessage.descriptor.id as string
+      messages[tooltipID] = tooltipMessage.descriptor.defaultMessage as string
     }
 
-    if (errorMessage) {
-      messages[errorMessage.descriptor.id] =
-        errorMessage.descriptor.defaultMessage
+    if (errorMessage?.descriptor?.id) {
+      const errID = errorMessage.descriptor.id as string
+      messages[errID] = errorMessage.descriptor.defaultMessage as string
     }
   })
   return messages

@@ -25,11 +25,18 @@ import {
   IConfigField,
   getFieldDefinition
 } from '@client/forms/configuration/configFields/utils'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { useParams } from 'react-router'
-import { Event, BirthSection, DeathSection } from '@client/forms'
+import {
+  Event,
+  BirthSection,
+  DeathSection,
+  fieldTypeLabel
+} from '@client/forms'
 import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
+import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
+import { modifyConfigField } from '@client/forms/configuration/configFields/actions'
 
 const Container = styled.div`
   display: flex;
@@ -82,6 +89,24 @@ const Body = styled.span`
   color: ${({ theme }) => theme.colors.grey500};
 `
 
+function HideToggleAction({ fieldId, enabled }: IConfigField) {
+  const dispatch = useDispatch()
+
+  return (
+    <CenteredToggle
+      selected={enabled === FieldEnabled.DISABLED}
+      onChange={() =>
+        dispatch(
+          modifyConfigField(fieldId, {
+            enabled:
+              enabled === FieldEnabled.DISABLED ? '' : FieldEnabled.DISABLED
+          })
+        )
+      }
+    />
+  )
+}
+
 export function DefaultFieldTools({
   configField
 }: {
@@ -96,35 +121,46 @@ export function DefaultFieldTools({
   const formField = getFieldDefinition(formSection, configField)
   const handleBar = getCertificateHandlebar(formField)
   const contentKey = getContentKey(formField)
+  const fieldType = fieldTypeLabel(formField.type)
+
   return (
     <Container>
-      <Title>{formField.type}</Title>
+      <Title>{intl.formatMessage(fieldType)}</Title>
       <ListViewSimplified bottomBorder>
         <ListViewItemSimplified
           label={<Label>{intl.formatMessage(messages.hideField)}</Label>}
-          actions={[<CenteredToggle key="hideField" />]}
+          actions={<HideToggleAction {...configField} />}
         />
-        <ListViewItemSimplified
-          label={
-            <Label>
-              {intl.formatMessage(messages.requiredForRegistration)}
-              <StyledTooltip />
-            </Label>
-          }
-          actions={[
-            <CenteredToggle
-              key="requiredForRegistration"
-              selected={configField.required}
-            />
-          ]}
-        />
+        {/*
+         *
+         *TODO: merge with develop to get the customizable prop in field definintion
+         * <ListViewItemSimplified
+         *   label={
+         *     <Label>
+         *       {intl.formatMessage(messages.requiredForRegistration)}
+         *       <StyledTooltip />
+         *     </Label>
+         *   }
+         *   actions={[
+         *     <CenteredToggle
+         *       key="requiredForRegistration"
+         *       selected={configField.required}
+         *     />
+         *   ]}
+         * />
+         *
+         */}
       </ListViewSimplified>
       <Content>
         <Subtitle>
           {intl.formatMessage(messages.contentKey)}
           <StyledTooltip />
         </Subtitle>
-        <Body>{contentKey}</Body>
+        <Body>
+          {contentKey.map((content, index) => (
+            <span key={index}>{content}</span>
+          ))}
+        </Body>
       </Content>
       {handleBar && (
         <HandleBar>

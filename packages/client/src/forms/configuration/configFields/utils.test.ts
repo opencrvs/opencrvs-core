@@ -27,7 +27,7 @@ const mockFormField: IFormField = {
 
 describe('getContentKey', () => {
   it('should return the key if available', () => {
-    expect(getContentKey(mockFormField)).toBe('test.dummy')
+    expect(getContentKey(mockFormField)).toEqual(['test.dummy'])
   })
 })
 

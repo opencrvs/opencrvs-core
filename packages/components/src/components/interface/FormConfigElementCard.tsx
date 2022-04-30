@@ -13,6 +13,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { ArrowUp, ArrowDown, Trash } from '../icons'
 import { CircleButton } from '../buttons'
+import { Pill } from './Pill'
 
 const Card = styled.div<{ selected: boolean }>`
   display: flex;
@@ -39,7 +40,7 @@ const Controls = styled.div`
   flex-direction: column;
   justify-content: space-between;
   min-width: 24px;
-  align-items: center;
+  align-items: end;
 `
 
 const MovementControls = styled.div`
@@ -51,14 +52,19 @@ const TrashButton = styled(CircleButton)`
   margin-top: auto;
 `
 
+const StatusPill = styled(Pill)`
+  margin-top: auto;
+`
+
 export interface IFormConfigElementCardProps {
   children: React.ReactNode
   selected?: boolean
   movable?: boolean
   removable?: boolean
+  status?: string
   isUpDisabled?: boolean
   isDownDisabled?: boolean
-  onClick?: () => void
+  onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   onRemove?: () => void
   onMoveUp?: () => void
   onMoveDown?: () => void
@@ -71,6 +77,7 @@ export function FormConfigElementCard({
   removable = false,
   isUpDisabled = false,
   isDownDisabled = false,
+  status,
   onClick,
   onRemove,
   onMoveUp,
@@ -81,7 +88,10 @@ export function FormConfigElementCard({
      * onClick event is for selecting the card so it should fire
      * only when the card is not selected
      */
-    <Card selected={selected} onClick={!selected ? onClick : undefined}>
+    <Card
+      selected={selected}
+      onClick={(event) => (!selected ? onClick && onClick(event) : undefined)}
+    >
       <ChildrenContainer>{children}</ChildrenContainer>
       <Controls>
         {movable && selected && (
@@ -107,6 +117,7 @@ export function FormConfigElementCard({
             <Trash />
           </TrashButton>
         )}
+        {!removable && status && <StatusPill label={status} />}
       </Controls>
     </Card>
   )

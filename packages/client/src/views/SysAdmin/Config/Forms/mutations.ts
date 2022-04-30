@@ -14,10 +14,8 @@ import { FORM_DRAFT_FIELDS } from '@client/forms/configuration/formDrafts/querie
 
 export const CHANGE_FORM_DRAFT_STATUS = gql`
   ${FORM_DRAFT_FIELDS}
-  mutation changeStatus($event: String!, $status: String!, $comment: String) {
-    createOrUpdateFormDraft(
-      formDraft: { event: $event, status: $status, comment: $comment }
-    ) {
+  mutation changeStatus($event: String!, $status: String!) {
+    modifyDraftStatus(formDraft: { event: $event, status: $status }) {
       ...FormDraftFields
     }
   }
@@ -28,7 +26,7 @@ export const CREATE_FORM_DRAFT = gql`
   mutation createFormDraft(
     $event: String!
     $status: String!
-    $comment: String
+    $comment: String!
     $questions: [QuestionInput!]!
   ) {
     createOrUpdateFormDraft(

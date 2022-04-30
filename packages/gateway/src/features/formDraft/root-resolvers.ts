@@ -14,6 +14,7 @@ import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 import { hasScope } from '@gateway/features/user/utils'
 import {
   GQLFormDraftInput,
+  GQLFormDraftStatusModify,
   GQLQuestionInput,
   GQLResolver
 } from '@gateway/graphql/schema'
@@ -61,6 +62,35 @@ export const resolvers: GQLResolver = {
         )
       }
       return await res.json()
+    },
+
+    async modifyDraftStatus(_, { formDraft }, authHeader) {
+      // Only natlsysadmin should be able to create or update a question
+      if (!hasScope(authHeader, 'natlsysadmin')) {
+        return await Promise.reject(
+          new Error('Update form draft status is only allowed for natlsysadmin')
+        )
+      }
+
+      const formDraftStatusPayload: IModifyDraftStatusPayload =
+        modifyFormDraftStatusPayload(formDraft)
+      const res = await fetch(`${APPLICATION_CONFIG_URL}formDraftStatus`, {
+        method: 'PUT',
+        body: JSON.stringify(formDraftStatusPayload),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 201) {
+        return await Promise.reject(
+          new Error(
+            `Something went wrong on config service. Couldn't update form draft status`
+          )
+        )
+      }
+      return await res.json()
     }
   }
 }
@@ -70,7 +100,6 @@ function createOrUpdateFormDraftPayload(
 ): IFormDraftPayload {
   const formDraftPayload: IFormDraftPayload = {
     questions: formDraft.questions as GQLQuestionInput[],
-    deleted: formDraft.deleted as string[],
     event: formDraft.event as Event,
     status: formDraft.status as DraftStatus,
     comment: formDraft.comment as string
@@ -79,6 +108,16 @@ function createOrUpdateFormDraftPayload(
   return formDraftPayload
 }
 
+function modifyFormDraftStatusPayload(
+  formDraft: GQLFormDraftStatusModify
+): IModifyDraftStatusPayload {
+  const formDraftStatusPayload: IModifyDraftStatusPayload = {
+    event: formDraft.event as Event,
+    status: formDraft.status as DraftStatus
+  }
+
+  return formDraftStatusPayload
+}
 enum Event {
   BIRTH = 'birth',
   DEATH = 'death'
@@ -86,15 +125,19 @@ enum Event {
 
 enum DraftStatus {
   DRAFT = 'DRAFT',
-  PREVIEW = 'PREVIEW',
+  IN_PREVIEW = 'IN_PREVIEW',
   PUBLISHED = 'PUBLISHED',
-  FINALISED = 'FINALISED'
+  DELETED = 'DELETED'
 }
 
 interface IFormDraftPayload {
-  questions?: GQLQuestionInput[]
-  deleted?: string[]
+  questions: GQLQuestionInput[] | []
   event: Event
   status: DraftStatus
   comment?: string
+}
+
+interface IModifyDraftStatusPayload {
+  event: Event
+  status: DraftStatus
 }
