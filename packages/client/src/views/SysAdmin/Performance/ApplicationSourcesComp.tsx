@@ -103,6 +103,28 @@ export function ApplicationSourcesComp(
             <PerformanceTitle>
               {' '}
               {intl.formatMessage(
+                messages.performanceHospitalApplicationsLabel
+              )}
+            </PerformanceTitle>
+          }
+          value={
+            <PerformanceValue>
+              <TotalDisplayWithPercentage
+                total={calculateTotal(
+                  data.results.filter(
+                    (item) => item.practitionerRole === 'HOSPITAL_NOTIFICATION'
+                  )
+                )}
+                ofNumber={calculateTotal(data.results)}
+              ></TotalDisplayWithPercentage>
+            </PerformanceValue>
+          }
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {' '}
+              {intl.formatMessage(
                 messages.performanceRegistrationAgentsApplicationsLabel
               )}
             </PerformanceTitle>
