@@ -40,16 +40,9 @@ const fontMap: Record<IPillSize, keyof IFonts> = {
   medium: 'bold14'
 }
 
-const paddingMap: Record<IPillSize, string> = {
-  small: '10px',
-  medium: '14px'
-}
-
-const StyledPill = styled.span<{ size: IPillSize; type: IPillType }>`
+export const StyledPill = styled.span<{ size: IPillSize; type: IPillType }>`
   display: inline-flex;
-  padding: 0 ${({ size }) => paddingMap[size]};
-  /*This needs to have total height of 40px to aligned properly in ListView*/
-  margin: calc(0.5 * (40px - ${({ size }) => heightMap[size]})) 0;
+  padding: 0 0.85em;
   background-color: ${({ type }) => colorMap[type]};
   height: ${({ size }) => heightMap[size]};
   align-items: center;
@@ -57,9 +50,14 @@ const StyledPill = styled.span<{ size: IPillSize; type: IPillType }>`
   ${({ size, theme }) => theme.fonts[fontMap[size]]}
 `
 
-export function Pill({ label, type = 'default', size = 'small' }: IPillProps) {
+export function Pill({
+  label,
+  type = 'default',
+  size = 'small',
+  ...rest
+}: IPillProps) {
   return (
-    <StyledPill type={type} size={size}>
+    <StyledPill type={type} size={size} {...rest}>
       {label}
     </StyledPill>
   )

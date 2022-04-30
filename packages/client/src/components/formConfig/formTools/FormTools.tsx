@@ -38,10 +38,6 @@ const CenteredToggle = styled(Toggle)`
   align-self: center;
 `
 
-interface IFormToolsProps {
-  onAddClickListener: (fieldType: QuestionConfigFieldType) => void
-}
-
 const listViewItems = (intl: IntlShape) => {
   const items = [
     {
@@ -102,13 +98,20 @@ const listViewItems = (intl: IntlShape) => {
   return items
 }
 
-export const FormTools = ({ onAddClickListener }: IFormToolsProps) => {
-  const [toggleSelected, setToggleSelected] = React.useState(false)
+type IFormToolsProps = {
+  onAddClickListener: (fieldType: QuestionConfigFieldType) => void
+  showHiddenFields: boolean
+  setShowHiddenFields: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export const FormTools = ({
+  onAddClickListener,
+  showHiddenFields,
+  setShowHiddenFields
+}: IFormToolsProps) => {
   const intl = useIntl()
 
-  const toggleOnChange = () => {
-    setToggleSelected(!toggleSelected)
-  }
+  const toggleShowHiddenFields = () => setShowHiddenFields((prev) => !prev)
 
   return (
     <>
@@ -118,8 +121,8 @@ export const FormTools = ({ onAddClickListener }: IFormToolsProps) => {
           actions={[
             <CenteredToggle
               key="toggle"
-              selected={toggleSelected}
-              onChange={toggleOnChange}
+              selected={showHiddenFields}
+              onChange={toggleShowHiddenFields}
             />
           ]}
         />

@@ -114,25 +114,6 @@ export const addCustomField = (
     customField
   }
 })
-export const MODIFY_CONFIG_FIELD = 'FORM/MODIFY_CONFIG_FIELD'
-export type ModifyConfigFieldAction = {
-  type: typeof MODIFY_CONFIG_FIELD
-  payload: {
-    fieldId: string
-    props: Partial<IConfigField>
-  }
-}
-
-export const modifyConfigField = (
-  fieldId: string,
-  props: Partial<IConfigField>
-): ModifyConfigFieldAction => ({
-  type: MODIFY_CONFIG_FIELD,
-  payload: {
-    fieldId,
-    props
-  }
-})
 
 export const REMOVE_CUSTOM_FIELD = 'FORM/REMOVE_CUSTOM_FIELD'
 export type RemoveCustomFieldAction = {
@@ -200,6 +181,26 @@ export const shiftConfigFieldDown = (
   type: SHIFT_CONFIG_FIELD_DOWN,
   payload: {
     fieldId
+  }
+})
+
+export const MODIFY_CONFIG_FIELD = 'FORM/MODIFY_CONFIG_FIELD'
+export type ModifyConfigFieldAction = {
+  type: typeof MODIFY_CONFIG_FIELD
+  payload: {
+    fieldId: string
+    modifiedProps: Partial<IConfigField>
+  }
+}
+
+export const modifyConfigField = (
+  fieldId: string,
+  modifiedProps: Partial<IConfigField>
+) => ({
+  type: MODIFY_CONFIG_FIELD,
+  payload: {
+    fieldId,
+    modifiedProps
   }
 })
 

@@ -54,8 +54,12 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import { SaveActionModal, SaveActionContext } from './SaveActionModal'
 import { SaveActionNotification } from './SaveActionNotification'
 import { FormConfigSettings } from './FormConfigSettings'
+import {
+  selectConfigField,
+  selectConfigFields
+} from '@client/forms/configuration/configFields/selectors'
+import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import { flushSync } from 'react-dom'
-import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
 
 const Container = styled.div`
   display: flex;
@@ -124,25 +128,19 @@ function isValidSection(section: string): section is WizardSection {
   ].includes(section)
 }
 
-function useHasNatlSysAdminScope() {
-  const scope = useSelector(getScope)
-  return scope?.includes(AuthScope.NATLSYSADMIN)
-}
-
 function isSelectedFieldValid(
   selectedField: IConfigField | null,
   section: string
 ): selectedField is IConfigField {
   return !!selectedField?.fieldId.includes(section)
 }
-
 /* TODO: move this into FormTools */
 function formToolClickListener(
   fieldType: QuestionConfigFieldType,
   fieldsMap: IConfigFieldMap,
   event: Event,
   section: string,
-  setSelectedField: React.Dispatch<React.SetStateAction<IConfigField | null>>,
+  setSelectedField: React.Dispatch<React.SetStateAction<string | null>>,
   dispatch: Dispatch
 ) {
   const customFieldConfig = prepareNewCustomFieldConfig(
@@ -152,38 +150,76 @@ function formToolClickListener(
     fieldType
   )
   dispatch(addCustomField(event, section, customFieldConfig))
-  flushSync(() => setSelectedField(customFieldConfig))
+  flushSync(() => setSelectedField(customFieldConfig.fieldId))
   document
     .getElementById(customFieldConfig.fieldId)
     ?.scrollIntoView({ behavior: 'smooth' })
 }
 
-export function FormConfigWizard() {
-  const [selectedField, setSelectedField] = React.useState<IConfigField | null>(
+function useHasNatlSysAdminScope() {
+  const scope = useSelector(getScope)
+  return scope?.includes(AuthScope.NATLSYSADMIN)
+}
+
+function useSelectedField() {
+  const { event, section } = useParams<IRouteProps>()
+  const [selectedFieldId, setSelectedFieldId] = React.useState<string | null>(
     null
   )
-  const hasNatlSysAdminScope = useHasNatlSysAdminScope()
-  const dispatch = useDispatch()
-  const intl = useIntl()
-  const { event, section } = useParams<IRouteProps>()
-  const fieldsMap = useSelector((store: IStoreState) =>
-    selectConfigFields(store, event, section)
+  const selectedField = useSelector((store: IStoreState) =>
+    selectConfigField(store, event, section, selectedFieldId)
   )
-  const { version } = useSelector((store: IStoreState) =>
-    selectFormDraft(store, event)
-  )
-  const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
 
   /*
    * We need to clear the selected field if section changes
    * as the changed section won't have the previously selected field
    */
   React.useEffect(() => {
-    if (selectedField && !selectedField.fieldId.includes(section)) {
-      setSelectedField(null)
+    if (selectedFieldId && !selectedFieldId.includes(section)) {
+      setSelectedFieldId(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [section])
+
+  return { selectedField, setSelectedField: setSelectedFieldId }
+}
+
+function useHiddenFields({
+  selectedField,
+  setSelectedField
+}: ReturnType<typeof useSelectedField>) {
+  const [showHiddenFields, setShowHiddenFields] = React.useState(true)
+
+  /*
+   * We need to clear the selected field if the selected field is made
+   * hidden and we have the showHiddenFields set to false
+   */
+  React.useEffect(() => {
+    if (!showHiddenFields && selectedField?.enabled === FieldEnabled.DISABLED) {
+      setSelectedField(null)
+    }
+  }, [showHiddenFields, selectedField?.enabled, setSelectedField])
+
+  return { showHiddenFields, setShowHiddenFields }
+}
+
+export function FormConfigWizard() {
+  const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
+  const { selectedField, setSelectedField } = useSelectedField()
+  const { showHiddenFields, setShowHiddenFields } = useHiddenFields({
+    selectedField,
+    setSelectedField
+  })
+  const { event, section } = useParams<IRouteProps>()
+  const { version } = useSelector((store: IStoreState) =>
+    selectFormDraft(store, event)
+  )
+  const fieldsMap = useSelector((store: IStoreState) =>
+    selectConfigFields(store, event, section)
+  )
+  const dispatch = useDispatch()
+  const hasNatlSysAdminScope = useHasNatlSysAdminScope()
+  const intl = useIntl()
 
   if (
     !hasNatlSysAdminScope ||
@@ -192,13 +228,6 @@ export function FormConfigWizard() {
   ) {
     return <Redirect to={HOME} />
   }
-
-  // if (
-  //   selectedField &&
-  //   undefined === (state as IEventTypes)[event][section][selectedField.fieldId]
-  // ) {
-  //   setSelectedField(null)
-  // }
 
   return (
     <Container>
@@ -211,6 +240,7 @@ export function FormConfigWizard() {
         topBarActions={[
           <TertiaryButton
             id="settings"
+            key="settings"
             icon={() => <SettingsBlue />}
             onClick={() => dispatch(goToFormConfigWizard(event, 'settings'))}
           ></TertiaryButton>,
@@ -238,16 +268,17 @@ export function FormConfigWizard() {
               <CanvasContainer>
                 <Canvas
                   selectedField={selectedField}
-                  onFieldSelect={(field) => setSelectedField(field)}
+                  setSelectedField={setSelectedField}
+                  showHiddenFields={showHiddenFields}
                 />
               </CanvasContainer>
             </CanvasWrapper>
             <ToolsContainer>
               {/*
-               *  The useEffect hook for clearing the selectedField takes
+               *  The useEffect hook for clearing the selectedFieldId takes
                *  effect after the render for when the section changes so
                *  for that particular render where the section has changed
-               *  but the selectedField is still from the previous section
+               *  but the selectedFieldId is still from the previous section,
                *  we need to make sure that the selectedField is valid
                */}
               {isSelectedFieldValid(selectedField, section) ? (
@@ -263,6 +294,8 @@ export function FormConfigWizard() {
                 )
               ) : (
                 <FormTools
+                  showHiddenFields={showHiddenFields}
+                  setShowHiddenFields={setShowHiddenFields}
                   onAddClickListener={(fieldType: QuestionConfigFieldType) =>
                     formToolClickListener(
                       fieldType,

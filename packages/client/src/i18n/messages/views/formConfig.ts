@@ -18,6 +18,7 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   showHiddenFields: MessageDescriptor
+  hidden: MessageDescriptor
   textInput: MessageDescriptor
   textAreaInput: MessageDescriptor
   numberInput: MessageDescriptor
@@ -155,6 +156,11 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.form.tools.showHiddenFields',
     defaultMessage: 'Show hidden fields',
     description: 'Label for Show hidden fields in form tools'
+  },
+  hidden: {
+    id: 'config.form.hidden',
+    defaultMessage: 'Hidden',
+    description: 'Label for hidden status'
   },
   textInput: {
     id: 'config.form.tools.textInput',

@@ -51,6 +51,14 @@ const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
   }
 `
 
+function previewSectionFilter(
+  section: BirthSection | DeathSection
+): section is
+  | Exclude<BirthSection, 'preview'>
+  | Exclude<DeathSection, 'preview'> {
+  return section !== BirthSection.Preview && section !== DeathSection.Preview
+}
+
 export function SectionNavigation() {
   const intl = useIntl()
   const dispatch = useDispatch()
@@ -61,23 +69,22 @@ export function SectionNavigation() {
     <>
       <Title>{intl.formatMessage(messages.pages)}</Title>
       <OrderedList>
-        {Object.values<BirthSection | DeathSection>(tabs).map((tab, idx) => {
-          if (tab === BirthSection.Preview || tab === DeathSection.Preview) {
-            return <React.Fragment key={idx}></React.Fragment>
-          }
-          return (
-            <li key={idx}>
-              <PageItems
-                id={`${tab}_navigation`}
-                label={`${idx + 1}. ${intl.formatMessage(
-                  navigationMessages[tab]
-                )}`}
-                isSelected={section === tab}
-                onClick={() => dispatch(goToFormConfigWizard(event, tab))}
-              />
-            </li>
-          )
-        })}
+        {Object.values<BirthSection | DeathSection>(tabs)
+          .filter(previewSectionFilter)
+          .map((tab, idx) => {
+            return (
+              <li key={idx}>
+                <PageItems
+                  id={`${tab}_navigation`}
+                  label={`${idx + 1}. ${intl.formatMessage(
+                    navigationMessages[tab]
+                  )}`}
+                  isSelected={section === tab}
+                  onClick={() => dispatch(goToFormConfigWizard(event, tab))}
+                />
+              </li>
+            )
+          })}
       </OrderedList>
     </>
   )

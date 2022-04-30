@@ -169,31 +169,31 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
 
     case actions.MODIFY_CONFIG_FIELD: {
       if (state.state === 'LOADING') return state
-      const { fieldId, props } = action.payload
+      const { fieldId, modifiedProps } = action.payload
       const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
       const { [fieldId]: originalField, ...fields } = state[event][sectionId]
 
       /* Adjusting preceedingFieldId & foregoingFieldId */
-      if (props.fieldId && fieldId !== props.fieldId) {
+      if (modifiedProps.fieldId && fieldId !== modifiedProps.fieldId) {
         if (
           originalField.preceedingFieldId &&
           originalField.preceedingFieldId !== FieldPosition.TOP
         ) {
           fields[originalField.preceedingFieldId] = {
             ...fields[originalField.preceedingFieldId],
-            foregoingFieldId: props.fieldId
+            foregoingFieldId: modifiedProps.fieldId
           }
         }
 
         if (originalField.foregoingFieldId !== FieldPosition.BOTTOM)
           fields[originalField.foregoingFieldId] = {
             ...fields[originalField.foregoingFieldId],
-            preceedingFieldId: props.fieldId
+            preceedingFieldId: modifiedProps.fieldId
           }
 
-        fields[props.fieldId] = {
+        fields[modifiedProps.fieldId] = {
           ...originalField,
-          ...props
+          ...modifiedProps
         }
 
         return {
@@ -207,7 +207,7 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
 
       fields[fieldId] = {
         ...originalField,
-        ...props
+        ...modifiedProps
       }
 
       return {

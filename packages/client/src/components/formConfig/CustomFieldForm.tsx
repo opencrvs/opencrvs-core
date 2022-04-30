@@ -153,10 +153,6 @@ interface ICustomFieldState {
   }
 }
 
-const DEFAULTS = {
-  DISABLED: 'disabled'
-}
-
 class CustomFieldFormsComp extends React.Component<
   IFullProps,
   ICustomFieldState
@@ -364,26 +360,6 @@ class CustomFieldFormsComp extends React.Component<
     return (
       <ListContainer>
         <H3>{this._getHeadingText()}</H3>
-        <ListRow>
-          <ListColumn>
-            {intl.formatMessage(customFieldFormMessages.hideFieldLabel)}
-          </ListColumn>
-          <ListColumn>
-            <RightAlignment>
-              <Toggle
-                selected={this.state.hideField === DEFAULTS.DISABLED}
-                onChange={() =>
-                  this.setState({
-                    hideField:
-                      this.state.hideField === DEFAULTS.DISABLED
-                        ? ''
-                        : DEFAULTS.DISABLED
-                  })
-                }
-              />
-            </RightAlignment>
-          </ListColumn>
-        </ListRow>
         <ListRow>
           <ListColumn>
             {intl.formatMessage(customFieldFormMessages.requiredFieldLabel)}

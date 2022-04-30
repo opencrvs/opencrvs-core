@@ -31,6 +31,9 @@ import {
   shiftConfigFieldDown,
   removeCustomField
 } from '@client/forms/configuration/configFields/actions'
+import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
+import { useIntl } from 'react-intl'
+import { messages } from '@client/i18n/messages/views/formConfig'
 
 const CanvasBox = styled(Box)`
   display: flex;
@@ -66,13 +69,19 @@ type IRouteProps = {
 }
 
 type ICanvasProps = {
+  showHiddenFields: boolean
   selectedField: IConfigField | null
-  onFieldSelect: (field: IConfigField) => void
+  setSelectedField: React.Dispatch<React.SetStateAction<string | null>>
 }
 
-export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
+export function Canvas({
+  showHiddenFields,
+  selectedField,
+  setSelectedField
+}: ICanvasProps) {
   const { event, section } = useParams<IRouteProps>()
   const dispatch = useDispatch()
+  const intl = useIntl()
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
@@ -83,9 +92,21 @@ export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
 
   return (
     <CanvasBox>
-      {configFields.map((configField) => {
-        const { fieldId, preceedingFieldId, foregoingFieldId } = configField
+      {(showHiddenFields
+        ? configFields
+        : configFields.filter(
+            ({ enabled }) => enabled !== FieldEnabled.DISABLED
+          )
+      ).map((configField) => {
+        const {
+          fieldId,
+          preceedingFieldId,
+          foregoingFieldId,
+          enabled,
+          custom
+        } = configField
         const isSelected = selectedField?.fieldId === fieldId
+        const isHidden = !custom && enabled === FieldEnabled.DISABLED
 
         return (
           <FormConfigElementCard
@@ -93,9 +114,10 @@ export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
             selected={isSelected}
             onClick={(event) => {
               event.stopPropagation()
-              onFieldSelect(configField)
+              setSelectedField(fieldId)
             }}
             movable={isSelected}
+            status={isHidden ? intl.formatMessage(messages.hidden) : undefined}
             removable={configField.custom}
             isUpDisabled={preceedingFieldId === FieldPosition.TOP}
             isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}
