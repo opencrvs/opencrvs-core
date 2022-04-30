@@ -61,6 +61,7 @@ import { constantsMessages } from '@client/i18n/messages/constants'
 import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
 import { PerformanceStats } from './PerformanceStats'
 import { SubHeader } from './utils'
+import { ApplicationSourcesComp } from './ApplicationSourcesComp'
 
 const Layout = styled.div`
   display: flex;
@@ -339,11 +340,14 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         data={data!.getTotalMetrics}
                         selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
                       />
+                      <CertificationRateComponent
+                        data={certificationRatesDummyData}
+                      />
+                      <ApplicationSourcesComp data={data!.getTotalMetrics} />
                     </>
                   )
                 }}
               </Query>
-              <CertificationRateComponent data={certificationRatesDummyData} />
               <CorrectionsReport
                 timeStart={timeStart}
                 timeEnd={timeEnd}

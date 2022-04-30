@@ -23,6 +23,8 @@ import {
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { buttonMessages } from '@client/i18n/messages'
 
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult
@@ -70,6 +72,9 @@ export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
                 ofNumber={calculateTotal(data.results)}
               ></TotalDisplayWithPercentage>
             </PerformanceValue>
+          }
+          actions={
+            <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
           }
         />
         <ListViewItemSimplified
