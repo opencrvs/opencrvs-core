@@ -32,16 +32,10 @@ import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
-import {
-  SysAdminContentWrapper,
-  SysAdminPageVariant
-} from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import {
-  ColumnContentAlignment,
-  ListTable
-} from '@opencrvs/components/lib/interface'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/interface'
 import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
 import {
   GQLEventProgressSet,
@@ -56,10 +50,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
-import {
-  checkExternalValidationStatus,
-  checkIfLocalLanguageProvided
-} from '@client/views/SysAdmin/Team/utils'
+import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCountView'
 import format, { formattedDuration } from '@client/utils/date-formatting'
@@ -72,12 +63,14 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
+import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
+import { TableView } from '@opencrvs/components/lib/interface/TableView'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
 const DoubleLineValueWrapper = styled.div`
-  margin: 12px 0px;
+  margin: 0px 0px;
 `
 
 const { useState } = React
@@ -235,7 +228,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.trackingId),
         key: 'id',
-        width: 14,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('id'),
         icon: columnToBeSort === 'id' ? <ArrowDownBlue /> : <></>,
@@ -271,7 +264,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(formMessages.informantName),
         key: 'informant',
-        width: 14,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('informant'),
         icon: columnToBeSort === 'informant' ? <ArrowDownBlue /> : <></>,
@@ -280,7 +273,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.declarationStarted),
         key: 'declarationStartedOn',
-        width: 12,
+        width: 10,
         isSortable: true,
         sortFunction: () => toggleSort('declarationStartedOn'),
         icon:
@@ -319,7 +312,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeReadyForReview),
         key: 'timeLoggedDeclared',
-        width: 14,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedDeclared'),
         icon:
@@ -329,7 +322,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeRequireUpdates),
         key: 'timeLoggedRejected',
-        width: 14,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedRejected'),
         icon:
@@ -366,7 +359,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeReadyToPrint),
         key: 'timeLoggedRegistered',
-        width: 13,
+        width: 12,
         alignment: ColumnContentAlignment.RIGHT,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedRegistered'),
@@ -765,6 +758,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         >
           {({ data, loading, error }) => {
             let total = 0
+            if (loading) {
+              return <Spinner id="status-view-loader" />
+            }
             if (
               data &&
               data.getEventsWithProgress &&
@@ -774,14 +770,14 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             }
             return (
               <>
-                <ListTable
+                <TableView
                   id="declaration-status-list"
                   content={getContent(data)}
                   columns={getColumns()}
                   isLoading={loading || Boolean(error)}
                   noResultText={intl.formatMessage(constantsMessages.noResults)}
                   hideBoxShadow
-                  fixedWidth={2791}
+                  fixedWidth={2050}
                   tableHeight={150}
                   currentPage={currentPageNumber}
                   pageSize={recordCount}
