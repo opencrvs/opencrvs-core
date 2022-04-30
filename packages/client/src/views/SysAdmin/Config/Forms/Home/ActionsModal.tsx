@@ -32,8 +32,17 @@ import {
   DraftStatus,
   IDraft
 } from '@client/forms/configuration/formDrafts/reducer'
-import { Event } from '@client/forms'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+
+/*
+ * There seems to be an issue with webpack
+ * if Event is imported form '@client/forms'
+ * similar to https://github.com/webpack/webpack/issues/12724
+ */
+enum Event {
+  BIRTH = 'birth',
+  DEATH = 'death'
+}
 
 export enum Actions {
   PUBLISH = 'PUBLISH',

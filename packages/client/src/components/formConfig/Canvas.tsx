@@ -13,7 +13,7 @@ import React from 'react'
 import { Box } from '@opencrvs/components/lib/interface'
 import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormConfigElementCard'
 import styled from '@client/styledComponents'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
@@ -26,6 +26,7 @@ import { getRegisterFormSection } from '@client/forms/register/declaration-selec
 import { FieldPosition } from '@client/forms/configuration'
 import { useParams } from 'react-router'
 import { BirthSection, DeathSection, Event } from '@client/forms'
+import { removeCustomField } from '@client/forms/configuration/configFields/actions'
 
 const CanvasBox = styled(Box)`
   display: flex;
@@ -74,6 +75,7 @@ export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
     getRegisterFormSection(store, section, event)
   )
   const configFields = generateConfigFields(fieldsMap)
+  const dispatch = useDispatch()
 
   return (
     <CanvasBox>
@@ -81,9 +83,17 @@ export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
         <FormConfigElementCard
           key={configField.fieldId}
           selected={selectedField?.fieldId === configField.fieldId}
-          onClick={() => onFieldSelect(configField)}
+          onClick={(event) => {
+            event.stopPropagation()
+            onFieldSelect(configField)
+          }}
+          removable={configField.custom}
+          onRemove={() => {
+            selectedField && dispatch(removeCustomField(selectedField.fieldId))
+          }}
         >
           <FormFieldGenerator
+            key={configField.fieldId}
             id={configField.fieldId}
             onChange={() => {}}
             fields={[getFieldDefinition(formSection, configField)]}
