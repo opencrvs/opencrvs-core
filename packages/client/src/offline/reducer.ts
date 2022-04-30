@@ -67,7 +67,7 @@ export interface ILocation {
   partOf: string
 }
 
-interface IForm {
+export interface IForm {
   registerForm: {
     birth: ISerializedForm
     death: ISerializedForm

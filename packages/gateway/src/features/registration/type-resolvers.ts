@@ -28,7 +28,6 @@ import {
   BODY_WEIGHT_CODE,
   BIRTH_TYPE_CODE,
   BIRTH_ATTENDANT_CODE,
-  BIRTH_REG_PRESENT_CODE,
   BIRTH_REG_TYPE_CODE,
   LAST_LIVE_BIRTH_CODE,
   NUMBER_BORN_ALIVE_CODE,
@@ -39,15 +38,11 @@ import {
   MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_CODE,
   CAUSE_OF_DEATH_METHOD_CODE,
-  PRIMARY_CAREGIVER_CODE,
-  REASON_MOTHER_NOT_APPLYING,
-  REASON_FATHER_NOT_APPLYING,
-  REASON_CAREGIVER_NOT_APPLYING,
-  PRIMARY_CAREGIVER,
-  PARENT_DETAILS,
   SPOUSE_CODE,
   MALE_DEPENDENTS_ON_DECEASED_CODE,
-  FEMALE_DEPENDENTS_ON_DECEASED_CODE
+  FEMALE_DEPENDENTS_ON_DECEASED_CODE,
+  DEATH_DESCRIPTION_CODE,
+  CAUSE_OF_DEATH_ESTABLISHED_CODE
 } from '@gateway/features/fhir/templates'
 import {
   GQLQuestionnaireQuestion,
@@ -148,6 +143,20 @@ export const typeResolvers: GQLResolver = {
         person.extension
       )
       return (occupationExtension && occupationExtension.valueString) || null
+    },
+    reasonNotApplying: (person) => {
+      const reasonNotApplyingExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
+        person.extension
+      )
+      return (
+        (reasonNotApplyingExtension &&
+          reasonNotApplyingExtension.valueString) ||
+        null
+      )
+    },
+    detailsExist: (person) => {
+      return person.active
     },
     multipleBirth: (person) => {
       return person.multipleBirthInteger
@@ -307,6 +316,60 @@ export const typeResolvers: GQLResolver = {
       return docRefReferences.map(async (docRefReference: string) => {
         return await fetchFHIR(`/${docRefReference}`, authHeader)
       })
+    },
+    async informantType(task: fhir.Task, _, authHeader) {
+      if (!task.focus) {
+        return null
+      }
+      const composition = await fetchFHIR(
+        `/${task.focus.reference}`,
+        authHeader
+      )
+      const patientSection = findCompositionSection(INFORMANT_CODE, composition)
+      if (!patientSection || !patientSection.entry) {
+        return null
+      }
+      const relatedPerson: fhir.RelatedPerson = await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )
+      if (
+        relatedPerson &&
+        relatedPerson.relationship &&
+        relatedPerson.relationship.coding &&
+        relatedPerson.relationship.coding[0]
+      ) {
+        return relatedPerson.relationship?.coding[0].code
+      } else {
+        return null
+      }
+    },
+    async otherInformantType(task: fhir.Task, _, authHeader) {
+      if (!task.focus) {
+        return null
+      }
+      const composition = await fetchFHIR(
+        `/${task.focus.reference}`,
+        authHeader
+      )
+      const patientSection = findCompositionSection(INFORMANT_CODE, composition)
+      if (!patientSection || !patientSection.entry) {
+        return null
+      }
+      const relatedPerson: fhir.RelatedPerson = await fetchFHIR(
+        `/${patientSection.entry[0].reference}`,
+        authHeader
+      )
+      if (
+        relatedPerson &&
+        relatedPerson.relationship &&
+        relatedPerson.relationship.coding &&
+        relatedPerson.relationship.coding[0]
+      ) {
+        return relatedPerson.relationship?.text
+      } else {
+        return null
+      }
     },
     contact: (task) => {
       const contact = findExtension(
@@ -586,101 +649,6 @@ export const typeResolvers: GQLResolver = {
     },
     address: (location) => location.address
   },
-
-  ReasonsNotApplying: {
-    primaryCaregiverType: (reasonNotApplying) =>
-      reasonNotApplying.primaryCaregiverType,
-    reasonNotApplying: (reasonNotApplying) =>
-      reasonNotApplying.reasonNotApplying,
-    isDeceased: (reasonNotApplying) => reasonNotApplying.isDeceased
-  },
-
-  PrimaryCaregiver: {
-    primaryCaregiver: async (primaryCaregiver, _, authHeader) => {
-      if (
-        !primaryCaregiver.patientSection ||
-        !primaryCaregiver.patientSection.entry ||
-        primaryCaregiver.patientSection.entry.length === 0
-      ) {
-        return null
-      }
-      return (await fetchFHIR(
-        `/${primaryCaregiver.patientSection.entry[0].reference}`,
-        authHeader
-      )) as fhir.Person
-    },
-    reasonsNotApplying: async (primaryCaregiver, _, authHeader) => {
-      const observations = (await fetchFHIR(
-        `/Observation?encounter=${primaryCaregiver.encounterSection.entry[0].reference}`,
-        authHeader
-      )) as fhir.Bundle
-      const reasons: {
-        primaryCaregiverType?: string
-        reasonNotApplying?: string
-        isDeceased?: boolean
-      }[] = []
-      let primaryCaregiverType
-      let reasonCaregiverNotApplying
-
-      if (!observations.entry) {
-        return reasons
-      }
-
-      observations.entry.forEach((observationResource) => {
-        const observation = observationResource.resource as fhir.Observation
-        const observationCode =
-          observation.code &&
-          observation.code.coding &&
-          observation.code.coding[0].code
-        const reasonNotApplying =
-          observation.valueString !== 'DECEASED' ? observation.valueString : ''
-        const isDeceased = observation.valueString === 'DECEASED' ? true : false
-        const careGiverType =
-          observationCode === REASON_MOTHER_NOT_APPLYING
-            ? 'MOTHER'
-            : observationCode === REASON_FATHER_NOT_APPLYING
-            ? 'FATHER'
-            : ''
-        if (careGiverType) {
-          reasons.push({
-            primaryCaregiverType: careGiverType,
-            reasonNotApplying,
-            isDeceased
-          })
-        } else if (observationCode === REASON_CAREGIVER_NOT_APPLYING) {
-          reasonCaregiverNotApplying = observation.valueString
-        } else if (observationCode === PRIMARY_CAREGIVER) {
-          primaryCaregiverType = observation.valueString
-        }
-      })
-
-      if (primaryCaregiver && reasonCaregiverNotApplying) {
-        reasons.push({
-          primaryCaregiverType,
-          reasonNotApplying: reasonCaregiverNotApplying
-        })
-      } else if (primaryCaregiver && !reasonCaregiverNotApplying) {
-        reasons.push({
-          primaryCaregiverType
-        })
-      }
-
-      return reasons
-    },
-    parentDetailsType: async (primaryCaregiver, _, authHeader) => {
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${primaryCaregiver.encounterSection.entry[0].reference}&code=${PARENT_DETAILS}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueString) ||
-        null
-      )
-    }
-  },
   MedicalPractitioner: {
     name: async (encounterParticipant, _, authHeader) => {
       if (
@@ -836,6 +804,8 @@ export const typeResolvers: GQLResolver = {
           femaleDependentsOfDeceased: FEMALE_DEPENDENTS_ON_DECEASED_CODE,
           mannerOfDeath: MANNER_OF_DEATH_CODE,
           causeOfDeathMethod: CAUSE_OF_DEATH_METHOD_CODE,
+          causeOfDeathEstablished: CAUSE_OF_DEATH_ESTABLISHED_CODE,
+          deathDescription: DEATH_DESCRIPTION_CODE,
           causeOfDeath: CAUSE_OF_DEATH_CODE
         }
         observations.entry.map(
@@ -954,6 +924,26 @@ export const typeResolvers: GQLResolver = {
         authHeader
       )
     },
+    async deathDescription(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${DEATH_DESCRIPTION_CODE}`,
+        authHeader
+      )
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueString) ||
+        null
+      )
+    },
     async mannerOfDeath(composition: ITemplatedComposition, _, authHeader) {
       const encounterSection = findCompositionSection(
         DEATH_ENCOUNTER_CODE,
@@ -964,6 +954,33 @@ export const typeResolvers: GQLResolver = {
       }
       const observations = await fetchFHIR(
         `/Observation?encounter=${encounterSection.entry[0].reference}&code=${MANNER_OF_DEATH_CODE}`,
+        authHeader
+      )
+      return (
+        (observations &&
+          observations.entry &&
+          observations.entry[0] &&
+          observations.entry[0].resource.valueCodeableConcept &&
+          observations.entry[0].resource.valueCodeableConcept.coding &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0] &&
+          observations.entry[0].resource.valueCodeableConcept.coding[0].code) ||
+        null
+      )
+    },
+    async causeOfDeathEstablished(
+      composition: ITemplatedComposition,
+      _,
+      authHeader
+    ) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const observations = await fetchFHIR(
+        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${CAUSE_OF_DEATH_ESTABLISHED_CODE}`,
         authHeader
       )
       return (
@@ -1159,7 +1176,6 @@ export const typeResolvers: GQLResolver = {
           birthType: BIRTH_TYPE_CODE,
           attendantAtBirth: BIRTH_ATTENDANT_CODE,
           birthRegistrationType: BIRTH_REG_TYPE_CODE,
-          presentAtBirthRegistration: BIRTH_REG_PRESENT_CODE,
           childrenBornAliveToMother: NUMBER_BORN_ALIVE_CODE,
           foetalDeathsToMother: NUMBER_FOEATAL_DEATH_CODE,
           lastPreviousLiveBirth: LAST_LIVE_BIRTH_CODE
@@ -1235,25 +1251,6 @@ export const typeResolvers: GQLResolver = {
         `/${patientSection.entry[0].reference}`,
         authHeader
       )) as fhir.RelatedPerson
-    },
-    async primaryCaregiver(composition: ITemplatedComposition, _, authHeader) {
-      const patientSection = findCompositionSection(
-        PRIMARY_CAREGIVER_CODE,
-        composition
-      )
-
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-
-      return {
-        patientSection,
-        encounterSection
-      }
     },
     async registration(composition: ITemplatedComposition, _, authHeader) {
       const taskBundle = await fetchFHIR(
@@ -1405,30 +1402,6 @@ export const typeResolvers: GQLResolver = {
       }
       const observations = await fetchFHIR(
         `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BIRTH_REG_TYPE_CODE}`,
-        authHeader
-      )
-      return (
-        (observations &&
-          observations.entry &&
-          observations.entry[0] &&
-          observations.entry[0].resource.valueString) ||
-        null
-      )
-    },
-    async presentAtBirthRegistration(
-      composition: ITemplatedComposition,
-      _,
-      authHeader
-    ) {
-      const encounterSection = findCompositionSection(
-        BIRTH_ENCOUNTER_CODE,
-        composition
-      )
-      if (!encounterSection || !encounterSection.entry) {
-        return null
-      }
-      const observations = await fetchFHIR(
-        `/Observation?encounter=${encounterSection.entry[0].reference}&code=${BIRTH_REG_PRESENT_CODE}`,
         authHeader
       )
       return (

@@ -102,7 +102,7 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import {
   IFormSectionData,
-  IContactPoint,
+  IContactPointPhone,
   CorrectionSection,
   Action,
   IForm,
@@ -538,7 +538,7 @@ const getDraftDeclarationData = (
     informantContact:
       (
         (declaration.data?.registration?.contactPoint as IFormSectionData)
-          ?.nestedFields as IContactPoint
+          ?.nestedFields as IContactPointPhone
       )?.registrationPhone.toString() || ''
   }
 }

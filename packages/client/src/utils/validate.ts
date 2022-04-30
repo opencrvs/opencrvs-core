@@ -568,7 +568,6 @@ export const isValidDeathOccurrenceDate: Validation = (
   drafts
 ) => {
   const cast = value && value.toString()
-
   return cast && isDateNotInFuture(cast) && isAValidDateFormat(cast)
     ? isDateNotBeforeBirth(cast, drafts as IFormData)
       ? undefined

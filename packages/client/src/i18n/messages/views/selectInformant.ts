@@ -33,6 +33,9 @@ interface IFormMessages
   granddaughter: MessageDescriptor
   birthErrorMessage: MessageDescriptor
   deathErrorMessage: MessageDescriptor
+  otherFamilyMember: MessageDescriptor
+  birthInformantTitle: MessageDescriptor
+  deathInformantTitle: MessageDescriptor
 }
 
 const messagesToDefine: IFormMessages = {
@@ -155,7 +158,12 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Please select the relationship to the deceased.',
     description: 'Label for death error message',
     id: 'register.selectInformant.deathErrorMessage'
+  },
+  otherFamilyMember: {
+    defaultMessage: 'Other family member',
+    description: 'Label for other family member relation',
+    id: 'form.field.label.relationOtherFamilyMember'
   }
 }
 
-export const formMessages: IFormMessages = defineMessages(messagesToDefine)
+export const messages: IFormMessages = defineMessages(messagesToDefine)

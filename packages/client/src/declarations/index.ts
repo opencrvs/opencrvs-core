@@ -15,7 +15,7 @@ import {
   IForm,
   IFormData,
   IFormFieldValue,
-  IRegistration,
+  IContactPoint,
   Sort
 } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -239,13 +239,17 @@ export type ICertificate = {
  */
 export interface IPrintableDeclaration extends Omit<IDeclaration, 'data'> {
   data: {
+    mother: {
+      detailsExist: boolean
+      [key: string]: IFormFieldValue
+    }
     father: {
-      fathersDetailsExist: boolean
+      detailsExist: boolean
       [key: string]: IFormFieldValue
     }
     registration: {
       _fhirID: string
-      presentAtBirthRegistration: Relation
+      informantType: Relation
       whoseContactDetails: string
       registrationPhone: string
       trackingId: string
@@ -253,7 +257,7 @@ export interface IPrintableDeclaration extends Omit<IDeclaration, 'data'> {
       certificates: ICertificate[]
       [key: string]: IFormFieldValue
     }
-  } & Exclude<IDeclaration['data'], 'father' | 'registration'>
+  } & Exclude<IDeclaration['data'], 'mother' | 'father' | 'registration'>
 }
 
 type PaymentType = 'MANUAL'
@@ -853,7 +857,7 @@ async function updateWorkqueueData(
     (declaration.data &&
       declaration.data.registration &&
       declaration.data.registration.contactPoint &&
-      (declaration.data.registration.contactPoint as IRegistration).nestedFields
+      (declaration.data.registration.contactPoint as IContactPoint).nestedFields
         .registrationPhone) ||
     ''
 
