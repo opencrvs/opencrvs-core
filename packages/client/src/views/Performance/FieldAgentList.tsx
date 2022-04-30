@@ -190,7 +190,7 @@ function FieldAgentListComponent(props: IProps) {
         timeEnd: timeEnd,
         primaryOfficeId: locationId,
         status: status.toString(),
-        event: (event && event.toUpperCase()) || undefined,
+        event: event || undefined,
         count: recordCount,
         sort: 'asc'
       }
@@ -199,7 +199,7 @@ function FieldAgentListComponent(props: IProps) {
         timeEnd: timeEnd,
         locationId: locationId,
         status: status.toString(),
-        event: (event && event.toUpperCase()) || undefined,
+        event: event || undefined,
         count: recordCount,
         sort: 'asc'
       }
