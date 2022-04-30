@@ -42,7 +42,7 @@ import {
   CorrectionSection,
   ReviewSection,
   IFormData,
-  IFormTag,
+  IPreviewGroup,
   REVIEW_OVERRIDE_POSITION,
   Action
 } from '@client/forms'
@@ -207,6 +207,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           >
             <TableView
               isLoading={false}
+              noPagination
               content={this.getChanges(formSections)}
               hideBoxShadow={true}
               hideTableBottomBorder={true}
@@ -502,7 +503,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         (group.previewGroups &&
           (group.previewGroups.filter(
             (previewGroup) => previewGroup.id === baseTag
-          ) as IFormTag[])) ||
+          ) as IPreviewGroup[])) ||
         []
       const values = taggedFields
         .map((field) =>

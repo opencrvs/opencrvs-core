@@ -68,3 +68,4 @@ ignore:
   - 'packages/workflow/src/index.ts'
   - 'packages/gateway/src/index.ts'
   - 'packages/gateway/src/routes.ts'
+  - 'packages/login/src/extract-translations.ts'

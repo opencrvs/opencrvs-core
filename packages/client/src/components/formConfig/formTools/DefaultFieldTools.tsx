@@ -20,7 +20,7 @@ import { Tooltip } from '@opencrvs/components/lib/icons'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { useIntl } from 'react-intl'
 import {
-  getContentKey,
+  getContentKeys,
   getCertificateHandlebar,
   IConfigField,
   getFieldDefinition
@@ -120,7 +120,7 @@ export function DefaultFieldTools({
   )
   const formField = getFieldDefinition(formSection, configField)
   const handleBar = getCertificateHandlebar(formField)
-  const contentKey = getContentKey(formField)
+  const contentKeys = getContentKeys(formField)
   const fieldType = fieldTypeLabel(formField.type)
 
   return (
@@ -156,11 +156,9 @@ export function DefaultFieldTools({
           {intl.formatMessage(messages.contentKey)}
           <StyledTooltip />
         </Subtitle>
-        <Body>
-          {contentKey.map((content, index) => (
-            <span key={index}>{content}</span>
-          ))}
-        </Body>
+        {contentKeys.map((content, index) => (
+          <Body key={index}>{content}</Body>
+        ))}
       </Content>
       {handleBar && (
         <HandleBar>

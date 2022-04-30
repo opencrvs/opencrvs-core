@@ -39,7 +39,7 @@ describe('Test phone number verification form', () => {
       })
 
       expect(app.update().find('#page-title').hostNodes().text()).toContain(
-        'ব্যবহারকারীর নাম পুনরুদ্ধারের অনুরোধ'
+        'Username reminder request'
       )
     })
 
@@ -50,7 +50,7 @@ describe('Test phone number verification form', () => {
       })
 
       expect(app.update().find('#page-title').hostNodes().text()).toContain(
-        'পাসওয়ার্ড পুনরায় সেট করুন'
+        'Password reset'
       )
     })
   })

@@ -138,11 +138,6 @@ const navigationMessagesToDefine: INavigationMessages = {
     id: 'config.form.navigation.registration',
     defaultMessage: 'Registration',
     description: 'Label for registration in page navigation'
-  },
-  primaryCaregiver: {
-    id: 'config.form.navigation.primaryCaregiver',
-    defaultMessage: 'Primary Caregiver',
-    description: 'Label for primaryCaregiver in page navigation'
   }
 }
 

@@ -42,6 +42,10 @@ import {
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formattedDuration } from '@client/utils/date-formatting'
+import { REGISTRAR_HOME } from '@client/navigation/routes'
+import { formatUrl } from '@client/navigation'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { birthDeclarationForReview } from '@client/tests/mock-graphql-responses'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -453,117 +457,25 @@ describe('OfficeHome sent for review tab related tests', () => {
         })
         .mockReturnValueOnce({
           data: {
-            fetchBirthRegistration: {
-              id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
-              _fhirIDMap: {
-                composition: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
-                encounter: 'dba420af-3d3a-46e3-817d-2fa5c37b7439',
-                observation: {
-                  birthType: '16643bcf-457a-4a5b-a7d2-328d57182476',
-                  weightAtBirth: '13a75fdf-54d3-476e-ab0e-68fca7286686',
-                  attendantAtBirth: 'add45cfa-8390-4792-a857-a1df587e45a6',
-                  presentAtBirthRegistration:
-                    'd43f9c01-bd4f-4df6-b38f-91f7a978a232'
-                }
-              },
-              child: null,
-              informant: null,
-              primaryCaregiver: null,
-              mother: {
-                name: [
-                  {
-                    use: 'bn',
-                    firstNames: '',
-                    familyName: 'ময়না'
-                  },
-                  {
-                    use: 'en',
-                    firstNames: '',
-                    familyName: 'Moyna'
-                  }
-                ],
-                birthDate: '2001-01-01',
-                maritalStatus: 'MARRIED',
-                occupation: 'Mother Occupation',
-                dateOfMarriage: '2001-01-01',
-                educationalAttainment: 'PRIMARY_ISCED_1',
-                nationality: ['BGD'],
-                identifier: [{ id: '1233', type: 'PASSPORT', otherType: '' }],
-                multipleBirth: 1,
-                address: [
-                  {
-                    type: 'PERMANENT',
-                    line: ['12', '', 'union1', 'upazila10'],
-                    district: 'district2',
-                    state: 'state2',
-                    city: '',
-                    postalCode: '',
-                    country: 'BGD'
-                  },
-                  {
-                    type: 'CURRENT',
-                    line: ['12', '', 'union1', 'upazila10'],
-                    district: 'district2',
-                    state: 'state2',
-                    city: '',
-                    postalCode: '',
-                    country: 'BGD'
-                  }
-                ],
-                telecom: [
-                  {
-                    system: 'phone',
-                    value: '01711111111'
-                  }
-                ],
-                id: '20e9a8d0-907b-4fbd-a318-ec46662bf608'
-              },
-              father: null,
-              registration: {
-                id: 'c8dbe751-5916-4e2a-ba95-1733ccf699b6',
-                contact: 'MOTHER',
-                contactRelationship: 'Contact Relation',
-                contactPhoneNumber: '01733333333',
-                attachments: null,
-                status: [
-                  {
-                    comments: [
-                      {
-                        comment: 'This is a note'
-                      }
-                    ],
-                    type: 'DECLARED',
-                    timestamp: null
-                  }
-                ],
-                trackingId: 'B123456',
-                registrationNumber: null,
-                type: 'BIRTH'
-              },
-              attendantAtBirth: 'NURSE',
-              weightAtBirth: 2,
-              birthType: 'SINGLE',
-              eventLocation: {
-                address: {
-                  country: 'BGD',
-                  state: 'state4',
-                  city: '',
-                  district: 'district2',
-                  postalCode: '',
-                  line: ['Rd #10', '', 'Akua', 'union1', '', 'upazila10'],
-                  postCode: '1020'
-                },
-                type: 'PRIVATE_HOME',
-                partOf: 'Location/upazila10'
-              },
-              presentAtBirthRegistration: 'MOTHER_ONLY'
-            }
+            fetchBirthRegistration: birthDeclarationForReview
           }
         })
       apolloClient.query = mockListSyncController
 
       createdTestComponent = await createTestComponent(
-        <OfficeHome {...createRouterProps('')} />,
+        <OfficeHome
+          {...createRouterProps(
+            formatUrl(REGISTRAR_HOME, {
+              tabId: WORKQUEUE_TABS.readyForReview
+            }),
+            { isNavigatedInsideApp: false },
+            {
+              matchParams: {
+                tabId: WORKQUEUE_TABS.readyForReview
+              }
+            }
+          )}
+        />,
         { store, history, apolloClient }
       )
 

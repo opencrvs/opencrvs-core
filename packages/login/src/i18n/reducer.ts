@@ -11,14 +11,13 @@
  */
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@login/i18n/actions'
-import { ENGLISH_STATE } from '@login/i18n/locales/en'
-import { BENGALI_STATE } from '@login/i18n/locales/bn'
-import { FRENCH_STATE } from '@login/i18n/locales/fr'
+
 import {
   getAvailableLanguages,
   getDefaultLanguage,
   storeLanguage
 } from './utils'
+import { loadContent } from '@login/utils/referenceApi'
 
 export interface IntlMessages {
   [key: string]: string
@@ -34,10 +33,30 @@ export interface ILanguageState {
   [key: string]: ILanguage
 }
 
-export const languages: ILanguageState = {
-  en: ENGLISH_STATE,
-  bn: BENGALI_STATE,
-  fr: FRENCH_STATE
+interface ISupportedLanguages {
+  code: string
+  language: string
+}
+
+const supportedLanguages: ISupportedLanguages[] = [
+  { code: 'en', language: 'English' },
+  { code: 'fr', language: 'Français' },
+  { code: 'bn', language: 'বাংলা' }
+]
+
+export const initLanguages = () => {
+  const initLanguages: ILanguageState = {}
+  getAvailableLanguages().forEach((lang) => {
+    const languageDescription = supportedLanguages.find(
+      (obj) => obj.code === lang
+    ) as ISupportedLanguages
+    initLanguages[lang] = {
+      lang,
+      displayName: languageDescription.language,
+      messages: {}
+    }
+  })
+  return initLanguages
 }
 
 export type IntlState = {
@@ -46,29 +65,50 @@ export type IntlState = {
   languages: ILanguageState
 }
 
+const DEFAULT_MESSAGES = { default: 'default' }
+
 export const initialState: IntlState = {
   language: getDefaultLanguage(),
-  messages: languages[getDefaultLanguage()].messages,
-  languages: getAvailableLanguages().reduce(
-    (accumulatedValues, language) => ({
-      ...accumulatedValues,
-      [language]: languages[language]
-    }),
-    {}
-  )
+  messages: DEFAULT_MESSAGES,
+  languages: initLanguages()
 }
 
-const getNextMessages = (language: string): IntlMessages => {
+const getNextMessages = (
+  language: string,
+  languages: ILanguageState
+): IntlMessages => {
   return languages[language].messages
 }
 
 export const intlReducer: LoopReducer<IntlState, any> = (
   state: IntlState = initialState,
-  action: any
+  action: actions.Action
 ): IntlState | Loop<IntlState, actions.Action> => {
   switch (action.type) {
+    case actions.LOAD_LANGUAGE:
+      return loop(
+        state,
+        Cmd.run(loadContent, {
+          successActionCreator: actions.loadLanguagesSuccess
+        })
+      )
+    case actions.LOAD_LANGUAGE_SUCCESS:
+      const { languages } = action.payload
+
+      const loadedLanguagesState: ILanguageState = languages.reduce(
+        (indexedByLang, language) => ({
+          ...indexedByLang,
+          [language.lang]: language
+        }),
+        {}
+      )
+      return {
+        ...state,
+        messages: getNextMessages(state.language, loadedLanguagesState),
+        languages: loadedLanguagesState
+      }
     case actions.CHANGE_LANGUAGE:
-      const messages = getNextMessages(action.payload.language)
+      const messages = getNextMessages(action.payload.language, state.languages)
 
       return loop(
         {

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { getContentKey, getCertificateHandlebar } from './utils'
+import { getContentKeys, getCertificateHandlebar } from './utils'
 import { IFormField } from '@client/forms'
 
 const mockFormField: IFormField = {
@@ -27,7 +27,7 @@ const mockFormField: IFormField = {
 
 describe('getContentKey', () => {
   it('should return the key if available', () => {
-    expect(getContentKey(mockFormField)).toEqual(['test.dummy'])
+    expect(getContentKeys(mockFormField)).toEqual(['test.dummy'])
   })
 })
 

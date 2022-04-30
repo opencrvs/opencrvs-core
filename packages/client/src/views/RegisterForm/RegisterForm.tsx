@@ -578,7 +578,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     )
     const isErrorOccured = this.state.hasError
     const debouncedModifyDeclaration = debounce(this.modifyDeclaration, 300)
-
     const menuItemDeleteOrClose =
       declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
         ? {
@@ -589,7 +588,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
             label: intl.formatMessage(buttonMessages.closeDeclaration),
             handler: () => this.onCloseDeclaration()
           }
-
     return (
       <>
         <TimeMounted

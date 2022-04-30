@@ -9,18 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormField, IFormData } from '@client/forms'
+import { IFormData } from '@client/forms'
 
-export function hasCaseOfDeathSectionTransformer(
+export function emptyMotherSectionTransformer(
   transformedData: IFormData,
   queryData: any,
-  sectionId: string,
-  field: IFormField
+  sectionId: string
 ) {
-  if (queryData.causeOfDeathMethod || queryData.causeOfDeath) {
-    transformedData[sectionId][field.name] = true
+  if (!queryData[sectionId]) {
+    transformedData[sectionId] = {
+      detailsExist: false
+    }
   } else {
-    transformedData[sectionId][field.name] = false
+    transformedData[sectionId] = {
+      detailsExist: true,
+      ...transformedData[sectionId]
+    }
   }
   return transformedData
 }

@@ -185,41 +185,41 @@ export const mockConditionals = {
     action: 'hide',
     expression: '!values.fathersDetailsExist'
   },
-  permanentAddressSameAsMother: {
+  primaryAddressSameAsOtherPrimary: {
     action: 'hide',
-    expression: 'values.permanentAddressSameAsMother'
+    expression: 'values.primaryAddressSameAsOtherPrimary'
   },
-  addressSameAsMother: {
+  secondaryAddressSameAsOtherSecondary: {
     action: 'hide',
-    expression: 'values.addressSameAsMother'
+    expression: 'values.secondaryAddressSameAsOtherSecondary'
   },
-  currentAddressSameAsPermanent: {
+  secondaryAddressSameAsPrimary: {
     action: 'hide',
-    expression: 'values.currentAddressSameAsPermanent'
+    expression: 'values.secondaryAddressSameAsPrimary'
   },
-  countryPermanent: {
+  countryPrimary: {
     action: 'hide',
-    expression: '!values.countryPermanent'
+    expression: '!values.countryPrimary'
   },
-  isDefaultCountryPermanent: {
+  isDefaultCountryPrimary: {
     action: 'hide',
-    expression: 'isDefaultCountry(values.countryPermanent)'
+    expression: 'isDefaultCountry(values.countryPrimary)'
   },
-  statePermanent: {
+  statePrimary: {
     action: 'hide',
-    expression: '!values.statePermanent'
+    expression: '!values.statePrimary'
   },
-  districtPermanent: {
+  districtPrimary: {
     action: 'hide',
-    expression: '!values.districtPermanent'
+    expression: '!values.districtPrimary'
   },
-  addressLine4Permanent: {
+  addressLine4Primary: {
     action: 'hide',
-    expression: '!values.addressLine4Permanent'
+    expression: '!values.addressLine4Primary'
   },
-  addressLine3Permanent: {
+  addressLine3Primary: {
     action: 'hide',
-    expression: '!values.addressLine3Permanent'
+    expression: '!values.addressLine3Primary'
   },
   country: {
     action: 'hide',
@@ -280,9 +280,9 @@ export const mockConditionals = {
     expression:
       '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
   },
-  deathPlaceAddressTypeHeathInstitue: {
+  placeOfDeathTypeHeathInstitue: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress!="HEALTH_FACILITY"'
+    expression: 'values.placeOfDeath!="HEALTH_FACILITY"'
   },
   otherBirthEventLocation: {
     action: 'hide',
@@ -299,35 +299,35 @@ export const mockConditionals = {
     expression:
       '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
   },
-  isNotCityLocationPermanent: {
+  isNotCityLocationPrimary: {
     action: 'hide',
     expression:
-      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))'
+      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Primary))'
   },
-  isCityLocationPermanent: {
+  isCityLocationPrimary: {
     action: 'hide',
     expression:
-      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))'
+      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Primary))'
   },
   iDAvailable: {
     action: 'hide',
     expression: '!values.iDType || values.iDType === "NO_ID"'
   },
-  informantPermanentAddressSameAsCurrent: {
+  informantPrimaryAddressSameAsCurrent: {
     action: 'hide',
-    expression: 'values.informantPermanentAddressSameAsCurrent'
+    expression: 'values.informantPrimaryAddressSameAsCurrent'
   },
   deathPlaceOther: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress !== "OTHER"'
+    expression: 'values.placeOfDeath !== "OTHER"'
   },
   deathPlaceAtPrivateHome: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress !== "PRIVATE_HOME"'
+    expression: 'values.placeOfDeath !== "PRIVATE_HOME"'
   },
   deathPlaceAtOtherLocation: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress !== "OTHER"'
+    expression: 'values.placeOfDeath !== "OTHER"'
   },
   causeOfDeathEstablished: {
     action: 'hide',
@@ -392,9 +392,10 @@ export const mockConditionals = {
     expression: 'draftData.formValues.action !== "REACTIVATE"'
   }
 }
+
 export const mockOfflineData = {
   forms: JSON.parse(
-    readFileSync(join(__dirname, './register.json')).toString()
+    readFileSync(join(__dirname, './default.json')).toString()
   ) as any,
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {

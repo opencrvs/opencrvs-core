@@ -47,6 +47,7 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
     case offlineActions.READY:
     case offlineActions.APPLICATION_CONFIG_LOADED:
       const { formConfig } = action.payload
+
       const birth = getConfiguredOrDefaultForm(formConfig, Event.BIRTH)
       const death = getConfiguredOrDefaultForm(formConfig, Event.DEATH)
 

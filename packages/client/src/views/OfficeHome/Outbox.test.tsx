@@ -21,7 +21,7 @@ describe('OutBox tests', () => {
     id: '10b7ccca-e1b9-4d14-a735-4bb7964a3ed9',
     data: {
       registration: {
-        presentAtBirthRegistration: 'BOTH_PARENTS',
+        informantType: 'MOTHER',
         informant: 'MOTHER_ONLY',
         registrationPhone: '01989898989',
         whoseContactDetails: 'FATHER'
@@ -44,16 +44,15 @@ describe('OutBox tests', () => {
         familyNameEng: 'Ma',
         motherBirthDate: '1991-11-11',
         maritalStatus: 'MARRIED',
-        countryPermanent: 'BGD',
-        statePermanent: '036de332-68be-4acd-bd51-d93c50cfeff3',
-        districtPermanent: '23b3bb18-20e4-4b05-897d-3c14cb3d374e',
-        addressLine4Permanent: 'e2fc9415-8492-4220-a1a2-c130630d2234',
-        addressLine3Permanent: 'a26bd41e-0363-4cd1-b358-243f8c7a85da',
-        currentAddressSameAsPermanent: true,
+        countryPrimary: 'BGD',
+        statePrimary: '036de332-68be-4acd-bd51-d93c50cfeff3',
+        districtPrimary: '23b3bb18-20e4-4b05-897d-3c14cb3d374e',
+        addressLine4Primary: 'e2fc9415-8492-4220-a1a2-c130630d2234',
+        addressLine3Primary: 'a26bd41e-0363-4cd1-b358-243f8c7a85da',
         country: 'BGD'
       },
       father: {
-        fathersDetailsExist: false
+        detailsExist: false
       },
       documents: {}
     },
@@ -76,11 +75,10 @@ describe('OutBox tests', () => {
         gender: 'male',
         maritalStatus: 'MARRIED',
         birthDate: '2011-11-11',
-        countryPermanent: 'BGD',
-        statePermanent: '61f745b4-5e97-4b06-9560-429df5ca511b',
-        districtPermanent: 'e4eab1dc-42dd-4b34-84e8-a81e08bc8966',
-        addressLine4Permanent: '9d0ff3fa-d9b6-4cb6-92ba-72bbb157d430',
-        currentAddressSameAsPermanent: true,
+        countryPrimary: 'BGD',
+        statePrimary: '61f745b4-5e97-4b06-9560-429df5ca511b',
+        districtPrimary: 'e4eab1dc-42dd-4b34-84e8-a81e08bc8966',
+        addressLine4Primary: '9d0ff3fa-d9b6-4cb6-92ba-72bbb157d430',
         country: 'BGD'
       },
       informant: {
@@ -94,12 +92,12 @@ describe('OutBox tests', () => {
         state: 'e5320d3c-78b3-4122-9dfd-9324906ab7de',
         district: '9914f913-453c-413e-a6fd-553971769f2e',
         addressLine4: '2c390875-0a74-4fb6-93ec-fa33dbf50ab9',
-        informantPermanentAddressSameAsCurrent: true,
-        countryPermanent: 'BGD'
+        informantPrimaryAddressSameAsCurrent: true,
+        countryPrimary: 'BGD'
       },
       deathEvent: {
         deathDate: '2018-11-11',
-        deathPlaceAddress: 'PERMANENT',
+        placeOfDeath: 'PRIMARY_ADDRESS',
         country: 'BGD'
       },
       causeOfDeath: {

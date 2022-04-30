@@ -110,7 +110,7 @@ describe('when user is in the register form for birth event', () => {
     it('changes the country select', async () => {
       const select = selectOption(
         component,
-        '#countryPermanent',
+        '#countryPrimary',
         'United States of America'
       )
       expect(select.text()).toEqual('United States of America')
@@ -176,8 +176,8 @@ describe('when user is in the register form for death event', () => {
           match={{
             params: {
               declarationId: draft.id,
-              pageId: 'causeOfDeath',
-              groupId: 'causeOfDeath-causeOfDeathEstablished'
+              pageId: 'deathEvent',
+              groupId: 'death-event-details'
             },
             isExact: true,
             path: '',
@@ -189,14 +189,16 @@ describe('when user is in the register form for death event', () => {
       component = testComponent
     })
 
-    it('renders the optional label', () => {
+    it('renders the deathEvent details page', () => {
       expect(
-        component
-          .find('#form_section_id_causeOfDeath-causeOfDeathEstablished')
-          .hostNodes()
+        component.find('#form_section_id_death-event-details').hostNodes()
       ).toHaveLength(1)
     })
   })
+
+  /*
+
+// ID API Check not available in Farajaland form
 
   describe('when user is in deceased section', () => {
     beforeEach(async () => {
@@ -230,7 +232,7 @@ describe('when user is in the register form for death event', () => {
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(0)
     })
   })
-
+*/
   describe('when user is in contact point page', () => {
     beforeEach(async () => {
       ;(debounce as jest.Mock).mockImplementation((fn) => fn)
@@ -256,9 +258,8 @@ describe('when user is in the register form for death event', () => {
       )
       component = testComponent
       component.find('#next_section').hostNodes().simulate('click')
-
-      await waitForElement(component, '#contactPoint_error')
-      expect(component.find('#contactPoint_error').hostNodes().text()).toBe(
+      await waitForElement(component, '#informantType_error')
+      expect(component.find('#informantType_error').hostNodes().text()).toBe(
         'Required for registration'
       )
     })
@@ -283,12 +284,16 @@ describe('when user is in the register form for death event', () => {
         { store, history }
       )
       component = testComponent
-      component.find('#exit_top_bar').hostNodes().simulate('click')
+      component.find('#crcl-btn').hostNodes().simulate('click')
 
       component.update()
 
       expect(history.location.pathname).toContain(REGISTRAR_HOME)
     })
+
+    /*
+
+    // ID API Check not available in Farajaland form
 
     it('renders loader button when idType is National ID', async () => {
       const testComponent = await createTestComponent(
@@ -314,7 +319,7 @@ describe('when user is in the register form for death event', () => {
         { store, history }
       )
       component = testComponent
-      selectOption(component, '#iDType', 'National ID number')
+      selectOption(component, '#iD', 'National ID')
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
     })
 
@@ -839,7 +844,7 @@ describe('when user is in the register form for death event', () => {
             params: {
               declarationId: draft.id,
               pageId: 'deathEvent',
-              groupId: 'deathEvent-deathDate'
+              groupId: 'death-event-details'
             },
             isExact: true,
             path: '',
@@ -852,9 +857,9 @@ describe('when user is in the register form for death event', () => {
         1
       )
     })
+*/
   })
 })
-
 describe('when user is in the register form preview section', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
@@ -868,6 +873,21 @@ describe('when user is in the register form preview section', () => {
     history = storeContext.history
 
     const draft = createDeclaration(Event.BIRTH)
+    draft.data = {
+      child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
+      father: {
+        detailsExist: true
+      },
+      mother: {
+        detailsExist: true
+      },
+      documents: {
+        imageUploader: { title: 'dummy', description: 'dummy', data: '' }
+      },
+      registration: {
+        commentsOrNotes: ''
+      }
+    }
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
 
@@ -1142,7 +1162,7 @@ describe('when user is in the register form from sent for review edit', () => {
   it('clicking save confirm saves the draft', async () => {
     const DRAFT_MODIFY_TIME = 1582525379383
     Date.now = jest.fn(() => DRAFT_MODIFY_TIME)
-    selectOption(component, '#iDType', 'National ID number')
+    selectOption(component, '#educationalAttainment', 'Tertiary')
 
     // Do some modifications
     component.find('input#iD').simulate('change', {
@@ -1236,8 +1256,8 @@ describe('When user is in Preview section death event', () => {
   it('Check if death location partOf is parsed properly', () => {
     expect(
       draftToGqlTransformer(deathForm, mockDeathDeclarationData as IFormData)
-        .eventLocation.partOf
-    ).toBe('Location/1dfc716a-c5f7-4d39-ad71-71d2a359210c')
+        .eventLocation.address.country
+    ).toEqual('FAR')
   })
 
   it('Should be able to submit the form', () => {
@@ -1255,16 +1275,15 @@ describe('When user is in Preview section death event', () => {
     const hospitalLocatioMockDeathDeclarationData = clone(
       mockDeathDeclarationData
     )
-    hospitalLocatioMockDeathDeclarationData.deathEvent.deathPlaceAddress =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.placeOfDeath =
       'HEALTH_FACILITY'
     hospitalLocatioMockDeathDeclarationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
-
     expect(
       draftToGqlTransformer(
         deathForm,
         hospitalLocatioMockDeathDeclarationData as IFormData
-      ).eventLocation.type
+      ).eventLocation.address
     ).toBe(undefined)
   })
 
@@ -1272,7 +1291,7 @@ describe('When user is in Preview section death event', () => {
     const hospitalLocatioMockDeathDeclarationData = clone(
       mockDeathDeclarationData
     )
-    hospitalLocatioMockDeathDeclarationData.deathEvent.deathPlaceAddress =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.placeOfDeath =
       'HEALTH_FACILITY'
     hospitalLocatioMockDeathDeclarationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
@@ -1287,35 +1306,11 @@ describe('When user is in Preview section death event', () => {
 
   it('Check if death location is deceased parmanent address', () => {
     const mockDeathDeclaration = clone(mockDeathDeclarationData)
-    mockDeathDeclaration.deathEvent.deathPlaceAddress = 'PERMANENT'
-
+    mockDeathDeclaration.deathEvent.placeOfDeath = 'PRIMARY_ADDRESS'
     expect(
       draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)
-        .eventLocation.address.type
-    ).toBe('PERMANENT')
-  })
-
-  it('Death location should be undefined if no decased address is found', () => {
-    const mockDeathDeclaration = cloneDeep(mockDeathDeclarationData)
-    // @ts-ignore
-    mockDeathDeclaration.deceased = {
-      iDType: 'NATIONAL_ID',
-      iD: '1230000000000',
-      firstNames: 'মকবুল',
-      familyName: 'ইসলাম',
-      firstNamesEng: 'Mokbul',
-      familyNameEng: 'Islam',
-      nationality: 'BGD',
-      gender: 'male',
-      maritalStatus: 'MARRIED',
-      birthDate: '1987-02-16'
-    }
-    mockDeathDeclaration.deathEvent.deathPlaceAddress = 'CURRENT'
-
-    expect(
-      draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)
-        .eventLocation
-    ).toBe(undefined)
+        .eventLocation.type
+    ).toBe('PRIMARY_ADDRESS')
   })
 })
 

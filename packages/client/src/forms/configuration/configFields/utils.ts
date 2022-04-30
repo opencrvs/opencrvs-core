@@ -154,7 +154,7 @@ export function getFieldDefinition(
   return formField
 }
 
-export function getContentKey(formField: IFormField) {
+export function getContentKeys(formField: IFormField) {
   if (
     (formField.type === RADIO_GROUP ||
       formField.type === RADIO_GROUP_WITH_NESTED_FIELDS ||

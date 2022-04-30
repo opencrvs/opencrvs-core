@@ -24,7 +24,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { Title } from './commons'
-import { messages } from './resetCredentialsForm'
+import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 
 const Actions = styled.div`
   padding: 32px 0;

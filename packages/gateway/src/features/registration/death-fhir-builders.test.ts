@@ -127,7 +127,7 @@ test('should build a minimal FHIR registration document without error', async ()
             status: 'final',
             originalFileName: 'original.jpg',
             systemFileName: 'system.jpg',
-            type: 'NATIONAL_ID_FRONT',
+            type: 'NATIONAL_ID',
             createdAt: '2018-10-21'
           },
           {
@@ -176,7 +176,7 @@ test('should build a minimal FHIR registration document without error', async ()
           postalCode: 'sw11',
           line: [
             'addressLine1',
-            'addressLine1CityOption',
+            'addressLine1UrbanOption',
             'addressLine2',
             '123',
             '456',

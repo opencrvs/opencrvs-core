@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { StyledComponentBase } from 'styled-components'
+import styled from 'styled-components'
 import { Button, IButtonProps } from './Button'
 
 export const SecondaryButton = ({
@@ -21,20 +21,22 @@ export const SecondaryButton = ({
 }
 
 const StyledButton = styled(Button)`
+  padding: 0 8px;
   color: ${({ theme }) => theme.colors.primary};
   transition: background 0.4s ease;
   border-radius: 4px;
   background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `2px solid ${theme.colors.secondary}`};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   ${({ theme }) => theme.fonts.bold16};
 
   & div {
     padding-top: 2px;
   }
 
-  &:hover {
+  &:hover:enabled {
     border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
+    color: ${({ theme }) => theme.colors.indigoDark};
+    background: ${({ theme }) => theme.colors.grey100};
   }
 
   &:focus {
@@ -51,8 +53,10 @@ const StyledButton = styled(Button)`
     border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
   }
 
-  &:active {
+  &:active:enabled {
     border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
+    color: ${({ theme }) => theme.colors.indigoDark};
+    background: ${({ theme }) => theme.colors.grey100};
   }
 
   &:disabled {

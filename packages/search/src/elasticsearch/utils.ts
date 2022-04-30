@@ -115,10 +115,6 @@ export interface IBirthCompositionBody extends ICompositionBody {
   informantFamilyName?: string
   informantFirstNamesLocal?: string
   informantFamilyNameLocal?: string
-  primaryCaregiverFirstNames?: string
-  primaryCaregiverFamilyName?: string
-  primaryCaregiverFirstNamesLocal?: string
-  primaryCaregiverFamilyNameLocal?: string
 }
 
 export interface IDeathCompositionBody extends ICompositionBody {

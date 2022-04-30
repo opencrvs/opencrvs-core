@@ -58,26 +58,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           }
         }
       }
-      primaryCaregiver {
-        parentDetailsType
-        primaryCaregiver {
-          name {
-            use
-            firstNames
-            familyName
-          }
-          telecom {
-            system
-            value
-            use
-          }
-        }
-        reasonsNotApplying {
-          primaryCaregiverType
-          reasonNotApplying
-          isDeceased
-        }
-      }
       mother {
         id
         name {
@@ -88,6 +68,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         birthDate
         maritalStatus
         occupation
+        detailsExist
+        reasonNotApplying
         dateOfMarriage
         educationalAttainment
         nationality
@@ -120,6 +102,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         birthDate
         maritalStatus
         occupation
+        detailsExist
+        reasonNotApplying
         dateOfMarriage
         educationalAttainment
         nationality
@@ -144,6 +128,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       }
       registration {
         id
+        informantType
+        otherInformantType
         contact
         contactRelationship
         contactPhoneNumber
@@ -168,6 +154,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       weightAtBirth
       birthType
       eventLocation {
+        id
         type
         address {
           line
@@ -182,7 +169,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         fieldId
         value
       }
-      presentAtBirthRegistration
       history {
         date
         action
@@ -287,6 +273,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         educationalAttainment
         nationality
         occupation
+        detailsExist
+        reasonNotApplying
         identifier {
           id
           type
@@ -319,6 +307,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         educationalAttainment
         nationality
         occupation
+        detailsExist
+        reasonNotApplying
         identifier {
           id
           type
@@ -368,28 +358,10 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           }
         }
       }
-      primaryCaregiver {
-        parentDetailsType
-        primaryCaregiver {
-          name {
-            use
-            firstNames
-            familyName
-          }
-          telecom {
-            system
-            value
-            use
-          }
-        }
-        reasonsNotApplying {
-          primaryCaregiverType
-          reasonNotApplying
-          isDeceased
-        }
-      }
       registration {
         id
+        informantType
+        otherInformantType
         contact
         contactPhoneNumber
         status {
@@ -422,6 +394,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         value
       }
       eventLocation {
+        id
         type
         address {
           line
@@ -432,7 +405,6 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           country
         }
       }
-      presentAtBirthRegistration
       history {
         date
         action

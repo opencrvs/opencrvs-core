@@ -74,7 +74,7 @@ const ApplicationName = styled.div`
 
 const Version = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
-  ${({ theme }) => theme.fonts.smallButtonStyle};
+  ${({ theme }) => theme.fonts.reg14};
   height: 40px;
   position: absolute;
   bottom: 0px;
@@ -105,7 +105,7 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
       </UserInfo>
       {props.children && props.children}
       <Version>
-        <span>OpenCRVS v1.1.0</span>
+        <span>OpenCRVS v1.0.0-alpha.3.1</span>
         <span>{process.env.REACT_APP_VERSION || 'Development'}</span>
       </Version>
     </LeftNavigationContainer>

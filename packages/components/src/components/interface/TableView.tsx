@@ -30,7 +30,7 @@ const Wrapper = styled.div<{
   background: ${({ theme }) => theme.colors.white};
   ${({ hideBoxShadow, isFullPage, theme }) =>
     isFullPage
-      ? `padding-bottom:24px;`
+      ? `padding-bottom: 24px;`
       : hideBoxShadow
       ? `padding: 24px 0;`
       : `padding: 24px;
@@ -47,19 +47,15 @@ const TableHeader = styled.div<{
   isSortable?: boolean
   totalWidth?: number
   fixedWidth?: number
-  hideTableHeaderBorder?: boolean
 }>`
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
   background: ${({ theme }) => theme.colors.grey100};
   padding: 10px 0px;
   display: flex;
-  align-items: flex-end;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
-  ${({ hideTableHeaderBorder }) =>
-    hideTableHeaderBorder === true ? 'border-bottom: none;' : ''};
-
-  border-radius: 2px;
+  align-items: flex-start;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-radius: 2px 2px 0 0;
 
   & span:first-child {
     padding-left: 8px;
@@ -74,7 +70,7 @@ const TableHeaderText = styled.div<{
   isSorted?: boolean
 }>`
   ${({ theme }) => theme.fonts.bold14};
-  color: ${({ theme }) => theme.colors.grey};
+  color: ${({ theme }) => theme.colors.grey600};
 `
 
 const TableBody = styled.div<{
@@ -136,14 +132,14 @@ const RowWrapper = styled.div<{
     ${({ horizontalPadding }) =>
       horizontalPadding
         ? `padding-left:${horizontalPadding.lg}px;`
-        : `padding-left: 12px;`}
+        : `padding-left: 8px;`}
   }
 
   & span:last-child {
     ${({ horizontalPadding }) =>
       horizontalPadding
         ? `padding-right:${horizontalPadding.lg}px;`
-        : `padding-right: 12px;`}
+        : `padding-right: 8px;`}
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -152,21 +148,21 @@ const RowWrapper = styled.div<{
       ${({ horizontalPadding }) =>
         horizontalPadding
           ? `padding-left:${horizontalPadding.md}px;`
-          : `padding-left: 12px;`}
+          : `padding-left: 8px;`}
     }
 
     & span:last-child {
       ${({ horizontalPadding }) =>
         horizontalPadding
           ? `padding-right:${horizontalPadding.md}px;`
-          : `padding-right: 12px;`}
+          : `padding-right: 8px;`}
     }
   }
 `
 const TableFooter = styled(RowWrapper)`
   padding-right: 10px;
-  background: ${({ theme }) => theme.colors.background};
-  border-top: 2px solid ${({ theme }) => theme.colors.disabled};
+  background: ${({ theme }) => theme.colors.grey200};
+  border-top: 2px solid ${({ theme }) => theme.colors.grey500};
   border-bottom: none;
   & span {
     color: ${({ theme }) => theme.colors.copy};
@@ -318,7 +314,7 @@ interface ITableViewProps {
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean
   fixedWidth?: number
-  hideTableHeaderBorder?: boolean
+  noPagination?: boolean
 }
 
 interface ITableViewState {
@@ -389,12 +385,15 @@ export class TableView extends React.Component<
   }
 
   render() {
+    const defaultPageSize = this.props.noPagination
+      ? this.props.content.length
+      : defaultConfiguration.pageSize
     const {
       id,
       columns,
       content,
       noResultText,
-      pageSize = defaultConfiguration.pageSize,
+      pageSize = defaultPageSize,
       currentPage = defaultConfiguration.currentPage,
       isLoading = false,
       tableTitle,
@@ -409,7 +408,7 @@ export class TableView extends React.Component<
       highlightRowOnMouseOver,
       isFullPage,
       fixedWidth,
-      hideTableHeaderBorder
+      noPagination
     } = this.props
     const totalItems = this.props.totalItems || 0
     const totalWidth = columns.reduce((total, col) => (total += col.width), 0)
@@ -431,11 +430,7 @@ export class TableView extends React.Component<
             >
               {!hideTableHeader && content.length > 0 && (
                 <TableHeaderWrapper>
-                  <TableHeader
-                    totalWidth={totalWidth}
-                    fixedWidth={fixedWidth}
-                    hideTableHeaderBorder={hideTableHeaderBorder}
-                  >
+                  <TableHeader totalWidth={totalWidth} fixedWidth={fixedWidth}>
                     {columns.map((preference, index) => (
                       <ContentWrapper
                         key={index}
@@ -567,7 +562,7 @@ export class TableView extends React.Component<
         )}
         {totalItems > pageSize && (
           <>
-            {!loadMoreText && (
+            {!loadMoreText && !noPagination && (
               <Pagination
                 initialPage={currentPage}
                 totalPages={Math.ceil(totalItems / pageSize)}

@@ -11,80 +11,100 @@
  */
 import * as React from 'react'
 import { ReactElement } from 'react'
-import styled, { ThemeConsumer } from 'styled-components'
+import styled from 'styled-components'
 import { colors } from '../colors'
-import { FormTabs, IFormTabProps } from '../forms'
-const Container = styled.div<{ size: string }>`
-  z-index: 1;
+import { Box } from './Box'
+
+const Container = styled(Box)<{ size: string }>`
   position: relative;
-  margin: 0 auto;
+  margin: 24px auto;
   max-width: ${({ size }) => (size === 'large' ? '1140px' : '778px')};
   height: 100%;
-  border-radius: 4px;
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
   box-sizing: border-box;
-  background-color: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
 `
 const Header = styled.div`
+  position: relative;
   display: flex;
-  flex-flow: column wrap;
+  align-items: center;
+  flex-direction: column;
+  margin: -24px -24px 24px;
+  padding: 0 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
-  padding-top: 20px;
-  padding-right: 32px;
-  padding-left: 32px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    border: 0;
+    padding: 0;
+  }
+`
+const TopActionBar = styled.div`
+  display: flex;
+  gap: 16px;
+`
+export const SubHeader = styled.div`
+  padding-bottom: 16px;
+  color: ${({ theme }) => theme.colors.supportingCopy};
+  ${({ theme }) => theme.fonts.reg18};
+`
+export const Body = styled.div`
+  padding-bottom: 24px;
+  color: ${({ theme }) => theme.colors.copy};
+  ${({ theme }) => theme.fonts.reg16};
 `
 const Footer = styled.div`
   display: flex;
   height: 72px;
-  padding-top: 20px;
-  padding-right: 32px;
-  padding-left: 32px;
-  margin-bottom: 32px;
-`
-
-export const SubHeader = styled.div`
-  padding-top: 20px;
-  padding-right: 32px;
-  padding-left: 32px;
-  color: rgb(89, 92, 95);
-  ${({ theme }) => theme.fonts.reg18};
-`
-export const Body = styled.div`
-  padding-top: 20px;
-  padding-right: 32px;
-  padding-left: 32px;
-  color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
-`
-const TopActionBar = styled.div`
-  display: flex;
-  gap: 28px;
-  margin-left: auto;
+  padding-top: 24px;
 `
 const TopTabBar = styled.div`
   display: flex;
   gap: 28px;
-  margin-right: auto;
+  width: 100%;
+  padding: 0;
+  position: relative;
+  & > div {
+    bottom: -1px;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 24px 16px 0;
+    border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  }
 `
 const TopBar = styled.div`
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 16px 0;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 const BottomActionBar = styled.div`
   display: flex;
-  gap: 28px;
+  gap: 16px;
   margin-right: auto;
 `
 const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
   display: flex;
-  gap: 10px;
-  margin-right: auto;
+  gap: 16px;
+  align-items: center;
+  width: 0;
+  flex: 1;
   color: ${({ theme, titleColor }) => titleColor && theme.colors[titleColor]};
 `
 
 const Title = styled.div`
   ${({ theme }) => theme.fonts.h2}
+  color: ${({ theme }) => theme.colors.copy};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
@@ -100,7 +120,7 @@ interface IProps {
   title?: string
   titleColor?: keyof typeof colors
   topActionButtons?: ReactElement[]
-  tabs?: IFormTabProps
+  tabBarContent?: React.ReactNode
   subtitle?: string
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
@@ -114,13 +134,12 @@ export class Content extends React.Component<IProps> {
       title,
       titleColor,
       topActionButtons,
-      tabs,
+      tabBarContent,
       subtitle,
       children,
       bottomActionButtons,
       size
     } = this.props
-
     return (
       <Container size={size as string}>
         <Header>
@@ -133,15 +152,7 @@ export class Content extends React.Component<IProps> {
               <TopActionBar>{topActionButtons}</TopActionBar>
             )}
           </TopBar>
-          {tabs && (
-            <TopTabBar>
-              <FormTabs
-                sections={tabs.sections}
-                activeTabId={tabs.activeTabId}
-                onTabClick={(id: string) => tabs.onTabClick(id)}
-              />
-            </TopTabBar>
-          )}
+          {tabBarContent && <TopTabBar>{tabBarContent}</TopTabBar>}
         </Header>
         {subtitle && <SubHeader>{subtitle}</SubHeader>}
         {children && <Body>{children}</Body>}

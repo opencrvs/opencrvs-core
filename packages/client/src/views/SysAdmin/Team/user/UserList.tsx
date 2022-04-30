@@ -76,7 +76,12 @@ import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
-import { userDetails } from '@client/tests/util'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState, useEffect } = React
@@ -674,7 +679,8 @@ function UserListComponent(props: IProps) {
         query={SEARCH_USERS}
         variables={{
           primaryOfficeId: locationId,
-          count: recordCount
+          count: DEFAULT_FIELD_AGENT_LIST_SIZE,
+          skip: (currentPageNumber - 1) * DEFAULT_FIELD_AGENT_LIST_SIZE
         }}
         fetchPolicy={'cache-and-network'}
       >
@@ -686,6 +692,8 @@ function UserListComponent(props: IProps) {
               </ErrorText>
             )
           }
+          const totalData =
+            (data && data.searchUsers && data.searchUsers.totalItems) || 0
           return (
             <UserTable id="user_list">
               <TableHeader>
@@ -709,6 +717,34 @@ function UserListComponent(props: IProps) {
                 }
                 noResultText="No result"
               />
+              {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+                <PaginationWrapper>
+                  <DesktopWrapper>
+                    <PaginationModified
+                      size={'small'}
+                      initialPage={currentPageNumber}
+                      totalPages={Math.ceil(
+                        totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                      )}
+                      onPageChange={(currentPage: number) =>
+                        setCurrentPageNumber(currentPage)
+                      }
+                    />
+                  </DesktopWrapper>
+                  <MobileWrapper>
+                    <PaginationModified
+                      size={'large'}
+                      initialPage={currentPageNumber}
+                      totalPages={Math.ceil(
+                        totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                      )}
+                      onPageChange={(currentPage: number) =>
+                        setCurrentPageNumber(currentPage)
+                      }
+                    />
+                  </MobileWrapper>
+                </PaginationWrapper>
+              )}
               <UserAuditActionModal
                 show={toggleActivation.modalVisible}
                 user={toggleActivation.selectedUser}
