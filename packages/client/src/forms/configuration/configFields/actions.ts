@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ICustomConfigField } from './utils'
+import { ICustomConfigField, IConfigField } from './utils'
 import { IQuestionConfig, Event } from '@client/forms'
 import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
 
@@ -105,24 +105,23 @@ export const addCustomField = (
     customField
   }
 })
-
-export const MODIFY_CUSTOM_FIELD = 'FORM/MODIFY_CUSTOM_FIELD'
-export type ModifyCustomFieldAction = {
-  type: typeof MODIFY_CUSTOM_FIELD
+export const MODIFY_CONFIG_FIELD = 'FORM/MODIFY_CONFIG_FIELD'
+export type ModifyConfigFieldAction = {
+  type: typeof MODIFY_CONFIG_FIELD
   payload: {
-    originalField: ICustomConfigField
-    modifiedField: ICustomConfigField
+    fieldId: string
+    props: Partial<IConfigField>
   }
 }
 
-export const modifyCustomField = (
-  originalField: ICustomConfigField,
-  modifiedField: ICustomConfigField
-): ModifyCustomFieldAction => ({
-  type: MODIFY_CUSTOM_FIELD,
+export const modifyConfigField = (
+  fieldId: string,
+  props: Partial<IConfigField>
+): ModifyConfigFieldAction => ({
+  type: MODIFY_CONFIG_FIELD,
   payload: {
-    originalField,
-    modifiedField
+    fieldId,
+    props
   }
 })
 
@@ -169,6 +168,6 @@ export type ConfigFieldsActions =
   | GetStorageConfigFieldsSuccessAction
   | GetStorageConfigFieldsFailedAction
   | AddCustomFieldAction
-  | ModifyCustomFieldAction
+  | ModifyConfigFieldAction
   | RemoveCustomFieldAction
   | UpdateQuestionsAction

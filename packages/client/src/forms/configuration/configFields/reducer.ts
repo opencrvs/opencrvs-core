@@ -142,37 +142,49 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         }
       }
     }
-    case actions.MODIFY_CUSTOM_FIELD: {
-      if (state.state === 'LOADING') {
-        return state
-      }
 
-      const { modifiedField, originalField } = action.payload
-      const { event, section } = getEventSectionGroupFromFieldID(
-        action.payload.originalField.fieldId
-      )
+    case actions.MODIFY_CONFIG_FIELD: {
+      if (state.state === 'LOADING') return state
+      const { fieldId, props } = action.payload
+      const { event, section } = getEventSectionGroupFromFieldID(fieldId)
+      const { [fieldId]: originalField, ...fields } = state[event][section]
 
-      const { [originalField.fieldId]: fieldToRemove, ...fields } =
-        state[event][section]
+      /* Adjusting preceedingFieldId & foregoingFieldId */
+      if (props.fieldId && fieldId !== props.fieldId) {
+        if (
+          originalField.preceedingFieldId &&
+          originalField.preceedingFieldId !== FieldPosition.TOP
+        ) {
+          fields[originalField.preceedingFieldId] = {
+            ...fields[originalField.preceedingFieldId],
+            foregoingFieldId: props.fieldId
+          }
+        }
 
-      fields[modifiedField.fieldId] = modifiedField
+        if (originalField.foregoingFieldId !== FieldPosition.BOTTOM)
+          fields[originalField.foregoingFieldId] = {
+            ...fields[originalField.foregoingFieldId],
+            preceedingFieldId: props.fieldId
+          }
 
-      // Adjusting precedingFieldId & foregoingFieldId
-      if (
-        modifiedField.preceedingFieldId &&
-        modifiedField.preceedingFieldId !== FieldPosition.TOP
-      ) {
-        fields[modifiedField.preceedingFieldId] = {
-          ...fields[modifiedField.preceedingFieldId],
-          foregoingFieldId: modifiedField.fieldId
+        fields[props.fieldId] = {
+          ...originalField,
+          ...props
+        }
+
+        return {
+          ...state,
+          [event]: {
+            ...state[event],
+            [section]: fields
+          }
         }
       }
 
-      if (modifiedField.foregoingFieldId !== FieldPosition.BOTTOM)
-        fields[modifiedField.foregoingFieldId] = {
-          ...fields[modifiedField.foregoingFieldId],
-          preceedingFieldId: modifiedField.fieldId
-        }
+      fields[fieldId] = {
+        ...originalField,
+        ...props
+      }
 
       return {
         ...state,

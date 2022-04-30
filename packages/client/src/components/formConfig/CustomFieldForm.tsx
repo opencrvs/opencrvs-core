@@ -19,7 +19,7 @@ import {
   DeathSection,
   Event
 } from '@client/forms'
-import { modifyCustomField } from '@client/forms/configuration/configFields/actions'
+import { modifyConfigField } from '@client/forms/configuration/configFields/actions'
 import {
   CUSTOM_GROUP_NAME,
   getCertificateHandlebar,
@@ -405,7 +405,7 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   inputFields() {
-    const { intl, selectedField, modifyCustomField, formField } = this.props
+    const { intl, selectedField, modifyConfigField, formField } = this.props
     const languages = this._getLanguages()
     const defaultLanguage = getDefaultLanguage()
 
@@ -558,7 +558,7 @@ class CustomFieldFormsComp extends React.Component<
                     return
                   }
                   const modifiedField = this._prepareModifiedFormField()
-                  modifyCustomField(selectedField, modifiedField)
+                  modifyConfigField(selectedField.fieldId, modifiedField)
                 }}
                 disabled={!this._isFormValid()}
               >
@@ -618,7 +618,7 @@ const mapStateToProps = (store: IStoreState, props: IProps) => {
 }
 
 const mapDispatchToProps = {
-  modifyCustomField
+  modifyConfigField
 }
 
 export const CustomFieldForms = connect(
