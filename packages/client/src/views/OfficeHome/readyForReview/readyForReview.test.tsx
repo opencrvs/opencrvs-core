@@ -29,14 +29,13 @@ import { waitForElement, waitFor } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
 import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 import { OfficeHome, EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
-import { Validate } from '@opencrvs/components/lib/icons'
+import { Validate, DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { Store } from 'redux'
-import { ReviewTab } from './reviewTab'
+import { ReadyForReview } from './ReadyForReview'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
@@ -225,17 +224,55 @@ describe('OfficeHome sent for review tab related tests', () => {
     await store.dispatch(checkAuth({ '?token': registerScopeToken }))
   })
 
+  it('should show pagination bar if items more than 11 in ReviewTab', async () => {
+    Date.now = jest.fn(() => 1554055200000)
+
+    const testComponent = await createTestComponent(
+      <ReadyForReview
+        queryData={{
+          data: {
+            totalItems: 24,
+            results: []
+          }
+        }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+      />,
+      { store, history }
+    )
+
+    const pagination = await waitForElement(
+      testComponent,
+      '#pagination_container'
+    )
+
+    expect(pagination.hostNodes()).toHaveLength(1)
+
+    testComponent
+      .find('#pagination button')
+      .last()
+      .hostNodes()
+      .simulate('click')
+    expect(testComponent.exists('#page-number-2')).toBeTruthy()
+  })
+
   it('renders all items returned from graphql query in ready for review', async () => {
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      <ReadyForReview
         queryData={{
           data: mockReviewTabData
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -249,9 +286,9 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('9a55d213-ad9f-4dcd-9418-340f3a7f6269')
-    expect(data[0].eventTimeElapsed).toBe('8 years ago')
-    expect(data[0].declarationTimeElapsed).toBe(EXPECTED_DATE_OF_DECLARATION)
-    expect(data[0].name).toBe('Iliyas Khan')
+    expect(data[0].dateOfEvent).toBe('8 years ago')
+    expect(data[0].sentForReview).toBe(EXPECTED_DATE_OF_DECLARATION)
+    expect(data[0].name).toBe('iliyas khan')
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
@@ -261,15 +298,18 @@ describe('OfficeHome sent for review tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      <ReadyForReview
         queryData={{
           data: {
             totalItems: 12,
             results: []
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -279,66 +319,11 @@ describe('OfficeHome sent for review tab related tests', () => {
     expect(data.length).toBe(0)
   })
 
-  it('should show pagination bar if pagination is used and items more than 11 in ReviewTab', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
-        queryData={{
-          data: {
-            totalItems: 14,
-            results: []
-          }
-        }}
-        showPaginated={true}
-      />,
-      { store, history }
-    )
-
-    const pagination = await waitForElement(testComponent, '#pagination')
-
-    expect(pagination.hostNodes()).toHaveLength(1)
-
-    testComponent
-      .find('#pagination button')
-      .last()
-      .hostNodes()
-      .simulate('click')
-  })
-  it('should show loadmore button if loadmore is used and items more than 11 in ReviewTab', async () => {
-    Date.now = jest.fn(() => 1554055200000)
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
-        queryData={{
-          data: {
-            totalItems: 14,
-            results: []
-          }
-        }}
-        showPaginated={false}
-      />,
-      { store, history }
-    )
-
-    const loadmore = await waitForElement(testComponent, '#load_more_button')
-
-    expect(loadmore.hostNodes()).toHaveLength(1)
-
-    testComponent.find('#load_more_button').last().hostNodes().simulate('click')
-  })
-
   it('redirects to recordAudit page if row is clicked', async () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      <ReadyForReview
         queryData={{
           data: {
             totalItems: 2,
@@ -423,6 +408,11 @@ describe('OfficeHome sent for review tab related tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -529,7 +519,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#action-error-ListItemAction-1'
+        '#ListItemAction-1-download-failed'
       )
 
       expect(errorIcon.hostNodes()).toHaveLength(1)
@@ -541,9 +531,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      <ReadyForReview
         queryData={{
           data: {
             totalItems: 2,
@@ -601,13 +589,18 @@ describe('OfficeHome sent for review tab related tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
 
-    const validate = await waitForElement(testComponent, Validate)
-
-    expect(validate).toHaveLength(1)
+    const component = await waitForElement(testComponent, DeclarationIcon)
+    const props = component.find('#declaration_icon').first().props().color
+    expect(props).toBe('grey')
   })
 
   describe.skip('handles download status for possible duplicate declaration', () => {
@@ -707,7 +700,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#action-error-ListItemAction-1'
+        '#ListItemAction-1-download-failed'
       )
 
       expect(errorIcon.hostNodes()).toHaveLength(1)
@@ -734,9 +727,7 @@ describe('Tablet tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ReviewTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      <ReadyForReview
         queryData={{
           data: {
             totalItems: 2,
@@ -800,6 +791,11 @@ describe('Tablet tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )

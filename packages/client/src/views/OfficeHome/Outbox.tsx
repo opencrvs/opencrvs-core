@@ -250,11 +250,7 @@ class Outbox extends React.Component<IFullProps, IState> {
             }
           ]}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
-          totalItems={declaration.length}
-          onPageChange={this.onPageChange}
-          pageSize={10}
-          showPaginated={this.props.showPaginated}
-          loadMoreText={intl.formatMessage(constantsMessages.loadMore)}
+          hideLastBorder={true}
         />
       </Container>
     )

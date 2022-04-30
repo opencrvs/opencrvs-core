@@ -37,7 +37,7 @@ import {
 } from '@client/tests/util'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { InProgressTab, SELECTOR_ID, TAB_ID } from './inProgressTab'
+import { InProgress, SELECTOR_ID, TAB_ID } from './InProgress'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
@@ -94,14 +94,23 @@ describe('In Progress tab', () => {
       }
     ]
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <InProgressTab
+      <InProgress
         drafts={localDrafts}
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        selectorId={SELECTOR_ID.ownDrafts}
+        isFieldAgent={false}
         queryData={{
           inProgressData: {},
           notificationData: {}
         }}
+        paginationId={{
+          draftId: 1,
+          fieldAgentId: 1,
+          healthSystemId: 1
+        }}
+        pageSize={10}
+        onPageChange={(pageId: number) => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -114,7 +123,7 @@ describe('In Progress tab', () => {
     testComponent.update()
     const app = testComponent
 
-    app.find(`#selector_${SELECTOR_ID.ownDrafts}`).hostNodes().simulate('click')
+    app.find(`#tab_${SELECTOR_ID.ownDrafts}`).hostNodes().simulate('click')
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
@@ -125,7 +134,7 @@ describe('In Progress tab', () => {
       })
     )
     app
-      .find(`#selector_${SELECTOR_ID.fieldAgentDrafts}`)
+      .find(`#tab_${SELECTOR_ID.fieldAgentDrafts}`)
       .hostNodes()
       .simulate('click')
     await new Promise((resolve) => {
@@ -154,15 +163,21 @@ describe('In Progress tab', () => {
     ]
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <InProgressTab
+      <InProgress
         drafts={localDrafts}
-        selectorId={'you'}
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+        selectorId={SELECTOR_ID.ownDrafts}
         queryData={{
           inProgressData: { totalItems: 5 },
           notificationData: { totalItems: 3 }
         }}
+        isFieldAgent={false}
+        paginationId={{
+          draftId: 1,
+          fieldAgentId: 1,
+          healthSystemId: 1
+        }}
+        pageSize={10}
+        onPageChange={(pageId: number) => {}}
       />,
       { store, history }
     )
@@ -175,8 +190,8 @@ describe('In Progress tab', () => {
     testComponent.update()
     const app = testComponent
 
-    expect(app.find('#selector_you').hostNodes().text()).toContain('Yours (2)')
-    expect(app.find('#selector_field-agents').hostNodes().text()).toContain(
+    expect(app.find('#tab_you').hostNodes().text()).toContain('Yours (2)')
+    expect(app.find('#tab_field-agents').hostNodes().text()).toContain(
       'Field agents (5)'
     )
   })
@@ -250,15 +265,21 @@ describe('In Progress tab', () => {
       ]
       // @ts-ignore
       const testComponent = await createTestComponent(
-        // @ts-ignore
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
             inProgressData: {},
             notificationData: {}
           }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
         />,
         { store, history }
       )
@@ -272,29 +293,34 @@ describe('In Progress tab', () => {
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(TIME_STAMP)
 
       expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-      expect(data[0].name).toBe('Anik Hoque')
-      expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
+      expect(data[0].name).toBe('anik hoque')
+      expect(data[0].lastUpdated).toBe(EXPECTED_DATE_OF_REJECTION)
       expect(data[0].event).toBe('Birth')
       expect(data[0].actions).toBeDefined()
     })
 
-    it('Should render pagination in progress tab if pagination is used and data is more than 10', async () => {
+    it('Should render pagination in progress tab if data is more than 10', async () => {
       jest.clearAllMocks()
       const drafts: IDeclaration[] = []
       for (let i = 0; i < 12; i++) {
         drafts.push(createDeclaration(Event.BIRTH))
       }
       const testComponent = await createTestComponent(
-        // @ts-ignore
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
             inProgressData: {},
             notificationData: {}
           }}
-          showPaginated={true}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
         />,
         { store, history }
       )
@@ -305,7 +331,7 @@ describe('In Progress tab', () => {
       })
 
       testComponent.update()
-      const pagiBtn = testComponent.find('#pagination')
+      const pagiBtn = testComponent.find('#pagination_container')
 
       expect(pagiBtn.hostNodes()).toHaveLength(1)
       testComponent
@@ -351,17 +377,6 @@ describe('In Progress tab', () => {
           }
         },
         {
-          id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be9',
-          event: Event.BIRTH,
-          modifiedOn: TIME_STAMP,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          data: {
-            child: {
-              familyName: 'অনিক'
-            }
-          }
-        },
-        {
           id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
           event: Event.DEATH,
           modifiedOn: TIME_STAMP,
@@ -369,9 +384,7 @@ describe('In Progress tab', () => {
           data: {
             deceased: {
               firstNamesEng: 'Anik',
-              firstNames: 'অনিক',
-              familyNameEng: 'Hoque',
-              familyName: 'অনিক'
+              familyNameEng: 'Hoque'
             }
           }
         },
@@ -383,17 +396,6 @@ describe('In Progress tab', () => {
           data: {
             deceased: {
               familyNameEng: 'Hoque'
-            }
-          }
-        },
-        {
-          id: 'cc66d69c-7f0a-4047-9283-f066571830f3',
-          event: Event.DEATH,
-          modifiedOn: TIME_STAMP,
-          submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
-          data: {
-            deceased: {
-              familyName: 'অনিক'
             }
           }
         },
@@ -410,15 +412,21 @@ describe('In Progress tab', () => {
       // @ts-ignore
       store.dispatch(storeDeclaration(drafts))
       const testComponent = await createTestComponent(
-        // @ts-ignore
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.ownDrafts}
-          registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
           queryData={{
             inProgressData: {},
             notificationData: {}
           }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
         />,
         { store, history }
       )
@@ -440,9 +448,8 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-
       expect(history.location.pathname).toContain(
-        '/drafts/e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
+        '/drafts/cc66d69c-7f0a-4047-9283-f066571830f4'
       )
     })
   })
@@ -453,11 +460,9 @@ describe('In Progress tab', () => {
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.BIRTH))
       const testComponent = await createTestComponent(
-        // @ts-ignore
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
             inProgressData: {
               totalItems: 1,
@@ -516,6 +521,14 @@ describe('In Progress tab', () => {
             },
             notificationData: {}
           }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
         />,
         { store, history }
       )
@@ -527,28 +540,32 @@ describe('In Progress tab', () => {
       testComponent.update()
       const data = testComponent.find(GridTable).prop('content')
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
-
       expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
-      expect(data[0].name).toBe('K M Abdullah al amin Khan')
-      expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
+      expect(data[0].name).toBe('k m abdullah al amin khan')
+      expect(data[0].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
       expect(data[0].event).toBe('Death')
     })
 
-    it('Should render pagination in progress tab if pagination is used and data is more than 10', async () => {
+    it('Should render pagination in progress tab if data is more than 10', async () => {
       jest.clearAllMocks()
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.BIRTH))
       const testComponent = await createTestComponent(
-        // @ts-ignore
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.fieldAgentDrafts}
-          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
             inProgressData: { totalItems: 12 },
             notificationData: { totalItems: 2 }
           }}
-          showPaginated={true}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
         />,
         { store, history }
       )
@@ -559,7 +576,7 @@ describe('In Progress tab', () => {
       })
 
       testComponent.update()
-      const pagiBtn = testComponent.find('#pagination')
+      const pagiBtn = testComponent.find('#pagination_container')
 
       expect(pagiBtn.hostNodes()).toHaveLength(1)
       testComponent
@@ -576,11 +593,9 @@ describe('In Progress tab', () => {
       drafts.push(createDeclaration(Event.BIRTH))
       // @ts-ignore
       const testComponent = await createTestComponent(
-        // @ts-ignore
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
-          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
             inProgressData: {},
             notificationData: {
@@ -644,6 +659,14 @@ describe('In Progress tab', () => {
               ]
             }
           }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
         />,
         { store, history }
       )
@@ -692,7 +715,15 @@ describe('In Progress tab', () => {
             ]
           },
           notificationData: {}
-        }
+        },
+        isFieldAgent: false,
+        paginationId: {
+          draftId: 1,
+          fieldAgentId: 1,
+          healthSystemId: 1
+        },
+        pageSize: 10,
+        onPageChange: (pageId: number) => {}
       }
       it('renders download button when not downloaded', async () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
@@ -703,8 +734,7 @@ describe('In Progress tab', () => {
         downloadableDeclaration.downloadStatus = undefined
         store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
-          // @ts-ignore
-          <InProgressTab {...inprogressProps} />,
+          <InProgress {...inprogressProps} />,
           { store, history }
         )
 
@@ -721,8 +751,7 @@ describe('In Progress tab', () => {
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
         store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
-          // @ts-ignore
-          <InProgressTab {...inprogressProps} />,
+          <InProgress {...inprogressProps} />,
           { store, history }
         )
 
@@ -739,8 +768,7 @@ describe('In Progress tab', () => {
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
         store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
-          // @ts-ignore
-          <InProgressTab {...inprogressProps} />,
+          <InProgress {...inprogressProps} />,
           { store, history }
         )
 
@@ -775,13 +803,11 @@ describe('In Progress tab', () => {
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
         store.dispatch(modifyDeclaration(downloadableDeclaration))
         const testComponent = await createTestComponent(
-          // @ts-ignore
-          <InProgressTab {...inprogressProps} />,
+          <InProgress {...inprogressProps} />,
           { store, history }
         )
-
         expect(
-          testComponent.find('#action-error-ListItemAction-0').hostNodes()
+          testComponent.find('#ListItemAction-0-download-failed').hostNodes()
         ).toHaveLength(1)
       })
     })
@@ -793,11 +819,9 @@ describe('In Progress tab', () => {
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.BIRTH))
       const testComponent = await createTestComponent(
-        // @ts-ignore
-        <InProgressTab
+        <InProgress
           drafts={drafts}
           selectorId={SELECTOR_ID.hospitalDrafts}
-          registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
           queryData={{
             notificationData: {
               totalItems: 2,
@@ -836,6 +860,14 @@ describe('In Progress tab', () => {
             },
             inProgressData: {}
           }}
+          isFieldAgent={false}
+          paginationId={{
+            draftId: 1,
+            fieldAgentId: 1,
+            healthSystemId: 1
+          }}
+          pageSize={10}
+          onPageChange={(pageId: number) => {}}
         />,
         { store, history }
       )
@@ -849,8 +881,8 @@ describe('In Progress tab', () => {
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
 
       expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
-      expect(data[0].name).toBe('Anik Hoque')
-      expect(data[0].dateOfModification).toBe(EXPECTED_DATE_OF_REJECTION)
+      expect(data[0].name).toBe('anik hoque')
+      expect(data[0].notificationSent).toBe(EXPECTED_DATE_OF_REJECTION)
       expect(data[0].event).toBe('Birth')
     })
   })
@@ -878,11 +910,9 @@ describe('Tablet tests', () => {
 
     // @ts-ignore
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <InProgressTab
+      <InProgress
         drafts={drafts}
         selectorId={SELECTOR_ID.fieldAgentDrafts}
-        registrarLocationId={'0627c48a-c721-4ff9-bc6e-1fba59a2332a'}
         queryData={{
           inProgressData: {
             totalItems: 1,
@@ -906,6 +936,14 @@ describe('Tablet tests', () => {
           },
           notificationData: {}
         }}
+        isFieldAgent={false}
+        paginationId={{
+          draftId: 1,
+          fieldAgentId: 1,
+          healthSystemId: 1
+        }}
+        pageSize={10}
+        onPageChange={(pageId: number) => {}}
       />,
       { store, history }
     )

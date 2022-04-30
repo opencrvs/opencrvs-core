@@ -88,9 +88,11 @@ export const SEARCH_DECLARATIONS_USER_WISE = gql`
           trackingId
           dateOfDeclaration
           modifiedAt
+          createdAt
           status
         }
         ... on BirthEventSearchSet {
+          dateOfBirth
           childName {
             use
             firstNames
@@ -98,6 +100,7 @@ export const SEARCH_DECLARATIONS_USER_WISE = gql`
           }
         }
         ... on DeathEventSearchSet {
+          dateOfDeath
           deceasedName {
             use
             firstNames

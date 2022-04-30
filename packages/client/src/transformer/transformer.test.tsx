@@ -115,12 +115,11 @@ describe('when draft data is transformed to graphql', () => {
       ).toBe('+8801733333333')
     })
     it('Pass false as detailsExist on father section', () => {
-      const clonedFather = clone(birthDraftData.father)
-      clonedFather.detailsExist = false
-
       const data = {
         child: birthDraftData.child,
-        father: clonedFather,
+        father: {
+          detailsExist: false
+        },
         mother: birthDraftData.mother,
         registration: birthDraftData.registration,
         documents: { imageUploader: '' }
@@ -131,7 +130,7 @@ describe('when draft data is transformed to graphql', () => {
       })
       expect(
         draftToGqlTransformer(form, data).registration.inCompleteFields
-      ).toEqual('father/father-view-group/reasonNotApplying')
+      ).toContain('father/father-view-group/reasonNotApplying')
     })
     it('Sends inCompleteFields if in-complete data is given', () => {
       const data = {

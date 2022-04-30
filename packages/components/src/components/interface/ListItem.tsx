@@ -29,6 +29,7 @@ export interface IActionObject {
   label: string
   handler: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   icon?: () => React.ReactNode
+  disabled?: boolean
 }
 
 export interface IActionComponent {

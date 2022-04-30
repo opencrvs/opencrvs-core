@@ -23,6 +23,11 @@ export const HIDE_SUBMIT_FORM_SUCCESS_TOAST = 'HIDE_SUBMIT_FORM_SUCCESS_TOAST'
 export const SHOW_SUBMIT_FORM_ERROR_TOAST = 'SHOW_SUBMIT_FORM_ERROR_TOAST'
 export const HIDE_SUBMIT_FORM_ERROR_TOAST = 'HIDE_SUBMIT_FORM_ERROR_TOAST '
 
+export const HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST =
+  'HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST'
+export const SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST =
+  'SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST'
+
 export const SHOW_USER_AUDIT_SUCCESS_TOAST = 'SHOW_USER_AUDIT_SUCCESS_TOAST'
 export const HIDE_USER_AUDIT_SUCCESS_TOAST = 'HIDE_USER_AUDIT_SUCCESS_TOAST'
 
@@ -57,6 +62,14 @@ export type ShowSubmitFormErrorToast = {
   payload: {
     data: string
   }
+}
+
+export type HideDownloadDeclarationFailedToast = {
+  type: typeof HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST
+}
+
+export type ShowDownloadDeclarationFailedToast = {
+  type: typeof SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST
 }
 
 export type HideSubmitFormErrorToast = {
@@ -134,6 +147,16 @@ export const showSubmitFormErrorToast = (
   payload: { data }
 })
 
+export const showDownloadDeclarationFailedToast =
+  (): ShowDownloadDeclarationFailedToast => ({
+    type: SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST
+  })
+
+export const hideDownloadDeclarationFailedToast =
+  (): HideDownloadDeclarationFailedToast => ({
+    type: HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST
+  })
+
 export const hideSubmitFormErrorToast = (): HideSubmitFormErrorToast => ({
   type: HIDE_SUBMIT_FORM_ERROR_TOAST
 })
@@ -183,3 +206,5 @@ export type Action =
   | HideUserAuditSuccessToast
   | ShowPINUpdateSuccessAction
   | HidePINUpdateSuccessAction
+  | ShowDownloadDeclarationFailedToast
+  | HideDownloadDeclarationFailedToast
