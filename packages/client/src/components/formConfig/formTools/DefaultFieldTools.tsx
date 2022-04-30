@@ -28,7 +28,12 @@ import {
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { useParams } from 'react-router'
-import { Event, BirthSection, DeathSection } from '@client/forms'
+import {
+  Event,
+  BirthSection,
+  DeathSection,
+  fieldTypeLabel
+} from '@client/forms'
 import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
 
 const Container = styled.div`
@@ -96,9 +101,11 @@ export function DefaultFieldTools({
   const formField = getFieldDefinition(formSection, configField)
   const handleBar = getCertificateHandlebar(formField)
   const contentKey = getContentKey(formField)
+  const fieldLabel = fieldTypeLabel(formField.type)
+
   return (
     <Container>
-      <Title>{formField.type}</Title>
+      <Title>{intl.formatMessage(fieldLabel)}</Title>
       <ListViewSimplified bottomBorder>
         <ListViewItemSimplified
           label={<Label>{intl.formatMessage(messages.hideField)}</Label>}

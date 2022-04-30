@@ -199,6 +199,7 @@ type Mutation {
   ): ApplicationConfiguration
   createOrUpdateQuestion(question: QuestionInput!): Question
   createOrUpdateFormDraft(formDraft: FormDraftInput!): FormDraft
+  modifyDraftStatus(formDraft: FormDraftStatusModify!): FormDraft
 }
 
 type Dummy {
@@ -619,17 +620,21 @@ input QuestionInput {
   fieldType: String
   preceedingFieldId: String
   required: Boolean
-  enabled: Boolean
+  enabled: String
   custom: Boolean
   initialValue: String
 }
 
 input FormDraftInput {
   questions: [QuestionInput]
-  deleted: [String]
   event: String!
   status: String!
   comment: String
+}
+
+input FormDraftStatusModify {
+  event: String!
+  status: String!
 }
 
 scalar Map
@@ -947,7 +952,7 @@ type DraftHistory {
   version: Int
   status: String
   comment: String
-  lastUpdateAt: Date
+  updatedAt: Date
 }
 
 input PersonInput {

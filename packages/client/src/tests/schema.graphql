@@ -136,7 +136,7 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getQuestions: [Question]
-  getFormDraft: [formDraft]
+  getFormDraft: [FormDraft]
 }
 
 type Mutation {
@@ -205,7 +205,7 @@ type Mutation {
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
   createOrUpdateQuestion(question: QuestionInput!): Question
-  createOrUpdateFormDraft(formDraft: formDraftInput!): formDraft
+  modifyDraftStatus(formDraft: FormDraftStatusModify!): FormDraft
   updateApplicationConfig(
     applicationConfig: ApplicationConfigurationInput
   ): ApplicationConfiguration
@@ -463,7 +463,7 @@ type Question {
   initialValue: String
 }
 
-type formDraft {
+type FormDraft {
   _id: ID
   event: String!
   status: String!
@@ -479,7 +479,7 @@ type DraftHistory {
   version: Int
   status: String
   comment: String
-  lastUpdateAt: Date
+  updatedAt: Date
 }
 
 type MesssageDescriptor {
@@ -596,7 +596,7 @@ input QuestionInput {
   fieldType: String
   preceedingFieldId: String
   required: Boolean
-  enabled: Boolean
+  enabled: String
   custom: Boolean
   initialValue: String
 }
@@ -607,6 +607,11 @@ input formDraftInput {
   event: String!
   status: String!
   comment: String
+}
+
+input FormDraftStatusModify {
+  event: String!
+  status: String!
 }
 
 type ApplicationConfiguration {

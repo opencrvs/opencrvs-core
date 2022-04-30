@@ -42,6 +42,12 @@ describe('Verify handler', () => {
   })
 
   it('modifyTaskBundle returns correct bundle', async () => {
+    jest
+      .spyOn(
+        require('../../../utils/formDraftUtils'),
+        'checkFormDraftStatusToAddTestExtension'
+      )
+      .mockReturnValue('')
     fetch.mockResponses(
       [taskResouceMock, { status: 200 }],
       [userMock, { status: 200 }],

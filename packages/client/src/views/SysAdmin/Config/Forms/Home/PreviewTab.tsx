@@ -91,7 +91,9 @@ function EventDrafts({ event }: { event: Event }) {
           actions
         ) : (
           <Pill
-            label={intl.formatMessage(draftStatusMessages.PUBLISHED)}
+            label={intl.formatMessage(
+              draftStatusMessages[DraftStatus.PUBLISHED]
+            )}
             type="active"
           />
         )

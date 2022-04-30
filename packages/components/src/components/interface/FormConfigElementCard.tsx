@@ -58,7 +58,7 @@ export interface IFormConfigElementCardProps {
   removable?: boolean
   isUpDisabled?: boolean
   isDownDisabled?: boolean
-  onClick?: () => void
+  onClick?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   onRemove?: () => void
   onMoveUp?: () => void
   onMoveDown?: () => void
@@ -81,7 +81,10 @@ export function FormConfigElementCard({
      * onClick event is for selecting the card so it should fire
      * only when the card is not selected
      */
-    <Card selected={selected} onClick={!selected ? onClick : undefined}>
+    <Card
+      selected={selected}
+      onClick={(event) => (!selected ? onClick && onClick(event) : undefined)}
+    >
       <ChildrenContainer>{children}</ChildrenContainer>
       <Controls>
         {movable && selected && (

@@ -20,7 +20,7 @@ import {
 
 export function selectConfigFieldsState(store: IStoreState) {
   if (store.configFields.state === 'LOADING') {
-    throw new Error('ConfigFields not loaded yet')
+    throw new Error('Offline data not loaded yet')
   }
   return store.configFields
 }
@@ -47,9 +47,11 @@ function generateQuestionConfigs(configFields: ISectionFieldMap) {
   Object.values(configFields).forEach((sectionConfigFields) => {
     Object.values(sectionConfigFields).forEach((configField) => {
       if (!isDefaultField(configField)) {
-        questionConfigs.push(configField)
+        const { foregoingFieldId, ...rest } = configField
+        questionConfigs.push(rest)
       } else if (hasDefaultFieldChanged(configField)) {
-        questionConfigs.push(configField)
+        const { foregoingFieldId, identifiers, ...rest } = configField
+        questionConfigs.push(rest)
       }
     })
   })
