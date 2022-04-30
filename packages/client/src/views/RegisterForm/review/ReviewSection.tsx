@@ -1548,16 +1548,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(declaration, sec.id)
                 return (
-                  <ListViewSimplifiedSectionContainer>
+                  <ListViewSimplifiedSectionContainer key={index}>
                     {sec.title && (
-                      <ListViewSimplifiedLabel>
+                      <ListViewSimplifiedTitle>
                         {sec.title}
                         {sec.action && (
                           <LinkButton onClick={sec.action.handler}>
                             {sec.action.label}
                           </LinkButton>
                         )}
-                      </ListViewSimplifiedLabel>
+                      </ListViewSimplifiedTitle>
                     )}
                     <DocumentListPreviewContainer>
                       <DocumentListPreview

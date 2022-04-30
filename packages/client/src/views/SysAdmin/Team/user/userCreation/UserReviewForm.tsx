@@ -47,7 +47,8 @@ import {
 import {
   PrimaryButton,
   SuccessButton,
-  ICON_ALIGNMENT
+  ICON_ALIGNMENT,
+  LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
 import {
@@ -65,6 +66,17 @@ import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdm
 import { Check } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
+import {
+  ListViewSimplifiedSectionContainer,
+  ListViewSimplifiedTitle,
+  ListViewSimplifiedLabel,
+  ListViewSimplifiedValue
+} from '@client/views/RegisterForm/review/ReviewSection'
+import {
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import styled from 'styled-components'
 
 export interface IUserReviewFormProps {
   userId?: string
@@ -92,6 +104,13 @@ interface ISectionData {
 type IFullProps = IUserReviewFormProps &
   IntlShapeProps &
   RouteComponentProps<{ userId?: string }>
+
+const Container = styled.div`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 24px;
+  }
+`
+
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
@@ -216,10 +235,48 @@ class UserReviewFormComponent extends React.Component<
             {intl.formatMessage(section.name)}
           </FormTitle>
         )}
-        {this.transformSectionData().map((sec, index) => (
-          <ListView key={index} {...sec} />
-        ))}
-        <Action>{actionComponent}</Action>
+        <Container>
+          {this.transformSectionData().map((sec, index) => {
+            return (
+              <ListViewSimplifiedSectionContainer key={index}>
+                {sec.title && (
+                  <ListViewSimplifiedTitle>{sec.title}</ListViewSimplifiedTitle>
+                )}
+                <ListViewSimplified>
+                  {sec.items.map((item, index) => {
+                    return (
+                      <ListViewItemSimplified
+                        key={index}
+                        label={
+                          <ListViewSimplifiedLabel>
+                            {item.label}
+                          </ListViewSimplifiedLabel>
+                        }
+                        value={
+                          <ListViewSimplifiedValue
+                            id={item.label.split(' ')[0]}
+                          >
+                            {item.value}
+                          </ListViewSimplifiedValue>
+                        }
+                        actions={
+                          <LinkButton
+                            id={item.action?.id}
+                            disabled={item.action?.disabled}
+                            onClick={item.action?.handler}
+                          >
+                            {item.action?.label}
+                          </LinkButton>
+                        }
+                      />
+                    )
+                  })}
+                </ListViewSimplified>
+              </ListViewSimplifiedSectionContainer>
+            )
+          })}
+          <Action>{actionComponent}</Action>
+        </Container>
       </ActionPageLight>
     )
   }
