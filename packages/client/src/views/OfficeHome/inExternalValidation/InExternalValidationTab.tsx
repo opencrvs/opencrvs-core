@@ -12,7 +12,6 @@
 import * as React from 'react'
 import {
   GridTable,
-  ColumnContentAlignment,
   COLUMNS,
   SORT_ORDER
 } from '@opencrvs/components/lib/interface'
@@ -24,25 +23,19 @@ import {
   dynamicConstantsMessages,
   constantsMessages
 } from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/registrarHome'
 import { connect } from 'react-redux'
 import { goToPage, goToDeclarationRecordAudit } from '@client/navigation'
-import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { formattedDuration } from '@client/utils/date-formatting'
 import {
   getSortedItems,
   changeSortedColumn
-} from '@client/views/OfficeHome/tabs/utils'
+} from '@client/views/OfficeHome/utils'
 import {
   IconWithName,
   IconWithNameEvent
-} from '@client/views/OfficeHome/tabs/components'
-import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
-import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
-import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
-import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
+} from '@client/views/OfficeHome/components'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 
 const { useState, useEffect } = React
 

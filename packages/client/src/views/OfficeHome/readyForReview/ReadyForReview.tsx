@@ -18,8 +18,8 @@ import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
-import { ITheme } from '@client/styledComponents'
-import { Scope } from '@client/utils/authUtils'
+import styled, { ITheme } from '@client/styledComponents'
+import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
   GridTable,
@@ -31,29 +31,37 @@ import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { withTheme } from 'styled-components'
+import ReactTooltip from 'react-tooltip'
 import {
-  buttonMessages,
   constantsMessages,
   dynamicConstantsMessages
 } from '@client/i18n/messages'
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import { messages } from '@client/i18n/messages/views/registrarHome'
+import {
+  IDeclaration,
+  DOWNLOAD_STATUS,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import { Action } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { withTheme } from 'styled-components'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
-  changeSortedColumn,
-  getSortedItems
-} from '@client/views/OfficeHome/tabs/utils'
-import {
   IconWithName,
   IconWithNameEvent
-} from '@client/views/OfficeHome/tabs/components'
-import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
+} from '@client/views/OfficeHome/components'
+import {
+  changeSortedColumn,
+  getSortedItems
+} from '@client/views/OfficeHome/utils'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 
-interface IBaseRejectTabProps {
+const ToolTipContainer = styled.span`
+  text-align: center;
+`
+interface IBaseReviewTabProps {
   theme: ITheme
   scope: Scope | null
   goToPage: typeof goToPage
@@ -70,29 +78,26 @@ interface IBaseRejectTabProps {
   error?: boolean
 }
 
-interface IRejectTabState {
+interface IReviewTabState {
   width: number
   sortedCol: COLUMNS
   sortOrder: SORT_ORDER
 }
 
-type IRejectTabProps = IntlShapeProps & IBaseRejectTabProps
+type IReviewTabProps = IntlShapeProps & IBaseReviewTabProps
 
-class RequiresUpdateRegistrarComponent extends React.Component<
-  IRejectTabProps,
-  IRejectTabState
+class ReadyForReviewComponent extends React.Component<
+  IReviewTabProps,
+  IReviewTabState
 > {
-  constructor(props: IRejectTabProps) {
+  pageSize = 10
+  constructor(props: IReviewTabProps) {
     super(props)
     this.state = {
       width: window.innerWidth,
       sortedCol: COLUMNS.NAME,
       sortOrder: SORT_ORDER.ASCENDING
     }
-  }
-
-  userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
   }
 
   componentDidMount() {
@@ -107,6 +112,10 @@ class RequiresUpdateRegistrarComponent extends React.Component<
     this.setState({ width: window.innerWidth })
   }
 
+  userHasRegisterScope() {
+    return this.props.scope && hasRegisterScope(this.props.scope)
+  }
+
   onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
@@ -119,64 +128,7 @@ class RequiresUpdateRegistrarComponent extends React.Component<
     })
   }
 
-  getColumns = () => {
-    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-      return [
-        {
-          width: 30,
-          label: this.props.intl.formatMessage(constantsMessages.name),
-          key: COLUMNS.ICON_WITH_NAME,
-          isSorted: this.state.sortedCol === COLUMNS.NAME,
-          sortFunction: this.onColumnClick
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.event),
-          width: 16,
-          key: COLUMNS.EVENT,
-          isSorted: this.state.sortedCol === COLUMNS.EVENT,
-          sortFunction: this.onColumnClick
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.eventDate),
-          width: 18,
-          key: COLUMNS.DATE_OF_EVENT,
-          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
-          sortFunction: this.onColumnClick
-        },
-        {
-          label: this.props.intl.formatMessage(
-            constantsMessages.sentForUpdates
-          ),
-          width: 18,
-          key: COLUMNS.SENT_FOR_UPDATES,
-          isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_UPDATES,
-          sortFunction: this.onColumnClick
-        },
-        {
-          width: 18,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: COLUMNS.ACTIONS,
-          isActionColumn: true
-        }
-      ]
-    } else {
-      return [
-        {
-          label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 70,
-          key: COLUMNS.ICON_WITH_NAME_EVENT
-        },
-        {
-          width: 30,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: COLUMNS.ACTIONS,
-          isActionColumn: true
-        }
-      ]
-    }
-  }
-
-  transformRejectedContent = (data: GQLEventSearchResultSet) => {
+  transformDeclaredContent = (data: GQLEventSearchResultSet) => {
     const { intl } = this.props
     if (!data || !data.results) {
       return []
@@ -194,7 +146,7 @@ class RequiresUpdateRegistrarComponent extends React.Component<
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         if (this.state.width > this.props.theme.grid.breakpoints.lg) {
           actions.push({
-            label: this.props.intl.formatMessage(buttonMessages.update),
+            label: this.props.intl.formatMessage(constantsMessages.review),
             handler: () => {},
             disabled: true
           })
@@ -215,7 +167,7 @@ class RequiresUpdateRegistrarComponent extends React.Component<
       } else {
         if (this.state.width > this.props.theme.grid.breakpoints.lg) {
           actions.push({
-            label: this.props.intl.formatMessage(buttonMessages.update),
+            label: this.props.intl.formatMessage(constantsMessages.review),
             handler: (
               e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
             ) => {
@@ -241,41 +193,46 @@ class RequiresUpdateRegistrarComponent extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
-      const sentForUpdates =
-        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
-          ? new Date(reg.modifiedAt)
-          : new Date(Number(reg.modifiedAt))) || ''
+      const isValidatedOnReview =
+        reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
+        this.userHasRegisterScope()
+          ? true
+          : false
       const dateOfEvent =
-        reg.dateOfEvent &&
-        reg.dateOfEvent.length > 0 &&
-        new Date(reg.dateOfEvent)
+        (reg.dateOfEvent &&
+          reg.dateOfEvent.length > 0 &&
+          new Date(reg.dateOfEvent)) ||
+        ''
+      const createdAt = (reg.createdAt && parseInt(reg.createdAt)) || ''
       return {
         ...reg,
         event,
+        dateOfEvent,
+        sentForReview: createdAt,
         name: reg.name && reg.name.toLowerCase(),
         iconWithName: (
           <IconWithName
             status={reg.declarationStatus}
             name={reg.name}
             isDuplicate={isDuplicate}
+            isValidatedOnReview={isValidatedOnReview}
           />
         ),
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.declarationStatus}
             name={reg.name}
-            event={reg.event}
+            event={event}
+            isValidatedOnReview={isValidatedOnReview}
             isDuplicate={isDuplicate}
           />
         ),
-        sentForUpdates,
-        dateOfEvent,
         actions,
         rowClickHandler: [
           {
             label: 'rowClickHandler',
             handler: () =>
-              this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
+              this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
           }
         ]
       }
@@ -290,14 +247,69 @@ class RequiresUpdateRegistrarComponent extends React.Component<
         ...item,
         dateOfEvent:
           item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
-        sentForUpdates:
-          item.sentForUpdates && formattedDuration(item.sentForUpdates as Date)
+        sentForReview:
+          item.sentForReview && formattedDuration(item.sentForReview as number)
       }
     })
   }
 
+  getColumns = () => {
+    if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 30,
+          key: COLUMNS.ICON_WITH_NAME,
+          sortFunction: this.onColumnClick,
+          isSorted: this.state.sortedCol === COLUMNS.NAME
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 16,
+          key: COLUMNS.EVENT,
+          sortFunction: this.onColumnClick,
+          isSorted: this.state.sortedCol === COLUMNS.EVENT
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.eventDate),
+          width: 18,
+          key: COLUMNS.DATE_OF_EVENT,
+          sortFunction: this.onColumnClick,
+          isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT
+        },
+        {
+          label: this.props.intl.formatMessage(constantsMessages.sentForReview),
+          width: 18,
+          key: COLUMNS.SENT_FOR_REVIEW,
+          sortFunction: this.onColumnClick,
+          isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_REVIEW
+        },
+        {
+          width: 18,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true,
+          alignment: ColumnContentAlignment.RIGHT
+        }
+      ]
+    } else {
+      return [
+        {
+          label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 70,
+          key: COLUMNS.ICON_WITH_NAME_EVENT
+        },
+        {
+          width: 30,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
+        }
+      ]
+    }
+  }
+
   render() {
-    const { intl, queryData, paginationId, onPageChange, pageSize } = this.props
+    const { intl, queryData, paginationId, pageSize, onPageChange } = this.props
     const { data } = queryData
     const totalPages = this.props.queryData.data.totalItems
       ? Math.ceil(this.props.queryData.data.totalItems / pageSize)
@@ -309,8 +321,10 @@ class RequiresUpdateRegistrarComponent extends React.Component<
         : false
     return (
       <WQContentWrapper
-        title={intl.formatMessage(navigationMessages.requiresUpdateRegistrar)}
-        isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
+        title={intl.formatMessage(navigationMessages.readyForReview)}
+        isMobileSize={
+          this.state.width < this.props.theme.grid.breakpoints.lg ? true : false
+        }
         isShowPagination={isShowPagination}
         paginationId={paginationId}
         totalPages={totalPages}
@@ -318,12 +332,19 @@ class RequiresUpdateRegistrarComponent extends React.Component<
         loading={this.props.loading}
         error={this.props.error}
         noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'sent for updates'
+          tab: 'are ready for review'
         })}
-        noContent={this.transformRejectedContent(data).length <= 0}
+        noContent={this.transformDeclaredContent(data).length <= 0}
       >
+        <ReactTooltip id="validateTooltip">
+          <ToolTipContainer>
+            {this.props.intl.formatMessage(
+              messages.validatedDeclarationTooltipForRegistrar
+            )}
+          </ToolTipContainer>
+        </ReactTooltip>
         <GridTable
-          content={this.transformRejectedContent(data)}
+          content={this.transformDeclaredContent(data)}
           columns={this.getColumns()}
           clickable={true}
           loading={this.props.loading}
@@ -343,8 +364,8 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const RequiresUpdateRegistrar = connect(mapStateToProps, {
+export const ReadyForReview = connect(mapStateToProps, {
   goToPage,
   goToReviewDuplicate,
   goToDeclarationRecordAudit
-})(injectIntl(withTheme(RequiresUpdateRegistrarComponent)))
+})(injectIntl(withTheme(ReadyForReviewComponent)))

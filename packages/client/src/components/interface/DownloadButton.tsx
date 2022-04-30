@@ -12,10 +12,9 @@
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from '@client/styledComponents'
-import { constantsMessages } from '@client/i18n/messages'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { Warning, Download } from '@opencrvs/components/lib/icons'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { Download } from '@opencrvs/components/lib/icons'
+import { IconButton } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import {
   downloadDeclaration,
@@ -54,7 +53,7 @@ const StatusIndicator = styled.div<{
   justify-content: ${({ isLoading }) =>
     isLoading ? `space-between` : `flex-end`};
 `
-const DownloadAction = styled(TertiaryButton)`
+const DownloadAction = styled(IconButton)`
   border-radius: 50%;
   height: 40px;
   width: 36px;

@@ -23,7 +23,6 @@ import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formattedDuration } from '@client/utils/date-formatting'
 import {
-  LoadingIndicator,
   IOnlineStatusProps,
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
@@ -54,12 +53,12 @@ import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
   getSortedItems
-} from '@client/views/OfficeHome/tabs/utils'
+} from '@client/views/OfficeHome/utils'
 import {
   IconWithName,
   IconWithNameEvent
-} from '@client/views/OfficeHome/tabs/components'
-import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
+} from '@client/views/OfficeHome/components'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { SUBMISSION_STATUS } from '@client/declarations'
 interface IProps {
   userDetails: IUserDetails | null

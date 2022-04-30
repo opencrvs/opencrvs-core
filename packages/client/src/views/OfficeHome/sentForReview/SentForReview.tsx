@@ -41,13 +41,13 @@ import { Event } from '@client/forms'
 import {
   getSortedItems,
   changeSortedColumn
-} from '@client/views/OfficeHome/tabs/utils'
+} from '@client/views/OfficeHome/utils'
 import {
   IconWithName,
   IconWithNameEvent,
   SubmissionStatusMap
-} from '@client/views/OfficeHome/tabs/components'
-import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
+} from '@client/views/OfficeHome/components'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 const DECLARATIONS_DAY_LIMIT = 7
 
 interface ISentForReviewProps {

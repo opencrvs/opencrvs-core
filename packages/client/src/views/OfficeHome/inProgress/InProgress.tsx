@@ -68,12 +68,12 @@ import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
 import {
   IconWithName,
   IconWithNameEvent
-} from '@client/views/OfficeHome/tabs/components'
+} from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
   getSortedItems
-} from '@client/views/OfficeHome/tabs/utils'
-import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
+} from '@client/views/OfficeHome/utils'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { constant } from 'lodash'
 
 interface IQueryData {

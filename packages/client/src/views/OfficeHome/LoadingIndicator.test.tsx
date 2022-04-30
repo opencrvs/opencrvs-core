@@ -32,20 +32,4 @@ describe('LoadingIndicator test cases', () => {
     ).length
     expect(isShowingLoadingText).toBe(1)
   })
-
-  it('Should display No declaration', async () => {
-    // @ts-ignore
-    const testComponent = await createTestComponent(
-      <LoadingIndicator
-        loading={false}
-        hasError={false}
-        noDeclaration={true}
-      />,
-      { store, history }
-    )
-    const isShowingLoadingText = testComponent.find(
-      'span#no-declaration-text'
-    ).length
-    expect(isShowingLoadingText).toBe(1)
-  })
 })

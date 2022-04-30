@@ -9,74 +9,71 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
+import { IDeclaration } from '@client/declarations'
 import {
-  goToDeclarationRecordAudit,
-  goToPrintCertificate
-} from '@client/navigation'
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/registrarHome'
+import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
+import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
-import { ITheme } from '@client/styledComponents'
+import { IStoreState } from '@client/store'
+import styled, { ITheme } from '@client/styledComponents'
 import {
-  ColumnContentAlignment,
   GridTable,
-  IAction,
-  SORT_ORDER,
-  COLUMNS
+  COLUMNS,
+  SORT_ORDER
 } from '@opencrvs/components/lib/interface'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
+import ReactTooltip from 'react-tooltip'
 import { withTheme } from 'styled-components'
-import {
-  buttonMessages,
-  constantsMessages,
-  dynamicConstantsMessages
-} from '@client/i18n/messages'
-import { IStoreState } from '@client/store'
-import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
-import { Action } from '@client/forms'
-import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
   getSortedItems
-} from '@client/views/OfficeHome/tabs/utils'
+} from '@client/views/OfficeHome/utils'
 import {
   IconWithName,
   IconWithNameEvent
-} from '@client/views/OfficeHome/tabs/components'
-import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-interface IBasePrintTabProps {
+} from '@client/views/OfficeHome/components'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+const ToolTipContainer = styled.span`
+  text-align: center;
+`
+interface IBaseApprovalTabProps {
   theme: ITheme
-  goToPrintCertificate: typeof goToPrintCertificate
+  goToPage: typeof goToPage
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
   queryData: {
     data: GQLEventSearchResultSet
   }
   paginationId: number
+  pageSize: number
   onPageChange: (newPageNumber: number) => void
   loading?: boolean
   error?: boolean
-  pageSize: number
 }
 
-interface IPrintTabState {
+interface IApprovalTabState {
   width: number
   sortedCol: COLUMNS
   sortOrder: SORT_ORDER
 }
 
-type IPrintTabProps = IntlShapeProps & IBasePrintTabProps
+type IApprovalTabProps = IntlShapeProps & IBaseApprovalTabProps
 
-class ReadyToPrintComponent extends React.Component<
-  IPrintTabProps,
-  IPrintTabState
+class SentForApprovalComponent extends React.Component<
+  IApprovalTabProps,
+  IApprovalTabState
 > {
-  constructor(props: IPrintTabProps) {
+  pageSize = 10
+  constructor(props: IApprovalTabProps) {
     super(props)
     this.state = {
       width: window.innerWidth,
@@ -95,12 +92,6 @@ class ReadyToPrintComponent extends React.Component<
 
   recordWindowWidth = () => {
     this.setState({ width: window.innerWidth })
-  }
-
-  getExpandable = () => {
-    return this.state.width > this.props.theme.grid.breakpoints.lg
-      ? true
-      : false
   }
 
   onColumnClick = (columnName: string) => {
@@ -140,103 +131,48 @@ class ReadyToPrintComponent extends React.Component<
           sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.registered),
+          label: this.props.intl.formatMessage(
+            constantsMessages.sentForApproval
+          ),
           width: 18,
-          key: COLUMNS.REGISTERED,
-          isSorted: this.state.sortedCol === COLUMNS.REGISTERED,
+          key: COLUMNS.SENT_FOR_APPROVAL,
+          isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_APPROVAL,
           sortFunction: this.onColumnClick
-        },
-        {
-          width: 18,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: COLUMNS.ACTIONS,
-          isActionColumn: true
         }
       ]
     } else {
       return [
         {
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 70,
+          width: 90,
           key: COLUMNS.ICON_WITH_NAME_EVENT
-        },
-        {
-          width: 30,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: COLUMNS.ACTIONS,
-          isActionColumn: true
         }
       ]
     }
   }
 
-  transformRegisteredContent = (data: GQLEventSearchResultSet) => {
+  transformValidatedContent = (data: GQLEventSearchResultSet) => {
     const { intl } = this.props
     if (!data || !data.results) {
       return []
     }
-
     const transformedData = transformData(data, this.props.intl)
-    const items = transformedData.map((reg, index) => {
-      const foundDeclaration = this.props.outboxDeclarations.find(
-        (declaration) => declaration.id === reg.id
-      )
-      const actions: IAction[] = []
-      const downloadStatus =
-        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
-      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-          actions.push({
-            label: this.props.intl.formatMessage(buttonMessages.print),
-            handler: () => {},
-            disabled: true
-          })
-        }
-        actions.push({
-          actionComponent: (
-            <DownloadButton
-              downloadConfigs={{
-                event: reg.event,
-                compositionId: reg.id,
-                action: Action.LOAD_REVIEW_DECLARATION
-              }}
-              key={`DownloadButton-${index}`}
-              status={downloadStatus as DOWNLOAD_STATUS}
-            />
-          )
-        })
-      } else {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-          actions.push({
-            label: this.props.intl.formatMessage(buttonMessages.print),
-            handler: (
-              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-            ) => {
-              e && e.stopPropagation()
-              this.props.goToPrintCertificate(
-                reg.id,
-                reg.event.toLocaleLowerCase() || ''
-              )
-            }
-          })
-        }
-        actions.push({ actionComponent: <Downloaded /> })
-      }
+    const items = transformedData.map((reg) => {
       const event =
         (reg.event &&
           intl.formatMessage(
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
+      const sentForApproval =
+        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
+          ? new Date(reg.modifiedAt)
+          : new Date(Number(reg.modifiedAt))) || ''
       const dateOfEvent =
         reg.dateOfEvent &&
         reg.dateOfEvent.length > 0 &&
         new Date(reg.dateOfEvent)
-      const registered =
-        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
-          ? new Date(reg.modifiedAt)
-          : new Date(Number(reg.modifiedAt))) || ''
       return {
         ...reg,
         event,
@@ -251,14 +187,16 @@ class ReadyToPrintComponent extends React.Component<
             event={event}
           />
         ),
+        eventTimeElapsed:
+          (reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))) ||
+          '',
         dateOfEvent,
-        registered,
-        actions,
+        sentForApproval,
         rowClickHandler: [
           {
             label: 'rowClickHandler',
             handler: () =>
-              this.props.goToDeclarationRecordAudit('printTab', reg.id)
+              this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
           }
         ]
       }
@@ -268,20 +206,20 @@ class ReadyToPrintComponent extends React.Component<
       this.state.sortedCol,
       this.state.sortOrder
     )
-
     return sortedItems.map((item) => {
       return {
         ...item,
         dateOfEvent:
           item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
-        registered:
-          item.registered && formattedDuration(item.registered as Date)
+        sentForApproval:
+          item.sentForApproval &&
+          formattedDuration(item.sentForApproval as Date)
       }
     })
   }
 
   render() {
-    const { intl, queryData, paginationId, onPageChange, pageSize } = this.props
+    const { intl, queryData, paginationId, pageSize, onPageChange } = this.props
     const { data } = queryData
     const totalPages = this.props.queryData.data.totalItems
       ? Math.ceil(this.props.queryData.data.totalItems / pageSize)
@@ -293,21 +231,28 @@ class ReadyToPrintComponent extends React.Component<
         : false
     return (
       <WQContentWrapper
-        title={intl.formatMessage(navigationMessages.print)}
+        title={intl.formatMessage(navigationMessages.approvals)}
         isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
         paginationId={paginationId}
         totalPages={totalPages}
         onPageChange={onPageChange}
+        noResultText={intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'sent for approval'
+        })}
         loading={this.props.loading}
         error={this.props.error}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'are ready to print'
-        })}
-        noContent={this.transformRegisteredContent(data).length <= 0}
+        noContent={this.transformValidatedContent(data).length <= 0}
       >
+        <ReactTooltip id="validatedTooltip">
+          <ToolTipContainer>
+            {this.props.intl.formatMessage(
+              messages.validatedDeclarationTooltipForRegistrationAgent
+            )}
+          </ToolTipContainer>
+        </ReactTooltip>
         <GridTable
-          content={this.transformRegisteredContent(data)}
+          content={this.transformValidatedContent(data)}
           columns={this.getColumns()}
           clickable={true}
           loading={this.props.loading}
@@ -322,11 +267,12 @@ class ReadyToPrintComponent extends React.Component<
 
 function mapStateToProps(state: IStoreState) {
   return {
+    scope: getScope(state),
     outboxDeclarations: state.declarationsState.declarations
   }
 }
 
-export const ReadyToPrint = connect(mapStateToProps, {
-  goToPrintCertificate,
+export const SentForApproval = connect(mapStateToProps, {
+  goToPage,
   goToDeclarationRecordAudit
-})(injectIntl(withTheme(ReadyToPrintComponent)))
+})(injectIntl(withTheme(SentForApprovalComponent)))

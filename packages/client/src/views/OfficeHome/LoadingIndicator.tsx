@@ -29,8 +29,14 @@ const Loading = styled(Spinner)`
     margin: auto;
   }
 `
+
+const ConnectivityContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`
 const NoConnectivity = styled(NoWifi)`
-  margin-right: 13px;
+  margin: auto;
 `
 const Wrapper = styled.div`
   display: flex;
@@ -44,18 +50,18 @@ const LoadingContainer = styled.div`
     padding-left: 20px;
   }
 `
-
-const Text = styled.span`
+const Text = styled.div`
   ${({ theme }) => theme.fonts.reg16};
-  display: flex;
+  text-align: center;
+  margin: auto;
 `
 
-const MobileViewContainer = styled.div`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+const MobileViewContainer = styled.div<{ noDeclaration?: boolean }>`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     position: fixed;
     left: 0;
     right: 0;
-    top: 50%;
+    ${({ noDeclaration }) => (noDeclaration ? `top:55%;` : `top:50%;`)}
   }
 `
 
@@ -78,24 +84,19 @@ export class LoadingIndicatorComp extends React.Component<IProps> {
             <Loading id="Spinner" baseColor="#4C68C1" />
           </LoadingContainer>
         )}
-        <MobileViewContainer>
+        <MobileViewContainer noDeclaration={noDeclaration}>
           {this.props.isOnline && hasError && (
             <ErrorText id="search-result-error-text-count">
               {intl.formatMessage(errorMessages.queryError)}
             </ErrorText>
           )}
-          {this.props.isOnline && noDeclaration && (
-            <Text id="no-declaration-text">
-              {intl.formatMessage(errorMessages.noDeclaration)}
-            </Text>
-          )}
           {!this.props.isOnline && (
-            <>
+            <ConnectivityContainer>
               <NoConnectivity />
               <Text id="wait-connection-text">
                 {intl.formatMessage(errorMessages.waitingForConnection)}
               </Text>
-            </>
+            </ConnectivityContainer>
           )}
         </MobileViewContainer>
       </Wrapper>

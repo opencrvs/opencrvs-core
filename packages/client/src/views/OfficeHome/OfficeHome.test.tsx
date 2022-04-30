@@ -32,7 +32,7 @@ import { merge } from 'lodash'
 import * as React from 'react'
 
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
-import { SELECTOR_ID } from './tabs/inProgress/InProgress'
+import { SELECTOR_ID } from './inProgress/InProgress'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const registerScopeToken =

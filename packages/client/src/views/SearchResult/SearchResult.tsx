@@ -74,8 +74,8 @@ import { Navigation } from '@client/components/interface/Navigation'
 import {
   IconWithName,
   IconWithNameEvent
-} from '@client/views/OfficeHome/tabs/components'
-import { WQContentWrapper } from '@client/views/OfficeHome/tabs/WQContentWrapper'
+} from '@client/views/OfficeHome/components'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 const ErrorText = styled.div`
