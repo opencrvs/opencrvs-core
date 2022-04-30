@@ -223,7 +223,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.declarationRequestedCorrectionOn'
   },
   declarationStarted: {
-    defaultMessage: 'Declaration started',
+    defaultMessage: 'Started',
     description: 'Label for table header column Declaration started',
     id: 'constants.declarationStarted'
   },

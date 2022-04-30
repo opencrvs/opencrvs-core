@@ -666,7 +666,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   return (
     <SysAdminContentWrapper id="workflow-status" isCertificatesConfigPage>
       <Content
-        title={'Registration by Status'}
+        title={intl.formatMessage(messages.registrationByStatus)}
         size={ContentSize.LARGE}
         filterContent={
           <FilterContainer>
