@@ -23,7 +23,8 @@ import { goToPerformanceHome, goToCompletenessRates } from '@client/navigation'
 
 import {
   FilterContainer,
-  getJurisidictionType
+  getJurisidictionType,
+  CompletenessRateTime
 } from '@client/views/SysAdmin/Performance/utils'
 import {
   SysAdminContentWrapper,
@@ -60,11 +61,12 @@ export enum REG_RATE_BASE {
   TIME = 'TIME',
   LOCATION = 'LOCATION'
 }
+
 interface ISearchParams {
-  title: string
   locationId: string
   timeStart: string
   timeEnd: string
+  time: CompletenessRateTime
 }
 interface IDispatchProps {
   goToPerformanceHome: typeof goToPerformanceHome
@@ -123,7 +125,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
     },
     goToPerformanceHome
   } = props
-  const { locationId, timeStart, timeEnd, title } = parse(
+  const { locationId, timeStart, timeEnd, time } = parse(
     search
   ) as unknown as ISearchParams
 
@@ -176,10 +178,10 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                   onChangeLocation={(newLocationId) => {
                     props.goToCompletenessRates(
                       eventType as Event,
-                      title,
                       newLocationId,
                       dateStart,
-                      dateEnd
+                      dateEnd,
+                      time
                     )
                   }}
                 />
@@ -190,12 +192,53 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                     startDate.setDate(startDate.getDate() + 1)
                     props.goToCompletenessRates(
                       eventType as Event,
-                      title,
                       locationId as string,
                       startDate,
-                      endDate
+                      endDate,
+                      time
                     )
                   }}
+                />
+                <PerformanceSelect
+                  onChange={(option) =>
+                    props.goToCompletenessRates(
+                      eventType as Event,
+                      locationId,
+                      dateStart,
+                      dateEnd,
+                      option.value as CompletenessRateTime
+                    )
+                  }
+                  id="completenessRateTimeSelect"
+                  withLightTheme={true}
+                  value={time}
+                  options={[
+                    {
+                      label: intl.formatMessage(
+                        messages.performanceWithinTargetDaysLabel,
+                        {
+                          target:
+                            window.config[
+                              (eventType.toUpperCase() as 'BIRTH') || 'DEATH'
+                            ].REGISTRATION_TARGET,
+                          withPrefix: false
+                        }
+                      ),
+                      value: CompletenessRateTime.WithinTarget
+                    },
+                    {
+                      label: intl.formatMessage(
+                        messages.performanceWithin1YearLabel
+                      ),
+                      value: CompletenessRateTime.Within1Year
+                    },
+                    {
+                      label: intl.formatMessage(
+                        messages.performanceWithin5YearsLabel
+                      ),
+                      value: CompletenessRateTime.Within5Years
+                    }
+                  ]}
                 />
               </FilterContainer>
             )

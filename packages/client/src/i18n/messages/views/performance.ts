@@ -101,7 +101,8 @@ const messagesToDefine = {
   },
   performanceWithinTargetDaysLabel: {
     id: 'performance.values.labels.withinTargetDays',
-    defaultMessage: 'Registered within {target} days',
+    defaultMessage:
+      '{withPrefix, select, true {Registered within} other {Within}} {target} days',
     description: 'Label text for displays showing registered within target days'
   },
   performanceWithin1YearLabel: {

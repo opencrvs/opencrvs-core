@@ -24,7 +24,8 @@ import {
   calculateTotal,
   PerformanceListHeader,
   PerformanceListSubHeader,
-  ReportContainer
+  ReportContainer,
+  CompletenessRateTime
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { useIntl } from 'react-intl'
@@ -34,11 +35,13 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 interface CompletenessReportProps {
   data: GQLTotalMetricsResult
   selectedEvent: 'BIRTH' | 'DEATH'
+  onClickDetails: (time: CompletenessRateTime) => void
 }
 
 export function CompletenessReport({
   data,
-  selectedEvent
+  selectedEvent,
+  onClickDetails
 }: CompletenessReportProps) {
   const intl = useIntl()
   return (
@@ -64,7 +67,8 @@ export function CompletenessReport({
         label={
           <PerformanceTitle>
             {intl.formatMessage(messages.performanceWithinTargetDaysLabel, {
-              target: window.config[selectedEvent].REGISTRATION_TARGET
+              target: window.config[selectedEvent].REGISTRATION_TARGET,
+              withPrefix: true
             })}
           </PerformanceTitle>
         }
@@ -122,7 +126,11 @@ export function CompletenessReport({
           </div>
         }
         actions={
-          <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+          <LinkButton
+            onClick={() => onClickDetails(CompletenessRateTime.WithinTarget)}
+          >
+            {intl.formatMessage(buttonMessages.view)}
+          </LinkButton>
         }
       />
       <ListViewItemSimplified
@@ -194,7 +202,11 @@ export function CompletenessReport({
           </div>
         }
         actions={
-          <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+          <LinkButton
+            onClick={() => onClickDetails(CompletenessRateTime.Within1Year)}
+          >
+            {intl.formatMessage(buttonMessages.view)}
+          </LinkButton>
         }
       />
       <ListViewItemSimplified
@@ -251,7 +263,11 @@ export function CompletenessReport({
           </div>
         }
         actions={
-          <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+          <LinkButton
+            onClick={() => onClickDetails(CompletenessRateTime.Within5Years)}
+          >
+            {intl.formatMessage(buttonMessages.view)}
+          </LinkButton>
         }
       />
     </ReportContainer>

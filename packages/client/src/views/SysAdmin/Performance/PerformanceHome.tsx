@@ -55,12 +55,14 @@ import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/Paym
 import { CertificationRateComponent } from '@client/views/SysAdmin/Performance/CertificationRateComponent'
 import {
   certificationRatesDummyData,
-  Description
+  Description,
+  CompletenessRateTime
 } from '@client/views/SysAdmin/Performance/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
 import { PerformanceStats } from './PerformanceStats'
 import { SubHeader } from './utils'
+import { goToCompletenessRates } from '@client/navigation'
 
 const Layout = styled.div`
   display: flex;
@@ -133,6 +135,10 @@ interface IConnectProps {
   offices: { [key: string]: ILocation }
 }
 
+interface IDispatchProps {
+  goToCompletenessRates: typeof goToCompletenessRates
+}
+
 interface ISearchParams {
   event: Event
   locationId: string
@@ -153,7 +159,8 @@ interface State {
 }
 
 type Props = WrappedComponentProps &
-  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps & {
+  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps &
+  IDispatchProps & {
     theme: ITheme
   }
 
@@ -216,6 +223,17 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     this.setState({
       toggleStatus: !this.state.toggleStatus
     })
+  }
+
+  onClickDetails = (time: CompletenessRateTime) => {
+    const { event, selectedLocation, timeStart, timeEnd } = this.state
+    this.props.goToCompletenessRates(
+      event,
+      selectedLocation.id,
+      timeStart,
+      timeEnd,
+      time
+    )
   }
 
   getFilter = (intl: IntlShape, selectedLocation: ISearchLocation) => {
@@ -334,6 +352,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       <CompletenessReport
                         data={data!.getTotalMetrics}
                         selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
+                        onClickDetails={this.onClickDetails}
                       />
                       <RegistrationsReport
                         data={data!.getTotalMetrics}
@@ -493,6 +512,10 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const PerformanceHome = connect(mapStateToProps)(
-  withTheme(injectIntl(PerformanceHomeComponent))
-)
+const mapDispatchToProps = {
+  goToCompletenessRates
+}
+export const PerformanceHome = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withTheme(injectIntl(PerformanceHomeComponent)))

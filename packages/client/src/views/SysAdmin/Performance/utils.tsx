@@ -233,3 +233,9 @@ export function getJurisdictionLocationIdFromUserDetails(
 
   return location && location.id
 }
+
+export enum CompletenessRateTime {
+  WithinTarget = 'withinTarget',
+  Within1Year = 'within1Year',
+  Within5Years = 'within5Years'
+}

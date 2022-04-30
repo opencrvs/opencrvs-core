@@ -56,7 +56,10 @@ import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
-import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import {
+  getJurisdictionLocationIdFromUserDetails,
+  CompletenessRateTime
+} from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import {
   goBack as back,
@@ -421,18 +424,18 @@ export function goToCreateNewUserWithLocationId(locationId: string) {
 
 export function goToCompletenessRates(
   eventType: Event,
-  title: string,
   locationId: string,
   timeStart: Date,
-  timeEnd: Date
+  timeEnd: Date,
+  time = CompletenessRateTime.WithinTarget
 ) {
   return push({
     pathname: formatUrl(EVENT_COMPLETENESS_RATES, { eventType }),
     search: stringify({
       locationId,
-      title,
       timeStart: timeStart.toISOString(),
-      timeEnd: timeEnd.toISOString()
+      timeEnd: timeEnd.toISOString(),
+      time
     })
   })
 }
