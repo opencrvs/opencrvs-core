@@ -128,6 +128,10 @@ import { DocumentListPreview } from '@client/components/form/DocumentUploadfield
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
 import { isCorrection } from '@client/views/CorrectionForm/utils'
+import {
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -196,12 +200,55 @@ const FormData = styled.div`
     padding: 24px;
   }
 `
-const FormDataHeader = styled.div`
-  ${({ theme }) => theme.fonts.h1}
+export const ListViewSimplifiedTitle = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  ${({ theme }) => theme.fonts.h2};
+  margin-bottom: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h2}
+    ${({ theme }) => theme.fonts.h3};
+    flex-direction: column;
+    align-items: flex-start;
+    button > div {
+      padding: 0;
+    }
+    gap: 0;
   }
 `
+export const ListViewSimplifiedLabel = styled.label`
+  ${({ theme }) => theme.fonts.bold16};
+  flex: 1;
+  margin-right: 10%;
+  max-width: 40%;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    max-width: 100%;
+    ${({ theme }) => theme.fonts.bold16};
+    margin-right: auto;
+  }
+`
+export const ListViewSimplifiedValue = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  flex: 1;
+  overflow-wrap: break-word;
+  max-width: 50%;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    ${({ theme }) => theme.fonts.reg16};
+    max-width: 100%;
+    margin-right: auto;
+  }
+`
+export const ListViewSimplifiedSectionContainer = styled.div`
+  margin-bottom: 30px;
+`
+
+const DocumentListPreviewContainer = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: block;
+  }
+`
+
 const InputWrapper = styled.div`
   margin-top: 56px;
 `
@@ -1501,19 +1548,56 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(declaration, sec.id)
                 return (
-                  <ListView
-                    responsiveContents={
+                  <ListViewSimplifiedSectionContainer>
+                    {sec.title && (
+                      <ListViewSimplifiedLabel>
+                        {sec.title}
+                        {sec.action && (
+                          <LinkButton onClick={sec.action.handler}>
+                            {sec.action.label}
+                          </LinkButton>
+                        )}
+                      </ListViewSimplifiedLabel>
+                    )}
+                    <DocumentListPreviewContainer>
                       <DocumentListPreview
                         id={sec.id}
                         documents={uploadedDocuments}
                         onSelect={this.selectForPreview}
                         dropdownOptions={selectOptions}
                       />
-                    }
-                    key={index}
-                    {...sec}
-                    id={'Section_' + sec.id}
-                  />
+                    </DocumentListPreviewContainer>
+                    <ListViewSimplified id={'Section_' + sec.id}>
+                      {sec.items.map((item, index) => {
+                        return (
+                          <ListViewItemSimplified
+                            key={index}
+                            label={
+                              <ListViewSimplifiedLabel>
+                                {item.label}
+                              </ListViewSimplifiedLabel>
+                            }
+                            value={
+                              <ListViewSimplifiedValue
+                                id={item.label.split(' ')[0]}
+                              >
+                                {item.value}
+                              </ListViewSimplifiedValue>
+                            }
+                            actions={
+                              <LinkButton
+                                id={item.action.id}
+                                disabled={item.action.disabled}
+                                onClick={item.action.handler}
+                              >
+                                {item.action.label}
+                              </LinkButton>
+                            }
+                          />
+                        )
+                      })}
+                    </ListViewSimplified>
+                  </ListViewSimplifiedSectionContainer>
                 )
               })}
               {event === Event.BIRTH && !isCorrection(declaration) && (
