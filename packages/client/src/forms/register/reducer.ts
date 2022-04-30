@@ -10,22 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop } from 'redux-loop'
-import {
-  IForm,
-  BirthSection,
-  DeathSection,
-  ISerializedForm,
-  Event
-} from '@client/forms'
+import { IForm, BirthSection, DeathSection, Event } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
-import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { registerForms } from '@client/forms/configuration/default'
 import { messages } from '@client/i18n/messages/views/review'
-import {
-  configureRegistrationForm,
-  filterQuestionsByEventType,
-  sortFormCustomisations
-} from '@client/forms/configuration'
+import { getConfiguredOrDefaultForm } from '@client/forms/configuration'
 
 export type IRegisterFormState =
   | {
@@ -57,30 +45,10 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
 ): IRegisterFormState | Loop<IRegisterFormState, Action> => {
   switch (action.type) {
     case offlineActions.READY:
-    case offlineActions.CONTENT_LOADED:
-      const configuredBirthForm: ISerializedForm = configureRegistrationForm(
-        sortFormCustomisations(
-          filterQuestionsByEventType(
-            action.payload.formConfig?.questionConfig,
-            Event.BIRTH
-          ),
-          registerForms.birth
-        ),
-        registerForms.birth
-      )
-      const configuredDeathForm: ISerializedForm = configureRegistrationForm(
-        sortFormCustomisations(
-          filterQuestionsByEventType(
-            action.payload.formConfig?.questionConfig,
-            Event.DEATH
-          ),
-          registerForms.death
-        ),
-        registerForms.death
-      )
-      const birth = deserializeForm(configuredBirthForm)
-      const death = deserializeForm(configuredDeathForm)
-
+    case offlineActions.APPLICATION_CONFIG_LOADED:
+      const { formConfig } = action.payload
+      const birth = getConfiguredOrDefaultForm(formConfig, Event.BIRTH)
+      const death = getConfiguredOrDefaultForm(formConfig, Event.DEATH)
       const preview = {
         viewType: 'preview' as const,
         name: messages.previewName,

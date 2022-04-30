@@ -9,17 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import { CustomFieldForms } from '@client/components/formConfig/CustomFieldForm'
-import { AddCustomField } from '@client/forms/configuration/configFields/actions'
-import { IEventTypes } from '@client/forms/configuration/configFields/reducer'
+import { addCustomField } from '@client/forms/configuration/configFields/actions'
 import {
-  IConfigFormField,
-  ICustomFieldAttribute,
-  prepareNewCustomFieldConfig
+  prepareNewCustomFieldConfig,
+  IConfigField,
+  isDefaultField,
+  IConfigFieldMap
 } from '@client/forms/configuration/configFields/utils'
-import { getDefaultLanguage } from '@client/i18n/utils'
-
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useIntl } from 'react-intl'
+import { Redirect, useParams } from 'react-router'
 import { HOME } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
@@ -30,11 +31,6 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { SettingsBlue } from '@opencrvs/components/lib/icons'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
-import React from 'react'
-import { IntlShape, useIntl } from 'react-intl'
-import { useDispatch, useSelector } from 'react-redux'
-import { Redirect, useParams } from 'react-router'
-import { useHasNatlSysAdminScope, useLoadFormDraft } from './hooks'
 import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import {
@@ -42,17 +38,24 @@ import {
   BirthSection,
   DeathSection,
   WizardSection,
-  IFormField
+  QuestionConfigFieldType
 } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
-import { selectEventFormDraft } from '@client/forms/configuration/selector'
+import { Dispatch } from 'redux'
+import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
 import { constantsMessages } from '@client/i18n/messages/constants'
-import { goToFormConfig, goToFormConfigWizard } from '@client/navigation'
-import { Dispatch } from 'redux'
+import { messages } from '@client/i18n/messages/views/formConfig'
+import { goToFormConfigHome, goToFormConfigWizard } from '@client/navigation'
+import { getScope } from '@client/profile/profileSelectors'
+import { AuthScope } from '@client/utils/authUtils'
+import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+import { SaveActionModal, SaveActionContext } from './SaveActionModal'
+import { SaveActionNotification } from './SaveActionNotification'
 import { FormConfigSettings } from './FormConfigSettings'
 import { flushSync } from 'react-dom'
+import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
 
 const Container = styled.div`
   display: flex;
@@ -109,62 +112,6 @@ type IRouteProps = {
   section: string
 }
 
-const DEFAULT_TEXT: IFormField = {
-  name: 'customField',
-  previewGroup: '',
-  type: 'TEXT',
-  label: {
-    defaultMessage: 'Custom text input',
-    description: 'Custom field label',
-    id: 'form.customField.label.customField'
-  },
-  validate: [],
-  required: false,
-  hidden: false,
-  initialValue: '',
-  mapping: {
-    template: ['', () => {}]
-  }
-}
-
-const DEFAULT_CUSTOM_FIELD_ATTRIBUTE: ICustomFieldAttribute = {
-  label: [
-    {
-      lang: getDefaultLanguage(),
-      descriptor: DEFAULT_TEXT.label
-    }
-  ]
-}
-
-const customField: IConfigFormField = {
-  fieldId: 'customField',
-  precedingFieldId: null,
-  foregoingFieldId: null,
-  required: false,
-  enabled: 'enabled',
-  custom: true,
-  customizedFieldAttributes: DEFAULT_CUSTOM_FIELD_ATTRIBUTE,
-  definition: {
-    ...DEFAULT_TEXT
-  }
-}
-
-const topBarActions = (event: Event, intl: IntlShape, dispatch: Dispatch) => {
-  return [
-    <TertiaryButton
-      id="settings"
-      icon={() => <SettingsBlue />}
-      onClick={() => dispatch(goToFormConfigWizard(event, 'settings'))}
-    ></TertiaryButton>,
-    <SecondaryButton key="save" size="small" onClick={() => {}}>
-      {intl.formatMessage(buttonMessages.save)}
-    </SecondaryButton>,
-    <SuccessButton key="publish" size="small" onClick={() => {}}>
-      {intl.formatMessage(buttonMessages.publish)}
-    </SuccessButton>
-  ]
-}
-
 function isValidEvent(event: string): event is Event {
   return Object.values<string>(Event).includes(event)
 }
@@ -177,55 +124,67 @@ function isValidSection(section: string): section is WizardSection {
   ].includes(section)
 }
 
-function useNewDraftVersion(event: Event) {
-  const formDraft = useSelector((store: IStoreState) =>
-    selectEventFormDraft(store, event)
-  )
-  return (formDraft?.version || 0) + 1
+function useHasNatlSysAdminScope() {
+  const scope = useSelector(getScope)
+  return scope?.includes(AuthScope.NATLSYSADMIN)
 }
 
+function isSelectedFieldValid(
+  selectedField: IConfigField | null,
+  section: string
+): selectedField is IConfigField {
+  return !!selectedField?.fieldId.includes(section)
+}
+
+/* TODO: move this into FormTools */
 function formToolClickListener(
-  fieldType: string,
-  state: IEventTypes,
+  fieldType: QuestionConfigFieldType,
+  fieldsMap: IConfigFieldMap,
   event: Event,
   section: string,
-  setSelectedField: React.Dispatch<
-    React.SetStateAction<IConfigFormField | null>
-  >,
+  setSelectedField: React.Dispatch<React.SetStateAction<IConfigField | null>>,
   dispatch: Dispatch
 ) {
-  const modifiedFieldMap = {
-    ...customField,
-    definition: {
-      ...customField.definition,
-      type: fieldType as IFormField['type']
-    }
-  } as IConfigFormField
-
   const customFieldConfig = prepareNewCustomFieldConfig(
-    state,
+    fieldsMap,
     event,
     section,
-    modifiedFieldMap
+    fieldType
   )
   if (!customFieldConfig) {
     return
   }
-  dispatch(AddCustomField(event, section, customFieldConfig))
+  dispatch(addCustomField(event, section, customFieldConfig))
   flushSync(() => setSelectedField(customFieldConfig))
   document.getElementById(customFieldConfig.fieldId)?.scrollIntoView()
 }
 
 export function FormConfigWizard() {
-  useLoadFormDraft()
-  const [selectedField, setSelectedField] =
-    React.useState<IConfigFormField | null>(null)
+  const [selectedField, setSelectedField] = React.useState<IConfigField | null>(
+    null
+  )
   const hasNatlSysAdminScope = useHasNatlSysAdminScope()
   const dispatch = useDispatch()
   const intl = useIntl()
   const { event, section } = useParams<IRouteProps>()
-  const version = useNewDraftVersion(event)
-  const state = useSelector((store: IStoreState) => store.configFields)
+  const fieldsMap = useSelector((store: IStoreState) =>
+    selectConfigFields(store, event, section)
+  )
+  const { version } = useSelector((store: IStoreState) =>
+    selectFormDraft(store, event)
+  )
+  const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
+
+  /*
+   * We need to clear the selected field if section changes
+   * as the changed section won't have the previously selected field
+   */
+  React.useEffect(() => {
+    if (selectedField && !selectedField.fieldId.includes(section)) {
+      setSelectedField(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section])
 
   if (
     !hasNatlSysAdminScope ||
@@ -235,57 +194,80 @@ export function FormConfigWizard() {
     return <Redirect to={HOME} />
   }
 
-  if (
-    selectedField &&
-    undefined === (state as IEventTypes)[event][section][selectedField.fieldId]
-  ) {
-    setSelectedField(null)
-  }
+  // if (
+  //   selectedField &&
+  //   undefined === (state as IEventTypes)[event][section][selectedField.fieldId]
+  // ) {
+  //   setSelectedField(null)
+  // }
 
   return (
     <Container>
       <EventTopBar
-        title={`${intl.formatMessage(constantsMessages[event])} v${version}`}
+        title={intl.formatMessage(messages.draftLabel, {
+          event: intl.formatMessage(constantsMessages[event]),
+          version: version + 1
+        })}
         pageIcon={<></>}
-        topBarActions={topBarActions(event, intl, dispatch)}
-        goHome={() => dispatch(goToFormConfig())}
+        topBarActions={[
+          <TertiaryButton
+            id="settings"
+            icon={() => <SettingsBlue />}
+            onClick={() => dispatch(goToFormConfigWizard(event, 'settings'))}
+          ></TertiaryButton>,
+          <SecondaryButton
+            key="save"
+            size="small"
+            disabled={status === ActionStatus.PROCESSING}
+            onClick={() => setStatus(ActionStatus.MODAL)}
+          >
+            {intl.formatMessage(buttonMessages.save)}
+          </SecondaryButton>,
+          <SuccessButton key="publish" size="small" onClick={() => {}}>
+            {intl.formatMessage(buttonMessages.publish)}
+          </SuccessButton>
+        ]}
+        goHome={() => dispatch(goToFormConfigHome())}
       />
       <WizardContainer>
         <NavigationContainer>
-          <SectionNavigation
-            event={event}
-            section={section}
-            onSectionChange={setSelectedField}
-          />
+          <SectionNavigation />
         </NavigationContainer>
         {section !== 'settings' ? (
           <>
             <CanvasWrapper onClick={() => setSelectedField(null)}>
               <CanvasContainer>
                 <Canvas
-                  event={event}
-                  section={section}
                   selectedField={selectedField}
                   onFieldSelect={(field) => setSelectedField(field)}
                 />
               </CanvasContainer>
             </CanvasWrapper>
             <ToolsContainer>
-              {selectedField ? (
-                !selectedField.custom ? (
+              {/*
+               *  The useEffect hook for clearing the selectedField takes
+               *  effect after the render for when the section changes so
+               *  for that particular render where the section has changed
+               *  but the selectedField is still from the previous section
+               *  we need to make sure that the selectedField is valid
+               */}
+              {isSelectedFieldValid(selectedField, section) ? (
+                isDefaultField(selectedField) ? (
                   <DefaultFieldTools configField={selectedField} />
                 ) : (
                   <CustomFieldForms
                     key={selectedField.fieldId}
+                    event={event}
+                    section={section}
                     selectedField={selectedField}
                   />
                 )
               ) : (
                 <FormTools
-                  onAddClickListener={(fieldType: string) =>
+                  onAddClickListener={(fieldType: QuestionConfigFieldType) =>
                     formToolClickListener(
                       fieldType,
-                      state as IEventTypes,
+                      fieldsMap,
                       event,
                       section,
                       setSelectedField,
@@ -295,6 +277,10 @@ export function FormConfigWizard() {
                 />
               )}
             </ToolsContainer>
+            <SaveActionContext.Provider value={{ status, setStatus }}>
+              <SaveActionModal />
+              <SaveActionNotification />
+            </SaveActionContext.Provider>
           </>
         ) : (
           <FormConfigSettings />

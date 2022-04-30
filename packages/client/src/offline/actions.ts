@@ -20,6 +20,8 @@ import {
   IApplicationConfig
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
+import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
+import { IQuestionConfig } from '@client/forms'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -85,11 +87,6 @@ export const ASSETS_FAILED = 'OFFLINE/ASSETS_FAILED'
 export type AssetsFailedAction = {
   type: typeof ASSETS_FAILED
   payload: Error
-}
-
-export const APPLICATION_CONFIG_LOAD = 'OFFLINE/APPLICATION_CONFIG_LOAD'
-export type ApplicationConfigLoadAction = {
-  type: typeof APPLICATION_CONFIG_LOAD
 }
 
 export const APPLICATION_CONFIG_LOADED = 'OFFLINE/APPLICATION_CONFIG_LOADED'
@@ -221,10 +218,6 @@ export const offlineDataUpdated = (state: IOfflineData) => ({
   payload: state
 })
 
-export const configLoad = (): ApplicationConfigLoadAction => ({
-  type: APPLICATION_CONFIG_LOAD
-})
-
 export const configLoaded = (
   payload: IApplicationConfigResponse
 ): ApplicationConfigLoadedAction => ({
@@ -249,6 +242,43 @@ export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
 })
 
+export const UPDATE_OFFLINE_FORM_DRAFT = 'OFFLINE/UPDATE_FORM_DRAFT'
+export type UpdateOfflineFormDraftAction = {
+  type: typeof UPDATE_OFFLINE_FORM_DRAFT
+  payload: {
+    formDrafts: IDraft[]
+  }
+}
+
+export const updateOfflineFormDraft = (
+  formDrafts: IDraft[]
+): UpdateOfflineFormDraftAction => ({
+  type: UPDATE_OFFLINE_FORM_DRAFT,
+  payload: {
+    formDrafts
+  }
+})
+
+export const UPDATE_OFFLINE_QUESTION_CONFIG = 'OFFLINE/UPDATE_QUESTION_CONFIG'
+export type UpdateOfflineQuestionConfigAction = {
+  type: typeof UPDATE_OFFLINE_QUESTION_CONFIG
+  payload: {
+    formDraft: IDraft
+    questionConfig: IQuestionConfig[]
+  }
+}
+
+export const updateOfflineQuestionConfig = (
+  formDraft: IDraft,
+  questionConfig: IQuestionConfig[]
+): UpdateOfflineQuestionConfigAction => ({
+  type: UPDATE_OFFLINE_QUESTION_CONFIG,
+  payload: {
+    formDraft,
+    questionConfig
+  }
+})
+
 export type Action =
   | GetLocations
   | LocationsFailedAction
@@ -264,10 +294,11 @@ export type Action =
   | ContentLoadedAction
   | AssetsLoadedAction
   | AssetsFailedAction
-  | ApplicationConfigLoadAction
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
+  | UpdateOfflineFormDraftAction
+  | UpdateOfflineQuestionConfigAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>

@@ -25,16 +25,18 @@ import applicationConfigHandler, {
 } from '@config/handlers/application/applicationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
-} from '@config/handlers/createQuestion/handler'
+} from '@config/handlers/question/createQuestion/handler'
 import updateQuestionHandler, {
   requestSchema as updateQuestionReqSchema
-} from '@config/handlers/updateQuestion/handler'
-import getQuestionsHandler from '@config/handlers/getQuestions/handler'
+} from '@config/handlers/question/updateQuestion/handler'
+import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
 import {
-  updateFormDraftHandler,
-  requestSchema as updateFormDraftReqSchema
-} from '@config/handlers/updateFormDraft/handler'
-import getFormDraft from '@config/handlers/getFormDraft/handler'
+  createOrUpdateFormDraftHandler,
+  requestSchema as updateFormDraftReqSchema,
+  modifyDraftStatusHandler,
+  modifyFormDraftStatus
+} from '@config/handlers/formDraft/createOrupdateFormDraft/handler'
+import getFormDrafts from '@config/handlers/formDraft/getFormDraft/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -152,9 +154,44 @@ export default function getRoutes() {
       }
     },
     {
+      method: 'GET',
+      path: '/formDraft',
+      handler: getFormDrafts,
+      config: {
+        tags: ['api'],
+        description: 'Get form draft',
+        auth: {
+          scope: [
+            RouteScope.NATLSYSADMIN,
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        }
+      }
+    },
+    {
+      method: 'PUT',
+      path: '/formDraftStatus',
+      handler: modifyDraftStatusHandler,
+      config: {
+        tags: ['api'],
+        description: 'Change form draft status',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: modifyFormDraftStatus
+        }
+      }
+    },
+    {
       method: 'PUT',
       path: '/draftQuestions',
-      handler: updateFormDraftHandler,
+      handler: createOrUpdateFormDraftHandler,
       config: {
         tags: ['api'],
         description: 'Update form draft & questions',
@@ -163,18 +200,6 @@ export default function getRoutes() {
         },
         validate: {
           payload: updateFormDraftReqSchema
-        }
-      }
-    },
-    {
-      method: 'GET',
-      path: '/formDraft',
-      handler: getFormDraft,
-      config: {
-        tags: ['api'],
-        description: 'Get form draft',
-        auth: {
-          scope: [RouteScope.NATLSYSADMIN]
         }
       }
     },

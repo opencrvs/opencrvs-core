@@ -10,40 +10,29 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import {
-  getContentKey,
-  IConfigFormField,
-  getCertificateHandlebar
-} from './utils'
+import { getContentKey, getCertificateHandlebar } from './utils'
+import { IFormField } from '@client/forms'
 
-const configFormField: IConfigFormField = {
-  fieldId: 'event.section.group.fieldId',
-  precedingFieldId: null,
-  foregoingFieldId: null,
-  enabled: 'enabled',
-  required: true,
-  custom: false,
-  definition: {
-    name: 'dummyField',
-    type: 'TEXT',
-    label: {
-      id: 'test.dummy'
-    },
-    mapping: {
-      template: ['dummyHandlebar', () => {}]
-    },
-    validate: [() => undefined]
-  }
+const mockFormField: IFormField = {
+  name: 'dummyField',
+  type: 'TEXT',
+  label: {
+    id: 'test.dummy'
+  },
+  mapping: {
+    template: ['dummyHandlebar', () => {}]
+  },
+  validate: [() => undefined]
 }
 
 describe('getContentKey', () => {
   it('should return the key if available', () => {
-    expect(getContentKey(configFormField)).toBe('test.dummy')
+    expect(getContentKey(mockFormField)).toBe('test.dummy')
   })
 })
 
 describe('getCertificateHandlebar', () => {
   it('should return the certificate handlebar if available', () => {
-    expect(getCertificateHandlebar(configFormField)).toBe('dummyHandlebar')
+    expect(getCertificateHandlebar(mockFormField)).toBe('dummyHandlebar')
   })
 })

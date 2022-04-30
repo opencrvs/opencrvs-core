@@ -9,14 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IMessage, NUMBER, TEL, TEXT, TEXTAREA } from '@client/forms'
-import { ModifyCustomField } from '@client/forms/configuration/configFields/actions'
-import { IEventTypes } from '@client/forms/configuration/configFields/reducer'
+import {
+  IMessage,
+  NUMBER,
+  TEL,
+  TEXT,
+  TEXTAREA,
+  BirthSection,
+  DeathSection,
+  Event
+} from '@client/forms'
+import { modifyCustomField } from '@client/forms/configuration/configFields/actions'
 import {
   CUSTOM_GROUP_NAME,
   getCertificateHandlebar,
   getEventSectionGroupFromFieldID,
-  IConfigFormField
+  ICustomConfigField,
+  getFieldDefinition
 } from '@client/forms/configuration/configFields/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
@@ -37,8 +46,10 @@ import { Tooltip } from '@opencrvs/components/lib/icons'
 import { Box } from '@opencrvs/components/lib/interface'
 import { camelCase } from 'lodash'
 import * as React from 'react'
-import { injectIntl, IntlShape, MessageDescriptor } from 'react-intl'
+import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
 import { connect } from 'react-redux'
+import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
+import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
 
 const CustomFieldFormContainer = styled(Box)`
   box-shadow: none;
@@ -117,13 +128,10 @@ const CErrorText = styled(ErrorText)`
   width: 200px;
 `
 
-type IFullProps = {
-  intl: IntlShape
-  selectedField: IConfigFormField
-  configFields: IEventTypes
-} & {
-  ModifyCustomField: typeof ModifyCustomField
-}
+type IFullProps = IProps &
+  IntlShapeProp &
+  ReturnType<typeof mapStateToProps> &
+  typeof mapDispatchToProps
 
 interface ICustomField {
   label: string
@@ -161,44 +169,29 @@ class CustomFieldFormsComp extends React.Component<
   _initialize() {
     const defaultLanguage = getDefaultLanguage()
     const languages = this._getLanguages()
-    const { selectedField } = this.props
+    const { selectedField, formField } = this.props
 
     const fieldForms: { [key: string]: ICustomField } = {}
 
     Object.keys(languages).map((lang) => {
       fieldForms[lang] = {
-        label: this._getIntlMessage(
-          selectedField.customizedFieldAttributes?.label,
-          lang
-        ),
-        placeholder: this._getIntlMessage(
-          selectedField.customizedFieldAttributes?.placeholder,
-          lang
-        ),
-        description: this._getIntlMessage(
-          selectedField.customizedFieldAttributes?.description,
-          lang
-        ),
-        tooltip: this._getIntlMessage(
-          selectedField.customizedFieldAttributes?.tooltip,
-          lang
-        ),
-        errorMessage: this._getIntlMessage(
-          selectedField.customizedFieldAttributes?.errorMessage,
-          lang
-        )
+        label: this._getIntlMessage(selectedField.label, lang),
+        placeholder: this._getIntlMessage(selectedField.placeholder, lang),
+        description: this._getIntlMessage(selectedField.description, lang),
+        tooltip: this._getIntlMessage(selectedField.tooltip, lang),
+        errorMessage: this._getIntlMessage(selectedField.errorMessage, lang)
       }
     })
 
     this.state = {
       isFieldDuplicate: false,
       handleBars:
-        getCertificateHandlebar(selectedField) ||
+        getCertificateHandlebar(formField) ||
         camelCase(fieldForms[defaultLanguage].label),
       selectedLanguage: defaultLanguage,
       hideField: selectedField.enabled,
       requiredField: selectedField.required || false,
-      maxLength: selectedField.customizedFieldAttributes?.maxLength,
+      maxLength: selectedField.maxLength,
       fieldForms
     }
   }
@@ -241,37 +234,30 @@ class CustomFieldFormsComp extends React.Component<
     return `${event}.${section}.${CUSTOM_GROUP_NAME}.${this.state.handleBars}`
   }
 
-  _prepareModifiedFormField(): IConfigFormField {
-    const { selectedField } = this.props
+  _prepareModifiedFormField(): ICustomConfigField {
+    const { selectedField, formField } = this.props
     const { fieldForms, handleBars } = this.state
     const dl = getDefaultLanguage()
     const languages = this._getLanguages()
     const newFieldID = this._generateNewFieldID()
     const modifiedField = { ...selectedField }
 
-    if (modifiedField.customizedFieldAttributes === undefined) {
-      modifiedField.customizedFieldAttributes = {
-        label: []
-      }
+    if (modifiedField.label === undefined) {
+      modifiedField.label = []
     }
 
     modifiedField.required = this.state.requiredField
     modifiedField.enabled = this.state.hideField
     modifiedField.fieldId = newFieldID
 
-    modifiedField.customizedFieldAttributes.label = Object.keys(languages).map(
-      (lang) => ({
-        lang,
-        descriptor: {
-          ...modifiedField.definition.label,
-          defaultMessage: this.state.fieldForms[lang].label
-        }
-      })
-    )
+    modifiedField.label = Object.keys(languages).map((lang) => ({
+      lang,
+      descriptor: {
+        defaultMessage: this.state.fieldForms[lang].label
+      }
+    }))
 
-    modifiedField.customizedFieldAttributes.placeholder = Object.keys(
-      languages
-    ).map((lang) => ({
+    modifiedField.placeholder = Object.keys(languages).map((lang) => ({
       lang,
       descriptor: {
         id: `form.customField.placeholder.${handleBars}`,
@@ -280,9 +266,7 @@ class CustomFieldFormsComp extends React.Component<
       }
     }))
 
-    modifiedField.customizedFieldAttributes.description = Object.keys(
-      languages
-    ).map((lang) => ({
+    modifiedField.description = Object.keys(languages).map((lang) => ({
       lang,
       descriptor: {
         id: `form.customField.description.${handleBars}`,
@@ -291,9 +275,7 @@ class CustomFieldFormsComp extends React.Component<
       }
     }))
 
-    modifiedField.customizedFieldAttributes.tooltip = Object.keys(
-      languages
-    ).map((lang) => ({
+    modifiedField.tooltip = Object.keys(languages).map((lang) => ({
       lang,
       descriptor: {
         id: `form.customField.tooltip.${handleBars}`,
@@ -302,71 +284,37 @@ class CustomFieldFormsComp extends React.Component<
       }
     }))
 
-    modifiedField.customizedFieldAttributes.errorMessage = Object.keys(
-      languages
-    ).map((lang) => ({
+    modifiedField.errorMessage = Object.keys(languages).map((lang) => ({
       lang,
       descriptor: {
         id: `form.customField.errorMessage.${getCertificateHandlebar(
-          modifiedField
+          formField
         )}`,
         description: 'Custom field attribute',
         defaultMessage: fieldForms[lang].errorMessage || ' '
       }
     }))
 
-    modifiedField.customizedFieldAttributes.maxLength = this.state.maxLength
-
-    modifiedField.definition.name = newFieldID
-    modifiedField.definition.label =
-      modifiedField.customizedFieldAttributes.label.find(
-        (item) => item.lang === dl
-      )?.descriptor as MessageDescriptor
-
-    modifiedField.definition.placeholder =
-      modifiedField.customizedFieldAttributes.placeholder.find(
-        (item) => item.lang === dl
-      )?.descriptor as MessageDescriptor
-
-    modifiedField.definition.description =
-      modifiedField.customizedFieldAttributes.description.find(
-        (item) => item.lang === dl
-      )?.descriptor as MessageDescriptor
-
-    modifiedField.definition.tooltip =
-      modifiedField.customizedFieldAttributes.tooltip.find(
-        (item) => item.lang === dl
-      )?.descriptor as MessageDescriptor
-
-    if (fieldForms[dl].tooltip.trim() === '') {
-      delete modifiedField.definition.tooltip
-    }
-
-    if (modifiedField.definition.mapping?.template?.length !== undefined) {
-      modifiedField.definition.mapping.template[0] = handleBars
-    }
+    modifiedField.maxLength = this.state.maxLength
 
     return modifiedField
   }
 
   _isFieldNameDuplicate(): boolean {
-    const { configFields, selectedField } = this.props
-    const { event, section } = getEventSectionGroupFromFieldID(
-      selectedField.fieldId
-    )
+    const { fieldsMap, selectedField } = this.props
     const newGeneratedFieldID = this._generateNewFieldID()
 
     if (selectedField.fieldId === newGeneratedFieldID) {
       return false
     }
 
-    return newGeneratedFieldID in configFields[event][section]
+    return newGeneratedFieldID in fieldsMap
   }
 
   _getHeadingText(): string {
     const { selectedField, intl } = this.props
 
-    switch (selectedField.definition.type) {
+    switch (selectedField.fieldType) {
       case TEXT:
         return intl.formatMessage(
           customFieldFormMessages.customTextFieldHeading
@@ -459,7 +407,7 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   inputFields() {
-    const { intl, selectedField, ModifyCustomField } = this.props
+    const { intl, selectedField, modifyCustomField, formField } = this.props
     const languages = this._getLanguages()
     const defaultLanguage = getDefaultLanguage()
 
@@ -482,7 +430,7 @@ class CustomFieldFormsComp extends React.Component<
                         handleBars:
                           defaultLanguage === this.state.selectedLanguage
                             ? camelCase(
-                                value || getCertificateHandlebar(selectedField)
+                                value || getCertificateHandlebar(formField)
                               )
                             : this.state.handleBars,
                         fieldForms: {
@@ -612,7 +560,7 @@ class CustomFieldFormsComp extends React.Component<
                     return
                   }
                   const modifiedField = this._prepareModifiedFormField()
-                  ModifyCustomField(selectedField, modifiedField)
+                  modifyCustomField(selectedField, modifiedField)
                 }}
                 disabled={!this._isFormValid()}
               >
@@ -656,14 +604,23 @@ class CustomFieldFormsComp extends React.Component<
   }
 }
 
-const mapStateToProps = (store: IStoreState) => {
+type IProps = {
+  event: Event
+  selectedField: ICustomConfigField
+  section: BirthSection | DeathSection
+}
+
+const mapStateToProps = (store: IStoreState, props: IProps) => {
+  const { event, selectedField, section } = props
+  const formSection = getRegisterFormSection(store, section, event)
   return {
-    configFields: store.configFields as IEventTypes
+    fieldsMap: selectConfigFields(store, event, section),
+    formField: getFieldDefinition(formSection, selectedField)
   }
 }
 
 const mapDispatchToProps = {
-  ModifyCustomField
+  modifyCustomField
 }
 
 export const CustomFieldForms = connect(

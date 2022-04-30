@@ -9,10 +9,26 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormField } from '@client/forms'
-import { ApplicationConfigLoadedAction } from '@client/offline/actions'
-import { IConfigFieldsState } from './reducer'
-import { IConfigFormField } from './utils'
+import { ICustomConfigField } from './utils'
+import { IQuestionConfig, Event } from '@client/forms'
+import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
+
+export const UPDATE_CONFIG_FIELDS = 'FORM/UPDATE_CONFIG_FIELDS'
+export type UpdateConfigFieldsAction = {
+  type: typeof UPDATE_CONFIG_FIELDS
+  payload: {
+    questionConfig: IQuestionConfig[]
+  }
+}
+
+export const updateConfigFields = (
+  questionConfig: IQuestionConfig[]
+): UpdateConfigFieldsAction => ({
+  type: UPDATE_CONFIG_FIELDS,
+  payload: {
+    questionConfig
+  }
+})
 
 export const GET_STORAGE_CONFIG_FIELDS_SUCCESS =
   'FORM/GET_STORAGE_CONFIG_FIELDS_SUCCESS'
@@ -40,19 +56,6 @@ export const getStorageConfigFieldsFailed = (
 ): GetStorageConfigFieldsFailedAction => ({
   type: GET_STORAGE_CONFIG_FIELDS_FAILED,
   payload: response
-})
-
-export const STORE_CONFIG_FIELDS = 'FORM/STORE_CONFIG_FIELDS'
-export type StoreConfigFieldsAction = {
-  type: typeof STORE_CONFIG_FIELDS
-  payload: IConfigFieldsState
-}
-
-export const storeConfigFields = (
-  configFields: IConfigFieldsState
-): StoreConfigFieldsAction => ({
-  type: STORE_CONFIG_FIELDS,
-  payload: configFields
 })
 
 export const STORE_CONFIG_FIELDS_SUCCESS = 'FORM/STORE_CONFIG_FIELDS_SUCCESS'
@@ -85,15 +88,15 @@ export const ADD_CUSTOM_FIELD = 'FORM/ADD_CUSTOM_FIELD'
 export type AddCustomFieldAction = {
   type: typeof ADD_CUSTOM_FIELD
   payload: {
-    event: string
+    event: Event
     section: string
-    customField: IConfigFormField
+    customField: ICustomConfigField
   }
 }
-export const AddCustomField = (
-  event: string,
+export const addCustomField = (
+  event: Event,
   section: string,
-  customField: IConfigFormField
+  customField: ICustomConfigField
 ): AddCustomFieldAction => ({
   type: ADD_CUSTOM_FIELD,
   payload: {
@@ -107,13 +110,14 @@ export const MODIFY_CUSTOM_FIELD = 'FORM/MODIFY_CUSTOM_FIELD'
 export type ModifyCustomFieldAction = {
   type: typeof MODIFY_CUSTOM_FIELD
   payload: {
-    originalField: IConfigFormField
-    modifiedField: IConfigFormField
+    originalField: ICustomConfigField
+    modifiedField: ICustomConfigField
   }
 }
-export const ModifyCustomField = (
-  originalField: IConfigFormField,
-  modifiedField: IConfigFormField
+
+export const modifyCustomField = (
+  originalField: ICustomConfigField,
+  modifiedField: ICustomConfigField
 ): ModifyCustomFieldAction => ({
   type: MODIFY_CUSTOM_FIELD,
   payload: {
@@ -126,11 +130,12 @@ export const REMOVE_CUSTOM_FIELD = 'FORM/REMOVE_CUSTOM_FIELD'
 export type RemoveCustomFieldAction = {
   type: typeof REMOVE_CUSTOM_FIELD
   payload: {
-    selectedField: IConfigFormField
+    selectedField: ICustomConfigField
   }
 }
-export const RemoveCustomField = (
-  customField: IConfigFormField
+
+export const removeCustomField = (
+  customField: ICustomConfigField
 ): RemoveCustomFieldAction => ({
   type: REMOVE_CUSTOM_FIELD,
   payload: {
@@ -138,12 +143,32 @@ export const RemoveCustomField = (
   }
 })
 
+export const UPDATE_QUESTION_CONFIG = 'FORM/UPDATE_QUESTION_CONFIG'
+export type UpdateQuestionsAction = {
+  type: typeof UPDATE_QUESTION_CONFIG
+  payload: {
+    formDraft: IDraft
+    questionConfig: IQuestionConfig[]
+  }
+}
+
+export const updateQuestionConfig = (
+  formDraft: IDraft,
+  questionConfig: IQuestionConfig[]
+): UpdateQuestionsAction => ({
+  type: UPDATE_QUESTION_CONFIG,
+  payload: {
+    formDraft,
+    questionConfig
+  }
+})
+
 export type ConfigFieldsActions =
-  | ApplicationConfigLoadedAction
-  | StoreConfigFieldsAction
+  | UpdateConfigFieldsAction
   | StoreConfigFieldsSuccessAction
   | GetStorageConfigFieldsSuccessAction
   | GetStorageConfigFieldsFailedAction
   | AddCustomFieldAction
   | ModifyCustomFieldAction
   | RemoveCustomFieldAction
+  | UpdateQuestionsAction

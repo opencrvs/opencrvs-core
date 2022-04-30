@@ -65,12 +65,8 @@ import { RecordAudit } from './views/Home/RecordAudit'
 import { ChangePhonePage } from './views/Settings/ChangePhonePage'
 import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
-import {
-  FormConfiguration,
-  FormConfigWizard
-} from './views/SysAdmin/Config/Forms'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
-import { FormConfigSettings } from './views/SysAdmin/Config/Forms/FormConfigSettings'
+import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -236,8 +232,8 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={routes.FORM_CONFIG}
-                                            component={FormConfiguration}
+                                            path={routes.FORM_CONFIG_HOME}
+                                            component={FormConfigHome}
                                           />
                                           <ProtectedRoute
                                             path={

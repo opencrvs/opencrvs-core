@@ -23,8 +23,8 @@ import {
   navigationMessages
 } from '@client/i18n/messages/views/formConfig'
 import { goToFormConfigWizard } from '@client/navigation'
-import { connect, useDispatch } from 'react-redux'
-import { IConfigFormField } from '@client/forms/configuration/configFields/utils'
+import { useDispatch } from 'react-redux'
+import { useParams } from 'react-router'
 
 const Title = styled.h1`
   margin-top: 16px;
@@ -39,10 +39,9 @@ const OrderedList = styled.ol`
   padding: 0px;
 `
 
-interface IPageNavigationProps {
+interface IRouteProps {
   section: WizardSection
   event: Event
-  onSectionChange: React.Dispatch<React.SetStateAction<IConfigFormField | null>>
 }
 
 const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
@@ -52,13 +51,10 @@ const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
   }
 `
 
-export function SectionNavigation({
-  event,
-  section,
-  onSectionChange
-}: IPageNavigationProps) {
+export function SectionNavigation() {
   const intl = useIntl()
   const dispatch = useDispatch()
+  const { event, section } = useParams<IRouteProps>()
   const tabs = event === Event.BIRTH ? BirthSection : DeathSection
 
   return (
@@ -72,16 +68,12 @@ export function SectionNavigation({
           return (
             <li key={idx}>
               <PageItems
-                key={idx}
                 id={`${tab}_navigation`}
                 label={`${idx + 1}. ${intl.formatMessage(
                   navigationMessages[tab]
                 )}`}
                 isSelected={section === tab}
-                onClick={() => {
-                  dispatch(goToFormConfigWizard(event, tab))
-                  onSectionChange(null)
-                }}
+                onClick={() => dispatch(goToFormConfigWizard(event, tab))}
               />
             </li>
           )

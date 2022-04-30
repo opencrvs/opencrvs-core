@@ -9,19 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { Meta, Story } from '@storybook/react'
+import { Warning } from './Warning'
 import React from 'react'
-import { loadFormDraft } from '@client/forms/configuration/actions'
-import { useSelector, useDispatch } from 'react-redux'
-import { getScope } from '@client/profile/profileSelectors'
-import { hasNatlSysAdminScope } from '@client/utils/authUtils'
 
-export function useLoadFormDraft() {
-  const dispatch = useDispatch()
-  React.useEffect(() => {
-    dispatch(loadFormDraft())
-  }, [dispatch])
+const Template: Story<{ label: string }> = (args) => {
+  return <Warning {...args} />
 }
 
-export function useHasNatlSysAdminScope() {
-  return hasNatlSysAdminScope(useSelector(getScope))
+export default {
+  title: 'Components/Interface/Warning',
+  component: Warning
+} as Meta
+
+export const Default = Template.bind({})
+Default.args = {
+  label: 'Nothing is currently published. Awating to be published: Birth, Death'
 }

@@ -18,13 +18,23 @@ import {
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
 import { Tooltip } from '@opencrvs/components/lib/icons'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import { MessageDescriptor, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import {
-  IConfigFormField,
   getContentKey,
-  getCertificateHandlebar
+  getCertificateHandlebar,
+  IConfigField,
+  getFieldDefinition
 } from '@client/forms/configuration/configFields/utils'
-import { fieldTypeLabel } from '@client/forms'
+import { useSelector } from 'react-redux'
+import { IStoreState } from '@client/store'
+import { useParams } from 'react-router'
+import {
+  Event,
+  BirthSection,
+  DeathSection,
+  fieldTypeLabel
+} from '@client/forms'
+import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
 
 const Container = styled.div`
   display: flex;
@@ -80,15 +90,22 @@ const Body = styled.span`
 export function DefaultFieldTools({
   configField
 }: {
-  configField: IConfigFormField
+  configField: IConfigField
 }) {
   const intl = useIntl()
-  const handleBar = getCertificateHandlebar(configField)
-  const contentKey = getContentKey(configField)
-  const fieldLabel = fieldTypeLabel(configField.definition.type)
+  const { event, section } =
+    useParams<{ event: Event; section: BirthSection | DeathSection }>()
+  const formSection = useSelector((store: IStoreState) =>
+    getRegisterFormSection(store, section, event)
+  )
+  const formField = getFieldDefinition(formSection, configField)
+  const handleBar = getCertificateHandlebar(formField)
+  const contentKey = getContentKey(formField)
+  const fieldLabel = fieldTypeLabel(formField.type)
+
   return (
     <Container>
-      <Title>{intl.formatMessage(fieldLabel as MessageDescriptor)}</Title>
+      <Title>{intl.formatMessage(fieldLabel)}</Title>
       <ListViewSimplified bottomBorder>
         <ListViewItemSimplified
           label={<Label>{intl.formatMessage(messages.hideField)}</Label>}
@@ -104,7 +121,7 @@ export function DefaultFieldTools({
           actions={[
             <CenteredToggle
               key="requiredForRegistration"
-              selected={configField.definition.required}
+              selected={configField.required}
             />
           ]}
         />

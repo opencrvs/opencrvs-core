@@ -32,7 +32,6 @@ import {
 } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import { readFileSync } from 'fs'
-import { join } from 'path'
 import { graphql, print } from 'graphql'
 import * as jwt from 'jsonwebtoken'
 import * as React from 'react'
@@ -43,16 +42,10 @@ import { Provider } from 'react-redux'
 import { AnyAction, Store } from 'redux'
 import { waitForElement } from './wait-for-element'
 import { setUserDetails } from '@client/profile/profileActions'
-import {
-  createBrowserHistory,
-  createLocation,
-  createMemoryHistory,
-  History
-} from 'history'
+import { createLocation, createMemoryHistory, History } from 'history'
 import { stringify } from 'query-string'
 import { match as Match } from 'react-router'
 import { ConnectedRouter } from 'connected-react-router'
-import { IVerifyIDCertificateCollectorDefinition } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { mockOfflineData } from './mock-offline-data'
 
 export const registerScopeToken =
@@ -2570,22 +2563,21 @@ export const mockConfigResponse = {
   formConfig: mockOfflineData.formConfig
 }
 
+export const mockOfflineDataDispatch = {
+  languages: mockOfflineData.languages,
+  templates: mockOfflineData.templates,
+  locations: mockOfflineData.locations,
+  facilities: mockOfflineData.facilities,
+  pilotLocations: mockOfflineData.pilotLocations,
+  offices: mockOfflineData.offices,
+  assets: mockOfflineData.assets,
+  config: mockOfflineData.config,
+  formConfig: mockOfflineData.formConfig
+}
+
 export async function createTestStore() {
   const { store, history } = createStore()
-  await store.dispatch(
-    offlineDataReady({
-      languages: mockOfflineData.languages,
-      forms: mockOfflineData.forms,
-      templates: mockOfflineData.templates,
-      locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities,
-      pilotLocations: mockOfflineData.pilotLocations,
-      offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets,
-      config: mockOfflineData.config,
-      formConfig: mockOfflineData.formConfig
-    })
-  )
+  await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   return { store, history }
 }
 
@@ -2604,20 +2596,7 @@ export async function createTestComponent(
   },
   options?: MountRendererProps
 ) {
-  await store.dispatch(
-    offlineDataReady({
-      languages: mockOfflineData.languages,
-      forms: mockOfflineData.forms,
-      templates: mockOfflineData.templates,
-      locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities,
-      pilotLocations: mockOfflineData.pilotLocations,
-      offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets,
-      config: mockOfflineData.config,
-      formConfig: mockOfflineData.formConfig
-    })
-  )
+  await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
 
   const withGraphQL = (node: JSX.Element) => {
     if (apolloClient) {

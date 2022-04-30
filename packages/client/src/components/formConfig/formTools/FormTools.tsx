@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { NUMBER, TEL, TEXT, TEXTAREA } from '@client/forms'
+import { QuestionConfigFieldType } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import styled from '@client/styledComponents'
@@ -39,7 +39,7 @@ const CenteredToggle = styled(Toggle)`
 `
 
 interface IFormToolsProps {
-  onAddClickListener: (fieldType: string) => void
+  onAddClickListener: (fieldType: QuestionConfigFieldType) => void
 }
 
 const listViewItems = (intl: IntlShape) => {
@@ -47,42 +47,54 @@ const listViewItems = (intl: IntlShape) => {
     {
       label: intl.formatMessage(messages.textInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (dispatchAction: (fieldType: string) => void) => {
-        dispatchAction(TEXT)
+      handler: (
+        dispatchAction: (fieldType: QuestionConfigFieldType) => void
+      ) => {
+        dispatchAction(QuestionConfigFieldType.TEXT)
       }
     },
     {
       label: intl.formatMessage(messages.textAreaInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (dispatchAction: (fieldType: string) => void) => {
-        dispatchAction(TEXTAREA)
+      handler: (
+        dispatchAction: (fieldType: QuestionConfigFieldType) => void
+      ) => {
+        dispatchAction(QuestionConfigFieldType.TEXTAREA)
       }
     },
     {
       label: intl.formatMessage(messages.numberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (dispatchAction: (fieldType: string) => void) => {
-        dispatchAction(NUMBER)
+      handler: (
+        dispatchAction: (fieldType: QuestionConfigFieldType) => void
+      ) => {
+        dispatchAction(QuestionConfigFieldType.NUMBER)
       }
     },
     {
       label: intl.formatMessage(messages.phoneNumberInput),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (dispatchAction: (fieldType: string) => void) => {
-        dispatchAction(TEL)
+      handler: (
+        dispatchAction: (fieldType: QuestionConfigFieldType) => void
+      ) => {
+        dispatchAction(QuestionConfigFieldType.TEL)
       }
     },
     {
       label: intl.formatMessage(messages.heading),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (dispatchAction: (fieldType: string) => void) => {
+      handler: (
+        dispatchAction: (fieldType: QuestionConfigFieldType) => void
+      ) => {
         // dispatchAction(TEXT)
       }
     },
     {
       label: intl.formatMessage(messages.supportingCopy),
       actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (dispatchAction: (fieldType: string) => void) => {
+      handler: (
+        dispatchAction: (fieldType: QuestionConfigFieldType) => void
+      ) => {
         // dispatchAction(TEXT)
       }
     }
