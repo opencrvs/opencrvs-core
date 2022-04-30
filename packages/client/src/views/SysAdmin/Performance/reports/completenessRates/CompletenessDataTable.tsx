@@ -29,6 +29,7 @@ import {
   GQLMonthWiseEstimationMetric
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formatLongDate } from '@client/utils/date-formatting'
+import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 
 interface IMonthWiseEstimationCount {
   actualTotalRegistration: number
@@ -47,6 +48,7 @@ interface ITableProps extends WrappedComponentProps {
   eventType?: Event
   base?: IEstimationBase
   data?: GQLMonthWiseEstimationMetric[] | GQLLocationWiseEstimationMetric[]
+  completenessRateTime: CompletenessRateTime
 }
 
 export enum SORT_ORDER {
@@ -74,10 +76,10 @@ function CompletenessDataTableComponent(props: ITableProps) {
         (props.data as GQLLocationWiseEstimationMetric[]).map((item) => ({
           location: item.locationName,
           totalRegistered: String(item.total),
-          registeredWithinTargetd: String(item.withinTarget),
+          registeredWithinTargetd: String(item[props.completenessRateTime]),
           estimated: String(item.estimated),
           rateOfRegistrationWithinTargetd: `${Number(
-            (item.withinTarget / item.estimated) * 100
+            (item[props.completenessRateTime] / item.estimated) * 100
           ).toFixed(2)}%`
         }))
       : base?.baseType === COMPLETENESS_RATE_REPORT_BASE.TIME
@@ -90,10 +92,10 @@ function CompletenessDataTableComponent(props: ITableProps) {
             'MMMM yyyy'
           ),
           totalRegistered: item.total,
-          registeredWithinTargetd: item.withinTarget,
+          registeredWithinTargetd: item[props.completenessRateTime],
           estimated: item.estimated,
           rateOfRegistrationWithinTargetd: `${Number(
-            (item.withinTarget / item.estimated) * 100
+            (item[props.completenessRateTime] / item.estimated) * 100
           ).toFixed(2)}%`
         }))
       : []
@@ -129,7 +131,7 @@ function CompletenessDataTableComponent(props: ITableProps) {
         width: 15
       },
       {
-        label: String(sum.withinTarget),
+        label: String(sum[props.completenessRateTime]),
         width: 15
       },
       {
@@ -141,7 +143,9 @@ function CompletenessDataTableComponent(props: ITableProps) {
           constantsMessages.averageRateOfRegistrations,
           {
             amount: Number(
-              ((sum.withinTarget / sum.estimated) * 100).toFixed(2)
+              ((sum[props.completenessRateTime] / sum.estimated) * 100).toFixed(
+                2
+              )
             )
           }
         ),

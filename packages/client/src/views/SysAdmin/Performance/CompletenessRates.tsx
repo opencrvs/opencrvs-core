@@ -79,7 +79,10 @@ export interface IEstimationBase {
   locationJurisdictionType?: string
 }
 
-function prepareChartData(data: GQLMonthWiseEstimationMetric[]) {
+function prepareChartData(
+  data: GQLMonthWiseEstimationMetric[],
+  time: CompletenessRateTime
+) {
   return (
     data &&
     data.reduce(
@@ -93,11 +96,11 @@ function prepareChartData(data: GQLMonthWiseEstimationMetric[]) {
                     'MMM yyyy'
                   )
                 : format(new Date(dataDetails.year, dataDetails.month), 'MMM'),
-            registeredInTargetDays: dataDetails.withinTarget,
+            registeredInTargetDays: dataDetails[time],
             totalRegistered: dataDetails.total,
             totalEstimate: dataDetails.estimated,
             registrationPercentage: `${Number(
-              (dataDetails.withinTarget / dataDetails.estimated) * 100
+              (dataDetails[time] / dataDetails.estimated) * 100
             ).toFixed(2)}%`
           })
         }
@@ -278,7 +281,10 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                   {base.baseType === COMPLETENESS_RATE_REPORT_BASE.TIME && (
                     <RegRatesLineChart loading={true} />
                   )}
-                  <CompletenessDataTable loading={true} />
+                  <CompletenessDataTable
+                    loading={true}
+                    completenessRateTime={time}
+                  />
                   <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
                 </>
               )
@@ -289,7 +295,8 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                     <RegRatesLineChart
                       loading={loading}
                       data={prepareChartData(
-                        data && data.fetchMonthWiseEventMetrics
+                        data && data.fetchMonthWiseEventMetrics,
+                        time
                       )}
                       eventType={eventType as Event}
                     />
@@ -304,6 +311,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                         : data.fetchLocationWiseEventMetrics)
                     }
                     eventType={eventType as Event}
+                    completenessRateTime={time}
                   />
                 </>
               )
