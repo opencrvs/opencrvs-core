@@ -22,7 +22,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { ApprovalTab } from './approvalTab'
+import { SentForApproval } from './SentForApproval'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
@@ -150,8 +150,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ApprovalTab
+      <SentForApproval
         queryData={{
           data: {
             totalItems: 2,
@@ -215,6 +214,11 @@ describe('RegistrationHome sent for approval tab related tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -236,14 +240,18 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ApprovalTab
+      <SentForApproval
         queryData={{
           data: {
             totalItems: 2,
             results: []
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -258,7 +266,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      <ApprovalTab
+      <SentForApproval
         queryData={{
           data: {
             totalItems: 14,
@@ -289,7 +297,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      <ApprovalTab
+      <SentForApproval
         queryData={{
           data: {
             totalItems: 24,
@@ -315,8 +323,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ApprovalTab
+      <SentForApproval
         queryData={{
           data: {
             totalItems: 2,
@@ -401,6 +408,11 @@ describe('RegistrationHome sent for approval tab related tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -439,8 +451,7 @@ describe('Tablet tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ApprovalTab
+      <SentForApproval
         queryData={{
           data: {
             totalItems: 2,
@@ -504,6 +515,11 @@ describe('Tablet tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )

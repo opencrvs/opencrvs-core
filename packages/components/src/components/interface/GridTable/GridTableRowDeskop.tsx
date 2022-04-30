@@ -29,14 +29,19 @@ export interface IGridTableRow {
     alignment?: ColumnContentAlignment | undefined
   ) => JSX.Element
   clickable: boolean | undefined
+  hideLastBorder?: boolean
 }
 
-const StyledBox = styled.div`
+const StyledBox = styled.div<{ hideLastBorder?: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey100};
+  &:last-child {
+    ${({ hideLastBorder }) => hideLastBorder && ` border-bottom: 0;`}
+  }
+
   height: 72px;
 `
 
@@ -80,7 +85,7 @@ export const GridTableRowDesktop = (props: IGridTableRow) => {
       {props.displayItems.map((item, index) => {
         const clickable = props.clickable || Boolean(item.rowClickable)
         return (
-          <StyledBox key={index}>
+          <StyledBox key={index} hideLastBorder={props.hideLastBorder}>
             <RowWrapper
               id={'row_' + index}
               clickable={clickable}

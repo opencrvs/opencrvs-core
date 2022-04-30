@@ -75,7 +75,7 @@ const Body = (props: IProps) => {
       {props.children}
       <PaginationLoaderContainer isShowPagination={isShowPagination}>
         {noContent && !loading && !error && (
-          <NoResultText>{props.noResultText}</NoResultText>
+          <NoResultText id="no-record">{props.noResultText}</NoResultText>
         )}
         {isShowPagination &&
           paginationId &&

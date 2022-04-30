@@ -312,6 +312,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           columns={this.getColumns()}
           sortedCol={this.state.sortedCol}
           sortOrder={this.state.sortOrder}
+          hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>
     )

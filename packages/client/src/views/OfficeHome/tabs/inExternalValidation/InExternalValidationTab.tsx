@@ -65,7 +65,7 @@ interface IDispatchProps {
 
 type IProps = IBaseProps & IntlShapeProps & IDispatchProps
 
-function ExternalValidationTabComponent(props: IProps) {
+function InExternalValidationComponent(props: IProps) {
   const [sortedCol, setSortedCOl] = React.useState<COLUMNS>(COLUMNS.NAME)
   const [sortOrder, setSortOrder] = React.useState<SORT_ORDER>(
     SORT_ORDER.ASCENDING
@@ -225,12 +225,13 @@ function ExternalValidationTabComponent(props: IProps) {
         columns={columns}
         sortOrder={sortOrder}
         sortedCol={sortedCol}
+        hideLastBorder={!isShowPagination}
       />
     </WQContentWrapper>
   )
 }
 
-export const ExternalValidationTab = connect(null, {
+export const InExternalValidationTab = connect(null, {
   goToPage,
   goToDeclarationRecordAudit
-})(injectIntl(withTheme(ExternalValidationTabComponent)))
+})(injectIntl(withTheme(InExternalValidationComponent)))

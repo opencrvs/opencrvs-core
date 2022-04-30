@@ -126,3 +126,10 @@ export const hasRegisterScope = (scope: Scope | null): boolean => {
   }
   return false
 }
+
+export const hasRegistrationClerkScope = (scope: Scope | null): boolean => {
+  if (scope?.includes(RouteScope.VALIDATE)) {
+    return true
+  }
+  return false
+}

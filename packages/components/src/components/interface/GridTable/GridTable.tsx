@@ -124,6 +124,7 @@ interface IGridTableProps {
   loading?: boolean
   sortedCol?: COLUMNS
   sortOrder?: SORT_ORDER
+  hideLastBorder?: boolean
 }
 
 interface IGridTableState {
@@ -210,6 +211,7 @@ export class GridTableComp extends React.Component<
             clickable={this.props.clickable}
             getRowClickHandler={this.getRowClickHandler}
             renderActionBlock={this.renderActionBlock}
+            hideLastBorder={this.props.hideLastBorder}
           />
         ) : (
           <GridTableRowMobile

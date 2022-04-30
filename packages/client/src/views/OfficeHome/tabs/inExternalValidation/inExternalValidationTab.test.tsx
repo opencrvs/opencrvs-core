@@ -17,7 +17,7 @@ import {
   createTestStore,
   resizeWindow
 } from '@client/tests/util'
-import { ExternalValidationTab } from './externalValidationTab'
+import { InExternalValidationTab } from './InExternalValidationTab'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { checkAuth } from '@client/profile/profileActions'
@@ -82,7 +82,7 @@ describe('Registrar home external validation tab tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <ExternalValidationTab
+      <InExternalValidationTab
         queryData={{ data: { totalItems: 1, results: [birthEventSearchSet] } }}
       />,
       { store: testStore, history: testHistory }

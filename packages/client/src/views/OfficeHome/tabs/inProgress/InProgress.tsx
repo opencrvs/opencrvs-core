@@ -126,7 +126,7 @@ export const SELECTOR_ID = {
   hospitalDrafts: 'hospitals'
 }
 
-export class InProgressTabComponent extends React.Component<
+export class InProgressComponent extends React.Component<
   IRegistrarHomeProps,
   IRegistrarHomeState
 > {
@@ -533,6 +533,7 @@ export class InProgressTabComponent extends React.Component<
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
         sortedCol={this.state.sortedCol}
+        hideLastBorder={!this.isShowPagination}
       />
     )
   }
@@ -546,9 +547,25 @@ export class InProgressTabComponent extends React.Component<
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
         sortedCol={this.state.sortedCol}
+        hideLastBorder={!this.isShowPagination}
       />
     )
   }
+
+  isShowPagination =
+    !this.props.selectorId || this.props.selectorId === SELECTOR_ID.ownDrafts
+      ? this.props.drafts.length > this.props.pageSize
+        ? true
+        : false
+      : this.props.selectorId === SELECTOR_ID.fieldAgentDrafts
+      ? this.props.queryData.inProgressData.totalItems &&
+        this.props.queryData.inProgressData.totalItems > this.props.pageSize
+        ? true
+        : false
+      : this.props.queryData.notificationData.totalItems &&
+        this.props.queryData.notificationData.totalItems > this.props.pageSize
+      ? true
+      : false
 
   render() {
     const { intl, selectorId, drafts, queryData, onPageChange, isFieldAgent } =
@@ -576,26 +593,19 @@ export class InProgressTabComponent extends React.Component<
               this.props.pageSize
           )
 
-    const isShowPagination =
-      !selectorId || selectorId === SELECTOR_ID.ownDrafts
-        ? this.props.drafts.length > this.props.pageSize
-          ? true
-          : false
-        : selectorId === SELECTOR_ID.fieldAgentDrafts
-        ? this.props.queryData.inProgressData.totalItems &&
-          this.props.queryData.inProgressData.totalItems > this.props.pageSize
-          ? true
-          : false
-        : this.props.queryData.notificationData.totalItems &&
-          this.props.queryData.notificationData.totalItems > this.props.pageSize
-        ? true
-        : false
     const noContent =
       !selectorId || selectorId === SELECTOR_ID.ownDrafts
         ? this.transformDraftContent().length <= 0
         : selectorId === SELECTOR_ID.fieldAgentDrafts
         ? this.transformRemoteDraftsContent(inProgressData).length <= 0
         : this.transformRemoteDraftsContent(notificationData).length <= 0
+
+    const noResultMessage =
+      !selectorId || selectorId === SELECTOR_ID.ownDrafts
+        ? 'in progress'
+        : selectorId === SELECTOR_ID.fieldAgentDrafts
+        ? 'from field agents'
+        : 'from health system'
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.progress)}
@@ -611,7 +621,7 @@ export class InProgressTabComponent extends React.Component<
             notificationData.totalItems || 0
           )
         }
-        isShowPagination={isShowPagination}
+        isShowPagination={this.isShowPagination}
         paginationId={paginationId}
         totalPages={totalPages}
         onPageChange={onPageChange}
@@ -622,7 +632,7 @@ export class InProgressTabComponent extends React.Component<
             : this.props.error
         }
         noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'in progress'
+          tab: noResultMessage
         })}
         noContent={noContent}
       >
@@ -634,6 +644,7 @@ export class InProgressTabComponent extends React.Component<
             loading={isFieldAgent ? false : this.props.loading}
             sortedCol={this.state.sortedCol}
             sortOrder={this.state.sortOrder}
+            hideLastBorder={!this.isShowPagination}
           />
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts &&
@@ -654,8 +665,8 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const InProgressTab = connect(mapStateToProps, {
+export const InProgress = connect(mapStateToProps, {
   goToPage: goToPageAction,
   goToRegistrarHomeTab: goToRegistrarHomeTabAction,
   goToDeclarationRecordAudit
-})(injectIntl(withTheme(InProgressTabComponent)))
+})(injectIntl(withTheme(InProgressComponent)))

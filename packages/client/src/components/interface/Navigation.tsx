@@ -61,9 +61,9 @@ export type IWORKQUEUE_TABS = typeof WORKQUEUE_TABS[Keys]
 export const WORKQUEUE_TABS = {
   inProgress: 'progress',
   sentForReview: 'sentForReview',
-  requiresUpdate: 'requiresUpdate',
+  requiresUpdateAgent: 'requiresUpdateAgent',
   readyForReview: 'readyForReview',
-  sentForUpdates: 'sentForUpdates',
+  requiresUpdateRegistrar: 'requiresUpdateRegistrar',
   sentForApproval: 'approvals',
   readyToPrint: 'print',
   externalValidation: 'waitingValidation',
@@ -89,13 +89,13 @@ const USER_SCOPE: IUSER_SCOPE = {
   FIELD_AGENT: [
     WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.sentForReview,
-    WORKQUEUE_TABS.requiresUpdate,
+    WORKQUEUE_TABS.requiresUpdateAgent,
     GROUP_ID.declarationGroup
   ],
   REGISTRATION_AGENT: [
     WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.readyForReview,
-    WORKQUEUE_TABS.sentForUpdates,
+    WORKQUEUE_TABS.requiresUpdateRegistrar,
     WORKQUEUE_TABS.sentForApproval,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
@@ -106,7 +106,7 @@ const USER_SCOPE: IUSER_SCOPE = {
   DISTRICT_REGISTRAR: [
     WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.readyForReview,
-    WORKQUEUE_TABS.sentForUpdates,
+    WORKQUEUE_TABS.requiresUpdateRegistrar,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
@@ -116,7 +116,7 @@ const USER_SCOPE: IUSER_SCOPE = {
   LOCAL_REGISTRAR: [
     WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.readyForReview,
-    WORKQUEUE_TABS.sentForUpdates,
+    WORKQUEUE_TABS.requiresUpdateRegistrar,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
@@ -267,7 +267,9 @@ export const NavigationView = (props: IFullProps) => {
         (filteredData.inProgressTab.totalItems || 0) +
         (filteredData.notificationTab.totalItems || 0),
     readyForReview: !initialSyncDone ? 0 : filteredData.reviewTab.totalItems,
-    sentForUpdates: !initialSyncDone ? 0 : filteredData.rejectTab.totalItems,
+    requiresUpdateRegistrar: !initialSyncDone
+      ? 0
+      : filteredData.rejectTab.totalItems,
     sentForApproval: !initialSyncDone ? 0 : filteredData.approvalTab.totalItems,
     externalValidation:
       window.config.EXTERNAL_VALIDATION_WORKQUEUE && !initialSyncDone
@@ -334,15 +336,15 @@ export const NavigationView = (props: IFullProps) => {
                   return (
                     <NavigationItem
                       icon={() => <DeclarationIconSmall color={'red'} />}
-                      id={`navigation_${WORKQUEUE_TABS.requiresUpdate}_loading`}
+                      id={`navigation_${WORKQUEUE_TABS.requiresUpdateAgent}_loading`}
                       label={intl.formatMessage(
-                        navigationMessages[WORKQUEUE_TABS.requiresUpdate]
+                        navigationMessages[WORKQUEUE_TABS.requiresUpdateAgent]
                       )}
                       count={0}
-                      isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
+                      isSelected={tabId === WORKQUEUE_TABS.requiresUpdateAgent}
                       onClick={() => {
                         props.goToRegistrarHomeTab(
-                          WORKQUEUE_TABS.requiresUpdate
+                          WORKQUEUE_TABS.requiresUpdateAgent
                         )
                         menuCollapse && menuCollapse()
                       }}
@@ -353,15 +355,15 @@ export const NavigationView = (props: IFullProps) => {
                   <>
                     <NavigationItem
                       icon={() => <DeclarationIconSmall color={'red'} />}
-                      id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
+                      id={`navigation_${WORKQUEUE_TABS.requiresUpdateAgent}`}
                       label={intl.formatMessage(
-                        navigationMessages[WORKQUEUE_TABS.requiresUpdate]
+                        navigationMessages[WORKQUEUE_TABS.requiresUpdateAgent]
                       )}
                       count={data?.searchEvents?.totalItems}
-                      isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
+                      isSelected={tabId === WORKQUEUE_TABS.requiresUpdateAgent}
                       onClick={() => {
                         props.goToRegistrarHomeTab(
-                          WORKQUEUE_TABS.requiresUpdate
+                          WORKQUEUE_TABS.requiresUpdateAgent
                         )
                         menuCollapse && menuCollapse()
                       }}
@@ -422,19 +424,23 @@ export const NavigationView = (props: IFullProps) => {
                   )}
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(
-                    WORKQUEUE_TABS.sentForUpdates
+                    WORKQUEUE_TABS.requiresUpdateRegistrar
                   ) && (
                     <NavigationItem
                       icon={() => <DeclarationIconSmall color={'red'} />}
-                      id={`navigation_${WORKQUEUE_TABS.sentForUpdates}`}
+                      id={`navigation_${WORKQUEUE_TABS.requiresUpdateRegistrar}`}
                       label={intl.formatMessage(
-                        navigationMessages[WORKQUEUE_TABS.sentForUpdates]
+                        navigationMessages[
+                          WORKQUEUE_TABS.requiresUpdateRegistrar
+                        ]
                       )}
-                      count={declarationCount.sentForUpdates}
-                      isSelected={tabId === WORKQUEUE_TABS.sentForUpdates}
+                      count={declarationCount.requiresUpdateRegistrar}
+                      isSelected={
+                        tabId === WORKQUEUE_TABS.requiresUpdateRegistrar
+                      }
                       onClick={() => {
                         props.goToRegistrarHomeTab(
-                          WORKQUEUE_TABS.sentForUpdates
+                          WORKQUEUE_TABS.requiresUpdateRegistrar
                         )
                         menuCollapse && menuCollapse()
                       }}

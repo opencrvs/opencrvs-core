@@ -250,6 +250,7 @@ class Outbox extends React.Component<IFullProps, IState> {
             }
           ]}
           noResultText={intl.formatMessage(constantsMessages.noResults)}
+          hideLastBorder={true}
         />
       </Container>
     )
