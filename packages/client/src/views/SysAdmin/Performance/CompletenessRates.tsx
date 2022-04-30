@@ -47,7 +47,13 @@ import {
   FETCH_MONTH_WISE_EVENT_ESTIMATIONS,
   HAS_CHILD_LOCATION
 } from './queries'
-import { WithinTargetDaysTable } from './reports/completenessRates/WithinTargetDaysTable'
+import { CompletenessDataTable } from './reports/completenessRates/CompletenessDataTable'
+import { useCallback } from 'react'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
 const { useState } = React
 
 export enum REG_RATE_BASE {
@@ -123,16 +129,9 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
 
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
-
-  return (
-    <SysAdminContentWrapper
-      id="reg-rates"
-      type={SysAdminPageVariant.SUBPAGE_CENTERED}
-      backActionHandler={() =>
-        goToPerformanceHome(dateStart, dateEnd, locationId)
-      }
-      headerTitle={title}
-      toolbarComponent={
+  const getFilter = useCallback(() => {
+    {
+      return (
         <Query query={HAS_CHILD_LOCATION} variables={{ parentId: locationId }}>
           {({ data, loading, error }) => {
             const options: IPerformanceSelectOption[] = [
@@ -202,60 +201,77 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
             )
           }}
         </Query>
-      }
+      )
+    }
+  }, [base, props])
+
+  return (
+    <SysAdminContentWrapper
+      id="reg-rates"
+      isCertificatesConfigPage={true}
+      profilePageStyle={{
+        paddingTopMd: 0,
+        horizontalPaddingMd: 0
+      }}
     >
-      <Query
-        query={
-          base.baseType === REG_RATE_BASE.TIME
-            ? FETCH_MONTH_WISE_EVENT_ESTIMATIONS
-            : FETCH_LOCATION_WISE_EVENT_ESTIMATIONS
-        }
-        variables={{
-          event: eventType.toUpperCase(),
-          timeStart: timeStart,
-          timeEnd: timeEnd,
-          locationId: locationId
-        }}
+      <Content
+        title={intl.formatMessage(navigationMessages.completenessRates)}
+        size={ContentSize.LARGE}
+        filterContent={getFilter()}
       >
-        {({ data, loading, error }) => {
-          if (error) {
-            return (
-              <>
-                {base.baseType === REG_RATE_BASE.TIME && (
-                  <RegRatesLineChart loading={true} />
-                )}
-                <WithinTargetDaysTable loading={true} />
-                <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-              </>
-            )
-          } else {
-            return (
-              <>
-                {base.baseType === REG_RATE_BASE.TIME && (
-                  <RegRatesLineChart
+        <Query
+          query={
+            base.baseType === REG_RATE_BASE.TIME
+              ? FETCH_MONTH_WISE_EVENT_ESTIMATIONS
+              : FETCH_LOCATION_WISE_EVENT_ESTIMATIONS
+          }
+          variables={{
+            event: eventType.toUpperCase(),
+            timeStart: timeStart,
+            timeEnd: timeEnd,
+            locationId: locationId
+          }}
+        >
+          {({ data, loading, error }) => {
+            if (error) {
+              return (
+                <>
+                  {base.baseType === REG_RATE_BASE.TIME && (
+                    <RegRatesLineChart loading={true} />
+                  )}
+                  <CompletenessDataTable loading={true} />
+                  <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                </>
+              )
+            } else {
+              return (
+                <>
+                  {base.baseType === REG_RATE_BASE.TIME && (
+                    <RegRatesLineChart
+                      loading={loading}
+                      data={prepareChartData(
+                        data && data.fetchMonthWiseEventMetrics
+                      )}
+                      eventType={eventType as Event}
+                    />
+                  )}
+                  <CompletenessDataTable
                     loading={loading}
-                    data={prepareChartData(
-                      data && data.fetchMonthWiseEventMetrics
-                    )}
+                    base={base}
+                    data={
+                      data &&
+                      (base.baseType === REG_RATE_BASE.TIME
+                        ? data.fetchMonthWiseEventMetrics
+                        : data.fetchLocationWiseEventMetrics)
+                    }
                     eventType={eventType as Event}
                   />
-                )}
-                <WithinTargetDaysTable
-                  loading={loading}
-                  base={base}
-                  data={
-                    data &&
-                    (base.baseType === REG_RATE_BASE.TIME
-                      ? data.fetchMonthWiseEventMetrics
-                      : data.fetchLocationWiseEventMetrics)
-                  }
-                  eventType={eventType as Event}
-                />
-              </>
-            )
-          }
-        }}
-      </Query>
+                </>
+              )
+            }
+          }}
+        </Query>
+      </Content>
     </SysAdminContentWrapper>
   )
 }

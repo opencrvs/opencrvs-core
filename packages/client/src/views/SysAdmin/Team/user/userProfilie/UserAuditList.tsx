@@ -50,7 +50,7 @@ import {
   InformationTitle
 } from '@client/views/SysAdmin/Team/user/userProfilie/UserProfile'
 import { orderBy } from 'lodash'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/WithinTargetDaysTable'
+import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import subMonths from 'date-fns/subMonths'
 import format from '@client/utils/date-formatting'
 

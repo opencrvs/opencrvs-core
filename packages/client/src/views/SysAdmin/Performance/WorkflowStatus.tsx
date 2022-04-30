@@ -30,7 +30,7 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
 
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/WithinTargetDaysTable'
+import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
 import {
   SysAdminContentWrapper,

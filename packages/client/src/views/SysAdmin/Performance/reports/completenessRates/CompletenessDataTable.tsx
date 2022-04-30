@@ -62,7 +62,7 @@ const INITIAL_SORT_MAP = {
   location: SORT_ORDER.ASCENDING
 }
 
-function WithinTargetDaysTableComponent(props: ITableProps) {
+function CompletenessDataTableComponent(props: ITableProps) {
   const { intl, loading, eventType, base } = props
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
 
@@ -215,4 +215,4 @@ function WithinTargetDaysTableComponent(props: ITableProps) {
   )
 }
 
-export const WithinTargetDaysTable = injectIntl(WithinTargetDaysTableComponent)
+export const CompletenessDataTable = injectIntl(CompletenessDataTableComponent)
