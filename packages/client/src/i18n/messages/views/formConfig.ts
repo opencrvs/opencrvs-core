@@ -78,6 +78,8 @@ interface IFormConfigMessages
   checkboxGroup: MessageDescriptor
   date: MessageDescriptor
   dynamicList: MessageDescriptor
+  formConfigMobileModalTitle: MessageDescriptor
+  formConfigMobileModalDesc: MessageDescriptor
 }
 
 type INavigationMessages = Record<
@@ -456,6 +458,17 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.form.draft.save.comment.error',
     defaultMessage: 'You must provide a description of your changes',
     description: 'Comment area error message for save draft modal'
+  },
+  formConfigMobileModalTitle: {
+    id: 'config.form.mobile.modal.title',
+    defaultMessage: 'Configuration on mobile unavailble',
+    description: 'Modal title for mobile form configuration'
+  },
+  formConfigMobileModalDesc: {
+    id: 'config.form.mobile.modal.desc',
+    defaultMessage:
+      'Please use a laptop or desktop to configure a declaration form',
+    description: 'Modal description for mobile form configuration'
   }
 }
 
