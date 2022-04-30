@@ -153,11 +153,15 @@
                         "mapping": {
                           "mutation": {
                             "operation": "changeHirerchyMutationTransformer",
-                            "parameters": ["registration.otherInformantType"]
+                            "parameters": [
+                              "registration.otherInformantType"
+                            ]
                           },
                           "query": {
                             "operation": "changeHirerchyQueryTransformer",
-                            "parameters": ["registration.otherInformantType"]
+                            "parameters": [
+                              "registration.otherInformantType"
+                            ]
                           }
                         }
                       }
@@ -166,11 +170,15 @@
                   "mapping": {
                     "mutation": {
                       "operation": "nestedRadioFieldToBundleFieldTransformer",
-                      "parameters": ["registration.informantType"]
+                      "parameters": [
+                        "registration.informantType"
+                      ]
                     },
                     "query": {
                       "operation": "bundleFieldToNestedRadioFieldTransformer",
-                      "parameters": ["registration.informantType"]
+                      "parameters": [
+                        "registration.informantType"
+                      ]
                     }
                   }
                 }
@@ -646,11 +654,15 @@
                   "mapping": {
                     "mutation": {
                       "operation": "nestedRadioFieldToBundleFieldTransformer",
-                      "parameters": ["registration.contact"]
+                      "parameters": [
+                        "registration.contact"
+                      ]
                     },
                     "query": {
                       "operation": "bundleFieldToNestedRadioFieldTransformer",
-                      "parameters": ["registration.contact"]
+                      "parameters": [
+                        "registration.contact"
+                      ]
                     }
                   }
                 }
@@ -666,7 +678,10 @@
               {
                 "fieldName": "certificateDate",
                 "operation": "certificateDateTransformer",
-                "parameters": ["en", "dd MMMM yyyy"]
+                "parameters": [
+                  "en",
+                  "dd MMMM yyyy"
+                ]
               },
               {
                 "fieldName": "registrarName",
@@ -731,15 +746,23 @@
                     "template": {
                       "operation": "dateFormatTransformer",
                       "fieldName": "eventDate",
-                      "parameters": ["birthDate", "en", "do MMMM yyyy"]
+                      "parameters": [
+                        "birthDate",
+                        "en",
+                        "do MMMM yyyy"
+                      ]
                     },
                     "mutation": {
                       "operation": "longDateTransformer",
-                      "parameters": ["birthDate"]
+                      "parameters": [
+                        "birthDate"
+                      ]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
-                      "parameters": ["birthDate"]
+                      "parameters": [
+                        "birthDate"
+                      ]
                     }
                   }
                 },
@@ -765,15 +788,24 @@
                     "template": {
                       "fieldName": "informantFirstName",
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "firstNames"]
+                      "parameters": [
+                        "en",
+                        "firstNames"
+                      ]
                     },
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": ["en", "firstNames"]
+                      "parameters": [
+                        "en",
+                        "firstNames"
+                      ]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "firstNames"]
+                      "parameters": [
+                        "en",
+                        "firstNames"
+                      ]
                     }
                   }
                 },
@@ -799,15 +831,24 @@
                     "template": {
                       "fieldName": "informantFamilyName",
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "familyName"]
+                      "parameters": [
+                        "en",
+                        "familyName"
+                      ]
                     },
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": ["en", "familyName"]
+                      "parameters": [
+                        "en",
+                        "familyName"
+                      ]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "familyName"]
+                      "parameters": [
+                        "en",
+                        "familyName"
+                      ]
                     }
                   }
                 },
@@ -1044,7 +1085,10 @@
                   "validate": [
                     {
                       "operation": "range",
-                      "parameters": [0, 6]
+                      "parameters": [
+                        0,
+                        6
+                      ]
                     }
                   ],
                   "postfix": "Kg",
@@ -1160,7 +1204,9 @@
                     "template": {
                       "fieldName": "placeOfBirth",
                       "operation": "eventLocationNameQueryOfflineTransformer",
-                      "parameters": ["facilities"]
+                      "parameters": [
+                        "facilities"
+                      ]
                     },
                     "mutation": {
                       "operation": "birthEventLocationMutationTransformer",
@@ -1265,11 +1311,15 @@
                   "validate": [
                     {
                       "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
+                      "parameters": [
+                        "NATIONAL_ID"
+                      ]
                     },
                     {
                       "operation": "duplicateIDNumber",
-                      "parameters": ["deceased.iD"]
+                      "parameters": [
+                        "deceased.iD"
+                      ]
                     }
                   ],
                   "conditionals": [],
@@ -1280,7 +1330,10 @@
                         "individual",
                         {
                           "operation": "fieldToIdentityTransformer",
-                          "parameters": ["id", "NATIONAL_ID"]
+                          "parameters": [
+                            "id",
+                            "NATIONAL_ID"
+                          ]
                         }
                       ]
                     },
@@ -1290,7 +1343,10 @@
                         "individual",
                         {
                           "operation": "identityToFieldTransformer",
-                          "parameters": ["id", "NATIONAL_ID"]
+                          "parameters": [
+                            "id",
+                            "NATIONAL_ID"
+                          ]
                         }
                       ]
                     }
@@ -1317,7 +1373,9 @@
                     },
                     {
                       "operation": "isValidParentsBirthDate",
-                      "parameters": [5]
+                      "parameters": [
+                        5
+                      ]
                     }
                   ],
                   "mapping": {
@@ -1327,7 +1385,9 @@
                         "individual",
                         {
                           "operation": "longDateTransformer",
-                          "parameters": ["birthDate"]
+                          "parameters": [
+                            "birthDate"
+                          ]
                         },
                         "birthDate"
                       ]
@@ -1338,7 +1398,9 @@
                         "individual",
                         {
                           "operation": "fieldValueTransformer",
-                          "parameters": ["birthDate"]
+                          "parameters": [
+                            "birthDate"
+                          ]
                         }
                       ]
                     }
@@ -1368,7 +1430,10 @@
                         "individual",
                         {
                           "operation": "fieldToNameTransformer",
-                          "parameters": ["en", "firstNames"]
+                          "parameters": [
+                            "en",
+                            "firstNames"
+                          ]
                         },
                         "name"
                       ]
@@ -1379,7 +1444,10 @@
                         "individual",
                         {
                           "operation": "nameToFieldTransformer",
-                          "parameters": ["en", "firstNames"]
+                          "parameters": [
+                            "en",
+                            "firstNames"
+                          ]
                         }
                       ]
                     }
@@ -1409,7 +1477,10 @@
                         "individual",
                         {
                           "operation": "fieldToNameTransformer",
-                          "parameters": ["en", "familyName"]
+                          "parameters": [
+                            "en",
+                            "familyName"
+                          ]
                         },
                         "name"
                       ]
@@ -1420,7 +1491,10 @@
                         "individual",
                         {
                           "operation": "nameToFieldTransformer",
-                          "parameters": ["en", "familyName"]
+                          "parameters": [
+                            "en",
+                            "familyName"
+                          ]
                         }
                       ]
                     }
@@ -1578,11 +1652,15 @@
                   "validate": [
                     {
                       "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
+                      "parameters": [
+                        "NATIONAL_ID"
+                      ]
                     },
                     {
                       "operation": "duplicateIDNumber",
-                      "parameters": ["father.iD"]
+                      "parameters": [
+                        "father.iD"
+                      ]
                     }
                   ],
                   "conditionals": [
@@ -1595,15 +1673,24 @@
                     "template": {
                       "fieldName": "motherNID",
                       "operation": "identityToFieldTransformer",
-                      "parameters": ["id", "NATIONAL_ID"]
+                      "parameters": [
+                        "id",
+                        "NATIONAL_ID"
+                      ]
                     },
                     "mutation": {
                       "operation": "fieldToIdentityTransformer",
-                      "parameters": ["id", "NATIONAL_ID"]
+                      "parameters": [
+                        "id",
+                        "NATIONAL_ID"
+                      ]
                     },
                     "query": {
                       "operation": "identityToFieldTransformer",
-                      "parameters": ["id", "NATIONAL_ID"]
+                      "parameters": [
+                        "id",
+                        "NATIONAL_ID"
+                      ]
                     }
                   }
                 },
@@ -1634,22 +1721,32 @@
                     },
                     {
                       "operation": "isValidParentsBirthDate",
-                      "parameters": [5]
+                      "parameters": [
+                        5
+                      ]
                     }
                   ],
                   "mapping": {
                     "template": {
                       "operation": "dateFormatTransformer",
                       "fieldName": "motherBirthDate",
-                      "parameters": ["birthDate", "en", "do MMMM yyyy"]
+                      "parameters": [
+                        "birthDate",
+                        "en",
+                        "do MMMM yyyy"
+                      ]
                     },
                     "mutation": {
                       "operation": "longDateTransformer",
-                      "parameters": ["birthDate"]
+                      "parameters": [
+                        "birthDate"
+                      ]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
-                      "parameters": ["birthDate"]
+                      "parameters": [
+                        "birthDate"
+                      ]
                     }
                   }
                 },
@@ -1680,15 +1777,24 @@
                     "template": {
                       "fieldName": "motherFirstName",
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "firstNames"]
+                      "parameters": [
+                        "en",
+                        "firstNames"
+                      ]
                     },
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": ["en", "firstNames"]
+                      "parameters": [
+                        "en",
+                        "firstNames"
+                      ]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "firstNames"]
+                      "parameters": [
+                        "en",
+                        "firstNames"
+                      ]
                     }
                   }
                 },
@@ -1719,15 +1825,24 @@
                     "template": {
                       "fieldName": "motherFamilyName",
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "familyName"]
+                      "parameters": [
+                        "en",
+                        "familyName"
+                      ]
                     },
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": ["en", "familyName"]
+                      "parameters": [
+                        "en",
+                        "familyName"
+                      ]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "familyName"]
+                      "parameters": [
+                        "en",
+                        "familyName"
+                      ]
                     }
                   }
                 },
@@ -1851,7 +1966,9 @@
                     },
                     {
                       "operation": "maxLength",
-                      "parameters": [2]
+                      "parameters": [
+                        2
+                      ]
                     }
                   ]
                 },
@@ -2080,11 +2197,15 @@
                   "validate": [
                     {
                       "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
+                      "parameters": [
+                        "NATIONAL_ID"
+                      ]
                     },
                     {
                       "operation": "duplicateIDNumber",
-                      "parameters": ["mother.iD"]
+                      "parameters": [
+                        "mother.iD"
+                      ]
                     }
                   ],
                   "conditionals": [
@@ -2097,15 +2218,24 @@
                     "template": {
                       "fieldName": "fatherNID",
                       "operation": "identityToFieldTransformer",
-                      "parameters": ["id", "NATIONAL_ID"]
+                      "parameters": [
+                        "id",
+                        "NATIONAL_ID"
+                      ]
                     },
                     "mutation": {
                       "operation": "fieldToIdentityTransformer",
-                      "parameters": ["id", "NATIONAL_ID"]
+                      "parameters": [
+                        "id",
+                        "NATIONAL_ID"
+                      ]
                     },
                     "query": {
                       "operation": "identityToFieldTransformer",
-                      "parameters": ["id", "NATIONAL_ID"]
+                      "parameters": [
+                        "id",
+                        "NATIONAL_ID"
+                      ]
                     }
                   }
                 },
@@ -2130,7 +2260,9 @@
                     },
                     {
                       "operation": "isValidParentsBirthDate",
-                      "parameters": [10]
+                      "parameters": [
+                        10
+                      ]
                     }
                   ],
                   "conditionals": [
@@ -2143,15 +2275,23 @@
                     "template": {
                       "operation": "dateFormatTransformer",
                       "fieldName": "fatherBirthDate",
-                      "parameters": ["birthDate", "en", "do MMMM yyyy"]
+                      "parameters": [
+                        "birthDate",
+                        "en",
+                        "do MMMM yyyy"
+                      ]
                     },
                     "mutation": {
                       "operation": "longDateTransformer",
-                      "parameters": ["birthDate"]
+                      "parameters": [
+                        "birthDate"
+                      ]
                     },
                     "query": {
                       "operation": "fieldValueTransformer",
-                      "parameters": ["birthDate"]
+                      "parameters": [
+                        "birthDate"
+                      ]
                     }
                   }
                 },
@@ -2182,15 +2322,24 @@
                     "template": {
                       "fieldName": "fatherFirstName",
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "firstNames"]
+                      "parameters": [
+                        "en",
+                        "firstNames"
+                      ]
                     },
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": ["en", "firstNames"]
+                      "parameters": [
+                        "en",
+                        "firstNames"
+                      ]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "firstNames"]
+                      "parameters": [
+                        "en",
+                        "firstNames"
+                      ]
                     }
                   }
                 },
@@ -2221,15 +2370,24 @@
                     "template": {
                       "fieldName": "fatherFamilyName",
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "familyName"]
+                      "parameters": [
+                        "en",
+                        "familyName"
+                      ]
                     },
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": ["en", "familyName"]
+                      "parameters": [
+                        "en",
+                        "familyName"
+                      ]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "familyName"]
+                      "parameters": [
+                        "en",
+                        "familyName"
+                      ]
                     }
                   }
                 },
@@ -2544,7 +2702,7 @@
                     {
                       "description": "Hidden for Parent Details none or Mother only",
                       "action": "hide",
-                      "expression": "draftData && draftData.mother && !draftData.mother.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!draftData.mother.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
                     }
                   ],
                   "mapping": {
@@ -2606,7 +2764,7 @@
                     {
                       "description": "Hidden for Parent Details none or Father only",
                       "action": "hide",
-                      "expression": "draftData && draftData.father && !draftData.father.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                      "expression": "!draftData.father.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
                     }
                   ],
                   "mapping": {
@@ -2892,11 +3050,15 @@
                         "mapping": {
                           "mutation": {
                             "operation": "changeHirerchyMutationTransformer",
-                            "parameters": ["registration.otherInformantType"]
+                            "parameters": [
+                              "registration.otherInformantType"
+                            ]
                           },
                           "query": {
                             "operation": "changeHirerchyQueryTransformer",
-                            "parameters": ["registration.otherInformantType"]
+                            "parameters": [
+                              "registration.otherInformantType"
+                            ]
                           }
                         }
                       }
@@ -2905,11 +3067,15 @@
                   "mapping": {
                     "mutation": {
                       "operation": "nestedRadioFieldToBundleFieldTransformer",
-                      "parameters": ["registration.informantType"]
+                      "parameters": [
+                        "registration.informantType"
+                      ]
                     },
                     "query": {
                       "operation": "bundleFieldToNestedRadioFieldTransformer",
-                      "parameters": ["registration.informantType"]
+                      "parameters": [
+                        "registration.informantType"
+                      ]
                     }
                   }
                 }
@@ -3481,11 +3647,15 @@
                   "mapping": {
                     "mutation": {
                       "operation": "nestedRadioFieldToBundleFieldTransformer",
-                      "parameters": ["registration.contact"]
+                      "parameters": [
+                        "registration.contact"
+                      ]
                     },
                     "query": {
                       "operation": "bundleFieldToNestedRadioFieldTransformer",
-                      "parameters": ["registration.contact"]
+                      "parameters": [
+                        "registration.contact"
+                      ]
                     }
                   }
                 }
@@ -3501,7 +3671,10 @@
               {
                 "fieldName": "certificateDate",
                 "operation": "certificateDateTransformer",
-                "parameters": ["en", "dd MMMM yyyy"]
+                "parameters": [
+                  "en",
+                  "dd MMMM yyyy"
+                ]
               },
               {
                 "fieldName": "registrarName",
@@ -3591,11 +3764,15 @@
                   "validate": [
                     {
                       "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
+                      "parameters": [
+                        "NATIONAL_ID"
+                      ]
                     },
                     {
                       "operation": "duplicateIDNumber",
-                      "parameters": ["informant.informantID"]
+                      "parameters": [
+                        "informant.informantID"
+                      ]
                     }
                   ],
                   "conditionals": [],
@@ -3603,15 +3780,24 @@
                     "template": {
                       "fieldName": "deceasedNID",
                       "operation": "identityToFieldTransformer",
-                      "parameters": ["id", "NATIONAL_ID"]
+                      "parameters": [
+                        "id",
+                        "NATIONAL_ID"
+                      ]
                     },
                     "mutation": {
                       "operation": "fieldToIdentityTransformer",
-                      "parameters": ["id", "NATIONAL_ID"]
+                      "parameters": [
+                        "id",
+                        "NATIONAL_ID"
+                      ]
                     },
                     "query": {
                       "operation": "identityToFieldTransformer",
-                      "parameters": ["id", "NATIONAL_ID"]
+                      "parameters": [
+                        "id",
+                        "NATIONAL_ID"
+                      ]
                     }
                   }
                 },
@@ -3634,7 +3820,11 @@
                     "template": {
                       "operation": "dateFormatTransformer",
                       "fieldName": "deceasedBirthDate",
-                      "parameters": ["birthDate", "en", "do MMMM yyyy"]
+                      "parameters": [
+                        "birthDate",
+                        "en",
+                        "do MMMM yyyy"
+                      ]
                     },
                     "mutation": {
                       "operation": "longDateTransformer",
@@ -3663,15 +3853,24 @@
                     "template": {
                       "fieldName": "deceasedFirstName",
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "firstNames"]
+                      "parameters": [
+                        "en",
+                        "firstNames"
+                      ]
                     },
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": ["en", "firstNames"]
+                      "parameters": [
+                        "en",
+                        "firstNames"
+                      ]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "firstNames"]
+                      "parameters": [
+                        "en",
+                        "firstNames"
+                      ]
                     }
                   }
                 },
@@ -3696,15 +3895,24 @@
                     "template": {
                       "fieldName": "deceasedFamilyName",
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "familyName"]
+                      "parameters": [
+                        "en",
+                        "familyName"
+                      ]
                     },
                     "mutation": {
                       "operation": "fieldToNameTransformer",
-                      "parameters": ["en", "familyName"]
+                      "parameters": [
+                        "en",
+                        "familyName"
+                      ]
                     },
                     "query": {
                       "operation": "nameToFieldTransformer",
-                      "parameters": ["en", "familyName"]
+                      "parameters": [
+                        "en",
+                        "familyName"
+                      ]
                     }
                   }
                 },
@@ -3894,7 +4102,11 @@
                     "template": {
                       "operation": "deceasedDateFormatTransformation",
                       "fieldName": "eventDate",
-                      "parameters": ["en", "do MMMM yyyy", "deceased"]
+                      "parameters": [
+                        "en",
+                        "do MMMM yyyy",
+                        "deceased"
+                      ]
                     },
                     "mutation": {
                       "operation": "fieldToDeceasedDateTransformation",
@@ -3908,7 +4120,9 @@
                     },
                     "query": {
                       "operation": "deceasedDateToFieldTransformation",
-                      "parameters": ["deceased"]
+                      "parameters": [
+                        "deceased"
+                      ]
                     }
                   }
                 },
@@ -3973,11 +4187,15 @@
                   "mapping": {
                     "mutation": {
                       "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": ["mannerOfDeath"]
+                      "parameters": [
+                        "mannerOfDeath"
+                      ]
                     },
                     "query": {
                       "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": ["mannerOfDeath"]
+                      "parameters": [
+                        "mannerOfDeath"
+                      ]
                     }
                   }
                 },
@@ -4014,11 +4232,15 @@
                   "mapping": {
                     "mutation": {
                       "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": ["causeOfDeathEstablished"]
+                      "parameters": [
+                        "causeOfDeathEstablished"
+                      ]
                     },
                     "query": {
                       "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": ["causeOfDeathEstablished"]
+                      "parameters": [
+                        "causeOfDeathEstablished"
+                      ]
                     }
                   }
                 },
@@ -4081,11 +4303,15 @@
                   "mapping": {
                     "mutation": {
                       "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": ["causeOfDeathMethod"]
+                      "parameters": [
+                        "causeOfDeathMethod"
+                      ]
                     },
                     "query": {
                       "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": ["causeOfDeathMethod"]
+                      "parameters": [
+                        "causeOfDeathMethod"
+                      ]
                     }
                   }
                 },
@@ -4110,11 +4336,15 @@
                   "mapping": {
                     "mutation": {
                       "operation": "sectionFieldToBundleFieldTransformer",
-                      "parameters": ["deathDescription"]
+                      "parameters": [
+                        "deathDescription"
+                      ]
                     },
                     "query": {
                       "operation": "bundleFieldToSectionFieldTransformer",
-                      "parameters": ["deathDescription"]
+                      "parameters": [
+                        "deathDescription"
+                      ]
                     }
                   }
                 },
@@ -4206,7 +4436,9 @@
                     "template": {
                       "fieldName": "placeOfDeath",
                       "operation": "eventLocationNameQueryOfflineTransformer",
-                      "parameters": ["facilities"]
+                      "parameters": [
+                        "facilities"
+                      ]
                     },
                     "mutation": {
                       "operation": "deathEventLocationMutationTransformer",
@@ -4293,11 +4525,15 @@
                   "validate": [
                     {
                       "operation": "validIDNumber",
-                      "parameters": ["NATIONAL_ID"]
+                      "parameters": [
+                        "NATIONAL_ID"
+                      ]
                     },
                     {
                       "operation": "duplicateIDNumber",
-                      "parameters": ["deceased.iD"]
+                      "parameters": [
+                        "deceased.iD"
+                      ]
                     }
                   ],
                   "conditionals": [],
@@ -4308,7 +4544,10 @@
                         "individual",
                         {
                           "operation": "fieldToIdentityTransformer",
-                          "parameters": ["id", "NATIONAL_ID"]
+                          "parameters": [
+                            "id",
+                            "NATIONAL_ID"
+                          ]
                         }
                       ]
                     },
@@ -4318,7 +4557,10 @@
                         "individual",
                         {
                           "operation": "identityToFieldTransformer",
-                          "parameters": ["id", "NATIONAL_ID"]
+                          "parameters": [
+                            "id",
+                            "NATIONAL_ID"
+                          ]
                         }
                       ]
                     }
@@ -4348,7 +4590,10 @@
                         "individual",
                         {
                           "operation": "fieldToNameTransformer",
-                          "parameters": ["en", "firstNames"]
+                          "parameters": [
+                            "en",
+                            "firstNames"
+                          ]
                         },
                         "name"
                       ]
@@ -4359,7 +4604,10 @@
                         "individual",
                         {
                           "operation": "nameToFieldTransformer",
-                          "parameters": ["en", "firstNames"]
+                          "parameters": [
+                            "en",
+                            "firstNames"
+                          ]
                         }
                       ]
                     }
@@ -4389,7 +4637,10 @@
                         "individual",
                         {
                           "operation": "fieldToNameTransformer",
-                          "parameters": ["en", "familyName"]
+                          "parameters": [
+                            "en",
+                            "familyName"
+                          ]
                         },
                         "name"
                       ]
@@ -4400,7 +4651,10 @@
                         "individual",
                         {
                           "operation": "nameToFieldTransformer",
-                          "parameters": ["en", "familyName"]
+                          "parameters": [
+                            "en",
+                            "familyName"
+                          ]
                         }
                       ]
                     }
@@ -4757,11 +5011,15 @@
                 "mapping": {
                   "mutation": {
                     "operation": "fieldNameTransformer",
-                    "parameters": ["primaryOffice"]
+                    "parameters": [
+                      "primaryOffice"
+                    ]
                   },
                   "query": {
                     "operation": "locationIDToFieldTransformer",
-                    "parameters": ["primaryOffice"]
+                    "parameters": [
+                      "primaryOffice"
+                    ]
                   }
                 }
               }
@@ -4800,11 +5058,17 @@
                 "mapping": {
                   "mutation": {
                     "operation": "fieldToNameTransformer",
-                    "parameters": ["en", "firstNames"]
+                    "parameters": [
+                      "en",
+                      "firstNames"
+                    ]
                   },
                   "query": {
                     "operation": "nameToFieldTransformer",
-                    "parameters": ["en", "firstNames"]
+                    "parameters": [
+                      "en",
+                      "firstNames"
+                    ]
                   }
                 }
               },
@@ -4826,11 +5090,17 @@
                 "mapping": {
                   "mutation": {
                     "operation": "fieldToNameTransformer",
-                    "parameters": ["en", "familyName"]
+                    "parameters": [
+                      "en",
+                      "familyName"
+                    ]
                   },
                   "query": {
                     "operation": "nameToFieldTransformer",
-                    "parameters": ["en", "familyName"]
+                    "parameters": [
+                      "en",
+                      "familyName"
+                    ]
                   }
                 }
               },
@@ -4852,11 +5122,15 @@
                 "mapping": {
                   "mutation": {
                     "operation": "msisdnTransformer",
-                    "parameters": ["user.mobile"]
+                    "parameters": [
+                      "user.mobile"
+                    ]
                   },
                   "query": {
                     "operation": "localPhoneTransformer",
-                    "parameters": ["user.mobile"]
+                    "parameters": [
+                      "user.mobile"
+                    ]
                   }
                 }
               },
@@ -4873,17 +5147,23 @@
                 "validate": [
                   {
                     "operation": "validIDNumber",
-                    "parameters": ["NATIONAL_ID"]
+                    "parameters": [
+                      "NATIONAL_ID"
+                    ]
                   }
                 ],
                 "mapping": {
                   "mutation": {
                     "operation": "fieldToIdentifierWithTypeTransformer",
-                    "parameters": ["NATIONAL_ID"]
+                    "parameters": [
+                      "NATIONAL_ID"
+                    ]
                   },
                   "query": {
                     "operation": "identifierWithTypeToFieldTransformer",
-                    "parameters": ["NATIONAL_ID"]
+                    "parameters": [
+                      "NATIONAL_ID"
+                    ]
                   }
                 }
               },
@@ -4982,7 +5262,9 @@
                   "description": "Description for user signature attachment",
                   "id": "form.field.label.userSignatureAttachmentDesc"
                 },
-                "allowedDocType": ["image/png"],
+                "allowedDocType": [
+                  "image/png"
+                ],
                 "initialValue": "",
                 "required": true,
                 "validate": []
@@ -5042,11 +5324,15 @@
                 "mapping": {
                   "mutation": {
                     "operation": "fieldNameTransformer",
-                    "parameters": ["primaryOffice"]
+                    "parameters": [
+                      "primaryOffice"
+                    ]
                   },
                   "query": {
                     "operation": "locationIDToFieldTransformer",
-                    "parameters": ["primaryOffice"]
+                    "parameters": [
+                      "primaryOffice"
+                    ]
                   }
                 }
               }
@@ -5085,11 +5371,17 @@
                 "mapping": {
                   "mutation": {
                     "operation": "fieldToNameTransformer",
-                    "parameters": ["en", "firstNames"]
+                    "parameters": [
+                      "en",
+                      "firstNames"
+                    ]
                   },
                   "query": {
                     "operation": "nameToFieldTransformer",
-                    "parameters": ["en", "firstNames"]
+                    "parameters": [
+                      "en",
+                      "firstNames"
+                    ]
                   }
                 }
               },
@@ -5111,11 +5403,17 @@
                 "mapping": {
                   "mutation": {
                     "operation": "fieldToNameTransformer",
-                    "parameters": ["en", "familyName"]
+                    "parameters": [
+                      "en",
+                      "familyName"
+                    ]
                   },
                   "query": {
                     "operation": "nameToFieldTransformer",
-                    "parameters": ["en", "familyName"]
+                    "parameters": [
+                      "en",
+                      "familyName"
+                    ]
                   }
                 }
               },
@@ -5137,11 +5435,15 @@
                 "mapping": {
                   "mutation": {
                     "operation": "msisdnTransformer",
-                    "parameters": ["user.mobile"]
+                    "parameters": [
+                      "user.mobile"
+                    ]
                   },
                   "query": {
                     "operation": "localPhoneTransformer",
-                    "parameters": ["user.mobile"]
+                    "parameters": [
+                      "user.mobile"
+                    ]
                   }
                 }
               },
@@ -5158,17 +5460,23 @@
                 "validate": [
                   {
                     "operation": "validIDNumber",
-                    "parameters": ["NATIONAL_ID"]
+                    "parameters": [
+                      "NATIONAL_ID"
+                    ]
                   }
                 ],
                 "mapping": {
                   "mutation": {
                     "operation": "fieldToIdentifierWithTypeTransformer",
-                    "parameters": ["NATIONAL_ID"]
+                    "parameters": [
+                      "NATIONAL_ID"
+                    ]
                   },
                   "query": {
                     "operation": "identifierWithTypeToFieldTransformer",
-                    "parameters": ["NATIONAL_ID"]
+                    "parameters": [
+                      "NATIONAL_ID"
+                    ]
                   }
                 }
               },
@@ -5256,7 +5564,9 @@
                   "description": "Description for user signature attachment",
                   "id": "form.field.label.userSignatureAttachmentDesc"
                 },
-                "allowedDocType": ["image/png"],
+                "allowedDocType": [
+                  "image/png"
+                ],
                 "initialValue": "",
                 "required": true,
                 "validate": []
