@@ -242,10 +242,6 @@ class CustomFieldFormsComp extends React.Component<
     const newFieldID = this._generateNewFieldID()
     const modifiedField = { ...selectedField }
 
-    if (modifiedField.label === undefined) {
-      modifiedField.label = []
-    }
-
     modifiedField.required = this.state.requiredField
     modifiedField.enabled = this.state.hideField
     modifiedField.fieldId = newFieldID
@@ -253,6 +249,8 @@ class CustomFieldFormsComp extends React.Component<
     modifiedField.label = Object.keys(languages).map((lang) => ({
       lang,
       descriptor: {
+        id: `form.customField.label.${handleBars}`,
+        description: 'Custom field attribute',
         defaultMessage: this.state.fieldForms[lang].label
       }
     }))
