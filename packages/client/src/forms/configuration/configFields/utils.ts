@@ -19,6 +19,11 @@ import {
   ISerializedFormSectionGroup,
   IFormSectionGroup,
   SerializedFormField,
+  IRadioOption,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
+  RADIO_GROUP,
+  SELECT_WITH_OPTIONS,
+  DOCUMENT_UPLOADER_WITH_OPTION,
   QuestionConfigFieldType
 } from '@client/forms'
 import { camelCase, keys } from 'lodash'
@@ -150,7 +155,19 @@ export function getFieldDefinition(
 }
 
 export function getContentKey(formField: IFormField) {
-  return formField.label.id
+  if (
+    (formField.type === RADIO_GROUP ||
+      formField.type === RADIO_GROUP_WITH_NESTED_FIELDS ||
+      formField.type === SELECT_WITH_OPTIONS ||
+      formField.type === DOCUMENT_UPLOADER_WITH_OPTION) &&
+    !['country', 'countryPermanent', 'nationality'].includes(formField.name)
+  ) {
+    const listedOptions = formField.options as IRadioOption[]
+    const listedContentKey = listedOptions.map((option) => option.label.id)
+    return listedContentKey
+  } else {
+    return [formField.label.id]
+  }
 }
 
 export function getCertificateHandlebar(formField: IFormField) {

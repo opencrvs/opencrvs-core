@@ -131,7 +131,11 @@ export function DefaultFieldTools({
           {intl.formatMessage(messages.contentKey)}
           <StyledTooltip />
         </Subtitle>
-        <Body>{contentKey}</Body>
+        <Body>
+          {contentKey.map((content, index) => (
+            <span key={index}>{content}</span>
+          ))}
+        </Body>
       </Content>
       {handleBar && (
         <HandleBar>
