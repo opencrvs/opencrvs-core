@@ -25,12 +25,22 @@ import { messages } from '@client/i18n/messages/views/performance'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
+import { goToFieldAgentList } from '@client/navigation'
+import { connect } from 'react-redux'
 
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult
+  locationId: string
+  timeStart: string
+  timeEnd: string
+}
+interface IDispatchProps {
+  goToFieldAgentList: typeof goToFieldAgentList
 }
 
-export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
+export function ApplicationSourcesComp(
+  props: ApplicationSourcesProps & IDispatchProps
+) {
   const { data } = props
   const intl = useIntl()
   return (
@@ -74,7 +84,18 @@ export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
             </PerformanceValue>
           }
           actions={
-            <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+            <LinkButton
+              id="field-agent-list-view"
+              onClick={() =>
+                props.goToFieldAgentList(
+                  props.locationId,
+                  props.timeStart,
+                  props.timeEnd
+                )
+              }
+            >
+              {intl.formatMessage(buttonMessages.view)}
+            </LinkButton>
           }
         />
         <ListViewItemSimplified
@@ -125,3 +146,9 @@ export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
     </ListContainer>
   )
 }
+export const AppSources = connect<ApplicationSourcesProps, IDispatchProps>(
+  undefined,
+  {
+    goToFieldAgentList
+  }
+)(ApplicationSourcesComp)
