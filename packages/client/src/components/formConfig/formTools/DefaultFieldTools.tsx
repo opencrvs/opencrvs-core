@@ -28,7 +28,12 @@ import {
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { useParams } from 'react-router'
-import { Event, BirthSection, DeathSection } from '@client/forms'
+import {
+  Event,
+  BirthSection,
+  DeathSection,
+  fieldTypeLabel
+} from '@client/forms'
 import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import { modifyConfigField } from '@client/forms/configuration/configFields/actions'
@@ -116,10 +121,11 @@ export function DefaultFieldTools({
   const formField = getFieldDefinition(formSection, configField)
   const handleBar = getCertificateHandlebar(formField)
   const contentKey = getContentKey(formField)
+  const fieldType = fieldTypeLabel(formField.type)
 
   return (
     <Container>
-      <Title>{formField.type}</Title>
+      <Title>{intl.formatMessage(fieldType)}</Title>
       <ListViewSimplified bottomBorder>
         <ListViewItemSimplified
           label={<Label>{intl.formatMessage(messages.hideField)}</Label>}
@@ -150,7 +156,11 @@ export function DefaultFieldTools({
           {intl.formatMessage(messages.contentKey)}
           <StyledTooltip />
         </Subtitle>
-        <Body>{contentKey}</Body>
+        <Body>
+          {contentKey.map((content, index) => (
+            <span key={index}>{content}</span>
+          ))}
+        </Body>
       </Content>
       {handleBar && (
         <HandleBar>

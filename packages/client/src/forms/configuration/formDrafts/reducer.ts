@@ -17,7 +17,7 @@ import { getFormDraft } from './utils'
 
 export enum DraftStatus {
   DRAFT = 'DRAFT',
-  PREVIEW = 'PREVIEW',
+  PREVIEW = 'IN_PREVIEW',
   PUBLISHED = 'PUBLISHED',
   DELETED = 'DELETED'
 }
@@ -26,7 +26,7 @@ export interface IHistory {
   version: number
   status: DraftStatus
   comment?: string
-  lastUpdateAt: number
+  updatedAt: number
 }
 
 export interface IDraft {

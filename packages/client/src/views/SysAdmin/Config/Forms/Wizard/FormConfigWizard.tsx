@@ -9,33 +9,44 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { CustomFieldForms } from '@client/components/formConfig/CustomFieldForm'
+import { addCustomField } from '@client/forms/configuration/configFields/actions'
+import {
+  prepareNewCustomFieldConfig,
+  IConfigField,
+  isDefaultField,
+  IConfigFieldMap
+} from '@client/forms/configuration/configFields/utils'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import { Redirect, useParams } from 'react-router'
 import { HOME } from '@client/navigation/routes'
-import { EventTopBar } from '@opencrvs/components/lib/interface'
-import { SettingsBlue } from '@opencrvs/components/lib/icons'
+import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
 import {
   SecondaryButton,
   SuccessButton,
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
-import styled from '@client/styledComponents'
+import { SettingsBlue } from '@opencrvs/components/lib/icons'
+import { EventTopBar } from '@opencrvs/components/lib/interface'
 import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
-import { Event, BirthSection, DeathSection, WizardSection } from '@client/forms'
+import {
+  Event,
+  BirthSection,
+  DeathSection,
+  WizardSection,
+  QuestionConfigFieldType
+} from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
+import { Dispatch } from 'redux'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
-import {
-  IConfigField,
-  isDefaultField
-} from '@client/forms/configuration/configFields/utils'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import { IStoreState } from '@client/store'
 import { goToFormConfigHome, goToFormConfigWizard } from '@client/navigation'
 import { getScope } from '@client/profile/profileSelectors'
 import { AuthScope } from '@client/utils/authUtils'
@@ -43,8 +54,12 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import { SaveActionModal, SaveActionContext } from './SaveActionModal'
 import { SaveActionNotification } from './SaveActionNotification'
 import { FormConfigSettings } from './FormConfigSettings'
-import { selectConfigField } from '@client/forms/configuration/configFields/selectors'
+import {
+  selectConfigField,
+  selectConfigFields
+} from '@client/forms/configuration/configFields/selectors'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
+import { flushSync } from 'react-dom'
 
 const Container = styled.div`
   display: flex;
@@ -79,6 +94,7 @@ const ToolsContainer = styled.div`
   padding-top: 30px;
   border-left: 1px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${({ theme }) => theme.colors.white};
+  overflow-y: auto;
 `
 
 const CanvasContainer = styled.div`
@@ -87,6 +103,12 @@ const CanvasContainer = styled.div`
   margin-left: 40px;
   margin-right: 40px;
   margin-top: 18px;
+`
+
+const CanvasWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
 `
 
 type IRouteProps = {
@@ -111,6 +133,27 @@ function isSelectedFieldValid(
   section: string
 ): selectedField is IConfigField {
   return !!selectedField?.fieldId.includes(section)
+}
+/* TODO: move this into FormTools */
+function formToolClickListener(
+  fieldType: QuestionConfigFieldType,
+  fieldsMap: IConfigFieldMap,
+  event: Event,
+  section: string,
+  setSelectedField: React.Dispatch<React.SetStateAction<string | null>>,
+  dispatch: Dispatch
+) {
+  const customFieldConfig = prepareNewCustomFieldConfig(
+    fieldsMap,
+    event,
+    section,
+    fieldType
+  )
+  dispatch(addCustomField(event, section, customFieldConfig))
+  flushSync(() => setSelectedField(customFieldConfig.fieldId))
+  document
+    .getElementById(customFieldConfig.fieldId)
+    ?.scrollIntoView({ behavior: 'smooth' })
 }
 
 function useHasNatlSysAdminScope() {
@@ -171,6 +214,9 @@ export function FormConfigWizard() {
   const { version } = useSelector((store: IStoreState) =>
     selectFormDraft(store, event)
   )
+  const fieldsMap = useSelector((store: IStoreState) =>
+    selectConfigFields(store, event, section)
+  )
   const dispatch = useDispatch()
   const hasNatlSysAdminScope = useHasNatlSysAdminScope()
   const intl = useIntl()
@@ -218,13 +264,15 @@ export function FormConfigWizard() {
         </NavigationContainer>
         {section !== 'settings' ? (
           <>
-            <CanvasContainer>
-              <Canvas
-                selectedField={selectedField}
-                setSelectedField={setSelectedField}
-                showHiddenFields={showHiddenFields}
-              />
-            </CanvasContainer>
+            <CanvasWrapper onClick={() => setSelectedField(null)}>
+              <CanvasContainer>
+                <Canvas
+                  selectedField={selectedField}
+                  setSelectedField={setSelectedField}
+                  showHiddenFields={showHiddenFields}
+                />
+              </CanvasContainer>
+            </CanvasWrapper>
             <ToolsContainer>
               {/*
                *  The useEffect hook for clearing the selectedFieldId takes
@@ -234,13 +282,30 @@ export function FormConfigWizard() {
                *  we need to make sure that the selectedField is valid
                */}
               {isSelectedFieldValid(selectedField, section) ? (
-                isDefaultField(selectedField) && (
+                isDefaultField(selectedField) ? (
                   <DefaultFieldTools configField={selectedField} />
+                ) : (
+                  <CustomFieldForms
+                    key={selectedField.fieldId}
+                    event={event}
+                    section={section}
+                    selectedField={selectedField}
+                  />
                 )
               ) : (
                 <FormTools
                   showHiddenFields={showHiddenFields}
                   setShowHiddenFields={setShowHiddenFields}
+                  onAddClickListener={(fieldType: QuestionConfigFieldType) =>
+                    formToolClickListener(
+                      fieldType,
+                      fieldsMap,
+                      event,
+                      section,
+                      setSelectedField,
+                      dispatch
+                    )
+                  }
                 />
               )}
             </ToolsContainer>

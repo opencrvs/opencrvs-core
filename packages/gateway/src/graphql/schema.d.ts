@@ -78,6 +78,7 @@ export interface GQLMutation {
   updateApplicationConfig?: GQLApplicationConfiguration
   createOrUpdateQuestion?: GQLQuestion
   createOrUpdateFormDraft?: GQLFormDraft
+  modifyDraftStatus?: GQLFormDraft
 }
 
 export interface GQLDummy {
@@ -516,10 +517,14 @@ export interface GQLQuestionInput {
 
 export interface GQLFormDraftInput {
   questions?: Array<GQLQuestionInput | null>
-  deleted?: Array<string | null>
   event: string
   status: string
   comment?: string
+}
+
+export interface GQLFormDraftStatusModify {
+  event: string
+  status: string
 }
 
 export type GQLMap = any
@@ -848,7 +853,7 @@ export interface GQLDraftHistory {
   version?: number
   status?: string
   comment?: string
-  lastUpdateAt?: GQLDate
+  updatedAt?: GQLDate
 }
 
 export interface GQLPersonInput {
@@ -2093,6 +2098,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
   createOrUpdateQuestion?: MutationToCreateOrUpdateQuestionResolver<TParent>
   createOrUpdateFormDraft?: MutationToCreateOrUpdateFormDraftResolver<TParent>
+  modifyDraftStatus?: MutationToModifyDraftStatusResolver<TParent>
 }
 
 export interface MutationToCreateNotificationArgs {
@@ -2566,6 +2572,21 @@ export interface MutationToCreateOrUpdateFormDraftResolver<
   (
     parent: TParent,
     args: MutationToCreateOrUpdateFormDraftArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToModifyDraftStatusArgs {
+  formDraft: GQLFormDraftStatusModify
+}
+export interface MutationToModifyDraftStatusResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToModifyDraftStatusArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -5000,7 +5021,7 @@ export interface GQLDraftHistoryTypeResolver<TParent = any> {
   version?: DraftHistoryToVersionResolver<TParent>
   status?: DraftHistoryToStatusResolver<TParent>
   comment?: DraftHistoryToCommentResolver<TParent>
-  lastUpdateAt?: DraftHistoryToLastUpdateAtResolver<TParent>
+  updatedAt?: DraftHistoryToUpdatedAtResolver<TParent>
 }
 
 export interface DraftHistoryTo_idResolver<TParent = any, TResult = any> {
@@ -5019,10 +5040,7 @@ export interface DraftHistoryToCommentResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface DraftHistoryToLastUpdateAtResolver<
-  TParent = any,
-  TResult = any
-> {
+export interface DraftHistoryToUpdatedAtResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

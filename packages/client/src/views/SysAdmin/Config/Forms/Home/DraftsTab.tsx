@@ -35,29 +35,43 @@ import {
   isDefaultDraft
 } from '@client/views/SysAdmin/Config/Forms/utils'
 import { ActionContext, Actions } from './ActionsModal'
+import { FormConfigMobileViewModal } from './FormConfigMobileViewModal'
+import { isMobileDevice } from '@client/utils/commonUtils'
 
 function ActionButton({ event, status, version }: IDraft) {
   const intl = useIntl()
   const dispatch = useDispatch()
+  const [showMobileModal, setMobileModal] = React.useState(false)
+  const toggleModal = () => setMobileModal((prev) => !prev)
   return (
-    <LinkButton
-      onClick={() =>
-        dispatch(
-          goToFormConfigWizard(
-            event,
-            event === Event.BIRTH
-              ? BirthSection.Registration
-              : DeathSection.Registration
-          )
-        )
-      }
-    >
-      {intl.formatMessage(
-        isDefaultDraft({ version }) || status === DraftStatus.DELETED
-          ? buttonMessages.configure
-          : buttonMessages.edit
-      )}
-    </LinkButton>
+    <>
+      <LinkButton
+        onClick={() => {
+          if (isMobileDevice()) {
+            toggleModal()
+          } else {
+            dispatch(
+              goToFormConfigWizard(
+                event,
+                event === Event.BIRTH
+                  ? BirthSection.Registration
+                  : DeathSection.Registration
+              )
+            )
+          }
+        }}
+      >
+        {intl.formatMessage(
+          isDefaultDraft({ version }) || status === DraftStatus.DELETED
+            ? buttonMessages.configure
+            : buttonMessages.edit
+        )}
+      </LinkButton>
+      <FormConfigMobileViewModal
+        showModal={showMobileModal}
+        toggleModal={toggleModal}
+      />
+    </>
   )
 }
 
@@ -121,12 +135,16 @@ function EventDrafts({ event }: { event: Event }) {
             actions
           ) : status === DraftStatus.PREVIEW ? (
             <Pill
-              label={intl.formatMessage(draftStatusMessages.PREVIEW)}
+              label={intl.formatMessage(
+                draftStatusMessages[DraftStatus.PREVIEW]
+              )}
               type="active"
             />
           ) : (
             <Pill
-              label={intl.formatMessage(draftStatusMessages.PUBLISHED)}
+              label={intl.formatMessage(
+                draftStatusMessages[DraftStatus.PUBLISHED]
+              )}
               type="active"
             />
           )

@@ -9,16 +9,16 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { RadioSize } from '@opencrvs/components/lib/forms'
 import {
   BirthSection,
-  REVIEW_OVERRIDE_POSITION,
-  FLEX_DIRECTION,
-  ISerializedForm,
   DeathSection,
-  IConditionals
+  FLEX_DIRECTION,
+  IFormField,
+  ISerializedForm,
+  REVIEW_OVERRIDE_POSITION
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
+import { RadioSize } from '@opencrvs/components/lib/forms'
 
 // THIS FILE CONTAINS THE DEFAULT, FACTORY RESET FORM CONFIGURATIONS
 

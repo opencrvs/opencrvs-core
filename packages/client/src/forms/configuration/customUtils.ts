@@ -105,6 +105,7 @@ export function createCustomField(
       query: {
         operation: 'questionnaireToCustomFieldTransformer'
       }
+      /* TODO: Add template mapping so that handlebars work */
     }
   }
   if (
