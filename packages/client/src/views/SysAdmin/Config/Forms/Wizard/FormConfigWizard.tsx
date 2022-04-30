@@ -151,12 +151,11 @@ function formToolClickListener(
     section,
     fieldType
   )
-  if (!customFieldConfig) {
-    return
-  }
   dispatch(addCustomField(event, section, customFieldConfig))
   flushSync(() => setSelectedField(customFieldConfig))
-  document.getElementById(customFieldConfig.fieldId)?.scrollIntoView()
+  document
+    .getElementById(customFieldConfig.fieldId)
+    ?.scrollIntoView({ behavior: 'smooth' })
 }
 
 export function FormConfigWizard() {

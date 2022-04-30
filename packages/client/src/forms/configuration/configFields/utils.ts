@@ -306,6 +306,7 @@ export function prepareNewCustomFieldConfig(
 
   return {
     fieldId: customFieldIndex,
+    fieldName: customFieldIndex,
     fieldType,
     preceedingFieldId: lastField ? lastField.fieldId : FieldPosition.TOP,
     foregoingFieldId: FieldPosition.BOTTOM,
