@@ -130,16 +130,16 @@ export const REMOVE_CUSTOM_FIELD = 'FORM/REMOVE_CUSTOM_FIELD'
 export type RemoveCustomFieldAction = {
   type: typeof REMOVE_CUSTOM_FIELD
   payload: {
-    selectedField: ICustomConfigField
+    fieldId: string
   }
 }
 
 export const removeCustomField = (
-  customField: ICustomConfigField
+  fieldId: string
 ): RemoveCustomFieldAction => ({
   type: REMOVE_CUSTOM_FIELD,
   payload: {
-    selectedField: customField
+    fieldId
   }
 })
 

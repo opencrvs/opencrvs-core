@@ -185,28 +185,24 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
 
     case actions.REMOVE_CUSTOM_FIELD: {
       if (state.state === 'LOADING') return state
-      const { selectedField } = action.payload
-      const [event, section] = selectedField.fieldId.split('.') as [
-        Event,
-        string
-      ]
+      const { fieldId } = action.payload
+      const { event, section } = getEventSectionGroupFromFieldID(fieldId)
 
-      const { [selectedField.fieldId]: fieldToRemove, ...fields } =
-        state[event][section]
+      const { [fieldId]: fieldToRemove, ...fields } = state[event][section]
 
       if (
-        selectedField.preceedingFieldId &&
-        selectedField.preceedingFieldId !== FieldPosition.TOP
+        fieldToRemove.preceedingFieldId &&
+        fieldToRemove.preceedingFieldId !== FieldPosition.TOP
       ) {
-        fields[selectedField.preceedingFieldId] = {
-          ...fields[selectedField.preceedingFieldId],
-          foregoingFieldId: selectedField.foregoingFieldId
+        fields[fieldToRemove.preceedingFieldId] = {
+          ...fields[fieldToRemove.preceedingFieldId],
+          foregoingFieldId: fieldToRemove.foregoingFieldId
         }
       }
-      if (selectedField.foregoingFieldId !== FieldPosition.BOTTOM) {
-        fields[selectedField.foregoingFieldId] = {
-          ...fields[selectedField.foregoingFieldId],
-          preceedingFieldId: selectedField.preceedingFieldId
+      if (fieldToRemove.foregoingFieldId !== FieldPosition.BOTTOM) {
+        fields[fieldToRemove.foregoingFieldId] = {
+          ...fields[fieldToRemove.foregoingFieldId],
+          preceedingFieldId: fieldToRemove.preceedingFieldId
         }
       }
 

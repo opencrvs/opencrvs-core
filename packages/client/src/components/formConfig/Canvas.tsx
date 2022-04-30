@@ -89,7 +89,7 @@ export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
           }}
           removable={configField.custom}
           onRemove={() => {
-            selectedField && dispatch(removeCustomField(selectedField))
+            selectedField && dispatch(removeCustomField(selectedField.fieldId))
           }}
         >
           <FormFieldGenerator
