@@ -19,7 +19,7 @@ import {
   ISectionFieldMap
 } from './utils'
 import * as offlineActions from '@client/offline/actions'
-import { getConfiguredForm } from '@client/forms/configuration'
+import { getConfiguredForm, FieldPosition } from '@client/forms/configuration'
 
 export type IConfigFieldsState =
   | {
@@ -114,76 +114,107 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
       }
       return state
 
-    case actions.ADD_CUSTOM_FIELD:
+    case actions.ADD_CUSTOM_FIELD: {
       if (state.state === 'LOADING') {
         return state
       }
       const { event, section, customField } = action.payload
+      const fields = {
+        ...state[event][section],
+        [customField.fieldId]: customField
+      }
+
+      if (
+        customField.preceedingFieldId &&
+        customField.preceedingFieldId !== FieldPosition.TOP
+      ) {
+        fields[customField.preceedingFieldId] = {
+          ...fields[customField.preceedingFieldId],
+          foregoingFieldId: customField.fieldId
+        }
+      }
 
       return {
         ...state,
         [event]: {
           ...state[event],
-          [section]: {
-            ...state[event][section],
-            [customField.fieldId]: customField
-          }
+          [section]: fields
         }
       }
+    }
     case actions.MODIFY_CUSTOM_FIELD: {
       if (state.state === 'LOADING') {
         return state
       }
+
+      const { modifiedField, originalField } = action.payload
       const { event, section } = getEventSectionGroupFromFieldID(
         action.payload.originalField.fieldId
       )
 
-      const newState = { ...state }
-      delete newState[event][section][action.payload.originalField.fieldId]
-      newState[event][section][action.payload.modifiedField.fieldId] =
-        action.payload.modifiedField
+      const { [originalField.fieldId]: fieldToRemove, ...fields } =
+        state[event][section]
+
+      fields[modifiedField.fieldId] = modifiedField
 
       // Adjusting precedingFieldId & foregoingFieldId
-      if (action.payload.modifiedField.preceedingFieldId) {
-        newState[event][section][
-          action.payload.modifiedField.preceedingFieldId
-        ].foregoingFieldId = action.payload.modifiedField.fieldId
+      if (
+        modifiedField.preceedingFieldId &&
+        modifiedField.preceedingFieldId !== FieldPosition.TOP
+      ) {
+        fields[modifiedField.preceedingFieldId] = {
+          ...fields[modifiedField.preceedingFieldId],
+          foregoingFieldId: modifiedField.fieldId
+        }
       }
 
-      if (action.payload.modifiedField.foregoingFieldId)
-        newState[event][section][
-          action.payload.modifiedField.foregoingFieldId
-        ].preceedingFieldId = action.payload.modifiedField.fieldId
+      if (modifiedField.foregoingFieldId !== FieldPosition.BOTTOM)
+        fields[modifiedField.foregoingFieldId] = {
+          ...fields[modifiedField.foregoingFieldId],
+          preceedingFieldId: modifiedField.fieldId
+        }
 
       return {
-        ...newState
+        ...state,
+        [event]: {
+          ...state[event],
+          [section]: fields
+        }
       }
     }
 
     case actions.REMOVE_CUSTOM_FIELD: {
       if (state.state === 'LOADING') return state
       const { selectedField } = action.payload
-      const [selectedFieldEvent, selectedFieldSection] =
-        selectedField.fieldId.split('.') as [Event, string]
+      const [event, section] = selectedField.fieldId.split('.') as [
+        Event,
+        string
+      ]
 
-      const fields = state[selectedFieldEvent][selectedFieldSection]
+      const { [selectedField.fieldId]: fieldToRemove, ...fields } =
+        state[event][section]
 
-      if (selectedField.preceedingFieldId) {
-        fields[selectedField.preceedingFieldId].foregoingFieldId =
-          selectedField.foregoingFieldId
+      if (
+        selectedField.preceedingFieldId &&
+        selectedField.preceedingFieldId !== FieldPosition.TOP
+      ) {
+        fields[selectedField.preceedingFieldId] = {
+          ...fields[selectedField.preceedingFieldId],
+          foregoingFieldId: selectedField.foregoingFieldId
+        }
       }
-      if (selectedField.foregoingFieldId) {
-        fields[selectedField.foregoingFieldId].preceedingFieldId =
-          selectedField.preceedingFieldId
+      if (selectedField.foregoingFieldId !== FieldPosition.BOTTOM) {
+        fields[selectedField.foregoingFieldId] = {
+          ...fields[selectedField.foregoingFieldId],
+          preceedingFieldId: selectedField.preceedingFieldId
+        }
       }
-
-      delete fields[selectedField.fieldId]
 
       return {
         ...state,
-        [selectedFieldEvent]: {
-          ...state[selectedFieldEvent],
-          [selectedFieldSection]: fields
+        [event]: {
+          ...state[event],
+          [section]: fields
         }
       }
     }
