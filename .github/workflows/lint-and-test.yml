@@ -11,9 +11,6 @@
 name: Lint and run unit tests
 
 on: [pull_request]
-env:
-  COUNTRY_CODE: farajaland
-  COUNTRY_CONFIG_REPO: https://github.com/opencrvs/opencrvs-farajaland.git
 
 jobs:
   test:
@@ -35,22 +32,6 @@ jobs:
 
       - name: Runs dependency installation
         run: yarn
-
-      - name: Checking out the country config repo
-        run: |
-          git clone -b develop --depth=1 $COUNTRY_CONFIG_REPO
-          cd opencrvs-farajaland
-          echo "COUNTRY_CONFIG_PATH=$(pwd)" >> $GITHUB_ENV
-          cd ../
-
-      - name: Run extract:translations - login
-        run: |
-          cd packages/login && yarn extract:translations
-          cd ../../
-      - name: Run extract:translations - client
-        run: |
-          cd packages/client && yarn extract:translations
-          cd ../../
 
       - name: Run linting
         run: yarn lint
