@@ -14,8 +14,7 @@ import { fetchEventsGroupByMonthDates } from '@metrics/features/metrics/metricsG
 import {
   getMonthRangeFilterListFromTimeRage,
   IMonthRangeFilter,
-  fetchEstimateForTargetDaysByLocationId,
-  getPercentage
+  fetchEstimateForTargetDaysByLocationId
 } from '@metrics/features/metrics/utils'
 import {
   TIME_FROM,
@@ -26,16 +25,13 @@ import {
 import { IAuthHeader } from '@metrics/features/registration/'
 
 interface IMonthWiseEstimation {
-  actualTotalRegistration: number
-  actualTargetDayRegistration: number
-  actualWithin1YearRegistration: number
-  actualWithin5YearsRegistration: number
-  estimatedRegistration: number
-  estimatedTargetDayPercentage: number
-  month: string
-  year: string
-  startOfMonth: string
-  endOfMonth: string
+  total: number
+  withinTarget: number
+  within1Year: number
+  within5Years: number
+  estimated: number
+  month: number
+  year: number
 }
 
 export async function monthWiseEventEstimationsHandler(
@@ -88,10 +84,10 @@ export async function monthWiseEventEstimationsHandler(
     const totalWithin1YearInMonth = registrationsGroupByMonthDates
       .filter(
         (p) =>
-          (p.dateLabel === `${monthFilter.year}-${monthFilter.monthIndex}` &&
-            p.timeLabel === 'withinTarget') ||
-          p.timeLabel === 'withinLate' ||
-          p.timeLabel === 'within1Year'
+          p.dateLabel === `${monthFilter.year}-${monthFilter.monthIndex}` &&
+          (p.timeLabel === 'withinTarget' ||
+            p.timeLabel === 'withinLate' ||
+            p.timeLabel === 'within1Year')
       )
       .reduce((t, p) => t + p.total, 0)
     const totalWithin5YearsInMonth = registrationsGroupByMonthDates
@@ -103,18 +99,12 @@ export async function monthWiseEventEstimationsHandler(
       .reduce((t, p) => t + p.total, 0)
 
     estimations.push({
-      startOfMonth: monthFilter.startOfMonthTime,
-      endOfMonth: monthFilter.endOfMonthTime,
-      actualTotalRegistration: totalRegistrationWithinMonth,
-      actualTargetDayRegistration: totalWithinTargetInMonth,
-      actualWithin1YearRegistration: totalWithin1YearInMonth,
-      actualWithin5YearsRegistration: totalWithin5YearsInMonth,
-      estimatedRegistration: estimatedTargetDayMetrics.totalEstimation,
-      estimatedTargetDayPercentage: getPercentage(
-        totalWithinTargetInMonth,
-        estimatedTargetDayMetrics.totalEstimation
-      ),
-      month: monthFilter.month,
+      total: totalRegistrationWithinMonth,
+      withinTarget: totalWithinTargetInMonth,
+      within1Year: totalWithin1YearInMonth,
+      within5Years: totalWithin5YearsInMonth,
+      estimated: estimatedTargetDayMetrics.totalEstimation,
+      month: monthFilter.monthIndex,
       year: monthFilter.year
     })
   }

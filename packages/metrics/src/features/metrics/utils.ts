@@ -56,7 +56,7 @@ export interface IMonthRangeFilter {
   startOfMonthTime: string
   endOfMonthTime: string
   month: string
-  year: string
+  year: number
   monthIndex: number
 }
 
@@ -426,7 +426,7 @@ export function getMonthRangeFilterListFromTimeRage(
     monthFilterList.push({
       monthIndex: filterDate.getMonth(),
       month: filterDate.toLocaleString('en-us', { month: 'long' }),
-      year: String(filterDate.getFullYear()),
+      year: filterDate.getFullYear(),
       startOfMonthTime: new Date(
         filterDate.getFullYear(),
         filterDate.getMonth(),

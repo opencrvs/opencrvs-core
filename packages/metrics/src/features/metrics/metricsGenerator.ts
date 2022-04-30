@@ -35,6 +35,10 @@ interface IGroupedByGender {
   gender: string
 }
 
+interface IGroupByTimeLabel {
+  total: number
+  timeLabel: string
+}
 interface IGroupByEventDate {
   total: number
   dateLabel: string
@@ -834,6 +838,41 @@ export async function fetchLocationWiseEventEstimations(
   }
 }
 
+export async function fetchLocaitonWiseEventEstimationsGroupByTimeLabel(
+  timeFrom: string,
+  timeTo: string,
+  locationId: string,
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+
+  const registrations: IGroupByTimeLabel[] = await query(
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}
+    WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}'
+      AND ( locationLevel2 = '${locationId}'
+          OR locationLevel3 = '${locationId}'
+          OR locationLevel4 = '${locationId}'
+          OR locationLevel5 = '${locationId}' )
+    GROUP BY timeLabel`
+  )
+  const estimationOfTimeRange: IEstimation =
+    await fetchEstimateForTargetDaysByLocationId(
+      locationId,
+      event,
+      authHeader,
+      timeFrom,
+      timeTo
+    )
+
+  return {
+    estimated: estimationOfTimeRange,
+    results: registrations
+  }
+}
 export async function fetchEventsGroupByMonthDates(
   timeFrom: string,
   timeTo: string,

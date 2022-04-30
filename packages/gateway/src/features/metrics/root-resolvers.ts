@@ -10,10 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-import {
-  getMetrics,
-  eventInTargetDayEstimationCalculator
-} from '@gateway/features/fhir/utils'
+import { getMetrics } from '@gateway/features/fhir/utils'
 
 export interface IMetricsParam {
   timeStart?: string
@@ -93,10 +90,7 @@ export const resolvers: GQLResolver = {
         },
         authHeader
       )
-      return {
-        details: metricsData,
-        total: eventInTargetDayEstimationCalculator(metricsData)
-      }
+      return metricsData
     },
     async fetchLocationWiseEventMetrics(
       _,
@@ -113,10 +107,7 @@ export const resolvers: GQLResolver = {
         },
         authHeader
       )
-      return {
-        details: metricsData,
-        total: eventInTargetDayEstimationCalculator(metricsData)
-      }
+      return metricsData
     },
     async fetchTimeLoggedMetricsByPractitioner(
       _,

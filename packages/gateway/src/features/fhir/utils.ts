@@ -60,7 +60,6 @@ import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 import { logger } from '@gateway/logger'
 import {
-  GQLMonthWiseTargetDayEstimation,
   GQLLocationWiseTargetDayEstimation,
   GQLEventInTargetDayEstimationCount,
   GQLRegStatus
@@ -1303,9 +1302,7 @@ export async function setInformantReference(
 }
 
 export function eventInTargetDayEstimationCalculator(
-  eventInTargetDayEstimations: Array<
-    GQLMonthWiseTargetDayEstimation | GQLLocationWiseTargetDayEstimation
-  >
+  eventInTargetDayEstimations: Array<GQLLocationWiseTargetDayEstimation>
 ): GQLEventInTargetDayEstimationCount {
   const initialValue: GQLEventInTargetDayEstimationCount = {
     actualTotalRegistration: 0,
