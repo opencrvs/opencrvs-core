@@ -30,10 +30,7 @@ import {
   SysAdminContentWrapper,
   SysAdminPageVariant
 } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import {
-  GQLMonthWiseTargetDayEstimation,
-  GQLMonthWiseEstimationMetrics
-} from '@opencrvs/gateway/src/graphql/schema'
+import { GQLMonthWiseEstimationMetric } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -55,9 +52,10 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import format from '@client/utils/date-formatting'
 const { useState } = React
 
-export enum REG_RATE_BASE {
+export enum COMPLETENESS_RATE_REPORT_BASE {
   TIME = 'TIME',
   LOCATION = 'LOCATION'
 }
@@ -77,32 +75,30 @@ type ICompletenessRateProps = RouteComponentProps<{ eventType: string }> &
   IDispatchProps
 
 export interface IEstimationBase {
-  baseType: REG_RATE_BASE
+  baseType: COMPLETENESS_RATE_REPORT_BASE
   locationJurisdictionType?: string
 }
 
-function prepareChartData(data: GQLMonthWiseEstimationMetrics) {
+function prepareChartData(data: GQLMonthWiseEstimationMetric[]) {
   return (
     data &&
-    data.details &&
-    data.details.reduce(
-      (
-        chartData: any[],
-        dataDetails: GQLMonthWiseTargetDayEstimation | null,
-        index
-      ) => {
+    data.reduce(
+      (chartData: any[], dataDetails: GQLMonthWiseEstimationMetric, index) => {
         if (dataDetails !== null) {
           chartData.push({
             label:
-              new Date(
-                Date.parse(`${dataDetails.month} 1, 1990`)
-              ).getMonth() === 0
-                ? `${dataDetails.month.slice(0, 3)} ${dataDetails.year}`
-                : `${dataDetails.month.slice(0, 3)}`,
-            registeredInTargetDays: dataDetails.actualTargetDayRegistration,
-            totalRegistered: dataDetails.actualTotalRegistration,
-            totalEstimate: dataDetails.estimatedRegistration,
-            registrationPercentage: `${dataDetails.estimatedTargetDayPercentage}%`
+              dataDetails.month === 0
+                ? format(
+                    new Date(dataDetails.year, dataDetails.month),
+                    'MMM yyyy'
+                  )
+                : format(new Date(dataDetails.year, dataDetails.month), 'MMM'),
+            registeredInTargetDays: dataDetails.withinTarget,
+            totalRegistered: dataDetails.total,
+            totalEstimate: dataDetails.estimated,
+            registrationPercentage: `${Number(
+              (dataDetails.withinTarget / dataDetails.estimated) * 100
+            ).toFixed(2)}%`
           })
         }
         return chartData
@@ -114,7 +110,7 @@ function prepareChartData(data: GQLMonthWiseEstimationMetrics) {
 
 function CompletenessRatesComponent(props: ICompletenessRateProps) {
   const [base, setBase] = useState<IEstimationBase>({
-    baseType: REG_RATE_BASE.TIME
+    baseType: COMPLETENESS_RATE_REPORT_BASE.TIME
   })
 
   const {
@@ -139,7 +135,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
             const options: IPerformanceSelectOption[] = [
               {
                 label: intl.formatMessage(messages.overTime),
-                value: REG_RATE_BASE.TIME
+                value: COMPLETENESS_RATE_REPORT_BASE.TIME
               }
             ]
             if (
@@ -155,7 +151,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                 label: intl.formatMessage(messages.byLocation, {
                   jurisdictionType
                 }),
-                value: REG_RATE_BASE.LOCATION,
+                value: COMPLETENESS_RATE_REPORT_BASE.LOCATION,
                 type: jurisdictionType || ''
               })
             }
@@ -168,7 +164,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                   options={options}
                   onChange={(option) =>
                     setBase({
-                      baseType: option.value as REG_RATE_BASE,
+                      baseType: option.value as COMPLETENESS_RATE_REPORT_BASE,
                       locationJurisdictionType: option.type
                     })
                   }
@@ -264,7 +260,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
       >
         <Query
           query={
-            base.baseType === REG_RATE_BASE.TIME
+            base.baseType === COMPLETENESS_RATE_REPORT_BASE.TIME
               ? FETCH_MONTH_WISE_EVENT_ESTIMATIONS
               : FETCH_LOCATION_WISE_EVENT_ESTIMATIONS
           }
@@ -279,7 +275,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
             if (error) {
               return (
                 <>
-                  {base.baseType === REG_RATE_BASE.TIME && (
+                  {base.baseType === COMPLETENESS_RATE_REPORT_BASE.TIME && (
                     <RegRatesLineChart loading={true} />
                   )}
                   <CompletenessDataTable loading={true} />
@@ -289,7 +285,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
             } else {
               return (
                 <>
-                  {base.baseType === REG_RATE_BASE.TIME && (
+                  {base.baseType === COMPLETENESS_RATE_REPORT_BASE.TIME && (
                     <RegRatesLineChart
                       loading={loading}
                       data={prepareChartData(
@@ -303,7 +299,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                     base={base}
                     data={
                       data &&
-                      (base.baseType === REG_RATE_BASE.TIME
+                      (base.baseType === COMPLETENESS_RATE_REPORT_BASE.TIME
                         ? data.fetchMonthWiseEventMetrics
                         : data.fetchLocationWiseEventMetrics)
                     }

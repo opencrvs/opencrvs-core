@@ -14,7 +14,7 @@ import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
 import {
   IEstimationBase,
-  REG_RATE_BASE
+  COMPLETENESS_RATE_REPORT_BASE
 } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
 import {
@@ -24,6 +24,11 @@ import {
 import { orderBy } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
+import {
+  GQLLocationWiseEstimationMetric,
+  GQLMonthWiseEstimationMetric
+} from '@opencrvs/gateway/src/graphql/schema'
+import { formatLongDate } from '@client/utils/date-formatting'
 
 interface IMonthWiseEstimationCount {
   actualTotalRegistration: number
@@ -41,10 +46,7 @@ interface ITableProps extends WrappedComponentProps {
   loading: boolean
   eventType?: Event
   base?: IEstimationBase
-  data?: {
-    details: IMonthWiseEstimation[]
-    total: IMonthWiseEstimationCount
-  }
+  data?: GQLMonthWiseEstimationMetric[] | GQLLocationWiseEstimationMetric[]
 }
 
 export enum SORT_ORDER {
@@ -66,49 +68,81 @@ function CompletenessDataTableComponent(props: ITableProps) {
   const { intl, loading, eventType, base } = props
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
 
-  const content =
-    (props.data &&
-      props.data.details &&
-      props.data.details.map((item) => ({
-        location: item.locationName,
-        startTime: item.startOfMonth,
-        month: `${item.month} ${item.year}`,
-        totalRegistered: String(item.actualTotalRegistration),
-        registeredWithinTargetd: String(item.actualTargetDayRegistration),
-        estimated: String(item.estimatedRegistration),
-        rateOfRegistrationWithinTargetd: `${item.estimatedTargetDayPercentage}%`
-      }))) ||
-    []
+  const content: any =
+    base?.baseType === COMPLETENESS_RATE_REPORT_BASE.LOCATION
+      ? props.data &&
+        (props.data as GQLLocationWiseEstimationMetric[]).map((item) => ({
+          location: item.locationName,
+          totalRegistered: String(item.total),
+          registeredWithinTargetd: String(item.withinTarget),
+          estimated: String(item.estimated),
+          rateOfRegistrationWithinTargetd: `${Number(
+            (item.withinTarget / item.estimated) * 100
+          ).toFixed(2)}%`
+        }))
+      : base?.baseType === COMPLETENESS_RATE_REPORT_BASE.TIME
+      ? props.data &&
+        (props.data as GQLMonthWiseEstimationMetric[]).map((item) => ({
+          startTime: new Date(item.year, item.month),
+          month: formatLongDate(
+            new Date(item.year, item.month).toISOString(),
+            intl.locale,
+            'MMMM yyyy'
+          ),
+          totalRegistered: item.total,
+          registeredWithinTargetd: item.withinTarget,
+          estimated: item.estimated,
+          rateOfRegistrationWithinTargetd: `${Number(
+            (item.withinTarget / item.estimated) * 100
+          ).toFixed(2)}%`
+        }))
+      : []
 
   function getFooterColumns() {
-    const {
-      actualTotalRegistration = 0,
-      actualTargetDayRegistration = 0,
-      estimatedRegistration = 0,
-      estimatedTargetDayPercentage = 0
-    } = (props.data && props.data.total) || {}
+    let sum = {
+      total: 0,
+      withinTarget: 0,
+      within1Year: 0,
+      within5Years: 0,
+      estimated: 0
+    }
+
+    sum = props.data
+      ? (props.data as GQLMonthWiseEstimationMetric[]).reduce(
+          (s: typeof sum, data) => ({
+            total: s.total + data.total,
+            withinTarget: s.withinTarget + data.withinTarget,
+            within1Year: s.within1Year + data.within1Year,
+            within5Years: s.within5Years + data.within5Years,
+            estimated: s.estimated + data.estimated
+          }),
+          sum
+        )
+      : sum
     return [
       {
         label: props.intl.formatMessage(constantsMessages.total),
         width: 40
       },
       {
-        label: String(actualTotalRegistration),
+        label: String(sum.total),
         width: 15
       },
       {
-        label: String(actualTargetDayRegistration),
+        label: String(sum.withinTarget),
         width: 15
       },
       {
-        label: String(estimatedRegistration),
+        label: String(sum.estimated),
         width: 15
       },
       {
         label: intl.formatMessage(
           constantsMessages.averageRateOfRegistrations,
           {
-            amount: estimatedTargetDayPercentage
+            amount: Number(
+              ((sum.withinTarget / sum.estimated) * 100).toFixed(2)
+            )
           }
         ),
         width: 15
@@ -138,7 +172,7 @@ function CompletenessDataTableComponent(props: ITableProps) {
     label: intl.formatMessage(constantsMessages.timePeriod),
     sortKey: 'startTime'
   }
-  if (base && base.baseType === REG_RATE_BASE.LOCATION) {
+  if (base && base.baseType === COMPLETENESS_RATE_REPORT_BASE.LOCATION) {
     firstColProp = {
       dataKey: 'location',
       label: intl.formatMessage(messages.locationTitle, {
