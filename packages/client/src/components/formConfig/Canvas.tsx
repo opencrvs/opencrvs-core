@@ -26,7 +26,11 @@ import { getRegisterFormSection } from '@client/forms/register/declaration-selec
 import { FieldPosition } from '@client/forms/configuration'
 import { useParams } from 'react-router'
 import { BirthSection, DeathSection, Event } from '@client/forms'
-import { removeCustomField } from '@client/forms/configuration/configFields/actions'
+import {
+  shiftConfigFieldUp,
+  shiftConfigFieldDown,
+  removeCustomField
+} from '@client/forms/configuration/configFields/actions'
 
 const CanvasBox = styled(Box)`
   display: flex;
@@ -68,6 +72,7 @@ type ICanvasProps = {
 
 export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
   const { event, section } = useParams<IRouteProps>()
+  const dispatch = useDispatch()
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
@@ -75,32 +80,41 @@ export function Canvas({ selectedField, onFieldSelect }: ICanvasProps) {
     getRegisterFormSection(store, section, event)
   )
   const configFields = generateConfigFields(fieldsMap)
-  const dispatch = useDispatch()
 
   return (
     <CanvasBox>
-      {configFields.map((configField) => (
-        <FormConfigElementCard
-          key={configField.fieldId}
-          selected={selectedField?.fieldId === configField.fieldId}
-          onClick={(event) => {
-            event.stopPropagation()
-            onFieldSelect(configField)
-          }}
-          removable={configField.custom}
-          onRemove={() => {
-            selectedField && dispatch(removeCustomField(selectedField.fieldId))
-          }}
-        >
-          <FormFieldGenerator
-            key={configField.fieldId}
-            id={configField.fieldId}
-            onChange={() => {}}
-            fields={[getFieldDefinition(formSection, configField)]}
-            setAllFieldsDirty={false}
-          />
-        </FormConfigElementCard>
-      ))}
+      {configFields.map((configField) => {
+        const { fieldId, preceedingFieldId, foregoingFieldId } = configField
+        const isSelected = selectedField?.fieldId === fieldId
+
+        return (
+          <FormConfigElementCard
+            key={fieldId}
+            selected={isSelected}
+            onClick={(event) => {
+              event.stopPropagation()
+              onFieldSelect(configField)
+            }}
+            movable={isSelected}
+            removable={configField.custom}
+            isUpDisabled={preceedingFieldId === FieldPosition.TOP}
+            isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}
+            onMoveUp={() => dispatch(shiftConfigFieldUp(fieldId))}
+            onMoveDown={() => dispatch(shiftConfigFieldDown(fieldId))}
+            onRemove={() => {
+              selectedField &&
+                dispatch(removeCustomField(selectedField.fieldId))
+            }}
+          >
+            <FormFieldGenerator
+              id={fieldId}
+              onChange={() => {}}
+              fields={[getFieldDefinition(formSection, configField)]}
+              setAllFieldsDirty={false}
+            />
+          </FormConfigElementCard>
+        )
+      })}
     </CanvasBox>
   )
 }

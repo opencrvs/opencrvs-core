@@ -23,7 +23,6 @@ import { modifyConfigField } from '@client/forms/configuration/configFields/acti
 import {
   CUSTOM_GROUP_NAME,
   getCertificateHandlebar,
-  getEventSectionGroupFromFieldID,
   ICustomConfigField,
   getFieldDefinition
 } from '@client/forms/configuration/configFields/utils'
@@ -50,6 +49,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
 import { connect } from 'react-redux'
 import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
 import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
+import { getConfigFieldIdentifiers } from '@client/forms/configuration/configFields/motionUtils'
 
 const CustomFieldFormContainer = styled(Box)`
   box-shadow: none;
@@ -227,11 +227,11 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   _generateNewFieldID() {
-    const { event, section } = getEventSectionGroupFromFieldID(
+    const { event, sectionId } = getConfigFieldIdentifiers(
       this.props.selectedField.fieldId
     )
 
-    return `${event}.${section}.${CUSTOM_GROUP_NAME}.${this.state.handleBars}`
+    return `${event}.${sectionId}.${CUSTOM_GROUP_NAME}.${this.state.handleBars}`
   }
 
   _prepareModifiedFormField(): ICustomConfigField {

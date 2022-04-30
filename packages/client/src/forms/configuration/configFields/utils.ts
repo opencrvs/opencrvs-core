@@ -202,7 +202,9 @@ export function getSectionFieldsMap(event: Event, form: IForm) {
   )
 }
 
-function getDeafultFieldIdentifiers(defaultConfigField: IDefaultConfigField) {
+function getDefaultConfigFieldIdentifiers(
+  defaultConfigField: IDefaultConfigField
+) {
   const { sectionIndex, groupIndex, fieldIndex } =
     defaultConfigField.identifiers
   return {
@@ -215,7 +217,7 @@ function getDeafultFieldIdentifiers(defaultConfigField: IDefaultConfigField) {
 
 function getPrecedingDefaultFieldId(defaultConfigField: IDefaultConfigField) {
   const { event, sectionIndex, groupIndex, fieldIndex } =
-    getDeafultFieldIdentifiers(defaultConfigField)
+    getDefaultConfigFieldIdentifiers(defaultConfigField)
   /* First field of the section */
   if (!fieldIndex && !groupIndex) {
     return FieldPosition.TOP
@@ -236,7 +238,7 @@ export function hasDefaultFieldChanged(
   defaultConfigField: IDefaultConfigField
 ) {
   const { event, sectionIndex, groupIndex, fieldIndex } =
-    getDeafultFieldIdentifiers(defaultConfigField)
+    getDefaultConfigFieldIdentifiers(defaultConfigField)
   const defaultFormField =
     registerForms[event].sections[sectionIndex].groups[groupIndex].fields[
       fieldIndex
@@ -272,13 +274,6 @@ function determineNextFieldIdNumber(
 
 export function generateKeyFromObj(obj: any) {
   return btoa(JSON.stringify(obj))
-}
-
-export function getEventSectionGroupFromFieldID(
-  fieldID: string
-): EventSectionGroup {
-  const [event, section, group] = fieldID.split('.')
-  return { event: event as Event, section, group }
 }
 
 function getLastConfigField(fieldsMap: IConfigFieldMap) {

@@ -58,6 +58,15 @@ export const getStorageConfigFieldsFailed = (
   payload: response
 })
 
+export const STORE_CONFIG_FIELDS = 'FORM/STORE_CONFIG_FIELDS'
+export type StoreConfigFields = {
+  type: typeof STORE_CONFIG_FIELDS
+}
+
+export const storeConfigFields = (): StoreConfigFields => ({
+  type: STORE_CONFIG_FIELDS
+})
+
 export const STORE_CONFIG_FIELDS_SUCCESS = 'FORM/STORE_CONFIG_FIELDS_SUCCESS'
 export type StoreConfigFieldsSuccessAction = {
   type: typeof STORE_CONFIG_FIELDS_SUCCESS
@@ -162,8 +171,41 @@ export const updateQuestionConfig = (
   }
 })
 
+export const SHIFT_CONFIG_FIELD_UP = 'FORM/SHIFT_CONFIG_FIELD_UP'
+export type ShiftConfigFieldUp = {
+  type: typeof SHIFT_CONFIG_FIELD_UP
+  payload: {
+    fieldId: string
+  }
+}
+
+export const shiftConfigFieldUp = (fieldId: string): ShiftConfigFieldUp => ({
+  type: SHIFT_CONFIG_FIELD_UP,
+  payload: {
+    fieldId
+  }
+})
+
+export const SHIFT_CONFIG_FIELD_DOWN = 'FORM/SHIFT_CONFIG_FIELD_DOWN'
+export type ShiftConfigFieldDown = {
+  type: typeof SHIFT_CONFIG_FIELD_DOWN
+  payload: {
+    fieldId: string
+  }
+}
+
+export const shiftConfigFieldDown = (
+  fieldId: string
+): ShiftConfigFieldDown => ({
+  type: SHIFT_CONFIG_FIELD_DOWN,
+  payload: {
+    fieldId
+  }
+})
+
 export type ConfigFieldsActions =
   | UpdateConfigFieldsAction
+  | StoreConfigFields
   | StoreConfigFieldsSuccessAction
   | GetStorageConfigFieldsSuccessAction
   | GetStorageConfigFieldsFailedAction
@@ -171,3 +213,5 @@ export type ConfigFieldsActions =
   | ModifyConfigFieldAction
   | RemoveCustomFieldAction
   | UpdateQuestionsAction
+  | ShiftConfigFieldUp
+  | ShiftConfigFieldDown

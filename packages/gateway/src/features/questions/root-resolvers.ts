@@ -114,7 +114,7 @@ interface IQuestionPayload {
   fieldType?: FieldType
   preceedingFieldId?: string
   required?: boolean
-  enabled: String
+  enabled: string
   custom?: boolean
   initialValue?: string
 }
