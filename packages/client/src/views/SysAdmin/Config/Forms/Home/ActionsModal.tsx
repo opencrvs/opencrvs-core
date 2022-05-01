@@ -27,12 +27,12 @@ import { useDispatch } from 'react-redux'
 import { Mutation } from 'react-apollo'
 import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
 import { CHANGE_FORM_DRAFT_STATUS } from '@client/views/SysAdmin/Config/Forms/mutations'
-import { modifyFormDraft } from '@client/forms/configuration/formDrafts/actions'
 import {
   DraftStatus,
   IDraft
 } from '@client/forms/configuration/formDrafts/reducer'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+import { updateFormConfig } from '@client/forms/configuration/formDrafts/actions'
 
 /*
  * There seems to be an issue with webpack
@@ -108,7 +108,7 @@ function ActionButton() {
       mutation={CHANGE_FORM_DRAFT_STATUS}
       onCompleted={({ modifyDraftStatus: formDraft }) => {
         if (formDraft) {
-          dispatch(modifyFormDraft(formDraft as IDraft))
+          dispatch(updateFormConfig(formDraft as IDraft))
           setAction({ status: ActionStatus.COMPLETED })
         }
       }}

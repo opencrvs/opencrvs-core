@@ -10,20 +10,26 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IDraft } from './reducer'
+import { IQuestionConfig } from '@client/forms'
 
-export const MODIFY_FORM_DRAFT = 'FORM/MODIFY_FORM_DRAFT'
-export type ModifyFormDraftAction = {
-  type: typeof MODIFY_FORM_DRAFT
+export const UPDATE_FORM_CONFIG = 'FORM/UPDATE_FORM_CONFIG'
+export type UpdateFormConfigAction = {
+  type: typeof UPDATE_FORM_CONFIG
   payload: {
     formDraft: IDraft
+    questionConfig?: IQuestionConfig[]
   }
 }
 
-export const modifyFormDraft = (formDraft: IDraft): ModifyFormDraftAction => ({
-  type: MODIFY_FORM_DRAFT,
+export const updateFormConfig = (
+  formDraft: IDraft,
+  questionConfig?: IQuestionConfig[]
+): UpdateFormConfigAction => ({
+  type: UPDATE_FORM_CONFIG,
   payload: {
-    formDraft
+    formDraft,
+    questionConfig
   }
 })
 
-export type FormDraftActions = ModifyFormDraftAction
+export type FormDraftActions = UpdateFormConfigAction

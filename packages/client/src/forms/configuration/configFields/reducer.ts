@@ -10,8 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as actions from '@client/forms/configuration/configFields/actions'
-import { storage } from '@client/storage'
-import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
+import { Loop, LoopReducer } from 'redux-loop'
 import * as offlineActions from '@client/offline/actions'
 import { Event } from '@client/forms'
 import { getConfiguredForm, FieldPosition } from '@client/forms/configuration'
@@ -38,18 +37,6 @@ export const initialState: IConfigFieldsState = {
   state: 'LOADING',
   birth: null,
   death: null
-}
-
-async function saveConfigFields(configFields: IConfigFieldsState) {
-  return storage.setItem('configFields', JSON.stringify(configFields))
-}
-
-async function loadConfigFields() {
-  return storage.getItem('configFields')
-}
-
-async function clearConfigFields() {
-  return storage.removeItem('configFields')
 }
 
 type Actions = actions.ConfigFieldsActions | offlineActions.Action
@@ -79,64 +66,21 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
   action: Actions
 ): IConfigFieldsState | Loop<IConfigFieldsState, Actions> => {
   switch (action.type) {
-    case offlineActions.READY: {
+    case offlineActions.READY:
+    case offlineActions.APPLICATION_CONFIG_LOADED:
+    case offlineActions.OFFLINE_FORM_CONFIG_UPDATED: {
       const { questionConfig } = action.payload.formConfig
-      return loop(state, Cmd.action(actions.updateConfigFields(questionConfig)))
-    }
 
-    case actions.UPDATE_CONFIG_FIELDS: {
-      const { questionConfig } = action.payload
       const birthForm = getConfiguredForm(questionConfig, Event.BIRTH)
       const deathForm = getConfiguredForm(questionConfig, Event.DEATH)
 
-      const newState: IConfigFieldsState = {
+      return {
         ...state,
         state: 'READY',
         birth: getSectionFieldsMap(Event.BIRTH, birthForm),
         death: getSectionFieldsMap(Event.DEATH, deathForm)
       }
-      return loop(
-        newState,
-        Cmd.run<
-          actions.GetStorageConfigFieldsFailedAction,
-          actions.GetStorageConfigFieldsSuccessAction
-        >(loadConfigFields, {
-          successActionCreator: actions.getStorageConfigFieldsSuccess,
-          failActionCreator: actions.getStorageConfigFieldsFailed
-        })
-      )
     }
-
-    case actions.GET_STORAGE_CONFIG_FIELDS_SUCCESS:
-      if (action.payload) {
-        const configFieldsState: IConfigFieldsState = JSON.parse(action.payload)
-        return { ...configFieldsState }
-      }
-      return loop(state, Cmd.action(actions.storeConfigFields()))
-
-    case actions.STORE_CONFIG_FIELDS:
-      return loop(
-        state,
-        Cmd.run<
-          actions.StoreConfigFieldsFailedAction,
-          actions.StoreConfigFieldsSuccessAction
-        >(saveConfigFields, {
-          successActionCreator: actions.storeConfigFieldsSuccess,
-          failActionCreator: actions.storeConfigFieldsFailed,
-          args: [state]
-        })
-      )
-
-    /* TODO: Add action handler for GET_STORAGE_CONFIG_FIELDS_FAILED */
-
-    case actions.STORE_CONFIG_FIELDS_SUCCESS:
-      if (action.payload) {
-        const configFieldsState: IConfigFieldsState = JSON.parse(action.payload)
-        return {
-          ...configFieldsState
-        }
-      }
-      return state
 
     case actions.ADD_CUSTOM_FIELD: {
       if (state.state === 'LOADING') {
@@ -251,23 +195,6 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
       }
     }
 
-    case actions.UPDATE_QUESTION_CONFIG: {
-      const { formDraft, questionConfig } = action.payload
-      return loop(
-        state,
-        Cmd.list([
-          Cmd.run(clearConfigFields),
-          Cmd.action(actions.updateConfigFields(questionConfig)),
-          Cmd.action(
-            offlineActions.updateOfflineQuestionConfig(
-              formDraft,
-              questionConfig
-            )
-          )
-        ])
-      )
-    }
-
     case actions.SHIFT_CONFIG_FIELD_UP: {
       if (state.state === 'LOADING') return state
       const { fieldId } = action.payload
@@ -285,16 +212,13 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         getNextField(fieldMap, fieldId)
       )
 
-      return loop(
-        {
-          ...state,
-          [event]: {
-            ...state[event],
-            [sectionId]: newSection
-          }
-        },
-        Cmd.action(actions.storeConfigFields())
-      )
+      return {
+        ...state,
+        [event]: {
+          ...state[event],
+          [sectionId]: newSection
+        }
+      }
     }
 
     case actions.SHIFT_CONFIG_FIELD_DOWN: {
@@ -314,16 +238,13 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         getNextField(fieldMap, fieldId)
       )
 
-      return loop(
-        {
-          ...state,
-          [event]: {
-            ...state[event],
-            [sectionId]: newSection
-          }
-        },
-        Cmd.action(actions.storeConfigFields())
-      )
+      return {
+        ...state,
+        [event]: {
+          ...state[event],
+          [sectionId]: newSection
+        }
+      }
     }
 
     default:

@@ -10,88 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ICustomConfigField, IConfigField } from './utils'
-import { IQuestionConfig, Event } from '@client/forms'
-import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
-
-export const UPDATE_CONFIG_FIELDS = 'FORM/UPDATE_CONFIG_FIELDS'
-export type UpdateConfigFieldsAction = {
-  type: typeof UPDATE_CONFIG_FIELDS
-  payload: {
-    questionConfig: IQuestionConfig[]
-  }
-}
-
-export const updateConfigFields = (
-  questionConfig: IQuestionConfig[]
-): UpdateConfigFieldsAction => ({
-  type: UPDATE_CONFIG_FIELDS,
-  payload: {
-    questionConfig
-  }
-})
-
-export const GET_STORAGE_CONFIG_FIELDS_SUCCESS =
-  'FORM/GET_STORAGE_CONFIG_FIELDS_SUCCESS'
-export type GetStorageConfigFieldsSuccessAction = {
-  type: typeof GET_STORAGE_CONFIG_FIELDS_SUCCESS
-  payload?: string
-}
-
-export const getStorageConfigFieldsSuccess = (
-  response?: string
-): GetStorageConfigFieldsSuccessAction => ({
-  type: GET_STORAGE_CONFIG_FIELDS_SUCCESS,
-  payload: response
-})
-
-export const GET_STORAGE_CONFIG_FIELDS_FAILED =
-  'FORM/GET_STORAGE_CONFIG_FIELDS_FAILED'
-export type GetStorageConfigFieldsFailedAction = {
-  type: typeof GET_STORAGE_CONFIG_FIELDS_FAILED
-  payload?: string
-}
-
-export const getStorageConfigFieldsFailed = (
-  response?: string
-): GetStorageConfigFieldsFailedAction => ({
-  type: GET_STORAGE_CONFIG_FIELDS_FAILED,
-  payload: response
-})
-
-export const STORE_CONFIG_FIELDS = 'FORM/STORE_CONFIG_FIELDS'
-export type StoreConfigFields = {
-  type: typeof STORE_CONFIG_FIELDS
-}
-
-export const storeConfigFields = (): StoreConfigFields => ({
-  type: STORE_CONFIG_FIELDS
-})
-
-export const STORE_CONFIG_FIELDS_SUCCESS = 'FORM/STORE_CONFIG_FIELDS_SUCCESS'
-export type StoreConfigFieldsSuccessAction = {
-  type: typeof STORE_CONFIG_FIELDS_SUCCESS
-  payload: string
-}
-
-export const storeConfigFieldsSuccess = (
-  response: string
-): StoreConfigFieldsSuccessAction => ({
-  type: STORE_CONFIG_FIELDS_SUCCESS,
-  payload: response
-})
-
-export const STORE_CONFIG_FIELDS_FAILED = 'FORM/STORE_CONFIG_FIELDS_SUCCESS'
-export type StoreConfigFieldsFailedAction = {
-  type: typeof STORE_CONFIG_FIELDS_FAILED
-  payload: string
-}
-
-export const storeConfigFieldsFailed = (
-  response: string
-): StoreConfigFieldsFailedAction => ({
-  type: STORE_CONFIG_FIELDS_FAILED,
-  payload: response
-})
+import { Event } from '@client/forms'
 
 export const ADD_CUSTOM_FIELD = 'FORM/ADD_CUSTOM_FIELD'
 export type AddCustomFieldAction = {
@@ -129,26 +48,6 @@ export const removeCustomField = (
   type: REMOVE_CUSTOM_FIELD,
   payload: {
     fieldId
-  }
-})
-
-export const UPDATE_QUESTION_CONFIG = 'FORM/UPDATE_QUESTION_CONFIG'
-export type UpdateQuestionsAction = {
-  type: typeof UPDATE_QUESTION_CONFIG
-  payload: {
-    formDraft: IDraft
-    questionConfig: IQuestionConfig[]
-  }
-}
-
-export const updateQuestionConfig = (
-  formDraft: IDraft,
-  questionConfig: IQuestionConfig[]
-): UpdateQuestionsAction => ({
-  type: UPDATE_QUESTION_CONFIG,
-  payload: {
-    formDraft,
-    questionConfig
   }
 })
 
@@ -205,14 +104,8 @@ export const modifyConfigField = (
 })
 
 export type ConfigFieldsActions =
-  | UpdateConfigFieldsAction
-  | StoreConfigFields
-  | StoreConfigFieldsSuccessAction
-  | GetStorageConfigFieldsSuccessAction
-  | GetStorageConfigFieldsFailedAction
   | AddCustomFieldAction
   | ModifyConfigFieldAction
   | RemoveCustomFieldAction
-  | UpdateQuestionsAction
   | ShiftConfigFieldUp
   | ShiftConfigFieldDown

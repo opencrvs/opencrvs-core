@@ -71,7 +71,8 @@ export const formDraftReducer: LoopReducer<IFormDraftState, Actions> = (
 ): IFormDraftState | Loop<IFormDraftState, Actions> => {
   switch (action.type) {
     case offlineActions.READY:
-    case offlineActions.UPDATED:
+    case offlineActions.APPLICATION_CONFIG_LOADED:
+    case offlineActions.OFFLINE_FORM_CONFIG_UPDATED:
       const {
         formConfig: { formDrafts }
       } = action.payload
@@ -79,26 +80,31 @@ export const formDraftReducer: LoopReducer<IFormDraftState, Actions> = (
         state: 'READY',
         formDraft: getFormDraft(formDrafts)
       }
-    case actions.MODIFY_FORM_DRAFT:
+
+    case actions.UPDATE_FORM_CONFIG: {
       if (state.state === 'LOADING') {
         return state
       }
-      const { formDraft } = action.payload
+      const { formDraft, questionConfig } = action.payload
+
       const newFormDraft = {
         ...state.formDraft,
         [formDraft.event]: formDraft
       }
+
       return loop(
         {
           ...state,
-          formDraft: newFormDraft
+          ...newFormDraft
         },
         Cmd.action(
-          offlineActions.updateOfflineFormDraft(
-            getOfflineFormDrafts(newFormDraft)
+          offlineActions.updateOfflineFormConfig(
+            getOfflineFormDrafts(newFormDraft),
+            questionConfig
           )
         )
       )
+    }
     default:
       return state
   }
