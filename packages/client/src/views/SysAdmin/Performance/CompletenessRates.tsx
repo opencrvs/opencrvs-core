@@ -55,6 +55,7 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import format from '@client/utils/date-formatting'
+import { SegmentedControl } from '@client/components/SegmentedControl'
 const { useState } = React
 
 export enum COMPLETENESS_RATE_REPORT_BASE {
@@ -169,17 +170,19 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
 
             return (
               <FilterContainer>
-                <PerformanceSelect
-                  id="base-select"
-                  value={base.baseType}
-                  options={options}
-                  onChange={(option) =>
-                    setBase({
-                      baseType: option.value as COMPLETENESS_RATE_REPORT_BASE,
-                      locationJurisdictionType: option.type
-                    })
-                  }
-                />
+                {options.length > 1 && (
+                  <SegmentedControl
+                    id="base-select"
+                    value={base.baseType}
+                    options={options}
+                    onChange={(option) =>
+                      setBase({
+                        baseType: option.value as COMPLETENESS_RATE_REPORT_BASE,
+                        locationJurisdictionType: option.type
+                      })
+                    }
+                  />
+                )}
                 <LocationPicker
                   additionalLocations={getAdditionalLocations(intl)}
                   selectedLocationId={
