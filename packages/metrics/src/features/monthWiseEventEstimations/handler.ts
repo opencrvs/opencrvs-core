@@ -40,7 +40,9 @@ export async function monthWiseEventEstimationsHandler(
 ) {
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
-  const locationId = 'Location/' + request.query[LOCATION_ID]
+  const locationId = request.query[LOCATION_ID]
+    ? 'Location/' + request.query[LOCATION_ID]
+    : undefined
   const event = request.query[EVENT]
   const authHeader: IAuthHeader = {
     Authorization: request.headers.authorization,

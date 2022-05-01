@@ -350,7 +350,7 @@ export const getRoutes = () => {
           query: Joi.object({
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
-            locationId: Joi.string().required(),
+            locationId: Joi.string(),
             event: Joi.string().required()
           })
         },
@@ -367,7 +367,7 @@ export const getRoutes = () => {
           query: Joi.object({
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
-            locationId: Joi.string().required(),
+            locationId: Joi.string(),
             event: Joi.string().required()
           })
         },

@@ -19,12 +19,14 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { Event } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToPerformanceHome, goToCompletenessRates } from '@client/navigation'
+import { goToCompletenessRates } from '@client/navigation'
 
 import {
   FilterContainer,
   getJurisidictionType,
-  CompletenessRateTime
+  CompletenessRateTime,
+  getAdditionalLocations,
+  NATIONAL_ADMINISTRATIVE_LEVEL
 } from '@client/views/SysAdmin/Performance/utils'
 import {
   SysAdminContentWrapper,
@@ -33,7 +35,7 @@ import {
 import { GQLMonthWiseEstimationMetric } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps } from 'react-intl'
+import { injectIntl, WrappedComponentProps, IntlShape } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import {
@@ -67,7 +69,6 @@ interface ISearchParams {
   time: CompletenessRateTime
 }
 interface IDispatchProps {
-  goToPerformanceHome: typeof goToPerformanceHome
   goToCompletenessRates: typeof goToCompletenessRates
 }
 type ICompletenessRateProps = RouteComponentProps<{ eventType: string }> &
@@ -121,8 +122,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
     location: { search },
     match: {
       params: { eventType }
-    },
-    goToPerformanceHome
+    }
   } = props
   const { locationId, timeStart, timeEnd, time } = parse(
     search
@@ -133,7 +133,15 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
   const getFilter = useCallback(() => {
     {
       return (
-        <Query query={HAS_CHILD_LOCATION} variables={{ parentId: locationId }}>
+        <Query
+          query={HAS_CHILD_LOCATION}
+          variables={{
+            parentId:
+              locationId && locationId !== NATIONAL_ADMINISTRATIVE_LEVEL
+                ? locationId
+                : '0'
+          }}
+        >
           {({ data, loading, error }) => {
             const options: IPerformanceSelectOption[] = [
               {
@@ -173,7 +181,10 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                   }
                 />
                 <LocationPicker
-                  selectedLocationId={locationId}
+                  additionalLocations={getAdditionalLocations(intl)}
+                  selectedLocationId={
+                    locationId || NATIONAL_ADMINISTRATIVE_LEVEL
+                  }
                   onChangeLocation={(newLocationId) => {
                     props.goToCompletenessRates(
                       eventType as Event,
@@ -271,7 +282,10 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
             event: eventType.toUpperCase(),
             timeStart: timeStart,
             timeEnd: timeEnd,
-            locationId: locationId
+            locationId:
+              locationId && locationId !== NATIONAL_ADMINISTRATIVE_LEVEL
+                ? locationId
+                : undefined
           }}
         >
           {({ data, loading, error }) => {
@@ -324,6 +338,5 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
 }
 
 export const CompletenessRates = connect(null, {
-  goToPerformanceHome,
   goToCompletenessRates
 })(injectIntl(CompletenessRatesComponent))

@@ -56,7 +56,10 @@ import { CertificationRateComponent } from '@client/views/SysAdmin/Performance/C
 import {
   certificationRatesDummyData,
   Description,
-  CompletenessRateTime
+  CompletenessRateTime,
+  getAdditionalLocations,
+  NATIONAL_ADMINISTRATIVE_LEVEL,
+  isCountry
 } from '@client/views/SysAdmin/Performance/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
@@ -173,7 +176,6 @@ const selectLocation = (
   ) as ISearchLocation
 }
 
-const NATIONAL_ADMINISTRATIVE_LEVEL = 'NATIONAL_ADMINISTRATIVE_LEVEL'
 class PerformanceHomeComponent extends React.Component<Props, State> {
   transformPropsToState(props: Props) {
     const {
@@ -187,7 +189,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     const selectedLocation = selectLocation(
       locationId,
       generateLocations({ ...locations, ...offices }, props.intl).concat(
-        this.getAdditionalLocations()
+        getAdditionalLocations(props.intl)
       )
     )
 
@@ -208,17 +210,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     this.state = this.transformPropsToState(props)
   }
 
-  getAdditionalLocations() {
-    const { intl } = this.props
-    return [
-      {
-        id: NATIONAL_ADMINISTRATIVE_LEVEL,
-        searchableText: intl.formatMessage(constantsMessages.countryName),
-        displayLabel: intl.formatMessage(constantsMessages.countryName)
-      }
-    ]
-  }
-
   togglePerformanceStatus = () => {
     this.setState({
       toggleStatus: !this.state.toggleStatus
@@ -229,7 +220,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     const { event, selectedLocation, timeStart, timeEnd } = this.state
     this.props.goToCompletenessRates(
       event,
-      selectedLocation.id,
+      selectedLocation && !isCountry(selectedLocation)
+        ? selectedLocation.id
+        : undefined,
       timeStart,
       timeEnd,
       time
@@ -242,7 +235,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     return (
       <PerformanceActions>
         <LocationPicker
-          additionalLocations={this.getAdditionalLocations()}
+          additionalLocations={getAdditionalLocations(intl)}
           selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
           onChangeLocation={(newLocationId) => {
             const newLocation = selectLocation(
@@ -253,7 +246,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   ...this.props.offices
                 },
                 this.props.intl
-              ).concat(this.getAdditionalLocations())
+              ).concat(getAdditionalLocations(intl))
             )
             this.setState({ selectedLocation: newLocation })
           }}
@@ -317,7 +310,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               <Query
                 query={PERFORMANCE_METRICS}
                 variables={
-                  this.state.selectedLocation
+                  this.state.selectedLocation &&
+                  !isCountry(this.state.selectedLocation)
                     ? {
                         ...queryVariablesWithoutLocationId,
                         locationId: this.state.selectedLocation.id
@@ -367,7 +361,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 timeStart={timeStart}
                 timeEnd={timeEnd}
                 locationId={
-                  this.state.selectedLocation
+                  this.state.selectedLocation &&
+                  !isCountry(this.state.selectedLocation)
                     ? this.state.selectedLocation.id
                     : undefined
                 }
@@ -376,7 +371,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               <Query
                 query={GET_TOTAL_PAYMENTS}
                 variables={
-                  this.state.selectedLocation
+                  this.state.selectedLocation &&
+                  !isCountry(this.state.selectedLocation)
                     ? {
                         ...queryVariablesWithoutLocationId,
                         locationId: this.state.selectedLocation.id
@@ -407,9 +403,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
           <Query
             query={PERFORMANCE_STATS}
             variables={{
-              locationId: this.state.selectedLocation
-                ? this.state.selectedLocation.id
-                : undefined,
+              locationId:
+                this.state.selectedLocation &&
+                !isCountry(this.state.selectedLocation)
+                  ? this.state.selectedLocation.id
+                  : undefined,
               populationYear: timeEnd.getFullYear(),
               event: this.state.event,
               status: [

@@ -82,12 +82,18 @@ export const resolvers: GQLResolver = {
     ) {
       const metricsData = await getMetrics(
         '/monthWiseEventEstimations',
-        {
-          timeStart,
-          timeEnd,
-          locationId,
-          event
-        },
+        locationId
+          ? {
+              timeStart,
+              timeEnd,
+              locationId,
+              event
+            }
+          : {
+              timeStart,
+              timeEnd,
+              event
+            },
         authHeader
       )
       return metricsData
@@ -99,12 +105,18 @@ export const resolvers: GQLResolver = {
     ) {
       const metricsData = await getMetrics(
         '/locationWiseEventEstimations',
-        {
-          timeStart,
-          timeEnd,
-          locationId,
-          event
-        },
+        locationId
+          ? {
+              timeStart,
+              timeEnd,
+              locationId,
+              event
+            }
+          : {
+              timeStart,
+              timeEnd,
+              event
+            },
         authHeader
       )
       return metricsData

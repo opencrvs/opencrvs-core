@@ -28,7 +28,7 @@ export const FETCH_MONTH_WISE_EVENT_ESTIMATIONS = gql`
   query data(
     $timeStart: String!
     $timeEnd: String!
-    $locationId: String!
+    $locationId: String
     $event: String!
   ) {
     fetchMonthWiseEventMetrics(
@@ -52,7 +52,7 @@ export const FETCH_LOCATION_WISE_EVENT_ESTIMATIONS = gql`
   query data(
     $timeStart: String!
     $timeEnd: String!
-    $locationId: String!
+    $locationId: String
     $event: String!
   ) {
     fetchLocationWiseEventMetrics(

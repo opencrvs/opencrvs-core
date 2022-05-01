@@ -1811,7 +1811,7 @@ export interface QueryToGetDeclarationsStartedMetricsResolver<
 export interface QueryToFetchMonthWiseEventMetricsArgs {
   timeStart: string
   timeEnd: string
-  locationId: string
+  locationId?: string
   event: string
 }
 export interface QueryToFetchMonthWiseEventMetricsResolver<
@@ -1829,7 +1829,7 @@ export interface QueryToFetchMonthWiseEventMetricsResolver<
 export interface QueryToFetchLocationWiseEventMetricsArgs {
   timeStart: string
   timeEnd: string
-  locationId: string
+  locationId?: string
   event: string
 }
 export interface QueryToFetchLocationWiseEventMetricsResolver<

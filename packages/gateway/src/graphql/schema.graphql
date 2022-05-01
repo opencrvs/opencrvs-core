@@ -87,13 +87,13 @@ type Query {
   fetchMonthWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
   ): [MonthWiseEstimationMetric!]
   fetchLocationWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
   ): [LocationWiseEstimationMetric!]
   fetchTimeLoggedMetricsByPractitioner(

@@ -424,19 +424,27 @@ export function goToCreateNewUserWithLocationId(locationId: string) {
 
 export function goToCompletenessRates(
   eventType: Event,
-  locationId: string,
+  locationId: string | undefined,
   timeStart: Date,
   timeEnd: Date,
   time = CompletenessRateTime.WithinTarget
 ) {
   return push({
     pathname: formatUrl(EVENT_COMPLETENESS_RATES, { eventType }),
-    search: stringify({
-      locationId,
-      timeStart: timeStart.toISOString(),
-      timeEnd: timeEnd.toISOString(),
-      time
-    })
+    search: stringify(
+      locationId
+        ? {
+            locationId,
+            timeStart: timeStart.toISOString(),
+            timeEnd: timeEnd.toISOString(),
+            time
+          }
+        : {
+            timeStart: timeStart.toISOString(),
+            timeEnd: timeEnd.toISOString(),
+            time
+          }
+    )
   })
 }
 
