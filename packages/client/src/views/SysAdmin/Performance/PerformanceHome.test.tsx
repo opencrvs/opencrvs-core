@@ -58,11 +58,5 @@ describe('Performance home test', () => {
     it('load performance home', () => {
       expect(app.find('#performanceHome').hostNodes()).toHaveLength(0)
     })
-    it('loads the location in the search input box', async () => {
-      const component = await waitForElement(app, '#locationSearchInput')
-      expect(
-        component.find('#locationSearchInput').hostNodes().props().value
-      ).toEqual('Khulna')
-    })
   })
 })
