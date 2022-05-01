@@ -62,12 +62,12 @@ const messagesToDefine: IOfficeHomeMessages = {
     id: 'regHome.inPro.selector.field.agents'
   },
   inProgressOwnDrafts: {
-    defaultMessage: 'Yours',
+    defaultMessage: 'My Drafts',
     description: 'The title of In progress own drafts',
     id: 'regHome.inPro.selector.own.drafts'
   },
   hospitalDrafts: {
-    defaultMessage: 'Hospitals',
+    defaultMessage: 'Health System',
     description: 'The title of In progress Hospitals',
     id: 'regHome.inPro.selector.hospital.drafts'
   },
@@ -112,7 +112,7 @@ const messagesToDefine: IOfficeHomeMessages = {
     id: 'regHome.sentForApprovals'
   },
   sentForExternalValidation: {
-    defaultMessage: 'Sent to BRIS',
+    defaultMessage: 'Sent for ext. validation',
     description: 'The label for external validation waiting duration column',
     id: 'regHome.sentForExternalValidation'
   },
@@ -132,7 +132,7 @@ const messagesToDefine: IOfficeHomeMessages = {
     id: 'regHome.val.regAgent.tooltip'
   },
   waitingForExternalValidation: {
-    defaultMessage: 'Waiting for BRIS',
+    defaultMessage: 'Waiting for ext. validation',
     description: 'The title of waiting for external validation',
     id: 'regHome.waitingForExternalValidation'
   }

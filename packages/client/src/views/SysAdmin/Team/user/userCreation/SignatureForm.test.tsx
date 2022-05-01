@@ -68,6 +68,25 @@ describe('signature upload tests', () => {
       expect(title).toBe('Attach the signature')
     })
 
+    it('return if not file', async () => {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+      testComponent
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            files: []
+          }
+        })
+      await flushPromises()
+      testComponent.update()
+
+      expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
+    })
+
     it('No error while uploading if valid file', async () => {
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
@@ -85,25 +104,6 @@ describe('signature upload tests', () => {
                 'image/png'
               )
             ]
-          }
-        })
-      await flushPromises()
-      testComponent.update()
-
-      expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
-    })
-
-    it('return if not file', async () => {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      testComponent
-        .find('#image_file_uploader_field')
-        .hostNodes()
-        .simulate('change', {
-          target: {
-            files: []
           }
         })
       await flushPromises()

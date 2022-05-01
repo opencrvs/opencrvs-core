@@ -28,7 +28,6 @@ import styled, {
 import { createClient } from '@client/utils/apolloClient'
 import { ReviewDuplicates } from '@client/views/Duplicates/ReviewDuplicates'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
-import { FieldAgentHome } from '@client/views/FieldAgentHome/FieldAgentHome'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
@@ -38,7 +37,6 @@ import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
 import { DeclarationForm } from '@client/views/RegisterForm/DeclarationForm'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
-import { SelectInformant } from '@client/views/SelectInformant/SelectInformant'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { OperationalReport } from '@client/views/SysAdmin/Performance/OperationalReport'
@@ -126,12 +124,7 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.HOME}
-                                            component={FieldAgentHome}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.FIELD_AGENT_HOME_TAB}
-                                            component={FieldAgentHome}
+                                            component={OfficeHome}
                                           />
                                           <ProtectedRoute
                                             exact
@@ -146,12 +139,12 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.SELECT_BIRTH_INFORMANT}
-                                            component={SelectInformant}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={routes.SELECT_DEATH_INFORMANT}
-                                            component={SelectInformant}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact

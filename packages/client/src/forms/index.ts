@@ -89,14 +89,14 @@ export enum Action {
 
 export enum QuestionConfigFieldType {
   TEXT = 'TEXT',
-  TEL = 'TEL',
-  NUMBER = 'NUMBER',
   TEXTAREA = 'TEXTAREA',
-  SUBSECTION = 'SUBSECTION',
-  PARAGRAPH = 'PARAGRAPH'
+  NUMBER = 'NUMBER',
+  TEL = 'TEL',
+  PARAGRAPH = 'PARAGRAPH',
+  SUBSECTION = 'SUBSECTION'
 }
 
-export interface IQuestionIdentifiers {
+export interface IIdentifiers {
   event: string
   sectionId: string
   groupId: string
@@ -259,7 +259,8 @@ export type IFormFieldValue =
   | IAttachmentValue
   | FieldValueArray
   | FieldValueMap
-  | IRegistration
+  | IContactPoint
+  | IInformant
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
 export interface FieldValueMap {
@@ -280,12 +281,21 @@ export interface IFileValue {
   data: string
 }
 
-export interface IContactPoint {
-  contactRelationship: string
+export interface IContactPointPhone {
   registrationPhone: string
 }
-export interface IRegistration {
-  nestedFields: IContactPoint
+
+interface IInformantOtherInformantType {
+  otherInformantType: string
+}
+export interface IInformant {
+  value: string
+  nestedFields: IInformantOtherInformantType
+}
+
+export interface IContactPoint {
+  value: string
+  nestedFields: IContactPointPhone
 }
 
 export interface IAttachmentValue {
@@ -311,6 +321,9 @@ export type IFormFieldQueryMapFunction = (
   offlineData?: IOfflineData
 ) => void
 
+export type IFormFieldTemplateMapOperation =
+  | [string, IFormFieldQueryMapFunction]
+  | [string]
 /*
  * Takes in an array of function arguments (array, number, string, function)
  * and replaces all functions with the descriptor type
@@ -354,7 +367,7 @@ export type IFormFieldQueryMapDescriptor<
 export type IFormFieldMapping = {
   mutation?: IFormFieldMutationMapFunction
   query?: IFormFieldQueryMapFunction
-  template?: [string, IFormFieldQueryMapFunction]
+  template?: IFormFieldTemplateMapOperation
 }
 
 /*
@@ -415,7 +428,7 @@ export type SerializedFormField = UnionOmit<
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
-    template?: IQueryDescriptor & { fieldName: string }
+    template?: ITemplateDescriptor
   }
 }
 export interface IAttachment {
@@ -476,6 +489,7 @@ export interface IFormFieldBase {
   }
   ignoreFieldLabelOnErrorMessage?: boolean
   ignoreBottomMargin?: boolean
+  customisable?: boolean
   customQuesstionMappingId?: string
 }
 
@@ -674,7 +688,7 @@ export type IFormField =
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
 
-export interface IFormTag {
+export interface IPreviewGroup {
   id: string
   label: MessageDescriptor
   fieldToRedirect?: string
@@ -695,17 +709,16 @@ export interface IConditional {
 }
 
 export interface IConditionals {
-  presentAtBirthRegistration: IConditional
+  informantType: IConditional
   iDType: IConditional
   isOfficePreSelected: IConditional
   fathersDetailsExist: IConditional
-  permanentAddressSameAsMother: IConditional
-  addressSameAsMother: IConditional
-  countryPermanent: IConditional
-  statePermanent: IConditional
-  districtPermanent: IConditional
-  addressLine4Permanent: IConditional
-  addressLine3Permanent: IConditional
+  primaryAddressSameAsOtherPrimary: IConditional
+  countryPrimary: IConditional
+  statePrimary: IConditional
+  districtPrimary: IConditional
+  addressLine4Primary: IConditional
+  addressLine3Primary: IConditional
   country: IConditional
   state: IConditional
   district: IConditional
@@ -718,17 +731,16 @@ export interface IConditionals {
   otherPersonCollectsCertificate: IConditional
   birthCertificateCollectorNotVerified: IConditional
   deathCertificateCollectorNotVerified: IConditional
-  currentAddressSameAsPermanent: IConditional
   placeOfBirthHospital: IConditional
-  deathPlaceAddressTypeHeathInstitue: IConditional
+  placeOfDeathTypeHeathInstitue: IConditional
   otherBirthEventLocation: IConditional
   isNotCityLocation: IConditional
   isCityLocation: IConditional
   isDefaultCountry: IConditional
-  isNotCityLocationPermanent: IConditional
-  isDefaultCountryPermanent: IConditional
-  isCityLocationPermanent: IConditional
-  informantPermanentAddressSameAsCurrent: IConditional
+  isNotCityLocationPrimary: IConditional
+  isDefaultCountryPrimary: IConditional
+  isCityLocationPrimary: IConditional
+  informantPrimaryAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
   deathPlaceOther: IConditional
   deathPlaceAtPrivateHome: IConditional
@@ -736,7 +748,6 @@ export interface IConditionals {
   causeOfDeathEstablished: IConditional
   isMarried: IConditional
   identifierIDSelected: IConditional
-  otherRelationship: IConditional
   fatherContactDetailsRequired: IConditional
   withInTargetDays: IConditional
   between46daysTo5yrs: IConditional
@@ -817,6 +828,12 @@ type QueryDefaultOperation<
 
 export type IQueryDescriptor = QueryFactoryOperation | QueryDefaultOperation
 
+type ISimpleTemplateDescriptor = { fieldName: string }
+export type IQueryTemplateDescriptor = ISimpleTemplateDescriptor &
+  IQueryDescriptor
+export type ITemplateDescriptor =
+  | IQueryTemplateDescriptor
+  | ISimpleTemplateDescriptor
 // Mutations
 
 type MutationFactoryOperationKeys = FilterType<
@@ -881,7 +898,6 @@ export enum BirthSection {
   Mother = 'mother',
   Father = 'father',
   Informant = 'informant',
-  Parent = 'primaryCaregiver',
   Documents = 'documents',
   Preview = 'preview'
 }
@@ -945,7 +961,6 @@ export type Section =
 export interface IFormSection {
   id: Section
   viewType: ViewType
-  replaceable?: boolean
   name: MessageDescriptor
   title: MessageDescriptor
   groups: IFormSectionGroup[]
@@ -976,7 +991,7 @@ export interface IFormSectionGroup {
   id: string
   title?: MessageDescriptor
   fields: IFormField[]
-  previewGroups?: IFormTag[]
+  previewGroups?: IPreviewGroup[]
   disabled?: boolean
   ignoreSingleFieldView?: boolean
   conditionals?: IConditional[]

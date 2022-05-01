@@ -34,6 +34,7 @@ interface INotificationsMessages
   userFormSuccess: MessageDescriptor
   userFormUpdateSuccess: MessageDescriptor
   waitingToRetry: MessageDescriptor
+  downloadDeclarationFailed: MessageDescriptor
 }
 
 const messagesToDefine: INotificationsMessages = {
@@ -158,6 +159,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Waiting to retry',
     description: 'Label for declaration status waiting for connection',
     id: 'regHome.outbox.waitingToRetry'
+  },
+  downloadDeclarationFailed: {
+    defaultMessage: 'Failed to download declaration. Please try again',
+    description: 'Label for declaration downloading failed',
+    id: 'regHome.workqueue.downloadDeclarationFailed'
   }
 }
 

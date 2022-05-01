@@ -32,7 +32,8 @@ import { merge } from 'lodash'
 import * as React from 'react'
 
 import { waitFor, waitForElement } from '@client/tests/wait-for-element'
-import { SELECTOR_ID } from './tabs/inProgress/inProgressTab'
+import { SELECTOR_ID } from './inProgress/InProgress'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -84,27 +85,6 @@ const declaration = {
     }
   ]
 }
-const currentUserData: IUserData = {
-  userID: '123',
-  declarations: [],
-  workqueue: {
-    loading: false,
-    error: false,
-    initialSyncDone: true,
-    data: {
-      inProgressTab: {
-        totalItems: 1,
-        results: [declaration]
-      },
-      notificationTab: { totalItems: 0, results: [] },
-      reviewTab: { totalItems: 0, results: [] },
-      rejectTab: { totalItems: 0, results: [] },
-      approvalTab: { totalItems: 0, results: [] },
-      printTab: { totalItems: 0, results: [] },
-      externalValidationTab: { totalItems: 0, results: [] }
-    }
-  }
-}
 
 const nameObj = {
   data: {
@@ -144,7 +124,7 @@ describe('OfficeHome related tests', () => {
       <OfficeHome
         match={{
           params: {
-            tabId: 'progress'
+            tabId: WORKQUEUE_TABS.inProgress
           },
           isExact: true,
           path: '',
@@ -180,7 +160,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'progress' },
+            params: { tabId: WORKQUEUE_TABS.inProgress },
             isExact: true,
             path: '',
             url: ''
@@ -193,8 +173,8 @@ describe('OfficeHome related tests', () => {
       )
 
       await waitForElement(testComponent, '#navigation_progress')
-      await waitForElement(testComponent, '#navigation_review')
-      await waitForElement(testComponent, '#navigation_updates')
+      await waitForElement(testComponent, '#navigation_readyForReview')
+      await waitForElement(testComponent, '#navigation_requiresUpdateRegistrar')
       await waitForElement(testComponent, '#navigation_print')
       await waitForElement(testComponent, '#navigation_waitingValidation')
     })
@@ -203,7 +183,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'progress' },
+            params: { tabId: WORKQUEUE_TABS.inProgress },
             isExact: true,
             path: '',
             url: ''
@@ -223,20 +203,19 @@ describe('OfficeHome related tests', () => {
           .find('#navigation_progress')
           .hostNodes()
           .text()
-          .includes('In Progress7')
-      )
-
-      expect(app.find('#navigation_review').hostNodes().text()).toContain(
-        'Ready for review3'
-      )
-      expect(app.find('#navigation_updates').hostNodes().text()).toContain(
-        'Sent for updates4'
+          .includes('In progress7')
       )
       expect(
+        app.find('#navigation_readyForReview').hostNodes().text()
+      ).toContain('Ready for review3')
+      expect(
+        app.find('#navigation_requiresUpdateRegistrar').hostNodes().text()
+      ).toContain('Requires update4')
+      expect(
         app.find('#navigation_waitingValidation').hostNodes().text()
-      ).toContain('Waiting for validation6')
+      ).toContain('In external validation6')
       expect(app.find('#navigation_print').hostNodes().text()).toContain(
-        'Ready to print 1'
+        'Ready to print1'
       )
     })
   })
@@ -259,7 +238,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'progress' },
+            params: { tabId: WORKQUEUE_TABS.inProgress },
             isExact: true,
             path: '',
             url: ''
@@ -281,7 +260,7 @@ describe('OfficeHome related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: 'progress',
+              tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.fieldAgentDrafts
             },
             isExact: true,
@@ -305,7 +284,7 @@ describe('OfficeHome related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: 'progress',
+              tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.hospitalDrafts
             },
             isExact: true,
@@ -328,7 +307,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'review' },
+            params: { tabId: WORKQUEUE_TABS.readyForReview },
             isExact: true,
             path: '',
             url: ''
@@ -350,7 +329,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'updates' },
+            params: { tabId: WORKQUEUE_TABS.requiresUpdateRegistrar },
             isExact: true,
             path: '',
             url: ''
@@ -372,7 +351,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'approvals' },
+            params: { tabId: WORKQUEUE_TABS.sentForApproval },
             isExact: true,
             path: '',
             url: ''
@@ -394,7 +373,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'print' },
+            params: { tabId: WORKQUEUE_TABS.readyToPrint },
             isExact: true,
             path: '',
             url: ''
@@ -417,7 +396,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'waitingValidation' },
+            params: { tabId: WORKQUEUE_TABS.externalValidation },
             isExact: true,
             path: '',
             url: ''
@@ -450,7 +429,7 @@ describe('OfficeHome related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: 'progress',
+              tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.fieldAgentDrafts
             },
             isExact: true,
@@ -474,7 +453,7 @@ describe('OfficeHome related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: 'progress',
+              tabId: WORKQUEUE_TABS.inProgress,
               selectorId: SELECTOR_ID.hospitalDrafts
             },
             isExact: true,
@@ -497,7 +476,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'review' },
+            params: { tabId: WORKQUEUE_TABS.readyForReview },
             isExact: true,
             path: '',
             url: ''
@@ -519,7 +498,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'updates' },
+            params: { tabId: WORKQUEUE_TABS.requiresUpdateRegistrar },
             isExact: true,
             path: '',
             url: ''
@@ -541,7 +520,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'approvals' },
+            params: { tabId: WORKQUEUE_TABS.sentForApproval },
             isExact: true,
             path: '',
             url: ''
@@ -563,7 +542,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'print' },
+            params: { tabId: WORKQUEUE_TABS.readyToPrint },
             isExact: true,
             path: '',
             url: ''
@@ -585,7 +564,7 @@ describe('OfficeHome related tests', () => {
       const testComponent = await createTestComponent(
         <OfficeHome
           match={{
-            params: { tabId: 'waitingValidation' },
+            params: { tabId: WORKQUEUE_TABS.externalValidation },
             isExact: true,
             path: '',
             url: ''
@@ -602,176 +581,6 @@ describe('OfficeHome related tests', () => {
       })
       testComponent.update()
       await waitForElement(testComponent, '#search-result-error-text-count')
-    })
-  })
-
-  describe('when there are items more than 10', () => {
-    beforeEach(() => {
-      // Mocking storage reading
-      // @ts-ignore
-      storage.getItem = jest.fn((key: string) => {
-        switch (key) {
-          case 'USER_DATA':
-            return JSON.stringify([currentUserData])
-          default:
-            return undefined
-        }
-      })
-
-      mockListSyncController.mockReturnValue({
-        data: {
-          inProgressTab: { totalItems: 15, results: [declaration] },
-          notificationTab: { totalItems: 12, results: [] },
-          reviewTab: { totalItems: 13, results: [] },
-          rejectTab: { totalItems: 14, results: [] },
-          approvalTab: { totalItems: 10, results: [] },
-          printTab: { totalItems: 11, results: [] },
-          externalValidationTab: { totalItems: 11, results: [] }
-        }
-      })
-      client.query = mockListSyncController
-    })
-    it('shows loadmore in progress tab', async () => {
-      for (let i = 0; i < 12; i++) {
-        await store.dispatch(storeDeclaration(createDeclaration(Event.BIRTH)))
-      }
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: 'progress' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      ) // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-
-      testComponent.update()
-      await waitForElement(testComponent, '#load_more_button')
-      testComponent
-        .find('#load_more_button')
-        .last()
-        .hostNodes()
-        .simulate('click')
-    })
-    it('shows loadmore in review tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: 'review' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      await waitForElement(testComponent, '#load_more_button')
-      testComponent
-        .find('#load_more_button')
-        .last()
-        .hostNodes()
-        .simulate('click')
-    })
-    it('shows loadmore in reject tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: 'updates' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      await waitForElement(testComponent, '#load_more_button')
-      testComponent
-        .find('#load_more_button')
-        .last()
-        .hostNodes()
-        .simulate('click')
-    })
-    it('shows loadmore in print tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: 'print' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      )
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 600)
-      })
-      testComponent.update()
-      await waitForElement(testComponent, '#load_more_button')
-      testComponent
-        .find('#load_more_button')
-        .last()
-        .hostNodes()
-        .simulate('click')
-      await flushPromises()
-    })
-
-    it('shows loadmore in externalValidation tab', async () => {
-      const testComponent = await createTestComponent(
-        <OfficeHome
-          match={{
-            params: { tabId: 'waitingValidation' },
-            isExact: true,
-            path: '',
-            url: ''
-          }}
-          staticContext={undefined}
-          history={history}
-          location={history.location}
-        />,
-        { store, history, apolloClient: client }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      await waitForElement(testComponent, '#load_more_button')
-      testComponent
-        .find('#load_more_button')
-        .last()
-        .hostNodes()
-        .simulate('click')
-      await flushPromises()
     })
   })
 })

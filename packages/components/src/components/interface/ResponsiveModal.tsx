@@ -26,7 +26,7 @@ const ModalContainer = styled.div`
   justify-content: center;
   align-items: flex-start;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding-top: 80px;
+    padding-top: 0px;
   }
 `
 
@@ -57,13 +57,12 @@ const ModalContent = styled.div<{
   flex-grow: ${({ fullscreen }) => (fullscreen ? 1 : 0)};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-grow: 1;
-    margin-right: 24px;
-    margin-left: 24px;
   }
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.lg}px) {
     width: 100%;
     height: 100vh;
+    border-radius: unset;
   }
 `
 const Header = styled.div<{
@@ -76,15 +75,17 @@ const Header = styled.div<{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: top;
-  padding: 8px 8px 32px 24px;
+  align-items: center;
+  padding: 24px 24px;
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.lg}px) {
     ${({ theme, hideBoxShadow }) => !hideBoxShadow && theme.shadows.light};
     margin-bottom: 16px;
+    padding-top: 8px 8px;
   }
 `
 const Title = styled.h1`
+  margin: 0px;
   ${({ theme }) => theme.fonts.h2};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     ${({ theme }) => theme.fonts.h4};

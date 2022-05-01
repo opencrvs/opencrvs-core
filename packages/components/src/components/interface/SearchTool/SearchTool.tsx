@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { SearchBlue, ClearText } from '../../icons'
-import { Button, CircleButton } from '../../buttons'
+import { Button } from '../../buttons'
 import styled from 'styled-components'
 
 const Wrapper = styled.form`
@@ -26,7 +26,7 @@ const Wrapper = styled.form`
 `
 const SearchTextInput = styled.input`
   border: none;
-  margin: 0px 10px;
+  margin: 0px 4px;
   ${({ theme }) => theme.fonts.reg16};
   background-color: ${({ theme }) => theme.colors.grey200};
   flex-grow: 1;
@@ -51,18 +51,20 @@ export const LabelButton = styled(Button)`
 const DropDownWrapper = styled.ul`
   background: ${({ theme }) => theme.colors.white};
   border-radius: 4px;
-  ${({ theme }) => theme.shadows.heavy};
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  ${({ theme }) => theme.shadows.light};
   position: absolute;
   padding: 8px 0px;
-  width: 250px;
+  width: 240px;
   z-index: 9999;
   list-style: none;
   top: 100%;
-  right: -56px;
-  margin: 6px 0px;
+  right: 0px;
+  margin: 4px 0px;
   cursor: pointer;
 `
 const DropDownItem = styled.li`
+  ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -70,43 +72,33 @@ const DropDownItem = styled.li`
     border-bottom: none;
   }
   &:hover {
-    background: ${({ theme }) => theme.colors.primary};
+    background: ${({ theme }) => theme.colors.grey100};
   }
   &:hover span {
-    color: ${({ theme }) => theme.colors.white};
-  }
-  &:hover svg path {
-    stroke: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }) => theme.colors.copy};
   }
 `
 const IconWrapper = styled.span`
   display: flex;
-  padding: 8px 16px;
+  padding: 8px 12px 8px 16px;
 `
 const Label = styled.span`
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
 const SelectedSearchCriteria = styled.span`
-  background: ${({ theme }) => theme.colors.gray300};
-  border-radius: 2px;
-  padding: 5px 10px;
-  color: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.fonts.bold14};
   display: flex;
+  margin-right: 16px;
+  &:hover:enabled {
+    background: none;
+  }
   & .selected-icon {
     display: none;
-  }
-  & .selected-label {
-    border-radius: 50px;
-    text-align: center;
     margin-right: 8px;
-    width: auto;
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    padding: 2px;
-    padding-right: 7px;
+    margin-right: 0;
     & .selected-icon {
       display: flex;
     }

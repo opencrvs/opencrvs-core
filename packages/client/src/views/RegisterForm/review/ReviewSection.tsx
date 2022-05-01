@@ -20,7 +20,6 @@ import {
   TextArea
 } from '@opencrvs/components/lib/forms'
 import {
-  DataSection,
   DocumentViewer,
   IDocumentViewerOptions,
   ListView,
@@ -51,7 +50,7 @@ import {
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
-  IFormTag,
+  IPreviewGroup,
   IRadioOption,
   ISelectOption,
   LIST,
@@ -110,7 +109,7 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { isMobileDevice } from '@client/utils/commonUtils'
-import { BIRTH, REJECTED } from '@client/utils/constants'
+import { REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
@@ -733,7 +732,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION, FETCH_BUTTON].find(
+    return [LIST, PARAGRAPH, WARNING, SUBSECTION, FETCH_BUTTON].find(
       (type) => type === field.type
     )
   }
@@ -939,7 +938,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         (group.previewGroups &&
           (group.previewGroups.filter(
             (previewGroup) => previewGroup.id === baseTag
-          ) as IFormTag[])) ||
+          ) as IPreviewGroup[])) ||
         []
       const values = taggedFields
         .map((field) =>
@@ -1335,6 +1334,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     this.closePreviewSection(() => this.removeAttachmentFromDraft(file))
   }
 
+  shouldShowChangeAll = (section: IFormSection) => {
+    const {
+      draft: { data, event }
+    } = this.props
+    return (
+      event === Event.BIRTH &&
+      ((section.id === BirthSection.Mother && !!data.mother?.detailsExist) ||
+        (section.id === BirthSection.Father && !!data.father?.detailsExist))
+    )
+  }
+
   transformSectionData = (
     formSections: IFormSection[],
     errorsOnFields: IErrorsBySection
@@ -1344,7 +1354,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       this.getOverriddenFieldsListForPreview(formSections)
     let tempItem: any
 
-    const initialTransformedSection = formSections.map((section) => {
+    return formSections.map((section) => {
       let items: any[] = []
       const visitedTags: string[] = []
       const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
@@ -1352,7 +1362,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         draft.data[section.id] || {},
         draft.data
       )
-      visibleGroups.forEach((group) => {
+      visibleGroups.forEach((group, index) => {
         group.fields
           .filter(
             (field) =>
@@ -1407,7 +1417,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         id: section.id,
         title: intl.formatMessage(section.title),
         items: items.filter((item) => item),
-        action: section.replaceable
+        action: this.shouldShowChangeAll(section)
           ? {
               label: intl.formatMessage(buttonMessages.replace),
               handler: () =>
@@ -1415,12 +1425,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             }
           : undefined
       }
-    })
-
-    return initialTransformedSection.map((sec) => {
-      if (sec.id === 'father' && sec.items[0].value === 'No') {
-        return { ...sec, items: [sec.items[0]] }
-      } else return { ...sec }
     })
   }
 
@@ -1438,7 +1442,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       onContinue
     } = this.props
     const formSections = this.getViewableSection(registerForm[event])
-
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,
@@ -1494,13 +1497,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               }
             />
             <FormData>
-              {!isCorrection(declaration) && (
-                <FormDataHeader>
-                  {intl.formatMessage(messages.formDataHeader, {
-                    isDraft: draft
-                  })}
-                </FormDataHeader>
-              )}
               {transformedSectionData.map((sec, index) => {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(declaration, sec.id)
@@ -1520,7 +1516,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   />
                 )
               })}
-              {event === BIRTH && !isCorrection(declaration) && (
+              {event === Event.BIRTH && !isCorrection(declaration) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
@@ -1577,6 +1573,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   })}
                   <LinkButton
                     id="edit-document"
+                    disabled={isCorrection(declaration)}
                     onClick={() =>
                       this.editLinkClickHandlerForDraft(
                         documentsSection.id,

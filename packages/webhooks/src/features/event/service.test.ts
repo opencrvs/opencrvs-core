@@ -216,7 +216,7 @@ const documentResource = {
     coding: [
       {
         system: 'http://opencrvs.org/specs/supporting-doc-type',
-        code: 'NATIONAL_ID_FRONT'
+        code: 'NATIONAL_ID'
       }
     ]
   },
@@ -346,7 +346,7 @@ const mosipBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/supporting-doc-type',
-              code: 'NATIONAL_ID_FRONT'
+              code: 'NATIONAL_ID'
             }
           ]
         },

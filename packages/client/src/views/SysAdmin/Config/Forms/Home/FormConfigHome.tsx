@@ -35,6 +35,7 @@ import {
   defaultActionState
 } from './ActionsModal'
 import { ActionsNotification } from './ActionsNotification'
+import { FormTabs } from '@opencrvs/components/lib/forms'
 
 const StyledWarning = styled(Warning)`
   margin: 0 auto 16px;
@@ -96,26 +97,30 @@ export function FormConfigHome() {
             ? intl.formatMessage(messages.publishedDescription)
             : undefined
         }
-        tabs={{
-          sections: [
-            {
-              id: DraftStatus.DRAFT,
-              title: intl.formatMessage(draftTabsMessages[DraftStatus.DRAFT])
-            },
-            {
-              id: DraftStatus.PREVIEW,
-              title: intl.formatMessage(draftTabsMessages[DraftStatus.PREVIEW])
-            },
-            {
-              id: DraftStatus.PUBLISHED,
-              title: intl.formatMessage(
-                draftTabsMessages[DraftStatus.PUBLISHED]
-              )
-            }
-          ],
-          activeTabId: selectedTab,
-          onTabClick: (tabId) => setSelectedTab(tabId)
-        }}
+        tabBarContent={
+          <FormTabs
+            sections={[
+              {
+                id: DraftStatus.DRAFT,
+                title: intl.formatMessage(draftTabsMessages[DraftStatus.DRAFT])
+              },
+              {
+                id: DraftStatus.PREVIEW,
+                title: intl.formatMessage(
+                  draftTabsMessages[DraftStatus.PREVIEW]
+                )
+              },
+              {
+                id: DraftStatus.PUBLISHED,
+                title: intl.formatMessage(
+                  draftTabsMessages[DraftStatus.PUBLISHED]
+                )
+              }
+            ]}
+            activeTabId={selectedTab}
+            onTabClick={(tabId) => setSelectedTab(tabId)}
+          />
+        }
       >
         <ActionContext.Provider value={{ actionState, setAction }}>
           {selectedTab === DraftStatus.DRAFT ? (

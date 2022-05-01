@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IDeclaration } from '@client/declarations'
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import {
   BirthSection,
   DeathSection,
@@ -21,10 +21,7 @@ import {
   GQLDeathEventSearchSet,
   GQLEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { IUserDetails } from './userUtils'
 import { getEvent } from '@client/views/PrintCertificate/utils'
-import { BIRTH, DEATH } from './constants'
-import { SUBMISSION_STATUS } from '@client/declarations'
 import { includes } from 'lodash'
 
 const getInformantFullName = (
@@ -95,7 +92,8 @@ const transformBirthSearchQueryDataToDraft = (
         data.childName
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.familyName)[0]) ||
-      ''
+      '',
+    childBirthDate: data.dateOfBirth && data.dateOfBirth
   }
 }
 
@@ -127,7 +125,8 @@ const transformDeathSearchQueryDataToDraft = (
         data.deceasedName
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.familyName)[0]) ||
-      ''
+      '',
+    deathDate: data.dateOfDeath && data.dateOfDeath
   }
 }
 
@@ -154,6 +153,8 @@ export const transformSearchQueryDataToDraft = (
   declaration.trackingId = data.registration && data.registration.trackingId
   declaration.submissionStatus = data.registration && data.registration.status
   declaration.compositionId = data.id
+  declaration.createdAt =
+    data.registration?.createdAt && data.registration.createdAt
 
   switch (eventType) {
     case Event.BIRTH:
@@ -170,9 +171,9 @@ export const transformSearchQueryDataToDraft = (
 
 export const getAttachmentSectionKey = (declarationEvent: Event): string => {
   switch (declarationEvent) {
-    case DEATH:
+    case Event.DEATH:
       return DeathSection.DeathDocuments
-    case BIRTH:
+    case Event.BIRTH:
     default:
       return BirthSection.Documents
   }

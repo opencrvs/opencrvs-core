@@ -13,7 +13,7 @@
 import {
   IFormConfig,
   ISerializedForm,
-  IQuestionIdentifiers,
+  IIdentifiers,
   IQuestionConfig,
   SerializedFormField,
   ISerializedFormSection,
@@ -36,6 +36,7 @@ import { getEventDraft } from '@client/forms/configuration/formDrafts/utils'
 import { registerForms } from './default'
 import { DraftStatus } from './formDrafts/reducer'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
+import { populateRegisterFormsWithAddresses } from './administrative/addresses'
 
 // THIS FILE SORTS & COMBINES CONFIGURATIONS WITH THE DEFAULT CONFIGURATION FOR RENDERING IN THE APPLICATION
 
@@ -88,9 +89,7 @@ export function getGroup(groups: IGroups, id: string): IGroup {
   }
 }
 
-export function getQuestionsIdentifiersFromFieldId(
-  fieldId: string
-): IQuestionIdentifiers {
+export function getIdentifiersFromFieldId(fieldId: string): IIdentifiers {
   const splitIds = fieldId.split('.')
   return {
     event: splitIds[0],
@@ -142,7 +141,7 @@ export function sortFormCustomisations(
     customQuestionConfigurations: []
   }
   const customQsToBeSorted: IQuestionConfig[] = []
-  customQuestions.map((question, index) => {
+  customQuestions.forEach((question) => {
     const defaultField: IDefaultField | undefined = getDefaultField(
       defaultEventForm,
       question.fieldId
@@ -213,7 +212,7 @@ export function sortFormCustomisations(
 }
 
 export function filterQuestionsByEventType(
-  questions: IQuestionConfig[] | undefined,
+  questions: IQuestionConfig[],
   event: string
 ) {
   return questions?.filter((question) => question.fieldId.includes(event)) || []
@@ -221,11 +220,16 @@ export function filterQuestionsByEventType(
 
 export function configureRegistrationForm(
   formCustomisations: IFormConfigurations,
-  defaultEventForm: ISerializedForm
+  defaultEventForm: ISerializedForm,
+  event: Event
 ): ISerializedForm {
+  const formWithAddresses = populateRegisterFormsWithAddresses(
+    defaultEventForm,
+    event
+  )
   const defaultFormWithCustomisations = configureDefaultQuestions(
     formCustomisations.defaultFieldCustomisations,
-    defaultEventForm
+    formWithAddresses
   )
   return configureCustomQuestions(
     formCustomisations.customQuestionConfigurations,
@@ -242,7 +246,8 @@ export function getConfiguredForm(
       filterQuestionsByEventType(questionConfig, event),
       registerForms[event]
     ),
-    registerForms[event]
+    registerForms[event],
+    event
   )
   return deserializeForm(form)
 }
@@ -263,7 +268,8 @@ export function getConfiguredOrDefaultForm(
           filterQuestionsByEventType(formConfig.questionConfig, event),
           registerForms[event]
         ),
-        registerForms[event]
+        registerForms[event],
+        event
       )
     : registerForms[event]
   return deserializeForm(form)

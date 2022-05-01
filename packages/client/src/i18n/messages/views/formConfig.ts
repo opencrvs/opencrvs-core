@@ -35,10 +35,6 @@ interface IFormConfigMessages
   certificateHandlebars: MessageDescriptor
   hideField: MessageDescriptor
   requiredForRegistration: MessageDescriptor
-  statusChangeDelete: MessageDescriptor
-  statusChangeError: MessageDescriptor
-  statusChangeInPreview: MessageDescriptor
-  statusChangePublish: MessageDescriptor
   draftLabel: MessageDescriptor
   previewDate: MessageDescriptor
   publishedDate: MessageDescriptor
@@ -138,11 +134,6 @@ const navigationMessagesToDefine: INavigationMessages = {
     id: 'config.form.navigation.registration',
     defaultMessage: 'Registration',
     description: 'Label for registration in page navigation'
-  },
-  primaryCaregiver: {
-    id: 'config.form.navigation.primaryCaregiver',
-    defaultMessage: 'Primary Caregiver',
-    description: 'Label for primaryCaregiver in page navigation'
   }
 }
 
@@ -406,28 +397,6 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.form.settings.dynamicList',
     defaultMessage: 'Dynamic List',
     description: 'Success notification label for number of addresses settings'
-  },
-  statusChangeDelete: {
-    id: 'config.form.statusChange.delete',
-    defaultMessage:
-      '{event} declaration form v{version} has been deleted successfully',
-    description: 'Delete toast description for status change to deleted'
-  },
-  statusChangeError: {
-    id: 'config.form.statusChange.error',
-    defaultMessage: 'Something went wrong. Please try again',
-    description: 'Error toast description for status change failure'
-  },
-  statusChangeInPreview: {
-    id: 'config.form.statusChange.inPreview',
-    defaultMessage: '{event} declaration form v{version} is now in preview',
-    description: 'Success toast description for status change to inPreview'
-  },
-  statusChangePublish: {
-    id: 'config.form.statusChange.publish',
-    defaultMessage:
-      '{event} declaration form v{version} successfully published',
-    description: 'Success toast description for status change to inPreview'
   },
   draftLabel: {
     id: 'config.form.draft.label',

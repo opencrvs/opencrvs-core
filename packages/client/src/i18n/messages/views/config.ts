@@ -21,7 +21,6 @@ interface IConfigMessages
   govtLogoFileLimitError: MessageDescriptor
   applicationConfigChangeError: MessageDescriptor
   certificateConfiguration: MessageDescriptor
-  declarationForms: MessageDescriptor
   printTemplate: MessageDescriptor
   downloadTemplate: MessageDescriptor
   uploadTemplate: MessageDescriptor
@@ -128,11 +127,6 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.certificateConfiguration',
     defaultMessage: 'Certificate configuration',
     description: 'Link Text for Config Declaration Settings'
-  },
-  declarationForms: {
-    id: 'config.declarationForms',
-    defaultMessage: 'Declaration forms',
-    description: 'Link Text for Config Declaration Forms'
   },
   printTemplate: {
     id: 'config.printTemplate',

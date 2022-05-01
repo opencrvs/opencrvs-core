@@ -20,7 +20,7 @@ import { Tooltip } from '@opencrvs/components/lib/icons'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { useIntl } from 'react-intl'
 import {
-  getContentKey,
+  getContentKeys,
   getCertificateHandlebar,
   IConfigField,
   getFieldDefinition
@@ -44,10 +44,9 @@ const Container = styled.div`
   gap: 16px;
 `
 
-const Title = styled.span`
+const Title = styled.h3`
+  margin: 0;
   ${({ theme }) => theme.fonts.h3}
-  text-overflow: ellipsis;
-  overflow: hidden;
 `
 
 const Subtitle = styled.span`
@@ -87,6 +86,8 @@ const HandleBar = styled.div`
 const Body = styled.span`
   ${({ theme }) => theme.fonts.reg14}
   color: ${({ theme }) => theme.colors.grey500};
+  text-overflow: ellipsis;
+  overflow: hidden;
 `
 
 function HideToggleAction({ fieldId, enabled }: IConfigField) {
@@ -107,6 +108,23 @@ function HideToggleAction({ fieldId, enabled }: IConfigField) {
   )
 }
 
+function RequiredToggleAction({ fieldId, required }: IConfigField) {
+  const dispatch = useDispatch()
+
+  return (
+    <CenteredToggle
+      selected={required}
+      onChange={() =>
+        dispatch(
+          modifyConfigField(fieldId, {
+            required: !required
+          })
+        )
+      }
+    />
+  )
+}
+
 export function DefaultFieldTools({
   configField
 }: {
@@ -120,47 +138,37 @@ export function DefaultFieldTools({
   )
   const formField = getFieldDefinition(formSection, configField)
   const handleBar = getCertificateHandlebar(formField)
-  const contentKey = getContentKey(formField)
+  const contentKeys = getContentKeys(formField)
   const fieldType = fieldTypeLabel(formField.type)
 
   return (
     <Container>
       <Title>{intl.formatMessage(fieldType)}</Title>
-      <ListViewSimplified bottomBorder>
-        <ListViewItemSimplified
-          label={<Label>{intl.formatMessage(messages.hideField)}</Label>}
-          actions={<HideToggleAction {...configField} />}
-        />
-        {/*
-         *
-         *TODO: merge with develop to get the customizable prop in field definintion
-         * <ListViewItemSimplified
-         *   label={
-         *     <Label>
-         *       {intl.formatMessage(messages.requiredForRegistration)}
-         *       <StyledTooltip />
-         *     </Label>
-         *   }
-         *   actions={[
-         *     <CenteredToggle
-         *       key="requiredForRegistration"
-         *       selected={configField.required}
-         *     />
-         *   ]}
-         * />
-         *
-         */}
-      </ListViewSimplified>
+      {formField.customisable && (
+        <ListViewSimplified bottomBorder>
+          <ListViewItemSimplified
+            label={<Label>{intl.formatMessage(messages.hideField)}</Label>}
+            actions={<HideToggleAction {...configField} />}
+          />
+          <ListViewItemSimplified
+            label={
+              <Label>
+                {intl.formatMessage(messages.requiredForRegistration)}
+                <StyledTooltip />
+              </Label>
+            }
+            actions={<RequiredToggleAction {...configField} />}
+          />
+        </ListViewSimplified>
+      )}
       <Content>
         <Subtitle>
           {intl.formatMessage(messages.contentKey)}
           <StyledTooltip />
         </Subtitle>
-        <Body>
-          {contentKey.map((content, index) => (
-            <span key={index}>{content}</span>
-          ))}
-        </Body>
+        {contentKeys.map((content, index) => (
+          <Body key={index}>{content}</Body>
+        ))}
       </Content>
       {handleBar && (
         <HandleBar>

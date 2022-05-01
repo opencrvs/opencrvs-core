@@ -119,3 +119,17 @@ export const hasNatlSysAdminScope = (scope: Scope | null): boolean => {
   }
   return false
 }
+
+export const hasRegisterScope = (scope: Scope | null): boolean => {
+  if (scope?.includes(AuthScope.REGISTER)) {
+    return true
+  }
+  return false
+}
+
+export const hasRegistrationClerkScope = (scope: Scope | null): boolean => {
+  if (scope?.includes(AuthScope.VALIDATE)) {
+    return true
+  }
+  return false
+}

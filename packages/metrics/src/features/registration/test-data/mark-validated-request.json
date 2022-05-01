@@ -234,7 +234,7 @@
         "multipleBirthInteger": 1,
         "address": [
           {
-            "type": "PERMANENT",
+            "type": "PRIMARY_ADDRESS",
             "line": [
               "",
               "",
@@ -248,7 +248,7 @@
             "country": "BGD"
           },
           {
-            "type": "CURRENT",
+            "type": "SECONDARY_ADDRESS",
             "line": [
               "",
               "",

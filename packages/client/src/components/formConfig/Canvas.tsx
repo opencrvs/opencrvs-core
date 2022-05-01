@@ -153,10 +153,7 @@ export function Canvas({
           <FormConfigElementCard
             key={fieldId}
             selected={isSelected}
-            onClick={(event) => {
-              event.stopPropagation()
-              setSelectedField(fieldId)
-            }}
+            onClick={() => setSelectedField(fieldId)}
             movable={isSelected}
             status={isHidden ? intl.formatMessage(messages.hidden) : undefined}
             removable={configField.custom}

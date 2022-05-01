@@ -1,12 +1,12 @@
 {
   "name": "@opencrvs/client",
-  "version": "1.0.0-alpha.3.1",
+  "version": "1.0.0-alpha.3.2",
   "description": "OpenCRVS client application",
   "license": "MPL-2.0",
   "private": true,
   "dependencies": {
     "@craco/craco": "^6.4.3",
-    "@opencrvs/components": "^1.0.0-alpha.3.1",
+    "@opencrvs/components": "^1.0.0-alpha.3.2",
     "@sentry/browser": "^4.6.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/history": "^4.6.2",
@@ -80,6 +80,7 @@
     "test": "yarn test:compilation && PORT=3000 craco test --watchAll=false --coverage --silent --noStackTrace --env=jsdom --modulePaths=src/",
     "test:watch": "PORT=3000 craco test --env=jsdom --modulePaths=src/ --watch",
     "open:cov": "yarn test && opener coverage/index.html",
+    "generate:test:forms": "bash generate-form.sh",
     "lint": "yarn lint:css && yarn lint:ts",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",
@@ -93,6 +94,7 @@
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "prettier --write",
+      "yarn generate:test:forms",
       "yarn lint:ts",
       "stylelint",
       "yarn extract:translations",

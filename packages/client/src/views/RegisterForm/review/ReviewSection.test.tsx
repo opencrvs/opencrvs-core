@@ -55,28 +55,14 @@ const { store, history } = createStore()
 const mockHandler = jest.fn()
 
 const draft = createDeclaration(DeclarationEvent.BIRTH)
-
-const declaredBirthDeclaration = createReviewDeclaration(
-  uuid(),
-  {},
-  DeclarationEvent.BIRTH
-)
-const rejectedDraftBirth = createReviewDeclaration(
-  uuid(),
-  {},
-  DeclarationEvent.BIRTH,
-  REJECTED
-)
-const rejectedDraftDeath = createReviewDeclaration(
-  uuid(),
-  {},
-  DeclarationEvent.DEATH,
-  REJECTED
-)
-
 draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
-  father: { fathersDetailsExist: true, addressSameAsMother: false },
+  father: {
+    detailsExist: true
+  },
+  mother: {
+    detailsExist: true
+  },
   documents: {
     imageUploader: { title: 'dummy', description: 'dummy', data: '' }
   },
@@ -84,6 +70,24 @@ draft.data = {
     commentsOrNotes: ''
   }
 }
+
+const declaredBirthDeclaration = createReviewDeclaration(
+  uuid(),
+  draft.data,
+  DeclarationEvent.BIRTH
+)
+const rejectedDraftBirth = createReviewDeclaration(
+  uuid(),
+  draft.data,
+  DeclarationEvent.BIRTH,
+  REJECTED
+)
+const rejectedDraftDeath = createReviewDeclaration(
+  uuid(),
+  draft.data,
+  DeclarationEvent.DEATH,
+  REJECTED
+)
 
 describe('when in device of large viewport', () => {
   let userAgentMock: jest.SpyInstance
@@ -182,10 +186,10 @@ describe('when in device of large viewport', () => {
       expect(
         renderSelectDynamicLabel(
           '8cbc862a-b817-4c29-a490-4a8767ff023c',
-          { resource: 'locations', dependency: 'countryPermanent' },
+          { resource: 'locations', dependency: 'countryPrimary' },
           {
-            countryPermanent: 'BGD',
-            statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
+            countryPrimary: 'BGD',
+            statePrimary: '8cbc862a-b817-4c29-a490-4a8767ff023c'
           },
           intl,
           mockOfflineData,
@@ -197,10 +201,10 @@ describe('when in device of large viewport', () => {
       expect(
         renderSelectDynamicLabel(
           '8cbc862a-b817-4c29-a490-4a8767ff023c',
-          { resource: 'locations', dependency: 'countryPermanent' },
+          { resource: 'locations', dependency: 'countryPrimary' },
           {
-            countryPermanent: 'BGD',
-            statePermanent: '8cbc862a-b817-4c29-a490-4a8767ff023c'
+            countryPrimary: 'BGD',
+            statePrimary: '8cbc862a-b817-4c29-a490-4a8767ff023c'
           },
           intl,
           mockOfflineData,
@@ -642,8 +646,8 @@ describe('when in device of small viewport', () => {
                     validate: [],
                     options: [
                       {
-                        label: formMessages.docTypeBR,
-                        value: 'Birth Registration'
+                        label: formMessages.docTypeBirthCert,
+                        value: 'BIRTH_CERTIFICATE'
                       }
                     ]
                   }

@@ -18,7 +18,7 @@ const Container = styled.div`
   flex-direction: row;
   flex-wrap: nowrap;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
-  padding: 8px 0px;
+  padding: 16px 0px;
   width: 100%;
   &:last-child {
     border-bottom: none;

@@ -17,6 +17,8 @@ import {
   isDefaultField,
   hasDefaultFieldChanged
 } from './utils'
+import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
+import { registerForms } from '@client/forms/configuration/default'
 
 export function selectConfigFieldsState(store: IStoreState) {
   if (store.configFields.state === 'LOADING') {
@@ -42,14 +44,18 @@ export function selectConfigField(
   return fieldId ? selectConfigFields(store, event, section)[fieldId] : null
 }
 
-function generateQuestionConfigs(configFields: ISectionFieldMap) {
+function generateQuestionConfigs(configFields: ISectionFieldMap, event: Event) {
   const questionConfigs: IQuestionConfig[] = []
+  const formWithAddresses = populateRegisterFormsWithAddresses(
+    registerForms[event],
+    event
+  )
   Object.values(configFields).forEach((sectionConfigFields) => {
     Object.values(sectionConfigFields).forEach((configField) => {
       if (!isDefaultField(configField)) {
         const { foregoingFieldId, ...rest } = configField
         questionConfigs.push(rest)
-      } else if (hasDefaultFieldChanged(configField)) {
+      } else if (hasDefaultFieldChanged(configField, formWithAddresses)) {
         const { foregoingFieldId, identifiers, ...rest } = configField
         questionConfigs.push(rest)
       }
@@ -60,5 +66,5 @@ function generateQuestionConfigs(configFields: ISectionFieldMap) {
 
 export function selectQuestionConfigs(store: IStoreState, event: Event) {
   const configFields = selectConfigFieldsState(store)
-  return generateQuestionConfigs(configFields[event])
+  return generateQuestionConfigs(configFields[event], event)
 }

@@ -24,14 +24,14 @@ import {
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
   DOCUMENT_UPLOADER_WITH_OPTION,
-  QuestionConfigFieldType
+  QuestionConfigFieldType,
+  ISerializedForm
 } from '@client/forms'
 import { camelCase, keys } from 'lodash'
 import { deserializeFormField } from '@client/forms/mappings/deserializer'
 import { createCustomField } from '@client/forms/configuration/customUtils'
 import { FieldPosition } from '@client/forms/configuration'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
-import { registerForms } from '@client/forms/configuration/default'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { MessageDescriptor } from 'react-intl'
 
@@ -151,7 +151,10 @@ export function getFieldDefinition(
   let formField: IFormField
   if (isDefaultField(configField)) {
     const { groupIndex, fieldIndex } = configField.identifiers
-    formField = { ...formSection.groups[groupIndex].fields[fieldIndex] }
+    formField = {
+      ...formSection.groups[groupIndex].fields[fieldIndex],
+      required: configField.required
+    }
   } else {
     formField = deserializeFormField(createCustomField(configField))
   }
@@ -160,7 +163,7 @@ export function getFieldDefinition(
   return formField
 }
 
-export function getContentKey(formField: IFormField) {
+export function getContentKeys(formField: IFormField) {
   if (
     (formField.type === RADIO_GROUP ||
       formField.type === RADIO_GROUP_WITH_NESTED_FIELDS ||
@@ -238,14 +241,17 @@ function getDefaultConfigFieldIdentifiers(
   }
 }
 
-function getPrecedingDefaultFieldId(defaultConfigField: IDefaultConfigField) {
+function getPrecedingDefaultFieldId(
+  defaultConfigField: IDefaultConfigField,
+  registerForm: ISerializedForm
+) {
   const { event, sectionIndex, groupIndex, fieldIndex } =
     getDefaultConfigFieldIdentifiers(defaultConfigField)
   /* First field of the section */
   if (!fieldIndex && !groupIndex) {
     return FieldPosition.TOP
   }
-  const section = registerForms[event].sections[sectionIndex]
+  const section = registerForm.sections[sectionIndex]
   /* First field of the group */
   if (!fieldIndex) {
     const group = section.groups[groupIndex - 1]
@@ -258,15 +264,17 @@ function getPrecedingDefaultFieldId(defaultConfigField: IDefaultConfigField) {
 }
 
 export function hasDefaultFieldChanged(
-  defaultConfigField: IDefaultConfigField
+  defaultConfigField: IDefaultConfigField,
+  registerForm: ISerializedForm
 ) {
-  const { event, sectionIndex, groupIndex, fieldIndex } =
+  const { sectionIndex, groupIndex, fieldIndex } =
     getDefaultConfigFieldIdentifiers(defaultConfigField)
   const defaultFormField =
-    registerForms[event].sections[sectionIndex].groups[groupIndex].fields[
-      fieldIndex
-    ]
-  const precedingDefaultFieldId = getPrecedingDefaultFieldId(defaultConfigField)
+    registerForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
+  const precedingDefaultFieldId = getPrecedingDefaultFieldId(
+    defaultConfigField,
+    registerForm
+  )
   if (precedingDefaultFieldId !== defaultConfigField.preceedingFieldId) {
     return true
   }

@@ -51,7 +51,8 @@ describe('User list tests', () => {
             query: SEARCH_USERS,
             variables: {
               primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10
+              count: 10,
+              skip: 0
             }
           },
           result: {
@@ -126,7 +127,8 @@ describe('User list tests', () => {
             query: SEARCH_USERS,
             variables: {
               primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10
+              count: 10,
+              skip: 0
             }
           },
           result: {
@@ -166,7 +168,8 @@ describe('User list tests', () => {
             query: SEARCH_USERS,
             variables: {
               primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10
+              count: 10,
+              skip: 0
             }
           },
           result: {
@@ -209,7 +212,8 @@ describe('User list tests', () => {
             query: SEARCH_USERS,
             variables: {
               primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10
+              count: 10,
+              skip: 0
             }
           },
           result: {
@@ -253,7 +257,8 @@ describe('User list tests', () => {
             query: SEARCH_USERS,
             variables: {
               primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10
+              count: 10,
+              skip: 0
             }
           },
           result: {
@@ -398,7 +403,8 @@ describe('User list tests', () => {
             query: SEARCH_USERS,
             variables: {
               primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10
+              count: 10,
+              skip: 0
             }
           },
           result: {

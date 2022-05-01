@@ -24,6 +24,9 @@ const Value = styled.span`
 const LabelValuePairContainer = styled.div`
   display: flex;
   flex-wrap: nowrap;
+  @media (max-width: 768px) {
+    display: grid;
+  }
 `
 interface IInfo {
   label: string
