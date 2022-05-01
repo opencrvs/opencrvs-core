@@ -11,14 +11,9 @@
  */
 
 import {
-  BirthSection,
-  DeathSection,
   ISerializedForm,
   IQuestionConfig,
-  SerializedFormField,
-  Event,
-  REVIEW_OVERRIDE_POSITION,
-  ISerializedFormSection
+  SerializedFormField
 } from '@client/forms/index'
 import { cloneDeep } from 'lodash'
 import { getGroup, getIdentifiersFromFieldId, getSection } from '.'
@@ -82,6 +77,7 @@ export function configureDefaultQuestions(
   defaultFieldCustomisations.forEach((defaultFieldCustomisation) => {
     // this is a customisation to a default field
     // default fields can only be enabled or disabled at present
+    /* TODO: Handle the changed positions and required property*/
     if (defaultFieldCustomisation.question.enabled === FieldEnabled.DISABLED) {
       newForm.sections[
         defaultFieldCustomisation.defaultField.selectedSectionIndex
