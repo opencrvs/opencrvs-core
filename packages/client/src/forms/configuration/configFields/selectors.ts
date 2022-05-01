@@ -11,14 +11,13 @@
  */
 
 import { IStoreState } from '@client/store'
-import { Event, IQuestionConfig } from '@client/forms'
+import { Event, IQuestionConfig, IForm } from '@client/forms'
 import {
   ISectionFieldMap,
   isDefaultField,
   hasDefaultFieldChanged
 } from './utils'
-import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
-import { registerForms } from '@client/forms/configuration/default'
+import { getConfiguredForm } from '@client/forms/configuration'
 
 export function selectConfigFieldsState(store: IStoreState) {
   if (store.configFields.state === 'LOADING') {
@@ -44,18 +43,22 @@ export function selectConfigField(
   return fieldId ? selectConfigFields(store, event, section)[fieldId] : null
 }
 
-function generateQuestionConfigs(configFields: ISectionFieldMap, event: Event) {
+function selectQuestionConfig(store: IStoreState) {
+  const configFieldsState = selectConfigFieldsState(store)
+  return configFieldsState.questionConfig
+}
+
+function generateModifiedQuestionConfigs(
+  configFields: ISectionFieldMap,
+  registerForm: IForm
+) {
   const questionConfigs: IQuestionConfig[] = []
-  const formWithAddresses = populateRegisterFormsWithAddresses(
-    registerForms[event],
-    event
-  )
   Object.values(configFields).forEach((sectionConfigFields) => {
     Object.values(sectionConfigFields).forEach((configField) => {
       if (!isDefaultField(configField)) {
         const { foregoingFieldId, ...rest } = configField
         questionConfigs.push(rest)
-      } else if (hasDefaultFieldChanged(configField, formWithAddresses)) {
+      } else if (hasDefaultFieldChanged(configField, registerForm)) {
         const { foregoingFieldId, identifiers, ...rest } = configField
         questionConfigs.push(rest)
       }
@@ -64,7 +67,12 @@ function generateQuestionConfigs(configFields: ISectionFieldMap, event: Event) {
   return questionConfigs
 }
 
-export function selectQuestionConfigs(store: IStoreState, event: Event) {
+export function selectModifiedQuestionConfigs(
+  store: IStoreState,
+  event: Event
+) {
   const configFields = selectConfigFieldsState(store)
-  return generateQuestionConfigs(configFields[event], event)
+  const previousQuestionConfig = selectQuestionConfig(store)
+  const registerForm = getConfiguredForm(previousQuestionConfig, event)
+  return generateModifiedQuestionConfigs(configFields[event], registerForm)
 }

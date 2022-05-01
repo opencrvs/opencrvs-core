@@ -12,7 +12,7 @@
 import * as actions from '@client/forms/configuration/configFields/actions'
 import { Loop, LoopReducer } from 'redux-loop'
 import * as offlineActions from '@client/offline/actions'
-import { Event } from '@client/forms'
+import { Event, IQuestionConfig } from '@client/forms'
 import { getConfiguredForm, FieldPosition } from '@client/forms/configuration'
 import { ISectionFieldMap, getSectionFieldsMap, IConfigFieldMap } from './utils'
 import {
@@ -26,17 +26,20 @@ export type IConfigFieldsState =
       state: 'LOADING'
       birth: null
       death: null
+      questionConfig: IQuestionConfig[]
     }
   | {
       state: 'READY'
       birth: ISectionFieldMap
       death: ISectionFieldMap
+      questionConfig: IQuestionConfig[]
     }
 
 export const initialState: IConfigFieldsState = {
   state: 'LOADING',
   birth: null,
-  death: null
+  death: null,
+  questionConfig: []
 }
 
 type Actions = actions.ConfigFieldsActions | offlineActions.Action
@@ -77,6 +80,7 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
       return {
         ...state,
         state: 'READY',
+        questionConfig,
         birth: getSectionFieldsMap(Event.BIRTH, birthForm),
         death: getSectionFieldsMap(Event.DEATH, deathForm)
       }

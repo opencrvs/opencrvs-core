@@ -24,8 +24,7 @@ import {
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
   DOCUMENT_UPLOADER_WITH_OPTION,
-  QuestionConfigFieldType,
-  ISerializedForm
+  QuestionConfigFieldType
 } from '@client/forms'
 import { camelCase, keys } from 'lodash'
 import { deserializeFormField } from '@client/forms/mappings/deserializer'
@@ -237,7 +236,7 @@ function getDefaultConfigFieldIdentifiers(
 
 function getPrecedingDefaultFieldId(
   defaultConfigField: IDefaultConfigField,
-  registerForm: ISerializedForm
+  registerForm: IForm
 ) {
   const { event, sectionIndex, groupIndex, fieldIndex } =
     getDefaultConfigFieldIdentifiers(defaultConfigField)
@@ -259,7 +258,7 @@ function getPrecedingDefaultFieldId(
 
 export function hasDefaultFieldChanged(
   defaultConfigField: IDefaultConfigField,
-  registerForm: ISerializedForm
+  registerForm: IForm
 ) {
   const { sectionIndex, groupIndex, fieldIndex } =
     getDefaultConfigFieldIdentifiers(defaultConfigField)

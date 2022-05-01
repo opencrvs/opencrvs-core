@@ -18,7 +18,7 @@ import {
   REDIRECT_DELAY
 } from '@client/views/SysAdmin/Config/Forms/utils'
 import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
-import { selectQuestionConfigs } from '@client/forms/configuration/configFields/selectors'
+import { selectModifiedQuestionConfigs } from '@client/forms/configuration/configFields/selectors'
 import { Event, IQuestionConfig } from '@client/forms'
 import { Mutation } from 'react-apollo'
 import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
@@ -47,7 +47,7 @@ function SaveActionButton({ comment }: { comment: string }) {
   const intl = useIntl()
   const { event } = useParams<{ event: Event }>()
   const questions = useSelector((store: IStoreState) =>
-    selectQuestionConfigs(store, event)
+    selectModifiedQuestionConfigs(store, event)
   )
   const { setStatus } = React.useContext(SaveActionContext)
   const dispatch = useDispatch()
