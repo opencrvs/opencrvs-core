@@ -54,6 +54,10 @@ function preparePlaceholderConfigAndVerify(
 ) {
   const field = getFieldDefinition(formSection, currentField)
 
+  if (field.customisable === true || !field.previewGroup) {
+    return true
+  }
+
   if (field.customisable === false && field.previewGroup) {
     const previewGroup = formSection.groups.map((group) =>
       group.previewGroups?.find(
@@ -64,10 +68,6 @@ function preparePlaceholderConfigAndVerify(
       currentField.previewGroupID = previewGroup.id
       currentField.previewGroupLabel = previewGroup.label
     }
-  }
-
-  if (field.customisable === true) {
-    return true
   }
 
   return !fields.find(
