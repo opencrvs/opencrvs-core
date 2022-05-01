@@ -51,11 +51,7 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
-import {
-  ActionPageLight,
-  IDataProps,
-  ListView
-} from '@opencrvs/components/lib/interface'
+import { ActionPageLight, IDataProps } from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -66,12 +62,6 @@ import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdm
 import { Check } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import {
-  ListViewSimplifiedSectionContainer,
-  ListViewSimplifiedTitle,
-  ListViewSimplifiedLabel,
-  ListViewSimplifiedValue
-} from '@client/views/RegisterForm/review/ReviewSection'
 import {
   ListViewSimplified,
   ListViewItemSimplified
@@ -111,6 +101,16 @@ const Container = styled.div`
   }
 `
 
+const Title = styled.div`
+  ${({ theme }) => theme.fonts.h2};
+  margin-bottom: 16px;
+`
+const Label = styled.label`
+  ${({ theme }) => theme.fonts.bold16};
+`
+const Value = styled.div`
+  ${({ theme }) => theme.fonts.reg16}
+`
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
@@ -238,26 +238,18 @@ class UserReviewFormComponent extends React.Component<
         <Container>
           {this.transformSectionData().map((sec, index) => {
             return (
-              <ListViewSimplifiedSectionContainer key={index}>
-                {sec.title && (
-                  <ListViewSimplifiedTitle>{sec.title}</ListViewSimplifiedTitle>
-                )}
+              <>
+                {sec.title && <Title>{sec.title}</Title>}
                 <ListViewSimplified>
                   {sec.items.map((item, index) => {
                     return (
                       <ListViewItemSimplified
                         key={index}
-                        label={
-                          <ListViewSimplifiedLabel>
-                            {item.label}
-                          </ListViewSimplifiedLabel>
-                        }
+                        label={<Label>{item.label}</Label>}
                         value={
-                          <ListViewSimplifiedValue
-                            id={item.label.split(' ')[0]}
-                          >
+                          <Value id={item.label.split(' ')[0]}>
                             {item.value}
-                          </ListViewSimplifiedValue>
+                          </Value>
                         }
                         actions={
                           <LinkButton
@@ -272,7 +264,7 @@ class UserReviewFormComponent extends React.Component<
                     )
                   })}
                 </ListViewSimplified>
-              </ListViewSimplifiedSectionContainer>
+              </>
             )
           })}
           <Action>{actionComponent}</Action>

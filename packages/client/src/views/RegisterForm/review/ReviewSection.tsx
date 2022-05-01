@@ -22,7 +22,6 @@ import {
 import {
   DocumentViewer,
   IDocumentViewerOptions,
-  ListView,
   ResponsiveModal
 } from '@opencrvs/components/lib/interface'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
@@ -200,45 +199,17 @@ const FormData = styled.div`
     padding: 24px;
   }
 `
-export const ListViewSimplifiedTitle = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
+const Title = styled.div`
   ${({ theme }) => theme.fonts.h2};
   margin-bottom: 16px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h3};
-    flex-direction: column;
-    align-items: flex-start;
-    button > div {
-      padding: 0;
-    }
-    gap: 0;
-  }
 `
-export const ListViewSimplifiedLabel = styled.label`
+const Label = styled.label`
   ${({ theme }) => theme.fonts.bold16};
-  flex: 1;
-  margin-right: 10%;
-  max-width: 40%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    max-width: 100%;
-    ${({ theme }) => theme.fonts.bold16};
-    margin-right: auto;
-  }
 `
-export const ListViewSimplifiedValue = styled.div`
-  ${({ theme }) => theme.fonts.reg16};
-  flex: 1;
-  overflow-wrap: break-word;
-  max-width: 50%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.reg16};
-    max-width: 100%;
-    margin-right: auto;
-  }
+const Value = styled.div`
+  ${({ theme }) => theme.fonts.reg16}
 `
-export const ListViewSimplifiedSectionContainer = styled.div`
+const SectionContainer = styled.div`
   margin-bottom: 30px;
 `
 
@@ -1548,16 +1519,16 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(declaration, sec.id)
                 return (
-                  <ListViewSimplifiedSectionContainer key={index}>
+                  <SectionContainer key={index}>
                     {sec.title && (
-                      <ListViewSimplifiedTitle>
+                      <Title>
                         {sec.title}
                         {sec.action && (
                           <LinkButton onClick={sec.action.handler}>
                             {sec.action.label}
                           </LinkButton>
                         )}
-                      </ListViewSimplifiedTitle>
+                      </Title>
                     )}
                     <DocumentListPreviewContainer>
                       <DocumentListPreview
@@ -1572,17 +1543,11 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         return (
                           <ListViewItemSimplified
                             key={index}
-                            label={
-                              <ListViewSimplifiedLabel>
-                                {item.label}
-                              </ListViewSimplifiedLabel>
-                            }
+                            label={<Label>{item.label}</Label>}
                             value={
-                              <ListViewSimplifiedValue
-                                id={item.label.split(' ')[0]}
-                              >
+                              <Value id={item.label.split(' ')[0]}>
                                 {item.value}
-                              </ListViewSimplifiedValue>
+                              </Value>
                             }
                             actions={
                               <LinkButton
@@ -1597,7 +1562,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                         )
                       })}
                     </ListViewSimplified>
-                  </ListViewSimplifiedSectionContainer>
+                  </SectionContainer>
                 )
               })}
               {event === Event.BIRTH && !isCorrection(declaration) && (

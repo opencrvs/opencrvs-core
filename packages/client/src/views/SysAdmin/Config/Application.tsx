@@ -23,7 +23,6 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
-  ListView,
   FloatingNotification,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
@@ -36,12 +35,30 @@ import styled from 'styled-components'
 import { lookup } from 'country-data'
 import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
 import { FormTabs } from '@opencrvs/components/lib/forms'
+import {
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { isString } from 'lodash'
+
+export const Label = styled.label`
+  ${({ theme }) => theme.fonts.bold16};
+`
+export const Value = styled.div`
+  ${({ theme }) => theme.fonts.reg16}
+`
 
 const ListGroupTitle = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
-  width: 240px;
-  height: 22px;
+  width: 100%;
+  height: 56px;
+  text-align: left;
   ${({ theme }) => theme.fonts.bold14};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
+  display: flex;
+  align-items: center;
 `
 
 type Props = IntlShapeProps & {
@@ -73,6 +90,7 @@ export enum GeneralActionId {
 export enum BirthActionId {
   BIRTH_REGISTRATION_TARGET = 'changeBirthRegTarget',
   BIRTH_LATE_REGISTRATION_TARGET = 'changeBirthLateRegTarget',
+  BIRTH_PERIOD_BETWEEN_LATE_DELAYED_TARGET = 'birthPeriodBetweenLateDelayedTarget',
   BIRTH_ON_TIME_FEE = 'changeBirthOnTimeFee',
   BIRTH_LATE_FEE = 'changeBirthLateFee',
   BIRTH_DELAYED_FEE = 'changeBirthDelayedFee'
@@ -80,8 +98,24 @@ export enum BirthActionId {
 
 export enum DeathActionId {
   DEATH_REGISTRATION_TARGET = 'changeDeathRegTarget',
+  DEATH_REGISTRATION_DELAYED_TARGET = 'birthRegistrationDelayedTarget',
   DEATH_ON_TIME_FEE = 'changeDeathOnTimeFee',
   DEATH_DELAYED_FEE = 'changeDeathDelayedFee'
+}
+
+interface IItem {
+  label: string | React.ReactNode
+  value: string | React.ReactNode
+  action: {
+    id: string
+    label: string
+    handler?: () => void
+    disabled?: boolean
+  }
+}
+interface ISection {
+  title: React.ReactNode
+  items: IItem[]
 }
 
 function GeneralTabContent({
@@ -96,80 +130,93 @@ function GeneralTabContent({
   const countryCurrencyName = lookup.currencies({
     code: offlineCountryConfiguration.config.CURRENCY.isoCode
   })
-  return (
-    <ListView
-      items={[
-        {
-          label: intl.formatMessage(messages.applicationNameLabel),
-          value: offlineCountryConfiguration.config.APPLICATION_NAME,
-          action: {
-            id: GeneralActionId.APPLICATION_NAME,
-            label: intl.formatMessage(buttonMessages.change),
-            handler: () => {
-              callBack(GeneralActionId.APPLICATION_NAME)
-            }
-          }
-        },
-        {
-          label: intl.formatMessage(messages.govermentLogoLabel),
-          value: (
-            <img
-              src={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
-              width={
-                offlineCountryConfiguration.config.COUNTRY_LOGO_RENDER_HEIGHT
-              }
-              height={
-                offlineCountryConfiguration.config.COUNTRY_LOGO_RENDER_WIDTH
-              }
-            />
-          ),
-          action: {
-            id: GeneralActionId.GOVT_LOGO,
-            label: intl.formatMessage(buttonMessages.change),
-            handler: () => {
-              callBack(GeneralActionId.GOVT_LOGO)
-            }
-          }
-        },
-        {
-          label: intl.formatMessage(messages.currencyLabel),
-          value: countryCurrencyName[0].name,
-          action: {
-            id: GeneralActionId.CURRENCY,
-            label: intl.formatMessage(buttonMessages.change),
-            handler: () => {
-              callBack(GeneralActionId.CURRENCY)
-            }
-          }
-        },
-        {
-          id: 'phoneNumberPattern_value_container',
-          label: intl.formatMessage(messages.phoneNumberLabel),
-          value:
-            offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.toString(),
-          action: {
-            id: GeneralActionId.PHONE_NUMBER,
-            label: intl.formatMessage(buttonMessages.change),
-            handler: () => {
-              callBack(GeneralActionId.PHONE_NUMBER)
-            }
-          }
-        },
-        {
-          id: 'nidPattern_value_container',
-          label: intl.formatMessage(messages.nidPatternTitle),
-          value:
-            offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString(),
-          action: {
-            id: GeneralActionId.NID_PATTERN,
-            label: intl.formatMessage(buttonMessages.change),
-            handler: () => {
-              callBack(GeneralActionId.NID_PATTERN)
-            }
-          }
+  const items = [
+    {
+      label: intl.formatMessage(messages.applicationNameLabel),
+      value: offlineCountryConfiguration.config.APPLICATION_NAME,
+      action: {
+        id: GeneralActionId.APPLICATION_NAME,
+        label: intl.formatMessage(buttonMessages.change),
+        handler: () => {
+          callBack(GeneralActionId.APPLICATION_NAME)
         }
-      ]}
-    />
+      }
+    },
+    {
+      label: intl.formatMessage(messages.govermentLogoLabel),
+      value: (
+        <img
+          src={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
+          width={offlineCountryConfiguration.config.COUNTRY_LOGO_RENDER_HEIGHT}
+          height={offlineCountryConfiguration.config.COUNTRY_LOGO_RENDER_WIDTH}
+        />
+      ),
+      action: {
+        id: GeneralActionId.GOVT_LOGO,
+        label: intl.formatMessage(buttonMessages.change),
+        handler: () => {
+          callBack(GeneralActionId.GOVT_LOGO)
+        }
+      }
+    },
+    {
+      label: intl.formatMessage(messages.currencyLabel),
+      value: countryCurrencyName[0].name,
+      action: {
+        id: GeneralActionId.CURRENCY,
+        label: intl.formatMessage(buttonMessages.change),
+        handler: () => {
+          callBack(GeneralActionId.CURRENCY)
+        }
+      }
+    },
+    {
+      id: 'phoneNumberPattern_value_container',
+      label: intl.formatMessage(messages.phoneNumberLabel),
+      value: offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.toString(),
+      action: {
+        id: GeneralActionId.PHONE_NUMBER,
+        label: intl.formatMessage(buttonMessages.change),
+        handler: () => {
+          callBack(GeneralActionId.PHONE_NUMBER)
+        }
+      }
+    },
+    {
+      id: 'nidPattern_value_container',
+      label: intl.formatMessage(messages.nidPatternTitle),
+      value: offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString(),
+      action: {
+        id: GeneralActionId.NID_PATTERN,
+        label: intl.formatMessage(buttonMessages.change),
+        handler: () => {
+          callBack(GeneralActionId.NID_PATTERN)
+        }
+      }
+    }
+  ]
+  return (
+    <ListViewSimplified>
+      {items.map((item) => {
+        const id = item.id
+          ? item.id
+          : isString(item.label)
+          ? item.label.split(' ').join('-')
+          : 'label-component'
+        return (
+          <ListViewItemSimplified
+            key={item.id}
+            label={<Label id={`${id}_label`}>{item.label}</Label>}
+            value={<Value id={`${id}_value`}>{item.value}</Value>}
+            actions={
+              <LinkButton id={item.action.id} onClick={item.action.handler}>
+                {item.action.label}
+              </LinkButton>
+            }
+          />
+        )
+      })}
+    </ListViewSimplified>
   )
 }
 
@@ -182,17 +229,14 @@ function BirthTabContent({
   intl: IntlShape
   callBack: (modalName: string) => void
 }) {
-  return (
-    <ListView
-      items={[
-        {
-          label: EMPTY_STRING,
-          value: (
-            <ListGroupTitle>
-              {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
-            </ListGroupTitle>
-          )
-        },
+  const sections: ISection[] = [
+    {
+      title: (
+        <ListGroupTitle>
+          {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
+        </ListGroupTitle>
+      ),
+      items: [
         {
           label: intl.formatMessage(messages.legallySpecifiedLabel),
           value: intl.formatMessage(messages.legallySpecifiedValue, {
@@ -215,6 +259,7 @@ function BirthTabContent({
               offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET
           }),
           action: {
+            id: BirthActionId.BIRTH_PERIOD_BETWEEN_LATE_DELAYED_TARGET,
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
@@ -232,15 +277,16 @@ function BirthTabContent({
               callBack(BirthActionId.BIRTH_LATE_REGISTRATION_TARGET)
             }
           }
-        },
-        {
-          label: EMPTY_STRING,
-          value: (
-            <ListGroupTitle>
-              {intl.formatMessage(messages.registrationFeesGroupTitle)}
-            </ListGroupTitle>
-          )
-        },
+        }
+      ]
+    },
+    {
+      title: (
+        <ListGroupTitle>
+          {intl.formatMessage(messages.registrationFeesGroupTitle)}
+        </ListGroupTitle>
+      ),
+      items: [
         {
           label: intl.formatMessage(messages.withinLegallySpecifiedTimeLabel),
           value: (
@@ -301,8 +347,41 @@ function BirthTabContent({
             }
           }
         }
-      ]}
-    />
+      ]
+    }
+  ]
+
+  return (
+    <>
+      {sections.map((section, idx) => (
+        <>
+          {section.title}
+          <ListViewSimplified key={idx}>
+            {section.items.map((item, index) => {
+              const id = isString(item.label)
+                ? item.label.split(' ').join('-')
+                : 'label-component'
+              return (
+                <ListViewItemSimplified
+                  key={index}
+                  label={<Label id={`${id}_label`}>{item.label}</Label>}
+                  value={<Value id={`${id}_value`}>{item.value}</Value>}
+                  actions={
+                    <LinkButton
+                      id={item.action.id}
+                      disabled={item.action.disabled}
+                      onClick={item.action.handler}
+                    >
+                      {item.action?.label}
+                    </LinkButton>
+                  }
+                />
+              )
+            })}
+          </ListViewSimplified>
+        </>
+      ))}
+    </>
   )
 }
 
@@ -315,17 +394,14 @@ function DeathTabContent({
   intl: IntlShape
   callBack: (modalName: string) => void
 }) {
-  return (
-    <ListView
-      items={[
-        {
-          label: EMPTY_STRING,
-          value: (
-            <ListGroupTitle>
-              {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
-            </ListGroupTitle>
-          )
-        },
+  const sections: ISection[] = [
+    {
+      title: (
+        <ListGroupTitle>
+          {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
+        </ListGroupTitle>
+      ),
+      items: [
         {
           label: intl.formatMessage(messages.legallySpecifiedLabel),
           value: intl.formatMessage(messages.legallySpecifiedValue, {
@@ -346,18 +422,20 @@ function DeathTabContent({
               offlineCountryConfiguration.config.DEATH.REGISTRATION_TARGET
           }),
           action: {
+            id: DeathActionId.DEATH_REGISTRATION_DELAYED_TARGET,
             label: intl.formatMessage(buttonMessages.change),
             disabled: true
           }
-        },
-        {
-          label: EMPTY_STRING,
-          value: (
-            <ListGroupTitle>
-              {intl.formatMessage(messages.registrationFeesGroupTitle)}
-            </ListGroupTitle>
-          )
-        },
+        }
+      ]
+    },
+    {
+      title: (
+        <ListGroupTitle>
+          {intl.formatMessage(messages.registrationFeesGroupTitle)}
+        </ListGroupTitle>
+      ),
+      items: [
         {
           label: intl.formatMessage(messages.lateRegistrationLabel),
           value: (
@@ -398,8 +476,42 @@ function DeathTabContent({
             }
           }
         }
-      ]}
-    />
+      ]
+    }
+  ]
+
+  return (
+    <>
+      {sections.map((section, idx) => (
+        <>
+          {section.title}
+          <ListViewSimplified key={idx}>
+            {section.items.map((item, index) => {
+              const id = isString(item.label)
+                ? item.label.split(' ').join('-')
+                : 'label-component'
+
+              return (
+                <ListViewItemSimplified
+                  key={index}
+                  label={<Label id={`${id}_label`}>{item.label}</Label>}
+                  value={<Value id={`${id}_value`}>{item.value}</Value>}
+                  actions={
+                    <LinkButton
+                      id={item.action.id}
+                      onClick={item.action.handler}
+                      disabled={item.action.disabled}
+                    >
+                      {item.action.label}
+                    </LinkButton>
+                  }
+                />
+              )
+            })}
+          </ListViewSimplified>
+        </>
+      ))}
+    </>
   )
 }
 

@@ -314,6 +314,7 @@ describe('create new user tests', () => {
       testComponent
         .find('#btn_change_familyNameEng')
         .hostNodes()
+        .first()
         .simulate('click')
       await flushPromises()
       expect(history.location.pathname).toBe('/createUser/user/user-view-group')
@@ -493,7 +494,7 @@ describe('edit user tests', () => {
         component,
         '#btn_change_type'
       )
-      changeButtonOfType.hostNodes().simulate('click')
+      changeButtonOfType.hostNodes().first().simulate('click')
       await flushPromises()
       expect(history.location.hash).toBe('#type')
     })

@@ -22,6 +22,7 @@ const Grid = styled.div<{ bottomBorder: boolean }>`
   > div:not(:nth-last-child(-n + 4)) {
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   }
+  margin: 24px 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     grid-template-columns: auto;
     > div:not(:nth-last-child(-n + 1)) {
@@ -159,14 +160,15 @@ export function ListViewItemSimplified({
 export function ListViewSimplified({
   bottomBorder = false,
   children,
-  id
+  id,
+  ...rest
 }: {
   bottomBorder?: boolean
   children: React.ReactNode
   id?: string
 }) {
   return (
-    <Grid id={id} bottomBorder={bottomBorder}>
+    <Grid {...rest} id={id} bottomBorder={bottomBorder}>
       {children}
     </Grid>
   )

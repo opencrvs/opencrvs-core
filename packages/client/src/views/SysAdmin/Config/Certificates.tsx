@@ -28,7 +28,6 @@ import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import {
   FloatingNotification,
-  ListView,
   NOTIFICATION_TYPE,
   ResponsiveModal,
   ToggleMenu
@@ -53,9 +52,20 @@ import { getDummyCertificateTemplateData } from '@client/views/SysAdmin/Config/p
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { executeHandlebarsTemplate } from '@client/views/PrintCertificate/PDFUtils'
 import { Content } from '@opencrvs/components/lib/interface/Content'
+import {
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 
 const HiddenInput = styled.input`
   display: none;
+`
+
+export const Label = styled.label`
+  ${({ theme }) => theme.fonts.bold16};
+`
+export const Value = styled.div`
+  ${({ theme }) => theme.fonts.reg16}
 `
 
 const ListTitleDiv = styled.div`
@@ -74,6 +84,7 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
+
 export type Scope = string[]
 
 export enum SVGFile {
@@ -482,7 +493,26 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                           {intl.formatMessage(messages.listDetailsQsn)}
                         </BlueTitle>
                       </ListTitleDiv>
-                      <ListView items={CertificateSection.items} />
+                      <ListViewSimplified>
+                        {CertificateSection.items.map((item) => {
+                          return (
+                            <ListViewItemSimplified
+                              key={item.id}
+                              label={
+                                <Label id={`${item.id}_label`}>
+                                  {item.label}
+                                </Label>
+                              }
+                              value={
+                                <Value id={`${item.id}_value`}>
+                                  {item.value}
+                                </Value>
+                              }
+                              actions={item.actionsMenu}
+                            />
+                          )
+                        })}
+                      </ListViewSimplified>
                     </Content>
                   )}
                   <FloatingNotification
