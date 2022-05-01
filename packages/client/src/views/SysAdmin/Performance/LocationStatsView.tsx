@@ -10,22 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/performance'
-import { Box, Spinner } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
 import { SubHeader } from './utils'
 
-const Stats = styled(Box)`
-  margin: 0 auto;
-  width: 100%;
-  height: auto;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    border: 0;
-    padding: 0;
-  }
-`
 const StatsRow = styled.div`
   width: 100%;
   display: flex;
@@ -52,7 +42,7 @@ type Props = WrappedComponentProps &
     theme: ITheme
   }
 
-class PerformanceStatsComponent extends React.Component<Props> {
+class LocationStatsViewComponent extends React.Component<Props> {
   constructor(props: Props) {
     super(props)
     window.__localeId__ = this.props.intl.locale
@@ -68,7 +58,7 @@ class PerformanceStatsComponent extends React.Component<Props> {
     } = this.props
 
     return (
-      <Stats>
+      <>
         <SubHeader>{intl.formatMessage(messages.stats)}</SubHeader>
         <StatsRow>
           <span>{intl.formatMessage(messages.declarationsStartedOffices)}</span>
@@ -90,9 +80,11 @@ class PerformanceStatsComponent extends React.Component<Props> {
             })}
           </span>
         </StatsRow>
-      </Stats>
+      </>
     )
   }
 }
 
-export const PerformanceStats = withTheme(injectIntl(PerformanceStatsComponent))
+export const LocationStatsView = withTheme(
+  injectIntl(LocationStatsViewComponent)
+)
