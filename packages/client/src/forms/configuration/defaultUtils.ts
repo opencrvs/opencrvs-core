@@ -77,7 +77,14 @@ export function configureDefaultQuestions(
   defaultFieldCustomisations.forEach((defaultFieldCustomisation) => {
     // this is a customisation to a default field
     // default fields can only be enabled or disabled at present
+
     /* TODO: Handle the changed positions and required property*/
+
+    /*
+     * Splicing the field away may not be the way to go as it's
+     * removing the field from FormConfig as well
+     */
+
     if (defaultFieldCustomisation.question.enabled === FieldEnabled.DISABLED) {
       newForm.sections[
         defaultFieldCustomisation.defaultField.selectedSectionIndex
