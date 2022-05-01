@@ -20,7 +20,8 @@ import { selectConfigFields } from '@client/forms/configuration/configFields/sel
 import {
   IConfigField,
   IConfigFieldMap,
-  getFieldDefinition
+  getFieldDefinition,
+  generateKeyFromObj
 } from '@client/forms/configuration/configFields/utils'
 import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
 import { FieldPosition } from '@client/forms/configuration'
@@ -126,6 +127,7 @@ export function Canvas({
             }}
           >
             <FormFieldGenerator
+              key={generateKeyFromObj(configField)}
               id={fieldId}
               onChange={() => {}}
               fields={[getFieldDefinition(formSection, configField)]}
