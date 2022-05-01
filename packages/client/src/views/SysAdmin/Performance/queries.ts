@@ -28,7 +28,7 @@ export const FETCH_MONTH_WISE_EVENT_ESTIMATIONS = gql`
   query data(
     $timeStart: String!
     $timeEnd: String!
-    $locationId: String!
+    $locationId: String
     $event: String!
   ) {
     fetchMonthWiseEventMetrics(
@@ -37,21 +37,13 @@ export const FETCH_MONTH_WISE_EVENT_ESTIMATIONS = gql`
       locationId: $locationId
       event: $event
     ) {
-      details {
-        actualTotalRegistration
-        actualTargetDayRegistration
-        estimatedRegistration
-        estimatedTargetDayPercentage
-        month
-        year
-        startOfMonth
-      }
-      total {
-        actualTotalRegistration
-        actualTargetDayRegistration
-        estimatedRegistration
-        estimatedTargetDayPercentage
-      }
+      total
+      estimated
+      withinTarget
+      within1Year
+      within5Years
+      month
+      year
     }
   }
 `
@@ -60,7 +52,7 @@ export const FETCH_LOCATION_WISE_EVENT_ESTIMATIONS = gql`
   query data(
     $timeStart: String!
     $timeEnd: String!
-    $locationId: String!
+    $locationId: String
     $event: String!
   ) {
     fetchLocationWiseEventMetrics(
@@ -69,20 +61,13 @@ export const FETCH_LOCATION_WISE_EVENT_ESTIMATIONS = gql`
       locationId: $locationId
       event: $event
     ) {
-      details {
-        actualTotalRegistration
-        actualTargetDayRegistration
-        estimatedRegistration
-        estimatedTargetDayPercentage
-        locationId
-        locationName
-      }
-      total {
-        actualTotalRegistration
-        actualTargetDayRegistration
-        estimatedRegistration
-        estimatedTargetDayPercentage
-      }
+      total
+      withinTarget
+      within1Year
+      within5Years
+      estimated
+      locationId
+      locationName
     }
   }
 `

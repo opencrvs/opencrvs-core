@@ -56,7 +56,8 @@ export interface IMonthRangeFilter {
   startOfMonthTime: string
   endOfMonthTime: string
   month: string
-  year: string
+  year: number
+  monthIndex: number
 }
 
 export enum EVENT_TYPE {
@@ -423,8 +424,9 @@ export function getMonthRangeFilterListFromTimeRage(
     const filterDate = new Date(timeStart)
     filterDate.setMonth(filterDate.getMonth() + index)
     monthFilterList.push({
+      monthIndex: filterDate.getMonth(),
       month: filterDate.toLocaleString('en-us', { month: 'long' }),
-      year: String(filterDate.getFullYear()),
+      year: filterDate.getFullYear(),
       startOfMonthTime: new Date(
         filterDate.getFullYear(),
         filterDate.getMonth(),

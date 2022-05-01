@@ -140,6 +140,7 @@ interface IConstantsMessages
   averageRateOfRegistrations: MessageDescriptor
   estimatedNumberOfEvents: MessageDescriptor
   rateOfRegistrationWithinTargetd: MessageDescriptor
+  rateOfRegistrationWithinYears: MessageDescriptor
   registerConfirmModalDesc: MessageDescriptor
   registeredWithinTargetd: MessageDescriptor
   registeredInTargetd: MessageDescriptor
@@ -811,6 +812,12 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Rate within {registrationTargetDays} days of event',
     description:
       'A label for Rate within {registrationTargetDays} days of event'
+  },
+  rateOfRegistrationWithinYears: {
+    id: 'constants.rateOfRegistrationWithinYears',
+    defaultMessage:
+      'Rate within {num} {num, plural, =0 {year} =1 {year} other {years}} of event',
+    description: 'A label for Rate within year of event'
   },
   registeredWithinTargetd: {
     id: 'constants.registeredWithinTargetd',

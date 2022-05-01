@@ -21,8 +21,12 @@ import startOfMonth from 'date-fns/startOfMonth'
 import endOfMonth from 'date-fns/endOfMonth'
 import React from 'react'
 import { getPercentage } from '@client/utils/data-formatting'
-import { FormattedNumber } from 'react-intl'
-import { ListViewSimplified } from '@opencrvs/components/lib/interface'
+import { FormattedNumber, IntlShape } from 'react-intl'
+import {
+  ListViewSimplified,
+  ISearchLocation
+} from '@opencrvs/components/lib/interface'
+import { constantsMessages } from '@client/i18n/messages'
 import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
 import { colors } from '@opencrvs/components/lib/colors'
 import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCountView'
@@ -235,6 +239,28 @@ export function getJurisdictionLocationIdFromUserDetails(
     })
 
   return location && location.id
+}
+
+export enum CompletenessRateTime {
+  WithinTarget = 'withinTarget',
+  Within1Year = 'within1Year',
+  Within5Years = 'within5Years'
+}
+
+export const NATIONAL_ADMINISTRATIVE_LEVEL = 'NATIONAL_ADMINISTRATIVE_LEVEL'
+
+export function getAdditionalLocations(intl: IntlShape) {
+  return [
+    {
+      id: NATIONAL_ADMINISTRATIVE_LEVEL,
+      searchableText: intl.formatMessage(constantsMessages.countryName),
+      displayLabel: intl.formatMessage(constantsMessages.countryName)
+    }
+  ]
+}
+
+export function isCountry(location: ISearchLocation) {
+  return location.id === NATIONAL_ADMINISTRATIVE_LEVEL
 }
 
 export const StatusMapping: IStatusMapping = {

@@ -20,7 +20,7 @@ import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   EVENT_INFO,
-  EVENT_REGISTRATION_RATES,
+  EVENT_COMPLETENESS_RATES,
   HOME,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
@@ -53,7 +53,10 @@ import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
-import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import {
+  getJurisdictionLocationIdFromUserDetails,
+  CompletenessRateTime
+} from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import {
   goBack as back,
@@ -382,21 +385,29 @@ export function goToCreateNewUserWithLocationId(locationId: string) {
   return push(formatUrl(CREATE_USER_ON_LOCATION, { locationId }))
 }
 
-export function goToRegistrationRates(
+export function goToCompletenessRates(
   eventType: Event,
-  title: string,
-  locationId: string,
+  locationId: string | undefined,
   timeStart: Date,
-  timeEnd: Date
+  timeEnd: Date,
+  time = CompletenessRateTime.WithinTarget
 ) {
   return push({
-    pathname: formatUrl(EVENT_REGISTRATION_RATES, { eventType }),
-    search: stringify({
-      locationId,
-      title,
-      timeStart: timeStart.toISOString(),
-      timeEnd: timeEnd.toISOString()
-    })
+    pathname: formatUrl(EVENT_COMPLETENESS_RATES, { eventType }),
+    search: stringify(
+      locationId
+        ? {
+            locationId,
+            timeStart: timeStart.toISOString(),
+            timeEnd: timeEnd.toISOString(),
+            time
+          }
+        : {
+            timeStart: timeStart.toISOString(),
+            timeEnd: timeEnd.toISOString(),
+            time
+          }
+    )
   })
 }
 

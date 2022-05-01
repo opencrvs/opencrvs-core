@@ -40,7 +40,7 @@ import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
-import { RegistrationRates } from '@client/views/SysAdmin/Performance/RegistrationRates'
+import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
@@ -324,9 +324,9 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={
-                                              routes.EVENT_REGISTRATION_RATES
+                                              routes.EVENT_COMPLETENESS_RATES
                                             }
-                                            component={RegistrationRates}
+                                            component={CompletenessRates}
                                           />
                                           <ProtectedRoute
                                             exact

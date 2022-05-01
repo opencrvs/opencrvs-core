@@ -19,8 +19,8 @@ import {
   flushPromises
 } from '@client/tests/util'
 import { AppStore } from '@client/store'
-import { RegistrationRates } from '@client/views/SysAdmin/Performance/RegistrationRates'
-import { EVENT_REGISTRATION_RATES } from '@client/navigation/routes'
+import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
+import { EVENT_COMPLETENESS_RATES } from '@client/navigation/routes'
 import {
   HAS_CHILD_LOCATION,
   FETCH_MONTH_WISE_EVENT_ESTIMATIONS
@@ -128,11 +128,11 @@ describe('Registraion Rates tests', () => {
 
   beforeEach(async () => {
     component = await createTestComponent(
-      <RegistrationRates
+      <CompletenessRates
         match={{
           params: { eventType: 'birth' },
           isExact: true,
-          path: EVENT_REGISTRATION_RATES,
+          path: EVENT_COMPLETENESS_RATES,
           url: ''
         }}
         // @ts-ignore
@@ -315,11 +315,11 @@ describe('Registraion Rates error state tests', () => {
     ;({ store, history } = await createTestStore())
 
     component = await createTestComponent(
-      <RegistrationRates
+      <CompletenessRates
         match={{
           params: { eventType: 'birth' },
           isExact: true,
-          path: EVENT_REGISTRATION_RATES,
+          path: EVENT_COMPLETENESS_RATES,
           url: ''
         }}
         // @ts-ignore

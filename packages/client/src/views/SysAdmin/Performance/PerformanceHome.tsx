@@ -55,7 +55,11 @@ import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/Paym
 import { CertificationRateComponent } from '@client/views/SysAdmin/Performance/CertificationRateComponent'
 import {
   certificationRatesDummyData,
-  StatusMapping
+  StatusMapping,
+  getAdditionalLocations,
+  CompletenessRateTime,
+  isCountry,
+  NATIONAL_ADMINISTRATIVE_LEVEL
 } from '@client/views/SysAdmin/Performance/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
@@ -64,7 +68,7 @@ import {
   IStatusMapping,
   StatusWiseDeclarationCountView
 } from './reports/operational/StatusWiseDeclarationCountView'
-import { goToWorkflowStatus } from '@client/navigation'
+import { goToWorkflowStatus, goToCompletenessRates } from '@client/navigation'
 
 const Layout = styled.div`
   display: flex;
@@ -178,6 +182,7 @@ interface State {
 
 interface IDispatchProps {
   goToWorkflowStatus: typeof goToWorkflowStatus
+  goToCompletenessRates: typeof goToCompletenessRates
 }
 
 type Props = WrappedComponentProps &
@@ -195,7 +200,6 @@ const selectLocation = (
   ) as ISearchLocation
 }
 
-const NATIONAL_ADMINISTRATIVE_LEVEL = 'NATIONAL_ADMINISTRATIVE_LEVEL'
 class PerformanceHomeComponent extends React.Component<Props, State> {
   transformPropsToState(props: Props) {
     const {
@@ -209,7 +213,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     const selectedLocation = selectLocation(
       locationId,
       generateLocations({ ...locations, ...offices }, props.intl).concat(
-        this.getAdditionalLocations()
+        getAdditionalLocations(props.intl)
       )
     )
 
@@ -230,21 +234,23 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     this.state = this.transformPropsToState(props)
   }
 
-  getAdditionalLocations() {
-    const { intl } = this.props
-    return [
-      {
-        id: NATIONAL_ADMINISTRATIVE_LEVEL,
-        searchableText: intl.formatMessage(constantsMessages.countryName),
-        displayLabel: intl.formatMessage(constantsMessages.countryName)
-      }
-    ]
-  }
-
   togglePerformanceStatus = () => {
     this.setState({
       toggleStatus: !this.state.toggleStatus
     })
+  }
+
+  onClickDetails = (time: CompletenessRateTime) => {
+    const { event, selectedLocation, timeStart, timeEnd } = this.state
+    this.props.goToCompletenessRates(
+      event,
+      selectedLocation && !isCountry(selectedLocation)
+        ? selectedLocation.id
+        : undefined,
+      timeStart,
+      timeEnd,
+      time
+    )
   }
 
   getFilter = (intl: IntlShape, selectedLocation: ISearchLocation) => {
@@ -253,7 +259,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     return (
       <PerformanceActions>
         <LocationPicker
-          additionalLocations={this.getAdditionalLocations()}
+          additionalLocations={getAdditionalLocations(intl)}
           selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
           onChangeLocation={(newLocationId) => {
             const newLocation = selectLocation(
@@ -264,7 +270,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   ...this.props.offices
                 },
                 this.props.intl
-              ).concat(this.getAdditionalLocations())
+              ).concat(getAdditionalLocations(intl))
             )
             this.setState({ selectedLocation: newLocation })
           }}
@@ -334,7 +340,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               <Query
                 query={PERFORMANCE_METRICS}
                 variables={
-                  this.state.selectedLocation
+                  this.state.selectedLocation &&
+                  !isCountry(this.state.selectedLocation)
                     ? {
                         ...queryVariablesWithoutLocationId,
                         locationId: this.state.selectedLocation.id
@@ -369,6 +376,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       <CompletenessReport
                         data={data!.getTotalMetrics}
                         selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
+                        onClickDetails={this.onClickDetails}
                       />
                       <RegistrationsReport
                         data={data!.getTotalMetrics}
@@ -383,7 +391,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 timeStart={timeStart}
                 timeEnd={timeEnd}
                 locationId={
-                  this.state.selectedLocation
+                  this.state.selectedLocation &&
+                  !isCountry(this.state.selectedLocation)
                     ? this.state.selectedLocation.id
                     : undefined
                 }
@@ -392,7 +401,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               <Query
                 query={GET_TOTAL_PAYMENTS}
                 variables={
-                  this.state.selectedLocation
+                  this.state.selectedLocation &&
+                  !isCountry(this.state.selectedLocation)
                     ? {
                         ...queryVariablesWithoutLocationId,
                         locationId: this.state.selectedLocation.id
@@ -423,7 +433,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
           <Query
             query={PERFORMANCE_STATS}
             variables={{
-              locationId: this.state.selectedLocation?.id,
+              locationId:
+                this.state.selectedLocation &&
+                !isCountry(this.state.selectedLocation)
+                  ? this.state.selectedLocation.id
+                  : undefined,
               populationYear: timeEnd.getFullYear(),
               event: this.state.event,
               status: [
@@ -541,5 +555,6 @@ function mapStateToProps(state: IStoreState) {
 }
 
 export const PerformanceHome = connect(mapStateToProps, {
-  goToWorkflowStatus
+  goToWorkflowStatus,
+  goToCompletenessRates
 })(withTheme(injectIntl(PerformanceHomeComponent)))

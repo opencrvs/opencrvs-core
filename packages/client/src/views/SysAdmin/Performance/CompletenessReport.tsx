@@ -24,7 +24,8 @@ import {
   calculateTotal,
   PerformanceListHeader,
   PerformanceListSubHeader,
-  ReportContainer
+  ReportContainer,
+  CompletenessRateTime
 } from '@client/views/SysAdmin/Performance/utils'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { useIntl } from 'react-intl'
@@ -34,11 +35,13 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 interface CompletenessReportProps {
   data: GQLTotalMetricsResult
   selectedEvent: 'BIRTH' | 'DEATH'
+  onClickDetails: (time: CompletenessRateTime) => void
 }
 
 export function CompletenessReport({
   data,
-  selectedEvent
+  selectedEvent,
+  onClickDetails
 }: CompletenessReportProps) {
   const intl = useIntl()
   return (
@@ -64,7 +67,8 @@ export function CompletenessReport({
         label={
           <PerformanceTitle>
             {intl.formatMessage(messages.performanceWithinTargetDaysLabel, {
-              target: window.config[selectedEvent].REGISTRATION_TARGET
+              target: window.config[selectedEvent].REGISTRATION_TARGET,
+              withPrefix: true
             })}
           </PerformanceTitle>
         }
@@ -72,10 +76,11 @@ export function CompletenessReport({
           <div>
             <PerformanceValue>
               {Number(
-                data.results
+                (data.results
                   .filter((p) => p.timeLabel === 'withinTarget')
                   .reduce((t, x) => t + x.total, 0) /
-                  data.estimated.totalEstimation
+                  data.estimated.totalEstimation) *
+                  100
               ).toFixed(2)}
               %
             </PerformanceValue>
@@ -94,7 +99,11 @@ export function CompletenessReport({
                             x.timeLabel === 'withinTarget'
                         )
                       )}
-                      ofNumber={data.estimated.maleEstimation}
+                      ofNumber={calculateTotal(
+                        data.results.filter(
+                          (x) => x.timeLabel === 'withinTarget'
+                        )
+                      )}
                     />
                   }
                 </BreakdownValue>
@@ -113,7 +122,11 @@ export function CompletenessReport({
                             x.timeLabel === 'withinTarget'
                         )
                       )}
-                      ofNumber={data.estimated.femaleEstimation}
+                      ofNumber={calculateTotal(
+                        data.results.filter(
+                          (x) => x.timeLabel === 'withinTarget'
+                        )
+                      )}
                     />
                   }
                 </BreakdownValue>
@@ -122,7 +135,11 @@ export function CompletenessReport({
           </div>
         }
         actions={
-          <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+          <LinkButton
+            onClick={() => onClickDetails(CompletenessRateTime.WithinTarget)}
+          >
+            {intl.formatMessage(buttonMessages.view)}
+          </LinkButton>
         }
       />
       <ListViewItemSimplified
@@ -134,17 +151,18 @@ export function CompletenessReport({
         value={
           <div>
             <PerformanceValue>
-              {getPercentage(
-                data.estimated.totalEstimation,
-                calculateTotal(
+              {Number(
+                (calculateTotal(
                   data.results.filter(
                     (x) =>
                       x.timeLabel === 'withinTarget' ||
                       x.timeLabel === 'withinLate' ||
                       x.timeLabel === 'within1Year'
                   )
-                )
-              )}
+                ) /
+                  data.estimated.totalEstimation) *
+                  100
+              ).toFixed(2)}
               %
             </PerformanceValue>
             <Breakdown>
@@ -164,7 +182,14 @@ export function CompletenessReport({
                               x.timeLabel === 'within1Year')
                         )
                       )}
-                      ofNumber={data.estimated.maleEstimation}
+                      ofNumber={calculateTotal(
+                        data.results.filter(
+                          (x) =>
+                            x.timeLabel === 'withinTarget' ||
+                            x.timeLabel === 'withinLate' ||
+                            x.timeLabel === 'within1Year'
+                        )
+                      )}
                     />
                   }
                 </BreakdownValue>
@@ -185,7 +210,14 @@ export function CompletenessReport({
                               x.timeLabel === 'within1Year')
                         )
                       )}
-                      ofNumber={data.estimated.femaleEstimation}
+                      ofNumber={calculateTotal(
+                        data.results.filter(
+                          (x) =>
+                            x.timeLabel === 'withinTarget' ||
+                            x.timeLabel === 'withinLate' ||
+                            x.timeLabel === 'within1Year'
+                        )
+                      )}
                     />
                   }
                 </BreakdownValue>
@@ -194,7 +226,11 @@ export function CompletenessReport({
           </div>
         }
         actions={
-          <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+          <LinkButton
+            onClick={() => onClickDetails(CompletenessRateTime.Within1Year)}
+          >
+            {intl.formatMessage(buttonMessages.view)}
+          </LinkButton>
         }
       />
       <ListViewItemSimplified
@@ -206,12 +242,13 @@ export function CompletenessReport({
         value={
           <div>
             <PerformanceValue>
-              {getPercentage(
-                data.estimated.totalEstimation,
-                calculateTotal(
+              {Number(
+                (calculateTotal(
                   data.results.filter((x) => x.timeLabel !== 'after5Years')
-                )
-              )}
+                ) /
+                  data.estimated.totalEstimation) *
+                  100
+              ).toFixed(2)}
               %
             </PerformanceValue>
             <Breakdown>
@@ -221,12 +258,14 @@ export function CompletenessReport({
                 </BreakdownLabel>
                 <BreakdownValue>
                   <PercentageDisplay
-                    ofNumber={data.estimated.maleEstimation}
                     total={calculateTotal(
                       data.results.filter(
                         (x) =>
                           x.gender === 'male' && x.timeLabel !== 'after5Years'
                       )
+                    )}
+                    ofNumber={calculateTotal(
+                      data.results.filter((x) => x.timeLabel !== 'after5Years')
                     )}
                   />
                 </BreakdownValue>
@@ -237,12 +276,14 @@ export function CompletenessReport({
                 </BreakdownLabel>
                 <BreakdownValue>
                   <PercentageDisplay
-                    ofNumber={data.estimated.femaleEstimation}
                     total={calculateTotal(
                       data.results.filter(
                         (x) =>
                           x.gender === 'female' && x.timeLabel !== 'after5Years'
                       )
+                    )}
+                    ofNumber={calculateTotal(
+                      data.results.filter((x) => x.timeLabel !== 'after5Years')
                     )}
                   />
                 </BreakdownValue>
@@ -251,7 +292,11 @@ export function CompletenessReport({
           </div>
         }
         actions={
-          <LinkButton>{intl.formatMessage(buttonMessages.view)}</LinkButton>
+          <LinkButton
+            onClick={() => onClickDetails(CompletenessRateTime.Within5Years)}
+          >
+            {intl.formatMessage(buttonMessages.view)}
+          </LinkButton>
         }
       />
     </ReportContainer>

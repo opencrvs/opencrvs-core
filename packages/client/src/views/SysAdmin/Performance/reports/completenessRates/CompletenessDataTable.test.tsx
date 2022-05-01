@@ -14,13 +14,13 @@ import * as React from 'react'
 import { AppStore, createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
 import { createTestStore, createTestComponent } from '@client/tests/util'
-import { WithinTargetDaysTable } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
+import { CompletenessDataTable } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { Event } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { REG_RATE_BASE } from '@client/views/SysAdmin/Performance/RegistrationRates'
+import { REG_RATE_BASE } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { History } from 'history'
 
-describe('WithinTargetDaysTable tests for over time option', () => {
+describe('CompletenessDataTable tests for over time option', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History
@@ -60,7 +60,7 @@ describe('WithinTargetDaysTable tests for over time option', () => {
 
   beforeEach(async () => {
     component = await createTestComponent(
-      <WithinTargetDaysTable
+      <CompletenessDataTable
         loading={false}
         base={{ baseType: REG_RATE_BASE.TIME }}
         eventType={Event.BIRTH}
@@ -88,7 +88,7 @@ describe('WithinTargetDaysTable tests for over time option', () => {
     expect(firstRowElement.hostNodes().childAt(0).text()).toBe('March 2020')
   })
 })
-describe('WithinTargetDaysTable tests for by location option', () => {
+describe('CompletenessDataTable tests for by location option', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History
@@ -126,7 +126,7 @@ describe('WithinTargetDaysTable tests for by location option', () => {
 
   beforeEach(async () => {
     component = await createTestComponent(
-      <WithinTargetDaysTable
+      <CompletenessDataTable
         loading={false}
         base={{
           baseType: REG_RATE_BASE.LOCATION,
