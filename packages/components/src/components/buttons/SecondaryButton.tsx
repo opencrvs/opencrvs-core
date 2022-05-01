@@ -14,12 +14,12 @@ import styled, { StyledComponentBase } from 'styled-components'
 import { Button, IButtonProps } from './Button'
 
 export const SecondaryButton = styled(Button)`
+  padding: 0 8px;
   color: ${({ theme }) => theme.colors.primary};
   transition: background 0.4s ease;
   border-radius: 4px;
   background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `2px solid ${theme.colors.secondary}`};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
   ${({ theme }) => theme.fonts.bold16};
   height: 40px;
 
@@ -27,8 +27,10 @@ export const SecondaryButton = styled(Button)`
     padding-top: 2px;
   }
 
-  &:hover {
+  &:hover:enabled {
     border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
+    color: ${({ theme }) => theme.colors.indigoDark};
+    background: ${({ theme }) => theme.colors.grey100};
   }
 
   &:focus {
@@ -45,8 +47,10 @@ export const SecondaryButton = styled(Button)`
     border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
   }
 
-  &:active {
+  &:active:enabled {
     border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
+    color: ${({ theme }) => theme.colors.indigoDark};
+    background: ${({ theme }) => theme.colors.grey100};
   }
 
   &:disabled {

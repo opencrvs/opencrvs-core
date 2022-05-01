@@ -99,7 +99,7 @@ describe('Corrector form', () => {
           ...birthDeclaration.data,
           father: {
             ...birthDeclaration.data.father,
-            fathersDetailsExist: true
+            detailsExist: true
           }
         }
       }
@@ -124,7 +124,7 @@ describe('Corrector form', () => {
           ...birthDeclaration.data,
           father: {
             ...birthDeclaration.data.father,
-            fathersDetailsExist: false
+            detailsExist: false
           }
         }
       }
@@ -138,56 +138,6 @@ describe('Corrector form', () => {
     })
     it('should not show the father option', () => {
       expect(wrapper.exists('#relationship_FATHER')).toBeFalsy()
-    })
-  })
-
-  describe('for a birth registration with father deceased', () => {
-    beforeEach(async () => {
-      const declaration: IDeclaration = {
-        ...birthDeclaration,
-        data: {
-          ...birthDeclaration.data,
-          primaryCaregiver: {
-            ...birthDeclaration.data.primaryCaregiver,
-            fatherIsDeceased: ['deceased']
-          }
-        }
-      }
-      wrapper = await createTestComponent(
-        <CorrectorForm declaration={declaration} />,
-        {
-          store,
-          history
-        }
-      )
-    })
-    it('should not show the father option', () => {
-      expect(wrapper.exists('#relationship_FATHER')).toBeFalsy()
-    })
-  })
-
-  describe('for a birth registration with mother deceased', () => {
-    beforeEach(async () => {
-      const declaration: IDeclaration = {
-        ...birthDeclaration,
-        data: {
-          ...birthDeclaration.data,
-          primaryCaregiver: {
-            ...birthDeclaration.data.primaryCaregiver,
-            motherIsDeceased: ['deceased']
-          }
-        }
-      }
-      wrapper = await createTestComponent(
-        <CorrectorForm declaration={declaration} />,
-        {
-          store,
-          history
-        }
-      )
-    })
-    it('should not show the mother option', () => {
-      expect(wrapper.exists('#relationship_MOTHER')).toBeFalsy()
     })
   })
 

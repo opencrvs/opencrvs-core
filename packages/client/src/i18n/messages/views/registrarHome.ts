@@ -62,12 +62,12 @@ const messagesToDefine: IOfficeHomeMessages = {
     id: 'regHome.inPro.selector.field.agents'
   },
   inProgressOwnDrafts: {
-    defaultMessage: 'Yours',
+    defaultMessage: 'My Drafts',
     description: 'The title of In progress own drafts',
     id: 'regHome.inPro.selector.own.drafts'
   },
   hospitalDrafts: {
-    defaultMessage: 'Hospitals',
+    defaultMessage: 'Health System',
     description: 'The title of In progress Hospitals',
     id: 'regHome.inPro.selector.hospital.drafts'
   },

@@ -171,6 +171,10 @@ export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
         fullName
         type
         status
+        avatar {
+          type
+          data
+        }
         primaryOfficeId
         creationDate
         totalNumberOfDeclarationStarted

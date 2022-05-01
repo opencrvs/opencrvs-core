@@ -18,6 +18,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { Navigation } from '@client/components/interface/Navigation'
+import { Divider } from '@opencrvs/components/lib/interface/Divider'
 import styled from '@client/styledComponents'
 import {
   RotateLeft,
@@ -101,7 +102,7 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import {
   IFormSectionData,
-  IContactPoint,
+  IContactPointPhone,
   CorrectionSection,
   Action,
   IForm,
@@ -132,15 +133,23 @@ import { goBack } from 'connected-react-router'
 import { getFieldValue } from './utils'
 import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import format, { formatLongDate } from '@client/utils/date-formatting'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
+
+const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
 const DesktopHeader = styled(Header)`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
 
 const MobileHeader = styled(PageHeader)`
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
@@ -149,7 +158,9 @@ const BodyContainer = styled.div`
   margin-left: 0px;
   margin-top: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 265px;
+    margin-left: 274px;
+    margin-top: 24px;
+    margin-right: 24px;
   }
 `
 
@@ -171,10 +182,7 @@ const IconDiv = styled.div`
   }
 `
 const BackButtonDiv = styled.div`
-  display: none;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: inline;
-  }
+  display: inline;
 `
 
 const BackButton = styled(CircleButton)`
@@ -240,7 +248,8 @@ const NameAvatar = styled.div`
   }
 `
 
-const Heading = styled.h4`
+const Heading = styled.h3`
+  ${({ theme }) => theme.fonts.h3}
   margin-bottom: 0px !important;
 `
 
@@ -336,15 +345,18 @@ interface IGQLDeclaration {
   }
 }
 
-const STATUSTOCOLOR: { [key: string]: string } = {
+export const STATUSTOCOLOR: { [key: string]: string } = {
   ARCHIVED: 'grey',
   DRAFT: 'purple',
+  IN_PROGRESS: 'purple',
   DECLARED: 'orange',
   REJECTED: 'red',
   VALIDATED: 'grey',
   REGISTERED: 'green',
-  CERTIFIED: 'green',
-  WAITING_VALIDATION: 'teal'
+  CERTIFIED: 'blue',
+  WAITING_VALIDATION: 'teal',
+  SUBMITTED: 'orange',
+  SUBMITTING: 'orange'
 }
 
 const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
@@ -526,7 +538,7 @@ const getDraftDeclarationData = (
     informantContact:
       (
         (declaration.data?.registration?.contactPoint as IFormSectionData)
-          ?.nestedFields as IContactPoint
+          ?.nestedFields as IContactPointPhone
       )?.registrationPhone.toString() || ''
   }
 }
@@ -842,6 +854,7 @@ const showPrintButton = ({
     return (
       <PrimaryButton
         key={id}
+        size={'medium'}
         id={`print-${id}`}
         onClick={() => {
           goToPrintCertificate &&
@@ -913,6 +926,20 @@ const getFormattedDate = (date: Date) => {
   )
 }
 
+const getDisplayItems = (
+  currentPage: number,
+  pageSize: number,
+  allData: IDynamicValues
+) => {
+  if (allData.length <= pageSize) {
+    return allData
+  }
+
+  const offset = (currentPage - 1) * pageSize
+  const displayItems = allData.slice(offset, offset + pageSize)
+  return displayItems
+}
+
 const GetHistory = ({
   intl,
   draft,
@@ -922,17 +949,27 @@ const GetHistory = ({
 }: CMethodParams & {
   toggleActionDetails: (actionItem: IActionDetailsData) => void
 }) => {
+  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const onPageChange = (currentPageNumber: number) =>
+    setCurrentPageNumber(currentPageNumber)
   if (!draft?.data?.history?.length)
     return (
       <>
-        <hr />
+        <Divider />
         <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
         <LargeGreyedInfo />
       </>
     )
-
+  const allHistoryData = draft.data.history as unknown as {
+    [key: string]: any
+  }[]
+  const historiesForDisplay = getDisplayItems(
+    currentPageNumber,
+    DEFAULT_HISTORY_RECORD_PAGE_SIZE,
+    allHistoryData
+  )
   const historyData = (
-    draft.data.history as unknown as { [key: string]: any }[]
+    historiesForDisplay as unknown as { [key: string]: any }[]
   )
     // TODO: We need to figure out a way to sort the history in backend
     .sort((fe, se) => {
@@ -984,7 +1021,7 @@ const GetHistory = ({
   ]
   return (
     <>
-      <hr />
+      <Divider />
       <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
       <TableView
         id="task-history"
@@ -994,8 +1031,32 @@ const GetHistory = ({
         columns={columns}
         content={historyData}
         alignItemCenter={true}
-        pageSize={100}
+        pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
       />
+      {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+        <PaginationWrapper>
+          <DesktopWrapper>
+            <PaginationModified
+              size="small"
+              initialPage={currentPageNumber}
+              totalPages={Math.ceil(
+                allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              )}
+              onPageChange={onPageChange}
+            />
+          </DesktopWrapper>
+          <MobileWrapper>
+            <PaginationModified
+              size="large"
+              initialPage={currentPageNumber}
+              totalPages={Math.ceil(
+                allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              )}
+              onPageChange={onPageChange}
+            />
+          </MobileWrapper>
+        </PaginationWrapper>
+      )}
     </>
   )
 }
@@ -1548,6 +1609,7 @@ function RecordAuditBody({
             <PrimaryButton
               id="continue"
               key="continue"
+              size={'medium'}
               onClick={() => {
                 reinstateDeclaration(declaration.id)
                 toggleDisplayDialog()
@@ -1561,6 +1623,7 @@ function RecordAuditBody({
             <DangerButton
               id="archive_confirm"
               key="archive_confirm"
+              size={'medium'}
               onClick={() => {
                 archiveDeclaration(declaration.id)
                 toggleDisplayDialog()

@@ -71,10 +71,6 @@ export const ROLE_TYPE_SECRETARY = 'SECRETARY'
 export const ROLE_TYPE_MAYOR = 'MAYOR'
 export const ROLE_TYPE_CHAIRMAN = 'CHAIRMAN'
 
-export const FIELD_AGENT_HOME_TAB_IN_PROGRESS = 'progress'
-export const FIELD_AGENT_HOME_TAB_SENT_FOR_REVIEW = 'review'
-export const FIELD_AGENT_HOME_TAB_REQUIRE_UPDATES = 'updates'
-
 export const PERFORMANCE_REPORT_TYPE_MONTHLY = 'monthly'
 
 export const PHONE_NO_FIELD_STRING = 'phoneNo'

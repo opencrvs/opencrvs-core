@@ -67,6 +67,12 @@ import subYears from 'date-fns/subYears'
 import differenceInSeconds from 'date-fns/differenceInSeconds'
 import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
 import { colors } from '@opencrvs/components/lib/colors'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -753,8 +759,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         query={FETCH_EVENTS_WITH_PROGRESS}
         variables={{
           locationId: locationId,
-          skip: 0,
-          count: recordCount,
+          skip: (currentPageNumber - 1) * DEFAULT_DECLARATION_STATUS_PAGE_SIZE,
+          count: DEFAULT_DECLARATION_STATUS_PAGE_SIZE,
           status: (status && [status]) || undefined,
           type: (event && [`${event.toLowerCase()}-declaration`]) || undefined
         }}
@@ -787,14 +793,36 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 onPageChange={(currentPage: number) => {
                   setCurrentPageNumber(currentPage)
                 }}
-                loadMoreText={intl.formatMessage(
-                  messages.showMoreUsersLinkLabel,
-                  {
-                    pageSize: DEFAULT_DECLARATION_STATUS_PAGE_SIZE
-                  }
-                )}
                 isFullPage
               />
+              {total > DEFAULT_DECLARATION_STATUS_PAGE_SIZE && (
+                <PaginationWrapper>
+                  <DesktopWrapper>
+                    <PaginationModified
+                      size={'small'}
+                      initialPage={currentPageNumber}
+                      totalPages={Math.ceil(
+                        total / DEFAULT_DECLARATION_STATUS_PAGE_SIZE
+                      )}
+                      onPageChange={(currentPage: number) => {
+                        setCurrentPageNumber(currentPage)
+                      }}
+                    />
+                  </DesktopWrapper>
+                  <MobileWrapper>
+                    <PaginationModified
+                      size={'large'}
+                      initialPage={currentPageNumber}
+                      totalPages={Math.ceil(
+                        total / DEFAULT_DECLARATION_STATUS_PAGE_SIZE
+                      )}
+                      onPageChange={(currentPage: number) => {
+                        setCurrentPageNumber(currentPage)
+                      }}
+                    />
+                  </MobileWrapper>
+                </PaginationWrapper>
+              )}
               {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
             </>
           )

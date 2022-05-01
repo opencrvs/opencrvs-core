@@ -108,7 +108,13 @@ interface IConstantsMessages
   to: MessageDescriptor
   toCapitalized: MessageDescriptor
   trackingId: MessageDescriptor
+  notificationSent: MessageDescriptor
+  sentForReview: MessageDescriptor
+  sentForValidation: MessageDescriptor
+  sentForUpdates: MessageDescriptor
+  sentForApproval: MessageDescriptor
   type: MessageDescriptor
+  event: MessageDescriptor
   update: MessageDescriptor
   user: MessageDescriptor
   username: MessageDescriptor
@@ -145,6 +151,8 @@ interface IConstantsMessages
   viewAll: MessageDescriptor
   notAvailable: MessageDescriptor
   history: MessageDescriptor
+  requireUpdatesLoading: MessageDescriptor
+  noRecords: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -535,7 +543,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.registerConfirmModalDesc'
   },
   registered: {
-    defaultMessage: 'registered',
+    defaultMessage: 'Registered',
     description: 'A label for registered',
     id: 'constants.registered'
   },
@@ -645,10 +653,40 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Search menu tracking id type',
     id: 'constants.trackingId'
   },
+  notificationSent: {
+    defaultMessage: 'Notification sent',
+    description: 'label for notification sent',
+    id: 'constants.notificationSent'
+  },
+  sentForReview: {
+    defaultMessage: 'Sent for review',
+    description: 'label for sent for review',
+    id: 'constants.sentForReview'
+  },
+  sentForValidation: {
+    defaultMessage: 'Sent for validation',
+    description: 'label for sent for validation',
+    id: 'constants.sentForValidation'
+  },
+  sentForUpdates: {
+    defaultMessage: 'Sent for updates',
+    description: 'label for sent for updates',
+    id: 'constants.sentForUpdates'
+  },
+  sentForApproval: {
+    defaultMessage: 'Sent for approval',
+    description: 'label for sent for approval',
+    id: 'constants.sentForApproval'
+  },
   type: {
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item',
     id: 'constants.type'
+  },
+  event: {
+    defaultMessage: 'Event',
+    description: 'Label for Event of event in work queue list item',
+    id: 'constants.event'
   },
   update: {
     defaultMessage: 'Update',
@@ -822,6 +860,16 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.history',
     defaultMessage: 'History',
     description: 'History heading'
+  },
+  requireUpdatesLoading: {
+    id: 'constants.requireUpdatesLoading',
+    defaultMessage: 'Checking your declarations',
+    description: 'The text when all rejected declarations are loading'
+  },
+  noRecords: {
+    defaultMessage: 'No records {tab}',
+    description: 'No Application in{tab} tab in officeHome',
+    id: 'constants.noRecords'
   }
 }
 

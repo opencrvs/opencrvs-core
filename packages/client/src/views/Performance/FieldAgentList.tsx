@@ -26,11 +26,9 @@ import { PerformanceSelect } from '@client/views/SysAdmin/Performance/Performanc
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
-import {
-  SysAdminContentWrapper,
-  SysAdminPageVariant
-} from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
+import { AvatarSmall } from '@client/components/Avatar'
 import {
   ColumnContentAlignment,
   TableView
@@ -46,11 +44,21 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
 import format from '@client/utils/date-formatting'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
+import { IAvatar } from '@client/utils/userUtils'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
-
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 25
 const { useState } = React
 interface SortMap {
@@ -103,6 +111,27 @@ enum STATUS_OPTIONS {
   ACTIVE = 'active',
   DEACTIVE = 'deactive',
   PENDING = 'pending'
+}
+
+const TableDiv = styled.div`
+  overflow: auto;
+`
+
+const NameAvatar = styled.div`
+  display: flex;
+  align-items: center;
+  img {
+    margin-right: 10px;
+  }
+`
+
+function getNameWithAvatar(userName: string, avatar?: IAvatar) {
+  return (
+    <NameAvatar>
+      <AvatarSmall name={userName} avatar={avatar} />
+      <span>{userName}</span>
+    </NameAvatar>
+  )
 }
 
 function getPercentage(total: number | undefined, current: number | undefined) {
@@ -169,7 +198,8 @@ function FieldAgentListComponent(props: IProps) {
         status: status.toString(),
         event: event === '' ? undefined : event.toUpperCase(),
         count: recordCount,
-        sort: 'asc'
+        sort: 'asc',
+        skip: 0
       }
     : {
         timeStart: timeStart,
@@ -178,7 +208,8 @@ function FieldAgentListComponent(props: IProps) {
         status: status.toString(),
         event: event === '' ? undefined : event.toUpperCase(),
         count: recordCount,
-        sort: 'asc'
+        sort: 'asc',
+        skip: 0
       }
 
   function toggleSort(key: keyof SortMap) {
@@ -309,7 +340,7 @@ function FieldAgentListComponent(props: IProps) {
           row.primaryOfficeId &&
           offices.find(({ id }) => id === row.primaryOfficeId)
         return {
-          name: row.fullName,
+          name: getNameWithAvatar(row.fullName || '', row.avatar),
           type: row.type,
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
@@ -355,156 +386,198 @@ function FieldAgentListComponent(props: IProps) {
       []
     )
   }
-
+  const skip = (currentPageNumber - 1) * 1
+  queryVariables.skip = skip
   return (
     <SysAdminContentWrapper
       id="field-agent-list"
-      type={SysAdminPageVariant.SUBPAGE}
-      backActionHandler={() =>
-        goToPerformanceHome(dateStart, dateEnd, locationId)
-      }
-      fixedWidth={1500}
-      headerTitle={intl.formatMessage(messages.fieldAgentsTitle)}
-      toolbarComponent={
-        <FilterContainer>
-          <LocationPicker
-            selectedLocationId={locationId}
-            onChangeLocation={(newLocationId) => {
-              props.goToFieldAgentList(newLocationId, timeStart, timeEnd, event)
-            }}
-            requiredJurisdictionTypes={
-              window.config.FIELD_AGENT_AUDIT_LOCATIONS
-            }
-          />
-          <DateRangePicker
-            startDate={dateStart}
-            endDate={dateEnd}
-            onDatesChange={({ startDate, endDate }) =>
-              props.goToFieldAgentList(
-                locationId as string,
-                startDate.toISOString(),
-                endDate.toISOString()
-              )
-            }
-          />
-          <PerformanceSelect
-            onChange={(option) => {
-              setEvent(
-                Object.values(EVENT_OPTIONS).find(
-                  (val) => val === option.value
-                ) || EVENT_OPTIONS.ALL
-              )
-            }}
-            id="event-select"
-            withLightTheme={true}
-            defaultWidth={175}
-            value={event}
-            options={[
-              {
-                label: intl.formatMessage(messages.eventOptionForBoth),
-                value: EVENT_OPTIONS.ALL
-              },
-              {
-                label: intl.formatMessage(messages.eventOptionForBirths),
-                value: EVENT_OPTIONS.BIRTH
-              },
-              {
-                label: intl.formatMessage(messages.eventOptionForDeaths),
-                value: EVENT_OPTIONS.DEATH
-              }
-            ]}
-          />
-          <PerformanceSelect
-            onChange={(option) => {
-              setStatus(
-                Object.values(STATUS_OPTIONS).find(
-                  (val) => val === option.value
-                ) || STATUS_OPTIONS.ACTIVE
-              )
-            }}
-            id="status-select"
-            withLightTheme={true}
-            defaultWidth={110}
-            value={status}
-            options={[
-              {
-                label: intl.formatMessage(
-                  messages.fieldAgentStatusOptionActive
-                ),
-                value: STATUS_OPTIONS.ACTIVE
-              },
-              {
-                label: intl.formatMessage(
-                  messages.fieldAgentStatusOptionPending
-                ),
-                value: STATUS_OPTIONS.PENDING
-              },
-              {
-                label: intl.formatMessage(
-                  messages.fieldAgentStatusOptionDeactive
-                ),
-                value: STATUS_OPTIONS.DEACTIVE
-              }
-            ]}
-          />
-        </FilterContainer>
-      }
+      isCertificatesConfigPage={true}
     >
-      <Query
-        query={FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA}
-        variables={queryVariables}
-        fetchPolicy={'no-cache'}
-      >
-        {({ data, loading, error }) => {
-          if (error) {
-            return (
-              <>
-                <TableView
-                  id={'field-agent-error-list'}
-                  noResultText={intl.formatMessage(
-                    messages.fieldAgentsNoResult
-                  )}
-                  fixedWidth={1500}
-                  isLoading={true}
-                  hideBoxShadow={true}
-                  columns={getColumns(data && data.searchFieldAgents)}
-                  content={getContent(data && data.searchFieldAgents)}
-                />
-                <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-              </>
-            )
-          } else {
-            return (
-              <TableView
-                id={'field-agent-list'}
-                noResultText={intl.formatMessage(messages.fieldAgentsNoResult)}
-                isLoading={loading}
-                fixedWidth={1500}
-                columns={getColumns(data && data.searchFieldAgents)}
-                content={getContent(data && data.searchFieldAgents)}
-                totalItems={
-                  data &&
-                  data.searchFieldAgents &&
-                  data.searchFieldAgents.totalItems
+      <Content
+        title={intl.formatMessage(messages.declarationsStartedFieldAgents)}
+        size={ContentSize.LARGE}
+        filterContent={
+          <FilterContainer>
+            <LocationPicker
+              selectedLocationId={locationId}
+              onChangeLocation={(newLocationId) => {
+                props.goToFieldAgentList(
+                  newLocationId,
+                  timeStart,
+                  timeEnd,
+                  event
+                )
+              }}
+              requiredJurisdictionTypes={
+                window.config.FIELD_AGENT_AUDIT_LOCATIONS
+              }
+            />
+            <PerformanceSelect
+              onChange={(option) => {
+                setEvent(
+                  Object.values(EVENT_OPTIONS).find(
+                    (val) => val === option.value
+                  ) || EVENT_OPTIONS.ALL
+                )
+              }}
+              id="event-select"
+              withLightTheme={true}
+              defaultWidth={110}
+              value={event}
+              options={[
+                {
+                  label: intl.formatMessage(messages.eventOptionForBoth),
+                  value: EVENT_OPTIONS.ALL
+                },
+                {
+                  label: intl.formatMessage(messages.eventOptionForBirths),
+                  value: EVENT_OPTIONS.BIRTH
+                },
+                {
+                  label: intl.formatMessage(messages.eventOptionForDeaths),
+                  value: EVENT_OPTIONS.DEATH
                 }
-                currentPage={currentPageNumber}
-                pageSize={recordCount}
-                onPageChange={(currentPage: number) => {
-                  setCurrentPageNumber(currentPage)
-                }}
-                loadMoreText={intl.formatMessage(
-                  messages.showMoreUsersLinkLabel,
-                  {
-                    pageSize: DEFAULT_FIELD_AGENT_LIST_SIZE
-                  }
-                )}
-                isFullPage
-                highlightRowOnMouseOver
-              />
-            )
-          }
-        }}
-      </Query>
+              ]}
+            />
+            <DateRangePicker
+              startDate={dateStart}
+              endDate={dateEnd}
+              onDatesChange={({ startDate, endDate }) =>
+                props.goToFieldAgentList(
+                  locationId as string,
+                  startDate.toISOString(),
+                  endDate.toISOString()
+                )
+              }
+            />
+            <PerformanceSelect
+              onChange={(option) => {
+                setStatus(
+                  Object.values(STATUS_OPTIONS).find(
+                    (val) => val === option.value
+                  ) || STATUS_OPTIONS.ACTIVE
+                )
+              }}
+              id="status-select"
+              withLightTheme={true}
+              defaultWidth={110}
+              value={status}
+              options={[
+                {
+                  label: intl.formatMessage(
+                    messages.fieldAgentStatusOptionActive
+                  ),
+                  value: STATUS_OPTIONS.ACTIVE
+                },
+                {
+                  label: intl.formatMessage(
+                    messages.fieldAgentStatusOptionPending
+                  ),
+                  value: STATUS_OPTIONS.PENDING
+                },
+                {
+                  label: intl.formatMessage(
+                    messages.fieldAgentStatusOptionDeactive
+                  ),
+                  value: STATUS_OPTIONS.DEACTIVE
+                }
+              ]}
+            />
+          </FilterContainer>
+        }
+      >
+        <Query
+          query={FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA}
+          variables={queryVariables}
+          fetchPolicy={'no-cache'}
+        >
+          {({ data, loading, error }) => {
+            if (error) {
+              return (
+                <>
+                  <TableView
+                    id={'field-agent-error-list'}
+                    noResultText={intl.formatMessage(
+                      messages.fieldAgentsNoResult
+                    )}
+                    fixedWidth={1500}
+                    isLoading={true}
+                    hideBoxShadow={true}
+                    columns={getColumns(data && data.searchFieldAgents)}
+                    content={getContent(data && data.searchFieldAgents)}
+                  />
+                  <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                </>
+              )
+            } else {
+              const totalData =
+                data &&
+                data.searchFieldAgents &&
+                data.searchFieldAgents.totalItems
+              return (
+                <TableDiv>
+                  <TableView
+                    id={'field-agent-list'}
+                    noResultText={intl.formatMessage(
+                      messages.fieldAgentsNoResult
+                    )}
+                    isLoading={loading}
+                    fixedWidth={1500}
+                    columns={getColumns(data && data.searchFieldAgents)}
+                    content={getContent(data && data.searchFieldAgents)}
+                    totalItems={
+                      data &&
+                      data.searchFieldAgents &&
+                      data.searchFieldAgents.totalItems
+                    }
+                    currentPage={currentPageNumber}
+                    pageSize={recordCount}
+                    onPageChange={(currentPage: number) => {
+                      setCurrentPageNumber(currentPage)
+                    }}
+                    loadMoreText={intl.formatMessage(
+                      messages.showMoreUsersLinkLabel,
+                      {
+                        pageSize: DEFAULT_FIELD_AGENT_LIST_SIZE
+                      }
+                    )}
+                    isFullPage
+                    highlightRowOnMouseOver
+                  />
+                  {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+                    <PaginationWrapper>
+                      <DesktopWrapper>
+                        <PaginationModified
+                          size="small"
+                          initialPage={currentPageNumber}
+                          totalPages={Math.ceil(
+                            totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                          )}
+                          onPageChange={(currentPage: number) => {
+                            setCurrentPageNumber(currentPage)
+                          }}
+                        />
+                      </DesktopWrapper>
+                      <MobileWrapper>
+                        <PaginationModified
+                          size="large"
+                          initialPage={currentPageNumber}
+                          totalPages={Math.ceil(
+                            totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                          )}
+                          onPageChange={(currentPage: number) => {
+                            setCurrentPageNumber(currentPage)
+                          }}
+                        />
+                      </MobileWrapper>
+                    </PaginationWrapper>
+                  )}
+                </TableDiv>
+              )
+            }
+          }}
+        </Query>
+      </Content>
     </SysAdminContentWrapper>
   )
 }
