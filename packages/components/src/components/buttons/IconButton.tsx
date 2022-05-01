@@ -17,8 +17,8 @@ export const IconButton = styled(Button)`
   width: 42px;
   height: 42px;
   color: ${({ theme }) => theme.colors.white};
-  background: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.shadows.light};
+  /* background: ${({ theme }) => theme.colors.primary}; */
+  /* ${({ theme }) => theme.shadows.light}; */
   justify-content: center;
   border-radius: 2px;
   ${({ theme }) => theme.fonts.bold14};
@@ -33,7 +33,7 @@ export const IconButton = styled(Button)`
 
   &:active:enabled {
     outline: none;
-    background: ${({ theme }) => theme.colors.primary};
+    /* background: ${({ theme }) => theme.colors.primary}; */
     border: 3px solid ${({ theme }) => theme.colors.yellow};
   }
 

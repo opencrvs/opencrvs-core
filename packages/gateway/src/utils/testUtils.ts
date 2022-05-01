@@ -1172,31 +1172,6 @@ export const mockObservations = {
       }
     ]
   },
-  presentAtBirthRegistration: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'present-at-birth-reg',
-                display: 'Present at birth registration'
-              }
-            ]
-          },
-          effectiveDateTime: '2016-03-28', // same as registration date
-          valueString: 'BOTH_PARENTS'
-        }
-      }
-    ]
-  },
   childrenBornAliveToMother: {
     entry: [
       {
@@ -1439,122 +1414,6 @@ export const mockObservations = {
         }
       }
     ]
-  },
-  parentDetailsType: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'parent-details',
-                display: 'Parent details'
-              }
-            ]
-          },
-          valueString: 'MOTHER_AND_FATHER'
-        }
-      }
-    ]
-  },
-  reasonMotherNotApplying: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'reason-mother-not-applying'
-              }
-            ]
-          },
-          valueString: 'Sick'
-        }
-      }
-    ]
-  },
-  reasonFatherNotApplying: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'reason-father-not-applying'
-              }
-            ]
-          },
-          valueString: 'DECEASED'
-        }
-      }
-    ]
-  },
-  reasonCaregiverNotApplying: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'reason-caregiver-not-applying'
-              }
-            ]
-          },
-          valueString: 'Not in town'
-        }
-      }
-    ]
-  },
-  primaryCaregiverType: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'primary-caregiver'
-              }
-            ]
-          },
-          valueString: 'OTHER'
-        }
-      }
-    ]
   }
 }
 
@@ -1690,24 +1549,3 @@ export const mockTaskForError = {
     versionId: '123'
   }
 }
-
-export const mockObservationBundle = {
-  resourceType: 'Bundle',
-  type: 'searchset',
-  entry: [
-    mockObservations.reasonMotherNotApplying.entry[0],
-    mockObservations.reasonFatherNotApplying.entry[0],
-    mockObservations.reasonCaregiverNotApplying.entry[0],
-    mockObservations.primaryCaregiverType.entry[0]
-  ]
-}
-
-export const reasonsNotApplyingMock = [
-  {
-    primaryCaregiverType: 'MOTHER',
-    reasonNotApplying: 'Sick',
-    isDeceased: false
-  },
-  { primaryCaregiverType: 'FATHER', reasonNotApplying: '', isDeceased: true },
-  { primaryCaregiverType: 'OTHER', reasonNotApplying: 'Not in town' }
-]

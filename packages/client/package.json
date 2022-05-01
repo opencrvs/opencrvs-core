@@ -80,6 +80,7 @@
     "test": "yarn test:compilation && PORT=3000 craco test --watchAll=false --coverage --silent --noStackTrace --env=jsdom --modulePaths=src/",
     "test:watch": "PORT=3000 craco test --env=jsdom --modulePaths=src/ --watch",
     "open:cov": "yarn test && opener coverage/index.html",
+    "generate:test:forms": "bash generate-form.sh",
     "lint": "yarn lint:css && yarn lint:ts",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",
@@ -93,6 +94,7 @@
   "lint-staged": {
     "src/**/*.{ts,tsx}": [
       "prettier --write",
+      "yarn generate:test:forms",
       "yarn lint:ts",
       "stylelint",
       "yarn extract:translations",

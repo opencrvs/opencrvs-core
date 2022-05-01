@@ -19,24 +19,12 @@ import {
 export const REGISTRATION_SECTION = 'registration'
 
 const fieldNameMapping = {
-  [deathDocumentForWhomFhirMapping["Proof of Deceased's ID"]]:
-    'uploadDocForDeceased',
-  [deathDocumentForWhomFhirMapping["Proof of Informant's ID"]]:
-    'uploadDocForInformant',
-  [deathDocumentForWhomFhirMapping["Proof of informant's authority to apply"]]:
-    'uploadDocForInformantAthorityToApply',
-  [deathDocumentForWhomFhirMapping['Proof Deceased Primary Address']]:
-    'uploadDocForDeceasedPrimaryAddress',
-  [deathDocumentForWhomFhirMapping['Proof of Date of Birth of Deceased']]:
-    'uploadDocForDeceasedDOB',
-  [deathDocumentForWhomFhirMapping['Proof of Death of Deceased']]:
+  [deathDocumentForWhomFhirMapping.DECEASED_ID_PROOF]: 'uploadDocForDeceased',
+  [deathDocumentForWhomFhirMapping.INFORMANT_ID_PROOF]: 'uploadDocForInformant',
+  [deathDocumentForWhomFhirMapping.DECEASED_DEATH_PROOF]:
     'uploadDocForDeceasedDeath',
-  [deathDocumentForWhomFhirMapping['Letter from ward councillor']]:
-    'uploadDocFromCounsilor',
-  [deathDocumentForWhomFhirMapping['Cuase of Death']]:
-    'uploadDocForCauseOfDeath',
-  [deathDocumentForWhomFhirMapping['Coroner Report']]:
-    'uploadDocForCoronerReport'
+  [deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF]:
+    'uploadDocForCauseOfDeath'
 }
 
 export function deathAttachmentToFieldTransformer(

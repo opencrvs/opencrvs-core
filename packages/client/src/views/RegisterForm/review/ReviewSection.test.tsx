@@ -55,30 +55,13 @@ const { store, history } = createStore()
 const mockHandler = jest.fn()
 
 const draft = createDeclaration(DeclarationEvent.BIRTH)
-
-const declaredBirthDeclaration = createReviewDeclaration(
-  uuid(),
-  {},
-  DeclarationEvent.BIRTH
-)
-const rejectedDraftBirth = createReviewDeclaration(
-  uuid(),
-  {},
-  DeclarationEvent.BIRTH,
-  REJECTED
-)
-const rejectedDraftDeath = createReviewDeclaration(
-  uuid(),
-  {},
-  DeclarationEvent.DEATH,
-  REJECTED
-)
-
 draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
   father: {
-    fathersDetailsExist: true,
-    secondaryAddressSameAsOtherSecondary: false
+    detailsExist: true
+  },
+  mother: {
+    detailsExist: true
   },
   documents: {
     imageUploader: { title: 'dummy', description: 'dummy', data: '' }
@@ -87,6 +70,24 @@ draft.data = {
     commentsOrNotes: ''
   }
 }
+
+const declaredBirthDeclaration = createReviewDeclaration(
+  uuid(),
+  draft.data,
+  DeclarationEvent.BIRTH
+)
+const rejectedDraftBirth = createReviewDeclaration(
+  uuid(),
+  draft.data,
+  DeclarationEvent.BIRTH,
+  REJECTED
+)
+const rejectedDraftDeath = createReviewDeclaration(
+  uuid(),
+  draft.data,
+  DeclarationEvent.DEATH,
+  REJECTED
+)
 
 describe('when in device of large viewport', () => {
   let userAgentMock: jest.SpyInstance
@@ -645,8 +646,8 @@ describe('when in device of small viewport', () => {
                     validate: [],
                     options: [
                       {
-                        label: formMessages.docTypeBR,
-                        value: 'Birth Registration'
+                        label: formMessages.docTypeBirthCert,
+                        value: 'BIRTH_CERTIFICATE'
                       }
                     ]
                   }

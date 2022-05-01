@@ -33,6 +33,7 @@ export type NotificationState = {
   submitFormErrorToast: string | null
   userAuditSuccessToast: UserAuditSuccessToastState
   showPINUpdateSuccess: boolean
+  downloadDeclarationFailedToast: boolean
 }
 
 export const initialState: NotificationState = {
@@ -44,7 +45,8 @@ export const initialState: NotificationState = {
   submitFormSuccessToast: null,
   submitFormErrorToast: null,
   userAuditSuccessToast: { visible: false },
-  showPINUpdateSuccess: false
+  showPINUpdateSuccess: false,
+  downloadDeclarationFailedToast: false
 }
 
 export const notificationReducer: LoopReducer<
@@ -99,6 +101,16 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         submitFormErrorToast: action.payload.data
+      }
+    case actions.SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST:
+      return {
+        ...state,
+        downloadDeclarationFailedToast: true
+      }
+    case actions.HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST:
+      return {
+        ...state,
+        downloadDeclarationFailedToast: false
       }
     case actions.HIDE_SUBMIT_FORM_ERROR_TOAST:
       return {
