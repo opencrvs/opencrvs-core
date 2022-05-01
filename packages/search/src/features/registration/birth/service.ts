@@ -36,7 +36,6 @@ import {
   getCompositionById,
   updateInHearth,
   findEntryResourceByUrl,
-  selectObservationEntry,
   findEventLocation,
   getLocationHirarchyIDs
 } from '@search/features/fhir/fhir-utils'
@@ -46,8 +45,6 @@ import * as Hapi from '@hapi/hapi'
 const MOTHER_CODE = 'mother-details'
 const FATHER_CODE = 'father-details'
 const INFORMANT_CODE = 'informant-details'
-const PRIMARY_CAREGIVER_CODE = 'primary-caregiver-details'
-const PRIMARY_CAREGIVER_TYPE_CODE = 'primary-caregiver'
 const CHILD_CODE = 'child-details'
 const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 
@@ -162,7 +159,6 @@ async function createIndexBody(
   createMotherIndex(body, composition, bundleEntries)
   createFatherIndex(body, composition, bundleEntries)
   createInformantIndex(body, composition, bundleEntries)
-  createPrimaryCaregiverIndex(body, composition, bundleEntries)
   await createDeclarationIndex(body, composition, bundleEntries)
   const task = findTask(bundleEntries)
   await createStatusHistory(body, task, authHeader)
@@ -300,58 +296,6 @@ function createInformantIndex(
     informantNameLocal &&
     informantNameLocal.family &&
     informantNameLocal.family[0]
-}
-
-function createPrimaryCaregiverIndex(
-  body: IBirthCompositionBody,
-  composition: fhir.Composition,
-  bundleEntries?: fhir.BundleEntry[]
-) {
-  const observationEntry = selectObservationEntry(
-    PRIMARY_CAREGIVER_TYPE_CODE,
-    bundleEntries
-  )
-  const observation =
-    observationEntry && (observationEntry.resource as fhir.Observation)
-  const primaryCaregiverType = (observation && observation.valueString) || ''
-
-  if (
-    primaryCaregiverType === 'MOTHER' ||
-    primaryCaregiverType === 'FATHER' ||
-    primaryCaregiverType === 'INFORMANT'
-  ) {
-    return
-  }
-
-  const primaryCaregiver = findEntry(
-    PRIMARY_CAREGIVER_CODE,
-    composition,
-    bundleEntries
-  ) as fhir.Patient
-
-  if (!primaryCaregiver) {
-    return
-  }
-
-  const primaryCaregiverName = findName(NAME_EN, primaryCaregiver.name)
-  const primaryCaregiverNameLocal = findNameLocale(primaryCaregiver.name)
-
-  body.primaryCaregiverFirstNames =
-    primaryCaregiverName &&
-    primaryCaregiverName.given &&
-    primaryCaregiverName.given.join(' ')
-  body.primaryCaregiverFamilyName =
-    primaryCaregiverName &&
-    primaryCaregiverName.family &&
-    primaryCaregiverName.family[0]
-  body.primaryCaregiverFirstNamesLocal =
-    primaryCaregiverNameLocal &&
-    primaryCaregiverNameLocal.given &&
-    primaryCaregiverNameLocal.given.join(' ')
-  body.primaryCaregiverFamilyNameLocal =
-    primaryCaregiverNameLocal &&
-    primaryCaregiverNameLocal.family &&
-    primaryCaregiverNameLocal.family[0]
 }
 
 async function createDeclarationIndex(

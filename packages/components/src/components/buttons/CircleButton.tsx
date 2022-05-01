@@ -11,14 +11,14 @@
  */
 import styled from 'styled-components'
 
-export const CircleButton = styled.button<{ dark?: boolean }>`
+export const CircleButton = styled.button<{ dark?: boolean; size?: string }>`
   color: ${({ theme }) => theme.colors.primary};
   margin: 0;
   transition: background 0.4s ease;
   border: none;
   background: none;
-  height: 40px;
-  width: 40px;
+  height: ${({ size }) => (size && size === 'small' ? 20 : 40)}px;
+  width: ${({ size }) => (size && size === 'small' ? 20 : 40)}px;
   display: flex;
   justify-content: center;
   align-items: center;

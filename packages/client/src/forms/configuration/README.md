@@ -295,52 +295,20 @@ This object holds sections for birth declaration forms. All sections are contain
   - #### `informantFamilyNameEng`
     The family name of the informant in English.
 
-4.  ### `primaryCaregiver`
-
-    This is a conditional section which is only visible when the informant is `LEGAL_GUARDIAN` or `OTHER`. Although the sections do not have conditional prop if all the groups of that section share the same condition in their conditional properties, it will make the entire section conditional.
-
-- #### `parent-details-view-group`
-
-  This view group takes input on whether the informant has the mother or father details. It has only one field.
-
-  - #### `parentDetailsType`
-    It is a radio group for taking input whose details the informant has between the parents. The options are `MOTHER_ONLY,FATHER_ONLY, MOTHER_AND_FATHER, NONE`. The options are self-descriptive.
-
-- #### `parent-not-applying-view-group`
-
-  This view group takes the reason for the parents not applying.
-
-  - #### `reasonMotherNotApplying`
-
-    Text input, to take input of the reason for the mother not applying if the mother is still alive.
-
-  - #### `motherIsDeceased`
-
-    Checkbox, checked if the reason for the mother is not applying is that she is deceased.
-
-  - #### `reasonFatherNotApplying`
-
-    Text input, to take input of the reason for the father not applying if the father is still alive.
-
-  - #### `motherIsDeceased`
-
-    Checkbox, checked if the reason for the father is not applying is that he is deceased.
-
-  - #### `caregiver-details-view-group`
-
-    This view group stands for the primary caregiver of the child. It has only one field.
-
-  - #### `primaryCaregiverType`
-    It is a radio option with nested fields. The options are `MOTHER, FATHER, LEGAL_GUARDIAN, OTHER, INFORMANT`. If the mother or the father or both are absent because of death, the option `MOTHER, FATHER` or both do not appear.
-
-  If options `LEGAL_GUARDIAN` or `OTHER` is selected the fields `name`, `phone`, `reasonNotApplying` appear as nested fields.
-
-5.  ### `mother`
+4.  ### `mother`
     This section takes information about the mother of the child. It has only one conditional view group which is mother-view-group, causing the entire section conditional.
 
 - #### `mother-view-group`
 
   This view group appears only when the informant has mother details (in other words, the informant selects `MOTHER_ONLY` or `MOTHER_AND_FATHER` in [parentDetailsType](#parentDetailsType) field). This view group consists of several fields
+
+  - #### `detailsExist`
+
+    This is a conditional radio option which checks if the mothers details exists or not if the mother is not the informant or contact type
+
+  - #### `reasonMotherNotApplying`
+
+    Text input, to take input of the reason for the mother not applying if the mother is not the informant or contact type
 
   - #### `motherBirthDate`
 
@@ -389,18 +357,19 @@ This object holds sections for birth declaration forms. All sections are contain
   - #### `educationalAttainment`
     Level of the educational qualification of the mother.
 
-6.  ### `father`
+5.  ### `father`
 
     This section takes input from the father of the child. It has only one view group.
 
 - #### `father-view-group`
 
-  This is a conditional group. When the informant has the father details (that means, the informant selects `FATHER_ONLY` or `MOTHER_AND_FATHER` in [`parentDetailsType`](https://docs.google.com/document/d/1RCEXO9qf_Wi7dH8dnU9grrlym7uyNmik1vIkK2exZLo/edit#heading=h.bxk5dw6oz7fk) field), this view group appears.
-  It has several fields like following.
+  - #### `detailsExist`
 
-  - #### `fathersDetailsExist`
+    This is a conditional radio option which checks if the fathers details exists or not if the father is not the informant or contact type
 
-    This is a conditional radio option which checks if the father details exists or not if the parent is the informant. If the informant is a legal guardian and he/she does not have father details (MOTHER_ONLY or NONE in [parentDetailsType](#parentDetailsType)).
+  - #### `reasonFatherNotApplying`
+
+    Text input, to take input of the reason for the father not applying if the father is not the informant or contact type
 
   - #### `fatherBirthDate`
 
@@ -442,9 +411,6 @@ This object holds sections for birth declaration forms. All sections are contain
   - #### `educationalAttainment`
 
   The level of the educational qualification of the father.
-
-  - #### `secondaryAddressSameAsOtherSecondary`
-    This is a radio option field, which checks whether the father’s address is the same as mother’s. If so, then the mother's address is copied into the father’s address.
 
 7.  ### documents
     This section is responsible for taking input of the supporting documents. It has only one view group.

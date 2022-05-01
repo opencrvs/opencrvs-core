@@ -12,6 +12,7 @@
 import { IFormConfig, QuestionConfigFieldType } from '@client/forms'
 import { readFileSync } from 'fs'
 import { join } from 'path'
+import { IApplicationConfig } from '@client/utils/referenceApi'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -290,9 +291,10 @@ export const mockConditionals = {
     expression: 'draftData.formValues.action !== "REACTIVATE"'
   }
 }
+
 export const mockOfflineData = {
   forms: JSON.parse(
-    readFileSync(join(__dirname, './register.json')).toString()
+    readFileSync(join(__dirname, './default.json')).toString()
   ) as any,
   facilities: {
     '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {

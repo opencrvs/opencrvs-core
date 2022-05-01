@@ -102,3 +102,34 @@ export function refreshToken() {
       })
   }
 }
+
+const enum RouteScope {
+  DECLARE = 'declare',
+  REGISTER = 'register',
+  CERTIFY = 'certify',
+  PERFORMANCE = 'performance',
+  SYSADMIN = 'sysadmin',
+  VALIDATE = 'validate',
+  NATLSYSADMIN = 'natlsysadmin'
+}
+
+export const hasNatlSysAdminScope = (scope: Scope | null): boolean => {
+  if (scope?.includes(RouteScope.NATLSYSADMIN)) {
+    return true
+  }
+  return false
+}
+
+export const hasRegisterScope = (scope: Scope | null): boolean => {
+  if (scope?.includes(RouteScope.REGISTER)) {
+    return true
+  }
+  return false
+}
+
+export const hasRegistrationClerkScope = (scope: Scope | null): boolean => {
+  if (scope?.includes(RouteScope.VALIDATE)) {
+    return true
+  }
+  return false
+}

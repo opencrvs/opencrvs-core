@@ -23,7 +23,6 @@ import {
   BODY_WEIGHT_CODE,
   BIRTH_ATTENDANT_CODE,
   BIRTH_REG_TYPE_CODE,
-  BIRTH_REG_PRESENT_CODE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE,
@@ -46,14 +45,12 @@ import {
   INFORMANT_TITLE,
   MANNER_OF_DEATH_CODE,
   CAUSE_OF_DEATH_METHOD_CODE,
-  PRIMARY_CAREGIVER,
-  PRIMARY_CAREGIVER_CODE,
-  PRIMARY_CAREGIVER_TITLE,
-  PARENT_DETAILS,
   SPOUSE_CODE,
   SPOUSE_TITLE,
   BIRTH_CORRECTION_ENCOUNTER_CODE,
-  DEATH_CORRECTION_ENCOUNTER_CODE
+  DEATH_CORRECTION_ENCOUNTER_CODE,
+  DEATH_DESCRIPTION_CODE,
+  CAUSE_OF_DEATH_ESTABLISHED_CODE
 } from '@gateway/features/fhir/templates'
 import {
   selectOrCreateEncounterResource,
@@ -74,10 +71,6 @@ import {
   selectOrCreateInformantResource,
   setInformantReference,
   fetchFHIR,
-  setPrimaryCaregiverReference,
-  selectObservationResource,
-  getReasonCodeAndDesc,
-  removeObservationResource,
   selectOrCreateEncounterPartitioner,
   selectOrCreateEncounterParticipant,
   selectOrCreateQuestionnaireResource,
@@ -662,6 +655,30 @@ function createOccupationBulder(resource: fhir.Patient, fieldValue: string) {
   }
 }
 
+function createReasonNotApplyingBulder(
+  resource: fhir.Patient,
+  fieldValue: string
+) {
+  if (!resource.extension) {
+    resource.extension = []
+  }
+
+  const hasReasonNotApplying = resource.extension.find(
+    (extention) =>
+      extention.url ===
+      `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`
+  )
+
+  if (hasReasonNotApplying) {
+    hasReasonNotApplying.valueString = fieldValue
+  } else {
+    resource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/reason-not-applying`,
+      valueString: fieldValue
+    })
+  }
+}
+
 function createEducationalAttainmentBuilder(
   resource: fhir.Patient,
   fieldValue: string
@@ -943,6 +960,30 @@ export const builders: IFieldBuilders = {
         )
         observation.id = fieldValue as string
       },
+      deathDescription: (fhirBundle, fieldValue, context) => {
+        const observation = selectOrCreateObservationResource(
+          DEATH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_VSIGN_CODE,
+          OBSERVATION_CATEGORY_VSIGN_DESC,
+          DEATH_DESCRIPTION_CODE,
+          'Lay reported or verbal autopsy description',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
+      causeOfDeathEstablished: (fhirBundle, fieldValue, context) => {
+        const observation = selectOrCreateObservationResource(
+          DEATH_ENCOUNTER_CODE,
+          OBSERVATION_CATEGORY_VSIGN_CODE,
+          OBSERVATION_CATEGORY_VSIGN_DESC,
+          CAUSE_OF_DEATH_ESTABLISHED_CODE,
+          'Cause of death established',
+          fhirBundle,
+          context
+        )
+        observation.id = fieldValue as string
+      },
       causeOfDeathMethod: (fhirBundle, fieldValue, context) => {
         const observation = selectOrCreateObservationResource(
           DEATH_ENCOUNTER_CODE,
@@ -1010,18 +1051,6 @@ export const builders: IFieldBuilders = {
           OBSERVATION_CATEGORY_PROCEDURE_DESC,
           BIRTH_REG_TYPE_CODE,
           'Birth registration type',
-          fhirBundle,
-          context
-        )
-        observation.id = fieldValue as string
-      },
-      presentAtBirthRegistration: (fhirBundle, fieldValue, context) => {
-        const observation = selectOrCreateObservationResource(
-          BIRTH_ENCOUNTER_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_DESC,
-          BIRTH_REG_PRESENT_CODE,
-          'Present at birth registration',
           fhirBundle,
           context
         )
@@ -1119,6 +1148,22 @@ export const builders: IFieldBuilders = {
         fhirBundle
       )
       return createOccupationBulder(person, fieldValue as string)
+    },
+    detailsExist: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
+      person.active = fieldValue as boolean
+    },
+    reasonNotApplying: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        MOTHER_CODE,
+        MOTHER_TITLE,
+        fhirBundle
+      )
+      return createReasonNotApplyingBulder(person, fieldValue as string)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const mother = selectOrCreatePersonResource(
@@ -1218,6 +1263,22 @@ export const builders: IFieldBuilders = {
         fhirBundle
       )
       return createOccupationBulder(person, fieldValue as string)
+    },
+    detailsExist: (fhirBundle, fieldValue, context) => {
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
+      person.active = fieldValue as boolean
+    },
+    reasonNotApplying: (fhirBundle, fieldValue) => {
+      const person = selectOrCreatePersonResource(
+        FATHER_CODE,
+        FATHER_TITLE,
+        fhirBundle
+      )
+      return createReasonNotApplyingBulder(person, fieldValue as string)
     },
     multipleBirth: (fhirBundle, fieldValue, context) => {
       const father = selectOrCreatePersonResource(
@@ -1957,6 +2018,76 @@ export const builders: IFieldBuilders = {
     ) => {
       const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
       return createInformantShareContactNumber(taskResource, fieldValue)
+    },
+    informantType: async (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        INFORMANT_CODE,
+        INFORMANT_TITLE,
+        fhirBundle
+      )
+
+      if (fieldValue !== 'OTHER') {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: fieldValue
+            }
+          ]
+        }
+      }
+      if (context.event === EVENT_TYPE.BIRTH) {
+        if (fieldValue === 'MOTHER') {
+          await setInformantReference(
+            MOTHER_CODE,
+            relatedPersonResource,
+            fhirBundle,
+            context
+          )
+        } else if (fieldValue === 'FATHER') {
+          await setInformantReference(
+            FATHER_CODE,
+            relatedPersonResource,
+            fhirBundle,
+            context
+          )
+        }
+      }
+    },
+    otherInformantType: async (
+      fhirBundle: ITemplatedBundle,
+      fieldValue: string,
+      context: any
+    ) => {
+      const relatedPersonResource = selectOrCreateInformantSection(
+        INFORMANT_CODE,
+        INFORMANT_TITLE,
+        fhirBundle
+      )
+      if (
+        fieldValue &&
+        relatedPersonResource.relationship &&
+        relatedPersonResource.relationship.coding &&
+        relatedPersonResource.relationship.coding[0]
+      ) {
+        relatedPersonResource.relationship.coding[0].code = 'OTHER'
+        relatedPersonResource.relationship.text = fieldValue
+      } else if (fieldValue) {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system: `${OPENCRVS_SPECIFICATION_URL}extension/other-informant-value`,
+              code: 'OTHER'
+            }
+          ],
+          text: fieldValue
+        }
+      }
     },
     draftId: (
       fhirBundle: ITemplatedBundle,
@@ -3233,152 +3364,6 @@ export const builders: IFieldBuilders = {
     )
     observation.valueString = fieldValue
   },
-  presentAtBirthRegistration: (
-    fhirBundle: ITemplatedBundle,
-    fieldValue: string,
-    context: any
-  ) => {
-    const observation = selectOrCreateObservationResource(
-      BIRTH_ENCOUNTER_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_CODE,
-      OBSERVATION_CATEGORY_PROCEDURE_DESC,
-      BIRTH_REG_PRESENT_CODE,
-      'Present at birth registration',
-      fhirBundle,
-      context
-    )
-    observation.valueString = fieldValue
-  },
-  primaryCaregiver: {
-    primaryCaregiver: {
-      _fhirID: (fhirBundle, fieldValue) => {
-        const primaryCaregiver = selectOrCreatePersonResource(
-          PRIMARY_CAREGIVER_CODE,
-          PRIMARY_CAREGIVER_TITLE,
-          fhirBundle
-        )
-        primaryCaregiver.id = fieldValue as string
-      },
-      name: createNameBuilder(PRIMARY_CAREGIVER_CODE, PRIMARY_CAREGIVER_TITLE),
-      identifier: createIDBuilder(
-        PRIMARY_CAREGIVER_CODE,
-        PRIMARY_CAREGIVER_TITLE
-      ),
-      telecom: createTelecomBuilder(
-        PRIMARY_CAREGIVER_CODE,
-        PRIMARY_CAREGIVER_TITLE
-      )
-    },
-    reasonsNotApplying: {
-      primaryCaregiverType: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        const observation = selectOrCreateObservationResource(
-          BIRTH_ENCOUNTER_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_CODE,
-          OBSERVATION_CATEGORY_PROCEDURE_DESC,
-          PRIMARY_CAREGIVER,
-          'Primary caregiver',
-          fhirBundle,
-          context
-        )
-
-        observation.valueString = fieldValue
-        setPrimaryCaregiverReference(
-          PRIMARY_CAREGIVER_CODE,
-          observation,
-          fhirBundle
-        )
-      },
-      reasonNotApplying: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: string,
-        context: any
-      ) => {
-        if (fieldValue) {
-          const primaryCaregiverObservation = selectObservationResource(
-            PRIMARY_CAREGIVER,
-            fhirBundle
-          )
-          const type =
-            (primaryCaregiverObservation &&
-              primaryCaregiverObservation.valueString) ||
-            PRIMARY_CAREGIVER
-          const codeAndDesc = getReasonCodeAndDesc(type)
-          const observation = selectOrCreateObservationResource(
-            BIRTH_ENCOUNTER_CODE,
-            OBSERVATION_CATEGORY_PROCEDURE_CODE,
-            OBSERVATION_CATEGORY_PROCEDURE_DESC,
-            codeAndDesc.code,
-            codeAndDesc.desc,
-            fhirBundle,
-            context
-          )
-
-          observation.valueString = fieldValue
-          setPrimaryCaregiverReference(
-            PRIMARY_CAREGIVER_CODE,
-            observation,
-            fhirBundle
-          )
-        }
-      },
-      isDeceased: (
-        fhirBundle: ITemplatedBundle,
-        fieldValue: boolean,
-        context: any
-      ) => {
-        if (fieldValue) {
-          const primaryCaregiverObservation = selectObservationResource(
-            PRIMARY_CAREGIVER,
-            fhirBundle
-          )
-          const type =
-            (primaryCaregiverObservation &&
-              primaryCaregiverObservation.valueString) ||
-            PRIMARY_CAREGIVER
-          const codeAndDesc = getReasonCodeAndDesc(type)
-          const observation = selectOrCreateObservationResource(
-            BIRTH_ENCOUNTER_CODE,
-            OBSERVATION_CATEGORY_PROCEDURE_CODE,
-            OBSERVATION_CATEGORY_PROCEDURE_DESC,
-            codeAndDesc.code,
-            codeAndDesc.desc,
-            fhirBundle,
-            context
-          )
-
-          observation.valueString = 'DECEASED'
-          setPrimaryCaregiverReference(
-            PRIMARY_CAREGIVER_CODE,
-            observation,
-            fhirBundle
-          )
-        }
-
-        removeObservationResource(PRIMARY_CAREGIVER, fhirBundle)
-      }
-    },
-    parentDetailsType: (
-      fhirBundle: ITemplatedBundle,
-      fieldValue: string,
-      context: any
-    ) => {
-      const observation = selectOrCreateObservationResource(
-        BIRTH_ENCOUNTER_CODE,
-        OBSERVATION_CATEGORY_PROCEDURE_CODE,
-        OBSERVATION_CATEGORY_PROCEDURE_DESC,
-        PARENT_DETAILS,
-        'Parent details',
-        fhirBundle,
-        context
-      )
-
-      observation.valueString = fieldValue
-    }
-  },
   childrenBornAliveToMother: (
     fhirBundle: ITemplatedBundle,
     fieldValue: number,
@@ -3450,7 +3435,46 @@ export const builders: IFieldBuilders = {
     observation.valueCodeableConcept = {
       coding: [
         {
-          system: 'http://hl7.org/fhir/ValueSet/icd-10',
+          system: `${OPENCRVS_SPECIFICATION_URL}manner-of-death`,
+          code: fieldValue
+        }
+      ]
+    }
+  },
+  deathDescription: (
+    fhirBundle: ITemplatedBundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = selectOrCreateObservationResource(
+      DEATH_ENCOUNTER_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_CODE,
+      OBSERVATION_CATEGORY_PROCEDURE_DESC,
+      DEATH_DESCRIPTION_CODE,
+      'Lay reported or verbal autopsy description',
+      fhirBundle,
+      context
+    )
+    observation.valueString = fieldValue
+  },
+  causeOfDeathEstablished: (
+    fhirBundle: ITemplatedBundle,
+    fieldValue: string,
+    context: any
+  ) => {
+    const observation = selectOrCreateObservationResource(
+      DEATH_ENCOUNTER_CODE,
+      OBSERVATION_CATEGORY_VSIGN_CODE,
+      OBSERVATION_CATEGORY_VSIGN_DESC,
+      CAUSE_OF_DEATH_ESTABLISHED_CODE,
+      'Cause of death established',
+      fhirBundle,
+      context
+    )
+    observation.valueCodeableConcept = {
+      coding: [
+        {
+          system: `${OPENCRVS_SPECIFICATION_URL}cause-of-death-established`,
           code: fieldValue
         }
       ]
@@ -3473,7 +3497,7 @@ export const builders: IFieldBuilders = {
     observation.valueCodeableConcept = {
       coding: [
         {
-          system: 'http://hl7.org/fhir/ValueSet/icd-10',
+          system: `${OPENCRVS_SPECIFICATION_URL}cause-of-death-method`,
           code: fieldValue
         }
       ]
@@ -3496,7 +3520,7 @@ export const builders: IFieldBuilders = {
     observation.valueCodeableConcept = {
       coding: [
         {
-          system: 'http://hl7.org/fhir/ValueSet/icd-10',
+          system: `${OPENCRVS_SPECIFICATION_URL}cause-of-death`,
           code: fieldValue
         }
       ]

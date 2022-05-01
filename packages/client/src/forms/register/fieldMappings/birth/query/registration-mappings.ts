@@ -96,11 +96,6 @@ export function getBirthRegistrationSectionTransformer(
       queryData[sectionId].registrationNumber
   }
 
-  if (queryData.presentAtBirthRegistration) {
-    transformedData[sectionId].presentAtBirthRegistration =
-      queryData.presentAtBirthRegistration
-  }
-
   if (queryData[sectionId].type && queryData[sectionId].type === 'BIRTH') {
     transformedData[sectionId].type = Event.BIRTH
   }
