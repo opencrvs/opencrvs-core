@@ -86,8 +86,8 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
 
     case actions.UPDATE_CONFIG_FIELDS: {
       const { questionConfig } = action.payload
-      const birthForm = getConfiguredForm(questionConfig, Event.BIRTH)
-      const deathForm = getConfiguredForm(questionConfig, Event.DEATH)
+      const birthForm = getConfiguredForm(questionConfig, Event.BIRTH, true)
+      const deathForm = getConfiguredForm(questionConfig, Event.DEATH, true)
 
       const newState: IConfigFieldsState = {
         ...state,

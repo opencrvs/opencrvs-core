@@ -110,7 +110,7 @@ class FormConfigSettingsComponent extends React.Component<
     this.state = {
       modalName: EMPTY_STRING,
       introductionPage:
-        this.props.applicationConfig.config.HIDE_EVENT_REGISTER_INFORMATION,
+        !this.props.applicationConfig.config.HIDE_EVENT_REGISTER_INFORMATION,
       numberOfAddresses: this.props.applicationConfig.config.ADDRESSES,
       showModal: false,
       errorOccured: false,
@@ -186,6 +186,7 @@ class FormConfigSettingsComponent extends React.Component<
         <Content
           title={intl.formatMessage(messages.settingsTitle)}
           titleColor={'copy'}
+          subtitle={intl.formatMessage(messages.globalSettingsDescription)}
         >
           <ListViewSimplified>
             <ListViewItemSimplified

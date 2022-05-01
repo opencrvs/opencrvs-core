@@ -71,21 +71,30 @@ export function getDefaultField(
 
 export function configureDefaultQuestions(
   defaultFieldCustomisations: IDefaultFieldCustomisation[],
-  defaultEventForm: ISerializedForm
+  defaultEventForm: ISerializedForm,
+  inConfig: boolean
 ): ISerializedForm {
   const newForm = cloneDeep(defaultEventForm)
   defaultFieldCustomisations.forEach((defaultFieldCustomisation) => {
     // this is a customisation to a default field
-    // default fields can only be enabled or disabled at present
 
-    /* TODO: Handle the changed positions and required property*/
+    /* TODO: Handle the changed positions */
 
-    /*
-     * Splicing the field away may not be the way to go as it's
-     * removing the field from FormConfig as well
-     */
+    const field: SerializedFormField =
+      newForm.sections[
+        defaultFieldCustomisation.defaultField.selectedSectionIndex
+      ].groups[defaultFieldCustomisation.defaultField.selectedGroupIndex]
+        .fields[defaultFieldCustomisation.defaultField.index]
+    field.required = defaultFieldCustomisation.question.required
 
-    if (defaultFieldCustomisation.question.enabled === FieldEnabled.DISABLED) {
+    // removing hidden fields should be the last thing to do after repositioning all default and custom fields vertically
+    if (
+      defaultFieldCustomisation.question.enabled === FieldEnabled.DISABLED &&
+      !inConfig
+    ) {
+      /*
+       * Splice the disabled field away only when in registration, not in configuration mode
+       */
       newForm.sections[
         defaultFieldCustomisation.defaultField.selectedSectionIndex
       ].groups[

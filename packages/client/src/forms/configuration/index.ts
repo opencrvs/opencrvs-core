@@ -221,15 +221,18 @@ export function filterQuestionsByEventType(
 export function configureRegistrationForm(
   formCustomisations: IFormConfigurations,
   defaultEventForm: ISerializedForm,
-  event: Event
+  event: Event,
+  inConfig: boolean
 ): ISerializedForm {
   const formWithAddresses = populateRegisterFormsWithAddresses(
     defaultEventForm,
     event
   )
+  // TODO: merge configureDefaultQuestions and configureCustomQuestions into a  single function as repositioning will have to happen together
   const defaultFormWithCustomisations = configureDefaultQuestions(
     formCustomisations.defaultFieldCustomisations,
-    formWithAddresses
+    formWithAddresses,
+    inConfig
   )
   return configureCustomQuestions(
     formCustomisations.customQuestionConfigurations,
@@ -239,7 +242,8 @@ export function configureRegistrationForm(
 
 export function getConfiguredForm(
   questionConfig: IQuestionConfig[],
-  event: Event
+  event: Event,
+  inConfig: boolean
 ) {
   const form: ISerializedForm = configureRegistrationForm(
     sortFormCustomisations(
@@ -247,21 +251,22 @@ export function getConfiguredForm(
       registerForms[event]
     ),
     registerForms[event],
-    event
+    event,
+    inConfig
   )
   return deserializeForm(form)
 }
 
 function isConfigured(status: DraftStatus) {
-  return status === DraftStatus.PUBLISHED || DraftStatus.PREVIEW
+  return status === DraftStatus.PUBLISHED || status === DraftStatus.PREVIEW
 }
 
 export function getConfiguredOrDefaultForm(
   formConfig: IFormConfig,
-  event: Event
+  event: Event,
+  inConfig: boolean
 ) {
   const { status } = getEventDraft(formConfig.formDrafts, event)
-
   const form: ISerializedForm = isConfigured(status)
     ? configureRegistrationForm(
         sortFormCustomisations(
@@ -269,7 +274,8 @@ export function getConfiguredOrDefaultForm(
           registerForms[event]
         ),
         registerForms[event],
-        event
+        event,
+        inConfig
       )
     : registerForms[event]
   return deserializeForm(form)
