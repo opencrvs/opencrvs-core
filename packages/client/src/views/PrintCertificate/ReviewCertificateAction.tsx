@@ -34,7 +34,7 @@ import {
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { TAB_ID } from '@client/views/OfficeHome/tabs/inProgress/inProgressTab'
+import { TAB_ID } from '@client/views/OfficeHome/inProgress/InProgress'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'

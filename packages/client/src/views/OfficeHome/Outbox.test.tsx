@@ -21,7 +21,7 @@ describe('OutBox tests', () => {
     id: '10b7ccca-e1b9-4d14-a735-4bb7964a3ed9',
     data: {
       registration: {
-        presentAtBirthRegistration: 'BOTH_PARENTS',
+        informantType: 'MOTHER',
         informant: 'MOTHER_ONLY',
         registrationPhone: '01989898989',
         whoseContactDetails: 'FATHER'
@@ -49,11 +49,10 @@ describe('OutBox tests', () => {
         districtPrimary: '23b3bb18-20e4-4b05-897d-3c14cb3d374e',
         addressLine4Primary: 'e2fc9415-8492-4220-a1a2-c130630d2234',
         addressLine3Primary: 'a26bd41e-0363-4cd1-b358-243f8c7a85da',
-        secondaryAddressSameAsPrimary: true,
         country: 'BGD'
       },
       father: {
-        fathersDetailsExist: false
+        detailsExist: false
       },
       documents: {}
     },
@@ -80,7 +79,6 @@ describe('OutBox tests', () => {
         statePrimary: '61f745b4-5e97-4b06-9560-429df5ca511b',
         districtPrimary: 'e4eab1dc-42dd-4b34-84e8-a81e08bc8966',
         addressLine4Primary: '9d0ff3fa-d9b6-4cb6-92ba-72bbb157d430',
-        secondaryAddressSameAsPrimary: true,
         country: 'BGD'
       },
       informant: {
@@ -279,35 +277,6 @@ describe('OutBox tests', () => {
       })
       const testComp = comp
       expect(testComp.find('#row_0').exists()).toBeFalsy()
-    })
-  })
-
-  describe('Pagination/loadmore test for more than 10 declarations', () => {
-    const declarations: IDeclaration[] = []
-    for (let i = 0; i < 16; i++) {
-      declarations.push(birthApp)
-    }
-    it('shows pagination bar when pagination is used', async () => {
-      const testComp = await createTestComponent(
-        <OutBox declaration={declarations} showPaginated={true} />,
-        { store, history }
-      )
-      expect(testComp.exists('#pagination')).toBeTruthy()
-      testComp
-        .find('#pagination')
-        .children()
-        .map((child) => child.simulate('click'))
-    })
-    it('shows loadmore button when loadmore is used', async () => {
-      const testComp = await createTestComponent(
-        <OutBox declaration={declarations} showPaginated={false} />,
-        { store, history }
-      )
-      expect(testComp.exists('#load_more_button')).toBeTruthy()
-      testComp
-        .find('#load_more_button')
-        .children()
-        .map((child) => child.simulate('click'))
     })
   })
 })

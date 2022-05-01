@@ -732,7 +732,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   }
 
   isViewOnly(field: IFormField) {
-    return [LIST, PARAGRAPH, WARNING, TEXTAREA, SUBSECTION, FETCH_BUTTON].find(
+    return [LIST, PARAGRAPH, WARNING, SUBSECTION, FETCH_BUTTON].find(
       (type) => type === field.type
     )
   }
@@ -1340,9 +1340,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     } = this.props
     return (
       event === Event.BIRTH &&
-      (section.id === BirthSection.Mother ||
-        (section.id === BirthSection.Father &&
-          !!data.father?.fathersDetailsExist))
+      ((section.id === BirthSection.Mother && !!data.mother?.detailsExist) ||
+        (section.id === BirthSection.Father && !!data.father?.detailsExist))
     )
   }
 
@@ -1355,7 +1354,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       this.getOverriddenFieldsListForPreview(formSections)
     let tempItem: any
 
-    const initialTransformedSection = formSections.map((section) => {
+    return formSections.map((section) => {
       let items: any[] = []
       const visitedTags: string[] = []
       const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
@@ -1363,7 +1362,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         draft.data[section.id] || {},
         draft.data
       )
-      visibleGroups.forEach((group) => {
+      visibleGroups.forEach((group, index) => {
         group.fields
           .filter(
             (field) =>
@@ -1427,12 +1426,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           : undefined
       }
     })
-
-    return initialTransformedSection.map((sec) => {
-      if (sec.id === 'father' && sec.items[0].value === 'No') {
-        return { ...sec, items: [sec.items[0]] }
-      } else return { ...sec }
-    })
   }
 
   render() {
@@ -1449,7 +1442,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       onContinue
     } = this.props
     const formSections = this.getViewableSection(registerForm[event])
-
     const errorsOnFields = getErrorsOnFieldsBySection(
       formSections,
       offlineCountryConfiguration,

@@ -21,7 +21,6 @@ import {
   DRAFT_DEATH_FORM,
   EVENT_INFO,
   EVENT_REGISTRATION_RATES,
-  FIELD_AGENT_HOME_TAB,
   HOME,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
@@ -34,9 +33,7 @@ import {
   SEARCH,
   SEARCH_RESULT,
   SELECT_BIRTH_INFORMANT,
-  SELECT_BIRTH_MAIN_CONTACT_POINT,
   SELECT_DEATH_INFORMANT,
-  SELECT_DEATH_MAIN_CONTACT_POINT,
   SELECT_VITAL_EVENT,
   SETTINGS,
   SYS_ADMIN_HOME_TAB,
@@ -104,13 +101,6 @@ type GoToRegistrarHome = {
   }
 }
 
-export const GO_TO_FIELD_AGENT_HOME = 'navigation/GO_TO_FIELD_AGENT_HOME'
-type GoToFieldAgentHome = {
-  type: typeof GO_TO_FIELD_AGENT_HOME
-  payload: {
-    tabId: string
-  }
-}
 export const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
 type GoToReviewUserDetails = {
   type: typeof GO_TO_REVIEW_USER_DETAILS
@@ -130,7 +120,6 @@ type GoToUserProfile = {
 export type Action =
   | GoToPageAction
   | GoToRegistrarHome
-  | GoToFieldAgentHome
   | GoToSysAdminHome
   | GoToReviewUserDetails
   | GoToUserProfile
@@ -158,24 +147,8 @@ export function goToDeathInformant(declarationId: string) {
   )
 }
 
-export function goToBirthContactPoint(declarationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_MAIN_CONTACT_POINT, {
-      declarationId
-    })
-  )
-}
-
 export function goToEventInfo(eventType: Event) {
   return push(formatUrl(EVENT_INFO, { eventType }))
-}
-
-export function goToDeathContactPoint(declarationId: string) {
-  return push(
-    formatUrl(SELECT_DEATH_MAIN_CONTACT_POINT, {
-      declarationId
-    })
-  )
 }
 
 export function goToEvents() {
@@ -203,10 +176,7 @@ export function goToApplicationConfig() {
 }
 
 export function goToHomeTab(tabId: string, selectorId = '') {
-  const path = getCurrentUserScope().includes('declare')
-    ? FIELD_AGENT_HOME_TAB
-    : REGISTRAR_HOME_TAB
-  return push(formatUrl(path, { tabId, selectorId }))
+  return push(formatUrl(REGISTRAR_HOME_TAB, { tabId, selectorId }))
 }
 
 type searchedLocation = {
@@ -378,13 +348,6 @@ export function goToRegistrarHomeTab(
   return {
     type: GO_TO_REGISTRAR_HOME,
     payload: { tabId, selectorId }
-  }
-}
-
-export function goToFieldAgentHomeTab(tabId: IWORKQUEUE_TABS) {
-  return {
-    type: GO_TO_FIELD_AGENT_HOME,
-    payload: { tabId }
   }
 }
 
@@ -666,14 +629,6 @@ export function navigationReducer(state: INavigationState, action: any) {
               selectorId: RegistrarHomeSelectorId
             })
           )
-        )
-      )
-    case GO_TO_FIELD_AGENT_HOME:
-      const { tabId: FieldAgentHomeTabId } = action.payload
-      return loop(
-        state,
-        Cmd.action(
-          push(formatUrl(FIELD_AGENT_HOME_TAB, { tabId: FieldAgentHomeTabId }))
         )
       )
     case GO_TO_SYS_ADMIN_HOME:

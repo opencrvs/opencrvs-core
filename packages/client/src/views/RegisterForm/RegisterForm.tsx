@@ -67,7 +67,11 @@ import { HOME } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled, { keyframes } from '@client/styledComponents'
-import { Scope } from '@client/utils/authUtils'
+import {
+  Scope,
+  hasRegisterScope,
+  hasRegistrationClerkScope
+} from '@client/utils/authUtils'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import {
   getVisibleSectionGroupsBasedOnConditions,
@@ -92,6 +96,7 @@ import {
 import { TimeMounted } from '@client/components/TimeMounted'
 import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
 import { isCorrection } from '@client/views/CorrectionForm/utils'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -476,17 +481,23 @@ class RegisterFormView extends React.Component<FullProps, State> {
       ''
     switch (status) {
       case 'DECLARED':
-        return 'review'
+        return WORKQUEUE_TABS.readyForReview
       case 'DRAFT':
-        return 'progress'
+        return WORKQUEUE_TABS.inProgress
       case 'IN_PROGRESS':
         return 'progress/field-agents'
       case 'REJECTED':
-        return 'updates'
+        if (
+          hasRegisterScope(this.props.scope) ||
+          hasRegistrationClerkScope(this.props.scope)
+        ) {
+          return WORKQUEUE_TABS.requiresUpdateRegistrar
+        }
+        return WORKQUEUE_TABS.requiresUpdateAgent
       case 'VALIDATED':
-        return 'review'
+        return WORKQUEUE_TABS.readyForReview
       default:
-        return 'progress'
+        return WORKQUEUE_TABS.inProgress
     }
   }
 
@@ -578,7 +589,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
     )
     const isErrorOccured = this.state.hasError
     const debouncedModifyDeclaration = debounce(this.modifyDeclaration, 300)
-
     const menuItemDeleteOrClose =
       declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
         ? {
@@ -589,7 +599,6 @@ class RegisterFormView extends React.Component<FullProps, State> {
             label: intl.formatMessage(buttonMessages.closeDeclaration),
             handler: () => this.onCloseDeclaration()
           }
-
     return (
       <>
         <TimeMounted

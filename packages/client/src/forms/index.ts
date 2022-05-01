@@ -249,7 +249,8 @@ export type IFormFieldValue =
   | IAttachmentValue
   | FieldValueArray
   | FieldValueMap
-  | IRegistration
+  | IContactPoint
+  | IInformant
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
 export interface FieldValueMap {
@@ -270,12 +271,21 @@ export interface IFileValue {
   data: string
 }
 
-export interface IContactPoint {
-  contactRelationship: string
+export interface IContactPointPhone {
   registrationPhone: string
 }
-export interface IRegistration {
-  nestedFields: IContactPoint
+
+interface IInformantOtherInformantType {
+  otherInformantType: string
+}
+export interface IInformant {
+  value: string
+  nestedFields: IInformantOtherInformantType
+}
+
+export interface IContactPoint {
+  value: string
+  nestedFields: IContactPointPhone
 }
 
 export interface IAttachmentValue {
@@ -689,12 +699,11 @@ export interface IConditional {
 }
 
 export interface IConditionals {
-  presentAtBirthRegistration: IConditional
+  informantType: IConditional
   iDType: IConditional
   isOfficePreSelected: IConditional
   fathersDetailsExist: IConditional
   primaryAddressSameAsOtherPrimary: IConditional
-  secondaryAddressSameAsOtherSecondary: IConditional
   countryPrimary: IConditional
   statePrimary: IConditional
   districtPrimary: IConditional
@@ -712,7 +721,6 @@ export interface IConditionals {
   otherPersonCollectsCertificate: IConditional
   birthCertificateCollectorNotVerified: IConditional
   deathCertificateCollectorNotVerified: IConditional
-  secondaryAddressSameAsPrimary: IConditional
   placeOfBirthHospital: IConditional
   placeOfDeathTypeHeathInstitue: IConditional
   otherBirthEventLocation: IConditional
@@ -730,7 +738,6 @@ export interface IConditionals {
   causeOfDeathEstablished: IConditional
   isMarried: IConditional
   identifierIDSelected: IConditional
-  otherRelationship: IConditional
   fatherContactDetailsRequired: IConditional
   withInTargetDays: IConditional
   between46daysTo5yrs: IConditional
@@ -880,7 +887,6 @@ export enum BirthSection {
   Mother = 'mother',
   Father = 'father',
   Informant = 'informant',
-  Parent = 'primaryCaregiver',
   Registration = 'registration',
   Documents = 'documents',
   Preview = 'preview'
