@@ -210,13 +210,18 @@ function CompletenessDataTableComponent(props: ITableProps) {
         {
           key: 'registeredWithinTargetd',
 
-          label: intl.formatMessage(constantsMessages.registeredWithinTargetd, {
-            registrationTargetDays:
-              eventType === Event.BIRTH
-                ? window.config.BIRTH.REGISTRATION_TARGET
-                : window.config.DEATH.REGISTRATION_TARGET,
-            lineBreak: <br key={'registeredWithinTargetd-break'} />
-          }),
+          label:
+            props.completenessRateTime === CompletenessRateTime.Within5Years
+              ? intl.formatMessage(messages.performanceWithin5YearsLabel)
+              : props.completenessRateTime === CompletenessRateTime.Within1Year
+              ? intl.formatMessage(messages.performanceWithin1YearLabel)
+              : intl.formatMessage(messages.performanceWithinTargetDaysLabel, {
+                  target:
+                    eventType === Event.BIRTH
+                      ? window.config.BIRTH.REGISTRATION_TARGET
+                      : window.config.DEATH.REGISTRATION_TARGET,
+                  withPrefix: false
+                }),
           width: 15
         },
         {
@@ -229,17 +234,30 @@ function CompletenessDataTableComponent(props: ITableProps) {
         },
         {
           key: 'rateOfRegistrationWithinTargetd',
-          label: intl.formatMessage(
-            constantsMessages.rateOfRegistrationWithinTargetd,
-            {
-              registrationTargetDays:
-                eventType === Event.BIRTH
-                  ? window.config.BIRTH.REGISTRATION_TARGET
-                  : window.config.DEATH.REGISTRATION_TARGET,
+          label:
+            props.completenessRateTime === CompletenessRateTime.Within5Years
+              ? intl.formatMessage(
+                  constantsMessages.rateOfRegistrationWithinYears,
+                  { num: 5 }
+                )
+              : props.completenessRateTime === CompletenessRateTime.Within1Year
+              ? intl.formatMessage(
+                  constantsMessages.rateOfRegistrationWithinYears,
+                  { num: 1 }
+                )
+              : intl.formatMessage(
+                  constantsMessages.rateOfRegistrationWithinTargetd,
+                  {
+                    registrationTargetDays:
+                      eventType === Event.BIRTH
+                        ? window.config.BIRTH.REGISTRATION_TARGET
+                        : window.config.DEATH.REGISTRATION_TARGET,
 
-              lineBreak: <br key={'rateOfRegistrationWithinTargetd-break'} />
-            }
-          ),
+                    lineBreak: (
+                      <br key={'rateOfRegistrationWithinTargetd-break'} />
+                    )
+                  }
+                ),
           alignment: ColumnContentAlignment.RIGHT,
           width: 15
         }

@@ -312,6 +312,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                         data && data.fetchMonthWiseEventMetrics,
                         time
                       )}
+                      completenessRateTime={time}
                       eventType={eventType as Event}
                     />
                   )}
