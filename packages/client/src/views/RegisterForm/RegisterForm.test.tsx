@@ -122,7 +122,7 @@ describe('when user is in the register form for birth event', () => {
       )
       component.find('#save_draft').hostNodes().simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toEqual('/field-agent-home/progress')
+      expect(history.location.pathname).toEqual('/registration-home/progress/')
     })
     it('takes registrar to declaration submitted page when save button is clicked', async () => {
       localStorage.getItem = jest.fn(

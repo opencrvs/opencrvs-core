@@ -31,7 +31,6 @@ interface IButtonProps {
 }
 
 const PaginationContainer = styled.div`
-  width: 100%;
   height: 60px;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   color: ${({ theme }) => theme.colors.primary};
@@ -161,7 +160,7 @@ export class PaginationModified extends React.Component<
           {pages.map((page, id) => (
             <CircleButton
               size={this.props.size ? this.props.size : 'small'}
-              id="page-number"
+              id={`page-number-${id}`}
               onClick={() => this.changePage(page)}
             >
               <StyledPageNumber

@@ -24,20 +24,45 @@ const ErrorText = styled.div`
 `
 const Loading = styled(Spinner)`
   width: 24px;
-  margin-right: 13px;
+  margin-right: auto;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin: auto;
+  }
+`
+
+const ConnectivityContainer = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 `
 const NoConnectivity = styled(NoWifi)`
-  margin-right: 13px;
+  margin: auto;
 `
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 38px;
 `
-const Text = styled.span`
+
+const LoadingContainer = styled.div`
+  width: 100%;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    padding-left: 20px;
+  }
+`
+const Text = styled.div`
   ${({ theme }) => theme.fonts.reg16};
-  display: flex;
+  text-align: center;
+  margin: auto;
+`
+
+const MobileViewContainer = styled.div<{ noDeclaration?: boolean }>`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    position: fixed;
+    left: 0;
+    right: 0;
+    ${({ noDeclaration }) => (noDeclaration ? `top:55%;` : `top:50%;`)}
+  }
 `
 
 type IBaseLoadingProps = {
@@ -55,31 +80,25 @@ export class LoadingIndicatorComp extends React.Component<IProps> {
     return (
       <Wrapper>
         {this.props.isOnline && loading && (
-          <>
+          <LoadingContainer>
             <Loading id="Spinner" baseColor="#4C68C1" />
-            <Text id="loading-text">
-              {intl.formatMessage(errorMessages.loadingDeclarations)}
-            </Text>
-          </>
+          </LoadingContainer>
         )}
-        {this.props.isOnline && hasError && (
-          <ErrorText id="search-result-error-text-count">
-            {intl.formatMessage(errorMessages.queryError)}
-          </ErrorText>
-        )}
-        {this.props.isOnline && noDeclaration && (
-          <Text id="no-declaration-text">
-            {intl.formatMessage(errorMessages.noDeclaration)}
-          </Text>
-        )}
-        {!this.props.isOnline && (
-          <>
-            <NoConnectivity />
-            <Text id="wait-connection-text">
-              {intl.formatMessage(errorMessages.waitingForConnection)}
-            </Text>
-          </>
-        )}
+        <MobileViewContainer noDeclaration={noDeclaration}>
+          {this.props.isOnline && hasError && (
+            <ErrorText id="search-result-error-text-count">
+              {intl.formatMessage(errorMessages.queryError)}
+            </ErrorText>
+          )}
+          {!this.props.isOnline && (
+            <ConnectivityContainer>
+              <NoConnectivity />
+              <Text id="wait-connection-text">
+                {intl.formatMessage(errorMessages.waitingForConnection)}
+              </Text>
+            </ConnectivityContainer>
+          )}
+        </MobileViewContainer>
       </Wrapper>
     )
   }

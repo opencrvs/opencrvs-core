@@ -545,9 +545,6 @@ export const getConditionalActionsForField = (
   if (!field.conditionals) {
     return []
   }
-  if (field.name === 'countryPrimary') {
-    // console.log('values: ', JSON.stringify(values))
-  }
   return (
     field.conditionals
       // eslint-disable-next-line no-eval

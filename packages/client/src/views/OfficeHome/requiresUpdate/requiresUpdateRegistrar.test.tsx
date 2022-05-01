@@ -34,7 +34,7 @@ import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { Store } from 'redux'
-import { RejectTab } from './rejectTab'
+import { RequiresUpdateRegistrar } from './RequiresUpdateRegistrar'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
@@ -163,8 +163,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RejectTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      <RequiresUpdateRegistrar
         queryData={{
           data: {
             totalItems: 2,
@@ -239,7 +238,7 @@ describe('OfficeHome sent for update tab related tests', () => {
     expect(data.length).toBe(2)
     expect(data[1].id).toBe('bc09200d-0160-43b4-9e2b-5b9e90424e95')
     expect(data[1].contactNumber).toBe('01622688231')
-    expect(data[1].dateOfRejection).toBe(EXPECTED_DATE_OF_REJECTION)
+    expect(data[1].sentForUpdates).toBe(EXPECTED_DATE_OF_REJECTION)
     expect(data[1].event).toBe('Death')
     expect(data[1].actions).toBeDefined()
   })
@@ -249,8 +248,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RejectTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      <RequiresUpdateRegistrar
         queryData={{
           data: {
             totalItems: 2,
@@ -265,52 +263,6 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const data = table.prop('content')
     expect(data.length).toBe(0)
-  })
-
-  it('should show pagination bar in sent for update tab if pagination is used and items more than 11', async () => {
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RejectTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
-        queryData={{
-          data: {
-            totalItems: 14,
-            results: []
-          }
-        }}
-        showPaginated={true}
-      />,
-      { store, history }
-    )
-
-    await waitForElement(testComponent, '#pagination')
-
-    testComponent
-      .find('#pagination button')
-      .last()
-      .hostNodes()
-      .simulate('click')
-  })
-
-  it('should show loadmore button in sent for update tab if loadmore is used and items more than 11', async () => {
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <RejectTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
-        queryData={{
-          data: {
-            totalItems: 14,
-            results: []
-          }
-        }}
-        showPaginated={false}
-      />,
-      { store, history }
-    )
-
-    await waitForElement(testComponent, '#load_more_button')
-
-    testComponent.find('#load_more_button').last().hostNodes().simulate('click')
   })
 
   it('redirects to recordAudit page if item is clicked on desktop size', async () => {
@@ -397,8 +349,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RejectTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      <RequiresUpdateRegistrar
         queryData={{
           data: {
             totalItems: 2,
@@ -599,7 +550,7 @@ describe('OfficeHome sent for update tab related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: WORKQUEUE_TABS.sentForUpdates
+              tabId: WORKQUEUE_TABS.requiresUpdateRegistrar
             },
             isExact: true,
             path: '',
@@ -660,7 +611,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#action-error-ListItemAction-1'
+        '#ListItemAction-1-download-failed'
       )
 
       expect(errorIcon.hostNodes()).toHaveLength(1)
@@ -687,8 +638,7 @@ describe('Tablet tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RejectTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      <RequiresUpdateRegistrar
         queryData={{
           data: {
             totalItems: 2,
