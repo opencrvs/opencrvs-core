@@ -76,10 +76,11 @@ export function CompletenessReport({
           <div>
             <PerformanceValue>
               {Number(
-                data.results
+                (data.results
                   .filter((p) => p.timeLabel === 'withinTarget')
                   .reduce((t, x) => t + x.total, 0) /
-                  data.estimated.totalEstimation
+                  data.estimated.totalEstimation) *
+                  100
               ).toFixed(2)}
               %
             </PerformanceValue>
@@ -98,7 +99,11 @@ export function CompletenessReport({
                             x.timeLabel === 'withinTarget'
                         )
                       )}
-                      ofNumber={data.estimated.maleEstimation}
+                      ofNumber={calculateTotal(
+                        data.results.filter(
+                          (x) => x.timeLabel === 'withinTarget'
+                        )
+                      )}
                     />
                   }
                 </BreakdownValue>
@@ -117,7 +122,11 @@ export function CompletenessReport({
                             x.timeLabel === 'withinTarget'
                         )
                       )}
-                      ofNumber={data.estimated.femaleEstimation}
+                      ofNumber={calculateTotal(
+                        data.results.filter(
+                          (x) => x.timeLabel === 'withinTarget'
+                        )
+                      )}
                     />
                   }
                 </BreakdownValue>
@@ -142,17 +151,18 @@ export function CompletenessReport({
         value={
           <div>
             <PerformanceValue>
-              {getPercentage(
-                data.estimated.totalEstimation,
-                calculateTotal(
+              {Number(
+                (calculateTotal(
                   data.results.filter(
                     (x) =>
                       x.timeLabel === 'withinTarget' ||
                       x.timeLabel === 'withinLate' ||
                       x.timeLabel === 'within1Year'
                   )
-                )
-              )}
+                ) /
+                  data.estimated.totalEstimation) *
+                  100
+              ).toFixed(2)}
               %
             </PerformanceValue>
             <Breakdown>
@@ -172,7 +182,14 @@ export function CompletenessReport({
                               x.timeLabel === 'within1Year')
                         )
                       )}
-                      ofNumber={data.estimated.maleEstimation}
+                      ofNumber={calculateTotal(
+                        data.results.filter(
+                          (x) =>
+                            x.timeLabel === 'withinTarget' ||
+                            x.timeLabel === 'withinLate' ||
+                            x.timeLabel === 'within1Year'
+                        )
+                      )}
                     />
                   }
                 </BreakdownValue>
@@ -193,7 +210,14 @@ export function CompletenessReport({
                               x.timeLabel === 'within1Year')
                         )
                       )}
-                      ofNumber={data.estimated.femaleEstimation}
+                      ofNumber={calculateTotal(
+                        data.results.filter(
+                          (x) =>
+                            x.timeLabel === 'withinTarget' ||
+                            x.timeLabel === 'withinLate' ||
+                            x.timeLabel === 'within1Year'
+                        )
+                      )}
                     />
                   }
                 </BreakdownValue>
@@ -218,12 +242,13 @@ export function CompletenessReport({
         value={
           <div>
             <PerformanceValue>
-              {getPercentage(
-                data.estimated.totalEstimation,
-                calculateTotal(
+              {Number(
+                (calculateTotal(
                   data.results.filter((x) => x.timeLabel !== 'after5Years')
-                )
-              )}
+                ) /
+                  data.estimated.totalEstimation) *
+                  100
+              ).toFixed(2)}
               %
             </PerformanceValue>
             <Breakdown>
@@ -233,12 +258,14 @@ export function CompletenessReport({
                 </BreakdownLabel>
                 <BreakdownValue>
                   <PercentageDisplay
-                    ofNumber={data.estimated.maleEstimation}
                     total={calculateTotal(
                       data.results.filter(
                         (x) =>
                           x.gender === 'male' && x.timeLabel !== 'after5Years'
                       )
+                    )}
+                    ofNumber={calculateTotal(
+                      data.results.filter((x) => x.timeLabel !== 'after5Years')
                     )}
                   />
                 </BreakdownValue>
@@ -249,12 +276,14 @@ export function CompletenessReport({
                 </BreakdownLabel>
                 <BreakdownValue>
                   <PercentageDisplay
-                    ofNumber={data.estimated.femaleEstimation}
                     total={calculateTotal(
                       data.results.filter(
                         (x) =>
                           x.gender === 'female' && x.timeLabel !== 'after5Years'
                       )
+                    )}
+                    ofNumber={calculateTotal(
+                      data.results.filter((x) => x.timeLabel !== 'after5Years')
                     )}
                   />
                 </BreakdownValue>
