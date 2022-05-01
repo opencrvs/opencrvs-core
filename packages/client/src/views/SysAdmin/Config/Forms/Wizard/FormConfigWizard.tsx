@@ -226,7 +226,14 @@ export function FormConfigWizard() {
         </NavigationContainer>
         {section !== 'settings' ? (
           <>
-            <CanvasWrapper onClick={() => setSelectedField(null)}>
+            <CanvasWrapper
+              onClick={(e) => {
+                e.preventDefault()
+                if (e.target === e.currentTarget) {
+                  setSelectedField(null)
+                }
+              }}
+            >
               <CanvasContainer>
                 <Canvas
                   selectedField={selectedField}
