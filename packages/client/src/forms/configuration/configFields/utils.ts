@@ -33,6 +33,7 @@ import { FieldPosition } from '@client/forms/configuration'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import { registerForms } from '@client/forms/configuration/default'
 import { getDefaultLanguage } from '@client/i18n/utils'
+import { MessageDescriptor } from 'react-intl'
 
 const CUSTOM_FIELD_LABEL = 'Custom Field'
 export const CUSTOM_GROUP_NAME = 'custom-view-group'
@@ -41,6 +42,11 @@ export type EventSectionGroup = {
   event: Event
   section: string
   group: string
+}
+
+type IPreviewGroupPlaceholder = {
+  previewGroupID?: string
+  previewGroupLabel?: MessageDescriptor
 }
 
 export type IDefaultConfigField = Pick<
@@ -53,11 +59,11 @@ export type IDefaultConfigField = Pick<
     groupIndex: number
     fieldIndex: number
   }
-}
+} & IPreviewGroupPlaceholder
 
 export type ICustomConfigField = IQuestionConfig & {
   foregoingFieldId: string
-}
+} & IPreviewGroupPlaceholder
 
 export type IConfigField = IDefaultConfigField | ICustomConfigField
 
