@@ -27,6 +27,9 @@ import {
   ISearchLocation
 } from '@opencrvs/components/lib/interface'
 import { constantsMessages } from '@client/i18n/messages'
+import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
+import { colors } from '@opencrvs/components/lib/colors'
+import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCountView'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
@@ -258,4 +261,43 @@ export function getAdditionalLocations(intl: IntlShape) {
 
 export function isCountry(location: ISearchLocation) {
   return location.id === NATIONAL_ADMINISTRATIVE_LEVEL
+}
+
+export const StatusMapping: IStatusMapping = {
+  IN_PROGRESS: {
+    labelDescriptor: statusMessages.inProgress,
+    color: colors.purple
+  },
+  DECLARED: {
+    labelDescriptor: statusMessages.readyForReview,
+    color: colors.orange
+  },
+  REJECTED: {
+    labelDescriptor: statusMessages.sentForUpdates,
+    color: colors.red
+  },
+  VALIDATED: {
+    labelDescriptor: statusMessages.sentForApprovals,
+    color: colors.grey300
+  },
+  WAITING_VALIDATION: {
+    labelDescriptor: statusMessages.sentForExternalValidation,
+    color: colors.grey500
+  },
+  REGISTERED: {
+    labelDescriptor: statusMessages.readyToPrint,
+    color: colors.green
+  },
+  CERTIFIED: {
+    labelDescriptor: statusMessages.certified,
+    color: colors.blue
+  },
+  REQUESTED_CORRECTION: {
+    labelDescriptor: statusMessages.requestedCorrection,
+    color: colors.blue
+  },
+  ARCHIVED: {
+    labelDescriptor: statusMessages.archived,
+    color: colors.blue
+  }
 }

@@ -19,7 +19,6 @@ const Container = styled(Box)<{ size: string }>`
   position: relative;
   margin: 24px auto;
   max-width: ${({ size }) => (size === 'large' ? '1140px' : '778px')};
-  height: 100%;
   box-sizing: border-box;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -27,6 +26,7 @@ const Container = styled(Box)<{ size: string }>`
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    height: 100%;
     margin: 0;
     border: 0;
     border-radius: 0;

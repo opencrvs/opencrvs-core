@@ -55,17 +55,20 @@ import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/Paym
 import { CertificationRateComponent } from '@client/views/SysAdmin/Performance/CertificationRateComponent'
 import {
   certificationRatesDummyData,
-  Description,
-  CompletenessRateTime,
+  StatusMapping,
   getAdditionalLocations,
-  NATIONAL_ADMINISTRATIVE_LEVEL,
-  isCountry
+  CompletenessRateTime,
+  isCountry,
+  NATIONAL_ADMINISTRATIVE_LEVEL
 } from '@client/views/SysAdmin/Performance/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
-import { PerformanceStats } from './PerformanceStats'
-import { SubHeader } from './utils'
-import { goToCompletenessRates } from '@client/navigation'
+import { LocationStatsView } from './LocationStatsView'
+import {
+  IStatusMapping,
+  StatusWiseDeclarationCountView
+} from './reports/operational/StatusWiseDeclarationCountView'
+import { goToWorkflowStatus, goToCompletenessRates } from '@client/navigation'
 
 const Layout = styled.div`
   display: flex;
@@ -119,6 +122,16 @@ const ResponsiveModalContent = styled.div`
   gap: 16px;
   flex-direction: column;
 `
+
+const LocationStats = styled(Box)`
+  margin: 0 auto;
+  width: 100%;
+  height: auto;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    border: 0;
+    padding: 0;
+  }
+`
 const RegistrationStatus = styled(Box)`
   width: 100%;
   height: auto;
@@ -126,6 +139,11 @@ const RegistrationStatus = styled(Box)`
     border: 0;
     padding: 0;
   }
+`
+
+const Devider = styled.div`
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  margin-bottom: 16px;
 `
 
 const PerformanceActions = styled.div`
@@ -136,10 +154,6 @@ const PerformanceActions = styled.div`
 interface IConnectProps {
   locations: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
-}
-
-interface IDispatchProps {
-  goToCompletenessRates: typeof goToCompletenessRates
 }
 
 interface ISearchParams {
@@ -155,15 +169,25 @@ interface IMetricsQueryResult {
 
 interface State {
   selectedLocation: ISearchLocation
+  /* TODO the event type should be changed because Event is birth/death.
+  WorkflowStatus.tsx, StatusWiseDeclarationCountView requires BIRTH/DEATH.
+  GraphQL Queries in PerformanceHome.tsx also require BIRTH/DEATH.
+  Due to that we had to use toUpperCase where it is required.
+  */
   event: Event
   timeStart: Date
   timeEnd: Date
   toggleStatus: boolean
 }
 
+interface IDispatchProps {
+  goToWorkflowStatus: typeof goToWorkflowStatus
+  goToCompletenessRates: typeof goToCompletenessRates
+}
+
 type Props = WrappedComponentProps &
-  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps &
-  IDispatchProps & {
+  IDispatchProps &
+  RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps & {
     theme: ITheme
   }
 
@@ -282,8 +306,14 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     )
   }
 
+  onClickStatusDetails = (status?: keyof IStatusMapping) => {
+    const { selectedLocation, event, timeStart, timeEnd } = this.state
+    const { id: locationId } = selectedLocation
+    this.props.goToWorkflowStatus(locationId, timeStart, timeEnd, status, event)
+  }
+
   render() {
-    const { intl, userDetails } = this.props
+    const { intl } = this.props
     const { timeStart, timeEnd, event, toggleStatus } = this.state
     const queryVariablesWithoutLocationId = {
       timeStart: timeStart.toISOString(),
@@ -422,6 +452,14 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             fetchPolicy="no-cache"
           >
             {({ loading, data, error }) => {
+              if (error) {
+                return (
+                  <>
+                    <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                  </>
+                )
+              }
+
               return (
                 <>
                   <ResponsiveModal
@@ -431,22 +469,44 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     actions={[]}
                   >
                     <ResponsiveModalContent>
-                      <RegistrationStatus>
-                        <SubHeader>
-                          {intl.formatMessage(messages.registrationByStatus)}
-                        </SubHeader>
-                        <Description>
-                          Current status of death records being processed
-                        </Description>
-                      </RegistrationStatus>
-                      {error ? (
+                      {loading ? (
+                        <Spinner id="modal-data-loading" />
+                      ) : (
                         <>
-                          <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                          <StatusWiseDeclarationCountView
+                            selectedEvent={this.state.event}
+                            locationId={this.state.selectedLocation?.id}
+                            statusMapping={StatusMapping}
+                            data={data.fetchRegistrationCountByStatus}
+                            onClickStatusDetails={this.onClickStatusDetails}
+                          />
+
+                          <Devider />
+
+                          <LocationStatsView
+                            registrationOffices={
+                              data.getLocationStatistics!.offices
+                            }
+                            totalRegistrars={
+                              data.getLocationStatistics!.registrars
+                            }
+                            citizen={
+                              Math.round(
+                                data.getLocationStatistics!.population
+                              ) /
+                              Math.round(data.getLocationStatistics!.registrars)
+                            }
+                          />
                         </>
-                      ) : loading ? (
+                      )}
+                    </ResponsiveModalContent>
+                  </ResponsiveModal>
+                  <LayoutRight>
+                    <LocationStats>
+                      {loading ? (
                         <Spinner id="location-stats-loading" />
                       ) : (
-                        <PerformanceStats
+                        <LocationStatsView
                           registrationOffices={
                             data.getLocationStatistics!.offices
                           }
@@ -459,36 +519,20 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                           }
                         />
                       )}
-                    </ResponsiveModalContent>
-                  </ResponsiveModal>
-                  <LayoutRight>
-                    {error ? (
-                      <>
-                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                      </>
-                    ) : loading ? (
-                      <Spinner id="location-stats-loading" />
-                    ) : (
-                      <PerformanceStats
-                        registrationOffices={
-                          data.getLocationStatistics!.offices
-                        }
-                        totalRegistrars={data.getLocationStatistics!.registrars}
-                        citizen={
-                          Math.round(data.getLocationStatistics!.population) /
-                          Math.round(data.getLocationStatistics!.registrars)
-                        }
-                      />
-                    )}
+                    </LocationStats>
 
-                    {/* TODO: RegistrationStatus could be replaced by the StatusWiseDeclarationCountView component */}
                     <RegistrationStatus>
-                      <SubHeader>
-                        {intl.formatMessage(messages.registrationByStatus)}
-                      </SubHeader>
-                      <Description>
-                        Current status of death records being processed
-                      </Description>
+                      {loading ? (
+                        <Spinner id="registration-status-loading" />
+                      ) : (
+                        <StatusWiseDeclarationCountView
+                          selectedEvent={this.state.event}
+                          locationId={this.state.selectedLocation?.id}
+                          statusMapping={StatusMapping}
+                          data={data.fetchRegistrationCountByStatus}
+                          onClickStatusDetails={this.onClickStatusDetails}
+                        />
+                      )}
                     </RegistrationStatus>
                   </LayoutRight>
                 </>
@@ -510,10 +554,7 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-const mapDispatchToProps = {
+export const PerformanceHome = connect(mapStateToProps, {
+  goToWorkflowStatus,
   goToCompletenessRates
-}
-export const PerformanceHome = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(withTheme(injectIntl(PerformanceHomeComponent)))
+})(withTheme(injectIntl(PerformanceHomeComponent)))
