@@ -108,6 +108,23 @@ function HideToggleAction({ fieldId, enabled }: IConfigField) {
   )
 }
 
+function RequiredToggleAction({ fieldId, required }: IConfigField) {
+  const dispatch = useDispatch()
+
+  return (
+    <CenteredToggle
+      selected={required}
+      onChange={() =>
+        dispatch(
+          modifyConfigField(fieldId, {
+            required: !required
+          })
+        )
+      }
+    />
+  )
+}
+
 export function DefaultFieldTools({
   configField
 }: {
@@ -127,31 +144,23 @@ export function DefaultFieldTools({
   return (
     <Container>
       <Title>{intl.formatMessage(fieldType)}</Title>
-      <ListViewSimplified bottomBorder>
-        <ListViewItemSimplified
-          label={<Label>{intl.formatMessage(messages.hideField)}</Label>}
-          actions={<HideToggleAction {...configField} />}
-        />
-        {/*
-         *
-         *TODO: merge with develop to get the customizable prop in field definintion
-         * <ListViewItemSimplified
-         *   label={
-         *     <Label>
-         *       {intl.formatMessage(messages.requiredForRegistration)}
-         *       <StyledTooltip />
-         *     </Label>
-         *   }
-         *   actions={[
-         *     <CenteredToggle
-         *       key="requiredForRegistration"
-         *       selected={configField.required}
-         *     />
-         *   ]}
-         * />
-         *
-         */}
-      </ListViewSimplified>
+      {formField.customisable && (
+        <ListViewSimplified bottomBorder>
+          <ListViewItemSimplified
+            label={<Label>{intl.formatMessage(messages.hideField)}</Label>}
+            actions={<HideToggleAction {...configField} />}
+          />
+          <ListViewItemSimplified
+            label={
+              <Label>
+                {intl.formatMessage(messages.requiredForRegistration)}
+                <StyledTooltip />
+              </Label>
+            }
+            actions={<RequiredToggleAction {...configField} />}
+          />
+        </ListViewSimplified>
+      )}
       <Content>
         <Subtitle>
           {intl.formatMessage(messages.contentKey)}
