@@ -42,6 +42,7 @@ import { History } from 'history'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 import { formConfig } from '@client/tests/mock-offline-data'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { birthDraftData, deathReviewDraftData } from '@client/tests/mock-drafts'
 import {
   birthDeclarationForReview,
@@ -468,7 +469,7 @@ describe('ReviewForm tests', () => {
     const exitButton = await waitForElement(testComponent, '#save_draft')
     exitButton.hostNodes().simulate('click')
     testComponent.update()
-    expect(window.location.href).toContain('/review')
+    expect(window.location.href).toContain(WORKQUEUE_TABS.readyForReview)
   })
 
   it('redirect to review tab when exit button is clicked', async () => {
@@ -516,7 +517,7 @@ describe('ReviewForm tests', () => {
     const exitButton = await waitForElement(testComponent, '#save_draft')
     exitButton.hostNodes().simulate('click')
     testComponent.update()
-    expect(window.location.href).toContain('/review')
+    expect(window.location.href).toContain(WORKQUEUE_TABS.readyForReview)
   })
 
   it('redirect to update tab when exit button is clicked', async () => {
@@ -564,7 +565,9 @@ describe('ReviewForm tests', () => {
     const exitButton = await waitForElement(testComponent, '#save_draft')
     exitButton.hostNodes().simulate('click')
     testComponent.update()
-    expect(window.location.href).toContain('/updates')
+    expect(window.location.href).toContain(
+      WORKQUEUE_TABS.requiresUpdateRegistrar
+    )
   })
 
   it('redirect to progress tab when exit button is clicked', async () => {

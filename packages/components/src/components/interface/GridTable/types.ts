@@ -44,6 +44,7 @@ export interface IColumn {
   isSortable?: boolean
   isSorted?: boolean
   icon?: JSX.Element | React.ReactNode
+  sortBy?: string
   sortFunction?: (key: string) => void
 }
 
@@ -55,12 +56,14 @@ export interface IFooterFColumn {
 export interface IDynamicValues {
   [key: string]:
     | string
+    | number
     | boolean
     | IAction[]
     | Array<string | null>
     | IStatus[]
     | React.ReactNode[]
     | JSX.Element
+    | Date
     | null
     | undefined
 }

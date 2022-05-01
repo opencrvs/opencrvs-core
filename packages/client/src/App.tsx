@@ -28,7 +28,6 @@ import styled, {
 import { createClient } from '@client/utils/apolloClient'
 import { ReviewDuplicates } from '@client/views/Duplicates/ReviewDuplicates'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
-import { FieldAgentHome } from '@client/views/FieldAgentHome/FieldAgentHome'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
@@ -125,12 +124,7 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.HOME}
-                                            component={FieldAgentHome}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.FIELD_AGENT_HOME_TAB}
-                                            component={FieldAgentHome}
+                                            component={OfficeHome}
                                           />
                                           <ProtectedRoute
                                             exact

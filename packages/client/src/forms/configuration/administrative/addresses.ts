@@ -49,7 +49,8 @@ const fathersDetailsExistBasedOnContactAndInformant =
   '!fathersDetailsExistBasedOnContactAndInformant'
 
 // if mothers details do not exist on other page
-const mothersDetailsDontExistOnOtherPage = '!draftData.mother.detailsExist'
+const mothersDetailsDontExistOnOtherPage =
+  'draftData && draftData.mother && !draftData.mother.detailsExist'
 
 // if mothers details do not exist
 const mothersDetailsDontExist = '!values.detailsExist'

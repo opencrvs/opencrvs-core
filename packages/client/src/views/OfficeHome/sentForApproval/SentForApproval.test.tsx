@@ -22,7 +22,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { ApprovalTab } from './approvalTab'
+import { SentForApproval } from './SentForApproval'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
@@ -150,9 +150,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ApprovalTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      <SentForApproval
         queryData={{
           data: {
             totalItems: 2,
@@ -216,6 +214,11 @@ describe('RegistrationHome sent for approval tab related tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -226,8 +229,8 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')
-    expect(data[0].dateOfApproval).toBe(EXPECTED_DATE_OF_DECLARATION)
-    expect(data[0].name).toBe('Iliyas Khan')
+    expect(data[0].sentForApproval).toBe(EXPECTED_DATE_OF_DECLARATION)
+    expect(data[0].name).toBe('iliyas khan')
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeUndefined()
@@ -237,14 +240,18 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ApprovalTab
+      <SentForApproval
         queryData={{
           data: {
             totalItems: 2,
             results: []
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -255,25 +262,29 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     expect(data.length).toBe(0)
   })
 
-  it('should show pagination bar if pagination is used and items more than 11 in Approval Tab', async () => {
+  it('should show pagination if items more than 10 in Approval Tab', async () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ApprovalTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      <SentForApproval
         queryData={{
           data: {
             totalItems: 14,
             results: []
           }
         }}
-        showPaginated={true}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
 
-    expect(testComponent.find('#pagination').hostNodes()).toHaveLength(1)
+    expect(
+      testComponent.find('#pagination_container').hostNodes()
+    ).toHaveLength(1)
 
     testComponent
       .find('#pagination button')
@@ -282,35 +293,37 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       .simulate('click')
   })
 
-  it('should show loadmore button if loadmore is used and items more than 11 in Approval Tab', async () => {
+  it('should show pagination and page number as per need ', async () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ApprovalTab
-        registrarLocationId={'2a83cf14-b959-47f4-8097-f75a75d1867f'}
+      <SentForApproval
         queryData={{
           data: {
-            totalItems: 14,
+            totalItems: 24,
             results: []
           }
         }}
-        showPaginated={false}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
 
-    expect(testComponent.find('#load_more_button').hostNodes()).toHaveLength(1)
-
-    testComponent.find('#load_more_button').last().hostNodes().simulate('click')
+    expect(
+      testComponent.find('#pagination_container').hostNodes()
+    ).toHaveLength(1)
+    expect(testComponent.exists('#page-number-2')).toBeTruthy()
   })
 
   it('redirect to recordAudit page if item is clicked on desktop view ', async () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ApprovalTab
+      <SentForApproval
         queryData={{
           data: {
             totalItems: 2,
@@ -395,6 +408,11 @@ describe('RegistrationHome sent for approval tab related tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )
@@ -433,8 +451,7 @@ describe('Tablet tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
-      <ApprovalTab
+      <SentForApproval
         queryData={{
           data: {
             totalItems: 2,
@@ -498,6 +515,11 @@ describe('Tablet tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
       />,
       { store, history }
     )

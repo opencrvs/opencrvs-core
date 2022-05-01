@@ -56,7 +56,6 @@ export const PRINT_CERTIFICATE_PAYMENT = '/payment/:registrationId/:eventType'
 
 export const REGISTRAR_HOME = '/registration-home'
 export const REGISTRAR_HOME_TAB = '/registration-home/:tabId/:selectorId?'
-export const FIELD_AGENT_HOME_TAB = '/field-agent-home/:tabId'
 export const SETTINGS = '/settings'
 export const CHANGE_PHONE = '/settings/phone'
 export const CERTIFICATE_CONFIG = '/config/certificate'
