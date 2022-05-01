@@ -89,11 +89,11 @@ export enum Action {
 
 export enum QuestionConfigFieldType {
   TEXT = 'TEXT',
-  TEL = 'TEL',
-  NUMBER = 'NUMBER',
   TEXTAREA = 'TEXTAREA',
-  SUBSECTION = 'SUBSECTION',
-  PARAGRAPH = 'PARAGRAPH'
+  NUMBER = 'NUMBER',
+  TEL = 'TEL',
+  PARAGRAPH = 'PARAGRAPH',
+  SUBSECTION = 'SUBSECTION'
 }
 
 export interface IIdentifiers {

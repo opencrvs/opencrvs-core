@@ -44,10 +44,9 @@ const Container = styled.div`
   gap: 16px;
 `
 
-const Title = styled.span`
+const Title = styled.h3`
+  margin: 0;
   ${({ theme }) => theme.fonts.h3}
-  text-overflow: ellipsis;
-  overflow: hidden;
 `
 
 const Subtitle = styled.span`
@@ -87,6 +86,8 @@ const HandleBar = styled.div`
 const Body = styled.span`
   ${({ theme }) => theme.fonts.reg14}
   color: ${({ theme }) => theme.colors.grey500};
+  text-overflow: ellipsis;
+  overflow: hidden;
 `
 
 function HideToggleAction({ fieldId, enabled }: IConfigField) {

@@ -10,12 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { CustomFieldForms } from '@client/components/formConfig/CustomFieldForm'
-import { addCustomField } from '@client/forms/configuration/configFields/actions'
 import {
-  prepareNewCustomFieldConfig,
   IConfigField,
-  isDefaultField,
-  IConfigFieldMap
+  isDefaultField
 } from '@client/forms/configuration/configFields/utils'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -33,16 +30,9 @@ import { SettingsBlue } from '@opencrvs/components/lib/icons'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
 import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
-import {
-  Event,
-  BirthSection,
-  DeathSection,
-  WizardSection,
-  QuestionConfigFieldType
-} from '@client/forms'
+import { Event, BirthSection, DeathSection, WizardSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
-import { Dispatch } from 'redux'
 import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
 import { constantsMessages } from '@client/i18n/messages/constants'
@@ -54,12 +44,8 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import { SaveActionModal, SaveActionContext } from './SaveActionModal'
 import { SaveActionNotification } from './SaveActionNotification'
 import { FormConfigSettings } from './FormConfigSettings'
-import {
-  selectConfigField,
-  selectConfigFields
-} from '@client/forms/configuration/configFields/selectors'
+import { selectConfigField } from '@client/forms/configuration/configFields/selectors'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
-import { flushSync } from 'react-dom'
 
 const Container = styled.div`
   display: flex;
@@ -134,27 +120,6 @@ function isSelectedFieldValid(
 ): selectedField is IConfigField {
   return !!selectedField?.fieldId.includes(section)
 }
-/* TODO: move this into FormTools */
-function formToolClickListener(
-  fieldType: QuestionConfigFieldType,
-  fieldsMap: IConfigFieldMap,
-  event: Event,
-  section: string,
-  setSelectedField: React.Dispatch<React.SetStateAction<string | null>>,
-  dispatch: Dispatch
-) {
-  const customFieldConfig = prepareNewCustomFieldConfig(
-    fieldsMap,
-    event,
-    section,
-    fieldType
-  )
-  dispatch(addCustomField(event, section, customFieldConfig))
-  flushSync(() => setSelectedField(customFieldConfig.fieldId))
-  document
-    .getElementById(customFieldConfig.fieldId)
-    ?.scrollIntoView({ behavior: 'smooth' })
-}
 
 function useHasNatlSysAdminScope() {
   const scope = useSelector(getScope)
@@ -213,9 +178,6 @@ export function FormConfigWizard() {
   const { event, section } = useParams<IRouteProps>()
   const { version } = useSelector((store: IStoreState) =>
     selectFormDraft(store, event)
-  )
-  const fieldsMap = useSelector((store: IStoreState) =>
-    selectConfigFields(store, event, section)
   )
   const dispatch = useDispatch()
   const hasNatlSysAdminScope = useHasNatlSysAdminScope()
@@ -296,16 +258,7 @@ export function FormConfigWizard() {
                 <FormTools
                   showHiddenFields={showHiddenFields}
                   setShowHiddenFields={setShowHiddenFields}
-                  onAddClickListener={(fieldType: QuestionConfigFieldType) =>
-                    formToolClickListener(
-                      fieldType,
-                      fieldsMap,
-                      event,
-                      section,
-                      setSelectedField,
-                      dispatch
-                    )
-                  }
+                  setSelectedField={setSelectedField}
                 />
               )}
             </ToolsContainer>

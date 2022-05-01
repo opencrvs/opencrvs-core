@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { QuestionConfigFieldType } from '@client/forms'
+import { QuestionConfigFieldType, Event } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import styled from '@client/styledComponents'
@@ -21,7 +21,14 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import React from 'react'
-import { IntlShape, useIntl } from 'react-intl'
+import { useIntl, MessageDescriptor } from 'react-intl'
+import { prepareNewCustomFieldConfig } from '@client/forms/configuration/configFields/utils'
+import { useSelector, useDispatch } from 'react-redux'
+import { IStoreState } from '@client/store'
+import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
+import { useParams } from 'react-router'
+import { addCustomField } from '@client/forms/configuration/configFields/actions'
+import { flushSync } from 'react-dom'
 
 const TitleContainer = styled.div`
   margin-top: 24px;
@@ -38,80 +45,54 @@ const CenteredToggle = styled(Toggle)`
   align-self: center;
 `
 
-const listViewItems = (intl: IntlShape) => {
-  const items = [
-    {
-      label: intl.formatMessage(messages.textInput),
-      actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (
-        dispatchAction: (fieldType: QuestionConfigFieldType) => void
-      ) => {
-        dispatchAction(QuestionConfigFieldType.TEXT)
-      }
-    },
-    {
-      label: intl.formatMessage(messages.textAreaInput),
-      actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (
-        dispatchAction: (fieldType: QuestionConfigFieldType) => void
-      ) => {
-        dispatchAction(QuestionConfigFieldType.TEXTAREA)
-      }
-    },
-    {
-      label: intl.formatMessage(messages.numberInput),
-      actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (
-        dispatchAction: (fieldType: QuestionConfigFieldType) => void
-      ) => {
-        dispatchAction(QuestionConfigFieldType.NUMBER)
-      }
-    },
-    {
-      label: intl.formatMessage(messages.phoneNumberInput),
-      actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (
-        dispatchAction: (fieldType: QuestionConfigFieldType) => void
-      ) => {
-        dispatchAction(QuestionConfigFieldType.TEL)
-      }
-    },
-    {
-      label: intl.formatMessage(messages.heading),
-      actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (
-        dispatchAction: (fieldType: QuestionConfigFieldType) => void
-      ) => {
-        // dispatchAction(TEXT)
-      }
-    },
-    {
-      label: intl.formatMessage(messages.supportingCopy),
-      actionLabel: intl.formatMessage(buttonMessages.add),
-      handler: (
-        dispatchAction: (fieldType: QuestionConfigFieldType) => void
-      ) => {
-        // dispatchAction(TEXT)
-      }
-    }
-  ]
-  return items
+const MESSAGE_MAP: Record<QuestionConfigFieldType, MessageDescriptor> = {
+  [QuestionConfigFieldType.TEXT]: messages.textInput,
+  [QuestionConfigFieldType.TEL]: messages.phoneNumberInput,
+  [QuestionConfigFieldType.NUMBER]: messages.numberInput,
+  [QuestionConfigFieldType.TEXTAREA]: messages.textAreaInput,
+  /* TODO */
+  [QuestionConfigFieldType.SUBSECTION]: messages.supportingCopy,
+  [QuestionConfigFieldType.PARAGRAPH]: messages.heading
+}
+
+type IRouteProps = {
+  event: Event
+  section: string
 }
 
 type IFormToolsProps = {
-  onAddClickListener: (fieldType: QuestionConfigFieldType) => void
   showHiddenFields: boolean
   setShowHiddenFields: React.Dispatch<React.SetStateAction<boolean>>
+  setSelectedField: React.Dispatch<React.SetStateAction<string | null>>
 }
 
 export const FormTools = ({
-  onAddClickListener,
   showHiddenFields,
-  setShowHiddenFields
+  setShowHiddenFields,
+  setSelectedField
 }: IFormToolsProps) => {
   const intl = useIntl()
+  const dispatch = useDispatch()
+  const { event, section } = useParams<IRouteProps>()
+  const fieldsMap = useSelector((store: IStoreState) =>
+    selectConfigFields(store, event, section)
+  )
 
   const toggleShowHiddenFields = () => setShowHiddenFields((prev) => !prev)
+
+  const createCustomField = (fieldType: QuestionConfigFieldType) => {
+    const customConfigField = prepareNewCustomFieldConfig(
+      fieldsMap,
+      event,
+      section,
+      fieldType
+    )
+    dispatch(addCustomField(event, section, customConfigField))
+    flushSync(() => setSelectedField(customConfigField.fieldId))
+    document
+      .getElementById(customConfigField.fieldId)
+      ?.scrollIntoView({ behavior: 'smooth' })
+  }
 
   return (
     <>
@@ -131,18 +112,23 @@ export const FormTools = ({
         {intl.formatMessage(messages.addInputContent)}
       </TitleContainer>
       <ListViewSimplified>
-        {listViewItems(intl).map((item, idx) => (
+        {Object.values(QuestionConfigFieldType).map((fieldType) => (
           <ListViewItemSimplified
-            key={idx}
-            label={<Label key={idx}>{item.label}</Label>}
-            actions={[
+            key={fieldType}
+            label={<Label>{intl.formatMessage(MESSAGE_MAP[fieldType])}</Label>}
+            actions={
               <LinkButton
-                key={idx}
-                onClick={() => item.handler(onAddClickListener)}
+                onClick={() => createCustomField(fieldType)}
+                size="small"
+                /* TODO */
+                disabled={
+                  fieldType === QuestionConfigFieldType.PARAGRAPH ||
+                  fieldType === QuestionConfigFieldType.SUBSECTION
+                }
               >
-                {item.actionLabel}
+                {intl.formatMessage(buttonMessages.add)}
               </LinkButton>
-            ]}
+            }
           />
         ))}
       </ListViewSimplified>
