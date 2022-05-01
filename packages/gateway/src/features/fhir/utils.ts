@@ -59,12 +59,7 @@ import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 import { logger } from '@gateway/logger'
-import {
-  GQLLocationWiseTargetDayEstimation,
-  GQLEventInTargetDayEstimationCount,
-  GQLRegStatus
-} from '@gateway/graphql/schema'
-import { reduce } from 'lodash'
+import { GQLRegStatus } from '@gateway/graphql/schema'
 
 export interface ITimeLoggedResponse {
   status?: string
@@ -1299,43 +1294,4 @@ export async function setInformantReference(
       }
     }
   }
-}
-
-export function eventInTargetDayEstimationCalculator(
-  eventInTargetDayEstimations: Array<GQLLocationWiseTargetDayEstimation>
-): GQLEventInTargetDayEstimationCount {
-  const initialValue: GQLEventInTargetDayEstimationCount = {
-    actualTotalRegistration: 0,
-    actualTargetDayRegistration: 0,
-    estimatedRegistration: 0,
-    estimatedTargetDayPercentage: 0
-  }
-  return reduce(
-    eventInTargetDayEstimations,
-    (accumulator, item) => {
-      const actualTotalRegistration =
-        accumulator.actualTotalRegistration + item.actualTotalRegistration
-      const actualTargetDayRegistration =
-        accumulator.actualTargetDayRegistration +
-        item.actualTargetDayRegistration
-      const estimatedRegistration =
-        accumulator.estimatedRegistration + item.estimatedRegistration
-
-      return {
-        actualTotalRegistration,
-        actualTargetDayRegistration,
-        estimatedRegistration,
-        estimatedTargetDayPercentage:
-          actualTargetDayRegistration === 0 || estimatedRegistration === 0
-            ? 0
-            : Number(
-                (
-                  (actualTargetDayRegistration / estimatedRegistration) *
-                  100
-                ).toFixed(2)
-              )
-      }
-    },
-    initialValue
-  )
 }
