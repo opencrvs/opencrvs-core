@@ -23,12 +23,24 @@ import {
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { buttonMessages } from '@client/i18n/messages'
+import { goToFieldAgentList } from '@client/navigation'
+import { connect } from 'react-redux'
 
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult
+  locationId: string
+  timeStart: string
+  timeEnd: string
+}
+interface IDispatchProps {
+  goToFieldAgentList: typeof goToFieldAgentList
 }
 
-export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
+export function ApplicationSourcesComp(
+  props: ApplicationSourcesProps & IDispatchProps
+) {
   const { data } = props
   const intl = useIntl()
   return (
@@ -65,6 +77,42 @@ export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
                 total={calculateTotal(
                   data.results.filter(
                     (item) => item.practitionerRole === 'FIELD_AGENT'
+                  )
+                )}
+                ofNumber={calculateTotal(data.results)}
+              ></TotalDisplayWithPercentage>
+            </PerformanceValue>
+          }
+          actions={
+            <LinkButton
+              id="field-agent-list-view"
+              onClick={() =>
+                props.goToFieldAgentList(
+                  props.locationId,
+                  props.timeStart,
+                  props.timeEnd
+                )
+              }
+            >
+              {intl.formatMessage(buttonMessages.view)}
+            </LinkButton>
+          }
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {' '}
+              {intl.formatMessage(
+                messages.performanceHospitalApplicationsLabel
+              )}
+            </PerformanceTitle>
+          }
+          value={
+            <PerformanceValue>
+              <TotalDisplayWithPercentage
+                total={calculateTotal(
+                  data.results.filter(
+                    (item) => item.practitionerRole === 'HOSPITAL_NOTIFICATION'
                   )
                 )}
                 ofNumber={calculateTotal(data.results)}
@@ -120,3 +168,9 @@ export function ApplicationSourcesComp(props: ApplicationSourcesProps) {
     </ListContainer>
   )
 }
+export const AppSources = connect<ApplicationSourcesProps, IDispatchProps>(
+  undefined,
+  {
+    goToFieldAgentList
+  }
+)(ApplicationSourcesComp)

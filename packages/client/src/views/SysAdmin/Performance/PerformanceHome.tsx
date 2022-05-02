@@ -63,6 +63,10 @@ import {
 } from '@client/views/SysAdmin/Performance/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
+import { PerformanceStats } from './PerformanceStats'
+import { SubHeader } from './utils'
+import { AppSources } from './ApplicationSourcesComp'
+
 import { LocationStatsView } from './LocationStatsView'
 import {
   IStatusMapping,
@@ -382,11 +386,19 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         data={data!.getTotalMetrics}
                         selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
                       />
+                      <CertificationRateComponent
+                        data={certificationRatesDummyData}
+                      />
+                      <AppSources
+                        data={data!.getTotalMetrics}
+                        locationId={this.state.selectedLocation.id}
+                        timeStart={timeStart.toISOString()}
+                        timeEnd={timeEnd.toISOString()}
+                      />
                     </>
                   )
                 }}
               </Query>
-              <CertificationRateComponent data={certificationRatesDummyData} />
               <CorrectionsReport
                 timeStart={timeStart}
                 timeEnd={timeEnd}
