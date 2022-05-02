@@ -137,6 +137,41 @@ function toInfluxTimestamp(date?: Date | string) {
   return new Date(date).valueOf() * 1000000
 }
 
+export const generateCertificationPoint = async (
+  payload: fhir.Bundle,
+  authHeader: IAuthHeader
+): Promise<IPoints> => {
+  const composition = getComposition(payload)
+
+  if (!composition) {
+    throw new Error('Composition not found')
+  }
+
+  const task = getTask(payload)
+
+  if (!task) {
+    throw new Error('Task not found')
+  }
+
+  const fields = {
+    compositionId: composition.id
+  }
+
+  const tags = {
+    eventType: getDeclarationType(task),
+    officeLocation: getRegLastOffice(payload),
+    ...(await generatePointLocations(payload, authHeader))
+  }
+
+  const point = {
+    measurement: 'certification',
+    tags,
+    fields,
+    timestamp: toInfluxTimestamp(composition.date)
+  }
+
+  return point
+}
 export const generateBirthRegPoint = async (
   payload: fhir.Bundle,
   regStatus: string,

@@ -25,6 +25,20 @@ export const influx = new Influx.InfluxDB({
   port: INFLUX_PORT,
   schema: [
     {
+      measurement: 'certification',
+      fields: {
+        compositionId: Influx.FieldType.STRING
+      },
+      tags: [
+        'eventType',
+        'officeLocation',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
+    },
+    {
       measurement: 'birth_registration',
       fields: {
         compositionId: Influx.FieldType.STRING,
