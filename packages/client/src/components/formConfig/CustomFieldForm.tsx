@@ -57,6 +57,7 @@ const CustomFieldFormContainer = styled(Box)`
   min-height: 100vh;
   margin-left: auto;
   padding: 0px;
+  border: none;
 `
 
 const CPrimaryButton = styled(PrimaryButton)`

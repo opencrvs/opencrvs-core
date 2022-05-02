@@ -19,7 +19,8 @@ import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import {
   IConfigField,
-  IConfigFieldMap
+  IConfigFieldMap,
+  generateKeyFromObj
 } from '@client/forms/configuration/formConfig/utils'
 import { FieldPosition } from '@client/forms/configuration'
 import { useParams } from 'react-router'
@@ -79,6 +80,7 @@ function FormField({ configField }: { configField: IConfigField }) {
 
   return (
     <FormFieldGenerator
+      key={generateKeyFromObj(configField)}
       id={fieldId}
       onChange={() => {}}
       fields={[formField]}
