@@ -131,7 +131,10 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
         ...state,
         [event]: {
           ...state[event],
-          [section]: fields
+          configFields: {
+            ...state[event].configFields,
+            [section]: fields
+          }
         }
       }
     }
@@ -169,7 +172,10 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
           ...state,
           [event]: {
             ...state[event],
-            [sectionId]: fields
+            configFields: {
+              ...state[event].configFields,
+              [sectionId]: fields
+            }
           }
         }
       }
@@ -183,7 +189,10 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
         ...state,
         [event]: {
           ...state[event],
-          [sectionId]: fields
+          configFields: {
+            ...state[event].configFields,
+            [sectionId]: fields
+          }
         }
       }
     }
@@ -215,7 +224,10 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
         ...state,
         [event]: {
           ...state[event],
-          [sectionId]: fields
+          configFields: {
+            ...state[event].configFields,
+            [sectionId]: fields
+          }
         }
       }
     }
@@ -240,7 +252,10 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
         ...state,
         [event]: {
           ...state[event],
-          [sectionId]: newSection
+          configFields: {
+            ...state[event].configFields,
+            [sectionId]: newSection
+          }
         }
       }
     }
@@ -265,7 +280,10 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
         ...state,
         [event]: {
           ...state[event],
-          [sectionId]: newSection
+          configFields: {
+            ...state[event].configFields,
+            [sectionId]: newSection
+          }
         }
       }
     }
