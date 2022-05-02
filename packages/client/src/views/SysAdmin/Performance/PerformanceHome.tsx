@@ -52,7 +52,7 @@ import { RegistrationsReport } from '@client/views/SysAdmin/Performance/Registra
 import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
 import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
-import { CertificationRateComponent } from '@client/views/SysAdmin/Performance/CertificationRateComponent'
+import { CertificationRatesReport } from '@client/views/SysAdmin/Performance/CertificationRatesReport'
 import {
   certificationRatesDummyData,
   StatusMapping,
@@ -64,7 +64,7 @@ import {
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
 
-import { AppSources } from './ApplicationSourcesComp'
+import { AppSources } from './ApplicationSourcesReport'
 import { LocationStatsView } from './LocationStatsView'
 import {
   IStatusMapping,
@@ -387,7 +387,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         data={data!.getTotalMetrics}
                         selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
                       />
-                      <CertificationRateComponent
+                      <CertificationRatesReport
                         data={certificationRatesDummyData}
                       />
                       <AppSources

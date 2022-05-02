@@ -131,8 +131,17 @@ export const ReportContainer = styled(ListViewSimplified)`
   }
 `
 
-export function PercentageDisplay(props: { total: number; ofNumber: number }) {
-  return <span>{getPercentage(props.ofNumber, props.total)}%</span>
+export function PercentageDisplay(props: {
+  total: number
+  ofNumber: number
+  precision?: number
+}) {
+  return (
+    <span>
+      {getPercentage(props.ofNumber, props.total).toFixed(props.precision || 0)}
+      %
+    </span>
+  )
 }
 
 export const ListContainer = styled.div`

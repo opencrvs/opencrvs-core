@@ -31,7 +31,7 @@ interface ICertificationRateProps {
   data: ICertificationRateData[]
 }
 
-export function CertificationRateComponent(props: ICertificationRateProps) {
+export function CertificationRatesReport(props: ICertificationRateProps) {
   const intl = useIntl()
   return (
     <ListContainer>

@@ -170,7 +170,6 @@ function FieldAgentListComponent(props: IProps) {
   const {
     intl,
     location: { search },
-    goToPerformanceHome,
     offlineOffices
   } = props
   const { locationId, timeStart, timeEnd } = parse(
@@ -399,6 +398,7 @@ function FieldAgentListComponent(props: IProps) {
           <FilterContainer>
             <LocationPicker
               selectedLocationId={locationId}
+              disabled={true}
               onChangeLocation={(newLocationId) => {
                 props.goToFieldAgentList(timeStart, timeEnd, newLocationId)
               }}

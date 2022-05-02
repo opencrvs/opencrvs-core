@@ -75,14 +75,13 @@ export function CompletenessReport({
         value={
           <div>
             <PerformanceValue>
-              {Number(
-                (data.results
+              <PercentageDisplay
+                precision={2}
+                total={data.results
                   .filter((p) => p.timeLabel === 'withinTarget')
-                  .reduce((t, x) => t + x.total, 0) /
-                  data.estimated.totalEstimation) *
-                  100
-              ).toFixed(2)}
-              %
+                  .reduce((t, x) => t + x.total, 0)}
+                ofNumber={data.estimated.totalEstimation}
+              />
             </PerformanceValue>
             <Breakdown>
               <BreakdownRow>
@@ -151,19 +150,18 @@ export function CompletenessReport({
         value={
           <div>
             <PerformanceValue>
-              {Number(
-                (calculateTotal(
+              <PercentageDisplay
+                precision={2}
+                total={calculateTotal(
                   data.results.filter(
                     (x) =>
                       x.timeLabel === 'withinTarget' ||
                       x.timeLabel === 'withinLate' ||
                       x.timeLabel === 'within1Year'
                   )
-                ) /
-                  data.estimated.totalEstimation) *
-                  100
-              ).toFixed(2)}
-              %
+                )}
+                ofNumber={data.estimated.totalEstimation}
+              />
             </PerformanceValue>
             <Breakdown>
               <BreakdownRow>
@@ -242,14 +240,13 @@ export function CompletenessReport({
         value={
           <div>
             <PerformanceValue>
-              {Number(
-                (calculateTotal(
+              <PercentageDisplay
+                precision={2}
+                total={calculateTotal(
                   data.results.filter((x) => x.timeLabel !== 'after5Years')
-                ) /
-                  data.estimated.totalEstimation) *
-                  100
-              ).toFixed(2)}
-              %
+                )}
+                ofNumber={data.estimated.totalEstimation}
+              />
             </PerformanceValue>
             <Breakdown>
               <BreakdownRow>

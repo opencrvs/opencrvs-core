@@ -26,7 +26,8 @@ import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { goToFieldAgentList } from '@client/navigation'
-import { connect } from 'react-redux'
+import { connect, useSelector } from 'react-redux'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult
@@ -38,11 +39,14 @@ interface IDispatchProps {
   goToFieldAgentList: typeof goToFieldAgentList
 }
 
-export function ApplicationSourcesComp(
+export function ApplicationSourcesReport(
   props: ApplicationSourcesProps & IDispatchProps
 ) {
-  const { data } = props
+  const { data, locationId } = props
   const intl = useIntl()
+  const userDetails = useSelector(getUserDetails)
+  const ownOffice = userDetails?.primaryOffice?.id === locationId
+
   return (
     <ListContainer>
       <ReportContainer>
@@ -84,18 +88,20 @@ export function ApplicationSourcesComp(
             </PerformanceValue>
           }
           actions={
-            <LinkButton
-              id="field-agent-list-view"
-              onClick={() =>
-                props.goToFieldAgentList(
-                  props.timeStart,
-                  props.timeEnd,
-                  props.locationId
-                )
-              }
-            >
-              {intl.formatMessage(buttonMessages.view)}
-            </LinkButton>
+            ownOffice && (
+              <LinkButton
+                id="field-agent-list-view"
+                onClick={() =>
+                  props.goToFieldAgentList(
+                    props.timeStart,
+                    props.timeEnd,
+                    props.locationId
+                  )
+                }
+              >
+                {intl.formatMessage(buttonMessages.view)}
+              </LinkButton>
+            )
           }
         />
         <ListViewItemSimplified
@@ -178,4 +184,4 @@ export const AppSources = connect<ApplicationSourcesProps, IDispatchProps>(
   {
     goToFieldAgentList
   }
-)(ApplicationSourcesComp)
+)(ApplicationSourcesReport)

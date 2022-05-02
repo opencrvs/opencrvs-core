@@ -125,6 +125,10 @@ export const PickerButton = styled.button`
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
   }
+  &:disabled {
+    background: ${({ theme }) => theme.colors.grey100};
+    border: 2px solid ${({ theme }) => theme.colors.grey200};
+  }
   white-space: nowrap;
   padding: 0;
   height: 32px;
@@ -163,16 +167,6 @@ export const ModalContainer = styled.div`
     left: 24px;
     margin-left: 0;
   }
-
-  /* @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    position: fixed;
-    border-radius: 2px;
-    width: auto;
-    top: 128px;
-    left: 50vw;
-    transform: translateX(-50%);
-    margin: 0;
-  } */
 `
 export const ModalHeader = styled.div<{ hide?: boolean }>`
   display: flex;
