@@ -23,11 +23,11 @@ import {
   getContentKeys,
   getCertificateHandlebar,
   IDefaultConfigField
-} from '@client/forms/configuration/configFields/utils'
+} from '@client/forms/configuration/formConfig/utils'
 import { useDispatch } from 'react-redux'
 import { fieldTypeLabel } from '@client/forms'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
-import { modifyConfigField } from '@client/forms/configuration/configFields/actions'
+import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
 
 const Container = styled.div`

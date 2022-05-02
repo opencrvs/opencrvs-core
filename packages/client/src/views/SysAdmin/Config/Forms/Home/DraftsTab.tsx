@@ -16,7 +16,7 @@ import {
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { selectFormDraft } from '@client/forms/configuration/configFields/selectors'
+import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
 import { Event, BirthSection, DeathSection } from '@client/forms'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'

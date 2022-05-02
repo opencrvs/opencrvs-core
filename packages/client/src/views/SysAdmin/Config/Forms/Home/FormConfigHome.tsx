@@ -21,7 +21,7 @@ import {
 } from '@client/i18n/messages/views/formConfig'
 import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
 import { DraftsTab } from './DraftsTab'
-import { selectFormDraft } from '@client/forms/configuration/configFields/selectors'
+import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
 import { PreviewTab } from './PreviewTab'
 import { PublishedTab } from './PublishedTab'
 import styled from '@client/styledComponents'

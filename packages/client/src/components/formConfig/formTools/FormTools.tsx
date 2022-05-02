@@ -22,12 +22,12 @@ import {
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import React from 'react'
 import { useIntl, MessageDescriptor } from 'react-intl'
-import { prepareNewCustomFieldConfig } from '@client/forms/configuration/configFields/utils'
+import { prepareNewCustomFieldConfig } from '@client/forms/configuration/formConfig/utils'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
+import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import { useParams } from 'react-router'
-import { addCustomField } from '@client/forms/configuration/configFields/actions'
+import { addCustomField } from '@client/forms/configuration/formConfig/actions'
 import { flushSync } from 'react-dom'
 
 const TitleContainer = styled.div`

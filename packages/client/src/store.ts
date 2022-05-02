@@ -62,7 +62,7 @@ import { userFormReducer, IUserFormState } from '@client/user/userReducer'
 import {
   formConfigReducer,
   IFormConfigState
-} from './forms/configuration/configFields/reducer'
+} from './forms/configuration/formConfig/reducer'
 
 export interface IStoreState {
   profile: ProfileState

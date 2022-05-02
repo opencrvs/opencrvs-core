@@ -35,7 +35,7 @@ import { getDefaultLanguage } from '@client/i18n/utils'
 import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
 import { LOADING_SCREEN_TEXT } from '@client/utils/constants'
-import { isFormConfigLoaded } from '@client/forms/configuration/configFields/selectors'
+import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
 
 const languageFromProps = ({ language }: IPageProps) => language
 

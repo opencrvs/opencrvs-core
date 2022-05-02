@@ -13,7 +13,7 @@ import { CustomFieldForms } from '@client/components/formConfig/CustomFieldForm'
 import {
   IConfigField,
   isDefaultField
-} from '@client/forms/configuration/configFields/utils'
+} from '@client/forms/configuration/formConfig/utils'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
@@ -46,7 +46,7 @@ import { FormConfigSettings } from './FormConfigSettings'
 import {
   selectConfigField,
   selectFormDraft
-} from '@client/forms/configuration/configFields/selectors'
+} from '@client/forms/configuration/formConfig/selectors'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 
 const Container = styled.div`

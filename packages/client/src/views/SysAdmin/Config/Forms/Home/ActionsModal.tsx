@@ -32,7 +32,7 @@ import {
   IFormDraft
 } from '@client/forms/configuration/formDrafts/utils'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
-import { updateFormConfig } from '@client/forms/configuration/configFields/actions'
+import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
 
 /*
  * There seems to be an issue with webpack

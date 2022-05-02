@@ -21,7 +21,7 @@ import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations
 import {
   selectConfigFields,
   selectConfigRegisterForm
-} from '@client/forms/configuration/configFields/selectors'
+} from '@client/forms/configuration/formConfig/selectors'
 import { Event, IQuestionConfig } from '@client/forms'
 import { Mutation } from 'react-apollo'
 import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
@@ -39,8 +39,8 @@ import { messages } from '@client/i18n/messages/views/formConfig'
 import { InputField, TextArea } from '@opencrvs/components/lib/forms'
 import { useParams } from 'react-router'
 import { goToFormConfigHome } from '@client/navigation'
-import { updateFormConfig } from '@client/forms/configuration/configFields/actions'
-import { generateModifiedQuestionConfigs } from '@client/forms/configuration/configFields/utils'
+import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
+import { generateModifiedQuestionConfigs } from '@client/forms/configuration/formConfig/utils'
 
 export const SaveActionContext = React.createContext({
   status: ActionStatus.IDLE,

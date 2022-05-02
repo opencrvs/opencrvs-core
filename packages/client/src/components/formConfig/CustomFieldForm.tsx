@@ -20,12 +20,12 @@ import {
   Event,
   IFormField
 } from '@client/forms'
-import { modifyConfigField } from '@client/forms/configuration/configFields/actions'
+import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import {
   CUSTOM_GROUP_NAME,
   getCertificateHandlebar,
   ICustomConfigField
-} from '@client/forms/configuration/configFields/utils'
+} from '@client/forms/configuration/formConfig/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
 import { ILanguageState, initLanguages } from '@client/i18n/reducer'
@@ -47,8 +47,8 @@ import { camelCase } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
 import { connect } from 'react-redux'
-import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
-import { getConfigFieldIdentifiers } from '@client/forms/configuration/configFields/motionUtils'
+import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
+import { getConfigFieldIdentifiers } from '@client/forms/configuration/formConfig/motionUtils'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
 
 const CustomFieldFormContainer = styled(Box)`

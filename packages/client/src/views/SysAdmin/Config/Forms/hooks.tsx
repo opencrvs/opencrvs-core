@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { selectConfigRegisterForm } from '@client/forms/configuration/configFields/selectors'
+import { selectConfigRegisterForm } from '@client/forms/configuration/formConfig/selectors'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import {
   IConfigField,
   getDefaultConfigFieldIdentifiers,
   isDefaultField
-} from '@client/forms/configuration/configFields/utils'
+} from '@client/forms/configuration/formConfig/utils'
 import { IFormField } from '@client/forms'
 import { deserializeFormField } from '@client/forms/mappings/deserializer'
 import { createCustomField } from '@client/forms/configuration/customUtils'
-import { getConfigFieldIdentifiers } from '@client/forms/configuration/configFields/motionUtils'
+import { getConfigFieldIdentifiers } from '@client/forms/configuration/formConfig/motionUtils'
 
 export function useFieldDefinition(configField: IConfigField): IFormField {
   const { event } = getConfigFieldIdentifiers(configField.fieldId)

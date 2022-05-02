@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as actions from '@client/forms/configuration/configFields/actions'
+import * as actions from '@client/forms/configuration/formConfig/actions'
 import { Loop, LoopReducer, loop, Cmd } from 'redux-loop'
 import * as offlineActions from '@client/offline/actions'
 import { Event, IForm, IFormConfig } from '@client/forms'

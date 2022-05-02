@@ -16,11 +16,11 @@ import styled from '@client/styledComponents'
 import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
-import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
+import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import {
   IConfigField,
   IConfigFieldMap
-} from '@client/forms/configuration/configFields/utils'
+} from '@client/forms/configuration/formConfig/utils'
 import { FieldPosition } from '@client/forms/configuration'
 import { useParams } from 'react-router'
 import { BirthSection, DeathSection, Event } from '@client/forms'
@@ -28,7 +28,7 @@ import {
   shiftConfigFieldUp,
   shiftConfigFieldDown,
   removeCustomField
-} from '@client/forms/configuration/configFields/actions'
+} from '@client/forms/configuration/formConfig/actions'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/formConfig'
