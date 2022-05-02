@@ -300,6 +300,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                   )}
                   <CompletenessDataTable
                     loading={true}
+                    base={base}
                     completenessRateTime={time}
                   />
                   <ToastNotification type={NOTIFICATION_TYPE.ERROR} />

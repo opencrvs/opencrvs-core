@@ -355,6 +355,11 @@ const messagesToDefine = {
     id: 'performance.registrationByStatus.header',
     defaultMessage: 'Registration by status',
     description: 'Title for Registration by status'
+  },
+  completenessRate: {
+    id: 'performance.completenessTable.completenessRate',
+    defaultMessage: 'Completeness {lineBreak}rate',
+    description: 'Title for Completeness rate column in the table'
   }
 }
 

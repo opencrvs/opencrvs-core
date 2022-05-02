@@ -16,7 +16,7 @@ import {
   IEstimationBase,
   COMPLETENESS_RATE_REPORT_BASE
 } from '@client/views/SysAdmin/Performance/CompletenessRates'
-import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
+import { SortArrow } from '@opencrvs/components/lib/icons'
 import {
   ListTable,
   ColumnContentAlignment
@@ -31,22 +31,10 @@ import {
 import { formatLongDate } from '@client/utils/date-formatting'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 
-interface IMonthWiseEstimationCount {
-  actualTotalRegistration: number
-  actualTargetDayRegistration: number
-  estimatedRegistration: number
-  estimatedTargetDayPercentage: number
-}
-interface IMonthWiseEstimation extends IMonthWiseEstimationCount {
-  month?: string
-  year?: string
-  startOfMonth?: string
-  locationName?: string
-}
 interface ITableProps extends WrappedComponentProps {
   loading: boolean
   eventType?: Event
-  base?: IEstimationBase
+  base: IEstimationBase
   data?: GQLMonthWiseEstimationMetric[] | GQLLocationWiseEstimationMetric[]
   completenessRateTime: CompletenessRateTime
 }
@@ -59,32 +47,48 @@ export enum SORT_ORDER {
 interface SortMap {
   startTime: SORT_ORDER
   location: SORT_ORDER
+  estimated: SORT_ORDER
+  completenessRate: SORT_ORDER
+  registeredWithinTargetd: SORT_ORDER
 }
 
 const INITIAL_SORT_MAP = {
   startTime: SORT_ORDER.DESCENDING,
-  location: SORT_ORDER.ASCENDING
+  location: SORT_ORDER.ASCENDING,
+  estimated: SORT_ORDER.ASCENDING,
+  completenessRate: SORT_ORDER.ASCENDING,
+  registeredWithinTargetd: SORT_ORDER.ASCENDING
 }
 
 function CompletenessDataTableComponent(props: ITableProps) {
   const { intl, loading, eventType, base } = props
-  const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
 
-  const content: any =
-    base?.baseType === COMPLETENESS_RATE_REPORT_BASE.LOCATION
-      ? props.data &&
-        (props.data as GQLLocationWiseEstimationMetric[]).map((item) => ({
-          location: item.locationName,
-          totalRegistered: String(item.total),
-          registeredWithinTargetd: String(item[props.completenessRateTime]),
-          estimated: String(item.estimated),
-          rateOfRegistrationWithinTargetd: `${Number(
-            (item[props.completenessRateTime] / item.estimated) * 100
-          ).toFixed(2)}%`
-        }))
-      : base?.baseType === COMPLETENESS_RATE_REPORT_BASE.TIME
-      ? props.data &&
-        (props.data as GQLMonthWiseEstimationMetric[]).map((item) => ({
+  // A dynamic list of fields and directions and in which priority order to sort them
+  // user clicking on a sort arrow puts the field in front of the list
+  // giving it the highest priority
+  // [{key: 'location', value: 'asc'}, {key: 'estimated', value: 'desc'}]
+  const [sortOrder, setSortOrder] = React.useState(
+    Object.entries(INITIAL_SORT_MAP).map(([key, value]) => ({
+      key: key as keyof SortMap,
+      value
+    }))
+  )
+
+  const content =
+    base.baseType === COMPLETENESS_RATE_REPORT_BASE.LOCATION
+      ? ((props.data || []) as GQLLocationWiseEstimationMetric[]).map(
+          (item) => ({
+            location: item.locationName,
+            totalRegistered: String(item.total),
+            registeredWithinTargetd: item[props.completenessRateTime],
+            estimated: String(item.estimated),
+            completenessRate: `${Number(
+              (item[props.completenessRateTime] / item.estimated) * 100
+            ).toFixed(2)}%`
+          })
+        )
+      : base.baseType === COMPLETENESS_RATE_REPORT_BASE.TIME
+      ? ((props.data || []) as GQLMonthWiseEstimationMetric[]).map((item) => ({
           startTime: new Date(item.year, item.month),
           month: formatLongDate(
             new Date(item.year, item.month).toISOString(),
@@ -94,122 +98,74 @@ function CompletenessDataTableComponent(props: ITableProps) {
           totalRegistered: item.total,
           registeredWithinTargetd: item[props.completenessRateTime],
           estimated: item.estimated,
-          rateOfRegistrationWithinTargetd: `${Number(
+          completenessRate: `${Number(
             (item[props.completenessRateTime] / item.estimated) * 100
           ).toFixed(2)}%`
         }))
       : []
 
-  function getFooterColumns() {
-    let sum = {
-      total: 0,
-      withinTarget: 0,
-      within1Year: 0,
-      within5Years: 0,
-      estimated: 0
-    }
-
-    sum = props.data
-      ? (props.data as GQLMonthWiseEstimationMetric[]).reduce(
-          (s: typeof sum, data) => ({
-            total: s.total + data.total,
-            withinTarget: s.withinTarget + data.withinTarget,
-            within1Year: s.within1Year + data.within1Year,
-            within5Years: s.within5Years + data.within5Years,
-            estimated: s.estimated + data.estimated
-          }),
-          sum
-        )
-      : sum
-    return [
-      {
-        label: props.intl.formatMessage(constantsMessages.total),
-        width: 40
-      },
-      {
-        label: String(sum.total),
-        width: 15
-      },
-      {
-        label: String(sum[props.completenessRateTime]),
-        width: 15
-      },
-      {
-        label: String(sum.estimated),
-        width: 15
-      },
-      {
-        label: intl.formatMessage(
-          constantsMessages.averageRateOfRegistrations,
-          {
-            amount: Number(
-              ((sum[props.completenessRateTime] / sum.estimated) * 100).toFixed(
-                2
-              )
-            )
-          }
-        ),
-        width: 15
-      }
-    ]
-  }
-
   function toggleSort(key: keyof SortMap) {
+    const existingItemInSortOrder = sortOrder.find((item) => item.key === key)!
+
     const invertedOrder =
-      sortOrder[key] === SORT_ORDER.DESCENDING
+      existingItemInSortOrder.value === SORT_ORDER.DESCENDING
         ? SORT_ORDER.ASCENDING
         : SORT_ORDER.DESCENDING
-    setSortOrder({ ...sortOrder, [key]: invertedOrder })
+
+    setSortOrder(
+      [{ ...existingItemInSortOrder, value: invertedOrder }].concat(
+        sortOrder.filter((x) => x != existingItemInSortOrder)
+      )
+    )
   }
 
-  const sortedContent = orderBy(
+  const sortedContent = orderBy<typeof content[number]>(
     content,
-    ['startTime', 'location'],
-    [sortOrder.startTime, sortOrder.location]
+    sortOrder.map(({ key }) => key),
+    sortOrder.map(({ value }) => value)
   )
-  let firstColProp: {
-    dataKey: string
-    label: string
-    sortKey: keyof SortMap
-  } = {
-    dataKey: 'month',
-    label: intl.formatMessage(constantsMessages.timePeriod),
-    sortKey: 'startTime'
-  }
-  if (base && base.baseType === COMPLETENESS_RATE_REPORT_BASE.LOCATION) {
-    firstColProp = {
-      dataKey: 'location',
-      label: intl.formatMessage(messages.locationTitle, {
-        jurisdictionType: base.locationJurisdictionType
-      }),
-      sortKey: 'location'
-    }
-  }
+
+  const firstColProp =
+    base.baseType === COMPLETENESS_RATE_REPORT_BASE.LOCATION
+      ? {
+          dataKey: 'location',
+          label: intl.formatMessage(messages.locationTitle, {
+            jurisdictionType: base.locationJurisdictionType
+          }),
+          sortKey: 'location' as const
+        }
+      : {
+          dataKey: 'month',
+          label: intl.formatMessage(constantsMessages.timePeriod),
+          sortKey: 'startTime' as const
+        }
+
   return (
     <ListTable
       noResultText={intl.formatMessage(constantsMessages.noResults)}
       isLoading={loading}
-      fixedWidth={1074}
       columns={[
         {
           key: firstColProp.dataKey,
           label: firstColProp.label,
-          width: 40,
+          width: 30,
           isSortable: true,
           sortFunction: () => toggleSort(firstColProp.sortKey),
-          icon: <ArrowDownBlue />,
+          icon: (
+            <SortArrow active={sortOrder[0].key === firstColProp.sortKey} />
+          ),
           isSorted: true
         },
         {
-          key: 'totalRegistered',
-          label: intl.formatMessage(constantsMessages.totalRegistered, {
-            lineBreak: <br key={'totalRegistered-break'} />
-          }),
-          width: 15
-        },
-        {
           key: 'registeredWithinTargetd',
-
+          isSortable: true,
+          sortFunction: () => toggleSort('registeredWithinTargetd'),
+          icon: (
+            <SortArrow
+              active={sortOrder[0].key === 'registeredWithinTargetd'}
+            />
+          ),
+          isSorted: true,
           label:
             props.completenessRateTime === CompletenessRateTime.Within5Years
               ? intl.formatMessage(messages.performanceWithin5YearsLabel)
@@ -222,49 +178,35 @@ function CompletenessDataTableComponent(props: ITableProps) {
                       : window.config.DEATH.REGISTRATION_TARGET,
                   withPrefix: false
                 }),
-          width: 15
+          width: 25
         },
         {
           key: 'estimated',
+          isSortable: true,
+          sortFunction: () => toggleSort('estimated'),
+          icon: <SortArrow active={sortOrder[0].key === 'estimated'} />,
+          isSorted: true,
           label: intl.formatMessage(constantsMessages.estimatedNumberOfEvents, {
             eventType,
-            lineBreak: <br key={'estimated-break'} />
+            lineBreak: <br />
           }),
-          width: 15
+          width: 20
         },
         {
-          key: 'rateOfRegistrationWithinTargetd',
-          label:
-            props.completenessRateTime === CompletenessRateTime.Within5Years
-              ? intl.formatMessage(
-                  constantsMessages.rateOfRegistrationWithinYears,
-                  { num: 5 }
-                )
-              : props.completenessRateTime === CompletenessRateTime.Within1Year
-              ? intl.formatMessage(
-                  constantsMessages.rateOfRegistrationWithinYears,
-                  { num: 1 }
-                )
-              : intl.formatMessage(
-                  constantsMessages.rateOfRegistrationWithinTargetd,
-                  {
-                    registrationTargetDays:
-                      eventType === Event.BIRTH
-                        ? window.config.BIRTH.REGISTRATION_TARGET
-                        : window.config.DEATH.REGISTRATION_TARGET,
-
-                    lineBreak: (
-                      <br key={'rateOfRegistrationWithinTargetd-break'} />
-                    )
-                  }
-                ),
-          alignment: ColumnContentAlignment.RIGHT,
-          width: 15
+          key: 'completenessRate',
+          isSortable: true,
+          sortFunction: () => toggleSort('completenessRate'),
+          icon: <SortArrow active={sortOrder[0].key === 'completenessRate'} />,
+          isSorted: true,
+          label: intl.formatMessage(messages.completenessRate, {
+            lineBreak: <br />
+          }),
+          alignment: ColumnContentAlignment.LEFT,
+          width: 25
         }
       ]}
       pageSize={sortedContent.length}
       content={sortedContent}
-      footerColumns={getFooterColumns()}
       hideBoxShadow={true}
       highlightRowOnMouseOver
     />
