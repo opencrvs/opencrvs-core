@@ -57,6 +57,7 @@ export const influx = new Influx.InfluxDB({
       tags: [
         'regStatus',
         'gender',
+        'ageLabel',
         'timeLabel',
         'dateLabel',
         'practitionerRole',

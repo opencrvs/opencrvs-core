@@ -212,12 +212,15 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     const { timeStart, timeEnd, locationId, event } = parse(
       search
     ) as unknown as ISearchParams
-    const selectedLocation = selectLocation(
-      locationId,
-      generateLocations({ ...locations, ...offices }, props.intl).concat(
-        getAdditionalLocations(props.intl)
-      )
-    )
+
+    const selectedLocation = !locationId
+      ? getAdditionalLocations(props.intl)[0]
+      : selectLocation(
+          locationId,
+          generateLocations({ ...locations, ...offices }, props.intl).concat(
+            getAdditionalLocations(props.intl)
+          )
+        )
 
     return {
       selectedLocation,
@@ -389,7 +392,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       />
                       <AppSources
                         data={data!.getTotalMetrics}
-                        locationId={this.state.selectedLocation.id}
+                        locationId={
+                          isCountry(this.state.selectedLocation)
+                            ? undefined
+                            : this.state.selectedLocation.id
+                        }
                         timeStart={timeStart.toISOString()}
                         timeEnd={timeEnd.toISOString()}
                       />
@@ -485,7 +492,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         <>
                           <StatusWiseDeclarationCountView
                             selectedEvent={this.state.event}
-                            locationId={this.state.selectedLocation?.id}
+                            locationId={
+                              isCountry(this.state.selectedLocation)
+                                ? undefined
+                                : this.state.selectedLocation?.id
+                            }
                             statusMapping={StatusMapping}
                             data={data.fetchRegistrationCountByStatus}
                             onClickStatusDetails={this.onClickStatusDetails}
@@ -537,7 +548,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       ) : (
                         <StatusWiseDeclarationCountView
                           selectedEvent={this.state.event}
-                          locationId={this.state.selectedLocation?.id}
+                          locationId={
+                            isCountry(this.state.selectedLocation)
+                              ? undefined
+                              : this.state.selectedLocation?.id
+                          }
                           statusMapping={StatusMapping}
                           data={data.fetchRegistrationCountByStatus}
                           onClickStatusDetails={this.onClickStatusDetails}

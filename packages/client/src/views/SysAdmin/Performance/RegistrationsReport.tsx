@@ -108,8 +108,8 @@ export function RegistrationsReport({
                 {
                   <TotalDisplayWithPercentage
                     total={calculateTotal(
-                      data.results.filter(
-                        (x) => !['withinLate'].includes(x.timeLabel)
+                      data.results.filter((x) =>
+                        ['withinLate'].includes(x.timeLabel)
                       )
                     )}
                     ofNumber={calculateTotal(data.results)}
@@ -128,12 +128,12 @@ export function RegistrationsReport({
                           data.results.filter(
                             (x) =>
                               x.gender === 'male' &&
-                              !['withinLate'].includes(x.timeLabel)
+                              ['withinLate'].includes(x.timeLabel)
                           )
                         )}
                         ofNumber={calculateTotal(
-                          data.results.filter(
-                            (x) => !['withinLate'].includes(x.timeLabel)
+                          data.results.filter((x) =>
+                            ['withinLate'].includes(x.timeLabel)
                           )
                         )}
                       />
@@ -274,8 +274,10 @@ export function RegistrationsReport({
               {
                 <TotalDisplayWithPercentage
                   total={calculateTotal(
-                    data.results.filter(
-                      (x) => x.eventLocationType === 'PRIVATE_HOME'
+                    data.results.filter((x) =>
+                      ['DECEASED_USUAL_RESIDENCE', 'PRIVATE_HOME'].includes(
+                        x.eventLocationType
+                      )
                     )
                   )}
                   ofNumber={calculateTotal(data.results)}
@@ -304,7 +306,10 @@ export function RegistrationsReport({
                 <TotalDisplayWithPercentage
                   total={calculateTotal(
                     data.results.filter(
-                      (x) => x.eventLocationType === 'HEALTH_FACILITY'
+                      (x) =>
+                        !['DECEASED_USUAL_RESIDENCE', 'PRIVATE_HOME'].includes(
+                          x.eventLocationType
+                        )
                     )
                   )}
                   ofNumber={calculateTotal(data.results)}

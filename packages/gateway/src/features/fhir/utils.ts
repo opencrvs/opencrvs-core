@@ -1023,9 +1023,12 @@ export const getMetrics = (
   params: IMetricsParam,
   authHeader: IAuthHeader
 ) => {
+  const paramsWithUndefined = Object.fromEntries(
+    Object.entries(params).filter(([, value]) => value !== undefined)
+  )
   return fetch(
-    // @ts-ignore
-    `${METRICS_URL}${prefix}?` + new URLSearchParams({ ...params }),
+    `${METRICS_URL}${prefix}?` +
+      new URLSearchParams({ ...paramsWithUndefined }),
     {
       method: 'GET',
       headers: {

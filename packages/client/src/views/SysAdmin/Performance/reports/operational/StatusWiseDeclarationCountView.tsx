@@ -47,7 +47,7 @@ interface BaseProps {
   data?: GQLRegistrationCountResult
   statusMapping?: IStatusMapping
   onClickStatusDetails: (status?: keyof IStatusMapping) => void
-  locationId: string
+  locationId?: string
   selectedEvent: Event
 }
 

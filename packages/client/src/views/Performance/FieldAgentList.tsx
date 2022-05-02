@@ -400,12 +400,7 @@ function FieldAgentListComponent(props: IProps) {
             <LocationPicker
               selectedLocationId={locationId}
               onChangeLocation={(newLocationId) => {
-                props.goToFieldAgentList(
-                  newLocationId,
-                  timeStart,
-                  timeEnd,
-                  event
-                )
+                props.goToFieldAgentList(timeStart, timeEnd, newLocationId)
               }}
               requiredJurisdictionTypes={
                 window.config.FIELD_AGENT_AUDIT_LOCATIONS
@@ -439,9 +434,9 @@ function FieldAgentListComponent(props: IProps) {
               endDate={dateEnd}
               onDatesChange={({ startDate, endDate }) =>
                 props.goToFieldAgentList(
-                  locationId as string,
                   startDate.toISOString(),
-                  endDate.toISOString()
+                  endDate.toISOString(),
+                  locationId
                 )
               }
             />

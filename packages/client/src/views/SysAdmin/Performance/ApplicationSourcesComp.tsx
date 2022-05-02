@@ -30,7 +30,7 @@ import { connect } from 'react-redux'
 
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult
-  locationId: string
+  locationId?: string
   timeStart: string
   timeEnd: string
 }
@@ -88,9 +88,9 @@ export function ApplicationSourcesComp(
               id="field-agent-list-view"
               onClick={() =>
                 props.goToFieldAgentList(
-                  props.locationId,
                   props.timeStart,
-                  props.timeEnd
+                  props.timeEnd,
+                  props.locationId
                 )
               }
             >
@@ -155,8 +155,13 @@ export function ApplicationSourcesComp(
             <PerformanceValue>
               <TotalDisplayWithPercentage
                 total={calculateTotal(
-                  data.results.filter(
-                    (item) => item.practitionerRole === 'REGISTRAR'
+                  data.results.filter((item) =>
+                    [
+                      'LOCAL_REGISTRAR',
+                      'DISTRICT_REGISTRAR',
+                      'STATE_REGISTRAR',
+                      'NATIONAL_REGISTRAR'
+                    ].includes(item.practitionerRole)
                   )
                 )}
                 ofNumber={calculateTotal(data.results)}

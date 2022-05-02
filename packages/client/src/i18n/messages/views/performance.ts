@@ -141,9 +141,9 @@ const messagesToDefine = {
     description: 'Label for registrars in application sources'
   },
   performanceRegistrationAgentsApplicationsLabel: {
-    id: 'performance.appSrc.labels.registrarAgents',
-    defaultMessage: 'Registrar agents',
-    description: 'Label for registrar agents in application sources'
+    id: 'performance.appSrc.labels.registrationAgents',
+    defaultMessage: 'Registration agents',
+    description: 'Label for registration agents in application sources'
   },
   performanceCertificationRateLabel: {
     id: 'performance.labels.certificationRate',
