@@ -63,10 +63,8 @@ import {
 } from '@client/views/SysAdmin/Performance/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
-import { PerformanceStats } from './PerformanceStats'
-import { SubHeader } from './utils'
-import { AppSources } from './ApplicationSourcesComp'
 
+import { AppSources } from './ApplicationSourcesComp'
 import { LocationStatsView } from './LocationStatsView'
 import {
   IStatusMapping,

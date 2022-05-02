@@ -15,7 +15,7 @@ import {
   WITHIN_1_YEAR
 } from '@metrics/features/metrics/constants'
 import {
-  ageIntervals,
+  getAgeIntervals,
   calculateInterval,
   fetchEstimateByLocation,
   fetchEstimateForTargetDaysByLocationId,
@@ -105,6 +105,7 @@ interface IGenderBasisPoint {
 
 export async function regByAge(timeStart: string, timeEnd: string) {
   const metricsData: any[] = []
+  const ageIntervals = await getAgeIntervals()
   for (const ageInterval of ageIntervals) {
     const points = await query(
       // tslint:disable-next-line
