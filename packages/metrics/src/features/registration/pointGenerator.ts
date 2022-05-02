@@ -185,7 +185,7 @@ export const generateBirthRegPoint = async (
   }
 
   const point = {
-    measurement: 'birth_reg',
+    measurement: 'birth_registration',
     tags,
     fields,
     timestamp: toInfluxTimestamp(composition.date)
@@ -260,7 +260,7 @@ export const generateDeathRegPoint = async (
   }
 
   const point = {
-    measurement: 'death_reg',
+    measurement: 'death_registration',
     tags,
     fields,
     timestamp: new Date(composition.date).valueOf() * 1000000

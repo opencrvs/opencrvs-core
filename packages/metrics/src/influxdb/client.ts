@@ -25,7 +25,7 @@ export const influx = new Influx.InfluxDB({
   port: INFLUX_PORT,
   schema: [
     {
-      measurement: 'birth_reg',
+      measurement: 'birth_registration',
       fields: {
         compositionId: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
@@ -47,7 +47,7 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
-      measurement: 'death_reg',
+      measurement: 'death_registration',
       fields: {
         compositionId: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
