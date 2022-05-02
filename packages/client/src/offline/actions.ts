@@ -20,7 +20,7 @@ import {
   IApplicationConfig
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
-import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { IQuestionConfig, IFormConfig } from '@client/forms'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
@@ -246,13 +246,13 @@ export const UPDATE_OFFLINE_FORM_CONFIG = 'OFFLINE/UPDATE_FORM_CONFIG'
 export type UpdateOfflineFormConfigAction = {
   type: typeof UPDATE_OFFLINE_FORM_CONFIG
   payload: {
-    formDrafts: IDraft[]
+    formDrafts: IFormDraft[]
     questionConfig?: IQuestionConfig[]
   }
 }
 
 export const updateOfflineFormConfig = (
-  formDrafts: IDraft[],
+  formDrafts: IFormDraft[],
   questionConfig?: IQuestionConfig[]
 ): UpdateOfflineFormConfigAction => ({
   type: UPDATE_OFFLINE_FORM_CONFIG,

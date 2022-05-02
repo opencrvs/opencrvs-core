@@ -29,10 +29,10 @@ import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
 import { CHANGE_FORM_DRAFT_STATUS } from '@client/views/SysAdmin/Config/Forms/mutations'
 import {
   DraftStatus,
-  IDraft
-} from '@client/forms/configuration/formDrafts/reducer'
+  IFormDraft
+} from '@client/forms/configuration/formDrafts/utils'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
-import { updateFormConfig } from '@client/forms/configuration/formDrafts/actions'
+import { updateFormConfig } from '@client/forms/configuration/configFields/actions'
 
 /*
  * There seems to be an issue with webpack
@@ -108,7 +108,7 @@ function ActionButton() {
       mutation={CHANGE_FORM_DRAFT_STATUS}
       onCompleted={({ modifyDraftStatus: formDraft }) => {
         if (formDraft) {
-          dispatch(updateFormConfig(formDraft as IDraft))
+          dispatch(updateFormConfig(formDraft as IFormDraft))
           setAction({ status: ActionStatus.COMPLETED })
         }
       }}

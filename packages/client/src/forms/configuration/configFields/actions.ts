@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ICustomConfigField, IConfigField } from './utils'
-import { Event } from '@client/forms'
+import { Event, IQuestionConfig } from '@client/forms'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 
 export const ADD_CUSTOM_FIELD = 'FORM/ADD_CUSTOM_FIELD'
 export type AddCustomFieldAction = {
@@ -102,6 +103,25 @@ export const modifyConfigField = (
     modifiedProps
   }
 })
+export const UPDATE_FORM_CONFIG = 'FORM/UPDATE_FORM_CONFIG'
+export type UpdateFormConfigAction = {
+  type: typeof UPDATE_FORM_CONFIG
+  payload: {
+    formDraft: IFormDraft
+    questionConfig?: IQuestionConfig[]
+  }
+}
+
+export const updateFormConfig = (
+  formDraft: IFormDraft,
+  questionConfig?: IQuestionConfig[]
+): UpdateFormConfigAction => ({
+  type: UPDATE_FORM_CONFIG,
+  payload: {
+    formDraft,
+    questionConfig
+  }
+})
 
 export type ConfigFieldsActions =
   | AddCustomFieldAction
@@ -109,3 +129,4 @@ export type ConfigFieldsActions =
   | RemoveCustomFieldAction
   | ShiftConfigFieldUp
   | ShiftConfigFieldDown
+  | UpdateFormConfigAction

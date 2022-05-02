@@ -63,10 +63,6 @@ import {
   formConfigReducer,
   IFormConfigState
 } from './forms/configuration/configFields/reducer'
-import {
-  IFormDraftState,
-  formDraftReducer
-} from './forms/configuration/formDrafts/reducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -83,7 +79,6 @@ export interface IStoreState {
   userForm: IUserFormState
   workqueueState: WorkqueueState
   formConfig: IFormConfigState
-  formDraft: IFormDraftState
 }
 
 const enhancedCreateStore = createReduxStore as StoreCreator
@@ -110,8 +105,7 @@ export const createStore = <T>(
     offline: offlineDataReducer,
     userForm: userFormReducer,
     workqueueState: registrarWorkqueueReducer,
-    formConfig: formConfigReducer,
-    formDraft: formDraftReducer
+    formConfig: formConfigReducer
   })
   const enhancer = compose(
     install(config),

@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as actions from '@client/forms/configuration/configFields/actions'
-import { Loop, LoopReducer } from 'redux-loop'
+import { Loop, LoopReducer, loop, Cmd } from 'redux-loop'
 import * as offlineActions from '@client/offline/actions'
-import { Event, IQuestionConfig, IForm } from '@client/forms'
+import { Event, IForm, IFormConfig } from '@client/forms'
 import { getConfiguredForm, FieldPosition } from '@client/forms/configuration'
 import { ISectionFieldMap, getSectionFieldsMap, IConfigFieldMap } from './utils'
 import {
@@ -20,6 +20,10 @@ import {
   shiftCurrentFieldUp,
   getConfigFieldIdentifiers
 } from './motionUtils'
+import {
+  IFormDraft,
+  getEventDraft
+} from '@client/forms/configuration/formDrafts/utils'
 
 export type IFormConfigState =
   | {
@@ -30,10 +34,12 @@ export type IFormConfigState =
   | {
       state: 'READY'
       birth: {
+        formDraft: IFormDraft
         registerForm: IForm
         configFields: ISectionFieldMap
       }
       death: {
+        formDraft: IFormDraft
         registerForm: IForm
         configFields: ISectionFieldMap
       }
@@ -67,17 +73,19 @@ function getNextField(fieldMap: IConfigFieldMap, fieldId: string) {
     : undefined
 }
 
-function getReadyState(questionConfig: IQuestionConfig[]) {
+function getReadyState({ formDrafts, questionConfig }: IFormConfig) {
   const birthForm = getConfiguredForm(questionConfig, Event.BIRTH)
   const deathForm = getConfiguredForm(questionConfig, Event.DEATH)
 
   return {
     state: 'READY' as const,
     birth: {
+      formDraft: getEventDraft(formDrafts, Event.BIRTH),
       registerForm: birthForm,
       configFields: getSectionFieldsMap(Event.BIRTH, birthForm)
     },
     death: {
+      formDraft: getEventDraft(formDrafts, Event.DEATH),
       registerForm: deathForm,
       configFields: getSectionFieldsMap(Event.DEATH, deathForm)
     }
@@ -91,7 +99,7 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
   /* First loading when offline formConfig is ready*/
   if (state.state === 'LOADING') {
     if (action.type === offlineActions.READY) {
-      return getReadyState(action.payload.formConfig.questionConfig)
+      return getReadyState(action.payload.formConfig)
     }
     return state
   }
@@ -99,9 +107,7 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
   switch (action.type) {
     case offlineActions.APPLICATION_CONFIG_LOADED:
     case offlineActions.OFFLINE_FORM_CONFIG_UPDATED: {
-      const { questionConfig } = action.payload.formConfig
-
-      return getReadyState(questionConfig)
+      return getReadyState(action.payload.formConfig)
     }
 
     case actions.ADD_CUSTOM_FIELD: {
@@ -262,6 +268,35 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
           [sectionId]: newSection
         }
       }
+    }
+
+    case actions.UPDATE_FORM_CONFIG: {
+      const { formDraft, questionConfig } = action.payload
+
+      const { event } = formDraft
+
+      const newState = {
+        ...state,
+        [event]: {
+          ...state[event],
+          formDraft
+        }
+      }
+
+      const {
+        birth: { formDraft: birthFormDraft },
+        death: { formDraft: deathFormDraft }
+      } = newState
+
+      return loop(
+        newState,
+        Cmd.action(
+          offlineActions.updateOfflineFormConfig(
+            [birthFormDraft, deathFormDraft],
+            questionConfig
+          )
+        )
+      )
     }
 
     default:

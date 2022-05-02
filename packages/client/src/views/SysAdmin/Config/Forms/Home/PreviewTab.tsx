@@ -16,7 +16,7 @@ import {
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
+import { selectFormDraft } from '@client/forms/configuration/configFields/selectors'
 import { Event } from '@client/forms'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
@@ -25,7 +25,7 @@ import {
   draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
+import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
 import { Value, DraftVersion } from './components'
 import { Pill } from '@opencrvs/components/lib/interface'
 import {

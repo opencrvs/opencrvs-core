@@ -27,7 +27,7 @@ import {
 } from '@client/i18n/messages/views/formConfig'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
+import { selectFormDraft } from '@client/forms/configuration/configFields/selectors'
 import { constantsMessages } from '@client/i18n/messages'
 
 export function ActionsNotification() {

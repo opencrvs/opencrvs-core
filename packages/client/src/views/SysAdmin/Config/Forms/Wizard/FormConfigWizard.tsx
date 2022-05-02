@@ -33,7 +33,6 @@ import { FormTools } from '@client/components/formConfig/formTools/FormTools'
 import { Event, BirthSection, DeathSection, WizardSection } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
-import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { messages } from '@client/i18n/messages/views/formConfig'
@@ -44,7 +43,10 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import { SaveActionModal, SaveActionContext } from './SaveActionModal'
 import { SaveActionNotification } from './SaveActionNotification'
 import { FormConfigSettings } from './FormConfigSettings'
-import { selectConfigField } from '@client/forms/configuration/configFields/selectors'
+import {
+  selectConfigField,
+  selectFormDraft
+} from '@client/forms/configuration/configFields/selectors'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 
 const Container = styled.div`
