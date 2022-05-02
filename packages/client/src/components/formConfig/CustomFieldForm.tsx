@@ -48,7 +48,7 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
 import { connect } from 'react-redux'
 import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
-import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
+import { selectSectionConfigFields } from '@client/forms/configuration/configFields/selectors'
 import { getConfigFieldIdentifiers } from '@client/forms/configuration/configFields/motionUtils'
 
 const CustomFieldFormContainer = styled(Box)`
@@ -588,7 +588,7 @@ const mapStateToProps = (store: IStoreState, props: IProps) => {
   const { event, selectedField, section } = props
   const formSection = getRegisterFormSection(store, section, event)
   return {
-    fieldsMap: selectConfigFields(store, event, section),
+    fieldsMap: selectSectionConfigFields(store, event, section),
     formField: getFieldDefinition(formSection, selectedField)
   }
 }

@@ -12,7 +12,7 @@
 import * as actions from '@client/forms/configuration/configFields/actions'
 import { Loop, LoopReducer } from 'redux-loop'
 import * as offlineActions from '@client/offline/actions'
-import { Event, IQuestionConfig } from '@client/forms'
+import { Event, IQuestionConfig, IForm } from '@client/forms'
 import { getConfiguredForm, FieldPosition } from '@client/forms/configuration'
 import { ISectionFieldMap, getSectionFieldsMap, IConfigFieldMap } from './utils'
 import {
@@ -21,25 +21,28 @@ import {
   getConfigFieldIdentifiers
 } from './motionUtils'
 
-export type IConfigFieldsState =
+export type IFormConfigState =
   | {
       state: 'LOADING'
       birth: null
       death: null
-      questionConfig: IQuestionConfig[]
     }
   | {
       state: 'READY'
-      birth: ISectionFieldMap
-      death: ISectionFieldMap
-      questionConfig: IQuestionConfig[]
+      birth: {
+        registerForm: IForm
+        configFields: ISectionFieldMap
+      }
+      death: {
+        registerForm: IForm
+        configFields: ISectionFieldMap
+      }
     }
 
-export const initialState: IConfigFieldsState = {
+export const initialState: IFormConfigState = {
   state: 'LOADING',
   birth: null,
-  death: null,
-  questionConfig: []
+  death: null
 }
 
 type Actions = actions.ConfigFieldsActions | offlineActions.Action
@@ -64,35 +67,47 @@ function getNextField(fieldMap: IConfigFieldMap, fieldId: string) {
     : undefined
 }
 
-export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
-  state: IConfigFieldsState = initialState,
+function getReadyState(questionConfig: IQuestionConfig[]) {
+  const birthForm = getConfiguredForm(questionConfig, Event.BIRTH)
+  const deathForm = getConfiguredForm(questionConfig, Event.DEATH)
+
+  return {
+    state: 'READY' as const,
+    birth: {
+      registerForm: birthForm,
+      configFields: getSectionFieldsMap(Event.BIRTH, birthForm)
+    },
+    death: {
+      registerForm: deathForm,
+      configFields: getSectionFieldsMap(Event.DEATH, deathForm)
+    }
+  }
+}
+
+export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
+  state: IFormConfigState = initialState,
   action: Actions
-): IConfigFieldsState | Loop<IConfigFieldsState, Actions> => {
+): IFormConfigState | Loop<IFormConfigState, Actions> => {
+  /* First loading when offline formConfig is ready*/
+  if (state.state === 'LOADING') {
+    if (action.type === offlineActions.READY) {
+      return getReadyState(action.payload.formConfig.questionConfig)
+    }
+    return state
+  }
+
   switch (action.type) {
-    case offlineActions.READY:
     case offlineActions.APPLICATION_CONFIG_LOADED:
     case offlineActions.OFFLINE_FORM_CONFIG_UPDATED: {
       const { questionConfig } = action.payload.formConfig
 
-      const birthForm = getConfiguredForm(questionConfig, Event.BIRTH)
-      const deathForm = getConfiguredForm(questionConfig, Event.DEATH)
-
-      return {
-        ...state,
-        state: 'READY',
-        questionConfig,
-        birth: getSectionFieldsMap(Event.BIRTH, birthForm),
-        death: getSectionFieldsMap(Event.DEATH, deathForm)
-      }
+      return getReadyState(questionConfig)
     }
 
     case actions.ADD_CUSTOM_FIELD: {
-      if (state.state === 'LOADING') {
-        return state
-      }
       const { event, section, customField } = action.payload
       const fields = {
-        ...state[event][section],
+        ...state[event].configFields[section],
         [customField.fieldId]: customField
       }
 
@@ -116,10 +131,10 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
     }
 
     case actions.MODIFY_CONFIG_FIELD: {
-      if (state.state === 'LOADING') return state
       const { fieldId, modifiedProps } = action.payload
       const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
-      const { [fieldId]: originalField, ...fields } = state[event][sectionId]
+      const { [fieldId]: originalField, ...fields } =
+        state[event].configFields[sectionId]
 
       /* Adjusting preceedingFieldId & foregoingFieldId */
       if (modifiedProps.fieldId && fieldId !== modifiedProps.fieldId) {
@@ -168,11 +183,11 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
     }
 
     case actions.REMOVE_CUSTOM_FIELD: {
-      if (state.state === 'LOADING') return state
       const { fieldId } = action.payload
       const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
 
-      const { [fieldId]: fieldToRemove, ...fields } = state[event][sectionId]
+      const { [fieldId]: fieldToRemove, ...fields } =
+        state[event].configFields[sectionId]
 
       if (
         fieldToRemove.preceedingFieldId &&
@@ -200,17 +215,16 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
     }
 
     case actions.SHIFT_CONFIG_FIELD_UP: {
-      if (state.state === 'LOADING') return state
       const { fieldId } = action.payload
 
       const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
 
-      const fieldMap = state[event][sectionId]
+      const fieldMap = state[event].configFields[sectionId]
 
       const currentField = fieldMap[fieldId]
 
       const newSection = shiftCurrentFieldUp(
-        state[event][sectionId],
+        state[event].configFields[sectionId],
         currentField,
         getPreviousField(fieldMap, fieldId),
         getNextField(fieldMap, fieldId)
@@ -226,17 +240,16 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
     }
 
     case actions.SHIFT_CONFIG_FIELD_DOWN: {
-      if (state.state === 'LOADING') return state
       const { fieldId } = action.payload
 
       const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
 
-      const fieldMap = state[event][sectionId]
+      const fieldMap = state[event].configFields[sectionId]
 
       const currentField = fieldMap[fieldId]
 
       const newSection = shiftCurrentFieldDown(
-        state[event][sectionId],
+        state[event].configFields[sectionId],
         currentField,
         getPreviousField(fieldMap, fieldId),
         getNextField(fieldMap, fieldId)

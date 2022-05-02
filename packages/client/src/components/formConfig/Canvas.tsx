@@ -16,7 +16,7 @@ import styled from '@client/styledComponents'
 import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
-import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
+import { selectSectionConfigFields } from '@client/forms/configuration/configFields/selectors'
 import {
   IConfigField,
   IConfigFieldMap,
@@ -83,7 +83,7 @@ export function Canvas({
   const dispatch = useDispatch()
   const intl = useIntl()
   const fieldsMap = useSelector((store: IStoreState) =>
-    selectConfigFields(store, event, section)
+    selectSectionConfigFields(store, event, section)
   )
   const formSection = useSelector((store: IStoreState) =>
     getRegisterFormSection(store, section, event)

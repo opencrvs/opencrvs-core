@@ -17,21 +17,26 @@ import {
   isDefaultField,
   hasDefaultFieldChanged
 } from './utils'
-import { getConfiguredForm } from '@client/forms/configuration'
 
-export function selectConfigFieldsState(store: IStoreState) {
-  if (store.configFields.state === 'LOADING') {
+export function selectFormConfigState(store: IStoreState) {
+  if (store.formConfig.state === 'LOADING') {
     throw new Error('Offline data not loaded yet')
   }
-  return store.configFields
+  return store.formConfig
 }
-export function selectConfigFields(
+
+function selectConfigRegisterForm(store: IStoreState, event: Event) {
+  const formConfigState = selectFormConfigState(store)
+  return formConfigState[event].registerForm
+}
+
+export function selectSectionConfigFields(
   store: IStoreState,
   event: Event,
   section: string
 ) {
-  const configFields = selectConfigFieldsState(store)
-  return configFields[event][section]
+  const formConfigState = selectFormConfigState(store)
+  return formConfigState[event].configFields[section]
 }
 
 export function selectConfigField(
@@ -40,12 +45,9 @@ export function selectConfigField(
   section: string,
   fieldId: string | null
 ) {
-  return fieldId ? selectConfigFields(store, event, section)[fieldId] : null
-}
-
-function selectQuestionConfig(store: IStoreState) {
-  const configFieldsState = selectConfigFieldsState(store)
-  return configFieldsState.questionConfig
+  return fieldId
+    ? selectSectionConfigFields(store, event, section)[fieldId]
+    : null
 }
 
 function generateModifiedQuestionConfigs(
@@ -71,8 +73,7 @@ export function selectModifiedQuestionConfigs(
   store: IStoreState,
   event: Event
 ) {
-  const configFields = selectConfigFieldsState(store)
-  const previousQuestionConfig = selectQuestionConfig(store)
-  const registerForm = getConfiguredForm(previousQuestionConfig, event)
-  return generateModifiedQuestionConfigs(configFields[event], registerForm)
+  const configFields = selectFormConfigState(store)[event].configFields
+  const registerForm = selectConfigRegisterForm(store, event)
+  return generateModifiedQuestionConfigs(configFields, registerForm)
 }
