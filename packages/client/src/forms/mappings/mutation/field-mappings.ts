@@ -292,14 +292,16 @@ export const copyAddressTransformer =
       fromSectionData = transformedData[fromSection][nodeName]
     }
     if (
-      (sectionId !== 'informant' && !fromSectionData.address) ||
-      (sectionId === 'informant' && !fromSectionData.individual.address)
+      (fromSection !== 'informant' && !fromSectionData.address) ||
+      (fromSection === 'informant' && !fromSectionData.individual.address)
     ) {
-      throw new Error(`Address data not found on section ${fromSection}`)
+      throw new Error(
+        `Address data not found on section copying from ${fromSection}`
+      )
     }
 
     const fromAddress =
-      sectionId === 'informant'
+      fromSection === 'informant'
         ? fromSectionData.individual.address
         : fromSectionData.address
     const address = (fromAddress as [{ type: string }]).find(

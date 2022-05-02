@@ -15,9 +15,21 @@ import {
   REVIEW_OVERRIDE_POSITION,
   FLEX_DIRECTION,
   ISerializedForm,
-  DeathSection
+  Event,
+  IConditionals,
+  DeathSection,
+  TEXTAREA
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
+import { messages as informantMessageDescriptors } from '@client/i18n/messages/views/selectInformant'
+import {
+  birthDocumentForWhomFhirMapping,
+  birthDocumentTypeFhirMapping
+} from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
+import {
+  deathDocumentForWhomFhirMapping,
+  deathDocumentTypeFhirMapping
+} from '@client/forms/register/fieldMappings/death/mutation/documents-mappings'
 
 // THIS FILE CONTAINS THE DEFAULT, FACTORY RESET FORM CONFIGURATIONS
 
@@ -36,83 +48,78 @@ export const registerForms: IDefaultRegisterForms = {
         title: formMessageDescriptors.registrationTitle,
         groups: [
           {
-            id: 'informant-relation',
-            title: formMessageDescriptors.informantRelation,
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== "OTHER" || draftData.registration.presentAtBirthRegistration === "BOTH_PARENTS" )'
-              }
-            ],
+            id: 'who-is-applying-view-group',
+            title: informantMessageDescriptors.birthInformantTitle,
+            conditionals: [],
             preventContinueIfError: true,
             showExitButtonOnly: true,
             fields: [
               {
-                name: 'informant',
+                name: 'informantType',
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                label: formMessageDescriptors.informantRelation,
-                required: true,
-                readonly: true,
+                label: informantMessageDescriptors.birthInformantTitle,
                 hideHeader: true,
+                required: true,
+                hideInPreview: false,
                 initialValue: '',
                 validate: [],
                 size: RadioSize.LARGE,
-                placeholder: formMessageDescriptors.select,
                 options: [
                   {
+                    value: 'MOTHER',
+                    label: informantMessageDescriptors.mother
+                  },
+                  {
+                    value: 'FATHER',
+                    label: informantMessageDescriptors.father
+                  },
+                  {
                     value: 'GRANDFATHER',
-                    label: formMessageDescriptors.grandfather
+                    label: informantMessageDescriptors.grandfather
                   },
                   {
                     value: 'GRANDMOTHER',
-                    label: formMessageDescriptors.grandmother
+                    label: informantMessageDescriptors.grandmother
                   },
                   {
                     value: 'BROTHER',
-                    label: formMessageDescriptors.brother
+                    label: informantMessageDescriptors.brother
+                  },
+                  {
+                    value: 'SISTER',
+                    label: informantMessageDescriptors.sister
+                  },
+                  {
+                    value: 'OTHER_FAMILY_MEMBER',
+                    label: informantMessageDescriptors.otherFamilyMember
+                  },
+                  {
+                    value: 'LEGAL_GUARDIAN',
+                    label: informantMessageDescriptors.legalGuardian
+                  },
+                  {
+                    value: 'OTHER',
+                    label: formMessageDescriptors.someoneElse
                   }
                 ],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 nestedFields: {
+                  MOTHER: [],
+                  FATHER: [],
                   GRANDFATHER: [],
                   GRANDMOTHER: [],
                   BROTHER: [],
                   SISTER: [],
-                  OTHER_FAMILY_MEMBER: [
-                    {
-                      name: 'otherRelationShip',
-                      type: 'TEXT',
-                      label: formMessageDescriptors.informantsRelationWithChild,
-                      placeholder:
-                        formMessageDescriptors.relationshipPlaceHolder,
-                      required: true,
-                      initialValue: '',
-                      validate: [],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: ['informant.otherRelationship']
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: ['informant.otherRelationship']
-                        }
-                      }
-                    }
-                  ],
+                  OTHER_FAMILY_MEMBER: [],
                   LEGAL_GUARDIAN: [],
-                  INSTITUTION_HEAD_PLACE_OF_BIRTH: [],
-                  HOUSE_OWNER: [],
-                  OPERATOR: [],
-                  OFFICE_IN_CHARGE: [],
                   OTHER: [
                     {
-                      name: 'otherRelationShip',
+                      name: 'otherInformantType',
                       type: 'TEXT',
                       label: formMessageDescriptors.informantsRelationWithChild,
                       placeholder:
                         formMessageDescriptors.relationshipPlaceHolder,
-                      required: true,
+                      required: false,
                       initialValue: '',
                       validate: [
                         {
@@ -122,11 +129,11 @@ export const registerForms: IDefaultRegisterForms = {
                       mapping: {
                         mutation: {
                           operation: 'changeHirerchyMutationTransformer',
-                          parameters: ['informant.otherRelationship']
+                          parameters: ['registration.otherInformantType']
                         },
                         query: {
                           operation: 'changeHirerchyQueryTransformer',
-                          parameters: ['informant.otherRelationship']
+                          parameters: ['registration.otherInformantType']
                         }
                       }
                     }
@@ -135,92 +142,11 @@ export const registerForms: IDefaultRegisterForms = {
                 mapping: {
                   mutation: {
                     operation: 'nestedRadioFieldToBundleFieldTransformer',
-                    parameters: ['informant.relationship']
+                    parameters: ['registration.informantType']
                   },
                   query: {
                     operation: 'bundleFieldToNestedRadioFieldTransformer',
-                    parameters: ['informant.relationship']
-                  }
-                }
-              }
-            ]
-          },
-          {
-            id: 'primary-informant',
-            title: {
-              defaultMessage:
-                'Who is the primary informant for this declaration?',
-              description: 'Form section title for primary informant',
-              id: 'register.primaryInformant.registerNewEventHeading'
-            },
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== "BOTH_PARENTS" || draftData.registration.presentAtBirthRegistration === "OTHER")'
-              }
-            ],
-            preventContinueIfError: true,
-            showExitButtonOnly: true,
-            fields: [
-              {
-                name: 'paragraph',
-                type: 'PARAGRAPH',
-                label: {
-                  defaultMessage:
-                    'This person is responsible for providing accurate information in this declaration.',
-                  description: 'Documents Paragraph text',
-                  id: 'register.primaryInformant.description'
-                },
-                initialValue: '',
-                validate: [],
-                conditionals: []
-              },
-              {
-                name: 'informant',
-                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                label: {
-                  defaultMessage: 'Who is the primary informant?',
-                  description: 'Label for field primary informant',
-                  id: 'register.selectInformant.primaryInformant'
-                },
-                hideHeader: true,
-                size: RadioSize.LARGE,
-                required: true,
-                readonly: true,
-                initialValue: '',
-                validate: [],
-                options: [
-                  {
-                    value: 'MOTHER',
-                    label: {
-                      defaultMessage: 'Mother',
-                      description: 'Mother as informant',
-                      id: 'form.field.label.informantRelation.mother'
-                    }
-                  },
-                  {
-                    value: 'FATHER',
-                    label: {
-                      defaultMessage: 'Father',
-                      description: 'Father as informant',
-                      id: 'form.field.label.informantRelation.father'
-                    }
-                  }
-                ],
-                nestedFields: {
-                  MOTHER: [],
-                  FATHER: []
-                },
-                conditionals: [],
-                mapping: {
-                  mutation: {
-                    operation: 'nestedRadioFieldToBundleFieldTransformer',
-                    parameters: ['informant.relationship']
-                  },
-                  query: {
-                    operation: 'bundleFieldToNestedRadioFieldTransformer',
-                    parameters: ['informant.relationship']
+                    parameters: ['registration.informantType']
                   }
                 }
               }
@@ -228,23 +154,14 @@ export const registerForms: IDefaultRegisterForms = {
           },
           {
             id: 'contact-view-group',
-            title: {
-              defaultMessage:
-                'Who is the main point of contact for this declaration?',
-              description: 'Form section title for contact point',
-              id: 'register.SelectContactPoint.heading'
-            },
+            title: informantMessageDescriptors.selectContactPoint,
             conditionals: [],
             preventContinueIfError: true,
             showExitButtonOnly: true,
             previewGroups: [
               {
                 id: 'contactPointGroup',
-                label: {
-                  defaultMessage: 'Main Contact',
-                  description: 'Label for form field: Place of delivery',
-                  id: 'form.field.label.declaration.mainContact'
-                },
+                label: formMessageDescriptors.reviewLabelMainContact,
                 required: false,
                 initialValue: '',
                 fieldToRedirect: 'contactPoint'
@@ -252,137 +169,9 @@ export const registerForms: IDefaultRegisterForms = {
             ],
             fields: [
               {
-                name: 'presentAtBirthRegistration',
-                type: 'RADIO_GROUP',
-                required: true,
-                readonly: true,
-                hidden: true,
-                hideInPreview: false,
-                initialValue: '',
-                validate: [],
-                options: [
-                  {
-                    value: 'MOTHER',
-                    label: {
-                      defaultMessage: 'Mother',
-                      description: 'Label for option Mother',
-                      id: 'form.field.label.informantRelation.mother'
-                    }
-                  },
-                  {
-                    value: 'FATHER',
-                    label: {
-                      defaultMessage: 'Father',
-                      description: 'Label for option Father',
-                      id: 'form.field.label.informantRelation.father'
-                    }
-                  },
-                  {
-                    value: 'BOTH_PARENTS',
-                    label: {
-                      id: 'register.selectInformant.parents',
-                      defaultMessage: 'Mother & Father',
-                      description:
-                        'The description that appears when selecting the parent as informant'
-                    }
-                  },
-                  {
-                    value: 'OTHER',
-                    label: {
-                      defaultMessage: 'Someone else',
-                      description: 'Other Label',
-                      id: 'form.field.label.someoneElse'
-                    }
-                  }
-                ],
-                label: {
-                  defaultMessage: 'Who is present for the birth registration?',
-                  description: 'Form section title for contact point',
-                  id: 'form.field.label.declaration.whoIsPresent'
-                },
-                reviewOverrides: {
-                  residingSection: 'registration',
-                  reference: {
-                    sectionID: 'registration',
-                    groupID: 'contact-view-group',
-                    fieldName: 'contactPoint'
-                  },
-                  position: REVIEW_OVERRIDE_POSITION.BEFORE,
-                  labelAs: {
-                    defaultMessage: 'Who is the informant?',
-                    description: 'Form section title for contact point',
-                    id: 'register.selectInformant.relation'
-                  },
-                  conditionals: [
-                    {
-                      action: 'hide',
-                      expression:
-                        '(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration === "OTHER")'
-                    }
-                  ]
-                },
-                mapping: {
-                  mutation: {
-                    operation: 'sectionFieldToBundleFieldTransformer',
-                    parameters: []
-                  },
-                  query: {
-                    operation: 'bundleFieldToSectionFieldTransformer',
-                    parameters: []
-                  }
-                }
-              },
-              {
-                name: 'informant',
-                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                readonly: true,
-                hidden: true,
-                initialValue: '',
-                validate: [],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '(!draftData || !draftData.registration || draftData.registration.presentAtBirthRegistration !== "LEGAL_GUARDIAN")'
-                  }
-                ],
-                label: {
-                  defaultMessage: 'Informant',
-                  description: 'Form section title for contact point',
-                  id: 'form.section.informant.name'
-                },
-                options: [
-                  {
-                    value: 'LEGAL_GUARDIAN',
-                    label: {
-                      defaultMessage: 'Legal guardian',
-                      description: 'Option for form field: Legal Guardian',
-                      id: 'register.selectinformant.legalGuardian'
-                    }
-                  }
-                ],
-                nestedFields: {
-                  LEGAL_GUARDIAN: []
-                },
-                mapping: {
-                  mutation: {
-                    operation: 'nestedRadioFieldToBundleFieldTransformer',
-                    parameters: ['informant.relationship']
-                  },
-                  query: {
-                    operation: 'bundleFieldToNestedRadioFieldTransformer',
-                    parameters: ['informant.relationship']
-                  }
-                }
-              },
-              {
                 name: 'contactPoint',
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                label: {
-                  defaultMessage: ' ',
-                  description: 'Form section title for contact point',
-                  id: 'register.SelectContactPoint.heading'
-                },
+                label: formMessageDescriptors.selectContactPoint,
                 conditionals: [],
                 previewGroup: 'contactPointGroup',
                 required: true,
@@ -390,75 +179,43 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 validate: [],
                 size: RadioSize.LARGE,
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'MOTHER',
-                    label: {
-                      defaultMessage: 'Mother',
-                      description: 'Label for "Mother" radio option',
-                      id: 'form.field.label.app.whoContDet.mother'
-                    }
+                    label: informantMessageDescriptors.mother
                   },
                   {
                     value: 'FATHER',
-                    label: {
-                      defaultMessage: 'Father',
-                      description: 'Label for "Father" radio option',
-                      id: 'form.field.label.app.whoContDet.father'
-                    }
+                    label: informantMessageDescriptors.father
                   },
                   {
                     value: 'GRANDFATHER',
-                    label: {
-                      defaultMessage: 'Grandfather',
-                      description: 'Label for "Grandfather" radio option',
-                      id: 'form.field.label.app.whoContDet.grandFather'
-                    }
+                    label: informantMessageDescriptors.grandfather
                   },
                   {
                     value: 'GRANDMOTHER',
-                    label: {
-                      defaultMessage: 'Grandmother',
-                      description: 'Label for "Grandmother" radio option',
-                      id: 'form.field.label.app.whoContDet.grandMother'
-                    }
+                    label: informantMessageDescriptors.grandmother
                   },
                   {
                     value: 'BROTHER',
-                    label: {
-                      defaultMessage: 'Brother',
-                      description: 'Label for "Broher" radio option',
-                      id: 'form.field.label.app.whoContDet.brother'
-                    }
+                    label: informantMessageDescriptors.brother
                   },
                   {
                     value: 'SISTER',
-                    label: {
-                      defaultMessage: 'Sister',
-                      description: 'Label for "Sister" radio option',
-                      id: 'form.field.label.app.whoContDet.sister'
-                    }
+                    label: informantMessageDescriptors.sister
                   },
                   {
-                    value: 'LEGALGUARDIAN',
-                    label: {
-                      defaultMessage: 'Legal Guardian',
-                      description: 'Label for "Legal Guardian" radio option',
-                      id: 'form.field.label.app.whoContDet.legalGuardian'
-                    }
+                    value: 'OTHER_FAMILY_MEMBER',
+                    label: informantMessageDescriptors.otherFamilyMember
+                  },
+                  {
+                    value: 'LEGAL_GUARDIAN',
+                    label: informantMessageDescriptors.legalGuardian
                   },
                   {
                     value: 'OTHER',
-                    label: {
-                      defaultMessage: 'Someone else',
-                      description: 'Label for "Someone else" radio option',
-                      id: 'form.field.label.someoneElse'
-                    }
+                    label: formMessageDescriptors.someoneElse
                   }
                 ],
                 nestedFields: {
@@ -466,12 +223,8 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
-                      required: false,
+                      label: formMessageDescriptors.phoneNumber,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -506,12 +259,8 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
-                      required: false,
+                      label: formMessageDescriptors.phoneNumber,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -546,12 +295,8 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
-                      required: false,
+                      label: formMessageDescriptors.phoneNumber,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -586,12 +331,8 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
-                      required: false,
+                      label: formMessageDescriptors.phoneNumber,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -626,12 +367,8 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
-                      required: false,
+                      label: formMessageDescriptors.phoneNumber,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -666,12 +403,8 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
-                      required: false,
+                      label: formMessageDescriptors.phoneNumber,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -702,16 +435,12 @@ export const registerForms: IDefaultRegisterForms = {
                       }
                     }
                   ],
-                  LEGALGUARDIAN: [
+                  LEGAL_GUARDIAN: [
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
-                      required: false,
+                      label: formMessageDescriptors.phoneNumber,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -746,12 +475,8 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
-                      required: false,
+                      label: formMessageDescriptors.phoneNumber,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -836,31 +561,47 @@ export const registerForms: IDefaultRegisterForms = {
       {
         id: BirthSection.Child,
         viewType: 'form',
-        name: {
-          defaultMessage: 'Child',
-          description: 'Form section name for Child',
-          id: 'form.section.child.name'
-        },
-        title: {
-          defaultMessage: "Child's details",
-          description: 'Form section title for Child',
-          id: 'form.section.child.title'
-        },
+        name: formMessageDescriptors.childTab,
+        title: formMessageDescriptors.childTitle,
         hasDocumentSection: true,
         groups: [
           {
             id: 'child-view-group',
             fields: [
               {
+                name: 'childBirthDate',
+                customisable: false,
+                type: 'DATE',
+                label: formMessageDescriptors.childDateOfBirth,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'isValidChildBirthDate'
+                  }
+                ],
+                mapping: {
+                  template: {
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'eventDate',
+                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
+                  },
+                  mutation: {
+                    operation: 'longDateTransformer',
+                    parameters: ['birthDate']
+                  },
+                  query: {
+                    operation: 'fieldValueTransformer',
+                    parameters: ['birthDate']
+                  }
+                }
+              },
+              {
                 name: 'firstNamesEng',
                 previewGroup: 'childNameInEnglish',
                 customisable: false,
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'First name(s)',
-                  description: 'Label for form field: Given names',
-                  id: 'form.field.label.childFirstNamesEng'
-                },
+                label: formMessageDescriptors.childFirstNamesEng,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -890,11 +631,7 @@ export const registerForms: IDefaultRegisterForms = {
                 previewGroup: 'childNameInEnglish',
                 customisable: false,
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'Last name',
-                  description: 'Label for form field: Last name in english',
-                  id: 'form.field.label.childFamilyNameEng'
-                },
+                label: formMessageDescriptors.childFamilyNameEng,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -923,19 +660,11 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'gender',
                 customisable: false,
                 type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Sex',
-                  description: 'Label for form field: Sex name',
-                  id: 'form.field.label.childSex'
-                },
+                label: formMessageDescriptors.childSex,
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
                   template: {
                     fieldName: 'informantGender',
@@ -945,151 +674,69 @@ export const registerForms: IDefaultRegisterForms = {
                 options: [
                   {
                     value: 'male',
-                    label: {
-                      defaultMessage: 'Male',
-                      description: 'Option for form field: Sex name',
-                      id: 'form.field.label.childSexMale'
-                    }
+                    label: formMessageDescriptors.childSexMale
                   },
                   {
                     value: 'female',
-                    label: {
-                      defaultMessage: 'Female',
-                      description: 'Option for form field: Sex name',
-                      id: 'form.field.label.childSexFemale'
-                    }
-                  },
-                  {
-                    value: 'other',
-                    label: {
-                      defaultMessage: 'Other',
-                      description: 'Option for form field: Sex name',
-                      id: 'form.field.label.childSexOther'
-                    }
+                    label: formMessageDescriptors.childSexFemale
                   },
                   {
                     value: 'unknown',
-                    label: {
-                      defaultMessage: 'Unknown',
-                      description: 'Option for form field: Sex name',
-                      id: 'form.field.label.childSexUnknown'
-                    }
+                    label: formMessageDescriptors.childSexUnknown
                   }
                 ]
               },
               {
-                name: 'childBirthDate',
-                customisable: false,
-                type: 'DATE',
+                name: 'seperator',
+                type: 'SUBSECTION',
                 label: {
-                  defaultMessage: 'Date of birth',
-                  description: 'Label for form field: Date of birth',
-                  id: 'form.field.label.childDateOfBirth'
+                  defaultMessage: ' ',
+                  description: 'empty string',
+                  id: 'form.field.label.empty'
                 },
-                required: true,
                 initialValue: '',
-                validate: [
-                  {
-                    operation: 'isValidChildBirthDate'
-                  }
-                ],
-                mapping: {
-                  template: {
-                    operation: 'dateFormatTransformer',
-                    fieldName: 'eventDate',
-                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
-                  },
-                  mutation: {
-                    operation: 'longDateTransformer',
-                    parameters: ['birthDate']
-                  },
-                  query: {
-                    operation: 'fieldValueTransformer',
-                    parameters: ['birthDate']
-                  }
-                }
+                validate: [],
+                conditionals: []
               },
               {
                 name: 'attendantAtBirth',
                 customisable: true,
                 type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Attendant at birth',
-                  description: 'Label for form field: Attendant at birth',
-                  id: 'form.field.label.attendantAtBirth'
-                },
+                label: formMessageDescriptors.attendantAtBirth,
                 required: false,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'PHYSICIAN',
-                    label: {
-                      defaultMessage: 'Physician',
-                      description: 'Label for form field: Attendant at birth',
-                      id: 'form.field.label.attendantAtBirthPhysician'
-                    }
+                    label: formMessageDescriptors.physician
                   },
                   {
                     value: 'NURSE',
-                    label: {
-                      defaultMessage: 'Nurse',
-                      description: 'Label for form field: Attendant at birth',
-                      id: 'form.field.label.attendantAtBirthNurse'
-                    }
+                    label: formMessageDescriptors.attendantAtBirthNurse
                   },
                   {
                     value: 'MIDWIFE',
-                    label: {
-                      defaultMessage: 'Midwife',
-                      description: 'Label for form field: Attendant at birth',
-                      id: 'form.field.label.attendantAtBirthMidwife'
-                    }
+                    label: formMessageDescriptors.attendantAtBirthMidwife
                   },
                   {
                     value: 'OTHER_PARAMEDICAL_PERSONNEL',
-                    label: {
-                      defaultMessage: 'Other paramedical personnel',
-                      description: 'Label for form field: Attendant at birth',
-                      id: 'form.field.label.attBirthOtherParaPers'
-                    }
+                    label:
+                      formMessageDescriptors.attendantAtBirthOtherParamedicalPersonnel
                   },
                   {
                     value: 'LAYPERSON',
-                    label: {
-                      defaultMessage: 'Layperson',
-                      description: 'Label for form field: Attendant at birth',
-                      id: 'form.field.label.attendantAtBirthLayperson'
-                    }
+                    label: formMessageDescriptors.attendantAtBirthLayperson
                   },
                   {
                     value: 'TRADITIONAL_BIRTH_ATTENDANT',
-                    label: {
-                      defaultMessage: 'Traditional birth attendant',
-                      description: 'Label for form field: Attendant at birth',
-                      id: 'form.field.label.attendantAtBirthTraditionalBirthAttendant'
-                    }
+                    label:
+                      formMessageDescriptors.attendantAtBirthTraditionalBirthAttendant
                   },
                   {
                     value: 'NONE',
-                    label: {
-                      defaultMessage: 'None',
-                      description: 'Label for form field: Attendant at birth',
-                      id: 'form.field.label.attendantAtBirthNone'
-                    }
-                  },
-                  {
-                    value: 'OTHER',
-                    label: {
-                      defaultMessage: 'Other',
-                      description: 'Label for form field: Attendant at birth',
-                      id: 'form.field.label.attendantAtBirthOther'
-                    }
+                    label: formMessageDescriptors.attendantAtBirthNone
                   }
                 ],
                 mapping: {
@@ -1115,51 +762,28 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'SINGLE',
-                    label: {
-                      defaultMessage: 'Single',
-                      description: 'Label for form field: Type of birth',
-                      id: 'form.field.label.birthTypeSingle'
-                    }
+                    label: formMessageDescriptors.birthTypeSingle
                   },
                   {
                     value: 'TWIN',
-                    label: {
-                      defaultMessage: 'Twin',
-                      description: 'Label for form field: Type of birth',
-                      id: 'form.field.label.birthTypeTwin'
-                    }
+                    label: formMessageDescriptors.birthTypeTwin
                   },
                   {
                     value: 'TRIPLET',
-                    label: {
-                      defaultMessage: 'Triplet',
-                      description: 'Label for form field: Type of birth',
-                      id: 'form.field.label.birthTypeTriplet'
-                    }
+                    label: formMessageDescriptors.birthTypeTriplet
                   },
                   {
                     value: 'QUADRUPLET',
-                    label: {
-                      defaultMessage: 'Quadruplet',
-                      description: 'Label for form field: Type of birth',
-                      id: 'form.field.label.birthTypeQuadruplet'
-                    }
+                    label: formMessageDescriptors.birthTypeQuadruplet
                   },
                   {
                     value: 'HIGHER_MULTIPLE_DELIVERY',
-                    label: {
-                      defaultMessage: 'Higher multiple delivery',
-                      description: 'Label for form field: Type of birth',
-                      id: 'form.field.label.birthTypeHigherMultipleDelivery'
-                    }
+                    label:
+                      formMessageDescriptors.birthTypeHigherMultipleDelivery
                   }
                 ],
                 mapping: {
@@ -1174,35 +798,10 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'multipleBirth',
-                type: 'NUMBER',
-                label: {
-                  defaultMessage: 'Order of birth (number)',
-                  description: 'Label for form field: Order of birth',
-                  id: 'form.field.label.multipleBirth'
-                },
-                customisable: false,
-                required: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'greaterThanZero'
-                  },
-                  {
-                    operation: 'maxLength',
-                    parameters: [2]
-                  }
-                ]
-              },
-              {
                 name: 'weightAtBirth',
                 type: 'NUMBER',
                 step: 0.01,
-                label: {
-                  defaultMessage: 'Weight at birth',
-                  description: 'Label for form field: Weight at birth',
-                  id: 'form.field.label.weightAtBirth'
-                },
+                label: formMessageDescriptors.weightAtBirth,
                 customisable: true,
                 required: false,
                 initialValue: '',
@@ -1228,11 +827,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'placeOfBirthTitle',
                 type: 'SUBSECTION',
-                label: {
-                  defaultMessage: 'Place of delivery',
-                  description: 'Title for place of birth sub section',
-                  id: 'form.field.label.placeOfBirthPreview'
-                },
+                label: formMessageDescriptors.placeOfBirthPreview,
                 previewGroup: 'placeOfBirtrh',
                 initialValue: '',
                 validate: []
@@ -1243,43 +838,23 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'SELECT_WITH_OPTIONS',
                 previewGroup: 'placeOfBirth',
                 ignoreFieldLabelOnErrorMessage: true,
-                label: {
-                  defaultMessage: 'Location',
-                  description: 'Label for form field: Place of delivery',
-                  id: 'form.field.label.placeOfBirth'
-                },
+                label: formMessageDescriptors.placeOfBirth,
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'HEALTH_FACILITY',
-                    label: {
-                      defaultMessage: 'Health Institution',
-                      description: 'Select item for Health Institution',
-                      id: 'form.field.label.healthInstitution'
-                    }
+                    label: formMessageDescriptors.healthInstitution
                   },
                   {
                     value: 'PRIVATE_HOME',
-                    label: {
-                      defaultMessage: 'Private Home',
-                      description: 'Select item for Private Home',
-                      id: 'form.field.label.privateHome'
-                    }
+                    label: formMessageDescriptors.privateHome
                   },
                   {
                     value: 'OTHER',
-                    label: {
-                      defaultMessage: 'Other Institution',
-                      description: 'Select item for Other Institution',
-                      id: 'form.field.label.otherInstitution'
-                    }
+                    label: formMessageDescriptors.otherInstitution
                   }
                 ],
                 mapping: {
@@ -1297,11 +872,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'birthLocation',
                 customisable: false,
                 type: 'LOCATION_SEARCH_INPUT',
-                label: {
-                  defaultMessage: 'Health institution',
-                  description: 'Label for form field: Health Institution',
-                  id: 'form.field.label.healthInstitution'
-                },
+                label: formMessageDescriptors.healthInstitution,
                 previewGroup: 'placeOfBirth',
                 required: true,
                 initialValue: '',
@@ -1341,11 +912,7 @@ export const registerForms: IDefaultRegisterForms = {
             previewGroups: [
               {
                 id: 'childNameInEnglish',
-                label: {
-                  defaultMessage: 'English name',
-                  description: 'Label for child name in english',
-                  id: 'form.preview.group.label.english.name'
-                },
+                label: formMessageDescriptors.nameInEnglishPreviewGroup,
                 fieldToRedirect: 'familyNameEng',
                 delimiter: ' '
               }
@@ -1361,11 +928,7 @@ export const registerForms: IDefaultRegisterForms = {
           description: 'Form section name for Informant',
           id: 'form.section.informant.name'
         },
-        title: {
-          defaultMessage: "What are the informant's details?",
-          description: 'Form section title for informants',
-          id: 'form.section.informant.title'
-        },
+        title: formMessageDescriptors.informantTitle,
         hasDocumentSection: true,
         groups: [
           {
@@ -1374,26 +937,21 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 action: 'hide',
                 expression:
-                  '(!draftData || !draftData.registration || !((draftData.presentAtBirthRegistration && (draftData.presentAtBirthRegistration === "LEGAL_GUARDIAN" || draftData.presentAtBirthRegistration === "OTHER")) || (draftData.registration.presentAtBirthRegistration && (draftData.registration.presentAtBirthRegistration === "LEGAL_GUARDIAN" || draftData.registration.presentAtBirthRegistration === "OTHER")  )))'
+                  "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
               }
             ],
             fields: [
               {
                 name: 'nationality',
                 type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Nationality',
-                  description: 'Label for form field: Nationality',
-                  id: 'form.field.label.deceased.nationality'
-                },
-                required: false,
-                initialValue: window.config.COUNTRY.toUpperCase(),
+                label: formMessageDescriptors.nationality,
+                required: true,
+                initialValue:
+                  typeof window !== 'undefined'
+                    ? window.config.COUNTRY.toUpperCase()
+                    : 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -1421,12 +979,8 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'informantID',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'National ID',
-                  description: 'Option for form field: Type of ID',
-                  id: 'form.field.label.iDTypeNationalID'
-                },
-                required: true,
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: false,
                 initialValue: '',
                 validate: [
                   {
@@ -1457,6 +1011,50 @@ export const registerForms: IDefaultRegisterForms = {
                       {
                         operation: 'identityToFieldTransformer',
                         parameters: ['id', 'NATIONAL_ID']
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                name: 'informantBirthDate',
+                type: 'DATE',
+                label: formMessageDescriptors.motherDateOfBirth,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'dateFormatIsCorrect',
+                    parameters: []
+                  },
+                  {
+                    operation: 'dateInPast',
+                    parameters: []
+                  },
+                  {
+                    operation: 'isValidParentsBirthDate',
+                    parameters: [5]
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'fieldValueNestingTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'longDateTransformer',
+                        parameters: ['birthDate']
+                      },
+                      'birthDate'
+                    ]
+                  },
+                  query: {
+                    operation: 'nestedValueToFieldTransformer',
+                    parameters: [
+                      'individual',
+                      {
+                        operation: 'fieldValueTransformer',
+                        parameters: ['birthDate']
                       }
                     ]
                   }
@@ -1571,777 +1169,80 @@ export const registerForms: IDefaultRegisterForms = {
         }
       },
       {
-        id: BirthSection.Parent,
-        hasDocumentSection: true,
-        viewType: 'form',
-        name: {
-          defaultMessage: 'Parents details',
-          description: 'Form section name or title for primary caregiver',
-          id: 'form.section.primaryCaregiver.nameOrTitle'
-        },
-        title: {
-          defaultMessage: 'Parents details',
-          description: 'Form section name or title for primary caregiver',
-          id: 'form.section.primaryCaregiver.nameOrTitle'
-        },
-        groups: [
-          {
-            id: 'parent-details-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(!draftData || !draftData.registration || !((draftData.presentAtBirthRegistration && (draftData.presentAtBirthRegistration === "LEGAL_GUARDIAN" || draftData.presentAtBirthRegistration === "OTHER")) || (draftData.registration.presentAtBirthRegistration && (draftData.registration.presentAtBirthRegistration === "LEGAL_GUARDIAN" || draftData.registration.presentAtBirthRegistration === "OTHER")  )))'
-              }
-            ],
-            fields: [
-              {
-                name: 'parentDetailsType',
-                type: 'RADIO_GROUP',
-                size: RadioSize.LARGE,
-                label: {
-                  defaultMessage:
-                    "Do you have the mother and father's details?",
-                  description:
-                    'Question to ask the user if they have the parents details',
-                  id: 'form.field.label.parentDetailsType'
-                },
-                initialValue: '',
-                required: true,
-                validate: [],
-                options: [
-                  {
-                    value: 'MOTHER_AND_FATHER',
-                    label: {
-                      defaultMessage: 'Yes',
-                      description:
-                        'confirmation label for parents radio button',
-                      id: 'buttons.yes'
-                    }
-                  },
-                  {
-                    value: 'MOTHER_ONLY',
-                    label: {
-                      defaultMessage: "Only the mother's",
-                      description: 'deny label for mother radio button',
-                      id: 'form.field.label.radio.mother'
-                    }
-                  },
-                  {
-                    value: 'FATHER_ONLY',
-                    label: {
-                      defaultMessage: "Only the father's",
-                      description: 'deny label for father radio button',
-                      id: 'form.field.label.radio.father'
-                    }
-                  },
-                  {
-                    value: 'NONE',
-                    label: {
-                      defaultMessage: 'No',
-                      description: 'confirmation label for No radio button',
-                      id: 'buttons.no'
-                    }
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            id: 'parent-not-applying-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(!draftData || !draftData.registration || !((draftData.presentAtBirthRegistration && (draftData.presentAtBirthRegistration === "LEGAL_GUARDIAN" || draftData.presentAtBirthRegistration === "OTHER")) || (draftData.registration.presentAtBirthRegistration && (draftData.registration.presentAtBirthRegistration === "LEGAL_GUARDIAN" || draftData.registration.presentAtBirthRegistration === "OTHER")  )))'
-              }
-            ],
-            title: {
-              defaultMessage: 'Why are the mother and father not applying?',
-              description:
-                'Form group name for reason parents are not applying',
-              id: 'form.group.reasonNotApplying.parents'
-            },
-            fields: [
-              {
-                name: 'reasonMotherNotApplying',
-                conditionals: [
-                  {
-                    action: 'disable',
-                    expression:
-                      '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.motherIsDeceased && draftData.primaryCaregiver.motherIsDeceased.toString() === ["deceased"].toString())'
-                  }
-                ],
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Reason for mother',
-                  description: 'Label for form field: reasonMotherNotApplying',
-                  id: 'form.field.label.reasonMotherNotApplying'
-                },
-                validate: [],
-                initialValue: '',
-                ignoreBottomMargin: true,
-                required: true,
-                extraValue: 'MOTHER',
-                previewGroup: 'reasonMotherNotApplying',
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToReasonsNotApplyingTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'reasonNotApplying',
-                      'primaryCaregiverType'
-                    ]
-                  },
-                  query: {
-                    operation: 'reasonsNotApplyingToFieldValueTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'reasonNotApplying',
-                      'primaryCaregiverType'
-                    ]
-                  }
-                }
-              },
-              {
-                name: 'motherIsDeceased',
-                type: 'CHECKBOX_GROUP',
-                label: {
-                  defaultMessage: ' ',
-                  description: 'Label for form field: motherIsDeceased',
-                  id: 'print.certificate.noLabel'
-                },
-                validate: [],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '(draftData && draftData.registration && draftData.registration.contactPoint && draftData.registration.contactPoint.value && draftData.registration.contactPoint.value === "MOTHER")'
-                  }
-                ],
-                initialValue: [],
-                extraValue: 'MOTHER',
-                required: false,
-                previewGroup: 'reasonMotherNotApplying',
-                options: [
-                  {
-                    value: 'deceased',
-                    label: {
-                      defaultMessage: 'Mother has died',
-                      description: 'Label for form field: motherIsDeceased',
-                      id: 'form.field.label.motherIsDeceased'
-                    }
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToReasonsNotApplyingTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'isDeceased',
-                      'primaryCaregiverType',
-                      true
-                    ]
-                  },
-                  query: {
-                    operation: 'reasonsNotApplyingToFieldValueTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'isDeceased',
-                      'primaryCaregiverType',
-                      undefined,
-                      ['deceased']
-                    ]
-                  }
-                }
-              },
-              {
-                name: 'reasonFatherNotApplying',
-                conditionals: [
-                  {
-                    action: 'disable',
-                    expression:
-                      '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.fatherIsDeceased && draftData.primaryCaregiver.fatherIsDeceased.toString() === ["deceased"].toString())'
-                  }
-                ],
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Reason for father',
-                  description: 'Label for form field: reasonFatherNotApplying',
-                  id: 'form.field.label.reasonFatherNotApplying'
-                },
-                validate: [],
-                initialValue: '',
-                ignoreBottomMargin: true,
-                required: true,
-                previewGroup: 'reasonFatherNotApplying',
-                extraValue: 'FATHER',
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToReasonsNotApplyingTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'reasonNotApplying',
-                      'primaryCaregiverType'
-                    ]
-                  },
-                  query: {
-                    operation: 'reasonsNotApplyingToFieldValueTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'reasonNotApplying',
-                      'primaryCaregiverType'
-                    ]
-                  }
-                }
-              },
-              {
-                name: 'fatherIsDeceased',
-                type: 'CHECKBOX_GROUP',
-                label: {
-                  defaultMessage: '',
-                  description: 'Label for form field: fatherIsDeceased',
-                  id: 'print.certificate.noLabel'
-                },
-                validate: [],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '(draftData && draftData.registration && draftData.registration.contactPoint && draftData.registration.contactPoint.value && draftData.registration.contactPoint.value === "FATHER")'
-                  }
-                ],
-                initialValue: [],
-                extraValue: 'FATHER',
-                required: false,
-                previewGroup: 'reasonFatherNotApplying',
-                options: [
-                  {
-                    value: 'deceased',
-                    label: {
-                      defaultMessage: 'Father has died',
-                      description: 'Label for form field: fatherIsDeceased',
-                      id: 'form.field.label.fatherIsDeceased'
-                    }
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToReasonsNotApplyingTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'isDeceased',
-                      'primaryCaregiverType',
-                      true
-                    ]
-                  },
-                  query: {
-                    operation: 'reasonsNotApplyingToFieldValueTransformer',
-                    parameters: [
-                      'reasonsNotApplying',
-                      'isDeceased',
-                      'primaryCaregiverType',
-                      undefined,
-                      ['deceased']
-                    ]
-                  }
-                }
-              }
-            ],
-            previewGroups: [
-              {
-                id: 'reasonMotherNotApplying',
-                label: {
-                  defaultMessage: 'Reason for mother not applying',
-                  description:
-                    'Label for form field: reasonMotherNotApplyingPreview',
-                  id: 'form.field.label.reasonMotherNotApplyingPreview'
-                },
-                fieldToRedirect: 'reasonMotherNotApplying'
-              },
-              {
-                id: 'reasonFatherNotApplying',
-                label: {
-                  defaultMessage: 'Reason for father not applying',
-                  description:
-                    'Label for form field: reasonFatherNotApplyingPreview',
-                  id: 'form.field.label.reasonFatherNotApplyingPreview'
-                },
-                fieldToRedirect: 'reasonFatherNotApplying'
-              }
-            ]
-          },
-          {
-            id: 'caregiver-details-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(!draftData || !draftData.registration || !((draftData.presentAtBirthRegistration && (draftData.presentAtBirthRegistration === "LEGAL_GUARDIAN" || draftData.presentAtBirthRegistration === "OTHER")) || (draftData.registration.presentAtBirthRegistration && (draftData.registration.presentAtBirthRegistration === "LEGAL_GUARDIAN" || draftData.registration.presentAtBirthRegistration === "OTHER")  )))'
-              }
-            ],
-            fields: [
-              {
-                name: 'primaryCaregiverType',
-                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                size: RadioSize.LARGE,
-                label: {
-                  defaultMessage: 'Who is looking after the child?',
-                  description: 'Question to ask the user about caregiver',
-                  id: 'form.field.label.primaryCaregiverType'
-                },
-                initialValue: '',
-                required: true,
-                validate: [],
-                options: [
-                  {
-                    value: 'MOTHER_AND_FATHER',
-                    label: {
-                      defaultMessage: 'Mother and father',
-                      description: 'label for parents radio button',
-                      id: 'form.field.label.caregiver.parents'
-                    },
-                    conditionals: [
-                      {
-                        action: 'hide',
-                        expression:
-                          '(draftData && draftData.primaryCaregiver && ((draftData.primaryCaregiver.motherIsDeceased && draftData.primaryCaregiver.motherIsDeceased.toString() === ["deceased"].toString()) || (draftData.primaryCaregiver.fatherIsDeceased && draftData.primaryCaregiver.fatherIsDeceased.toString() === ["deceased"].toString())))'
-                      }
-                    ]
-                  },
-                  {
-                    value: 'MOTHER',
-                    label: {
-                      defaultMessage: 'Mother',
-                      description: 'label for mother radio button',
-                      id: 'form.field.label.caregiver.mother'
-                    },
-                    conditionals: [
-                      {
-                        action: 'hide',
-                        expression:
-                          '(draftData && draftData.primaryCaregiver && (draftData.primaryCaregiver.motherIsDeceased && draftData.primaryCaregiver.motherIsDeceased.toString() === ["deceased"].toString()))'
-                      }
-                    ]
-                  },
-                  {
-                    value: 'FATHER',
-                    label: {
-                      defaultMessage: 'Father',
-                      description: 'label for father radio button',
-                      id: 'form.field.label.caregiver.father'
-                    },
-                    conditionals: [
-                      {
-                        action: 'hide',
-                        expression:
-                          '(draftData && draftData.primaryCaregiver &&  (draftData.primaryCaregiver.fatherIsDeceased && draftData.primaryCaregiver.fatherIsDeceased.toString() === ["deceased"].toString()))'
-                      }
-                    ]
-                  },
-                  {
-                    value: 'LEGAL_GUARDIAN',
-                    label: {
-                      defaultMessage: 'Legal guardian',
-                      description: 'label for Legal guardian radio button',
-                      id: 'form.field.label.caregiver.legalGuardian'
-                    },
-                    conditionals: [
-                      {
-                        action: 'hide',
-                        expression:
-                          '(draftData && draftData.registration && draftData.registration.informant && draftData.registration.informant.value === "LEGAL_GUARDIAN")'
-                      }
-                    ]
-                  },
-                  {
-                    value: 'INFORMANT',
-                    label: {
-                      defaultMessage: 'Informant is the primary caregiver',
-                      description: 'label for informant radio button',
-                      id: 'form.field.label.caregiver.informant'
-                    }
-                  },
-                  {
-                    value: 'OTHER',
-                    label: {
-                      defaultMessage: 'Other caregiver',
-                      description: 'label for Other caregiver radio button',
-                      id: 'form.field.label.caregiver.other'
-                    }
-                  }
-                ],
-                nestedFields: {
-                  MOTHER_AND_FATHER: [],
-                  MOTHER: [],
-                  FATHER: [],
-                  LEGAL_GUARDIAN: [
-                    {
-                      name: 'name',
-                      type: 'TEXT',
-                      label: {
-                        id: 'form.field.label.name',
-                        defaultMessage: 'Name',
-                        description: 'field label for name'
-                      },
-                      initialValue: '',
-                      validate: [],
-                      required: true,
-                      maxLength: 32,
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldValueNestingTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'fieldToNameTransformer',
-                                  parameters: ['en', 'familyName']
-                                },
-                                'name'
-                              ]
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'nestedValueToFieldTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'nameToFieldTransformer',
-                                  parameters: ['en', 'familyName']
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    {
-                      name: 'phone',
-                      type: 'TEL',
-                      label: {
-                        id: 'form.field.label.declaration.phone',
-                        defaultMessage: 'Phone number',
-                        description: 'field label for phone'
-                      },
-                      initialValue: '',
-                      required: true,
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldValueNestingTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'fieldToPhoneNumberTransformer',
-                                  parameters: []
-                                },
-                                'phone'
-                              ]
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'nestedValueToFieldTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'phoneNumberToFieldTransformer'
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    {
-                      name: 'reasonNotApplying',
-                      type: 'TEXT',
-                      label: {
-                        id: 'form.field.label.reasonNotApplying',
-                        defaultMessage: 'Reason not applying',
-                        description: 'field label for reasonNotApplying'
-                      },
-                      initialValue: '',
-                      validate: [],
-                      extraValue: 'LEGAL_GUARDIAN',
-                      required: false,
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldToReasonsNotApplyingTransformer',
-                              parameters: [
-                                'reasonsNotApplying',
-                                'reasonNotApplying',
-                                'primaryCaregiverType'
-                              ]
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation:
-                                'reasonsNotApplyingToFieldValueTransformer',
-                              parameters: [
-                                'reasonsNotApplying',
-                                'reasonNotApplying',
-                                'primaryCaregiverType',
-                                ['LEGAL_GUARDIAN']
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  INFORMANT: [],
-                  OTHER: [
-                    {
-                      name: 'name',
-                      type: 'TEXT',
-                      label: {
-                        id: 'form.field.label.name',
-                        defaultMessage: 'Name',
-                        description: 'field label for name'
-                      },
-                      initialValue: '',
-                      required: true,
-                      maxLength: 32,
-                      validate: [],
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldValueNestingTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'fieldToNameTransformer',
-                                  parameters: ['en', 'familyName']
-                                },
-                                'name'
-                              ]
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'nestedValueToFieldTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'nameToFieldTransformer',
-                                  parameters: ['en', 'familyName']
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    {
-                      name: 'phone',
-                      type: 'TEL',
-                      label: {
-                        id: 'form.field.label.declaration.phone',
-                        defaultMessage: 'Phone number',
-                        description: 'field label for phone'
-                      },
-                      initialValue: '',
-                      required: true,
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldValueNestingTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'fieldToPhoneNumberTransformer',
-                                  parameters: []
-                                },
-                                'phone'
-                              ]
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'nestedValueToFieldTransformer',
-                              parameters: [
-                                'primaryCaregiver',
-                                {
-                                  operation: 'phoneNumberToFieldTransformer'
-                                }
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    {
-                      name: 'reasonNotApplying',
-                      type: 'TEXT',
-                      label: {
-                        id: 'form.field.label.reasonNotApplying',
-                        defaultMessage: 'Reason not applying',
-                        description: 'field label for reasonNotApplying'
-                      },
-                      initialValue: '',
-                      validate: [],
-                      required: false,
-                      extraValue: 'OTHER',
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldToReasonsNotApplyingTransformer',
-                              parameters: [
-                                'reasonsNotApplying',
-                                'reasonNotApplying',
-                                'primaryCaregiverType'
-                              ]
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation:
-                                'reasonsNotApplyingToFieldValueTransformer',
-                              parameters: [
-                                'reasonsNotApplying',
-                                'reasonNotApplying',
-                                'primaryCaregiverType',
-                                ['OTHER']
-                              ]
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ]
-                },
-                mapping: {
-                  mutation: {
-                    operation: 'nestedRadioFieldTransformer',
-                    parameters: [
-                      {
-                        operation: 'fieldToReasonsNotApplyingTransformer',
-                        parameters: [
-                          'reasonsNotApplying',
-                          'primaryCaregiverType',
-                          '',
-                          false,
-                          true
-                        ]
-                      }
-                    ]
-                  },
-                  query: {
-                    operation: 'valueToNestedRadioFieldTransformer',
-                    parameters: [
-                      {
-                        operation: 'reasonsNotApplyingToFieldValueTransformer',
-                        parameters: [
-                          'reasonsNotApplying',
-                          'primaryCaregiverType',
-                          '',
-                          [
-                            'MOTHER_AND_FATHER',
-                            'MOTHER',
-                            'FATHER',
-                            'INFORMANT',
-                            'OTHER',
-                            'LEGAL_GUARDIAN'
-                          ]
-                        ]
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          }
-        ]
-      },
-      {
         id: BirthSection.Mother,
         viewType: 'form',
-        name: {
-          defaultMessage: 'Mother',
-          description: 'Form section name for Mother',
-          id: 'form.section.mother.name'
-        },
-        title: {
-          defaultMessage: "Mother's details",
-          description: 'Form section title for Mother',
-          id: 'form.section.mother.title'
-        },
+        name: formMessageDescriptors.motherName,
+        title: formMessageDescriptors.motherTitle,
         hasDocumentSection: true,
         groups: [
           {
             id: 'mother-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && (draftData.primaryCaregiver.parentDetailsType ===  "FATHER_ONLY" || draftData.primaryCaregiver.parentDetailsType ===  "NONE" ))'
-              }
-            ],
             fields: [
+              {
+                name: 'detailsExist',
+                type: 'RADIO_GROUP',
+                label: formMessageDescriptors.mothersDetailsExist,
+                required: true,
+                initialValue: true,
+                validate: [],
+                options: [
+                  {
+                    value: true,
+                    label: formMessageDescriptors.confirm
+                  },
+                  {
+                    value: false,
+                    label: formMessageDescriptors.deny
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: 'mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
+                  }
+                }
+              },
+              {
+                name: 'reasonNotApplying',
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      'mothersDetailsExistBasedOnContactAndInformant || values.detailsExist'
+                  }
+                ],
+                type: 'TEXT',
+                label: formMessageDescriptors.reasonMNA,
+                validate: [],
+                initialValue: '',
+                required: true
+              },
               {
                 name: 'nationality',
                 type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Nationality',
-                  description: 'Label for form field: Nationality',
-                  id: 'form.field.label.deceased.nationality'
-                },
-                required: false,
-                initialValue: window.config.COUNTRY.toUpperCase(),
+                label: formMessageDescriptors.nationality,
+                required: true,
+                initialValue:
+                  typeof window !== 'undefined'
+                    ? window.config.COUNTRY.toUpperCase()
+                    : 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
                 mapping: {
                   template: {
                     fieldName: 'motherNationality',
@@ -2358,12 +1259,8 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'iD',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'National ID',
-                  description: 'Option for form field: Type of ID',
-                  id: 'form.field.label.iDTypeNationalID'
-                },
-                required: true,
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: false,
                 initialValue: '',
                 validate: [
                   {
@@ -2375,7 +1272,13 @@ export const registerForms: IDefaultRegisterForms = {
                     parameters: ['father.iD']
                   }
                 ],
-                conditionals: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
                 mapping: {
                   template: {
                     fieldName: 'motherNID',
@@ -2393,96 +1296,6 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'socialSecurityNo',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Social Security No',
-                  description: 'text for social security number form field',
-                  id: 'form.field.label.socialSecurityNumber'
-                },
-                customisable: true,
-                required: false,
-                initialValue: '',
-                validate: [],
-                conditionals: [],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToIdentityTransformer',
-                    parameters: ['id', 'SOCIAL_SECURITY_NO']
-                  },
-                  query: {
-                    operation: 'identityToFieldTransformer',
-                    parameters: ['id', 'SOCIAL_SECURITY_NO']
-                  }
-                }
-              },
-              {
-                name: 'firstNamesEng',
-                previewGroup: 'motherNameInEnglish',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'First Name',
-                  description: 'Label for form field: First names in english',
-                  id: 'form.field.label.motherFirstNamesEng'
-                },
-                maxLength: 32,
-                required: false,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'englishOnlyNameFormat'
-                  }
-                ],
-                mapping: {
-                  template: {
-                    fieldName: 'motherFirstName',
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'firstNames']
-                  },
-                  mutation: {
-                    operation: 'fieldToNameTransformer',
-                    parameters: ['en', 'firstNames']
-                  },
-                  query: {
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'firstNames']
-                  }
-                }
-              },
-              {
-                name: 'familyNameEng',
-                previewGroup: 'motherNameInEnglish',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Last Name',
-                  description: 'Label for form field: Family name in english',
-                  id: 'form.field.label.motherFamilyNameEng'
-                },
-                maxLength: 32,
-                required: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'englishOnlyNameFormat'
-                  }
-                ],
-                mapping: {
-                  template: {
-                    fieldName: 'motherFamilyName',
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
-                  },
-                  mutation: {
-                    operation: 'fieldToNameTransformer',
-                    parameters: ['en', 'familyName']
-                  },
-                  query: {
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
-                  }
-                }
-              },
-              {
                 name: 'motherBirthDate',
                 type: 'DATE',
                 label: {
@@ -2490,7 +1303,14 @@ export const registerForms: IDefaultRegisterForms = {
                   description: 'Label for form field: Date of birth',
                   id: 'form.field.label.motherDateOfBirth'
                 },
-                required: false,
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                required: true,
                 initialValue: '',
                 validate: [
                   {
@@ -2523,6 +1343,86 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
+                name: 'firstNamesEng',
+                previewGroup: 'motherNameInEnglish',
+                type: 'TEXT',
+                label: {
+                  defaultMessage: 'First Name',
+                  description: 'Label for form field: First names in english',
+                  id: 'form.field.label.motherFirstNamesEng'
+                },
+                maxLength: 32,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  }
+                ],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'motherFirstName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'firstNames']
+                  },
+                  mutation: {
+                    operation: 'fieldToNameTransformer',
+                    parameters: ['en', 'firstNames']
+                  },
+                  query: {
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'firstNames']
+                  }
+                }
+              },
+              {
+                name: 'familyNameEng',
+                previewGroup: 'motherNameInEnglish',
+                type: 'TEXT',
+                label: {
+                  defaultMessage: 'Last Name',
+                  description: 'Label for form field: Family name in english',
+                  id: 'form.field.label.motherFamilyNameEng'
+                },
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                maxLength: 32,
+                required: true,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'englishOnlyNameFormat'
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'motherFamilyName',
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName']
+                  },
+                  mutation: {
+                    operation: 'fieldToNameTransformer',
+                    parameters: ['en', 'familyName']
+                  },
+                  query: {
+                    operation: 'nameToFieldTransformer',
+                    parameters: ['en', 'familyName']
+                  }
+                }
+              },
+              {
                 name: 'seperator',
                 type: 'SUBSECTION',
                 label: {
@@ -2532,7 +1432,13 @@ export const registerForms: IDefaultRegisterForms = {
                 },
                 initialValue: '',
                 validate: [],
-                conditionals: []
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ]
               },
               {
                 name: 'maritalStatus',
@@ -2544,24 +1450,27 @@ export const registerForms: IDefaultRegisterForms = {
                 },
                 customisable: true,
                 required: false,
-                initialValue: 'MARRIED',
+                initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
                   template: {
                     fieldName: 'motherMaritalStatus',
                     operation: 'selectTransformer'
                   }
                 },
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
                 options: [
                   {
                     value: 'SINGLE',
                     label: {
-                      defaultMessage: 'Unmarried',
+                      defaultMessage: 'Single',
                       description: 'Option for form field: Marital status',
                       id: 'form.field.label.maritalStatusSingle'
                     }
@@ -2609,6 +1518,34 @@ export const registerForms: IDefaultRegisterForms = {
                 ]
               },
               {
+                name: 'multipleBirth',
+                type: 'NUMBER',
+                label: {
+                  defaultMessage: 'No. of previous births',
+                  description: 'Label for form field: multipleBirth',
+                  id: ' '
+                },
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                customisable: false,
+                required: false,
+                initialValue: '',
+                validate: [
+                  {
+                    operation: 'greaterThanZero'
+                  },
+                  {
+                    operation: 'maxLength',
+                    parameters: [2]
+                  }
+                ]
+              },
+              {
                 name: 'occupation',
                 type: 'TEXT',
                 label: {
@@ -2620,7 +1557,13 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: '',
                 validate: [],
-                conditionals: []
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ]
               },
               {
                 name: 'educationalAttainment',
@@ -2633,11 +1576,14 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'NO_SCHOOLING',
@@ -2692,7 +1638,12 @@ export const registerForms: IDefaultRegisterForms = {
               }
             ]
           }
-        ]
+        ],
+        mapping: {
+          query: {
+            operation: 'emptyMotherSectionTransformer'
+          }
+        }
       },
       {
         id: BirthSection.Father,
@@ -2711,16 +1662,9 @@ export const registerForms: IDefaultRegisterForms = {
         groups: [
           {
             id: 'father-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && (draftData.primaryCaregiver.parentDetailsType ===  "MOTHER_ONLY" || draftData.primaryCaregiver.parentDetailsType ===  "NONE" ))'
-              }
-            ],
             fields: [
               {
-                name: 'fathersDetailsExist',
+                name: 'detailsExist',
                 type: 'RADIO_GROUP',
                 label: {
                   defaultMessage: "Do you have the father's details?",
@@ -2734,45 +1678,79 @@ export const registerForms: IDefaultRegisterForms = {
                 options: [
                   {
                     value: true,
-                    label: {
-                      defaultMessage: 'Yes',
-                      description:
-                        'confirmation label for yes / no radio button',
-                      id: 'form.field.label.confirm'
-                    }
+                    label: formMessageDescriptors.confirm
                   },
                   {
                     value: false,
-                    label: {
-                      defaultMessage: 'No',
-                      description: 'deny label for yes / no radio button',
-                      id: 'form.field.label.deny'
-                    }
+                    label: formMessageDescriptors.deny
                   }
                 ],
                 conditionals: [
                   {
                     action: 'hide',
-                    expression:
-                      '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
+                    expression: 'fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
+                  query: {
+                    operation: 'booleanTransformer'
+                  }
+                }
+              },
+              {
+                name: 'reasonNotApplying',
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      'fathersDetailsExistBasedOnContactAndInformant || values.detailsExist'
+                  }
+                ],
+                type: 'TEXT',
+                label: formMessageDescriptors.reasonFNA,
+                validate: [],
+                initialValue: '',
+                required: true
+              },
+              {
+                name: 'nationality',
+                type: 'SELECT_WITH_OPTIONS',
+                label: formMessageDescriptors.nationality,
+                required: true,
+                initialValue:
+                  typeof window !== 'undefined'
+                    ? window.config.COUNTRY.toUpperCase()
+                    : 'FAR',
+                validate: [],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                options: {
+                  resource: 'countries'
+                },
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                  }
+                ],
+                mapping: {
+                  template: {
+                    fieldName: 'fatherNationality',
+                    operation: 'selectTransformer'
+                  },
                   mutation: {
-                    operation: 'sectionRemoveTransformer',
-                    parameters: []
+                    operation: 'fieldToArrayTransformer'
+                  },
+                  query: {
+                    operation: 'arrayToFieldTransformer'
                   }
                 }
               },
               {
                 name: 'iD',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'National ID',
-                  description: 'Option for form field: Type of ID',
-                  id: 'form.field.label.iDTypeNationalID'
-                },
-                required: true,
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: false,
                 initialValue: '',
                 validate: [
                   {
@@ -2787,7 +1765,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.fathersDetailsExist'
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2807,69 +1786,49 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'socialSecurityNo',
-                type: 'TEXT',
+                name: 'fatherBirthDate',
+                type: 'DATE',
                 label: {
-                  defaultMessage: 'Social Security No',
-                  description: 'text for social security number form field',
-                  id: 'form.field.label.socialSecurityNumber'
+                  defaultMessage: 'Date of birth',
+                  description: 'Label for form field: Date of birth',
+                  id: 'form.field.label.motherDateOfBirth'
                 },
-                customisable: true,
-                required: false,
+                required: true,
                 initialValue: '',
-                validate: [],
-                conditionals: [
+                validate: [
                   {
-                    action: 'hide',
-                    expression: '!values.fathersDetailsExist'
+                    operation: 'dateFormatIsCorrect',
+                    parameters: []
+                  },
+                  {
+                    operation: 'dateInPast',
+                    parameters: []
+                  },
+                  {
+                    operation: 'isValidParentsBirthDate',
+                    parameters: [10]
                   }
                 ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToIdentityTransformer',
-                    parameters: ['id', 'SOCIAL_SECURITY_NO']
-                  },
-                  query: {
-                    operation: 'identityToFieldTransformer',
-                    parameters: ['id', 'SOCIAL_SECURITY_NO']
-                  }
-                }
-              },
-              {
-                name: 'nationality',
-                type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Nationality',
-                  description: 'Label for form field: Nationality',
-                  id: 'form.field.label.deceased.nationality'
-                },
-                required: false,
-                initialValue: window.config.COUNTRY.toUpperCase(),
-                validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
-                options: {
-                  resource: 'countries'
-                },
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.fathersDetailsExist'
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
                   template: {
-                    fieldName: 'fatherNationality',
-                    operation: 'selectTransformer'
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'fatherBirthDate',
+                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
                   },
                   mutation: {
-                    operation: 'fieldToArrayTransformer'
+                    operation: 'longDateTransformer',
+                    parameters: ['birthDate']
                   },
                   query: {
-                    operation: 'arrayToFieldTransformer'
+                    operation: 'fieldValueTransformer',
+                    parameters: ['birthDate']
                   }
                 }
               },
@@ -2883,7 +1842,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.fatherFirstNamesEng'
                 },
                 maxLength: 32,
-                required: false,
+                required: true,
                 initialValue: '',
                 validate: [
                   {
@@ -2893,7 +1852,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.fathersDetailsExist'
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2932,7 +1892,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.fathersDetailsExist'
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2952,52 +1913,6 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'fatherBirthDate',
-                type: 'DATE',
-                label: {
-                  defaultMessage: 'Date of birth',
-                  description: 'Label for form field: Date of birth',
-                  id: 'form.field.label.motherDateOfBirth'
-                },
-                required: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'dateFormatIsCorrect',
-                    parameters: []
-                  },
-                  {
-                    operation: 'dateInPast',
-                    parameters: []
-                  },
-                  {
-                    operation: 'isValidParentsBirthDate',
-                    parameters: [10]
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression: '!values.fathersDetailsExist'
-                  }
-                ],
-                mapping: {
-                  template: {
-                    operation: 'dateFormatTransformer',
-                    fieldName: 'fatherBirthDate',
-                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
-                  },
-                  mutation: {
-                    operation: 'longDateTransformer',
-                    parameters: ['birthDate']
-                  },
-                  query: {
-                    operation: 'fieldValueTransformer',
-                    parameters: ['birthDate']
-                  }
-                }
-              },
-              {
                 name: 'seperator',
                 type: 'SUBSECTION',
                 label: {
@@ -3010,7 +1925,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.fathersDetailsExist'
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
               },
@@ -3024,17 +1940,14 @@ export const registerForms: IDefaultRegisterForms = {
                 },
                 customisable: true,
                 required: false,
-                initialValue: 'MARRIED',
+                initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.fathersDetailsExist'
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -3109,7 +2022,8 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.fathersDetailsExist'
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ]
               },
@@ -3125,15 +2039,12 @@ export const registerForms: IDefaultRegisterForms = {
                 required: false,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.fathersDetailsExist'
+                    expression:
+                      '!values.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 options: [
@@ -3201,11 +2112,7 @@ export const registerForms: IDefaultRegisterForms = {
       {
         id: BirthSection.Documents,
         viewType: 'form',
-        name: {
-          defaultMessage: 'Documents',
-          description: 'Form section name for Documents',
-          id: 'form.section.documents.name'
-        },
+        name: formMessageDescriptors.documentsName,
         title: {
           defaultMessage: 'Attaching supporting documents',
           description: 'Form section title for Documents',
@@ -3226,44 +2133,22 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'paragraph',
                 type: 'PARAGRAPH',
-                label: {
-                  defaultMessage:
-                    'For birth registration of birth the following documents are required:',
-                  description: 'Documents Paragraph text',
-                  id: 'form.section.documents.birth.requirements'
-                },
+                label: formMessageDescriptors.documentsParagraph,
                 initialValue: '',
                 validate: []
               },
               {
                 name: 'uploadDocForChildDOB',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: 'Proof of Place and Date of Birth of Child',
-                  description: 'Label for list item Child Birth Proof',
-                  id: 'form.field.label.proofOfBirthPlaceAndDate'
-                },
+                label: formMessageDescriptors.proofOfBirth,
                 initialValue: '',
-                extraValue: 'CHILD',
+                extraValue: birthDocumentForWhomFhirMapping.CHILD,
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'Original Birth Record',
-                    label: {
-                      defaultMessage: 'Original birth record',
-                      description:
-                        'Label for select option original Birth Record',
-                      id: 'form.field.label.docTypeChildBirthProof'
-                    }
-                  },
-                  {
-                    value: 'Under Five Card',
-                    label: {
-                      defaultMessage: 'Under five card',
-                      description: 'Label for select option Under five card',
-                      id: 'form.field.label.docTypeChildUnderFiveCard'
-                    }
+                    value: birthDocumentTypeFhirMapping.NOTIFICATION_OF_BIRTH,
+                    label: formMessageDescriptors.docTypeChildBirthProof
                   }
                 ],
                 mapping: {
@@ -3278,33 +2163,27 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'uploadDocForMother',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: "Proof of Mother's ID",
-                  description: 'Label for list item Mother ID Proof',
-                  id: 'form.field.label.proofOfMothersID'
-                },
+                label: formMessageDescriptors.proofOfMothersID,
                 initialValue: '',
-                extraValue: 'MOTHER',
+                extraValue: birthDocumentForWhomFhirMapping.MOTHER,
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'National ID (front)',
-                    label: {
-                      defaultMessage: 'Front of national ID',
-                      description:
-                        'Label for select option front of national ID',
-                      id: 'form.field.label.docTypeNIDFront'
-                    }
+                    value: birthDocumentTypeFhirMapping.NATIONAL_ID,
+                    label: formMessageDescriptors.docTypeNID
                   },
                   {
-                    value: 'National ID (back)',
-                    label: {
-                      defaultMessage: "Back of national ID'",
-                      description:
-                        "Label for select option back of national ID'",
-                      id: 'form.field.label.docTypeNIDBack'
-                    }
+                    value: birthDocumentTypeFhirMapping.PASSPORT,
+                    label: formMessageDescriptors.docTypePassport
+                  },
+                  {
+                    value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
+                    label: formMessageDescriptors.docTypeBirthCert
+                  },
+                  {
+                    value: birthDocumentTypeFhirMapping.OTHER,
+                    label: formMessageDescriptors.docTypeOther
                   }
                 ],
                 conditionals: [
@@ -3313,7 +2192,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'Hidden for Parent Details none or Mother only',
                     action: 'hide',
                     expression:
-                      '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === "NONE") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === "FATHER_ONLY")'
+                      '!draftData.mother.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -3328,33 +2207,27 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'uploadDocForFather',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: "Proof of Father's ID",
-                  description: 'Label for list item Father ID Proof',
-                  id: 'form.field.label.proofOfFathersID'
-                },
+                label: formMessageDescriptors.proofOfFathersID,
                 initialValue: '',
-                extraValue: 'FATHER',
+                extraValue: birthDocumentForWhomFhirMapping.FATHER,
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'National ID (front)',
-                    label: {
-                      defaultMessage: 'Front of national ID',
-                      description:
-                        'Label for select option front of national ID',
-                      id: 'form.field.label.docTypeNIDFront'
-                    }
+                    value: birthDocumentTypeFhirMapping.NATIONAL_ID,
+                    label: formMessageDescriptors.docTypeNID
                   },
                   {
-                    value: 'National ID (back)',
-                    label: {
-                      defaultMessage: 'Back of national ID',
-                      description:
-                        "Label for select option back of national ID'",
-                      id: 'form.field.label.docTypeNIDBack'
-                    }
+                    value: birthDocumentTypeFhirMapping.PASSPORT,
+                    label: formMessageDescriptors.docTypePassport
+                  },
+                  {
+                    value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
+                    label: formMessageDescriptors.docTypeBirthCert
+                  },
+                  {
+                    value: birthDocumentTypeFhirMapping.OTHER,
+                    label: formMessageDescriptors.docTypeOther
                   }
                 ],
                 conditionals: [
@@ -3363,7 +2236,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'Hidden for Parent Details none or Father only',
                     action: 'hide',
                     expression:
-                      '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === "NONE") || (draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType === "MOTHER_ONLY") || (draftData && draftData.father && draftData.father.fathersDetailsExist === false)'
+                      '!draftData.father.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -3378,145 +2251,78 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'uploadDocForInformant',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: "Proof of informant's ID",
-                  description:
-                    'Option for radio group field: Type of Document To Upload',
-                  id: 'form.field.label.informantIDProof'
-                },
+                label: formMessageDescriptors.proofOfInformantsID,
                 initialValue: '',
-                extraValue: 'INFORMANT_ID_PROOF',
+                extraValue: birthDocumentForWhomFhirMapping.INFORMANT_ID_PROOF,
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'National ID (front)',
-                    label: {
-                      defaultMessage: 'National ID (Front)',
-                      description:
-                        'Label for select option radio option NID front',
-                      id: 'form.field.label.docTypeNIDFront'
-                    }
+                    value: birthDocumentTypeFhirMapping.NATIONAL_ID,
+                    label: formMessageDescriptors.docTypeNID
                   },
                   {
-                    value: 'National ID (back)',
-                    label: {
-                      defaultMessage: 'National ID (Back)',
-                      description:
-                        'Label for select option radio option NID back',
-                      id: 'form.field.label.docTypeNIDBack'
-                    }
+                    value: birthDocumentTypeFhirMapping.PASSPORT,
+                    label: formMessageDescriptors.docTypePassport
                   },
                   {
-                    value: 'Birth Registration',
-                    label: {
-                      defaultMessage: 'Birth registration certificate',
-                      description: 'Label for select option Birth Registration',
-                      id: 'form.field.label.docTypeBR'
-                    }
+                    value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
+                    label: formMessageDescriptors.docTypeBirthCert
                   },
                   {
-                    value: 'Passport',
-                    label: {
-                      defaultMessage: 'Passport',
-                      description: 'Label for radio option Passport',
-                      id: 'form.field.label.docTypePassport'
-                    }
+                    value: birthDocumentTypeFhirMapping.OTHER,
+                    label: formMessageDescriptors.docTypeOther
                   }
                 ],
                 conditionals: [
                   {
                     action: 'hide',
                     expression:
-                      '(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== "LEGAL_GUARDIAN" && draftData.registration.presentAtBirthRegistration !== "OTHER")'
+                      "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
                   }
                 ],
                 mapping: {
                   mutation: {
-                    operation: 'deathFieldToAttachmentTransformer'
+                    operation: 'birthFieldToAttachmentTransformer'
                   },
                   query: {
-                    operation: 'deathAttachmentToFieldTransformer'
+                    operation: 'birthAttachmentToFieldTransformer'
                   }
                 }
               },
               {
                 name: 'uploadDocForProofOfLegarGuardian',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: 'Proof of legal guardianship',
-                  description:
-                    'Option for radio group field: Type of Document To Upload',
-                  id: 'form.field.label.legalGuardianProof'
-                },
+                label: formMessageDescriptors.otherBirthSupportingDocuments,
                 initialValue: '',
-                extraValue: 'LEGAL_GUARDIAN_PROOF',
+                extraValue:
+                  birthDocumentForWhomFhirMapping.LEGAL_GUARDIAN_PROOF,
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'Proof of legal guardianship',
-                    label: {
-                      defaultMessage: 'Proof of legal guardianship',
-                      description:
-                        'Label for select option radio option NID front',
-                      id: 'form.field.label.legalGuardianProof'
-                    }
+                    value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
+                    label: formMessageDescriptors.legalGuardianProof
+                  },
+                  {
+                    value:
+                      birthDocumentTypeFhirMapping.PROOF_OF_ASSIGNED_RESPONSIBILITY,
+                    label: formMessageDescriptors.assignedResponsibilityProof
                   }
                 ],
                 conditionals: [
                   {
                     action: 'hide',
                     expression:
-                      '(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== "LEGAL_GUARDIAN")'
+                      "(draftData && draftData.registration && draftData.registration.informantType && selectedInformantAndContactType.selectedInformantType && (selectedInformantAndContactType.selectedInformantType === 'MOTHER' || selectedInformantAndContactType.selectedInformantType === 'FATHER'))"
                   }
                 ],
                 mapping: {
                   mutation: {
-                    operation: 'deathFieldToAttachmentTransformer'
+                    operation: 'birthFieldToAttachmentTransformer'
                   },
                   query: {
-                    operation: 'deathAttachmentToFieldTransformer'
-                  }
-                }
-              },
-              {
-                name: 'uploadDocForProofOfAssignedResponsibility',
-                type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: 'Proof of assigned responsibility',
-                  description:
-                    'Option for radio group field: Type of Document To Upload',
-                  id: 'form.field.label.assignedResponsibilityProof'
-                },
-                initialValue: '',
-                extraValue: 'ASSIGNED_RESPONSIBILITY_PROOF',
-                hideAsterisk: true,
-                validate: [],
-                options: [
-                  {
-                    value: 'Proof of assigned responsibility',
-                    label: {
-                      defaultMessage: 'Proof of assigned responsibility',
-                      description:
-                        'Label for select option radio option NID front',
-                      id: 'form.field.label.assignedResponsibilityProof'
-                    }
-                  }
-                ],
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '(draftData && draftData.registration && draftData.registration.presentAtBirthRegistration !== "OTHER")'
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'deathFieldToAttachmentTransformer'
-                  },
-                  query: {
-                    operation: 'deathAttachmentToFieldTransformer'
+                    operation: 'birthAttachmentToFieldTransformer'
                   }
                 }
               }
@@ -3531,113 +2337,88 @@ export const registerForms: IDefaultRegisterForms = {
       {
         id: DeathSection.Registration,
         viewType: 'form',
-        name: {
-          defaultMessage: 'Registration',
-          description: 'Form section name for Registration',
-          id: 'form.section.declaration.name'
-        },
-        title: {
-          defaultMessage: 'Declaration Details',
-          description: 'Form section title for Registration',
-          id: 'form.section.declaration.title'
-        },
+        name: formMessageDescriptors.registrationName,
+        title: formMessageDescriptors.registrationTitle,
         groups: [
           {
-            id: 'other-relationship-with-deceased',
-            title: {
-              defaultMessage:
-                "What is the informant's relationship to the deceased?",
-              description: 'Form section title for primary informant',
-              id: 'register.selInf.deathInfSomeoneElse'
-            },
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(!draftData || !draftData.informant || !["OTHER", "OFFICER_IN_CHARGE", "DRIVER_OF_THE_VEHICLE", "OWNER_OF_THE_HOUSE", "HEAD_OF_THE_INSTITUTE"].includes(draftData.informant.relationship))'
-              }
-            ],
-            showExitButtonOnly: true,
+            id: 'who-is-applying-view-group',
+            title: informantMessageDescriptors.deathInformantTitle,
+            conditionals: [],
             preventContinueIfError: true,
+            showExitButtonOnly: true,
             fields: [
               {
-                name: 'relationship',
+                name: 'informantType',
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                label: {
-                  defaultMessage:
-                    "What is the informant's relationship to the deceased?",
-                  description: 'Form section title for primary informant',
-                  id: 'register.selInf.deathInfSomeoneElse'
-                },
+                label: informantMessageDescriptors.deathInformantTitle,
                 hideHeader: true,
-                size: RadioSize.LARGE,
                 required: true,
+                hideInPreview: false,
                 initialValue: '',
                 validate: [],
+                size: RadioSize.LARGE,
                 options: [
                   {
-                    value: 'HEAD_OF_THE_INSTITUTE',
-                    label: {
-                      defaultMessage:
-                        'Head of the institution where the death occurred',
-                      description:
-                        'Option for form field: Head of the institute',
-                      id: 'form.field.label.informantRelation.headInst'
-                    }
+                    value: 'SPOUSE',
+                    label: informantMessageDescriptors.spouse
                   },
                   {
-                    value: 'OWNER_OF_THE_HOUSE',
-                    label: {
-                      defaultMessage:
-                        'Owner of the house or building where the death occurred',
-                      description: 'Option for form field: Owner of the house',
-                      id: 'form.field.label.informantRelation.owner'
-                    }
+                    value: 'SON',
+                    label: informantMessageDescriptors.son
                   },
                   {
-                    value: 'DRIVER_OF_THE_VEHICLE',
-                    label: {
-                      defaultMessage:
-                        'Driver or operator of the land or water vehicle or aircraft where the death occurred',
-                      description:
-                        'Option for form field: Driver of the vehicle',
-                      id: 'form.field.label.informantRelation.driver'
-                    }
+                    value: 'DAUGHTER',
+                    label: informantMessageDescriptors.daughter
                   },
                   {
-                    value: 'OFFICER_IN_CHARGE',
-                    label: {
-                      defaultMessage:
-                        'Officer-in-charge of the Thana of a road or public space where the death occurred',
-                      description: 'Option for form field: Officer-in-charge',
-                      id: 'form.field.label.informantRelation.officer'
-                    }
+                    value: 'SON_IN_LAW',
+                    label: informantMessageDescriptors.sonInLaw
+                  },
+                  {
+                    value: 'DAUGHTER_IN_LAW',
+                    label: informantMessageDescriptors.daughterInLaw
+                  },
+                  {
+                    value: 'MOTHER',
+                    label: informantMessageDescriptors.mother
+                  },
+                  {
+                    value: 'FATHER',
+                    label: informantMessageDescriptors.father
+                  },
+                  {
+                    value: 'GRANDSON',
+                    label: informantMessageDescriptors.grandson
+                  },
+                  {
+                    value: 'GRANDDAUGHTER',
+                    label: informantMessageDescriptors.granddaughter
                   },
                   {
                     value: 'OTHER',
-                    label: {
-                      defaultMessage: 'Someone else',
-                      description: 'Option for form field: Someone else',
-                      id: 'form.field.label.relationSomeoneElse'
-                    }
+                    label: formMessageDescriptors.someoneElse
                   }
                 ],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 nestedFields: {
+                  SPOUSE: [],
+                  SON: [],
+                  DAUGHTER: [],
+                  SON_IN_LAW: [],
+                  DAUGHTER_IN_LAW: [],
+                  MOTHER: [],
+                  FATHER: [],
+                  GRANDSON: [],
+                  GRANDDAUGHTER: [],
                   OTHER: [
                     {
-                      name: 'otherRelationship',
+                      name: 'otherInformantType',
                       type: 'TEXT',
-                      label: {
-                        defaultMessage: 'Relationship to deceased',
-                        id: 'register.selectInformant.relationshipLabel',
-                        description: 'Label for input Relationship to deceased'
-                      },
-                      placeholder: {
-                        defaultMessage: 'eg. Grandmother',
-                        description: 'Placeholder for example of relationship',
-                        id: 'form.field.label.relationshipPlaceHolder'
-                      },
-                      required: true,
+                      label:
+                        formMessageDescriptors.informantsRelationWithDeceased,
+                      placeholder:
+                        formMessageDescriptors.relationshipPlaceHolder,
+                      required: false,
                       initialValue: '',
                       validate: [
                         {
@@ -3647,146 +2428,97 @@ export const registerForms: IDefaultRegisterForms = {
                       mapping: {
                         mutation: {
                           operation: 'changeHirerchyMutationTransformer',
-                          parameters: ['informant.otherRelationship']
+                          parameters: ['registration.otherInformantType']
                         },
                         query: {
                           operation: 'changeHirerchyQueryTransformer',
-                          parameters: ['informant.otherRelationship']
+                          parameters: ['registration.otherInformantType']
                         }
                       }
                     }
-                  ],
-                  OFFICER_IN_CHARGE: [],
-                  DRIVER_OF_THE_VEHICLE: [],
-                  OWNER_OF_THE_HOUSE: [],
-                  HEAD_OF_THE_INSTITUTE: []
+                  ]
                 },
-                conditionals: [],
                 mapping: {
                   mutation: {
                     operation: 'nestedRadioFieldToBundleFieldTransformer',
-                    parameters: ['informant.relationship']
+                    parameters: ['registration.informantType']
                   },
                   query: {
                     operation: 'bundleFieldToNestedRadioFieldTransformer',
-                    parameters: ['informant.relationship']
+                    parameters: ['registration.informantType']
                   }
                 }
               }
             ]
           },
           {
-            id: 'point-of-contact',
-            title: {
-              defaultMessage:
-                'Who is the main point of contact for this declaration?',
-              description: 'Form section title for contact point',
-              id: 'register.SelectContactPoint.heading'
-            },
+            id: 'contact-view-group',
+            title: informantMessageDescriptors.selectContactPoint,
+            conditionals: [],
             preventContinueIfError: true,
             showExitButtonOnly: true,
-            conditionals: [],
+            previewGroups: [
+              {
+                id: 'contactPointGroup',
+                label: formMessageDescriptors.reviewLabelMainContact,
+                required: false,
+                initialValue: '',
+                fieldToRedirect: 'contactPoint'
+              }
+            ],
             fields: [
               {
                 name: 'contactPoint',
                 type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                label: {
-                  defaultMessage:
-                    'Who is the main point of contact for this declaration?',
-                  description: 'Form section title for contact point',
-                  id: 'register.SelectContactPoint.heading'
-                },
+                label: formMessageDescriptors.selectContactPoint,
                 conditionals: [],
-                hideHeader: true,
+                previewGroup: 'contactPointGroup',
                 required: true,
+                hideHeader: true,
                 initialValue: '',
                 validate: [],
                 size: RadioSize.LARGE,
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'SPOUSE',
-                    label: {
-                      defaultMessage: 'Spouse',
-                      description: 'Label for "Spouse" radio option',
-                      id: 'form.field.label.spouse'
-                    }
+                    label: informantMessageDescriptors.spouse
                   },
                   {
                     value: 'SON',
-                    label: {
-                      defaultMessage: 'Son',
-                      description: 'Label for "Son" radio option',
-                      id: 'form.field.label.son'
-                    }
+                    label: informantMessageDescriptors.son
                   },
                   {
                     value: 'DAUGHTER',
-                    label: {
-                      defaultMessage: 'Daughter',
-                      description: 'Label for "Daughter" radio option',
-                      id: 'form.field.label.daughter'
-                    }
+                    label: informantMessageDescriptors.daughter
                   },
                   {
                     value: 'SON_IN_LAW',
-                    label: {
-                      defaultMessage: 'Son in law',
-                      description: 'Label for "Son in law" radio option',
-                      id: 'form.field.label.sonInLaw'
-                    }
+                    label: informantMessageDescriptors.sonInLaw
                   },
                   {
                     value: 'DAUGHTER_IN_LAW',
-                    label: {
-                      defaultMessage: 'Daughter in law',
-                      description: 'Label for "Daughter in law" radio option',
-                      id: 'form.field.label.daughterInLaw'
-                    }
-                  },
-                  {
-                    value: 'FATHER',
-                    label: {
-                      defaultMessage: 'Father',
-                      description: 'Label for "Father" radio option',
-                      id: 'form.field.label.father'
-                    }
+                    label: informantMessageDescriptors.daughterInLaw
                   },
                   {
                     value: 'MOTHER',
-                    label: {
-                      defaultMessage: 'Mother',
-                      description: 'Label for "Mother" radio option',
-                      id: 'form.field.label.mother'
-                    }
+                    label: informantMessageDescriptors.mother
+                  },
+                  {
+                    value: 'FATHER',
+                    label: informantMessageDescriptors.father
                   },
                   {
                     value: 'GRANDSON',
-                    label: {
-                      defaultMessage: 'Grandson',
-                      description: 'Label for "Grandson" radio option',
-                      id: 'form.field.label.grandSon'
-                    }
+                    label: informantMessageDescriptors.grandson
                   },
                   {
                     value: 'GRANDDAUGHTER',
-                    label: {
-                      defaultMessage: 'Granddaughter',
-                      description: 'Label for "Granddaughter" radio option',
-                      id: 'form.field.label.grandDaughter'
-                    }
+                    label: informantMessageDescriptors.granddaughter
                   },
                   {
                     value: 'OTHER',
-                    label: {
-                      defaultMessage: 'Someone else',
-                      description: 'Label for "Someone else" radio option',
-                      id: 'form.field.label.someoneElse'
-                    }
+                    label: formMessageDescriptors.someoneElse
                   }
                 ],
                 nestedFields: {
@@ -3794,11 +2526,7 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
+                      label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
                       validate: [
@@ -3834,11 +2562,7 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
+                      label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
                       validate: [
@@ -3874,11 +2598,7 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
+                      label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
                       validate: [
@@ -3914,11 +2634,7 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
+                      label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
                       validate: [
@@ -3954,51 +2670,7 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
-                      required: true,
-                      initialValue: '',
-                      validate: [
-                        {
-                          operation: 'phoneNumberFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'changeHirerchyMutationTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'msisdnTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'changeHirerchyQueryTransformer',
-                          parameters: [
-                            'registration.contactPhoneNumber',
-                            {
-                              operation: 'localPhoneTransformer',
-                              parameters: ['registration.contactPhoneNumber']
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  FATHER: [
-                    {
-                      name: 'registrationPhone',
-                      type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
+                      label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
                       validate: [
@@ -4034,11 +2706,43 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
+                      label: formMessageDescriptors.phoneNumber,
+                      required: true,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
+                  FATHER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
                       validate: [
@@ -4074,11 +2778,7 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
+                      label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
                       validate: [
@@ -4114,11 +2814,7 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
+                      label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
                       validate: [
@@ -4154,11 +2850,7 @@ export const registerForms: IDefaultRegisterForms = {
                     {
                       name: 'registrationPhone',
                       type: 'TEL',
-                      label: {
-                        defaultMessage: 'Phone number',
-                        description: 'Input label for phone input',
-                        id: 'form.field.label.phoneNumber'
-                      },
+                      label: formMessageDescriptors.phoneNumber,
                       required: true,
                       initialValue: '',
                       validate: [
@@ -4244,30 +2936,45 @@ export const registerForms: IDefaultRegisterForms = {
       {
         id: DeathSection.Deceased,
         viewType: 'form',
-        name: {
-          defaultMessage: 'Deceased',
-          description: 'Form section name for Deceased',
-          id: 'form.section.deceased.name'
-        },
-        title: {
-          defaultMessage: 'What are the deceased details?',
-          description: 'Form section title for Deceased',
-          id: 'form.section.deceased.title'
-        },
+        name: formMessageDescriptors.deceasedName,
+        title: formMessageDescriptors.deceasedTitle,
         hasDocumentSection: true,
         groups: [
           {
             id: 'deceased-view-group',
             fields: [
               {
+                name: 'nationality',
+                type: 'SELECT_WITH_OPTIONS',
+                label: formMessageDescriptors.nationality,
+                required: true,
+                initialValue:
+                  typeof window !== 'undefined'
+                    ? window.config.COUNTRY.toUpperCase()
+                    : 'FAR',
+                validate: [],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                options: {
+                  resource: 'countries'
+                },
+                mapping: {
+                  template: {
+                    fieldName: 'deceasedNationality',
+                    operation: 'selectTransformer'
+                  },
+                  mutation: {
+                    operation: 'fieldToArrayTransformer'
+                  },
+                  query: {
+                    operation: 'arrayToFieldTransformer'
+                  }
+                }
+              },
+              {
                 name: 'iD',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'National ID',
-                  description: 'Option for form field: Type of ID',
-                  id: 'form.field.label.iDTypeNationalID'
-                },
-                required: true,
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: false,
                 initialValue: '',
                 validate: [
                   {
@@ -4297,57 +3004,25 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'socialSecurityNo',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Social security no./NAPSA',
-                  description: 'text for social security number form field',
-                  id: 'form.field.label.socialSecurityNumber'
-                },
+                name: 'birthDate',
+                type: 'DATE',
+                label: formMessageDescriptors.deceasedDateOfBirth,
                 required: true,
                 initialValue: '',
-                validate: [],
-                conditionals: [],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToIdentityTransformer',
-                    parameters: ['id', 'SOCIAL_SECURITY_NO']
-                  },
-                  query: {
-                    operation: 'identityToFieldTransformer',
-                    parameters: ['id', 'SOCIAL_SECURITY_NO']
+                validate: [
+                  {
+                    operation: 'isValidBirthDate'
                   }
-                }
-              },
-              {
-                name: 'nationality',
-                type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Nationality',
-                  description: 'Label for form field: Nationality',
-                  id: 'form.field.label.deceased.nationality'
-                },
-                required: false,
-                initialValue: window.config.COUNTRY.toUpperCase(),
-                validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
-                options: {
-                  resource: 'countries'
-                },
+                ],
                 mapping: {
                   template: {
-                    fieldName: 'deceasedNationality',
-                    operation: 'selectTransformer'
+                    operation: 'dateFormatTransformer',
+                    fieldName: 'deceasedBirthDate',
+                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
                   },
                   mutation: {
-                    operation: 'fieldToArrayTransformer'
-                  },
-                  query: {
-                    operation: 'arrayToFieldTransformer'
+                    operation: 'longDateTransformer',
+                    parameters: []
                   }
                 }
               },
@@ -4355,11 +3030,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'firstNamesEng',
                 previewGroup: 'deceasedNameInEnglish',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'First name(s)',
-                  description: 'Label for form field: Given names',
-                  id: 'form.field.label.deceasedGivenNamesEng'
-                },
+                label: formMessageDescriptors.deceasedGivenNamesEng,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -4388,11 +3059,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'familyNameEng',
                 previewGroup: 'deceasedNameInEnglish',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'Last name',
-                  description: 'Label for form field: Last name in english',
-                  id: 'form.field.label.deceasedFamilyNameEng'
-                },
+                label: formMessageDescriptors.deceasedFamilyNameEng,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -4418,48 +3085,13 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
-                name: 'birthDate',
-                type: 'DATE',
-                label: {
-                  defaultMessage: 'Date of Birth',
-                  description: 'Label for form field: Date of birth',
-                  id: 'form.field.label.deceasedDateOfBirth'
-                },
-                required: true,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'isValidBirthDate'
-                  }
-                ],
-                mapping: {
-                  template: {
-                    operation: 'dateFormatTransformer',
-                    fieldName: 'deceasedBirthDate',
-                    parameters: ['birthDate', 'en', 'do MMMM yyyy']
-                  },
-                  mutation: {
-                    operation: 'longDateTransformer',
-                    parameters: []
-                  }
-                }
-              },
-              {
                 name: 'gender',
                 type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Sex',
-                  description: 'Label for form field: Sex name',
-                  id: 'form.field.label.deceasedSex'
-                },
+                label: formMessageDescriptors.deceasedSex,
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
                   template: {
                     fieldName: 'deceasedGender',
@@ -4469,35 +3101,15 @@ export const registerForms: IDefaultRegisterForms = {
                 options: [
                   {
                     value: 'male',
-                    label: {
-                      defaultMessage: 'Male',
-                      description: 'Option for form field: Sex name',
-                      id: 'form.field.label.deceasedSexMale'
-                    }
+                    label: formMessageDescriptors.deceasedSexMale
                   },
                   {
                     value: 'female',
-                    label: {
-                      defaultMessage: 'Female',
-                      description: 'Option for form field: Sex name',
-                      id: 'form.field.label.deceasedSexFemale'
-                    }
-                  },
-                  {
-                    value: 'other',
-                    label: {
-                      defaultMessage: 'Other',
-                      description: 'Option for form field: Sex name',
-                      id: 'form.field.label.deceasedSexOther'
-                    }
+                    label: formMessageDescriptors.deceasedSexFemale
                   },
                   {
                     value: 'unknown',
-                    label: {
-                      defaultMessage: 'Unknown',
-                      description: 'Option for form field: Sex name',
-                      id: 'form.field.label.deceasedSexUnknown'
-                    }
+                    label: formMessageDescriptors.deceasedSexUnknown
                   }
                 ]
               },
@@ -4516,19 +3128,11 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'maritalStatus',
                 type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Marital status',
-                  description: 'Label for form field: Marital status',
-                  id: 'form.field.label.maritalStatus'
-                },
+                label: formMessageDescriptors.maritalStatus,
                 required: false,
-                initialValue: 'MARRIED',
+                initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 mapping: {
                   template: {
                     fieldName: 'deceasedMaritalStatus',
@@ -4585,19 +3189,6 @@ export const registerForms: IDefaultRegisterForms = {
                     }
                   }
                 ]
-              },
-              {
-                name: 'occupation',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Occupation',
-                  description: 'text for occupation form field',
-                  id: 'form.field.label.occupation'
-                },
-                required: false,
-                initialValue: '',
-                validate: [],
-                conditionals: []
               }
               // PRIMARY ADDRESS SUBSECTION
               // PRIMARY ADDRESS
@@ -4608,11 +3199,7 @@ export const registerForms: IDefaultRegisterForms = {
             previewGroups: [
               {
                 id: 'deceasedNameInEnglish',
-                label: {
-                  defaultMessage: 'English name',
-                  description: 'Label for deceased name in english',
-                  id: 'form.preview.group.label.english.name'
-                },
+                label: formMessageDescriptors.nameInEnglishPreviewGroup,
                 fieldToRedirect: 'familyNameEng',
                 delimiter: ' '
               }
@@ -4623,16 +3210,8 @@ export const registerForms: IDefaultRegisterForms = {
       {
         id: DeathSection.Event,
         viewType: 'form',
-        name: {
-          defaultMessage: 'When did the death occur?',
-          description: 'Form section name for Death Event',
-          id: 'form.section.deathEvent.name'
-        },
-        title: {
-          defaultMessage: 'When did the death occur?',
-          description: 'Form section title for Death Event',
-          id: 'form.section.deathEvent.title'
-        },
+        name: formMessageDescriptors.deathEventName,
+        title: formMessageDescriptors.deathEventTitle,
         groups: [
           {
             id: 'death-event-details',
@@ -4640,18 +3219,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'deathDate',
                 type: 'DATE',
-                label: {
-                  defaultMessage: 'When did the death occur?',
-                  description: 'Form section title for Death Event',
-                  id: 'form.section.deathEvent.title'
-                },
-                notice: {
-                  defaultMessage:
-                    'Enter the date as: day, month, year e.g. 24 10 2020',
-                  description: 'Label for form field: Date of occurrence',
-                  id: 'form.field.label.deathDate'
-                },
-                ignorePlaceHolder: true,
+                label: formMessageDescriptors.deathEventDate,
                 required: true,
                 initialValue: '',
                 validate: [
@@ -4683,61 +3251,32 @@ export const registerForms: IDefaultRegisterForms = {
               },
               {
                 name: 'manner',
-                type: 'RADIO_GROUP',
-                label: {
-                  defaultMessage: 'What was the manner of death?',
-                  description: 'Label for form field: Manner of death',
-                  id: 'form.field.label.mannerOfDeath'
-                },
+                type: 'SELECT_WITH_OPTIONS',
+                label: formMessageDescriptors.manner,
                 required: false,
                 initialValue: '',
                 validate: [],
-                size: RadioSize.LARGE,
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'NATURAL_CAUSES',
-                    label: {
-                      defaultMessage: 'Natural causes',
-                      description: 'Option for form field: Manner of death',
-                      id: 'form.field.label.mannerOfDeathNatural'
-                    }
+                    label: formMessageDescriptors.mannerNatural
                   },
                   {
                     value: 'ACCIDENT',
-                    label: {
-                      defaultMessage: 'Accident',
-                      description: 'Option for form field: Manner of death',
-                      id: 'form.field.label.mannerOfDeathAccident'
-                    }
+                    label: formMessageDescriptors.mannerAccident
                   },
                   {
                     value: 'SUICIDE',
-                    label: {
-                      defaultMessage: 'Suicide',
-                      description: 'Option for form field: Manner of death',
-                      id: 'form.field.label.mannerOfDeathSuicide'
-                    }
+                    label: formMessageDescriptors.mannerSuicide
                   },
                   {
                     value: 'HOMICIDE',
-                    label: {
-                      defaultMessage: 'Homicide',
-                      description: 'Option for form field: Manner of death',
-                      id: 'form.field.label.mannerOfDeathHomicide'
-                    }
+                    label: formMessageDescriptors.mannerHomicide
                   },
                   {
                     value: 'MANNER_UNDETERMINED',
-                    label: {
-                      defaultMessage: 'Manner undetermined',
-                      description: 'Option for form field: Manner of death',
-                      id: 'form.field.label.mannerOfDeathUndetermined'
-                    }
+                    label: formMessageDescriptors.mannerUndetermined
                   }
                 ],
                 mapping: {
@@ -4752,48 +3291,126 @@ export const registerForms: IDefaultRegisterForms = {
                 }
               },
               {
+                name: 'causeOfDeathEstablished',
+                type: 'RADIO_GROUP',
+                label: formMessageDescriptors.causeOfDeathEstablished,
+                required: false,
+                initialValue: 'true',
+                size: RadioSize.NORMAL,
+                validate: [],
+                options: [
+                  {
+                    value: 'true',
+                    label: formMessageDescriptors.confirm
+                  },
+                  {
+                    value: 'false',
+                    label: formMessageDescriptors.deny
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'sectionFieldToBundleFieldTransformer',
+                    parameters: ['causeOfDeathEstablished']
+                  },
+                  query: {
+                    operation: 'bundleFieldToSectionFieldTransformer',
+                    parameters: ['causeOfDeathEstablished']
+                  }
+                }
+              },
+              {
+                name: 'causeOfDeathMethod',
+                type: 'SELECT_WITH_OPTIONS',
+                label: formMessageDescriptors.causeOfDeathMethod,
+                required: true,
+                initialValue: '',
+                validate: [],
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression: '!values.causeOfDeathEstablished'
+                  }
+                ],
+                options: [
+                  {
+                    value: 'PHYSICIAN',
+                    label: formMessageDescriptors.physician
+                  },
+                  {
+                    value: 'LAY_REPORTED',
+                    label: formMessageDescriptors.layReported
+                  },
+                  {
+                    value: 'VERBAL_AUTOPSY',
+                    label: formMessageDescriptors.verbalAutopsy
+                  },
+                  {
+                    value: 'MEDICALLY_CERTIFIED',
+                    label: formMessageDescriptors.medicallyCertified
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'sectionFieldToBundleFieldTransformer',
+                    parameters: ['causeOfDeathMethod']
+                  },
+                  query: {
+                    operation: 'bundleFieldToSectionFieldTransformer',
+                    parameters: ['causeOfDeathMethod']
+                  }
+                }
+              },
+              {
+                name: 'deathDescription',
+                type: TEXTAREA,
+                label: formMessageDescriptors.deathDescription,
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      'values.causeOfDeathMethod !== "LAY_REPORTED" && values.causeOfDeathMethod !== "VERBAL_AUTOPSY"'
+                  }
+                ],
+                initialValue: '',
+                validate: [],
+                required: true,
+                maxLength: 500,
+                mapping: {
+                  mutation: {
+                    operation: 'sectionFieldToBundleFieldTransformer',
+                    parameters: ['deathDescription']
+                  },
+                  query: {
+                    operation: 'bundleFieldToSectionFieldTransformer',
+                    parameters: ['deathDescription']
+                  }
+                }
+              },
+              {
                 name: 'placeOfDeath',
                 customisable: false,
                 type: 'SELECT_WITH_OPTIONS',
                 previewGroup: 'placeOfDeath',
                 ignoreFieldLabelOnErrorMessage: true,
-                label: {
-                  defaultMessage: 'Location',
-                  description: 'Label for form field: Place of delivery',
-                  id: 'form.field.label.placeOfDeath'
-                },
+                label: formMessageDescriptors.placeOfDeath,
                 required: true,
                 initialValue: '',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: [
                   {
                     value: 'HEALTH_FACILITY',
-                    label: {
-                      defaultMessage: 'Health Institution',
-                      description: 'Select item for Health Institution',
-                      id: 'form.field.label.healthInstitution'
-                    }
+                    label: formMessageDescriptors.healthInstitution
                   },
                   {
-                    value: 'PRIVATE_HOME',
-                    label: {
-                      defaultMessage: 'Private Home',
-                      description: 'Select item for Private Home',
-                      id: 'form.field.label.privateHome'
-                    }
+                    value: 'DECEASED_USUAL_RESIDENCE',
+                    label: formMessageDescriptors.placeOfDeathSameAsPrimary
                   },
                   {
                     value: 'OTHER',
-                    label: {
-                      defaultMessage: 'Other Institution',
-                      description: 'Select item for Other Institution',
-                      id: 'form.field.label.otherInstitution'
-                    }
+                    label: formMessageDescriptors.otherInstitution
                   }
                 ],
                 mapping: {
@@ -4807,6 +3424,7 @@ export const registerForms: IDefaultRegisterForms = {
                   }
                 }
               },
+
               {
                 name: 'deathLocation',
                 customisable: false,
@@ -4853,149 +3471,13 @@ export const registerForms: IDefaultRegisterForms = {
               }
             ]
           }
-        ],
-        mapping: {
-          mutation: {
-            operation: 'setDeathRegistrationSectionTransformer'
-          },
-          query: {
-            operation: 'getDeathRegistrationSectionTransformer'
-          }
-        }
-      },
-      {
-        id: DeathSection.CauseOfDeath,
-        viewType: 'form',
-        name: {
-          defaultMessage: 'What is the official cause of death?',
-          description: 'Form section name for Cause of Death',
-          id: 'form.section.causeOfDeath.name'
-        },
-        title: {
-          defaultMessage: 'What is the official cause of death?',
-          description: 'Form section title for Cause of Death',
-          id: 'form.section.causeOfDeath.title'
-        },
-        groups: [
-          {
-            id: 'causeOfDeath-causeOfDeathEstablished',
-            fields: [
-              {
-                name: 'causeOfDeathEstablished',
-                type: 'RADIO_GROUP',
-                label: {
-                  defaultMessage:
-                    'Has an official cause of death been established ?',
-                  description:
-                    'Label for form field: Cause of Death Established',
-                  id: 'form.field.label.causeOfDeathEstablished'
-                },
-                notice: {
-                  defaultMessage:
-                    'A Medically Certified Cause of Death is not mandatory to submit the declaration. This can be added at a later date.',
-                  description: 'Form section notice for Cause of Death',
-                  id: 'form.section.causeOfDeathNotice'
-                },
-                required: false,
-                initialValue: '',
-                size: RadioSize.LARGE,
-                validate: [],
-                options: [
-                  {
-                    value: true,
-                    label: {
-                      defaultMessage: 'Yes',
-                      description:
-                        'confirmation label for yes / no radio button',
-                      id: 'form.field.label.confirm'
-                    }
-                  },
-                  {
-                    value: false,
-                    label: {
-                      defaultMessage: 'No',
-                      description: 'deny label for yes / no radio button',
-                      id: 'form.field.label.deny'
-                    }
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'ignoreFieldTransformer'
-                  },
-                  query: {
-                    operation: 'hasCaseOfDeathSectionTransformer'
-                  }
-                }
-              }
-            ]
-          },
-          {
-            id: 'causeOfDeath-methodOfCauseOfDeathSection',
-            title: {
-              defaultMessage: 'What is the medically certified cause of death?',
-              description: 'Form section title for Cause of Death',
-              id: 'form.section.causeOfDeath.title'
-            },
-            conditionals: [
-              {
-                action: 'hide',
-                expression: '!values.causeOfDeathEstablished'
-              }
-            ],
-            fields: [
-              {
-                name: 'paragraph',
-                type: 'PARAGRAPH',
-                hidden: true,
-                label: {
-                  defaultMessage: ' ',
-                  description: 'No Label',
-                  id: 'print.certificate.noLabel'
-                },
-                initialValue: '',
-                validate: []
-              },
-              {
-                name: 'causeOfDeathCode',
-                type: 'TEXT',
-                initialValue: '',
-                label: {
-                  defaultMessage: 'Underlying cause of death',
-                  description:
-                    'Label for form field: Underlying cause of death',
-                  id: 'form.field.label.causeOfDeathCode'
-                },
-                required: false,
-                validate: [],
-                mapping: {
-                  mutation: {
-                    operation: 'sectionFieldToBundleFieldTransformer',
-                    parameters: ['causeOfDeath']
-                  },
-                  query: {
-                    operation: 'bundleFieldToSectionFieldTransformer',
-                    parameters: ['causeOfDeath']
-                  }
-                }
-              }
-            ]
-          }
         ]
       },
       {
         id: DeathSection.Informants,
         viewType: 'form',
-        name: {
-          defaultMessage: 'Informant',
-          description: 'Form section name for Informant',
-          id: 'form.section.informant.name'
-        },
-        title: {
-          defaultMessage: "What are the informant's details?",
-          description: 'Form section title for informants',
-          id: 'form.section.informant.title'
-        },
+        name: formMessageDescriptors.informantName,
+        title: formMessageDescriptors.informantTitle,
         hasDocumentSection: true,
         groups: [
           {
@@ -5004,19 +3486,14 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'nationality',
                 type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Nationality',
-                  description: 'Label for form field: Nationality',
-                  id: 'form.field.label.deceased.nationality'
-                },
-                required: false,
-                initialValue: window.config.COUNTRY.toUpperCase(),
+                label: formMessageDescriptors.nationality,
+                required: true,
+                initialValue:
+                  typeof window !== 'undefined'
+                    ? window.config.COUNTRY.toUpperCase()
+                    : 'FAR',
                 validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
+                placeholder: formMessageDescriptors.formSelectPlaceholder,
                 options: {
                   resource: 'countries'
                 },
@@ -5044,12 +3521,8 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'informantID',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'National ID',
-                  description: 'Option for form field: Type of ID',
-                  id: 'form.field.label.iDTypeNationalID'
-                },
-                required: true,
+                label: formMessageDescriptors.iDTypeNationalID,
+                required: false,
                 initialValue: '',
                 validate: [
                   {
@@ -5089,11 +3562,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'firstNamesEng',
                 previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'First name(s)',
-                  description: 'Label for form field: Given names',
-                  id: 'form.field.label.childFirstNamesEng'
-                },
+                label: formMessageDescriptors.childFirstNamesEng,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -5130,11 +3599,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'familyNameEng',
                 previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
-                label: {
-                  defaultMessage: 'Last name',
-                  description: 'Label for form field: Last name in english',
-                  id: 'form.field.label.childFamilyNameEng'
-                },
+                label: formMessageDescriptors.childFamilyNameEng,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -5164,173 +3629,6 @@ export const registerForms: IDefaultRegisterForms = {
                         parameters: ['en', 'familyName']
                       }
                     ]
-                  }
-                }
-              },
-              {
-                name: 'relationship',
-                type: 'SELECT_WITH_OPTIONS',
-                label: {
-                  defaultMessage: 'Relationship to Deceased',
-                  description: 'Label for Relationship to Deceased select',
-                  id: 'form.field.label.informantsRelationWithDeceased'
-                },
-                required: true,
-                initialValue: '',
-                validate: [],
-                placeholder: {
-                  defaultMessage: 'Select',
-                  description: 'Placeholder text for a select',
-                  id: 'form.field.select.placeholder'
-                },
-                conditionals: [
-                  {
-                    action: 'hide',
-                    expression:
-                      '(draftData && draftData.registration && draftData.registration.relationship && draftData.registration.relationship.value === "OFFICER_IN_CHARGE")'
-                  },
-                  {
-                    action: 'hide',
-                    expression:
-                      '(draftData && draftData.registration && draftData.registration.relationship && draftData.registration.relationship.value === "DRIVER_OF_THE_VEHICLE")'
-                  },
-                  {
-                    action: 'hide',
-                    expression:
-                      '(draftData && draftData.registration && draftData.registration.relationship && draftData.registration.relationship.value === "OWNER_OF_THE_HOUSE")'
-                  },
-                  {
-                    action: 'hide',
-                    expression:
-                      '(draftData && draftData.registration && draftData.registration.relationship && draftData.registration.relationship.value === "HEAD_OF_THE_INSTITUTE")'
-                  },
-                  {
-                    action: 'hide',
-                    expression:
-                      '(draftData && draftData.registration && draftData.registration.relationship && draftData.registration.relationship.value === "OTHER")'
-                  }
-                ],
-                readonly: true,
-                hidden: true,
-                options: [
-                  {
-                    value: 'FATHER',
-                    label: {
-                      defaultMessage: 'Father',
-                      description: 'Label for option Father',
-                      id: 'form.field.label.informantRelation.father'
-                    }
-                  },
-                  {
-                    value: 'MOTHER',
-                    label: {
-                      defaultMessage: 'Mother',
-                      description: 'Label for option Mother',
-                      id: 'form.field.label.informantRelation.mother'
-                    }
-                  },
-                  {
-                    value: 'SPOUSE',
-                    label: {
-                      defaultMessage: 'Spouse',
-                      description: 'Label for option Spouse',
-                      id: 'form.field.label.informantRelation.spouse'
-                    }
-                  },
-                  {
-                    value: 'SON',
-                    label: {
-                      defaultMessage: 'Son',
-                      description: 'Label for option Son',
-                      id: 'form.field.label.informantRelation.son'
-                    }
-                  },
-                  {
-                    value: 'DAUGHTER',
-                    label: {
-                      defaultMessage: 'Daughter',
-                      description: 'Label for option Daughter',
-                      id: 'form.field.label.informantRelation.daughter'
-                    }
-                  },
-                  {
-                    value: 'SON_IN_LAW',
-                    label: {
-                      defaultMessage: 'Son in law',
-                      description: 'Label for option Son in law',
-                      id: 'form.field.label.informantRelation.sonInLaw'
-                    }
-                  },
-                  {
-                    value: 'DAUGHTER_IN_LAW',
-                    label: {
-                      defaultMessage: 'Daughter in law',
-                      description: 'Label for option Daughter in law',
-                      id: 'form.field.label.informantRelation.daughterInLaw'
-                    }
-                  },
-                  {
-                    value: 'DAUGHTER',
-                    label: {
-                      defaultMessage: 'Daughter',
-                      description: 'Label for option Daughter',
-                      id: 'form.field.label.informantRelation.daughter'
-                    }
-                  },
-                  {
-                    value: 'GRANDSON',
-                    label: {
-                      defaultMessage: 'Grandson',
-                      description: 'Label for option Grandson',
-                      id: 'form.field.label.informantRelation.grandson'
-                    }
-                  },
-                  {
-                    value: 'GRANDDAUGHTER',
-                    label: {
-                      defaultMessage: 'Granddaughter',
-                      description: 'Label for option Granddaughter',
-                      id: 'form.field.label.informantRelation.granddaughter'
-                    }
-                  },
-                  {
-                    value: 'OTHER',
-                    label: {
-                      defaultMessage: 'Other (Specify)',
-                      description: 'Label for option Other',
-                      id: 'form.field.label.informantRelation.other'
-                    }
-                  }
-                ],
-                reviewOverrides: {
-                  residingSection: 'informant',
-                  reference: {
-                    sectionID: 'registration',
-                    groupID: 'point-of-contact',
-                    fieldName: 'contactPoint'
-                  },
-                  position: REVIEW_OVERRIDE_POSITION.BEFORE,
-                  labelAs: {
-                    defaultMessage: 'Who is the informant?',
-                    description: 'Form section title for contact point',
-                    id: 'register.selectInformant.relation'
-                  },
-                  conditionals: [
-                    {
-                      action: 'hide',
-                      expression:
-                        '(!draftData || !draftData.informant || draftData.informant.relationship === "OTHER")'
-                    }
-                  ]
-                },
-                mapping: {
-                  mutation: {
-                    operation: 'fieldValueSectionExchangeTransformer',
-                    parameters: ['informant', 'relationship']
-                  },
-                  query: {
-                    operation: 'sectionFieldExchangeTransformer',
-                    parameters: ['informant', 'relationship']
                   }
                 }
               }
@@ -5364,378 +3662,10 @@ export const registerForms: IDefaultRegisterForms = {
         }
       },
       {
-        id: DeathSection.Father,
-        viewType: 'form',
-        name: {
-          defaultMessage: "What is the deceased's father name?",
-          description: 'Form section name for father section',
-          id: 'form.section.deceased.father.name'
-        },
-        title: {
-          defaultMessage: "Father's details",
-          description: 'Form section name for father section',
-          id: 'form.section.deceased.father.title'
-        },
-        groups: [
-          {
-            id: 'father-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(draftData && draftData.informant && draftData.informant.relationship === "FATHER")'
-              }
-            ],
-            fields: [
-              {
-                name: 'fatherFirstNamesEng',
-                previewGroup: 'fatherNameInEnglish',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'First Name(s) in English',
-                  description: 'Label for form field: Given names in english',
-                  id: 'form.field.label.deceasedFathersGivenNamesEng'
-                },
-                maxLength: 32,
-                required: false,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'englishOnlyNameFormat'
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToNameTransformer',
-                    parameters: ['en', 'firstNames']
-                  },
-                  query: {
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'firstNames']
-                  }
-                }
-              },
-              {
-                name: 'fatherFamilyNameEng',
-                previewGroup: 'fatherNameInEnglish',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Last Name(s) in English',
-                  description: 'Label for form field: Family name in english',
-                  id: 'form.field.label.deceasedFathersFamilyNameEng'
-                },
-                required: true,
-                initialValue: '',
-                maxLength: 32,
-                validate: [
-                  {
-                    operation: 'englishOnlyNameFormat'
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToNameTransformer',
-                    parameters: ['en', 'familyName']
-                  },
-                  query: {
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
-                  }
-                }
-              }
-            ],
-            previewGroups: [
-              {
-                id: 'fatherNameInEnglish',
-                label: {
-                  defaultMessage: "Father's English name",
-                  description: "Group label for father's name in english",
-                  id: 'form.preview.group.label.father.english.name'
-                },
-                fieldToRedirect: 'fatherFamilyNameEng',
-                delimiter: ' '
-              }
-            ]
-          }
-        ]
-      },
-      {
-        id: DeathSection.Mother,
-        viewType: 'form',
-        name: {
-          defaultMessage: "What is the deceased's mother name?",
-          description: 'Form section name for mother section',
-          id: 'form.section.deceased.mother.name'
-        },
-        title: {
-          defaultMessage: "Mother's details",
-          description: 'Form section name for mother section',
-          id: 'form.section.deceased.mother.title'
-        },
-        groups: [
-          {
-            id: 'mother-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(draftData && draftData.informant && draftData.informant.relationship === "MOTHER")'
-              }
-            ],
-            fields: [
-              {
-                name: 'motherFirstNamesEng',
-                previewGroup: 'motherNameInEnglish',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'First Name(s) in English',
-                  description: 'Label for form field: Given names in english',
-                  id: 'form.field.label.deceasedMothersGivenNamesEng'
-                },
-                required: false,
-                maxLength: 32,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'englishOnlyNameFormat'
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToNameTransformer',
-                    parameters: ['en', 'firstNames']
-                  },
-                  query: {
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'firstNames']
-                  }
-                }
-              },
-              {
-                name: 'motherFamilyNameEng',
-                previewGroup: 'motherNameInEnglish',
-                type: 'TEXT',
-                label: {
-                  defaultMessage: 'Last Name(s) in English',
-                  description: 'Label for form field: Family name in english',
-                  id: 'form.field.label.deceasedMothersFamilyNameEng'
-                },
-                required: true,
-                maxLength: 32,
-                initialValue: '',
-                validate: [
-                  {
-                    operation: 'englishOnlyNameFormat'
-                  }
-                ],
-                mapping: {
-                  mutation: {
-                    operation: 'fieldToNameTransformer',
-                    parameters: ['en', 'familyName']
-                  },
-                  query: {
-                    operation: 'nameToFieldTransformer',
-                    parameters: ['en', 'familyName']
-                  }
-                }
-              }
-            ],
-            previewGroups: [
-              {
-                id: 'motherNameInEnglish',
-                label: {
-                  defaultMessage: "Mother's English name",
-                  description: "Group label for mother's name in english",
-                  id: 'form.preview.group.label.mother.english.name'
-                },
-                fieldToRedirect: 'motherFamilyNameEng',
-                delimiter: ' '
-              }
-            ]
-          }
-        ]
-      },
-      {
-        id: DeathSection.Spouse,
-        viewType: 'form',
-        name: {
-          defaultMessage: "Spouse's details",
-          description: 'Form section title for spouse section',
-          id: 'form.section.deceased.spouse.title'
-        },
-        title: {
-          defaultMessage: "Spouse's details",
-          description: 'Form section title for spouse section',
-          id: 'form.section.deceased.spouse.title'
-        },
-        groups: [
-          {
-            id: 'spouse-view-group',
-            conditionals: [
-              {
-                action: 'hide',
-                expression:
-                  '(draftData && draftData.informant && draftData.informant.relationship === "SPOUSE")'
-              }
-            ],
-            fields: [
-              {
-                name: 'hasDetails',
-                type: 'RADIO_GROUP_WITH_NESTED_FIELDS',
-                label: {
-                  defaultMessage: 'Does the deceased have a spouse?',
-                  description: 'Form section title for spouse section',
-                  id: 'form.section.deceased.spouse.name'
-                },
-                hideHeader: true,
-                size: RadioSize.LARGE,
-                required: true,
-                initialValue: '',
-                validate: [],
-                options: [
-                  {
-                    value: 'Yes',
-                    label: {
-                      defaultMessage: 'Yes',
-                      description: 'Option for form field: Deceased has spouse',
-                      id: 'form.section.deceased.hasSpouse'
-                    }
-                  },
-                  {
-                    value: 'No',
-                    label: {
-                      defaultMessage: 'No / Unknown',
-                      description:
-                        "Option for form field: Deceased doesn't have spouse",
-                      id: 'form.section.deceased.noSpouse'
-                    }
-                  }
-                ],
-                nestedFields: {
-                  Yes: [
-                    {
-                      name: 'spouseFirstNamesEng',
-                      previewGroup: 'spouseNameInEnglish',
-                      type: 'TEXT',
-                      label: {
-                        defaultMessage: 'First Name(s) in English',
-                        description:
-                          'Label for form field: Given names in english',
-                        id: 'form.field.label.deceasedSpousesGivenNamesEng'
-                      },
-                      maxLength: 32,
-                      required: false,
-                      initialValue: '',
-                      extraValue: 'Yes',
-                      validate: [
-                        {
-                          operation: 'englishOnlyNameFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldToNameTransformer',
-                              parameters: ['en', 'firstNames']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'nameToFieldTransformer',
-                              parameters: ['en', 'firstNames']
-                            }
-                          ]
-                        }
-                      }
-                    },
-                    {
-                      name: 'spouseFamilyNameEng',
-                      previewGroup: 'spouseNameInEnglish',
-                      type: 'TEXT',
-                      label: {
-                        defaultMessage: 'Last Name(s) in English',
-                        description:
-                          'Label for form field: Family name in english',
-                        id: 'form.field.label.deceasedSpousesFamilyNameEng'
-                      },
-                      maxLength: 32,
-                      required: true,
-                      initialValue: '',
-                      extraValue: 'Yes',
-                      validate: [
-                        {
-                          operation: 'englishOnlyNameFormat'
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'nestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'fieldToNameTransformer',
-                              parameters: ['en', 'familyName']
-                            }
-                          ]
-                        },
-                        query: {
-                          operation: 'valueToNestedRadioFieldTransformer',
-                          parameters: [
-                            {
-                              operation: 'nameToFieldTransformer',
-                              parameters: ['en', 'familyName']
-                            }
-                          ]
-                        }
-                      }
-                    }
-                  ],
-                  No: []
-                },
-                ignoreNestedFieldWrappingInPreview: true,
-                conditionals: [],
-                mapping: {
-                  mutation: {
-                    operation: 'ignoreFieldTransformer'
-                  },
-                  query: {
-                    operation: 'hasSpouseDetailsTransformer'
-                  }
-                }
-              }
-            ],
-            previewGroups: [
-              {
-                id: 'spouseNameInEnglish',
-                label: {
-                  defaultMessage: "Spouse's English name",
-                  description: "Group label for spouse's name in english",
-                  id: 'form.preview.group.label.spouse.english.name'
-                },
-                fieldToRedirect: 'spouseFamilyNameEng',
-                delimiter: ' '
-              }
-            ]
-          }
-        ]
-      },
-      {
         id: DeathSection.DeathDocuments,
         viewType: 'form',
-        name: {
-          defaultMessage: 'Documents',
-          description: 'Form section name for Documents',
-          id: 'form.section.documents.name'
-        },
-        title: {
-          defaultMessage: 'Attach supporting documents',
-          description: 'Form section title for Documents',
-          id: 'form.section.documents.title'
-        },
+        name: formMessageDescriptors.documentsName,
+        title: formMessageDescriptors.documentsTitle,
         groups: [
           {
             id: 'documents-view-group',
@@ -5743,62 +3673,34 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'paragraph',
                 type: 'PARAGRAPH',
-                label: {
-                  defaultMessage:
-                    'For a death registration the following documents are required:',
-                  description: 'Documents Paragraph text',
-                  id: 'form.field.label.deceasedDocumentParagraph'
-                },
+                label: formMessageDescriptors.deceasedParagraph,
                 initialValue: '',
                 validate: []
               },
               {
                 name: 'uploadDocForDeceased',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: "Proof of deceased's ID",
-                  description:
-                    'Option for radio group field: Type of Document To Upload',
-                  id: 'form.field.label.deceasedIDProof'
-                },
+                label: formMessageDescriptors.deceasedIDProof,
                 initialValue: '',
-                extraValue: 'DECEASED_ID_PROOF',
+                extraValue: deathDocumentForWhomFhirMapping.DECEASED_ID_PROOF,
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'National ID (front)',
-                    label: {
-                      defaultMessage: 'National ID (Front)',
-                      description:
-                        'Label for select option radio option NID front',
-                      id: 'form.field.label.docTypeNIDFront'
-                    }
+                    value: deathDocumentTypeFhirMapping.NATIONAL_ID,
+                    label: formMessageDescriptors.docTypeNID
                   },
                   {
-                    value: 'National ID (back)',
-                    label: {
-                      defaultMessage: 'National ID (Back)',
-                      description:
-                        'Label for select option radio option NID back',
-                      id: 'form.field.label.docTypeNIDBack'
-                    }
+                    value: deathDocumentTypeFhirMapping.PASSPORT,
+                    label: formMessageDescriptors.docTypePassport
                   },
                   {
-                    value: 'Birth Registration',
-                    label: {
-                      defaultMessage: 'Birth registration certificate',
-                      description: 'Label for select option Birth Registration',
-                      id: 'form.field.label.docTypeBR'
-                    }
+                    value: deathDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
+                    label: formMessageDescriptors.docTypeBirthCert
                   },
                   {
-                    value: 'Passport',
-                    label: {
-                      defaultMessage: 'Passport',
-                      description: 'Label for radio option Passport',
-                      id: 'form.field.label.docTypePassport'
-                    }
+                    value: deathDocumentTypeFhirMapping.OTHER,
+                    label: formMessageDescriptors.docTypeOther
                   }
                 ],
                 mapping: {
@@ -5813,50 +3715,27 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'uploadDocForInformant',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: 'Informant ID',
-                  description:
-                    'Option for radio group field: Type of Document To Upload',
-                  id: 'form.field.label.informantIDProof'
-                },
+                label: formMessageDescriptors.proofOfInformantsID,
                 initialValue: '',
-                extraValue: 'INFORMANT_ID_PROOF',
+                extraValue: deathDocumentForWhomFhirMapping.INFORMANT_ID_PROOF,
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'National ID (front)',
-                    label: {
-                      defaultMessage: 'Front of national ID',
-                      description:
-                        'Label for select option radio option NID front',
-                      id: 'form.field.label.docTypeNIDFront'
-                    }
+                    value: deathDocumentTypeFhirMapping.NATIONAL_ID,
+                    label: formMessageDescriptors.docTypeNID
                   },
                   {
-                    value: 'National ID (back)',
-                    label: {
-                      defaultMessage: 'Back of national ID',
-                      description:
-                        'Label for select option radio option NID back',
-                      id: 'form.field.label.docTypeNIDBack'
-                    }
+                    value: deathDocumentTypeFhirMapping.PASSPORT,
+                    label: formMessageDescriptors.docTypePassport
                   },
                   {
-                    value: 'Birth Registration',
-                    label: {
-                      defaultMessage: 'Birth registration certificate',
-                      description: 'Label for select option Birth Registration',
-                      id: 'form.field.label.docTypeBR'
-                    }
+                    value: deathDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
+                    label: formMessageDescriptors.docTypeBirthCert
                   },
                   {
-                    value: 'Passport',
-                    label: {
-                      defaultMessage: 'Passport',
-                      description: 'Label for radio option Passport',
-                      id: 'form.field.label.docTypePassport'
-                    }
+                    value: deathDocumentTypeFhirMapping.OTHER,
+                    label: formMessageDescriptors.docTypeOther
                   }
                 ],
                 mapping: {
@@ -5871,94 +3750,73 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 name: 'uploadDocForDeceasedDeath',
                 type: 'DOCUMENT_UPLOADER_WITH_OPTION',
-                label: {
-                  defaultMessage: 'Proof of death of deceased',
-                  description:
-                    'Option for radio group field: Type of Document To Upload',
-                  id: 'form.field.label.deceasedDeathProof'
-                },
+                label: formMessageDescriptors.deceasedDeathProof,
                 initialValue: '',
-                extraValue: 'DECEASED_DEATH_PROOF',
+                extraValue:
+                  deathDocumentForWhomFhirMapping.DECEASED_DEATH_PROOF,
                 hideAsterisk: true,
                 validate: [],
                 options: [
                   {
-                    value: 'Police Brought In Dead Certificate',
-                    label: {
-                      defaultMessage: 'Police brought in dead certificate',
-                      description:
-                        'Label for select option Police brought in dead certificate',
-                      id: 'form.field.label.docTypePoliceBroughtInDeathCertificate'
-                    }
+                    value:
+                      deathDocumentTypeFhirMapping.ATTESTED_LETTER_OF_DEATH,
+                    label: formMessageDescriptors.docTypeLetterOfDeath
                   },
                   {
-                    value: 'Certified Post Mortem Report',
-                    label: {
-                      defaultMessage: 'Certified post mortem report',
-                      description: 'Label for select option Post Mortem Report',
-                      id: 'form.field.label.docTypePostMortemReport'
-                    }
+                    value:
+                      deathDocumentTypeFhirMapping.POLICE_CERTIFICATE_OF_DEATH,
+                    label: formMessageDescriptors.docTypePoliceCertificate
                   },
                   {
-                    value: 'Hospital Discharge Certificate',
-                    label: {
-                      defaultMessage: 'Hospital discharge certificate',
-                      description:
-                        'Label for select option Hospital Discharge Certificate',
-                      id: 'form.field.label.docHospDischCert'
-                    }
+                    value:
+                      deathDocumentTypeFhirMapping.HOSPITAL_CERTIFICATE_OF_DEATH,
+                    label:
+                      formMessageDescriptors.docTypeHospitalDeathCertificate
                   },
                   {
-                    value: 'Attested Letter of Death',
-                    label: {
-                      defaultMessage: 'Attested letter of death',
-                      description:
-                        'Label for select option Attested Letter of Death',
-                      id: 'form.field.label.docTypeLetterOfDeath'
-                    }
+                    value: deathDocumentTypeFhirMapping.CORONERS_REPORT,
+                    label: formMessageDescriptors.docTypeCoronersReport
                   },
                   {
-                    value: 'Attested Certificate of Death',
-                    label: {
-                      defaultMessage: 'Attested certificate of death',
-                      description:
-                        'Label for select option Attested Certificate of Death',
-                      id: 'form.field.label.docTypeDeathCertificate'
-                    }
+                    value: deathDocumentTypeFhirMapping.BURIAL_RECEIPT,
+                    label: formMessageDescriptors.docTypeCopyOfBurialReceipt
                   },
                   {
-                    value: 'Certified Copy of Burial Receipt',
-                    label: {
-                      defaultMessage: 'Certified copy of burial receipt',
-                      description:
-                        'Label for select option Certified Copy of Burial Receipt',
-                      id: 'form.field.label.docTypeCopyOfBurialReceipt'
-                    }
+                    value: deathDocumentTypeFhirMapping.OTHER,
+                    label: formMessageDescriptors.docTypeOther
+                  }
+                ],
+                mapping: {
+                  mutation: {
+                    operation: 'deathFieldToAttachmentTransformer'
+                  },
+                  query: {
+                    operation: 'deathAttachmentToFieldTransformer'
+                  }
+                }
+              },
+              {
+                name: 'uploadDocForCauseOfDeath',
+                type: 'DOCUMENT_UPLOADER_WITH_OPTION',
+                label: formMessageDescriptors.causeOfDeathProof,
+                initialValue: '',
+                extraValue:
+                  deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF,
+                hideAsterisk: true,
+                validate: [],
+                options: [
+                  {
+                    value:
+                      deathDocumentTypeFhirMapping.MEDICALLY_CERTIFIED_CAUSE_OF_DEATH,
+                    label: formMessageDescriptors.medicallyCertified
                   },
                   {
-                    value: 'Certified Copy of Funeral Receipt',
-                    label: {
-                      defaultMessage: 'Certified copy of funeral receipt',
-                      description:
-                        'Label for select option Certified Copy of Funeral Receipt',
-                      id: 'form.field.label.docTypeFuneralReceipt'
-                    }
+                    value: deathDocumentTypeFhirMapping.VERBAL_AUTOPSY_REPORT,
+                    label: formMessageDescriptors.verbalAutopsyReport
                   },
                   {
-                    value: 'Coroners Report',
-                    label: {
-                      defaultMessage: "Coroner's report",
-                      description: "Label for select option Coroner's report",
-                      id: 'form.field.label.docTypeCoronersReport'
-                    }
-                  },
-                  {
-                    value: 'Other',
-                    label: {
-                      defaultMessage: 'Other',
-                      description: 'Label for radio option Other',
-                      id: 'form.field.label.docTypeOther'
-                    }
+                    value: deathDocumentTypeFhirMapping.OTHER,
+                    label: formMessageDescriptors.docTypeOther
                   }
                 ],
                 mapping: {

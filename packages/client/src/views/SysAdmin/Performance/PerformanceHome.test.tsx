@@ -107,9 +107,10 @@ describe('Performance home test', () => {
       app.update()
     })
 
-    it('loads the location in the search input box', () => {
+    it('loads the location in the search input box', async () => {
+      const component = await waitForElement(app, '#locationSearchInput')
       expect(
-        app.find('#locationSearchInput').hostNodes().props().value
+        component.find('#locationSearchInput').hostNodes().props().value
       ).toEqual('Khulna')
     })
   })

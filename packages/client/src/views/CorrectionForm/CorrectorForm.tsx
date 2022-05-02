@@ -70,23 +70,12 @@ function getGroupWithVisibleFields(
   if (event === Event.BIRTH) {
     const declarationData = declaration.data
 
-    const isMotherDeceased = isEqual(
-      get(declarationData, 'primaryCaregiver.motherIsDeceased'),
-      ['deceased']
-    )
-    const isFatherDeceased = isEqual(
-      get(declarationData, 'primaryCaregiver.fatherIsDeceased'),
-      ['deceased']
-    )
-
-    const motherDataExists =
-      declarationData && declarationData.mother && !isMotherDeceased
+    const motherDataExists = declarationData && declarationData.mother
 
     const fatherDataExists =
       declarationData &&
       declarationData.father &&
-      declarationData.father.fathersDetailsExist &&
-      !isFatherDeceased
+      declarationData.father.detailsExist
 
     if (!fatherDataExists) {
       field.options = field.options.filter(

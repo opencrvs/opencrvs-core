@@ -19,13 +19,16 @@ const dummyBirthRegistrationResponse = {
     encounter: '65f436b8-562a-4a35-8df9-ff41205a7770',
     eventLocation: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
     observation: {
+      birthType: 'ca45479d-365b-4883-9980-e3687f5eafb3',
+      weightAtBirth: '22c18ced-5fad-4ec4-8dad-29bd05b20fd9',
+      attendantAtBirth: '302f91de-eeaa-4ef9-a22c-7a488aad19a5',
       presentAtBirthRegistration: 'b84da113-f463-4ffd-a7f5-b4055b6275dc'
     }
   },
   id: '1e09f4b5-43f4-415c-b2ab-f24a4b0be20a',
   child: {
     id: '21e12ec4-65a3-4f13-ab32-3c8580359c05',
-    multipleBirth: 3,
+    multipleBirth: null,
     name: [
       {
         use: 'en',
@@ -37,6 +40,13 @@ const dummyBirthRegistrationResponse = {
     birthDate: '2021-05-19',
     gender: 'male',
     __typename: 'Person'
+  },
+  informant: {
+    id: '0fc8d8e2-5736-4809-8de8-796001c4f983',
+    relationship: 'MOTHER',
+    otherRelationship: null,
+    individual: null,
+    __typename: 'RelatedPerson'
   },
   mother: {
     id: 'b7793115-0d7f-44d8-89ba-7051e8d4bc29',
@@ -51,9 +61,11 @@ const dummyBirthRegistrationResponse = {
     birthDate: null,
     maritalStatus: 'MARRIED',
     dateOfMarriage: null,
+    detailsExist: true,
     educationalAttainment: null,
     nationality: ['FAR'],
     occupation: null,
+    reasonNotApplying: null,
     identifier: [
       {
         id: '123456879',
@@ -63,16 +75,6 @@ const dummyBirthRegistrationResponse = {
       }
     ],
     address: [
-      {
-        type: 'SECONDARY_ADDRESS',
-        line: ['', '', '', '', '', ''],
-        district: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
-        state: 'df669feb-61a3-4984-ab24-4b28511b472a',
-        city: null,
-        postalCode: null,
-        country: 'FAR',
-        __typename: 'Address'
-      },
       {
         type: 'PRIMARY_ADDRESS',
         line: ['', '', '', '', '', '', 'URBAN'],
@@ -97,25 +99,53 @@ const dummyBirthRegistrationResponse = {
     telecom: null,
     __typename: 'Person'
   },
-  father: null,
-  informant: null,
-  primaryCaregiver: {
-    parentDetailsType: null,
-    primaryCaregiver: null,
-    reasonsNotApplying: [
+  father: {
+    id: '51ac52fe-754f-4c91-8e71-c4e5c7252cc1',
+    name: [
       {
-        primaryCaregiverType: null,
-        reasonNotApplying: null,
-        isDeceased: null,
-        __typename: 'ReasonsNotApplying'
+        use: 'en',
+        firstNames: 'Frank',
+        familyName: 'Styles',
+        __typename: 'HumanName'
       }
     ],
-    __typename: 'PrimaryCaregiver'
+    birthDate: '1990-12-23',
+    maritalStatus: 'MARRIED',
+    occupation: 'Teacher',
+    detailsExist: true,
+    reasonNotApplying: null,
+    dateOfMarriage: null,
+    educationalAttainment: 'FIRST_STAGE_TERTIARY_ISCED_5',
+    nationality: ['FAR'],
+    identifier: [
+      {
+        id: '321654985',
+        type: 'NATIONAL_ID',
+        otherType: null,
+        __typename: 'IdentityType'
+      }
+    ],
+    address: [
+      {
+        type: 'PRIMARY_ADDRESS',
+        line: ['', '', '', '', 'Mother village', 'RURAL'],
+        district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+        state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+        city: null,
+        postalCode: null,
+        country: 'FAR',
+        __typename: 'Address'
+      }
+    ],
+    telecom: null,
+    __typename: 'Person'
   },
   registration: {
     id: 'f2580a50-58d7-4946-b15b-ed638c87bf30',
+    informantType: 'MOTHER',
+    otherInformantType: null,
     contact: 'MOTHER',
-    contactPhoneNumber: '+260965656868',
+    contactRelationship: null,
     status: [
       {
         comments: null,
@@ -332,9 +362,9 @@ const dummyBirthRegistrationResponse = {
     registrationNumber: '2022BLOQITK',
     __typename: 'Registration'
   },
-  attendantAtBirth: null,
-  weightAtBirth: null,
-  birthType: null,
+  attendantAtBirth: 'PHYSICIAN',
+  weightAtBirth: 5,
+  birthType: 'SINGLE',
   questionnaire: null,
   eventLocation: {
     type: 'HEALTH_FACILITY',
@@ -349,7 +379,6 @@ const dummyBirthRegistrationResponse = {
     },
     __typename: 'Location'
   },
-  presentAtBirthRegistration: 'MOTHER',
   history: [
     {
       date: '2022-03-25T12:19:25.860+00:00',
@@ -882,7 +911,15 @@ const dummyBirthRegistrationResponse = {
 
 const dummyDeathRegistrationResponse = {
   _fhirIDMap: {
-    composition: '70620dec-57db-4d57-bb54-dbc3a6447fa7'
+    composition: 'b68d5ca8-1b47-479a-a1c0-52ff210a3452',
+    encounter: '871b7abe-5e4e-4937-b0d1-4680b2dbc330',
+    eventLocation: 'ec396045-3437-4224-8e03-f299e17158e5',
+    observation: {
+      mannerOfDeath: '9603d6d8-80a0-4d1f-8c08-a6f6ae91e56d',
+      deathDescription: 'beab5f76-c30b-47f6-917f-5dfd3f56e488',
+      causeOfDeathMethod: 'eee32aa4-ce32-4026-90bb-991dce3deca1',
+      causeOfDeathEstablished: 'ca6157bc-8282-4f95-98b2-22fedbb6a893'
+    }
   },
   id: '70620dec-57db-4d57-bb54-dbc3a6447fa7',
   deceased: {
@@ -904,18 +941,6 @@ const dummyDeathRegistrationResponse = {
       {
         id: '123456789',
         type: 'NATIONAL_ID',
-        otherType: null,
-        __typename: 'IdentityType'
-      },
-      {
-        id: '2',
-        type: 'SOCIAL_SECURITY_NO',
-        otherType: null,
-        __typename: 'IdentityType'
-      },
-      {
-        id: '2022D0FLRZW',
-        type: 'DEATH_REGISTRATION_NUMBER',
         otherType: null,
         __typename: 'IdentityType'
       }
@@ -980,37 +1005,14 @@ const dummyDeathRegistrationResponse = {
     },
     __typename: 'RelatedPerson'
   },
-  father: {
-    id: 'f1918aae-4703-4075-8e92-906a249cfbc5',
-    name: [
-      {
-        use: 'en',
-        firstNames: '',
-        familyName: 'Bagge',
-        __typename: 'HumanName'
-      }
-    ],
-    __typename: 'Person'
-  },
-  mother: {
-    id: '6a0702a5-81a8-492c-8e49-64578509dcef',
-    name: [
-      {
-        use: 'en',
-        firstNames: '',
-        familyName: 'Bagge',
-        __typename: 'HumanName'
-      }
-    ],
-    __typename: 'Person'
-  },
-  spouse: null,
   medicalPractitioner: null,
   registration: {
     id: 'a288f6d2-7aa5-4572-8b1b-af7ca3ce0a78',
     contact: 'SPOUSE',
+    informantType: 'SPOUSE',
+    otherInformantType: null,
     contactRelationship: null,
-    contactPhoneNumber: '+260965656868',
+    contactPhoneNumber: '+260787877878',
     status: [
       {
         comments: null,
@@ -1098,8 +1100,10 @@ const dummyDeathRegistrationResponse = {
     __typename: 'Location'
   },
   mannerOfDeath: 'NATURAL_CAUSES',
-  causeOfDeathMethod: null,
+  causeOfDeathEstablished: 'true',
+  causeOfDeathMethod: 'VERBAL_AUTOPSY',
   causeOfDeath: null,
+  deathDescription: 'Verbal autopsy description',
   maleDependentsOfDeceased: null,
   femaleDependentsOfDeceased: null,
   history: [

@@ -44,7 +44,7 @@ const declaration: IDeclaration = createDeclaration(
 )
 declaration.data.registration = {
   ...declaration.data.registration,
-  presentAtBirthRegistration: 'MOTHER',
+  informantType: 'MOTHER',
   contactPoint: {
     value: 'MOTHER',
     nestedFields: { registrationPhone: '01557394986' }

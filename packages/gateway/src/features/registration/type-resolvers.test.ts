@@ -29,8 +29,6 @@ import {
   mockCertificateComposition,
   mockCertificate,
   mockErrorComposition,
-  mockObservationBundle,
-  reasonsNotApplyingMock,
   mockTaskDownloaded
 } from '@gateway/utils/testUtils'
 import { GQLRegStatus } from '@gateway/graphql/schema'
@@ -134,29 +132,6 @@ describe('Registration type resolvers', () => {
     expect(informant.resource.resourceType).toEqual('RelatedPerson')
     expect(informant.resource.relationship.coding[0].code).toEqual('OTHER')
     expect(informant.resource.relationship.text).toEqual('Nephew')
-  })
-
-  it('returns primaryCaregiver', async () => {
-    const primaryCaregiver =
-      await typeResolvers.BirthRegistration.primaryCaregiver(mockComposition)
-    expect(primaryCaregiver).toBeDefined()
-    expect(primaryCaregiver.patientSection.title).toBe(
-      "Primary caregiver's details"
-    )
-    expect(primaryCaregiver.encounterSection.title).toBe('Birth Encounter')
-  })
-
-  it('returns null as primaryCaregiver if no encounter section', async () => {
-    const primaryCaregiver =
-      await typeResolvers.BirthRegistration.primaryCaregiver({
-        identifier: {
-          system: 'urn:ietf:rfc:3986',
-          value: '{{urn_uuid}}'
-        },
-        resourceType: 'Composition',
-        section: []
-      })
-    expect(primaryCaregiver).toBe(null)
   })
 
   it('returns id from identifier', () => {
@@ -469,25 +444,6 @@ describe('Registration type resolvers', () => {
                   valueString: 'PHYSICIAN',
                   id: '305cf792-dd96-40b7-bdad-909861faa4b4'
                 }
-              },
-              {
-                resource: {
-                  resourceType: 'Observation',
-                  context: {
-                    reference: 'Encounter/b1912018-ad50-4cdb-9954-5c7a512bc96e'
-                  },
-                  code: {
-                    coding: [
-                      {
-                        system: 'http://loinc.org',
-                        code: 'present-at-birth-reg',
-                        display: 'Present at birth registration'
-                      }
-                    ]
-                  },
-                  valueString: 'MOTHER_ONLY',
-                  id: '0280e498-5d70-4666-ae4e-12431dcea163'
-                }
               }
             ]
           }),
@@ -527,8 +483,7 @@ describe('Registration type resolvers', () => {
         observation: {
           birthType: 'aef33762-c5a3-4642-8d03-6e21c0ef6445',
           weightAtBirth: '5f761077-9623-4626-8ce6-648724614485',
-          attendantAtBirth: '305cf792-dd96-40b7-bdad-909861faa4b4',
-          presentAtBirthRegistration: '0280e498-5d70-4666-ae4e-12431dcea163'
+          attendantAtBirth: '305cf792-dd96-40b7-bdad-909861faa4b4'
         }
       })
     })
@@ -570,18 +525,6 @@ describe('Registration type resolvers', () => {
           mockComposition
         )
       expect(birthRegistrationType).toEqual('BOTH_PARENTS')
-    })
-    it('returns presentAtBirthRegistration', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify(mockObservations.presentAtBirthRegistration)
-      )
-
-      // @ts-ignore
-      const presentAtBirthRegistration =
-        await typeResolvers.BirthRegistration.presentAtBirthRegistration(
-          mockComposition
-        )
-      expect(presentAtBirthRegistration).toEqual('BOTH_PARENTS')
     })
     it('returns lastPreviousLiveBirth', async () => {
       fetch.mockResponseOnce(
@@ -709,22 +652,6 @@ describe('Registration type resolvers', () => {
           section: []
         })
       expect(birthRegistrationType).toEqual(null)
-    })
-    it('returns presentAtBirthRegistration null', async () => {
-      // @ts-ignore
-      const presentAtBirthRegistration =
-        await typeResolvers.BirthRegistration.presentAtBirthRegistration({
-          section: []
-        })
-      expect(presentAtBirthRegistration).toEqual(null)
-    })
-    it('returns presentAtBirthRegistration null', async () => {
-      // @ts-ignore
-      const presentAtBirthRegistration =
-        await typeResolvers.BirthRegistration.presentAtBirthRegistration({
-          section: []
-        })
-      expect(presentAtBirthRegistration).toEqual(null)
     })
     it('returns childrenBornAliveToMother null', async () => {
       // @ts-ignore
@@ -1239,179 +1166,6 @@ describe('Registration type resolvers', () => {
       )
       expect(relatedPerson).toBeDefined()
       expect(relatedPerson.id).toBe('9185c9f1-a491-41f0-b823-6cba987b550b')
-    })
-  })
-
-  describe('Primary Caregiver type', () => {
-    const primaryCaregiverObj = {
-      patientSection: {
-        title: "Primary caregiver's details",
-        code: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/doc-sections',
-              code: 'primary-caregiver-details'
-            }
-          ],
-          text: "Primary caregiver's details"
-        },
-        entry: [
-          {
-            reference: 'Patient/123' // reference to a Patient resource contained below, by fullUrl
-          }
-        ]
-      },
-      encounterSection: {
-        title: 'Birth Encounter',
-        code: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/sections',
-              code: 'birth-encounter'
-            }
-          ],
-          text: 'Birth encounter'
-        },
-        text: '',
-        entry: [
-          {
-            reference: 'Encounter/123' // reference to Encounter resource contained below
-          }
-        ]
-      }
-    }
-
-    it('returns parentDetailsType', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockObservations.parentDetailsType))
-
-      const parentDetailsType =
-        await typeResolvers.PrimaryCaregiver.parentDetailsType(
-          primaryCaregiverObj
-        )
-
-      expect(parentDetailsType).toBe('MOTHER_AND_FATHER')
-    })
-
-    it('returns null as parentDetailsType if there is no parent details type section', async () => {
-      fetch.mockResponseOnce(JSON.stringify({}))
-
-      const parentDetailsType =
-        await typeResolvers.PrimaryCaregiver.parentDetailsType(
-          primaryCaregiverObj
-        )
-
-      expect(parentDetailsType).toBe(null)
-    })
-
-    it('returns primaryCaregiver', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockPatient))
-
-      const primaryCaregiver =
-        await typeResolvers.PrimaryCaregiver.primaryCaregiver(
-          primaryCaregiverObj
-        )
-
-      expect(primaryCaregiver.name.length).toBeGreaterThan(0)
-    })
-
-    it('returns null if no patientSection', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockPatient))
-
-      const primaryCaregiver =
-        await typeResolvers.PrimaryCaregiver.primaryCaregiver({})
-
-      expect(primaryCaregiver).toBe(null)
-    })
-
-    it('returns reasonsNotApplying', async () => {
-      fetch.mockResponseOnce(JSON.stringify(mockObservationBundle))
-
-      const reasonsNotApplying =
-        await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
-          primaryCaregiverObj
-        )
-
-      expect(reasonsNotApplying).toEqual(reasonsNotApplyingMock)
-    })
-
-    it('returns reasonsNotApplying', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              fullUrl: 'urn:uuid:<uuid>',
-              resource: {
-                resourceType: 'Observation',
-                context: {
-                  reference: 'Encounter/123'
-                },
-                code: {
-                  coding: [
-                    {
-                      system: 'http://opencrvs.org/specs/obs-type',
-                      code: 'primary-caregiver'
-                    }
-                  ]
-                },
-                valueString: 'INFORMANT'
-              }
-            }
-          ]
-        })
-      )
-
-      const reasonsNotApplying =
-        await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
-          primaryCaregiverObj
-        )
-
-      expect(reasonsNotApplying).toEqual([
-        { primaryCaregiverType: 'INFORMANT' }
-      ])
-    })
-
-    it('returns empty reasons array if  no observations', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          type: 'searchset'
-        })
-      )
-
-      const reasonsNotApplying =
-        await typeResolvers.PrimaryCaregiver.reasonsNotApplying(
-          primaryCaregiverObj
-        )
-
-      expect(reasonsNotApplying).toEqual([])
-    })
-  })
-
-  describe('Reason not applying type', () => {
-    it('returns primaryCaregiverType', () => {
-      const primaryCaregiverType =
-        typeResolvers.ReasonsNotApplying.primaryCaregiverType(
-          reasonsNotApplyingMock[2]
-        )
-
-      expect(primaryCaregiverType).toBe('OTHER')
-    })
-
-    it('returns reasonNotApplying', () => {
-      const reason = typeResolvers.ReasonsNotApplying.reasonNotApplying(
-        reasonsNotApplyingMock[0]
-      )
-
-      expect(reason).toBe('Sick')
-    })
-
-    it('returns isDeceased', () => {
-      const isDeceased = typeResolvers.ReasonsNotApplying.isDeceased(
-        reasonsNotApplyingMock[1]
-      )
-
-      expect(isDeceased).toBe(true)
     })
   })
 })
