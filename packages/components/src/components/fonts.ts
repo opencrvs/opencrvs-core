@@ -38,6 +38,10 @@ const languageFonts = {
     semiBoldFontFamily: 'noto_sans_semi_bold',
     regularFontFamily: 'noto_sans_regular'
   },
+  fr: {
+    semiBoldFontFamily: 'noto_sans_semi_bold',
+    regularFontFamily: 'noto_sans_regular'
+  },
   default: {
     semiBoldFontFamily: 'noto_sans_semi_bold',
     regularFontFamily: 'noto_sans_regular'

@@ -13,8 +13,9 @@ import format from 'date-fns/format'
 import formatDistanceToNowStrict from 'date-fns/formatDistanceToNowStrict'
 import enGB from 'date-fns/locale/en-GB'
 import bn from 'date-fns/locale/bn'
+import fr from 'date-fns/locale/fr'
 
-export const locales: Record<string, Locale> = { en: enGB, bn }
+export const locales: Record<string, Locale> = { en: enGB, bn, fr }
 
 export const formatLongDate = (
   date: string,

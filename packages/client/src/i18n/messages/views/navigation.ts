@@ -16,8 +16,8 @@ interface INavigationMessages
   progress: MessageDescriptor
   readyForReview: MessageDescriptor
   sentForReview: MessageDescriptor
-  requiresUpdate: MessageDescriptor
-  sentForUpdates: MessageDescriptor
+  requiresUpdateRegistrar: MessageDescriptor
+  requiresUpdateAgent: MessageDescriptor
   approvals: MessageDescriptor
   waitingValidation: MessageDescriptor //Waiting for validation',
   print: MessageDescriptor
@@ -25,7 +25,8 @@ interface INavigationMessages
   performance: MessageDescriptor
   team: MessageDescriptor
   config: MessageDescriptor
-  certificates: MessageDescriptor //'Certificates',pplication',
+  certificate: MessageDescriptor
+  completenessRates: MessageDescriptor
 }
 
 const messagesToDefine: INavigationMessages = {
@@ -44,15 +45,15 @@ const messagesToDefine: INavigationMessages = {
     description: 'Sent for review label in navigation',
     id: 'navigation.sentForReview'
   },
-  requiresUpdate: {
+  requiresUpdateRegistrar: {
     defaultMessage: 'Requires update',
-    description: 'Requires update label in navigation',
+    description: 'Requires update label for registrar in navigation',
     id: 'navigation.requiresUpdate'
   },
-  sentForUpdates: {
-    defaultMessage: 'Sent for updates',
-    description: 'Sent for updates label in navigation',
-    id: 'navigation.sentForUpdates'
+  requiresUpdateAgent: {
+    defaultMessage: 'Requires update',
+    description: 'Requires update label for field agent in navigation',
+    id: 'navigation.requiresUpdate'
   },
   approvals: {
     defaultMessage: 'Sent for approval',
@@ -60,7 +61,7 @@ const messagesToDefine: INavigationMessages = {
     id: 'navigation.approvals'
   },
   waitingValidation: {
-    defaultMessage: 'Waiting for validation',
+    defaultMessage: 'In external validation',
     description: 'Waiting for validation label in navigation',
     id: 'navigation.waitingValidation'
   },
@@ -89,10 +90,15 @@ const messagesToDefine: INavigationMessages = {
     description: 'Config label in navigation',
     id: 'navigation.config'
   },
-  certificates: {
-    defaultMessage: 'Certificates',
+  certificate: {
+    defaultMessage: 'Certificate',
     description: 'Certificates label in navigation',
-    id: 'navigation.certificates'
+    id: 'navigation.certificate'
+  },
+  completenessRates: {
+    defaultMessage: 'Completeness rates',
+    description: 'Completeness rates in navigation',
+    id: 'navigation.completenessRates'
   }
 }
 

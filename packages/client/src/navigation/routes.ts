@@ -15,17 +15,13 @@ export const HOME = '/'
 export const SELECT_VITAL_EVENT = '/events'
 
 export const EVENT_INFO = '/events/:eventType/info'
-export const SELECT_BIRTH_INFORMANT = `/drafts/:declarationId/events/${Event.BIRTH}/registration/informant`
-export const SELECT_BIRTH_MAIN_CONTACT_POINT = `/drafts/:declarationId/events/${Event.BIRTH}/registration/contact`
-
+export const SELECT_BIRTH_INFORMANT = `/drafts/:declarationId/events/${Event.BIRTH}/registration/informantType`
 export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:declarationId/events/${Event.BIRTH}`
 export const DRAFT_BIRTH_PARENT_FORM_PAGE = `/drafts/:declarationId/events/${Event.BIRTH}/:pageId`
 export const DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.BIRTH}/:pageId/group/:groupId`
 export const DRAFT_BIRTH_INFORMANT_FORM = `/events/${Event.BIRTH}/contact`
 export const DRAFT_BIRTH_PARENT_FORM_TAB = `/drafts/:declarationId/events/${Event.BIRTH}/parent/:tabId`
-
-export const SELECT_DEATH_INFORMANT = `/drafts/:declarationId/events/${Event.DEATH}/registration/informant`
-export const SELECT_DEATH_MAIN_CONTACT_POINT = `/drafts/:declarationId/events/${Event.DEATH}/registration/contact`
+export const SELECT_DEATH_INFORMANT = `/drafts/:declarationId/events/${Event.DEATH}/registration/informantType`
 export const DRAFT_DEATH_FORM = `/drafts/:declarationId/events/${Event.DEATH}`
 export const DRAFT_DEATH_FORM_PAGE = `/drafts/:declarationId/events/${Event.DEATH}/:pageId`
 export const DRAFT_DEATH_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.DEATH}/:pageId/group/:groupId`
@@ -60,7 +56,6 @@ export const PRINT_CERTIFICATE_PAYMENT = '/payment/:registrationId/:eventType'
 
 export const REGISTRAR_HOME = '/registration-home'
 export const REGISTRAR_HOME_TAB = '/registration-home/:tabId/:selectorId?'
-export const FIELD_AGENT_HOME_TAB = '/field-agent-home/:tabId'
 export const SETTINGS = '/settings'
 export const CHANGE_PHONE = '/settings/phone'
 export const CERTIFICATE_CONFIG = '/config/certificate'
@@ -73,8 +68,8 @@ export const SYS_ADMIN_HOME = '/sys-admin-home'
 export const SYS_ADMIN_HOME_TAB = '/sys-admin-home/:tabId'
 
 export const PERFORMANCE_HOME = '/performance'
-export const EVENT_REGISTRATION_RATES =
-  '/performance/operations/regestrationRates/:eventType'
+export const EVENT_COMPLETENESS_RATES =
+  '/performance/operations/completenessRates/:eventType'
 export const WORKFLOW_STATUS = '/performance/operations/workflowStatus'
 export const PERFORMANCE_FIELD_AGENT_LIST = '/performance/field-agents'
 

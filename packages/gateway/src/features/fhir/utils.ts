@@ -30,9 +30,6 @@ import {
   DEATH_ENCOUNTER_CODE,
   INFORMANT_CODE,
   INFORMANT_TITLE,
-  REASON_MOTHER_NOT_APPLYING,
-  REASON_FATHER_NOT_APPLYING,
-  REASON_CAREGIVER_NOT_APPLYING,
   createPractitionerEntryTemplate,
   BIRTH_CORRECTION_ENCOUNTER_CODE,
   DEATH_CORRECTION_ENCOUNTER_CODE,
@@ -59,13 +56,7 @@ import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 import { logger } from '@gateway/logger'
-import {
-  GQLMonthWiseTargetDayEstimation,
-  GQLLocationWiseTargetDayEstimation,
-  GQLEventInTargetDayEstimationCount,
-  GQLRegStatus
-} from '@gateway/graphql/schema'
-import { reduce } from 'lodash'
+import { GQLRegStatus } from '@gateway/graphql/schema'
 
 export interface ITimeLoggedResponse {
   status?: string
@@ -304,26 +295,6 @@ export async function removeObservationResource(
       }
     }
   })
-}
-
-export function getReasonCodeAndDesc(type: string) {
-  switch (type) {
-    case 'MOTHER':
-      return {
-        code: REASON_MOTHER_NOT_APPLYING,
-        desc: 'Reason mother not applying'
-      }
-    case 'FATHER':
-      return {
-        code: REASON_FATHER_NOT_APPLYING,
-        desc: 'Reason father not applying'
-      }
-    default:
-      return {
-        code: REASON_CAREGIVER_NOT_APPLYING,
-        desc: 'Reason caregiver not applying'
-      }
-  }
 }
 
 export function createObservationResource(
@@ -721,26 +692,6 @@ export async function setCertificateCollectorReference(
       relatedPerson.patient = {
         reference: sec.entry[0].reference
       }
-    }
-  }
-}
-
-export async function setPrimaryCaregiverReference(
-  sectionCode: string,
-  observation: fhir.Observation,
-  fhirBundle: ITemplatedBundle
-) {
-  const section = findCompositionSectionInBundle(sectionCode, fhirBundle)
-  if (section && section.entry) {
-    const personSectionEntry = section.entry[0]
-    const personEntry = fhirBundle.entry.find(
-      (entry) => entry.fullUrl === personSectionEntry.reference
-    )
-    if (!personEntry) {
-      throw new Error('Expected person entry not found on the bundle')
-    }
-    observation.subject = {
-      reference: personEntry.fullUrl
     }
   }
 }
@@ -1300,45 +1251,4 @@ export async function setInformantReference(
       }
     }
   }
-}
-
-export function eventInTargetDayEstimationCalculator(
-  eventInTargetDayEstimations: Array<
-    GQLMonthWiseTargetDayEstimation | GQLLocationWiseTargetDayEstimation
-  >
-): GQLEventInTargetDayEstimationCount {
-  const initialValue: GQLEventInTargetDayEstimationCount = {
-    actualTotalRegistration: 0,
-    actualTargetDayRegistration: 0,
-    estimatedRegistration: 0,
-    estimatedTargetDayPercentage: 0
-  }
-  return reduce(
-    eventInTargetDayEstimations,
-    (accumulator, item) => {
-      const actualTotalRegistration =
-        accumulator.actualTotalRegistration + item.actualTotalRegistration
-      const actualTargetDayRegistration =
-        accumulator.actualTargetDayRegistration +
-        item.actualTargetDayRegistration
-      const estimatedRegistration =
-        accumulator.estimatedRegistration + item.estimatedRegistration
-
-      return {
-        actualTotalRegistration,
-        actualTargetDayRegistration,
-        estimatedRegistration,
-        estimatedTargetDayPercentage:
-          actualTargetDayRegistration === 0 || estimatedRegistration === 0
-            ? 0
-            : Number(
-                (
-                  (actualTargetDayRegistration / estimatedRegistration) *
-                  100
-                ).toFixed(2)
-              )
-      }
-    },
-    initialValue
-  )
 }

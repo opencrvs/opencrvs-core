@@ -15,7 +15,7 @@ import {
   IForm,
   IFormData,
   IFormFieldValue,
-  IRegistration,
+  IContactPoint,
   Sort
 } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -52,6 +52,10 @@ import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
 import { v4 as uuid } from 'uuid'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import {
+  showDownloadDeclarationFailedToast,
+  ShowDownloadDeclarationFailedToast
+} from '@client/notification/actions'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -84,6 +88,7 @@ export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
   READY_TO_SUBMIT = 'READY_TO_SUBMIT',
   SUBMITTING = 'SUBMITTING',
+  VALIDATED = 'VALIDATED',
   DECLARED = 'DECLARED',
   SUBMITTED = 'SUBMITTED',
   READY_TO_APPROVE = 'READY_TO_APPROVE',
@@ -160,6 +165,7 @@ export interface IDeclaration {
   data: IFormData
   originalData?: IFormData
   savedOn?: number
+  createdAt?: string
   modifiedOn?: number
   eventType?: string
   review?: boolean
@@ -185,14 +191,10 @@ export interface IWorkqueue {
 }
 
 interface IWorkqueuePaginationParams {
-  inProgressCount: number
-  reviewCount: number
-  rejectCount: number
-  approvalCount: number
-  externalValidationCount: number
-  printCount: number
+  pageSize: number
 
   inProgressSkip: number
+  healthSystemSkip: number
   reviewSkip: number
   rejectSkip: number
   approvalSkip: number
@@ -237,13 +239,17 @@ export type ICertificate = {
  */
 export interface IPrintableDeclaration extends Omit<IDeclaration, 'data'> {
   data: {
+    mother: {
+      detailsExist: boolean
+      [key: string]: IFormFieldValue
+    }
     father: {
-      fathersDetailsExist: boolean
+      detailsExist: boolean
       [key: string]: IFormFieldValue
     }
     registration: {
       _fhirID: string
-      presentAtBirthRegistration: Relation
+      informantType: Relation
       whoseContactDetails: string
       registrationPhone: string
       trackingId: string
@@ -251,7 +257,7 @@ export interface IPrintableDeclaration extends Omit<IDeclaration, 'data'> {
       certificates: ICertificate[]
       [key: string]: IFormFieldValue
     }
-  } & Exclude<IDeclaration['data'], 'father' | 'registration'>
+  } & Exclude<IDeclaration['data'], 'mother' | 'father' | 'registration'>
 }
 
 type PaymentType = 'MANUAL'
@@ -378,14 +384,10 @@ interface IDownloadDeclarationFail {
 interface UpdateRegistrarWorkqueueAction {
   type: typeof UPDATE_REGISTRAR_WORKQUEUE
   payload: {
-    inProgressCount: number
-    reviewCount: number
-    rejectCount: number
-    approvalCount: number
-    externalValidationCount: number
-    printCount: number
+    pageSize: number
 
     inProgressSkip: number
+    healthSystemSkip: number
     reviewSkip: number
     rejectSkip: number
     approvalSkip: number
@@ -429,6 +431,7 @@ export type Action =
   | UpdateFieldAgentDeclaredDeclarationsAction
   | UpdateFieldAgentDeclaredDeclarationsSuccessAction
   | UpdateFieldAgentDeclaredDeclarationsFailAction
+  | ShowDownloadDeclarationFailedToast
 
 export interface IUserData {
   userID: string
@@ -635,7 +638,6 @@ async function getFieldAgentDeclaredDeclarations(userDetails: IUserDetails) {
   } catch (exception) {
     result = undefined
   }
-
   return result
 }
 
@@ -677,7 +679,6 @@ export function mergeDeclaredDeclarations(
     .map((app) => {
       return transformSearchQueryDataToDraft(app)
     })
-
   declarations.push(...transformedDeclaredDeclarations)
 }
 
@@ -856,7 +857,7 @@ async function updateWorkqueueData(
     (declaration.data &&
       declaration.data.registration &&
       declaration.data.registration.contactPoint &&
-      (declaration.data.registration.contactPoint as IRegistration).nestedFields
+      (declaration.data.registration.contactPoint as IContactPoint).nestedFields
         .registrationPhone) ||
     ''
 
@@ -1015,13 +1016,9 @@ async function getWorkqueueData(
       : [EVENT_STATUS.DECLARED]
 
   const {
-    inProgressCount,
-    reviewCount,
-    rejectCount,
-    approvalCount,
-    externalValidationCount,
-    printCount,
+    pageSize,
     inProgressSkip,
+    healthSystemSkip,
     reviewSkip,
     rejectSkip,
     approvalSkip,
@@ -1032,13 +1029,9 @@ async function getWorkqueueData(
   const result = await syncRegistrarWorkqueue(
     registrationLocationId,
     reviewStatuses,
-    inProgressCount,
-    reviewCount,
-    rejectCount,
-    approvalCount,
-    externalValidationCount,
-    printCount,
+    pageSize,
     inProgressSkip,
+    healthSystemSkip,
     reviewSkip,
     rejectSkip,
     approvalSkip,
@@ -1144,14 +1137,10 @@ export function downloadDeclaration(
 }
 
 export function updateRegistrarWorkqueue(
-  inProgressCount = 10,
-  reviewCount = 10,
-  rejectCount = 10,
-  approvalCount = 10,
-  externalValidationCount = 10,
-  printCount = 10,
+  pageSize = 10,
 
   inProgressSkip = 0,
+  healthSystemSkip = 0,
   reviewSkip = 0,
   rejectSkip = 0,
   approvalSkip = 0,
@@ -1161,14 +1150,10 @@ export function updateRegistrarWorkqueue(
   return {
     type: UPDATE_REGISTRAR_WORKQUEUE,
     payload: {
-      inProgressCount,
-      reviewCount,
-      rejectCount,
-      approvalCount,
-      externalValidationCount,
-      printCount,
+      pageSize,
 
       inProgressSkip,
+      healthSystemSkip,
       reviewSkip,
       rejectSkip,
       approvalSkip,
@@ -1696,9 +1681,12 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
             ...state,
             declarations: declarationsAfterError
           },
-          Cmd.run(writeDeclarationByUser, {
-            args: [Cmd.getState, state.userID, erroredDeclaration]
-          })
+          Cmd.list([
+            Cmd.action(showDownloadDeclarationFailedToast()),
+            Cmd.run(writeDeclarationByUser, {
+              args: [Cmd.getState, state.userID, erroredDeclaration]
+            })
+          ])
         )
       }
 

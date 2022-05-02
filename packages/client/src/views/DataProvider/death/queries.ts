@@ -114,6 +114,8 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       registration {
         id
         contact
+        informantType
+        otherInformantType
         contactRelationship
         contactPhoneNumber
         attachments {
@@ -148,7 +150,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         value
       }
       mannerOfDeath
+      causeOfDeathEstablished
+      causeOfDeathMethod
       causeOfDeath
+      deathDescription
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
       history {
@@ -328,6 +333,8 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       registration {
         id
         contact
+        informantType
+        otherInformantType
         contactRelationship
         contactPhoneNumber
         status {
@@ -371,8 +378,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         }
       }
       mannerOfDeath
+      causeOfDeathEstablished
       causeOfDeathMethod
       causeOfDeath
+      deathDescription
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
       history {

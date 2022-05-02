@@ -122,7 +122,7 @@ describe('when user is in the register form for birth event', () => {
       )
       component.find('#save_draft').hostNodes().simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toEqual('/field-agent-home/progress')
+      expect(history.location.pathname).toEqual('/registration-home/progress/')
     })
     it('takes registrar to declaration submitted page when save button is clicked', async () => {
       localStorage.getItem = jest.fn(
@@ -176,8 +176,8 @@ describe('when user is in the register form for death event', () => {
           match={{
             params: {
               declarationId: draft.id,
-              pageId: 'causeOfDeath',
-              groupId: 'causeOfDeath-causeOfDeathEstablished'
+              pageId: 'deathEvent',
+              groupId: 'death-event-details'
             },
             isExact: true,
             path: '',
@@ -189,14 +189,16 @@ describe('when user is in the register form for death event', () => {
       component = testComponent
     })
 
-    it('renders the optional label', () => {
+    it('renders the deathEvent details page', () => {
       expect(
-        component
-          .find('#form_section_id_causeOfDeath-causeOfDeathEstablished')
-          .hostNodes()
+        component.find('#form_section_id_death-event-details').hostNodes()
       ).toHaveLength(1)
     })
   })
+
+  /*
+
+// ID API Check not available in Farajaland form
 
   describe('when user is in deceased section', () => {
     beforeEach(async () => {
@@ -230,7 +232,7 @@ describe('when user is in the register form for death event', () => {
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(0)
     })
   })
-
+*/
   describe('when user is in contact point page', () => {
     beforeEach(async () => {
       ;(debounce as jest.Mock).mockImplementation((fn) => fn)
@@ -256,9 +258,8 @@ describe('when user is in the register form for death event', () => {
       )
       component = testComponent
       component.find('#next_section').hostNodes().simulate('click')
-
-      await waitForElement(component, '#contactPoint_error')
-      expect(component.find('#contactPoint_error').hostNodes().text()).toBe(
+      await waitForElement(component, '#informantType_error')
+      expect(component.find('#informantType_error').hostNodes().text()).toBe(
         'Required for registration'
       )
     })
@@ -290,6 +291,10 @@ describe('when user is in the register form for death event', () => {
       expect(history.location.pathname).toContain(REGISTRAR_HOME)
     })
 
+    /*
+
+    // ID API Check not available in Farajaland form
+
     it('renders loader button when idType is National ID', async () => {
       const testComponent = await createTestComponent(
         // @ts-ignore
@@ -314,7 +319,7 @@ describe('when user is in the register form for death event', () => {
         { store, history }
       )
       component = testComponent
-      selectOption(component, '#iDType', 'National ID number')
+      selectOption(component, '#iD', 'National ID')
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
     })
 
@@ -852,9 +857,9 @@ describe('when user is in the register form for death event', () => {
         1
       )
     })
+*/
   })
 })
-
 describe('when user is in the register form preview section', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
@@ -868,6 +873,21 @@ describe('when user is in the register form preview section', () => {
     history = storeContext.history
 
     const draft = createDeclaration(Event.BIRTH)
+    draft.data = {
+      child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
+      father: {
+        detailsExist: true
+      },
+      mother: {
+        detailsExist: true
+      },
+      documents: {
+        imageUploader: { title: 'dummy', description: 'dummy', data: '' }
+      },
+      registration: {
+        commentsOrNotes: ''
+      }
+    }
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
 
@@ -1142,7 +1162,7 @@ describe('when user is in the register form from sent for review edit', () => {
   it('clicking save confirm saves the draft', async () => {
     const DRAFT_MODIFY_TIME = 1582525379383
     Date.now = jest.fn(() => DRAFT_MODIFY_TIME)
-    selectOption(component, '#iDType', 'National ID number')
+    selectOption(component, '#educationalAttainment', 'Tertiary')
 
     // Do some modifications
     component.find('input#iD').simulate('change', {

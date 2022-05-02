@@ -77,8 +77,6 @@ interface IConstantsMessages
   lastEdited: MessageDescriptor
   month: MessageDescriptor
   name: MessageDescriptor
-  nameDefaultLocale: MessageDescriptor
-  nameRegionalLocale: MessageDescriptor
   newBirthRegistration: MessageDescriptor
   newDeathRegistration: MessageDescriptor
   noNameProvided: MessageDescriptor
@@ -108,7 +106,13 @@ interface IConstantsMessages
   to: MessageDescriptor
   toCapitalized: MessageDescriptor
   trackingId: MessageDescriptor
+  notificationSent: MessageDescriptor
+  sentForReview: MessageDescriptor
+  sentForValidation: MessageDescriptor
+  sentForUpdates: MessageDescriptor
+  sentForApproval: MessageDescriptor
   type: MessageDescriptor
+  event: MessageDescriptor
   update: MessageDescriptor
   user: MessageDescriptor
   username: MessageDescriptor
@@ -136,6 +140,7 @@ interface IConstantsMessages
   averageRateOfRegistrations: MessageDescriptor
   estimatedNumberOfEvents: MessageDescriptor
   rateOfRegistrationWithinTargetd: MessageDescriptor
+  rateOfRegistrationWithinYears: MessageDescriptor
   registerConfirmModalDesc: MessageDescriptor
   registeredWithinTargetd: MessageDescriptor
   registeredInTargetd: MessageDescriptor
@@ -144,6 +149,8 @@ interface IConstantsMessages
   viewAll: MessageDescriptor
   notAvailable: MessageDescriptor
   history: MessageDescriptor
+  requireUpdatesLoading: MessageDescriptor
+  noRecords: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -225,7 +232,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.declarationRequestedCorrectionOn'
   },
   declarationStarted: {
-    defaultMessage: 'Declaration started',
+    defaultMessage: 'Started',
     description: 'Label for table header column Declaration started',
     id: 'constants.declarationStarted'
   },
@@ -376,7 +383,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.eventDate'
   },
   eventType: {
-    defaultMessage: 'Event type',
+    defaultMessage: 'Event',
     description: 'Label for table header column Event type',
     id: 'constants.eventType'
   },
@@ -475,16 +482,6 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Name label',
     id: 'constants.name'
   },
-  nameDefaultLocale: {
-    defaultMessage: 'English name',
-    description: 'Label for column of English name',
-    id: 'constants.nameDefaultLocale'
-  },
-  nameRegionalLocale: {
-    defaultMessage: 'Local name',
-    description: 'Label for column of Local name',
-    id: 'constants.nameRegionalLocale'
-  },
   newBirthRegistration: {
     id: 'register.selectInformant.newBirthRegistration',
     defaultMessage: 'New birth declaration',
@@ -534,7 +531,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.registerConfirmModalDesc'
   },
   registered: {
-    defaultMessage: 'registered',
+    defaultMessage: 'Registered',
     description: 'A label for registered',
     id: 'constants.registered'
   },
@@ -620,8 +617,8 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.timeWatingApproval'
   },
   timeWaitingExternalValidation: {
-    defaultMessage: 'Time in waiting for waiting for BRIS',
-    description: 'Label for column Time in waiting for waiting for BRIS',
+    defaultMessage: 'Time in external validation',
+    description: 'Label for column Time in external validation BRIS',
     id: 'constants.timeWaitingExternalValidation'
   },
   timeReadyToPrint: {
@@ -644,10 +641,40 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Search menu tracking id type',
     id: 'constants.trackingId'
   },
+  notificationSent: {
+    defaultMessage: 'Notification sent',
+    description: 'label for notification sent',
+    id: 'constants.notificationSent'
+  },
+  sentForReview: {
+    defaultMessage: 'Sent for review',
+    description: 'label for sent for review',
+    id: 'constants.sentForReview'
+  },
+  sentForValidation: {
+    defaultMessage: 'Sent for validation',
+    description: 'label for sent for validation',
+    id: 'constants.sentForValidation'
+  },
+  sentForUpdates: {
+    defaultMessage: 'Sent for updates',
+    description: 'label for sent for updates',
+    id: 'constants.sentForUpdates'
+  },
+  sentForApproval: {
+    defaultMessage: 'Sent for approval',
+    description: 'label for sent for approval',
+    id: 'constants.sentForApproval'
+  },
   type: {
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item',
     id: 'constants.type'
+  },
+  event: {
+    defaultMessage: 'Event',
+    description: 'Label for Event of event in work queue list item',
+    id: 'constants.event'
   },
   update: {
     defaultMessage: 'Update',
@@ -786,6 +813,12 @@ const messagesToDefine: IConstantsMessages = {
     description:
       'A label for Rate within {registrationTargetDays} days of event'
   },
+  rateOfRegistrationWithinYears: {
+    id: 'constants.rateOfRegistrationWithinYears',
+    defaultMessage:
+      'Rate within {num} {num, plural, =0 {year} =1 {year} other {years}} of event',
+    description: 'A label for Rate within year of event'
+  },
   registeredWithinTargetd: {
     id: 'constants.registeredWithinTargetd',
     defaultMessage: `Registered within\n{registrationTargetDays} days of event`,
@@ -815,6 +848,16 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.history',
     defaultMessage: 'History',
     description: 'History heading'
+  },
+  requireUpdatesLoading: {
+    id: 'constants.requireUpdatesLoading',
+    defaultMessage: 'Checking your declarations',
+    description: 'The text when all rejected declarations are loading'
+  },
+  noRecords: {
+    defaultMessage: 'No records {tab}',
+    description: 'No Application in{tab} tab in officeHome',
+    id: 'constants.noRecords'
   }
 }
 

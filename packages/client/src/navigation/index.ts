@@ -20,8 +20,7 @@ import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   EVENT_INFO,
-  EVENT_REGISTRATION_RATES,
-  FIELD_AGENT_HOME_TAB,
+  EVENT_COMPLETENESS_RATES,
   HOME,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
@@ -34,9 +33,7 @@ import {
   SEARCH,
   SEARCH_RESULT,
   SELECT_BIRTH_INFORMANT,
-  SELECT_BIRTH_MAIN_CONTACT_POINT,
   SELECT_DEATH_INFORMANT,
-  SELECT_DEATH_MAIN_CONTACT_POINT,
   SELECT_VITAL_EVENT,
   SETTINGS,
   SYS_ADMIN_HOME_TAB,
@@ -56,7 +53,10 @@ import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
-import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import {
+  getJurisdictionLocationIdFromUserDetails,
+  CompletenessRateTime
+} from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import {
   goBack as back,
@@ -104,13 +104,6 @@ type GoToRegistrarHome = {
   }
 }
 
-export const GO_TO_FIELD_AGENT_HOME = 'navigation/GO_TO_FIELD_AGENT_HOME'
-type GoToFieldAgentHome = {
-  type: typeof GO_TO_FIELD_AGENT_HOME
-  payload: {
-    tabId: string
-  }
-}
 export const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
 type GoToReviewUserDetails = {
   type: typeof GO_TO_REVIEW_USER_DETAILS
@@ -130,7 +123,6 @@ type GoToUserProfile = {
 export type Action =
   | GoToPageAction
   | GoToRegistrarHome
-  | GoToFieldAgentHome
   | GoToSysAdminHome
   | GoToReviewUserDetails
   | GoToUserProfile
@@ -158,24 +150,8 @@ export function goToDeathInformant(declarationId: string) {
   )
 }
 
-export function goToBirthContactPoint(declarationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_MAIN_CONTACT_POINT, {
-      declarationId
-    })
-  )
-}
-
 export function goToEventInfo(eventType: Event) {
   return push(formatUrl(EVENT_INFO, { eventType }))
-}
-
-export function goToDeathContactPoint(declarationId: string) {
-  return push(
-    formatUrl(SELECT_DEATH_MAIN_CONTACT_POINT, {
-      declarationId
-    })
-  )
 }
 
 export function goToEvents() {
@@ -203,10 +179,7 @@ export function goToApplicationConfig() {
 }
 
 export function goToHomeTab(tabId: string, selectorId = '') {
-  const path = getCurrentUserScope().includes('declare')
-    ? FIELD_AGENT_HOME_TAB
-    : REGISTRAR_HOME_TAB
-  return push(formatUrl(path, { tabId, selectorId }))
+  return push(formatUrl(REGISTRAR_HOME_TAB, { tabId, selectorId }))
 }
 
 type searchedLocation = {
@@ -381,13 +354,6 @@ export function goToRegistrarHomeTab(
   }
 }
 
-export function goToFieldAgentHomeTab(tabId: IWORKQUEUE_TABS) {
-  return {
-    type: GO_TO_FIELD_AGENT_HOME,
-    payload: { tabId }
-  }
-}
-
 export function goToSysAdminHomeTab(tabId: string) {
   return {
     type: GO_TO_SYS_ADMIN_HOME,
@@ -419,21 +385,29 @@ export function goToCreateNewUserWithLocationId(locationId: string) {
   return push(formatUrl(CREATE_USER_ON_LOCATION, { locationId }))
 }
 
-export function goToRegistrationRates(
+export function goToCompletenessRates(
   eventType: Event,
-  title: string,
-  locationId: string,
+  locationId: string | undefined,
   timeStart: Date,
-  timeEnd: Date
+  timeEnd: Date,
+  time = CompletenessRateTime.WithinTarget
 ) {
   return push({
-    pathname: formatUrl(EVENT_REGISTRATION_RATES, { eventType }),
-    search: stringify({
-      locationId,
-      title,
-      timeStart: timeStart.toISOString(),
-      timeEnd: timeEnd.toISOString()
-    })
+    pathname: formatUrl(EVENT_COMPLETENESS_RATES, { eventType }),
+    search: stringify(
+      locationId
+        ? {
+            locationId,
+            timeStart: timeStart.toISOString(),
+            timeEnd: timeEnd.toISOString(),
+            time
+          }
+        : {
+            timeStart: timeStart.toISOString(),
+            timeEnd: timeEnd.toISOString(),
+            time
+          }
+    )
   })
 }
 
@@ -666,14 +640,6 @@ export function navigationReducer(state: INavigationState, action: any) {
               selectorId: RegistrarHomeSelectorId
             })
           )
-        )
-      )
-    case GO_TO_FIELD_AGENT_HOME:
-      const { tabId: FieldAgentHomeTabId } = action.payload
-      return loop(
-        state,
-        Cmd.action(
-          push(formatUrl(FIELD_AGENT_HOME_TAB, { tabId: FieldAgentHomeTabId }))
         )
       )
     case GO_TO_SYS_ADMIN_HOME:

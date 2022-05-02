@@ -14,12 +14,14 @@ import styled, { keyframes, withTheme } from 'styled-components'
 import { CrossLarge, Error, Success, Warning } from '../icons'
 import { Spinner } from './Spinner'
 import { ITheme } from '../theme'
+import NotificationError from '../icons/NotificationError'
 
 export enum NOTIFICATION_TYPE {
   SUCCESS = 'success',
   WARNING = 'warning',
   IN_PROGRESS = 'inProgress',
-  ERROR = 'error'
+  ERROR = 'error',
+  ALTERNATE_ERROR = 'alternateError'
 }
 
 interface IProps {
@@ -78,6 +80,9 @@ const NotificationContainer = styled.div`
   &.warning {
     background: ${({ theme }) => theme.colors.neutral};
   }
+  &.alternateError {
+    background: ${({ theme }) => theme.colors.negative};
+  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
 
@@ -127,6 +132,7 @@ class FloatingNotificationComp extends React.Component<FullProps> {
         <Content>
           {type === NOTIFICATION_TYPE.SUCCESS && <Success />}
           {type === NOTIFICATION_TYPE.WARNING && <Warning />}
+          {type === NOTIFICATION_TYPE.ALTERNATE_ERROR && <NotificationError />}
           {type === NOTIFICATION_TYPE.ERROR && <Error />}
           {type === NOTIFICATION_TYPE.IN_PROGRESS && (
             <Spinner

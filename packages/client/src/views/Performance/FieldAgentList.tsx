@@ -24,7 +24,7 @@ import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
+import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
@@ -49,11 +49,16 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { IAvatar } from '@client/utils/userUtils'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
-
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 25
 const { useState } = React
 interface SortMap {
@@ -97,7 +102,6 @@ type IProps = RouteComponentProps &
   IDispatchProps
 
 export enum EVENT_OPTIONS {
-  ALL = '',
   BIRTH = 'BIRTH',
   DEATH = 'DEATH'
 }
@@ -173,7 +177,7 @@ function FieldAgentListComponent(props: IProps) {
     search
   ) as unknown as ISearchParams
   const [status, setStatus] = useState<STATUS_OPTIONS>(STATUS_OPTIONS.ACTIVE)
-  const [event, setEvent] = useState<EVENT_OPTIONS>(EVENT_OPTIONS.ALL)
+  const [event, setEvent] = useState<EVENT_OPTIONS>(EVENT_OPTIONS.BIRTH)
   const [sortOrder, setSortOrder] = React.useState<SortMap>(INITIAL_SORT_MAP)
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const [columnToBeSort, setColumnToBeSort] =
@@ -191,18 +195,20 @@ function FieldAgentListComponent(props: IProps) {
         timeEnd: timeEnd,
         primaryOfficeId: locationId,
         status: status.toString(),
-        event: event === '' ? undefined : event.toUpperCase(),
+        event: event || undefined,
         count: recordCount,
-        sort: 'asc'
+        sort: 'asc',
+        skip: 0
       }
     : {
         timeStart: timeStart,
         timeEnd: timeEnd,
         locationId: locationId,
         status: status.toString(),
-        event: event === '' ? undefined : event.toUpperCase(),
+        event: event || undefined,
         count: recordCount,
-        sort: 'asc'
+        sort: 'asc',
+        skip: 0
       }
 
   function toggleSort(key: keyof SortMap) {
@@ -379,7 +385,8 @@ function FieldAgentListComponent(props: IProps) {
       []
     )
   }
-
+  const skip = (currentPageNumber - 1) * 1
+  queryVariables.skip = skip
   return (
     <SysAdminContentWrapper
       id="field-agent-list"
@@ -409,18 +416,14 @@ function FieldAgentListComponent(props: IProps) {
                 setEvent(
                   Object.values(EVENT_OPTIONS).find(
                     (val) => val === option.value
-                  ) || EVENT_OPTIONS.ALL
+                  ) || EVENT_OPTIONS.BIRTH
                 )
               }}
               id="event-select"
               withLightTheme={true}
-              defaultWidth={110}
+              defaultWidth={100}
               value={event}
               options={[
-                {
-                  label: intl.formatMessage(messages.eventOptionForBoth),
-                  value: EVENT_OPTIONS.ALL
-                },
                 {
                   label: intl.formatMessage(messages.eventOptionForBirths),
                   value: EVENT_OPTIONS.BIRTH
@@ -502,6 +505,10 @@ function FieldAgentListComponent(props: IProps) {
                 </>
               )
             } else {
+              const totalData =
+                data &&
+                data.searchFieldAgents &&
+                data.searchFieldAgents.totalItems
               return (
                 <TableDiv>
                   <TableView
@@ -532,6 +539,34 @@ function FieldAgentListComponent(props: IProps) {
                     isFullPage
                     highlightRowOnMouseOver
                   />
+                  {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+                    <PaginationWrapper>
+                      <DesktopWrapper>
+                        <PaginationModified
+                          size="small"
+                          initialPage={currentPageNumber}
+                          totalPages={Math.ceil(
+                            totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                          )}
+                          onPageChange={(currentPage: number) => {
+                            setCurrentPageNumber(currentPage)
+                          }}
+                        />
+                      </DesktopWrapper>
+                      <MobileWrapper>
+                        <PaginationModified
+                          size="large"
+                          initialPage={currentPageNumber}
+                          totalPages={Math.ceil(
+                            totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                          )}
+                          onPageChange={(currentPage: number) => {
+                            setCurrentPageNumber(currentPage)
+                          }}
+                        />
+                      </MobileWrapper>
+                    </PaginationWrapper>
+                  )}
                 </TableDiv>
               )
             }

@@ -45,20 +45,14 @@ type DeclarationsStartedMetrics {
   officeDeclarations: Int!
 }
 
-type MonthWiseEstimationMetrics {
-  details: [MonthWiseTargetDayEstimation]
-  total: EventInTargetDayEstimationCount
-}
-
-type MonthWiseTargetDayEstimation {
-  actualTotalRegistration: Int!
-  actualTargetDayRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedTargetDayPercentage: Float!
-  month: String!
-  year: String!
-  startOfMonth: String!
-  endOfMonth: String!
+type MonthWiseEstimationMetric {
+  total: Int!
+  withinTarget: Int!
+  within1Year: Int!
+  within5Years: Int!
+  estimated: Int!
+  month: Int!
+  year: Int!
 }
 
 type EventInTargetDayEstimationCount {
@@ -73,11 +67,12 @@ type LocationWiseEstimationMetrics {
   total: EventInTargetDayEstimationCount
 }
 
-type LocationWiseTargetDayEstimation {
-  actualTotalRegistration: Int!
-  actualTargetDayRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedTargetDayPercentage: Float!
+type LocationWiseEstimationMetric {
+  total: Int!
+  withinTarget: Int!
+  within1Year: Int!
+  within5Years: Int!
+  estimated: Int!
   locationId: String!
   locationName: String!
 }
@@ -131,15 +126,15 @@ type Query {
   fetchMonthWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): MonthWiseEstimationMetrics
+  ): [MonthWiseEstimationMetric!]
   fetchLocationWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): LocationWiseEstimationMetrics
+  ): [LocationWiseEstimationMetric!]
   fetchTimeLoggedMetricsByPractitioner(
     timeStart: String!
     timeEnd: String!

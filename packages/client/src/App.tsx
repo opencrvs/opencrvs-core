@@ -28,7 +28,6 @@ import styled, {
 import { createClient } from '@client/utils/apolloClient'
 import { ReviewDuplicates } from '@client/views/Duplicates/ReviewDuplicates'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
-import { FieldAgentHome } from '@client/views/FieldAgentHome/FieldAgentHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
@@ -38,11 +37,10 @@ import { DeclarationForm } from '@client/views/RegisterForm/DeclarationForm'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
-import { SelectInformant } from '@client/views/SelectInformant/SelectInformant'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
-import { RegistrationRates } from '@client/views/SysAdmin/Performance/RegistrationRates'
+import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
@@ -122,12 +120,7 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.HOME}
-                                            component={FieldAgentHome}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.FIELD_AGENT_HOME_TAB}
-                                            component={FieldAgentHome}
+                                            component={OfficeHome}
                                           />
                                           <ProtectedRoute
                                             exact
@@ -142,12 +135,12 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.SELECT_BIRTH_INFORMANT}
-                                            component={SelectInformant}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={routes.SELECT_DEATH_INFORMANT}
-                                            component={SelectInformant}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
@@ -331,9 +324,9 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={
-                                              routes.EVENT_REGISTRATION_RATES
+                                              routes.EVENT_COMPLETENESS_RATES
                                             }
-                                            component={RegistrationRates}
+                                            component={CompletenessRates}
                                           />
                                           <ProtectedRoute
                                             exact
