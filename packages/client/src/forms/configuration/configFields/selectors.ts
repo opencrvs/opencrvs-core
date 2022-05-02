@@ -14,6 +14,11 @@ import { IStoreState } from '@client/store'
 import { Event } from '@client/forms'
 import { ISectionFieldMap, IConfigFieldMap } from './utils'
 
+export function isFormConfigLoaded(store: IStoreState) {
+  return store.formConfig.state !== 'LOADING'
+}
+
+/* This selector will only be called after form config is loaded*/
 export function selectFormConfigState(store: IStoreState) {
   if (store.formConfig.state === 'LOADING') {
     throw new Error('Offline data not loaded yet')
