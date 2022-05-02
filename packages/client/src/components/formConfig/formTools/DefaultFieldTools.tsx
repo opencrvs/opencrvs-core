@@ -22,21 +22,13 @@ import { useIntl } from 'react-intl'
 import {
   getContentKeys,
   getCertificateHandlebar,
-  IConfigField,
-  getFieldDefinition
+  IDefaultConfigField
 } from '@client/forms/configuration/configFields/utils'
-import { useSelector, useDispatch } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { useParams } from 'react-router'
-import {
-  Event,
-  BirthSection,
-  DeathSection,
-  fieldTypeLabel
-} from '@client/forms'
-import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
+import { useDispatch } from 'react-redux'
+import { fieldTypeLabel } from '@client/forms'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import { modifyConfigField } from '@client/forms/configuration/configFields/actions'
+import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
 
 const Container = styled.div`
   display: flex;
@@ -90,7 +82,7 @@ const Body = styled.span`
   overflow: hidden;
 `
 
-function HideToggleAction({ fieldId, enabled }: IConfigField) {
+function HideToggleAction({ fieldId, enabled }: IDefaultConfigField) {
   const dispatch = useDispatch()
 
   return (
@@ -108,7 +100,7 @@ function HideToggleAction({ fieldId, enabled }: IConfigField) {
   )
 }
 
-function RequiredToggleAction({ fieldId, required }: IConfigField) {
+function RequiredToggleAction({ fieldId, required }: IDefaultConfigField) {
   const dispatch = useDispatch()
 
   return (
@@ -128,15 +120,10 @@ function RequiredToggleAction({ fieldId, required }: IConfigField) {
 export function DefaultFieldTools({
   configField
 }: {
-  configField: IConfigField
+  configField: IDefaultConfigField
 }) {
   const intl = useIntl()
-  const { event, section } =
-    useParams<{ event: Event; section: BirthSection | DeathSection }>()
-  const formSection = useSelector((store: IStoreState) =>
-    getRegisterFormSection(store, section, event)
-  )
-  const formField = getFieldDefinition(formSection, configField)
+  const formField = useFieldDefinition(configField)
   const handleBar = getCertificateHandlebar(formField)
   const contentKeys = getContentKeys(formField)
   const fieldType = fieldTypeLabel(formField.type)

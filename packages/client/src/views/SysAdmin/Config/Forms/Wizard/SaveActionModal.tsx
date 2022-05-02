@@ -18,7 +18,10 @@ import {
   REDIRECT_DELAY
 } from '@client/views/SysAdmin/Config/Forms/utils'
 import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
-import { selectModifiedQuestionConfigs } from '@client/forms/configuration/configFields/selectors'
+import {
+  selectConfigFields,
+  selectConfigRegisterForm
+} from '@client/forms/configuration/configFields/selectors'
 import { Event, IQuestionConfig } from '@client/forms'
 import { Mutation } from 'react-apollo'
 import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
@@ -37,18 +40,30 @@ import { InputField, TextArea } from '@opencrvs/components/lib/forms'
 import { useParams } from 'react-router'
 import { goToFormConfigHome } from '@client/navigation'
 import { updateFormConfig } from '@client/forms/configuration/formDrafts/actions'
+import { generateModifiedQuestionConfigs } from '@client/forms/configuration/configFields/utils'
 
 export const SaveActionContext = React.createContext({
   status: ActionStatus.IDLE,
   setStatus: (_: ActionStatus) => {}
 })
 
+function useModifiedQuestionConfig(event: Event) {
+  const configFields = useSelector((store: IStoreState) =>
+    selectConfigFields(store, event)
+  )
+  const registerForm = useSelector((store: IStoreState) =>
+    selectConfigRegisterForm(store, event)
+  )
+  return React.useMemo(
+    () => generateModifiedQuestionConfigs(configFields, registerForm),
+    [configFields, registerForm]
+  )
+}
+
 function SaveActionButton({ comment }: { comment: string }) {
   const intl = useIntl()
   const { event } = useParams<{ event: Event }>()
-  const questions = useSelector((store: IStoreState) =>
-    selectModifiedQuestionConfigs(store, event)
-  )
+  const questions = useModifiedQuestionConfig(event)
   const { setStatus } = React.useContext(SaveActionContext)
   const dispatch = useDispatch()
 

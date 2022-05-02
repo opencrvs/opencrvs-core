@@ -17,14 +17,14 @@ import {
   TEXTAREA,
   BirthSection,
   DeathSection,
-  Event
+  Event,
+  IFormField
 } from '@client/forms'
 import { modifyConfigField } from '@client/forms/configuration/configFields/actions'
 import {
   CUSTOM_GROUP_NAME,
   getCertificateHandlebar,
-  ICustomConfigField,
-  getFieldDefinition
+  ICustomConfigField
 } from '@client/forms/configuration/configFields/utils'
 import { buttonMessages } from '@client/i18n/messages'
 import { customFieldFormMessages } from '@client/i18n/messages/views/customFieldForm'
@@ -47,9 +47,9 @@ import { camelCase } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
 import { connect } from 'react-redux'
-import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
-import { selectSectionConfigFields } from '@client/forms/configuration/configFields/selectors'
+import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
 import { getConfigFieldIdentifiers } from '@client/forms/configuration/configFields/motionUtils'
+import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
 
 const CustomFieldFormContainer = styled(Box)`
   box-shadow: none;
@@ -128,7 +128,16 @@ const CErrorText = styled(ErrorText)`
   width: 200px;
 `
 
+type IFormFieldWrapper = { formField: IFormField }
+
+type IProps = {
+  event: Event
+  selectedField: ICustomConfigField
+  section: BirthSection | DeathSection
+}
+
 type IFullProps = IProps &
+  IFormFieldWrapper &
   IntlShapeProp &
   ReturnType<typeof mapStateToProps> &
   typeof mapDispatchToProps
@@ -578,18 +587,19 @@ class CustomFieldFormsComp extends React.Component<
   }
 }
 
-type IProps = {
-  event: Event
-  selectedField: ICustomConfigField
-  section: BirthSection | DeathSection
+function withFieldDefinition<T extends { selectedField: ICustomConfigField }>(
+  WrappedComponent: React.ComponentType<T & IFormFieldWrapper>
+) {
+  return function WithFieldDefinition(props: T) {
+    const formField = useFieldDefinition(props.selectedField)
+    return <WrappedComponent formField={formField} {...props} />
+  }
 }
 
 const mapStateToProps = (store: IStoreState, props: IProps) => {
-  const { event, selectedField, section } = props
-  const formSection = getRegisterFormSection(store, section, event)
+  const { event, section } = props
   return {
-    fieldsMap: selectSectionConfigFields(store, event, section),
-    formField: getFieldDefinition(formSection, selectedField)
+    fieldsMap: selectConfigFields(store, event, section)
   }
 }
 
@@ -600,4 +610,4 @@ const mapDispatchToProps = {
 export const CustomFieldForms = connect(
   mapStateToProps,
   mapDispatchToProps
-)(injectIntl(CustomFieldFormsComp))
+)(injectIntl(withFieldDefinition(CustomFieldFormsComp)))

@@ -11,12 +11,8 @@
  */
 
 import { IStoreState } from '@client/store'
-import { Event, IQuestionConfig, IForm } from '@client/forms'
-import {
-  ISectionFieldMap,
-  isDefaultField,
-  hasDefaultFieldChanged
-} from './utils'
+import { Event } from '@client/forms'
+import { ISectionFieldMap, IConfigFieldMap } from './utils'
 
 export function selectFormConfigState(store: IStoreState) {
   if (store.formConfig.state === 'LOADING') {
@@ -25,18 +21,29 @@ export function selectFormConfigState(store: IStoreState) {
   return store.formConfig
 }
 
-function selectConfigRegisterForm(store: IStoreState, event: Event) {
+export function selectConfigRegisterForm(store: IStoreState, event: Event) {
   const formConfigState = selectFormConfigState(store)
   return formConfigState[event].registerForm
 }
 
-export function selectSectionConfigFields(
+export function selectConfigFields(
+  store: IStoreState,
+  event: Event
+): ISectionFieldMap
+export function selectConfigFields(
   store: IStoreState,
   event: Event,
   section: string
+): IConfigFieldMap
+export function selectConfigFields(
+  store: IStoreState,
+  event: Event,
+  section?: string
 ) {
-  const formConfigState = selectFormConfigState(store)
-  return formConfigState[event].configFields[section]
+  const {
+    [event]: { configFields }
+  } = selectFormConfigState(store)
+  return section ? configFields[section] : configFields
 }
 
 export function selectConfigField(
@@ -45,35 +52,5 @@ export function selectConfigField(
   section: string,
   fieldId: string | null
 ) {
-  return fieldId
-    ? selectSectionConfigFields(store, event, section)[fieldId]
-    : null
-}
-
-function generateModifiedQuestionConfigs(
-  configFields: ISectionFieldMap,
-  registerForm: IForm
-) {
-  const questionConfigs: IQuestionConfig[] = []
-  Object.values(configFields).forEach((sectionConfigFields) => {
-    Object.values(sectionConfigFields).forEach((configField) => {
-      if (!isDefaultField(configField)) {
-        const { foregoingFieldId, ...rest } = configField
-        questionConfigs.push(rest)
-      } else if (hasDefaultFieldChanged(configField, registerForm)) {
-        const { foregoingFieldId, identifiers, ...rest } = configField
-        questionConfigs.push(rest)
-      }
-    })
-  })
-  return questionConfigs
-}
-
-export function selectModifiedQuestionConfigs(
-  store: IStoreState,
-  event: Event
-) {
-  const configFields = selectFormConfigState(store)[event].configFields
-  const registerForm = selectConfigRegisterForm(store, event)
-  return generateModifiedQuestionConfigs(configFields, registerForm)
+  return fieldId ? selectConfigFields(store, event, section)[fieldId] : null
 }

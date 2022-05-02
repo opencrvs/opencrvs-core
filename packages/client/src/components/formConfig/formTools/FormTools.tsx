@@ -25,7 +25,7 @@ import { useIntl, MessageDescriptor } from 'react-intl'
 import { prepareNewCustomFieldConfig } from '@client/forms/configuration/configFields/utils'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { selectSectionConfigFields } from '@client/forms/configuration/configFields/selectors'
+import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
 import { useParams } from 'react-router'
 import { addCustomField } from '@client/forms/configuration/configFields/actions'
 import { flushSync } from 'react-dom'
@@ -75,7 +75,7 @@ export const FormTools = ({
   const dispatch = useDispatch()
   const { event, section } = useParams<IRouteProps>()
   const fieldsMap = useSelector((store: IStoreState) =>
-    selectSectionConfigFields(store, event, section)
+    selectConfigFields(store, event, section)
   )
 
   const toggleShowHiddenFields = () => setShowHiddenFields((prev) => !prev)
