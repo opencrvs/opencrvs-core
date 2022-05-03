@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Actions, ActionContext } from './ActionsModal'
+import { ActionContext } from './ActionsModal'
 import {
   ActionStatus,
   isNotifiable,
@@ -21,13 +21,10 @@ import {
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 import { useIntl } from 'react-intl'
-import {
-  messages,
-  statusChangeActionMessages
-} from '@client/i18n/messages/views/formConfig'
+import { statusChangeActionMessages } from '@client/i18n/messages/views/formConfig'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
+import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
 import { constantsMessages } from '@client/i18n/messages'
 
 export function ActionsNotification() {

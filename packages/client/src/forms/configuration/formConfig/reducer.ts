@@ -9,11 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as actions from '@client/forms/configuration/configFields/actions'
-import { storage } from '@client/storage'
-import { Cmd, loop, Loop, LoopReducer } from 'redux-loop'
+import * as actions from '@client/forms/configuration/formConfig/actions'
+import { Loop, LoopReducer, loop, Cmd } from 'redux-loop'
 import * as offlineActions from '@client/offline/actions'
-import { Event } from '@client/forms'
+import { Event, IForm, IFormConfig } from '@client/forms'
 import { getConfiguredForm, FieldPosition } from '@client/forms/configuration'
 import { ISectionFieldMap, getSectionFieldsMap, IConfigFieldMap } from './utils'
 import {
@@ -21,8 +20,12 @@ import {
   shiftCurrentFieldUp,
   getConfigFieldIdentifiers
 } from './motionUtils'
+import {
+  IFormDraft,
+  getEventDraft
+} from '@client/forms/configuration/formDrafts/utils'
 
-export type IConfigFieldsState =
+export type IFormConfigState =
   | {
       state: 'LOADING'
       birth: null
@@ -30,26 +33,22 @@ export type IConfigFieldsState =
     }
   | {
       state: 'READY'
-      birth: ISectionFieldMap
-      death: ISectionFieldMap
+      birth: {
+        formDraft: IFormDraft
+        registerForm: IForm
+        configFields: ISectionFieldMap
+      }
+      death: {
+        formDraft: IFormDraft
+        registerForm: IForm
+        configFields: ISectionFieldMap
+      }
     }
 
-export const initialState: IConfigFieldsState = {
+export const initialState: IFormConfigState = {
   state: 'LOADING',
   birth: null,
   death: null
-}
-
-async function saveConfigFields(configFields: IConfigFieldsState) {
-  return storage.setItem('configFields', JSON.stringify(configFields))
-}
-
-async function loadConfigFields() {
-  return storage.getItem('configFields')
-}
-
-async function clearConfigFields() {
-  return storage.removeItem('configFields')
 }
 
 type Actions = actions.ConfigFieldsActions | offlineActions.Action
@@ -74,77 +73,47 @@ function getNextField(fieldMap: IConfigFieldMap, fieldId: string) {
     : undefined
 }
 
-export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
-  state: IConfigFieldsState = initialState,
+function getReadyState({ formDrafts, questionConfig }: IFormConfig) {
+  const birthForm = getConfiguredForm(questionConfig, Event.BIRTH, true)
+  const deathForm = getConfiguredForm(questionConfig, Event.DEATH, true)
+
+  return {
+    state: 'READY' as const,
+    birth: {
+      formDraft: getEventDraft(formDrafts, Event.BIRTH),
+      registerForm: birthForm,
+      configFields: getSectionFieldsMap(Event.BIRTH, birthForm)
+    },
+    death: {
+      formDraft: getEventDraft(formDrafts, Event.DEATH),
+      registerForm: deathForm,
+      configFields: getSectionFieldsMap(Event.DEATH, deathForm)
+    }
+  }
+}
+
+export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
+  state: IFormConfigState = initialState,
   action: Actions
-): IConfigFieldsState | Loop<IConfigFieldsState, Actions> => {
+): IFormConfigState | Loop<IFormConfigState, Actions> => {
+  /* First loading when offline formConfig is ready*/
+  if (state.state === 'LOADING') {
+    if (action.type === offlineActions.READY) {
+      return getReadyState(action.payload.formConfig)
+    }
+    return state
+  }
+
   switch (action.type) {
-    case offlineActions.READY: {
-      const { questionConfig } = action.payload.formConfig
-      return loop(state, Cmd.action(actions.updateConfigFields(questionConfig)))
+    case offlineActions.APPLICATION_CONFIG_LOADED:
+    case offlineActions.OFFLINE_FORM_CONFIG_UPDATED: {
+      return getReadyState(action.payload.formConfig)
     }
-
-    case actions.UPDATE_CONFIG_FIELDS: {
-      const { questionConfig } = action.payload
-      const birthForm = getConfiguredForm(questionConfig, Event.BIRTH, true)
-      const deathForm = getConfiguredForm(questionConfig, Event.DEATH, true)
-
-      const newState: IConfigFieldsState = {
-        ...state,
-        state: 'READY',
-        birth: getSectionFieldsMap(Event.BIRTH, birthForm),
-        death: getSectionFieldsMap(Event.DEATH, deathForm)
-      }
-      return loop(
-        newState,
-        Cmd.run<
-          actions.GetStorageConfigFieldsFailedAction,
-          actions.GetStorageConfigFieldsSuccessAction
-        >(loadConfigFields, {
-          successActionCreator: actions.getStorageConfigFieldsSuccess,
-          failActionCreator: actions.getStorageConfigFieldsFailed
-        })
-      )
-    }
-
-    case actions.GET_STORAGE_CONFIG_FIELDS_SUCCESS:
-      if (action.payload) {
-        const configFieldsState: IConfigFieldsState = JSON.parse(action.payload)
-        return { ...configFieldsState }
-      }
-      return loop(state, Cmd.action(actions.storeConfigFields()))
-
-    case actions.STORE_CONFIG_FIELDS:
-      return loop(
-        state,
-        Cmd.run<
-          actions.StoreConfigFieldsFailedAction,
-          actions.StoreConfigFieldsSuccessAction
-        >(saveConfigFields, {
-          successActionCreator: actions.storeConfigFieldsSuccess,
-          failActionCreator: actions.storeConfigFieldsFailed,
-          args: [state]
-        })
-      )
-
-    /* TODO: Add action handler for GET_STORAGE_CONFIG_FIELDS_FAILED */
-
-    case actions.STORE_CONFIG_FIELDS_SUCCESS:
-      if (action.payload) {
-        const configFieldsState: IConfigFieldsState = JSON.parse(action.payload)
-        return {
-          ...configFieldsState
-        }
-      }
-      return state
 
     case actions.ADD_CUSTOM_FIELD: {
-      if (state.state === 'LOADING') {
-        return state
-      }
       const { event, section, customField } = action.payload
       const fields = {
-        ...state[event][section],
+        ...state[event].configFields[section],
         [customField.fieldId]: customField
       }
 
@@ -162,16 +131,19 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         ...state,
         [event]: {
           ...state[event],
-          [section]: fields
+          configFields: {
+            ...state[event].configFields,
+            [section]: fields
+          }
         }
       }
     }
 
     case actions.MODIFY_CONFIG_FIELD: {
-      if (state.state === 'LOADING') return state
       const { fieldId, modifiedProps } = action.payload
       const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
-      const { [fieldId]: originalField, ...fields } = state[event][sectionId]
+      const { [fieldId]: originalField, ...fields } =
+        state[event].configFields[sectionId]
 
       /* Adjusting preceedingFieldId & foregoingFieldId */
       if (modifiedProps.fieldId && fieldId !== modifiedProps.fieldId) {
@@ -200,7 +172,10 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
           ...state,
           [event]: {
             ...state[event],
-            [sectionId]: fields
+            configFields: {
+              ...state[event].configFields,
+              [sectionId]: fields
+            }
           }
         }
       }
@@ -214,17 +189,20 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         ...state,
         [event]: {
           ...state[event],
-          [sectionId]: fields
+          configFields: {
+            ...state[event].configFields,
+            [sectionId]: fields
+          }
         }
       }
     }
 
     case actions.REMOVE_CUSTOM_FIELD: {
-      if (state.state === 'LOADING') return state
       const { fieldId } = action.payload
       const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
 
-      const { [fieldId]: fieldToRemove, ...fields } = state[event][sectionId]
+      const { [fieldId]: fieldToRemove, ...fields } =
+        state[event].configFields[sectionId]
 
       if (
         fieldToRemove.preceedingFieldId &&
@@ -246,83 +224,96 @@ export const configFieldsReducer: LoopReducer<IConfigFieldsState, Actions> = (
         ...state,
         [event]: {
           ...state[event],
-          [sectionId]: fields
+          configFields: {
+            ...state[event].configFields,
+            [sectionId]: fields
+          }
         }
       }
     }
 
-    case actions.UPDATE_QUESTION_CONFIG: {
-      const { formDraft, questionConfig } = action.payload
-      return loop(
-        state,
-        Cmd.list([
-          Cmd.run(clearConfigFields),
-          Cmd.action(actions.updateConfigFields(questionConfig)),
-          Cmd.action(
-            offlineActions.updateOfflineQuestionConfig(
-              formDraft,
-              questionConfig
-            )
-          )
-        ])
-      )
-    }
-
     case actions.SHIFT_CONFIG_FIELD_UP: {
-      if (state.state === 'LOADING') return state
       const { fieldId } = action.payload
 
       const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
 
-      const fieldMap = state[event][sectionId]
+      const fieldMap = state[event].configFields[sectionId]
 
       const currentField = fieldMap[fieldId]
 
       const newSection = shiftCurrentFieldUp(
-        state[event][sectionId],
+        state[event].configFields[sectionId],
         currentField,
         getPreviousField(fieldMap, fieldId),
         getNextField(fieldMap, fieldId)
       )
 
-      return loop(
-        {
-          ...state,
-          [event]: {
-            ...state[event],
+      return {
+        ...state,
+        [event]: {
+          ...state[event],
+          configFields: {
+            ...state[event].configFields,
             [sectionId]: newSection
           }
-        },
-        Cmd.action(actions.storeConfigFields())
-      )
+        }
+      }
     }
 
     case actions.SHIFT_CONFIG_FIELD_DOWN: {
-      if (state.state === 'LOADING') return state
       const { fieldId } = action.payload
 
       const { event, sectionId } = getConfigFieldIdentifiers(fieldId)
 
-      const fieldMap = state[event][sectionId]
+      const fieldMap = state[event].configFields[sectionId]
 
       const currentField = fieldMap[fieldId]
 
       const newSection = shiftCurrentFieldDown(
-        state[event][sectionId],
+        state[event].configFields[sectionId],
         currentField,
         getPreviousField(fieldMap, fieldId),
         getNextField(fieldMap, fieldId)
       )
 
-      return loop(
-        {
-          ...state,
-          [event]: {
-            ...state[event],
+      return {
+        ...state,
+        [event]: {
+          ...state[event],
+          configFields: {
+            ...state[event].configFields,
             [sectionId]: newSection
           }
-        },
-        Cmd.action(actions.storeConfigFields())
+        }
+      }
+    }
+
+    case actions.UPDATE_FORM_CONFIG: {
+      const { formDraft, questionConfig } = action.payload
+
+      const { event } = formDraft
+
+      const newState = {
+        ...state,
+        [event]: {
+          ...state[event],
+          formDraft
+        }
+      }
+
+      const {
+        birth: { formDraft: birthFormDraft },
+        death: { formDraft: deathFormDraft }
+      } = newState
+
+      return loop(
+        newState,
+        Cmd.action(
+          offlineActions.updateOfflineFormConfig(
+            [birthFormDraft, deathFormDraft],
+            questionConfig
+          )
+        )
       )
     }
 

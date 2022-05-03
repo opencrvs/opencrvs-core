@@ -343,41 +343,29 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
-    case actions.UPDATE_OFFLINE_FORM_DRAFT: {
-      if (!state.offlineData.formConfig?.questionConfig) return state
-      const { formDrafts } = action.payload
-      const newOfflineData = {
-        ...state.offlineData,
-        formConfig: {
-          ...state.offlineData.formConfig,
-          formDrafts
-        }
+    case actions.UPDATE_OFFLINE_FORM_CONFIG: {
+      const { formConfig } = state.offlineData
+
+      if (!formConfig) return state
+
+      const { formDrafts, questionConfig = formConfig.questionConfig } =
+        action.payload
+
+      const newFormConfig = {
+        formDrafts,
+        questionConfig
       }
-      return {
-        ...state,
-        offlineData: newOfflineData
-      }
-    }
-    case actions.UPDATE_OFFLINE_QUESTION_CONFIG: {
-      if (!state.offlineData.formConfig?.formDrafts) return state
-      const { formDraft: newFormDraft, questionConfig } = action.payload
-      const newFormDrafts = state.offlineData.formConfig.formDrafts.map(
-        (formDraft) => {
-          if (formDraft.event === newFormDraft.event) return newFormDraft
-          return formDraft
-        }
+
+      return loop(
+        {
+          ...state,
+          offlineData: {
+            ...state.offlineData,
+            formConfig: newFormConfig
+          }
+        },
+        Cmd.action(actions.offlineFormConfigUpdated(newFormConfig))
       )
-      const newOfflineData = {
-        ...state.offlineData,
-        formConfig: {
-          formDrafts: newFormDrafts,
-          questionConfig
-        }
-      }
-      return {
-        ...state,
-        offlineData: newOfflineData
-      }
     }
     /*
      * Configurations

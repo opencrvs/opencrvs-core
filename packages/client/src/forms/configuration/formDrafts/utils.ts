@@ -10,10 +10,33 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { find } from 'lodash'
-import { IDraft } from './reducer'
 import { Event } from '@client/forms'
 
-export function getEventDraft(formDrafts: IDraft[], event: Event) {
+export enum DraftStatus {
+  DRAFT = 'DRAFT',
+  PREVIEW = 'IN_PREVIEW',
+  PUBLISHED = 'PUBLISHED',
+  DELETED = 'DELETED'
+}
+
+export interface IDraftHistory {
+  version: number
+  status: DraftStatus
+  comment?: string
+  updatedAt: number
+}
+
+export interface IFormDraft {
+  event: Event
+  status: DraftStatus
+  comment?: string
+  version: number
+  history?: IDraftHistory[]
+  updatedAt: number
+  createdAt: number
+}
+
+export function getEventDraft(formDrafts: IFormDraft[], event: Event) {
   const formDraft = find(formDrafts, { event })
   if (!formDraft) {
     throw new Error(`${event} formDraft not found`)
@@ -21,7 +44,7 @@ export function getEventDraft(formDrafts: IDraft[], event: Event) {
   return formDraft
 }
 
-export function getFormDraft(formDrafts: IDraft[]) {
+export function getFormDraft(formDrafts: IFormDraft[]) {
   const birthDraft = getEventDraft(formDrafts, Event.BIRTH)
   const deathDraft = getEventDraft(formDrafts, Event.DEATH)
   return {

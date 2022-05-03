@@ -34,7 +34,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -125,7 +125,7 @@ export interface IQuestionConfig {
 
 export interface IFormConfig {
   questionConfig: IQuestionConfig[]
-  formDrafts: IDraft[]
+  formDrafts: IFormDraft[]
 }
 
 export interface ISelectOption {

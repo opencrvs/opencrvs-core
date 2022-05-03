@@ -60,13 +60,9 @@ import * as Sentry from '@sentry/browser'
 import createSentryMiddleware from 'redux-sentry-middleware'
 import { userFormReducer, IUserFormState } from '@client/user/userReducer'
 import {
-  configFieldsReducer,
-  IConfigFieldsState
-} from './forms/configuration/configFields/reducer'
-import {
-  IFormDraftState,
-  formDraftReducer
-} from './forms/configuration/formDrafts/reducer'
+  formConfigReducer,
+  IFormConfigState
+} from './forms/configuration/formConfig/reducer'
 
 export interface IStoreState {
   profile: ProfileState
@@ -82,8 +78,7 @@ export interface IStoreState {
   offline: IOfflineDataState
   userForm: IUserFormState
   workqueueState: WorkqueueState
-  configFields: IConfigFieldsState
-  formDraft: IFormDraftState
+  formConfig: IFormConfigState
 }
 
 const enhancedCreateStore = createReduxStore as StoreCreator
@@ -110,8 +105,7 @@ export const createStore = <T>(
     offline: offlineDataReducer,
     userForm: userFormReducer,
     workqueueState: registrarWorkqueueReducer,
-    configFields: configFieldsReducer,
-    formDraft: formDraftReducer
+    formConfig: formConfigReducer
   })
   const enhancer = compose(
     install(config),

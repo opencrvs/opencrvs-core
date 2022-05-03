@@ -35,6 +35,7 @@ import { getDefaultLanguage } from '@client/i18n/utils'
 import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
 import { LOADING_SCREEN_TEXT } from '@client/utils/constants'
+import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -108,6 +109,7 @@ interface IPageProps {
   initialDeclarationsLoaded: boolean
   offlineDataLoaded: boolean
   registerFormLoaded: boolean
+  formConfigLoaded: boolean
   loadingError: boolean
 }
 
@@ -166,10 +168,16 @@ class Component extends React.Component<
       initialDeclarationsLoaded,
       offlineDataLoaded,
       registerFormLoaded,
+      formConfigLoaded,
       children
     } = this.props
 
-    if (offlineDataLoaded && initialDeclarationsLoaded && registerFormLoaded) {
+    if (
+      offlineDataLoaded &&
+      initialDeclarationsLoaded &&
+      registerFormLoaded &&
+      formConfigLoaded
+    ) {
       return (
         <div id="readyDeclaration">
           <StyledPage {...this.props}>{children}</StyledPage>
@@ -192,7 +200,8 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
     initialDeclarationsLoaded: getInitialDeclarationsLoaded(store),
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store),
-    registerFormLoaded: isRegisterFormReady(store)
+    registerFormLoaded: isRegisterFormReady(store),
+    formConfigLoaded: isFormConfigLoaded(store)
   }
 }
 

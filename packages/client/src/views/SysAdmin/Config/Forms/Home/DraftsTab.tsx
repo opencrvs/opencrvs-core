@@ -16,7 +16,7 @@ import {
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { selectFormDraft } from '@client/forms/configuration/formDrafts/selectors'
+import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
 import { Event, BirthSection, DeathSection } from '@client/forms'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
@@ -27,8 +27,8 @@ import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { goToFormConfigWizard } from '@client/navigation'
 import {
   DraftStatus,
-  IDraft
-} from '@client/forms/configuration/formDrafts/reducer'
+  IFormDraft
+} from '@client/forms/configuration/formDrafts/utils'
 import { Value, DraftVersion } from './components'
 import {
   ActionStatus,
@@ -38,7 +38,7 @@ import { ActionContext, Actions } from './ActionsModal'
 import { FormConfigMobileViewModal } from './FormConfigMobileViewModal'
 import { isMobileDevice } from '@client/utils/commonUtils'
 
-function ActionButton({ event, status, version }: IDraft) {
+function ActionButton({ event, status, version }: IFormDraft) {
   const intl = useIntl()
   const dispatch = useDispatch()
   const [showMobileModal, setMobileModal] = React.useState(false)

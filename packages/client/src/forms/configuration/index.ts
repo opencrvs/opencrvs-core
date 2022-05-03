@@ -34,7 +34,7 @@ import {
 } from '@client/forms/configuration/defaultUtils'
 import { getEventDraft } from '@client/forms/configuration/formDrafts/utils'
 import { registerForms } from './default'
-import { DraftStatus } from './formDrafts/reducer'
+import { DraftStatus } from './formDrafts/utils'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { populateRegisterFormsWithAddresses } from './administrative/addresses'
 
