@@ -34,6 +34,8 @@ import {
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
+  GQLBirthRegistrationInput,
+  GQLDeathRegistrationInput,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
@@ -617,25 +619,10 @@ async function markEventAsRegistered(
   id: string,
   authHeader: IAuthHeader,
   event: EVENT_TYPE,
-  details?: any
+  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput
 ) {
-  let doc
-  if (!details) {
-    const taskBundle = await fetchFHIR(
-      `/Task?focus=Composition/${id}`,
-      authHeader
-    )
-    if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
-      throw new Error('Task does not exist')
-    }
-    doc = {
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: taskBundle.entry
-    }
-  } else {
-    doc = await buildFHIRBundle(details, event, authHeader)
-  }
+  const doc = await buildFHIRBundle(details, event, authHeader)
+
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition

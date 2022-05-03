@@ -2070,7 +2070,7 @@ export interface MutationToMarkBirthAsValidatedResolver<
 
 export interface MutationToMarkBirthAsRegisteredArgs {
   id: string
-  details?: GQLBirthRegistrationInput
+  details: GQLBirthRegistrationInput
 }
 export interface MutationToMarkBirthAsRegisteredResolver<
   TParent = any,
@@ -2241,7 +2241,7 @@ export interface MutationToMarkDeathAsValidatedResolver<
 
 export interface MutationToMarkDeathAsRegisteredArgs {
   id: string
-  details?: GQLDeathRegistrationInput
+  details: GQLDeathRegistrationInput
 }
 export interface MutationToMarkDeathAsRegisteredResolver<
   TParent = any,

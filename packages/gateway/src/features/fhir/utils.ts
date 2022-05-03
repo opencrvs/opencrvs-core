@@ -974,12 +974,12 @@ export function removeDuplicatesFromComposition(
   return composition
 }
 
-export const fetchFHIR = (
+export const fetchFHIR = <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
   method: string = 'GET',
   body: string | undefined = undefined
-) => {
+): Promise<T> => {
   return fetch(`${FHIR_URL}${suffix}`, {
     method,
     headers: {
