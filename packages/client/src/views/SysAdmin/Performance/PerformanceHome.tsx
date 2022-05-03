@@ -59,7 +59,8 @@ import {
   getAdditionalLocations,
   CompletenessRateTime,
   isCountry,
-  NATIONAL_ADMINISTRATIVE_LEVEL
+  NATIONAL_ADMINISTRATIVE_LEVEL,
+  calculateTotal
 } from '@client/views/SysAdmin/Performance/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
@@ -388,7 +389,16 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
                       />
                       <CertificationRatesReport
-                        data={certificationRatesDummyData}
+                        totalRegistrations={calculateTotal(
+                          data?.getTotalMetrics.results || []
+                        )}
+                        {...(this.state.selectedLocation &&
+                        !isCountry(this.state.selectedLocation)
+                          ? {
+                              ...queryVariablesWithoutLocationId,
+                              locationId: this.state.selectedLocation.id
+                            }
+                          : queryVariablesWithoutLocationId)}
                       />
                       <AppSources
                         data={data!.getTotalMetrics}

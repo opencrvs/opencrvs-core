@@ -69,6 +69,11 @@ type Query {
     locationId: String
     event: String!
   ): [PaymentMetric!]
+  getTotalCertifications(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+  ): [CertificationMetric!]
   getTotalCorrections(
     timeStart: String!
     timeEnd: String!
@@ -380,6 +385,11 @@ type TotalMetricsResult {
 type PaymentMetric {
   total: Float!
   paymentType: String!
+}
+
+type CertificationMetric {
+  total: Float!
+  eventType: String!
 }
 
 type CorrectionMetric {

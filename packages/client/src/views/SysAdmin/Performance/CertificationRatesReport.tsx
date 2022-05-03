@@ -17,60 +17,113 @@ import {
   PerformanceTitle,
   PerformanceValue,
   PerformanceListSubHeader,
-  ReportContainer
+  ReportContainer,
+  PercentageDisplay
 } from '@client/views/SysAdmin/Performance/utils'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
-
+import { Query } from '@client/components/Query'
+import { GET_TOTAL_CERTIFICATIONS } from './queries'
+import {
+  NOTIFICATION_TYPE,
+  ToastNotification
+} from '@client/components/interface/ToastNotification'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import { GQLCertificationMetric } from '@opencrvs/gateway/src/graphql/schema.d'
 interface ICertificationRateData {
   label: string
   value: number
 }
 
 interface ICertificationRateProps {
-  data: ICertificationRateData[]
+  timeStart: string
+  timeEnd: string
+  event: string
+  locationId?: string
+  totalRegistrations: number
 }
 
 export function CertificationRatesReport(props: ICertificationRateProps) {
   const intl = useIntl()
   return (
-    <ListContainer>
-      <ReportContainer>
-        <ListViewItemSimplified
-          label={
-            <div>
-              <PerformanceListHeader>
-                {intl.formatMessage(
-                  messages.performanceTotalCertificatesHeader
-                )}
-              </PerformanceListHeader>
-              <PerformanceListSubHeader>
-                {intl.formatMessage(
-                  messages.performanceTotalCertificatesSubHeader
-                )}
-              </PerformanceListSubHeader>
-            </div>
-          }
-        />
+    <Query
+      query={GET_TOTAL_CERTIFICATIONS}
+      variables={{
+        timeStart: props.timeStart,
+        timeEnd: props.timeEnd,
+        event: props.event,
+        locationId: props.locationId
+      }}
+    >
+      {({ data, loading, error }) => {
+        if (error) {
+          return (
+            <>
+              <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+            </>
+          )
+        }
 
-        <ListViewItemSimplified
-          label={
-            <PerformanceTitle>
-              {intl.formatMessage(messages.performanceTotalLabel)}
-            </PerformanceTitle>
-          }
-          value={<PerformanceValue>{props.data[0].value}</PerformanceValue>}
-        />
+        if (loading) {
+          return <Spinner id="certification-rates-report-loading" />
+        }
 
-        <ListViewItemSimplified
-          label={
-            <PerformanceTitle>
-              {intl.formatMessage(messages.performanceCertificationRateLabel)}
-            </PerformanceTitle>
-          }
-          value={<PerformanceValue>{props.data[1].value}%</PerformanceValue>}
-        />
-      </ReportContainer>
-    </ListContainer>
+        const dataItem: GQLCertificationMetric =
+          data.getTotalCertifications.find(
+            (dataPoint: GQLCertificationMetric) =>
+              dataPoint.eventType === props.event
+          ) || { total: 0 }
+
+        return (
+          <ListContainer>
+            <ReportContainer>
+              <ListViewItemSimplified
+                label={
+                  <div>
+                    <PerformanceListHeader>
+                      {intl.formatMessage(
+                        messages.performanceTotalCertificatesHeader
+                      )}
+                    </PerformanceListHeader>
+                    <PerformanceListSubHeader>
+                      {intl.formatMessage(
+                        messages.performanceTotalCertificatesSubHeader
+                      )}
+                    </PerformanceListSubHeader>
+                  </div>
+                }
+              />
+
+              <ListViewItemSimplified
+                label={
+                  <PerformanceTitle>
+                    {intl.formatMessage(messages.performanceTotalLabel)}
+                  </PerformanceTitle>
+                }
+                value={<PerformanceValue>{dataItem.total}</PerformanceValue>}
+              />
+
+              <ListViewItemSimplified
+                label={
+                  <PerformanceTitle>
+                    {intl.formatMessage(
+                      messages.performanceCertificationRateLabel
+                    )}
+                  </PerformanceTitle>
+                }
+                value={
+                  <PerformanceValue>
+                    <PercentageDisplay
+                      total={dataItem.total}
+                      ofNumber={props.totalRegistrations}
+                    />
+                  </PerformanceValue>
+                }
+              />
+            </ReportContainer>
+          </ListContainer>
+        )
+      }}
+    </Query>
   )
 }

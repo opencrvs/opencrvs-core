@@ -204,3 +204,15 @@ export const GET_TOTAL_PAYMENTS = gql`
     }
   }
 `
+export const GET_TOTAL_CERTIFICATIONS = gql`
+  query data($timeStart: String!, $timeEnd: String!, $locationId: String) {
+    getTotalCertifications(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+    ) {
+      total
+      eventType
+    }
+  }
+`

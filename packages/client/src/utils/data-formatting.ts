@@ -76,5 +76,5 @@ export const mergeArraysRemovingEmptyStrings = (
 }
 
 export function getPercentage(total: number, current: number) {
-  return current === 0 || total === 0 ? 0 : current / total
+  return current === 0 || total === 0 ? 0 : (current / total) * 100
 }

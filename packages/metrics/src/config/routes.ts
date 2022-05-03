@@ -46,6 +46,7 @@ import { totalMetricsHandler } from '@metrics/features/totalMetrics/handler'
 import { totalPaymentsHandler } from '@metrics/features/payments/handler'
 import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
 import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
+import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
 
 export const getRoutes = () => {
   const routes = [
@@ -305,6 +306,21 @@ export const getRoutes = () => {
             timeEnd: Joi.string().required(),
             locationId: Joi.string(),
             event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'GET',
+      path: '/totalCertifications',
+      handler: totalCertificationsHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string()
           })
         },
         tags: ['api']
