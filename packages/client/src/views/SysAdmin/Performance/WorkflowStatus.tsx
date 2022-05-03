@@ -61,7 +61,6 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
-import { DateRangePicker } from '@client/components/DateRangePicker'
 import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
 import { TableView } from '@opencrvs/components/lib/interface/TableView'
 
@@ -708,19 +707,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   value: EVENT_OPTIONS.DEATH
                 }
               ]}
-            />
-            <DateRangePicker
-              startDate={new Date(timeStart)}
-              endDate={new Date(timeEnd)}
-              onDatesChange={({ startDate, endDate }) => {
-                props.goToWorkflowStatus(
-                  locationId,
-                  startDate,
-                  endDate,
-                  status,
-                  event
-                )
-              }}
             />
             <PerformanceSelect
               onChange={({ value }) => {
