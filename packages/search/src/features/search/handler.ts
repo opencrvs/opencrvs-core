@@ -95,19 +95,58 @@ export async function getStatusWiseRegistrationCountHandler(
 ) {
   try {
     const payload = request.payload as ICountQueryParam
-    const countResult: { status: string; count: number }[] = []
-    for (const regStatus of payload.status) {
-      const searchResult = await searchComposition({
-        declarationLocationHirarchyId: payload.declarationLocationHirarchyId,
-        status: [regStatus],
-        event: payload.event ? capitalize(payload.event) : ''
-      })
-      countResult.push({
-        status: regStatus,
-        count: searchResult?.body?.hits?.total?.value || 0
-      })
+
+    const response = await client.search<{
+      aggregations?: {
+        statusCounts: {
+          buckets: Array<{
+            key: string
+            doc_count: number
+          }>
+        }
+      }
+    }>({
+      body: {
+        size: 0,
+        query: {
+          bool: {
+            must: [
+              {
+                match: {
+                  event: capitalize(payload.event || EVENT.BIRTH)
+                }
+              },
+              {
+                terms: {
+                  'type.keyword': payload.status
+                }
+              }
+            ]
+          }
+        },
+        aggs: {
+          statusCounts: {
+            terms: {
+              field: 'type.keyword'
+            }
+          }
+        }
+      }
+    })
+
+    if (!response.body.aggregations) {
+      return []
     }
-    return h.response(countResult).code(200)
+
+    const countResult = response.body.aggregations.statusCounts.buckets.map(
+      ({ key, doc_count }) => ({ status: key, count: doc_count })
+    )
+
+    const emptyResults = payload.status
+      .filter((status) => !countResult.find(({ status: s }) => s === status))
+      .map((status) => ({ status, count: 0 }))
+
+    return h.response(countResult.concat(emptyResults)).code(200)
   } catch (err) {
     return internal(err)
   }
