@@ -20,8 +20,8 @@ import {
   IApplicationConfig
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
-import { IDraft } from '@client/forms/configuration/formDrafts/reducer'
-import { IQuestionConfig } from '@client/forms'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { IQuestionConfig, IFormConfig } from '@client/forms'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -242,40 +242,40 @@ export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
 })
 
-export const UPDATE_OFFLINE_FORM_DRAFT = 'OFFLINE/UPDATE_FORM_DRAFT'
-export type UpdateOfflineFormDraftAction = {
-  type: typeof UPDATE_OFFLINE_FORM_DRAFT
+export const UPDATE_OFFLINE_FORM_CONFIG = 'OFFLINE/UPDATE_FORM_CONFIG'
+export type UpdateOfflineFormConfigAction = {
+  type: typeof UPDATE_OFFLINE_FORM_CONFIG
   payload: {
-    formDrafts: IDraft[]
+    formDrafts: IFormDraft[]
+    questionConfig?: IQuestionConfig[]
   }
 }
 
-export const updateOfflineFormDraft = (
-  formDrafts: IDraft[]
-): UpdateOfflineFormDraftAction => ({
-  type: UPDATE_OFFLINE_FORM_DRAFT,
+export const updateOfflineFormConfig = (
+  formDrafts: IFormDraft[],
+  questionConfig?: IQuestionConfig[]
+): UpdateOfflineFormConfigAction => ({
+  type: UPDATE_OFFLINE_FORM_CONFIG,
   payload: {
-    formDrafts
+    formDrafts,
+    questionConfig
   }
 })
 
-export const UPDATE_OFFLINE_QUESTION_CONFIG = 'OFFLINE/UPDATE_QUESTION_CONFIG'
-export type UpdateOfflineQuestionConfigAction = {
-  type: typeof UPDATE_OFFLINE_QUESTION_CONFIG
+export const OFFLINE_FORM_CONFIG_UPDATED = 'OFFLINE/FORM_CONFIG_UPDATED'
+export type OfflineFormConfigUpdatedAction = {
+  type: typeof OFFLINE_FORM_CONFIG_UPDATED
   payload: {
-    formDraft: IDraft
-    questionConfig: IQuestionConfig[]
+    formConfig: IFormConfig
   }
 }
 
-export const updateOfflineQuestionConfig = (
-  formDraft: IDraft,
-  questionConfig: IQuestionConfig[]
-): UpdateOfflineQuestionConfigAction => ({
-  type: UPDATE_OFFLINE_QUESTION_CONFIG,
+export const offlineFormConfigUpdated = (
+  formConfig: IFormConfig
+): OfflineFormConfigUpdatedAction => ({
+  type: OFFLINE_FORM_CONFIG_UPDATED,
   payload: {
-    formDraft,
-    questionConfig
+    formConfig
   }
 })
 
@@ -297,8 +297,8 @@ export type Action =
   | ApplicationConfigLoadedAction
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
-  | UpdateOfflineFormDraftAction
-  | UpdateOfflineQuestionConfigAction
+  | UpdateOfflineFormConfigAction
+  | OfflineFormConfigUpdatedAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>

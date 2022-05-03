@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 import { DeathSection, BirthSection } from '@client/forms'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/reducer'
+import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
 import { Actions } from '@client/views/SysAdmin/Config/Forms/Home/ActionsModal'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 

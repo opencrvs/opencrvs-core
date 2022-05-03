@@ -16,14 +16,12 @@ import styled from '@client/styledComponents'
 import { useDispatch, useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
-import { selectConfigFields } from '@client/forms/configuration/configFields/selectors'
+import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import {
   IConfigField,
   IConfigFieldMap,
-  getFieldDefinition,
   generateKeyFromObj
-} from '@client/forms/configuration/configFields/utils'
-import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
+} from '@client/forms/configuration/formConfig/utils'
 import { FieldPosition } from '@client/forms/configuration'
 import { useParams } from 'react-router'
 import { BirthSection, DeathSection, Event } from '@client/forms'
@@ -31,10 +29,11 @@ import {
   shiftConfigFieldUp,
   shiftConfigFieldDown,
   removeCustomField
-} from '@client/forms/configuration/configFields/actions'
+} from '@client/forms/configuration/formConfig/actions'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/formConfig'
+import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
 
 const CanvasBox = styled(Box)`
   display: flex;
@@ -75,6 +74,21 @@ type ICanvasProps = {
   setSelectedField: React.Dispatch<React.SetStateAction<string | null>>
 }
 
+function FormField({ configField }: { configField: IConfigField }) {
+  const formField = useFieldDefinition(configField)
+  const { fieldId } = configField
+
+  return (
+    <FormFieldGenerator
+      key={generateKeyFromObj(configField)}
+      id={fieldId}
+      onChange={() => {}}
+      fields={[formField]}
+      setAllFieldsDirty={false}
+    />
+  )
+}
+
 export function Canvas({
   showHiddenFields,
   selectedField,
@@ -85,9 +99,6 @@ export function Canvas({
   const intl = useIntl()
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
-  )
-  const formSection = useSelector((store: IStoreState) =>
-    getRegisterFormSection(store, section, event)
   )
   const configFields = generateConfigFields(fieldsMap)
 
@@ -126,13 +137,7 @@ export function Canvas({
                 dispatch(removeCustomField(selectedField.fieldId))
             }}
           >
-            <FormFieldGenerator
-              key={generateKeyFromObj(configField)}
-              id={fieldId}
-              onChange={() => {}}
-              fields={[getFieldDefinition(formSection, configField)]}
-              setAllFieldsDirty={false}
-            />
+            <FormField configField={configField} />
           </FormConfigElementCard>
         )
       })}

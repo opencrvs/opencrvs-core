@@ -24,12 +24,9 @@ import {
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
   DOCUMENT_UPLOADER_WITH_OPTION,
-  QuestionConfigFieldType,
-  ISerializedForm
+  QuestionConfigFieldType
 } from '@client/forms'
 import { camelCase, keys } from 'lodash'
-import { deserializeFormField } from '@client/forms/mappings/deserializer'
-import { createCustomField } from '@client/forms/configuration/customUtils'
 import { FieldPosition } from '@client/forms/configuration'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -138,25 +135,6 @@ export function fieldToQuestionConfig(
   return customFieldToQuestionConfig(fieldId, preceedingFieldId, field)
 }
 
-export function getFieldDefinition(
-  formSection: IFormSection,
-  configField: IConfigField
-) {
-  let formField: IFormField
-  if (isDefaultField(configField)) {
-    const { groupIndex, fieldIndex } = configField.identifiers
-    formField = {
-      ...formSection.groups[groupIndex].fields[fieldIndex],
-      required: configField.required
-    }
-  } else {
-    formField = deserializeFormField(createCustomField(configField))
-  }
-  /* We need to build the field regardless of the conditionals */
-  delete formField.conditionals
-  return formField
-}
-
 export function getContentKeys(formField: IFormField) {
   if (
     (formField.type === RADIO_GROUP ||
@@ -222,7 +200,7 @@ export function getSectionFieldsMap(event: Event, form: IForm) {
   )
 }
 
-function getDefaultConfigFieldIdentifiers(
+export function getDefaultConfigFieldIdentifiers(
   defaultConfigField: IDefaultConfigField
 ) {
   const { sectionIndex, groupIndex, fieldIndex } =
@@ -237,7 +215,7 @@ function getDefaultConfigFieldIdentifiers(
 
 function getPrecedingDefaultFieldId(
   defaultConfigField: IDefaultConfigField,
-  registerForm: ISerializedForm
+  registerForm: IForm
 ) {
   const { event, sectionIndex, groupIndex, fieldIndex } =
     getDefaultConfigFieldIdentifiers(defaultConfigField)
@@ -259,7 +237,7 @@ function getPrecedingDefaultFieldId(
 
 export function hasDefaultFieldChanged(
   defaultConfigField: IDefaultConfigField,
-  registerForm: ISerializedForm
+  registerForm: IForm
 ) {
   const { sectionIndex, groupIndex, fieldIndex } =
     getDefaultConfigFieldIdentifiers(defaultConfigField)
@@ -343,4 +321,23 @@ export function prepareNewCustomFieldConfig(
       }
     ]
   }
+}
+
+export function generateModifiedQuestionConfigs(
+  configFields: ISectionFieldMap,
+  registerForm: IForm
+) {
+  const questionConfigs: IQuestionConfig[] = []
+  Object.values(configFields).forEach((sectionConfigFields) => {
+    Object.values(sectionConfigFields).forEach((configField) => {
+      if (!isDefaultField(configField)) {
+        const { foregoingFieldId, ...rest } = configField
+        questionConfigs.push(rest)
+      } else if (hasDefaultFieldChanged(configField, registerForm)) {
+        const { foregoingFieldId, identifiers, ...rest } = configField
+        questionConfigs.push(rest)
+      }
+    })
+  })
+  return questionConfigs
 }
