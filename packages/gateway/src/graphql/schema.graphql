@@ -687,7 +687,7 @@ enum MannerOfDeath {
   ACCIDENT
   SUICIDE
   HOMICIDE
-  UNDETERMINED
+  MANNER_UNDETERMINED
 }
 
 enum CauseOfDeathMethodType {

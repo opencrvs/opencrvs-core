@@ -577,7 +577,7 @@ export const enum GQLMannerOfDeath {
   ACCIDENT = 'ACCIDENT',
   SUICIDE = 'SUICIDE',
   HOMICIDE = 'HOMICIDE',
-  UNDETERMINED = 'UNDETERMINED'
+  MANNER_UNDETERMINED = 'MANNER_UNDETERMINED'
 }
 
 export const enum GQLCauseOfDeathMethodType {
