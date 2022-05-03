@@ -490,7 +490,6 @@ function FieldAgentListComponent(props: IProps) {
                     noResultText={intl.formatMessage(
                       messages.fieldAgentsNoResult
                     )}
-                    fixedWidth={1500}
                     isLoading={true}
                     hideBoxShadow={true}
                     columns={getColumns(data && data.searchFieldAgents)}
@@ -512,7 +511,6 @@ function FieldAgentListComponent(props: IProps) {
                       messages.fieldAgentsNoResult
                     )}
                     isLoading={loading}
-                    fixedWidth={1500}
                     columns={getColumns(data && data.searchFieldAgents)}
                     content={getContent(data && data.searchFieldAgents)}
                     totalItems={
