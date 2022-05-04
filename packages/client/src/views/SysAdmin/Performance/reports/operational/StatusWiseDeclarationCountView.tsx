@@ -70,7 +70,7 @@ class StatusWiseDeclarationCountViewComponent extends React.Component<
       this.props
     const { results, total } = data
     return (
-      <ContentHolder>
+      <ContentHolder id="declaration-statuses">
         <SubHeader>
           {intl.formatMessage(performanceMessages.registrationByStatus)}
         </SubHeader>

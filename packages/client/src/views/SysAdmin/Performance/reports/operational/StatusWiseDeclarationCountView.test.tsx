@@ -11,33 +11,20 @@
  */
 import { createTestComponent } from '@client/tests/util'
 import { StatusWiseDeclarationCountView } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
-import { StatusMapping } from '@client/views/SysAdmin/Performance/OperationalReport'
+
 import { createStore } from '@client/store'
 import * as React from 'react'
 import { GQLRegistrationCountResult } from '@opencrvs/gateway/src/graphql/schema'
 import { ReactWrapper } from 'enzyme'
 import * as locationUtils from '@client/utils/locationUtils'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { StatusMapping } from '../../WorkflowStatus'
+import { Event } from '@client/forms'
 
 describe('Status wise registration count', () => {
   const { store, history } = createStore()
   beforeEach(async () => {
     jest.spyOn(locationUtils, 'getJurisidictionType').mockReturnValue('UNION')
-  })
-
-  it('renders loading indicator', async () => {
-    const component = await createTestComponent(
-      <StatusWiseDeclarationCountView
-        loading={true}
-        locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
-        statusMapping={StatusMapping}
-        onClickStatusDetails={jest.fn()}
-      />,
-      { store, history }
-    )
-
-    expect(component.find('#status-header-loader').hostNodes()).toHaveLength(1)
-    expect(component.find('#status-header').hostNodes()).toHaveLength(0)
   })
 
   describe('when it has data in props', () => {
@@ -57,6 +44,7 @@ describe('Status wise registration count', () => {
       }
       component = await createTestComponent(
         <StatusWiseDeclarationCountView
+          selectedEvent={Event.BIRTH}
           data={data}
           locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
           statusMapping={StatusMapping}
@@ -66,21 +54,17 @@ describe('Status wise registration count', () => {
       )
     })
     it('renders status count view with progress bars', async () => {
-      expect(component.find('#status-header-loader').hostNodes()).toHaveLength(
-        0
+      expect(component.find('#declaration-statuses').hostNodes()).toHaveLength(
+        1
       )
-      expect(component.find('#status-header').hostNodes()).toHaveLength(1)
     })
     it('clicking on title link triggers onClickStatusDetails', async () => {
-      const viewAllLink = await waitForElement(component, '#view-all-link')
-      viewAllLink.hostNodes().simulate('click')
-      expect(onClickStatusDetailsMock).toBeCalled()
       const registeredTitleLink = await waitForElement(
         component,
-        '#registered-5-title-link'
+        '#in_progress-0-title-link'
       )
       registeredTitleLink.hostNodes().simulate('click')
-      expect(onClickStatusDetailsMock).toBeCalledWith('REGISTERED')
+      expect(onClickStatusDetailsMock).toBeCalledWith('IN_PROGRESS')
     })
   })
 })

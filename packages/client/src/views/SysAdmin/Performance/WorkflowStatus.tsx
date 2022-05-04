@@ -753,6 +753,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             ) {
               total = data.getEventsWithProgress.totalItems
             }
+
             return (
               <>
                 <TableView

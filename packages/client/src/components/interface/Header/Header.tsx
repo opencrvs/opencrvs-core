@@ -429,6 +429,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     return (
       <HeaderLeft>
         <CircleButton
+          id="header-go-back-button"
           disabled={
             (this.props.history.action === 'POP' ||
               this.props.history.action === 'REPLACE') &&

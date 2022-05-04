@@ -48,6 +48,7 @@ export function SegmentedControl(
       {props.options.map((opt, i) => (
         <Segment
           key={`${opt.label}_${i}`}
+          id={`${opt.label}_${i}`}
           isSelected={opt.value === props.value}
           onClick={() => {
             if (props.onChange) {
