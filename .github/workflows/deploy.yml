@@ -68,9 +68,6 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Check if images exist on Dockerhub and build if they dont
-        run: bash check-before-build.sh ${{ secrets.DOCKER_USERNAME }} ${{ secrets.DOCKER_PASSWORD }} ${{ env.CORE_VERSION }}
-
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
