@@ -96,6 +96,7 @@ services:
       - FHIR_URL=http://openhim-core:5001/fhir
       - SEARCH_URL=http://search:9090/
       - CHECK_INVALID_TOKEN=true
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
   # END User facing services
   auth:
     image: opencrvs/ocrvs-auth:${VERSION:-latest}
