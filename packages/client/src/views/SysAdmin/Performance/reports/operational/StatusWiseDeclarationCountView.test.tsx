@@ -18,7 +18,7 @@ import { GQLRegistrationCountResult } from '@opencrvs/gateway/src/graphql/schema
 import { ReactWrapper } from 'enzyme'
 import * as locationUtils from '@client/utils/locationUtils'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { StatusMapping } from '../../WorkflowStatus'
+import { StatusMapping } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { Event } from '@client/forms'
 
 describe('Status wise registration count', () => {

@@ -132,134 +132,128 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
   const dateStart = new Date(timeStart)
   const dateEnd = new Date(timeEnd)
   const getFilter = useCallback(() => {
-    {
-      return (
-        <Query
-          query={HAS_CHILD_LOCATION}
-          variables={{
-            parentId:
-              locationId && locationId !== NATIONAL_ADMINISTRATIVE_LEVEL
-                ? locationId
-                : '0'
-          }}
-        >
-          {({ data, loading, error }) => {
-            const options: IPerformanceSelectOption[] = [
-              {
-                label: intl.formatMessage(messages.overTime),
-                value: COMPLETENESS_RATE_REPORT_BASE.TIME
-              }
-            ]
-            if (
-              data &&
-              data.hasChildLocation &&
-              data.hasChildLocation.type === 'ADMIN_STRUCTURE'
-            ) {
-              const jurisdictionType = getJurisidictionType(
-                data.hasChildLocation
-              )
-
-              options.push({
-                label: intl.formatMessage(messages.byLocation, {
-                  jurisdictionType
-                }),
-                value: COMPLETENESS_RATE_REPORT_BASE.LOCATION,
-                type: jurisdictionType || ''
-              })
+    return (
+      <Query
+        query={HAS_CHILD_LOCATION}
+        variables={{
+          parentId:
+            locationId && locationId !== NATIONAL_ADMINISTRATIVE_LEVEL
+              ? locationId
+              : '0'
+        }}
+      >
+        {({ data, loading, error }) => {
+          const options: IPerformanceSelectOption[] = [
+            {
+              label: intl.formatMessage(messages.overTime),
+              value: COMPLETENESS_RATE_REPORT_BASE.TIME
             }
+          ]
+          if (
+            data &&
+            data.hasChildLocation &&
+            data.hasChildLocation.type === 'ADMIN_STRUCTURE'
+          ) {
+            const jurisdictionType = getJurisidictionType(data.hasChildLocation)
 
-            return (
-              <FilterContainer>
-                {options.length > 1 && (
-                  <SegmentedControl
-                    id="base-select"
-                    value={base.baseType}
-                    options={options}
-                    onChange={(option) =>
-                      setBase({
-                        baseType: option.value as COMPLETENESS_RATE_REPORT_BASE,
-                        locationJurisdictionType: option.type
-                      })
-                    }
-                  />
-                )}
-                <LocationPicker
-                  additionalLocations={getAdditionalLocations(intl)}
-                  selectedLocationId={
-                    locationId || NATIONAL_ADMINISTRATIVE_LEVEL
-                  }
-                  onChangeLocation={(newLocationId) => {
-                    props.goToCompletenessRates(
-                      eventType as Event,
-                      newLocationId,
-                      dateStart,
-                      dateEnd,
-                      time
-                    )
-                  }}
-                />
-                <DateRangePicker
-                  startDate={dateStart}
-                  endDate={dateEnd}
-                  onDatesChange={({ startDate, endDate }) => {
-                    startDate.setDate(startDate.getDate() + 1)
-                    props.goToCompletenessRates(
-                      eventType as Event,
-                      locationId as string,
-                      startDate,
-                      endDate,
-                      time
-                    )
-                  }}
-                />
-                <PerformanceSelect
+            options.push({
+              label: intl.formatMessage(messages.byLocation, {
+                jurisdictionType
+              }),
+              value: COMPLETENESS_RATE_REPORT_BASE.LOCATION,
+              type: jurisdictionType || ''
+            })
+          }
+
+          return (
+            <FilterContainer>
+              {options.length > 1 && (
+                <SegmentedControl
+                  id="base-select"
+                  value={base.baseType}
+                  options={options}
                   onChange={(option) =>
-                    props.goToCompletenessRates(
-                      eventType as Event,
-                      locationId,
-                      dateStart,
-                      dateEnd,
-                      option.value as CompletenessRateTime
-                    )
+                    setBase({
+                      baseType: option.value as COMPLETENESS_RATE_REPORT_BASE,
+                      locationJurisdictionType: option.type
+                    })
                   }
-                  id="completenessRateTimeSelect"
-                  withLightTheme={true}
-                  value={time}
-                  options={[
-                    {
-                      label: intl.formatMessage(
-                        messages.performanceWithinTargetDaysLabel,
-                        {
-                          target:
-                            window.config[
-                              (eventType.toUpperCase() as 'BIRTH') || 'DEATH'
-                            ].REGISTRATION_TARGET,
-                          withPrefix: false
-                        }
-                      ),
-                      value: CompletenessRateTime.WithinTarget
-                    },
-                    {
-                      label: intl.formatMessage(
-                        messages.performanceWithin1YearLabel
-                      ),
-                      value: CompletenessRateTime.Within1Year
-                    },
-                    {
-                      label: intl.formatMessage(
-                        messages.performanceWithin5YearsLabel
-                      ),
-                      value: CompletenessRateTime.Within5Years
-                    }
-                  ]}
                 />
-              </FilterContainer>
-            )
-          }}
-        </Query>
-      )
-    }
-  }, [base, props])
+              )}
+              <LocationPicker
+                additionalLocations={getAdditionalLocations(intl)}
+                selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
+                onChangeLocation={(newLocationId) => {
+                  props.goToCompletenessRates(
+                    eventType as Event,
+                    newLocationId,
+                    dateStart,
+                    dateEnd,
+                    time
+                  )
+                }}
+              />
+              <DateRangePicker
+                startDate={dateStart}
+                endDate={dateEnd}
+                onDatesChange={({ startDate, endDate }) => {
+                  startDate.setDate(startDate.getDate() + 1)
+                  props.goToCompletenessRates(
+                    eventType as Event,
+                    locationId as string,
+                    startDate,
+                    endDate,
+                    time
+                  )
+                }}
+              />
+              <PerformanceSelect
+                onChange={(option) =>
+                  props.goToCompletenessRates(
+                    eventType as Event,
+                    locationId,
+                    dateStart,
+                    dateEnd,
+                    option.value as CompletenessRateTime
+                  )
+                }
+                id="completenessRateTimeSelect"
+                withLightTheme={true}
+                value={time}
+                options={[
+                  {
+                    label: intl.formatMessage(
+                      messages.performanceWithinTargetDaysLabel,
+                      {
+                        target:
+                          window.config[
+                            (eventType.toUpperCase() as 'BIRTH') || 'DEATH'
+                          ].REGISTRATION_TARGET,
+                        withPrefix: false
+                      }
+                    ),
+                    value: CompletenessRateTime.WithinTarget
+                  },
+                  {
+                    label: intl.formatMessage(
+                      messages.performanceWithin1YearLabel
+                    ),
+                    value: CompletenessRateTime.Within1Year
+                  },
+                  {
+                    label: intl.formatMessage(
+                      messages.performanceWithin5YearsLabel
+                    ),
+                    value: CompletenessRateTime.Within5Years
+                  }
+                ]}
+              />
+            </FilterContainer>
+          )
+        }}
+      </Query>
+    )
+  }, [base, props, dateEnd, dateStart, eventType, intl, locationId, time])
 
   return (
     <SysAdminContentWrapper

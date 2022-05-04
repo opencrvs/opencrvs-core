@@ -19,8 +19,8 @@ import { Event } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 import { History } from 'history'
-import { COMPLETENESS_RATE_REPORT_BASE } from '../../CompletenessRates'
-import { CompletenessRateTime } from '../../utils'
+import { COMPLETENESS_RATE_REPORT_BASE } from '@client/views/SysAdmin/Performance/CompletenessRates'
+import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
 
 describe('CompletenessDataTable tests for over time option', () => {
   let component: ReactWrapper<{}, {}>

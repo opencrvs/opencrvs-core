@@ -36,7 +36,7 @@ export const formattedDuration = (fromDate: Date | number) => {
   })
 }
 
-export default function (date: Date | number, formatStr = 'PP') {
+export default function formatDate(date: Date | number, formatStr = 'PP') {
   return format(date, formatStr, {
     locale: locales[window.__localeId__]
   })

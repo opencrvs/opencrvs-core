@@ -114,7 +114,7 @@ function CompletenessDataTableComponent(props: ITableProps) {
 
     setSortOrder(
       [{ ...existingItemInSortOrder, value: invertedOrder }].concat(
-        sortOrder.filter((x) => x != existingItemInSortOrder)
+        sortOrder.filter((x) => x !== existingItemInSortOrder)
       )
     )
   }
