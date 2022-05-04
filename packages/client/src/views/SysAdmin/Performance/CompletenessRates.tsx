@@ -129,9 +129,9 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
     search
   ) as unknown as ISearchParams
 
-  const dateStart = new Date(timeStart)
-  const dateEnd = new Date(timeEnd)
   const getFilter = useCallback(() => {
+    const dateStart = new Date(timeStart)
+    const dateEnd = new Date(timeEnd)
     return (
       <Query
         query={HAS_CHILD_LOCATION}
@@ -253,7 +253,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
         }}
       </Query>
     )
-  }, [base, props, dateEnd, dateStart, eventType, intl, locationId, time])
+  }, [base, props, timeStart, timeEnd, eventType, intl, locationId, time])
 
   return (
     <SysAdminContentWrapper
