@@ -32,7 +32,7 @@ const Grid = styled.div<{ bottomBorder: boolean }>`
 
 const LabelValueContainer = styled.div`
   display: flex;
-  padding: 8px 0;
+  padding: 16px 0;
   grid-column-start: 2;
   gap: 20px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -78,7 +78,7 @@ const LabelContainer = styled.div`
 
 const ActionsContainer = styled.div`
   display: flex;
-  padding: 8px 0;
+  padding: 16px 0;
   gap: 8px;
   justify-content: right;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
