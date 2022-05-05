@@ -182,7 +182,7 @@ export const ModalHeader = styled.div<{ hide?: boolean }>`
 export const TitleContent = styled.div`
   display: flex;
   align-items: center;
-  ${({ theme }) => theme.fonts.h2}
+  ${({ theme }) => theme.fonts.bold18}
   text-transform: none;
 
   & > :first-child {
