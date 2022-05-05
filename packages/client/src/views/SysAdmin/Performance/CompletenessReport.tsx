@@ -12,7 +12,7 @@
 import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
 import React from 'react'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { getPercentage } from '@client/utils/data-formatting'
+
 import {
   PerformanceTitle,
   PerformanceValue,
@@ -31,12 +31,18 @@ import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/performance'
 import { buttonMessages } from '@client/i18n/messages/buttons'
+import styled from '@client/styledComponents'
 
 interface CompletenessReportProps {
   data: GQLTotalMetricsResult
   selectedEvent: 'BIRTH' | 'DEATH'
   onClickDetails: (time: CompletenessRateTime) => void
 }
+
+const ActionButton = styled(LinkButton)`
+  height: auto;
+  align-self: baseline;
+`
 
 export function CompletenessReport({
   data,
@@ -134,11 +140,11 @@ export function CompletenessReport({
           </div>
         }
         actions={
-          <LinkButton
+          <ActionButton
             onClick={() => onClickDetails(CompletenessRateTime.WithinTarget)}
           >
             {intl.formatMessage(buttonMessages.view)}
-          </LinkButton>
+          </ActionButton>
         }
       />
       <ListViewItemSimplified
@@ -224,11 +230,11 @@ export function CompletenessReport({
           </div>
         }
         actions={
-          <LinkButton
+          <ActionButton
             onClick={() => onClickDetails(CompletenessRateTime.Within1Year)}
           >
             {intl.formatMessage(buttonMessages.view)}
-          </LinkButton>
+          </ActionButton>
         }
       />
       <ListViewItemSimplified
@@ -289,11 +295,11 @@ export function CompletenessReport({
           </div>
         }
         actions={
-          <LinkButton
+          <ActionButton
             onClick={() => onClickDetails(CompletenessRateTime.Within5Years)}
           >
             {intl.formatMessage(buttonMessages.view)}
-          </LinkButton>
+          </ActionButton>
         }
       />
     </ReportContainer>

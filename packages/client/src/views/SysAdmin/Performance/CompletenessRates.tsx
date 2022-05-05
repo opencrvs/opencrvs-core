@@ -28,10 +28,7 @@ import {
   getAdditionalLocations,
   NATIONAL_ADMINISTRATIVE_LEVEL
 } from '@client/views/SysAdmin/Performance/utils'
-import {
-  SysAdminContentWrapper,
-  SysAdminPageVariant
-} from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { GQLMonthWiseEstimationMetric } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
