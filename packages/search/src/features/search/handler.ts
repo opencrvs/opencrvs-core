@@ -135,18 +135,22 @@ export async function getStatusWiseRegistrationCountHandler(
     })
 
     if (!response.body.aggregations) {
-      return []
+      return payload.status.map((status) => ({
+        status,
+        count: 0
+      }))
     }
 
     const countResult = response.body.aggregations.statusCounts.buckets.map(
       ({ key, doc_count }) => ({ status: key, count: doc_count })
     )
 
-    const emptyResults = payload.status
-      .filter((status) => !countResult.find(({ status: s }) => s === status))
-      .map((status) => ({ status, count: 0 }))
+    const data = payload.status.map((status) => ({
+      status,
+      count: countResult.find(({ status: s }) => s === status)?.count || 0
+    }))
 
-    return h.response(countResult.concat(emptyResults)).code(200)
+    return h.response(data).code(200)
   } catch (err) {
     return internal(err)
   }
