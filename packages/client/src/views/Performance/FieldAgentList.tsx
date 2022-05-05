@@ -27,7 +27,7 @@ import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
+import { SortArrow } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import {
   ColumnContentAlignment,
@@ -229,7 +229,7 @@ function FieldAgentListComponent(props: IProps) {
         width: 20,
         isSortable: true,
         sortFunction: () => toggleSort('name'),
-        icon: columnToBeSort === 'name' ? <ArrowDownBlue /> : <></>,
+        icon: columnToBeSort === 'name' ? <SortArrow active={true} /> : <></>,
         isSorted: columnToBeSort === 'name' ? true : false
       },
       {
@@ -238,7 +238,7 @@ function FieldAgentListComponent(props: IProps) {
         width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('type'),
-        icon: columnToBeSort === 'type' ? <ArrowDownBlue /> : <></>,
+        icon: columnToBeSort === 'type' ? <SortArrow active={true} /> : <></>,
         isSorted: columnToBeSort === 'type' ? true : false
       },
       {
@@ -247,7 +247,8 @@ function FieldAgentListComponent(props: IProps) {
         width: 20,
         isSortable: true,
         sortFunction: () => toggleSort('officeName'),
-        icon: columnToBeSort === 'officeName' ? <ArrowDownBlue /> : <></>,
+        icon:
+          columnToBeSort === 'officeName' ? <SortArrow active={true} /> : <></>,
         isSorted: columnToBeSort === 'officeName' ? true : false
       },
       {
@@ -256,7 +257,8 @@ function FieldAgentListComponent(props: IProps) {
         width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('startMonth'),
-        icon: columnToBeSort === 'startMonth' ? <ArrowDownBlue /> : <></>,
+        icon:
+          columnToBeSort === 'startMonth' ? <SortArrow active={true} /> : <></>,
         isSorted: columnToBeSort === 'startMonth' ? true : false
       },
       {
@@ -268,7 +270,11 @@ function FieldAgentListComponent(props: IProps) {
         isSortable: true,
         sortFunction: () => toggleSort('totalDeclarations'),
         icon:
-          columnToBeSort === 'totalDeclarations' ? <ArrowDownBlue /> : <></>,
+          columnToBeSort === 'totalDeclarations' ? (
+            <SortArrow active={true} />
+          ) : (
+            <></>
+          ),
         isSorted: columnToBeSort === 'totalDeclarations' ? true : false
       },
       {
@@ -281,7 +287,7 @@ function FieldAgentListComponent(props: IProps) {
         sortFunction: () => toggleSort('inProgressDeclarations'),
         icon:
           columnToBeSort === 'inProgressDeclarations' ? (
-            <ArrowDownBlue />
+            <SortArrow active={true} />
           ) : (
             <></>
           ),
@@ -297,7 +303,7 @@ function FieldAgentListComponent(props: IProps) {
         sortFunction: () => toggleSort('avgCompleteDeclarationTime'),
         icon:
           columnToBeSort === 'avgCompleteDeclarationTime' ? (
-            <ArrowDownBlue />
+            <SortArrow active={true} />
           ) : (
             <></>
           ),
@@ -311,7 +317,11 @@ function FieldAgentListComponent(props: IProps) {
         isSortable: true,
         sortFunction: () => toggleSort('rejectedDeclarations'),
         icon:
-          columnToBeSort === 'rejectedDeclarations' ? <ArrowDownBlue /> : <></>,
+          columnToBeSort === 'rejectedDeclarations' ? (
+            <SortArrow active={true} />
+          ) : (
+            <></>
+          ),
         isSorted: columnToBeSort === 'rejectedDeclarations' ? true : false
       }
     ]
@@ -512,6 +522,7 @@ function FieldAgentListComponent(props: IProps) {
                     )}
                     isLoading={loading}
                     fixedWidth={1200}
+                    disableScrollOnOverflow={true}
                     columns={getColumns(data && data.searchFieldAgents)}
                     content={getContent(data && data.searchFieldAgents)}
                     totalItems={

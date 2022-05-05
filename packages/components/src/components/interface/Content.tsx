@@ -119,7 +119,7 @@ const Title = styled.div`
   ${({ theme }) => theme.fonts.h2}
   color: ${({ theme }) => theme.colors.copy};
   white-space: nowrap;
-
+  overflow: hidden;
   text-overflow: ellipsis;
 `
 const Icon = styled.div`

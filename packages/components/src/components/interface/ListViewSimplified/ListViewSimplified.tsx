@@ -70,9 +70,6 @@ const LabelContainer = styled.div`
     display: block;
     grid-column-start: 2;
     align-self: center;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
   }
 `
 
