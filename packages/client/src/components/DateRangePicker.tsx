@@ -153,19 +153,18 @@ export const ContentWrapper = styled.div`
 `
 
 export const ModalContainer = styled.div`
-  position: relative;
+  position: fixed;
   z-index: 2;
   width: 608px;
-  margin: -42px 0 0 -16px;
   overflow: hidden;
-
+  right: 50%;
+  transform: translateX(50%);
   ${({ theme }) => theme.shadows.heavy};
   border-radius: 4px;
   color: ${({ theme }) => theme.colors.copy};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    left: 24px;
-    margin-left: 0;
+    max-width: calc(100vw - 24px * 2);
   }
 `
 export const ModalHeader = styled.div<{ hide?: boolean }>`
