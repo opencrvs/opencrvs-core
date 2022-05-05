@@ -15,7 +15,6 @@ import {
   IQuestionConfig,
   SerializedFormField
 } from '@client/forms/index'
-import { cloneDeep } from 'lodash'
 import { getGroup, getIdentifiersFromFieldId, getSection } from '.'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE THE DEFAULT CONFIGURATION
@@ -67,40 +66,4 @@ export function getDefaultField(
   } else {
     return undefined
   }
-}
-
-export function configureDefaultQuestions(
-  defaultFieldCustomisations: IDefaultFieldCustomisation[],
-  defaultEventForm: ISerializedForm,
-  inConfig: boolean
-): ISerializedForm {
-  const newForm = cloneDeep(defaultEventForm)
-  defaultFieldCustomisations.forEach((defaultFieldCustomisation) => {
-    // this is a customisation to a default field
-
-    /* TODO: Handle the changed positions */
-
-    const field: SerializedFormField =
-      newForm.sections[
-        defaultFieldCustomisation.defaultField.selectedSectionIndex
-      ].groups[defaultFieldCustomisation.defaultField.selectedGroupIndex]
-        .fields[defaultFieldCustomisation.defaultField.index]
-    field.required = defaultFieldCustomisation.question.required
-
-    // removing hidden fields should be the last thing to do after repositioning all default and custom fields vertically
-    if (
-      defaultFieldCustomisation.question.enabled === FieldEnabled.DISABLED &&
-      !inConfig
-    ) {
-      /*
-       * Splice the disabled field away only when in registration, not in configuration mode
-       */
-      newForm.sections[
-        defaultFieldCustomisation.defaultField.selectedSectionIndex
-      ].groups[
-        defaultFieldCustomisation.defaultField.selectedGroupIndex
-      ].fields.splice(defaultFieldCustomisation.defaultField.index, 1)
-    }
-  })
-  return newForm
 }

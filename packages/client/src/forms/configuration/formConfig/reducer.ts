@@ -76,7 +76,6 @@ function getNextField(fieldMap: IConfigFieldMap, fieldId: string) {
 function getReadyState({ formDrafts, questionConfig }: IFormConfig) {
   const birthForm = getConfiguredForm(questionConfig, Event.BIRTH, true)
   const deathForm = getConfiguredForm(questionConfig, Event.DEATH, true)
-
   return {
     state: 'READY' as const,
     birth: {
