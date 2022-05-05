@@ -106,8 +106,9 @@ const LayoutLeft = styled.div`
 `
 const LayoutRight = styled.div`
   margin: 24px auto;
-  width: 360px;
+  width: 335px;
   display: flex;
+  flex-shrink: 0;
   gap: 16px;
   flex-direction: column;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
