@@ -190,7 +190,7 @@ interface State {
   timeStart: Date
   timeEnd: Date
   toggleStatus: boolean
-  queriesLoading: DocumentNode[]
+  queriesLoading: string[]
 }
 
 interface IDispatchProps {
@@ -243,7 +243,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
       event: event || Event.BIRTH,
       toggleStatus: false,
-      queriesLoading: [PERFORMANCE_METRICS, GET_TOTAL_PAYMENTS]
+      queriesLoading: ['PERFORMANCE_METRICS', 'GET_TOTAL_PAYMENTS']
     }
   }
 
@@ -332,7 +332,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     this.props.goToWorkflowStatus(locationId, timeStart, timeEnd, status, event)
   }
 
-  markFinished = (query: DocumentNode) => {
+  markFinished = (query: string) => {
     this.setState({
       queriesLoading: this.state.queriesLoading.filter((q) => q !== query)
     })
@@ -367,9 +367,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               filterContent={this.getFilter(intl, this.state.selectedLocation)}
             >
               <Query
+                fetchPolicy="no-cache"
                 query={PERFORMANCE_METRICS}
-                onCompleted={() => this.markFinished(PERFORMANCE_METRICS)}
-                onError={() => this.markFinished(PERFORMANCE_METRICS)}
+                onCompleted={() => this.markFinished('PERFORMANCE_METRICS')}
+                onError={() => this.markFinished('PERFORMANCE_METRICS')}
                 variables={
                   this.state.selectedLocation &&
                   !isCountry(this.state.selectedLocation)
@@ -379,7 +380,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       }
                     : queryVariablesWithoutLocationId
                 }
-                fetchPolicy="no-cache"
               >
                 {({
                   error,
@@ -439,9 +439,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 }}
               </Query>
               <Query
+                fetchPolicy="no-cache"
                 query={CORRECTION_TOTALS}
-                onCompleted={() => this.markFinished(CORRECTION_TOTALS)}
-                onError={() => this.markFinished(CORRECTION_TOTALS)}
+                onCompleted={() => this.markFinished('CORRECTION_TOTALS')}
+                onError={() => this.markFinished('CORRECTION_TOTALS')}
                 variables={
                   this.state.selectedLocation &&
                   !isCountry(this.state.selectedLocation)
@@ -451,7 +452,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       }
                     : queryVariablesWithoutLocationId
                 }
-                fetchPolicy="no-cache"
               >
                 {({
                   loading,
@@ -477,9 +477,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 }}
               </Query>
               <Query
+                fetchPolicy="no-cache"
                 query={GET_TOTAL_PAYMENTS}
-                onCompleted={() => this.markFinished(GET_TOTAL_PAYMENTS)}
-                onError={() => this.markFinished(GET_TOTAL_PAYMENTS)}
+                onCompleted={() => this.markFinished('GET_TOTAL_PAYMENTS')}
+                onError={() => this.markFinished('GET_TOTAL_PAYMENTS')}
                 variables={
                   this.state.selectedLocation &&
                   !isCountry(this.state.selectedLocation)
