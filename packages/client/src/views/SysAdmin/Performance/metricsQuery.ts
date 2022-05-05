@@ -11,6 +11,24 @@
  */
 import gql from 'graphql-tag'
 
+export const CORRECTION_TOTALS = gql`
+  query data(
+    $event: String!
+    $timeStart: String!
+    $timeEnd: String!
+    $locationId: String
+  ) {
+    getTotalCorrections(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+      event: $event
+    ) {
+      total
+      reason
+    }
+  }
+`
 export const PERFORMANCE_METRICS = gql`
   query data(
     $event: String!

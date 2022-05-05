@@ -41,7 +41,11 @@ import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Query } from '@client/components/Query'
-import { PERFORMANCE_METRICS, PERFORMANCE_STATS } from './metricsQuery'
+import {
+  CORRECTION_TOTALS,
+  PERFORMANCE_METRICS,
+  PERFORMANCE_STATS
+} from './metricsQuery'
 import { ApolloError } from 'apollo-client'
 import {
   ToastNotification,
@@ -49,7 +53,10 @@ import {
 } from '@client/components/interface/ToastNotification'
 import { CompletenessReport } from '@client/views/SysAdmin/Performance/CompletenessReport'
 import { RegistrationsReport } from '@client/views/SysAdmin/Performance/RegistrationsReport'
-import { GQLTotalMetricsResult } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  GQLCorrectionMetric,
+  GQLTotalMetricsResult
+} from '@opencrvs/gateway/src/graphql/schema'
 import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
 import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
 import { CertificationRatesReport } from '@client/views/SysAdmin/Performance/CertificationRatesReport'
@@ -72,6 +79,7 @@ import {
   StatusWiseDeclarationCountView
 } from './reports/operational/StatusWiseDeclarationCountView'
 import { goToWorkflowStatus, goToCompletenessRates } from '@client/navigation'
+import { DocumentNode } from 'graphql'
 
 const Layout = styled.div`
   display: flex;
@@ -182,6 +190,7 @@ interface State {
   timeStart: Date
   timeEnd: Date
   toggleStatus: boolean
+  queriesLoading: DocumentNode[]
 }
 
 interface IDispatchProps {
@@ -202,6 +211,9 @@ const selectLocation = (
   return searchableLocations.find(
     ({ id }) => id === locationId
   ) as ISearchLocation
+}
+interface ICorrectionsQueryResult {
+  getTotalCorrections: Array<GQLCorrectionMetric>
 }
 
 class PerformanceHomeComponent extends React.Component<Props, State> {
@@ -230,7 +242,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
         (timeStart && new Date(timeStart)) || subYears(new Date(Date.now()), 1),
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
       event: event || Event.BIRTH,
-      toggleStatus: false
+      toggleStatus: false,
+      queriesLoading: [PERFORMANCE_METRICS, GET_TOTAL_PAYMENTS]
     }
   }
 
@@ -319,6 +332,15 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     this.props.goToWorkflowStatus(locationId, timeStart, timeEnd, status, event)
   }
 
+  markFinished = (query: DocumentNode) => {
+    this.setState({
+      queriesLoading: this.state.queriesLoading.filter((q) => q !== query)
+    })
+  }
+
+  isQueriesInProgress = () => {
+    return this.state.queriesLoading.length > 0
+  }
   render() {
     const { intl } = this.props
     const { timeStart, timeEnd, event, toggleStatus } = this.state
@@ -346,6 +368,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             >
               <Query
                 query={PERFORMANCE_METRICS}
+                onCompleted={() => this.markFinished(PERFORMANCE_METRICS)}
+                onError={() => this.markFinished(PERFORMANCE_METRICS)}
                 variables={
                   this.state.selectedLocation &&
                   !isCountry(this.state.selectedLocation)
@@ -358,7 +382,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 fetchPolicy="no-cache"
               >
                 {({
-                  loading,
                   error,
                   data
                 }: {
@@ -374,7 +397,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     )
                   }
 
-                  if (loading) {
+                  if (this.isQueriesInProgress()) {
                     return <Spinner id="performance-home-loading" />
                   }
 
@@ -415,19 +438,48 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   )
                 }}
               </Query>
-              <CorrectionsReport
-                timeStart={timeStart}
-                timeEnd={timeEnd}
-                locationId={
+              <Query
+                query={CORRECTION_TOTALS}
+                onCompleted={() => this.markFinished(CORRECTION_TOTALS)}
+                onError={() => this.markFinished(CORRECTION_TOTALS)}
+                variables={
                   this.state.selectedLocation &&
                   !isCountry(this.state.selectedLocation)
-                    ? this.state.selectedLocation.id
-                    : undefined
+                    ? {
+                        ...queryVariablesWithoutLocationId,
+                        locationId: this.state.selectedLocation.id
+                      }
+                    : queryVariablesWithoutLocationId
                 }
-                selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
-              />
+                fetchPolicy="no-cache"
+              >
+                {({
+                  loading,
+                  error,
+                  data
+                }: {
+                  loading: boolean
+                  error?: ApolloError
+                  data?: ICorrectionsQueryResult
+                }) => {
+                  if (error) {
+                    return (
+                      <>
+                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                      </>
+                    )
+                  }
+
+                  if (this.isQueriesInProgress()) {
+                    return null
+                  }
+                  return <CorrectionsReport data={data!.getTotalCorrections} />
+                }}
+              </Query>
               <Query
                 query={GET_TOTAL_PAYMENTS}
+                onCompleted={() => this.markFinished(GET_TOTAL_PAYMENTS)}
+                onError={() => this.markFinished(GET_TOTAL_PAYMENTS)}
                 variables={
                   this.state.selectedLocation &&
                   !isCountry(this.state.selectedLocation)
@@ -438,20 +490,20 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     : queryVariablesWithoutLocationId
                 }
               >
-                {({ loading, data, error }) => {
-                  if (data && data.getTotalPayments) {
-                    return (
-                      <PaymentsAmountComponent data={data!.getTotalPayments} />
-                    )
-                  }
-                  if (loading) {
-                    return <Spinner id="fees-collected-loading" />
-                  }
+                {({ data, error }) => {
                   if (error) {
                     return (
                       <>
                         <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
                       </>
+                    )
+                  }
+                  if (this.isQueriesInProgress()) {
+                    return null
+                  }
+                  if (data && data.getTotalPayments) {
+                    return (
+                      <PaymentsAmountComponent data={data!.getTotalPayments} />
                     )
                   }
                 }}

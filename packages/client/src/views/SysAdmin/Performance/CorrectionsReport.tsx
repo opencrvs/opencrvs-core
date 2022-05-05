@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  ListViewItemSimplified,
-  Spinner
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
 import React from 'react'
 import {
   calculateTotal,
@@ -28,195 +25,113 @@ import { messages as correctionMessages } from '@client/i18n/messages/views/corr
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { useIntl } from 'react-intl'
 
-import { Query } from '@client/components/Query'
-import gql from 'graphql-tag'
-import { ApolloError } from 'apollo-client'
-
-import {
-  NOTIFICATION_TYPE,
-  ToastNotification
-} from '@client/components/interface/ToastNotification'
-
 interface CorrectionsReportProps {
-  selectedEvent: 'BIRTH' | 'DEATH'
-  timeStart: Date
-  timeEnd: Date
-  locationId?: string
+  data: Array<GQLCorrectionMetric>
 }
 
-export const CORRECTION_TOTALS = gql`
-  query data(
-    $event: String!
-    $timeStart: String!
-    $timeEnd: String!
-    $locationId: String
-  ) {
-    getTotalCorrections(
-      timeStart: $timeStart
-      timeEnd: $timeEnd
-      locationId: $locationId
-      event: $event
-    ) {
-      total
-      reason
-    }
-  }
-`
-interface ICorrectionsQueryResult {
-  getTotalCorrections: Array<GQLCorrectionMetric>
-}
-
-export function CorrectionsReport({
-  selectedEvent,
-  timeStart,
-  timeEnd,
-  locationId
-}: CorrectionsReportProps) {
+export function CorrectionsReport({ data }: CorrectionsReportProps) {
   const intl = useIntl()
   return (
     <ListContainer>
-      <Query
-        query={CORRECTION_TOTALS}
-        variables={{
-          timeStart: timeStart.toISOString(),
-          timeEnd: timeEnd.toISOString(),
-          locationId,
-          event: selectedEvent
-        }}
-        fetchPolicy="no-cache"
-      >
-        {({
-          loading,
-          error,
-          data
-        }: {
-          loading: boolean
-          error?: ApolloError
-          data?: ICorrectionsQueryResult
-        }) => {
-          if (error) {
-            return (
-              <>
-                <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-              </>
-            )
+      <ReportContainer>
+        <ListViewItemSimplified
+          label={
+            <div>
+              <PerformanceListHeader>Corrections</PerformanceListHeader>
+            </div>
           }
-
-          if (loading) {
-            return <Spinner id="performance-home-loading" />
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(messages.performanceTotalLabel)}
+            </PerformanceTitle>
           }
-
-          return (
-            <ReportContainer>
-              <ListViewItemSimplified
-                label={
-                  <div>
-                    <PerformanceListHeader>Corrections</PerformanceListHeader>
-                  </div>
-                }
-              />
-              <ListViewItemSimplified
-                label={
-                  <PerformanceTitle>
-                    {intl.formatMessage(messages.performanceTotalLabel)}
-                  </PerformanceTitle>
-                }
-                value={
-                  <div>
-                    <PerformanceValue>
-                      {calculateTotal(data!.getTotalCorrections)}
-                    </PerformanceValue>
-                  </div>
-                }
-              />
-              <ListViewItemSimplified
-                label={
-                  <PerformanceTitle>
-                    {intl.formatMessage(correctionMessages.clericalError)}
-                  </PerformanceTitle>
-                }
-                value={
-                  <PerformanceValue>
-                    {calculateTotal(
-                      data!.getTotalCorrections.filter(
-                        ({ reason }) =>
-                          reason === CorrectionReason.CLERICAL_ERROR
-                      )
-                    )}
-                  </PerformanceValue>
-                }
-              />
-              <ListViewItemSimplified
-                label={
-                  <PerformanceTitle>
-                    {intl.formatMessage(correctionMessages.materialError)}
-                  </PerformanceTitle>
-                }
-                value={
-                  <PerformanceValue>
-                    {calculateTotal(
-                      data!.getTotalCorrections.filter(
-                        ({ reason }) =>
-                          reason === CorrectionReason.MATERIAL_ERROR
-                      )
-                    )}
-                  </PerformanceValue>
-                }
-              />
-              <ListViewItemSimplified
-                label={
-                  <PerformanceTitle>
-                    {intl.formatMessage(correctionMessages.materialOmission)}
-                  </PerformanceTitle>
-                }
-                value={
-                  <PerformanceValue>
-                    {calculateTotal(
-                      data!.getTotalCorrections.filter(
-                        ({ reason }) =>
-                          reason === CorrectionReason.MATERIAL_OMISSION
-                      )
-                    )}
-                  </PerformanceValue>
-                }
-              />
-              <ListViewItemSimplified
-                label={
-                  <PerformanceTitle>
-                    {intl.formatMessage(correctionMessages.judicialOrder)}
-                  </PerformanceTitle>
-                }
-                value={
-                  <PerformanceValue>
-                    {calculateTotal(
-                      data!.getTotalCorrections.filter(
-                        ({ reason }) =>
-                          reason === CorrectionReason.JUDICIAL_ORDER
-                      )
-                    )}
-                  </PerformanceValue>
-                }
-              />
-              <ListViewItemSimplified
-                label={
-                  <PerformanceTitle>
-                    {intl.formatMessage(messages.otherCorrectionReason)}
-                  </PerformanceTitle>
-                }
-                value={
-                  <PerformanceValue>
-                    {calculateTotal(
-                      data!.getTotalCorrections.filter(
-                        ({ reason }) => reason === CorrectionReason.OTHER
-                      )
-                    )}
-                  </PerformanceValue>
-                }
-              />
-            </ReportContainer>
-          )
-        }}
-      </Query>
+          value={
+            <div>
+              <PerformanceValue>{calculateTotal(data)}</PerformanceValue>
+            </div>
+          }
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(correctionMessages.clericalError)}
+            </PerformanceTitle>
+          }
+          value={
+            <PerformanceValue>
+              {calculateTotal(
+                data.filter(
+                  ({ reason }) => reason === CorrectionReason.CLERICAL_ERROR
+                )
+              )}
+            </PerformanceValue>
+          }
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(correctionMessages.materialError)}
+            </PerformanceTitle>
+          }
+          value={
+            <PerformanceValue>
+              {calculateTotal(
+                data.filter(
+                  ({ reason }) => reason === CorrectionReason.MATERIAL_ERROR
+                )
+              )}
+            </PerformanceValue>
+          }
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(correctionMessages.materialOmission)}
+            </PerformanceTitle>
+          }
+          value={
+            <PerformanceValue>
+              {calculateTotal(
+                data.filter(
+                  ({ reason }) => reason === CorrectionReason.MATERIAL_OMISSION
+                )
+              )}
+            </PerformanceValue>
+          }
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(correctionMessages.judicialOrder)}
+            </PerformanceTitle>
+          }
+          value={
+            <PerformanceValue>
+              {calculateTotal(
+                data.filter(
+                  ({ reason }) => reason === CorrectionReason.JUDICIAL_ORDER
+                )
+              )}
+            </PerformanceValue>
+          }
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {intl.formatMessage(messages.otherCorrectionReason)}
+            </PerformanceTitle>
+          }
+          value={
+            <PerformanceValue>
+              {calculateTotal(
+                data.filter(({ reason }) => reason === CorrectionReason.OTHER)
+              )}
+            </PerformanceValue>
+          }
+        />
+      </ReportContainer>
     </ListContainer>
   )
 }
