@@ -138,7 +138,7 @@ export function PercentageDisplay(props: {
 }) {
   return (
     <span>
-      {getPercentage(props.ofNumber, props.total).toFixed(props.precision || 0)}
+      {getPercentage(props.ofNumber, props.total).toFixed(props.precision || 1)}
       %
     </span>
   )

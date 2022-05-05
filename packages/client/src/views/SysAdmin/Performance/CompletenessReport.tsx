@@ -82,7 +82,6 @@ export function CompletenessReport({
           <div>
             <PerformanceValue>
               <PercentageDisplay
-                precision={2}
                 total={data.results
                   .filter((p) => p.timeLabel === 'withinTarget')
                   .reduce((t, x) => t + x.total, 0)}
@@ -157,7 +156,6 @@ export function CompletenessReport({
           <div>
             <PerformanceValue>
               <PercentageDisplay
-                precision={2}
                 total={calculateTotal(
                   data.results.filter(
                     (x) =>
@@ -247,7 +245,6 @@ export function CompletenessReport({
           <div>
             <PerformanceValue>
               <PercentageDisplay
-                precision={2}
                 total={calculateTotal(
                   data.results.filter((x) => x.timeLabel !== 'after5Years')
                 )}
