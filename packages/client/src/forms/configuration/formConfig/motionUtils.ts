@@ -22,15 +22,6 @@ export function getConfigFieldIdentifiers(fieldId: string) {
   }
 }
 
-export function belongsToSamePreviewGroup(
-  field1: IConfigField,
-  field2: IConfigField
-) {
-  return (
-    hasPreviewGroup(field1) && field1.previewGroupID === field2.previewGroupID
-  )
-}
-
 export function hasPreviewGroup(field: IConfigField) {
   return Boolean(field.previewGroupID)
 }
@@ -51,18 +42,6 @@ export function getIndexOfPlaceholderPreviewGroup(
   return reverse
     ? elements.reverse().indexOf(givenField)
     : elements.indexOf(givenField)
-}
-
-function getLastElemOfPlaceholderPreviewGroup(
-  section: IConfigFieldMap,
-  givenField: IConfigField
-) {
-  const elements = Object.values(section).filter((s) => {
-    return s.previewGroupID === givenField.previewGroupID
-  })
-
-  if (elements.length) return elements[elements.length - 1]
-  return
 }
 
 export function shiftCurrentFieldUp(
