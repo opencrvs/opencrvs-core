@@ -26,13 +26,13 @@ export const CircleButton = styled.button<{ dark?: boolean; size?: string }>`
   &:hover:not([disabled]) {
     ${({ theme, dark }) =>
       dark
-        ? theme.colors.indigoDark
+        ? 'background-color: ' + theme.colors.opacity54
         : 'background-color: ' + theme.colors.grey200};
   }
   &:not([data-focus-visible-added]):not([disabled]):hover {
     ${({ theme, dark }) =>
       dark
-        ? theme.colors.indigoDark
+        ? 'background-color: ' + theme.colors.opacity54
         : 'background-color: ' + theme.colors.grey200};
   }
   cursor: pointer;
@@ -49,8 +49,10 @@ export const CircleButton = styled.button<{ dark?: boolean; size?: string }>`
   }
   &:active:not([data-focus-visible-added]):not([disabled]) {
     outline: none;
-    background: ${({ theme }) => theme.colors.grey200};
-    color: ${({ theme }) => theme.colors.copy};
+    ${({ theme, dark }) =>
+      dark
+        ? 'background-color: ' + theme.colors.opacity54
+        : 'background-color: ' + theme.colors.grey200};
   }
   padding: 0 8px;
   &:disabled {

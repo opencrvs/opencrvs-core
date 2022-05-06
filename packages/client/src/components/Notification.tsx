@@ -174,14 +174,14 @@ class Component extends React.Component<
           </Toast>
         )}
         {downloadDeclarationFailedToast && (
-          <FloatingNotification
+          <Toast
             id="PINUpdateSuccessToast"
             show={Boolean(downloadDeclarationFailedToast)}
-            type={NOTIFICATION_TYPE.ALTERNATE_ERROR}
+            type={NOTIFICATION_TYPE.ERROR}
             callback={this.props.hideDownloadDeclarationFailedToast}
           >
             {intl.formatMessage(messages.downloadDeclarationFailed)}
-          </FloatingNotification>
+          </Toast>
         )}
         {/* More notification types can be added here */}
       </div>

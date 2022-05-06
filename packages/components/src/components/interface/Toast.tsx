@@ -11,17 +11,16 @@
  */
 import * as React from 'react'
 import styled, { keyframes, withTheme } from 'styled-components'
-import { Cross, Error, Success, Warning } from '../icons'
+import { Cross, Alert, Success, Warning } from '../icons'
+import { CircleButton } from '../buttons'
 import { Spinner } from './Spinner'
 import { ITheme } from '../theme'
-import NotificationError from '../icons/NotificationError'
 
 export enum NOTIFICATION_TYPE {
   SUCCESS = 'success',
   WARNING = 'warning',
   IN_PROGRESS = 'inProgress',
-  ERROR = 'error',
-  ALTERNATE_ERROR = 'alternateError'
+  ERROR = 'error'
 }
 
 interface IProps {
@@ -37,20 +36,13 @@ type FullProps = IProps & { theme: ITheme }
 
 const easeInFromBottom = keyframes`
   from { bottom: -200px; }
-  to { bottom: 100px; }
-`
-
-const easeInFromTop = keyframes`
-  from { top: -200px; }
-  to { top: 56px; }
+  to { bottom: 0px; }
 `
 
 const Wrapper = styled.div`
   position: fixed;
-  padding: 16px 24px;
-  width: 50%;
-  border-radius: 4px;
-  left: 250px;
+  padding: 8px 24px;
+  width: 100%;
   display: flex;
   box-shadow: ${({ theme }) => theme.shadows.light};
   z-index: 1;
@@ -60,7 +52,7 @@ const Wrapper = styled.div`
 
   &.show {
     animation: ${easeInFromBottom} 500ms;
-    bottom: 100px;
+    bottom: 0px;
   }
 
   &.hide {
@@ -79,25 +71,13 @@ const Wrapper = styled.div`
   &.warning {
     background: ${({ theme }) => theme.colors.neutral};
   }
-  &.alternateError {
-    background: ${({ theme }) => theme.colors.negative};
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 100%;
-
-    &.show {
-      animation: ${easeInFromTop} 500ms;
-      top: 56px;
-      bottom: auto;
-    }
-  }
 `
 
 const Content = styled.div`
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 `
 const Close = styled.div`
   align-items: center;
@@ -108,7 +88,7 @@ const Close = styled.div`
 
 const ToastMessage = styled.div`
   position: relative;
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.bold16};
   color: ${({ theme }) => theme.colors.white};
   min-width: 160px;
 `
@@ -127,8 +107,7 @@ class ToastComp extends React.Component<FullProps> {
         <Content>
           {type === NOTIFICATION_TYPE.SUCCESS && <Success />}
           {type === NOTIFICATION_TYPE.WARNING && <Warning />}
-          {type === NOTIFICATION_TYPE.ALTERNATE_ERROR && <NotificationError />}
-          {type === NOTIFICATION_TYPE.ERROR && <Error />}
+          {type === NOTIFICATION_TYPE.ERROR && <Alert />}
           {type === NOTIFICATION_TYPE.IN_PROGRESS && (
             <Spinner
               id="in-progress-floating-notification"
@@ -139,9 +118,14 @@ class ToastComp extends React.Component<FullProps> {
           <ToastMessage>{children}</ToastMessage>
         </Content>
         {callback && (
-          <Close id={`${id}Cancel`} onClick={callback} className={' clickable'}>
+          <CircleButton
+            id={`${id}Cancel`}
+            onClick={callback}
+            className={' clickable'}
+            dark={true}
+          >
             <Cross color="white" />
-          </Close>
+          </CircleButton>
         )}
       </Wrapper>
     )
