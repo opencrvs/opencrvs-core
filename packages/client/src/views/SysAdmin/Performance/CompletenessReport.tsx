@@ -40,7 +40,6 @@ interface CompletenessReportProps {
 }
 
 const ActionButton = styled(LinkButton)`
-  height: auto;
   align-self: baseline;
 `
 
