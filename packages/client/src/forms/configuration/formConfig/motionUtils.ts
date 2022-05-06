@@ -11,8 +11,8 @@
  */
 
 import { Event } from '@client/forms'
-import { IConfigFieldMap, IConfigField } from './utils'
 import { FieldPosition } from '@client/forms/configuration'
+import { IConfigField, IConfigFieldMap } from './utils'
 
 export function getConfigFieldIdentifiers(fieldId: string) {
   const [event, sectionId] = fieldId.split('.')
@@ -20,6 +20,49 @@ export function getConfigFieldIdentifiers(fieldId: string) {
     event: event as Event,
     sectionId
   }
+}
+
+export function belongsToSamePreviewGroup(
+  field1: IConfigField,
+  field2: IConfigField
+) {
+  return (
+    hasPreviewGroup(field1) && field1.previewGroupID === field2.previewGroupID
+  )
+}
+
+export function hasPreviewGroup(field: IConfigField) {
+  return Boolean(field.previewGroupID)
+}
+
+export function getIndexOfPlaceholderPreviewGroup(
+  section: IConfigFieldMap,
+  givenField: IConfigField,
+  reverse?: boolean
+) {
+  if (!givenField.previewGroupID) {
+    return -1
+  }
+
+  const elements = Object.values(section).filter((s) => {
+    return s.previewGroupID === givenField.previewGroupID
+  })
+
+  return reverse
+    ? elements.reverse().indexOf(givenField)
+    : elements.indexOf(givenField)
+}
+
+function getLastElemOfPlaceholderPreviewGroup(
+  section: IConfigFieldMap,
+  givenField: IConfigField
+) {
+  const elements = Object.values(section).filter((s) => {
+    return s.previewGroupID === givenField.previewGroupID
+  })
+
+  if (elements.length) return elements[elements.length - 1]
+  return
 }
 
 export function shiftCurrentFieldUp(

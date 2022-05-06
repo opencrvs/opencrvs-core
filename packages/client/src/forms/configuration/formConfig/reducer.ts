@@ -9,21 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as actions from '@client/forms/configuration/formConfig/actions'
-import { Loop, LoopReducer, loop, Cmd } from 'redux-loop'
-import * as offlineActions from '@client/offline/actions'
 import { Event, IForm, IFormConfig } from '@client/forms'
-import { getConfiguredForm, FieldPosition } from '@client/forms/configuration'
-import { ISectionFieldMap, getSectionFieldsMap, IConfigFieldMap } from './utils'
+import { FieldPosition, getConfiguredForm } from '@client/forms/configuration'
+import * as actions from '@client/forms/configuration/formConfig/actions'
 import {
-  shiftCurrentFieldDown,
-  shiftCurrentFieldUp,
-  getConfigFieldIdentifiers
-} from './motionUtils'
-import {
-  IFormDraft,
-  getEventDraft
+  getEventDraft,
+  IFormDraft
 } from '@client/forms/configuration/formDrafts/utils'
+import * as offlineActions from '@client/offline/actions'
+import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
+import {
+  getConfigFieldIdentifiers,
+  getIndexOfPlaceholderPreviewGroup,
+  hasPreviewGroup,
+  shiftCurrentFieldDown,
+  shiftCurrentFieldUp
+} from './motionUtils'
+import { getSectionFieldsMap, IConfigFieldMap, ISectionFieldMap } from './utils'
 
 export type IFormConfigState =
   | {
@@ -239,14 +241,39 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
 
       const fieldMap = state[event].configFields[sectionId]
 
-      const currentField = fieldMap[fieldId]
+      let currentField = fieldMap[fieldId]
 
-      const newSection = shiftCurrentFieldUp(
-        state[event].configFields[sectionId],
-        currentField,
-        getPreviousField(fieldMap, fieldId),
-        getNextField(fieldMap, fieldId)
-      )
+      let newSection
+      let previousField = getPreviousField(fieldMap, fieldId)
+      let nextField = getNextField(fieldMap, fieldId)
+
+      if (undefined !== previousField && hasPreviewGroup(previousField)) {
+        let section = state[event].configFields[sectionId]
+
+        while (
+          previousField &&
+          getIndexOfPlaceholderPreviewGroup(section, previousField) > -1
+        ) {
+          newSection = shiftCurrentFieldUp(
+            section,
+            currentField,
+            previousField,
+            nextField
+          )
+
+          previousField = getPreviousField(newSection, fieldId)
+          nextField = getNextField(newSection, fieldId)
+          section = newSection
+          currentField = newSection[fieldId]
+        }
+      } else {
+        newSection = shiftCurrentFieldUp(
+          state[event].configFields[sectionId],
+          currentField,
+          previousField,
+          nextField
+        )
+      }
 
       return {
         ...state,
@@ -267,14 +294,39 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
 
       const fieldMap = state[event].configFields[sectionId]
 
-      const currentField = fieldMap[fieldId]
+      let currentField = fieldMap[fieldId]
 
-      const newSection = shiftCurrentFieldDown(
-        state[event].configFields[sectionId],
-        currentField,
-        getPreviousField(fieldMap, fieldId),
-        getNextField(fieldMap, fieldId)
-      )
+      let newSection
+      let previousField = getPreviousField(fieldMap, fieldId)
+      let nextField = getNextField(fieldMap, fieldId)
+
+      if (undefined !== nextField && hasPreviewGroup(nextField)) {
+        let section = state[event].configFields[sectionId]
+
+        while (
+          nextField &&
+          getIndexOfPlaceholderPreviewGroup(section, nextField, true) > -1
+        ) {
+          newSection = shiftCurrentFieldDown(
+            section,
+            currentField,
+            previousField,
+            nextField
+          )
+
+          previousField = getPreviousField(newSection, fieldId)
+          nextField = getNextField(newSection, fieldId)
+          section = newSection
+          currentField = newSection[fieldId]
+        }
+      } else {
+        newSection = shiftCurrentFieldDown(
+          state[event].configFields[sectionId],
+          currentField,
+          previousField,
+          nextField
+        )
+      }
 
       return {
         ...state,
