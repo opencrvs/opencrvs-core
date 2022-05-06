@@ -13,7 +13,10 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { createServer } from '@search/server'
 import { searchComposition } from '@search/features/search/service'
-import { mockSearchResult } from '@search/test/utils'
+import {
+  mockSearchResult,
+  mockAggregationSearchResult
+} from '@search/test/utils'
 import { client } from '@search/elasticsearch/client'
 import * as fetchMock from 'jest-fetch-mock'
 
@@ -138,26 +141,10 @@ describe('Verify handlers', () => {
     })
     describe('/statusWiseRegistrationCount', () => {
       it('Should return 200 for valid payload', async () => {
-        jest.spyOn(client, 'search').mockResolvedValueOnce({
-          body: {
-            aggregations: {
-              statusCounts: {
-                doc_count_error_upper_bound: 0,
-                sum_other_doc_count: 0,
-                buckets: [{ key: 'REGISTERED', doc_count: 1 }]
-              }
-            }
-          }
-        } as unknown as {
-          aggregations?: {
-            statusCounts: {
-              buckets: Array<{
-                key: string
-                doc_count: number
-              }>
-            }
-          }
-        })
+        jest
+          .spyOn(client, 'search')
+          // @ts-ignore
+          .mockResolvedValueOnce(mockAggregationSearchResult)
         const res = await server.server.inject({
           method: 'POST',
           url: '/statusWiseRegistrationCount',
