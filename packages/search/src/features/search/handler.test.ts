@@ -152,7 +152,7 @@ describe('Verify handlers', () => {
         expect(res.statusCode).toBe(200)
       })
       it('Should return 500 for an error', async () => {
-        ;(searchComposition as jest.Mock).mockImplementation(() => {
+        jest.spyOn(client, 'search').mockImplementation(() => {
           throw new Error('error')
         })
         const res = await server.server.inject({
@@ -166,6 +166,7 @@ describe('Verify handlers', () => {
             Authorization: `Bearer ${token}`
           }
         })
+
         expect(res.statusCode).toBe(500)
       })
     })

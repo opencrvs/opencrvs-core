@@ -139,7 +139,7 @@ describe('Verify point generation', () => {
     )
 
     expect(point).toMatchObject({
-      measurement: 'birth_reg',
+      measurement: 'birth_registration',
       tags: {
         regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
@@ -180,7 +180,7 @@ describe('Verify point generation', () => {
       AUTH_HEADER
     )
     expect(point).toMatchObject({
-      measurement: 'birth_reg',
+      measurement: 'birth_registration',
       tags: {
         regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
@@ -205,7 +205,7 @@ describe('Verify point generation', () => {
       AUTH_HEADER
     )
     expect(point).toMatchObject({
-      measurement: 'birth_reg',
+      measurement: 'birth_registration',
       tags: {
         regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
@@ -246,7 +246,7 @@ describe('Verify point generation', () => {
       AUTH_HEADER
     )
     expect(point).toMatchObject({
-      measurement: 'death_reg',
+      measurement: 'death_registration',
       tags: {
         regStatus: 'mark-existing-declaration-registered',
         gender: 'male',

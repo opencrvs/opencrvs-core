@@ -17,41 +17,42 @@ beforeEach(() => {
   fetch.resetMocks()
 })
 
-describe('get event estimation metrics', () => {
-  it('returns estimated data for both birth and death', async () => {
+describe('get total metrics', () => {
+  it('returns estimated data for event', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
-        birthTargetDayMetrics: {
-          actualRegistration: 50,
-          estimatedRegistration: 356,
-          estimatedPercentage: 14,
-          malePercentage: 50,
-          femalePercentage: 50
+        estimated: {
+          totalEstimation: 263977,
+          maleEstimation: 127633,
+          femaleEstimation: 136838,
+          locationId: 'Location/0',
+          estimationYear: 2022,
+          locationLevel: 'COUNTRY'
         },
-        deathTargetDayMetrics: {
-          actualRegistration: 0,
-          estimatedRegistration: 150,
-          estimatedPercentage: 0,
-          malePercentage: 0,
-          femalePercentage: 0
-        }
+        results: [
+          {
+            total: 1,
+            gender: 'male',
+            eventLocationType: 'HEALTH_FACILITY',
+            timeLabel: 'withinTarget',
+            practitionerRole: 'LOCAL_REGISTRAR'
+          }
+        ]
       })
     )
 
-    const data = await resolvers.Query.getEventEstimationMetrics(
+    const data = await resolvers.Query.getTotalMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',
         timeEnd: '2019-12-24T18:00:00.000Z',
-        locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9'
+        event: 'BIRTH'
       }
     )
 
     expect(data).toBeDefined()
-    expect(data.birthTargetDayMetrics).toBeInstanceOf(Object)
-    expect(data.birthTargetDayMetrics.estimatedPercentage).toBe(14)
-    expect(data.deathTargetDayMetrics).toBeInstanceOf(Object)
-    expect(data.deathTargetDayMetrics.estimatedPercentage).toBe(0)
+    expect(data).toBeInstanceOf(Object)
+    expect(data.results).toHaveLength(1)
   })
 })
 describe('get declarations started metrics', () => {
@@ -82,20 +83,22 @@ describe('get month wise event estimation metrics', () => {
     fetch.mockResponseOnce(
       JSON.stringify([
         {
-          actualTotalRegistration: 120,
-          actualTargetDayRegistration: 50,
-          estimatedRegistration: 356,
-          estimatedTargetDayPercentage: 14,
-          month: 'January',
-          year: '2020'
+          total: 120,
+          withinTarget: 50,
+          within1Year: 100,
+          within5Years: 300,
+          estimated: 356,
+          month: 0,
+          year: 2020
         },
         {
-          actualTotalRegistration: 10,
-          actualTargetDayRegistration: 0,
-          estimatedRegistration: 356,
-          estimatedTargetDayPercentage: 0,
-          month: 'February',
-          year: '2020'
+          total: 10,
+          withinTarget: 0,
+          within1Year: 17,
+          within5Years: 34,
+          estimated: 356,
+          month: 1,
+          year: 2020
         }
       ])
     )
@@ -106,13 +109,13 @@ describe('get month wise event estimation metrics', () => {
         timeStart: '2019-10-24T18:00:00.000Z',
         timeEnd: '2019-12-24T18:00:00.000Z',
         locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9',
-        event: 'birth'
+        event: 'BIRTH'
       }
     )
 
     expect(data).toBeDefined()
-    expect(data.details.length).toBe(2)
-    expect(data.total.actualTotalRegistration).toBe(130)
+    expect(data.length).toBe(2)
+    expect(data[0].total).toBe(120)
   })
 })
 describe('get location wise event estimation metrics', () => {
@@ -120,18 +123,20 @@ describe('get location wise event estimation metrics', () => {
     fetch.mockResponseOnce(
       JSON.stringify([
         {
-          actualTotalRegistration: 120,
-          actualTargetDayRegistration: 50,
-          estimatedRegistration: 356,
-          estimatedTargetDayPercentage: 14,
+          total: 120,
+          withinTarget: 50,
+          within1Year: 100,
+          within5Years: 300,
+          estimated: 356,
           locationName: 'Baniajan Union Parishod',
           locationId: '123'
         },
         {
-          actualTotalRegistration: 10,
-          actualTargetDayRegistration: 0,
-          estimatedRegistration: 356,
-          estimatedTargetDayPercentage: 0,
+          total: 10,
+          withinTarget: 0,
+          within1Year: 100,
+          within5Years: 310,
+          estimated: 356,
           locationName: 'Atarpar Union Parishod',
           locationId: '123'
         }
@@ -149,9 +154,9 @@ describe('get location wise event estimation metrics', () => {
     )
 
     expect(data).toBeDefined()
-    expect(data.details.length).toBe(2)
-    expect(data.details[0].locationName).toEqual('Baniajan Union Parishod')
-    expect(data.total.actualTotalRegistration).toBe(130)
+    expect(data.length).toBe(2)
+    expect(data[0].locationName).toEqual('Baniajan Union Parishod')
+    expect(data[1].total).toBe(10)
   })
 })
 describe('get practitioner wise time logged metrics', () => {
