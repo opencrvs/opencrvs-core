@@ -18,14 +18,17 @@ import {
   REDIRECT_DELAY
 } from '@client/views/SysAdmin/Config/Forms/utils'
 import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
-import { selectQuestionConfigs } from '@client/forms/configuration/configFields/selectors'
+import {
+  selectConfigFields,
+  selectConfigRegisterForm
+} from '@client/forms/configuration/formConfig/selectors'
 import { Event, IQuestionConfig } from '@client/forms'
 import { Mutation } from 'react-apollo'
 import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
 import {
-  IDraft,
+  IFormDraft,
   DraftStatus
-} from '@client/forms/configuration/formDrafts/reducer'
+} from '@client/forms/configuration/formDrafts/utils'
 import {
   SecondaryButton,
   PrimaryButton
@@ -36,19 +39,31 @@ import { messages } from '@client/i18n/messages/views/formConfig'
 import { InputField, TextArea } from '@opencrvs/components/lib/forms'
 import { useParams } from 'react-router'
 import { goToFormConfigHome } from '@client/navigation'
-import { updateQuestionConfig } from '@client/forms/configuration/configFields/actions'
+import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
+import { generateModifiedQuestionConfigs } from '@client/forms/configuration/formConfig/utils'
 
 export const SaveActionContext = React.createContext({
   status: ActionStatus.IDLE,
   setStatus: (_: ActionStatus) => {}
 })
 
+function useModifiedQuestionConfig(event: Event) {
+  const configFields = useSelector((store: IStoreState) =>
+    selectConfigFields(store, event)
+  )
+  const registerForm = useSelector((store: IStoreState) =>
+    selectConfigRegisterForm(store, event)
+  )
+  return React.useMemo(
+    () => generateModifiedQuestionConfigs(configFields, registerForm),
+    [configFields, registerForm]
+  )
+}
+
 function SaveActionButton({ comment }: { comment: string }) {
   const intl = useIntl()
   const { event } = useParams<{ event: Event }>()
-  const questions = useSelector((store: IStoreState) =>
-    selectQuestionConfigs(store, event)
-  )
+  const questions = useModifiedQuestionConfig(event)
   const { setStatus } = React.useContext(SaveActionContext)
   const dispatch = useDispatch()
 
@@ -66,7 +81,7 @@ function SaveActionButton({ comment }: { comment: string }) {
       onError={() => setStatus(ActionStatus.ERROR)}
       onCompleted={({ createOrUpdateFormDraft: formDraft }) => {
         if (formDraft) {
-          dispatch(updateQuestionConfig(formDraft as IDraft, questions))
+          dispatch(updateFormConfig(formDraft as IFormDraft, questions))
           setStatus(ActionStatus.COMPLETED)
           setTimeout(() => dispatch(goToFormConfigHome()), REDIRECT_DELAY)
         }
