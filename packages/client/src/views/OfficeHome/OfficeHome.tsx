@@ -41,7 +41,8 @@ import {
   PAGE_TRANSITIONS_ENTER_TIME,
   FIELD_AGENT_ROLES,
   NATL_ADMIN_ROLES,
-  SYS_ADMIN_ROLES
+  SYS_ADMIN_ROLES,
+  PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
 import {
   FloatingNotification,
@@ -370,22 +371,24 @@ export class OfficeHomeView extends React.Component<
         {this.role && NATL_ADMIN_ROLES.includes(this.role) && (
           <Redirect to={PERFORMANCE_HOME} />
         )}
-        {this.role && SYS_ADMIN_ROLES.includes(this.role) && (
-          <Redirect
-            to={{
-              pathname: OPERATIONAL_REPORT,
-              search:
-                '?locationId=' +
-                this.jurisdictionLocationId +
-                '&sectionId=' +
-                OPERATIONAL_REPORT_SECTION.OPERATIONAL +
-                '&timeStart=' +
-                subYears(new Date(Date.now()), 1).toISOString() +
-                '&timeEnd=' +
-                new Date(Date.now()).toISOString()
-            }}
-          />
-        )}
+        {this.role &&
+          (SYS_ADMIN_ROLES.includes(this.role) ||
+            PERFORMANCE_MANAGEMENT_ROLES.includes(this.role)) && (
+            <Redirect
+              to={{
+                pathname: OPERATIONAL_REPORT,
+                search:
+                  '?locationId=' +
+                  this.jurisdictionLocationId +
+                  '&sectionId=' +
+                  OPERATIONAL_REPORT_SECTION.OPERATIONAL +
+                  '&timeStart=' +
+                  subYears(new Date(Date.now()), 1).toISOString() +
+                  '&timeEnd=' +
+                  new Date(Date.now()).toISOString()
+              }}
+            />
+          )}
         <Navigation />
         <BodyContainer>
           {tabId === WORKQUEUE_TABS.inProgress && (
@@ -596,7 +599,7 @@ function mapStateToProps(
         )) ||
       []
     ).reverse(),
-    userDetails: getUserDetails(state)
+    userDetails
   }
 }
 export const OfficeHome = connect<

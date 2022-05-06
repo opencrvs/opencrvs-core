@@ -40,7 +40,8 @@ import {
   PHONE_TEXT,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES,
-  TRACKING_ID_TEXT
+  TRACKING_ID_TEXT,
+  PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
 import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
 import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -199,6 +200,12 @@ const HeaderRight = styled.div`
   height: 40px;
   background: ${({ theme }) => theme.colors.white};
 `
+
+const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
+  NATL_ADMIN_ROLES,
+  PERFORMANCE_MANAGEMENT_ROLES
+)
+
 class HeaderComp extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
@@ -281,23 +288,44 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         }
       }
     } else {
-      if (this.props.mobileSearchBar) {
-        return {
-          mobileLeft: {
-            icon: () => <ArrowBack />,
-            handler: () => window.history.back()
-          },
-          mobileBody: this.renderSearchInput(this.props, true)
+      if (
+        this.props.userDetails?.role &&
+        USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
+      ) {
+        if (this.props.mobileSearchBar) {
+          return {
+            mobileLeft: {
+              icon: () => <ArrowBack />,
+              handler: () => window.history.back()
+            }
+          }
+        } else {
+          return {
+            mobileLeft: {
+              icon: () => this.hamburger(),
+              handler: this.toggleMenu
+            }
+          }
         }
       } else {
-        return {
-          mobileLeft: {
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
-          },
-          mobileRight: {
-            icon: () => <SearchDark />,
-            handler: () => this.props.goToSearch()
+        if (this.props.mobileSearchBar) {
+          return {
+            mobileLeft: {
+              icon: () => <ArrowBack />,
+              handler: () => window.history.back()
+            },
+            mobileBody: this.renderSearchInput(this.props, true)
+          }
+        } else {
+          return {
+            mobileLeft: {
+              icon: () => this.hamburger(),
+              handler: this.toggleMenu
+            },
+            mobileRight: {
+              icon: () => <SearchDark />,
+              handler: () => this.props.goToSearch()
+            }
           }
         }
       }
@@ -467,15 +495,23 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       },
       {
         element: (
-          <HeaderCenter>
-            <StyledPrimaryButton
-              key="newEvent"
-              id="header_new_event"
-              onClick={this.props.goToEvents}
-              icon={() => <Plus />}
-            />
-            {this.renderSearchInput(this.props)}
-          </HeaderCenter>
+          <>
+            {!(
+              this.props.userDetails?.role &&
+              USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
+            ) && (
+              <HeaderCenter>
+                <StyledPrimaryButton
+                  key="newEvent"
+                  id="header_new_event"
+                  onClick={this.props.goToEvents}
+                  icon={() => <Plus />}
+                />
+
+                {this.renderSearchInput(this.props)}
+              </HeaderCenter>
+            )}
+          </>
         )
       },
       {
