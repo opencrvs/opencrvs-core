@@ -67,13 +67,21 @@ async function sendSMSClickatell(
 
 async function sendSMSInfobip(to: string, text: string) {
   const body = JSON.stringify({
-    from: INFOBIP_SENDER_ID,
-    to,
-    text
+    messages: [
+      {
+        destinations: [
+          {
+            to
+          }
+        ],
+        from: INFOBIP_SENDER_ID,
+        text
+      }
+    ]
   })
   const headers = {
-    Authorization: `Basic ${INFOBIP_API_KEY}`,
-    'Content-Type': 'declaration/json'
+    Authorization: `App ${INFOBIP_API_KEY}`,
+    'Content-Type': 'application/json'
   }
 
   let response

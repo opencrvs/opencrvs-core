@@ -239,12 +239,9 @@ type BirthRegistration implements EventRegistration {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: String
-  otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
-  primaryCaregiver: PrimaryCaregiver
   createdAt: Date
   updatedAt: Date
 }
@@ -261,6 +258,7 @@ type DeathRegistration implements EventRegistration {
   eventLocation: Location
   mannerOfDeath: MannerOfDeath
   causeOfDeathMethod: CauseOfDeathMethodType
+  causeOfDeathEstablished: String
   causeOfDeath: String
   maleDependentsOfDeceased: Float
   femaleDependentsOfDeceased: Float
@@ -280,6 +278,8 @@ type Person {
   age: Float
   maritalStatus: MaritalStatusType
   occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
   dateOfMarriage: Date
   multipleBirth: Int
   address: [Address]
@@ -455,12 +455,9 @@ input BirthRegistrationInput {
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: String
-  otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int
   foetalDeathsToMother: Int
   lastPreviousLiveBirth: Date
-  primaryCaregiver: PrimaryCaregiverInput
   createdAt: Date
   updatedAt: Date
 }
@@ -475,6 +472,7 @@ input DeathRegistrationInput {
   spouse: PersonInput
   eventLocation: LocationInput
   mannerOfDeath: MannerOfDeath
+  causeOfDeathEstablished: String
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeath: String
   maleDependentsOfDeceased: Float
@@ -578,6 +576,8 @@ type Registration {
   page: String
   book: String
   contact: String
+  informantType: InformantType
+  otherInformantType: String
   contactRelationship: String
   contactPhoneNumber: String
   status: [RegWorkflow]
@@ -624,21 +624,17 @@ enum BirthRegType {
   FATHER_ONLY
 }
 
-type PrimaryCaregiver {
-  primaryCaregiver: Person
-  reasonsNotApplying: [ReasonsNotApplying]
-  parentDetailsType: ParentDetailsType
-}
-
 enum MannerOfDeath {
   NATURAL_CAUSES
   ACCIDENT
   SUICIDE
   HOMICIDE
-  UNDETERMINED
+  MANNER_UNDETERMINED
 }
 
 enum CauseOfDeathMethodType {
+  PHYSICIAN
+  LAY_REPORTED
   VERBAL_AUTOPSY
   MEDICALLY_CERTIFIED
 }
@@ -872,6 +868,8 @@ input PersonInput {
   age: Float
   maritalStatus: MaritalStatusType
   occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
   dateOfMarriage: Date
   multipleBirth: Int
   address: [AddressInput]
@@ -909,6 +907,8 @@ input RegistrationInput {
   contact: String
   contactRelationship: String
   contactPhoneNumber: String
+  informantType: InformantType
+  otherInformantType: String
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
@@ -925,12 +925,6 @@ input RelatedPersonInput {
   otherRelationship: String
   affidavit: [AttachmentInput]
   individual: PersonInput
-}
-
-input PrimaryCaregiverInput {
-  primaryCaregiver: PersonInput
-  reasonsNotApplying: [ReasonsNotApplyingInput]
-  parentDetailsType: ParentDetailsType
 }
 
 input MedicalPractitionerInput {
@@ -1044,10 +1038,24 @@ type Certificate {
   data: String
 }
 
-type ReasonsNotApplying {
-  primaryCaregiverType: PrimaryCaregiverType
-  reasonNotApplying: String
-  isDeceased: Boolean
+enum InformantType {
+  INFORMANT
+  MOTHER
+  FATHER
+  GRANDFATHER
+  GRANDMOTHER
+  BROTHER
+  SISTER
+  OTHER_FAMILY_MEMBER
+  LEGAL_GUARDIAN
+  SPOUSE
+  SON
+  DAUGHTER
+  SON_IN_LAW
+  DAUGHTER_IN_LAW
+  GRANDSON
+  GRANDDAUGHTER
+  OTHER
 }
 
 enum ParentDetailsType {
@@ -1084,42 +1092,20 @@ enum AddressType {
 }
 
 enum AttachmentType {
+  BIRTH_CERTIFICATE
+  NATIONAL_ID
   PASSPORT
-  NATIONAL_ID_FRONT
-  NATIONAL_ID_BACK
   NOTIFICATION_OF_BIRTH
-  IMMUNISATION_CERTIFICATE
-  PAPER_FORM
-  PASSPORT_PHOTO
-  BIRTH_REGISTRATION
-  SCHOOL_CERTIFICATE
-  PROOF_OF_DEATH
-  OTHER
-  POST_MORTEM_CERTIFICATE
-  HOSPITAL_DISCHARGE_CERTIFICATE
-  ATTESTED_DEATH_LETTER
-  ATTESTED_DEATH_CERTIFICATE
-  BURIAL_RECEIPT
-  FUNERAL_RECEIPT
-  DOCTOR_CERTIFICATE
-  EPI_CARD
-  EPI_STAFF_CERTIFICATE
-  BIRTH_PLACE_DATE_PROOF
-  DISCHARGE_CERTIFICATE
-  MEDICAL_INSTITUTION
-  BIRTH_ATTENDANT
-  TAX_RECEIPT
-  BROUGHT_IN_DEAD_CERTIFICATE
-  CORONERS_REPORT
-  SIGNED_AFFIDAVIT
-  DECEASED_BIRTH_PROOF_PAPER
-  ORIGINAL_BIRTH_RECORD
-  UNDER_FIVE_CARD
   PROOF_OF_LEGAL_GUARDIANSHIP
   PROOF_OF_ASSIGNED_RESPONSIBILITY
-  LETTER_FROM_COUNCILLOR
-  CAUSE_OF_DEATH
-  DECEASED_DEATH_PROOF
+  HOSPITAL_CERTIFICATE_OF_DEATH
+  ATTESTED_LETTER_OF_DEATH
+  BURIAL_RECEIPT
+  POLICE_CERTIFICATE_OF_DEATH
+  MEDICALLY_CERTIFIED_CAUSE_OF_DEATH
+  VERBAL_AUTOPSY_REPORT
+  CORONERS_REPORT
+  OTHER
 }
 
 enum AttachmentSubject {
@@ -1333,12 +1319,6 @@ input CorrectionInput {
   note: String
 }
 
-input ReasonsNotApplyingInput {
-  primaryCaregiverType: PrimaryCaregiverType
-  reasonNotApplying: String
-  isDeceased: Boolean
-}
-
 enum RegStatus {
   IN_PROGRESS
   DECLARED
@@ -1363,15 +1343,6 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
-}
-
-enum PrimaryCaregiverType {
-  MOTHER_AND_FATHER
-  MOTHER
-  FATHER
-  INFORMANT
-  LEGAL_GUARDIAN
-  OTHER
 }
 
 input CommentInput {

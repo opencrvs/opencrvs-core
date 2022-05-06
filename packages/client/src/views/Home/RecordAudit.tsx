@@ -102,7 +102,7 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import {
   IFormSectionData,
-  IContactPoint,
+  IContactPointPhone,
   CorrectionSection,
   Action,
   IForm,
@@ -143,13 +143,13 @@ import {
 const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
 
 const DesktopHeader = styled(Header)`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
 
 const MobileHeader = styled(PageHeader)`
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
 `
@@ -182,10 +182,7 @@ const IconDiv = styled.div`
   }
 `
 const BackButtonDiv = styled.div`
-  display: none;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: inline;
-  }
+  display: inline;
 `
 
 const BackButton = styled(CircleButton)`
@@ -348,15 +345,18 @@ interface IGQLDeclaration {
   }
 }
 
-const STATUSTOCOLOR: { [key: string]: string } = {
+export const STATUSTOCOLOR: { [key: string]: string } = {
   ARCHIVED: 'grey',
   DRAFT: 'purple',
+  IN_PROGRESS: 'purple',
   DECLARED: 'orange',
   REJECTED: 'red',
   VALIDATED: 'grey',
   REGISTERED: 'green',
-  CERTIFIED: 'green',
-  WAITING_VALIDATION: 'teal'
+  CERTIFIED: 'blue',
+  WAITING_VALIDATION: 'teal',
+  SUBMITTED: 'orange',
+  SUBMITTING: 'orange'
 }
 
 const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
@@ -538,7 +538,7 @@ const getDraftDeclarationData = (
     informantContact:
       (
         (declaration.data?.registration?.contactPoint as IFormSectionData)
-          ?.nestedFields as IContactPoint
+          ?.nestedFields as IContactPointPhone
       )?.registrationPhone.toString() || ''
   }
 }

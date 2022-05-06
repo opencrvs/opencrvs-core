@@ -12,10 +12,9 @@
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from '@client/styledComponents'
-import { constantsMessages } from '@client/i18n/messages'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { Warning, Download } from '@opencrvs/components/lib/icons'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { Download } from '@opencrvs/components/lib/icons'
+import { IconButton } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import {
   downloadDeclaration,
@@ -48,18 +47,16 @@ const StatusIndicator = styled.div<{
   isLoading?: boolean
 }>`
   display: flex;
-  flex-grow: 1;
+  flex-grow: 0;
   align-items: center;
   max-width: 152px;
   justify-content: ${({ isLoading }) =>
     isLoading ? `space-between` : `flex-end`};
 `
-const DownloadAction = styled(TertiaryButton)<{
-  isFullHeight?: boolean
-}>`
-  ${({ isFullHeight }) => isFullHeight && `height: 100%;`}
+const DownloadAction = styled(IconButton)`
   border-radius: 50%;
   height: 40px;
+  width: 36px;
   & > div {
     padding: 0px 0px;
   }
@@ -78,14 +75,16 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 
     props.downloadDeclaration(downloadableDeclaration, props.client)
   }
-
   if (
     status === DOWNLOAD_STATUS.READY_TO_DOWNLOAD ||
     status === DOWNLOAD_STATUS.DOWNLOADING
   ) {
     return (
-      <StatusIndicator isLoading={true} className={className}>
-        {intl.formatMessage(constantsMessages.downloading)}
+      <StatusIndicator
+        isLoading={true}
+        className={className}
+        id={`${id}-download-loading`}
+      >
         <Spinner id={`action-loading-${id}`} size={24} />
       </StatusIndicator>
     )
@@ -96,16 +95,14 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     status === DOWNLOAD_STATUS.FAILED_NETWORK
   ) {
     return (
-      <StatusIndicator className={className}>
-        <Warning id={`action-error-${id}`} />
+      <StatusIndicator className={className} id={`${id}-download-failed`}>
         <DownloadAction
-          isFullHeight={false}
           id={`${id}-icon`}
           onClick={(e) => {
             initiateDownload()
             e.stopPropagation()
           }}
-          icon={() => <Download />}
+          icon={() => <Download isFailed={true} />}
         />
       </StatusIndicator>
     )
@@ -113,7 +110,6 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 
   return (
     <DownloadAction
-      isFullHeight={false}
       id={`${id}-icon`}
       onClick={(e) => {
         initiateDownload()

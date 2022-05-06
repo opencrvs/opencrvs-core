@@ -32,7 +32,6 @@ function isPathExactmatch(pathname: string, routesPath: string): boolean {
 function isUserHome(pathname: string): boolean {
   if (
     isPathExactmatch(pathname, routes.HOME) ||
-    isPathExactmatch(pathname, routes.FIELD_AGENT_HOME_TAB) ||
     isPathExactmatch(pathname, routes.REGISTRAR_HOME) ||
     isPathExactmatch(pathname, routes.REGISTRAR_HOME_TAB)
   ) {

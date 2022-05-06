@@ -54,6 +54,13 @@ jobs:
         if: ${{ github.event.inputs.farajaland-image-tag }}
         run: |
           echo "COUNTRY_CONFIG_VERSION=${{ github.event.inputs.farajaland-image-tag }}" >> $GITHUB_ENV
+
+      # Checkout farajaland at the commit hash associated in order for yarn deploy to pickup any deploy Docker Compose changes
+      - name: Checkout correct Farajaland branch
+        run: |
+          cd opencrvs-farajaland
+          git checkout ${{ env.COUNTRY_CONFIG_VERSION }}
+          cd ../
       - name: Set CORE_VERSION from inputs
         if: ${{ github.event.inputs.core-image-tag }}
         run: echo "CORE_VERSION=${{ github.event.inputs.core-image-tag }}" >> $GITHUB_ENV

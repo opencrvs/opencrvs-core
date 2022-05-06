@@ -16,6 +16,7 @@ import {
   goToEndOfForm,
   waitForReady,
   validateScopeToken,
+  registerScopeToken,
   primaryAddressData,
   primaryInternationalAddressLines,
   secondaryAddressData,
@@ -44,6 +45,11 @@ import * as ReactApollo from 'react-apollo'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 
 import { waitForElement } from '@client/tests/wait-for-element'
+import {
+  birthDraftData,
+  birthReviewDraftData,
+  deathReviewDraftData
+} from '@client/tests/mock-drafts'
 
 interface IPersonDetails {
   [key: string]: any
@@ -65,89 +71,8 @@ describe('when user is previewing the form data', () => {
   describe('when user is in the preview section', () => {
     let customDraft: IDeclaration
 
-    const childDetails: IPersonDetails = {
-      attendantAtBirth: 'NURSE',
-      childBirthDate: '1999-10-10',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'নাইম',
-      firstNamesEng: 'Naim',
-      gender: 'male',
-      placeOfBirth: 'HOSPITAL',
-      birthLocation: '90d39759-7f02-4646-aca3-9272b4b5ce5a',
-      multipleBirth: '2',
-      birthType: 'SINGLE',
-      weightAtBirth: '5'
-    }
-
-    const fatherDetails: IPersonDetails = {
-      fathersDetailsExist: true,
-      iD: '987987987',
-      iDType: 'NATIONAL_ID',
-      nationality: 'FAR',
-      iDTypeOther: 'Taxpayer Identification Number',
-      secondaryAddressSameAsOtherSecondary: true,
-      primaryAddressSameAsOtherPrimary: true,
-      ...primaryAddressData,
-      ...primaryInternationalAddressLines,
-      ...secondaryAddressData,
-      ...secondaryInternationalAddressLines,
-      motherBirthDate: '1999-10-10',
-      dateOfMarriage: '2010-10-10',
-      educationalAttainment: 'PRIMARY_ISCED_1',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'আনোয়ার',
-      firstNamesEng: 'Anwar',
-      maritalStatus: 'MARRIED'
-    }
-
-    const motherDetails: IPersonDetails = {
-      iD: '987987987',
-      iDType: 'NATIONAL_ID',
-      nationality: 'FAR',
-      familyName: 'ইসলাম',
-      familyNameEng: 'Islam',
-      firstNames: 'রোকেয়া',
-      firstNamesEng: 'Rokeya',
-      maritalStatus: 'MARRIED',
-      dateOfMarriage: '2010-10-10',
-      fatherBirthDate: '1999-10-10',
-      educationalAttainment: 'PRIMARY_ISCED_1',
-      ...primaryAddressData,
-      ...primaryInternationalAddressLines,
-      ...secondaryAddressData,
-      ...secondaryInternationalAddressLines
-    }
-
-    const registrationDetails = {
-      commentsOrNotes: 'comments',
-      presentAtBirthRegistration: 'MOTHER',
-      registrationCertificateLanguage: ['en'],
-      whoseContactDetails: 'MOTHER',
-      informant: {
-        value: 'OTHER',
-        nestedFields: {
-          otherRelationShip: 'Friend'
-        }
-      },
-      contactPoint: {
-        value: 'OTHER',
-        nestedFields: {
-          registrationPhone: '01717000000',
-          contactRelationshipOther: 'grandma'
-        }
-      }
-    }
-
     beforeEach(async () => {
-      const data = {
-        child: childDetails,
-        father: fatherDetails,
-        mother: motherDetails,
-        registration: registrationDetails,
-        documents: { imageUploader: '' }
-      }
+      const data = birthDraftData
 
       customDraft = {
         id: uuid(),
@@ -167,7 +92,9 @@ describe('when user is previewing the form data', () => {
     })
 
     describe('when user clicks the "submit" button', () => {
-      beforeEach(async () => goToEndOfForm(app))
+      beforeEach(async () => {
+        await goToEndOfForm(app)
+      })
 
       it('check whether submit button is enabled or not', async () => {
         expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
@@ -214,10 +141,9 @@ describe('when user is previewing the form data', () => {
     }
 
     const fatherDetails: IPersonDetails = {
-      fathersDetailsExist: true,
+      detailsExist: true,
       iD: '432432432',
       iDType: 'NATIONAL_ID',
-      secondaryAddressSameAsOtherSecondary: true,
       primaryAddressSameAsOtherPrimary: true,
       ...primaryAddressData,
       ...primaryInternationalAddressLines,
@@ -263,32 +189,11 @@ describe('when user is previewing the form data', () => {
       registrationNumber: '2019121525B1234568',
       _fhirID: '4'
     }
-    const registerScopeToken =
-      'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
 
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
       await store.dispatch(checkAuth({ '?token': registerScopeToken }))
-      const data = {
-        _fhirIDMap: {
-          composition: '11'
-        },
-        child: childDetails,
-        father: fatherDetails,
-        mother: motherDetails,
-        registration: registrationDetails,
-        documents: {
-          imageUploader: [
-            {
-              data: 'base64-data',
-              type: 'image/jpeg',
-              optionValues: ['Mother', 'National ID (front)'],
-              title: 'Mother',
-              description: 'National ID (front)'
-            }
-          ]
-        }
-      }
+      const data = birthReviewDraftData
 
       customDraft = { id: uuid(), data, review: true, event: Event.BIRTH }
       store.dispatch(storeDeclaration(customDraft))
@@ -419,30 +324,7 @@ describe('when user is previewing the form data', () => {
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
       await store.dispatch(checkAuth({ '?token': registerScopeToken }))
-      const data = {
-        _fhirIDMap: {
-          composition: '11'
-        },
-        deceased: deceasedDetails,
-        informant: informantDetails,
-        father: fatherDetails,
-        mother: motherDetails,
-        spouse: spouseDetails,
-        deathEvent: deathEventDetails,
-        causeOfDeath: causeOfDeathDetails,
-        registration: registrationDetails,
-        documents: {
-          imageUploader: [
-            {
-              data: 'base64-data',
-              type: 'image/jpeg',
-              optionValues: ['Mother', 'National ID (front)'],
-              title: 'Mother',
-              description: 'National ID (front)'
-            }
-          ]
-        }
-      }
+      const data = deathReviewDraftData
 
       customDraft = { id: uuid(), data, review: true, event: Event.DEATH }
       store.dispatch(storeDeclaration(customDraft))

@@ -24,7 +24,8 @@ import {
   hideSubmitFormSuccessToast,
   hideSubmitFormErrorToast,
   hideUserAuditSuccessToast,
-  hidePINUpdateSuccessToast
+  hidePINUpdateSuccessToast,
+  hideDownloadDeclarationFailedToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { NotificationState } from '@client/notification/reducer'
@@ -38,6 +39,7 @@ type NotificationProps = {
   submitFormErrorToast: string | null
   userAuditSuccessToast: NotificationState['userAuditSuccessToast']
   showPINUpdateSuccess: boolean
+  downloadDeclarationFailedToast: NotificationState['downloadDeclarationFailedToast']
 }
 
 type DispatchProps = {
@@ -48,6 +50,7 @@ type DispatchProps = {
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
   hideUserAuditSuccessToast: typeof hideUserAuditSuccessToast
   hidePINUpdateSuccessToast: typeof hidePINUpdateSuccessToast
+  hideDownloadDeclarationFailedToast: typeof hideDownloadDeclarationFailedToast
 }
 
 class Component extends React.Component<
@@ -87,7 +90,8 @@ class Component extends React.Component<
       submitFormSuccessToast,
       submitFormErrorToast,
       userAuditSuccessToast,
-      showPINUpdateSuccess
+      showPINUpdateSuccess,
+      downloadDeclarationFailedToast
     } = this.props
 
     return (
@@ -169,6 +173,16 @@ class Component extends React.Component<
             {intl.formatMessage(messages.updatePINSuccess)}
           </Toast>
         )}
+        {downloadDeclarationFailedToast && (
+          <FloatingNotification
+            id="PINUpdateSuccessToast"
+            show={Boolean(downloadDeclarationFailedToast)}
+            type={NOTIFICATION_TYPE.ALTERNATE_ERROR}
+            callback={this.props.hideDownloadDeclarationFailedToast}
+          >
+            {intl.formatMessage(messages.downloadDeclarationFailed)}
+          </FloatingNotification>
+        )}
         {/* More notification types can be added here */}
       </div>
     )
@@ -185,7 +199,9 @@ const mapStateToProps = (store: IStoreState) => {
     submitFormSuccessToast: store.notification.submitFormSuccessToast,
     submitFormErrorToast: store.notification.submitFormErrorToast,
     userAuditSuccessToast: store.notification.userAuditSuccessToast,
-    showPINUpdateSuccess: store.notification.showPINUpdateSuccess
+    showPINUpdateSuccess: store.notification.showPINUpdateSuccess,
+    downloadDeclarationFailedToast:
+      store.notification.downloadDeclarationFailedToast
   }
 }
 
@@ -197,6 +213,7 @@ export const NotificationComponent = withRouter(
     hideSubmitFormErrorToast,
     toggleDraftSavedNotification,
     hideUserAuditSuccessToast,
-    hidePINUpdateSuccessToast
+    hidePINUpdateSuccessToast,
+    hideDownloadDeclarationFailedToast
   })(injectIntl(Component))
 )

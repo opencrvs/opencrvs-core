@@ -37,12 +37,33 @@ export enum EventLocationAddressCases {
   PLACE_OF_DEATH = 'placeOfDeath'
 }
 
-export enum AddressComparisonCases {
-  // the below are camelCase because they map to fieldNames used in conditionals
-  SECONDARY_ADDRESS_SAME_AS_PRIMARY = 'secondaryAddressSameAsPrimary',
-  PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY = 'primaryAddressSameAsOtherPrimary',
-  SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY = 'secondaryAddressSameAsOtherSecondary'
+export enum AddressCopyConfigCases {
+  PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY = 'primaryAddressSameAsOtherPrimary'
 }
+
+// if the informant or contact is mother
+const mothersDetailsExistBasedOnContactAndInformant =
+  '!mothersDetailsExistBasedOnContactAndInformant'
+// if the informant or contact is father
+const fathersDetailsExistBasedOnContactAndInformant =
+  '!fathersDetailsExistBasedOnContactAndInformant'
+
+// if mothers details do not exist on other page
+const mothersDetailsDontExistOnOtherPage =
+  'draftData && draftData.mother && !draftData.mother.detailsExist'
+
+// if mothers details do not exist
+const mothersDetailsDontExist = '!values.detailsExist'
+
+// if fathers details do not exist
+const fathersDetailsDontExist = '!values.detailsExist'
+
+// primary address same as other primary
+const primaryAddressSameAsOtherPrimaryAddress =
+  'values.primaryAddressSameAsOtherPrimary'
+
+// secondary addresses are not enabled
+const secondaryAddressesDisabled = '!window.config.ADDRESSES!==2'
 
 export enum AddressSubsections {
   PRIMARY_ADDRESS_SUBSECTION = 'primaryAddress',
@@ -58,12 +79,12 @@ export type AllowedAddressConfigurations = {
   config:
     | AddressCases
     | AddressSubsections
-    | AddressComparisonCases
+    | AddressCopyConfigCases
     | EventLocationAddressCases
   label?: MessageDescriptor
   xComparisonSection?: BirthSection | DeathSection
   yComparisonSection?: BirthSection | DeathSection
-  comparisonCase?: AddressComparisonCases
+  conditionalCase?: string
   informant?: boolean
 }
 
@@ -83,7 +104,17 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.primaryAddress
       },
-      { config: AddressCases.PRIMARY_ADDRESS, informant: true }
+      { config: AddressCases.PRIMARY_ADDRESS, informant: true },
+      {
+        config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.informantSecondaryAddress,
+        conditionalCase: secondaryAddressesDisabled
+      },
+      {
+        config: AddressCases.SECONDARY_ADDRESS,
+        conditionalCase: secondaryAddressesDisabled,
+        informant: true
+      }
     ]
   },
   {
@@ -91,24 +122,23 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
-        label: formMessageDescriptors.primaryAddress
+        label: formMessageDescriptors.primaryAddress,
+        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant})`
       },
-      { config: AddressCases.PRIMARY_ADDRESS, informant: false },
       {
-        config: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY,
-        label: formMessageDescriptors.secondaryAddressSameAsPrimary,
-        xComparisonSection: BirthSection.Mother,
-        yComparisonSection: BirthSection.Mother
+        config: AddressCases.PRIMARY_ADDRESS,
+        informant: false,
+        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant})`
       },
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.secondaryAddress,
-        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant} && ${secondaryAddressesDisabled}) || (${secondaryAddressesDisabled})`
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
         informant: false,
-        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant} && ${secondaryAddressesDisabled}) || (${secondaryAddressesDisabled})`
       }
     ]
   },
@@ -116,46 +146,36 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     preceedingFieldId: 'birth.father.father-view-group.educationalAttainment',
     configurations: [
       {
-        config: AddressComparisonCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
-        label: formMessageDescriptors.primaryAddressSameAsOtherPrimary,
-        xComparisonSection: BirthSection.Father,
-        yComparisonSection: BirthSection.Mother
-      },
-      {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.primaryAddress,
-        comparisonCase:
-          AddressComparisonCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY
+        conditionalCase: `(${fathersDetailsDontExist} && ${fathersDetailsExistBasedOnContactAndInformant})`
+      },
+      {
+        config: AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
+        label: formMessageDescriptors.primaryAddressSameAsOtherPrimary,
+        xComparisonSection: BirthSection.Father,
+        yComparisonSection: BirthSection.Mother,
+        conditionalCase: `(${fathersDetailsDontExist} || ${mothersDetailsDontExistOnOtherPage})`
       },
       {
         config: AddressCases.PRIMARY_ADDRESS,
         informant: false,
-        comparisonCase:
-          AddressComparisonCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY
-      },
-      {
-        config:
-          AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY,
-        label: formMessageDescriptors.secondaryAddressSameAsOtherSecondary,
-        xComparisonSection: BirthSection.Father,
-        yComparisonSection: BirthSection.Mother
+        conditionalCase: `((${fathersDetailsDontExist} && ${fathersDetailsExistBasedOnContactAndInformant}) || ${primaryAddressSameAsOtherPrimaryAddress})`
       },
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.secondaryAddress,
-        comparisonCase:
-          AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY
+        conditionalCase: `${fathersDetailsDontExist} || ${secondaryAddressesDisabled}`
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
         informant: false,
-        comparisonCase:
-          AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY
+        conditionalCase: `${fathersDetailsDontExist} || ${secondaryAddressesDisabled}`
       }
     ]
   },
   {
-    preceedingFieldId: 'death.deceased.deceased-view-group.occupation',
+    preceedingFieldId: 'death.deceased.deceased-view-group.maritalStatus',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
@@ -163,46 +183,45 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       },
       { config: AddressCases.PRIMARY_ADDRESS, informant: false },
       {
-        config: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY,
-        label: formMessageDescriptors.deceasedSecondaryAddressSameAsPrimary,
-        xComparisonSection: DeathSection.Deceased,
-        yComparisonSection: DeathSection.Deceased
-      },
-      {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.deceasedSecondaryAddress,
-        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+        conditionalCase: secondaryAddressesDisabled
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
         informant: false,
-        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+        conditionalCase: secondaryAddressesDisabled
       }
     ]
   },
   {
-    preceedingFieldId: 'death.informant.informant-view-group.relationship',
+    preceedingFieldId: 'death.informant.informant-view-group.familyNameEng',
     configurations: [
       {
-        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
-        label: formMessageDescriptors.informantPrimaryAddress
-      },
-      { config: AddressCases.PRIMARY_ADDRESS, informant: true },
-      {
-        config: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY,
-        label: formMessageDescriptors.informantSecondaryAddressSameAsPrimary,
+        config: AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
+        label: formMessageDescriptors.primaryAddressSameAsDeceasedsPrimary,
         xComparisonSection: DeathSection.Informants,
-        yComparisonSection: DeathSection.Informants
+        yComparisonSection: DeathSection.Deceased
+      },
+      {
+        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.informantPrimaryAddress,
+        conditionalCase: `${primaryAddressSameAsOtherPrimaryAddress}`
+      },
+      {
+        config: AddressCases.PRIMARY_ADDRESS,
+        informant: true,
+        conditionalCase: `${primaryAddressSameAsOtherPrimaryAddress}`
       },
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.informantSecondaryAddress,
-        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+        conditionalCase: secondaryAddressesDisabled
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
         informant: true,
-        comparisonCase: AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY
+        conditionalCase: secondaryAddressesDisabled
       }
     ]
   }
@@ -224,7 +243,7 @@ export function getAddressFields(
       return getAddress(
         AddressCases.PRIMARY_ADDRESS,
         configuration.informant,
-        configuration.comparisonCase
+        configuration.conditionalCase
       )
     case AddressCases.SECONDARY_ADDRESS:
       if (configuration.informant === undefined) {
@@ -235,11 +254,9 @@ export function getAddressFields(
       return getAddress(
         AddressCases.SECONDARY_ADDRESS,
         configuration.informant,
-        configuration.comparisonCase
+        configuration.conditionalCase
       )
-    case AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY:
-    case AddressComparisonCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY:
-    case AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY:
+    case AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY:
       if (
         !configuration.label ||
         !configuration.xComparisonSection ||
@@ -250,10 +267,10 @@ export function getAddressFields(
         )
       }
       return getXAddressSameAsY(
-        configuration.config,
         configuration.xComparisonSection,
         configuration.yComparisonSection,
-        configuration.label
+        configuration.label,
+        configuration.conditionalCase
       )
     case AddressSubsections.PRIMARY_ADDRESS_SUBSECTION:
     case AddressSubsections.SECONDARY_ADDRESS_SUBSECTION:
@@ -265,7 +282,7 @@ export function getAddressFields(
       return getAddressSubsection(
         configuration.config,
         configuration.label,
-        configuration.comparisonCase
+        configuration.conditionalCase
       )
     default:
       return []
@@ -333,7 +350,7 @@ export function getPreviewGroups(
 export const getAddressSubsection = (
   previewGroup: AddressSubsections,
   label: MessageDescriptor,
-  comparisonCase?: AddressComparisonCases
+  conditionalCase?: string
 ): SerializedFormField[] => {
   const fields: SerializedFormField[] = []
   const subsection: SerializedFormField = {
@@ -344,11 +361,12 @@ export const getAddressSubsection = (
     initialValue: '',
     validate: []
   }
-  if (comparisonCase) {
+
+  if (conditionalCase) {
     subsection['conditionals'] = [
       {
         action: 'hide',
-        expression: `values.${comparisonCase}`
+        expression: `${conditionalCase}`
       }
     ]
   }
@@ -357,93 +375,74 @@ export const getAddressSubsection = (
 }
 
 export const getXAddressSameAsY = (
-  comparisonCase: AddressComparisonCases,
   xComparisonSection: BirthSection | DeathSection,
   yComparisonSection: BirthSection | DeathSection,
-  label: MessageDescriptor
+  label: MessageDescriptor,
+  conditionalCase?: string
 ): SerializedFormField[] => {
-  return [
-    {
-      name: comparisonCase,
-      type: 'RADIO_GROUP',
-      label,
-      required: true,
-      initialValue: true,
-      validate: [],
-      options: [
-        {
-          value: true,
-          label: {
-            defaultMessage: 'Yes',
-            description: 'confirmation label for yes / no radio button',
-            id: 'form.field.label.confirm'
-          }
-        },
-        {
-          value: false,
-          label: {
-            defaultMessage: 'No',
-            description: 'deny label for yes / no radio button',
-            id: 'form.field.label.deny'
-          }
+  const copyAddressField: SerializedFormField = {
+    name: AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
+    type: 'RADIO_GROUP',
+    label,
+    required: true,
+    initialValue: true,
+    validate: [],
+    options: [
+      {
+        value: true,
+        label: {
+          defaultMessage: 'Yes',
+          description: 'confirmation label for yes / no radio button',
+          id: 'form.field.label.confirm'
         }
-      ],
-      conditionals:
-        xComparisonSection === BirthSection.Father
-          ? [
-              {
-                action: 'hide',
-                expression: '!values.fathersDetailsExist'
-              },
-              {
-                action: 'hide',
-                expression:
-                  '(draftData && draftData.primaryCaregiver && draftData.primaryCaregiver.parentDetailsType && draftData.primaryCaregiver.parentDetailsType ===  "FATHER_ONLY")'
-              }
-            ]
-          : [],
-      mapping: {
-        mutation: {
-          operation: 'copyAddressTransformer',
-          parameters: [
-            comparisonCase ===
-              AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY ||
-            comparisonCase ===
-              AddressComparisonCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY
-              ? AddressCases.PRIMARY_ADDRESS
-              : AddressCases.SECONDARY_ADDRESS,
-            yComparisonSection,
-            comparisonCase ===
-              AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY ||
-            comparisonCase ===
-              AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY
-              ? AddressCases.SECONDARY_ADDRESS
-              : AddressCases.PRIMARY_ADDRESS,
-            xComparisonSection
-          ]
-        },
-        query: {
-          operation: 'sameAddressFieldTransformer',
-          parameters: [
-            comparisonCase ===
-              AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY ||
-            comparisonCase ===
-              AddressComparisonCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY
-              ? AddressCases.PRIMARY_ADDRESS
-              : AddressCases.SECONDARY_ADDRESS,
-            yComparisonSection,
-            comparisonCase ===
-              AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_PRIMARY ||
-            comparisonCase ===
-              AddressComparisonCases.SECONDARY_ADDRESS_SAME_AS_OTHER_SECONDARY
-              ? AddressCases.SECONDARY_ADDRESS
-              : AddressCases.PRIMARY_ADDRESS,
-            xComparisonSection
-          ]
+      },
+      {
+        value: false,
+        label: {
+          defaultMessage: 'No',
+          description: 'deny label for yes / no radio button',
+          id: 'form.field.label.deny'
         }
       }
+    ],
+    conditionals: conditionalCase
+      ? [
+          {
+            action: 'hide',
+            expression: `${conditionalCase}`
+          }
+        ]
+      : [],
+    mapping: {
+      mutation: {
+        operation: 'copyAddressTransformer',
+        parameters: [
+          AddressCases.PRIMARY_ADDRESS,
+          yComparisonSection,
+          AddressCases.PRIMARY_ADDRESS,
+          xComparisonSection
+        ]
+      },
+      query: {
+        operation: 'sameAddressFieldTransformer',
+        parameters: [
+          AddressCases.PRIMARY_ADDRESS,
+          yComparisonSection,
+          AddressCases.PRIMARY_ADDRESS,
+          xComparisonSection
+        ]
+      }
     }
-  ]
+  }
+  if (conditionalCase) {
+    copyAddressField['conditionals'] = [
+      {
+        action: 'hide',
+        expression: `${conditionalCase}`
+      }
+    ]
+  }
+  return [copyAddressField]
 }
 
 export function populateRegisterFormsWithAddresses(
@@ -500,27 +499,31 @@ export function populateRegisterFormsWithAddresses(
 export function getAddress(
   addressCase: AddressCases,
   informant: boolean,
-  comparisonCase?: AddressComparisonCases
+  conditionalCase?: string
 ): SerializedFormField[] {
   const defaultFields: SerializedFormField[] =
     addressCase === AddressCases.PRIMARY_ADDRESS
       ? getPrimaryAddressFields(informant)
       : getSecondaryAddressFields(informant)
-  if (comparisonCase) {
+  if (conditionalCase) {
     defaultFields.forEach((field) => {
-      const newConditional = {
-        action: 'hide',
-        expression: `values.${comparisonCase}`
+      let conditional
+      if (conditionalCase) {
+        conditional = {
+          action: 'hide',
+          expression: `${conditionalCase}`
+        }
       }
       if (
+        conditional &&
         field.conditionals &&
         field.conditionals.filter(
-          (conditional) => conditional.expression === `values.${comparisonCase}`
+          (conditional) => conditional.expression === conditionalCase
         ).length === 0
       ) {
-        field.conditionals.push(newConditional)
-      } else if (!field.conditionals) {
-        field.conditionals = [newConditional]
+        field.conditionals.push(conditional)
+      } else if (conditional && !field.conditionals) {
+        field.conditionals = [conditional]
       }
     })
   }
@@ -943,7 +946,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       name: 'addressLine2UrbanOptionPrimary',
       type: 'TEXT',
       label: {
-        defaultMessage: 'Street / Plot Number',
+        defaultMessage: 'Street',
         description: 'Title for the address line 1',
         id: 'form.field.label.addressLine2UrbanOption'
       },
@@ -1009,7 +1012,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
     },
     {
       name: 'numberUrbanOptionPrimary',
-      type: 'NUMBER',
+      type: 'TEXT',
       label: {
         defaultMessage: 'Number',
         description: 'Title for the number field',
@@ -1993,7 +1996,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       name: 'addressLine2UrbanOptionSecondary',
       type: 'TEXT',
       label: {
-        defaultMessage: 'Street / Plot Number',
+        defaultMessage: 'Street',
         description: 'Title for the address line 1',
         id: 'form.field.label.addressLine2UrbanOption'
       },
@@ -2059,7 +2062,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
     },
     {
       name: 'numberUrbanOptionSecondary',
-      type: 'NUMBER',
+      type: 'TEXT',
       label: {
         defaultMessage: 'Number',
         description: 'Title for the number field',
@@ -2994,7 +2997,7 @@ export function getPlaceOfEventAddressFields(
       customisable: false,
       type: 'TEXT',
       label: {
-        defaultMessage: 'Street / Plot Number',
+        defaultMessage: 'Street',
         description: 'Title for the address line 1',
         id: 'form.field.label.addressLine2UrbanOption'
       },
@@ -3045,7 +3048,7 @@ export function getPlaceOfEventAddressFields(
     {
       name: 'numberUrbanOption',
       customisable: false,
-      type: 'NUMBER',
+      type: 'TEXT',
       label: {
         defaultMessage: 'Number',
         description: 'Title for the number field',

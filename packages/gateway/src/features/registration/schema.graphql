@@ -36,11 +36,23 @@ enum RegistrationContactType {
   INFORMANT
 }
 
-enum BirthRegPresence {
-  BOTH_PARENTS
+enum InformantType {
   INFORMANT
   MOTHER
   FATHER
+  GRANDFATHER
+  GRANDMOTHER
+  BROTHER
+  SISTER
+  OTHER_FAMILY_MEMBER
+  LEGAL_GUARDIAN
+  SPOUSE
+  SON
+  DAUGHTER
+  SON_IN_LAW
+  DAUGHTER_IN_LAW
+  GRANDSON
+  GRANDDAUGHTER
   OTHER
 }
 
@@ -64,42 +76,20 @@ enum AttendantType {
 }
 
 enum AttachmentType {
+  BIRTH_CERTIFICATE
+  NATIONAL_ID
   PASSPORT
-  NATIONAL_ID_FRONT
-  NATIONAL_ID_BACK
   NOTIFICATION_OF_BIRTH
-  IMMUNISATION_CERTIFICATE
-  PAPER_FORM
-  PASSPORT_PHOTO
-  BIRTH_REGISTRATION
-  SCHOOL_CERTIFICATE
-  PROOF_OF_DEATH
-  OTHER
-  POST_MORTEM_CERTIFICATE
-  HOSPITAL_DISCHARGE_CERTIFICATE
-  ATTESTED_DEATH_LETTER
-  ATTESTED_DEATH_CERTIFICATE
-  BURIAL_RECEIPT
-  FUNERAL_RECEIPT
-  DOCTOR_CERTIFICATE
-  EPI_CARD
-  EPI_STAFF_CERTIFICATE
-  BIRTH_PLACE_DATE_PROOF
-  DISCHARGE_CERTIFICATE
-  MEDICAL_INSTITUTION
-  BIRTH_ATTENDANT
-  TAX_RECEIPT
-  BROUGHT_IN_DEAD_CERTIFICATE
-  CORONERS_REPORT
-  SIGNED_AFFIDAVIT
-  DECEASED_BIRTH_PROOF_PAPER
-  ORIGINAL_BIRTH_RECORD
-  UNDER_FIVE_CARD
   PROOF_OF_LEGAL_GUARDIANSHIP
   PROOF_OF_ASSIGNED_RESPONSIBILITY
-  LETTER_FROM_COUNCILLOR
-  CAUSE_OF_DEATH
-  DECEASED_DEATH_PROOF
+  HOSPITAL_CERTIFICATE_OF_DEATH
+  ATTESTED_LETTER_OF_DEATH
+  BURIAL_RECEIPT
+  POLICE_CERTIFICATE_OF_DEATH
+  MEDICALLY_CERTIFIED_CAUSE_OF_DEATH
+  VERBAL_AUTOPSY_REPORT
+  CORONERS_REPORT
+  OTHER
 }
 
 enum AttachmentSubject {
@@ -132,7 +122,7 @@ enum MannerOfDeath {
   ACCIDENT
   SUICIDE
   HOMICIDE
-  UNDETERMINED
+  MANNER_UNDETERMINED
 }
 
 enum PaymentType {
@@ -146,6 +136,8 @@ enum PaymentOutcomeType {
 }
 
 enum CauseOfDeathMethodType {
+  PHYSICIAN
+  LAY_REPORTED
   VERBAL_AUTOPSY
   MEDICALLY_CERTIFIED
 }
@@ -181,44 +173,11 @@ type MedicalPractitioner { # -> Encounter.participant
   lastVisitDate: Date # -> Encounter.participant.preriod.start
 }
 
-enum PrimaryCaregiverType {
-  MOTHER_AND_FATHER
-  MOTHER
-  FATHER
-  INFORMANT
-  LEGAL_GUARDIAN
-  OTHER
-}
-
 enum ParentDetailsType {
   MOTHER_AND_FATHER
   MOTHER_ONLY
   FATHER_ONLY
   NONE
-}
-
-input ReasonsNotApplyingInput {
-  primaryCaregiverType: PrimaryCaregiverType # -> Observation.valueString
-  reasonNotApplying: String # -> Observation.valueString
-  isDeceased: Boolean
-}
-
-input PrimaryCaregiverInput {
-  primaryCaregiver: PersonInput # -> Use for Observation.subject.reference
-  reasonsNotApplying: [ReasonsNotApplyingInput]
-  parentDetailsType: ParentDetailsType # -> Observation.valueString
-}
-
-type ReasonsNotApplying {
-  primaryCaregiverType: PrimaryCaregiverType
-  reasonNotApplying: String
-  isDeceased: Boolean
-}
-
-type PrimaryCaregiver {
-  primaryCaregiver: Person
-  reasonsNotApplying: [ReasonsNotApplying]
-  parentDetailsType: ParentDetailsType
 }
 
 input CommentInput {
@@ -301,12 +260,9 @@ input BirthRegistrationInput {
   attendantAtBirth: AttendantType # Not in BDRIS2
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: String # Informant in BDRIS2
-  otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
   lastPreviousLiveBirth: Date # Not in BDRIS2
-  primaryCaregiver: PrimaryCaregiverInput # Not in BDRIS2
   createdAt: Date
   updatedAt: Date
 }
@@ -326,12 +282,9 @@ type BirthRegistration implements EventRegistration { # -> Composition
   attendantAtBirth: AttendantType # -> Observation.valueString
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType # -> Observation.valueString
-  presentAtBirthRegistration: String # -> Observation.valueString
-  otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime
-  primaryCaregiver: PrimaryCaregiver
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
   history: [History]
@@ -349,7 +302,9 @@ input DeathRegistrationInput {
   eventLocation: LocationInput
   questionnaire: [QuestionnaireQuestionInput]
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
+  deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
+  causeOfDeathEstablished: String
   causeOfDeath: String # need to store ICD-10? More types of cause of death
   maleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
   femaleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
@@ -372,7 +327,9 @@ type DeathRegistration implements EventRegistration { # -> Composition
   eventLocation: Location
   questionnaire: [QuestionnaireQuestion]
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
+  deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
+  causeOfDeathEstablished: String
   causeOfDeath: String # -> Observation.valueCodeableConcept
   maleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
   femaleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
@@ -412,6 +369,8 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
+  informantType: InformantType # -> Observation.valueString
+  otherInformantType: String
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String
@@ -435,6 +394,8 @@ type Registration { # -> Task
   paperFormID: String # -> .identifier
   page: String # -> .identifier
   book: String # -> .identifier
+  informantType: InformantType # -> Observation.valueString
+  otherInformantType: String
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
