@@ -27,14 +27,17 @@ const Segment = styled(Button)<{ isSelected?: boolean }>`
     color: ${theme.colors.primary};`}
   height: 32px;
   border: 2px solid ${({ theme }) => theme.colors.primary};
+  &:first-child {
+    border-radius: 4px 0 0 4px;
+  }
   &:last-child {
+    border-radius: 0 4px 4px 0;
     border-left: none;
   }
 `
 
 const Container = styled.div`
   margin: 0;
-  border-radius: 2px;
   height: 32px;
 `
 export function SegmentedControl(
