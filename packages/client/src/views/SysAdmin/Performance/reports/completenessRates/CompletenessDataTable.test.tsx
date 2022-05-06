@@ -13,46 +13,40 @@
 import * as React from 'react'
 import { AppStore, createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
-import { createTestStore, createTestComponent } from '@client/tests/util'
-import { WithinTargetDaysTable } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
+import { createTestComponent } from '@client/tests/util'
+import { CompletenessDataTable } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { Event } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { REG_RATE_BASE } from '@client/views/SysAdmin/Performance/RegistrationRates'
-import { History } from 'history'
 
-describe('WithinTargetDaysTable tests for over time option', () => {
+import { History } from 'history'
+import { COMPLETENESS_RATE_REPORT_BASE } from '@client/views/SysAdmin/Performance/CompletenessRates'
+import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
+
+describe('CompletenessDataTable tests for over time option', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History
 
-  const mockData = {
-    details: [
-      {
-        actualTotalRegistration: 20,
-        actualTargetDayRegistration: 9,
-        estimatedRegistration: 45,
-        estimatedTargetDayPercentage: 4.5,
-        month: 'April',
-        year: '2020',
-        startOfMonth: '2020-03-30T18:00:00.000Z'
-      },
-      {
-        actualTotalRegistration: 10,
-        actualTargetDayRegistration: 0,
-        estimatedRegistration: 45,
-        estimatedTargetDayPercentage: 0,
-        month: 'March',
-        year: '2020',
-        startOfMonth: '2020-02-29T18:00:00.000Z'
-      }
-    ],
-    total: {
-      actualTotalRegistration: 30,
-      actualTargetDayRegistration: 9,
-      estimatedRegistration: 45,
-      estimatedTargetDayPercentage: 2.25
+  const mockData = [
+    {
+      total: 3,
+      withinTarget: 3,
+      within1Year: 3,
+      within5Years: 3,
+      estimated: 3,
+      month: 2,
+      year: 2020
+    },
+    {
+      total: 3,
+      withinTarget: 3,
+      within1Year: 3,
+      within5Years: 3,
+      estimated: 3,
+      month: 3,
+      year: 2020
     }
-  }
+  ]
 
   beforeAll(async () => {
     ;({ history, store } = createStore())
@@ -60,9 +54,10 @@ describe('WithinTargetDaysTable tests for over time option', () => {
 
   beforeEach(async () => {
     component = await createTestComponent(
-      <WithinTargetDaysTable
+      <CompletenessDataTable
+        completenessRateTime={CompletenessRateTime.Within1Year}
         loading={false}
-        base={{ baseType: REG_RATE_BASE.TIME }}
+        base={{ baseType: COMPLETENESS_RATE_REPORT_BASE.TIME }}
         eventType={Event.BIRTH}
         data={mockData}
       />,
@@ -88,37 +83,34 @@ describe('WithinTargetDaysTable tests for over time option', () => {
     expect(firstRowElement.hostNodes().childAt(0).text()).toBe('March 2020')
   })
 })
-describe('WithinTargetDaysTable tests for by location option', () => {
+
+describe('CompletenessDataTable tests for by location option', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History
 
-  const mockData = {
-    details: [
-      {
-        actualTotalRegistration: 20,
-        actualTargetDayRegistration: 9,
-        estimatedRegistration: 45,
-        estimatedTargetDayPercentage: 4.5,
-        locationName: 'Atpara Sadar',
-        locationId: '123'
-      },
-      {
-        actualTotalRegistration: 10,
-        actualTargetDayRegistration: 0,
-        estimatedRegistration: 45,
-        estimatedTargetDayPercentage: 0,
-        locationName: 'Baniajan',
-        locationId: '456'
-      }
-    ],
-    total: {
-      actualTotalRegistration: 30,
-      actualTargetDayRegistration: 9,
-      estimatedRegistration: 45,
-      estimatedTargetDayPercentage: 2.25
+  const mockData = [
+    {
+      locationName: 'Baniajan',
+      total: 3,
+      withinTarget: 3,
+      within1Year: 3,
+      within5Years: 3,
+      estimated: 3,
+      month: 3,
+      year: 3
+    },
+    {
+      locationName: 'Atpara Sadar',
+      total: 3,
+      withinTarget: 3,
+      within1Year: 3,
+      within5Years: 3,
+      estimated: 3,
+      month: 3,
+      year: 3
     }
-  }
+  ]
 
   beforeAll(async () => {
     ;({ history, store } = createStore())
@@ -126,10 +118,11 @@ describe('WithinTargetDaysTable tests for by location option', () => {
 
   beforeEach(async () => {
     component = await createTestComponent(
-      <WithinTargetDaysTable
+      <CompletenessDataTable
+        completenessRateTime={CompletenessRateTime.Within1Year}
         loading={false}
         base={{
-          baseType: REG_RATE_BASE.LOCATION,
+          baseType: COMPLETENESS_RATE_REPORT_BASE.LOCATION,
           locationJurisdictionType: 'UNION'
         }}
         eventType={Event.BIRTH}

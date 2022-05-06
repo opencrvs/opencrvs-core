@@ -39,11 +39,8 @@ import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
-import { OperationalReport } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
-import { RegistrationRates } from '@client/views/SysAdmin/Performance/RegistrationRates'
-import { Report } from '@client/views/SysAdmin/Performance/Report'
-import { ReportList } from '@client/views/SysAdmin/Performance/ReportList'
+import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
@@ -327,26 +324,9 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={
-                                              routes.PERFORMANCE_REPORT_LIST
+                                              routes.EVENT_COMPLETENESS_RATES
                                             }
-                                            component={ReportList}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.PERFORMANCE_REPORT}
-                                            component={Report}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.OPERATIONAL_REPORT}
-                                            component={OperationalReport}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={
-                                              routes.EVENT_REGISTRATION_RATES
-                                            }
-                                            component={RegistrationRates}
+                                            component={CompletenessRates}
                                           />
                                           <ProtectedRoute
                                             exact

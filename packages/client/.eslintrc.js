@@ -27,6 +27,7 @@ module.exports = {
     jest: true
   },
   rules: {
+    'react-hooks/exhaustive-deps': 'error',
     'import/namespace': 'off',
     'prettier/prettier': [
       'error',

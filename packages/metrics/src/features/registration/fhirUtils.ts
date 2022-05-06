@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IAuthHeader } from '@metrics/features/registration'
-import { fetchLocation, fetchTaskHistory } from '@metrics/api'
+import {
+  fetchLocation,
+  fetchPractitionerRole,
+  fetchTaskHistory
+} from '@metrics/api'
 
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
@@ -120,6 +124,14 @@ export async function getPreviousTask(
   return findPreviousTask(taskHistory, allowedPreviousStates)
 }
 
+export function getPractitionerIdFromBundle(bundle: fhir.Bundle) {
+  const task = getTask(bundle)
+  if (!task) {
+    throw new Error('Task not found in bundle')
+  }
+  return getPractionerIdFromTask(task)
+}
+
 export function getPractionerIdFromTask(task: fhir.Task) {
   return task?.extension
     ?.find(
@@ -155,16 +167,12 @@ export function getTrackingId(task: Task) {
   return trackingIdentifier.value
 }
 
-export function getDeclarationType(task: Task): DECLARATION_TYPE | null {
-  if (!task.code || !task.code.coding) {
-    return null
-  }
-
-  const coding = task.code.coding.find(
+export function getDeclarationType(task: Task): DECLARATION_TYPE {
+  const coding = task.code?.coding?.find(
     ({ system }) => system === 'http://opencrvs.org/specs/types'
   )
   if (!coding) {
-    return null
+    throw new Error('No declaration type found in task')
   }
   return coding.code as DECLARATION_TYPE
 }
@@ -366,4 +374,37 @@ export function getObservationValueByCode(
     'UNKNOWN'
 
   return value
+}
+
+export async function fetchDeclarationsBeginnerRole(
+  fhirBundle: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
+  let startedByRole = ''
+  const currentTask = getTask(fhirBundle)
+  const composition = getComposition(fhirBundle)
+  if (isNotification(composition as fhir.Composition)) {
+    return 'HOSPITAL_NOTIFICATION'
+  }
+  if (currentTask) {
+    const bundle = await fetchTaskHistory(currentTask.id, authHeader)
+    const length = bundle.entry ? bundle.entry.length : 0
+    const task =
+      bundle.entry &&
+      bundle.entry
+        .map((entry) => entry.resource)
+        .filter((resource): resource is fhir.Task =>
+          Boolean(resource && isTaskResource(resource))
+        )
+
+    if (task && length > 0) {
+      const startedTask = task[length - 1] //the last task in the entries of history bundle
+      const practitionerId = getPractionerIdFromTask(startedTask)
+      if (!practitionerId) {
+        throw new Error('Practitioner id not found')
+      }
+      startedByRole = await fetchPractitionerRole(practitionerId, authHeader)
+    }
+  }
+  return startedByRole
 }

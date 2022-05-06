@@ -10,12 +10,16 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { AppStore } from '@client/store'
-import { createTestComponent, createTestStore } from '@client/tests/util'
+import {
+  createRouterProps,
+  createTestComponent,
+  createTestStore
+} from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import { stringify, parse } from 'query-string'
+import { stringify } from 'query-string'
 import * as React from 'react'
 import { FieldAgentList } from './FieldAgentList'
 
@@ -30,16 +34,28 @@ describe('Field agent list tests', () => {
   })
 
   beforeEach(async () => {
+    const { history, location, match } = createRouterProps(
+      '/performance/field-agents',
+      { isNavigatedInsideApp: false },
+      {
+        matchParams: {},
+        search: {
+          locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
+          timeEnd: new Date(1487076708000).toISOString(),
+          timeStart: new Date(1455454308000).toISOString()
+        }
+      }
+    )
     const graphqlMock = [
       {
         request: {
           query: FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA,
           variables: {
+            timeStart: '2016-02-14T12:51:48.000Z',
+            timeEnd: '2017-02-14T12:51:48.000Z',
             locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
             status: 'active',
-            event: undefined,
-            timeEnd: new Date(1487076708000).toISOString(),
-            timeStart: new Date(1455454308000).toISOString(),
+            event: 'BIRTH',
             count: 25,
             sort: 'asc',
             skip: 0
@@ -81,16 +97,7 @@ describe('Field agent list tests', () => {
       }
     ]
     const testComponent = await createTestComponent(
-      <FieldAgentList
-        // @ts-ignore
-        location={{
-          search: stringify({
-            locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
-            timeEnd: new Date(1487076708000).toISOString(),
-            timeStart: new Date(1455454308000).toISOString()
-          })
-        }}
-      />,
+      <FieldAgentList history={history} location={location} match={match} />,
       { store, history, graphqlMocks: graphqlMock }
     )
     component = testComponent
@@ -112,44 +119,21 @@ describe('Field agent list tests', () => {
     expect(firstRowElement.hostNodes().childAt(0).text()).toBe('Naeem Hossain')
   })
 
-  it('changing location id from location picker updates the query params', async () => {
-    const locationIdBeforeChange = parse(history.location.search).locationId
-    const locationPickerElement = await waitForElement(
-      component,
-      '#location-range-picker-action'
-    )
-
-    locationPickerElement.hostNodes().simulate('click')
-
-    const locationSearchInput = await waitForElement(
-      component,
-      '#locationSearchInput'
-    )
-    locationSearchInput.hostNodes().simulate('change', {
-      target: { value: 'Duaz', id: 'locationSearchInput' }
-    })
-
-    const searchResultOption = await waitForElement(
-      component,
-      '#locationOptiond3cef1d4-6187-4f0e-a024-61abd3fce9d4'
-    )
-    searchResultOption.hostNodes().simulate('click')
-    const newLocationId = parse(history.location.search).locationId
-    expect(newLocationId).not.toBe(locationIdBeforeChange)
-    expect(newLocationId).toBe('d3cef1d4-6187-4f0e-a024-61abd3fce9d4')
-  })
   it('For graphql errors it renders with error components', async () => {
+    const { history, location, match } = createRouterProps(
+      '/performance/field-agents',
+      { isNavigatedInsideApp: false },
+      {
+        matchParams: {},
+        search: {
+          locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
+          timeEnd: new Date(1487076708000).toISOString(),
+          timeStart: new Date(1455454308000).toISOString()
+        }
+      }
+    )
     const testErrorComponent = await createTestComponent(
-      <FieldAgentList
-        // @ts-ignore
-        location={{
-          search: stringify({
-            locationId: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
-            timeEnd: new Date(1487076708000).toISOString(),
-            timeStart: new Date(1455454308000).toISOString()
-          })
-        }}
-      />,
+      <FieldAgentList history={history} location={location} match={match} />,
       { store, history }
     )
     await waitForElement(testErrorComponent, '#field-agent-error-list')

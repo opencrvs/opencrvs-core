@@ -139,7 +139,7 @@ describe('Verify point generation', () => {
     )
 
     expect(point).toMatchObject({
-      measurement: 'birth_reg',
+      measurement: 'birth_registration',
       tags: {
         regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
@@ -180,7 +180,7 @@ describe('Verify point generation', () => {
       AUTH_HEADER
     )
     expect(point).toMatchObject({
-      measurement: 'birth_reg',
+      measurement: 'birth_registration',
       tags: {
         regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
@@ -205,7 +205,7 @@ describe('Verify point generation', () => {
       AUTH_HEADER
     )
     expect(point).toMatchObject({
-      measurement: 'birth_reg',
+      measurement: 'birth_registration',
       tags: {
         regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
@@ -246,7 +246,7 @@ describe('Verify point generation', () => {
       AUTH_HEADER
     )
     expect(point).toMatchObject({
-      measurement: 'death_reg',
+      measurement: 'death_registration',
       tags: {
         regStatus: 'mark-existing-declaration-registered',
         gender: 'male',
@@ -280,11 +280,13 @@ describe('Verify point generation', () => {
   it('returns payment point', async () => {
     const point = await generatePaymentPoint(
       cloneDeep(testDeathCertPayload),
-      AUTH_HEADER
+      AUTH_HEADER,
+      'certification'
     )
     expect(point).toMatchObject({
-      measurement: 'certification_payment',
+      measurement: 'payment',
       tags: {
+        paymentType: 'certification',
         eventType: 'DEATH',
         officeLocation: 'Location/232ed3db-6b3f-4a5c-875e-f57aacadb2d3',
         locationLevel5: 'Location/9a3c7389-bf06-4f42-b1b3-202ced23b3af'
@@ -299,17 +301,17 @@ describe('Verify point generation', () => {
     const payload = cloneDeep(testDeathCertPayload)
     // @ts-ignore
     payload.entry[1] = {}
-    expect(generatePaymentPoint(payload, AUTH_HEADER)).rejects.toThrowError(
-      'Task not found'
-    )
+    expect(
+      generatePaymentPoint(payload, AUTH_HEADER, 'certification')
+    ).rejects.toThrowError('Task not found')
   })
   it('Throw error when no reconciliation found for payment point', () => {
     const payload = cloneDeep(testDeathCertPayload)
     // @ts-ignore
     payload.entry[4] = {}
-    expect(generatePaymentPoint(payload, AUTH_HEADER)).rejects.toThrowError(
-      'Payment reconciliation not found'
-    )
+    expect(
+      generatePaymentPoint(payload, AUTH_HEADER, 'certification')
+    ).rejects.toThrowError('Payment reconciliation not found')
   })
   it('returns declarations started point for field agent', async () => {
     fetchParentLocationByLocationID
