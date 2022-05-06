@@ -527,8 +527,9 @@ type Query {
   fetchRegistration(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
   fetchRegistrationCountByStatus(
-    locationId: String!
     status: [String]!
+    locationId: String
+    event: String
   ): RegistrationCountResult
 }
 
@@ -544,7 +545,7 @@ type Mutation {
   markBirthAsValidated(id: ID!, details: BirthRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
   markBirthAsRegistered(
     id: ID!
-    details: BirthRegistrationInput
+    details: BirthRegistrationInput!
   ): BirthRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
   requestBirthRegistrationCorrection(
@@ -566,7 +567,7 @@ type Mutation {
   markDeathAsValidated(id: ID!, details: DeathRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
   markDeathAsRegistered(
     id: ID!
-    details: DeathRegistrationInput
+    details: DeathRegistrationInput!
   ): DeathRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
   requestDeathRegistrationCorrection(

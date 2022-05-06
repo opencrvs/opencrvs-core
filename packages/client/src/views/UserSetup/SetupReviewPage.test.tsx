@@ -210,9 +210,6 @@ describe('SetupReviewPage page tests', () => {
     })
     testComponent.update()
 
-    expect(testComponent.find('div#BengaliName').hostNodes().text()).toBe(
-      'Bengali nameChange'
-    )
     expect(testComponent.find('div#EnglishName').hostNodes().text()).toBe(
       'English nameChange'
     )

@@ -22,6 +22,7 @@ import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { constantsMessages } from '@client/i18n/messages'
 import { CircleButton } from '@opencrvs/components/lib/buttons'
+import { colors } from '@opencrvs/components/lib/colors'
 import {
   PickerButton,
   ContentWrapper,
@@ -42,7 +43,9 @@ interface IConnectProps {
 }
 
 interface IBaseProps {
-  selectedLocationId: string
+  additionalLocations?: ISearchLocation[]
+  selectedLocationId?: string
+  disabled?: boolean
   onChangeLocation: (locationId: string) => void
   requiredJurisdictionTypes?: string
 }
@@ -103,6 +106,8 @@ function LocationPickerComponent(props: LocationPickerProps) {
     offlineOffices,
     jurisidictionTypeFilter,
     selectedLocationId,
+    disabled,
+    additionalLocations = [],
     intl
   } = props
   const [modalVisible, setModalVisible] = useState<boolean>(false)
@@ -116,6 +121,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
   const offlineSearchableOffices = generateLocations(offlineOffices, intl)
 
   const searchableLocations = [
+    ...additionalLocations,
     ...offlineSearchableLocations,
     ...offlineSearchableOffices
   ]
@@ -144,10 +150,15 @@ function LocationPickerComponent(props: LocationPickerProps) {
       <PickerButton
         id="location-range-picker-action"
         onClick={() => setModalVisible(true)}
+        disabled={disabled}
       >
         <ContentWrapper>
-          <span>{selectedSearchedLocation.displayLabel}</span>
-          <MapPin />
+          <span>
+            {(selectedSearchedLocation &&
+              selectedSearchedLocation.displayLabel) ||
+              ''}
+          </span>
+          <MapPin color={props.disabled ? colors.grey200 : undefined} />
         </ContentWrapper>
       </PickerButton>
       {modalVisible && (

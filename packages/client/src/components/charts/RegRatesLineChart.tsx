@@ -16,12 +16,15 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
+import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
+import { messages } from '@client/i18n/messages/views/performance'
 
 interface IProps extends WrappedComponentProps {
   theme: ITheme
   data?: ILineDataPoint[]
   loading?: boolean
   eventType?: Event
+  completenessRateTime?: CompletenessRateTime
 }
 
 interface IActiveState {
@@ -211,7 +214,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
       activeTotalRegistered,
       activeTotalEstimate
     } = this.state.activeLabel ? this.state : this.getLatestData()
-    const { intl, eventType } = this.props
+    const { intl, eventType, completenessRateTime } = this.props
     return (
       <CustomLegendContainer
         marginLeft={this.state.legendMarginLeft}
@@ -253,12 +256,20 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
           </div>
           <LegendData>
             <LegendDataLabel>
-              {intl.formatMessage(constantsMessages.registeredInTargetd, {
-                registrationTargetDays:
-                  eventType === Event.BIRTH
-                    ? window.config.BIRTH.REGISTRATION_TARGET
-                    : window.config.DEATH.REGISTRATION_TARGET
-              })}
+              {completenessRateTime === CompletenessRateTime.Within5Years
+                ? intl.formatMessage(messages.performanceWithin5YearsLabel)
+                : completenessRateTime === CompletenessRateTime.Within1Year
+                ? intl.formatMessage(messages.performanceWithin1YearLabel)
+                : intl.formatMessage(
+                    messages.performanceWithinTargetDaysLabel,
+                    {
+                      target:
+                        eventType === Event.BIRTH
+                          ? window.config.BIRTH.REGISTRATION_TARGET
+                          : window.config.DEATH.REGISTRATION_TARGET,
+                      withPrefix: false
+                    }
+                  )}
             </LegendDataLabel>
             <br />
             <LegendDataValue>

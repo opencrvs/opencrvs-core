@@ -9,7 +9,24 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export * from '@client/views/SysAdmin/Performance/reports/GenderBasisReports'
-export * from '@client/views/SysAdmin/Performance/reports/TimeFrameReports'
-export * from '@client/views/SysAdmin/Performance/reports/CertificationPaymentReports'
-export * from '@client/views/SysAdmin/Performance/reports/EstimatedTargetDayRegistrationReports'
+import User from '@user-mgnt/model/user'
+
+export async function countUsersByLocation(
+  searchCriteria: Record<string, unknown>
+) {
+  const queryResult = await User.aggregate([
+    { $match: searchCriteria },
+    {
+      $group: {
+        _id: '$primaryOfficeId',
+        total: {
+          $sum: 1
+        }
+      }
+    }
+  ]).exec()
+  return queryResult.map(({ _id, total }: { _id: string; total: number }) => ({
+    locationId: _id,
+    total
+  }))
+}

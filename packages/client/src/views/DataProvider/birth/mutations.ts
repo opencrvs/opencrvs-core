@@ -27,12 +27,12 @@ export const SUBMIT_BIRTH_DECLARATION = gql`
   }
 `
 export const APPROVE_BIRTH_DECLARATION = gql`
-  mutation submitMutation($id: ID!, $details: BirthRegistrationInput) {
+  mutation submitMutation($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsValidated(id: $id, details: $details)
   }
 `
 export const REGISTER_BIRTH_DECLARATION = gql`
-  mutation submitMutation($id: ID!, $details: BirthRegistrationInput) {
+  mutation submitMutation($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsRegistered(id: $id, details: $details) {
       id
       registration {

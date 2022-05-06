@@ -18,9 +18,7 @@ import {
   goForward,
   goToEvents as goToEventsAction,
   goToHome,
-  goToOperationalReport,
   goToPerformanceHome,
-  goToPerformanceReportList,
   goToSearch,
   goToSearchResult,
   goToSettings,
@@ -54,7 +52,8 @@ import {
   Plus,
   SearchDark,
   TrackingID,
-  User
+  User,
+  Activity
 } from '@opencrvs/components/lib/icons'
 import {
   AppHeader,
@@ -66,14 +65,13 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import styled from 'styled-components'
+import styled, { ThemeConsumer } from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Avatar } from '@client/components/Avatar'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
   HOME,
-  OPERATIONAL_REPORT,
   PERFORMANCE_HOME,
   REGISTRAR_HOME
 } from '@client/navigation/routes'
@@ -93,8 +91,7 @@ type IDispatchProps = {
   goForward: typeof goForward
   goToHomeAction: typeof goToHome
   goToPerformanceHomeAction: typeof goToPerformanceHome
-  goToPerformanceReportListAction: typeof goToPerformanceReportList
-  goToOperationalReportAction: typeof goToOperationalReport
+
   goToTeamSearchAction: typeof goToTeamSearch
   goToTeamUserListAction: typeof goToTeamUserList
 }
@@ -108,6 +105,7 @@ interface IProps extends RouteComponentProps {
   mobileSearchBar?: boolean
   enableMenuSelection?: boolean
   mapPinClickHandler?: () => void
+  mapPerformanceClickHandler?: () => void
 }
 
 type IFullProps = IntlShapeProps &
@@ -246,10 +244,22 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     )
   }
 
-  getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM) {
-    if (
-      (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE ||
-        activeMenuItem === ACTIVE_MENU_ITEM.TEAM) &&
+  getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM, theme: ITheme) {
+    if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
+      return {
+        mobileLeft: {
+          icon: () => this.hamburger(),
+          handler: this.toggleMenu
+        },
+        mobileRight: {
+          icon: () => <Activity stroke={theme.colors.primary} />,
+          handler: () =>
+            this.props.mapPerformanceClickHandler &&
+            this.props.mapPerformanceClickHandler()
+        }
+      }
+    } else if (
+      activeMenuItem === ACTIVE_MENU_ITEM.TEAM &&
       (NATL_ADMIN_ROLES.includes(this.props.userDetails?.role as string) ||
         SYS_ADMIN_ROLES.includes(this.props.userDetails?.role as string))
     ) {
@@ -317,7 +327,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       (NATL_ADMIN_ROLES.includes(role as string) &&
         PERFORMANCE_HOME.includes(location)) ||
       (SYS_ADMIN_ROLES.includes(role as string) &&
-        OPERATIONAL_REPORT.includes(location)) ||
+        PERFORMANCE_HOME.includes(location)) ||
       (REGISTRAR_ROLES.includes(role as string) &&
         REGISTRAR_HOME.includes(location))
     ) {
@@ -400,18 +410,15 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   }
 
   goToPerformanceView(props: IFullProps) {
-    const {
-      userDetails,
-      goToPerformanceHomeAction,
-      goToOperationalReportAction
-    } = props
+    const { userDetails, goToPerformanceHomeAction } = props
     if (userDetails && userDetails.role) {
       if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
         return goToPerformanceHomeAction()
       } else {
         const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
         return (
-          (locationId && goToOperationalReportAction(locationId)) ||
+          (locationId &&
+            goToPerformanceHomeAction(undefined, undefined, locationId)) ||
           goToPerformanceHomeAction()
         )
       }
@@ -422,6 +429,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     return (
       <HeaderLeft>
         <CircleButton
+          id="header-go-back-button"
           disabled={
             (this.props.history.action === 'POP' ||
               this.props.history.action === 'REPLACE') &&
@@ -445,9 +453,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   }
 
   render() {
-    const { intl, activeMenuItem } = this.props
-    const headerProps: React.HTMLAttributes<HTMLDivElement> = this
-      .props as React.HTMLAttributes<HTMLDivElement>
+    const { intl, activeMenuItem, theme } = this.props
+
     const title =
       this.props.title ||
       intl.formatMessage(
@@ -502,18 +509,18 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       ]
     }
 
-    const mobileHeaderActionProps =
-      this.getMobileHeaderActionProps(activeMenuItem)
+    const mobileHeaderActionProps = this.getMobileHeaderActionProps(
+      activeMenuItem,
+      theme
+    )
 
     return (
-      <div {...headerProps}>
-        <AppHeader
-          id="register_app_header"
-          desktopRightMenu={rightMenu}
-          title={title}
-          {...mobileHeaderActionProps}
-        />
-      </div>
+      <AppHeader
+        id="register_app_header"
+        desktopRightMenu={rightMenu}
+        title={title}
+        {...mobileHeaderActionProps}
+      />
     )
   }
 }
@@ -540,8 +547,7 @@ export const Header = connect(
     goToEvents: goToEventsAction,
     goToHomeAction: goToHome,
     goToPerformanceHomeAction: goToPerformanceHome,
-    goToOperationalReportAction: goToOperationalReport,
-    goToPerformanceReportListAction: goToPerformanceReportList,
+
     goToTeamSearchAction: goToTeamSearch,
     goToTeamUserListAction: goToTeamUserList
   }

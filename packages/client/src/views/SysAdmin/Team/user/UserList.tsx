@@ -226,7 +226,6 @@ const ValueWrapper = styled.div`
   align-content: space-between;
   width: 60%;
   margin-left: 300px;
-  margin-top: 6px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: block;
     width: 100%;
