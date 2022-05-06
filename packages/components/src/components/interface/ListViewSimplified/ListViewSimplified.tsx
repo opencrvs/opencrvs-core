@@ -22,7 +22,6 @@ const Grid = styled.div<{ bottomBorder: boolean }>`
   > div:not(:nth-last-child(-n + 4)) {
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   }
-  margin: 24px 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     grid-template-columns: auto;
     > div:not(:nth-last-child(-n + 1)) {

@@ -189,9 +189,13 @@ const StatusMenuContainer = styled.div`
   align-items: center;
 `
 
-const Value = styled.div`
+const Value = styled.span`
   color: ${({ theme }) => theme.colors.grey500};
   ${({ theme }) => theme.fonts.reg16}
+`
+
+const ListViewContainer = styled.div`
+  margin-top: 24px;
 `
 
 const NoRecord = styled.div<{ isFullPage?: boolean }>`
@@ -519,28 +523,30 @@ function UserListComponent(props: IProps) {
                   </AddUserContainer>
                 )}
               </TableHeader>
-              <ListViewSimplified>
-                {generateUserContents(data, locationId, userDetails).length <=
-                0 ? (
-                  <NoRecord id="no-record">
-                    {intl.formatMessage(constantsMessages.noResult)}
-                  </NoRecord>
-                ) : (
-                  generateUserContents(data, locationId, userDetails).map(
-                    (content, index) => {
-                      return (
-                        <ListViewItemSimplified
-                          key={index}
-                          image={content.image}
-                          label={content.label}
-                          value={content.value}
-                          actions={content.actions}
-                        />
-                      )
-                    }
-                  )
-                )}
-              </ListViewSimplified>
+              <ListViewContainer>
+                <ListViewSimplified>
+                  {generateUserContents(data, locationId, userDetails).length <=
+                  0 ? (
+                    <NoRecord id="no-record">
+                      {intl.formatMessage(constantsMessages.noResult)}
+                    </NoRecord>
+                  ) : (
+                    generateUserContents(data, locationId, userDetails).map(
+                      (content, index) => {
+                        return (
+                          <ListViewItemSimplified
+                            key={index}
+                            image={content.image}
+                            label={content.label}
+                            value={content.value}
+                            actions={content.actions}
+                          />
+                        )
+                      }
+                    )
+                  )}
+                </ListViewSimplified>
+              </ListViewContainer>
               {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
                 <PaginationWrapper>
                   <DesktopWrapper>

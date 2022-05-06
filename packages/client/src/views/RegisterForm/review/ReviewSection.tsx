@@ -203,10 +203,10 @@ const Title = styled.div`
   ${({ theme }) => theme.fonts.h2};
   margin-bottom: 16px;
 `
-const Label = styled.label`
+const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
 `
-const Value = styled.div`
+const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 const SectionContainer = styled.div`

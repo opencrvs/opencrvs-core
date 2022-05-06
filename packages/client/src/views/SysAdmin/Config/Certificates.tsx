@@ -61,10 +61,14 @@ const HiddenInput = styled.input`
   display: none;
 `
 
-export const Label = styled.label`
+const ListViewContainer = styled.div`
+  margin-top: 24px;
+`
+
+const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
 `
-export const Value = styled.div`
+const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
@@ -493,26 +497,28 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                           {intl.formatMessage(messages.listDetailsQsn)}
                         </BlueTitle>
                       </ListTitleDiv>
-                      <ListViewSimplified>
-                        {CertificateSection.items.map((item) => {
-                          return (
-                            <ListViewItemSimplified
-                              key={item.id}
-                              label={
-                                <Label id={`${item.id}_label`}>
-                                  {item.label}
-                                </Label>
-                              }
-                              value={
-                                <Value id={`${item.id}_value`}>
-                                  {item.value}
-                                </Value>
-                              }
-                              actions={item.actionsMenu}
-                            />
-                          )
-                        })}
-                      </ListViewSimplified>
+                      <ListViewContainer>
+                        <ListViewSimplified>
+                          {CertificateSection.items.map((item) => {
+                            return (
+                              <ListViewItemSimplified
+                                key={item.id}
+                                label={
+                                  <Label id={`${item.id}_label`}>
+                                    {item.label}
+                                  </Label>
+                                }
+                                value={
+                                  <Value id={`${item.id}_value`}>
+                                    {item.value}
+                                  </Value>
+                                }
+                                actions={item.actionsMenu}
+                              />
+                            )
+                          })}
+                        </ListViewSimplified>
+                      </ListViewContainer>
                     </Content>
                   )}
                   <FloatingNotification

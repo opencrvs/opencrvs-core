@@ -43,10 +43,10 @@ import {
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { isString } from 'lodash'
 
-export const Label = styled.label`
+export const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
 `
-export const Value = styled.div`
+export const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
