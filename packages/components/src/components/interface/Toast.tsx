@@ -140,7 +140,7 @@ class ToastComp extends React.Component<FullProps> {
         </Content>
         {callback && (
           <Close id={`${id}Cancel`} onClick={callback} className={' clickable'}>
-            <Cross color={white} />
+            <Cross color="white" />
           </Close>
         )}
       </Wrapper>
