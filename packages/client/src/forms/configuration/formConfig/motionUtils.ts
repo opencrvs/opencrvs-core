@@ -26,6 +26,15 @@ export function hasPreviewGroup(field: IConfigField) {
   return Boolean(field.previewGroupID)
 }
 
+export function getElementsOfPreviewGroup(
+  section: IConfigFieldMap,
+  previewGroupID: string | undefined
+) {
+  return Object.values(section).filter((s) => {
+    return s.previewGroupID === previewGroupID
+  })
+}
+
 export function getIndexOfPlaceholderPreviewGroup(
   section: IConfigFieldMap,
   givenField: IConfigField,
@@ -35,9 +44,7 @@ export function getIndexOfPlaceholderPreviewGroup(
     return -1
   }
 
-  const elements = Object.values(section).filter((s) => {
-    return s.previewGroupID === givenField.previewGroupID
-  })
+  const elements = getElementsOfPreviewGroup(section, givenField.previewGroupID)
 
   return reverse
     ? elements.reverse().indexOf(givenField)
