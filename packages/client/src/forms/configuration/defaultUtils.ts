@@ -15,7 +15,6 @@ import {
   IQuestionConfig,
   SerializedFormField
 } from '@client/forms/index'
-import { cloneDeep } from 'lodash'
 import { getGroup, getIdentifiersFromFieldId, getSection } from '.'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE THE DEFAULT CONFIGURATION
@@ -67,31 +66,4 @@ export function getDefaultField(
   } else {
     return undefined
   }
-}
-
-export function configureDefaultQuestions(
-  defaultFieldCustomisations: IDefaultFieldCustomisation[],
-  defaultEventForm: ISerializedForm
-): ISerializedForm {
-  const newForm = cloneDeep(defaultEventForm)
-  defaultFieldCustomisations.forEach((defaultFieldCustomisation) => {
-    // this is a customisation to a default field
-    // default fields can only be enabled or disabled at present
-
-    /* TODO: Handle the changed positions and required property*/
-
-    /*
-     * Splicing the field away may not be the way to go as it's
-     * removing the field from FormConfig as well
-     */
-
-    if (defaultFieldCustomisation.question.enabled === FieldEnabled.DISABLED) {
-      newForm.sections[
-        defaultFieldCustomisation.defaultField.selectedSectionIndex
-      ].groups[
-        defaultFieldCustomisation.defaultField.selectedGroupIndex
-      ].fields.splice(defaultFieldCustomisation.defaultField.index, 1)
-    }
-  })
-  return newForm
 }

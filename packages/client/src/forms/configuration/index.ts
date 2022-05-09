@@ -21,13 +21,13 @@ import {
   Event
 } from '@client/forms/index'
 import {
-  configureCustomQuestions,
   createCustomField,
   createCustomGroup,
-  ISortedCustomGroup
+  ISortedCustomGroup,
+  getCustomFields
 } from '@client/forms/configuration/customUtils'
 import {
-  configureDefaultQuestions,
+  FieldEnabled,
   getDefaultField,
   IDefaultField,
   IDefaultFieldCustomisation
@@ -37,6 +37,7 @@ import { registerForms } from './default'
 import { DraftStatus } from './formDrafts/utils'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { populateRegisterFormsWithAddresses } from './administrative/addresses'
+import { cloneDeep, concat } from 'lodash'
 
 // THIS FILE SORTS & COMBINES CONFIGURATIONS WITH THE DEFAULT CONFIGURATION FOR RENDERING IN THE APPLICATION
 
@@ -130,7 +131,7 @@ function sortCustomQuestionPosition(
 }
 
 export function sortFormCustomisations(
-  customQuestions: IQuestionConfig[],
+  questionConfig: IQuestionConfig[],
   defaultEventForm: ISerializedForm
 ): IFormConfigurations {
   // Separates default field customisations
@@ -141,22 +142,27 @@ export function sortFormCustomisations(
     customQuestionConfigurations: []
   }
   const customQsToBeSorted: IQuestionConfig[] = []
-  customQuestions.forEach((question) => {
+  questionConfig.forEach((question) => {
     const defaultField: IDefaultField | undefined = getDefaultField(
       defaultEventForm,
       question.fieldId
     )
     if (defaultField && !question.custom) {
+      // this is a customisation to a default field
       formCustomisations.defaultFieldCustomisations?.push({
         question,
         defaultField
       })
     } else if (question.custom && question.preceedingFieldId) {
+      // this is a configuration for a new custom field
+
+      // custom questions may be stacked below each other in blocks, so we need to group those fields so that the whole block can be repositioned
       const preceedingDefaultField: IDefaultField | undefined = getDefaultField(
         defaultEventForm,
         question.preceedingFieldId
       )
 
+      // initialise blocks that either appear after a default field or at the top of the form
       if (preceedingDefaultField) {
         createCustomGroup(
           defaultEventForm,
@@ -174,6 +180,7 @@ export function sortFormCustomisations(
           true
         )
       } else {
+        // throw every other custom question in this storage array
         customQsToBeSorted.push(question)
       }
     }
@@ -221,25 +228,77 @@ export function filterQuestionsByEventType(
 export function configureRegistrationForm(
   formCustomisations: IFormConfigurations,
   defaultEventForm: ISerializedForm,
-  event: Event
+  event: Event,
+  inConfig: boolean
 ): ISerializedForm {
   const formWithAddresses = populateRegisterFormsWithAddresses(
     defaultEventForm,
     event
   )
-  const defaultFormWithCustomisations = configureDefaultQuestions(
-    formCustomisations.defaultFieldCustomisations,
-    formWithAddresses
+  // TODO: merge configureDefaultQuestions and configureCustomQuestions into a  single function as repositioning will have to happen together
+  const newForm = cloneDeep(formWithAddresses)
+  formCustomisations.defaultFieldCustomisations.forEach(
+    (defaultFieldCustomisation) => {
+      // this is a customisation to a default field
+
+      /* TODO: Handle the changed positions */
+
+      const field: SerializedFormField =
+        newForm.sections[
+          defaultFieldCustomisation.defaultField.selectedSectionIndex
+        ].groups[defaultFieldCustomisation.defaultField.selectedGroupIndex]
+          .fields[defaultFieldCustomisation.defaultField.index]
+      field.required = defaultFieldCustomisation.question.required
+
+      // removing hidden fields should be the last thing to do after repositioning all default and custom fields vertically
+      if (
+        defaultFieldCustomisation.question.enabled === FieldEnabled.DISABLED &&
+        !inConfig
+      ) {
+        /*
+         * Splice the disabled field away only when in registration, not in configuration mode
+         */
+        newForm.sections[
+          defaultFieldCustomisation.defaultField.selectedSectionIndex
+        ].groups[
+          defaultFieldCustomisation.defaultField.selectedGroupIndex
+        ].fields.splice(defaultFieldCustomisation.defaultField.index, 1)
+      }
+    }
   )
-  return configureCustomQuestions(
-    formCustomisations.customQuestionConfigurations,
-    defaultFormWithCustomisations
+
+  console.log(
+    'formCustomisations.customQuestionConfigurations: ',
+    JSON.stringify(formCustomisations.customQuestionConfigurations)
   )
+
+  formCustomisations.customQuestionConfigurations.forEach((customGroup) => {
+    if (customGroup.positionTop) {
+      newForm.sections[customGroup.sectionIndex].groups[
+        customGroup.groupIndex
+      ].fields = concat(
+        getCustomFields(customGroup.questions),
+        newForm.sections[customGroup.sectionIndex].groups[
+          customGroup.groupIndex
+        ].fields
+      )
+    } else if (customGroup.preceedingDefaultField) {
+      newForm.sections[customGroup.sectionIndex].groups[
+        customGroup.groupIndex
+      ].fields.splice(
+        customGroup.preceedingDefaultField.index + 1,
+        0,
+        ...getCustomFields(customGroup.questions)
+      )
+    }
+  })
+  return newForm
 }
 
 export function getConfiguredForm(
   questionConfig: IQuestionConfig[],
-  event: Event
+  event: Event,
+  inConfig: boolean
 ) {
   const form: ISerializedForm = configureRegistrationForm(
     sortFormCustomisations(
@@ -247,21 +306,22 @@ export function getConfiguredForm(
       registerForms[event]
     ),
     registerForms[event],
-    event
+    event,
+    inConfig
   )
   return deserializeForm(form)
 }
 
 function isConfigured(status: DraftStatus) {
-  return status === DraftStatus.PUBLISHED || DraftStatus.PREVIEW
+  return status === DraftStatus.PUBLISHED || status === DraftStatus.PREVIEW
 }
 
 export function getConfiguredOrDefaultForm(
   formConfig: IFormConfig,
-  event: Event
+  event: Event,
+  inConfig: boolean
 ) {
   const { status } = getEventDraft(formConfig.formDrafts, event)
-
   const form: ISerializedForm = isConfigured(status)
     ? configureRegistrationForm(
         sortFormCustomisations(
@@ -269,7 +329,8 @@ export function getConfiguredOrDefaultForm(
           registerForms[event]
         ),
         registerForms[event],
-        event
+        event,
+        inConfig
       )
     : registerForms[event]
   return deserializeForm(form)
