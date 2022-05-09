@@ -12,11 +12,7 @@
 import { RadioSize } from '@opencrvs/components/lib/forms'
 import {
   BirthSection,
-  REVIEW_OVERRIDE_POSITION,
-  FLEX_DIRECTION,
   ISerializedForm,
-  Event,
-  IConditionals,
   DeathSection,
   TEXTAREA
 } from '@client/forms/index'
@@ -3510,7 +3506,7 @@ export const registerForms: IDefaultRegisterForms = {
         ]
       },
       {
-        id: DeathSection.Informants,
+        id: DeathSection.Informant,
         viewType: 'form',
         name: formMessageDescriptors.informantName,
         title: formMessageDescriptors.informantTitle,

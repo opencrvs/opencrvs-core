@@ -22,14 +22,21 @@ import {
 import applicationConfigHandler, {
   updateApplicationConfig,
   updateApplicationConfigHandler
-} from '@config/handlers/applicationConfigHandler'
+} from '@config/handlers/application/applicationConfigHandler'
 import createQuestionHandler, {
   requestSchema as createQuestionReqSchema
-} from '@config/handlers/createQuestion/handler'
+} from '@config/handlers/question/createQuestion/handler'
 import updateQuestionHandler, {
   requestSchema as updateQuestionReqSchema
-} from '@config/handlers/updateQuestion/handler'
-import getQuestionsHandler from '@config/handlers/getQuestions/handler'
+} from '@config/handlers/question/updateQuestion/handler'
+import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
+import {
+  createOrUpdateFormDraftHandler,
+  requestSchema as updateFormDraftReqSchema,
+  modifyDraftStatusHandler,
+  modifyFormDraftStatus
+} from '@config/handlers/formDraft/createOrupdateFormDraft/handler'
+import getFormDrafts from '@config/handlers/formDraft/getFormDraft/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -147,6 +154,56 @@ export default function getRoutes() {
       }
     },
     {
+      method: 'GET',
+      path: '/formDraft',
+      handler: getFormDrafts,
+      config: {
+        tags: ['api'],
+        description: 'Get form draft',
+        auth: {
+          scope: [
+            RouteScope.NATLSYSADMIN,
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        }
+      }
+    },
+    {
+      method: 'PUT',
+      path: '/formDraftStatus',
+      handler: modifyDraftStatusHandler,
+      config: {
+        tags: ['api'],
+        description: 'Change form draft status',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: modifyFormDraftStatus
+        }
+      }
+    },
+    {
+      method: 'PUT',
+      path: '/draftQuestions',
+      handler: createOrUpdateFormDraftHandler,
+      config: {
+        tags: ['api'],
+        description: 'Update form draft & questions',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: updateFormDraftReqSchema
+        }
+      }
+    },
+    {
       method: 'POST',
       path: '/updateApplicationConfig',
       handler: updateApplicationConfigHandler,
@@ -172,10 +229,6 @@ export default function getRoutes() {
           scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
-          /*failAction: async (request: any, h: any, err: any) => {
-            console.log(`Joi error: ${err}`)
-            throw err
-          },*/
           payload: createQuestionReqSchema
         }
       }

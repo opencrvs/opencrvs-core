@@ -35,7 +35,7 @@ export const SubItemContainer = styled.button<{ isSelected?: boolean }>`
   ${({ theme }) => theme.fonts.reg14};
 `
 
-const LabelContainer = styled.div`
+export const LabelContainer = styled.div`
   padding: 7px 38px 9px 42px;
   text-align: left;
 `

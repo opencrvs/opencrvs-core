@@ -30,6 +30,8 @@ import {
   getRegistrationTargetDays
 } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration/'
+import { deleteMeasurements } from '@metrics/influxdb/client'
+import { INFLUX_DB } from '@metrics/influxdb/constants'
 
 export async function metricsHandler(
   request: Hapi.Request,
@@ -118,4 +120,16 @@ export async function metricsHandler(
   )
 
   return { timeFrames, payments, genderBasisMetrics, estimatedTargetDayMetrics }
+}
+
+export async function metricsDeleteMeasurementHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const res = await deleteMeasurements()
+    return h.response(res).code(200)
+  } catch (err) {
+    throw new Error(`Could not delete influx database ${INFLUX_DB}`)
+  }
 }

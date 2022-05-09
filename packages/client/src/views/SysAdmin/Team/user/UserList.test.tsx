@@ -14,7 +14,7 @@ import {
   mockLocalSysAdminUserResponse,
   createTestComponent,
   flushPromises,
-  mockOfflineData
+  mockOfflineDataDispatch
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
@@ -26,7 +26,6 @@ import { UserList } from './UserList'
 import { userMutations } from '@client/user/mutations'
 import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
-import { formConfig } from '@client/tests/mock-offline-data'
 
 describe('User list tests', () => {
   let store: AppStore
@@ -41,20 +40,7 @@ describe('User list tests', () => {
       payload: mockLocalSysAdminUserResponse
     }
     await store.dispatch(action)
-    await store.dispatch(
-      offlineDataReady({
-        languages: mockOfflineData.languages,
-        forms: mockOfflineData.forms,
-        templates: mockOfflineData.templates,
-        locations: mockOfflineData.locations,
-        facilities: mockOfflineData.facilities,
-        pilotLocations: mockOfflineData.pilotLocations,
-        assets: mockOfflineData.assets,
-        offices: mockOfflineData.offices,
-        config: mockOfflineData.config,
-        formConfig
-      })
-    )
+    await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   })
 
   describe('Header test', () => {

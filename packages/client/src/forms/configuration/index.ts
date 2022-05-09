@@ -32,9 +32,22 @@ import {
   IDefaultField,
   IDefaultFieldCustomisation
 } from '@client/forms/configuration/defaultUtils'
+import { getEventDraft } from '@client/forms/configuration/formDrafts/utils'
+import { registerForms } from './default'
+import { DraftStatus } from './formDrafts/utils'
+import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { populateRegisterFormsWithAddresses } from './administrative/addresses'
 
 // THIS FILE SORTS & COMBINES CONFIGURATIONS WITH THE DEFAULT CONFIGURATION FOR RENDERING IN THE APPLICATION
+
+/*
+ * For preceedingFieldId & foregoingFieldId to
+ * denote front most and bottom most position
+ */
+export enum FieldPosition {
+  TOP = 'TOP',
+  BOTTOM = 'BOTTOM'
+}
 
 export interface IFormConfigurations {
   defaultFieldCustomisations: IDefaultFieldCustomisation[]
@@ -128,7 +141,7 @@ export function sortFormCustomisations(
     customQuestionConfigurations: []
   }
   const customQsToBeSorted: IQuestionConfig[] = []
-  customQuestions.forEach((question, index) => {
+  customQuestions.forEach((question) => {
     const defaultField: IDefaultField | undefined = getDefaultField(
       defaultEventForm,
       question.fieldId
@@ -152,7 +165,7 @@ export function sortFormCustomisations(
           preceedingDefaultField,
           false
         )
-      } else if (question.preceedingFieldId === 'TOP') {
+      } else if (question.preceedingFieldId === FieldPosition.TOP) {
         createCustomGroup(
           defaultEventForm,
           formCustomisations.customQuestionConfigurations,
@@ -199,22 +212,10 @@ export function sortFormCustomisations(
 }
 
 export function filterQuestionsByEventType(
-  formConfig: IFormConfig,
+  questions: IQuestionConfig[],
   event: string
-): IQuestionConfig[] {
-  const filteredQuestions: IQuestionConfig[] = []
-  if (
-    formConfig &&
-    formConfig.questionConfig &&
-    formConfig.questionConfig.length > 0
-  ) {
-    formConfig.questionConfig.forEach((question) => {
-      if (question.fieldId.includes(event)) {
-        filteredQuestions.push(question)
-      }
-    })
-  }
-  return filteredQuestions
+) {
+  return questions?.filter((question) => question.fieldId.includes(event)) || []
 }
 
 export function configureRegistrationForm(
@@ -234,4 +235,42 @@ export function configureRegistrationForm(
     formCustomisations.customQuestionConfigurations,
     defaultFormWithCustomisations
   )
+}
+
+export function getConfiguredForm(
+  questionConfig: IQuestionConfig[],
+  event: Event
+) {
+  const form: ISerializedForm = configureRegistrationForm(
+    sortFormCustomisations(
+      filterQuestionsByEventType(questionConfig, event),
+      registerForms[event]
+    ),
+    registerForms[event],
+    event
+  )
+  return deserializeForm(form)
+}
+
+function isConfigured(status: DraftStatus) {
+  return status === DraftStatus.PUBLISHED || DraftStatus.PREVIEW
+}
+
+export function getConfiguredOrDefaultForm(
+  formConfig: IFormConfig,
+  event: Event
+) {
+  const { status } = getEventDraft(formConfig.formDrafts, event)
+
+  const form: ISerializedForm = isConfigured(status)
+    ? configureRegistrationForm(
+        sortFormCustomisations(
+          filterQuestionsByEventType(formConfig.questionConfig, event),
+          registerForms[event]
+        ),
+        registerForms[event],
+        event
+      )
+    : registerForms[event]
+  return deserializeForm(form)
 }

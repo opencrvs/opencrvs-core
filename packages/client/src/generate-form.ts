@@ -64,6 +64,7 @@ declare global {
       DECLARATION_AUDIT_LOCATIONS: string
       LOGROCKET: string
       SENTRY: string
+      ADDRESSES: number
     }
   }
 }

@@ -19,13 +19,15 @@ import {
   populateHierarchicalLocationIdsHandler
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
+import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
   VALIDATE = 'validate',
   REGISTER = 'register',
   SYSADMIN = 'sysadmin',
-  CERTIFY = 'certify'
+  CERTIFY = 'certify',
+  NATLSYSADMIN = 'natlsysadmin'
 }
 
 export const getRoutes = () => {
@@ -155,6 +157,18 @@ export const getRoutes = () => {
         },
         description:
           'Populates hierarchical location ids for the legacy indexes'
+      }
+    },
+    {
+      method: 'DELETE',
+      path: '/elasticIndex',
+      handler: deleteOCRVSIndexHandler,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        description: 'Delete ocrvs index from elasticsearch'
       }
     }
   ]

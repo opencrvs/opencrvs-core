@@ -18,14 +18,14 @@ import {
   createTestComponent,
   flushPromises,
   loginAsFieldAgent,
-  mockOfflineData
+  mockOfflineData,
+  mockOfflineDataDispatch
 } from '@client/tests/util'
 import { modifyUserFormData, processRoles } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import {
   mockCompleteFormData,
-  mockDataWithRegistarRoleSelected,
-  mockIncompleteFormData
+  mockDataWithRegistarRoleSelected
 } from '@client/views/SysAdmin/Team/utils'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
@@ -37,7 +37,6 @@ import { UserSection } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { History } from 'history'
-import { formConfig } from '@client/tests/mock-offline-data'
 export const mockRoles = {
   data: {
     getRoles: [
@@ -396,20 +395,7 @@ describe('edit user tests', () => {
   beforeEach(() => {
     ;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
     ;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
-    store.dispatch(
-      offlineDataReady({
-        languages: mockOfflineData.languages,
-        forms: mockOfflineData.forms,
-        templates: mockOfflineData.templates,
-        locations: mockOfflineData.locations,
-        facilities: mockOfflineData.facilities,
-        pilotLocations: mockOfflineData.pilotLocations,
-        assets: mockOfflineData.assets,
-        offices: mockOfflineData.offices,
-        config: mockOfflineData.config,
-        formConfig
-      })
-    )
+    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   })
 
   describe('when user is in update form page', () => {

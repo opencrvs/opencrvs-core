@@ -9,28 +9,89 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormConfig, QuestionConfigFieldType } from '@client/forms'
+import { IFormConfig, QuestionConfigFieldType, Event } from '@client/forms'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { IApplicationConfig } from '@client/utils/referenceApi'
+import {
+  DraftStatus,
+  IFormDraft
+} from '@client/forms/configuration/formDrafts/utils'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
+const formDrafts: IFormDraft[] = [
+  {
+    event: Event.BIRTH,
+    status: DraftStatus.DRAFT,
+    version: 0,
+    updatedAt: 1649395100098,
+    createdAt: 1649395100098
+  },
+  {
+    event: Event.DEATH,
+    status: DraftStatus.DRAFT,
+    version: 0,
+    updatedAt: 1649395100098,
+    createdAt: 1649395100098
+  }
+]
+
 export const formConfig: IFormConfig = {
+  formDrafts,
   questionConfig: [
     {
       fieldId: 'birth.child.child-view-group.vaccinations',
-      label: {
-        defaultMessage: 'What vaccinations has the child received?',
-        description: 'Label for form field: vaccination question',
-        id: 'form.field.label.vaccination'
-      },
-      placeholder: {
-        defaultMessage: 'E.G. Polio, Diptheria',
-        description: 'Placeholder for form field: vaccination question',
-        id: 'form.field.label.vaccinationPlaceholder'
-      },
+      label: [
+        {
+          lang: 'en',
+          descriptor: {
+            defaultMessage: 'What vaccinations has the child received?',
+            description: 'Label for form field: vaccination question',
+            id: 'form.field.label.vaccination'
+          }
+        }
+      ],
+      placeholder: [
+        {
+          lang: 'en',
+          descriptor: {
+            defaultMessage: 'E.G. Polio, Diptheria',
+            description: 'Placeholder for form field: vaccination question',
+            id: 'form.field.label.vaccinationPlaceholder'
+          }
+        }
+      ],
+      description: [
+        {
+          lang: 'en',
+          descriptor: {
+            defaultMessage: 'Vaccine name',
+            description: 'Input field for vaccination question',
+            id: 'form.field.label.vaccinationDescription'
+          }
+        }
+      ],
+      tooltip: [
+        {
+          lang: 'en',
+          descriptor: {
+            defaultMessage: 'Enter the Vaccine name',
+            description: 'Tooltip for form field: vaccination question',
+            id: 'form.field.label.vaccinationTooltip'
+          }
+        }
+      ],
+      errorMessage: [
+        {
+          lang: 'en',
+          descriptor: {
+            defaultMessage: 'Please enter the valid vaccine name',
+            description: 'Error Message for form field: vaccination question',
+            id: 'form.field.label.vaccinationErrorMessage'
+          }
+        }
+      ],
       maxLength: 32,
       fieldName: 'vaccination',
       fieldType: QuestionConfigFieldType.TEXT,
@@ -41,16 +102,56 @@ export const formConfig: IFormConfig = {
     },
     {
       fieldId: 'birth.child.child-view-group.vaccinations',
-      label: {
-        defaultMessage: 'What vaccinations has the child received?',
-        description: 'Label for form field: vaccination question',
-        id: 'form.field.label.vaccination'
-      },
-      placeholder: {
-        defaultMessage: 'E.G. Polio, Diptheria',
-        description: 'Placeholder for form field: vaccination question',
-        id: 'form.field.label.vaccinationPlaceholder'
-      },
+      label: [
+        {
+          lang: 'en',
+          descriptor: {
+            defaultMessage: 'What vaccinations has the child received?',
+            description: 'Label for form field: vaccination question',
+            id: 'form.field.label.vaccination'
+          }
+        }
+      ],
+      placeholder: [
+        {
+          lang: 'en',
+          descriptor: {
+            defaultMessage: 'E.G. Polio, Diptheria',
+            description: 'Placeholder for form field: vaccination question',
+            id: 'form.field.label.vaccinationPlaceholder'
+          }
+        }
+      ],
+      description: [
+        {
+          lang: 'en',
+          descriptor: {
+            defaultMessage: 'Vaccine name',
+            description: 'Input field for vaccination question',
+            id: 'form.field.label.vaccinationDescription'
+          }
+        }
+      ],
+      tooltip: [
+        {
+          lang: 'en',
+          descriptor: {
+            defaultMessage: 'Enter the Vaccine name',
+            description: 'Tooltip for form field: vaccination question',
+            id: 'form.field.label.vaccinationTooltip'
+          }
+        }
+      ],
+      errorMessage: [
+        {
+          lang: 'en',
+          descriptor: {
+            defaultMessage: 'Please enter the valid vaccine name',
+            description: 'Error Message for form field: vaccination question',
+            id: 'form.field.label.vaccinationErrorMessage'
+          }
+        }
+      ],
       maxLength: 32,
       fieldName: 'vaccination',
       fieldType: QuestionConfigFieldType.TEXT,
@@ -642,7 +743,8 @@ export const mockOfflineData = {
     DEATH_REGISTRATION_TARGET: 45,
     NID_NUMBER_PATTERN: /^[0-9]{9}$/,
     SENTRY: 'https://sentry.com',
-    LOGROCKET: 'opencrvs-foundation/opencrvs-zambia'
+    LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
+    ADDRESSES: 1
   },
   formConfig
 }

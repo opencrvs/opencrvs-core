@@ -10,21 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop } from 'redux-loop'
-import {
-  IForm,
-  ReviewSection,
-  ISerializedForm,
-  Event as VitalEvent
-} from '@client/forms'
+import { IForm, ReviewSection, Event } from '@client/forms'
 import { messages } from '@client/i18n/messages/views/review'
 import * as offlineActions from '@client/offline/actions'
-import { deserializeForm } from '@client/forms/mappings/deserializer'
-import { registerForms } from '@client/forms/configuration/default'
-import {
-  configureRegistrationForm,
-  filterQuestionsByEventType,
-  sortFormCustomisations
-} from '@client/forms/configuration'
+import { getConfiguredOrDefaultForm } from '@client/forms/configuration'
 
 export type IReviewFormState =
   | {
@@ -56,31 +45,11 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
 ): IReviewFormState | Loop<IReviewFormState, Action> => {
   switch (action.type) {
     case offlineActions.READY:
-    case offlineActions.CONTENT_LOADED:
-      const configuredBirthForm: ISerializedForm = configureRegistrationForm(
-        sortFormCustomisations(
-          filterQuestionsByEventType(
-            action.payload.formConfig,
-            VitalEvent.BIRTH
-          ),
-          registerForms.birth
-        ),
-        registerForms.birth,
-        VitalEvent.BIRTH
-      )
-      const configuredDeathForm: ISerializedForm = configureRegistrationForm(
-        sortFormCustomisations(
-          filterQuestionsByEventType(
-            action.payload.formConfig,
-            VitalEvent.DEATH
-          ),
-          registerForms.death
-        ),
-        registerForms.death,
-        VitalEvent.DEATH
-      )
-      const birth = deserializeForm(configuredBirthForm)
-      const death = deserializeForm(configuredDeathForm)
+    case offlineActions.APPLICATION_CONFIG_LOADED:
+      const { formConfig } = action.payload
+
+      const birth = getConfiguredOrDefaultForm(formConfig, Event.BIRTH)
+      const death = getConfiguredOrDefaultForm(formConfig, Event.DEATH)
 
       const review = {
         id: ReviewSection.Review,

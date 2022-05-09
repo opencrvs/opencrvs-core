@@ -200,7 +200,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       {
         config: AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
         label: formMessageDescriptors.primaryAddressSameAsDeceasedsPrimary,
-        xComparisonSection: DeathSection.Informants,
+        xComparisonSection: DeathSection.Informant,
         yComparisonSection: DeathSection.Deceased
       },
       {
