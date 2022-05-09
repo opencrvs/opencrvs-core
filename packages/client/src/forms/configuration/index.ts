@@ -252,15 +252,17 @@ export function getConfiguredForm(
   return deserializeForm(form)
 }
 
-function isConfigured(status: DraftStatus) {
-  return status === DraftStatus.PUBLISHED || DraftStatus.PREVIEW
+function isConfigured(status: DraftStatus | null) {
+  return status === DraftStatus.PUBLISHED || status === DraftStatus.PREVIEW
 }
 
 export function getConfiguredOrDefaultForm(
   formConfig: IFormConfig,
   event: Event
 ) {
-  const { status } = getEventDraft(formConfig.formDrafts, event)
+  const { status } = getEventDraft(formConfig.formDrafts, event) || {
+    status: null
+  }
 
   const form: ISerializedForm = isConfigured(status)
     ? configureRegistrationForm(

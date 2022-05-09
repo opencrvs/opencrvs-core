@@ -20,7 +20,10 @@ import { selectFormDraft } from '@client/forms/configuration/formConfig/selector
 import { Event, BirthSection, DeathSection } from '@client/forms'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
-import { draftStatusMessages } from '@client/i18n/messages/views/formConfig'
+import {
+  messages,
+  draftStatusMessages
+} from '@client/i18n/messages/views/formConfig'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ToggleMenu, Pill } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
@@ -129,7 +132,13 @@ function EventDrafts({ event }: { event: Event }) {
       <ListViewItemSimplified
         key={version}
         label={<DraftVersion event={event} version={version} />}
-        value={<Value>{comment}</Value>}
+        value={
+          <Value>
+            {isDefaultDraft(formDraft)
+              ? intl.formatMessage(messages.defaultComment)
+              : comment}
+          </Value>
+        }
         actions={
           status === DraftStatus.DRAFT || status === DraftStatus.DELETED ? (
             actions

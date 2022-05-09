@@ -17,7 +17,6 @@ import Question, {
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
-import { internal } from '@hapi/boom'
 import FormDraft, {
   IFormDraft,
   IHistory,
@@ -59,10 +58,10 @@ export function isValidFormDraftOperation(
   return true
 }
 
-export interface IQuestionsDraft
-  extends Omit<
+export interface ICreateDraft
+  extends Pick<
     IFormDraftModel,
-    'version' | 'history' | 'updatedAt' | 'createdAt'
+    'event' | 'comment'
   > {
   questions: IQuestion[] | []
 }
@@ -72,120 +71,115 @@ export interface IModifyDraftStatus {
   status: DraftStatus
 }
 
-export async function createOrUpdateFormDraftHandler(
+export async function createFormDraftHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const newDraft = request.payload as IQuestionsDraft
+  const newDraft = request.payload as ICreateDraft
   const eventRegex = new RegExp(`^(${newDraft.event}\.)`)
   let oldDraft: IFormDraftModel | null = await FormDraft.findOne({
     event: newDraft.event
   })
-
-  //update draft
-  if (oldDraft) {
-    if (!isValidFormDraftOperation(oldDraft.status, newDraft.status)) {
-      return h
-        .response(
-          `Invalid Operation. Can not update form draft status from ${oldDraft.status} to ${newDraft.status}`
-        )
-        .code(400)
-    }
-
-    const history: IHistory = {
-      version: oldDraft.version,
-      status: oldDraft.status,
-      comment: oldDraft.comment,
-      updatedAt: oldDraft.updatedAt
-    }
-    oldDraft.history?.unshift(history)
-    oldDraft.status = DraftStatus.DRAFT
-    oldDraft.version = oldDraft.version + 1
-    oldDraft.comment = newDraft.comment
-    oldDraft.updatedAt = Date.now()
-
-    try {
-      await FormDraft.updateOne({ _id: oldDraft._id }, oldDraft)
-    } catch (err) {
-      logger.error(err)
-      return h
-        .response(`Could not update draft for ${oldDraft.event} event`)
-        .code(400)
-    }
-
-    //create/update/delete questions
-    if (!isEmpty(newDraft.questions)) {
-      const existingQuestions: IQuestionModel[] = await Question.find({
-        fieldId: eventRegex
-      }).exec()
-
-      const [modifiedQuestions, newQuestions] = partition(
-        newDraft.questions,
-        (question) => {
-          return find(existingQuestions, { fieldId: question.fieldId })
-        }
-      )
-
-      //update existing questions
-      if (modifiedQuestions) {
-        try {
-          await Promise.all(
-            modifiedQuestions.map(async (question) => {
-              await Question.updateOne({ fieldId: question.fieldId }, question)
-            })
-          )
-        } catch (err) {
-          return h
-            .response(`Failed to update existing question. ${err}`)
-            .code(400)
-        }
-      }
-
-      //create new questions
-      if (newQuestions) {
-        try {
-          await Question.insertMany(newQuestions)
-        } catch (err) {
-          return h.response(`Failed to create new questions. ${err}`).code(400)
-        }
-      }
-
-      //delete non-existing questions
-      try {
-        const deletedQuestionList = existingQuestions
-          .filter(
-            ({ fieldId: existQuestion }) =>
-              !modifiedQuestions.find(
-                ({ fieldId: newQuestion }) => newQuestion === existQuestion
-              )
-          )
-          .map((question) => question.fieldId)
-        await Question.deleteMany({ fieldId: { $in: deletedQuestionList } })
-      } catch (err) {
-        return h.response(`Failed to delete question. ${err}`).code(400)
-      }
-    } else {
-      //deleting question for requested event type
-      try {
-        await Question.deleteMany({ fieldId: eventRegex })
-      } catch (err) {
-        return h.response(`Failed to delete questions. ${err}`).code(400)
-      }
-    }
-  } else {
+  
+  if (!oldDraft) {
     //create draft
     try {
       const formDraft: IFormDraft = {
         event: newDraft.event,
-        status: newDraft.status,
+        status: DraftStatus.DRAFT,
         comment: newDraft.comment,
-        version: 0,
+        history: [],
+        version: 1,
         createdAt: Date.now(),
         updatedAt: Date.now()
       }
-      oldDraft = await FormDraft.create(formDraft)
+      await FormDraft.create(formDraft)
+      return h.response(formDraft).code(201)
     } catch (e) {
-      throw internal(e.message)
+      return h.response('Could not create draft').code(400)
+    }
+  }
+
+  //update draft
+  const history: IHistory = {
+    version: oldDraft.version,
+    status: oldDraft.status,
+    comment: oldDraft.comment,
+    updatedAt: oldDraft.updatedAt
+  }
+
+  oldDraft.history.unshift(history)
+  oldDraft.status = DraftStatus.DRAFT
+  oldDraft.version = oldDraft.version + 1
+  oldDraft.comment = newDraft.comment
+  oldDraft.updatedAt = Date.now()
+
+  try {
+    await FormDraft.updateOne({ _id: oldDraft._id }, oldDraft)
+  } catch (err) {
+    logger.error(err)
+    return h
+      .response(`Could not update draft for ${oldDraft.event} event`)
+      .code(400)
+  }
+
+  //create/update/delete questions
+  if (!isEmpty(newDraft.questions)) {
+    const existingQuestions: IQuestionModel[] = await Question.find({
+      fieldId: eventRegex
+    }).exec()
+
+    const [modifiedQuestions, newQuestions] = partition(
+      newDraft.questions,
+      (question) => {
+        return find(existingQuestions, { fieldId: question.fieldId })
+      }
+    )
+
+    //update existing questions
+    if (modifiedQuestions) {
+      try {
+        await Promise.all(
+          modifiedQuestions.map(async (question) => {
+            await Question.updateOne({ fieldId: question.fieldId }, question)
+          })
+        )
+      } catch (err) {
+        return h
+          .response(`Failed to update existing question. ${err}`)
+          .code(400)
+      }
+    }
+
+    //create new questions
+    if (newQuestions) {
+      try {
+        await Question.insertMany(newQuestions)
+      } catch (err) {
+        return h.response(`Failed to create new questions. ${err}`).code(400)
+      }
+    }
+
+    //delete non-existing questions
+    try {
+      const deletedQuestionList = existingQuestions
+        .filter(
+          ({ fieldId: existQuestion }) =>
+            !modifiedQuestions.find(
+              ({ fieldId: newQuestion }) => newQuestion === existQuestion
+            )
+        )
+        .map((question) => question.fieldId)
+      await Question.deleteMany({ fieldId: { $in: deletedQuestionList } })
+    } catch (err) {
+      return h.response(`Failed to delete question. ${err}`).code(400)
+    }
+  } else {
+    //deleting question for requested event type
+    try {
+      await Question.deleteMany({ fieldId: eventRegex })
+    } catch (err) {
+      return h.response(`Failed to delete questions. ${err}`).code(400)
     }
   }
 
@@ -204,7 +198,7 @@ export async function modifyDraftStatusHandler(
 
   if (!draft) {
     return h
-      .response(`Could not found any form draft for ${event} event`)
+      .response(`Could not find any form draft for ${event} event`)
       .code(400)
   }
 
@@ -273,6 +267,6 @@ export const modifyFormDraftStatus = Joi.object({
     .valid(...validEvent)
     .required(),
   status: Joi.string()
-    .valid(DraftStatus.IN_PREVIEW, DraftStatus.PUBLISHED, DraftStatus.DELETED)
+    .valid(DraftStatus.DRAFT, DraftStatus.IN_PREVIEW, DraftStatus.PUBLISHED, DraftStatus.DELETED)
     .required()
 })

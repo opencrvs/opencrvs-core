@@ -18,6 +18,7 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   showHiddenFields: MessageDescriptor
+  defaultComment: MessageDescriptor
   hidden: MessageDescriptor
   textInput: MessageDescriptor
   textAreaInput: MessageDescriptor
@@ -138,6 +139,11 @@ const navigationMessagesToDefine: INavigationMessages = {
 }
 
 const messagesToDefine: IFormConfigMessages = {
+  defaultComment: {
+    id: 'config.form.draft.defaultComment',
+    defaultMessage: 'Default Configuration',
+    description: 'Default comment for drafts'
+  },
   pages: {
     id: 'config.form.navigation.pages',
     defaultMessage: 'Pages',
@@ -628,7 +634,7 @@ const draftActionMessagesToDefine: IActionMessage = {
   [ActionStatus.COMPLETED]: {
     id: 'config.form.draft.success',
     defaultMessage:
-      '{event} draft v{version} has been moved to draft successfully',
+      '{event} draft v{version} has been moved to drafts successfully',
     description: 'Edit draft success notification label'
   }
 }

@@ -31,7 +31,7 @@ import updateQuestionHandler, {
 } from '@config/handlers/question/updateQuestion/handler'
 import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
 import {
-  createOrUpdateFormDraftHandler,
+  createFormDraftHandler,
   requestSchema as updateFormDraftReqSchema,
   modifyDraftStatusHandler,
   modifyFormDraftStatus
@@ -191,7 +191,7 @@ export default function getRoutes() {
     {
       method: 'PUT',
       path: '/draftQuestions',
-      handler: createOrUpdateFormDraftHandler,
+      handler: createFormDraftHandler,
       config: {
         tags: ['api'],
         description: 'Update form draft & questions',

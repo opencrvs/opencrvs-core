@@ -14,7 +14,8 @@ import { FieldPosition, getConfiguredForm } from '@client/forms/configuration'
 import * as actions from '@client/forms/configuration/formConfig/actions'
 import {
   getEventDraft,
-  IFormDraft
+  IFormDraft,
+  DraftStatus
 } from '@client/forms/configuration/formDrafts/utils'
 import * as offlineActions from '@client/offline/actions'
 import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
@@ -84,12 +85,24 @@ function getReadyState({ formDrafts, questionConfig }: IFormConfig) {
   return {
     state: 'READY' as const,
     birth: {
-      formDraft: getEventDraft(formDrafts, Event.BIRTH),
+      formDraft: getEventDraft(formDrafts, Event.BIRTH) || {
+        version: 0,
+        status: DraftStatus.DRAFT,
+        event: Event.BIRTH,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      },
       registerForm: birthForm,
       configFields: getSectionFieldsMap(Event.BIRTH, birthForm)
     },
     death: {
-      formDraft: getEventDraft(formDrafts, Event.DEATH),
+      formDraft: getEventDraft(formDrafts, Event.DEATH) || {
+        version: 0,
+        status: DraftStatus.DRAFT,
+        event: Event.DEATH,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      },
       registerForm: deathForm,
       configFields: getSectionFieldsMap(Event.DEATH, deathForm)
     }
