@@ -18,14 +18,16 @@ import {
   shiftConfigFieldDown,
   shiftConfigFieldUp
 } from '@client/forms/configuration/formConfig/actions'
-import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
+import {
+  selectConfigFields,
+  selectConfigRegisterForm
+} from '@client/forms/configuration/formConfig/selectors'
 import {
   generateKeyFromObj,
   getFieldDefinition,
   IConfigField,
   IConfigFieldMap
 } from '@client/forms/configuration/formConfig/utils'
-import { getRegisterFormSection } from '@client/forms/register/declaration-selectors'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
@@ -140,9 +142,15 @@ export function Canvas({
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
-  const formSection = useSelector((store: IStoreState) =>
-    getRegisterFormSection(store, section, event)
+  const form = useSelector((store: IStoreState) =>
+    selectConfigRegisterForm(store, event)
   )
+  const formSection = form.sections.find((sec) => sec.id === section)
+
+  if (!formSection) {
+    throw Error('No valid section found')
+  }
+
   const configFields = generateConfigFields(fieldsMap, formSection)
 
   return (
