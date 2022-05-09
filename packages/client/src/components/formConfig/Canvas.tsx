@@ -9,31 +9,36 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
+import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
+import { BirthSection, DeathSection, Event, IFormSection } from '@client/forms'
+import { FieldPosition } from '@client/forms/configuration'
+import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
+import {
+  removeCustomField,
+  shiftConfigFieldDown,
+  shiftConfigFieldUp
+} from '@client/forms/configuration/formConfig/actions'
+import {
+  selectConfigFields,
+  selectConfigRegisterForm
+} from '@client/forms/configuration/formConfig/selectors'
+import {
+  generateKeyFromObj,
+  getFieldDefinition,
+  IConfigField,
+  IConfigFieldMap
+} from '@client/forms/configuration/formConfig/utils'
+import { messages } from '@client/i18n/messages/views/formConfig'
+import { IStoreState } from '@client/store'
+import styled from '@client/styledComponents'
+import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
 import { Box } from '@opencrvs/components/lib/interface'
 import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormConfigElementCard'
-import styled from '@client/styledComponents'
-import { useDispatch, useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
-import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
-import {
-  IConfigField,
-  IConfigFieldMap,
-  generateKeyFromObj
-} from '@client/forms/configuration/formConfig/utils'
-import { FieldPosition } from '@client/forms/configuration'
-import { useParams } from 'react-router'
-import { BirthSection, DeathSection, Event } from '@client/forms'
-import {
-  shiftConfigFieldUp,
-  shiftConfigFieldDown,
-  removeCustomField
-} from '@client/forms/configuration/formConfig/actions'
-import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
+import React from 'react'
 import { useIntl } from 'react-intl'
-import { messages } from '@client/i18n/messages/views/formConfig'
-import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router'
+import ConfigPlaceholder from './ConfigPlaceholder'
 
 const CanvasBox = styled(Box)`
   display: flex;
@@ -43,7 +48,40 @@ const CanvasBox = styled(Box)`
   border-radius: 4px;
 `
 
-function generateConfigFields(formFieldMap: IConfigFieldMap) {
+function preparePlaceholderConfigAndVerify(
+  formSection: IFormSection,
+  currentField: IConfigField,
+  fields: IConfigField[]
+) {
+  const field = getFieldDefinition(formSection, currentField)
+
+  if (field.customisable === true || !field.previewGroup) {
+    return true
+  }
+
+  if (field.customisable === false && field.previewGroup) {
+    const previewGroup = formSection.groups.map((group) =>
+      group.previewGroups?.find(
+        (previewGroup) => previewGroup.id === field.previewGroup
+      )
+    )[0]
+    if (previewGroup) {
+      currentField.previewGroupID = previewGroup.id
+      currentField.previewGroupLabel = previewGroup.label
+    }
+  }
+
+  return !fields.find(
+    (tempField) =>
+      tempField.previewGroupID === currentField.previewGroupID &&
+      field.customisable === false
+  )
+}
+
+function generateConfigFields(
+  formFieldMap: IConfigFieldMap,
+  formSection: IFormSection
+) {
   const firstField = Object.values(formFieldMap).find(
     (formField) => formField.preceedingFieldId === FieldPosition.TOP
   )
@@ -55,7 +93,11 @@ function generateConfigFields(formFieldMap: IConfigFieldMap) {
   const configFields: IConfigField[] = []
   let currentField: IConfigField | null = firstField
   while (currentField) {
-    configFields.push(currentField)
+    if (
+      preparePlaceholderConfigAndVerify(formSection, currentField, configFields)
+    ) {
+      configFields.push(currentField)
+    }
     currentField = currentField.foregoingFieldId
       ? formFieldMap[currentField.foregoingFieldId]
       : null
@@ -100,7 +142,16 @@ export function Canvas({
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
-  const configFields = generateConfigFields(fieldsMap)
+  const form = useSelector((store: IStoreState) =>
+    selectConfigRegisterForm(store, event)
+  )
+  const formSection = form.sections.find((sec) => sec.id === section)
+
+  if (!formSection) {
+    throw Error('No valid section found')
+  }
+
+  const configFields = generateConfigFields(fieldsMap, formSection)
 
   return (
     <CanvasBox>
@@ -137,7 +188,13 @@ export function Canvas({
                 dispatch(removeCustomField(selectedField.fieldId))
             }}
           >
-            <FormField configField={configField} />
+            {configField.previewGroupLabel && (
+              <ConfigPlaceholder label={configField.previewGroupLabel} />
+            )}
+
+            {!configField.previewGroupLabel && (
+              <FormField configField={configField} />
+            )}
           </FormConfigElementCard>
         )
       })}

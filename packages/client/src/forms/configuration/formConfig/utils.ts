@@ -30,6 +30,9 @@ import { camelCase, keys } from 'lodash'
 import { FieldPosition } from '@client/forms/configuration'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import { getDefaultLanguage } from '@client/i18n/utils'
+import { MessageDescriptor } from 'react-intl'
+import { deserializeFormField } from '@client/forms/mappings/deserializer'
+import { createCustomField } from '@client/forms/configuration/customUtils'
 
 const CUSTOM_FIELD_LABEL = 'Custom Field'
 export const CUSTOM_GROUP_NAME = 'custom-view-group'
@@ -38,6 +41,11 @@ export type EventSectionGroup = {
   event: Event
   section: string
   group: string
+}
+
+type IPreviewGroupPlaceholder = {
+  previewGroupID?: string
+  previewGroupLabel?: MessageDescriptor
 }
 
 export type IDefaultConfigField = Pick<
@@ -50,11 +58,11 @@ export type IDefaultConfigField = Pick<
     groupIndex: number
     fieldIndex: number
   }
-}
+} & IPreviewGroupPlaceholder
 
 export type ICustomConfigField = IQuestionConfig & {
   foregoingFieldId: string
-}
+} & IPreviewGroupPlaceholder
 
 export type IConfigField = IDefaultConfigField | ICustomConfigField
 
@@ -133,6 +141,25 @@ export function fieldToQuestionConfig(
     )
   }
   return customFieldToQuestionConfig(fieldId, preceedingFieldId, field)
+}
+
+export function getFieldDefinition(
+  formSection: IFormSection,
+  configField: IConfigField
+) {
+  let formField: IFormField
+  if (isDefaultField(configField)) {
+    const { groupIndex, fieldIndex } = configField.identifiers
+    formField = {
+      ...formSection.groups[groupIndex].fields[fieldIndex],
+      required: configField.required
+    }
+  } else {
+    formField = deserializeFormField(createCustomField(configField))
+  }
+  /* We need to build the field regardless of the conditionals */
+  delete formField.conditionals
+  return formField
 }
 
 export function getContentKeys(formField: IFormField) {
