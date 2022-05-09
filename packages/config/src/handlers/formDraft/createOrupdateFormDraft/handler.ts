@@ -28,7 +28,10 @@ import FormDraft, {
 import { messageSchema } from '@config/handlers/question/createQuestion/handler'
 import { find, partition, isEmpty } from 'lodash'
 import { Event } from '@config/models/certificate'
-import { clearHearthElasticInfluxData } from '@config/services/formDraftService'
+import {
+  clearHearthElasticInfluxData,
+  clearQuestionConfigs
+} from '@config/services/formDraftService'
 
 export function isValidFormDraftOperation(
   currentStatus: string,
@@ -40,7 +43,7 @@ export function isValidFormDraftOperation(
       DraftStatus.IN_PREVIEW,
       DraftStatus.DELETED
     ],
-    [DraftStatus.IN_PREVIEW]: [DraftStatus.PUBLISHED, DraftStatus.DELETED],
+    [DraftStatus.IN_PREVIEW]: [DraftStatus.PUBLISHED, DraftStatus.DRAFT],
     [DraftStatus.PUBLISHED]: [null],
     [DraftStatus.DELETED]: [DraftStatus.DRAFT]
   }
@@ -193,43 +196,45 @@ export async function modifyDraftStatusHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const formDraftStatusPayload = request.payload as IModifyDraftStatus
+  const { event, status: newStatus } = request.payload as IModifyDraftStatus
 
-  const draft: IFormDraftModel | null = await FormDraft.findOne({
-    event: formDraftStatusPayload.event
+  const draft = await FormDraft.findOne({
+    event
   })
 
-  if (draft) {
-    if (
-      !isValidFormDraftOperation(draft.status, formDraftStatusPayload.status)
-    ) {
-      return h
-        .response(
-          `Invalid Operation. Can not update form draft status from ${draft.status} to ${formDraftStatusPayload.status}`
-        )
-        .code(400)
-    }
+  if (!draft) {
+    return h
+      .response(`Could not found any form draft for ${event} event`)
+      .code(400)
+  }
 
-    draft.status = formDraftStatusPayload.status
-    draft.updatedAt = Date.now()
-
-    try {
-      if (formDraftStatusPayload.status === DraftStatus.DELETED) {
-        await clearHearthElasticInfluxData(request)
-      }
-      await FormDraft.updateOne({ _id: draft._id }, draft)
-    } catch (err) {
-      logger.error(err)
-      return h
-        .response(
-          `Could not able to update draft for ${draft.event} event. Error : ${err}`
-        )
-        .code(400)
-    }
-  } else {
+  if (!isValidFormDraftOperation(draft.status, newStatus)) {
     return h
       .response(
-        `Could not found any form draft for ${formDraftStatusPayload.event} event`
+        `Invalid Operation. Can not update form draft status from ${draft.status} to ${newStatus}`
+      )
+      .code(400)
+  }
+
+  try {
+    if (
+      (draft.status === DraftStatus.IN_PREVIEW &&
+        newStatus === DraftStatus.DRAFT) ||
+      newStatus === DraftStatus.DELETED
+    ) {
+      await clearHearthElasticInfluxData(request)
+      if (newStatus === DraftStatus.DELETED) {
+        await clearQuestionConfigs(event)
+      }
+    }
+    draft.status = newStatus
+    draft.updatedAt = Date.now()
+    await FormDraft.updateOne({ _id: draft._id }, draft)
+  } catch (err) {
+    logger.error(err)
+    return h
+      .response(
+        `Could not update draft for ${draft.event} event. Error : ${err}`
       )
       .code(400)
   }

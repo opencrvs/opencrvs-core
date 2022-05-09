@@ -614,11 +614,30 @@ const deleteActionMessagesToDefine: IActionMessage = {
   }
 }
 
+const draftActionMessagesToDefine: IActionMessage = {
+  [ActionStatus.ERROR]: {
+    id: 'config.form.draft.error',
+    defaultMessage: 'Something went wrong. Please try again',
+    description: 'Edit error notification label'
+  },
+  [ActionStatus.PROCESSING]: {
+    id: 'config.form.draft.inProgress',
+    defaultMessage: 'Reverting back to draft...',
+    description: 'Edit draft in progress notification label'
+  },
+  [ActionStatus.COMPLETED]: {
+    id: 'config.form.draft.success',
+    defaultMessage:
+      '{event} draft v{version} has been moved to draft successfully',
+    description: 'Edit draft success notification label'
+  }
+}
+
 const statusChangeActionMessagesToDefine = {
   [Actions.PREVIEW]: previewActionMessagesToDefine,
   [Actions.PUBLISH]: publishActionMessagesToDefine,
   [Actions.DELETE]: deleteActionMessagesToDefine,
-  [Actions.EDIT]: deleteActionMessagesToDefine
+  [Actions.EDIT]: draftActionMessagesToDefine
 }
 
 export const messages: IFormConfigMessages = defineMessages(messagesToDefine)

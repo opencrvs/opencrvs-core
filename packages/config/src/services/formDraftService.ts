@@ -47,78 +47,74 @@ export async function clearHearthElasticInfluxData(request: Hapi.Request) {
   try {
     hearthDBConn = await getHearthDb()
   } catch (err) {
-    throw Error(`Could not able to get hearthDB connection. ${err}`)
+    throw Error(`Could not get hearthDB connection. ${err}`)
   }
-  const tasks = (await hearthDBConn
+  const tasks: fhir.Task[] = await hearthDBConn
     .collection('Task')
     .find()
-    .toArray()) as fhir.Task[]
+    .toArray()
 
   //check if all the available tasks have configuration exrension
   const hasTestExtensionOnAllTasks = every(tasks, {
     extension: [{ url: `${OPENCRVS_SPECIFICATION_URL}extension/configuration` }]
   })
-  if (hasTestExtensionOnAllTasks) {
-    //deleting all elastic and influx data
-    try {
-      const token = request.headers.authorization.replace('Bearer ', '')
-      Promise.all([
-        await fetch(`${SEARCH_URL}elasticIndex`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          }
-        }),
-        await fetch(`${METRICS_URL}/influxMeasurement`, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          }
-        })
-      ])
-    } catch (err) {
-      throw Error(`Failed to delete elastic, influx data. ${err}`)
-    }
-
-    //deleting question for requested event type
-    try {
-      const eventRegex = new RegExp(`^(${formDraft.event}\.)`)
-      await Question.deleteMany({ fieldId: eventRegex })
-    } catch (err) {
-      throw Error(`Failed to delete questions. ${err}`)
-    }
-
-    hearthDBConn.db.listCollections().toArray((err, collections) => {
-      if (err) {
-        logger.error(
-          `Error occured getting list of hearthDB collections: ${err}`
-        )
-      } else {
-        Promise.all(
-          collections.map(async (collection) => {
-            if (
-              Object.values(HearthCollectionsName).includes(collection.name)
-            ) {
-              try {
-                await hearthDBConn.dropCollection(collection.name)
-                logger.info(`Droped hearthDB collection :: ${collection.name} `)
-              } catch (err) {
-                logger.error(
-                  `Error occured droping collection name (${collection.name}) : ${err}`
-                )
-              }
-            }
-          })
-        ).then(() => {
-          logger.info('Successfully droped all listed hearthDB collections')
-        })
-      }
-    })
-  } else {
+  if (!hasTestExtensionOnAllTasks) {
     throw Error(
       `Could not delete draft for ${formDraft.event} event. Other task found without configuration extension`
     )
+  }
+  //deleting all elastic and influx data
+  try {
+    const token = request.headers.authorization.replace('Bearer ', '')
+    Promise.all([
+      await fetch(`${SEARCH_URL}elasticIndex`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      }),
+      await fetch(`${METRICS_URL}/influxMeasurement`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        }
+      })
+    ])
+  } catch (err) {
+    throw Error(`Failed to delete elastic, influx data. ${err}`)
+  }
+
+  hearthDBConn.db.listCollections().toArray((err, collections) => {
+    if (err) {
+      logger.error(`Error occured getting list of hearthDB collections: ${err}`)
+    } else {
+      Promise.all(
+        collections.map(async (collection) => {
+          if (Object.values(HearthCollectionsName).includes(collection.name)) {
+            try {
+              await hearthDBConn.dropCollection(collection.name)
+              logger.info(`Droped hearthDB collection :: ${collection.name} `)
+            } catch (err) {
+              logger.error(
+                `Error occured droping collection name (${collection.name}) : ${err}`
+              )
+            }
+          }
+        })
+      ).then(() => {
+        logger.info('Successfully droped all listed hearthDB collections')
+      })
+    }
+  })
+}
+
+export async function clearQuestionConfigs(event: string) {
+  try {
+    const eventRegex = new RegExp(`^(${event}\.)`)
+    await Question.deleteMany({ fieldId: eventRegex })
+  } catch (err) {
+    throw Error(`Failed to delete questions. ${err}`)
   }
 }

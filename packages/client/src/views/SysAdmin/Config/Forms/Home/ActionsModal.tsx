@@ -71,7 +71,7 @@ export type ActionState = {
 const STATUS_CHANGE_MAP: Record<Actions, DraftStatus> = {
   [Actions.PUBLISH]: DraftStatus.PUBLISHED,
   [Actions.PREVIEW]: DraftStatus.PREVIEW,
-  [Actions.EDIT]: DraftStatus.DELETED,
+  [Actions.EDIT]: DraftStatus.DRAFT,
   [Actions.DELETE]: DraftStatus.DELETED
 }
 
