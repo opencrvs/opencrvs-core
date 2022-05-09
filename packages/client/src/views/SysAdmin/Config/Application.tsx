@@ -104,8 +104,8 @@ export enum DeathActionId {
 }
 
 interface IItem {
-  label: string | React.ReactNode
-  value: string | React.ReactNode
+  label: React.ReactNode
+  value: React.ReactNode
   action: {
     id: string
     label: string
@@ -130,6 +130,8 @@ function GeneralTabContent({
   const countryCurrencyName = lookup.currencies({
     code: offlineCountryConfiguration.config.CURRENCY.isoCode
   })
+
+  //TODO: Follow the approach used in FormTools
   const items = [
     {
       label: intl.formatMessage(messages.applicationNameLabel),

@@ -20,7 +20,6 @@ export const LinkButton = styled(Button)<{
   color: ${({ theme }) => theme.colors.tertiary};
   padding: 0;
   border-radius: 2px;
-
   &:focus {
     background: ${({ theme }) => theme.colors.focus};
     color: ${({ theme }) => theme.colors.copy};

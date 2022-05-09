@@ -13,6 +13,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IConstantsMessages
   extends Record<string | number | symbol, MessageDescriptor> {
+  countryName: MessageDescriptor
   address: MessageDescriptor
   allEvents: MessageDescriptor
   allStatuses: MessageDescriptor
@@ -76,8 +77,6 @@ interface IConstantsMessages
   lastEdited: MessageDescriptor
   month: MessageDescriptor
   name: MessageDescriptor
-  nameDefaultLocale: MessageDescriptor
-  nameRegionalLocale: MessageDescriptor
   newBirthRegistration: MessageDescriptor
   newDeathRegistration: MessageDescriptor
   noNameProvided: MessageDescriptor
@@ -140,7 +139,6 @@ interface IConstantsMessages
   percentageOfEstimation: MessageDescriptor
   averageRateOfRegistrations: MessageDescriptor
   estimatedNumberOfEvents: MessageDescriptor
-  rateOfRegistrationWithinTargetd: MessageDescriptor
   registerConfirmModalDesc: MessageDescriptor
   registeredWithinTargetd: MessageDescriptor
   registeredInTargetd: MessageDescriptor
@@ -154,6 +152,11 @@ interface IConstantsMessages
   noRecords: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
+  countryName: {
+    defaultMessage: 'Farajaland',
+    description: 'Name of the OpenCRVS implementation country',
+    id: 'constants.countryName'
+  },
   address: {
     defaultMessage: 'Address',
     description: 'Label for address',
@@ -228,7 +231,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.declarationRequestedCorrectionOn'
   },
   declarationStarted: {
-    defaultMessage: 'Declaration started',
+    defaultMessage: 'Started',
     description: 'Label for table header column Declaration started',
     id: 'constants.declarationStarted'
   },
@@ -379,7 +382,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.eventDate'
   },
   eventType: {
-    defaultMessage: 'Event type',
+    defaultMessage: 'Event',
     description: 'Label for table header column Event type',
     id: 'constants.eventType'
   },
@@ -477,16 +480,6 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Name',
     description: 'Name label',
     id: 'constants.name'
-  },
-  nameDefaultLocale: {
-    defaultMessage: 'English name',
-    description: 'Label for column of English name',
-    id: 'constants.nameDefaultLocale'
-  },
-  nameRegionalLocale: {
-    defaultMessage: 'Local name',
-    description: 'Label for column of Local name',
-    id: 'constants.nameRegionalLocale'
   },
   newBirthRegistration: {
     id: 'register.selectInformant.newBirthRegistration',
@@ -628,8 +621,8 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.timeWatingApproval'
   },
   timeWaitingExternalValidation: {
-    defaultMessage: 'Time in waiting for waiting for BRIS',
-    description: 'Label for column Time in waiting for waiting for BRIS',
+    defaultMessage: 'Time in external validation',
+    description: 'Label for column Time in external validation BRIS',
     id: 'constants.timeWaitingExternalValidation'
   },
   timeReadyToPrint: {
@@ -818,12 +811,7 @@ const messagesToDefine: IConstantsMessages = {
       'Estimated no. of {eventType, select, birth {birth} death {death} other {birth}}s',
     description: 'A label for Estimated number of events'
   },
-  rateOfRegistrationWithinTargetd: {
-    id: 'constants.rateOfRegistrationWithinTargetd',
-    defaultMessage: 'Rate within {registrationTargetDays} days of event',
-    description:
-      'A label for Rate within {registrationTargetDays} days of event'
-  },
+
   registeredWithinTargetd: {
     id: 'constants.registeredWithinTargetd',
     defaultMessage: `Registered within\n{registrationTargetDays} days of event`,
