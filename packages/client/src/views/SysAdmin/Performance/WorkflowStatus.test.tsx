@@ -21,7 +21,6 @@ import { ReactWrapper } from 'enzyme'
 import { stringify, parse } from 'query-string'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
-import { OPERATIONAL_REPORT_SECTION } from './OperationalReport'
 import { GraphQLError } from 'graphql'
 import { match } from 'react-router'
 
@@ -177,7 +176,7 @@ describe('Workflow status tests', () => {
                     createdAt: '1590128285130',
                     modifiedAt: null
                   },
-                  startedAt: '2020-05-17',
+                  startedAt: '2020-05-18',
                   startedBy: {
                     name: [
                       {
@@ -207,7 +206,6 @@ describe('Workflow status tests', () => {
     beforeEach(async () => {
       const path = '/performance/operations/workflowStatus'
       const location = createLocation(path, {
-        sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
         timeStart,
         timeEnd
       })
@@ -231,23 +229,17 @@ describe('Workflow status tests', () => {
 
       component = testComponent
 
-      await waitForElement(component, '#declaration-status-list')
       component.update()
+      await waitForElement(component, '#declaration-status-list')
     })
 
-    it('renders without crashing', async () => {
-      await waitForElement(component, '#workflow-status-header')
-    })
-
-    it('clicking on back takes back to operational dashboard', async () => {
+    it('clicking on back takes back to your previous url', async () => {
       const backButton = await waitForElement(
         component,
-        '#workflow-status-action-back'
+        '#header-go-back-button'
       )
       backButton.hostNodes().simulate('click')
-
-      expect(history.location.pathname).toContain('/performance/operations')
-      expect(history.location.pathname).not.toContain('workflowStatus')
+      expect(history.location.pathname).toBe('/')
     })
 
     it('renders data', async () => {
@@ -269,20 +261,20 @@ describe('Workflow status tests', () => {
         component,
         'span#declarationStartedOn-label'
       )
-      expect(listTable.find('div#row_0').hostNodes().childAt(7).text()).toMatch(
+      expect(listTable.find('div#row_0').hostNodes().childAt(5).text()).toMatch(
+        /May 18, 2020/
+      )
+
+      toggleSortButton.hostNodes().simulate('click')
+
+      expect(listTable.find('div#row_0').hostNodes().childAt(5).text()).toMatch(
         /May 17, 2020/
       )
 
       toggleSortButton.hostNodes().simulate('click')
 
-      expect(listTable.find('div#row_2').hostNodes().childAt(7).text()).toMatch(
-        /May 17, 2020/
-      )
-
-      toggleSortButton.hostNodes().simulate('click')
-
-      expect(listTable.find('div#row_0').hostNodes().childAt(7).text()).toMatch(
-        /May 17, 2020/
+      expect(listTable.find('div#row_0').hostNodes().childAt(5).text()).toMatch(
+        /May 18, 2020/
       )
     })
 
@@ -353,7 +345,6 @@ describe('Workflow status tests', () => {
     beforeEach(async () => {
       const path = '/performance/operations/workflowStatus'
       const location = createLocation(path, {
-        sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
         timeStart,
         timeEnd
       })

@@ -37,8 +37,9 @@ type Query {
   fetchRegistration(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
   fetchRegistrationCountByStatus(
-    locationId: String!
     status: [String]!
+    locationId: String
+    event: String
   ): RegistrationCountResult
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
@@ -68,17 +69,33 @@ type Query {
     sort: String
   ): SearchFieldAgentResult
   verifyPasswordById(id: String!, password: String!): VerifyPasswordResult
-  fetchRegistrationMetrics(
+  getTotalMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): RegistrationMetrics
-  getEventEstimationMetrics(
+  ): TotalMetricsResult
+  getTotalPayments(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
-  ): EventEstimationMetrics
+    locationId: String
+    event: String!
+  ): [PaymentMetric!]
+  getTotalCertifications(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+  ): [CertificationMetric!]
+  getTotalCorrections(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+  ): [CorrectionMetric!]
+  getLocationStatistics(
+    locationId: String
+    populationYear: Int!
+  ): LocationStatisticsResponse
   getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
@@ -87,15 +104,15 @@ type Query {
   fetchMonthWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): MonthWiseEstimationMetrics
+  ): [MonthWiseEstimationMetric!]
   fetchLocationWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): LocationWiseEstimationMetrics
+  ): [LocationWiseEstimationMetric!]
   fetchTimeLoggedMetricsByPractitioner(
     timeStart: String!
     timeEnd: String!
@@ -135,6 +152,7 @@ type Query {
   ): [Role]
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
+  getQuestions: [Question]
 }
 
 type Mutation {
@@ -149,7 +167,7 @@ type Mutation {
   markBirthAsValidated(id: ID!, details: BirthRegistrationInput): ID
   markBirthAsRegistered(
     id: ID!
-    details: BirthRegistrationInput
+    details: BirthRegistrationInput!
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   requestBirthRegistrationCorrection(
@@ -157,6 +175,8 @@ type Mutation {
     details: BirthRegistrationInput!
   ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID!
+  markEventAsReinstated(id: String!): Reinstated
+  markEventAsArchived(id: String!): ID!
   notADuplicate(id: String!, duplicateId: String!): ID!
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
   updateDeathRegistration(id: ID!, details: DeathRegistrationInput!): ID!
@@ -167,7 +187,7 @@ type Mutation {
   markDeathAsValidated(id: ID!, details: DeathRegistrationInput): ID
   markDeathAsRegistered(
     id: ID!
-    details: DeathRegistrationInput
+    details: DeathRegistrationInput!
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
   requestDeathRegistrationCorrection(
@@ -191,7 +211,7 @@ type Mutation {
     nonce: String!
     verifyCode: String!
   ): String
-  changeAvatar(userId: String!, avatar: AvatarInput!): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): Avatar
   auditUser(
     userId: String!
     action: String!
@@ -205,6 +225,7 @@ type Mutation {
   updateApplicationConfig(
     applicationConfig: ApplicationConfigurationInput
   ): ApplicationConfiguration
+  createOrUpdateQuestion(question: QuestionInput!): Question
 }
 
 type Dummy {
@@ -233,8 +254,8 @@ type BirthRegistration implements EventRegistration {
   father: Person
   informant: RelatedPerson
   eventLocation: Location
-  questionnaire: [QuestionnaireQuestion]
   birthType: BirthType
+  questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
@@ -244,6 +265,7 @@ type BirthRegistration implements EventRegistration {
   lastPreviousLiveBirth: Date
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type DeathRegistration implements EventRegistration {
@@ -256,7 +278,9 @@ type DeathRegistration implements EventRegistration {
   father: Person
   spouse: Person
   eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
   mannerOfDeath: MannerOfDeath
+  deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType
   causeOfDeathEstablished: String
   causeOfDeath: String
@@ -265,6 +289,7 @@ type DeathRegistration implements EventRegistration {
   medicalPractitioner: MedicalPractitioner
   createdAt: Date
   updatedAt: Date
+  history: [History]
 }
 
 type Person {
@@ -297,6 +322,7 @@ type BirthRegResultSet {
 interface EventRegistration {
   id: ID!
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 
@@ -363,16 +389,30 @@ type VerifyPasswordResult {
   id: String
 }
 
-type RegistrationMetrics {
-  genderBasisMetrics: RegistrationGenderBasisMetrics
-  timeFrames: RegistrationTimeFrameMetrics
-  estimatedTargetDayMetrics: RegistrationTargetDayEstimatedMetrics
-  payments: CertificationPaymentMetrics
+type TotalMetricsResult {
+  estimated: Estimation!
+  results: [EventMetrics!]!
 }
 
-type EventEstimationMetrics {
-  birthTargetDayMetrics: EstimationMetrics
-  deathTargetDayMetrics: EstimationMetrics
+type PaymentMetric {
+  total: Float!
+  paymentType: String!
+}
+
+type CertificationMetric {
+  total: Float!
+  eventType: String!
+}
+
+type CorrectionMetric {
+  total: Float!
+  reason: String!
+}
+
+type LocationStatisticsResponse {
+  population: Int
+  registrars: Int!
+  offices: Int!
 }
 
 type DeclarationsStartedMetrics {
@@ -381,14 +421,24 @@ type DeclarationsStartedMetrics {
   officeDeclarations: Int!
 }
 
-type MonthWiseEstimationMetrics {
-  details: [MonthWiseTargetDayEstimation]
-  total: EventInTargetDayEstimationCount
+type MonthWiseEstimationMetric {
+  total: Int!
+  withinTarget: Int!
+  within1Year: Int!
+  within5Years: Int!
+  estimated: Int!
+  month: Int!
+  year: Int!
 }
 
-type LocationWiseEstimationMetrics {
-  details: [LocationWiseTargetDayEstimation]
-  total: EventInTargetDayEstimationCount
+type LocationWiseEstimationMetric {
+  total: Int!
+  withinTarget: Int!
+  within1Year: Int!
+  within5Years: Int!
+  estimated: Int!
+  locationId: String!
+  locationName: String!
 }
 
 type TimeLoggedMetricsResultSet {
@@ -425,6 +475,21 @@ type CertificateSVG {
   status: String
 }
 
+type Question {
+  _id: ID
+  fieldId: String
+  label: MesssageDescriptor
+  placeholder: MesssageDescriptor
+  maxLength: Int
+  fieldName: String
+  fieldType: String
+  preceedingFieldId: String
+  required: Boolean
+  enabled: Boolean
+  custom: Boolean
+  initialValue: String
+}
+
 input NotificationInput {
   child: PersonInput
   mother: PersonInput
@@ -449,8 +514,8 @@ input BirthRegistrationInput {
   father: PersonInput
   informant: RelatedPersonInput
   eventLocation: LocationInput
-  questionnaire: [QuestionnaireQuestionInput]
   birthType: BirthType
+  questionnaire: [QuestionnaireQuestionInput]
   weightAtBirth: Float
   attendantAtBirth: AttendantType
   otherAttendantAtBirth: String
@@ -462,6 +527,11 @@ input BirthRegistrationInput {
   updatedAt: Date
 }
 
+type Reinstated {
+  taskEntryResourceID: ID!
+  registrationStatus: RegStatus
+}
+
 input DeathRegistrationInput {
   _fhirIDMap: Map
   registration: RegistrationInput
@@ -471,9 +541,11 @@ input DeathRegistrationInput {
   father: PersonInput
   spouse: PersonInput
   eventLocation: LocationInput
+  questionnaire: [QuestionnaireQuestionInput]
   mannerOfDeath: MannerOfDeath
-  causeOfDeathEstablished: String
+  deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType
+  causeOfDeathEstablished: String
   causeOfDeath: String
   maleDependentsOfDeceased: Float
   femaleDependentsOfDeceased: Float
@@ -500,6 +572,11 @@ input UserInput {
 input SecurityQuestionAnswer {
   questionKey: String
   answer: String
+}
+
+type Avatar {
+  type: String!
+  data: String!
 }
 
 input AvatarInput {
@@ -564,6 +641,21 @@ input ApplicationConfigurationInput {
   NID_NUMBER_PATTERN: String
 }
 
+input QuestionInput {
+  id: ID
+  fieldId: String
+  label: MesssageDescriptorInput
+  placeholder: MesssageDescriptorInput
+  maxLength: Int
+  fieldName: String
+  fieldType: String
+  preceedingFieldId: String
+  required: Boolean
+  enabled: Boolean
+  custom: Boolean
+  initialValue: String
+}
+
 scalar Map
 
 type Registration {
@@ -575,9 +667,9 @@ type Registration {
   paperFormID: String
   page: String
   book: String
-  contact: String
   informantType: InformantType
   otherInformantType: String
+  contact: String
   contactRelationship: String
   contactPhoneNumber: String
   status: [RegWorkflow]
@@ -605,6 +697,11 @@ enum BirthType {
   HIGHER_MULTIPLE_DELIVERY
 }
 
+type QuestionnaireQuestion {
+  fieldId: String
+  value: String
+}
+
 enum AttendantType {
   PHYSICIAN
   NURSE
@@ -622,6 +719,20 @@ enum BirthRegType {
   INFORMANT_ONLY
   MOTHER_ONLY
   FATHER_ONLY
+}
+
+type History {
+  user: User
+  date: Date
+  action: RegStatus
+  statusReason: StatusReason
+  reinstated: Boolean
+  location: Location
+  office: Location
+  comments: [Comment]
+  input: [InputOutput]
+  output: [InputOutput]
+  certificates: [Certificate]
 }
 
 enum MannerOfDeath {
@@ -703,11 +814,6 @@ type Attachment {
   createdAt: Date
 }
 
-type QuestionnaireQuestion {
-  fieldName: String
-  value: String
-}
-
 type Deceased {
   deceased: Boolean
   deathDate: String
@@ -741,6 +847,7 @@ enum LocationType {
   ADMIN_STRUCTURE
   CRVS_OFFICE
   PRIVATE_HOME
+  DECEASED_USUAL_RESIDENCE
   SECONDARY_ADDRESS
   PRIMARY_ADDRESS
   MILITARY_BASE_OR_CANTONMENT
@@ -760,16 +867,12 @@ type Signature {
   type: String
 }
 
-type Avatar {
-  type: String!
-  data: String!
-}
-
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
   type: String
   status: String
+  avatar: Avatar
   primaryOfficeId: String
   creationDate: String
   totalNumberOfDeclarationStarted: Int
@@ -778,59 +881,21 @@ type SearchFieldAgentResponse {
   averageTimeForDeclaredDeclarations: Int
 }
 
-type RegistrationGenderBasisMetrics {
-  details: [GenderBasisDetailsMetrics!]
-  total: GenderBasisTotalCount
-}
-
-type RegistrationTimeFrameMetrics {
-  details: [TimeFrameDetailMetrics!]
-  total: TimeFrameTotalCount
-}
-
-type RegistrationTargetDayEstimatedMetrics {
-  details: [EstimatedTargetDayMetrics!]
-  total: EstimateTargetDayTotalCount
-}
-
-type CertificationPaymentMetrics {
-  details: [CertificationPaymentDetailsMetrics!]
-  total: CertificationPaymentTotalCount
-}
-
-type EstimationMetrics {
-  actualRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedPercentage: Float!
-  malePercentage: Float!
-  femalePercentage: Float!
-}
-
-type MonthWiseTargetDayEstimation {
-  actualTotalRegistration: Int!
-  actualTargetDayRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedTargetDayPercentage: Float!
-  month: String!
-  year: String!
-  startOfMonth: String!
-  endOfMonth: String!
-}
-
-type EventInTargetDayEstimationCount {
-  actualTotalRegistration: Int!
-  actualTargetDayRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedTargetDayPercentage: Float!
-}
-
-type LocationWiseTargetDayEstimation {
-  actualTotalRegistration: Int!
-  actualTargetDayRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedTargetDayPercentage: Float!
+type Estimation {
+  totalEstimation: Int!
+  maleEstimation: Int!
+  femaleEstimation: Int!
   locationId: String!
-  locationName: String!
+  estimationYear: Int!
+  locationLevel: String!
+}
+
+type EventMetrics {
+  total: Int!
+  gender: String!
+  eventLocationType: String!
+  timeLabel: String!
+  practitionerRole: String!
 }
 
 type TimeLoggedMetrics {
@@ -856,6 +921,12 @@ type EventProgressSet {
   startedByFacility: String
   startedAt: Date
   progressReport: EventProgressData
+}
+
+type MesssageDescriptor {
+  id: String
+  description: String
+  defaultMessage: String
 }
 
 input PersonInput {
@@ -904,11 +975,11 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
+  informantType: InformantType
+  otherInformantType: String
   contact: String
   contactRelationship: String
   contactPhoneNumber: String
-  informantType: InformantType
-  otherInformantType: String
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
@@ -925,6 +996,24 @@ input RelatedPersonInput {
   otherRelationship: String
   affidavit: [AttachmentInput]
   individual: PersonInput
+}
+
+input QuestionnaireQuestionInput {
+  fieldId: String
+  value: String
+}
+
+enum RegStatus {
+  IN_PROGRESS
+  ARCHIVED
+  DECLARED
+  DECLARATION_UPDATED
+  WAITING_VALIDATION
+  VALIDATED
+  REGISTERED
+  CERTIFIED
+  REJECTED
+  DOWNLOADED
 }
 
 input MedicalPractitionerInput {
@@ -950,26 +1039,15 @@ input SignatureInput {
   type: String
 }
 
-type BirthFee {
-  ON_TIME: Float
-  LATE: Float
-  DELAYED: Float
-}
-
 type Birth {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
   FEE: BirthFee
 }
 
-type DeathFee {
-  ON_TIME: Float
-  DELAYED: Float
-}
-
-type Death {
-  REGISTRATION_TARGET: Int
-  FEE: DeathFee
+type CountryLogo {
+  fileName: String
+  file: String
 }
 
 type Currency {
@@ -977,31 +1055,15 @@ type Currency {
   languagesAndCountry: [String]
 }
 
-input BirthFeeInput {
-  ON_TIME: Float
-  LATE: Float
-  DELAYED: Float
+type Death {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFee
 }
 
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
   FEE: BirthFeeInput
-}
-
-input DeathFeeInput {
-  ON_TIME: Float
-  DELAYED: Float
-}
-
-input DeathInput {
-  REGISTRATION_TARGET: Int
-  FEE: DeathFeeInput
-}
-
-type CountryLogo {
-  fileName: String
-  file: String
 }
 
 input CountryLogoInput {
@@ -1012,6 +1074,37 @@ input CountryLogoInput {
 input CurrencyInput {
   isoCode: String
   languagesAndCountry: [String]
+}
+
+input DeathInput {
+  REGISTRATION_TARGET: Int
+  FEE: DeathFeeInput
+}
+
+input MesssageDescriptorInput {
+  id: String
+  description: String
+  defaultMessage: String
+}
+
+enum InformantType {
+  INFORMANT
+  MOTHER
+  FATHER
+  GRANDFATHER
+  GRANDMOTHER
+  BROTHER
+  SISTER
+  OTHER_FAMILY_MEMBER
+  LEGAL_GUARDIAN
+  SPOUSE
+  SON
+  DAUGHTER
+  SON_IN_LAW
+  DAUGHTER_IN_LAW
+  GRANDSON
+  GRANDDAUGHTER
+  OTHER
 }
 
 type RegWorkflow {
@@ -1038,31 +1131,21 @@ type Certificate {
   data: String
 }
 
-enum InformantType {
-  INFORMANT
-  MOTHER
-  FATHER
-  GRANDFATHER
-  GRANDMOTHER
-  BROTHER
-  SISTER
-  OTHER_FAMILY_MEMBER
-  LEGAL_GUARDIAN
-  SPOUSE
-  SON
-  DAUGHTER
-  SON_IN_LAW
-  DAUGHTER_IN_LAW
-  GRANDSON
-  GRANDDAUGHTER
-  OTHER
+type StatusReason {
+  text: String
 }
 
-enum ParentDetailsType {
-  MOTHER_AND_FATHER
-  MOTHER_ONLY
-  FATHER_ONLY
-  NONE
+type Comment {
+  id: ID!
+  user: User
+  comment: String
+  createdAt: Date
+}
+
+type InputOutput {
+  valueCode: String
+  valueId: String
+  valueString: String
 }
 
 enum IdentityIDType {
@@ -1083,6 +1166,7 @@ enum AddressType {
   ADMIN_STRUCTURE
   CRVS_OFFICE
   PRIVATE_HOME
+  DECEASED_USUAL_RESIDENCE
   SECONDARY_ADDRESS
   PRIMARY_ADDRESS
   MILITARY_BASE_OR_CANTONMENT
@@ -1128,64 +1212,6 @@ enum AttachmentSubject {
   CORONERS_REPORT
 }
 
-type GenderBasisDetailsMetrics {
-  location: ID!
-  maleUnder18: Int!
-  femaleUnder18: Int!
-  maleOver18: Int!
-  femaleOver18: Int!
-  total: Int!
-}
-
-type GenderBasisTotalCount {
-  maleUnder18: Int!
-  femaleUnder18: Int!
-  maleOver18: Int!
-  femaleOver18: Int!
-  total: Int!
-}
-
-type TimeFrameDetailMetrics {
-  locationId: String!
-  regWithinTargetd: Int!
-  regWithinTargetdTo1yr: Int!
-  regWithin1yrTo5yr: Int!
-  regOver5yr: Int!
-  total: Int!
-}
-
-type TimeFrameTotalCount {
-  regWithinTargetd: Int!
-  regWithinTargetdTo1yr: Int!
-  regWithin1yrTo5yr: Int!
-  regOver5yr: Int!
-  total: Int!
-}
-
-type EstimatedTargetDayMetrics {
-  locationId: String!
-  estimatedRegistration: Float!
-  registrationInTargetDay: Int!
-  estimationYear: Int!
-  estimationLocationLevel: String!
-  estimationPercentage: Float!
-}
-
-type EstimateTargetDayTotalCount {
-  estimatedRegistration: Float!
-  registrationInTargetDay: Int!
-  estimationPercentage: Float!
-}
-
-type CertificationPaymentDetailsMetrics {
-  total: Int!
-  locationId: String!
-}
-
-type CertificationPaymentTotalCount {
-  total: Int!
-}
-
 type RegistrationSearchSet {
   status: String
   contactNumber: String
@@ -1200,19 +1226,6 @@ type RegistrationSearchSet {
   duplicates: [ID]
   createdAt: String
   modifiedAt: String
-}
-
-type OperationHistorySearchSet {
-  operationType: String
-  operatedOn: Date
-  operatorRole: String
-  operatorName: [HumanName]
-  operatorOfficeName: String
-  operatorOfficeAlias: [String]
-  notificationFacilityName: String
-  notificationFacilityAlias: [String]
-  rejectReason: String
-  rejectComment: String
 }
 
 type BirthEventSearchSet implements EventSearchSet {
@@ -1266,11 +1279,6 @@ input AddressInput {
   to: Date
 }
 
-input QuestionnaireQuestionInput {
-  fieldName: String
-  value: String
-}
-
 input AttachmentInput {
   _fhirID: ID
   contentType: String
@@ -1319,21 +1327,26 @@ input CorrectionInput {
   note: String
 }
 
-enum RegStatus {
-  IN_PROGRESS
-  DECLARED
-  WAITING_VALIDATION
-  VALIDATED
-  REGISTERED
-  CERTIFIED
-  REJECTED
+type BirthFee {
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
 }
 
-type Comment {
-  id: ID!
-  user: User
-  comment: String
-  createdAt: Date
+type DeathFee {
+  ON_TIME: Float
+  DELAYED: Float
+}
+
+input BirthFeeInput {
+  ON_TIME: Float
+  LATE: Float
+  DELAYED: Float
+}
+
+input DeathFeeInput {
+  ON_TIME: Float
+  DELAYED: Float
 }
 
 type Payment {

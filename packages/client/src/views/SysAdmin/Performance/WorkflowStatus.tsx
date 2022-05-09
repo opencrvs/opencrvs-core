@@ -24,27 +24,17 @@ import {
   userMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/performance'
-import { goToOperationalReport, goToWorkflowStatus } from '@client/navigation'
+import { goToPerformanceHome, goToWorkflowStatus } from '@client/navigation'
 import { LANG_EN } from '@client/utils/constants'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { EVENT_OPTIONS } from '@client/views/Performance/FieldAgentList'
-import {
-  OPERATIONAL_REPORT_SECTION,
-  StatusMapping
-} from '@client/views/SysAdmin/Performance/OperationalReport'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/registrationRates/WithinTargetDaysTable'
+import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
 import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
-import {
-  SysAdminContentWrapper,
-  SysAdminPageVariant
-} from '@client/views/SysAdmin/SysAdminContentWrapper'
+import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import {
-  ColumnContentAlignment,
-  ListTable
-} from '@opencrvs/components/lib/interface'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/interface'
 import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
 import {
   GQLEventProgressSet,
@@ -59,27 +49,26 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
-import {
-  checkExternalValidationStatus,
-  checkIfLocalLanguageProvided
-} from '@client/views/SysAdmin/Team/utils'
+import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCountView'
 import format, { formattedDuration } from '@client/utils/date-formatting'
 import subYears from 'date-fns/subYears'
 import differenceInSeconds from 'date-fns/differenceInSeconds'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
+import { colors } from '@opencrvs/components/lib/colors'
 import {
-  PaginationWrapper,
-  MobileWrapper,
-  DesktopWrapper
-} from '@opencrvs/components/lib/styleForPagination'
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
+import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
+import { TableView } from '@opencrvs/components/lib/interface/TableView'
 
 const ToolTipContainer = styled.span`
   text-align: center;
 `
 const DoubleLineValueWrapper = styled.div`
-  margin: 12px 0px;
+  margin: 0px 0px;
 `
 
 const { useState } = React
@@ -120,6 +109,45 @@ const INITIAL_SORT_MAP = {
 
 const DEFAULT_DECLARATION_STATUS_PAGE_SIZE = 25
 
+export const StatusMapping: IStatusMapping = {
+  IN_PROGRESS: {
+    labelDescriptor: statusMessages.inProgress,
+    color: colors.purple
+  },
+  DECLARED: {
+    labelDescriptor: statusMessages.readyForReview,
+    color: colors.orange
+  },
+  REJECTED: {
+    labelDescriptor: statusMessages.sentForUpdates,
+    color: colors.red
+  },
+  VALIDATED: {
+    labelDescriptor: statusMessages.sentForApprovals,
+    color: colors.grey300
+  },
+  WAITING_VALIDATION: {
+    labelDescriptor: statusMessages.sentForExternalValidation,
+    color: colors.grey500
+  },
+  REGISTERED: {
+    labelDescriptor: statusMessages.readyToPrint,
+    color: colors.green
+  },
+  CERTIFIED: {
+    labelDescriptor: statusMessages.certified,
+    color: colors.blue
+  },
+  REQUESTED_CORRECTION: {
+    labelDescriptor: statusMessages.requestedCorrection,
+    color: colors.blue
+  },
+  ARCHIVED: {
+    labelDescriptor: statusMessages.archived,
+    color: colors.blue
+  }
+}
+
 const statusOptions = [
   {
     label: constantsMessages.allStatuses,
@@ -147,7 +175,7 @@ function isPrimaryContact(contact: string): contact is PrimaryContact {
 }
 
 interface DispatchProps {
-  goToOperationalReport: typeof goToOperationalReport
+  goToPerformanceHome: typeof goToPerformanceHome
   goToWorkflowStatus: typeof goToWorkflowStatus
 }
 interface ISearchParams {
@@ -156,7 +184,6 @@ interface ISearchParams {
   event?: Event
 }
 export interface IHistoryStateProps {
-  sectionId: OPERATIONAL_REPORT_SECTION
   timeStart: Date | string
   timeEnd: Date | string
 }
@@ -175,13 +202,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     'declarationStartedOn'
   )
   const recordCount = DEFAULT_DECLARATION_STATUS_PAGE_SIZE * currentPageNumber
-  let sectionId = OPERATIONAL_REPORT_SECTION.OPERATIONAL
+
   let timeStart: string | Date = subYears(new Date(Date.now()), 1)
   let timeEnd: string | Date = new Date(Date.now())
   const historyState = props.history.location.state
 
   if (props.location.state) {
-    sectionId = historyState.sectionId
     timeStart = historyState.timeStart
     timeEnd = historyState.timeEnd
   }
@@ -195,14 +221,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     setColumnToBeSort(key)
   }
 
-  function getColumns(totalItems = 0): IColumn[] {
+  function getColumns(): IColumn[] {
     const keys = [
       {
-        label: intl.formatMessage(constantsMessages.declarations, {
-          totalItems
-        }),
+        label: intl.formatMessage(constantsMessages.trackingId),
         key: 'id',
-        width: 14,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('id'),
         icon: columnToBeSort === 'id' ? <ArrowDownBlue /> : <></>,
@@ -227,16 +251,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         isSorted: columnToBeSort === 'eventType' ? true : false
       },
       {
-        label: intl.formatMessage(constantsMessages.eventDate),
-        key: 'dateOfEvent',
-        width: 12,
-        isSortable: true,
-        sortFunction: () => toggleSort('dateOfEvent'),
-        icon: columnToBeSort === 'dateOfEvent' ? <ArrowDownBlue /> : <></>,
-        isSorted: columnToBeSort === 'dateOfEvent' ? true : false
-      },
-      {
-        label: intl.formatMessage(constantsMessages.nameDefaultLocale),
+        label: intl.formatMessage(constantsMessages.name),
         key: 'nameIntl',
         width: 12,
         isSortable: true,
@@ -245,14 +260,9 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         isSorted: columnToBeSort === 'nameIntl' ? true : false
       },
       {
-        label: intl.formatMessage(constantsMessages.nameRegionalLocale),
-        key: 'nameLocal',
-        width: 12
-      },
-      {
         label: intl.formatMessage(formMessages.informantName),
         key: 'informant',
-        width: 14,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('informant'),
         icon: columnToBeSort === 'informant' ? <ArrowDownBlue /> : <></>,
@@ -261,7 +271,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.declarationStarted),
         key: 'declarationStartedOn',
-        width: 12,
+        width: 10,
         isSortable: true,
         sortFunction: () => toggleSort('declarationStartedOn'),
         icon:
@@ -279,6 +289,15 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         isSorted: columnToBeSort === 'declarationStartedBy' ? true : false
       },
       {
+        label: intl.formatMessage(constantsMessages.eventDate),
+        key: 'dateOfEvent',
+        width: 12,
+        isSortable: true,
+        sortFunction: () => toggleSort('dateOfEvent'),
+        icon: columnToBeSort === 'dateOfEvent' ? <ArrowDownBlue /> : <></>,
+        isSorted: columnToBeSort === 'dateOfEvent' ? true : false
+      },
+      {
         label: intl.formatMessage(constantsMessages.timeInProgress),
         key: 'timeLoggedInProgress',
         width: 12,
@@ -291,7 +310,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeReadyForReview),
         key: 'timeLoggedDeclared',
-        width: 14,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedDeclared'),
         icon:
@@ -301,7 +320,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeRequireUpdates),
         key: 'timeLoggedRejected',
-        width: 14,
+        width: 12,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedRejected'),
         icon:
@@ -338,7 +357,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       {
         label: intl.formatMessage(constantsMessages.timeReadyToPrint),
         key: 'timeLoggedRegistered',
-        width: 13,
+        width: 12,
         alignment: ColumnContentAlignment.RIGHT,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedRegistered'),
@@ -348,7 +367,10 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
       }
     ] as IColumn[]
     return keys.filter((item) => {
-      return !(!checkIfLocalLanguageProvided() && item.key === 'nameLocal')
+      return !(
+        !window.config.EXTERNAL_VALIDATION_WORKQUEUE &&
+        item.key === 'timeLoggedWaitingValidation'
+      )
     })
   }
 
@@ -640,167 +662,135 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   }
 
   return (
-    <SysAdminContentWrapper
-      id="workflow-status"
-      type={SysAdminPageVariant.SUBPAGE}
-      headerTitle={intl.formatMessage(messages.workflowStatusHeader)}
-      backActionHandler={() =>
-        props.goToOperationalReport(
-          locationId,
-          sectionId,
-          new Date(timeStart),
-          new Date(timeEnd)
-        )
-      }
-      toolbarComponent={
-        <FilterContainer>
-          <LocationPicker
-            selectedLocationId={locationId}
-            onChangeLocation={(newLocationId: string) => {
-              props.goToWorkflowStatus(
-                sectionId,
-                newLocationId,
-                new Date(timeStart),
-                new Date(timeEnd),
-                status,
-                event
-              )
-            }}
-            requiredJurisdictionTypes={
-              window.config.DECLARATION_AUDIT_LOCATIONS
-            }
-          />
-          <PerformanceSelect
-            onChange={({ value }) => {
-              props.goToWorkflowStatus(
-                sectionId,
-                locationId,
-                new Date(timeStart),
-                new Date(timeEnd),
-                status,
-                value as Event
-              )
-            }}
-            id="event-select"
-            withLightTheme={true}
-            defaultWidth={175}
-            value={(event as unknown as EVENT_OPTIONS) || EVENT_OPTIONS.ALL}
-            options={[
-              {
-                label: intl.formatMessage(constantsMessages.allEvents),
-                value: EVENT_OPTIONS.ALL
-              },
-              {
-                label: intl.formatMessage(messages.eventOptionForBirths),
-                value: EVENT_OPTIONS.BIRTH
-              },
-              {
-                label: intl.formatMessage(messages.eventOptionForDeaths),
-                value: EVENT_OPTIONS.DEATH
+    <SysAdminContentWrapper id="workflow-status" isCertificatesConfigPage>
+      <Content
+        title={intl.formatMessage(messages.registrationByStatus)}
+        size={ContentSize.LARGE}
+        filterContent={
+          <FilterContainer>
+            <LocationPicker
+              selectedLocationId={locationId}
+              onChangeLocation={(newLocationId: string) => {
+                props.goToWorkflowStatus(
+                  newLocationId,
+                  new Date(timeStart),
+                  new Date(timeEnd),
+                  status,
+                  event
+                )
+              }}
+              requiredJurisdictionTypes={
+                window.config.DECLARATION_AUDIT_LOCATIONS
               }
-            ]}
-          />
-          <PerformanceSelect
-            onChange={({ value }) => {
-              props.goToWorkflowStatus(
-                sectionId,
-                locationId,
-                new Date(timeStart),
-                new Date(timeEnd),
-                value,
-                event
-              )
-            }}
-            id="status-select"
-            withLightTheme={true}
-            defaultWidth={175}
-            value={(status as string) || ''}
-            options={statusOptions.map((option) => ({
-              ...option,
-              label: intl.formatMessage(option.label)
-            }))}
-          />
-        </FilterContainer>
-      }
-    >
-      <Query
-        query={FETCH_EVENTS_WITH_PROGRESS}
-        variables={{
-          locationId: locationId,
-          skip: (currentPageNumber - 1) * DEFAULT_DECLARATION_STATUS_PAGE_SIZE,
-          count: DEFAULT_DECLARATION_STATUS_PAGE_SIZE,
-          status: (status && [status]) || undefined,
-          type: (event && [`${event.toLowerCase()}-declaration`]) || undefined
-        }}
-        fetchPolicy={'no-cache'}
+            />
+            <PerformanceSelect
+              onChange={({ value }) => {
+                props.goToWorkflowStatus(
+                  locationId,
+                  new Date(timeStart),
+                  new Date(timeEnd),
+                  status,
+                  value as Event
+                )
+              }}
+              id="event-select"
+              withLightTheme={true}
+              defaultWidth={100}
+              value={(event as unknown as EVENT_OPTIONS) || EVENT_OPTIONS.BIRTH}
+              options={[
+                {
+                  label: intl.formatMessage(messages.eventOptionForBirths),
+                  value: EVENT_OPTIONS.BIRTH
+                },
+                {
+                  label: intl.formatMessage(messages.eventOptionForDeaths),
+                  value: EVENT_OPTIONS.DEATH
+                }
+              ]}
+            />
+            <PerformanceSelect
+              onChange={({ value }) => {
+                props.goToWorkflowStatus(
+                  locationId,
+                  new Date(timeStart),
+                  new Date(timeEnd),
+                  value,
+                  event
+                )
+              }}
+              id="status-select"
+              withLightTheme={true}
+              defaultWidth={175}
+              value={(status as string) || ''}
+              options={statusOptions.map((option) => ({
+                ...option,
+                label: intl.formatMessage(option.label)
+              }))}
+            />
+          </FilterContainer>
+        }
       >
-        {({ data, loading, error }) => {
-          let total = 0
-          if (
-            data &&
-            data.getEventsWithProgress &&
-            data.getEventsWithProgress.totalItems
-          ) {
-            total = data.getEventsWithProgress.totalItems
-          }
-          return (
-            <>
-              <ListTable
-                id="declaration-status-list"
-                content={getContent(data)}
-                columns={getColumns(total)}
-                isLoading={loading || Boolean(error)}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-                hideBoxShadow
-                fixedWidth={2791}
-                tableHeight={150}
-                currentPage={currentPageNumber}
-                pageSize={recordCount}
-                totalItems={total}
-                highlightRowOnMouseOver
-                onPageChange={(currentPage: number) => {
-                  setCurrentPageNumber(currentPage)
-                }}
-                isFullPage
-              />
-              {total > DEFAULT_DECLARATION_STATUS_PAGE_SIZE && (
-                <PaginationWrapper>
-                  <DesktopWrapper>
-                    <PaginationModified
-                      size={'small'}
-                      initialPage={currentPageNumber}
-                      totalPages={Math.ceil(
-                        total / DEFAULT_DECLARATION_STATUS_PAGE_SIZE
-                      )}
-                      onPageChange={(currentPage: number) => {
-                        setCurrentPageNumber(currentPage)
-                      }}
-                    />
-                  </DesktopWrapper>
-                  <MobileWrapper>
-                    <PaginationModified
-                      size={'large'}
-                      initialPage={currentPageNumber}
-                      totalPages={Math.ceil(
-                        total / DEFAULT_DECLARATION_STATUS_PAGE_SIZE
-                      )}
-                      onPageChange={(currentPage: number) => {
-                        setCurrentPageNumber(currentPage)
-                      }}
-                    />
-                  </MobileWrapper>
-                </PaginationWrapper>
-              )}
-              {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
-            </>
-          )
-        }}
-      </Query>
+        <Query
+          query={FETCH_EVENTS_WITH_PROGRESS}
+          variables={{
+            locationId: locationId,
+            skip: 0,
+            count: recordCount,
+            status: (status && [status]) || undefined,
+            type: (event && [`${event.toLowerCase()}-declaration`]) || undefined
+          }}
+          fetchPolicy={'no-cache'}
+        >
+          {({ data, loading, error }) => {
+            let total = 0
+            if (loading) {
+              return <Spinner id="status-view-loader" />
+            }
+            if (
+              data &&
+              data.getEventsWithProgress &&
+              data.getEventsWithProgress.totalItems
+            ) {
+              total = data.getEventsWithProgress.totalItems
+            }
+
+            return (
+              <>
+                <TableView
+                  id="declaration-status-list"
+                  content={getContent(data)}
+                  columns={getColumns()}
+                  isLoading={loading || Boolean(error)}
+                  noResultText={intl.formatMessage(constantsMessages.noResults)}
+                  hideBoxShadow
+                  fixedWidth={2050}
+                  tableHeight={150}
+                  currentPage={currentPageNumber}
+                  pageSize={recordCount}
+                  totalItems={total}
+                  highlightRowOnMouseOver
+                  onPageChange={(currentPage: number) => {
+                    setCurrentPageNumber(currentPage)
+                  }}
+                  loadMoreText={intl.formatMessage(
+                    messages.showMoreUsersLinkLabel,
+                    {
+                      pageSize: DEFAULT_DECLARATION_STATUS_PAGE_SIZE
+                    }
+                  )}
+                  isFullPage
+                />
+                {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
+              </>
+            )
+          }}
+        </Query>
+      </Content>
     </SysAdminContentWrapper>
   )
 }
 
 export const WorkflowStatus = connect(null, {
-  goToOperationalReport,
+  goToPerformanceHome,
   goToWorkflowStatus
 })(injectIntl(WorkflowStatusComponent))

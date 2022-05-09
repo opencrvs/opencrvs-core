@@ -197,6 +197,7 @@ const ValueWrapper = styled.span<{
     alignment === ColumnContentAlignment.RIGHT ? 'flex-end' : 'flex-start'};
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 8px;
+  align-self: center;
   ${({ color }) => color && `color: ${color};`}
 `
 const Error = styled.span`

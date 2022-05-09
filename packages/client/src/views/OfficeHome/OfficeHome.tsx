@@ -68,9 +68,8 @@ import {
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { SentForReview } from './sentForReview/SentForReview'
 import { RequiresUpdateFieldAgent } from './requiresUpdate/RequiresUpdateFieldAgent'
-import { PERFORMANCE_HOME, OPERATIONAL_REPORT } from '@client/navigation/routes'
+import { PERFORMANCE_HOME } from '@client/navigation/routes'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 
 export interface IProps extends IButtonProps {
@@ -376,16 +375,8 @@ export class OfficeHomeView extends React.Component<
             PERFORMANCE_MANAGEMENT_ROLES.includes(this.role)) && (
             <Redirect
               to={{
-                pathname: OPERATIONAL_REPORT,
-                search:
-                  '?locationId=' +
-                  this.jurisdictionLocationId +
-                  '&sectionId=' +
-                  OPERATIONAL_REPORT_SECTION.OPERATIONAL +
-                  '&timeStart=' +
-                  subYears(new Date(Date.now()), 1).toISOString() +
-                  '&timeEnd=' +
-                  new Date(Date.now()).toISOString()
+                pathname: PERFORMANCE_HOME,
+                search: `?locationId=${this.jurisdictionLocationId}`
               }}
             />
           )}

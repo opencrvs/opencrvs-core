@@ -27,12 +27,12 @@ const SUBMIT_DEATH_DECLARATION = gql`
   }
 `
 export const APPROVE_DEATH_DECLARATION = gql`
-  mutation submitMutation($id: ID!, $details: DeathRegistrationInput) {
+  mutation submitMutation($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsValidated(id: $id, details: $details)
   }
 `
 export const REGISTER_DEATH_DECLARATION = gql`
-  mutation submitMutation($id: ID!, $details: DeathRegistrationInput) {
+  mutation submitMutation($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsRegistered(id: $id, details: $details) {
       id
       registration {

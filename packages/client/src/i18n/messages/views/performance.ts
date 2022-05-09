@@ -9,65 +9,146 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IPerformanceReportsMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  monthlyTabTitle: MessageDescriptor
-  monthlyReportsBodyHeader: MessageDescriptor
-  sysAdminPerformanceHomeHeader: MessageDescriptor
-  sysAdminTeamHomeHeader: MessageDescriptor
-  noResultForLocation: MessageDescriptor
-  noResultForLocationWithoutPilotAreas: MessageDescriptor
-  exportAll: MessageDescriptor
-  operational: MessageDescriptor
-  reports: MessageDescriptor
-  declarationsStartedTitle: MessageDescriptor
-  declarationsStartedDescription: MessageDescriptor
-  declarationsStartedTotal: MessageDescriptor
-  declarationsStartedFieldAgents: MessageDescriptor
-  declarationsStartedHospitals: MessageDescriptor
-  declarationsStartedOffices: MessageDescriptor
-  registrationRatesReportHeader: MessageDescriptor
-  registrationRatesReportSubHeader: MessageDescriptor
-  registrationRatesReportDescription: MessageDescriptor
-  birthRegistrationRatesReportHeader: MessageDescriptor
-  deathRegistrationRatesReportHeader: MessageDescriptor
-  overTime: MessageDescriptor
-  byLocation: MessageDescriptor
-  locationTitle: MessageDescriptor
-  declarationCountByStatusDescription: MessageDescriptor
-  workflowStatusHeader: MessageDescriptor
-  fieldAgentsTitle: MessageDescriptor
-  fieldAgentsNoResult: MessageDescriptor
-  fieldAgentColumnHeader: MessageDescriptor
-  typeColumnHeader: MessageDescriptor
-  officeColumnHeader: MessageDescriptor
-  startMonthColumnHeader: MessageDescriptor
-  totalSentColumnHeader: MessageDescriptor
-  totalInProgressColumnHeader: MessageDescriptor
-  avgCompletionTimeColumnHeader: MessageDescriptor
-  totalRejectedColumnHeader: MessageDescriptor
-  fieldAgentStatusOptionActive: MessageDescriptor
-  fieldAgentStatusOptionPending: MessageDescriptor
-  fieldAgentStatusOptionDeactive: MessageDescriptor
-  eventOptionForBoth: MessageDescriptor
-  eventOptionForBirths: MessageDescriptor
-  eventOptionForDeaths: MessageDescriptor
-  showMoreUsersLinkLabel: MessageDescriptor
-  pilotAreaListHeader: MessageDescriptor
-}
-
-const messagesToDefine: IPerformanceReportsMessages = {
-  monthlyTabTitle: {
-    id: 'performance.topbar.tab.title.monthly',
-    defaultMessage: 'Monthly',
-    description: 'Title used for monthly tab in performance page header'
+const messagesToDefine = {
+  performanceCompletenessRatesHeader: {
+    id: 'performance.reports.header.completenessRates',
+    defaultMessage: 'Completeness rates',
+    description: 'Header for report completeness rates'
   },
-  monthlyReportsBodyHeader: {
-    id: 'performance.body.header.monthly.reports',
-    defaultMessage: 'Monthly reports',
-    description: 'Header used for the body of monthly reports page'
+  performanceCompletenessRatesSubHeader: {
+    id: 'performance.reports.subHeader.completenessRates',
+    defaultMessage:
+      'The no. of registrations, expressed as a % of the total estimated no. of {event, select, BIRTH{birth} DEATH{death} other{birth}}s occurring',
+    description: 'Sub header for report completeness rates'
+  },
+  performanceTotalRegitrationsHeader: {
+    id: 'performance.reports.header.totalRegistrations',
+    defaultMessage: 'Registrations',
+    description: 'Header for report total registrations'
+  },
+  performanceTotalCertificatesHeader: {
+    id: 'performance.reports.header.totalCertificates',
+    defaultMessage: 'Certificates issued',
+    description: 'Header for report total certificates'
+  },
+  performanceTotalCertificatesSubHeader: {
+    id: 'performance.reports.subHeader.totalCertificates',
+    defaultMessage:
+      'Certification rate is the no. of certificates issues, expressed as a percentage of the total number of registrations',
+    description: 'Sub header for report total certificates'
+  },
+  performanceTotalCorrectionsHeader: {
+    id: 'performance.reports.header.totalCorrections',
+    defaultMessage: 'Corrections',
+    description: 'Header for report total corrections'
+  },
+  performanceTotalPaymentsHeader: {
+    id: 'performance.reports.header.totalPayments',
+    defaultMessage: 'Fees collected',
+    description: 'Header for report total payments'
+  },
+  performanceApplicationSourcesHeader: {
+    id: 'performance.reports.header.applicationSources',
+    defaultMessage: 'Sources of applications',
+    description: 'Header for sources of applications'
+  },
+  performanceTotalLabel: {
+    id: 'performance.values.labels.total',
+    defaultMessage: 'Total',
+    description: 'Label text for displays showing totals'
+  },
+  performanceDelayedRegistrationsLabel: {
+    id: 'performance.values.labels.delayed',
+    defaultMessage: 'Delayed registrations',
+    description: 'Label text for display showing delayed registrations'
+  },
+  performanceLateRegistrationsLabel: {
+    id: 'performance.values.labels.late',
+    defaultMessage: 'Late registrations',
+    description: 'Label text for display showing late registrations'
+  },
+  performanceHealthFacilityBirth: {
+    id: 'performance.values.labels.birth.healthFacility',
+    defaultMessage: 'Health facility birth',
+    description: 'Label text for display showing health facility births'
+  },
+  performanceHealthFacilityDeath: {
+    id: 'performance.values.labels.death.healthFacility',
+    defaultMessage: 'Health facility death',
+    description: 'Label text for display showing health facility deaths'
+  },
+  performanceHomeBirth: {
+    id: 'performance.values.labels.birth.home',
+    defaultMessage: 'Home birth',
+    description: 'Label text for display showing private home births'
+  },
+  performanceHomeDeath: {
+    id: 'performance.values.labels.death.home',
+    defaultMessage: 'Home death',
+    description: 'Label text for display showing private home deaths'
+  },
+  performanceMaleLabel: {
+    id: 'performance.values.labels.male',
+    defaultMessage: 'Male',
+    description: 'Label text for displays showing the number of males'
+  },
+  performanceFemaleLabel: {
+    id: 'performance.values.labels.female',
+    defaultMessage: 'Female',
+    description: 'Label text for displays showing the number of females'
+  },
+  performanceWithinTargetDaysLabel: {
+    id: 'performance.values.labels.withinTargetDays',
+    defaultMessage:
+      '{withPrefix, select, true {Registered within} other {Within}} {target} days',
+    description: 'Label text for displays showing registered within target days'
+  },
+  performanceWithin1YearLabel: {
+    id: 'performance.values.labels.within1Year',
+    defaultMessage: 'Within 1 year',
+    description: 'Label text for displays showing registered within 1 year'
+  },
+  performanceWithin5YearsLabel: {
+    id: 'performance.values.labels.within5Years',
+    defaultMessage: 'Within 5 years',
+    description: 'Label text for displays showing registered within 5 years'
+  },
+  performanceCertificationFeeLabel: {
+    id: 'performance.payments.label.certificationFee',
+    defaultMessage: 'Certification fee',
+    description: 'Label for certification fee'
+  },
+  performanceCorrectionFeeLabel: {
+    id: 'performance.payments.label.correctionFee',
+    defaultMessage: 'Correction fee',
+    description: 'Label for correction fee'
+  },
+  performanceHospitalApplicationsLabel: {
+    id: 'performance.appSrc.labels.hospitalApplications',
+    defaultMessage: 'Health system (integration)',
+    description: 'Label for hospital applications'
+  },
+  performanceFieldAgentsApplicationsLabel: {
+    id: 'performance.appSrc.labels.fieldAgents',
+    defaultMessage: 'Field agents',
+    description: 'Label for field agents in application sources'
+  },
+  performanceRegistrarsApplicationsLabel: {
+    id: 'performance.appSrc.labels.registrars',
+    defaultMessage: 'Registrars',
+    description: 'Label for registrars in application sources'
+  },
+  performanceRegistrationAgentsApplicationsLabel: {
+    id: 'performance.appSrc.labels.registrationAgents',
+    defaultMessage: 'Registration agents',
+    description: 'Label for registration agents in application sources'
+  },
+  performanceCertificationRateLabel: {
+    id: 'performance.labels.certificationRate',
+    defaultMessage: 'Certification rate',
+    descrption: 'Label for certification rate'
   },
   sysAdminPerformanceHomeHeader: {
     id: 'performance.header.sysadmin.home',
@@ -90,11 +171,6 @@ const messagesToDefine: IPerformanceReportsMessages = {
     defaultMessage: 'No data for {searchedLocation}.',
     description: 'Message to show if no data is found for a location'
   },
-  exportAll: {
-    id: 'performance.reports.exportAll',
-    defaultMessage: 'Export all performance data',
-    description: 'Link text where all performance data is downloaded from'
-  },
   operational: {
     id: 'performance.reports.select.item.operational',
     defaultMessage: 'Operational',
@@ -104,6 +180,11 @@ const messagesToDefine: IPerformanceReportsMessages = {
     id: 'performance.reports.select.item.reports',
     defaultMessage: 'Reports',
     description: 'Label for select option Reports'
+  },
+  otherCorrectionReason: {
+    id: 'performance.reports.corrections.other.label',
+    defaultMessage: 'Other',
+    description: 'Label "Other" category in corrections'
   },
   declarationsStartedTitle: {
     id: 'performance.reports.declarationsStarted.title',
@@ -136,35 +217,6 @@ const messagesToDefine: IPerformanceReportsMessages = {
     defaultMessage: 'Hospitals (DHIS2)',
     description: 'Hospitals declarations started title'
   },
-  registrationRatesReportHeader: {
-    id: 'performance.report.registration.rates.header',
-    defaultMessage: 'Registration rates',
-    description: 'Header for registration rates report'
-  },
-  registrationRatesReportSubHeader: {
-    id: 'performance.report.registration.rates.subheader',
-    defaultMessage:
-      'Rates are based on estimated totals calculated using the crude birth and death rate for {startTime} - {endTime}',
-    description: 'Sub header for registration rates report'
-  },
-  registrationRatesReportDescription: {
-    id: 'performance.report.registration.rates.description',
-    defaultMessage:
-      '{totalRegistrationNumber} registered within {registrationTarget} days out of estimated {estimatedRegistrationNumber}',
-    description: 'Event registration rate report description'
-  },
-  birthRegistrationRatesReportHeader: {
-    id: 'performance.report.regrates.birth.head',
-    defaultMessage:
-      'Birth registration rate within {birthRegistrationTarget} days of event',
-    description: 'Header for birth registration rates report'
-  },
-  deathRegistrationRatesReportHeader: {
-    id: 'performance.report.regrates.death.head',
-    defaultMessage:
-      'Death registration rate within {deathRegistrationTarget} days of event',
-    description: 'Header for death registration rates report'
-  },
   overTime: {
     id: 'performance.regRates.select.item.overTime',
     defaultMessage: 'Over time',
@@ -183,7 +235,7 @@ const messagesToDefine: IPerformanceReportsMessages = {
   declarationCountByStatusDescription: {
     id: 'performance.ops.statCount.desc',
     defaultMessage:
-      'Current status of all declarations being processed for your selected administrative area.',
+      'Current status of {event, select, BIRTH{birth} DEATH{death} records being processed.',
     description: 'Description of the status wise declaration count view'
   },
   workflowStatusHeader: {
@@ -283,8 +335,32 @@ const messagesToDefine: IPerformanceReportsMessages = {
     id: 'performance.pilotArea.header',
     defaultMessage: 'Pilot Areas',
     description: 'Label for pilot area list header'
+  },
+  stats: {
+    id: 'performance.stats.header',
+    defaultMessage: 'Stats',
+    description: 'Title for perforamce stats'
+  },
+  registrarsToCitizen: {
+    id: 'performance.registrarsToCitizen',
+    defaultMessage: 'Registrars to citizens',
+    description: 'Title for Registrars to citizens'
+  },
+  registrarsToCitizenValue: {
+    id: 'performance.registrarsToCitizenValue',
+    defaultMessage: '1 to {citizen}',
+    description: 'Value for Registrars to citizens'
+  },
+  registrationByStatus: {
+    id: 'performance.registrationByStatus.header',
+    defaultMessage: 'Registration by status',
+    description: 'Title for Registration by status'
+  },
+  completenessRate: {
+    id: 'performance.completenessTable.completenessRate',
+    defaultMessage: 'Completeness {lineBreak}rate',
+    description: 'Title for Completeness rate column in the table'
   }
 }
 
-export const messages: IPerformanceReportsMessages =
-  defineMessages(messagesToDefine)
+export const messages = defineMessages(messagesToDefine)

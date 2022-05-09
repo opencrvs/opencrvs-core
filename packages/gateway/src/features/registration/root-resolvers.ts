@@ -34,6 +34,8 @@ import {
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
+  GQLBirthRegistrationInput,
+  GQLDeathRegistrationInput,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
@@ -189,22 +191,26 @@ export const resolvers: GQLResolver = {
     },
     async fetchRegistrationCountByStatus(
       _,
-      { locationId, status },
+      { locationId, status, event },
       authHeader
     ) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare') ||
-        hasScope(authHeader, 'sysadmin')
+        hasScope(authHeader, 'sysadmin') ||
+        hasScope(authHeader, 'performance')
       ) {
         const payload: {
-          declarationLocationHirarchyId: string
+          declarationLocationHirarchyId?: string
           status: string[]
+          event?: string
         } = {
           declarationLocationHirarchyId: locationId,
-          status: status as string[]
+          status: status as string[],
+          event
         }
+
         const results: GQLStatusWiseRegistrationCount[] = await fetch(
           `${SEARCH_URL}statusWiseRegistrationCount`,
           {
@@ -216,6 +222,7 @@ export const resolvers: GQLResolver = {
             }
           }
         ).then((data) => data.json())
+
         let total = 0
         if (results && results.length > 0) {
           total = results.reduce(
@@ -613,25 +620,10 @@ async function markEventAsRegistered(
   id: string,
   authHeader: IAuthHeader,
   event: EVENT_TYPE,
-  details?: any
+  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput
 ) {
-  let doc
-  if (!details) {
-    const taskBundle = await fetchFHIR(
-      `/Task?focus=Composition/${id}`,
-      authHeader
-    )
-    if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
-      throw new Error('Task does not exist')
-    }
-    doc = {
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: taskBundle.entry
-    }
-  } else {
-    doc = await buildFHIRBundle(details, event, authHeader)
-  }
+  const doc = await buildFHIRBundle(details, event, authHeader)
+
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition

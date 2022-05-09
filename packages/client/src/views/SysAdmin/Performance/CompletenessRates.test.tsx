@@ -19,8 +19,8 @@ import {
   flushPromises
 } from '@client/tests/util'
 import { AppStore } from '@client/store'
-import { RegistrationRates } from '@client/views/SysAdmin/Performance/RegistrationRates'
-import { EVENT_REGISTRATION_RATES } from '@client/navigation/routes'
+import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
+import { EVENT_COMPLETENESS_RATES } from '@client/navigation/routes'
 import {
   HAS_CHILD_LOCATION,
   FETCH_MONTH_WISE_EVENT_ESTIMATIONS
@@ -128,16 +128,17 @@ describe('Registraion Rates tests', () => {
 
   beforeEach(async () => {
     component = await createTestComponent(
-      <RegistrationRates
+      <CompletenessRates
         match={{
           params: { eventType: 'birth' },
           isExact: true,
-          path: EVENT_REGISTRATION_RATES,
+          path: EVENT_COMPLETENESS_RATES,
           url: ''
         }}
         // @ts-ignore
         location={{
           search: stringify({
+            time: 'withinTarget',
             locationId: LOCATION_DHAKA_DIVISION.id,
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
@@ -161,32 +162,7 @@ describe('Registraion Rates tests', () => {
       configurable: true,
       value: 200
     })
-    await waitForElement(component, '#reg-rates-header')
-  })
-
-  it('because of more than one child locations from the query, by location option arrives in dropdown', async () => {
-    const select = await waitForElement(component, '#base-select')
-    select
-      .find('.react-select__control')
-      .simulate('keyDown', { key: 'ArrowDown', keyCode: 40 })
-    component.update()
-    expect(component.find('.react-select__menu-list').children().length).toBe(2)
-    expect(component.find('.react-select__menu-list').childAt(1).text()).toBe(
-      'By location'
-    )
-  })
-
-  it('clicking on back takes back to operational dashboard with selected location', async () => {
-    const backAction = await waitForElement(component, '#reg-rates-action-back')
-    backAction.hostNodes().simulate('click')
-    await flushPromises()
-    expect(history.location.pathname).toBe('/performance/operations')
-    expect(parse(history.location.search)).toEqual({
-      sectionId: 'OPERATIONAL',
-      locationId: LOCATION_DHAKA_DIVISION.id,
-      timeEnd: new Date(1487076708000).toISOString(),
-      timeStart: new Date(1455454308000).toISOString()
-    })
+    await waitForElement(component, '#reg-rates')
   })
 
   it('clicking on any other preset range changes date ranges in url', async () => {
@@ -315,16 +291,17 @@ describe('Registraion Rates error state tests', () => {
     ;({ store, history } = await createTestStore())
 
     component = await createTestComponent(
-      <RegistrationRates
+      <CompletenessRates
         match={{
           params: { eventType: 'birth' },
           isExact: true,
-          path: EVENT_REGISTRATION_RATES,
+          path: EVENT_COMPLETENESS_RATES,
           url: ''
         }}
         // @ts-ignore
         location={{
           search: stringify({
+            time: 'withinTarget',
             locationId: LOCATION_DHAKA_DIVISION.id,
             timeEnd: new Date(1487076708000).toISOString(),
             timeStart: new Date(1455454308000).toISOString()
