@@ -393,6 +393,7 @@ function UserListComponent(props: IProps) {
         ? true
         : false
     return (
+      // TODO use Pill Component from #2780
       <StatusMenuContainer>
         {underInvestigation && <SearchRed />}
         <Status status={status || 'pending'} />
@@ -511,6 +512,11 @@ function UserListComponent(props: IProps) {
           }
           const totalData =
             (data && data.searchUsers && data.searchUsers.totalItems) || 0
+          const userContent = generateUserContents(
+            data,
+            locationId,
+            userDetails
+          )
           return (
             <UserTable id="user_list">
               <TableHeader>
@@ -525,25 +531,22 @@ function UserListComponent(props: IProps) {
               </TableHeader>
               <ListViewContainer>
                 <ListViewSimplified>
-                  {generateUserContents(data, locationId, userDetails).length <=
-                  0 ? (
+                  {userContent.length <= 0 ? (
                     <NoRecord id="no-record">
                       {intl.formatMessage(constantsMessages.noResult)}
                     </NoRecord>
                   ) : (
-                    generateUserContents(data, locationId, userDetails).map(
-                      (content, index) => {
-                        return (
-                          <ListViewItemSimplified
-                            key={index}
-                            image={content.image}
-                            label={content.label}
-                            value={content.value}
-                            actions={content.actions}
-                          />
-                        )
-                      }
-                    )
+                    userContent.map((content, index) => {
+                      return (
+                        <ListViewItemSimplified
+                          key={index}
+                          image={content.image}
+                          label={content.label}
+                          value={content.value}
+                          actions={content.actions}
+                        />
+                      )
+                    })
                   )}
                 </ListViewSimplified>
               </ListViewContainer>
