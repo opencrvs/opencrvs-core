@@ -26,6 +26,12 @@ export function hasPreviewGroup(field: IConfigField) {
   return Boolean(field.previewGroupID)
 }
 
+export function samePreviewGroupID(field1: IConfigField, field2: IConfigField) {
+  return (
+    field1.previewGroupID && field1.previewGroupID === field2.previewGroupID
+  )
+}
+
 export function getElementsOfPreviewGroup(
   section: IConfigFieldMap,
   previewGroupID: string | undefined

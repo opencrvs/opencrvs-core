@@ -23,6 +23,7 @@ import {
   getElementsOfPreviewGroup,
   getIndexOfPlaceholderPreviewGroup,
   hasPreviewGroup,
+  samePreviewGroupID,
   shiftCurrentFieldDown,
   shiftCurrentFieldUp
 } from './motionUtils'
@@ -104,7 +105,8 @@ function shiftUp(fieldMap: IConfigFieldMap, fieldId: string) {
   if (undefined !== previousField && hasPreviewGroup(previousField)) {
     while (
       previousField &&
-      getIndexOfPlaceholderPreviewGroup(newSection, previousField) > -1
+      getIndexOfPlaceholderPreviewGroup(newSection, previousField) > -1 &&
+      !samePreviewGroupID(previousField, currentField)
     ) {
       newSection = shiftCurrentFieldUp(
         newSection,
@@ -138,7 +140,8 @@ function shiftDown(fieldMap: IConfigFieldMap, fieldId: string) {
   if (undefined !== nextField && hasPreviewGroup(nextField)) {
     while (
       nextField &&
-      getIndexOfPlaceholderPreviewGroup(newSection, nextField, true) > -1
+      getIndexOfPlaceholderPreviewGroup(newSection, nextField, true) > -1 &&
+      !samePreviewGroupID(nextField, currentField)
     ) {
       newSection = shiftCurrentFieldDown(
         newSection,
