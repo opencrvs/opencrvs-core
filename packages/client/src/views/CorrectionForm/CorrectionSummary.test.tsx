@@ -29,6 +29,7 @@ import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
 import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
 import { getOfflineDataSuccess } from '@client/offline/actions'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 let wrapper: ReactWrapper<{}, {}>
 
@@ -380,7 +381,7 @@ describe('Correction summary', () => {
 
       wrapper.update()
 
-      expect(history.location.pathname).toContain('/review')
+      expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
     })
 
     it('after successful correction request redirects to  reg home review tab', () => {
