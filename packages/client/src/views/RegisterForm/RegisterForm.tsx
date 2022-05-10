@@ -520,7 +520,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     return {
       title: intl.formatMessage(correctionMessages.title),
       pageIcon: backButton,
-      goHome: () => this.props.goToHomeTab('review')
+      goHome: () => this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
     }
   }
 
