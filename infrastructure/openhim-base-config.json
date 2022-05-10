@@ -2424,7 +2424,7 @@
       "responseBody": true,
       "rewriteUrlsConfig": [],
       "name": "Birth Archive",
-      "urlPattern": "^/events/downloaded-and-assigned$",
+      "urlPattern": "^/events/assigned$",
       "matchContentRegex": null,
       "matchContentXpath": null,
       "matchContentValue": null,
