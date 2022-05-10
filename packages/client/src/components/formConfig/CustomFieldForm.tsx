@@ -51,12 +51,31 @@ import { selectConfigFields } from '@client/forms/configuration/formConfig/selec
 import { getConfigFieldIdentifiers } from '@client/forms/configuration/formConfig/motionUtils'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
 
+const CInputField = styled(InputField)`
+  label {
+    ${({ theme }) => theme.fonts.reg14};
+  }
+`
+
+const CTextInput = styled(TextInput)`
+  height: 32px;
+  border: solid 1px ${({ theme }) => theme.colors.grey600};
+  font-size: ${({ theme }) => theme.fonts.reg14};
+`
+
+const CTextArea = styled(TextArea)`
+  height: 32px;
+  background: ${({ theme }) => theme.colors.white};
+  border: solid 1px ${({ theme }) => theme.colors.grey600};
+  font-size: ${({ theme }) => theme.fonts.reg14};
+`
+
 const CustomFieldFormContainer = styled(Box)`
   box-shadow: none;
   max-width: 348px;
   min-height: 100vh;
   margin-left: auto;
-  padding: 0px;
+  padding: 0px 3px;
   border: none;
 `
 
@@ -112,6 +131,20 @@ const ListRow = styled.div`
 
 const LanguageSelect = styled(Select)`
   width: 175px;
+  border: solid 2px ${({ theme }) => theme.colors.indigoDark};
+  border-radius: 2px;
+  .react-select__control {
+    max-height: 32px;
+    min-height: 32px;
+  }
+  .react-select__value-container {
+    display: block;
+    line-height: auto;
+  }
+  div {
+    ${({ theme }) => theme.fonts.reg14};
+    color: ${({ theme }) => theme.colors.indigoDark};
+  }
 `
 
 const StyledTooltip = styled(Tooltip)`
@@ -354,6 +387,7 @@ class CustomFieldFormsComp extends React.Component<
       languageOptions.length > 1 && (
         <FieldContainer>
           <LanguageSelect
+            hideBorder={true}
             value={this.state.selectedLanguage}
             onChange={(selectedLanguage: string) => {
               this.setState({ selectedLanguage })
@@ -401,12 +435,12 @@ class CustomFieldFormsComp extends React.Component<
           return (
             <React.Fragment key={index}>
               <FieldContainer hide={language !== this.state.selectedLanguage}>
-                <InputField
+                <CInputField
                   id={`custom-form-label-${language}`}
                   label={intl.formatMessage(customFieldFormMessages.label)}
                   touched={true}
                 >
-                  <TextInput
+                  <CTextInput
                     value={this.state.fieldForms[language].label}
                     onChange={(event: any) => {
                       const { value } = event.target
@@ -429,11 +463,11 @@ class CustomFieldFormsComp extends React.Component<
                       })
                     }}
                   />
-                </InputField>
+                </CInputField>
               </FieldContainer>
 
               <FieldContainer hide={language !== this.state.selectedLanguage}>
-                <InputField
+                <CInputField
                   required={false}
                   id={`custom-form-placeholder-${language}`}
                   label={intl.formatMessage(
@@ -441,17 +475,17 @@ class CustomFieldFormsComp extends React.Component<
                   )}
                   touched={false}
                 >
-                  <TextInput
+                  <CTextInput
                     value={this.state.fieldForms[language].placeholder}
                     onChange={(event: any) =>
                       this._setValue('placeholder', event.target.value)
                     }
                   />
-                </InputField>
+                </CInputField>
               </FieldContainer>
 
               <FieldContainer hide={language !== this.state.selectedLanguage}>
-                <InputField
+                <CInputField
                   id={`custom-form-description-${language}`}
                   label={intl.formatMessage(
                     customFieldFormMessages.descriptionLabel
@@ -459,7 +493,7 @@ class CustomFieldFormsComp extends React.Component<
                   required={false}
                   touched={false}
                 >
-                  <TextArea
+                  <CTextArea
                     ignoreMediaQuery={true}
                     {...{
                       onChange: (event: any) => {
@@ -468,11 +502,11 @@ class CustomFieldFormsComp extends React.Component<
                       value: this.state.fieldForms[language].description
                     }}
                   />
-                </InputField>
+                </CInputField>
               </FieldContainer>
 
               <FieldContainer hide={language !== this.state.selectedLanguage}>
-                <InputField
+                <CInputField
                   required={false}
                   id={`custom-form-tooltip-${language}`}
                   label={intl.formatMessage(
@@ -480,17 +514,17 @@ class CustomFieldFormsComp extends React.Component<
                   )}
                   touched={false}
                 >
-                  <TextInput
+                  <CTextInput
                     onChange={(event: any) =>
                       this._setValue('tooltip', event.target.value)
                     }
                     value={this.state.fieldForms[language].tooltip}
                   />
-                </InputField>
+                </CInputField>
               </FieldContainer>
 
               <FieldContainer hide={language !== this.state.selectedLanguage}>
-                <InputField
+                <CInputField
                   required={false}
                   id={`custom-form-error-message-${language}`}
                   label={intl.formatMessage(
@@ -498,7 +532,7 @@ class CustomFieldFormsComp extends React.Component<
                   )}
                   touched={false}
                 >
-                  <TextArea
+                  <CTextArea
                     ignoreMediaQuery={true}
                     {...{
                       onChange: (event: any) => {
@@ -507,11 +541,11 @@ class CustomFieldFormsComp extends React.Component<
                       value: this.state.fieldForms[language].errorMessage
                     }}
                   />
-                </InputField>
+                </CInputField>
               </FieldContainer>
 
               <FieldContainer hide={language !== this.state.selectedLanguage}>
-                <InputField
+                <CInputField
                   required={false}
                   id={`custom-form-max-length-${language}`}
                   label={intl.formatMessage(
@@ -519,7 +553,7 @@ class CustomFieldFormsComp extends React.Component<
                   )}
                   touched={false}
                 >
-                  <TextInput
+                  <CTextInput
                     value={this.state.maxLength}
                     onChange={(event: any) =>
                       this.setState({
@@ -527,7 +561,7 @@ class CustomFieldFormsComp extends React.Component<
                       })
                     }
                   />
-                </InputField>
+                </CInputField>
               </FieldContainer>
             </React.Fragment>
           )
