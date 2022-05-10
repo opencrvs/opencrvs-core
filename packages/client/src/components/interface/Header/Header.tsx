@@ -266,11 +266,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         }
       }
     } else if (
-      (activeMenuItem === ACTIVE_MENU_ITEM.TEAM &&
-        (NATL_ADMIN_ROLES.includes(this.props.userDetails?.role as string) ||
-          SYS_ADMIN_ROLES.includes(this.props.userDetails?.role as string))) ||
-      (this.props.userDetails?.role &&
-        USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role))
+      this.props.userDetails?.role &&
+      USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
     ) {
       return {
         mobileLeft: {
