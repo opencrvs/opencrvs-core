@@ -376,6 +376,7 @@ describe('when user has starts a new declaration', () => {
           app
             .find('#btn_change_child_familyNameEng')
             .hostNodes()
+            .first()
             .simulate('click')
         })
 
@@ -388,7 +389,7 @@ describe('when user has starts a new declaration', () => {
             app,
             '#btn_change_child_familyNameEng'
           )
-          expect(changeNameButton.hostNodes()).toHaveLength(1)
+          expect(changeNameButton.hostNodes()).toHaveLength(2)
         })
 
         it('should go to input field when user press change button to edit information', async () => {
@@ -404,7 +405,7 @@ describe('when user has starts a new declaration', () => {
             '#btn_change_child_familyNameEng'
           )
 
-          changeNameButton.hostNodes().simulate('click')
+          changeNameButton.hostNodes().first().simulate('click')
 
           const familyNameEngInputField = await waitForElement(
             app,
