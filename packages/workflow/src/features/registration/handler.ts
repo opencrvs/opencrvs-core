@@ -418,7 +418,7 @@ export async function markEventAsCertifiedHandler(
   }
 }
 
-export async function markEventAsDownloadedHandler(
+export async function markEventAsDownloadedAndAssignedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {

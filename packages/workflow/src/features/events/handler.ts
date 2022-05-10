@@ -23,7 +23,7 @@ import {
   markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
-  markEventAsDownloadedHandler
+  markEventAsDownloadedAndAssignedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
@@ -70,7 +70,7 @@ export enum Events {
   DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
   DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
-  DOWNLOADED = '/events/downloaded',
+  DOWNLOADED_AND_ASSIGNED = '/events/downloaded-and-assigned',
   UNKNOWN = 'unknown'
 }
 
@@ -155,8 +155,8 @@ function detectEvent(request: Hapi.Request): Events {
         }
       }
       if (firstEntry.resourceType === 'Task' && firstEntry.id) {
-        if (fhirBundle?.signature?.type[0]?.code === 'downloaded') {
-          return Events.DOWNLOADED
+        if (fhirBundle?.signature?.type[0]?.code === 'downloadedAndAssigned') {
+          return Events.DOWNLOADED_AND_ASSIGNED
         }
 
         const eventType = getEventType(fhirBundle)
@@ -401,9 +401,13 @@ export async function fhirWorkflowEventHandler(
         request.headers
       )
       break
-    case Events.DOWNLOADED:
-      response = await markEventAsDownloadedHandler(request, h)
-      await triggerEvent(Events.DOWNLOADED, request.payload, request.headers)
+    case Events.DOWNLOADED_AND_ASSIGNED:
+      response = await markEventAsDownloadedAndAssignedHandler(request, h)
+      await triggerEvent(
+        Events.DOWNLOADED_AND_ASSIGNED,
+        request.payload,
+        request.headers
+      )
       break
     default:
       // forward as-is to hearth
