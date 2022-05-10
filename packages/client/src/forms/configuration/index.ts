@@ -273,6 +273,6 @@ export function getConfiguredOrDefaultForm(
         registerForms[event],
         event
       )
-    : registerForms[event]
+    : populateRegisterFormsWithAddresses(registerForms[event], event)
   return deserializeForm(form)
 }
