@@ -49,6 +49,12 @@ export interface ICorrection {
   oldValue: string
   newValue: string
 }
+export interface IAssignment {
+  userId: string
+  firstName: string
+  lastName: string
+  officeName: string
+}
 export interface IOperationHistory {
   operationType: string
   operatedOn: string
@@ -89,6 +95,7 @@ export interface ICompositionBody {
   updatedBy?: string
   createdAt?: string
   modifiedAt?: string
+  assignment?: IAssignment | null
   operationHistories?: IOperationHistory[]
 }
 
@@ -140,8 +147,7 @@ export interface IDeathCompositionBody extends ICompositionBody {
   informantFirstNamesLocal?: string
   informantFamilyNameLocal?: string
 }
-
-interface IUserModelData {
+export interface IUserModelData {
   _id: string
   role: string
   name: fhir.HumanName[]
