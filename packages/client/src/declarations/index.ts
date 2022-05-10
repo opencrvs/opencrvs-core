@@ -148,7 +148,9 @@ const ACTION_LIST: IActionList = {
   [DeclarationAction.LOAD_REVIEW_DECLARATION]:
     DeclarationAction.LOAD_REVIEW_DECLARATION,
   [DeclarationAction.LOAD_CERTIFICATE_DECLARATION]:
-    DeclarationAction.LOAD_CERTIFICATE_DECLARATION
+    DeclarationAction.LOAD_CERTIFICATE_DECLARATION,
+  [DeclarationAction.LOAD_REQUESTED_CORRECTION_DECLARATION]:
+    DeclarationAction.LOAD_REVIEW_DECLARATION
 }
 
 export interface IPayload {

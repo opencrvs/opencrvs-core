@@ -649,7 +649,7 @@ export const convertToMSISDN = (phone: string) => {
    */
   const countryCode =
     window.config.COUNTRY.toUpperCase() === 'FAR'
-      ? 'FIN'
+      ? 'ZMB'
       : window.config.COUNTRY.toUpperCase()
 
   const countryCallingCode =
