@@ -25,6 +25,7 @@ const Container = styled.div`
   }
 `
 const ListDataContainer = styled.div`
+  align-items: center;
   ${({ theme }) => theme.fonts.bigBody};
   display: flex;
   flex-grow: 1;

@@ -22,6 +22,7 @@ import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
 import { ApiResponse } from '@elastic/elasticsearch'
 import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
 import { updateComposition } from '@search/elasticsearch/dbhelper'
+import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
 export async function searchDeclaration(
@@ -86,6 +87,7 @@ export async function getAllDocumentsHandler(
 interface ICountQueryParam {
   declarationLocationHirarchyId: string
   status: string[]
+  event?: string
 }
 
 export async function getStatusWiseRegistrationCountHandler(
@@ -94,18 +96,62 @@ export async function getStatusWiseRegistrationCountHandler(
 ) {
   try {
     const payload = request.payload as ICountQueryParam
-    const countResult: { status: string; count: number }[] = []
-    for (const regStatus of payload.status) {
-      const searchResult = await searchComposition({
-        declarationLocationHirarchyId: payload.declarationLocationHirarchyId,
-        status: [regStatus]
-      })
-      countResult.push({
-        status: regStatus,
-        count: searchResult?.body?.hits?.total?.value || 0
-      })
+
+    const response = await client.search<{
+      aggregations?: {
+        statusCounts: {
+          buckets: Array<{
+            key: string
+            doc_count: number
+          }>
+        }
+      }
+    }>({
+      body: {
+        size: 0,
+        query: {
+          bool: {
+            must: [
+              {
+                match: {
+                  event: capitalize(payload.event || EVENT.BIRTH)
+                }
+              },
+              {
+                terms: {
+                  'type.keyword': payload.status
+                }
+              }
+            ]
+          }
+        },
+        aggs: {
+          statusCounts: {
+            terms: {
+              field: 'type.keyword'
+            }
+          }
+        }
+      }
+    })
+
+    if (!response.body.aggregations) {
+      return payload.status.map((status) => ({
+        status,
+        count: 0
+      }))
     }
-    return h.response(countResult).code(200)
+
+    const countResult = response.body.aggregations.statusCounts.buckets.map(
+      ({ key, doc_count }) => ({ status: key, count: doc_count })
+    )
+
+    const data = payload.status.map((status) => ({
+      status,
+      count: countResult.find(({ status: s }) => s === status)?.count || 0
+    }))
+
+    return h.response(data).code(200)
   } catch (err) {
     return internal(err)
   }

@@ -84,6 +84,7 @@ export async function createServer() {
       })
       .catch((err: Error) => {
         server.log('info', `Error creating Influx database! ${err.stack}`)
+        throw err
       })
   }
 

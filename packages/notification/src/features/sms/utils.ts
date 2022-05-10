@@ -56,7 +56,7 @@ export async function getTranslations(
   messagePayload: ISendSMSPayload,
   locale: string
 ): Promise<string> {
-  const url = `${COUNTRY_CONFIG_URL}/definitions/notification`
+  const url = `${COUNTRY_CONFIG_URL}/content/notification`
   const res: ITranslationsResponse = await fetch(url, {
     method: 'GET',
     headers: {

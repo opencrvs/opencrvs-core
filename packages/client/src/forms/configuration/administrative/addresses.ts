@@ -160,7 +160,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       {
         config: AddressCases.PRIMARY_ADDRESS,
         informant: false,
-        conditionalCase: `((${fathersDetailsDontExist} || ${primaryAddressSameAsOtherPrimaryAddress}) && !${mothersDetailsDontExistOnOtherPage}) || (${fathersDetailsDontExist} && ${mothersDetailsDontExistOnOtherPage}) `
+        conditionalCase: `((${fathersDetailsDontExist} && ${fathersDetailsExistBasedOnContactAndInformant}) || ${primaryAddressSameAsOtherPrimaryAddress})`
       },
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
@@ -445,13 +445,18 @@ export const getXAddressSameAsY = (
   return [copyAddressField]
 }
 
+const shouldAddAddressFields = (configuration: AllowedAddressConfigurations) =>
+  window.config.ADDRESSES === 1 &&
+  (configuration.config === AddressSubsections.SECONDARY_ADDRESS_SUBSECTION ||
+    configuration.config === AddressCases.SECONDARY_ADDRESS)
+    ? false
+    : true
+
 export function populateRegisterFormsWithAddresses(
   defaultEventForm: ISerializedForm,
   event: string
 ) {
   const newForm = cloneDeep(defaultEventForm)
-  // TODO: will remove this line and add coverage to this function when tests are refactored in this PR: https://github.com/opencrvs/opencrvs-core/pull/2818
-  // and when this PR is merged with https://github.com/opencrvs/opencrvs-core/pull/2907
   defaultAddressConfiguration.forEach(
     (addressConfiguration: IAddressConfiguration) => {
       if (addressConfiguration.preceedingFieldId.includes(event)) {
@@ -462,14 +467,15 @@ export function populateRegisterFormsWithAddresses(
         let previewGroups: IPreviewGroup[] = []
         if (preceedingDefaultField) {
           addressConfiguration.configurations.forEach((configuration) => {
-            // TODO: At this point we can check the ApplicationConfig from this PR: https://github.com/opencrvs/opencrvs-core/pull/2818 and see if 2 addresses are enabled
-            const tmpAddressFields: SerializedFormField[] =
-              addressFields.concat(getAddressFields(configuration))
-            addressFields = tmpAddressFields
-            const tmpPreviewGroups: IPreviewGroup[] = previewGroups.concat(
-              getPreviewGroups(configuration)
-            )
-            previewGroups = tmpPreviewGroups
+            if (shouldAddAddressFields(configuration)) {
+              const tmpAddressFields: SerializedFormField[] =
+                addressFields.concat(getAddressFields(configuration))
+              addressFields = tmpAddressFields
+              const tmpPreviewGroups: IPreviewGroup[] = previewGroups.concat(
+                getPreviewGroups(configuration)
+              )
+              previewGroups = tmpPreviewGroups
+            }
           })
         }
         if (preceedingDefaultField && addressFields.length) {

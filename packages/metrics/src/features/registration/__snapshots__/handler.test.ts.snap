@@ -6,11 +6,12 @@ Object {
     "compositionId": "1744fc19-95be-434b-8bc9-a76d6b81551b",
     "total": 50,
   },
-  "measurement": "certification_payment",
+  "measurement": "payment",
   "tags": Object {
     "eventType": "BIRTH",
     "locationLevel5": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b",
     "officeLocation": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b",
+    "paymentType": "certification",
   },
   "timestamp": undefined,
 }
@@ -148,11 +149,12 @@ Object {
     "compositionId": "c41a95b6-4439-4fc7-9d56-6d3a8ea0f80b",
     "total": undefined,
   },
-  "measurement": "correction_payment",
+  "measurement": "payment",
   "tags": Object {
     "eventType": "BIRTH",
     "locationLevel5": "Location/976c4871-c4d1-46f7-b50b-09f346e05d55",
     "officeLocation": "Location/fe68d322-4d98-4cdf-a320-2db9653f781d",
+    "paymentType": "correction",
   },
   "timestamp": undefined,
 }

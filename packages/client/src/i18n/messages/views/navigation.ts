@@ -10,10 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
-import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 interface INavigationMessages
-  extends Record<IWORKQUEUE_TABS, MessageDescriptor> {
+  extends Record<string | number | symbol, MessageDescriptor> {
   progress: MessageDescriptor
   readyForReview: MessageDescriptor
   sentForReview: MessageDescriptor
@@ -26,7 +25,8 @@ interface INavigationMessages
   performance: MessageDescriptor
   team: MessageDescriptor
   config: MessageDescriptor
-  certificate: MessageDescriptor //'Certificates',pplication',
+  certificate: MessageDescriptor
+  completenessRates: MessageDescriptor
   form: MessageDescriptor
 }
 
@@ -95,6 +95,11 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Certificate',
     description: 'Certificates label in navigation',
     id: 'navigation.certificate'
+  },
+  completenessRates: {
+    defaultMessage: 'Completeness rates',
+    description: 'Completeness rates in navigation',
+    id: 'navigation.completenessRates'
   },
   form: {
     defaultMessage: 'Declaration forms',

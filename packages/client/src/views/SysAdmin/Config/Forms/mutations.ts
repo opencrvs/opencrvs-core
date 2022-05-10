@@ -25,17 +25,11 @@ export const CREATE_FORM_DRAFT = gql`
   ${FORM_DRAFT_FIELDS}
   mutation createFormDraft(
     $event: String!
-    $status: String!
     $comment: String!
     $questions: [QuestionInput!]!
   ) {
-    createOrUpdateFormDraft(
-      formDraft: {
-        event: $event
-        status: $status
-        comment: $comment
-        questions: $questions
-      }
+    createFormDraft(
+      formDraft: { event: $event, comment: $comment, questions: $questions }
     ) {
       ...FormDraftFields
     }

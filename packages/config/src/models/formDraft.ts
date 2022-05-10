@@ -34,7 +34,7 @@ export interface IFormDraft {
   status: DraftStatus
   comment?: string
   version: number
-  history?: IHistory[]
+  history: IHistory[]
   updatedAt: number
   createdAt: number
 }

@@ -8,126 +8,41 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-type RegistrationMetrics {
-  genderBasisMetrics: RegistrationGenderBasisMetrics
-  timeFrames: RegistrationTimeFrameMetrics
-  estimatedTargetDayMetrics: RegistrationTargetDayEstimatedMetrics
-  payments: CertificationPaymentMetrics
-}
-
-type RegistrationGenderBasisMetrics {
-  details: [GenderBasisDetailsMetrics!]
-  total: GenderBasisTotalCount
-}
-
-type GenderBasisDetailsMetrics {
-  location: ID!
-  maleUnder18: Int!
-  femaleUnder18: Int!
-  maleOver18: Int!
-  femaleOver18: Int!
+type EventMetrics {
   total: Int!
+  gender: String!
+  eventLocationType: String!
+  timeLabel: String!
+  practitionerRole: String!
 }
 
-type GenderBasisTotalCount {
-  maleUnder18: Int!
-  femaleUnder18: Int!
-  maleOver18: Int!
-  femaleOver18: Int!
-  total: Int!
-}
-
-type CertificationPaymentMetrics {
-  details: [CertificationPaymentDetailsMetrics!]
-  total: CertificationPaymentTotalCount
-}
-
-type CertificationPaymentDetailsMetrics {
-  total: Int!
+type Estimation {
+  totalEstimation: Int!
+  maleEstimation: Int!
+  femaleEstimation: Int!
   locationId: String!
-}
-
-type CertificationPaymentTotalCount {
-  total: Int!
-}
-
-type RegistrationTimeFrameMetrics {
-  details: [TimeFrameDetailMetrics!]
-  total: TimeFrameTotalCount
-}
-
-type RegistrationTargetDayEstimatedMetrics {
-  details: [EstimatedTargetDayMetrics!]
-  total: EstimateTargetDayTotalCount
-}
-
-type EstimateTargetDayTotalCount {
-  estimatedRegistration: Float!
-  registrationInTargetDay: Int!
-  estimationPercentage: Float!
-}
-
-type EstimatedTargetDayMetrics {
-  locationId: String!
-  estimatedRegistration: Float!
-  registrationInTargetDay: Int!
   estimationYear: Int!
-  estimationLocationLevel: String!
-  estimationPercentage: Float!
+  locationLevel: String!
 }
 
-type TimeFrameTotalCount {
-  regWithinTargetd: Int!
-  regWithinTargetdTo1yr: Int!
-  regWithin1yrTo5yr: Int!
-  regOver5yr: Int!
-  total: Int!
+type TotalMetricsResult {
+  estimated: Estimation!
+  results: [EventMetrics!]!
 }
 
-type TimeFrameDetailMetrics {
-  locationId: String!
-  regWithinTargetd: Int!
-  regWithinTargetdTo1yr: Int!
-  regWithin1yrTo5yr: Int!
-  regOver5yr: Int!
-  total: Int!
+type PaymentMetric {
+  total: Float!
+  paymentType: String!
 }
 
-type BirthRegistrationByAgeMetrics {
-  label: String
-  value: Int
+type CertificationMetric {
+  total: Float!
+  eventType: String!
 }
 
-type BirthRegistrationWithInTargetD {
-  label: String
-  value: Int
-  totalEstimate: Int
-}
-
-type BirthKeyFigures {
-  label: String
-  value: Int
-  total: Int
-  estimate: Int
-  categoricalData: [BirthKeyFiguresData]
-}
-
-type BirthKeyFiguresData {
-  name: String
-  value: Int
-}
-
-type EventEstimationMetrics {
-  birthTargetDayMetrics: EstimationMetrics
-  deathTargetDayMetrics: EstimationMetrics
-}
-
-type EstimationMetrics {
-  actualRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedPercentage: Float!
-  malePercentage: Float!
-  femalePercentage: Float!
+type CorrectionMetric {
+  total: Float!
+  reason: String!
 }
 
 type DeclarationsStartedMetrics {
@@ -136,20 +51,14 @@ type DeclarationsStartedMetrics {
   officeDeclarations: Int!
 }
 
-type MonthWiseEstimationMetrics {
-  details: [MonthWiseTargetDayEstimation]
-  total: EventInTargetDayEstimationCount
-}
-
-type MonthWiseTargetDayEstimation {
-  actualTotalRegistration: Int!
-  actualTargetDayRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedTargetDayPercentage: Float!
-  month: String!
-  year: String!
-  startOfMonth: String!
-  endOfMonth: String!
+type MonthWiseEstimationMetric {
+  total: Int!
+  withinTarget: Int!
+  within1Year: Int!
+  within5Years: Int!
+  estimated: Int!
+  month: Int!
+  year: Int!
 }
 
 type EventInTargetDayEstimationCount {
@@ -164,11 +73,12 @@ type LocationWiseEstimationMetrics {
   total: EventInTargetDayEstimationCount
 }
 
-type LocationWiseTargetDayEstimation {
-  actualTotalRegistration: Int!
-  actualTargetDayRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedTargetDayPercentage: Float!
+type LocationWiseEstimationMetric {
+  total: Int!
+  withinTarget: Int!
+  within1Year: Int!
+  within5Years: Int!
+  estimated: Int!
   locationId: String!
   locationName: String!
 }
@@ -185,18 +95,40 @@ type TimeLoggedMetricsResultSet {
   totalItems: Int
 }
 
+type LocationStatisticsResponse {
+  population: Int
+  registrars: Int!
+  offices: Int!
+}
+
 type Query {
-  fetchRegistrationMetrics(
+  getTotalMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): RegistrationMetrics
-  getEventEstimationMetrics(
+  ): TotalMetricsResult
+  getTotalPayments(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
-  ): EventEstimationMetrics
+    locationId: String
+    event: String!
+  ): [PaymentMetric!]
+  getTotalCertifications(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+  ): [CertificationMetric!]
+  getTotalCorrections(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+  ): [CorrectionMetric!]
+  getLocationStatistics(
+    locationId: String
+    populationYear: Int!
+  ): LocationStatisticsResponse
   getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
@@ -205,15 +137,15 @@ type Query {
   fetchMonthWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): MonthWiseEstimationMetrics
+  ): [MonthWiseEstimationMetric!]
   fetchLocationWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): LocationWiseEstimationMetrics
+  ): [LocationWiseEstimationMetric!]
   fetchTimeLoggedMetricsByPractitioner(
     timeStart: String!
     timeEnd: String!

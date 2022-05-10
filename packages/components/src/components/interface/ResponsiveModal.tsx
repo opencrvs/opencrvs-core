@@ -25,7 +25,7 @@ const ModalContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding-top: 0px;
   }
 `

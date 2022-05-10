@@ -22,7 +22,6 @@ import {
 } from '@client/forms'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import {
-  CUSTOM_GROUP_NAME,
   getCertificateHandlebar,
   ICustomConfigField
 } from '@client/forms/configuration/formConfig/utils'
@@ -104,13 +103,6 @@ const H3 = styled.h3`
   ${({ theme }) => theme.fonts.h3};
 `
 
-const H4 = styled.span`
-  ${({ theme }) => theme.fonts.bold14};
-  display: flex;
-  align-items: center;
-  gap: 4px;
-`
-
 const ListContainer = styled.div`
   margin-bottom: 26px;
 `
@@ -168,6 +160,8 @@ type IProps = {
   event: Event
   selectedField: ICustomConfigField
   section: BirthSection | DeathSection
+  groupId: string
+  setSelectedField: React.Dispatch<React.SetStateAction<string | null>>
 }
 
 type IFullProps = IProps &
@@ -270,7 +264,7 @@ class CustomFieldFormsComp extends React.Component<
       this.props.selectedField.fieldId
     )
 
-    return `${event}.${sectionId}.${CUSTOM_GROUP_NAME}.${this.state.handleBars}`
+    return `${event}.${sectionId}.${this.props.groupId}.${this.state.handleBars}`
   }
 
   _prepareModifiedFormField(): ICustomConfigField {
@@ -425,7 +419,13 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   inputFields() {
-    const { intl, selectedField, modifyConfigField, formField } = this.props
+    const {
+      intl,
+      selectedField,
+      modifyConfigField,
+      formField,
+      setSelectedField
+    } = this.props
     const languages = this._getLanguages()
     const defaultLanguage = getDefaultLanguage()
 
@@ -546,7 +546,7 @@ class CustomFieldFormsComp extends React.Component<
 
               <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <CInputField
-                  required={false}
+                  required={true}
                   id={`custom-form-max-length-${language}`}
                   label={intl.formatMessage(
                     customFieldFormMessages.maxLengthLabel
@@ -554,7 +554,9 @@ class CustomFieldFormsComp extends React.Component<
                   touched={false}
                 >
                   <CTextInput
-                    value={this.state.maxLength}
+                    type="number"
+                    maxLength={this.state.maxLength || 250}
+                    value={this.state.maxLength || 250}
                     onChange={(event: any) =>
                       this.setState({
                         maxLength: event.target.value
@@ -579,6 +581,7 @@ class CustomFieldFormsComp extends React.Component<
                   }
                   const modifiedField = this._prepareModifiedFormField()
                   modifyConfigField(selectedField.fieldId, modifiedField)
+                  setSelectedField(null)
                 }}
                 disabled={!this._isFormValid()}
               >
@@ -588,19 +591,6 @@ class CustomFieldFormsComp extends React.Component<
           </ListRow>
         </ListContainer>
       </>
-    )
-  }
-
-  certificate() {
-    const { intl } = this.props
-    return (
-      <FieldContainer>
-        <H4>
-          {intl.formatMessage(customFieldFormMessages.handleBardHeading)}
-          <StyledTooltip />
-        </H4>
-        <GreyText>{`{{ ${this.state.handleBars} }}`}</GreyText>
-      </FieldContainer>
     )
   }
 
@@ -616,7 +606,6 @@ class CustomFieldFormsComp extends React.Component<
             {intl.formatMessage(customFieldFormMessages.duplicateField)}
           </CErrorText>
         )}
-        {this.certificate()}
       </CustomFieldFormContainer>
     )
   }

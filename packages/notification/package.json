@@ -22,6 +22,7 @@
     "@hapi/hapi": "^20.0.1",
     "@opencrvs/commons": "^1.0.0-alpha.3.2",
     "app-module-path": "^2.2.0",
+    "dotenv": "^16.0.0",
     "handlebars": "^4.7.6",
     "hapi-auth-jwt2": "10.2.0",
     "hapi-i18n": "^2.0.0",

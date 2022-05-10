@@ -35,7 +35,6 @@ import { deserializeFormField } from '@client/forms/mappings/deserializer'
 import { createCustomField } from '@client/forms/configuration/customUtils'
 
 const CUSTOM_FIELD_LABEL = 'Custom Field'
-export const CUSTOM_GROUP_NAME = 'custom-view-group'
 
 export type EventSectionGroup = {
   event: Event
@@ -111,6 +110,7 @@ function customFieldToQuestionConfig(
     fieldId,
     preceedingFieldId,
     enabled: field.enabled ?? '',
+    custom: true,
     foregoingFieldId: FieldPosition.BOTTOM,
     ...messageProperties.reduce(
       (accum, prop) => ({
@@ -287,14 +287,15 @@ export function hasDefaultFieldChanged(
 function determineNextFieldIdNumber(
   fieldsMap: IConfigFieldMap,
   event: Event,
-  section: string
+  section: string,
+  groupId: string
 ): number {
   const partialHandleBar = camelCase(CUSTOM_FIELD_LABEL)
   const customFieldNumber = keys(fieldsMap)
     .filter((item) => item.includes(partialHandleBar))
     .map((item) => {
       const elemNumber = item.replace(
-        `${event}.${section}.${CUSTOM_GROUP_NAME}.${partialHandleBar}`,
+        `${event}.${section}.${groupId}.${partialHandleBar}`,
         ''
       )
       return parseInt(elemNumber)
@@ -316,22 +317,24 @@ export function prepareNewCustomFieldConfig(
   fieldsMap: IConfigFieldMap,
   event: Event,
   section: string,
+  groupId: string,
   fieldType: QuestionConfigFieldType
 ): ICustomConfigField {
   const customFieldNumber = determineNextFieldIdNumber(
     fieldsMap,
     event,
-    section
+    section,
+    groupId
   )
   const defaultMessage = `${CUSTOM_FIELD_LABEL} ${customFieldNumber}`
-  const customFieldIndex = `${event}.${section}.${CUSTOM_GROUP_NAME}.${camelCase(
+  const customFieldIndex = `${event}.${section}.${groupId}.${camelCase(
     defaultMessage
   )}`
   const lastField = getLastConfigField(fieldsMap)
 
   return {
     fieldId: customFieldIndex,
-    fieldName: customFieldIndex,
+    fieldName: camelCase(defaultMessage),
     fieldType,
     preceedingFieldId: lastField ? lastField.fieldId : FieldPosition.TOP,
     foregoingFieldId: FieldPosition.BOTTOM,

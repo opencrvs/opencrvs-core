@@ -14,7 +14,8 @@ import { FieldPosition, getConfiguredForm } from '@client/forms/configuration'
 import * as actions from '@client/forms/configuration/formConfig/actions'
 import {
   getEventDraft,
-  IFormDraft
+  IFormDraft,
+  DraftStatus
 } from '@client/forms/configuration/formDrafts/utils'
 import * as offlineActions from '@client/offline/actions'
 import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
@@ -78,18 +79,29 @@ function getNextField(fieldMap: IConfigFieldMap, fieldId: string) {
 }
 
 function getReadyState({ formDrafts, questionConfig }: IFormConfig) {
-  const birthForm = getConfiguredForm(questionConfig, Event.BIRTH)
-  const deathForm = getConfiguredForm(questionConfig, Event.DEATH)
-
+  const birthForm = getConfiguredForm(questionConfig, Event.BIRTH, true)
+  const deathForm = getConfiguredForm(questionConfig, Event.DEATH, true)
   return {
     state: 'READY' as const,
     birth: {
-      formDraft: getEventDraft(formDrafts, Event.BIRTH),
+      formDraft: getEventDraft(formDrafts, Event.BIRTH) || {
+        version: 0,
+        status: DraftStatus.DRAFT,
+        event: Event.BIRTH,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      },
       registerForm: birthForm,
       configFields: getSectionFieldsMap(Event.BIRTH, birthForm)
     },
     death: {
-      formDraft: getEventDraft(formDrafts, Event.DEATH),
+      formDraft: getEventDraft(formDrafts, Event.DEATH) || {
+        version: 0,
+        status: DraftStatus.DRAFT,
+        event: Event.DEATH,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      },
       registerForm: deathForm,
       configFields: getSectionFieldsMap(Event.DEATH, deathForm)
     }

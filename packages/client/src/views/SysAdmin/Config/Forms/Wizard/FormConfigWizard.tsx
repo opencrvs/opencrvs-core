@@ -21,11 +21,7 @@ import { Redirect, useParams } from 'react-router'
 import { HOME } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import {
-  SecondaryButton,
-  SuccessButton,
-  TertiaryButton
-} from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { SettingsBlue } from '@opencrvs/components/lib/icons'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
 import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
@@ -45,9 +41,14 @@ import { SaveActionNotification } from './SaveActionNotification'
 import { FormConfigSettings } from './FormConfigSettings'
 import {
   selectConfigField,
-  selectFormDraft
+  selectFormDraft,
+  selectConfigFields
 } from '@client/forms/configuration/formConfig/selectors'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
+import {
+  FieldPosition,
+  getIdentifiersFromFieldId
+} from '@client/forms/configuration'
 
 const Container = styled.div`
   display: flex;
@@ -181,6 +182,16 @@ export function FormConfigWizard() {
   const { version } = useSelector((store: IStoreState) =>
     selectFormDraft(store, event)
   )
+  const fieldsMap = useSelector((store: IStoreState) =>
+    selectConfigFields(store, event, section)
+  )
+  const firstField = Object.values(fieldsMap).find(
+    (formField) => formField.preceedingFieldId === FieldPosition.TOP
+  )
+  if (!firstField) {
+    throw new Error(`No starting field found in section`)
+  }
+  const firstFieldIdentifiers = getIdentifiersFromFieldId(firstField.fieldId)
   const dispatch = useDispatch()
   const hasNatlSysAdminScope = useHasNatlSysAdminScope()
   const intl = useIntl()
@@ -208,17 +219,14 @@ export function FormConfigWizard() {
             icon={() => <SettingsBlue />}
             onClick={() => dispatch(goToFormConfigWizard(event, 'settings'))}
           ></TertiaryButton>,
-          <SecondaryButton
+          <PrimaryButton
             key="save"
             size="small"
             disabled={status === ActionStatus.PROCESSING}
             onClick={() => setStatus(ActionStatus.MODAL)}
           >
             {intl.formatMessage(buttonMessages.save)}
-          </SecondaryButton>,
-          <SuccessButton key="publish" size="small" onClick={() => {}}>
-            {intl.formatMessage(buttonMessages.publish)}
-          </SuccessButton>
+          </PrimaryButton>
         ]}
         goHome={() => dispatch(goToFormConfigHome())}
       />
@@ -261,6 +269,8 @@ export function FormConfigWizard() {
                     event={event}
                     section={section}
                     selectedField={selectedField}
+                    setSelectedField={setSelectedField}
+                    groupId={firstFieldIdentifiers.groupId}
                   />
                 )
               ) : (
@@ -268,6 +278,7 @@ export function FormConfigWizard() {
                   showHiddenFields={showHiddenFields}
                   setShowHiddenFields={setShowHiddenFields}
                   setSelectedField={setSelectedField}
+                  groupId={firstFieldIdentifiers.groupId}
                 />
               )}
             </ToolsContainer>

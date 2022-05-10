@@ -107,11 +107,6 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         userDetails.name &&
         (createNamesMap(userDetails.name as GQLHumanName[])['en'] as string)) ||
       ''
-    const bengaliName =
-      (userDetails &&
-        userDetails.name &&
-        (createNamesMap(userDetails.name as GQLHumanName[])['bn'] as string)) ||
-      ''
 
     const mobile = (userDetails && (userDetails.mobile as string)) || ''
 
@@ -154,15 +149,6 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         })
       })
     const items = [
-      {
-        id: 'BengaliName',
-        label: intl.formatMessage(messages.labelBanglaName),
-        value: bengaliName,
-        action: {
-          label: intl.formatMessage(buttonMessages.change),
-          disabled: true
-        }
-      },
       {
         id: 'EnglishName',
         label: intl.formatMessage(messages.labelEnglishName),

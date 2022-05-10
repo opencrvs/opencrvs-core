@@ -15,12 +15,12 @@ import { Button } from './Button'
 export const LinkButton = styled(Button)<{
   isBoldLink?: boolean
 }>`
+  height: auto;
   ${({ theme, isBoldLink }) =>
     isBoldLink ? theme.fonts.bold16 : theme.fonts.reg16}
   color: ${({ theme }) => theme.colors.tertiary};
   padding: 0;
   border-radius: 2px;
-
   &:focus {
     background: ${({ theme }) => theme.colors.focus};
     color: ${({ theme }) => theme.colors.copy};
