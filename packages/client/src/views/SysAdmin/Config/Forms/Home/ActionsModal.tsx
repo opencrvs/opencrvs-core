@@ -71,7 +71,7 @@ export type ActionState = {
 const STATUS_CHANGE_MAP: Record<Actions, DraftStatus> = {
   [Actions.PUBLISH]: DraftStatus.PUBLISHED,
   [Actions.PREVIEW]: DraftStatus.PREVIEW,
-  [Actions.EDIT]: DraftStatus.DELETED,
+  [Actions.EDIT]: DraftStatus.DRAFT,
   [Actions.DELETE]: DraftStatus.DELETED
 }
 
@@ -110,6 +110,11 @@ function ActionButton() {
         if (formDraft) {
           dispatch(updateFormConfig(formDraft as IFormDraft))
           setAction({ status: ActionStatus.COMPLETED })
+
+          /* uncommenting this causes issues with webpack compilation */
+          // if (action === Actions.EDIT) {
+          //   dispatch(goToFormConfigWizard(event, event === Event.BIRTH ? BirthSection.Registration : DeathSection.Registration))
+          // }
         }
       }}
       onError={() => setAction({ status: ActionStatus.ERROR })}

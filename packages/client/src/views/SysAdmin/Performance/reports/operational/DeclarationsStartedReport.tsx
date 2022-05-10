@@ -250,9 +250,9 @@ class DeclarationsStartedReportComponent extends React.Component<
               disabled={disableFieldAgentLink || false}
               onClick={() => {
                 this.props.goToFieldAgentList(
-                  locationId,
                   reportTimeFrom.toISOString(),
-                  reportTimeTo.toISOString()
+                  reportTimeTo.toISOString(),
+                  locationId
                 )
               }}
             >

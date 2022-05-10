@@ -1192,7 +1192,9 @@ const ActionDetailsModalListTable = (
     if (!actionDetailsData.certificates) return []
     return actionDetailsData.certificates
       .map((certificate: IDynamicValues) => {
-        if (!certificate) return
+        if (!certificate) {
+          return
+        }
 
         const name = getIndividualNameObj(
           certificate.collector.individual.name,

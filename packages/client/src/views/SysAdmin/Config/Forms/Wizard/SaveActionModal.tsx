@@ -22,13 +22,13 @@ import {
   selectConfigFields,
   selectConfigRegisterForm
 } from '@client/forms/configuration/formConfig/selectors'
-import { Event, IQuestionConfig } from '@client/forms'
+import { Event } from '@client/forms'
 import { Mutation } from 'react-apollo'
-import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
 import {
-  IFormDraft,
-  DraftStatus
-} from '@client/forms/configuration/formDrafts/utils'
+  GQLMutation,
+  GQLFormDraftInput
+} from '@opencrvs/gateway/src/graphql/schema'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import {
   SecondaryButton,
   PrimaryButton
@@ -68,18 +68,10 @@ function SaveActionButton({ comment }: { comment: string }) {
   const dispatch = useDispatch()
 
   return (
-    <Mutation<
-      GQLMutation,
-      {
-        event: Event
-        status: DraftStatus
-        comment: string
-        questions: IQuestionConfig[]
-      }
-    >
+    <Mutation<GQLMutation, GQLFormDraftInput>
       mutation={CREATE_FORM_DRAFT}
       onError={() => setStatus(ActionStatus.ERROR)}
-      onCompleted={({ createOrUpdateFormDraft: formDraft }) => {
+      onCompleted={({ createFormDraft: formDraft }) => {
         if (formDraft) {
           dispatch(updateFormConfig(formDraft as IFormDraft, questions))
           setStatus(ActionStatus.COMPLETED)
@@ -94,9 +86,8 @@ function SaveActionButton({ comment }: { comment: string }) {
             setStatus(ActionStatus.PROCESSING)
             createFormDraft({
               variables: {
-                event: event,
-                status: DraftStatus.DRAFT,
-                comment: comment,
+                event,
+                comment,
                 questions
               }
             })

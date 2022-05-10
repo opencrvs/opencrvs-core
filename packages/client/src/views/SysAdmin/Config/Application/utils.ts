@@ -87,7 +87,7 @@ export function isValidExample(pattern: string, example: string) {
 
 export const getCurrencySelectOptions = () => {
   const currencyOptions = [] as ICurrencyOptions[]
-  countryList.all.map((element: ICountrylist) => {
+  countryList.all.forEach((element: ICountrylist) => {
     const countryLanguage = lookup.languages({
       alpha3: element.languages[0]
     })

@@ -17,7 +17,7 @@ import {
   QuestionConfigFieldType,
   IMessage
 } from '@client/forms/index'
-import { cloneDeep, concat, find } from 'lodash'
+import { find } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import { IDefaultField } from '@client/forms/configuration/defaultUtils'
 import {
@@ -129,38 +129,12 @@ export function createCustomField(
   return baseField
 }
 
-function getCustomFields(customQuestionConfig: ICustomQuestionConfiguration[]) {
+export function getCustomFields(
+  customQuestionConfig: ICustomQuestionConfiguration[]
+) {
   const fields: SerializedFormField[] = []
   customQuestionConfig.forEach((config) => {
     fields.push(config.field)
   })
   return fields
-}
-
-export function configureCustomQuestions(
-  sortedCustomGroups: ISortedCustomGroup[],
-  defaultFormWithCustomisations: ISerializedForm
-): ISerializedForm {
-  const newForm = cloneDeep(defaultFormWithCustomisations)
-  sortedCustomGroups.forEach((customGroup) => {
-    if (customGroup.positionTop) {
-      newForm.sections[customGroup.sectionIndex].groups[
-        customGroup.groupIndex
-      ].fields = concat(
-        getCustomFields(customGroup.questions),
-        newForm.sections[customGroup.sectionIndex].groups[
-          customGroup.groupIndex
-        ].fields
-      )
-    } else if (customGroup.preceedingDefaultField) {
-      newForm.sections[customGroup.sectionIndex].groups[
-        customGroup.groupIndex
-      ].fields.splice(
-        customGroup.preceedingDefaultField.index + 1,
-        0,
-        ...getCustomFields(customGroup.questions)
-      )
-    }
-  })
-  return newForm
 }

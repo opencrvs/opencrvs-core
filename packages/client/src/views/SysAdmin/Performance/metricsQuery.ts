@@ -11,124 +11,82 @@
  */
 import gql from 'graphql-tag'
 
-export const PERFORMANCE_METRICS = gql`
+export const CORRECTION_TOTALS = gql`
   query data(
+    $event: String!
     $timeStart: String!
     $timeEnd: String!
-    $locationId: String!
-    $event: String!
+    $locationId: String
   ) {
-    fetchRegistrationMetrics(
+    getTotalCorrections(
       timeStart: $timeStart
       timeEnd: $timeEnd
       locationId: $locationId
       event: $event
     ) {
-      timeFrames {
-        details {
-          locationId
-          regWithinTargetd
-          regWithinTargetdTo1yr
-          regWithin1yrTo5yr
-          regOver5yr
-          total
-        }
-        total {
-          regWithinTargetd
-          regWithinTargetdTo1yr
-          regWithin1yrTo5yr
-          regOver5yr
-          total
-        }
+      total
+      reason
+    }
+  }
+`
+export const PERFORMANCE_METRICS = gql`
+  query data(
+    $event: String!
+    $timeStart: String!
+    $timeEnd: String!
+    $locationId: String
+  ) {
+    getTotalMetrics(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+      event: $event
+    ) {
+      estimated {
+        totalEstimation
+        maleEstimation
+        femaleEstimation
+        locationId
+        estimationYear
+        locationLevel
       }
-      genderBasisMetrics {
-        details {
-          location
-          maleUnder18
-          femaleUnder18
-          maleOver18
-          femaleOver18
-          total
-        }
-        total {
-          maleUnder18
-          femaleUnder18
-          maleOver18
-          femaleOver18
-          total
-        }
-      }
-      estimatedTargetDayMetrics {
-        details {
-          locationId
-          estimatedRegistration
-          registrationInTargetDay
-          estimationYear
-          estimationLocationLevel
-          estimationPercentage
-        }
-        total {
-          estimatedRegistration
-          registrationInTargetDay
-          estimationPercentage
-        }
-      }
-      payments {
-        details {
-          locationId
-          total
-        }
-        total {
-          total
-        }
+      results {
+        total
+        gender
+        eventLocationType
+        practitionerRole
+        timeLabel
       }
     }
   }
 `
-export const OPERATIONAL_REPORTS_METRICS_FOR_OFFICE = gql`
-  query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
-    getDeclarationsStartedMetrics(
-      timeStart: $timeStart
-      timeEnd: $timeEnd
+
+export const PERFORMANCE_STATS = gql`
+  query data(
+    $locationId: String
+    $populationYear: Int!
+    $status: [String]!
+    $event: String
+  ) {
+    getLocationStatistics(
       locationId: $locationId
+      populationYear: $populationYear
     ) {
-      fieldAgentDeclarations
-      hospitalDeclarations
-      officeDeclarations
-    }
-  }
-`
-export const OPERATIONAL_REPORTS_METRICS = gql`
-  query data($timeStart: String!, $timeEnd: String!, $locationId: String!) {
-    getEventEstimationMetrics(
-      timeStart: $timeStart
-      timeEnd: $timeEnd
-      locationId: $locationId
-    ) {
-      birthTargetDayMetrics {
-        actualRegistration
-        estimatedRegistration
-        estimatedPercentage
-        malePercentage
-        femalePercentage
-      }
-      deathTargetDayMetrics {
-        actualRegistration
-        estimatedRegistration
-        estimatedPercentage
-        malePercentage
-        femalePercentage
-      }
+      population
+      offices
+      registrars
     }
 
-    getDeclarationsStartedMetrics(
-      timeStart: $timeStart
-      timeEnd: $timeEnd
+    fetchRegistrationCountByStatus(
       locationId: $locationId
+      status: $status
+      event: $event
     ) {
-      fieldAgentDeclarations
-      hospitalDeclarations
-      officeDeclarations
+      results {
+        status
+        count
+      }
+      total
     }
   }
 `

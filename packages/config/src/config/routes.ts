@@ -31,11 +31,14 @@ import updateQuestionHandler, {
 } from '@config/handlers/question/updateQuestion/handler'
 import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
 import {
-  createOrUpdateFormDraftHandler,
-  requestSchema as updateFormDraftReqSchema,
+  createFormDraftHandler,
+  requestSchema as createFormDraftReqSchema
+} from '@config/handlers/formDraft/createFormDraft/handler'
+import {
   modifyDraftStatusHandler,
-  modifyFormDraftStatus
-} from '@config/handlers/formDraft/createOrupdateFormDraft/handler'
+  requestSchema as modifyFormDraftStatus
+} from '@config/handlers/formDraft/updateFormDraft/handler'
+
 import getFormDrafts from '@config/handlers/formDraft/getFormDraft/handler'
 
 const enum RouteScope {
@@ -191,7 +194,7 @@ export default function getRoutes() {
     {
       method: 'PUT',
       path: '/draftQuestions',
-      handler: createOrUpdateFormDraftHandler,
+      handler: createFormDraftHandler,
       config: {
         tags: ['api'],
         description: 'Update form draft & questions',
@@ -199,7 +202,7 @@ export default function getRoutes() {
           scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
-          payload: updateFormDraftReqSchema
+          payload: createFormDraftReqSchema
         }
       }
     },

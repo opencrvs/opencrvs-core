@@ -31,6 +31,7 @@ const Card = styled.div<{ selected: boolean }>`
 `
 
 const ChildrenContainer = styled.div`
+  pointer-events: none;
   flex-grow: 1;
 `
 

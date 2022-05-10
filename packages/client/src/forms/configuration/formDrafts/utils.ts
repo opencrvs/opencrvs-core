@@ -37,11 +37,7 @@ export interface IFormDraft {
 }
 
 export function getEventDraft(formDrafts: IFormDraft[], event: Event) {
-  const formDraft = find(formDrafts, { event })
-  if (!formDraft) {
-    throw new Error(`${event} formDraft not found`)
-  }
-  return formDraft
+  return find(formDrafts, { event })
 }
 
 export function getFormDraft(formDrafts: IFormDraft[]) {

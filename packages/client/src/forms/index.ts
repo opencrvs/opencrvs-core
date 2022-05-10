@@ -11,6 +11,7 @@
  */
 import { ValidationInitializer } from '@client/utils/validate'
 import { MessageDescriptor } from 'react-intl'
+import { Message } from 'typescript-react-intl'
 import {
   ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
@@ -104,7 +105,7 @@ export interface IIdentifiers {
 }
 export interface IMessage {
   lang: string
-  descriptor: MessageDescriptor
+  descriptor: Message
 }
 export interface IQuestionConfig {
   fieldId: string

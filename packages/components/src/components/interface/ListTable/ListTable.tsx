@@ -68,7 +68,8 @@ const TableHeaderText = styled.div<{
   isSorted?: boolean
 }>`
   ${({ theme }) => theme.fonts.bold16};
-  color: ${({ theme }) => theme.colors.grey};
+  color: ${({ theme }) => theme.colors.copy};
+  display: flex;
 `
 
 const TableBody = styled.div<{ footerColumns: boolean }>`
@@ -166,6 +167,7 @@ const ContentWrapper = styled.span<{
   sortable?: boolean
   totalWidth?: number
 }>`
+  align-self: flex-start;
   width: ${({ width, totalWidth }) =>
     totalWidth && totalWidth > 100 ? (width * 100) / totalWidth : width}%;
   flex-shrink: 0;
@@ -432,7 +434,7 @@ export class ListTable extends React.Component<
                         }
                       >
                         <TableHeaderText isSorted={preference.isSorted}>
-                          {preference.label}
+                          <div>{preference.label}</div>
                           <ToggleSortIcon
                             toggle={
                               this.state.sortIconInverted &&
