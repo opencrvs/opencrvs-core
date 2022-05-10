@@ -28,32 +28,6 @@ import { messageSchema } from '@config/handlers/question/createQuestion/handler'
 import { find, partition, isEmpty } from 'lodash'
 import { Event } from '@config/models/certificate'
 
-export function isValidFormDraftOperation(
-  currentStatus: string,
-  newStatus: string
-) {
-  const validStatusMapping = {
-    [DraftStatus.DRAFT]: [
-      DraftStatus.DRAFT,
-      DraftStatus.IN_PREVIEW,
-      DraftStatus.DELETED
-    ],
-    [DraftStatus.IN_PREVIEW]: [DraftStatus.PUBLISHED, DraftStatus.DRAFT],
-    [DraftStatus.PUBLISHED]: [null],
-    [DraftStatus.DELETED]: [DraftStatus.DRAFT]
-  }
-
-  if (
-    currentStatus &&
-    validStatusMapping[currentStatus] &&
-    !validStatusMapping[currentStatus].includes(newStatus)
-  ) {
-    return false
-  }
-
-  return true
-}
-
 export interface ICreateDraft
   extends Pick<IFormDraftModel, 'event' | 'comment'> {
   questions: IQuestion[] | []
@@ -184,6 +158,9 @@ export const questionReqSchema = Joi.object({
   fieldId: Joi.string(),
   label: messageSchema,
   placeholder: messageSchema,
+  description: messageSchema,
+  tooltip: messageSchema,
+  errorMessage: messageSchema,
   maxLength: Joi.number(),
   fieldName: Joi.string(),
   fieldType: Joi.string().valid(...validFieldType),
