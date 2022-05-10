@@ -78,7 +78,6 @@ export enum Events {
 
 function detectEvent(request: Hapi.Request): Events {
   const fhirBundle = request.payload as fhir.Bundle
-  const taskResource = getTaskResource(fhirBundle)
   if (
     request.method === 'post' &&
     (request.path === '/fhir' || request.path === '/fhir/')
@@ -158,6 +157,7 @@ function detectEvent(request: Hapi.Request): Events {
         }
       }
       if (firstEntry.resourceType === 'Task' && firstEntry.id) {
+        const taskResource = getTaskResource(fhirBundle)
         if (fhirBundle?.signature?.type[0]?.code === 'downloaded') {
           if (hasAssignedExtension(taskResource)) {
             return Events.DOWNLOADED_ASSIGNED_EVENT
@@ -186,6 +186,7 @@ function detectEvent(request: Hapi.Request): Events {
   }
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
+    const taskResource = getTaskResource(fhirBundle)
     const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
       if (isRejectedTask(taskResource)) {
