@@ -33,7 +33,8 @@ import {
 import {
   hasReinstatedExtension,
   isRejectedTask,
-  isArchiveTask
+  isArchiveTask,
+  hasAssignedExtension
 } from '@workflow/features/task/fhir/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
@@ -70,12 +71,14 @@ export enum Events {
   DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
   DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
-  DOWNLOADED_AND_ASSIGNED = '/events/downloaded-and-assigned',
+  DOWNLOADED = '/events/downloaded',
+  DOWNLOADED_ASSIGNED_EVENT = '/events/assigned',
   UNKNOWN = 'unknown'
 }
 
 function detectEvent(request: Hapi.Request): Events {
   const fhirBundle = request.payload as fhir.Bundle
+  const taskResource = getTaskResource(fhirBundle)
   if (
     request.method === 'post' &&
     (request.path === '/fhir' || request.path === '/fhir/')
@@ -155,8 +158,11 @@ function detectEvent(request: Hapi.Request): Events {
         }
       }
       if (firstEntry.resourceType === 'Task' && firstEntry.id) {
-        if (fhirBundle?.signature?.type[0]?.code === 'downloadedAndAssigned') {
-          return Events.DOWNLOADED_AND_ASSIGNED
+        if (fhirBundle?.signature?.type[0]?.code === 'downloaded') {
+          if (hasAssignedExtension(taskResource)) {
+            return Events.DOWNLOADED_ASSIGNED_EVENT
+          }
+          return Events.DOWNLOADED
         }
 
         const eventType = getEventType(fhirBundle)
@@ -180,7 +186,6 @@ function detectEvent(request: Hapi.Request): Events {
   }
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
-    const taskResource = getTaskResource(fhirBundle)
     const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
       if (isRejectedTask(taskResource)) {
@@ -401,10 +406,13 @@ export async function fhirWorkflowEventHandler(
         request.headers
       )
       break
-    case Events.DOWNLOADED_AND_ASSIGNED:
+    case Events.DOWNLOADED:
+      response = await markEventAsDownloadedAndAssignedHandler(request, h)
+      break
+    case Events.DOWNLOADED_ASSIGNED_EVENT:
       response = await markEventAsDownloadedAndAssignedHandler(request, h)
       await triggerEvent(
-        Events.DOWNLOADED_AND_ASSIGNED,
+        Events.DOWNLOADED_ASSIGNED_EVENT,
         request.payload,
         request.headers
       )

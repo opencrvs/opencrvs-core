@@ -442,6 +442,7 @@ export async function setupLastRegLocation(
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+      valueString: primaryOffice.name,
       valueReference: { reference: `Location/${primaryOffice.id}` }
     })
   }
@@ -491,9 +492,9 @@ export function setupRegAssigned(
     }
     setupRegAssignedExtension.valueReference.reference =
       getPractitionerRef(practitioner)
+    taskResource.lastModified =
+      taskResource.lastModified || new Date().toISOString()
   }
-  taskResource.lastModified =
-    taskResource.lastModified || new Date().toISOString()
   return taskResource
 }
 
