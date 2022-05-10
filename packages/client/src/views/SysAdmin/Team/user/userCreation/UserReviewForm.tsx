@@ -47,14 +47,11 @@ import {
 import {
   PrimaryButton,
   SuccessButton,
-  ICON_ALIGNMENT
+  ICON_ALIGNMENT,
+  LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
-import {
-  ActionPageLight,
-  IDataProps,
-  ListView
-} from '@opencrvs/components/lib/interface'
+import { ActionPageLight, IDataProps } from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -65,6 +62,11 @@ import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdm
 import { Check } from '@opencrvs/components/lib/icons'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
+import {
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import styled from 'styled-components'
 
 export interface IUserReviewFormProps {
   userId?: string
@@ -92,6 +94,23 @@ interface ISectionData {
 type IFullProps = IUserReviewFormProps &
   IntlShapeProps &
   RouteComponentProps<{ userId?: string }>
+
+const Container = styled.div`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 24px;
+  }
+`
+
+const Title = styled.div`
+  ${({ theme }) => theme.fonts.h2};
+  margin-bottom: 16px;
+`
+const Label = styled.span`
+  ${({ theme }) => theme.fonts.bold16};
+`
+const Value = styled.span`
+  ${({ theme }) => theme.fonts.reg16}
+`
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
@@ -216,10 +235,40 @@ class UserReviewFormComponent extends React.Component<
             {intl.formatMessage(section.name)}
           </FormTitle>
         )}
-        {this.transformSectionData().map((sec, index) => (
-          <ListView key={index} {...sec} />
-        ))}
-        <Action>{actionComponent}</Action>
+        <Container>
+          {this.transformSectionData().map((sec, index) => {
+            return (
+              <>
+                {sec.title && <Title>{sec.title}</Title>}
+                <ListViewSimplified>
+                  {sec.items.map((item, index) => {
+                    return (
+                      <ListViewItemSimplified
+                        key={index}
+                        label={<Label>{item.label}</Label>}
+                        value={
+                          <Value id={item.label.split(' ')[0]}>
+                            {item.value}
+                          </Value>
+                        }
+                        actions={
+                          <LinkButton
+                            id={item.action?.id}
+                            disabled={item.action?.disabled}
+                            onClick={item.action?.handler}
+                          >
+                            {item.action?.label}
+                          </LinkButton>
+                        }
+                      />
+                    )
+                  })}
+                </ListViewSimplified>
+              </>
+            )
+          })}
+          <Action>{actionComponent}</Action>
+        </Container>
       </ActionPageLight>
     )
   }

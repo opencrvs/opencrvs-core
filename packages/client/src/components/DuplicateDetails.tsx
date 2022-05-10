@@ -65,6 +65,7 @@ export enum Action {
   REJECTED = 'REJECTED',
   REGISTERED = 'REGISTERED',
   CERTIFIED = 'CERTIFIED',
+  REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   DOWNLOADED = 'Declaration downloaded',
   LOAD_REVIEW_DECLARATION = 'load declaration data for review'
 }
