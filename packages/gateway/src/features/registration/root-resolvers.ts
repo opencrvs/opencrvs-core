@@ -681,11 +681,7 @@ async function markRecordAsDownloadedAndAssigned(
     ]
   }
 
-  doc = addOrUpdateExtension(
-    taskBundle.entry[0],
-    extensions,
-    'downloadedAndAssigned'
-  )
+  doc = addOrUpdateExtension(taskBundle.entry[0], extensions, 'downloaded')
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 

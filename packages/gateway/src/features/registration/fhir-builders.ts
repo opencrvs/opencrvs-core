@@ -3569,7 +3569,7 @@ export async function updateFHIRTaskBundle(
 export function addOrUpdateExtension(
   taskEntry: ITaskBundleEntry,
   extensions: fhir.Extension[],
-  code: 'downloadedAndAssigned' | 'reinstated'
+  code: 'downloaded' | 'reinstated'
 ) {
   const task = taskEntry.resource
 
