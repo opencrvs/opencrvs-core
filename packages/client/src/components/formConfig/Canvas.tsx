@@ -119,7 +119,6 @@ type ICanvasProps = {
 function FormField({ configField }: { configField: IConfigField }) {
   const formField = useFieldDefinition(configField)
   const { fieldId } = configField
-
   return (
     <FormFieldGenerator
       key={generateKeyFromObj(configField)}
@@ -152,7 +151,6 @@ export function Canvas({
   }
 
   const configFields = generateConfigFields(fieldsMap, formSection)
-
   return (
     <CanvasBox>
       {(showHiddenFields

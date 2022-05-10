@@ -92,7 +92,7 @@ function getReadyState({ formDrafts, questionConfig }: IFormConfig) {
         updatedAt: Date.now()
       },
       registerForm: birthForm,
-      configFields: getSectionFieldsMap(Event.BIRTH, birthForm)
+      configFields: getSectionFieldsMap(Event.BIRTH, birthForm, questionConfig)
     },
     death: {
       formDraft: getEventDraft(formDrafts, Event.DEATH) || {
@@ -103,7 +103,7 @@ function getReadyState({ formDrafts, questionConfig }: IFormConfig) {
         updatedAt: Date.now()
       },
       registerForm: deathForm,
-      configFields: getSectionFieldsMap(Event.DEATH, deathForm)
+      configFields: getSectionFieldsMap(Event.DEATH, deathForm, questionConfig)
     }
   }
 }

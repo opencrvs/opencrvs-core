@@ -94,32 +94,43 @@ function defaultFieldToQuestionConfig(
 function customFieldToQuestionConfig(
   fieldId: string,
   preceedingFieldId: string,
-  field: IFormField
+  field: IFormField,
+  questionConfig: IQuestionConfig[]
 ): ICustomConfigField {
   /* TODO: add errorMessage when implemented for FormFields */
-  const messageProperties = [
-    'label',
-    'placeholder',
-    'tooltip',
-    'description'
-  ] as const
 
-  const lang = getDefaultLanguage()
+  const originalConfig = questionConfig.filter(
+    (question) => question.fieldId === fieldId
+  )[0]
+  let fieldType
 
-  return {
+  for (const k in QuestionConfigFieldType) {
+    if (
+      QuestionConfigFieldType[k as keyof typeof QuestionConfigFieldType] ===
+      field.type
+    ) {
+      fieldType =
+        QuestionConfigFieldType[k as keyof typeof QuestionConfigFieldType]
+    }
+  }
+
+  const customQuestionConfig: ICustomConfigField = {
     fieldId,
+    fieldName: field.name,
     preceedingFieldId,
+    required: originalConfig.required,
     enabled: field.enabled ?? '',
     custom: true,
     foregoingFieldId: FieldPosition.BOTTOM,
-    ...messageProperties.reduce(
-      (accum, prop) => ({
-        ...accum,
-        [prop]: [{ lang, descriptor: field[prop] }]
-      }),
-      {}
-    )
+    label: originalConfig.label,
+    placeholder: originalConfig.placeholder,
+    tooltip: originalConfig.tooltip,
+    description: originalConfig.description
   }
+  if (fieldType) {
+    customQuestionConfig.fieldType = fieldType
+  }
+  return customQuestionConfig
 }
 
 export function fieldToQuestionConfig(
@@ -128,7 +139,8 @@ export function fieldToQuestionConfig(
   sectionIndex: number,
   groupIndex: number,
   fieldIndex: number,
-  field: IFormField
+  field: IFormField,
+  questionConfig: IQuestionConfig[]
 ): IConfigField {
   if (!field.custom) {
     return defaultFieldToQuestionConfig(
@@ -140,7 +152,12 @@ export function fieldToQuestionConfig(
       field
     )
   }
-  return customFieldToQuestionConfig(fieldId, preceedingFieldId, field)
+  return customFieldToQuestionConfig(
+    fieldId,
+    preceedingFieldId,
+    field,
+    questionConfig
+  )
 }
 
 export function getFieldDefinition(
@@ -197,7 +214,11 @@ function getFieldId(
   return [event.toLowerCase(), section.id, group.id, field.name].join('.')
 }
 
-export function getSectionFieldsMap(event: Event, form: IForm) {
+export function getSectionFieldsMap(
+  event: Event,
+  form: IForm,
+  questionConfig: IQuestionConfig[]
+) {
   return form.sections.reduce<ISectionFieldMap>(
     (sectionFieldMap, section, sectionIndex) => {
       let precedingFieldId: string = FieldPosition.TOP
@@ -211,7 +232,8 @@ export function getSectionFieldsMap(event: Event, form: IForm) {
               sectionIndex,
               groupIndex,
               fieldIndex,
-              field
+              field,
+              questionConfig
             )
             if (precedingFieldId in fieldMap) {
               fieldMap[precedingFieldId]!.foregoingFieldId = fieldId

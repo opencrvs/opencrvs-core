@@ -195,7 +195,6 @@ export function FormConfigWizard() {
   const dispatch = useDispatch()
   const hasNatlSysAdminScope = useHasNatlSysAdminScope()
   const intl = useIntl()
-
   if (
     !hasNatlSysAdminScope ||
     !isValidEvent(event) ||
