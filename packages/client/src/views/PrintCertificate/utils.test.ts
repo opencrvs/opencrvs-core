@@ -51,6 +51,13 @@ describe('calculateDays, timeElapsed tests', () => {
         messages: {
           'countries.BGD': 'বাংলাদেশ'
         }
+      },
+      fr: {
+        lang: 'fr',
+        displayName: 'Français',
+        messages: {
+          'countries.BGD': 'Bangladesh'
+        }
       }
     }
     const countries = [
@@ -66,7 +73,8 @@ describe('calculateDays, timeElapsed tests', () => {
     const availableCountries = getCountryTranslations(languageState, countries)
     expect(availableCountries).toMatchObject([
       { countries: [{ value: 'BGD', name: 'Bangladesh' }], language: 'en' },
-      { countries: [{ value: 'BGD', name: 'বাংলাদেশ' }], language: 'bn' }
+      { countries: [{ value: 'BGD', name: 'বাংলাদেশ' }], language: 'bn' },
+      { countries: [{ value: 'BGD', name: 'Bangladesh' }], language: 'fr' }
     ])
   })
 })

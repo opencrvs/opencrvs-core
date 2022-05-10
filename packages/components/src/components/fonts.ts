@@ -19,6 +19,7 @@ export interface IFonts {
   h4: string
 
   bold16: string
+  bold18: string
   bold14: string
   bold12: string
 
@@ -90,6 +91,12 @@ export const fonts = (language: string): IFonts => {
       `,
 
     // Bold Body Styles
+
+    bold18: `font-family: ${semiBoldFont};
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 27px;
+    `,
 
     bold16: `font-family: ${semiBoldFont};
       font-size: 16px;

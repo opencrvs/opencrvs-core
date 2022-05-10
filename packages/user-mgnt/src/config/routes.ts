@@ -74,6 +74,8 @@ import resendSMSInviteHandler, {
 import changePhoneHandler, {
   changePhoneRequestSchema
 } from '@user-mgnt/features/changePhone/handler'
+import * as Joi from 'joi'
+import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -505,6 +507,29 @@ export const getRoutes = () => {
         },
         response: {
           schema: getSystemResponseSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/countUsersByLocation',
+      handler: countUsersByLocationHandler,
+      config: {
+        tags: ['api'],
+        description: 'Gets count of users group by office ids',
+        auth: {
+          scope: [
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          query: Joi.object({
+            role: Joi.string().required()
+          })
         }
       }
     }

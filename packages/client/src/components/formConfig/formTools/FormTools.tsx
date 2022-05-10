@@ -61,6 +61,7 @@ type IRouteProps = {
 }
 
 type IFormToolsProps = {
+  groupId: string
   showHiddenFields: boolean
   setShowHiddenFields: React.Dispatch<React.SetStateAction<boolean>>
   setSelectedField: React.Dispatch<React.SetStateAction<string | null>>
@@ -68,6 +69,7 @@ type IFormToolsProps = {
 
 export const FormTools = ({
   showHiddenFields,
+  groupId,
   setShowHiddenFields,
   setSelectedField
 }: IFormToolsProps) => {
@@ -85,6 +87,7 @@ export const FormTools = ({
       fieldsMap,
       event,
       section,
+      groupId,
       fieldType
     )
     dispatch(addCustomField(event, section, customConfigField))

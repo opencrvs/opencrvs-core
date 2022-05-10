@@ -2617,6 +2617,18 @@ export const mockSearchResult = {
   }
 }
 
+export const mockAggregationSearchResult = {
+  body: {
+    aggregations: {
+      statusCounts: {
+        doc_count_error_upper_bound: 0,
+        sum_other_doc_count: 0,
+        buckets: [{ key: 'REGISTERED', doc_count: 1 }]
+      }
+    }
+  }
+}
+
 export const mockBirthFhirBundleWithoutParents = {
   resourceType: 'Bundle',
   type: 'document',

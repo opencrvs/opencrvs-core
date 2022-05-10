@@ -86,6 +86,7 @@ import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import { CorrectionReason } from '@client/forms/correction/reason'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IGQLLocation } from '@client/utils/userUtils'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -198,7 +199,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
           title={intl.formatMessage(messages.title)}
           hideBackground
           goBack={goBack}
-          goHome={() => this.props.goToHomeTab('review')}
+          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
         >
           <Content
             title={intl.formatMessage(messages.correctionSummaryTitle)}

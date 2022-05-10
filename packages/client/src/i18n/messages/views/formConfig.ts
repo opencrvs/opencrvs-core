@@ -48,6 +48,7 @@ interface IFormConfigMessages
   addressesSettings: MessageDescriptor
   enable: MessageDescriptor
   disable: MessageDescriptor
+  globalSettingsDescription: MessageDescriptor
   introductionPageSettingsDialogTitle: MessageDescriptor
   introductionPageSettingsDialogDesc: MessageDescriptor
   addressesSettingsDialogTitle: MessageDescriptor
@@ -81,7 +82,8 @@ interface IFormConfigMessages
 }
 
 type INavigationMessages = Record<
-  Exclude<BirthSection, 'preview'> | Exclude<DeathSection, 'preview'>,
+  | Exclude<BirthSection, 'preview' | 'registration'>
+  | Exclude<DeathSection, 'preview' | 'registration'>,
   MessageDescriptor
 >
 
@@ -130,11 +132,6 @@ const navigationMessagesToDefine: INavigationMessages = {
     id: 'config.form.navigation.spouse',
     defaultMessage: 'Spouse details',
     description: 'Label for spouse details in page navigation'
-  },
-  registration: {
-    id: 'config.form.navigation.registration',
-    defaultMessage: 'Registration',
-    description: 'Label for registration in page navigation'
   }
 }
 
@@ -143,6 +140,12 @@ const messagesToDefine: IFormConfigMessages = {
     id: 'config.form.draft.defaultComment',
     defaultMessage: 'Default Configuration',
     description: 'Default comment for drafts'
+  },
+  globalSettingsDescription: {
+    id: 'config.form.settings.globalSettingsDescription',
+    defaultMessage:
+      'These are global form settings that can be configured.  Please note that applying any changes to these settings takes effect immediately to the currently active forms independently to your draft status.',
+    description: 'Label for global form settings introduction'
   },
   pages: {
     id: 'config.form.navigation.pages',

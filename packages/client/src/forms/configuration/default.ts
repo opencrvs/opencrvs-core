@@ -431,6 +431,42 @@ export const registerForms: IDefaultRegisterForms = {
                       }
                     }
                   ],
+                  OTHER_FAMILY_MEMBER: [
+                    {
+                      name: 'registrationPhone',
+                      type: 'TEL',
+                      label: formMessageDescriptors.phoneNumber,
+                      required: true,
+                      initialValue: '',
+                      validate: [
+                        {
+                          operation: 'phoneNumberFormat'
+                        }
+                      ],
+                      mapping: {
+                        mutation: {
+                          operation: 'changeHirerchyMutationTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'msisdnTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        },
+                        query: {
+                          operation: 'changeHirerchyQueryTransformer',
+                          parameters: [
+                            'registration.contactPhoneNumber',
+                            {
+                              operation: 'localPhoneTransformer',
+                              parameters: ['registration.contactPhoneNumber']
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ],
                   LEGAL_GUARDIAN: [
                     {
                       name: 'registrationPhone',

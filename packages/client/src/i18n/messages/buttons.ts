@@ -329,6 +329,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Make correction',
     description: 'Make correction button text on correction summary'
   },
+  view: {
+    id: 'buttons.view',
+    defaultMessage: 'View',
+    description: 'Label for link button view'
+  },
   publish: {
     id: 'buttons.publish',
     defaultMessage: 'Publish',

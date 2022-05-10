@@ -57,8 +57,8 @@ function ActionButton({ event, status, version }: IFormDraft) {
               goToFormConfigWizard(
                 event,
                 event === Event.BIRTH
-                  ? BirthSection.Registration
-                  : DeathSection.Registration
+                  ? BirthSection.Child
+                  : DeathSection.Deceased
               )
             )
           }

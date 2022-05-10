@@ -54,9 +54,14 @@ const PageItems = styled(NavigationSubItem)<{ isSelected: boolean }>`
 function previewSectionFilter(
   section: BirthSection | DeathSection
 ): section is
-  | Exclude<BirthSection, 'preview'>
-  | Exclude<DeathSection, 'preview'> {
-  return section !== BirthSection.Preview && section !== DeathSection.Preview
+  | Exclude<BirthSection, 'preview' | 'registration'>
+  | Exclude<DeathSection, 'preview' | 'registration'> {
+  return (
+    section !== BirthSection.Preview &&
+    section !== BirthSection.Registration &&
+    section !== DeathSection.Preview &&
+    section !== DeathSection.Registration
+  )
 }
 
 export function SectionNavigation() {
