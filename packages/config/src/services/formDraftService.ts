@@ -21,7 +21,7 @@ import {
   SEARCH_URL
 } from '@config/config/constants'
 import { getHearthDb } from '@config/config/database'
-import { IModifyDraftStatus } from '@config/handlers/formDraft/createOrupdateFormDraft/handler'
+import { IModifyDraftStatus } from '@config/handlers/formDraft/updateFormDraft/handler'
 
 enum HearthCollectionsName {
   Composition = 'Composition',

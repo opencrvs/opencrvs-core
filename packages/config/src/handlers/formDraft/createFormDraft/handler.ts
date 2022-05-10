@@ -27,10 +27,6 @@ import FormDraft, {
 import { messageSchema } from '@config/handlers/question/createQuestion/handler'
 import { find, partition, isEmpty } from 'lodash'
 import { Event } from '@config/models/certificate'
-import {
-  clearHearthElasticInfluxData,
-  clearQuestionConfigs
-} from '@config/services/formDraftService'
 
 export function isValidFormDraftOperation(
   currentStatus: string,
@@ -183,56 +179,6 @@ export async function createFormDraftHandler(
   return h.response(oldDraft).code(201)
 }
 
-export async function modifyDraftStatusHandler(
-  request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
-  const { event, status: newStatus } = request.payload as IModifyDraftStatus
-
-  const draft = await FormDraft.findOne({
-    event
-  })
-
-  if (!draft) {
-    return h
-      .response(`Could not find any form draft for ${event} event`)
-      .code(400)
-  }
-
-  if (!isValidFormDraftOperation(draft.status, newStatus)) {
-    return h
-      .response(
-        `Invalid Operation. Can not update form draft status from ${draft.status} to ${newStatus}`
-      )
-      .code(400)
-  }
-
-  try {
-    if (
-      (draft.status === DraftStatus.IN_PREVIEW &&
-        newStatus === DraftStatus.DRAFT) ||
-      newStatus === DraftStatus.DELETED
-    ) {
-      await clearHearthElasticInfluxData(request)
-      if (newStatus === DraftStatus.DELETED) {
-        await clearQuestionConfigs(event)
-      }
-    }
-    draft.status = newStatus
-    draft.updatedAt = Date.now()
-    await FormDraft.updateOne({ _id: draft._id }, draft)
-  } catch (err) {
-    logger.error(err)
-    return h
-      .response(
-        `Could not update draft for ${draft.event} event. Error : ${err}`
-      )
-      .code(400)
-  }
-
-  return h.response(draft).code(201)
-}
-
 export const questionReqSchema = Joi.object({
   id: Joi.string(),
   fieldId: Joi.string(),
@@ -255,18 +201,4 @@ export const requestSchema = Joi.object({
     .required(),
   questions: Joi.array().items(questionReqSchema).required(),
   comment: Joi.string().required()
-})
-
-export const modifyFormDraftStatus = Joi.object({
-  event: Joi.string()
-    .valid(...validEvent)
-    .required(),
-  status: Joi.string()
-    .valid(
-      DraftStatus.DRAFT,
-      DraftStatus.IN_PREVIEW,
-      DraftStatus.PUBLISHED,
-      DraftStatus.DELETED
-    )
-    .required()
 })

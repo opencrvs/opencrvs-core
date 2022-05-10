@@ -32,10 +32,13 @@ import updateQuestionHandler, {
 import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
 import {
   createFormDraftHandler,
-  requestSchema as updateFormDraftReqSchema,
+  requestSchema as createFormDraftReqSchema
+} from '@config/handlers/formDraft/createFormDraft/handler'
+import {
   modifyDraftStatusHandler,
-  modifyFormDraftStatus
-} from '@config/handlers/formDraft/createOrupdateFormDraft/handler'
+  requestSchema as modifyFormDraftStatus
+} from '@config/handlers/formDraft/updateFormDraft/handler'
+
 import getFormDrafts from '@config/handlers/formDraft/getFormDraft/handler'
 
 const enum RouteScope {
@@ -199,7 +202,7 @@ export default function getRoutes() {
           scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
-          payload: updateFormDraftReqSchema
+          payload: createFormDraftReqSchema
         }
       }
     },

@@ -49,26 +49,6 @@ const birthMockFormDraft = {
   __v: 0
 }
 
-const birthUpdatedMockFormDraft = {
-  status: 'DRAFT',
-  _id: '623f30a18aef60124a72df14',
-  event: 'death',
-  comment: 'Modified previous death question',
-  version: 2,
-  createdAt: 1648308385612,
-  updatedAt: 1648308396432,
-  history: [
-    {
-      status: 'IN_PREVIEW',
-      _id: '623f30ac8aef60124a72df1c',
-      version: 1,
-      comment: 'Added new death question',
-      updatedAt: 1648308385612
-    }
-  ],
-  __v: 0
-}
-
 const deathMockFormDraft = {
   status: 'DRAFT',
   _id: '623f30c18aef60124a72df28',
@@ -106,7 +86,7 @@ const mockQuestion = [
   }
 ]
 
-describe('updateFormDraftHandler test', () => {
+describe('createFormDraftHandler test', () => {
   let server: any
 
   beforeEach(async () => {
@@ -128,7 +108,7 @@ describe('updateFormDraftHandler test', () => {
       payload: {
         event: 'birth',
         comment: 'Modified question',
-        status: 'DRAFT'
+        questions: []
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -179,8 +159,7 @@ describe('updateFormDraftHandler test', () => {
           }
         ],
         event: 'birth',
-        comment: 'Modified question',
-        status: 'DRAFT'
+        comment: 'Modified question'
       },
       headers: {
         Authorization: `Bearer ${token}`
@@ -200,7 +179,6 @@ describe('updateFormDraftHandler test', () => {
       url: '/draftQuestions',
       payload: {
         event: 'birth',
-        status: 'DRAFT',
         questions: [
           {
             fieldId: 'birth.registration.informant-relation.newField3',
@@ -226,71 +204,7 @@ describe('updateFormDraftHandler test', () => {
       payload: {
         event: 'death',
         comment: 'Modified question',
-        status: 'DRAFT',
         deleted: ['death.wrongId']
-      },
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(400)
-  })
-})
-
-describe('modifyDraftStatusHandler test', () => {
-  let server: any
-
-  beforeEach(async () => {
-    server = await createServer()
-    fetch.resetMocks()
-    fetch.mockReject(new Error())
-  })
-
-  it('should update form draft status using mongoose', async () => {
-    mockingoose(FormDraft).toReturn(birthMockFormDraft, 'findOne')
-    mockingoose(FormDraft).toReturn(birthUpdatedMockFormDraft, 'updateOne')
-
-    const res = await server.server.inject({
-      method: 'PUT',
-      url: '/formDraftStatus',
-      payload: {
-        event: 'birth',
-        status: 'IN_PREVIEW'
-      },
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(201)
-  })
-
-  it('should return error if wrong operation requested using mongoose', async () => {
-    mockingoose(FormDraft).toReturn(birthMockFormDraft, 'findOne')
-    mockingoose(FormDraft).toReturn(birthMockFormDraft, 'updateOne')
-
-    const res = await server.server.inject({
-      method: 'PUT',
-      url: '/formDraftStatus',
-      payload: {
-        event: 'birth',
-        status: 'PUBLISHED'
-      },
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
-    expect(res.statusCode).toBe(400)
-  })
-
-  it('should return error if any error occured on update draft', async () => {
-    mockingoose(FormDraft).toReturn(deathMockFormDraft, 'findOne')
-    mockingoose(FormDraft).toReturn(new Error('boom'), 'updateOne')
-    const res = await server.server.inject({
-      method: 'PUT',
-      url: '/formDraftStatus',
-      payload: {
-        event: 'death',
-        status: 'IN_PREVIEW'
       },
       headers: {
         Authorization: `Bearer ${token}`
