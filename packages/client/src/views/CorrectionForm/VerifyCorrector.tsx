@@ -109,13 +109,13 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
       const iDType = (info[fields.identifierTypeField] ||
         info[fields.identifierOtherTypeField]) as string
 
-      const firstNameIndex = fields.nameFields[intl.locale]
-        ? fields.nameFields[intl.locale].firstNamesField
-        : fields.nameFields[intl.defaultLocale].firstNamesField
+      const firstNameIndex = (
+        fields.nameFields[intl.locale] || fields.nameFields[intl.defaultLocale]
+      ).firstNamesField
 
-      const familyNameIndex = fields.nameFields[intl.locale]
-        ? fields.nameFields[intl.locale].familyNameField
-        : fields.nameFields[intl.defaultLocale].familyNameField
+      const familyNameIndex = (
+        fields.nameFields[intl.locale] || fields.nameFields[intl.defaultLocale]
+      ).familyNameField
 
       const firstNames = info[firstNameIndex] as string
       const familyName = info[familyNameIndex] as string
