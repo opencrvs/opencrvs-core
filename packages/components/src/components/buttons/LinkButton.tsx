@@ -15,7 +15,6 @@ import { Button } from './Button'
 export const LinkButton = styled(Button)<{
   isBoldLink?: boolean
 }>`
-  height: auto;
   ${({ theme, isBoldLink }) =>
     isBoldLink ? theme.fonts.bold16 : theme.fonts.reg16}
   color: ${({ theme }) => theme.colors.tertiary};

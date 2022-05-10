@@ -34,7 +34,8 @@ import {
   createTestComponent,
   flushPromises,
   mockOfflineData,
-  resizeWindow
+  resizeWindow,
+  wait
 } from '@client/tests/util'
 import { REJECTED } from '@client/utils/constants'
 import {
@@ -44,7 +45,7 @@ import {
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { v4 as uuid } from 'uuid'
-import { waitForElement } from '@client/tests/wait-for-element'
+import { waitForElement, waitFor } from '@client/tests/wait-for-element'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { createIntl } from 'react-intl'
 import { phoneNumberFormat } from '@client/utils/validate'
@@ -134,6 +135,7 @@ describe('when in device of large viewport', () => {
         reviewSectionComponent
           .find('#btn_change_child_familyNameEng')
           .hostNodes()
+          .first()
           .simulate('click')
         reviewSectionComponent.update()
       })
@@ -148,6 +150,7 @@ describe('when in device of large viewport', () => {
         reviewSectionComponent
           .find('#btn_change_child_familyNameEng')
           .hostNodes()
+          .first()
           .simulate('click')
         reviewSectionComponent.update()
         await flushPromises()
@@ -296,6 +299,7 @@ describe('when in device of large viewport', () => {
         reviewSectionComponent
           .find('#btn_change_child_familyNameEng')
           .hostNodes()
+          .first()
           .simulate('click')
         reviewSectionComponent.update()
       })
@@ -483,13 +487,22 @@ describe('when in device of large viewport', () => {
       reviewSectionComponent = testComponent
     })
 
-    it('renders values in review section', () => {
+    it('renders values in review section', async () => {
+      const component = await waitForElement(
+        reviewSectionComponent,
+        '#Informant'
+      )
       expect(
-        reviewSectionComponent.find('#Informant').hostNodes()
+        reviewSectionComponent.find('#Informant').hostNodes().first()
       ).toHaveLength(1)
 
       expect(
-        reviewSectionComponent.find('#Informant').hostNodes().childAt(0).text()
+        reviewSectionComponent
+          .find('#Informant')
+          .hostNodes()
+          .first()
+          .childAt(0)
+          .text()
       ).toContain('Mother')
     })
 
@@ -498,7 +511,7 @@ describe('when in device of large viewport', () => {
         reviewSectionComponent
           .find('#required_label_registration_informant')
           .hostNodes()
-      ).toHaveLength(1)
+      ).toHaveLength(2)
     })
   })
 
@@ -578,13 +591,7 @@ describe('when in device of large viewport', () => {
     })
 
     it('renders selected location label', () => {
-      expect(
-        reviewSectionComponent
-          .find('#Section_child')
-          .hostNodes()
-          .childAt(2)
-          .text()
-      ).toContain('Hospital / ClinicChange')
+      expect(reviewSectionComponent.find('#Hospital')).toBeTruthy()
     })
   })
 })
