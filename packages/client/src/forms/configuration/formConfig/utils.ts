@@ -110,6 +110,7 @@ function customFieldToQuestionConfig(
     fieldId,
     preceedingFieldId,
     enabled: field.enabled ?? '',
+    custom: true,
     foregoingFieldId: FieldPosition.BOTTOM,
     ...messageProperties.reduce(
       (accum, prop) => ({

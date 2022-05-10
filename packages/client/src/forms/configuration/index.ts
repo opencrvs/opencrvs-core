@@ -300,10 +300,14 @@ export function getConfiguredForm(
   event: Event,
   inConfig: boolean
 ) {
+  const formWithAddresses = populateRegisterFormsWithAddresses(
+    registerForms[event],
+    event
+  )
   const form: ISerializedForm = configureRegistrationForm(
     sortFormCustomisations(
       filterQuestionsByEventType(questionConfig, event),
-      registerForms[event]
+      formWithAddresses
     ),
     registerForms[event],
     event,
@@ -325,16 +329,21 @@ export function getConfiguredOrDefaultForm(
     status: null
   }
 
+  const formWithAddresses = populateRegisterFormsWithAddresses(
+    registerForms[event],
+    event
+  )
+
   const form: ISerializedForm = isConfigured(status)
     ? configureRegistrationForm(
         sortFormCustomisations(
           filterQuestionsByEventType(formConfig.questionConfig, event),
-          registerForms[event]
+          formWithAddresses
         ),
         registerForms[event],
         event,
         inConfig
       )
-    : populateRegisterFormsWithAddresses(registerForms[event], event)
+    : formWithAddresses
   return deserializeForm(form)
 }
