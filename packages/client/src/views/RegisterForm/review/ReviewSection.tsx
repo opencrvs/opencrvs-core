@@ -162,14 +162,16 @@ const Column = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 0px;
-    width: 100%;
+    width: 0%;
   }
 `
 
 const StyledColumn = styled(Column)`
   ${({ theme }) => theme.shadows.light};
   width: 60%;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    width: 100%;
+  }
 `
 
 const ZeroDocument = styled.div`
@@ -1084,9 +1086,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) {
-    // const {
-    //   draft: { data, originalData }
-    // } = this.props
     if (!originalData) return false
     if (data[field.name] && (data[field.name] as IFormData).value) {
       return this.hasNestedDataChanged(
