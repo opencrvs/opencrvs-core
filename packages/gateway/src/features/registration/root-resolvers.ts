@@ -13,7 +13,8 @@ import { IAuthHeader } from '@gateway/common-types'
 import {
   EVENT_TYPE,
   DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL
+  REINSTATED_EXTENSION_URL,
+  ASSIGNED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
@@ -89,7 +90,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await markRecordAsDownloaded(id, authHeader)
+        return await markRecordAsDownloadedAndAssigned(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -102,7 +103,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await markRecordAsDownloaded(id, authHeader)
+        return await markRecordAsDownloadedAndAssigned(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -440,10 +441,12 @@ export const resolvers: GQLResolver = {
 
         const newTaskBundle = addOrUpdateExtension(
           taskEntryData,
-          {
-            url: REINSTATED_EXTENSION_URL,
-            valueString: regStatusCode
-          },
+          [
+            {
+              url: REINSTATED_EXTENSION_URL,
+              valueString: regStatusCode
+            }
+          ],
           'reinstated'
         )
 
@@ -643,7 +646,10 @@ async function markEventAsCertified(
   return getIDFromResponse(res)
 }
 
-async function markRecordAsDownloaded(id: string, authHeader: IAuthHeader) {
+async function markRecordAsDownloadedAndAssigned(
+  id: string,
+  authHeader: IAuthHeader
+) {
   const taskBundle: ITaskBundle = await fetchFHIR(
     `/Task?focus=Composition/${id}`,
     authHeader
@@ -651,13 +657,34 @@ async function markRecordAsDownloaded(id: string, authHeader: IAuthHeader) {
   if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
     throw new Error('Task does not exist')
   }
-  const doc = addOrUpdateExtension(
+
+  let doc: ITaskBundle
+  let extensions: fhir.Extension[]
+
+  if (hasScope(authHeader, 'register') || hasScope(authHeader, 'validate')) {
+    extensions = [
+      {
+        url: DOWNLOADED_EXTENSION_URL,
+        valueString: getStatusFromTask(taskBundle.entry[0].resource)
+      },
+      {
+        url: ASSIGNED_EXTENSION_URL,
+        valueString: getStatusFromTask(taskBundle.entry[0].resource)
+      }
+    ]
+  } else {
+    extensions = [
+      {
+        url: DOWNLOADED_EXTENSION_URL,
+        valueString: getStatusFromTask(taskBundle.entry[0].resource)
+      }
+    ]
+  }
+
+  doc = addOrUpdateExtension(
     taskBundle.entry[0],
-    {
-      url: DOWNLOADED_EXTENSION_URL,
-      valueString: getStatusFromTask(taskBundle.entry[0].resource)
-    },
-    'downloaded'
+    extensions,
+    'downloadedAndAssigned'
   )
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
