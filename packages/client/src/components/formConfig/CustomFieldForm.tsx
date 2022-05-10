@@ -57,16 +57,16 @@ const CInputField = styled(InputField)`
 `
 
 const CTextInput = styled(TextInput)`
+  ${({ theme }) => theme.fonts.reg14};
   height: 32px;
   border: solid 1px ${({ theme }) => theme.colors.grey600};
-  font-size: ${({ theme }) => theme.fonts.reg14};
 `
 
 const CTextArea = styled(TextArea)`
+  ${({ theme }) => theme.fonts.reg14};
   height: 32px;
   background: ${({ theme }) => theme.colors.white};
   border: solid 1px ${({ theme }) => theme.colors.grey600};
-  font-size: ${({ theme }) => theme.fonts.reg14};
 `
 
 const CustomFieldFormContainer = styled(Box)`
@@ -131,7 +131,6 @@ const LanguageSelect = styled(Select)`
   }
   .react-select__value-container {
     display: block;
-    line-height: auto;
   }
   div {
     ${({ theme }) => theme.fonts.reg14};
