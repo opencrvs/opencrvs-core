@@ -266,9 +266,11 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         }
       }
     } else if (
-      activeMenuItem === ACTIVE_MENU_ITEM.TEAM &&
-      (NATL_ADMIN_ROLES.includes(this.props.userDetails?.role as string) ||
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.role as string))
+      (activeMenuItem === ACTIVE_MENU_ITEM.TEAM &&
+        (NATL_ADMIN_ROLES.includes(this.props.userDetails?.role as string) ||
+          SYS_ADMIN_ROLES.includes(this.props.userDetails?.role as string))) ||
+      (this.props.userDetails?.role &&
+        USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role))
     ) {
       return {
         mobileLeft: {
@@ -298,44 +300,23 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         }
       }
     } else {
-      if (
-        this.props.userDetails?.role &&
-        USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
-      ) {
-        if (this.props.mobileSearchBar) {
-          return {
-            mobileLeft: {
-              icon: () => <ArrowBack />,
-              handler: () => window.history.back()
-            }
-          }
-        } else {
-          return {
-            mobileLeft: {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
-            }
-          }
+      if (this.props.mobileSearchBar) {
+        return {
+          mobileLeft: {
+            icon: () => <ArrowBack />,
+            handler: () => window.history.back()
+          },
+          mobileBody: this.renderSearchInput(this.props, true)
         }
       } else {
-        if (this.props.mobileSearchBar) {
-          return {
-            mobileLeft: {
-              icon: () => <ArrowBack />,
-              handler: () => window.history.back()
-            },
-            mobileBody: this.renderSearchInput(this.props, true)
-          }
-        } else {
-          return {
-            mobileLeft: {
-              icon: () => this.hamburger(),
-              handler: this.toggleMenu
-            },
-            mobileRight: {
-              icon: () => <SearchDark />,
-              handler: () => this.props.goToSearch()
-            }
+        return {
+          mobileLeft: {
+            icon: () => this.hamburger(),
+            handler: this.toggleMenu
+          },
+          mobileRight: {
+            icon: () => <SearchDark />,
+            handler: () => this.props.goToSearch()
           }
         }
       }
