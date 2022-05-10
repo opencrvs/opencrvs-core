@@ -198,7 +198,7 @@ type Mutation {
     applicationConfig: ApplicationConfigurationInput
   ): ApplicationConfiguration
   createOrUpdateQuestion(question: QuestionInput!): Question
-  createOrUpdateFormDraft(formDraft: FormDraftInput!): FormDraft
+  createFormDraft(formDraft: FormDraftInput!): FormDraft
   modifyDraftStatus(formDraft: FormDraftStatusModify!): FormDraft
 }
 
@@ -626,10 +626,9 @@ input QuestionInput {
 }
 
 input FormDraftInput {
-  questions: [QuestionInput]
+  questions: [QuestionInput!]!
   event: String!
-  status: String!
-  comment: String
+  comment: String!
 }
 
 input FormDraftStatusModify {
@@ -1439,7 +1438,7 @@ input DeathFeeInput {
 
 input MesssageDescriptorInput {
   id: String!
-  description: String!
+  description: String
   defaultMessage: String!
 }
 

@@ -12,12 +12,7 @@
 import fetch from 'node-fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 import { hasScope } from '@gateway/features/user/utils'
-import {
-  GQLFormDraftInput,
-  GQLFormDraftStatusModify,
-  GQLQuestionInput,
-  GQLResolver
-} from '@gateway/graphql/schema'
+import { GQLFormDraftStatusModify, GQLResolver } from '@gateway/graphql/schema'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -34,7 +29,7 @@ export const resolvers: GQLResolver = {
   },
 
   Mutation: {
-    async createOrUpdateFormDraft(_, { formDraft }, authHeader) {
+    async createFormDraft(_, { formDraft }, authHeader) {
       // Only natlsysadmin should be able to create or update a question
       if (!hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(
@@ -43,11 +38,9 @@ export const resolvers: GQLResolver = {
           )
         )
       }
-      const formDraftPayload: IFormDraftPayload =
-        createOrUpdateFormDraftPayload(formDraft)
       const res = await fetch(`${APPLICATION_CONFIG_URL}draftQuestions`, {
         method: 'PUT',
-        body: JSON.stringify(formDraftPayload),
+        body: JSON.stringify(formDraft),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader
@@ -95,19 +88,6 @@ export const resolvers: GQLResolver = {
   }
 }
 
-function createOrUpdateFormDraftPayload(
-  formDraft: GQLFormDraftInput
-): IFormDraftPayload {
-  const formDraftPayload: IFormDraftPayload = {
-    questions: formDraft.questions as GQLQuestionInput[],
-    event: formDraft.event as Event,
-    status: formDraft.status as DraftStatus,
-    comment: formDraft.comment as string
-  }
-
-  return formDraftPayload
-}
-
 function modifyFormDraftStatusPayload(
   formDraft: GQLFormDraftStatusModify
 ): IModifyDraftStatusPayload {
@@ -128,13 +108,6 @@ enum DraftStatus {
   IN_PREVIEW = 'IN_PREVIEW',
   PUBLISHED = 'PUBLISHED',
   DELETED = 'DELETED'
-}
-
-interface IFormDraftPayload {
-  questions: GQLQuestionInput[] | []
-  event: Event
-  status: DraftStatus
-  comment?: string
 }
 
 interface IModifyDraftStatusPayload {

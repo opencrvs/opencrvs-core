@@ -83,7 +83,7 @@ describe('getFormDraft()', () => {
   })
 })
 
-describe('createOrUpdateFormDraft mutation', () => {
+describe('createFormDraft mutation', () => {
   let authHeaderSysAdmin: { Authorization: string }
   let authHeaderRegister: { Authorization: string }
   beforeEach(() => {
@@ -136,7 +136,7 @@ describe('createOrUpdateFormDraft mutation', () => {
       { status: 201 }
     )
 
-    const response = await resolvers.Mutation.createOrUpdateFormDraft(
+    const response = await resolvers.Mutation.createFormDraft(
       {},
       { formDraft },
       authHeaderSysAdmin
@@ -154,7 +154,7 @@ describe('createOrUpdateFormDraft mutation', () => {
       }),
       { status: 201 }
     )
-    const response = await resolvers.Mutation.createOrUpdateFormDraft(
+    const response = await resolvers.Mutation.createFormDraft(
       {},
       {
         formDraft: {
@@ -180,17 +180,13 @@ describe('createOrUpdateFormDraft mutation', () => {
     )
 
     expect(
-      resolvers.Mutation.createOrUpdateFormDraft(
-        {},
-        { formDraft },
-        authHeaderRegister
-      )
+      resolvers.Mutation.createFormDraft({}, { formDraft }, authHeaderRegister)
     ).rejects.toThrowError(
       'Create or update form draft is only allowed for natlsysadmin'
     )
   })
 
-  it('should throw error when /createOrUpdateFormDraft sends anything but 201', async () => {
+  it('should throw error when /createFormDraft sends anything but 201', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
         statusCode: '201'
@@ -199,11 +195,7 @@ describe('createOrUpdateFormDraft mutation', () => {
     )
 
     expect(
-      resolvers.Mutation.createOrUpdateFormDraft(
-        {},
-        { formDraft },
-        authHeaderSysAdmin
-      )
+      resolvers.Mutation.createFormDraft({}, { formDraft }, authHeaderSysAdmin)
     ).rejects.toThrowError(
       "Something went wrong on config service. Couldn't mofify form draft"
     )

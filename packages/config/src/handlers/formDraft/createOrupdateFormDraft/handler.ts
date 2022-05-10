@@ -59,10 +59,7 @@ export function isValidFormDraftOperation(
 }
 
 export interface ICreateDraft
-  extends Pick<
-    IFormDraftModel,
-    'event' | 'comment'
-  > {
+  extends Pick<IFormDraftModel, 'event' | 'comment'> {
   questions: IQuestion[] | []
 }
 
@@ -77,10 +74,10 @@ export async function createFormDraftHandler(
 ) {
   const newDraft = request.payload as ICreateDraft
   const eventRegex = new RegExp(`^(${newDraft.event}\.)`)
-  let oldDraft: IFormDraftModel | null = await FormDraft.findOne({
+  const oldDraft: IFormDraftModel | null = await FormDraft.findOne({
     event: newDraft.event
   })
-  
+
   if (!oldDraft) {
     //create draft
     try {
@@ -256,10 +253,8 @@ export const requestSchema = Joi.object({
   event: Joi.string()
     .valid(...validEvent)
     .required(),
-  questions: Joi.array().items(questionReqSchema),
-  status: Joi.string().valid(DraftStatus.DRAFT).required(),
-  comment: Joi.string(),
-  deleted: Joi.array().items(Joi.string())
+  questions: Joi.array().items(questionReqSchema).required(),
+  comment: Joi.string().required()
 })
 
 export const modifyFormDraftStatus = Joi.object({
@@ -267,6 +262,11 @@ export const modifyFormDraftStatus = Joi.object({
     .valid(...validEvent)
     .required(),
   status: Joi.string()
-    .valid(DraftStatus.DRAFT, DraftStatus.IN_PREVIEW, DraftStatus.PUBLISHED, DraftStatus.DELETED)
+    .valid(
+      DraftStatus.DRAFT,
+      DraftStatus.IN_PREVIEW,
+      DraftStatus.PUBLISHED,
+      DraftStatus.DELETED
+    )
     .required()
 })

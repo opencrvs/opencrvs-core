@@ -30,10 +30,10 @@ export default async function createQuestion(
 }
 
 export const messageSchema = Joi.array().items({
-  lang: Joi.string(),
+  lang: Joi.string().required(),
   descriptor: Joi.object({
     id: Joi.string().required(),
-    defaultMessage: Joi.string(),
+    defaultMessage: Joi.string().required(),
     description: Joi.string()
   })
 })

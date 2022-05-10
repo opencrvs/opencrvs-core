@@ -77,7 +77,7 @@ export interface GQLMutation {
   createOrUpdateCertificateSVG?: GQLCertificateSVG
   updateApplicationConfig?: GQLApplicationConfiguration
   createOrUpdateQuestion?: GQLQuestion
-  createOrUpdateFormDraft?: GQLFormDraft
+  createFormDraft?: GQLFormDraft
   modifyDraftStatus?: GQLFormDraft
 }
 
@@ -516,10 +516,9 @@ export interface GQLQuestionInput {
 }
 
 export interface GQLFormDraftInput {
-  questions?: Array<GQLQuestionInput | null>
+  questions: Array<GQLQuestionInput>
   event: string
-  status: string
-  comment?: string
+  comment: string
 }
 
 export interface GQLFormDraftStatusModify {
@@ -1340,7 +1339,7 @@ export interface GQLDeathFeeInput {
 
 export interface GQLMesssageDescriptorInput {
   id: string
-  description: string
+  description?: string
   defaultMessage: string
 }
 
@@ -2062,7 +2061,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   createOrUpdateCertificateSVG?: MutationToCreateOrUpdateCertificateSVGResolver<TParent>
   updateApplicationConfig?: MutationToUpdateApplicationConfigResolver<TParent>
   createOrUpdateQuestion?: MutationToCreateOrUpdateQuestionResolver<TParent>
-  createOrUpdateFormDraft?: MutationToCreateOrUpdateFormDraftResolver<TParent>
+  createFormDraft?: MutationToCreateFormDraftResolver<TParent>
   modifyDraftStatus?: MutationToModifyDraftStatusResolver<TParent>
 }
 
@@ -2527,16 +2526,16 @@ export interface MutationToCreateOrUpdateQuestionResolver<
   ): TResult
 }
 
-export interface MutationToCreateOrUpdateFormDraftArgs {
+export interface MutationToCreateFormDraftArgs {
   formDraft: GQLFormDraftInput
 }
-export interface MutationToCreateOrUpdateFormDraftResolver<
+export interface MutationToCreateFormDraftResolver<
   TParent = any,
   TResult = any
 > {
   (
     parent: TParent,
-    args: MutationToCreateOrUpdateFormDraftArgs,
+    args: MutationToCreateFormDraftArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
