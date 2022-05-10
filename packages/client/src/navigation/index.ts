@@ -20,13 +20,10 @@ import {
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   EVENT_INFO,
-  EVENT_REGISTRATION_RATES,
+  EVENT_COMPLETENESS_RATES,
   HOME,
-  OPERATIONAL_REPORT,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
-  PERFORMANCE_REPORT,
-  PERFORMANCE_REPORT_LIST,
   PRINT_CERTIFICATE_PAYMENT,
   REGISTRAR_HOME_TAB,
   REVIEW_CERTIFICATE,
@@ -55,9 +52,11 @@ import {
 import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
-import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
+import {
+  getJurisdictionLocationIdFromUserDetails,
+  CompletenessRateTime
+} from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import {
   goBack as back,
@@ -193,39 +192,14 @@ export function goToTeamSearch(searchedLocation?: searchedLocation) {
     : push(TEAM_SEARCH)
 }
 
-export function goToPerformanceHome(state?: searchedLocation) {
-  return state && state.selectedLocation
-    ? push(PERFORMANCE_HOME, { selectedLocation: state.selectedLocation })
-    : push(PERFORMANCE_HOME)
-}
-
-export function goToPerformanceReportList() {
-  return push(PERFORMANCE_REPORT_LIST)
-}
-
-export function goToPerformanceReport(
-  selectedLocation: ISearchLocation,
-  eventType: Event,
-  timeStart: Date,
-  timeEnd: Date
-) {
-  return push(PERFORMANCE_REPORT, {
-    selectedLocation,
-    timeRange: { start: timeStart, end: timeEnd },
-    eventType
-  })
-}
-
-export function goToOperationalReport(
-  locationId: string,
-  sectionId: OPERATIONAL_REPORT_SECTION = OPERATIONAL_REPORT_SECTION.OPERATIONAL,
+export function goToPerformanceHome(
   timeStart: Date = subYears(new Date(Date.now()), 1),
-  timeEnd: Date = new Date(Date.now())
+  timeEnd: Date = new Date(Date.now()),
+  locationId?: string
 ) {
   return push({
-    pathname: OPERATIONAL_REPORT,
+    pathname: PERFORMANCE_HOME,
     search: stringify({
-      sectionId,
       locationId,
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString()
@@ -411,29 +385,36 @@ export function goToCreateNewUserWithLocationId(locationId: string) {
   return push(formatUrl(CREATE_USER_ON_LOCATION, { locationId }))
 }
 
-export function goToRegistrationRates(
+export function goToCompletenessRates(
   eventType: Event,
-  title: string,
-  locationId: string,
+  locationId: string | undefined,
   timeStart: Date,
-  timeEnd: Date
+  timeEnd: Date,
+  time = CompletenessRateTime.WithinTarget
 ) {
   return push({
-    pathname: formatUrl(EVENT_REGISTRATION_RATES, { eventType }),
-    search: stringify({
-      locationId,
-      title,
-      timeStart: timeStart.toISOString(),
-      timeEnd: timeEnd.toISOString()
-    })
+    pathname: formatUrl(EVENT_COMPLETENESS_RATES, { eventType }),
+    search: stringify(
+      locationId
+        ? {
+            locationId,
+            timeStart: timeStart.toISOString(),
+            timeEnd: timeEnd.toISOString(),
+            time
+          }
+        : {
+            timeStart: timeStart.toISOString(),
+            timeEnd: timeEnd.toISOString(),
+            time
+          }
+    )
   })
 }
 
 export function goToFieldAgentList(
-  locationId: string,
   timeStart: string,
   timeEnd: string,
-  event?: string
+  locationId?: string
 ) {
   return push({
     pathname: PERFORMANCE_FIELD_AGENT_LIST,
@@ -446,7 +427,6 @@ export function goToFieldAgentList(
 }
 
 export function goToWorkflowStatus(
-  sectionId: string,
   locationId: string,
   timeStart: Date,
   timeEnd: Date,
@@ -461,7 +441,6 @@ export function goToWorkflowStatus(
       event
     }),
     state: {
-      sectionId,
       timeStart,
       timeEnd
     }
@@ -595,7 +574,7 @@ export function goToPerformanceView(userDetails: IUserDetails) {
     } else {
       const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
       return (
-        (locationId && goToOperationalReport(locationId)) ||
+        (locationId && goToPerformanceHome(undefined, undefined, locationId)) ||
         goToPerformanceHome()
       )
     }

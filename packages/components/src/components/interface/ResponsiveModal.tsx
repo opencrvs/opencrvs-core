@@ -14,18 +14,18 @@ import styled from 'styled-components'
 import { Cross } from '../icons'
 import { CircleButton } from '../buttons'
 
-const ModalContainer = styled.div`
+const ModalContainer = styled.div<{ fullscreen?: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  padding-top: 160px;
+  padding-top: ${({ fullscreen }) => (fullscreen ? 0 : 160)}px;
   z-index: 5;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding-top: 0px;
   }
 `
@@ -194,7 +194,7 @@ export class ResponsiveModal extends React.Component<IProps> {
     }
 
     return (
-      <ModalContainer id={id}>
+      <ModalContainer id={id} fullscreen={fullscreen}>
         <ScreenBlocker />
         <ModalContent
           width={width}

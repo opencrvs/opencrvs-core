@@ -28,6 +28,7 @@ const DataContainer = styled.div`
   display: flex;
   flex-grow: 1;
   max-width: 90%;
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-direction: column;
     width: 100%;

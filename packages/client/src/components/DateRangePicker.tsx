@@ -110,6 +110,7 @@ interface MonthSelectorProps {
 }
 
 export const PickerButton = styled.button`
+  min-width: 200px;
   border: 2px solid ${({ theme }) => theme.colors.secondary};
   border-radius: 2px;
   &:focus {
@@ -124,6 +125,10 @@ export const PickerButton = styled.button`
   &:hover {
     background: ${({ theme }) => theme.colors.grey100};
   }
+  &:disabled {
+    background: ${({ theme }) => theme.colors.grey100};
+    border: 2px solid ${({ theme }) => theme.colors.grey200};
+  }
   white-space: nowrap;
   padding: 0;
   height: 32px;
@@ -136,6 +141,7 @@ export const PickerButton = styled.button`
 
 export const ContentWrapper = styled.div`
   display: flex;
+  justify-content: space-between;
   width: 100%;
   align-items: center;
   ${({ theme }) => theme.fonts.reg14};
@@ -147,30 +153,19 @@ export const ContentWrapper = styled.div`
 `
 
 export const ModalContainer = styled.div`
-  position: relative;
+  position: fixed;
   z-index: 2;
   width: 608px;
-  margin: -42px 0 0 -16px;
   overflow: hidden;
-
+  right: 50%;
+  transform: translateX(50%);
   ${({ theme }) => theme.shadows.heavy};
   border-radius: 4px;
   color: ${({ theme }) => theme.colors.copy};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    left: 24px;
-    margin-left: 0;
+    max-width: calc(100vw - 24px * 2);
   }
-
-  /* @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    position: fixed;
-    border-radius: 2px;
-    width: auto;
-    top: 128px;
-    left: 50vw;
-    transform: translateX(-50%);
-    margin: 0;
-  } */
 `
 export const ModalHeader = styled.div<{ hide?: boolean }>`
   display: flex;
@@ -186,7 +181,7 @@ export const ModalHeader = styled.div<{ hide?: boolean }>`
 export const TitleContent = styled.div`
   display: flex;
   align-items: center;
-  ${({ theme }) => theme.fonts.h2}
+  ${({ theme }) => theme.fonts.bold18}
   text-transform: none;
 
   & > :first-child {

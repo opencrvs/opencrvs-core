@@ -32,7 +32,7 @@ const Grid = styled.div<{ bottomBorder: boolean }>`
 
 const LabelValueContainer = styled.div`
   display: flex;
-  padding: 8px 0;
+  padding: 16px 0;
   grid-column-start: 2;
   gap: 20px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -70,15 +70,12 @@ const LabelContainer = styled.div`
     display: block;
     grid-column-start: 2;
     align-self: center;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
   }
 `
 
 const ActionsContainer = styled.div`
   display: flex;
-  padding: 8px 0;
+  padding: 16px 0;
   gap: 8px;
   justify-content: right;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -157,11 +154,20 @@ export function ListViewItemSimplified({
 }
 
 export function ListViewSimplified({
+  className,
   bottomBorder = false,
-  children
+  children,
+  id,
+  ...rest
 }: {
   bottomBorder?: boolean
+  className?: string
   children: React.ReactNode
+  id?: string
 }) {
-  return <Grid bottomBorder={bottomBorder}>{children}</Grid>
+  return (
+    <Grid {...rest} id={id} bottomBorder={bottomBorder}>
+      {children}
+    </Grid>
+  )
 }

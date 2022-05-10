@@ -41,7 +41,8 @@ import {
   PAGE_TRANSITIONS_ENTER_TIME,
   FIELD_AGENT_ROLES,
   NATL_ADMIN_ROLES,
-  SYS_ADMIN_ROLES
+  SYS_ADMIN_ROLES,
+  PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
 import {
   FloatingNotification,
@@ -67,9 +68,8 @@ import {
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { SentForReview } from './sentForReview/SentForReview'
 import { RequiresUpdateFieldAgent } from './requiresUpdate/RequiresUpdateFieldAgent'
-import { PERFORMANCE_HOME, OPERATIONAL_REPORT } from '@client/navigation/routes'
+import { PERFORMANCE_HOME } from '@client/navigation/routes'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 
 export interface IProps extends IButtonProps {
@@ -367,22 +367,16 @@ export class OfficeHomeView extends React.Component<
     )
     return (
       <>
-        {this.role && NATL_ADMIN_ROLES.includes(this.role) && (
-          <Redirect to={PERFORMANCE_HOME} />
-        )}
+        {this.role &&
+          (NATL_ADMIN_ROLES.includes(this.role) ||
+            PERFORMANCE_MANAGEMENT_ROLES.includes(this.role)) && (
+            <Redirect to={PERFORMANCE_HOME} />
+          )}
         {this.role && SYS_ADMIN_ROLES.includes(this.role) && (
           <Redirect
             to={{
-              pathname: OPERATIONAL_REPORT,
-              search:
-                '?locationId=' +
-                this.jurisdictionLocationId +
-                '&sectionId=' +
-                OPERATIONAL_REPORT_SECTION.OPERATIONAL +
-                '&timeStart=' +
-                subYears(new Date(Date.now()), 1).toISOString() +
-                '&timeEnd=' +
-                new Date(Date.now()).toISOString()
+              pathname: PERFORMANCE_HOME,
+              search: `?locationId=${this.jurisdictionLocationId}`
             }}
           />
         )}
@@ -596,7 +590,7 @@ function mapStateToProps(
         )) ||
       []
     ).reverse(),
-    userDetails: getUserDetails(state)
+    userDetails
   }
 }
 export const OfficeHome = connect<
