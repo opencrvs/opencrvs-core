@@ -102,13 +102,12 @@ export const FormTools = ({
       <ListViewSimplified>
         <ListViewItemSimplified
           label={<Label>{intl.formatMessage(messages.showHiddenFields)}</Label>}
-          actions={[
+          actions={
             <CenteredToggle
-              key="toggle"
-              selected={showHiddenFields}
+              defaultChecked={showHiddenFields}
               onChange={toggleShowHiddenFields}
             />
-          ]}
+          }
         />
       </ListViewSimplified>
       <TitleContainer>

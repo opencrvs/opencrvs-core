@@ -12,11 +12,6 @@
 import styled from 'styled-components'
 import * as React from 'react'
 
-export interface IToggle extends React.HTMLAttributes<HTMLDivElement> {
-  selected?: boolean
-  onChange?: () => void
-}
-
 const CheckBoxWrapper = styled.div`
   position: relative;
   width: 46px;
@@ -26,19 +21,24 @@ const CheckBoxWrapper = styled.div`
     box-shadow: 0px 0px 0px 2px ${({ theme }) => theme.colors.yellow};
   }
 `
-const CheckBoxLabel = styled.label<{ selected?: boolean }>`
+const CheckBoxLabel = styled.label<{ checked: boolean }>`
   position: absolute;
   top: 0;
   left: 0;
   width: 46px;
   height: 24px;
   border-radius: 100px;
-  background: ${({ theme }) => theme.colors.grey300};
+  background: ${({ checked, theme }) =>
+    checked ? theme.colors.positive : theme.colors.grey300};
   :hover {
-    background: ${({ theme }) => theme.colors.grey400};
+    background: ${({ checked, theme }) =>
+      checked ? theme.colors.greenDark : theme.colors.grey400};
   }
   cursor: pointer;
   &::after {
+    position: absolute;
+    top: 0;
+    left: 0;
     content: '';
     display: block;
     border-radius: 100px;
@@ -46,40 +46,24 @@ const CheckBoxLabel = styled.label<{ selected?: boolean }>`
     height: 18px;
     margin-top: 3px;
     margin-bottom: 3px;
-    margin-left: 4px;
-    margin-right: 24px;
+    margin-left: ${({ checked }) => (checked ? '24px' : '4px')};
+    margin-right: ${({ checked }) => (checked ? '4px' : '24px')};
     background: ${({ theme }) => theme.colors.white};
     transition: margin-left 0.2s;
   }
 `
 const CheckBox = styled.input`
   opacity: 0;
-  border-radius: 100px;
-  width: 46px;
-  height: 24px;
-  &:checked + ${CheckBoxLabel} {
-    background: ${({ theme }) => theme.colors.positive};
-    :hover {
-      background: ${({ theme }) => theme.colors.greenDark};
-    }
-    &::after {
-      margin-left: 24px;
-      margin-right: 4px;
-    }
-  }
+  cursor: pointer;
 `
 
-export function Toggle({ selected, onChange, ...props }: IToggle) {
-  const checkboxID = `checkbox-${new Date().getTime()}`
+export function Toggle(props: React.HTMLAttributes<HTMLInputElement>) {
+  const { defaultChecked } = props
   return (
-    <CheckBoxWrapper {...props}>
-      <CheckBox
-        id={checkboxID}
-        type="checkbox"
-        checked={selected}
-        onChange={onChange}
-      />
-      <CheckBoxLabel htmlFor={checkboxID} />
+    <CheckBoxWrapper>
+      <CheckBoxLabel checked={!!defaultChecked}>
+        <CheckBox type="checkbox" {...props} />
+      </CheckBoxLabel>
     </CheckBoxWrapper>
   )
 }
