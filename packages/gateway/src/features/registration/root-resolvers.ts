@@ -31,7 +31,8 @@ import {
   buildFHIRBundle,
   updateFHIRTaskBundle,
   addOrUpdateExtension,
-  ITaskBundle
+  ITaskBundle,
+  checkUserAssignment
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
@@ -279,20 +280,45 @@ export const resolvers: GQLResolver = {
       }
     },
     async markBirthAsValidated(_, { id, details }, authHeader) {
-      if (hasScope(authHeader, 'validate')) {
-        await markEventAsValidated(id, authHeader, EVENT_TYPE.BIRTH, details)
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        return await Promise.reject(new Error('ASSIGNMENT_PROBLEM'))
+      }
+      if (!hasScope(authHeader, 'validate')) {
+        return await Promise.reject(
+          new Error('User does not have a validate scope')
+        )
       } else {
-        await Promise.reject(new Error('User does not have a validate scope'))
+        return await markEventAsValidated(
+          id,
+          authHeader,
+          EVENT_TYPE.BIRTH,
+          details
+        )
       }
     },
     async markDeathAsValidated(_, { id, details }, authHeader) {
-      if (hasScope(authHeader, 'validate')) {
-        await markEventAsValidated(id, authHeader, EVENT_TYPE.DEATH, details)
-      } else {
-        await Promise.reject(new Error('User does not have a validate scope'))
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        return await Promise.reject(new Error('ASSIGNMENT_PROBLEM'))
       }
+      if (!hasScope(authHeader, 'validate')) {
+        return await Promise.reject(
+          new Error('User does not have a validate scope')
+        )
+      }
+      return await markEventAsValidated(
+        id,
+        authHeader,
+        EVENT_TYPE.DEATH,
+        details
+      )
     },
     async markBirthAsRegistered(_, { id, details }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        return await Promise.reject(new Error('ASSIGNMENT_PROBLEM'))
+      }
       if (hasScope(authHeader, 'register')) {
         return markEventAsRegistered(id, authHeader, EVENT_TYPE.BIRTH, details)
       } else {
@@ -302,6 +328,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markDeathAsRegistered(_, { id, details }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        return await Promise.reject(new Error('ASSIGNMENT_PROBLEM'))
+      }
       if (hasScope(authHeader, 'register')) {
         return await markEventAsRegistered(
           id,
@@ -316,6 +346,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsVoided(_, { id, reason, comment }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        return await Promise.reject(new Error('ASSIGNMENT_PROBLEM'))
+      }
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
@@ -350,6 +384,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsArchived(_, { id }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        return await Promise.reject(new Error('ASSIGNMENT_PROBLEM'))
+      }
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
@@ -393,6 +431,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsReinstated(_, { id }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        return await Promise.reject(new Error('ASSIGNMENT_PROBLEM'))
+      }
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
@@ -475,14 +517,22 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async markBirthAsCertified(_, { details }, authHeader) {
+    async markBirthAsCertified(_, { id, details }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        return await Promise.reject(new Error('ASSIGNMENT_PROBLEM'))
+      }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
       } else {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
     },
-    async markDeathAsCertified(_, { details }, authHeader) {
+    async markDeathAsCertified(_, { id, details }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        return await Promise.reject(new Error('ASSIGNMENT_PROBLEM'))
+      }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
       } else {
