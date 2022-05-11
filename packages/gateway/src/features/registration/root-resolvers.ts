@@ -198,7 +198,8 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare') ||
-        hasScope(authHeader, 'sysadmin')
+        hasScope(authHeader, 'sysadmin') ||
+        hasScope(authHeader, 'performance')
       ) {
         const payload: {
           declarationLocationHirarchyId?: string

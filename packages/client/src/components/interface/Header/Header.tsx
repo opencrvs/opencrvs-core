@@ -38,7 +38,8 @@ import {
   PHONE_TEXT,
   REGISTRAR_ROLES,
   SYS_ADMIN_ROLES,
-  TRACKING_ID_TEXT
+  TRACKING_ID_TEXT,
+  PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
 import { getIndividualNameObj, IUserDetails } from '@client/utils/userUtils'
 import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -197,6 +198,12 @@ const HeaderRight = styled.div`
   height: 40px;
   background: ${({ theme }) => theme.colors.white};
 `
+
+const USERS_WITHOUT_SEARCH = SYS_ADMIN_ROLES.concat(
+  NATL_ADMIN_ROLES,
+  PERFORMANCE_MANAGEMENT_ROLES
+)
+
 class HeaderComp extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
@@ -259,9 +266,8 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         }
       }
     } else if (
-      activeMenuItem === ACTIVE_MENU_ITEM.TEAM &&
-      (NATL_ADMIN_ROLES.includes(this.props.userDetails?.role as string) ||
-        SYS_ADMIN_ROLES.includes(this.props.userDetails?.role as string))
+      this.props.userDetails?.role &&
+      USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
     ) {
       return {
         mobileLeft: {
@@ -474,15 +480,23 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       },
       {
         element: (
-          <HeaderCenter>
-            <StyledPrimaryButton
-              key="newEvent"
-              id="header_new_event"
-              onClick={this.props.goToEvents}
-              icon={() => <Plus />}
-            />
-            {this.renderSearchInput(this.props)}
-          </HeaderCenter>
+          <>
+            {!(
+              this.props.userDetails?.role &&
+              USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
+            ) && (
+              <HeaderCenter>
+                <StyledPrimaryButton
+                  key="newEvent"
+                  id="header_new_event"
+                  onClick={this.props.goToEvents}
+                  icon={() => <Plus />}
+                />
+
+                {this.renderSearchInput(this.props)}
+              </HeaderCenter>
+            )}
+          </>
         )
       },
       {
