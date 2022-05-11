@@ -980,7 +980,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
-                    ? window.config.COUNTRY.toUpperCase()
+                    ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -1261,7 +1261,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
-                    ? window.config.COUNTRY.toUpperCase()
+                    ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -1751,7 +1751,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
-                    ? window.config.COUNTRY.toUpperCase()
+                    ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -2982,7 +2982,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
-                    ? window.config.COUNTRY.toUpperCase()
+                    ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -3522,7 +3522,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
-                    ? window.config.COUNTRY.toUpperCase()
+                    ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,

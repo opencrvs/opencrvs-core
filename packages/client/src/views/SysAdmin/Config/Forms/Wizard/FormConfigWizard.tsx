@@ -199,7 +199,6 @@ export function FormConfigWizard() {
     }
     firstFieldIdentifiers = getIdentifiersFromFieldId(firstField.fieldId)
   }
-
   if (
     !hasNatlSysAdminScope ||
     !isValidEvent(event) ||

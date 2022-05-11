@@ -18,10 +18,7 @@ import {
   REDIRECT_DELAY
 } from '@client/views/SysAdmin/Config/Forms/utils'
 import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
-import {
-  selectConfigFields,
-  selectConfigRegisterForm
-} from '@client/forms/configuration/formConfig/selectors'
+import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import { Event } from '@client/forms'
 import { Mutation } from 'react-apollo'
 import {
@@ -41,6 +38,8 @@ import { useParams } from 'react-router'
 import { goToFormConfigHome } from '@client/navigation'
 import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
 import { generateModifiedQuestionConfigs } from '@client/forms/configuration/formConfig/utils'
+import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
+import { registerForms } from '@client/forms/configuration/default'
 
 export const SaveActionContext = React.createContext({
   status: ActionStatus.IDLE,
@@ -51,13 +50,12 @@ function useModifiedQuestionConfig(event: Event) {
   const configFields = useSelector((store: IStoreState) =>
     selectConfigFields(store, event)
   )
-  const registerForm = useSelector((store: IStoreState) =>
-    selectConfigRegisterForm(store, event)
-  )
-  return React.useMemo(
-    () => generateModifiedQuestionConfigs(configFields, registerForm),
-    [configFields, registerForm]
-  )
+  return React.useMemo(() => {
+    return generateModifiedQuestionConfigs(
+      configFields,
+      populateRegisterFormsWithAddresses(registerForms[event], event)
+    )
+  }, [configFields, event])
 }
 
 function SaveActionButton({ comment }: { comment: string }) {

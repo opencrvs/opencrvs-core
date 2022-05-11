@@ -124,7 +124,6 @@ type ICanvasProps = {
 function FormField({ configField }: { configField: IConfigField }) {
   const formField = useFieldDefinition(configField)
   const { fieldId } = configField
-
   return (
     <FormFieldGenerator
       key={generateKeyFromObj(configField)}
@@ -157,7 +156,6 @@ export function Canvas({
   }
 
   const configFields = generateConfigFields(fieldsMap, formSection)
-
   return (
     <CanvasBox>
       {(showHiddenFields
@@ -183,7 +181,7 @@ export function Canvas({
             onClick={() => setSelectedField(fieldId)}
             movable={isSelected}
             status={isHidden ? intl.formatMessage(messages.hidden) : undefined}
-            removable={configField.custom}
+            customField={configField.custom}
             isUpDisabled={preceedingFieldId === FieldPosition.TOP}
             isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}
             onMoveUp={() => dispatch(shiftConfigFieldUp(fieldId))}

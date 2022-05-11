@@ -24,10 +24,14 @@ import {
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
   DOCUMENT_UPLOADER_WITH_OPTION,
-  QuestionConfigFieldType
+  QuestionConfigFieldType,
+  ISerializedForm
 } from '@client/forms'
 import { camelCase, keys } from 'lodash'
-import { FieldPosition } from '@client/forms/configuration'
+import {
+  FieldPosition,
+  getIdentifiersFromFieldId
+} from '@client/forms/configuration'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { MessageDescriptor } from 'react-intl'
@@ -94,32 +98,43 @@ function defaultFieldToQuestionConfig(
 function customFieldToQuestionConfig(
   fieldId: string,
   preceedingFieldId: string,
-  field: IFormField
+  field: IFormField,
+  questionConfig: IQuestionConfig[]
 ): ICustomConfigField {
   /* TODO: add errorMessage when implemented for FormFields */
-  const messageProperties = [
-    'label',
-    'placeholder',
-    'tooltip',
-    'description'
-  ] as const
 
-  const lang = getDefaultLanguage()
+  const originalConfig = questionConfig.filter(
+    (question) => question.fieldId === fieldId
+  )[0]
+  let fieldType
 
-  return {
+  for (const k in QuestionConfigFieldType) {
+    if (
+      QuestionConfigFieldType[k as keyof typeof QuestionConfigFieldType] ===
+      field.type
+    ) {
+      fieldType =
+        QuestionConfigFieldType[k as keyof typeof QuestionConfigFieldType]
+    }
+  }
+
+  const customQuestionConfig: ICustomConfigField = {
     fieldId,
+    fieldName: field.name,
     preceedingFieldId,
+    required: originalConfig.required,
     enabled: field.enabled ?? '',
     custom: true,
     foregoingFieldId: FieldPosition.BOTTOM,
-    ...messageProperties.reduce(
-      (accum, prop) => ({
-        ...accum,
-        [prop]: [{ lang, descriptor: field[prop] }]
-      }),
-      {}
-    )
+    label: originalConfig.label,
+    placeholder: originalConfig.placeholder,
+    tooltip: originalConfig.tooltip,
+    description: originalConfig.description
   }
+  if (fieldType) {
+    customQuestionConfig.fieldType = fieldType
+  }
+  return customQuestionConfig
 }
 
 export function fieldToQuestionConfig(
@@ -128,7 +143,8 @@ export function fieldToQuestionConfig(
   sectionIndex: number,
   groupIndex: number,
   fieldIndex: number,
-  field: IFormField
+  field: IFormField,
+  questionConfig: IQuestionConfig[]
 ): IConfigField {
   if (!field.custom) {
     return defaultFieldToQuestionConfig(
@@ -140,7 +156,12 @@ export function fieldToQuestionConfig(
       field
     )
   }
-  return customFieldToQuestionConfig(fieldId, preceedingFieldId, field)
+  return customFieldToQuestionConfig(
+    fieldId,
+    preceedingFieldId,
+    field,
+    questionConfig
+  )
 }
 
 export function getFieldDefinition(
@@ -197,7 +218,11 @@ function getFieldId(
   return [event.toLowerCase(), section.id, group.id, field.name].join('.')
 }
 
-export function getSectionFieldsMap(event: Event, form: IForm) {
+export function getSectionFieldsMap(
+  event: Event,
+  form: IForm,
+  questionConfig: IQuestionConfig[]
+) {
   return form.sections.reduce<ISectionFieldMap>(
     (sectionFieldMap, section, sectionIndex) => {
       let precedingFieldId: string = FieldPosition.TOP
@@ -211,7 +236,8 @@ export function getSectionFieldsMap(event: Event, form: IForm) {
               sectionIndex,
               groupIndex,
               fieldIndex,
-              field
+              field,
+              questionConfig
             )
             if (precedingFieldId in fieldMap) {
               fieldMap[precedingFieldId]!.foregoingFieldId = fieldId
@@ -240,17 +266,45 @@ export function getDefaultConfigFieldIdentifiers(
   }
 }
 
-function getPrecedingDefaultFieldId(
+function getIdentifiersInDefaultForm(
   defaultConfigField: IDefaultConfigField,
-  registerForm: IForm
+  defaultForm: ISerializedForm
+) {
+  const { event, sectionId, groupId, fieldName } = getIdentifiersFromFieldId(
+    defaultConfigField.fieldId
+  )
+
+  const sectionIndex = defaultForm.sections.findIndex(
+    ({ id }) => id === sectionId
+  )
+
+  const groups = defaultForm.sections[sectionIndex].groups
+
+  const groupIndex = groups.findIndex(({ id }) => id === groupId)
+
+  const fields = groups[groupIndex].fields
+
+  const fieldIndex = fields.findIndex(({ name }) => name === fieldName)
+
+  return {
+    event: event as Event,
+    sectionIndex,
+    groupIndex,
+    fieldIndex
+  }
+}
+
+function getPrecedingDefaultFieldId(
+  defaultFieldIdentifiers: ReturnType<typeof getIdentifiersInDefaultForm>,
+  defaultForm: ISerializedForm
 ) {
   const { event, sectionIndex, groupIndex, fieldIndex } =
-    getDefaultConfigFieldIdentifiers(defaultConfigField)
+    defaultFieldIdentifiers
   /* First field of the section */
   if (!fieldIndex && !groupIndex) {
     return FieldPosition.TOP
   }
-  const section = registerForm.sections[sectionIndex]
+  const section = defaultForm.sections[sectionIndex]
   /* First field of the group */
   if (!fieldIndex) {
     const group = section.groups[groupIndex - 1]
@@ -264,15 +318,19 @@ function getPrecedingDefaultFieldId(
 
 export function hasDefaultFieldChanged(
   defaultConfigField: IDefaultConfigField,
-  registerForm: IForm
+  defaultForm: ISerializedForm
 ) {
-  const { sectionIndex, groupIndex, fieldIndex } =
-    getDefaultConfigFieldIdentifiers(defaultConfigField)
-  const defaultFormField =
-    registerForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
-  const precedingDefaultFieldId = getPrecedingDefaultFieldId(
+  const defaultFieldIdentifiers = getIdentifiersInDefaultForm(
     defaultConfigField,
-    registerForm
+    defaultForm
+  )
+
+  const { sectionIndex, groupIndex, fieldIndex } = defaultFieldIdentifiers
+  const defaultFormField =
+    defaultForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
+  const precedingDefaultFieldId = getPrecedingDefaultFieldId(
+    defaultFieldIdentifiers,
+    defaultForm
   )
   if (precedingDefaultFieldId !== defaultConfigField.preceedingFieldId) {
     return true
@@ -355,16 +413,23 @@ export function prepareNewCustomFieldConfig(
 
 export function generateModifiedQuestionConfigs(
   configFields: ISectionFieldMap,
-  registerForm: IForm
+  defaultRegisterForm: ISerializedForm
 ) {
   const questionConfigs: IQuestionConfig[] = []
   Object.values(configFields).forEach((sectionConfigFields) => {
     Object.values(sectionConfigFields).forEach((configField) => {
       if (!isDefaultField(configField)) {
-        const { foregoingFieldId, ...rest } = configField
+        const { foregoingFieldId, previewGroupID, previewGroupLabel, ...rest } =
+          configField
         questionConfigs.push(rest)
-      } else if (hasDefaultFieldChanged(configField, registerForm)) {
-        const { foregoingFieldId, identifiers, ...rest } = configField
+      } else if (hasDefaultFieldChanged(configField, defaultRegisterForm)) {
+        const {
+          foregoingFieldId,
+          identifiers,
+          previewGroupID,
+          previewGroupLabel,
+          ...rest
+        } = configField
         questionConfigs.push(rest)
       }
     })

@@ -42,7 +42,7 @@ import {
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { Tooltip } from '@opencrvs/components/lib/icons'
 import { Box } from '@opencrvs/components/lib/interface'
-import { camelCase } from 'lodash'
+import { camelCase, debounce } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
 import { connect } from 'react-redux'
@@ -177,6 +177,10 @@ interface ICustomField {
   errorMessage: string
 }
 
+interface IFieldForms {
+  [key: string]: ICustomField
+}
+
 interface ICustomFieldState {
   isFieldDuplicate: boolean
   selectedLanguage: string
@@ -184,9 +188,11 @@ interface ICustomFieldState {
   hideField: string
   requiredField: boolean
   maxLength: number | undefined
-  fieldForms: {
-    [key: string]: ICustomField
-  }
+  fieldForms: IFieldForms
+}
+
+interface IOptionalContent {
+  [key: string]: IMessage[]
 }
 
 class CustomFieldFormsComp extends React.Component<
@@ -195,26 +201,26 @@ class CustomFieldFormsComp extends React.Component<
 > {
   constructor(props: IFullProps) {
     super(props)
-    this._initialize()
+    this.initialize()
   }
 
-  _initialize() {
+  initialize() {
     const defaultLanguage = getDefaultLanguage()
-    const languages = this._getLanguages()
+    const languages = this.getLanguages()
     const { selectedField, formField } = this.props
 
     const fieldForms: { [key: string]: ICustomField } = {}
 
     Object.keys(languages).map((lang) => {
+      const label = this.getIntlMessage(selectedField.label, lang)
       fieldForms[lang] = {
-        label: this._getIntlMessage(selectedField.label, lang),
-        placeholder: this._getIntlMessage(selectedField.placeholder, lang),
-        description: this._getIntlMessage(selectedField.description, lang),
-        tooltip: this._getIntlMessage(selectedField.tooltip, lang),
-        errorMessage: this._getIntlMessage(selectedField.errorMessage, lang)
+        label,
+        placeholder: this.getIntlMessage(selectedField.placeholder, lang),
+        description: this.getIntlMessage(selectedField.description, lang),
+        tooltip: this.getIntlMessage(selectedField.tooltip, lang),
+        errorMessage: this.getIntlMessage(selectedField.errorMessage, lang)
       }
     })
-
     this.state = {
       isFieldDuplicate: false,
       handleBars:
@@ -228,17 +234,19 @@ class CustomFieldFormsComp extends React.Component<
     }
   }
 
-  _getIntlMessage(messages: IMessage[] | undefined, lang: string) {
+  getIntlMessage(messages: IMessage[] | undefined, lang: string) {
     if (!messages) return ''
     const message = messages.find((message) => message.lang === lang)
-    return message ? this.props.intl.formatMessage(message.descriptor) : ''
+    return message && message.descriptor
+      ? message.descriptor.defaultMessage
+      : ''
   }
 
-  _getLanguages(): ILanguageState {
+  getLanguages(): ILanguageState {
     return initLanguages()
   }
 
-  _setValue(field: string, value: string) {
+  setValue(field: string, value: string) {
     const language = this.state.selectedLanguage
     this.setState({
       fieldForms: {
@@ -251,14 +259,14 @@ class CustomFieldFormsComp extends React.Component<
     })
   }
 
-  _isFormValid(): boolean {
-    for (const lang in this._getLanguages()) {
+  isFormValid(): boolean {
+    for (const lang in this.getLanguages()) {
       if (Boolean(this.state.fieldForms[lang].label) === false) return false
     }
     return true
   }
 
-  _generateNewFieldID() {
+  generateNewFieldID() {
     const { event, sectionId } = getConfigFieldIdentifiers(
       this.props.selectedField.fieldId
     )
@@ -266,19 +274,82 @@ class CustomFieldFormsComp extends React.Component<
     return `${event}.${sectionId}.${this.props.groupId}.${this.state.handleBars}`
   }
 
-  _prepareModifiedFormField(): ICustomConfigField {
+  doesContentExist(
+    languages: ILanguageState,
+    fieldForms: IFieldForms,
+    key: string
+  ): boolean {
+    let contentExists = false
+    for (const lang in languages) {
+      const customField = fieldForms[lang]
+      if (customField[key as keyof typeof customField]) {
+        contentExists = true
+      }
+    }
+    return contentExists
+  }
+
+  populateOptionalContent(
+    fieldName: string,
+    languages: ILanguageState,
+    fieldForms: IFieldForms,
+    key: string,
+    optionalContent: IOptionalContent
+  ) {
+    if (this.doesContentExist(languages, fieldForms, key)) {
+      optionalContent[key] = []
+      for (const lang in languages) {
+        const customField = fieldForms[lang]
+        optionalContent[key].push({
+          lang,
+          descriptor: {
+            id: `form.customField.${key}.${fieldName}`,
+            description: 'Custom field attribute',
+            defaultMessage: customField[key as keyof typeof customField] || ' '
+          }
+        })
+      }
+    }
+  }
+
+  prepareModifiedFormField(defaultLanguage: string): ICustomConfigField {
     const { selectedField, formField } = this.props
     const { fieldForms, handleBars } = this.state
-    const dl = getDefaultLanguage()
-    const languages = this._getLanguages()
-    const newFieldID = this._generateNewFieldID()
-    const modifiedField = { ...selectedField }
+    const languages = this.getLanguages()
+    const newFieldID = this.generateNewFieldID()
 
-    modifiedField.required = this.state.requiredField
-    modifiedField.enabled = this.state.hideField
-    modifiedField.fieldId = newFieldID
+    // later we can check the field type and not populate any content that isnt required for the type
+    const optionalContent: IOptionalContent = {}
+    this.populateOptionalContent(
+      handleBars,
+      languages,
+      fieldForms,
+      'placeholder',
+      optionalContent
+    )
+    this.populateOptionalContent(
+      handleBars,
+      languages,
+      fieldForms,
+      'description',
+      optionalContent
+    )
+    this.populateOptionalContent(
+      handleBars,
+      languages,
+      fieldForms,
+      'tooltip',
+      optionalContent
+    )
+    this.populateOptionalContent(
+      handleBars,
+      languages,
+      fieldForms,
+      'errorMessage',
+      optionalContent
+    )
 
-    modifiedField.label = Object.keys(languages).map((lang) => ({
+    const label = Object.keys(languages).map((lang) => ({
       lang,
       descriptor: {
         id: `form.customField.label.${handleBars}`,
@@ -287,52 +358,25 @@ class CustomFieldFormsComp extends React.Component<
       }
     }))
 
-    modifiedField.placeholder = Object.keys(languages).map((lang) => ({
-      lang,
-      descriptor: {
-        id: `form.customField.placeholder.${handleBars}`,
-        description: 'Custom field attribute',
-        defaultMessage: fieldForms[lang].placeholder || ' '
-      }
-    }))
-
-    modifiedField.description = Object.keys(languages).map((lang) => ({
-      lang,
-      descriptor: {
-        id: `form.customField.description.${handleBars}`,
-        description: 'Custom field attribute',
-        defaultMessage: fieldForms[dl].description || ' '
-      }
-    }))
-
-    modifiedField.tooltip = Object.keys(languages).map((lang) => ({
-      lang,
-      descriptor: {
-        id: `form.customField.tooltip.${handleBars}`,
-        description: 'Custom field attribute',
-        defaultMessage: fieldForms[dl].tooltip || ' '
-      }
-    }))
-
-    modifiedField.errorMessage = Object.keys(languages).map((lang) => ({
-      lang,
-      descriptor: {
-        id: `form.customField.errorMessage.${getCertificateHandlebar(
-          formField
-        )}`,
-        description: 'Custom field attribute',
-        defaultMessage: fieldForms[lang].errorMessage || ' '
-      }
-    }))
-
+    const modifiedField = {
+      ...selectedField,
+      placeholder: optionalContent.placeholder,
+      tooltip: optionalContent.tooltip,
+      description: optionalContent.description,
+      errorMessage: optionalContent.errorMessage,
+      fieldName: handleBars,
+      required: this.state.requiredField,
+      enabled: this.state.hideField,
+      fieldId: newFieldID,
+      label
+    }
     modifiedField.maxLength = this.state.maxLength
-
     return modifiedField
   }
 
-  _isFieldNameDuplicate(): boolean {
+  isFieldNameDuplicate(): boolean {
     const { fieldsMap, selectedField } = this.props
-    const newGeneratedFieldID = this._generateNewFieldID()
+    const newGeneratedFieldID = this.generateNewFieldID()
 
     if (selectedField.fieldId === newGeneratedFieldID) {
       return false
@@ -341,7 +385,7 @@ class CustomFieldFormsComp extends React.Component<
     return newGeneratedFieldID in fieldsMap
   }
 
-  _getHeadingText(): string {
+  getHeadingText(): string {
     const { selectedField, intl } = this.props
 
     switch (selectedField.fieldType) {
@@ -367,7 +411,7 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   getLanguageDropDown() {
-    const initializeLanguages = this._getLanguages()
+    const initializeLanguages = this.getLanguages()
     const languageOptions = []
     for (const index in initializeLanguages) {
       languageOptions.push({
@@ -396,7 +440,7 @@ class CustomFieldFormsComp extends React.Component<
     const { intl } = this.props
     return (
       <ListContainer>
-        <H3>{this._getHeadingText()}</H3>
+        <H3>{this.getHeadingText()}</H3>
         <ListRow>
           <ListColumn>
             {intl.formatMessage(customFieldFormMessages.requiredFieldLabel)}
@@ -425,9 +469,11 @@ class CustomFieldFormsComp extends React.Component<
       formField,
       setSelectedField
     } = this.props
-    const languages = this._getLanguages()
+    const languages = this.getLanguages()
     const defaultLanguage = getDefaultLanguage()
-
+    const debouncedNullifySelectedField = debounce(() => {
+      setSelectedField(null)
+    }, 300)
     return (
       <>
         {Object.keys(languages).map((language, index) => {
@@ -477,7 +523,7 @@ class CustomFieldFormsComp extends React.Component<
                   <CTextInput
                     value={this.state.fieldForms[language].placeholder}
                     onChange={(event: any) =>
-                      this._setValue('placeholder', event.target.value)
+                      this.setValue('placeholder', event.target.value)
                     }
                   />
                 </CInputField>
@@ -496,7 +542,7 @@ class CustomFieldFormsComp extends React.Component<
                     ignoreMediaQuery={true}
                     {...{
                       onChange: (event: any) => {
-                        this._setValue('description', event.target.value)
+                        this.setValue('description', event.target.value)
                       },
                       value: this.state.fieldForms[language].description
                     }}
@@ -515,7 +561,7 @@ class CustomFieldFormsComp extends React.Component<
                 >
                   <CTextInput
                     onChange={(event: any) =>
-                      this._setValue('tooltip', event.target.value)
+                      this.setValue('tooltip', event.target.value)
                     }
                     value={this.state.fieldForms[language].tooltip}
                   />
@@ -535,7 +581,7 @@ class CustomFieldFormsComp extends React.Component<
                     ignoreMediaQuery={true}
                     {...{
                       onChange: (event: any) => {
-                        this._setValue('errorMessage', event.target.value)
+                        this.setValue('errorMessage', event.target.value)
                       },
                       value: this.state.fieldForms[language].errorMessage
                     }}
@@ -572,17 +618,18 @@ class CustomFieldFormsComp extends React.Component<
             <ListColumn>
               <CPrimaryButton
                 onClick={() => {
-                  if (this._isFieldNameDuplicate()) {
+                  if (this.isFieldNameDuplicate()) {
                     this.setState({
                       isFieldDuplicate: true
                     })
                     return
                   }
-                  const modifiedField = this._prepareModifiedFormField()
+                  const modifiedField =
+                    this.prepareModifiedFormField(defaultLanguage)
                   modifyConfigField(selectedField.fieldId, modifiedField)
-                  setSelectedField(null)
+                  debouncedNullifySelectedField()
                 }}
-                disabled={!this._isFormValid()}
+                disabled={!this.isFormValid()}
               >
                 {intl.formatMessage(buttonMessages.save)}
               </CPrimaryButton>
