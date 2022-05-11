@@ -37,7 +37,7 @@ const StyledBox = styled.div<{ hideLastBorder?: boolean }>`
   ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.grey100};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   &:last-child {
     ${({ hideLastBorder }) => hideLastBorder && ` border-bottom: 0;`}
   }
