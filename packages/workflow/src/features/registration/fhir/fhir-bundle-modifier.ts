@@ -264,6 +264,9 @@ export async function touchBundle(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
+  /* setting regAssigned valueReference here if regAssigned extension exists */
+  setupRegAssigned(taskResource, practitioner)
+
   return bundle
 }
 
@@ -439,6 +442,7 @@ export async function setupLastRegLocation(
   } else {
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+      valueString: primaryOffice.name,
       valueReference: { reference: `Location/${primaryOffice.id}` }
     })
   }
@@ -467,6 +471,30 @@ export function setupLastRegUser(
   }
   taskResource.lastModified =
     taskResource.lastModified || new Date().toISOString()
+  return taskResource
+}
+
+export function setupRegAssigned(
+  taskResource: fhir.Task,
+  practitioner: fhir.Practitioner
+): fhir.Task {
+  if (!taskResource.extension) {
+    taskResource.extension = []
+  }
+  const setupRegAssignedExtension = taskResource.extension.find((extension) => {
+    return (
+      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`
+    )
+  })
+  if (setupRegAssignedExtension) {
+    if (!setupRegAssignedExtension.valueReference) {
+      setupRegAssignedExtension.valueReference = {}
+    }
+    setupRegAssignedExtension.valueReference.reference =
+      getPractitionerRef(practitioner)
+    taskResource.lastModified =
+      taskResource.lastModified || new Date().toISOString()
+  }
   return taskResource
 }
 

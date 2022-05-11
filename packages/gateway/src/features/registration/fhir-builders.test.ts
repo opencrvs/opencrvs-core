@@ -984,7 +984,7 @@ describe('addOrUpdateExtension()', () => {
   it('should add the extension if it is not present', () => {
     const bundle = addOrUpdateExtension(
       { resource: mockTask },
-      { url: 'mock-url', valueString: 'mock-value' },
+      [{ url: 'mock-url', valueString: 'mock-value' }],
       'downloaded'
     )
     const extension = bundle.entry[0].resource.extension as fhir.Extension[]
@@ -1001,7 +1001,7 @@ describe('addOrUpdateExtension()', () => {
     }
     const bundle = addOrUpdateExtension(
       { resource: mockTaskWithExtension },
-      { url: 'mock-url', valueString: 'mock-value' },
+      [{ url: 'mock-url', valueString: 'mock-value' }],
       'downloaded'
     )
     const extension = bundle.entry[0].resource.extension as fhir.Extension[]

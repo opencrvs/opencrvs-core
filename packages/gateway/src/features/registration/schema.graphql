@@ -575,4 +575,5 @@ type Mutation {
     id: ID!
     details: DeathRegistrationInput!
   ): ID!
+  markEventAsUnassigned(id: String!): ID! # remove assigned extension from task'
 }

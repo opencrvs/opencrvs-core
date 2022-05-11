@@ -1120,7 +1120,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
   })
 })
 
-describe('markEventAsDownloadedHandler', () => {
+describe('markEventAsDownloadedAndAssignedHandler', () => {
   let server: any
 
   beforeEach(async () => {

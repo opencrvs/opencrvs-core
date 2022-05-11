@@ -25,6 +25,12 @@ const allSearchFields = `
       duplicates
       createdAt
       modifiedAt
+      assignment {
+        userId
+        firstName
+        lastName
+        officeName
+      }
     }    
     ... on BirthEventSearchSet {
       dateOfBirth

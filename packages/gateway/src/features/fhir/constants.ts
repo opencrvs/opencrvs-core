@@ -24,6 +24,7 @@ export enum EVENT_TYPE {
 
 export const DOWNLOADED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
 export const REINSTATED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated`
+export const ASSIGNED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`
 
 export const BIRTH_REG_NO = 'birth-registration-number'
 export const DEATH_REG_NO = 'death-registration-number'

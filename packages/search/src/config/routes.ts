@@ -19,6 +19,10 @@ import {
   populateHierarchicalLocationIdsHandler
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
+import {
+  assignEventHandler,
+  unassignEventHandler
+} from '@search/features/registration/assignment/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -102,6 +106,26 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Marks the declaration as not a duplicate'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/assigned',
+      handler: assignEventHandler,
+      config: {
+        tags: ['api'],
+        description:
+          'Handles indexing a new declaration or updating an existing declaration'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/unassigned',
+      handler: unassignEventHandler,
+      config: {
+        tags: ['api'],
+        description:
+          'Handles indexing a new declaration or updating an existing declaration'
       }
     },
     {
