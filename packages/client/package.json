@@ -87,7 +87,7 @@
     "start:prod": "yarn build && yarn serve -s -l 3000 build",
     "test:compilation": "tsc --noEmit",
     "extract:translations": "bash extract-translations.sh",
-    "generate-gateway-types": "graphql-codegen --config codegen.yml",
+    "generate-gateway-types": "graphql-codegen --config codegen.yml && prettier --write src/utils/gateway.ts",
     "build:clean": "rm -rf build",
     "serve": "node serve-static.js"
   },
