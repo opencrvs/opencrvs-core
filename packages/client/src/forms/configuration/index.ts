@@ -156,6 +156,17 @@ export function sortFormCustomisations(
     } else if (question.custom && question.preceedingFieldId) {
       // this is a configuration for a new custom field
 
+      if (question.preceedingFieldId === FieldPosition.TOP) {
+        createCustomGroup(
+          defaultEventForm,
+          formCustomisations.customQuestionConfigurations,
+          question,
+          null,
+          true
+        )
+        return
+      }
+
       // custom questions may be stacked below each other in blocks, so we need to group those fields so that the whole block can be repositioned
       const preceedingDefaultField: IDefaultField | undefined = getDefaultField(
         defaultEventForm,
@@ -170,14 +181,6 @@ export function sortFormCustomisations(
           question,
           preceedingDefaultField,
           false
-        )
-      } else if (question.preceedingFieldId === FieldPosition.TOP) {
-        createCustomGroup(
-          defaultEventForm,
-          formCustomisations.customQuestionConfigurations,
-          question,
-          null,
-          true
         )
       } else {
         // throw every other custom question in this storage array
