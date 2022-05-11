@@ -372,7 +372,7 @@ class CustomFieldFormsComp extends React.Component<
           <ListColumn>
             <RightAlignment>
               <Toggle
-                selected={this.state.requiredField}
+                defaultChecked={this.state.requiredField}
                 onChange={() => {
                   this.setState({ requiredField: !this.state.requiredField })
                 }}
