@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { updateEventToAddAssignment } from '@search/features/registration/assign/service'
+import {
+  updateEventToAddAssignment,
+  updateEventToRemoveAssignment
+} from '@search/features/registration/assignment/service'
 import { logger } from '@search/logger'
 import { internal } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
@@ -22,6 +25,20 @@ export async function assignEventHandler(
     await updateEventToAddAssignment(request)
   } catch (error) {
     logger.error(`Search/assignEventHandler: error: ${error}`)
+    return internal(error)
+  }
+
+  return h.response().code(200)
+}
+
+export async function unassignEventHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    await updateEventToRemoveAssignment(request)
+  } catch (error) {
+    logger.error(`Search/unassignEventHandler: error: ${error}`)
     return internal(error)
   }
 

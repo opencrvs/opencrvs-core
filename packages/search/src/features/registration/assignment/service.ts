@@ -81,3 +81,40 @@ export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
     }
   }
 }
+
+export async function updateEventToRemoveAssignment(
+  requestBundle: Hapi.Request
+) {
+  const bundle = requestBundle.payload as fhir.Bundle
+  const bundleEntries = bundle.entry
+
+  if (bundleEntries && bundleEntries.length === 1) {
+    const resource = bundleEntries[0].resource as fhir.Task
+
+    if (resource && resource.resourceType === 'Task') {
+      const compositionId =
+        resource &&
+        resource.focus &&
+        resource.focus.reference &&
+        resource.focus.reference.split('/')[1]
+
+      if (!compositionId) {
+        throw new Error('No Composition ID found')
+      }
+
+      const regLastUserIdentifier = findTaskExtension(
+        resource,
+        'http://opencrvs.org/specs/extension/regLastUser'
+      )
+      const body: ICompositionBody = {}
+      body.modifiedAt = Date.now().toString()
+      body.assignment = null
+      body.updatedBy =
+        regLastUserIdentifier &&
+        regLastUserIdentifier.valueReference &&
+        regLastUserIdentifier.valueReference.reference &&
+        regLastUserIdentifier.valueReference.reference.split('/')[1]
+      await updateComposition(compositionId, body)
+    }
+  }
+}
