@@ -93,7 +93,7 @@ export const FormTools = ({
     dispatch(addCustomField(event, section, customConfigField))
     flushSync(() => setSelectedField(customConfigField.fieldId))
     document
-      .getElementById(customConfigField.fieldId)
+      .getElementById(`${customConfigField.fieldName}-form-input`)
       ?.scrollIntoView({ behavior: 'smooth' })
   }
 
