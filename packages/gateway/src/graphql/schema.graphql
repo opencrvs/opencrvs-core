@@ -182,6 +182,7 @@ type Mutation {
     id: ID!
     details: DeathRegistrationInput!
   ): ID!
+  markEventAsUnassigned(id: String!): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!

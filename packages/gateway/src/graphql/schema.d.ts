@@ -69,6 +69,7 @@ export interface GQLMutation {
   markDeathAsRegistered: GQLDeathRegistration
   markDeathAsCertified: string
   requestDeathRegistrationCorrection: string
+  markEventAsUnassigned: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -1973,6 +1974,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsRegistered?: MutationToMarkDeathAsRegisteredResolver<TParent>
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
   requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<TParent>
+  markEventAsUnassigned?: MutationToMarkEventAsUnassignedResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -2292,6 +2294,21 @@ export interface MutationToRequestDeathRegistrationCorrectionResolver<
   (
     parent: TParent,
     args: MutationToRequestDeathRegistrationCorrectionArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkEventAsUnassignedArgs {
+  id: string
+}
+export interface MutationToMarkEventAsUnassignedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkEventAsUnassignedArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

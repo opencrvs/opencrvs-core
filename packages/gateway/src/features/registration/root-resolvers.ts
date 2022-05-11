@@ -534,6 +534,56 @@ export const resolvers: GQLResolver = {
           new Error('User does not have a register scope')
         )
       }
+    },
+    async markEventAsUnassigned(_, { id }, authHeader) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
+        const taskBundle = (await fetchFHIR(
+          `/Task?focus=Composition/${id}`,
+          authHeader
+        )) as ITaskBundle
+        const taskEntry = taskBundle.entry[0]
+        if (!taskEntry) {
+          throw new Error('Task does not exist')
+        }
+        const taskResource = taskBundle.entry[0].resource
+        // remove assigned extension when unassigned
+        if (
+          taskResource.extension &&
+          findExtension(ASSIGNED_EXTENSION_URL, taskResource.extension)
+        ) {
+          taskResource.extension = taskResource.extension.filter(
+            (ext) => ext.url !== ASSIGNED_EXTENSION_URL
+          )
+        }
+        taskEntry.request = {
+          method: 'PUT',
+          url: `Task/${taskEntry.resource.id}`
+        } as fhir.BundleEntryRequest
+
+        const fhirBundle: ITaskBundle = {
+          resourceType: 'Bundle',
+          type: 'document',
+          entry: [taskEntry],
+          signature: {
+            type: [
+              {
+                code: 'unassigned'
+              }
+            ],
+            when: Date().toString()
+          }
+        }
+        await fetchFHIR('', authHeader, 'POST', JSON.stringify(fhirBundle))
+        // return the taskId
+        return taskEntry.resource.id
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
     }
   }
 }
