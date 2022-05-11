@@ -23,7 +23,7 @@ import {
   markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
-  markEventAsDownloadedAndAssignedHandler
+  markDownloadedEventAsAssignedOrUnassignedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
@@ -73,6 +73,7 @@ export enum Events {
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
   DOWNLOADED = '/events/downloaded',
   DOWNLOADED_ASSIGNED_EVENT = '/events/assigned',
+  UNASSIGNED_EVENT = '/events/unassigned',
   UNKNOWN = 'unknown'
 }
 
@@ -164,6 +165,10 @@ function detectEvent(request: Hapi.Request): Events {
           } else {
             return Events.DOWNLOADED
           }
+        }
+
+        if (fhirBundle?.signature?.type[0]?.code === 'unassigned') {
+          return Events.UNASSIGNED_EVENT
         }
 
         const eventType = getEventType(fhirBundle)
@@ -409,12 +414,28 @@ export async function fhirWorkflowEventHandler(
       )
       break
     case Events.DOWNLOADED:
-      response = await markEventAsDownloadedAndAssignedHandler(request, h)
+      response = await markDownloadedEventAsAssignedOrUnassignedHandler(
+        request,
+        h
+      )
       break
     case Events.DOWNLOADED_ASSIGNED_EVENT:
-      response = await markEventAsDownloadedAndAssignedHandler(request, h)
+      response = await markDownloadedEventAsAssignedOrUnassignedHandler(
+        request,
+        h
+      )
       await triggerEvent(
         Events.DOWNLOADED_ASSIGNED_EVENT,
+        request.payload,
+        request.headers
+      )
+    case Events.UNASSIGNED_EVENT:
+      response = await markDownloadedEventAsAssignedOrUnassignedHandler(
+        request,
+        h
+      )
+      await triggerEvent(
+        Events.UNASSIGNED_EVENT,
         request.payload,
         request.headers
       )

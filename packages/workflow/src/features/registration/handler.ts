@@ -418,7 +418,7 @@ export async function markEventAsCertifiedHandler(
   }
 }
 
-export async function markEventAsDownloadedAndAssignedHandler(
+export async function markDownloadedEventAsAssignedOrUnassignedHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -431,7 +431,9 @@ export async function markEventAsDownloadedAndAssignedHandler(
     const newRequest = { ...request, payload } as Hapi.Request
     return await forwardToHearth(newRequest, h)
   } catch (error) {
-    logger.error(`Workflow/markBirthAsDownloadHandler: error: ${error}`)
+    logger.error(
+      `Workflow/markDownloadedEventAsAssignedOrUnassignedHandler: error: ${error}`
+    )
     throw new Error(error)
   }
 }
