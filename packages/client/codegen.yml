@@ -14,6 +14,8 @@ schema:
         Authorization: 'Bearer ${TOKEN}'
 documents:
   - 'src/**/queries.ts'
+  - 'src/**/queries/*.ts'
+  - '!src/**/*.test.ts'
 generates:
   src/utils/gateway.ts:
     plugins:

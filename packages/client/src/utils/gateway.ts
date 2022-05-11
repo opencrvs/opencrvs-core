@@ -1707,6 +1707,80 @@ export type Unnamed_1_Query = {
   } | null> | null
 }
 
+export type FetchPersonQueryVariables = Exact<{
+  identifier: Scalars['ID']
+}>
+
+export type FetchPersonQuery = {
+  __typename?: 'Query'
+  queryPersonByIdentifier?: {
+    __typename?: 'Person'
+    id?: string | null
+    birthDate?: string | null
+    gender?: string | null
+    name?: Array<{
+      __typename?: 'HumanName'
+      use?: string | null
+      firstNames?: string | null
+      familyName?: string | null
+    } | null> | null
+    address?: Array<{
+      __typename?: 'Address'
+      type?: AddressType | null
+      line?: Array<string | null> | null
+      city?: string | null
+      district?: string | null
+      state?: string | null
+      postalCode?: string | null
+      country?: string | null
+    } | null> | null
+  } | null
+}
+
+export type FetchPersonByNidQueryVariables = Exact<{
+  dob: Scalars['String']
+  nid: Scalars['String']
+  country?: InputMaybe<Scalars['String']>
+}>
+
+export type FetchPersonByNidQuery = {
+  __typename?: 'Query'
+  queryPersonByNidIdentifier?: {
+    __typename?: 'Person'
+    gender?: string | null
+    name?: Array<{
+      __typename?: 'HumanName'
+      use?: string | null
+      firstNames?: string | null
+      familyName?: string | null
+    } | null> | null
+  } | null
+}
+
+export type QueryRegistrationByIdentifierQueryVariables = Exact<{
+  identifier: Scalars['ID']
+}>
+
+export type QueryRegistrationByIdentifierQuery = {
+  __typename?: 'Query'
+  queryRegistrationByIdentifier?: {
+    __typename?: 'BirthRegistration'
+    id: string
+    child?: {
+      __typename?: 'Person'
+      id?: string | null
+      birthDate?: string | null
+      gender?: string | null
+      name?: Array<{
+        __typename?: 'HumanName'
+        use?: string | null
+        firstNames?: string | null
+        familyName?: string | null
+      } | null> | null
+    } | null
+  } | null
+}
+
 export type Unnamed_2_QueryVariables = Exact<{ [key: string]: never }>
 
 export type Unnamed_2_Query = {
