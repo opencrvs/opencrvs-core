@@ -267,11 +267,6 @@ export function configureRegistrationForm(
     }
   )
 
-  console.log(
-    'formCustomisations.customQuestionConfigurations: ',
-    JSON.stringify(formCustomisations.customQuestionConfigurations)
-  )
-
   formCustomisations.customQuestionConfigurations.forEach((customGroup) => {
     if (customGroup.positionTop) {
       newForm.sections[customGroup.sectionIndex].groups[

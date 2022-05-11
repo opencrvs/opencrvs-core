@@ -53,16 +53,22 @@ export interface IQuestion {
 
 export interface IQuestionModel extends IQuestion, Document {}
 
-export const messageDescriptor = new Schema({
-  id: { type: String, required: true },
-  description: { type: String },
-  defaultMessage: { type: String }
-})
+export const messageDescriptor = new Schema(
+  {
+    id: { type: String, required: true },
+    description: { type: String },
+    defaultMessage: { type: String }
+  },
+  { _id: false }
+)
 
-export const message = new Schema({
-  lang: { type: String },
-  descriptor: { type: messageDescriptor }
-})
+export const message = new Schema(
+  {
+    lang: { type: String },
+    descriptor: { type: messageDescriptor }
+  },
+  { _id: false }
+)
 
 const questionSchema = new Schema({
   fieldId: { type: String, unique: true, required: true },
