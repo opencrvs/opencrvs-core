@@ -161,8 +161,9 @@ function detectEvent(request: Hapi.Request): Events {
         if (fhirBundle?.signature?.type[0]?.code === 'downloaded') {
           if (hasAssignedExtension(taskResource)) {
             return Events.DOWNLOADED_ASSIGNED_EVENT
+          } else {
+            return Events.DOWNLOADED
           }
-          return Events.DOWNLOADED
         }
 
         const eventType = getEventType(fhirBundle)
