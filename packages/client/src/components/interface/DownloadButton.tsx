@@ -14,7 +14,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from '@client/styledComponents'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { Download } from '@opencrvs/components/lib/icons'
-import { IconButton } from '@opencrvs/components/lib/buttons'
+import { CircleButton } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import {
   downloadDeclaration,
@@ -53,10 +53,10 @@ const StatusIndicator = styled.div<{
   justify-content: ${({ isLoading }) =>
     isLoading ? `space-between` : `flex-end`};
 `
-const DownloadAction = styled(IconButton)`
+const DownloadAction = styled(CircleButton)`
   border-radius: 50%;
   height: 40px;
-  width: 36px;
+  width: 40px;
   & > div {
     padding: 0px 0px;
   }
@@ -102,8 +102,9 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
             initiateDownload()
             e.stopPropagation()
           }}
-          icon={() => <Download isFailed={true} />}
-        />
+        >
+          <Download isFailed={true} />
+        </DownloadAction>
       </StatusIndicator>
     )
   }
@@ -115,9 +116,10 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
         initiateDownload()
         e.stopPropagation()
       }}
-      icon={() => <Download />}
       className={className}
-    />
+    >
+      <Download />
+    </DownloadAction>
   )
 }
 
