@@ -280,14 +280,13 @@ class FormConfigSettingsComponent extends React.Component<
                     {intl.formatMessage(messages.showIntroductionPage)}
                   </Label>
                 }
-                actions={[
+                actions={
                   <CenteredToggle
-                    key="toggle"
                     id="introductionPage"
-                    selected={introductionPage}
+                    defaultChecked={introductionPage}
                     onChange={this.toggleOnChange}
                   />
-                ]}
+                }
               />
             </ListViewSimplified>
           ) : modalName === ConfigModals.ADDRESSES ? (

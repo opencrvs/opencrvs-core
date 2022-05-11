@@ -38,7 +38,7 @@ import { ActionsNotification } from './ActionsNotification'
 import { FormTabs } from '@opencrvs/components/lib/forms'
 
 const StyledWarning = styled(Warning)`
-  margin: 0 auto 16px;
+  margin: 24px auto 16px;
   max-width: 778px;
 `
 

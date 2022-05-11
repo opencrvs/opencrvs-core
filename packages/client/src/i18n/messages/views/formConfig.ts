@@ -122,16 +122,6 @@ const navigationMessagesToDefine: INavigationMessages = {
     id: 'config.form.navigation.deathEvent',
     defaultMessage: 'Event details',
     description: 'Label for event details in page navigation'
-  },
-  causeOfDeath: {
-    id: 'config.form.navigation.causeOfDeath',
-    defaultMessage: 'Cause of death',
-    description: 'Label for cause of death in page navigation'
-  },
-  spouse: {
-    id: 'config.form.navigation.spouse',
-    defaultMessage: 'Spouse details',
-    description: 'Label for spouse details in page navigation'
   }
 }
 

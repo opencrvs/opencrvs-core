@@ -907,11 +907,7 @@ export enum DeathSection {
   Registration = 'registration',
   Deceased = 'deceased',
   Event = 'deathEvent',
-  CauseOfDeath = 'causeOfDeath',
   Informant = 'informant',
-  Father = 'father',
-  Mother = 'mother',
-  Spouse = 'spouse',
   DeathDocuments = 'documents',
   Preview = 'preview'
 }

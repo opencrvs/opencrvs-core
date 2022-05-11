@@ -87,7 +87,7 @@ function HideToggleAction({ fieldId, enabled }: IDefaultConfigField) {
 
   return (
     <CenteredToggle
-      selected={enabled === FieldEnabled.DISABLED}
+      defaultChecked={enabled === FieldEnabled.DISABLED}
       onChange={() =>
         dispatch(
           modifyConfigField(fieldId, {
@@ -105,7 +105,7 @@ function RequiredToggleAction({ fieldId, required }: IDefaultConfigField) {
 
   return (
     <CenteredToggle
-      selected={required}
+      defaultChecked={!!required}
       onChange={() =>
         dispatch(
           modifyConfigField(fieldId, {

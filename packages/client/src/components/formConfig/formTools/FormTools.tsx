@@ -93,7 +93,7 @@ export const FormTools = ({
     dispatch(addCustomField(event, section, customConfigField))
     flushSync(() => setSelectedField(customConfigField.fieldId))
     document
-      .getElementById(customConfigField.fieldId)
+      .getElementById(`${customConfigField.fieldName}-form-input`)
       ?.scrollIntoView({ behavior: 'smooth' })
   }
 
@@ -102,13 +102,12 @@ export const FormTools = ({
       <ListViewSimplified>
         <ListViewItemSimplified
           label={<Label>{intl.formatMessage(messages.showHiddenFields)}</Label>}
-          actions={[
+          actions={
             <CenteredToggle
-              key="toggle"
-              selected={showHiddenFields}
+              defaultChecked={showHiddenFields}
               onChange={toggleShowHiddenFields}
             />
-          ]}
+          }
         />
       </ListViewSimplified>
       <TitleContainer>

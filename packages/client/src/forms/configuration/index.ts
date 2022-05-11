@@ -141,7 +141,6 @@ export function sortFormCustomisations(
     defaultFieldCustomisations: [],
     customQuestionConfigurations: []
   }
-  console.log('whut')
   const customQsToBeSorted: IQuestionConfig[] = []
   questionConfig.forEach((question) => {
     const defaultField: IDefaultField | undefined = getDefaultField(
@@ -265,8 +264,15 @@ export function configureRegistrationForm(
   const newForm = cloneDeep(formWithAddresses)
   // repositioning and configuration of fields
 
-  // TODO reposition default fields
-  // repositioning default fields seems to cause an infinite loop in form config
+  // TODO Reposition default fields
+  // ERROR: Repositioning default fields seems to cause an infinite loop in form config
+
+  /*
+  1. Loop through changes to default fields.  If any have been repositioned and the preceedingField is a default field, move the field, store any default field changes where the preceeding field is a custom field for processing in step 3
+  2. Reposition all custom fields
+  3. Reposition the remaining default fields that need to be positioned after custom fields
+  */
+
   /*const defaultFieldsToBeRepositionedAfterCustomFields: IDefaultFieldCustomisation[] =
     []
   formCustomisations.defaultFieldCustomisations.forEach(
@@ -325,6 +331,9 @@ export function configureRegistrationForm(
     }
   })
 
+  // TODO reposition default fields
+  // repositioning default fields seems to cause an infinite loop in form config
+
   /*defaultFieldsToBeRepositionedAfterCustomFields.forEach(
     (defaultFieldsToBeRepositionedAfterCustomField) => {
       let spliceIndex = 0
@@ -360,8 +369,12 @@ export function configureRegistrationForm(
   formCustomisations.defaultFieldCustomisations.forEach(
     (defaultPropCustomisation) => {
       // set default field as required or not depending on customisation
-      defaultPropCustomisation.defaultField.field.required =
-        defaultPropCustomisation.question.required
+      const field: SerializedFormField =
+        newForm.sections[
+          defaultPropCustomisation.defaultField.selectedSectionIndex
+        ].groups[defaultPropCustomisation.defaultField.selectedGroupIndex]
+          .fields[defaultPropCustomisation.defaultField.index]
+      field.required = defaultPropCustomisation.question.required
 
       // removing hidden fields should be the last thing to do after repositioning all default and custom fields vertically
       if (

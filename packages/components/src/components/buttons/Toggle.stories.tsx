@@ -20,7 +20,9 @@ export default {
 
 const Template: Story<{}> = () => {
   const [selected, setSelected] = React.useState(true)
-  return <Toggle selected={selected} onChange={() => setSelected(!selected)} />
+  return (
+    <Toggle defaultChecked={selected} onChange={() => setSelected(!selected)} />
+  )
 }
 
 export const ActivityView = Template.bind({})
