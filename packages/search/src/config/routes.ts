@@ -29,7 +29,8 @@ const enum RouteScope {
   VALIDATE = 'validate',
   REGISTER = 'register',
   SYSADMIN = 'sysadmin',
-  CERTIFY = 'certify'
+  CERTIFY = 'certify',
+  PERFORMANCE = 'performance'
 }
 
 export const getRoutes = () => {
@@ -155,7 +156,8 @@ export const getRoutes = () => {
             RouteScope.DECLARE,
             RouteScope.VALIDATE,
             RouteScope.REGISTER,
-            RouteScope.SYSADMIN
+            RouteScope.SYSADMIN,
+            RouteScope.PERFORMANCE
           ]
         },
         validate: {

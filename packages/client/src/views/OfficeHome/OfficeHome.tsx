@@ -41,7 +41,8 @@ import {
   PAGE_TRANSITIONS_ENTER_TIME,
   FIELD_AGENT_ROLES,
   NATL_ADMIN_ROLES,
-  SYS_ADMIN_ROLES
+  SYS_ADMIN_ROLES,
+  PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
 import {
   FloatingNotification,
@@ -366,9 +367,11 @@ export class OfficeHomeView extends React.Component<
     )
     return (
       <>
-        {this.role && NATL_ADMIN_ROLES.includes(this.role) && (
-          <Redirect to={PERFORMANCE_HOME} />
-        )}
+        {this.role &&
+          (NATL_ADMIN_ROLES.includes(this.role) ||
+            PERFORMANCE_MANAGEMENT_ROLES.includes(this.role)) && (
+            <Redirect to={PERFORMANCE_HOME} />
+          )}
         {this.role && SYS_ADMIN_ROLES.includes(this.role) && (
           <Redirect
             to={{
@@ -587,7 +590,7 @@ function mapStateToProps(
         )) ||
       []
     ).reverse(),
-    userDetails: getUserDetails(state)
+    userDetails
   }
 }
 export const OfficeHome = connect<
