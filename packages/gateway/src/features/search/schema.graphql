@@ -12,6 +12,13 @@ type EventSearchResultSet {
   totalItems: Int
 }
 
+type AssignmentData {
+  userId: String
+  firstName: String
+  lastName: String
+  officeName: String
+}
+
 interface EventSearchSet {
   id: ID!
   type: String
@@ -32,6 +39,7 @@ type RegistrationSearchSet {
   duplicates: [ID]
   createdAt: String
   modifiedAt: String
+  assignment: AssignmentData
 }
 
 type BirthEventSearchSet implements EventSearchSet {

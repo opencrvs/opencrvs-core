@@ -658,17 +658,16 @@ async function markRecordAsDownloadedAndAssigned(
     throw new Error('Task does not exist')
   }
 
-  let doc: ITaskBundle
   let extensions: fhir.Extension[]
 
   if (hasScope(authHeader, 'register') || hasScope(authHeader, 'validate')) {
     extensions = [
       {
-        url: DOWNLOADED_EXTENSION_URL,
+        url: ASSIGNED_EXTENSION_URL,
         valueString: getStatusFromTask(taskBundle.entry[0].resource)
       },
       {
-        url: ASSIGNED_EXTENSION_URL,
+        url: DOWNLOADED_EXTENSION_URL,
         valueString: getStatusFromTask(taskBundle.entry[0].resource)
       }
     ]
@@ -681,7 +680,11 @@ async function markRecordAsDownloadedAndAssigned(
     ]
   }
 
-  doc = addOrUpdateExtension(taskBundle.entry[0], extensions, 'downloaded')
+  const doc = addOrUpdateExtension(
+    taskBundle.entry[0],
+    extensions,
+    'downloaded'
+  )
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
