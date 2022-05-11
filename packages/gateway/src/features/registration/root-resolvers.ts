@@ -364,12 +364,17 @@ export const resolvers: GQLResolver = {
         const status = 'ARCHIVED'
         const newTaskBundle = await updateFHIRTaskBundle(taskEntry, status)
         const taskResource = newTaskBundle.entry[0].resource
+        // remove downloaded and assigned extension while archiving
         if (
           taskResource.extension &&
-          findExtension(DOWNLOADED_EXTENSION_URL, taskResource.extension)
+          (findExtension(DOWNLOADED_EXTENSION_URL, taskResource.extension) ||
+            findExtension(ASSIGNED_EXTENSION_URL, taskResource.extension))
         ) {
           taskResource.extension = taskResource.extension.filter(
-            (ext) => ext.url !== DOWNLOADED_EXTENSION_URL
+            (ext) =>
+              ![DOWNLOADED_EXTENSION_URL, ASSIGNED_EXTENSION_URL].includes(
+                ext.url
+              )
           )
         }
         await fetchFHIR(
