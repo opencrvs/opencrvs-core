@@ -24,10 +24,14 @@ import {
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
   DOCUMENT_UPLOADER_WITH_OPTION,
-  QuestionConfigFieldType
+  QuestionConfigFieldType,
+  ISerializedForm
 } from '@client/forms'
 import { camelCase, keys } from 'lodash'
-import { FieldPosition } from '@client/forms/configuration'
+import {
+  FieldPosition,
+  getIdentifiersFromFieldId
+} from '@client/forms/configuration'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { MessageDescriptor } from 'react-intl'
@@ -262,17 +266,45 @@ export function getDefaultConfigFieldIdentifiers(
   }
 }
 
-function getPrecedingDefaultFieldId(
+function getIdentifiersInDefaultForm(
   defaultConfigField: IDefaultConfigField,
-  registerForm: IForm
+  defaultForm: ISerializedForm
+) {
+  const { event, sectionId, groupId, fieldName } = getIdentifiersFromFieldId(
+    defaultConfigField.fieldId
+  )
+
+  const sectionIndex = defaultForm.sections.findIndex(
+    ({ id }) => id === sectionId
+  )
+
+  const groups = defaultForm.sections[sectionIndex].groups
+
+  const groupIndex = groups.findIndex(({ id }) => id === groupId)
+
+  const fields = groups[groupIndex].fields
+
+  const fieldIndex = fields.findIndex(({ name }) => name === fieldName)
+
+  return {
+    event: event as Event,
+    sectionIndex,
+    groupIndex,
+    fieldIndex
+  }
+}
+
+function getPrecedingDefaultFieldId(
+  defaultFieldIdentifiers: ReturnType<typeof getIdentifiersInDefaultForm>,
+  defaultForm: ISerializedForm
 ) {
   const { event, sectionIndex, groupIndex, fieldIndex } =
-    getDefaultConfigFieldIdentifiers(defaultConfigField)
+    defaultFieldIdentifiers
   /* First field of the section */
   if (!fieldIndex && !groupIndex) {
     return FieldPosition.TOP
   }
-  const section = registerForm.sections[sectionIndex]
+  const section = defaultForm.sections[sectionIndex]
   /* First field of the group */
   if (!fieldIndex) {
     const group = section.groups[groupIndex - 1]
@@ -286,15 +318,19 @@ function getPrecedingDefaultFieldId(
 
 export function hasDefaultFieldChanged(
   defaultConfigField: IDefaultConfigField,
-  registerForm: IForm
+  defaultForm: ISerializedForm
 ) {
-  const { sectionIndex, groupIndex, fieldIndex } =
-    getDefaultConfigFieldIdentifiers(defaultConfigField)
-  const defaultFormField =
-    registerForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
-  const precedingDefaultFieldId = getPrecedingDefaultFieldId(
+  const defaultFieldIdentifiers = getIdentifiersInDefaultForm(
     defaultConfigField,
-    registerForm
+    defaultForm
+  )
+
+  const { sectionIndex, groupIndex, fieldIndex } = defaultFieldIdentifiers
+  const defaultFormField =
+    defaultForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
+  const precedingDefaultFieldId = getPrecedingDefaultFieldId(
+    defaultFieldIdentifiers,
+    defaultForm
   )
   if (precedingDefaultFieldId !== defaultConfigField.preceedingFieldId) {
     return true
@@ -377,16 +413,23 @@ export function prepareNewCustomFieldConfig(
 
 export function generateModifiedQuestionConfigs(
   configFields: ISectionFieldMap,
-  registerForm: IForm
+  defaultRegisterForm: ISerializedForm
 ) {
   const questionConfigs: IQuestionConfig[] = []
   Object.values(configFields).forEach((sectionConfigFields) => {
     Object.values(sectionConfigFields).forEach((configField) => {
       if (!isDefaultField(configField)) {
-        const { foregoingFieldId, ...rest } = configField
+        const { foregoingFieldId, previewGroupID, previewGroupLabel, ...rest } =
+          configField
         questionConfigs.push(rest)
-      } else if (hasDefaultFieldChanged(configField, registerForm)) {
-        const { foregoingFieldId, identifiers, ...rest } = configField
+      } else if (hasDefaultFieldChanged(configField, defaultRegisterForm)) {
+        const {
+          foregoingFieldId,
+          identifiers,
+          previewGroupID,
+          previewGroupLabel,
+          ...rest
+        } = configField
         questionConfigs.push(rest)
       }
     })
