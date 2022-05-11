@@ -71,7 +71,7 @@ workbox.precaching.precacheAndRoute([])
  */
 
 workbox.routing.registerRoute(
-  '/config.js',
+  /http(.+)config\.js$/,
   new workbox.strategies.NetworkFirst()
 )
 
