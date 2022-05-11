@@ -153,7 +153,7 @@ type Query {
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
   getQuestions: [Question]
-  getFormDraft: [FormDraft]
+  getFormDraft: [FormDraft!]
 }
 
 type Mutation {
@@ -223,12 +223,12 @@ type Mutation {
   createOrUpdateCertificateSVG(
     certificateSVG: CertificateSVGInput!
   ): CertificateSVG
-  createOrUpdateQuestion(question: QuestionInput!): Question
-  modifyDraftStatus(formDraft: FormDraftStatusModify!): FormDraft
   updateApplicationConfig(
     applicationConfig: ApplicationConfigurationInput
   ): ApplicationConfiguration
   createOrUpdateQuestion(question: QuestionInput!): Question
+  createFormDraft(formDraft: FormDraftInput!): FormDraft
+  modifyDraftStatus(formDraft: FormDraftStatusModify!): FormDraft
 }
 
 type Dummy {
@@ -244,17 +244,6 @@ type Notification {
   location: Location
   createdAt: Date
   updatedAt: Date
-}
-
-input MesssageDescriptorInput {
-  id: String!
-  description: String!
-  defaultMessage: String!
-}
-
-input MesssageInput {
-  lang: String!
-  descriptor: MesssageDescriptorInput!
 }
 
 scalar Date
@@ -489,11 +478,6 @@ type CertificateSVG {
   status: String
 }
 
-type Messsage {
-  lang: String!
-  descriptor: MesssageDescriptor!
-}
-
 type Question {
   _id: ID!
   fieldId: String!
@@ -518,23 +502,9 @@ type FormDraft {
   status: String!
   comment: String
   version: Int!
-  history: [DraftHistory]
+  history: [DraftHistory!]
   updatedAt: Date!
   createdAt: Date!
-}
-
-type DraftHistory {
-  _id: ID
-  version: Int
-  status: String
-  comment: String
-  updatedAt: Date
-}
-
-type MesssageDescriptor {
-  id: String!
-  description: String!
-  defaultMessage: String!
 }
 
 input NotificationInput {
@@ -642,37 +612,6 @@ input CertificateSVGInput {
   status: String!
 }
 
-input QuestionInput {
-  id: ID
-  fieldId: String!
-  label: [MesssageInput!]
-  placeholder: [MesssageInput!]
-  description: [MesssageInput!]
-  tooltip: [MesssageInput!]
-  errorMessage: [MesssageInput!]
-  maxLength: Int
-  fieldName: String
-  fieldType: String
-  preceedingFieldId: String
-  required: Boolean
-  enabled: String
-  custom: Boolean
-  initialValue: String
-}
-
-input formDraftInput {
-  questions: [QuestionInput]
-  deleted: [String]
-  event: String!
-  status: String!
-  comment: String
-}
-
-input FormDraftStatusModify {
-  event: String!
-  status: String!
-}
-
 type ApplicationConfiguration {
   APPLICATION_NAME: String
   BACKGROUND_SYNC_BROADCAST_CHANNEL: String
@@ -723,17 +662,31 @@ input ApplicationConfigurationInput {
 
 input QuestionInput {
   id: ID
-  fieldId: String
-  label: MesssageDescriptorInput
-  placeholder: MesssageDescriptorInput
+  fieldId: String!
+  label: [MesssageInput!]
+  placeholder: [MesssageInput!]
+  description: [MesssageInput!]
+  tooltip: [MesssageInput!]
+  errorMessage: [MesssageInput!]
   maxLength: Int
   fieldName: String
   fieldType: String
   preceedingFieldId: String
   required: Boolean
-  enabled: Boolean
+  enabled: String
   custom: Boolean
   initialValue: String
+}
+
+input FormDraftInput {
+  questions: [QuestionInput!]!
+  event: String!
+  comment: String!
+}
+
+input FormDraftStatusModify {
+  event: String!
+  status: String!
 }
 
 scalar Map
@@ -1003,10 +956,17 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
-type MesssageDescriptor {
-  id: String
-  description: String
-  defaultMessage: String
+type Messsage {
+  lang: String!
+  descriptor: MesssageDescriptor!
+}
+
+type DraftHistory {
+  _id: ID
+  version: Int
+  status: String
+  comment: String
+  updatedAt: Date
 }
 
 input PersonInput {
@@ -1093,6 +1053,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  REQUESTED_CORRECTION
   DOWNLOADED
 }
 
@@ -1161,10 +1122,9 @@ input DeathInput {
   FEE: DeathFeeInput
 }
 
-input MesssageDescriptorInput {
-  id: String
-  description: String
-  defaultMessage: String
+input MesssageInput {
+  lang: String!
+  descriptor: MesssageDescriptorInput!
 }
 
 enum InformantType {
@@ -1333,6 +1293,12 @@ type EventProgressData {
   timeInReadyToPrint: Int
 }
 
+type MesssageDescriptor {
+  id: String!
+  description: String!
+  defaultMessage: String!
+}
+
 input IdentityInput {
   id: ID
   type: IdentityIDType
@@ -1427,6 +1393,12 @@ input BirthFeeInput {
 input DeathFeeInput {
   ON_TIME: Float
   DELAYED: Float
+}
+
+input MesssageDescriptorInput {
+  id: String!
+  description: String
+  defaultMessage: String!
 }
 
 type Payment {
