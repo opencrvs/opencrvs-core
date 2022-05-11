@@ -172,6 +172,9 @@ function useHiddenFields({
 }
 
 export function FormConfigWizard() {
+  const dispatch = useDispatch()
+  const hasNatlSysAdminScope = useHasNatlSysAdminScope()
+  const intl = useIntl()
   const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
   const { selectedField, setSelectedField } = useSelectedField()
   const { showHiddenFields, setShowHiddenFields } = useHiddenFields({
@@ -185,16 +188,17 @@ export function FormConfigWizard() {
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
-  const firstField = Object.values(fieldsMap).find(
-    (formField) => formField.preceedingFieldId === FieldPosition.TOP
-  )
-  if (!firstField) {
-    throw new Error(`No starting field found in section`)
+
+  let firstFieldIdentifiers
+  if (section !== 'settings') {
+    const firstField = Object.values(fieldsMap).find(
+      (formField) => formField.preceedingFieldId === FieldPosition.TOP
+    )
+    if (!firstField) {
+      throw new Error(`No starting field found in section`)
+    }
+    firstFieldIdentifiers = getIdentifiersFromFieldId(firstField.fieldId)
   }
-  const firstFieldIdentifiers = getIdentifiersFromFieldId(firstField.fieldId)
-  const dispatch = useDispatch()
-  const hasNatlSysAdminScope = useHasNatlSysAdminScope()
-  const intl = useIntl()
 
   if (
     !hasNatlSysAdminScope ||
@@ -234,7 +238,7 @@ export function FormConfigWizard() {
         <NavigationContainer>
           <SectionNavigation />
         </NavigationContainer>
-        {section !== 'settings' ? (
+        {section !== 'settings' && firstFieldIdentifiers !== undefined ? (
           <>
             <CanvasWrapper
               onClick={(e) => {

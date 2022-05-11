@@ -12,6 +12,7 @@
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { BirthSection, DeathSection, Event, IFormSection } from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
+import { PlaceholderPreviewGroups } from '@client/forms/configuration/default'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 import {
   removeCustomField,
@@ -55,7 +56,11 @@ function preparePlaceholderConfigAndVerify(
 ) {
   const field = getFieldDefinition(formSection, currentField)
 
-  if (field.customisable === true || !field.previewGroup) {
+  if (
+    field.customisable === true ||
+    !field.previewGroup ||
+    !PlaceholderPreviewGroups.includes(field.previewGroup)
+  ) {
     return true
   }
 

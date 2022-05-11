@@ -57,7 +57,8 @@ export function selectConfigField(
   section: string,
   fieldId: string | null
 ) {
-  return fieldId ? selectConfigFields(store, event, section)[fieldId] : null
+  const configFields = selectConfigFields(store, event, section)
+  return fieldId && configFields ? configFields[fieldId] : null
 }
 
 export function selectFormDraft(store: IStoreState, event: Event) {

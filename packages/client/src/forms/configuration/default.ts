@@ -860,7 +860,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'placeOfBirthTitle',
                 type: 'SUBSECTION',
                 label: formMessageDescriptors.placeOfBirthPreview,
-                previewGroup: 'placeOfBirtrh',
+                previewGroup: 'placeOfBirth',
                 initialValue: '',
                 validate: []
               },
@@ -3867,3 +3867,10 @@ export const registerForms: IDefaultRegisterForms = {
     ]
   }
 }
+
+export const PlaceholderPreviewGroups = [
+  'placeOfBirth',
+  'placeOfDeath',
+  'secondaryAddress',
+  'primaryAddress'
+]
