@@ -11,39 +11,6 @@
  */
 import gql from 'graphql-tag'
 
-const allSearchFields = `
-  id
-    type
-    registration {
-      status
-      contactRelationship
-      contactNumber
-      trackingId
-      eventLocationId
-      registrationNumber
-      registeredLocationId
-      duplicates
-      createdAt
-      modifiedAt
-    }    
-    ... on BirthEventSearchSet {
-      dateOfBirth
-      childName {
-        firstNames
-        familyName
-        use
-      }
-    }
-    ... on DeathEventSearchSet {
-      dateOfDeath
-      deceasedName {
-        firstNames
-        familyName
-        use
-      }
-    }
-  `
-
 export const REGISTRATION_HOME_QUERY = gql`
   query registrationHome(
     $locationIds: [String]
@@ -66,7 +33,36 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        id
+        type
+        registration {
+          status
+          contactRelationship
+          contactNumber
+          trackingId
+          eventLocationId
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
+          }
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
+        }
       }
     }
     notificationTab: searchEvents(
@@ -78,7 +74,36 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        id
+        type
+        registration {
+          status
+          contactRelationship
+          contactNumber
+          trackingId
+          eventLocationId
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
+          }
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
+        }
       }
     }
     reviewTab: searchEvents(
@@ -89,7 +114,36 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        id
+        type
+        registration {
+          status
+          contactRelationship
+          contactNumber
+          trackingId
+          eventLocationId
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
+          }
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
+        }
       }
     }
     rejectTab: searchEvents(
@@ -102,7 +156,36 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        id
+        type
+        registration {
+          status
+          contactRelationship
+          contactNumber
+          trackingId
+          eventLocationId
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
+          }
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
+        }
       }
     }
     approvalTab: searchEvents(
@@ -113,7 +196,36 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        id
+        type
+        registration {
+          status
+          contactRelationship
+          contactNumber
+          trackingId
+          eventLocationId
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
+          }
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
+        }
       }
     }
     externalValidationTab: searchEvents(
@@ -124,7 +236,36 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        id
+        type
+        registration {
+          status
+          contactRelationship
+          contactNumber
+          trackingId
+          eventLocationId
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
+          }
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
+        }
       }
     }
     printTab: searchEvents(
@@ -135,14 +276,43 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        id
+        type
+        registration {
+          status
+          contactRelationship
+          contactNumber
+          trackingId
+          eventLocationId
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
+          }
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
+        }
       }
     }
   }
 `
 
 export const SEARCH_EVENTS = gql`
-  query(
+  query searchEventsForWorkqueue(
     $sort: String
     $trackingId: String
     $contactNumber: String
@@ -164,14 +334,43 @@ export const SEARCH_EVENTS = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        id
+        type
+        registration {
+          status
+          contactRelationship
+          contactNumber
+          trackingId
+          eventLocationId
+          registrationNumber
+          registeredLocationId
+          duplicates
+          createdAt
+          modifiedAt
+        }
+        ... on BirthEventSearchSet {
+          dateOfBirth
+          childName {
+            firstNames
+            familyName
+            use
+          }
+        }
+        ... on DeathEventSearchSet {
+          dateOfDeath
+          deceasedName {
+            firstNames
+            familyName
+            use
+          }
+        }
       }
     }
   }
 `
 
 export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
-  query data($id: ID!) {
+  query fetchRegistrationByComposition($id: ID!) {
     fetchRegistration(id: $id) {
       id
       registration {

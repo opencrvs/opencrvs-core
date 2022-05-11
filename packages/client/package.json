@@ -32,11 +32,10 @@
     "eslint-plugin-import": "^2.17.3",
     "focus-visible": "^5.0.2",
     "formik": "^1.5.1",
-    "graphql": "^15.0.0",
+    "graphql": "^16.5.0",
     "graphql-tag": "^2.4.2",
     "graphql-tools": "^4.0.7",
     "history": "^4.7.2",
-    "tsconfig-paths": "^3.13.0",
     "http-proxy-middleware": "^0.20.0",
     "jimp": "^0.16.1",
     "jsdom-worker": "^0.2.1",
@@ -67,6 +66,7 @@
     "redux-sentry-middleware": "^0.0.15",
     "sanitize-html": "^2.4.0",
     "styled-components": "^5.2.0",
+    "tsconfig-paths": "^3.13.0",
     "xregexp": "^4.2.0"
   },
   "scripts": {
@@ -87,7 +87,7 @@
     "start:prod": "yarn build && yarn serve -s -l 3000 build",
     "test:compilation": "tsc --noEmit",
     "extract:translations": "bash extract-translations.sh",
-    "graphql:codegen": "graphql-codegen --config codegen.yml",
+    "generate-gateway-types": "graphql-codegen --config codegen.yml",
     "build:clean": "rm -rf build",
     "serve": "node serve-static.js"
   },
@@ -102,13 +102,11 @@
     ]
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "^1.2.0",
-    "@graphql-codegen/fragment-matcher": "1.2.0",
-    "@graphql-codegen/introspection": "^1.2.0",
-    "@graphql-codegen/typescript": "^1.2.0",
-    "@graphql-codegen/typescript-graphql-files-modules": "1.2.0",
-    "@graphql-codegen/typescript-operations": "1.2.0",
-    "@graphql-codegen/typescript-react-apollo": "1.2.0",
+    "@graphql-codegen/add": "3.1.1",
+    "@graphql-codegen/cli": "2.6.2",
+    "@graphql-codegen/introspection": "2.1.1",
+    "@graphql-codegen/typescript": "2.4.11",
+    "@graphql-codegen/typescript-operations": "^2.4.0",
     "@types/enzyme": "^3.1.13",
     "@types/enzyme-adapter-react-16": "^1.0.3",
     "@types/fetch-mock": "^7.3.0",

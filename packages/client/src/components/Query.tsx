@@ -18,17 +18,15 @@
  */
 
 import * as React from 'react'
-import { ComponentProps } from '@client/utils/react'
+
 // eslint-disable-next-line no-restricted-imports
-import { Query as ApolloQuery } from 'react-apollo'
+import { Query as ApolloQuery, QueryProps } from 'react-apollo'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 
-type Props = ComponentProps<ApolloQuery>
-
-export function Query(props: Props) {
+export function Query<T = any>(props: QueryProps<T>) {
   return (
-    <ApolloQuery
+    <ApolloQuery<T>
       onError={(error: Error) => {
         Sentry.captureException(error)
       }}

@@ -17,7 +17,7 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema.d'
 
 export const FETCH_REGISTRATION = gql`
-  query fetchRegistration($identifier: ID!) {
+  query queryRegistrationByIdentifier($identifier: ID!) {
     queryRegistrationByIdentifier(identifier: $identifier) {
       id
       child {

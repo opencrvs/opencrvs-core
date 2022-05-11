@@ -4,6 +4,7 @@
   "description": "OpenCRVS API Gateway with GraphQL",
   "license": "MPL-2.0",
   "scripts": {
+    "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then npx crlf --set=LF ./node_modules/graphql-schema-typescript/**/*; fi",
     "start": "yarn gen:schema && yarn gen:types && concurrently \"nodemon --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\" \"yarn gen:schema:watch\"",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
