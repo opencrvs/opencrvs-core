@@ -176,7 +176,7 @@ export function Canvas({
             onClick={() => setSelectedField(fieldId)}
             movable={isSelected}
             status={isHidden ? intl.formatMessage(messages.hidden) : undefined}
-            removable={configField.custom}
+            customField={configField.custom}
             isUpDisabled={preceedingFieldId === FieldPosition.TOP}
             isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}
             onMoveUp={() => dispatch(shiftConfigFieldUp(fieldId))}

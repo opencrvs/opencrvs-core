@@ -34,6 +34,8 @@ export interface IDefaultField {
 export interface IDefaultFieldCustomisation {
   question: IQuestionConfig
   defaultField: IDefaultField
+  positionTop: boolean
+  preceedingDefaultField?: IDefaultField
 }
 
 export function getDefaultField(
