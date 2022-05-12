@@ -11,19 +11,18 @@
  */
 
 import {
-  BirthSection,
-  DeathSection,
   ISerializedForm,
   IQuestionConfig,
-  SerializedFormField,
-  Event,
-  REVIEW_OVERRIDE_POSITION,
-  ISerializedFormSection
+  SerializedFormField
 } from '@client/forms/index'
-import { cloneDeep } from 'lodash'
 import { getGroup, getIdentifiersFromFieldId, getSection } from '.'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE THE DEFAULT CONFIGURATION
+
+/* For the enabled field in FormFields */
+export enum FieldEnabled {
+  DISABLED = 'DISABLED'
+}
 
 export interface IDefaultField {
   index: number
@@ -35,6 +34,8 @@ export interface IDefaultField {
 export interface IDefaultFieldCustomisation {
   question: IQuestionConfig
   defaultField: IDefaultField
+  positionTop: boolean
+  preceedingDefaultField?: IDefaultField
 }
 
 export function getDefaultField(
@@ -67,23 +68,4 @@ export function getDefaultField(
   } else {
     return undefined
   }
-}
-
-export function configureDefaultQuestions(
-  defaultFieldCustomisations: IDefaultFieldCustomisation[],
-  defaultEventForm: ISerializedForm
-): ISerializedForm {
-  const newForm = cloneDeep(defaultEventForm)
-  defaultFieldCustomisations.forEach((defaultFieldCustomisation) => {
-    // this is a customisation to a default field
-    // default fields can only be enabled or disabled at present
-    if (defaultFieldCustomisation.question.enabled === 'DISABLED') {
-      newForm.sections[
-        defaultFieldCustomisation.defaultField.selectedSectionIndex
-      ].groups[
-        defaultFieldCustomisation.defaultField.selectedGroupIndex
-      ].fields.splice(defaultFieldCustomisation.defaultField.index, 1)
-    }
-  })
-  return newForm
 }

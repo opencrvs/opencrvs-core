@@ -11,6 +11,7 @@
  */
 import { ValidationInitializer } from '@client/utils/validate'
 import { MessageDescriptor } from 'react-intl'
+import { Message } from 'typescript-react-intl'
 import {
   ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
@@ -33,6 +34,8 @@ import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { IUserDetails } from '@client/utils/userUtils'
+import { messages } from '@client/i18n/messages/views/formConfig'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -87,11 +90,11 @@ export enum Action {
 
 export enum QuestionConfigFieldType {
   TEXT = 'TEXT',
-  TEL = 'TEL',
-  NUMBER = 'NUMBER',
   TEXTAREA = 'TEXTAREA',
-  SUBSECTION = 'SUBSECTION',
-  PARAGRAPH = 'PARAGRAPH'
+  NUMBER = 'NUMBER',
+  TEL = 'TEL',
+  PARAGRAPH = 'PARAGRAPH',
+  SUBSECTION = 'SUBSECTION'
 }
 
 export interface IIdentifiers {
@@ -100,10 +103,17 @@ export interface IIdentifiers {
   groupId: string
   fieldName: string
 }
+export interface IMessage {
+  lang: string
+  descriptor: Message
+}
 export interface IQuestionConfig {
   fieldId: string
-  label?: MessageDescriptor
-  placeholder?: MessageDescriptor
+  label?: IMessage[]
+  placeholder?: IMessage[]
+  description?: IMessage[]
+  tooltip?: IMessage[]
+  errorMessage?: IMessage[]
   maxLength?: number
   fieldName?: string
   fieldType?: QuestionConfigFieldType
@@ -116,6 +126,7 @@ export interface IQuestionConfig {
 
 export interface IFormConfig {
   questionConfig: IQuestionConfig[]
+  formDrafts: IFormDraft[]
 }
 
 export interface ISelectOption {
@@ -883,27 +894,25 @@ export type IFormSectionQueryMapFunction = (
 ) => void
 
 export enum BirthSection {
+  Registration = 'registration',
   Child = 'child',
   Mother = 'mother',
   Father = 'father',
   Informant = 'informant',
-  Registration = 'registration',
   Documents = 'documents',
   Preview = 'preview'
 }
 
 export enum DeathSection {
+  Registration = 'registration',
   Deceased = 'deceased',
   Event = 'deathEvent',
-  CauseOfDeath = 'causeOfDeath',
-  Informants = 'informant',
-  Registration = 'registration',
+  Informant = 'informant',
   DeathDocuments = 'documents',
-  Preview = 'preview',
-  Father = 'father',
-  Mother = 'mother',
-  Spouse = 'spouse'
+  Preview = 'preview'
 }
+
+export type WizardSection = BirthSection | DeathSection | 'settings'
 
 export enum UserSection {
   User = 'user',
@@ -959,13 +968,15 @@ export interface IFormSection {
   hasDocumentSection?: boolean
 }
 
+export type ISerializedFormSectionGroup = Omit<IFormSectionGroup, 'fields'> & {
+  fields: SerializedFormField[]
+}
+
 export type ISerializedFormSection = Omit<
   IFormSection,
   'groups' | 'mapping'
 > & {
-  groups: Array<
-    Omit<IFormSectionGroup, 'fields'> & { fields: SerializedFormField[] }
-  >
+  groups: ISerializedFormSectionGroup[]
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
@@ -1219,4 +1230,39 @@ export interface ICertificate {
   hasShowedVerifiedDocument?: boolean
   payments?: Payment[]
   data?: string
+}
+
+export function fieldTypeLabel(type: IFormField['type']) {
+  const labelDict: {
+    [key in IFormField['type']]: MessageDescriptor
+  } = {
+    TEXT: messages.textInput,
+    TEXTAREA: messages.textAreaInput,
+    SUBSECTION: messages.heading,
+    FIELD_GROUP_TITLE: messages.fieldGroup,
+    DOCUMENTS: messages.documents,
+    LIST: messages.list,
+    PARAGRAPH: messages.paragraph,
+    IMAGE_UPLOADER_WITH_OPTIONS: messages.imageUploader,
+    DOCUMENT_UPLOADER_WITH_OPTION: messages.documentUploader,
+    SIMPLE_DOCUMENT_UPLOADER: messages.simpleDocumentUploader,
+    LOCATION_SEARCH_INPUT: messages.locationSearch,
+    WARNING: messages.warning,
+    LINK: messages.link,
+    FETCH_BUTTON: messages.fetchButton,
+    TEL: messages.tel,
+    NUMBER: messages.numberInput,
+    BIG_NUMBER: messages.numberInput,
+    SELECT_WITH_OPTIONS: messages.selectWithOption,
+    SELECT_WITH_DYNAMIC_OPTIONS: messages.selectWithDynamicOption,
+    FIELD_WITH_DYNAMIC_DEFINITIONS: messages.fieldWithDynamicDefinition,
+    RADIO_GROUP: messages.radioGroup,
+    RADIO_GROUP_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
+    INFORMATIVE_RADIO_GROUP: messages.informativeRadioGroup,
+    CHECKBOX_GROUP: messages.checkboxGroup,
+    DATE: messages.date,
+    DYNAMIC_LIST: messages.dynamicList
+  }
+
+  return labelDict[type]
 }

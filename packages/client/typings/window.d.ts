@@ -59,6 +59,7 @@ interface Window {
     DECLARATION_AUDIT_LOCATIONS: string
     LOGROCKET: string
     SENTRY: string
+    ADDRESSES: number
   }
   __localeId__: string
 }

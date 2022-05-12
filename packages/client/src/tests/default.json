@@ -1156,7 +1156,7 @@
                     "description": "Title for place of birth sub section",
                     "id": "form.field.label.placeOfBirthPreview"
                   },
-                  "previewGroup": "placeOfBirtrh",
+                  "previewGroup": "placeOfBirth",
                   "initialValue": "",
                   "validate": []
                 },
