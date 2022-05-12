@@ -166,6 +166,13 @@ describe('Verify handler', () => {
         .spyOn(require('./utils'), 'sendEventNotification')
         .mockReturnValue('')
 
+      jest
+        .spyOn(
+          require('../../utils/formDraftUtils'),
+          'checkFormDraftStatusToAddTestExtension'
+        )
+        .mockReturnValue('')
+
       const token = jwt.sign(
         { scope: ['declare'] },
         readFileSync('../auth/test/cert.key'),

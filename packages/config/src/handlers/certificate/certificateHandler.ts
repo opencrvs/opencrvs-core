@@ -14,7 +14,7 @@ import Certificate, {
   ICertificateModel,
   Status,
   Event
-} from '@config/models/Certificate' //   IDeclarationConfigurationModel
+} from '@config/models/certificate' //   IDeclarationConfigurationModel
 import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
 import { badRequest } from '@hapi/boom'

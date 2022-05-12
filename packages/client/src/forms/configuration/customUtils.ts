@@ -14,9 +14,10 @@ import {
   ISerializedForm,
   IQuestionConfig,
   SerializedFormField,
-  QuestionConfigFieldType
+  QuestionConfigFieldType,
+  IMessage
 } from '@client/forms/index'
-import { cloneDeep, concat } from 'lodash'
+import { find } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import { IDefaultField } from '@client/forms/configuration/defaultUtils'
 import {
@@ -26,6 +27,7 @@ import {
   IGroup,
   ISection
 } from '@client/forms/configuration'
+import { getDefaultLanguage } from '@client/i18n/utils'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE CUSTOM FORM CONFIGURATIONS
 
@@ -33,7 +35,6 @@ interface ICustomQuestionConfiguration {
   question: IQuestionConfig
   field: SerializedFormField
 }
-
 export interface ISortedCustomGroup {
   preceedingDefaultField?: IDefaultField
   positionTop?: boolean
@@ -72,6 +73,14 @@ export function createCustomGroup(
   customQuestionConfigurations.push(newCustomGroup)
 }
 
+function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
+  const language = getDefaultLanguage()
+  const defaultMessage = find(messages, {
+    lang: language
+  })
+  return defaultMessage?.descriptor
+}
+
 export function createCustomField(
   question: IQuestionConfig
 ): SerializedFormField {
@@ -80,9 +89,13 @@ export function createCustomField(
     customQuesstionMappingId: question.fieldId,
     custom: true,
     type: question.fieldType as QuestionConfigFieldType,
-    label: question.label as MessageDescriptor,
+    label: getDefaultLanguageMessage(question.label) as MessageDescriptor,
     initialValue: '',
     validate: [],
+    description: getDefaultLanguageMessage(
+      question.description
+    ) as MessageDescriptor,
+    tooltip: getDefaultLanguageMessage(question.tooltip) as MessageDescriptor,
     mapping: {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'
@@ -90,6 +103,7 @@ export function createCustomField(
       query: {
         operation: 'questionnaireToCustomFieldTransformer'
       }
+      /* TODO: Add template mapping so that handlebars work */
     }
   }
   if (
@@ -98,7 +112,9 @@ export function createCustomField(
     baseField.type === 'TEXTAREA'
   ) {
     baseField.required = question.required
-    baseField.placeholder = question.placeholder as MessageDescriptor
+    baseField.placeholder = getDefaultLanguageMessage(
+      question.placeholder
+    ) as MessageDescriptor
   }
   if (baseField.type === 'TEL') {
     baseField.validate = [
@@ -113,38 +129,12 @@ export function createCustomField(
   return baseField
 }
 
-function getCustomFields(customQuestionConfig: ICustomQuestionConfiguration[]) {
+export function getCustomFields(
+  customQuestionConfig: ICustomQuestionConfiguration[]
+) {
   const fields: SerializedFormField[] = []
   customQuestionConfig.forEach((config) => {
     fields.push(config.field)
   })
   return fields
-}
-
-export function configureCustomQuestions(
-  sortedCustomGroups: ISortedCustomGroup[],
-  defaultFormWithCustomisations: ISerializedForm
-): ISerializedForm {
-  const newForm = cloneDeep(defaultFormWithCustomisations)
-  sortedCustomGroups.forEach((customGroup) => {
-    if (customGroup.positionTop) {
-      newForm.sections[customGroup.sectionIndex].groups[
-        customGroup.groupIndex
-      ].fields = concat(
-        getCustomFields(customGroup.questions),
-        newForm.sections[customGroup.sectionIndex].groups[
-          customGroup.groupIndex
-        ].fields
-      )
-    } else if (customGroup.preceedingDefaultField) {
-      newForm.sections[customGroup.sectionIndex].groups[
-        customGroup.groupIndex
-      ].fields.splice(
-        customGroup.preceedingDefaultField.index + 1,
-        0,
-        ...getCustomFields(customGroup.questions)
-      )
-    }
-  })
-  return newForm
 }

@@ -23,6 +23,7 @@ import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { Store } from 'redux'
 import { History } from 'history'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 let wrapper: ReactWrapper<{}, {}>
 let store: Store
@@ -93,7 +94,7 @@ describe('Review form for an declaration', () => {
     wrapper.find('#crcl-btn').hostNodes().simulate('click')
     wrapper.update()
 
-    expect(history.location.pathname).toContain('/review')
+    expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
   })
 
   it('should disable the continue button if no changes have been made', () => {

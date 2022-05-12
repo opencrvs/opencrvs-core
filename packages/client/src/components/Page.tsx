@@ -32,8 +32,8 @@ import { Ii18n } from '@client/type/i18n'
 import { getPreferredLanguage } from '@client/i18n/utils'
 import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
-import { configLoad } from '@client/offline/actions'
 import { LOADING_SCREEN_TEXT } from '@client/utils/constants'
+import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -107,6 +107,7 @@ interface IPageProps {
   initialDeclarationsLoaded: boolean
   offlineDataLoaded: boolean
   registerFormLoaded: boolean
+  formConfigLoaded: boolean
   loadingError: boolean
 }
 
@@ -116,7 +117,6 @@ interface IDispatchProps {
   showConfigurationErrorNotification: () => void
   hideConfigurationErrorNotification: () => void
   changeLanguage: (values: Ii18n) => void
-  configLoad: () => void
 }
 
 class Component extends React.Component<
@@ -148,8 +148,6 @@ class Component extends React.Component<
   }
 
   async componentDidMount() {
-    this.props.configLoad()
-
     const language = await getPreferredLanguage()
 
     this.props.changeLanguage({ language })
@@ -162,10 +160,16 @@ class Component extends React.Component<
       initialDeclarationsLoaded,
       offlineDataLoaded,
       registerFormLoaded,
+      formConfigLoaded,
       children
     } = this.props
 
-    if (offlineDataLoaded && initialDeclarationsLoaded && registerFormLoaded) {
+    if (
+      offlineDataLoaded &&
+      initialDeclarationsLoaded &&
+      registerFormLoaded &&
+      formConfigLoaded
+    ) {
       return (
         <div id="readyDeclaration">
           <StyledPage {...this.props}>{children}</StyledPage>
@@ -188,7 +192,8 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
     initialDeclarationsLoaded: getInitialDeclarationsLoaded(store),
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store),
-    registerFormLoaded: isRegisterFormReady(store)
+    registerFormLoaded: isRegisterFormReady(store),
+    formConfigLoaded: isFormConfigLoaded(store)
   }
 }
 
@@ -197,8 +202,7 @@ const mapDispatchToProps = {
   checkAuth,
   showConfigurationErrorNotification,
   hideConfigurationErrorNotification,
-  changeLanguage,
-  configLoad
+  changeLanguage
 }
 
 export const Page = withRouter(

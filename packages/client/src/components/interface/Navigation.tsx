@@ -31,6 +31,7 @@ import {
   goToSettings,
   goToPerformanceView,
   goToTeamView,
+  goToFormConfigHome,
   goToApplicationConfig
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -38,14 +39,13 @@ import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
-import { Activity, Avatar, Users } from '@opencrvs/components/lib/icons'
+import { Activity, Users } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
-import { ITheme, withTheme } from '@client/styledComponents'
 import { Query } from '@client/components/Query'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { getOfflineData } from '@client/offline/selectors'
@@ -73,7 +73,8 @@ export const WORKQUEUE_TABS = {
   application: 'application',
   certificate: 'certificate',
   settings: 'settings',
-  logout: 'logout'
+  logout: 'logout',
+  declarationForms: 'form'
 }
 
 const GROUP_ID = {
@@ -166,6 +167,7 @@ interface IProps {
 interface IDispatchProps {
   goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToCertificateConfigAction: typeof goToCertificateConfig
+  goToFormConfigAction: typeof goToFormConfigHome
   goToApplicationConfigAction: typeof goToApplicationConfig
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
@@ -186,7 +188,8 @@ interface IStateProps {
 type IFullProps = IProps &
   IStateProps &
   IDispatchProps &
-  IntlShapeProps & { theme: ITheme } & RouteComponentProps<{ tabId: string }>
+  IntlShapeProps &
+  RouteComponentProps<{ tabId: string }>
 
 const getSettingsAndLogout = (props: IFullProps) => {
   const {
@@ -230,12 +233,12 @@ export const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     activeMenuItem,
     goToCertificateConfigAction,
+    goToFormConfigAction,
     goToApplicationConfigAction,
     navigationWidth,
     workqueue,
     storedDeclarations,
     draftDeclarations,
-    theme,
     menuCollapse,
     userInfo,
     offlineCountryConfiguration
@@ -247,7 +250,11 @@ export const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-  const configTab = [WORKQUEUE_TABS.application, WORKQUEUE_TABS.certificate]
+  const configTab = [
+    WORKQUEUE_TABS.application,
+    WORKQUEUE_TABS.certificate,
+    WORKQUEUE_TABS.declarationForms
+  ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -593,6 +600,19 @@ export const NavigationView = (props: IFullProps) => {
                               activeMenuItem === WORKQUEUE_TABS.certificate
                             }
                           />
+                          <NavigationSubItem
+                            id={`navigation_${WORKQUEUE_TABS.declarationForms}`}
+                            label={intl.formatMessage(
+                              navigationMessages[
+                                WORKQUEUE_TABS.declarationForms
+                              ]
+                            )}
+                            onClick={goToFormConfigAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.declarationForms
+                            }
+                          />
                         </>
                       )}
                     </>
@@ -638,6 +658,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.settings
       : window.location.href.includes(WORKQUEUE_TABS.certificate)
       ? WORKQUEUE_TABS.certificate
+      : window.location.href.includes(WORKQUEUE_TABS.declarationForms)
+      ? WORKQUEUE_TABS.declarationForms
       : ''
   }
 }
@@ -650,9 +672,10 @@ export const Navigation = connect<
 >(mapStateToProps, {
   goToRegistrarHomeTab,
   goToCertificateConfigAction: goToCertificateConfig,
+  goToFormConfigAction: goToFormConfigHome,
   goToApplicationConfigAction: goToApplicationConfig,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
   goToSettings
-})(injectIntl(withTheme(withRouter(NavigationView))))
+})(injectIntl(withRouter(NavigationView)))

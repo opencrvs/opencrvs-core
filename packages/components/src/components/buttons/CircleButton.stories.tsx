@@ -11,40 +11,43 @@
  */
 import React from 'react'
 import { Story, Meta } from '@storybook/react'
-import { CircleButton, IButtonProps } from '.'
+import { CircleButton } from './CircleButton'
+import { ArrowUp } from '../icons'
 
-interface IProps extends IButtonProps {
+interface IProps {
   dark?: boolean
+  size?: 'small' | 'medium' | 'large'
 }
 
-const Template: Story<IProps> = (args) => <CircleButton {...args} />
+const Template: Story<IProps> = ({ size }) => (
+  <CircleButton size={size}>
+    <ArrowUp />
+  </CircleButton>
+)
 
 export default {
   title: 'Components/Buttons/CircleButton',
   component: CircleButton,
   argTypes: {
-    icon: {
+    size: {
       control: {
         type: 'select',
-        options: []
-      }
-    },
-    align: {
-      control: {
-        type: 'select',
-        options: ['LEFT', 'RIGHT']
+        options: ['small', 'medium', 'large']
       }
     }
   }
 } as Meta
 
-export const CircleButtonView = Template.bind({})
-CircleButtonView.args = {
-  dark: true,
-  onClick: () => alert('Circle button clicked'),
-  children: (
-    <span style={{ color: '#111', fontSize: '40px', lineHeight: '30px' }}>
-      +
-    </span>
-  )
+export const Large = Template.bind({})
+
+export const Medium = Template.bind({})
+
+Medium.args = {
+  size: 'medium'
+}
+
+export const Small = Template.bind({})
+
+Small.args = {
+  size: 'small'
 }

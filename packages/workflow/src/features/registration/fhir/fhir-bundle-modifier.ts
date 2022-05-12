@@ -40,6 +40,7 @@ import { logger } from '@workflow/logger'
 import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils'
 import { RESOURCE_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
+import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
@@ -81,6 +82,9 @@ export async function modifyRegistrationBundle(
     await setupLastRegLocation(taskResource, practitioner)
   }
 
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
   /* setting author and time on notes here */
   setupAuthorOnNotes(taskResource, practitioner)
 
@@ -105,6 +109,9 @@ export async function markBundleAsValidated(
 
   setupLastRegUser(taskResource, practitioner)
 
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
   return bundle
 }
 
@@ -125,6 +132,9 @@ export async function markBundleAsRequestedForCorrection(
   await setupLastRegLocation(taskResource, practitioner)
 
   setupLastRegUser(taskResource, practitioner)
+
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
 }
@@ -168,6 +178,9 @@ export async function markBundleAsWaitingValidation(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
   return bundle
 }
 
@@ -191,6 +204,9 @@ export async function markBundleAsDeclarationUpdated(
 
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
+
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
 }
@@ -247,6 +263,9 @@ export async function markBundleAsCertified(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
   return bundle
 }
 
@@ -263,6 +282,9 @@ export async function touchBundle(
 
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
+
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
 }
@@ -463,6 +485,28 @@ export function setupLastRegUser(
     taskResource.extension.push({
       url: `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
       valueReference: { reference: getPractitionerRef(practitioner) }
+    })
+  }
+  taskResource.lastModified =
+    taskResource.lastModified || new Date().toISOString()
+  return taskResource
+}
+
+export function setupTestExtension(taskResource: fhir.Task): fhir.Task {
+  if (!taskResource.extension) {
+    taskResource.extension = []
+  }
+  const testExtension = taskResource.extension.find((extension) => {
+    return (
+      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/configuration`
+    )
+  })
+  if (testExtension && testExtension.valueReference) {
+    testExtension.valueReference.reference = 'IN_CONFIGURATION'
+  } else {
+    taskResource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/configuration`,
+      valueReference: { reference: 'IN_CONFIGURATION' }
     })
   }
   taskResource.lastModified =

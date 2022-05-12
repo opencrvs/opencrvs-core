@@ -10,10 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { StyledComponentBase } from 'styled-components'
+import styled from 'styled-components'
 import { Button, IButtonProps } from './Button'
 
-export const SecondaryButton = styled(Button)`
+export const SecondaryButton = ({
+  size = 'medium',
+  ...props
+}: IButtonProps) => {
+  return <StyledButton {...props} size={size} />
+}
+
+const StyledButton = styled(Button)`
   padding: 0 8px;
   color: ${({ theme }) => theme.colors.primary};
   transition: background 0.4s ease;
@@ -21,7 +28,6 @@ export const SecondaryButton = styled(Button)`
   background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `2px solid ${theme.colors.secondary}`};
   ${({ theme }) => theme.fonts.bold16};
-  height: 40px;
 
   & div {
     padding-top: 2px;
