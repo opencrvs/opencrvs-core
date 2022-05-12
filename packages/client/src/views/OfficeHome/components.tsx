@@ -22,7 +22,11 @@ import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 
 const Flex = styled.div`
   display: flex;
+  align-items: center;
   gap: 16px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    align-items: flex-start;
+  }
 `
 
 const Name = styled.div`
@@ -32,6 +36,9 @@ const Name = styled.div`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-bottom: 4px;
+  }
 `
 
 const Error = styled.span`
@@ -51,6 +58,8 @@ const NameEventContainer = styled.div`
 
 const Icon = styled.div`
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
   width: 24px;
 `
 interface IIconWith {

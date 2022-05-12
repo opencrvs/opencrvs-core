@@ -49,7 +49,7 @@ export const RowWrapper = styled.div<{
   clickable?: boolean
 }>`
   width: 100%;
-  padding: 0 18px;
+  padding: 0 16px;
   display: flex;
   align-items: center;
   cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
@@ -76,7 +76,7 @@ export const Error = styled.span`
 `
 
 export const IconWrapper = styled(ContentWrapper)`
-  padding-top: 5px;
+  padding-top: 8px;
 `
 
 export const GridTableRowDesktop = (props: IGridTableRow) => {
