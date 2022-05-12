@@ -41,7 +41,7 @@ export const formConfig: IFormConfig = {
   formDrafts,
   questionConfig: [
     {
-      fieldId: 'birth.child.child-view-group.vaccinations',
+      fieldId: 'birth.child.child-view-group.vaccination',
       label: [
         {
           lang: 'en',
@@ -101,7 +101,7 @@ export const formConfig: IFormConfig = {
       custom: true
     },
     {
-      fieldId: 'birth.child.child-view-group.vaccinations',
+      fieldId: 'birth.child.child-view-group.vaccination',
       label: [
         {
           lang: 'en',

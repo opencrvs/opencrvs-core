@@ -84,7 +84,7 @@ describe('Introduction page settings update test', () => {
     await flushPromises()
     expect(
       testComponent.find('#Introduction-page_value').hostNodes().first().text()
-    ).toBe('Enabled')
+    ).toBe('Disabled')
   })
 
   it('should show success notification if appliction name change', async () => {
@@ -107,7 +107,7 @@ describe('Introduction page settings update test', () => {
     await flushPromises()
     expect(
       testComponent.find('#form-settings-notification').hostNodes().text()
-    ).toBe('Introduction page has been Enabled')
+    ).toBe('Introduction page has been Disabled')
   })
 })
 
