@@ -147,7 +147,6 @@ interface IConstantsMessages
   viewAll: MessageDescriptor
   notAvailable: MessageDescriptor
   history: MessageDescriptor
-  noResult: MessageDescriptor
   requireUpdatesLoading: MessageDescriptor
   noRecords: MessageDescriptor
   noConnection: MessageDescriptor
@@ -498,15 +497,10 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.noNameProvided'
   },
   noResults: {
-    defaultMessage: 'No result to display',
+    defaultMessage: 'No result',
     description:
       'Text to display if the search return no results for the current filters',
     id: 'constants.noResults'
-  },
-  noResult: {
-    defaultMessage: 'No result',
-    description: 'Text to display if the search return no results',
-    id: 'constants.noResult'
   },
   over5Years: {
     defaultMessage: 'Over 5 years',
