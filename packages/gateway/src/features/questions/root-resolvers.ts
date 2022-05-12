@@ -15,7 +15,7 @@ import { hasScope } from '@gateway/features/user/utils'
 import {
   GQLQuestionInput,
   GQLResolver,
-  GQLMesssageDescriptorInput
+  GQLMesssageInput
 } from '@gateway/graphql/schema'
 
 export const resolvers: GQLResolver = {
@@ -72,14 +72,17 @@ function createOrUpdateQuestionPayload(
   const questionPayload: IQuestionPayload = {
     id: question.id as string,
     fieldId: question.fieldId as string,
-    label: question.label as GQLMesssageDescriptorInput,
-    placeholder: question.placeholder as GQLMesssageDescriptorInput,
+    label: question.label as GQLMesssageInput[],
+    placeholder: question.placeholder as GQLMesssageInput[],
+    description: question.description as GQLMesssageInput[],
+    tooltip: question.tooltip as GQLMesssageInput[],
+    errorMessage: question.errorMessage as GQLMesssageInput[],
     maxLength: question.maxLength as number,
     fieldName: question.fieldName as string,
     fieldType: question.fieldType as FieldType,
     preceedingFieldId: question.preceedingFieldId as string,
     required: question.required as boolean,
-    enabled: question.enabled as boolean,
+    enabled: question.enabled as string,
     custom: question.custom as boolean,
     initialValue: question.initialValue as string
   }
@@ -99,16 +102,19 @@ enum FieldType {
 }
 
 interface IQuestionPayload {
-  id: string
+  id?: string
   fieldId: string
-  label?: GQLMesssageDescriptorInput
-  placeholder?: GQLMesssageDescriptorInput
+  label?: GQLMesssageInput[]
+  placeholder?: GQLMesssageInput[]
+  description?: GQLMesssageInput[]
+  tooltip?: GQLMesssageInput[]
+  errorMessage?: GQLMesssageInput[]
   maxLength?: number
   fieldName?: string
   fieldType?: FieldType
   preceedingFieldId?: string
   required?: boolean
-  enabled: boolean
+  enabled: string
   custom?: boolean
   initialValue?: string
 }

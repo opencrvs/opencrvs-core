@@ -21,19 +21,23 @@ export enum FieldType {
 }
 
 export const validFieldType = Object.values(FieldType)
-
-export interface IMessageDescriptor {
-  id: string
-  description: string
-  defaultMessage: string
+export interface IMessage {
+  lang: string
+  descriptor: {
+    id: string
+    description: string
+    defaultMessage: string
+  }
 }
-
 export interface IQuestion {
   // fieldId is in the format:
   // event.sectionId.groupId.fieldName
   fieldId: string
-  label?: IMessageDescriptor
-  placeholder?: IMessageDescriptor
+  label?: IMessage[]
+  placeholder?: IMessage[]
+  description?: IMessage[]
+  tooltip?: IMessage[]
+  errorMessage?: IMessage[]
   maxLength?: number
   fieldName?: string
   fieldType?: FieldType
@@ -49,16 +53,50 @@ export interface IQuestion {
 
 export interface IQuestionModel extends IQuestion, Document {}
 
-export const messageDescriptor = new Schema({
-  id: { type: String, required: true },
-  description: { type: String },
-  defaultMessage: { type: String }
-})
+export const messageDescriptor = new Schema(
+  {
+    id: { type: String, required: true },
+    description: { type: String },
+    defaultMessage: { type: String }
+  },
+  { _id: false }
+)
+
+export const message = new Schema(
+  {
+    lang: { type: String },
+    descriptor: { type: messageDescriptor }
+  },
+  { _id: false }
+)
 
 const questionSchema = new Schema({
   fieldId: { type: String, unique: true, required: true },
-  label: { type: messageDescriptor },
-  placeholder: { type: messageDescriptor },
+  label: [
+    {
+      type: message
+    }
+  ],
+  placeholder: [
+    {
+      type: message
+    }
+  ],
+  description: [
+    {
+      type: message
+    }
+  ],
+  tooltip: [
+    {
+      type: message
+    }
+  ],
+  errorMessage: [
+    {
+      type: message
+    }
+  ],
   maxLength: { type: Number, default: 280 },
   fieldName: { type: String },
   fieldType: {

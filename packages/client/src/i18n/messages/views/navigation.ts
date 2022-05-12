@@ -27,6 +27,7 @@ interface INavigationMessages
   config: MessageDescriptor
   certificate: MessageDescriptor
   completenessRates: MessageDescriptor
+  form: MessageDescriptor
 }
 
 const messagesToDefine: INavigationMessages = {
@@ -99,6 +100,11 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Completeness rates',
     description: 'Completeness rates in navigation',
     id: 'navigation.completenessRates'
+  },
+  form: {
+    defaultMessage: 'Declaration forms',
+    description: 'Declaration forms label in navigation',
+    id: 'navigation.declarationForms'
   }
 }
 

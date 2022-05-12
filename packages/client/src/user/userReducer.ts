@@ -271,8 +271,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 ): IUserFormState | Loop<IUserFormState, UserFormAction> => {
   switch (action.type) {
     case offlineActions.READY:
-    case offlineActions.CONTENT_LOADED:
-      const form = deserializeForm(createUserForm as ISerializedForm)
+      const form = deserializeForm(createUserForm)
 
       return {
         ...state,
