@@ -652,7 +652,7 @@ class FormSectionComponent extends React.Component<Props> {
       prevProps.onChange(this.props.values)
     }
 
-    if (sectionChanged) {
+    if (sectionChanged || fieldChanged) {
       prevProps.resetForm()
       if (this.props.setAllFieldsDirty) {
         this.showValidationErrors(this.props.fields)
@@ -827,6 +827,7 @@ class FormSectionComponent extends React.Component<Props> {
               touched[`${field.name}-mm`] &&
               touched[`${field.name}-yyyy`]
           }
+
           const withDynamicallyGeneratedFields =
             field.type === SELECT_WITH_DYNAMIC_OPTIONS
               ? ({
