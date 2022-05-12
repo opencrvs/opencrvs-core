@@ -79,7 +79,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
       undefined &&
     declaration.data[section.id]?.supportDocumentRequiredForCorrection !== ''
 
-  group.fields = [
+  const fields = [
     group.fields[0],
     {
       ...group.fields[1],
@@ -149,7 +149,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
               modifyDeclaration(values, section, declaration)
             }}
             setAllFieldsDirty={false}
-            fields={group.fields}
+            fields={fields}
             draftData={declaration.data}
             onUploadingStateChanged={onUploadingStateChanged}
           />
