@@ -38,7 +38,7 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { IAvatar, IUserDetails } from '@client/utils/userUtils'
+import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   AddUser,
@@ -47,20 +47,10 @@ import {
 } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import {
-  ColumnContentAlignment,
-  ListTable,
   ToggleMenu,
   FloatingNotification,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
-import {
-  ListView,
-  IListRowProps
-} from '@opencrvs/components/lib/interface/ViewData'
-import {
-  IColumn,
-  IDynamicValues
-} from '@opencrvs/components/lib/interface/GridTable/types'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
@@ -82,9 +72,13 @@ import {
   MobileWrapper,
   DesktopWrapper
 } from '@opencrvs/components/lib/styleForPagination'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
-const { useState, useEffect } = React
+const { useState } = React
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -165,14 +159,6 @@ const HeaderContainer = styled.div`
   }
 `
 
-const PhotoNameRoleContainer = styled.div`
-  display: flex;
-`
-
-const MarginPhotoRight = styled.span`
-  margin-right: 16px;
-`
-
 const LocationInfo = styled.div`
   padding: 8px 0px;
 `
@@ -198,52 +184,28 @@ const ChangeButton = styled(LinkButton)`
   }
 `
 
-const NameRoleTypeContainer = styled.div`
-  margin-right: auto;
-  display: flex;
-  flex-direction: column;
-`
-
-const StatusMenu = styled.div`
+const StatusMenuContainer = styled.div`
   display: flex;
   align-items: center;
 `
 
-const Name = styled(LinkButton)`
-  align-self: flex-start;
+const Value = styled.span`
+  color: ${({ theme }) => theme.colors.grey500};
+  ${({ theme }) => theme.fonts.reg16}
+`
+
+const ListViewContainer = styled.div`
+  margin-top: 24px;
+`
+
+const NoRecord = styled.div<{ isFullPage?: boolean }>`
+  ${({ theme }) => theme.fonts.h3};
   text-align: left;
+  margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
+  color: ${({ theme }) => theme.colors.copy};
+  margin-top: 20px;
 `
 
-const RoleType = styled.div`
-  ${({ theme }) => theme.fonts.reg14}
-  color: ${({ theme }) => theme.colors.waitingForExternalValidation};
-  text-align: left;
-`
-
-const ValueWrapper = styled.div`
-  display: flex;
-  align-items: flex-start;
-  align-content: space-between;
-  width: 60%;
-  margin-left: 300px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: block;
-    width: 100%;
-    margin-left: 45px;
-  }
-`
-const HideMobileStatusWrapper = styled.div`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none;
-  }
-`
-
-const HideDesktopStatusWrapper = styled.div`
-  display: none;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: inline;
-  }
-`
 interface ISearchParams {
   locationId: string
 }
@@ -310,16 +272,6 @@ function UserListComponent(props: IProps) {
       selectedUser: null
     })
 
-  const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth)
-  useEffect(() => {
-    function recordWindowWidth() {
-      setViewportWidth(window.innerWidth)
-    }
-
-    window.addEventListener('resize', recordWindowWidth)
-
-    return () => window.removeEventListener('resize', recordWindowWidth)
-  }, [])
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const searchedLocation: ILocation | undefined = offlineOffices.find(
@@ -394,86 +346,6 @@ function UserListComponent(props: IProps) {
     return menuItems
   }
 
-  function getRoleType(role: string, type: string) {
-    return (
-      <>
-        {role} &middot; {type}
-      </>
-    )
-  }
-
-  function getNameRoleType(
-    id: string,
-    name: string,
-    role: string,
-    type: string
-  ) {
-    return (
-      <NameRoleTypeContainer>
-        <Name
-          id={`name-role-type-link-${id}`}
-          onClick={() => goToUserProfile(id)}
-        >
-          {name}
-        </Name>
-        <RoleType>{getRoleType(role, type)}</RoleType>
-      </NameRoleTypeContainer>
-    )
-  }
-
-  function getPhotoNameRoleType(
-    id: string,
-    name: string,
-    role: string,
-    type: string,
-    avatar: IAvatar | undefined
-  ) {
-    return (
-      <PhotoNameRoleContainer>
-        <AvatarSmall name={name} avatar={avatar} />
-        <MarginPhotoRight />
-        <NameRoleTypeContainer>
-          <Name
-            id={`name-role-type-link-${id}`}
-            onClick={() => goToUserProfile(id)}
-          >
-            {name}
-          </Name>
-          <RoleType>{getRoleType(role, type)}</RoleType>
-        </NameRoleTypeContainer>
-      </PhotoNameRoleContainer>
-    )
-  }
-
-  function getPhotoNameType(
-    id: string,
-    name: string,
-    avatar: IAvatar | undefined
-  ) {
-    return (
-      <>
-        <AvatarSmall name={name} avatar={avatar} />
-        <MarginPhotoRight />
-        <LinkButton
-          isBoldLink={true}
-          id={`name-link-${id}`}
-          onClick={() => goToUserProfile(id || '')}
-        >
-          {name}
-        </LinkButton>
-      </>
-    )
-  }
-
-  function renderStatus(status?: string, underInvestigation?: boolean) {
-    return (
-      <>
-        {underInvestigation && <SearchRed />}
-        <Status status={status || 'pending'} />
-      </>
-    )
-  }
-
   function getViewOnly(
     locationId: string,
     userDetails: IUserDetails | null,
@@ -499,24 +371,32 @@ function UserListComponent(props: IProps) {
     }
   }
 
-  function getStatusMenuType(
-    userDetails: IUserDetails | null,
-    locationId: string,
-    user: GQLUser,
-    index: number,
-    status?: string,
+  function StatusMenu({
+    userDetails,
+    locationId,
+    user,
+    index,
+    status,
+    underInvestigation
+  }: {
+    userDetails: IUserDetails | null
+    locationId: string
+    user: GQLUser
+    index: number
+    status?: string
     underInvestigation?: boolean
-  ) {
+  }) {
     const canEditUserDetails =
       userDetails?.role === 'NATIONAL_SYSTEM_ADMIN' ||
       (userDetails?.role === 'LOCAL_SYSTEM_ADMIN' &&
         userDetails?.primaryOffice?.id === locationId)
         ? true
         : false
-    const statusDetails = renderStatus(status, underInvestigation)
     return (
-      <StatusMenu>
-        <HideMobileStatusWrapper>{statusDetails}</HideMobileStatusWrapper>
+      // TODO use Pill Component from #2780
+      <StatusMenuContainer>
+        {underInvestigation && <SearchRed />}
+        <Status status={status || 'pending'} />
         {canEditUserDetails && (
           <ToggleMenu
             id={`user-item-${index}-menu`}
@@ -524,7 +404,7 @@ function UserListComponent(props: IProps) {
             menuItems={getMenuItems(user)}
           />
         )}
-      </StatusMenu>
+      </StatusMenuContainer>
     )
   }
 
@@ -552,25 +432,31 @@ function UserListComponent(props: IProps) {
             ''
           const role =
             (user.role && intl.formatMessage(userMessages[user.role])) || '-'
-          const type =
-            (user.type && intl.formatMessage(userMessages[user.type])) || '-'
 
           const avatar = user.avatar
 
           return {
-            label: 'user details',
-            value: <ValueWrapper>{role}</ValueWrapper>,
-            actionsMenu: getStatusMenuType(
-              userDetails,
-              locationId,
-              user,
-              index,
-              user.status,
-              user.underInvestigation
+            image: <AvatarSmall name={name} avatar={avatar} />,
+            label: (
+              <LinkButton
+                isBoldLink={true}
+                id={`name-link-${user.id}`}
+                onClick={() => goToUserProfile(user.id || '')}
+              >
+                {name}
+              </LinkButton>
             ),
-
-            nameWithAvatar: getPhotoNameType(user.id || '', name, avatar),
-            status: renderStatus(user.status, user.underInvestigation)
+            value: <Value>{role}</Value>,
+            actions: (
+              <StatusMenu
+                userDetails={userDetails}
+                locationId={locationId}
+                user={user}
+                index={index}
+                status={user.status}
+                underInvestigation={user.underInvestigation}
+              />
+            )
           }
         }
         return {
@@ -599,80 +485,13 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  function renderUserList(
-    locationId: string,
+  function RenderUserList({
+    locationId,
+    userDetails
+  }: {
+    locationId: string
     userDetails: IUserDetails | null
-  ) {
-    let columns: IColumn[] = []
-    if (viewportWidth <= props.theme.grid.breakpoints.md) {
-      columns = columns.concat([
-        {
-          label: intl.formatMessage(constantsMessages.name),
-          width: 65,
-          key: 'nameRoleType'
-        },
-        {
-          label: intl.formatMessage(constantsMessages.status),
-          width: 35,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: 'statusMenu'
-        }
-      ])
-    } else if (viewportWidth <= props.theme.grid.breakpoints.lg) {
-      columns = columns.concat([
-        {
-          label: intl.formatMessage(constantsMessages.name),
-          width: 70,
-          key: 'photoNameRoleType'
-        },
-        {
-          label: intl.formatMessage(constantsMessages.status),
-          width: 30,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: 'statusMenu'
-        }
-      ])
-    } else {
-      if (getViewOnly(locationId, userDetails, false)) {
-        columns = columns.concat([
-          {
-            label: intl.formatMessage(constantsMessages.name),
-            width: 35,
-            key: 'photoNameType'
-          },
-          {
-            label: intl.formatMessage(constantsMessages.labelRole),
-            width: 45,
-            key: 'roleType'
-          },
-          {
-            label: intl.formatMessage(constantsMessages.status),
-            width: 20,
-            alignment: ColumnContentAlignment.RIGHT,
-            key: 'statusMenu'
-          }
-        ])
-      } else {
-        columns = columns.concat([
-          {
-            label: intl.formatMessage(constantsMessages.name),
-            width: 35,
-            key: 'photoNameType'
-          },
-          {
-            label: intl.formatMessage(constantsMessages.labelRole),
-            width: 40,
-            key: 'roleType'
-          },
-          {
-            label: intl.formatMessage(constantsMessages.status),
-            width: 25,
-            alignment: ColumnContentAlignment.RIGHT,
-            key: 'statusMenu'
-          }
-        ])
-      }
-    }
+  }) {
     return (
       <Query
         query={SEARCH_USERS}
@@ -693,6 +512,11 @@ function UserListComponent(props: IProps) {
           }
           const totalData =
             (data && data.searchUsers && data.searchUsers.totalItems) || 0
+          const userContent = generateUserContents(
+            data,
+            locationId,
+            userDetails
+          )
           return (
             <UserTable id="user_list">
               <TableHeader>
@@ -705,17 +529,27 @@ function UserListComponent(props: IProps) {
                   </AddUserContainer>
                 )}
               </TableHeader>
-              <ListView
-                key="userList"
-                items={
-                  generateUserContents(
-                    data,
-                    locationId,
-                    userDetails
-                  ) as IListRowProps[]
-                }
-                noResultText="No result"
-              />
+              <ListViewContainer>
+                <ListViewSimplified>
+                  {userContent.length <= 0 ? (
+                    <NoRecord id="no-record">
+                      {intl.formatMessage(constantsMessages.noResults)}
+                    </NoRecord>
+                  ) : (
+                    userContent.map((content, index) => {
+                      return (
+                        <ListViewItemSimplified
+                          key={index}
+                          image={content.image}
+                          label={content.label}
+                          value={content.value}
+                          actions={content.actions}
+                        />
+                      )
+                    })
+                  )}
+                </ListViewSimplified>
+              </ListViewContainer>
               {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
                 <PaginationWrapper>
                   <DesktopWrapper>
@@ -794,7 +628,7 @@ function UserListComponent(props: IProps) {
           </LocationInfoEmptyValue>
         )}
       </LocationInfo>
-      {renderUserList(locationId, userDetails)}
+      <RenderUserList locationId={locationId} userDetails={userDetails} />
       {showResendSMSSuccess && (
         <FloatingNotification
           id="resend_invite_success"

@@ -160,14 +160,17 @@ export function ListViewItemSimplified({
 export function ListViewSimplified({
   className,
   bottomBorder = false,
-  children
+  children,
+  id,
+  ...rest
 }: {
   bottomBorder?: boolean
   className?: string
   children: React.ReactNode
+  id?: string
 }) {
   return (
-    <Grid className={className} bottomBorder={bottomBorder}>
+    <Grid {...rest} id={id} bottomBorder={bottomBorder}>
       {children}
     </Grid>
   )
