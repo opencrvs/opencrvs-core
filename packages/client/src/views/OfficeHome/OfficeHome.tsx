@@ -23,7 +23,6 @@ import {
   goToEvents,
   goToPage,
   goToPrintCertificate,
-  goToRegistrarHomeTab,
   goToReviewDuplicate
 } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
@@ -118,7 +117,6 @@ const BodyContainer = styled.div`
 
 interface IDispatchProps {
   goToPage: typeof goToPage
-  goToRegistrarHomeTab: typeof goToRegistrarHomeTab
   goToReviewDuplicate: typeof goToReviewDuplicate
   goToPrintCertificate: typeof goToPrintCertificate
   goToEvents: typeof goToEvents
@@ -601,7 +599,6 @@ export const OfficeHome = connect<
 >(mapStateToProps, {
   goToEvents,
   goToPage,
-  goToRegistrarHomeTab,
   goToReviewDuplicate,
   goToPrintCertificate,
   updateRegistrarWorkqueue,

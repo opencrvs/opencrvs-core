@@ -44,6 +44,7 @@ import { messages } from '@client/i18n/messages/views/correction'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { groupHasError } from './utils'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 type IProps = {
   declaration: IDeclaration
@@ -178,7 +179,7 @@ function CorrectorFormComponent(props: IFullProps) {
         title={intl.formatMessage(section.title)}
         hideBackground
         goBack={props.goBack}
-        goHome={() => props.goToHomeTab('review')}
+        goHome={() => props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
       >
         <Content
           title={group.title && intl.formatMessage(group.title)}

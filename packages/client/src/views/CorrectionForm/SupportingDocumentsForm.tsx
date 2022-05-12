@@ -39,6 +39,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 type IProps = {
   declaration: IDeclaration
@@ -126,7 +127,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
         title={intl.formatMessage(section.title)}
         hideBackground
         goBack={props.goBack}
-        goHome={() => props.goToHomeTab('review')}
+        goHome={() => props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
       >
         <Content
           {...contentProps}

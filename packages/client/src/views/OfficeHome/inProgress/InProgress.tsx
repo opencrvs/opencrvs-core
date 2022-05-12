@@ -31,7 +31,7 @@ import {
 } from '@client/declarations'
 import {
   goToPage as goToPageAction,
-  goToRegistrarHomeTab as goToRegistrarHomeTabAction,
+  goToHomeTab,
   goToDeclarationRecordAudit
 } from '@client/navigation'
 import {
@@ -75,6 +75,7 @@ import {
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { constant } from 'lodash'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -84,7 +85,7 @@ interface IQueryData {
 interface IBaseRegistrarHomeProps {
   theme: ITheme
   goToPage: typeof goToPageAction
-  goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
+  goToHomeTab: typeof goToHomeTab
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   selectorId: string
   drafts: IDeclaration[]
@@ -114,12 +115,6 @@ interface IProps {
 
 type IRegistrarHomeProps = IntlShapeProps & IBaseRegistrarHomeProps & IProps
 
-export const TAB_ID = {
-  inProgress: 'progress',
-  readyForReview: 'review',
-  sentForUpdates: 'updates',
-  readyForPrint: 'print'
-}
 export const SELECTOR_ID = {
   ownDrafts: 'you',
   fieldAgentDrafts: 'field-agents',
@@ -488,7 +483,7 @@ export class InProgressComponent extends React.Component<
     const tabs = {
       activeTabId: selectorId || SELECTOR_ID.ownDrafts,
       onTabClick: (tabId: string) => {
-        this.props.goToRegistrarHomeTab(TAB_ID.inProgress, tabId)
+        this.props.goToHomeTab(WORKQUEUE_TABS.inProgress, tabId)
       },
       sections: [
         {
@@ -667,6 +662,6 @@ function mapStateToProps(state: IStoreState) {
 
 export const InProgress = connect(mapStateToProps, {
   goToPage: goToPageAction,
-  goToRegistrarHomeTab: goToRegistrarHomeTabAction,
+  goToHomeTab: goToHomeTab,
   goToDeclarationRecordAudit
 })(injectIntl(withTheme(InProgressComponent)))

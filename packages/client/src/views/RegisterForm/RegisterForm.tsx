@@ -414,7 +414,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onDeleteDeclaration = (declaration: IDeclaration) => {
-    this.props.goToHomeTab('progress')
+    this.props.goToHomeTab(WORKQUEUE_TABS.inProgress)
 
     setTimeout(
       () => this.props.deleteDeclaration(declaration),
@@ -485,7 +485,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       case 'DRAFT':
         return WORKQUEUE_TABS.inProgress
       case 'IN_PROGRESS':
-        return 'progress/field-agents'
+        return WORKQUEUE_TABS.inProgressFieldAgent
       case 'REJECTED':
         if (
           hasRegisterScope(this.props.scope) ||
