@@ -78,7 +78,7 @@ describe('Registrar home external validation tab tests', () => {
     Date.now = jest.fn(() => SECONDARY_TIME)
     const { store: testStore, history: testHistory } = await createTestStore()
     getItem.mockReturnValue(registerScopeToken)
-    testStore.dispatch(checkAuth({ '?token': registerScopeToken }))
+    testStore.dispatch(checkAuth())
 
     const testComponent = await createTestComponent(
       // @ts-ignore

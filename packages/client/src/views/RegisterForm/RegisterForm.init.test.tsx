@@ -47,7 +47,6 @@ describe('when user logs in', () => {
   }
 
   const currentUserDetails: IUserDetails = {
-    language: 'en',
     userMgntUserID: 'shakib75',
     localRegistrar: { name: [] }
   }
