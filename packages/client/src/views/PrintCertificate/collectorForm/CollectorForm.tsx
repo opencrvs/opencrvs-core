@@ -11,6 +11,8 @@
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { Content } from '@opencrvs/components/lib/interface/Content'
+
 import {
   ActionPageLight,
   ResponsiveModal
@@ -410,55 +412,54 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       <>
         <ActionPageLight
           id="collector_form"
+          hideBackground
           title={intl.formatMessage(formSection.title)}
           goBack={goBack}
         >
-          <FormSectionTitle>
-            {formGroup.fields.length === 1 &&
-              (formGroup.fields[0].hideHeader = true)}
-            <>
-              {(formGroup.title && intl.formatMessage(formGroup.title)) || ''}
-            </>
-          </FormSectionTitle>
-          {showError && (
-            <ErrorWrapper>
-              <ErrorText id="form_error" ignoreMediaQuery={true}>
-                {(formGroup.error && intl.formatMessage(formGroup.error)) || ''}
-              </ErrorText>
-            </ErrorWrapper>
-          )}
-          <FormFieldGenerator
-            id={formGroup.id}
-            onChange={(values) => {
-              if (values && values.affidavitFile) {
-                this.setState({
-                  showError: false
-                })
-              }
-              this.modifyDeclaration(values, declarationToBeCertified)
-            }}
-            setAllFieldsDirty={false}
-            fields={formGroup.fields}
-            draftData={declarationToBeCertified.data}
-            onUploadingStateChanged={this.onUploadingStateChanged}
-          />
-          <PrimaryButton
-            id="confirm_form"
-            onClick={() => {
-              this.continueButtonHandler(
-                declarationToBeCertified.id,
-                formGroup.id,
-                nextSectionGroup ? nextSectionGroup.groupId : undefined,
-                event,
-                formSection.id,
-                formGroup.fields,
-                declarationToBeCertified
-              )
-            }}
-            disabled={this.state.isFileUploading}
+          <Content
+            title={formGroup.title && intl.formatMessage(formGroup.title)}
           >
-            {intl.formatMessage(buttonMessages.continueButton)}
-          </PrimaryButton>
+            {showError && (
+              <ErrorWrapper>
+                <ErrorText id="form_error" ignoreMediaQuery={true}>
+                  {(formGroup.error && intl.formatMessage(formGroup.error)) ||
+                    ''}
+                </ErrorText>
+              </ErrorWrapper>
+            )}
+            <FormFieldGenerator
+              id={formGroup.id}
+              onChange={(values) => {
+                if (values && values.affidavitFile) {
+                  this.setState({
+                    showError: false
+                  })
+                }
+                this.modifyDeclaration(values, declarationToBeCertified)
+              }}
+              setAllFieldsDirty={false}
+              fields={formGroup.fields}
+              draftData={declarationToBeCertified.data}
+              onUploadingStateChanged={this.onUploadingStateChanged}
+            />
+            <PrimaryButton
+              id="confirm_form"
+              onClick={() => {
+                this.continueButtonHandler(
+                  declarationToBeCertified.id,
+                  formGroup.id,
+                  nextSectionGroup ? nextSectionGroup.groupId : undefined,
+                  event,
+                  formSection.id,
+                  formGroup.fields,
+                  declarationToBeCertified
+                )
+              }}
+              disabled={this.state.isFileUploading}
+            >
+              {intl.formatMessage(buttonMessages.continueButton)}
+            </PrimaryButton>
+          </Content>
         </ActionPageLight>
         {showModalForNoSignedAffidavit && (
           <ResponsiveModal

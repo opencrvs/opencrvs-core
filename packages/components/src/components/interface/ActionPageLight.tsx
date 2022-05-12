@@ -35,7 +35,7 @@ const Container = styled.div<{ hideBackground: boolean | undefined }>`
   ${({ theme, hideBackground }) => (hideBackground ? '' : theme.shadows.light)};
   color: ${({ theme }) => theme.colors.copy};
   padding: 24px 32px 32px;
-  margin: 32px auto 0;
+  margin: 0 auto 0;
   max-width: 940px;
   background: ${({ theme, hideBackground }) =>
     hideBackground ? '' : theme.colors.white};
