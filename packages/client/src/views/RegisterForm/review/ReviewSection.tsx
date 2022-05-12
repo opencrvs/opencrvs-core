@@ -150,7 +150,7 @@ const Row = styled.div`
     flex-direction: column;
   }
 `
-const Column = styled.div`
+const RightColumn = styled.div`
   width: 40%;
   margin: 0px 15px;
 
@@ -162,14 +162,24 @@ const Column = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 0px;
-    width: 100%;
+    display: none;
   }
 `
 
-const StyledColumn = styled(Column)`
+const LeftColumn = styled.div`
   ${({ theme }) => theme.shadows.light};
   width: 60%;
+
+  &:first-child {
+    margin-left: 0px;
+  }
+  &:last-child {
+    margin-right: 0px;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    width: 100%;
+  }
 `
 
 const ZeroDocument = styled.div`
@@ -1084,9 +1094,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) {
-    // const {
-    //   draft: { data, originalData }
-    // } = this.props
     if (!originalData) return false
     if (data[field.name] && (data[field.name] as IFormData).value) {
       return this.hasNestedDataChanged(
@@ -1498,7 +1505,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return (
       <FullBodyContent>
         <Row>
-          <StyledColumn>
+          <LeftColumn>
             <ReviewHeader
               id="review_header"
               logoSource={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
@@ -1603,8 +1610,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </FooterArea>
               )}
             </FormData>
-          </StyledColumn>
-          <Column>
+          </LeftColumn>
+          <RightColumn>
             <ResponsiveDocumentViewer
               isRegisterScope={this.userHasRegisterScope()}
             >
@@ -1635,7 +1642,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </ZeroDocument>
               </DocumentViewer>
             </ResponsiveDocumentViewer>
-          </Column>
+          </RightColumn>
         </Row>
         <ResponsiveModal
           title={intl.formatMessage(messages.editDeclarationConfirmationTitle)}
