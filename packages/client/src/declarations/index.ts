@@ -971,10 +971,10 @@ export async function writeDeclarationByUser(
 function mergeWorkQueueData(
   state: IStoreState,
   workQueueIds: (keyof IQueryData)[],
-  currentApplicatons: IDeclaration[] | undefined,
+  currentApplications: IDeclaration[] | undefined,
   destinationWorkQueue: IWorkqueue
 ) {
-  if (!currentApplicatons) {
+  if (!currentApplications) {
     return destinationWorkQueue
   }
   workQueueIds.forEach((workQueueId) => {
@@ -987,16 +987,23 @@ function mergeWorkQueueData(
       if (declaration == null) {
         return
       }
-      const declarationIndex = currentApplicatons.findIndex(
+      const declarationIndex = currentApplications.findIndex(
         (app) => app && app.id === declaration.id
       )
+
       if (declarationIndex >= 0) {
-        updateWorkqueueData(
-          state,
-          currentApplicatons[declarationIndex],
-          workQueueId,
-          destinationWorkQueue
-        )
+        const isDownloadFailed =
+          currentApplications[declarationIndex].downloadStatus ===
+          SUBMISSION_STATUS.FAILED_NETWORK
+
+        if (!isDownloadFailed) {
+          updateWorkqueueData(
+            state,
+            currentApplications[declarationIndex],
+            workQueueId,
+            destinationWorkQueue
+          )
+        }
       }
     })
   })
