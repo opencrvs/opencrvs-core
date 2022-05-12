@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as queryString from 'querystring'
+import { storage } from '@client/storage'
 
 export function getAvailableLanguages() {
   return window.config.LANGUAGES.split(',')
@@ -19,7 +20,22 @@ export function getDefaultLanguage() {
   return getAvailableLanguages()[0]
 }
 
-export function getSelectedLanguage() {
-  return queryString.parse(window.location.search.replace(/^\?/, ''))
-    .language as string
+export async function getPreferredLanguage() {
+  const languageInUrl = queryString.parse(
+    window.location.search.replace(/^\?/, '')
+  ).language as string | undefined
+
+  const alreadyStoredLanguage = await storage.getItem('language')
+
+  if (languageInUrl) {
+    return languageInUrl
+  } else if (alreadyStoredLanguage) {
+    return alreadyStoredLanguage
+  } else {
+    return getDefaultLanguage()
+  }
+}
+
+export function storeLanguage(language: string) {
+  storage.setItem('language', language)
 }

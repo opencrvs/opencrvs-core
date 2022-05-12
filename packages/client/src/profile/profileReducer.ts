@@ -35,7 +35,6 @@ import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { serviceApi } from '@client/profile/serviceApi'
 import { Action } from 'redux'
-import { getSelectedLanguage } from '@client/i18n/utils'
 
 export type ProfileState = {
   authenticated: boolean
@@ -86,6 +85,12 @@ export const profileReducer: LoopReducer<
       )
     case actions.CHECK_AUTH:
       const token = getToken()
+
+      // Remove token and language from url if these exists
+      if (window.location.search.includes('token=')) {
+        window.history.replaceState(null, '', window.location.pathname)
+      }
+
       const payload = getTokenPayload(token)
 
       if (!payload) {
@@ -117,18 +122,8 @@ export const profileReducer: LoopReducer<
       const result: ApolloQueryResult<GQLQuery> = action.payload
       const data: GQLQuery = result && result.data
 
-      const language = getSelectedLanguage()
-      // Remove token and language from url if these exists
-      if (window.location.search.includes('token=')) {
-        window.history.replaceState(null, '', window.location.pathname)
-      }
-
       if (data && data.getUser) {
         const userDetails = getUserDetails(data.getUser)
-
-        if (language) {
-          userDetails.language = language
-        }
 
         return loop(
           {
@@ -158,16 +153,6 @@ export const profileReducer: LoopReducer<
           args: [details]
         })
       ]
-      if (state.userDetails?.language !== details.language) {
-        commandList.push(
-          Cmd.action(
-            changeLanguageActions.changeLanguage({
-              language: details.language
-            })
-          )
-        )
-      }
-
       if (details) {
         return loop(
           {

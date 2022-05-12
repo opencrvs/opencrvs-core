@@ -283,7 +283,6 @@ describe('archiveDeclaration tests', () => {
     }
 
     const currentUserDetails: IUserDetails = {
-      language: 'en',
       userMgntUserID: '123',
       localRegistrar: { name: [] }
     }

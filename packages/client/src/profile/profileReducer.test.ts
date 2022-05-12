@@ -75,22 +75,7 @@ describe('profileReducer tests', () => {
       store.dispatch(action)
     })
 
-    it('modifies the app language', async () => {
-      const spy = jest.spyOn(changeLanguageActions, 'changeLanguage')
-      const action = {
-        type: actions.MODIFY_USER_DETAILS,
-        payload: {
-          ...userDetails,
-          language: 'bn'
-        }
-      }
-      await store.dispatch(action)
-      expect(spy).toHaveBeenCalledWith({ language: 'bn' })
-      expect(store.getState().i18n.language).toEqual('bn')
-    })
-
     it('modifies the user details', () => {
-      const spy = jest.spyOn(changeLanguageActions, 'changeLanguage')
       const action = {
         type: actions.MODIFY_USER_DETAILS,
         payload: {
@@ -99,7 +84,6 @@ describe('profileReducer tests', () => {
         }
       }
       store.dispatch(action)
-      expect(spy).not.toHaveBeenCalled()
       expect(store.getState().profile.userDetails?.mobile).toBe('2121')
     })
   })
