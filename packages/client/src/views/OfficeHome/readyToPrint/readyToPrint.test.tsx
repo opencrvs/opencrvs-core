@@ -234,7 +234,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
   beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
   })
 
   it('renders all items returned from graphql query in ready for print', async () => {
@@ -740,7 +740,7 @@ describe('Tablet tests', () => {
 
   beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
     resizeWindow(800, 1280)
   })
 
