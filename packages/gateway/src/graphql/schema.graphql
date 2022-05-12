@@ -25,8 +25,9 @@ type Query {
   fetchRegistration(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
   fetchRegistrationCountByStatus(
-    locationId: String!
     status: [String]!
+    locationId: String
+    event: String
   ): RegistrationCountResult
   locationsByParent(parentId: String, type: String): [Location]
   locationById(locationId: String): Location
@@ -56,17 +57,33 @@ type Query {
     sort: String
   ): SearchFieldAgentResult
   verifyPasswordById(id: String!, password: String!): VerifyPasswordResult
-  fetchRegistrationMetrics(
+  getTotalMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): RegistrationMetrics
-  getEventEstimationMetrics(
+  ): TotalMetricsResult
+  getTotalPayments(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
-  ): EventEstimationMetrics
+    locationId: String
+    event: String!
+  ): [PaymentMetric!]
+  getTotalCertifications(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+  ): [CertificationMetric!]
+  getTotalCorrections(
+    timeStart: String!
+    timeEnd: String!
+    locationId: String
+    event: String!
+  ): [CorrectionMetric!]
+  getLocationStatistics(
+    locationId: String
+    populationYear: Int!
+  ): LocationStatisticsResponse
   getDeclarationsStartedMetrics(
     timeStart: String!
     timeEnd: String!
@@ -75,15 +92,15 @@ type Query {
   fetchMonthWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): MonthWiseEstimationMetrics
+  ): [MonthWiseEstimationMetric!]
   fetchLocationWiseEventMetrics(
     timeStart: String!
     timeEnd: String!
-    locationId: String!
+    locationId: String
     event: String!
-  ): LocationWiseEstimationMetrics
+  ): [LocationWiseEstimationMetric!]
   fetchTimeLoggedMetricsByPractitioner(
     timeStart: String!
     timeEnd: String!
@@ -138,7 +155,7 @@ type Mutation {
   markBirthAsValidated(id: ID!, details: BirthRegistrationInput): ID
   markBirthAsRegistered(
     id: ID!
-    details: BirthRegistrationInput
+    details: BirthRegistrationInput!
   ): BirthRegistration!
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID!
   requestBirthRegistrationCorrection(
@@ -158,7 +175,7 @@ type Mutation {
   markDeathAsValidated(id: ID!, details: DeathRegistrationInput): ID
   markDeathAsRegistered(
     id: ID!
-    details: DeathRegistrationInput
+    details: DeathRegistrationInput!
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
   requestDeathRegistrationCorrection(
@@ -360,16 +377,30 @@ type VerifyPasswordResult {
   id: String
 }
 
-type RegistrationMetrics {
-  genderBasisMetrics: RegistrationGenderBasisMetrics
-  timeFrames: RegistrationTimeFrameMetrics
-  estimatedTargetDayMetrics: RegistrationTargetDayEstimatedMetrics
-  payments: CertificationPaymentMetrics
+type TotalMetricsResult {
+  estimated: Estimation!
+  results: [EventMetrics!]!
 }
 
-type EventEstimationMetrics {
-  birthTargetDayMetrics: EstimationMetrics
-  deathTargetDayMetrics: EstimationMetrics
+type PaymentMetric {
+  total: Float!
+  paymentType: String!
+}
+
+type CertificationMetric {
+  total: Float!
+  eventType: String!
+}
+
+type CorrectionMetric {
+  total: Float!
+  reason: String!
+}
+
+type LocationStatisticsResponse {
+  population: Int
+  registrars: Int!
+  offices: Int!
 }
 
 type DeclarationsStartedMetrics {
@@ -378,14 +409,24 @@ type DeclarationsStartedMetrics {
   officeDeclarations: Int!
 }
 
-type MonthWiseEstimationMetrics {
-  details: [MonthWiseTargetDayEstimation]
-  total: EventInTargetDayEstimationCount
+type MonthWiseEstimationMetric {
+  total: Int!
+  withinTarget: Int!
+  within1Year: Int!
+  within5Years: Int!
+  estimated: Int!
+  month: Int!
+  year: Int!
 }
 
-type LocationWiseEstimationMetrics {
-  details: [LocationWiseTargetDayEstimation]
-  total: EventInTargetDayEstimationCount
+type LocationWiseEstimationMetric {
+  total: Int!
+  withinTarget: Int!
+  within1Year: Int!
+  within5Years: Int!
+  estimated: Int!
+  locationId: String!
+  locationName: String!
 }
 
 type TimeLoggedMetricsResultSet {
@@ -687,7 +728,7 @@ enum MannerOfDeath {
   ACCIDENT
   SUICIDE
   HOMICIDE
-  UNDETERMINED
+  MANNER_UNDETERMINED
 }
 
 enum CauseOfDeathMethodType {
@@ -819,6 +860,7 @@ type SearchFieldAgentResponse {
   fullName: String
   type: String
   status: String
+  avatar: Avatar
   primaryOfficeId: String
   creationDate: String
   totalNumberOfDeclarationStarted: Int
@@ -827,59 +869,21 @@ type SearchFieldAgentResponse {
   averageTimeForDeclaredDeclarations: Int
 }
 
-type RegistrationGenderBasisMetrics {
-  details: [GenderBasisDetailsMetrics!]
-  total: GenderBasisTotalCount
-}
-
-type RegistrationTimeFrameMetrics {
-  details: [TimeFrameDetailMetrics!]
-  total: TimeFrameTotalCount
-}
-
-type RegistrationTargetDayEstimatedMetrics {
-  details: [EstimatedTargetDayMetrics!]
-  total: EstimateTargetDayTotalCount
-}
-
-type CertificationPaymentMetrics {
-  details: [CertificationPaymentDetailsMetrics!]
-  total: CertificationPaymentTotalCount
-}
-
-type EstimationMetrics {
-  actualRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedPercentage: Float!
-  malePercentage: Float!
-  femalePercentage: Float!
-}
-
-type MonthWiseTargetDayEstimation {
-  actualTotalRegistration: Int!
-  actualTargetDayRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedTargetDayPercentage: Float!
-  month: String!
-  year: String!
-  startOfMonth: String!
-  endOfMonth: String!
-}
-
-type EventInTargetDayEstimationCount {
-  actualTotalRegistration: Int!
-  actualTargetDayRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedTargetDayPercentage: Float!
-}
-
-type LocationWiseTargetDayEstimation {
-  actualTotalRegistration: Int!
-  actualTargetDayRegistration: Int!
-  estimatedRegistration: Float!
-  estimatedTargetDayPercentage: Float!
+type Estimation {
+  totalEstimation: Int!
+  maleEstimation: Int!
+  femaleEstimation: Int!
   locationId: String!
-  locationName: String!
+  estimationYear: Int!
+  locationLevel: String!
+}
+
+type EventMetrics {
+  total: Int!
+  gender: String!
+  eventLocationType: String!
+  timeLabel: String!
+  practitionerRole: String!
 }
 
 type TimeLoggedMetrics {
@@ -997,6 +1001,7 @@ enum RegStatus {
   REGISTERED
   CERTIFIED
   REJECTED
+  REQUESTED_CORRECTION
   DOWNLOADED
 }
 
@@ -1194,64 +1199,6 @@ enum AttachmentSubject {
   WARD_COUNCILLOR_PROOF
   CAUSE_OF_DEATH
   CORONERS_REPORT
-}
-
-type GenderBasisDetailsMetrics {
-  location: ID!
-  maleUnder18: Int!
-  femaleUnder18: Int!
-  maleOver18: Int!
-  femaleOver18: Int!
-  total: Int!
-}
-
-type GenderBasisTotalCount {
-  maleUnder18: Int!
-  femaleUnder18: Int!
-  maleOver18: Int!
-  femaleOver18: Int!
-  total: Int!
-}
-
-type TimeFrameDetailMetrics {
-  locationId: String!
-  regWithinTargetd: Int!
-  regWithinTargetdTo1yr: Int!
-  regWithin1yrTo5yr: Int!
-  regOver5yr: Int!
-  total: Int!
-}
-
-type TimeFrameTotalCount {
-  regWithinTargetd: Int!
-  regWithinTargetdTo1yr: Int!
-  regWithin1yrTo5yr: Int!
-  regOver5yr: Int!
-  total: Int!
-}
-
-type EstimatedTargetDayMetrics {
-  locationId: String!
-  estimatedRegistration: Float!
-  registrationInTargetDay: Int!
-  estimationYear: Int!
-  estimationLocationLevel: String!
-  estimationPercentage: Float!
-}
-
-type EstimateTargetDayTotalCount {
-  estimatedRegistration: Float!
-  registrationInTargetDay: Int!
-  estimationPercentage: Float!
-}
-
-type CertificationPaymentDetailsMetrics {
-  total: Int!
-  locationId: String!
-}
-
-type CertificationPaymentTotalCount {
-  total: Int!
 }
 
 type RegistrationSearchSet {

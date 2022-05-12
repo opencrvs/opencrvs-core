@@ -56,21 +56,7 @@ import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 import { logger } from '@gateway/logger'
-import {
-  GQLTimeFrameDetailMetrics,
-  GQLTimeFrameTotalCount,
-  GQLGenderBasisDetailsMetrics,
-  GQLGenderBasisTotalCount,
-  GQLCertificationPaymentDetailsMetrics,
-  GQLCertificationPaymentTotalCount,
-  GQLEstimateTargetDayTotalCount,
-  GQLEstimatedTargetDayMetrics,
-  GQLMonthWiseTargetDayEstimation,
-  GQLLocationWiseTargetDayEstimation,
-  GQLEventInTargetDayEstimationCount,
-  GQLRegStatus
-} from '@gateway/graphql/schema'
-import { reduce } from 'lodash'
+import { GQLRegStatus } from '@gateway/graphql/schema'
 
 export interface ITimeLoggedResponse {
   status?: string
@@ -988,12 +974,12 @@ export function removeDuplicatesFromComposition(
   return composition
 }
 
-export const fetchFHIR = (
+export const fetchFHIR = <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
   method: string = 'GET',
   body: string | undefined = undefined
-) => {
+): Promise<T> => {
   return fetch(`${FHIR_URL}${suffix}`, {
     method,
     headers: {
@@ -1037,9 +1023,12 @@ export const getMetrics = (
   params: IMetricsParam,
   authHeader: IAuthHeader
 ) => {
+  const paramsWithUndefined = Object.fromEntries(
+    Object.entries(params).filter(([, value]) => value !== undefined)
+  )
   return fetch(
-    // @ts-ignore
-    `${METRICS_URL}${prefix}?` + new URLSearchParams({ ...params }),
+    `${METRICS_URL}${prefix}?` +
+      new URLSearchParams({ ...paramsWithUndefined }),
     {
       method: 'GET',
       headers: {
@@ -1265,154 +1254,4 @@ export async function setInformantReference(
       }
     }
   }
-}
-
-export function timeFrameTotalCalculator(
-  timeFrameMetrics: Array<GQLTimeFrameDetailMetrics>
-): GQLTimeFrameTotalCount {
-  const initialValue: GQLTimeFrameTotalCount = {
-    regWithinTargetd: 0,
-    regWithinTargetdTo1yr: 0,
-    regWithin1yrTo5yr: 0,
-    regOver5yr: 0,
-    total: 0
-  }
-  return reduce(
-    timeFrameMetrics,
-    (accumulator, item) => {
-      const regWithinTargetd =
-        accumulator.regWithinTargetd + item.regWithinTargetd
-      const regWithinTargetdTo1yr =
-        accumulator.regWithinTargetdTo1yr + item.regWithinTargetdTo1yr
-      const regWithin1yrTo5yr =
-        accumulator.regWithin1yrTo5yr + item.regWithin1yrTo5yr
-      const regOver5yr = accumulator.regOver5yr + item.regOver5yr
-
-      return {
-        regWithinTargetd,
-        regWithinTargetdTo1yr,
-        regWithin1yrTo5yr,
-        regOver5yr,
-        total:
-          regWithinTargetd +
-          regWithinTargetdTo1yr +
-          regWithin1yrTo5yr +
-          regOver5yr
-      }
-    },
-    initialValue
-  )
-}
-
-export function genderBasisTotalCalculator(
-  genderMetrics: Array<GQLGenderBasisDetailsMetrics>
-): GQLGenderBasisTotalCount {
-  const initialValue: GQLGenderBasisTotalCount = {
-    maleUnder18: 0,
-    femaleUnder18: 0,
-    maleOver18: 0,
-    femaleOver18: 0,
-    total: 0
-  }
-  return reduce(
-    genderMetrics,
-    (accumulator, item) => {
-      const maleUnder18 = accumulator.maleUnder18 + item.maleUnder18
-      const femaleUnder18 = accumulator.femaleUnder18 + item.femaleUnder18
-      const maleOver18 = accumulator.maleOver18 + item.maleOver18
-      const femaleOver18 = accumulator.femaleOver18 + item.femaleOver18
-
-      return {
-        maleUnder18,
-        femaleUnder18,
-        maleOver18,
-        femaleOver18,
-        total: maleUnder18 + femaleUnder18 + maleOver18 + femaleOver18
-      }
-    },
-    initialValue
-  )
-}
-
-export function estimatedTargetDayMetricsTotalCalculator(
-  estimatedTargetDayMetrics: Array<GQLEstimatedTargetDayMetrics>
-): GQLEstimateTargetDayTotalCount {
-  const initialValue: GQLEstimateTargetDayTotalCount = {
-    estimatedRegistration: 0,
-    registrationInTargetDay: 0,
-    estimationPercentage: 0
-  }
-  return reduce(
-    estimatedTargetDayMetrics,
-    (accumulator, item) => {
-      const estimatedRegistration =
-        accumulator.estimatedRegistration + item.estimatedRegistration
-      const registrationInTargetDay =
-        accumulator.registrationInTargetDay + item.registrationInTargetDay
-      return {
-        estimatedRegistration,
-        registrationInTargetDay,
-        estimationPercentage:
-          registrationInTargetDay === 0 || estimatedRegistration === 0
-            ? 0
-            : Math.round(
-                (registrationInTargetDay / estimatedRegistration) * 100
-              )
-      }
-    },
-    initialValue
-  )
-}
-
-export function paymentTotalCalculator(
-  paymentMetrics: Array<GQLCertificationPaymentDetailsMetrics>
-): GQLCertificationPaymentTotalCount {
-  return reduce(
-    paymentMetrics,
-    (accumulator, item) => ({
-      total: accumulator.total + item.total
-    }),
-    { total: 0 }
-  )
-}
-
-export function eventInTargetDayEstimationCalculator(
-  eventInTargetDayEstimations: Array<
-    GQLMonthWiseTargetDayEstimation | GQLLocationWiseTargetDayEstimation
-  >
-): GQLEventInTargetDayEstimationCount {
-  const initialValue: GQLEventInTargetDayEstimationCount = {
-    actualTotalRegistration: 0,
-    actualTargetDayRegistration: 0,
-    estimatedRegistration: 0,
-    estimatedTargetDayPercentage: 0
-  }
-  return reduce(
-    eventInTargetDayEstimations,
-    (accumulator, item) => {
-      const actualTotalRegistration =
-        accumulator.actualTotalRegistration + item.actualTotalRegistration
-      const actualTargetDayRegistration =
-        accumulator.actualTargetDayRegistration +
-        item.actualTargetDayRegistration
-      const estimatedRegistration =
-        accumulator.estimatedRegistration + item.estimatedRegistration
-
-      return {
-        actualTotalRegistration,
-        actualTargetDayRegistration,
-        estimatedRegistration,
-        estimatedTargetDayPercentage:
-          actualTargetDayRegistration === 0 || estimatedRegistration === 0
-            ? 0
-            : Number(
-                (
-                  (actualTargetDayRegistration / estimatedRegistration) *
-                  100
-                ).toFixed(2)
-              )
-      }
-    },
-    initialValue
-  )
 }

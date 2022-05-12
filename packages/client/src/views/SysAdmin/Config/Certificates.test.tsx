@@ -65,13 +65,13 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
   })
 
   it('shows last birth certificate template updated date', async () => {
-    expect(testComponent.find('#birth_value').hostNodes().text()).toBe(
+    expect(testComponent.find('#birth_value').hostNodes().first().text()).toBe(
       'Updated '
     )
   })
 
   it('shows last death certificate template updated date', async () => {
-    expect(testComponent.find('#death_value').hostNodes().text()).toBe(
+    expect(testComponent.find('#death_value').hostNodes().first().text()).toBe(
       'Updated '
     )
   })

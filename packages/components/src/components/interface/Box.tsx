@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { StyledFunction, withTheme } from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 
 import { IGrid } from '../grid'
 
@@ -21,7 +21,6 @@ const Wrapper = styled.div<IBox>`
   padding: 24px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   background: ${({ theme }) => theme.colors.white};
-  overflow: hidden;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     height: 100%;
     border: 0;
@@ -31,7 +30,7 @@ const Wrapper = styled.div<IBox>`
 
 class Component extends React.Component<IBox & { theme: { grid: IGrid } }> {
   render() {
-    const { id, title, children, className, theme } = this.props
+    const { id, children, className } = this.props
     return (
       <Wrapper id={id} className={className}>
         {children}

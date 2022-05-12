@@ -64,13 +64,17 @@ export const mergeArraysRemovingEmptyStrings = (
   strArrayA: string[],
   strArrayB: string[]
 ): string[] => {
-  if (strArrayA.length != strArrayB.length) {
+  if (strArrayA.length !== strArrayB.length) {
     return strArrayA
   }
   const output = []
   for (let i = 0; i < strArrayA.length; i++) {
-    if (strArrayA[i] == '') output.push(strArrayB[i])
+    if (strArrayA[i] === '') output.push(strArrayB[i])
     else output.push(strArrayA[i])
   }
   return output
+}
+
+export function getPercentage(total: number, current: number) {
+  return current === 0 || total === 0 ? 0 : (current / total) * 100
 }

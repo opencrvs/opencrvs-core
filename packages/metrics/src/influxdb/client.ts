@@ -25,7 +25,21 @@ export const influx = new Influx.InfluxDB({
   port: INFLUX_PORT,
   schema: [
     {
-      measurement: 'birth_reg',
+      measurement: 'certification',
+      fields: {
+        compositionId: Influx.FieldType.STRING
+      },
+      tags: [
+        'eventType',
+        'officeLocation',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
+    },
+    {
+      measurement: 'birth_registration',
       fields: {
         compositionId: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
@@ -34,6 +48,10 @@ export const influx = new Influx.InfluxDB({
       tags: [
         'regStatus',
         'gender',
+        'timeLabel',
+        'ageLabel',
+        'dateLabel',
+        'practitionerRole',
         'eventLocationType',
         'officeLocation',
         'locationLevel5',
@@ -43,7 +61,7 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
-      measurement: 'death_reg',
+      measurement: 'death_registration',
       fields: {
         compositionId: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
@@ -53,6 +71,10 @@ export const influx = new Influx.InfluxDB({
       tags: [
         'regStatus',
         'gender',
+        'ageLabel',
+        'timeLabel',
+        'dateLabel',
+        'practitionerRole',
         'eventLocationType',
         'mannerOfDeath',
         'causeOfDeath',
@@ -109,13 +131,13 @@ export const influx = new Influx.InfluxDB({
       tags: ['currentStatus', 'previousStatus', 'eventType']
     },
     {
-      measurement: 'certification_payment',
+      measurement: 'correction',
       fields: {
-        total: Influx.FieldType.FLOAT,
         compositionId: Influx.FieldType.STRING
       },
       tags: [
         'eventType',
+        'reason',
         'officeLocation',
         'locationLevel5',
         'locationLevel4',
@@ -124,13 +146,14 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
-      measurement: 'correction_payment',
+      measurement: 'payment',
       fields: {
         total: Influx.FieldType.FLOAT,
         compositionId: Influx.FieldType.STRING
       },
       tags: [
         'eventType',
+        'paymentType',
         'officeLocation',
         'locationLevel5',
         'locationLevel4',
@@ -180,9 +203,16 @@ export const writePoints = (points: IPoints[]) => {
   })
 }
 
-export const query = <T = any>(q: string): Promise<T> => {
+type InfluxQueryOptions = {
+  placeholders: Record<string, any>
+}
+
+export const query = <T = any>(
+  q: string,
+  options?: InfluxQueryOptions
+): Promise<T> => {
   try {
-    return influx.query(q)
+    return influx.query(q, options)
   } catch (err) {
     logger.error(`Error reading data from InfluxDB! ${err.stack}`)
     throw err

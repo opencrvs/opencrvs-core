@@ -19,7 +19,9 @@ import {
   generatePaymentPoint,
   generateDeclarationStartedPoint,
   generateTimeLoggedPoint,
-  generateRejectedPoints
+  generateRejectedPoints,
+  generateCorrectionReasonPoint,
+  generateCertificationPoint
 } from '@metrics/features/registration/pointGenerator'
 import { internal } from '@hapi/boom'
 import { populateBundleFromPayload } from '@metrics/features/registration/utils'
@@ -357,10 +359,18 @@ export async function markCertifiedHandler(
 ) {
   try {
     const points = await Promise.all([
-      generatePaymentPoint(request.payload as fhir.Bundle, {
+      generateCertificationPoint(request.payload as fhir.Bundle, {
         Authorization: request.headers.authorization,
         'x-correlation-id': request.headers['x-correlation-id']
       }),
+      generatePaymentPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        },
+        'certification'
+      ),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED'],
@@ -418,8 +428,11 @@ export async function requestCorrectionHandler(
         {
           Authorization: request.headers.authorization
         },
-        'correction_payment'
+        'correction'
       ),
+      generateCorrectionReasonPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      }),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED', 'CERTIFIED'],

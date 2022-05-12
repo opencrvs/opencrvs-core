@@ -25,7 +25,8 @@ interface INavigationMessages
   performance: MessageDescriptor
   team: MessageDescriptor
   config: MessageDescriptor
-  certificate: MessageDescriptor //'Certificates',pplication',
+  certificate: MessageDescriptor
+  completenessRates: MessageDescriptor
 }
 
 const messagesToDefine: INavigationMessages = {
@@ -93,6 +94,11 @@ const messagesToDefine: INavigationMessages = {
     defaultMessage: 'Certificate',
     description: 'Certificates label in navigation',
     id: 'navigation.certificate'
+  },
+  completenessRates: {
+    defaultMessage: 'Completeness rates',
+    description: 'Completeness rates in navigation',
+    id: 'navigation.completenessRates'
   }
 }
 

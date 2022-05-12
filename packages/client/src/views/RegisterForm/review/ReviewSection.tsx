@@ -22,7 +22,6 @@ import {
 import {
   DocumentViewer,
   IDocumentViewerOptions,
-  ListView,
   ResponsiveModal
 } from '@opencrvs/components/lib/interface'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
@@ -128,6 +127,10 @@ import { DocumentListPreview } from '@client/components/form/DocumentUploadfield
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
 import { isCorrection } from '@client/views/CorrectionForm/utils'
+import {
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -147,7 +150,7 @@ const Row = styled.div`
     flex-direction: column;
   }
 `
-const Column = styled.div`
+const RightColumn = styled.div`
   width: 40%;
   margin: 0px 15px;
 
@@ -159,14 +162,24 @@ const Column = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 0px;
-    width: 100%;
+    display: none;
   }
 `
 
-const StyledColumn = styled(Column)`
+const LeftColumn = styled.div`
   ${({ theme }) => theme.shadows.light};
   width: 60%;
+
+  &:first-child {
+    margin-left: 0px;
+  }
+  &:last-child {
+    margin-right: 0px;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    width: 100%;
+  }
 `
 
 const ZeroDocument = styled.div`
@@ -196,12 +209,27 @@ const FormData = styled.div`
     padding: 24px;
   }
 `
-const FormDataHeader = styled.div`
-  ${({ theme }) => theme.fonts.h1}
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h2}
+const Title = styled.div`
+  ${({ theme }) => theme.fonts.h2};
+  margin-bottom: 16px;
+`
+const Label = styled.span`
+  ${({ theme }) => theme.fonts.bold16};
+`
+const Value = styled.span`
+  ${({ theme }) => theme.fonts.reg16}
+`
+const SectionContainer = styled.div`
+  margin-bottom: 30px;
+`
+
+const DocumentListPreviewContainer = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: block;
   }
 `
+
 const InputWrapper = styled.div`
   margin-top: 56px;
 `
@@ -1066,9 +1094,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     data: IFormSectionData,
     originalData?: IFormSectionData
   ) {
-    // const {
-    //   draft: { data, originalData }
-    // } = this.props
     if (!originalData) return false
     if (data[field.name] && (data[field.name] as IFormData).value) {
       return this.hasNestedDataChanged(
@@ -1480,7 +1505,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     return (
       <FullBodyContent>
         <Row>
-          <StyledColumn>
+          <LeftColumn>
             <ReviewHeader
               id="review_header"
               logoSource={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
@@ -1501,19 +1526,50 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(declaration, sec.id)
                 return (
-                  <ListView
-                    responsiveContents={
+                  <SectionContainer key={index}>
+                    {sec.title && (
+                      <Title>
+                        {sec.title}
+                        {sec.action && (
+                          <LinkButton onClick={sec.action.handler}>
+                            {sec.action.label}
+                          </LinkButton>
+                        )}
+                      </Title>
+                    )}
+                    <DocumentListPreviewContainer>
                       <DocumentListPreview
                         id={sec.id}
                         documents={uploadedDocuments}
                         onSelect={this.selectForPreview}
                         dropdownOptions={selectOptions}
                       />
-                    }
-                    key={index}
-                    {...sec}
-                    id={'Section_' + sec.id}
-                  />
+                    </DocumentListPreviewContainer>
+                    <ListViewSimplified id={'Section_' + sec.id}>
+                      {sec.items.map((item, index) => {
+                        return (
+                          <ListViewItemSimplified
+                            key={index}
+                            label={<Label>{item.label}</Label>}
+                            value={
+                              <Value id={item.label.split(' ')[0]}>
+                                {item.value}
+                              </Value>
+                            }
+                            actions={
+                              <LinkButton
+                                id={item.action.id}
+                                disabled={item.action.disabled}
+                                onClick={item.action.handler}
+                              >
+                                {item.action.label}
+                              </LinkButton>
+                            }
+                          />
+                        )
+                      })}
+                    </ListViewSimplified>
+                  </SectionContainer>
                 )
               })}
               {event === Event.BIRTH && !isCorrection(declaration) && (
@@ -1554,8 +1610,8 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </FooterArea>
               )}
             </FormData>
-          </StyledColumn>
-          <Column>
+          </LeftColumn>
+          <RightColumn>
             <ResponsiveDocumentViewer
               isRegisterScope={this.userHasRegisterScope()}
             >
@@ -1586,7 +1642,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </ZeroDocument>
               </DocumentViewer>
             </ResponsiveDocumentViewer>
-          </Column>
+          </RightColumn>
         </Row>
         <ResponsiveModal
           title={intl.formatMessage(messages.editDeclarationConfirmationTitle)}

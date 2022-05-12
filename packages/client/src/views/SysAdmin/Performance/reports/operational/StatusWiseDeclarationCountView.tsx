@@ -11,7 +11,7 @@
  */
 import { constantsMessages } from '@client/i18n/messages'
 import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
-import { LoaderBox } from '@client/views/SysAdmin/Performance/reports/operational/RegistrationRatesReport'
+
 import {
   Description,
   SubHeader,
@@ -19,7 +19,6 @@ import {
   getPrimaryLocationIdOfOffice,
   isUnderJurisdictionOfUser
 } from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ProgressBar } from '@opencrvs/components/lib/forms'
 import { GQLRegistrationCountResult } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
@@ -36,6 +35,7 @@ import { getJurisidictionType } from '@client/utils/locationUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { SYS_ADMIN_ROLES } from '@client/utils/constants'
 import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
+import { Event } from '@client/forms'
 
 type Props = WrappedComponentProps & IStateProps & BaseProps
 
@@ -45,99 +45,43 @@ export interface IStatusMapping {
 
 interface BaseProps {
   data?: GQLRegistrationCountResult
-  loading?: boolean
   statusMapping?: IStatusMapping
   onClickStatusDetails: (status?: keyof IStatusMapping) => void
-  locationId: string
+  locationId?: string
+  selectedEvent: Event
 }
 
 interface IStateProps {
   disableDeclarationLink: boolean
 }
 
-const ContentHolder = styled.div`
-  padding: 0px 25px;
-`
-
-const StatusHeader = styled.div`
-  margin: 30px 0px;
-`
+const ContentHolder = styled.div``
 
 const StatusProgressBarWrapper = styled.div`
   margin-top: 20px;
-`
-const StatusListFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  padding: 0px 10px;
-  ${({ theme }) => theme.fonts.bold16};
-  background: ${({ theme }) => theme.colors.background};
-  border-top: 1px solid ${({ theme }) => theme.colors.disabled};
-  border-bottom: none;
 `
 
 class StatusWiseDeclarationCountViewComponent extends React.Component<
   Props,
   {}
 > {
-  getLoader() {
-    return (
-      <ContentHolder>
-        <StatusHeader id="status-header-loader">
-          <LoaderBox width={20} />
-          <br />
-          <br />
-          <LoaderBox width={100} />
-        </StatusHeader>
-        <StatusProgressBarWrapper>
-          <ProgressBar loading={true} />
-        </StatusProgressBarWrapper>
-        <StatusProgressBarWrapper>
-          <ProgressBar loading={true} />
-        </StatusProgressBarWrapper>
-        <StatusProgressBarWrapper>
-          <ProgressBar loading={true} />
-        </StatusProgressBarWrapper>
-        <StatusProgressBarWrapper>
-          <ProgressBar loading={true} />
-        </StatusProgressBarWrapper>
-        <StatusProgressBarWrapper>
-          <ProgressBar loading={true} />
-        </StatusProgressBarWrapper>
-        <StatusProgressBarWrapper>
-          <ProgressBar loading={true} />
-        </StatusProgressBarWrapper>
-        <StatusListFooter>
-          <p>&nbsp;</p>
-        </StatusListFooter>
-      </ContentHolder>
-    )
-  }
-
   getStatusCountView(data: GQLRegistrationCountResult) {
-    const { intl, statusMapping, disableDeclarationLink } = this.props
+    const { intl, statusMapping, disableDeclarationLink, selectedEvent } =
+      this.props
     const { results, total } = data
     return (
-      <ContentHolder>
-        <StatusHeader id="status-header">
-          <SubHeader>
-            {intl.formatMessage(constantsMessages.declarationTitle)}
-          </SubHeader>
-          <Description>
-            {intl.formatMessage(
-              performanceMessages.declarationCountByStatusDescription
-            )}{' '}
-            {!disableDeclarationLink && (
-              <LinkButton
-                id="view-all-link"
-                onClick={() => this.props.onClickStatusDetails()}
-              >
-                {intl.formatMessage(constantsMessages.viewAll)}
-              </LinkButton>
-            )}
-          </Description>
-        </StatusHeader>
+      <ContentHolder id="declaration-statuses">
+        <SubHeader>
+          {intl.formatMessage(performanceMessages.registrationByStatus)}
+        </SubHeader>
+        <Description>
+          {intl.formatMessage(
+            performanceMessages.declarationCountByStatusDescription,
+            {
+              event: selectedEvent.toUpperCase()
+            }
+          )}
+        </Description>
         {results
           .filter((item) => item && checkExternalValidationStatus(item.status))
           .map((statusCount, index) => {
@@ -161,22 +105,13 @@ class StatusWiseDeclarationCountViewComponent extends React.Component<
               )
             )
           })}
-        <StatusListFooter>
-          <p>{intl.formatMessage(constantsMessages.total)}</p>
-          <p>{total}</p>
-        </StatusListFooter>
       </ContentHolder>
     )
   }
 
   render() {
-    const { data, loading } = this.props
-    return (
-      <>
-        {loading && this.getLoader()}
-        {data && this.getStatusCountView(data)}
-      </>
-    )
+    const { data } = this.props
+    return <>{data && this.getStatusCountView(data)}</>
   }
 }
 
@@ -186,6 +121,9 @@ export const StatusWiseDeclarationCountView = connect<
   BaseProps,
   IStoreState
 >((state: IStoreState, ownProps: BaseProps) => {
+  if (!ownProps.locationId) {
+    return { disableDeclarationLink: true }
+  }
   const offlineLocations = getOfflineData(state).locations
   const offlineOffices = getOfflineData(state).offices
 

@@ -38,7 +38,7 @@ const Content = styled(BodyContent)<{
   profilePageStyle?: IprofilePageStyle
 }>`
   padding: 0px 24px;
-  margin: 32px auto 0;
+  margin: 0 auto;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 0px 16px;
 
@@ -48,6 +48,10 @@ const Content = styled(BodyContent)<{
       margin: ${profilePageStyle.paddingTopMd}px auto ${0};
       padding: ${0}px ${profilePageStyle.horizontalPaddingMd}px
     `}
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 0;
   }
 `
 const SubPageContent = styled(Content)`
@@ -67,8 +71,13 @@ interface BasePage {
   marginRight?: number
   fixedWidth?: number
   mapPinClickHandler?: () => void
+  mapPerformanceClickHandler?: () => void
   profilePageStyle?: IprofilePageStyle
   subMenuComponent?: React.ReactNode
+  /*
+  FIXME: This prop should be removed at some point.
+  It only toggle background between gray and white.
+  */
   isCertificatesConfigPage?: boolean
 }
 
@@ -218,7 +227,12 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
       </DynamicContainer>
     )
   } else {
-    pageHeader = <Header mapPinClickHandler={props.mapPinClickHandler} />
+    pageHeader = (
+      <Header
+        mapPinClickHandler={props.mapPinClickHandler}
+        mapPerformanceClickHandler={props.mapPerformanceClickHandler}
+      />
+    )
     pageContent = (
       <>
         <Navigation />
