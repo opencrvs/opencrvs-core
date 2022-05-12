@@ -110,7 +110,7 @@ class FormConfigSettingsComponent extends React.Component<
     this.state = {
       modalName: EMPTY_STRING,
       introductionPage:
-        !this.props.applicationConfig.config.HIDE_EVENT_REGISTER_INFORMATION,
+        this.props.applicationConfig.config.HIDE_EVENT_REGISTER_INFORMATION,
       numberOfAddresses: this.props.applicationConfig.config.ADDRESSES,
       showModal: false,
       errorOccured: false,
@@ -133,8 +133,8 @@ class FormConfigSettingsComponent extends React.Component<
             messages.introductionPageSuccessNotification,
             {
               action: this.state.introductionPage
-                ? this.props.intl.formatMessage(messages.enable)
-                : this.props.intl.formatMessage(messages.disable)
+                ? this.props.intl.formatMessage(messages.disable)
+                : this.props.intl.formatMessage(messages.enable)
             }
           )
         })
@@ -194,8 +194,8 @@ class FormConfigSettingsComponent extends React.Component<
               value={[
                 <span id="Introduction-page_value">
                   {introductionPage
-                    ? intl.formatMessage(messages.enable)
-                    : intl.formatMessage(messages.disable)}
+                    ? intl.formatMessage(messages.disable)
+                    : intl.formatMessage(messages.enable)}
                 </span>
               ]}
               actions={[
@@ -283,7 +283,7 @@ class FormConfigSettingsComponent extends React.Component<
                 actions={
                   <CenteredToggle
                     id="introductionPage"
-                    defaultChecked={introductionPage}
+                    defaultChecked={!introductionPage}
                     onChange={this.toggleOnChange}
                   />
                 }

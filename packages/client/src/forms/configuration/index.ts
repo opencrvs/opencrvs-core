@@ -368,12 +368,14 @@ export function configureRegistrationForm(
 
   formCustomisations.defaultFieldCustomisations.forEach(
     (defaultPropCustomisation) => {
-      // set default field as required or not depending on customisation
-      const field: SerializedFormField =
+      const groupFields =
         newForm.sections[
           defaultPropCustomisation.defaultField.selectedSectionIndex
         ].groups[defaultPropCustomisation.defaultField.selectedGroupIndex]
-          .fields[defaultPropCustomisation.defaultField.index]
+          .fields
+      // set default field as required or not depending on customisation
+      const field: SerializedFormField =
+        groupFields[defaultPropCustomisation.defaultField.index]
       field.required = defaultPropCustomisation.question.required
 
       // removing hidden fields should be the last thing to do after repositioning all default and custom fields vertically
@@ -384,11 +386,20 @@ export function configureRegistrationForm(
         /*
          * Splice the disabled field away only when in registration, not in configuration mode
          */
-        newForm.sections[
-          defaultPropCustomisation.defaultField.selectedSectionIndex
-        ].groups[
-          defaultPropCustomisation.defaultField.selectedGroupIndex
-        ].fields.splice(defaultPropCustomisation.defaultField.index, 1)
+
+        // update preceedingDefaultField.index as it may have changed now that custom groups are added
+        let newIndex = 0
+        groupFields.filter((field, index) => {
+          if (
+            defaultPropCustomisation.defaultField &&
+            field.name === defaultPropCustomisation.defaultField.field.name
+          ) {
+            newIndex = index
+          }
+        })
+        defaultPropCustomisation.defaultField.index = newIndex
+
+        groupFields.splice(defaultPropCustomisation.defaultField.index, 1)
       }
     }
   )
