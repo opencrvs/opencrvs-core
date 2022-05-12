@@ -63,7 +63,7 @@ const primaryAddressSameAsOtherPrimaryAddress =
   'values.primaryAddressSameAsOtherPrimary'
 
 // secondary addresses are not enabled
-const secondaryAddressesDisabled = '!window.config.ADDRESSES!==2'
+const secondaryAddressesDisabled = '!window.config.ADDRESSES==2'
 
 export enum AddressSubsections {
   PRIMARY_ADDRESS_SUBSECTION = 'primaryAddress',
@@ -445,12 +445,25 @@ export const getXAddressSameAsY = (
   return [copyAddressField]
 }
 
-const shouldAddAddressFields = (configuration: AllowedAddressConfigurations) =>
-  window.config.ADDRESSES === 1 &&
-  (configuration.config === AddressSubsections.SECONDARY_ADDRESS_SUBSECTION ||
-    configuration.config === AddressCases.SECONDARY_ADDRESS)
-    ? false
-    : true
+const shouldAddAddressFields = (
+  configuration: AllowedAddressConfigurations
+) => {
+  if (
+    (configuration.config === AddressSubsections.SECONDARY_ADDRESS_SUBSECTION ||
+      configuration.config === AddressCases.SECONDARY_ADDRESS) &&
+    window.config.ADDRESSES === 2
+  ) {
+    return true
+  } else if (
+    (configuration.config === AddressSubsections.SECONDARY_ADDRESS_SUBSECTION ||
+      configuration.config === AddressCases.SECONDARY_ADDRESS) &&
+    window.config.ADDRESSES === 1
+  ) {
+    return false
+  } else {
+    return true
+  }
+}
 
 export function populateRegisterFormsWithAddresses(
   defaultEventForm: ISerializedForm,
@@ -468,6 +481,13 @@ export function populateRegisterFormsWithAddresses(
         if (preceedingDefaultField) {
           addressConfiguration.configurations.forEach((configuration) => {
             if (shouldAddAddressFields(configuration)) {
+              if (
+                configuration.config ===
+                  AddressSubsections.SECONDARY_ADDRESS_SUBSECTION ||
+                configuration.config === AddressCases.SECONDARY_ADDRESS
+              ) {
+                console.log('SHOULD BE RENDERING SECOND ADDRESS')
+              }
               const tmpAddressFields: SerializedFormField[] =
                 addressFields.concat(getAddressFields(configuration))
               addressFields = tmpAddressFields

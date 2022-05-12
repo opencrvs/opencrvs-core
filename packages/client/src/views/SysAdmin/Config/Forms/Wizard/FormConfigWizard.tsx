@@ -17,7 +17,7 @@ import {
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
-import { Redirect, useParams } from 'react-router'
+import { Redirect, useParams, useLocation } from 'react-router'
 import { HOME } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
@@ -188,6 +188,7 @@ export function FormConfigWizard() {
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
+  const location = useLocation()
 
   let firstFieldIdentifiers
   if (section !== 'settings') {
@@ -215,22 +216,28 @@ export function FormConfigWizard() {
           version: version + 1
         })}
         pageIcon={<></>}
-        topBarActions={[
-          <TertiaryButton
-            id="settings"
-            key="settings"
-            icon={() => <SettingsBlue />}
-            onClick={() => dispatch(goToFormConfigWizard(event, 'settings'))}
-          ></TertiaryButton>,
-          <PrimaryButton
-            key="save"
-            size="small"
-            disabled={status === ActionStatus.PROCESSING}
-            onClick={() => setStatus(ActionStatus.MODAL)}
-          >
-            {intl.formatMessage(buttonMessages.save)}
-          </PrimaryButton>
-        ]}
+        topBarActions={
+          !location.pathname.includes('settings')
+            ? [
+                <TertiaryButton
+                  id="settings"
+                  key="settings"
+                  icon={() => <SettingsBlue />}
+                  onClick={() =>
+                    dispatch(goToFormConfigWizard(event, 'settings'))
+                  }
+                ></TertiaryButton>,
+                <PrimaryButton
+                  key="save"
+                  size="small"
+                  disabled={status === ActionStatus.PROCESSING}
+                  onClick={() => setStatus(ActionStatus.MODAL)}
+                >
+                  {intl.formatMessage(buttonMessages.save)}
+                </PrimaryButton>
+              ]
+            : []
+        }
         goHome={() => dispatch(goToFormConfigHome())}
       />
       <WizardContainer>
