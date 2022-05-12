@@ -652,7 +652,7 @@ class FormSectionComponent extends React.Component<Props> {
       prevProps.onChange(this.props.values)
     }
 
-    if (sectionChanged || fieldChanged) {
+    if (sectionChanged) {
       prevProps.resetForm()
       if (this.props.setAllFieldsDirty) {
         this.showValidationErrors(this.props.fields)
