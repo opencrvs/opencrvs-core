@@ -31,7 +31,7 @@ import { storage } from '@client/storage'
 import { changeLanguage } from '@client/i18n/actions'
 import { Ii18n } from '@client/type/i18n'
 import { USER_DETAILS } from '@client/utils/userUtils'
-import { getDefaultLanguage } from '@client/i18n/utils'
+import { getDefaultLanguage, getSelectedLanguage } from '@client/i18n/utils'
 import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
 import { configLoad } from '@client/offline/actions'
@@ -151,16 +151,17 @@ class Component extends React.Component<
 
   async componentDidMount() {
     this.props.configLoad()
-    const values = parse(this.props.location.search)
 
-    this.props.checkAuth(values)
+    const language = getSelectedLanguage()
+
+    this.props.checkAuth()
 
     const userDetails = JSON.parse(
       (await storage.getItem(USER_DETAILS)) || '{}'
     )
 
     this.props.changeLanguage({
-      language: userDetails.language || getDefaultLanguage()
+      language: language || userDetails.language || getDefaultLanguage()
     })
   }
 

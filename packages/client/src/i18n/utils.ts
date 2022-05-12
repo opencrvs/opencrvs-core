@@ -9,10 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import * as queryString from 'querystring'
+
 export function getAvailableLanguages() {
   return window.config.LANGUAGES.split(',')
 }
 
 export function getDefaultLanguage() {
   return getAvailableLanguages()[0]
+}
+
+export function getSelectedLanguage() {
+  return queryString.parse(window.location.search.replace(/^\?/, ''))
+    .language as string
 }
