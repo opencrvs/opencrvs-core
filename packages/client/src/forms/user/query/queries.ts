@@ -13,7 +13,7 @@ import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
 
 export const getRolesQuery = gql`
-  query {
+  query getRoles {
     getRoles(active: true) {
       value
       types

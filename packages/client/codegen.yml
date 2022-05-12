@@ -13,9 +13,9 @@ schema:
       headers:
         Authorization: 'Bearer ${TOKEN}'
 documents:
-  - 'src/**/queries.ts'
-  - 'src/**/queries/*.ts'
-  - '!src/**/*.test.ts'
+  - 'src/**/*.ts*'
+  - '!src/utils/gateway.ts'
+  - '!src/**/*.test.ts*'
 generates:
   src/utils/gateway.ts:
     plugins:

@@ -1690,9 +1690,23 @@ export type VerifyPasswordResult = {
   username?: Maybe<Scalars['String']>
 }
 
-export type Unnamed_1_QueryVariables = Exact<{ [key: string]: never }>
+export type CreateOrUpdateCertificateSvgMutationVariables = Exact<{
+  certificateSVG: CertificateSvgInput
+}>
 
-export type Unnamed_1_Query = {
+export type CreateOrUpdateCertificateSvgMutation = {
+  __typename?: 'Mutation'
+  createOrUpdateCertificateSVG?: {
+    __typename?: 'CertificateSVG'
+    svgCode?: string | null
+  } | null
+}
+
+export type GetActiveCertificatesSvgQueryVariables = Exact<{
+  [key: string]: never
+}>
+
+export type GetActiveCertificatesSvgQuery = {
   __typename?: 'Query'
   getActiveCertificatesSVG?: Array<{
     __typename?: 'CertificateSVG'
@@ -1705,6 +1719,26 @@ export type Unnamed_1_Query = {
     svgDateUpdated?: string | null
     svgDateCreated?: string | null
   } | null> | null
+}
+
+export type RequestBirthRegistrationCorrectionMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: BirthRegistrationInput
+}>
+
+export type RequestBirthRegistrationCorrectionMutation = {
+  __typename?: 'Mutation'
+  requestBirthRegistrationCorrection: string
+}
+
+export type RequestDeathRegistrationCorrectionMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: DeathRegistrationInput
+}>
+
+export type RequestDeathRegistrationCorrectionMutation = {
+  __typename?: 'Mutation'
+  requestDeathRegistrationCorrection: string
 }
 
 export type FetchPersonQueryVariables = Exact<{
@@ -1781,9 +1815,18 @@ export type QueryRegistrationByIdentifierQuery = {
   } | null
 }
 
-export type Unnamed_2_QueryVariables = Exact<{ [key: string]: never }>
+export type CreateOrUpdateUserMutationVariables = Exact<{
+  user: UserInput
+}>
 
-export type Unnamed_2_Query = {
+export type CreateOrUpdateUserMutation = {
+  __typename?: 'Mutation'
+  createOrUpdateUser: { __typename?: 'User'; username?: string | null }
+}
+
+export type GetRolesQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetRolesQuery = {
   __typename?: 'Query'
   getRoles?: Array<{
     __typename?: 'Role'
@@ -2002,6 +2045,15 @@ export type CountUserWiseDeclarationsQuery = {
   } | null
 }
 
+export type ResendSmsInviteMutationVariables = Exact<{
+  userId: Scalars['String']
+}>
+
+export type ResendSmsInviteMutation = {
+  __typename?: 'Mutation'
+  resendSMSInvite?: string | null
+}
+
 export type SearchUsersQueryVariables = Exact<{
   count?: InputMaybe<Scalars['Int']>
   skip?: InputMaybe<Scalars['Int']>
@@ -2134,6 +2186,126 @@ export type VerifyPasswordByIdQuery = {
     id?: string | null
     username?: string | null
   } | null
+}
+
+export type CreateBirthRegistrationMutationVariables = Exact<{
+  details: BirthRegistrationInput
+}>
+
+export type CreateBirthRegistrationMutation = {
+  __typename?: 'Mutation'
+  createBirthRegistration: {
+    __typename?: 'CreatedIds'
+    trackingId?: string | null
+    compositionId?: string | null
+  }
+}
+
+export type MarkBirthAsValidatedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: BirthRegistrationInput
+}>
+
+export type MarkBirthAsValidatedMutation = {
+  __typename?: 'Mutation'
+  markBirthAsValidated?: string | null
+}
+
+export type MarkBirthAsRegisteredMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: BirthRegistrationInput
+}>
+
+export type MarkBirthAsRegisteredMutation = {
+  __typename?: 'Mutation'
+  markBirthAsRegistered: {
+    __typename?: 'BirthRegistration'
+    id: string
+    registration?: {
+      __typename?: 'Registration'
+      id?: string | null
+      status?: Array<{
+        __typename?: 'RegWorkflow'
+        id: string
+        type?: RegStatus | null
+        timestamp?: any | null
+        user?: {
+          __typename?: 'User'
+          id?: string | null
+          role?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+        } | null
+        location?: {
+          __typename?: 'Location'
+          id: string
+          name?: string | null
+          alias?: Array<string | null> | null
+        } | null
+        office?: {
+          __typename?: 'Location'
+          name?: string | null
+          alias?: Array<string | null> | null
+          address?: {
+            __typename?: 'Address'
+            district?: string | null
+            state?: string | null
+          } | null
+        } | null
+        comments?: Array<{
+          __typename?: 'Comment'
+          comment?: string | null
+        } | null> | null
+      } | null> | null
+    } | null
+  }
+}
+
+export type MarkEventAsVoidedMutationVariables = Exact<{
+  id: Scalars['String']
+  reason: Scalars['String']
+  comment: Scalars['String']
+}>
+
+export type MarkEventAsVoidedMutation = {
+  __typename?: 'Mutation'
+  markEventAsVoided: string
+}
+
+export type MarkEventAsReinstatedMutationVariables = Exact<{
+  id: Scalars['String']
+}>
+
+export type MarkEventAsReinstatedMutation = {
+  __typename?: 'Mutation'
+  markEventAsReinstated?: {
+    __typename?: 'Reinstated'
+    taskEntryResourceID: string
+    registrationStatus?: RegStatus | null
+  } | null
+}
+
+export type MarkEventAsArchivedMutationVariables = Exact<{
+  id: Scalars['String']
+}>
+
+export type MarkEventAsArchivedMutation = {
+  __typename?: 'Mutation'
+  markEventAsArchived: string
+}
+
+export type MarkBirthAsCertifiedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: BirthRegistrationInput
+}>
+
+export type MarkBirthAsCertifiedMutation = {
+  __typename?: 'Mutation'
+  markBirthAsCertified: string
 }
 
 export type FetchBirthRegistrationForReviewQueryVariables = Exact<{
@@ -2678,6 +2850,93 @@ export type FetchBirthRegistrationForCertificateQuery = {
       } | null> | null
     } | null> | null
   } | null
+}
+
+export type CreateDeathRegistrationMutationVariables = Exact<{
+  details: DeathRegistrationInput
+}>
+
+export type CreateDeathRegistrationMutation = {
+  __typename?: 'Mutation'
+  createDeathRegistration: {
+    __typename?: 'CreatedIds'
+    trackingId?: string | null
+    compositionId?: string | null
+  }
+}
+
+export type MarkDeathAsValidatedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: DeathRegistrationInput
+}>
+
+export type MarkDeathAsValidatedMutation = {
+  __typename?: 'Mutation'
+  markDeathAsValidated?: string | null
+}
+
+export type MarkDeathAsRegisteredMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: DeathRegistrationInput
+}>
+
+export type MarkDeathAsRegisteredMutation = {
+  __typename?: 'Mutation'
+  markDeathAsRegistered: {
+    __typename?: 'DeathRegistration'
+    id: string
+    registration?: {
+      __typename?: 'Registration'
+      id?: string | null
+      status?: Array<{
+        __typename?: 'RegWorkflow'
+        id: string
+        type?: RegStatus | null
+        timestamp?: any | null
+        user?: {
+          __typename?: 'User'
+          id?: string | null
+          role?: string | null
+          name?: Array<{
+            __typename?: 'HumanName'
+            use?: string | null
+            firstNames?: string | null
+            familyName?: string | null
+          } | null> | null
+        } | null
+        location?: {
+          __typename?: 'Location'
+          id: string
+          name?: string | null
+          alias?: Array<string | null> | null
+        } | null
+        office?: {
+          __typename?: 'Location'
+          name?: string | null
+          alias?: Array<string | null> | null
+          address?: {
+            __typename?: 'Address'
+            district?: string | null
+            state?: string | null
+          } | null
+        } | null
+        comments?: Array<{
+          __typename?: 'Comment'
+          comment?: string | null
+        } | null> | null
+      } | null> | null
+    } | null
+  }
+}
+
+export type MarkDeathAsCertifiedMutationVariables = Exact<{
+  id: Scalars['ID']
+  details: DeathRegistrationInput
+}>
+
+export type MarkDeathAsCertifiedMutation = {
+  __typename?: 'Mutation'
+  markDeathAsCertified: string
 }
 
 export type FetchDeathRegistrationForReviewQueryVariables = Exact<{
@@ -3249,6 +3508,62 @@ export type FetchDeclarationShortInfoQuery = {
       }
     | null
 }
+
+type EventSearchFields_BirthEventSearchSet_Fragment = {
+  __typename?: 'BirthEventSearchSet'
+  dateOfBirth?: any | null
+  id: string
+  type?: string | null
+  childName?: Array<{
+    __typename?: 'HumanName'
+    firstNames?: string | null
+    familyName?: string | null
+    use?: string | null
+  } | null> | null
+  registration?: {
+    __typename?: 'RegistrationSearchSet'
+    status?: string | null
+    contactRelationship?: string | null
+    contactNumber?: string | null
+    trackingId?: string | null
+    eventLocationId?: string | null
+    registrationNumber?: string | null
+    registeredLocationId?: string | null
+    duplicates?: Array<string | null> | null
+    createdAt?: string | null
+    modifiedAt?: string | null
+  } | null
+}
+
+type EventSearchFields_DeathEventSearchSet_Fragment = {
+  __typename?: 'DeathEventSearchSet'
+  dateOfDeath?: any | null
+  id: string
+  type?: string | null
+  deceasedName?: Array<{
+    __typename?: 'HumanName'
+    firstNames?: string | null
+    familyName?: string | null
+    use?: string | null
+  } | null> | null
+  registration?: {
+    __typename?: 'RegistrationSearchSet'
+    status?: string | null
+    contactRelationship?: string | null
+    contactNumber?: string | null
+    trackingId?: string | null
+    eventLocationId?: string | null
+    registrationNumber?: string | null
+    registeredLocationId?: string | null
+    duplicates?: Array<string | null> | null
+    createdAt?: string | null
+    modifiedAt?: string | null
+  } | null
+}
+
+export type EventSearchFieldsFragment =
+  | EventSearchFields_BirthEventSearchSet_Fragment
+  | EventSearchFields_DeathEventSearchSet_Fragment
 
 export type RegistrationHomeQueryVariables = Exact<{
   locationIds?: InputMaybe<
@@ -4031,6 +4346,156 @@ export type FetchRegistrationQuery = {
         } | null
       }
     | null
+}
+
+export type ChangeAvatarMutationVariables = Exact<{
+  userId: Scalars['String']
+  avatar: AvatarInput
+}>
+
+export type ChangeAvatarMutation = {
+  __typename?: 'Mutation'
+  changeAvatar?: { __typename?: 'Avatar'; type: string; data: string } | null
+}
+
+export type ChangePhoneMutationVariables = Exact<{
+  userId: Scalars['String']
+  phoneNumber: Scalars['String']
+  nonce: Scalars['String']
+  verifyCode: Scalars['String']
+}>
+
+export type ChangePhoneMutation = {
+  __typename?: 'Mutation'
+  changePhone?: string | null
+}
+
+export type ChangePasswordMutationVariables = Exact<{
+  userId: Scalars['String']
+  existingPassword: Scalars['String']
+  password: Scalars['String']
+}>
+
+export type ChangePasswordMutation = {
+  __typename?: 'Mutation'
+  changePassword?: string | null
+}
+
+export type UpdateApplicationConfigMutationVariables = Exact<{
+  applicationConfig?: InputMaybe<ApplicationConfigurationInput>
+}>
+
+export type UpdateApplicationConfigMutation = {
+  __typename?: 'Mutation'
+  updateApplicationConfig?: {
+    __typename?: 'ApplicationConfiguration'
+    APPLICATION_NAME?: string | null
+    NID_NUMBER_PATTERN?: string | null
+    PHONE_NUMBER_PATTERN?: string | null
+    COUNTRY_LOGO?: {
+      __typename?: 'CountryLogo'
+      fileName?: string | null
+      file?: string | null
+    } | null
+    CURRENCY?: {
+      __typename?: 'Currency'
+      languagesAndCountry?: Array<string | null> | null
+      isoCode?: string | null
+    } | null
+    BIRTH?: {
+      __typename?: 'Birth'
+      REGISTRATION_TARGET?: number | null
+      LATE_REGISTRATION_TARGET?: number | null
+      FEE?: {
+        __typename?: 'BirthFee'
+        ON_TIME?: number | null
+        LATE?: number | null
+        DELAYED?: number | null
+      } | null
+    } | null
+    DEATH?: {
+      __typename?: 'Death'
+      REGISTRATION_TARGET?: number | null
+      FEE?: {
+        __typename?: 'DeathFee'
+        ON_TIME?: number | null
+        DELAYED?: number | null
+      } | null
+    } | null
+  } | null
+}
+
+export type GetTotalCorrectionsQueryVariables = Exact<{
+  event: Scalars['String']
+  timeStart: Scalars['String']
+  timeEnd: Scalars['String']
+  locationId?: InputMaybe<Scalars['String']>
+}>
+
+export type GetTotalCorrectionsQuery = {
+  __typename?: 'Query'
+  getTotalCorrections?: Array<{
+    __typename?: 'CorrectionMetric'
+    total: number
+    reason: string
+  }> | null
+}
+
+export type GetTotalMetricsQueryVariables = Exact<{
+  event: Scalars['String']
+  timeStart: Scalars['String']
+  timeEnd: Scalars['String']
+  locationId?: InputMaybe<Scalars['String']>
+}>
+
+export type GetTotalMetricsQuery = {
+  __typename?: 'Query'
+  getTotalMetrics?: {
+    __typename?: 'TotalMetricsResult'
+    estimated: {
+      __typename?: 'Estimation'
+      totalEstimation: number
+      maleEstimation: number
+      femaleEstimation: number
+      locationId: string
+      estimationYear: number
+      locationLevel: string
+    }
+    results: Array<{
+      __typename?: 'EventMetrics'
+      total: number
+      gender: string
+      eventLocationType: string
+      practitionerRole: string
+      timeLabel: string
+    }>
+  } | null
+}
+
+export type GetLocationStatisticsQueryVariables = Exact<{
+  locationId?: InputMaybe<Scalars['String']>
+  populationYear: Scalars['Int']
+  status: Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
+  event?: InputMaybe<Scalars['String']>
+}>
+
+export type GetLocationStatisticsQuery = {
+  __typename?: 'Query'
+  getLocationStatistics?: {
+    __typename?: 'LocationStatisticsResponse'
+    population?: number | null
+    offices: number
+    registrars: number
+  } | null
+  fetchRegistrationCountByStatus?: {
+    __typename?: 'RegistrationCountResult'
+    total: number
+    results: Array<{
+      __typename?: 'StatusWiseRegistrationCount'
+      status: string
+      count: number
+    } | null>
+  } | null
 }
 
 export type HasChildLocationQueryVariables = Exact<{

@@ -11,7 +11,43 @@
  */
 import gql from 'graphql-tag'
 
+const EVENT_SEARCH_RESULT_FIELDS = gql`
+  fragment EventSearchFields on EventSearchSet {
+    id
+    type
+    registration {
+      status
+      contactRelationship
+      contactNumber
+      trackingId
+      eventLocationId
+      registrationNumber
+      registeredLocationId
+      duplicates
+      createdAt
+      modifiedAt
+    }
+    ... on BirthEventSearchSet {
+      dateOfBirth
+      childName {
+        firstNames
+        familyName
+        use
+      }
+    }
+    ... on DeathEventSearchSet {
+      dateOfDeath
+      deceasedName {
+        firstNames
+        familyName
+        use
+      }
+    }
+  }
+`
+
 export const REGISTRATION_HOME_QUERY = gql`
+  ${EVENT_SEARCH_RESULT_FIELDS}
   query registrationHome(
     $locationIds: [String]
     $pageSize: Int
@@ -33,36 +69,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        id
-        type
-        registration {
-          status
-          contactRelationship
-          contactNumber
-          trackingId
-          eventLocationId
-          registrationNumber
-          registeredLocationId
-          duplicates
-          createdAt
-          modifiedAt
-        }
-        ... on BirthEventSearchSet {
-          dateOfBirth
-          childName {
-            firstNames
-            familyName
-            use
-          }
-        }
-        ... on DeathEventSearchSet {
-          dateOfDeath
-          deceasedName {
-            firstNames
-            familyName
-            use
-          }
-        }
+        ...EventSearchFields
       }
     }
     notificationTab: searchEvents(
@@ -74,36 +81,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        id
-        type
-        registration {
-          status
-          contactRelationship
-          contactNumber
-          trackingId
-          eventLocationId
-          registrationNumber
-          registeredLocationId
-          duplicates
-          createdAt
-          modifiedAt
-        }
-        ... on BirthEventSearchSet {
-          dateOfBirth
-          childName {
-            firstNames
-            familyName
-            use
-          }
-        }
-        ... on DeathEventSearchSet {
-          dateOfDeath
-          deceasedName {
-            firstNames
-            familyName
-            use
-          }
-        }
+        ...EventSearchFields
       }
     }
     reviewTab: searchEvents(
@@ -114,36 +92,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        id
-        type
-        registration {
-          status
-          contactRelationship
-          contactNumber
-          trackingId
-          eventLocationId
-          registrationNumber
-          registeredLocationId
-          duplicates
-          createdAt
-          modifiedAt
-        }
-        ... on BirthEventSearchSet {
-          dateOfBirth
-          childName {
-            firstNames
-            familyName
-            use
-          }
-        }
-        ... on DeathEventSearchSet {
-          dateOfDeath
-          deceasedName {
-            firstNames
-            familyName
-            use
-          }
-        }
+        ...EventSearchFields
       }
     }
     rejectTab: searchEvents(
@@ -156,36 +105,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        id
-        type
-        registration {
-          status
-          contactRelationship
-          contactNumber
-          trackingId
-          eventLocationId
-          registrationNumber
-          registeredLocationId
-          duplicates
-          createdAt
-          modifiedAt
-        }
-        ... on BirthEventSearchSet {
-          dateOfBirth
-          childName {
-            firstNames
-            familyName
-            use
-          }
-        }
-        ... on DeathEventSearchSet {
-          dateOfDeath
-          deceasedName {
-            firstNames
-            familyName
-            use
-          }
-        }
+        ...EventSearchFields
       }
     }
     approvalTab: searchEvents(
@@ -196,36 +116,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        id
-        type
-        registration {
-          status
-          contactRelationship
-          contactNumber
-          trackingId
-          eventLocationId
-          registrationNumber
-          registeredLocationId
-          duplicates
-          createdAt
-          modifiedAt
-        }
-        ... on BirthEventSearchSet {
-          dateOfBirth
-          childName {
-            firstNames
-            familyName
-            use
-          }
-        }
-        ... on DeathEventSearchSet {
-          dateOfDeath
-          deceasedName {
-            firstNames
-            familyName
-            use
-          }
-        }
+        ...EventSearchFields
       }
     }
     externalValidationTab: searchEvents(
@@ -236,36 +127,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        id
-        type
-        registration {
-          status
-          contactRelationship
-          contactNumber
-          trackingId
-          eventLocationId
-          registrationNumber
-          registeredLocationId
-          duplicates
-          createdAt
-          modifiedAt
-        }
-        ... on BirthEventSearchSet {
-          dateOfBirth
-          childName {
-            firstNames
-            familyName
-            use
-          }
-        }
-        ... on DeathEventSearchSet {
-          dateOfDeath
-          deceasedName {
-            firstNames
-            familyName
-            use
-          }
-        }
+        ...EventSearchFields
       }
     }
     printTab: searchEvents(
@@ -276,42 +138,14 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        id
-        type
-        registration {
-          status
-          contactRelationship
-          contactNumber
-          trackingId
-          eventLocationId
-          registrationNumber
-          registeredLocationId
-          duplicates
-          createdAt
-          modifiedAt
-        }
-        ... on BirthEventSearchSet {
-          dateOfBirth
-          childName {
-            firstNames
-            familyName
-            use
-          }
-        }
-        ... on DeathEventSearchSet {
-          dateOfDeath
-          deceasedName {
-            firstNames
-            familyName
-            use
-          }
-        }
+        ...EventSearchFields
       }
     }
   }
 `
 
 export const SEARCH_EVENTS = gql`
+  ${EVENT_SEARCH_RESULT_FIELDS}
   query searchEventsForWorkqueue(
     $sort: String
     $trackingId: String
@@ -334,36 +168,7 @@ export const SEARCH_EVENTS = gql`
     ) {
       totalItems
       results {
-        id
-        type
-        registration {
-          status
-          contactRelationship
-          contactNumber
-          trackingId
-          eventLocationId
-          registrationNumber
-          registeredLocationId
-          duplicates
-          createdAt
-          modifiedAt
-        }
-        ... on BirthEventSearchSet {
-          dateOfBirth
-          childName {
-            firstNames
-            familyName
-            use
-          }
-        }
-        ... on DeathEventSearchSet {
-          dateOfDeath
-          deceasedName {
-            firstNames
-            familyName
-            use
-          }
-        }
+        ...EventSearchFields
       }
     }
   }
