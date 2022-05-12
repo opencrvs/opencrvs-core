@@ -12,7 +12,7 @@
 import gql from 'graphql-tag'
 
 export const HAS_CHILD_LOCATION = gql`
-  query data($parentId: String!) {
+  query hasChildLocation($parentId: String!) {
     hasChildLocation(parentId: $parentId) {
       id
       type
@@ -25,7 +25,7 @@ export const HAS_CHILD_LOCATION = gql`
 `
 
 export const FETCH_MONTH_WISE_EVENT_ESTIMATIONS = gql`
-  query data(
+  query fetchMonthWiseEventMetrics(
     $timeStart: String!
     $timeEnd: String!
     $locationId: String
@@ -49,7 +49,7 @@ export const FETCH_MONTH_WISE_EVENT_ESTIMATIONS = gql`
 `
 
 export const FETCH_LOCATION_WISE_EVENT_ESTIMATIONS = gql`
-  query data(
+  query fetchLocationWiseEventMetrics(
     $timeStart: String!
     $timeEnd: String!
     $locationId: String
@@ -73,7 +73,10 @@ export const FETCH_LOCATION_WISE_EVENT_ESTIMATIONS = gql`
 `
 
 export const FETCH_STATUS_WISE_REGISTRATION_COUNT = gql`
-  query data($locationId: String!, $status: [String]!) {
+  query fetchRegistrationCountByStatus(
+    $locationId: String!
+    $status: [String]!
+  ) {
     fetchRegistrationCountByStatus(locationId: $locationId, status: $status) {
       results {
         status
@@ -85,7 +88,7 @@ export const FETCH_STATUS_WISE_REGISTRATION_COUNT = gql`
 `
 
 export const FETCH_EVENTS_WITH_PROGRESS = gql`
-  query data(
+  query getEventsWithProgress(
     $locationId: String!
     $count: Int
     $skip: Int
@@ -142,7 +145,7 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
   }
 `
 export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
-  query data(
+  query searchFieldAgents(
     $locationId: String
     $primaryOfficeId: String
     $timeStart: String!
@@ -187,7 +190,7 @@ export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
   }
 `
 export const GET_TOTAL_PAYMENTS = gql`
-  query data(
+  query getTotalPayments(
     $timeStart: String!
     $timeEnd: String!
     $locationId: String
@@ -205,7 +208,11 @@ export const GET_TOTAL_PAYMENTS = gql`
   }
 `
 export const GET_TOTAL_CERTIFICATIONS = gql`
-  query data($timeStart: String!, $timeEnd: String!, $locationId: String) {
+  query getTotalCertifications(
+    $timeStart: String!
+    $timeEnd: String!
+    $locationId: String
+  ) {
     getTotalCertifications(
       timeStart: $timeStart
       timeEnd: $timeEnd

@@ -51,7 +51,7 @@ import {
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
+
 import {
   ColumnContentAlignment,
   GridTable,
@@ -59,10 +59,8 @@ import {
   Loader,
   COLUMNS
 } from '@opencrvs/components/lib/interface'
-import {
-  GQLEventSearchResultSet,
-  GQLQuery
-} from '@opencrvs/gateway/src/graphql/schema.d'
+
+import { SearchEventsQuery } from '@client/utils/gateway'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -162,6 +160,8 @@ interface ISearchResultState {
   width: number
 }
 
+type QueryData = SearchEventsQuery['searchEvents']
+
 export class SearchResultView extends React.Component<
   ISearchResultProps,
   ISearchResultState
@@ -251,7 +251,7 @@ export class SearchResultView extends React.Component<
     return this.userHasValidateScope() || this.userHasRegisterScope()
   }
 
-  transformSearchContent = (data: GQLEventSearchResultSet) => {
+  transformSearchContent = (data: QueryData) => {
     const { intl } = this.props
     if (!data || !data.results) {
       return []
@@ -409,7 +409,7 @@ export class SearchResultView extends React.Component<
         <BodyContainer>
           <>
             {searchText && searchType && (
-              <Query
+              <Query<SearchEventsQuery>
                 query={SEARCH_EVENTS}
                 variables={{
                   locationIds: userDetails
@@ -427,15 +427,7 @@ export class SearchResultView extends React.Component<
                 }}
                 fetchPolicy="no-cache"
               >
-                {({
-                  loading,
-                  error,
-                  data
-                }: {
-                  loading: boolean
-                  error?: Error
-                  data: GQLQuery
-                }) => {
+                {({ loading, error, data }) => {
                   if (loading) {
                     return (
                       <Loader
@@ -448,7 +440,7 @@ export class SearchResultView extends React.Component<
                     )
                   }
 
-                  if (error || !data.searchEvents) {
+                  if (error || !data?.searchEvents) {
                     return (
                       <ErrorText id="search-result-error-text">
                         {intl.formatMessage(errorMessages.queryError)}
