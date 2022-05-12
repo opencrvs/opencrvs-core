@@ -533,7 +533,7 @@ function UserListComponent(props: IProps) {
                 <ListViewSimplified>
                   {userContent.length <= 0 ? (
                     <NoRecord id="no-record">
-                      {intl.formatMessage(constantsMessages.noResult)}
+                      {intl.formatMessage(constantsMessages.noResults)}
                     </NoRecord>
                   ) : (
                     userContent.map((content, index) => {
