@@ -481,13 +481,6 @@ export function populateRegisterFormsWithAddresses(
         if (preceedingDefaultField) {
           addressConfiguration.configurations.forEach((configuration) => {
             if (shouldAddAddressFields(configuration)) {
-              if (
-                configuration.config ===
-                  AddressSubsections.SECONDARY_ADDRESS_SUBSECTION ||
-                configuration.config === AddressCases.SECONDARY_ADDRESS
-              ) {
-                console.log('SHOULD BE RENDERING SECOND ADDRESS')
-              }
               const tmpAddressFields: SerializedFormField[] =
                 addressFields.concat(getAddressFields(configuration))
               addressFields = tmpAddressFields
