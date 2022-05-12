@@ -174,7 +174,7 @@ export interface IDeclaration {
   event: Event
   registrationStatus?: string
   submissionStatus?: string
-  downloadStatus?: string
+  downloadStatus?: DOWNLOAD_STATUS
   downloadRetryAttempt?: number
   action?: string
   trackingId?: string

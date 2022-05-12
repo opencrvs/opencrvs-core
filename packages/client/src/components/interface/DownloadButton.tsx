@@ -23,6 +23,8 @@ import {
 } from '@client/declarations'
 import { Event, Action } from '@client/forms'
 import { withApollo, WithApolloClient } from 'react-apollo'
+import { useCallback } from 'react'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 interface IDownloadConfig {
   event: string
@@ -30,11 +32,11 @@ interface IDownloadConfig {
   action: Action
 }
 
-interface DownloadButtonProps extends IntlShapeProps {
+interface DownloadButtonProps {
   id?: string
   className?: string
   downloadConfigs: IDownloadConfig
-  status: DOWNLOAD_STATUS
+  status?: DOWNLOAD_STATUS
 }
 
 interface IDispatchProps {
@@ -63,18 +65,19 @@ const DownloadAction = styled(CircleButton)`
 `
 
 function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
-  const { id, status, intl, className } = props
-
-  function initiateDownload() {
-    const { event, compositionId, action } = props.downloadConfigs
+  const { id, status, className } = props
+  const { downloadConfigs, client, downloadDeclaration } = props
+  const initiateDownload = useCallback(() => {
+    const { event, compositionId, action } = downloadConfigs
     const downloadableDeclaration = makeDeclarationReadyToDownload(
       event.toLowerCase() as unknown as Event,
       compositionId,
       action
     )
 
-    props.downloadDeclaration(downloadableDeclaration, props.client)
-  }
+    downloadDeclaration(downloadableDeclaration, client)
+  }, [downloadConfigs, client, downloadDeclaration])
+
   if (
     status === DOWNLOAD_STATUS.READY_TO_DOWNLOAD ||
     status === DOWNLOAD_STATUS.DOWNLOADING
@@ -98,7 +101,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       <StatusIndicator className={className} id={`${id}-download-failed`}>
         <DownloadAction
           id={`${id}-icon`}
-          onClick={(e) => {
+          onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
             initiateDownload()
             e.stopPropagation()
           }}
@@ -109,10 +112,18 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     )
   }
 
+  if (status === DOWNLOAD_STATUS.DOWNLOADED) {
+    return (
+      <StatusIndicator>
+        <Downloaded />
+      </StatusIndicator>
+    )
+  }
+
   return (
     <DownloadAction
       id={`${id}-icon`}
-      onClick={(e) => {
+      onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         initiateDownload()
         e.stopPropagation()
       }}
@@ -124,5 +135,5 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 }
 
 export const DownloadButton = connect(null, { downloadDeclaration })(
-  injectIntl(withApollo(DownloadButtonComponent))
+  withApollo(DownloadButtonComponent)
 )
