@@ -663,10 +663,6 @@ class FormSectionComponent extends React.Component<Props> {
         this.showValidationErrors(this.props.fieldsToShowValidationErrors)
       }
     }
-
-    if (fieldChanged) {
-      prevProps.resetForm()
-    }
   }
 
   async componentDidMount() {
