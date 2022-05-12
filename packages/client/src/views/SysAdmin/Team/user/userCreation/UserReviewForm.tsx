@@ -298,6 +298,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
 
       if (variables.user.signature) {
         delete variables.user.signature.name
+        delete variables.user.signature.__typename //to fix updating registrar bug
       }
 
       dispatch(
