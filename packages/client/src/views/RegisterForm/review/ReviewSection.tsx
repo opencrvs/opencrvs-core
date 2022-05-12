@@ -22,7 +22,6 @@ import {
 import {
   DocumentViewer,
   IDocumentViewerOptions,
-  ListView,
   ResponsiveModal
 } from '@opencrvs/components/lib/interface'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
@@ -128,6 +127,10 @@ import { DocumentListPreview } from '@client/components/form/DocumentUploadfield
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
 import { isCorrection } from '@client/views/CorrectionForm/utils'
+import {
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -196,12 +199,27 @@ const FormData = styled.div`
     padding: 24px;
   }
 `
-const FormDataHeader = styled.div`
-  ${({ theme }) => theme.fonts.h1}
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h2}
+const Title = styled.div`
+  ${({ theme }) => theme.fonts.h2};
+  margin-bottom: 16px;
+`
+const Label = styled.span`
+  ${({ theme }) => theme.fonts.bold16};
+`
+const Value = styled.span`
+  ${({ theme }) => theme.fonts.reg16}
+`
+const SectionContainer = styled.div`
+  margin-bottom: 30px;
+`
+
+const DocumentListPreviewContainer = styled.div`
+  display: none;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: block;
   }
 `
+
 const InputWrapper = styled.div`
   margin-top: 56px;
 `
@@ -1501,19 +1519,50 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 const { uploadedDocuments, selectOptions } =
                   this.prepSectionDocuments(declaration, sec.id)
                 return (
-                  <ListView
-                    responsiveContents={
+                  <SectionContainer key={index}>
+                    {sec.title && (
+                      <Title>
+                        {sec.title}
+                        {sec.action && (
+                          <LinkButton onClick={sec.action.handler}>
+                            {sec.action.label}
+                          </LinkButton>
+                        )}
+                      </Title>
+                    )}
+                    <DocumentListPreviewContainer>
                       <DocumentListPreview
                         id={sec.id}
                         documents={uploadedDocuments}
                         onSelect={this.selectForPreview}
                         dropdownOptions={selectOptions}
                       />
-                    }
-                    key={index}
-                    {...sec}
-                    id={'Section_' + sec.id}
-                  />
+                    </DocumentListPreviewContainer>
+                    <ListViewSimplified id={'Section_' + sec.id}>
+                      {sec.items.map((item, index) => {
+                        return (
+                          <ListViewItemSimplified
+                            key={index}
+                            label={<Label>{item.label}</Label>}
+                            value={
+                              <Value id={item.label.split(' ')[0]}>
+                                {item.value}
+                              </Value>
+                            }
+                            actions={
+                              <LinkButton
+                                id={item.action.id}
+                                disabled={item.action.disabled}
+                                onClick={item.action.handler}
+                              >
+                                {item.action.label}
+                              </LinkButton>
+                            }
+                          />
+                        )
+                      })}
+                    </ListViewSimplified>
+                  </SectionContainer>
                 )
               })}
               {event === Event.BIRTH && !isCorrection(declaration) && (

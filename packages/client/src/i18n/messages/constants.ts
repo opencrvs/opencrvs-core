@@ -496,7 +496,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.noNameProvided'
   },
   noResults: {
-    defaultMessage: 'No result to display',
+    defaultMessage: 'No result',
     description:
       'Text to display if the search return no results for the current filters',
     id: 'constants.noResults'
