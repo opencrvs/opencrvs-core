@@ -27,8 +27,8 @@ import {
   ICertificateTemplateData
 } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
-import { filterLocations, getLocation } from '@client/utils/locationUtils'
-import { IFormConfig, ISerializedForm } from '@client/forms'
+import { filterLocations } from '@client/utils/locationUtils'
+import { IFormConfig, IQuestionConfig } from '@client/forms'
 import { isOfflineDataLoaded, isNationalSystemAdmin } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
@@ -36,8 +36,6 @@ import {
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
 import { find, merge } from 'lodash'
-import { registerForms } from '@client/forms/configuration/default'
-import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
 
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
@@ -67,21 +65,12 @@ export interface ILocation {
   partOf: string
 }
 
-export interface IForm {
-  registerForm: {
-    birth: ISerializedForm
-    death: ISerializedForm
-  }
-  userForm: ISerializedForm
-}
-
 export interface IOfflineData {
   locations: { [key: string]: ILocation }
   facilities: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
   pilotLocations: { [key: string]: ILocation }
   languages: ILanguage[]
-  forms: IForm
   templates: {
     receipt?: IPDFTemplate
     certificates: {
@@ -112,6 +101,63 @@ export const initialState: IOfflineDataState = {
 
 async function saveOfflineData(offlineData: IOfflineData) {
   return storage.setItem('offline', JSON.stringify(offlineData))
+}
+
+function getAvailableContent(formConfig: IFormConfig, languages: ILanguage[]) {
+  languages.forEach((language) => {
+    language.messages = {
+      ...language.messages,
+      ...extractMessages(formConfig.questionConfig, language.lang)
+    }
+  })
+  return languages
+}
+
+function extractMessages(questions: IQuestionConfig[], language: string) {
+  const messages: { [key: string]: string } = {}
+  questions.forEach((question) => {
+    const labelMessage = find(question.label, {
+      lang: language
+    })
+    const placeholderMessage = find(question.placeholder, {
+      lang: language
+    })
+    const descriptionMessage = find(question.description, {
+      lang: language
+    })
+    const tooltipMessage = find(question.tooltip, {
+      lang: language
+    })
+    const errorMessage = find(question.errorMessage, {
+      lang: language
+    })
+    if (labelMessage?.descriptor?.id) {
+      const labelID: string = labelMessage.descriptor.id as string
+      messages[labelID] = labelMessage?.descriptor?.defaultMessage as string
+    }
+
+    if (placeholderMessage?.descriptor?.id) {
+      const placeholderID: string = placeholderMessage.descriptor.id as string
+      messages[placeholderID] = placeholderMessage.descriptor
+        .defaultMessage as string
+    }
+
+    if (descriptionMessage?.descriptor?.id) {
+      const descID = descriptionMessage.descriptor.id as string
+      messages[descID] = descriptionMessage.descriptor.defaultMessage as string
+    }
+
+    if (tooltipMessage?.descriptor?.id) {
+      const tooltipID = tooltipMessage.descriptor.id as string
+      messages[tooltipID] = tooltipMessage.descriptor.defaultMessage as string
+    }
+
+    if (errorMessage?.descriptor?.id) {
+      const errID = errorMessage.descriptor.id as string
+      messages[errID] = errorMessage.descriptor.defaultMessage as string
+    }
+  })
+  return messages
 }
 
 function checkIfDone(
@@ -171,6 +217,11 @@ const PILOT_LOCATIONS_CMD = Cmd.run(() => referenceApi.loadPilotLocations(), {
   failActionCreator: actions.pilotLocationsFailed
 })
 
+/*
+ * TODO: This API is not used anymore so this can be
+ * removed but will require quite a bit of refactoring
+ * in the tests
+ */
 const ASSETS_CMD = Cmd.run(() => referenceApi.loadAssets(), {
   successActionCreator: actions.assetsLoaded,
   failActionCreator: actions.assetsFailed
@@ -179,6 +230,11 @@ const ASSETS_CMD = Cmd.run(() => referenceApi.loadAssets(), {
 const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   successActionCreator: actions.configLoaded,
   failActionCreator: actions.configFailed
+})
+
+const CONTENT_CMD = Cmd.run(() => referenceApi.loadContent(), {
+  successActionCreator: actions.contentLoaded,
+  failActionCreator: actions.contentFailed
 })
 
 const RETRY_TIMEOUT = 5000
@@ -190,23 +246,13 @@ function delay(cmd: RunCmd<any>, time: number) {
   )
 }
 
-function getContentCmd(state: IOfflineDataState) {
-  // formConfig needs to be passed from the offline reducer to the form reducer and so this is the only way
-
-  return Cmd.run(referenceApi.loadContent, {
-    successActionCreator: actions.contentLoaded,
-    failActionCreator: actions.contentFailed,
-    args: [state.offlineData.formConfig]
-  })
-}
-
-function getDataLoadingCommands(state: IOfflineDataState) {
+function getDataLoadingCommands() {
   return Cmd.list<actions.Action>([
     FACILITIES_CMD,
     LOCATIONS_CMD,
     PILOT_LOCATIONS_CMD,
     CONFIG_CMD,
-    getContentCmd(state),
+    CONTENT_CMD,
     ASSETS_CMD
   ])
 }
@@ -256,7 +302,7 @@ function reducer(
     case actions.REFRESH_OFFLINE_DATA: {
       return loop(
         state,
-        Cmd.list([getDataLoadingCommands(state), updateGlobalConfig()])
+        Cmd.list([getDataLoadingCommands(), updateGlobalConfig()])
       )
     }
     case actions.GET_OFFLINE_DATA_SUCCESS: {
@@ -265,7 +311,7 @@ function reducer(
         offlineDataString ? offlineDataString : '{}'
       )
 
-      const dataLoadingCmds = getDataLoadingCommands(state)
+      const dataLoadingCmds = getDataLoadingCommands()
       const offlineDataLoaded = isOfflineDataLoaded(offlineData)
       if (offlineDataLoaded) {
         return loop(
@@ -297,20 +343,42 @@ function reducer(
         Cmd.run(saveOfflineData, { args: [newOfflineData] })
       )
     }
+    case actions.UPDATE_OFFLINE_FORM_CONFIG: {
+      const { formConfig } = state.offlineData
+
+      if (!formConfig) return state
+
+      const { formDrafts, questionConfig = formConfig.questionConfig } =
+        action.payload
+
+      const newFormConfig = {
+        formDrafts,
+        questionConfig
+      }
+
+      return loop(
+        {
+          ...state,
+          offlineData: {
+            ...state.offlineData,
+            formConfig: newFormConfig
+          }
+        },
+        Cmd.action(actions.offlineFormConfigUpdated(newFormConfig))
+      )
+    }
     /*
      * Configurations
      */
-    case actions.APPLICATION_CONFIG_LOAD: {
-      return loop(state, CONFIG_CMD)
-    }
     case actions.APPLICATION_CONFIG_LOADED: {
-      merge(window.config, action.payload.config)
-      const birthCertificateTemplate = find(action.payload.certificates, {
+      const { certificates, config, formConfig } = action.payload
+      merge(window.config, config)
+      const birthCertificateTemplate = find(certificates, {
         event: 'birth',
         status: 'ACTIVE'
       }) as ICertificateTemplateData
 
-      const deathCertificateTemplate = find(action.payload.certificates, {
+      const deathCertificateTemplate = find(certificates, {
         event: 'death',
         status: 'ACTIVE'
       }) as ICertificateTemplateData
@@ -322,8 +390,8 @@ function reducer(
 
       const newOfflineData = {
         ...state.offlineData,
-        config: action.payload.config,
-        formConfig: action.payload.formConfig,
+        config,
+        formConfig,
         templates: {
           certificates: {
             birth: {
@@ -358,16 +426,16 @@ function reducer(
      */
 
     case actions.CONTENT_LOADED: {
-      const defaultFormsConfig = {
-        registerForm: registerForms,
-        userForm: createUserForm
-      }
       return {
         ...state,
         offlineData: {
           ...state.offlineData,
-          languages: action.payload.languages,
-          forms: defaultFormsConfig as IForm
+          languages: state.offlineData.formConfig
+            ? getAvailableContent(
+                state.offlineData.formConfig as IFormConfig,
+                action.payload.languages
+              )
+            : action.payload.languages
         }
       }
     }
@@ -377,7 +445,7 @@ function reducer(
           ...state,
           loadingError: errorIfDataNotLoaded(state)
         },
-        delay(getContentCmd(state), RETRY_TIMEOUT)
+        delay(CONTENT_CMD, RETRY_TIMEOUT)
       )
     }
 

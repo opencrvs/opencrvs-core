@@ -15,9 +15,9 @@ importScripts(
 
 const queue = new workbox.backgroundSync.Queue('registerQueue', {
   callbacks: {
-    queueDidReplay: function(requestArray) {
+    queueDidReplay: function (requestArray) {
       let requestSynced = 0
-      requestArray.forEach(item => {
+      requestArray.forEach((item) => {
         if (!item.error) {
           requestSynced++
         }
@@ -33,12 +33,12 @@ const queue = new workbox.backgroundSync.Queue('registerQueue', {
 })
 const GraphQLMatch = /graphql(\S+)?/
 
-self.addEventListener('fetch', event => {
+self.addEventListener('fetch', (event) => {
   if (
     null !== event.request.url.match(GraphQLMatch) &&
     navigator.onLine === false
   ) {
-    const promiseChain = fetch(event.request.clone()).catch(err => {
+    const promiseChain = fetch(event.request.clone()).catch((err) => {
       return queue.addRequest(event.request)
     })
 
@@ -46,7 +46,7 @@ self.addEventListener('fetch', event => {
   }
 })
 
-self.addEventListener('message', event => {
+self.addEventListener('message', (event) => {
   if (!event.data) {
     return
   }
@@ -70,8 +70,14 @@ workbox.precaching.precacheAndRoute([])
  * https://developers.google.com/web/tools/workbox/modules/workbox-strategies#network_first_network_falling_back_to_cache
  */
 
+// This caches the config files fetched from country config
 workbox.routing.registerRoute(
-  '/config.js',
+  /http(.+)config\.js$/,
+  new workbox.strategies.NetworkFirst()
+)
+// This caches config fetched from the config microservice
+workbox.routing.registerRoute(
+  /http(.+)config$/,
   new workbox.strategies.NetworkFirst()
 )
 

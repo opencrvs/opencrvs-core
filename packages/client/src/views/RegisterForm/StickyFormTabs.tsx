@@ -11,9 +11,8 @@
  */
 import * as React from 'react'
 import Sticky from 'react-stickynode'
-import { IFormSection } from '@client/forms'
+import { IFormTabs, FormTabs } from '@opencrvs/components/lib/forms'
 import styled from '@client/styledComponents'
-import { FormTabs } from '@client/components/form'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 
 const StickyFormTabsContainer = styled.div`
@@ -23,7 +22,7 @@ const StickyFormTabsContainer = styled.div`
 `
 
 interface IStickyFormTabProps {
-  sections: IFormSection[]
+  sections: IFormTabs[]
   activeTabId: string
   onTabClick: (tabId: string) => void
 }

@@ -97,12 +97,7 @@ describe('Verify getLoggedInPractitionerResource', () => {
         }),
         { status: 200 }
       ],
-      [
-        JSON.stringify({
-          data: 'ivalid'
-        }),
-        { status: 200 }
-      ]
+      [{}, { status: 401 }]
     )
     const token = jwt.sign(
       { scope: ['declare'] },
@@ -181,8 +176,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
           link: [
             {
               relation: 'self',
-              url:
-                'http://localhost:3447/fhir/Practitioner?telecom=phone%7C01711111111'
+              url: 'http://localhost:3447/fhir/Practitioner?telecom=phone%7C01711111111'
             }
           ],
           entry: [
@@ -196,9 +190,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
         { status: 200 }
       ]
     )
-    expect(getLoggedInPractitionerPrimaryLocation(token)).rejects.toThrowError(
-      'Invalid practioner found'
-    )
+    expect(getLoggedInPractitionerPrimaryLocation(token)).rejects.toThrowError()
   })
   it('throws errof if practioner does not have any valid role entry', async () => {
     const token = jwt.sign(
@@ -228,8 +220,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
           link: [
             {
               relation: 'self',
-              url:
-                'http://localhost:3447/fhir/Practitioner?telecom=phone%7C01711111111'
+              url: 'http://localhost:3447/fhir/Practitioner?telecom=phone%7C01711111111'
             }
           ],
           entry: [
@@ -268,8 +259,7 @@ describe('Verify getLoggedInPractitionerPrimaryLocation', () => {
           link: [
             {
               relation: 'self',
-              url:
-                'http://localhost:3447/fhir/Practitioner?telecom=phone%7C01711111111'
+              url: 'http://localhost:3447/fhir/Practitioner?telecom=phone%7C01711111111'
             }
           ],
           entry: [

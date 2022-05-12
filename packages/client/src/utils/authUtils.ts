@@ -103,7 +103,7 @@ export function refreshToken() {
   }
 }
 
-const enum RouteScope {
+export const enum AuthScope {
   DECLARE = 'declare',
   REGISTER = 'register',
   CERTIFY = 'certify',
@@ -114,21 +114,21 @@ const enum RouteScope {
 }
 
 export const hasNatlSysAdminScope = (scope: Scope | null): boolean => {
-  if (scope?.includes(RouteScope.NATLSYSADMIN)) {
+  if (scope?.includes(AuthScope.NATLSYSADMIN)) {
     return true
   }
   return false
 }
 
 export const hasRegisterScope = (scope: Scope | null): boolean => {
-  if (scope?.includes(RouteScope.REGISTER)) {
+  if (scope?.includes(AuthScope.REGISTER)) {
     return true
   }
   return false
 }
 
 export const hasRegistrationClerkScope = (scope: Scope | null): boolean => {
-  if (scope?.includes(RouteScope.VALIDATE)) {
+  if (scope?.includes(AuthScope.VALIDATE)) {
     return true
   }
   return false

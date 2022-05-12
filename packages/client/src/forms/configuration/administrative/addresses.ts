@@ -63,7 +63,7 @@ const primaryAddressSameAsOtherPrimaryAddress =
   'values.primaryAddressSameAsOtherPrimary'
 
 // secondary addresses are not enabled
-const secondaryAddressesDisabled = '!window.config.ADDRESSES!==2'
+const secondaryAddressesDisabled = '!window.config.ADDRESSES==2'
 
 export enum AddressSubsections {
   PRIMARY_ADDRESS_SUBSECTION = 'primaryAddress',
@@ -200,7 +200,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       {
         config: AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
         label: formMessageDescriptors.primaryAddressSameAsDeceasedsPrimary,
-        xComparisonSection: DeathSection.Informants,
+        xComparisonSection: DeathSection.Informant,
         yComparisonSection: DeathSection.Deceased
       },
       {
@@ -445,13 +445,31 @@ export const getXAddressSameAsY = (
   return [copyAddressField]
 }
 
+const shouldAddAddressFields = (
+  configuration: AllowedAddressConfigurations
+) => {
+  if (
+    (configuration.config === AddressSubsections.SECONDARY_ADDRESS_SUBSECTION ||
+      configuration.config === AddressCases.SECONDARY_ADDRESS) &&
+    window.config.ADDRESSES === 2
+  ) {
+    return true
+  } else if (
+    (configuration.config === AddressSubsections.SECONDARY_ADDRESS_SUBSECTION ||
+      configuration.config === AddressCases.SECONDARY_ADDRESS) &&
+    window.config.ADDRESSES === 1
+  ) {
+    return false
+  } else {
+    return true
+  }
+}
+
 export function populateRegisterFormsWithAddresses(
   defaultEventForm: ISerializedForm,
   event: string
 ) {
   const newForm = cloneDeep(defaultEventForm)
-  // TODO: will remove this line and add coverage to this function when tests are refactored in this PR: https://github.com/opencrvs/opencrvs-core/pull/2818
-  // and when this PR is merged with https://github.com/opencrvs/opencrvs-core/pull/2907
   defaultAddressConfiguration.forEach(
     (addressConfiguration: IAddressConfiguration) => {
       if (addressConfiguration.preceedingFieldId.includes(event)) {
@@ -462,14 +480,15 @@ export function populateRegisterFormsWithAddresses(
         let previewGroups: IPreviewGroup[] = []
         if (preceedingDefaultField) {
           addressConfiguration.configurations.forEach((configuration) => {
-            // TODO: At this point we can check the ApplicationConfig from this PR: https://github.com/opencrvs/opencrvs-core/pull/2818 and see if 2 addresses are enabled
-            const tmpAddressFields: SerializedFormField[] =
-              addressFields.concat(getAddressFields(configuration))
-            addressFields = tmpAddressFields
-            const tmpPreviewGroups: IPreviewGroup[] = previewGroups.concat(
-              getPreviewGroups(configuration)
-            )
-            previewGroups = tmpPreviewGroups
+            if (shouldAddAddressFields(configuration)) {
+              const tmpAddressFields: SerializedFormField[] =
+                addressFields.concat(getAddressFields(configuration))
+              addressFields = tmpAddressFields
+              const tmpPreviewGroups: IPreviewGroup[] = previewGroups.concat(
+                getPreviewGroups(configuration)
+              )
+              previewGroups = tmpPreviewGroups
+            }
           })
         }
         if (preceedingDefaultField && addressFields.length) {
@@ -540,6 +559,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the country select',
         id: 'form.field.label.country'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: true,
       initialValue: window.config.COUNTRY.toUpperCase(),
@@ -594,6 +614,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the state select',
         id: 'form.field.label.state'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: true,
       initialValue: '',
@@ -660,6 +681,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the district select',
         id: 'form.field.label.district'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: true,
       initialValue: '',
@@ -750,6 +772,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       ],
       initialValue: 'URBAN',
       flexDirection: FLEX_DIRECTION.ROW,
+      customisable: false,
       previewGroup: 'primaryAddress',
       hideValueInPreview: true,
       required: false,
@@ -814,6 +837,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the address line 4',
         id: 'form.field.label.cityUrbanOption'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: false,
       initialValue: '',
@@ -882,6 +906,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the address line 3 option 2',
         id: 'form.field.label.addressLine3UrbanOption'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: false,
       initialValue: '',
@@ -950,6 +975,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the address line 1',
         id: 'form.field.label.addressLine2UrbanOption'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: false,
       initialValue: '',
@@ -1018,6 +1044,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the number field',
         id: 'form.field.label.number'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: false,
       initialValue: '',
@@ -1086,6 +1113,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international postcode',
         id: 'form.field.label.internationalPostcode'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: false,
       initialValue: '',
@@ -1154,6 +1182,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the address line 1',
         id: 'form.field.label.addressLine5'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: false,
       initialValue: '',
@@ -1222,6 +1251,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international state select',
         id: 'form.field.label.internationalState'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: true,
       initialValue: '',
@@ -1274,6 +1304,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international district select',
         id: 'form.field.label.internationalDistrict'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: true,
       initialValue: '',
@@ -1326,6 +1357,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international city select',
         id: 'form.field.label.internationalCity'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: false,
       initialValue: '',
@@ -1378,6 +1410,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international address line 1 select',
         id: 'form.field.label.internationalAddressLine1'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: false,
       initialValue: '',
@@ -1430,6 +1463,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international address line 2 select',
         id: 'form.field.label.internationalAddressLine2'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: false,
       initialValue: '',
@@ -1482,6 +1516,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international address line 3 select',
         id: 'form.field.label.internationalAddressLine3'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: false,
       initialValue: '',
@@ -1534,6 +1569,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international postcode',
         id: 'form.field.label.internationalPostcode'
       },
+      customisable: false,
       previewGroup: 'primaryAddress',
       required: false,
       initialValue: '',
@@ -1590,6 +1626,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the country select',
         id: 'form.field.label.country'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: true,
       initialValue: window.config.COUNTRY.toUpperCase(),
@@ -1644,6 +1681,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the state select',
         id: 'form.field.label.state'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: true,
       initialValue: '',
@@ -1710,6 +1748,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the district select',
         id: 'form.field.label.district'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: true,
       initialValue: '',
@@ -1800,6 +1839,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       ],
       initialValue: 'URBAN',
       flexDirection: FLEX_DIRECTION.ROW,
+      customisable: false,
       previewGroup: 'secondaryAddress',
       hideValueInPreview: true,
       required: false,
@@ -1864,6 +1904,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the address line 4',
         id: 'form.field.label.cityUrbanOption'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: false,
       initialValue: '',
@@ -1932,6 +1973,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the address line 3 option 2',
         id: 'form.field.label.addressLine3UrbanOption'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: false,
       initialValue: '',
@@ -2000,6 +2042,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the address line 1',
         id: 'form.field.label.addressLine2UrbanOption'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: false,
       initialValue: '',
@@ -2068,6 +2111,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the number field',
         id: 'form.field.label.number'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: false,
       initialValue: '',
@@ -2136,6 +2180,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international postcode',
         id: 'form.field.label.internationalPostcode'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: false,
       initialValue: '',
@@ -2204,6 +2249,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the address line 1',
         id: 'form.field.label.addressLine5'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: false,
       initialValue: '',
@@ -2272,6 +2318,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international state select',
         id: 'form.field.label.internationalState'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: true,
       initialValue: '',
@@ -2324,6 +2371,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international district select',
         id: 'form.field.label.internationalDistrict'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: true,
       initialValue: '',
@@ -2376,6 +2424,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international city select',
         id: 'form.field.label.internationalCity'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: false,
       initialValue: '',
@@ -2428,6 +2477,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international address line 1 select',
         id: 'form.field.label.internationalAddressLine1'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: false,
       initialValue: '',
@@ -2480,6 +2530,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international address line 2 select',
         id: 'form.field.label.internationalAddressLine2'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: false,
       initialValue: '',
@@ -2532,6 +2583,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international address line 3 select',
         id: 'form.field.label.internationalAddressLine3'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: false,
       initialValue: '',
@@ -2584,6 +2636,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
         description: 'Title for the international postcode',
         id: 'form.field.label.internationalPostcode'
       },
+      customisable: false,
       previewGroup: 'secondaryAddress',
       required: false,
       initialValue: '',

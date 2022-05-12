@@ -12,7 +12,7 @@
 import gql from 'graphql-tag'
 
 export const SEARCH_EVENTS = gql`
-  query (
+  query searchEvents(
     $sort: String
     $trackingId: String
     $contactNumber: String
@@ -63,7 +63,7 @@ export const SEARCH_EVENTS = gql`
   }
 `
 export const SEARCH_DECLARATIONS_USER_WISE = gql`
-  query (
+  query searchDeclarationsUserWise(
     $status: [String]
     $userId: String
     $locationIds: [String]
@@ -113,7 +113,11 @@ export const SEARCH_DECLARATIONS_USER_WISE = gql`
 `
 
 export const COUNT_USER_WISE_DECLARATIONS = gql`
-  query ($status: [String], $userId: String, $locationIds: [String]) {
+  query countUserWiseDeclarations(
+    $status: [String]
+    $userId: String
+    $locationIds: [String]
+  ) {
     searchEvents(status: $status, userId: $userId, locationIds: $locationIds) {
       totalItems
     }

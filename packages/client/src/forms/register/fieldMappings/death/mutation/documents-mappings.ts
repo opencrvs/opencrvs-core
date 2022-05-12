@@ -30,14 +30,12 @@ export const deathSectionMapping = {
     deathDocumentForWhomFhirMapping.DECEASED_DEATH_PROOF,
     deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF
   ],
-  [DeathSection.Informants]: [
-    deathDocumentForWhomFhirMapping.INFORMANT_ID_PROOF
-  ]
+  [DeathSection.Informant]: [deathDocumentForWhomFhirMapping.INFORMANT_ID_PROOF]
 }
 
 export const deathSectionTitle = {
   [DeathSection.Deceased]: 'Deceased',
-  [DeathSection.Informants]: 'Informant'
+  [DeathSection.Informant]: 'Informant'
 }
 
 export const deathDocumentTypeFhirMapping = {

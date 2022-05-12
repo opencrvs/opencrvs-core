@@ -27,3 +27,4 @@ src/i18n/locales/bn.csv
 src/i18n/locales/en.csv
 
 .vscode
+graphql.schema.json
