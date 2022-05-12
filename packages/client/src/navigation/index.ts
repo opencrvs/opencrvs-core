@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event, UserSection, CorrectionSection } from '@client/forms'
+import {
+  Event,
+  UserSection,
+  CorrectionSection,
+  WizardSection
+} from '@client/forms'
 import {
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
@@ -47,9 +52,10 @@ import {
   APPLICATION_CONFIG,
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
-  DECLARATION_RECORD_AUDIT
+  DECLARATION_RECORD_AUDIT,
+  FORM_CONFIG_WIZARD,
+  FORM_CONFIG_HOME
 } from '@client/navigation/routes'
-import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
@@ -172,6 +178,10 @@ export function goToHome() {
 
 export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
+}
+
+export function goToFormConfigHome() {
+  return push(FORM_CONFIG_HOME)
 }
 
 export function goToApplicationConfig() {
@@ -352,6 +362,15 @@ export function goToRegistrarHomeTab(
     type: GO_TO_REGISTRAR_HOME,
     payload: { tabId, selectorId }
   }
+}
+
+export function goToFormConfigWizard(event: Event, section: WizardSection) {
+  return push(
+    formatUrl(FORM_CONFIG_WIZARD, {
+      event: event,
+      section: section
+    })
+  )
 }
 
 export function goToSysAdminHomeTab(tabId: string) {

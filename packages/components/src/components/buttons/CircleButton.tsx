@@ -10,15 +10,23 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import styled from 'styled-components'
+import React from 'react'
 
-export const CircleButton = styled.button<{ dark?: boolean; size?: string }>`
+type IButtonSize = 'small' | 'medium' | 'large'
+
+const dimensionMap = {
+  small: '24px',
+  medium: '32px',
+  large: '40px'
+}
+
+const Button = styled.button<ICircleButtonProps & { size: IButtonSize }>`
   color: ${({ theme }) => theme.colors.primary};
-  margin: 0;
   transition: background 0.4s ease;
   border: none;
   background: none;
-  height: ${({ size }) => (size && size === 'small' ? 20 : 40)}px;
-  width: ${({ size }) => (size && size === 'small' ? 20 : 40)}px;
+  height: ${({ size }) => dimensionMap[size]};
+  width: ${({ size }) => dimensionMap[size]};
   display: flex;
   justify-content: center;
   align-items: center;
@@ -52,11 +60,28 @@ export const CircleButton = styled.button<{ dark?: boolean; size?: string }>`
     background: ${({ theme }) => theme.colors.grey200};
     color: ${({ theme }) => theme.colors.copy};
   }
-  padding: 0 8px;
   &:disabled {
     cursor: default;
     path {
       stroke: ${({ theme }) => theme.colors.disabled};
+      fill: ${({ theme }) => theme.colors.disabled};
     }
   }
 `
+interface ICircleButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  size?: IButtonSize
+  dark?: boolean
+}
+
+export function CircleButton({
+  size = 'large',
+  children,
+  ...props
+}: ICircleButtonProps) {
+  return (
+    <Button size={size} {...props}>
+      {children}
+    </Button>
+  )
+}

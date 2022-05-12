@@ -33,10 +33,17 @@ const TopBarTitle = styled.h4`
   padding-left: 16px;
   color: ${({ theme }) => theme.colors.copy};
 `
+
 const Item = styled.span`
   display: flex;
   align-items: center;
 `
+const TopBarActionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`
+
 export interface IEventTopBarProps {
   id?: string
   title: string
@@ -46,7 +53,9 @@ export interface IEventTopBarProps {
   exitAction?: IEventTopBarMenuAction
   menuItems?: IToggleMenuItem[]
   iconColor?: string
+  topBarActions?: React.ReactNode[]
 }
+
 export interface IEventTopBarMenuAction {
   handler: () => void
   label: string
@@ -65,16 +74,19 @@ export const EventTopBar = (props: IEventTopBarProps) => {
     exitAction,
     menuItems,
     iconColor = 'purple',
+    topBarActions,
     pageIcon
   } = props
   return (
     <TopBar>
       <Item>
         {pageIcon || <DeclarationIcon color={iconColor} />}
-        {''}
         <TopBarTitle>{title}</TopBarTitle>
       </Item>
       <Item>
+        {topBarActions && (
+          <TopBarActionsContainer>{topBarActions}</TopBarActionsContainer>
+        )}
         {goHome && (
           <CircleButton id="crcl-btn" onClick={goHome}>
             <Cross color="currentColor" />
@@ -91,7 +103,6 @@ export const EventTopBar = (props: IEventTopBarProps) => {
             <Cross color="currentColor" />
           </CircleButton>
         )}
-
         {menuItems && (
           <ToggleMenu
             id="eventToggleMenu"

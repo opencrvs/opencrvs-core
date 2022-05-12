@@ -23,6 +23,7 @@ import { ApiResponse } from '@elastic/elasticsearch'
 import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
 import { updateComposition } from '@search/elasticsearch/dbhelper'
 import { capitalize } from '@search/features/search/utils'
+import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
 export async function searchDeclaration(
   request: Hapi.Request,
@@ -46,7 +47,7 @@ export async function getAllDocumentsHandler(
     // By performing the search, requesting only the first 10 in DEFAULT_SIZE we can get the total count
     const allDocumentsCountCheck = await client.search(
       {
-        index: 'ocrvs',
+        index: OPENCRVS_INDEX_NAME,
         body: {
           query: { match_all: {} },
           sort: [{ dateOfDeclaration: 'asc' }],
@@ -66,7 +67,7 @@ export async function getAllDocumentsHandler(
     // If total count is less than 5000, then proceed.
     const allDocuments = await client.search(
       {
-        index: 'ocrvs',
+        index: OPENCRVS_INDEX_NAME,
         body: {
           query: { match_all: {} },
           sort: [{ dateOfDeclaration: 'asc' }],
@@ -169,7 +170,7 @@ export async function populateHierarchicalLocationIdsHandler(
     // By performing the search, requesting only the first 10 in DEFAULT_SIZE we can get the total count
     const resultCountCheck = await client.search(
       {
-        index: 'ocrvs',
+        index: OPENCRVS_INDEX_NAME,
         body: {
           query: {
             bool: {
@@ -198,7 +199,7 @@ export async function populateHierarchicalLocationIdsHandler(
       ISearchResponse<ICompositionBody>
     > = await client.search(
       {
-        index: 'ocrvs',
+        index: OPENCRVS_INDEX_NAME,
         body: {
           query: {
             bool: {
