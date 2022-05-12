@@ -994,7 +994,9 @@ function mergeWorkQueueData(
       if (declarationIndex >= 0) {
         const isDownloadFailed =
           currentApplications[declarationIndex].downloadStatus ===
-          SUBMISSION_STATUS.FAILED_NETWORK
+            SUBMISSION_STATUS.FAILED_NETWORK ||
+          currentApplications[declarationIndex].downloadStatus ===
+            SUBMISSION_STATUS.FAILED
 
         if (!isDownloadFailed) {
           updateWorkqueueData(
