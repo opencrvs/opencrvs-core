@@ -288,7 +288,10 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description: 'Retrieves a user avatar',
-        auth: false
+        auth: false,
+        validate: {
+          payload: getUserAvatarRequestSchema
+        }
       }
     },
     {
@@ -309,10 +312,7 @@ export const getRoutes = () => {
         validate: {
           payload: searchSchema
         },
-        tags: ['api'],
-        response: {
-          schema: getUserAvatarRequestSchema
-        }
+        tags: ['api']
       }
     },
     {
