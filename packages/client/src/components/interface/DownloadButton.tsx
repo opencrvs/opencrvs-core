@@ -68,7 +68,13 @@ const DownloadAction = styled(IconButton)`
     padding: 0px 0px;
   }
 `
-
+const NoConnectionViewContainer = styled.div`
+  .no-connection {
+    ::after {
+      display: none;
+    }
+  }
+`
 function DownloadButtonComponent(
   props: DownloadButtonProps & HOCProps & IOnlineStatusProps
 ) {
@@ -119,25 +125,18 @@ function DownloadButtonComponent(
 
   if (!isOnline) {
     return (
-      <>
+      <NoConnectionViewContainer>
         <div
           data-tip
-          data-popper-arrow
           data-for={`${id}_noConnection`}
-          data-arrow-color="transparent"
+          data-class="no-connection"
         >
           <ConnectionError id={`${id}_noConnection`} key={id} />
         </div>
-        <ReactTooltip
-          id={`${id}_noConnection`}
-          place="top"
-          effect="solid"
-          data-arrow-color="transparent"
-          data-popper-arrow
-        >
+        <ReactTooltip id={`${id}_noConnection`} place="top" effect="solid">
           {intl.formatMessage(constantsMessages.noConnection)}
         </ReactTooltip>
-      </>
+      </NoConnectionViewContainer>
     )
   }
 
