@@ -15,13 +15,15 @@ import {
 } from '@gateway/features/registration/root-resolvers'
 import {
   DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL
+  REINSTATED_EXTENSION_URL,
+  ASSIGNED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import { cloneDeep } from 'lodash'
 import { getStatusFromTask, findExtension } from '@gateway/features/fhir/utils'
+import { mockTaskBundle } from '@gateway/utils/testUtils'
 
 const fetch = fetchAny as any
 
@@ -97,84 +99,6 @@ const authHeaderSysAdmin = {
 
 const authHeaderNotSysAdmin = {
   Authorization: `Bearer ${declareToken}`
-}
-
-const mockTaskBundle = {
-  resourceType: 'Bundle',
-  id: 'dc4e9b8b-82fa-4868-a6d2-2fb49f795ec1',
-  meta: { lastUpdated: '2018-11-29T10:43:30.286+00:00' },
-  type: 'searchset',
-  total: 1,
-  link: [
-    {
-      relation: 'self',
-      url: 'http://localhost:3447/fhir/Task?focus=Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
-    }
-  ],
-  entry: [
-    {
-      fullUrl:
-        'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
-      resource: {
-        resourceType: 'Task',
-        status: 'requested',
-        code: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/types',
-              code: 'BIRTH'
-            }
-          ]
-        },
-        extension: [
-          {
-            url: 'http://opencrvs.org/specs/extension/contact-person',
-            valueString: 'MOTHER'
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regLastUser',
-            valueReference: { reference: 'DUMMY' }
-          },
-          {
-            url: 'http://opencrvs.org/specs/extension/regAssigned',
-            valueReference: {
-              reference: 'Practitioner/2d11389d-f58e-4d47-a562-b934f1b85936'
-            }
-          }
-        ],
-        lastModified: '2018-11-28T15:13:57.492Z',
-        note: [
-          {
-            text: '',
-            time: '2018-11-28T15:13:57.492Z',
-            authorString: 'DUMMY'
-          }
-        ],
-        focus: {
-          reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
-        },
-        identifier: [
-          {
-            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-            value: 'B1mW7jA'
-          }
-        ],
-        businessStatus: {
-          coding: [
-            {
-              system: 'http://opencrvs.org/specs/reg-status',
-              code: 'DECLARED'
-            }
-          ]
-        },
-        meta: {
-          lastUpdated: '2018-11-29T10:40:08.913+00:00',
-          versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
-        },
-        id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
-      }
-    }
-  ]
 }
 
 const mockUserDetails = {
@@ -2658,5 +2582,36 @@ describe('Registration root resolvers', () => {
         )
       ).rejects.toThrowError('User does not have enough scope')
     })
+  })
+})
+
+describe('markEventAsUnassigned()', () => {
+  it('updates a task with rejected status, reason and comment', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(mockTaskBundle)],
+      [JSON.stringify(mockTaskBundle)]
+    )
+    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    const result = await resolvers.Mutation.markEventAsUnassigned(
+      {},
+      { id },
+      authHeaderRegCert
+    )
+    const postData = JSON.parse(fetch.mock.calls[1][1].body)
+    expect(
+      findExtension(ASSIGNED_EXTENSION_URL, postData.extension)
+    ).toBeUndefined()
+    expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
+  })
+
+  it('throws error if user does not have register or validate scope', async () => {
+    fetch.mockResponses(
+      [JSON.stringify(mockTaskBundle)],
+      [JSON.stringify(mockUserDetails)]
+    )
+    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    await expect(
+      resolvers.Mutation.markEventAsUnassigned({}, { id }, authHeaderNotRegCert)
+    ).rejects.toThrowError('User does not have a register or validate scope')
   })
 })

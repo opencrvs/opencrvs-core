@@ -12,14 +12,14 @@
 import {
   buildFHIRBundle,
   updateFHIRTaskBundle,
-  addOrUpdateExtension
+  addOrUpdateExtension,
+  checkUserAssignment
 } from '@gateway/features/registration/fhir-builders'
 import {
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
   FHIR_OBSERVATION_CATEGORY_URL
 } from '@gateway/features/fhir/constants'
-
 import {
   BIRTH_TYPE_CODE,
   BODY_WEIGHT_CODE,
@@ -31,8 +31,15 @@ import {
 } from '@gateway/features/fhir/templates'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import * as _ from 'lodash'
-import { mockTask } from '@gateway/utils/testUtils'
+import {
+  mockTask,
+  mockTaskBundle,
+  mockUserDetails
+} from '@gateway/utils/testUtils'
 import { findExtension } from '@gateway/features/fhir/utils'
+import * as fetchAny from 'jest-fetch-mock'
+import { readFileSync } from 'fs'
+import * as jwt from 'jsonwebtoken'
 
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle(
@@ -1010,5 +1017,65 @@ describe('addOrUpdateExtension()', () => {
       'valueString',
       'mock-value'
     )
+  })
+})
+
+describe('checkUserAssignment()', () => {
+  const fetch = fetchAny as fetchAny.FetchMock
+  const registerCertifyToken = jwt.sign(
+    { scope: ['register', 'certify'] },
+    readFileSync('../auth/test/cert.key'),
+    {
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:gateway-user'
+    }
+  )
+  const authHeaderRegCert = {
+    Authorization: `Bearer ${registerCertifyToken}`
+  }
+  it('should return true if user is assigned on task', async () => {
+    fetch.mockResponseOnce(JSON.stringify(mockTaskBundle))
+    fetch.mockResponse(JSON.stringify(mockUserDetails))
+    const bundle = await checkUserAssignment(
+      '5d027bc403b93b17526323f6',
+      authHeaderRegCert
+    )
+    expect(bundle).toBe(true)
+  })
+
+  it('should return false if user is not assigned on task', async () => {
+    fetch.mockResponseOnce(JSON.stringify(mockTaskBundle))
+    mockUserDetails.practitionerId = '1325'
+    fetch.mockResponse(JSON.stringify(mockUserDetails))
+    const bundle = await checkUserAssignment(
+      '5d027bc403b93b17526323f6',
+      authHeaderRegCert
+    )
+    expect(bundle).toBe(false)
+  })
+
+  it('should return false if authHeader has no Authorization', async () => {
+    fetch.mockResponseOnce(JSON.stringify(mockTaskBundle))
+    mockUserDetails.practitionerId = '1325'
+    fetch.mockResponse(JSON.stringify(mockUserDetails))
+    delete authHeaderRegCert.Authorization
+    const bundle = await checkUserAssignment(
+      '5d027bc403b93b17526323f6',
+      authHeaderRegCert
+    )
+    expect(bundle).toBe(false)
+  })
+
+  it('should return false if has no regAssigned extension', async () => {
+    fetch.mockResponseOnce(JSON.stringify(mockTask))
+    mockUserDetails.practitionerId = '1325'
+    fetch.mockResponse(JSON.stringify(mockUserDetails))
+    delete authHeaderRegCert.Authorization
+    const bundle = await checkUserAssignment(
+      '5d027bc403b93b17526323f6',
+      authHeaderRegCert
+    )
+    expect(bundle).toBe(false)
   })
 })

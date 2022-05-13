@@ -3641,9 +3641,9 @@ export async function checkUserAssignment(id: string, authHeader: IAuthHeader) {
     assignedExtensionData.valueReference.reference &&
     assignedExtensionData.valueReference.reference.split('/')[1]
 
-  const userDetauils = await getUser({ userId }, authHeader)
+  const userDetails = await getUser({ userId }, authHeader)
 
-  if (practitionerId === userDetauils.practitionerId) {
+  if (practitionerId === userDetails.practitionerId) {
     return true
   }
   return false
