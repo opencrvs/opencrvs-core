@@ -19,7 +19,7 @@ import {
 import { REQUEST_DEATH_REG_CORRECTION } from '@client/forms/correction/mutations'
 
 const SUBMIT_DEATH_DECLARATION = gql`
-  mutation submitMutation($details: DeathRegistrationInput!) {
+  mutation createDeathRegistration($details: DeathRegistrationInput!) {
     createDeathRegistration(details: $details) {
       trackingId
       compositionId
@@ -27,12 +27,12 @@ const SUBMIT_DEATH_DECLARATION = gql`
   }
 `
 export const APPROVE_DEATH_DECLARATION = gql`
-  mutation submitMutation($id: ID!, $details: DeathRegistrationInput!) {
+  mutation markDeathAsValidated($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsValidated(id: $id, details: $details)
   }
 `
 export const REGISTER_DEATH_DECLARATION = gql`
-  mutation submitMutation($id: ID!, $details: DeathRegistrationInput!) {
+  mutation markDeathAsRegistered($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsRegistered(id: $id, details: $details) {
       id
       registration {
@@ -72,12 +72,16 @@ export const REGISTER_DEATH_DECLARATION = gql`
   }
 `
 export const REJECT_DEATH_DECLARATION = gql`
-  mutation submitMutation($id: String!, $reason: String!, $comment: String!) {
+  mutation markEventAsVoided(
+    $id: String!
+    $reason: String!
+    $comment: String!
+  ) {
     markEventAsVoided(id: $id, reason: $reason, comment: $comment)
   }
 `
 export const REINSTATE_DEATH_DECLARATION = gql`
-  mutation submitMutation($id: String!) {
+  mutation markEventAsReinstated($id: String!) {
     markEventAsReinstated(id: $id) {
       taskEntryResourceID
       registrationStatus
@@ -85,13 +89,13 @@ export const REINSTATE_DEATH_DECLARATION = gql`
   }
 `
 export const ARCHIVE_DEATH_DECLARATION = gql`
-  mutation submitMutation($id: String!) {
+  mutation markEventAsArchived($id: String!) {
     markEventAsArchived(id: $id)
   }
 `
 
 export const COLLECT_DEATH_CERTIFICATE = gql`
-  mutation submitMutation($id: ID!, $details: DeathRegistrationInput!) {
+  mutation markDeathAsCertified($id: ID!, $details: DeathRegistrationInput!) {
     markDeathAsCertified(id: $id, details: $details)
   }
 `

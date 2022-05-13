@@ -48,7 +48,6 @@ export interface IUserDetails {
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]
   primaryOffice?: IGQLLocation
-  language: string
   localRegistrar: {
     name: Array<GQLHumanName | null>
     role?: string
@@ -72,7 +71,6 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     avatar
   } = user
   const userDetails: IUserDetails = {
-    language: getDefaultLanguage(),
     localRegistrar
   }
   if (userMgntUserID) {

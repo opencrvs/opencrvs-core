@@ -38,7 +38,6 @@ type RedirectToAuthenticationAction = {
 
 type CheckAuthAction = {
   type: typeof CHECK_AUTH
-  payload: IURLParams
 }
 
 type SetUserDetailsAction = {
@@ -80,9 +79,8 @@ export type ISetInitialUserDetails = {
   type: typeof SET_INITIAL_USER_DETAILS
 }
 
-export const checkAuth = (payload: IURLParams): CheckAuthAction => ({
-  type: CHECK_AUTH,
-  payload
+export const checkAuth = (): CheckAuthAction => ({
+  type: CHECK_AUTH
 })
 
 export const setUserDetails = (

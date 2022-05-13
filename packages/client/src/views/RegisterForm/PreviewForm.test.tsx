@@ -192,7 +192,7 @@ describe('when user is previewing the form data', () => {
 
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+      await store.dispatch(checkAuth())
       const data = birthReviewDraftData
 
       customDraft = { id: uuid(), data, review: true, event: Event.BIRTH }
@@ -323,7 +323,7 @@ describe('when user is previewing the form data', () => {
 
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+      await store.dispatch(checkAuth())
       const data = deathReviewDraftData
 
       customDraft = { id: uuid(), data, review: true, event: Event.DEATH }
@@ -371,7 +371,7 @@ describe('when user is previewing the form data', () => {
   describe('when user has validate scope', () => {
     beforeEach(async () => {
       getItem.mockReturnValue(validateScopeToken)
-      await store.dispatch(checkAuth({ '?token': validateScopeToken }))
+      await store.dispatch(checkAuth())
       const data = {
         _fhirIDMap: {
           composition: '16'

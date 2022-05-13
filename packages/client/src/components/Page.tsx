@@ -27,11 +27,9 @@ import {
   showConfigurationErrorNotification,
   hideConfigurationErrorNotification
 } from '@client/notification/actions'
-import { storage } from '@client/storage'
 import { changeLanguage } from '@client/i18n/actions'
 import { Ii18n } from '@client/type/i18n'
-import { USER_DETAILS } from '@client/utils/userUtils'
-import { getDefaultLanguage } from '@client/i18n/utils'
+import { getPreferredLanguage } from '@client/i18n/utils'
 import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
 import { LOADING_SCREEN_TEXT } from '@client/utils/constants'
@@ -150,17 +148,11 @@ class Component extends React.Component<
   }
 
   async componentDidMount() {
-    const values = parse(this.props.location.search)
+    const language = await getPreferredLanguage()
 
-    this.props.checkAuth(values)
+    this.props.changeLanguage({ language })
 
-    const userDetails = JSON.parse(
-      (await storage.getItem(USER_DETAILS)) || '{}'
-    )
-
-    this.props.changeLanguage({
-      language: userDetails.language || getDefaultLanguage()
-    })
+    this.props.checkAuth()
   }
 
   render() {

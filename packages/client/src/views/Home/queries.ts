@@ -12,7 +12,7 @@
 import gql from 'graphql-tag'
 
 export const FETCH_DECLARATION_SHORT_INFO = gql`
-  query data($id: ID!) {
+  query fetchDeclarationShortInfo($id: ID!) {
     fetchRegistration(id: $id) {
       id
       registration {

@@ -142,7 +142,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
   beforeEach(async () => {
     ;({ store, history } = createStore())
     getItem.mockReturnValue(validateScopeToken)
-    await store.dispatch(checkAuth({ '?token': validateScopeToken }))
+    await store.dispatch(checkAuth())
   })
 
   it('renders all items returned from graphql query in sent for approval', async () => {
@@ -437,7 +437,7 @@ describe('Tablet tests', () => {
 
   beforeAll(async () => {
     getItem.mockReturnValue(validateScopeToken)
-    await store.dispatch(checkAuth({ '?token': validateScopeToken }))
+    await store.dispatch(checkAuth())
     resizeWindow(800, 1280)
   })
 

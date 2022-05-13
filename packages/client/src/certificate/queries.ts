@@ -13,7 +13,7 @@ import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
 
 export const GET_ACTIVE_CERTIFICATES = gql`
-  query {
+  query getActiveCertificatesSVG {
     getActiveCertificatesSVG {
       _id
       svgCode

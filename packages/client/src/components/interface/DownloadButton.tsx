@@ -23,6 +23,13 @@ import {
 } from '@client/declarations'
 import { Event, Action } from '@client/forms'
 import { withApollo, WithApolloClient } from 'react-apollo'
+import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
+import {
+  withOnlineStatus,
+  IOnlineStatusProps
+} from '@client/views/OfficeHome/LoadingIndicator'
+import ReactTooltip from 'react-tooltip'
+import { constantsMessages } from '@client/i18n/messages'
 
 interface IDownloadConfig {
   event: string
@@ -61,9 +68,17 @@ const DownloadAction = styled(IconButton)`
     padding: 0px 0px;
   }
 `
-
-function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
-  const { id, status, intl, className } = props
+const NoConnectionViewContainer = styled.div`
+  .no-connection {
+    ::after {
+      display: none;
+    }
+  }
+`
+function DownloadButtonComponent(
+  props: DownloadButtonProps & HOCProps & IOnlineStatusProps
+) {
+  const { id, status, intl, className, isOnline } = props
 
   function initiateDownload() {
     const { event, compositionId, action } = props.downloadConfigs
@@ -108,6 +123,23 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     )
   }
 
+  if (!isOnline) {
+    return (
+      <NoConnectionViewContainer>
+        <div
+          data-tip
+          data-for={`${id}_noConnection`}
+          data-class="no-connection"
+        >
+          <ConnectionError id={`${id}_noConnection`} key={id} />
+        </div>
+        <ReactTooltip id={`${id}_noConnection`} place="top" effect="solid">
+          {intl.formatMessage(constantsMessages.noConnection)}
+        </ReactTooltip>
+      </NoConnectionViewContainer>
+    )
+  }
+
   return (
     <DownloadAction
       id={`${id}-icon`}
@@ -122,5 +154,5 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 }
 
 export const DownloadButton = connect(null, { downloadDeclaration })(
-  injectIntl(withApollo(DownloadButtonComponent))
+  injectIntl(withApollo(withOnlineStatus(DownloadButtonComponent)))
 )

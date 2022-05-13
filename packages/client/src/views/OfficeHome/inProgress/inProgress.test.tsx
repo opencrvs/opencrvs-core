@@ -77,7 +77,7 @@ storage.setItem = jest.fn()
 const { store, history } = createStore()
 beforeAll(async () => {
   getItem.mockReturnValue(registerScopeToken)
-  await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+  await store.dispatch(checkAuth())
 })
 
 describe('In Progress tab', () => {
@@ -894,7 +894,7 @@ describe('Tablet tests', () => {
 
   beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
     resizeWindow(800, 1280)
   })
 
@@ -950,7 +950,7 @@ describe('Tablet tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
