@@ -35,15 +35,13 @@ const Container = styled.div<{ hideBackground: boolean | undefined }>`
   ${({ theme, hideBackground }) => (hideBackground ? '' : theme.shadows.light)};
   color: ${({ theme }) => theme.colors.copy};
   padding: 24px 32px 32px;
-  margin: 0 auto 0;
+  margin: 0 auto;
   max-width: 940px;
   background: ${({ theme, hideBackground }) =>
     hideBackground ? '' : theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 40px 54px;
     padding: 24px 32px;
     min-height: 100vh;
-    background: ${({ theme }) => theme.colors.white};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
