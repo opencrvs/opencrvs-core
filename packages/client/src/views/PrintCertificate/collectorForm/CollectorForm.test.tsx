@@ -282,7 +282,7 @@ describe('Certificate collector test for a birth registration without father det
         await waitForElement(component, '#form_error')
 
         expect(component.find('#form_error').hostNodes().text()).toBe(
-          'Attach a signed affidavit or click the checkbox if they do not have one.'
+          'Upload a signed affidavit or click the checkbox if they do not have one.'
         )
       })
 
