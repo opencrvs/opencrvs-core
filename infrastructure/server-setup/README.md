@@ -27,27 +27,37 @@
 
 # Setting up a hosting environment for deploying OpenCRVS
 
-This README outlines the process to setup and deploy OpenCRVS on a remote server environment. The documentation is in progress and will be finalised for the public Beta release scheduled for June 2022.
+This README outlines the process to setup and deploy OpenCRVS on a remote server environment.
 
-### How can I install and manage an OpenCRVS server cluster?
+### Decide on the size of your deployment
 
-OpenCRVS can be deployed on a cluster of 3 or 5 server nodes in production and 1 server node in a demo, staging or QA environment, each with the following minimm specification:
+Decide on the size of your deployment. OpenCRVS supports deploying to 1 server, but this is only supported for a testing, staging or a QA environment.
 
-#### 8 GB Memory (preferrably 16 GB) / 160 GB Disk / Ubuntu 18.04.3 (LTS) x64
+Alternatively, OpenCRVS supports deploying to 3 servers creating Mongo replica sets for managing a production environment at a normal scale.
 
-This folder contains scripts to setup the server nodes for OpenCRVS.
+Finally, OpenCRVS supports deploying to 5 servers creating Mongo replica sets for managing a production environment at a large scale.
 
-Ansible is required to run the server setup. This should be installed on your local machine. Also ensure that you have ssh access with the root user to all the servers that you are trying to configure.
+If you wish to enable an automated backup from production onto another server, you will need an additional server for this.
 
-Add your users GIT SSH keys to all nodes
+### Provision your IP addresses with SSH access
+
+1. Using your hosting provider, setup 1, 3 or 5 Ubuntu server nodes with an additional backup server node should you require this option. OpenCRVS can be deployed on a cluster of 3 or 5 server nodes in production and 1 server node in a demo, staging or QA environment, each with the following minimm specification:
+
+8 GB Memory (preferrably 16 GB) / 160 GB Disk / Ubuntu 18.04.3 (LTS) x64
+
+2. Decide which of your IP addresses will be the **Manager Node** This server will be the manager in the Docker Swarm and the main server used to control load balancing.
+
+3. Add your users GIT SSH keys to all nodes, and ensure that you take a note of each server's **hostname**
+
+This is a handy command to copy any SSH keys you use on Git into a server's .ssh/authorized_keys file.
 
 ```
 curl https://github.com/<git-user>.keys >> ~/.ssh/authorized_keys
 ```
 
-For production deployments of 3 or 5 servers, ensure the manager node can ssh into worker nodes (Required for automated backups)
+4. For production deployments of 3 or 5 servers, or where you are provisioning a server backup, ensure the manager node can ssh into all the other worker and backup nodes.
 
-SSH into manager node and create ssh key. Press Enter for defaults and no passphrase
+SSH into manager node and create an ssh key. Press Enter for defaults and no passphrase
 
 ```
 ssh-keygen
@@ -59,19 +69,29 @@ Print the key for copying:
 cat ~/.ssh/id_rsa.pub
 ```
 
-Copy the key and SSH into worker nodes to add manager key into node authorised keys, and repeat for all workers
+Copy the key and exit the manager node.
+
+SSH into the 2 or 4 worker nodes to add the key into the .ssh/authorised_keys for all nodes
 
 ```
 echo "<manager-node-public-key>" >> ~/.ssh/authorized_keys
 ```
 
-Decide on the size of your deployment. OpenCRVS supports deploying to 1 server, but this is only supported for a testing, staging or a QA environment.
+If you are setting up a backup server, ensure that the manager node can ssh into that too. SSH into the backup node to add the key into its .ssh/authorised_keys file.
 
-Alternatively OpenCRVS supports deploying to 3 servers creating Mongo replica sets for managing a production environment at a normal scale.
+SSH into the manager, and confirm that you can SSH into all nodes from the manager.
 
-Finally OpenCRVS supports deploying to 5 servers creating Mongo replica sets for managing a production environment at a large scale.
+You are now ready to exit all nodes and run the Ansible command from your local environment.
 
-These files contain the list of servers which are to be configured:
+### Install Ansible to automate the dependency installation, firewall and optional backup
+
+Ansible is required to run the server setup. Ansible is an IT automation tool and the script we provide will install all the dependencies onto your nodes and configure a secure firewall, open required ports and provision the optional automated backup of OpenCRVS for use in production.
+
+Ansible should be installed on your local machine. Installation instructions are [here](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html). Also ensure that you have ssh access with the root user to all the servers that you are trying to configure.
+
+1. Create an account on [Dockerhub](https://hub.docker.com/) as Ansible will require your username and password in order to login.
+
+2. Duplicate the **example-X.ini** inventory_file of choice depending if you are deploying to 1, 3 or 5 servers.
 
 If you are only deploying to 1 server, you need to make a copy of the [example-1.ini](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/example-1.ini) file to run with the Ansible [playbook-1.yml](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/playbook-1.yml) explained below.
 
@@ -81,50 +101,98 @@ If you are deploying to a standard production deploymet of 3 servers, you need t
 
 If you are deploying to 5 servers, you need to make a copy of the [example-5.ini](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/example-5.ini) file to run with the Ansible [playbook-5.yml](https://github.com/opencrvs/opencrvs-core/blob/master/infrastructure/server-setup/playbook-5.yml) explained below.
 
-Note: Add the ansible_password prop to the ini file of choice next to each worker IP for each node that requires an SSH password. Usually we recommend creating nodes that use SSH key access. Use `-K` option if you need supply an ssh password when running the playbook
-
-Note: For automated daily external data backup to another server, you can pass optional parameters to the playbook of choice. This line in the playbook will set that up for you. Read about emergency backups below.
+You will be required to uncomment some lines to enter the IP addresses and hostnames, e.g.:
 
 ```
-job: 'cd ~/ && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh <ssh-user> <external-server-for-remote-backup-host> <ssh-port> <your-production-environment-manger-node-host> <path-to-encrypted-volume-on-external-server> <number-of-server-replicas-1-3-or-5> >> /var/log/opencrvs-backup.log 2>&1'
+;manager1 ansible_host="ENTER YOUR MANAGER HOST IP"
 ```
 
-Run the [Ansible](https://www.ansible.com/) playbook configuration script of your choice from your client computer (You must have [Ansible](https://www.ansible.com/) installed, a [Dockerhub](https://hub.docker.com/) account & optionally a [Papertrail](https://www.papertrail.com/) account - leave "papertrail_token" variable undefined if you do not wish to use the logging service. We recommend you use an external Logging service to have live backup access to logs):
+becomes:
 
-Use the `-b` option if your servers require sudo to perform the ansible tasks. If you are setting up a new set of servers, you will need to create a new file.
+```
+manager1 ansible_host="159.223.11.243"
+```
 
-Ansible playbooks are run like this:
+... and:
+
+```
+;data1_hostname=ENTER_HOSTNAME_1
+```
+
+becomes:
+
+```
+;data1_hostname=farajaland-staging
+```
+
+3. Using a strong password generator, create a master mongo password and encrypt_passphrase along with an elasticsearch superuser password in order to prepare these required parameters:
+
+**Required parameters:**
+
+Call the Ansible command below passing these required paramters.
+
+dockerhub_username
+dockerhub_password
+mongodb_admin_username
+mongodb_admin_password
+elasticsearch_superuser_password
+encrypt_passphrase
+
+**Optional parameters:**
+
+For the optional automated daily external data backup to another server, these parameters must be prepared:
+
+external_backup_server_ip
+external_backup_server_user
+external_backup_server_ssh_port
+external_backup_server_remote_directory
+
+If you have a [Papertrail](https://www.papertrail.com/) account, OpenCRVS can automatically export system logs to Loggly using this parameter:
+
+papertrail_token
+
+4. Ansible playbooks are run like this **at a minimum**:
+
+If you are on the root directory of the opencrvs-core repository, navigate to the server-setup folder:
+
+```
+cd infrastructure/server-setup
+```
+
+Now you can run the playbook like this, substituting the paramters as required:
 
 ```
 ansible-playbook -i <inventory_file> <playbook_file> -e " \
 dockerhub_username=<your_username> \
 dockerhub_password=<your_password> \
-papertrail_token=<your_papertrail_token> \
+mongodb_admin_username=opencrvs-admin \
+mongodb_admin_password=<secure password you generated> \
+elasticsearch_superuser_password=<secure password you generated> \
+encrypt_passphrase=<a_strong_passphrase> \
+encrypt_data=True"
+```
+
+Or with all the possible **optional props**:
+
+```
+ansible-playbook -i <inventory_file> <playbook_file> -e " \
+dockerhub_username=<your_username> \
+dockerhub_password=<your_password> \
+mongodb_admin_username=opencrvs-admin \
+mongodb_admin_password=<secure password you generated> \
+elasticsearch_superuser_password=<secure password you generated> \
+encrypt_passphrase=<a_strong_passphrase> \
+encrypt_data=True \
 external_backup_server_ip=<your_external_backup_server_ip> \
 external_backup_server_user=<your_external_backup_server_user> \
 external_backup_server_ssh_port=<your_external_backup_server_ssh_port> \
 manager_production_server_ip=<your_manager_production_server_ip> \
-external_backup_server_remote_directory=<your_external_backup_server_remote_directory> \
-mongodb_admin_username=<opencrvs-admin> \
-mongodb_admin_password=<secure password you generated> \
-elasticsearch_superuser_password=<secure password you generated>"
+external_backup_server_remote_directory=<your_external_backup_server_remote_directory>"
 ```
 
-E.G.:
+Once this command is finished the servers are prepared for an OpenCRVS deployment.
 
-```
-ansible-playbook -i example-3.ini playbook-3.yml -e "dockerhub_username=your_username dockerhub_password=your_password ..."
-```
-
-## Enabling encryption
-
-For production servers we offer the ability to setup an encrypted /data folder for the docker containers to use. This allows us to support encryption at rest. To do this run the ansible script with these extra variables. Note, if the server is already setup the docker stack must be stopped and ALL DATA WILL BE LOST when switching to an ecrypted folder. It is useful to set this up from the beginning.
-
-```
-ansible-playbook -i <inventory_file> <playbook_file> -e "encrypt_passphrase=<a_strong_passphrase> encrypt_data=True"
-```
-
-Once this command is finished the servers are now prepared for an OpenCRVS deployment.
+### Create Docker Secrets
 
 Before the deployment can be done a few secrets need to be manually added to the docker swarm:
 
