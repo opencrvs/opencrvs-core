@@ -21,15 +21,17 @@ export async function getUserAvatarHandler(
   const params = {
     userId: request.params.userId as string
   }
-  const avatarBuffer = await fetch(
-    resolve(USER_MANAGEMENT_URL, 'getUserAvatar'),
-    {
-      method: 'POST',
-      body: JSON.stringify(params),
-      headers: {
-        'Content-Type': 'application/json'
-      }
+  return await fetch(resolve(USER_MANAGEMENT_URL, 'getUserAvatar'), {
+    method: 'POST',
+    body: JSON.stringify(params),
+    headers: {
+      'Content-Type': 'application/json'
     }
-  )
-  return await avatarBuffer.buffer()
+  })
+    .then((response) => {
+      return response.buffer()
+    })
+    .catch((error) => {
+      return Promise.reject(new Error(` request failed: ${error.message}`))
+    })
 }
