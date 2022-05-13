@@ -429,6 +429,7 @@ export async function fhirWorkflowEventHandler(
         request.payload,
         request.headers
       )
+      break
     case Events.UNASSIGNED_EVENT:
       response = await markDownloadedEventAsAssignedOrUnassignedHandler(
         request,
