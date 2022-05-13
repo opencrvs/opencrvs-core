@@ -9,9 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { LoopReducer, Loop } from 'redux-loop'
+import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
 import * as actions from '@client/i18n/actions'
-import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
+import {
+  getDefaultLanguage,
+  getAvailableLanguages,
+  storeLanguage
+} from '@client/i18n/utils'
 import * as offlineActions from '@client/offline/actions'
 import { ILocation } from '@client/offline/reducer'
 
@@ -107,11 +111,14 @@ export const intlReducer: LoopReducer<IntlState, any> = (
     case actions.CHANGE_LANGUAGE:
       const messages = getNextMessages(action.payload.language, state.languages)
 
-      return {
-        ...state,
-        language: action.payload.language,
-        messages
-      }
+      return loop(
+        {
+          ...state,
+          language: action.payload.language,
+          messages
+        },
+        Cmd.run(() => storeLanguage(action.payload.language))
+      )
 
     case offlineActions.READY:
     case offlineActions.UPDATED:

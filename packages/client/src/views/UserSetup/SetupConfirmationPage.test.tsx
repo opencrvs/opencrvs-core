@@ -21,7 +21,7 @@ describe('Setup confirmation page tests', () => {
   const { store, history } = createStore()
   beforeAll(async () => {
     getItem.mockReturnValue(validToken)
-    await store.dispatch(checkAuth({ '?token': validToken }))
+    await store.dispatch(checkAuth())
   })
   it('renders page successfully', async () => {
     const testComponent = await createTestComponent(

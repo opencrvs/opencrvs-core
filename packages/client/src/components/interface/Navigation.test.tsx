@@ -83,7 +83,7 @@ describe('Navigation for national system admin related tests', () => {
     ;({ store, history } = createStore())
     client = createClient(store)
     getItem.mockReturnValue(natlSysAdminToken)
-    await store.dispatch(checkAuth({ '?token': natlSysAdminToken }))
+    await store.dispatch(checkAuth())
 
     testComponent = await createTestComponent(
       <OfficeHome
@@ -136,7 +136,7 @@ describe('Navigation for Registration agent related tests', () => {
     ;({ store, history } = createStore())
     client = createClient(store)
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
 
     testComponent = await createTestComponent(
       <OfficeHome
@@ -219,7 +219,7 @@ describe('Navigation for District Registrar related tests', () => {
     ;({ store, history } = createStore())
     client = createClient(store)
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
 
     testComponent = await createTestComponent(
       <Navigation menuCollapse={() => {}} />,

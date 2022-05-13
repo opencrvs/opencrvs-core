@@ -15,6 +15,7 @@ import * as actions from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
 import * as routes from '@login/navigation/routes'
 import { merge } from 'lodash'
+import { IStoreState } from '@login/store'
 
 export type LoginState = {
   submitting: boolean
@@ -176,11 +177,16 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
           resentSMS: false,
           token: action.payload.token
         },
-        Cmd.run(() => {
-          window.location.assign(
-            `${window.config.CLIENT_APP_URL}?token=${action.payload.token}`
-          )
-        })
+        Cmd.run(
+          (getState: () => IStoreState) => {
+            window.location.assign(
+              `${window.config.CLIENT_APP_URL}?token=${
+                action.payload.token
+              }&language=${getState().i18n.language}`
+            )
+          },
+          { args: [Cmd.getState] }
+        )
       )
     case actions.GOTO_APP:
       return loop(
