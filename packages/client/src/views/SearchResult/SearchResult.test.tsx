@@ -55,7 +55,7 @@ describe('SearchResult tests', () => {
   beforeEach(async () => {
     ;({ store, history } = createStore())
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
   })
 
   it('sets loading state while waiting for data', async () => {
@@ -807,7 +807,7 @@ describe('SearchResult downloadButton tests', () => {
   beforeEach(async () => {
     ;({ store, history } = createStore())
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
   })
   it('renders review button in search page', async () => {
     const declaration = {

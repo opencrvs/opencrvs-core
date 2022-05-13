@@ -232,7 +232,7 @@ describe('Record audit for a draft declaration', () => {
 
     getItem.mockReturnValue(registerScopeToken)
 
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    store.dispatch(checkAuth())
 
     await flushPromises()
 
@@ -418,7 +418,7 @@ describe('Record audit for a reinstate declaration', () => {
 
     getItem.mockReturnValue(registerScopeToken)
 
-    store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    store.dispatch(checkAuth())
 
     await flushPromises()
 

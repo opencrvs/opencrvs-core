@@ -13,7 +13,7 @@ import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
 
 export const FETCH_USER = gql`
-  query ($userId: String!) {
+  query fetchUser($userId: String!) {
     getUser(userId: $userId) {
       userMgntUserID
       practitionerId

@@ -13,7 +13,7 @@ import gql from 'graphql-tag'
 import { Action } from '@client/forms'
 
 export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
-  query data($id: ID!) {
+  query fetchBirthRegistrationForReview($id: ID!) {
     fetchBirthRegistration(id: $id) {
       _fhirIDMap
       id
@@ -245,7 +245,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
 `
 
 export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
-  query data($id: ID!) {
+  query fetchBirthRegistrationForCertificate($id: ID!) {
     fetchBirthRegistration(id: $id) {
       _fhirIDMap
       id
