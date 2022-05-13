@@ -143,6 +143,25 @@ class PaymentComponent extends React.Component<IFullProps> {
       offlineCountryConfig
     )
 
+    const RecieptPrint = (
+      <TertiaryButton
+        id="print-receipt"
+        icon={() => <Print />}
+        align={0}
+        disabled={true}
+        onClick={() =>
+          printMoneyReceipt(
+            this.props.intl,
+            this.props.declaration,
+            this.props.userDetails,
+            this.props.offlineCountryConfig
+          )
+        }
+      >
+        {intl.formatMessage(messages.printReceipt)}
+      </TertiaryButton>
+    )
+
     return (
       <>
         <ActionPageLight
@@ -150,7 +169,10 @@ class PaymentComponent extends React.Component<IFullProps> {
           goBack={goBack}
           hideBackground
         >
-          <Content title={intl.formatMessage(messages.payment)}>
+          <Content
+            title={intl.formatMessage(messages.payment)}
+            topActionButtons={[RecieptPrint]}
+          >
             <LabelValue
               id="service"
               label={intl.formatMessage(messages.receiptService)}
@@ -169,22 +191,6 @@ class PaymentComponent extends React.Component<IFullProps> {
                 />
               }
             />
-            <TertiaryButton
-              id="print-receipt"
-              icon={() => <Print />}
-              align={0}
-              disabled={true}
-              onClick={() =>
-                printMoneyReceipt(
-                  this.props.intl,
-                  this.props.declaration,
-                  this.props.userDetails,
-                  this.props.offlineCountryConfig
-                )
-              }
-            >
-              {intl.formatMessage(messages.printReceipt)}
-            </TertiaryButton>
             <Action>
               <PrimaryButton
                 id="Continue"
