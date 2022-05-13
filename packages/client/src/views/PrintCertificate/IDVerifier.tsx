@@ -11,6 +11,7 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
+import { Content } from '@opencrvs/components/lib/interface/Content'
 import {
   SuccessButton,
   DangerButton,
@@ -55,27 +56,6 @@ interface IIDVerifierProps {
   collectorInformation: ICollectorInfo
   actionProps: IVerifierActionProps
 }
-
-const Title = styled.div`
-  ${({ theme }) => theme.fonts.h2}
-  margin-bottom: 32px;
-`
-const Content = styled.div`
-  z-index: 1;
-  padding: 16px 24px;
-  position: relative;
-  white-space: pre-wrap;
-  color: ${({ theme }) => theme.colors.copy};
-`
-const UnderLayBackground = styled.div`
-  background-color: ${({ theme }) => theme.colors.primary};
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.08;
-`
 
 const ActionContainer = styled.div`
   flex-flow: row wrap;
@@ -162,29 +142,28 @@ class IDVerifierComponent extends React.Component<
 
     return (
       <div id={id}>
-        <Title>{this.props.title}</Title>
-        <Content>
-          <UnderLayBackground />
+        <Content title={this.props.title}>
           {this.renderLabelValue()}
+          <ActionContainer>
+            <SuccessButton
+              id="verifyPositive"
+              onClick={positiveAction.handler}
+              icon={() => <Check />}
+              align={ICON_ALIGNMENT.LEFT}
+            >
+              {positiveAction.label}
+            </SuccessButton>
+            <DangerButton
+              id="verifyNegative"
+              onClick={this.togglePrompt}
+              icon={() => <Cross color="currentColor" />}
+              align={ICON_ALIGNMENT.LEFT}
+            >
+              {negativeAction.label}
+            </DangerButton>
+          </ActionContainer>
         </Content>
-        <ActionContainer>
-          <SuccessButton
-            id="verifyPositive"
-            onClick={positiveAction.handler}
-            icon={() => <Check />}
-            align={ICON_ALIGNMENT.LEFT}
-          >
-            {positiveAction.label}
-          </SuccessButton>
-          <DangerButton
-            id="verifyNegative"
-            onClick={this.togglePrompt}
-            icon={() => <Cross color="currentColor" />}
-            align={ICON_ALIGNMENT.LEFT}
-          >
-            {negativeAction.label}
-          </DangerButton>
-        </ActionContainer>
+
         <ResponsiveModal
           id="withoutVerificationPrompt"
           show={showPrompt}

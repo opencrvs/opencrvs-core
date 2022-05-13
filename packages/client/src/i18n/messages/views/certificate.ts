@@ -182,7 +182,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.idCheckDialog.title'
   },
   idCheckTitle: {
-    defaultMessage: 'Check proof of ID. Does it match the following details?',
+    defaultMessage: 'Check proof of ID?',
     description: 'The title for id check component',
     id: 'print.certificate.collector.idCheck.title'
   },
@@ -245,7 +245,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.other'
   },
   payment: {
-    defaultMessage: 'Payment is required',
+    defaultMessage: 'Collect payment',
     description: 'The title for payment section',
     id: 'print.certificate.payment'
   },
@@ -327,29 +327,29 @@ const messagesToDefine: ICertificateMessages = {
     id: 'certificate.parent.details.label.typeOfID'
   },
   whoToCollect: {
-    defaultMessage: 'Who is collecting the certificate?',
+    defaultMessage: 'Certificate collector',
     description: 'The label for collector of certificate select',
     id: 'print.certificate.collector.whoToCollect'
   },
   confirmAndPrint: {
-    defaultMessage: 'Continue and print',
-    description: 'The text for Confirm & print button',
+    defaultMessage: 'Print',
+    description: 'The text for print button',
     id: 'print.certificate.button.confirmPrint'
   },
   reviewTitle: {
-    defaultMessage: 'Are all the details on the {event} certificate correct?',
+    defaultMessage: 'Review certificate',
     description: 'Certificate review title',
     id: 'print.certificate.review.title'
   },
   reviewDescription: {
     defaultMessage:
-      'Please confirm that the informant has reviewed that the information on the certificate is correct and that it is ready to print.',
+      'Please confirm that the information on the certificate is correct and that it is ready to print.',
     description: 'Certificate review description',
     id: 'print.certificate.review.description'
   },
   modalTitle: {
     id: 'print.certificate.review.modal.title',
-    defaultMessage: 'Print Certificate?',
+    defaultMessage: 'Print certificate?',
     description: 'Print certificate modal title text'
   },
   modalBody: {

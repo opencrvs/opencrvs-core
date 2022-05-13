@@ -261,12 +261,6 @@ class ReviewCertificateActionComponent extends React.Component<
         )}
         goBack={this.goBack}
       >
-        {this.state.certificatePdf && (
-          <PdfWrapper id="pdfwrapper">
-            <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
-          </PdfWrapper>
-        )}
-
         <Content
           title={this.getTitle()}
           subtitle={intl.formatMessage(certificateMessages.reviewDescription)}
@@ -292,6 +286,11 @@ class ReviewCertificateActionComponent extends React.Component<
             </DangerButton>
           </ButtonWrapper>
         </Content>
+        {this.state.certificatePdf && (
+          <PdfWrapper id="pdfwrapper">
+            <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
+          </PdfWrapper>
+        )}
 
         <ResponsiveModal
           id="confirm-print-modal"

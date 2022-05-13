@@ -12,6 +12,7 @@
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { Print } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { Content } from '@opencrvs/components/lib/interface/Content'
 import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
 import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
 import { Event } from '@client/forms'
@@ -40,35 +41,16 @@ import {
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 
-const Header = styled.h4`
-  ${({ theme }) => theme.fonts.h2};
-  color: ${({ theme }) => theme.colors.black};
-  margin-bottom: 16px;
-  margin-top: 0;
-`
-
-const Instruction = styled.p`
-  color: ${({ theme }) => theme.colors.copy};
-`
 const Action = styled.div`
   margin-top: 32px;
 `
-const GreyBody = styled.div`
-  background: ${({ theme }) => theme.colors.background};
-  padding: 16px 24px;
-
-  & button {
-    margin-top: 16px;
-    padding: 0;
-  }
-`
 
 const StyledLabel = styled.label`
-  ${({ theme }) => theme.fonts.bold16};
-  margin-right: 3px;
+  ${({ theme }) => theme.fonts.bold18};
+  margin-right: 2px;
 `
 const StyledValue = styled.span`
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.reg18};
 `
 
 function LabelValue({
@@ -163,12 +145,12 @@ class PaymentComponent extends React.Component<IFullProps> {
 
     return (
       <>
-        <ActionPageLight title={'Certificate collection'} goBack={goBack}>
-          <Header>{intl.formatMessage(messages.payment)}</Header>
-          <Instruction>
-            {intl.formatMessage(messages.paymentInstruction)}
-          </Instruction>
-          <GreyBody>
+        <ActionPageLight
+          title={'Print certificate'}
+          goBack={goBack}
+          hideBackground
+        >
+          <Content title={intl.formatMessage(messages.payment)}>
             <LabelValue
               id="service"
               label={intl.formatMessage(messages.receiptService)}
@@ -203,15 +185,15 @@ class PaymentComponent extends React.Component<IFullProps> {
             >
               {intl.formatMessage(messages.printReceipt)}
             </TertiaryButton>
-          </GreyBody>
-          <Action>
-            <PrimaryButton
-              id="Continue"
-              onClick={() => this.continue(paymentAmount.toString())}
-            >
-              {intl.formatMessage(buttonMessages.continueButton)}
-            </PrimaryButton>
-          </Action>
+            <Action>
+              <PrimaryButton
+                id="Continue"
+                onClick={() => this.continue(paymentAmount.toString())}
+              >
+                {intl.formatMessage(buttonMessages.continueButton)}
+              </PrimaryButton>
+            </Action>
+          </Content>
         </ActionPageLight>
       </>
     )

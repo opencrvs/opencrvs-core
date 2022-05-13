@@ -86,13 +86,6 @@ import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 
-const FormSectionTitle = styled.h4`
-  ${({ theme }) => theme.fonts.h2};
-  color: ${({ theme }) => theme.colors.copy};
-  margin-top: 0px;
-  margin-bottom: 16px;
-`
-
 const ErrorWrapper = styled.div`
   margin-top: -3px;
   margin-bottom: 16px;
@@ -417,7 +410,9 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           goBack={goBack}
         >
           <Content
-            title={formGroup.title && intl.formatMessage(formGroup.title)}
+            title={
+              (formGroup.title && intl.formatMessage(formGroup.title)) || ''
+            }
           >
             {showError && (
               <ErrorWrapper>
