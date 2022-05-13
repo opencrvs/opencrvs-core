@@ -221,7 +221,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     apolloClient = createClient(store)
 
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
   })
 
   it('should show pagination bar if items more than 11 in ReviewTab', async () => {
@@ -645,7 +645,7 @@ describe('OfficeHome sent for review tab related tests', () => {
       )
 
       getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+      await store.dispatch(checkAuth())
       testComponent = createdTestComponent
     })
 
@@ -801,7 +801,7 @@ describe('Tablet tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
 
     const row = await waitForElement(testComponent, '#row_0')
     row.hostNodes().simulate('click')

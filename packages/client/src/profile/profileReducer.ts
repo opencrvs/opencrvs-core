@@ -86,7 +86,7 @@ export const profileReducer: LoopReducer<
     case actions.CHECK_AUTH:
       const token = getToken()
 
-      // Remove token from url if it exists
+      // Remove token and language from url if these exists
       if (window.location.search.includes('token=')) {
         window.history.replaceState(null, '', window.location.pathname)
       }
@@ -124,6 +124,7 @@ export const profileReducer: LoopReducer<
 
       if (data && data.getUser) {
         const userDetails = getUserDetails(data.getUser)
+
         return loop(
           {
             ...state,
@@ -152,16 +153,6 @@ export const profileReducer: LoopReducer<
           args: [details]
         })
       ]
-      if (state.userDetails?.language !== details.language) {
-        commandList.push(
-          Cmd.action(
-            changeLanguageActions.changeLanguage({
-              language: details.language
-            })
-          )
-        )
-      }
-
       if (details) {
         return loop(
           {
