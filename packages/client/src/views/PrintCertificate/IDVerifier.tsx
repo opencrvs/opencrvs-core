@@ -50,6 +50,16 @@ export interface ICollectorInfo {
   nationality: string
 }
 
+const Container = styled.div`
+  z-index: 1;
+  position: relative;
+  white-space: pre-wrap;
+  color: ${({ theme }) => theme.colors.copy};
+  @media (max-width: 768px) {
+    padding: 0px;
+  }
+`
+
 interface IIDVerifierProps {
   id?: string
   title: string
@@ -143,7 +153,7 @@ class IDVerifierComponent extends React.Component<
     return (
       <div id={id}>
         <Content title={this.props.title}>
-          {this.renderLabelValue()}
+          <Container>{this.renderLabelValue()}</Container>
           <ActionContainer>
             <SuccessButton
               id="verifyPositive"

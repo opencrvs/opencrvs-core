@@ -186,12 +186,12 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.idCheck.title'
   },
   idCheckVerify: {
-    defaultMessage: 'Yes',
+    defaultMessage: 'ID verfied',
     description: 'The label for id check component action when verify details',
     id: 'print.cert.coll.idCheck.actions.ver'
   },
   idCheckWithoutVerify: {
-    defaultMessage: 'No',
+    defaultMessage: 'No ID match',
     description:
       'The label for id check component action when does not verify details',
     id: 'print.cert.coll.idCheck.actions.noVer'
@@ -400,7 +400,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.cert.coll.other.aff.check'
   },
   noAffidavitModalTitle: {
-    defaultMessage: 'Print without signed affidavit??',
+    defaultMessage: 'Print without signed affidavit?',
     description:
       'Modal title for other coller form submission without signed affidavit',
     id: 'print.cert.coll.other.aff.title'
