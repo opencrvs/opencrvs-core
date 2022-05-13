@@ -67,7 +67,6 @@ interface ICertificateMessages
   modalBody: MessageDescriptor
   toastMessage: MessageDescriptor
   otherCollectorFormTitle: MessageDescriptor
-  otherCollectorFormParagraph: MessageDescriptor
   certificateCollectorError: MessageDescriptor
   certificateOtherCollectorInfoError: MessageDescriptor
   certificateOtherCollectorAffidavitFormTitle: MessageDescriptor
@@ -87,7 +86,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.addAnotherSignature'
   },
   certificateCollectionTitle: {
-    defaultMessage: 'Certificate collection',
+    defaultMessage: 'Print certificate',
     description: 'The title of print certificate action',
     id: 'print.certificate.section.title'
   },
@@ -176,13 +175,13 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.cert.coll.id.description'
   },
   idCheckDialogTitle: {
-    defaultMessage: 'Continue without proof of ID?',
+    defaultMessage: 'Print without proof of ID?',
     description:
       'The title for the dialog when details of the collector not verified',
     id: 'print.certificate.collector.idCheckDialog.title'
   },
   idCheckTitle: {
-    defaultMessage: 'Check proof of ID?',
+    defaultMessage: 'Check proof of ID',
     description: 'The title for id check component',
     id: 'print.certificate.collector.idCheck.title'
   },
@@ -364,15 +363,9 @@ const messagesToDefine: ICertificateMessages = {
     description: 'Floating Toast message upon certificate ready to print'
   },
   otherCollectorFormTitle: {
-    defaultMessage: 'What is their ID and name?',
+    defaultMessage: 'Collector details',
     description: 'Title for other collector form',
     id: 'print.certificate.collector.other.title'
-  },
-  otherCollectorFormParagraph: {
-    defaultMessage:
-      'Because there are no details of this person on record, we need to capture their details:',
-    description: 'Paragraph for other collector form',
-    id: 'print.certificate.collector.other.paragraph'
   },
   certificateCollectorError: {
     defaultMessage: 'Please select who is collecting the certificate',
@@ -385,13 +378,13 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.other.form.error'
   },
   certificateOtherCollectorAffidavitFormTitle: {
-    defaultMessage: 'Attach a signed affidavit',
+    defaultMessage: 'Upload signed affidavit',
     description: 'Form title for other collector affidavit form',
     id: 'print.cert.coll.other.aff.form.title'
   },
   certificateOtherCollectorAffidavitError: {
     defaultMessage:
-      'Attach a signed affidavit or click the checkbox if they do not have one.',
+      'Upload signed affidavit or click the checkbox if they do not have one.',
     description: 'Form level error for other collector affidavit form',
     id: 'print.cert.coll.other.aff.error'
   },
@@ -402,12 +395,12 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.cert.coll.other.aff.paragraph'
   },
   noSignedAffidavitAvailable: {
-    defaultMessage: "They don't have a signed affidavit",
+    defaultMessage: 'No signed affidavit available',
     description: 'Label for no affidavit checkbox',
     id: 'print.cert.coll.other.aff.check'
   },
   noAffidavitModalTitle: {
-    defaultMessage: 'Continue without signed affidavit?',
+    defaultMessage: 'Print without signed affidavit??',
     description:
       'Modal title for other coller form submission without signed affidavit',
     id: 'print.cert.coll.other.aff.title'

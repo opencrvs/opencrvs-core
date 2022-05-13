@@ -220,13 +220,6 @@ export const collectBirthCertificateFormSection: IFormSection = {
       error: certificateMessages.certificateOtherCollectorInfoError,
       fields: [
         {
-          name: 'paragraph',
-          type: PARAGRAPH,
-          label: certificateMessages.otherCollectorFormParagraph,
-          initialValue: '',
-          validate: []
-        },
-        {
           name: 'iDType',
           type: SELECT_WITH_OPTIONS,
           label: formMessages.typeOfId,
@@ -379,13 +372,6 @@ export const collectDeathCertificateFormSection: IFormSection = {
       title: certificateMessages.otherCollectorFormTitle,
       error: certificateMessages.certificateOtherCollectorInfoError,
       fields: [
-        {
-          name: 'paragraph',
-          type: PARAGRAPH,
-          label: certificateMessages.otherCollectorFormParagraph,
-          initialValue: '',
-          validate: []
-        },
         {
           name: 'iDType',
           type: SELECT_WITH_OPTIONS,
