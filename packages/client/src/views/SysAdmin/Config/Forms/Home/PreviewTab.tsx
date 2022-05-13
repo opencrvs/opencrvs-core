@@ -49,6 +49,7 @@ function EventDrafts({ event }: { event: Event }) {
   const actions = (
     <>
       <LinkButton
+        id="edit"
         onClick={() => {
           setAction({
             action: Actions.EDIT,
@@ -60,6 +61,7 @@ function EventDrafts({ event }: { event: Event }) {
         {intl.formatMessage(buttonMessages.edit)}
       </LinkButton>
       <LinkButton
+        id="publish"
         onClick={() => {
           setAction({
             action: Actions.PUBLISH,
