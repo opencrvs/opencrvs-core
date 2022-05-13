@@ -25,6 +25,7 @@ const formDrafts: IFormDraft[] = [
     event: Event.BIRTH,
     status: DraftStatus.DRAFT,
     version: 0,
+    history: [],
     updatedAt: 1649395100098,
     createdAt: 1649395100098
   },
@@ -32,6 +33,7 @@ const formDrafts: IFormDraft[] = [
     event: Event.DEATH,
     status: DraftStatus.DRAFT,
     version: 0,
+    history: [],
     updatedAt: 1649395100098,
     createdAt: 1649395100098
   }
