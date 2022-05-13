@@ -356,6 +356,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           type: RADIO_GROUP,
           size: RadioSize.LARGE,
           label: certificateMessages.whoToCollect,
+          hideHeader: true,
           required: true,
           initialValue: true,
           validate: [],
