@@ -21,6 +21,7 @@ import { VerifyCorrector } from './VerifyCorrector'
 import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/forms'
 import { ReactWrapper } from 'enzyme'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 describe('verify corrector tests', () => {
   const { store, history } = createStore()
@@ -201,7 +202,7 @@ describe('verify corrector tests', () => {
 
       testComponent.update()
 
-      expect(history.location.pathname).toContain('/review')
+      expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
     })
   })
 

@@ -17,7 +17,10 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
-import { Navigation } from '@client/components/interface/Navigation'
+import {
+  Navigation,
+  WORKQUEUE_TABS
+} from '@client/components/interface/Navigation'
 import { Divider } from '@opencrvs/components/lib/interface/Divider'
 import styled from '@client/styledComponents'
 import {
@@ -31,7 +34,7 @@ import { AvatarSmall } from '@client/components/Avatar'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
 import {
-  goToRegistrarHomeTab,
+  goToHomeTab,
   goToPage,
   goToCertificateCorrection,
   goToPrintCertificate,
@@ -286,7 +289,7 @@ interface IDispatchProps {
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
-  goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+  goToHomeTab: typeof goToHomeTab
   goToUserProfile: typeof goToUserProfile
   goToTeamUserList: typeof goToTeamUserList
   goBack: typeof goBack
@@ -1361,7 +1364,7 @@ function RecordAuditBody({
   goToCertificateCorrection,
   goToPrintCertificate,
   goToPage,
-  goToRegistrarHomeTab,
+  goToHomeTab,
   scope,
   userDetails,
   registerForm,
@@ -1629,7 +1632,7 @@ function RecordAuditBody({
               onClick={() => {
                 archiveDeclaration(declaration.id)
                 toggleDisplayDialog()
-                goToRegistrarHomeTab('review')
+                goToHomeTab(WORKQUEUE_TABS.readyForReview)
               }}
             >
               {intl.formatMessage(buttonMessages.archive)}
@@ -1774,7 +1777,7 @@ export const RecordAudit = connect<
   goToCertificateCorrection,
   goToPage,
   goToPrintCertificate,
-  goToRegistrarHomeTab,
+  goToHomeTab,
   goToUserProfile,
   goToTeamUserList,
   goBack

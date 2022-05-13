@@ -102,14 +102,6 @@ type GoToPageAction = {
   }
 }
 
-export const GO_TO_REGISTRAR_HOME = 'navigation/GO_TO_REGISTRAR_HOME'
-type GoToRegistrarHome = {
-  type: typeof GO_TO_REGISTRAR_HOME
-  payload: {
-    tabId: string
-  }
-}
-
 export const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
 type GoToReviewUserDetails = {
   type: typeof GO_TO_REVIEW_USER_DETAILS
@@ -128,7 +120,6 @@ type GoToUserProfile = {
 
 export type Action =
   | GoToPageAction
-  | GoToRegistrarHome
   | GoToSysAdminHome
   | GoToReviewUserDetails
   | GoToUserProfile
@@ -188,7 +179,7 @@ export function goToApplicationConfig() {
   return push(APPLICATION_CONFIG)
 }
 
-export function goToHomeTab(tabId: string, selectorId = '') {
+export function goToHomeTab(tabId: IWORKQUEUE_TABS, selectorId = '') {
   return push(formatUrl(REGISTRAR_HOME_TAB, { tabId, selectorId }))
 }
 
@@ -352,16 +343,6 @@ export function goToDeathRegistration(declarationId: string) {
   return push(
     formatUrl(DRAFT_DEATH_FORM, { declarationId: declarationId.toString() })
   )
-}
-
-export function goToRegistrarHomeTab(
-  tabId: IWORKQUEUE_TABS,
-  selectorId?: string
-) {
-  return {
-    type: GO_TO_REGISTRAR_HOME,
-    payload: { tabId, selectorId }
-  }
 }
 
 export function goToFormConfigWizard(event: Event, section: WizardSection) {
@@ -641,22 +622,6 @@ export function navigationReducer(state: INavigationState, action: any) {
               event
             }) + (fieldNameHash ? `#${fieldNameHash}` : ''),
             historyState
-          )
-        )
-      )
-    case GO_TO_REGISTRAR_HOME:
-      const {
-        tabId: RegistrarHomeTabId,
-        selectorId: RegistrarHomeSelectorId = ''
-      } = action.payload
-      return loop(
-        state,
-        Cmd.action(
-          push(
-            formatUrl(REGISTRAR_HOME_TAB, {
-              tabId: RegistrarHomeTabId,
-              selectorId: RegistrarHomeSelectorId
-            })
           )
         )
       )
