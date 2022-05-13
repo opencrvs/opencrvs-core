@@ -20,7 +20,6 @@ const InputHeader = styled.div`
 `
 const ComponentWrapper = styled.span`
   display: flex;
-  max-width: 344px;
 `
 
 const Padding = styled.span`
