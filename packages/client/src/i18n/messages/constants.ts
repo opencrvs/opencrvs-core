@@ -149,6 +149,7 @@ interface IConstantsMessages
   history: MessageDescriptor
   requireUpdatesLoading: MessageDescriptor
   noRecords: MessageDescriptor
+  noConnection: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -845,6 +846,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'No records {tab}',
     description: 'No Application in{tab} tab in officeHome',
     id: 'constants.noRecords'
+  },
+  noConnection: {
+    defaultMessage: 'No connection',
+    description: 'No Connection hover text',
+    id: 'constants.noConnection'
   }
 }
 
