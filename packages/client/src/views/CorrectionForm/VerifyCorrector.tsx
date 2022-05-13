@@ -30,6 +30,7 @@ import { RouteComponentProps } from 'react-router'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { getVerifyCorrectorDefinition } from '@client/forms/correction/verifyCorrector'
 import { TimeMounted } from '@client/components/TimeMounted'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 interface INameField {
   firstNamesField: string
   familyNameField: string
@@ -168,7 +169,7 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
       <TimeMounted onUnmount={this.logTime}>
         <ActionPageLight
           goBack={this.props.goBack}
-          goHome={() => this.props.goToHomeTab('review')}
+          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
           title={intl.formatMessage(messages.title)}
           hideBackground
         >

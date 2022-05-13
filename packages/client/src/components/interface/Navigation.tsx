@@ -26,7 +26,7 @@ import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/Na
 import { NavigationSubItem } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
 import { connect } from 'react-redux'
 import {
-  goToRegistrarHomeTab,
+  goToHomeTab,
   goToCertificateConfig,
   goToSettings,
   goToPerformanceView,
@@ -60,6 +60,7 @@ export type IWORKQUEUE_TABS = typeof WORKQUEUE_TABS[Keys]
 
 export const WORKQUEUE_TABS = {
   inProgress: 'progress',
+  inProgressFieldAgent: 'progress/field-agents',
   sentForReview: 'sentForReview',
   requiresUpdateAgent: 'requiresUpdateAgent',
   readyForReview: 'readyForReview',
@@ -75,7 +76,7 @@ export const WORKQUEUE_TABS = {
   settings: 'settings',
   logout: 'logout',
   declarationForms: 'form'
-}
+} as const
 
 const GROUP_ID = {
   declarationGroup: 'declarationGroup',
@@ -165,7 +166,7 @@ interface IProps {
 }
 
 interface IDispatchProps {
-  goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+  goToHomeTab: typeof goToHomeTab
   goToCertificateConfigAction: typeof goToCertificateConfig
   goToFormConfigAction: typeof goToFormConfigHome
   goToApplicationConfigAction: typeof goToApplicationConfig
@@ -250,7 +251,7 @@ export const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-  const configTab = [
+  const configTab: string[] = [
     WORKQUEUE_TABS.application,
     WORKQUEUE_TABS.certificate,
     WORKQUEUE_TABS.declarationForms
@@ -306,7 +307,7 @@ export const NavigationView = (props: IFullProps) => {
               count={props.draftDeclarations.length}
               isSelected={tabId === WORKQUEUE_TABS.inProgress}
               onClick={() => {
-                props.goToRegistrarHomeTab(WORKQUEUE_TABS.inProgress)
+                props.goToHomeTab(WORKQUEUE_TABS.inProgress)
                 menuCollapse && menuCollapse()
               }}
             />
@@ -319,7 +320,7 @@ export const NavigationView = (props: IFullProps) => {
               count={props.declarationsReadyToSend.length}
               isSelected={tabId === WORKQUEUE_TABS.sentForReview}
               onClick={() => {
-                props.goToRegistrarHomeTab(WORKQUEUE_TABS.sentForReview)
+                props.goToHomeTab(WORKQUEUE_TABS.sentForReview)
                 menuCollapse && menuCollapse()
               }}
             />
@@ -351,9 +352,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={0}
                       isSelected={tabId === WORKQUEUE_TABS.requiresUpdateAgent}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(
-                          WORKQUEUE_TABS.requiresUpdateAgent
-                        )
+                        props.goToHomeTab(WORKQUEUE_TABS.requiresUpdateAgent)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -370,9 +369,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={data?.searchEvents?.totalItems}
                       isSelected={tabId === WORKQUEUE_TABS.requiresUpdateAgent}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(
-                          WORKQUEUE_TABS.requiresUpdateAgent
-                        )
+                        props.goToHomeTab(WORKQUEUE_TABS.requiresUpdateAgent)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -405,7 +402,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={declarationCount.inProgress}
                       isSelected={tabId === WORKQUEUE_TABS.inProgress}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(WORKQUEUE_TABS.inProgress)
+                        props.goToHomeTab(WORKQUEUE_TABS.inProgress)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -423,9 +420,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={declarationCount.readyForReview}
                       isSelected={tabId === WORKQUEUE_TABS.readyForReview}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(
-                          WORKQUEUE_TABS.readyForReview
-                        )
+                        props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -447,7 +442,7 @@ export const NavigationView = (props: IFullProps) => {
                         tabId === WORKQUEUE_TABS.requiresUpdateRegistrar
                       }
                       onClick={() => {
-                        props.goToRegistrarHomeTab(
+                        props.goToHomeTab(
                           WORKQUEUE_TABS.requiresUpdateRegistrar
                         )
                         menuCollapse && menuCollapse()
@@ -467,9 +462,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={declarationCount.sentForApproval}
                       isSelected={tabId === WORKQUEUE_TABS.sentForApproval}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(
-                          WORKQUEUE_TABS.sentForApproval
-                        )
+                        props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -484,9 +477,7 @@ export const NavigationView = (props: IFullProps) => {
                     count={declarationCount.externalValidation}
                     isSelected={tabId === WORKQUEUE_TABS.externalValidation}
                     onClick={() => {
-                      props.goToRegistrarHomeTab(
-                        WORKQUEUE_TABS.externalValidation
-                      )
+                      props.goToHomeTab(WORKQUEUE_TABS.externalValidation)
                       menuCollapse && menuCollapse()
                     }}
                   />
@@ -504,7 +495,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={declarationCount.readyToPrint}
                       isSelected={tabId === WORKQUEUE_TABS.readyToPrint}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(WORKQUEUE_TABS.readyToPrint)
+                        props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -670,7 +661,7 @@ export const Navigation = connect<
   IProps,
   IStoreState
 >(mapStateToProps, {
-  goToRegistrarHomeTab,
+  goToHomeTab,
   goToCertificateConfigAction: goToCertificateConfig,
   goToFormConfigAction: goToFormConfigHome,
   goToApplicationConfigAction: goToApplicationConfig,
