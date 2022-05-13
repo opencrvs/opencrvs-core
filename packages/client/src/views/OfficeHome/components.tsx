@@ -22,20 +22,19 @@ import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 
 const Flex = styled.div`
   display: flex;
-  gap: 16px;
+  align-items: center;
+  gap: 8px;
 `
 
-const Name = styled.div`
-  color: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.fonts.bold16}
-  margin-right: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`
-
-const Error = styled.span`
+export const NoNameContainer = styled.span`
   color: ${({ theme }) => theme.colors.negative};
+  cursor: pointer;
+  padding: 0 8px;
+  &:hover {
+    color: ${({ theme }) => theme.colors.negative};
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+  }
 `
 
 const Event = styled.div`
@@ -55,7 +54,7 @@ const Icon = styled.div`
 `
 interface IIconWith {
   status?: string
-  name?: string
+  name: React.ReactNode
   event?: string
   isDuplicate?: boolean
   isValidatedOnReview?: boolean
@@ -99,7 +98,7 @@ export const IconWithName = ({
           isValidatedOnReview={isValidatedOnReview}
         />
       )}
-      {name ? <Name id="name">{name}</Name> : <Error>No name provided</Error>}
+      {name}
     </Flex>
   )
 }
@@ -121,7 +120,7 @@ export const IconWithNameEvent = ({
         />
       )}
       <NameEventContainer id="nameEvent">
-        {name ? <Name>{name}</Name> : <Error>No name provided</Error>}
+        {name}
         {event && <Event>{event}</Event>}
       </NameEventContainer>
     </Flex>

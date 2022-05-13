@@ -33,9 +33,11 @@ import {
 } from '@client/views/OfficeHome/utils'
 import {
   IconWithName,
-  IconWithNameEvent
+  IconWithNameEvent,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 
 const { useState, useEffect } = React
 
@@ -117,17 +119,34 @@ function InExternalValidationComponent(props: IProps) {
         (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
           ? new Date(reg.modifiedAt)
           : new Date(Number(reg.modifiedAt))) || ''
+      const NameComponent = reg.name ? (
+        <LinkButton
+          onClick={() =>
+            props.goToDeclarationRecordAudit('externalValidationTab', reg.id)
+          }
+        >
+          {reg.name}
+        </LinkButton>
+      ) : (
+        <NoNameContainer
+          onClick={() =>
+            props.goToDeclarationRecordAudit('externalValidationTab', reg.id)
+          }
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
       return {
         ...reg,
         event,
         name: reg.name && reg.name.toLowerCase(),
         iconWithName: (
-          <IconWithName status={reg.declarationStatus} name={reg.name} />
+          <IconWithName status={reg.declarationStatus} name={NameComponent} />
         ),
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.declarationStatus}
-            name={reg.name}
+            name={NameComponent}
             event={event}
           />
         ),
@@ -213,7 +232,6 @@ function InExternalValidationComponent(props: IProps) {
     >
       <GridTable
         content={transformWaitingValidationContent(data)}
-        clickable={true}
         loading={props.loading}
         columns={columns}
         sortOrder={sortOrder}

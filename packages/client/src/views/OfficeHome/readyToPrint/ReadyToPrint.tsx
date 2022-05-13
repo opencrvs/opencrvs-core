@@ -45,10 +45,12 @@ import {
 } from '@client/views/OfficeHome/utils'
 import {
   IconWithName,
-  IconWithNameEvent
+  IconWithNameEvent,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
@@ -237,30 +239,40 @@ class ReadyToPrintComponent extends React.Component<
         (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
           ? new Date(reg.modifiedAt)
           : new Date(Number(reg.modifiedAt))) || ''
+      const NameComponent = reg.name ? (
+        <LinkButton
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('printTab', reg.id)
+          }
+        >
+          {reg.name}
+        </LinkButton>
+      ) : (
+        <NoNameContainer
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('printTab', reg.id)
+          }
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
       return {
         ...reg,
         event,
         name: reg.name && reg.name.toLowerCase(),
         iconWithName: (
-          <IconWithName status={reg.declarationStatus} name={reg.name} />
+          <IconWithName status={reg.declarationStatus} name={NameComponent} />
         ),
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.declarationStatus}
-            name={reg.name}
+            name={NameComponent}
             event={event}
           />
         ),
         dateOfEvent,
         registered,
-        actions,
-        rowClickHandler: [
-          {
-            label: 'rowClickHandler',
-            handler: () =>
-              this.props.goToDeclarationRecordAudit('printTab', reg.id)
-          }
-        ]
+        actions
       }
     })
     const sortedItems = getSortedItems(
@@ -309,7 +321,6 @@ class ReadyToPrintComponent extends React.Component<
         <GridTable
           content={this.transformRegisteredContent(data)}
           columns={this.getColumns()}
-          clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}

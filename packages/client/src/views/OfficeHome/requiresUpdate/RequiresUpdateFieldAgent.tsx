@@ -26,7 +26,8 @@ import { SearchDeclarationsUserWiseQuery } from '@client/utils/gateway'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import {
   IconWithName,
-  IconWithNameEvent
+  IconWithNameEvent,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import {
   IOnlineStatusProps,
@@ -57,6 +58,7 @@ import {
   WrappedComponentProps as IntlShapeProps
 } from 'react-intl'
 import { connect } from 'react-redux'
+import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 
 interface IProps {
   userDetails: IUserDetails | null
@@ -123,6 +125,31 @@ const transformRejectedContent = (
     const name =
       (createNamesMap(names)[props.intl.locale] as string) ||
       (createNamesMap(names)[LANG_EN] as string)
+    const NameComponent = name ? (
+      <LinkButton
+        onClick={() =>
+          props.isOnline &&
+          props.goToDeclarationRecordAudit(
+            'rejectTab',
+            registrationSearchSet.id
+          )
+        }
+      >
+        {name}
+      </LinkButton>
+    ) : (
+      <NoNameContainer
+        onClick={() =>
+          props.isOnline &&
+          props.goToDeclarationRecordAudit(
+            'rejectTab',
+            registrationSearchSet.id
+          )
+        }
+      >
+        {intl.formatMessage(constantsMessages.noNameProvided)}
+      </NoNameContainer>
+    )
     return {
       id: registrationSearchSet.id,
       event:
@@ -131,28 +158,21 @@ const transformRejectedContent = (
         '',
       name: name.toString().toLowerCase(),
       iconWithName: (
-        <IconWithName status={SUBMISSION_STATUS.REJECTED} name={name} />
+        <IconWithName
+          status={SUBMISSION_STATUS.REJECTED}
+          name={NameComponent}
+        />
       ),
       dateOfEvent:
         (dateOfEvent && dateOfEvent.length > 0 && new Date(dateOfEvent)) || '',
       iconWithNameEvent: (
         <IconWithNameEvent
           status={SUBMISSION_STATUS.DRAFT}
-          name={name}
+          name={NameComponent}
           event={event}
         />
       ),
-      sentForUpdates: (sentForUpdates && new Date(sentForUpdates)) || '',
-      rowClickHandler: [
-        {
-          label: 'rowClickHandler',
-          handler: () =>
-            props.goToDeclarationRecordAudit(
-              'rejectTab',
-              registrationSearchSet.id
-            )
-        }
-      ]
+      sentForUpdates: (sentForUpdates && new Date(sentForUpdates)) || ''
     }
   })
   const sortedItems = getSortedItems(items, sortedCol, sortOrder)
@@ -298,7 +318,6 @@ const RequiresUpdateFieldAgentComponent = (props: IFullProps) => {
                   sortedCol,
                   onColumnClick
                 )}
-                clickable={props.isOnline}
                 loading={loading}
                 sortedCol={sortedCol}
                 sortOrder={sortOrder}

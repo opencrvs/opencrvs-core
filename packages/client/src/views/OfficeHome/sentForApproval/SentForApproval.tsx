@@ -39,9 +39,11 @@ import {
 } from '@client/views/OfficeHome/utils'
 import {
   IconWithName,
-  IconWithNameEvent
+  IconWithNameEvent,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 const ToolTipContainer = styled.span`
   text-align: center;
 `
@@ -173,17 +175,34 @@ class SentForApprovalComponent extends React.Component<
         reg.dateOfEvent &&
         reg.dateOfEvent.length > 0 &&
         new Date(reg.dateOfEvent)
+      const NameComponent = reg.name ? (
+        <LinkButton
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
+          }
+        >
+          {reg.name}
+        </LinkButton>
+      ) : (
+        <NoNameContainer
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
+          }
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
       return {
         ...reg,
         event,
         name: reg.name && reg.name.toLowerCase(),
         iconWithName: (
-          <IconWithName status={reg.declarationStatus} name={reg.name} />
+          <IconWithName status={reg.declarationStatus} name={NameComponent} />
         ),
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.declarationStatus}
-            name={reg.name}
+            name={NameComponent}
             event={event}
           />
         ),
@@ -191,14 +210,7 @@ class SentForApprovalComponent extends React.Component<
           (reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))) ||
           '',
         dateOfEvent,
-        sentForApproval,
-        rowClickHandler: [
-          {
-            label: 'rowClickHandler',
-            handler: () =>
-              this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
-          }
-        ]
+        sentForApproval
       }
     })
     const sortedItems = getSortedItems(
@@ -254,7 +266,6 @@ class SentForApprovalComponent extends React.Component<
         <GridTable
           content={this.transformValidatedContent(data)}
           columns={this.getColumns()}
-          clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
