@@ -15,6 +15,8 @@ import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
 import { STATUSTOCOLOR } from '@client/views/Home/RecordAudit'
 import { Duplicate, StatusFailed } from '@opencrvs/components/lib/icons'
 import { SUBMISSION_STATUS } from '@client/declarations'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+
 import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
 import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
 import { WaitingToSent } from '@opencrvs/components/lib/icons/WaitingToSent'
@@ -26,18 +28,6 @@ const Flex = styled.div`
   gap: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     align-items: flex-start;
-  }
-`
-
-const Name = styled.div`
-  color: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.fonts.bold16}
-  margin-right: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-bottom: 4px;
   }
 `
 
@@ -108,7 +98,13 @@ export const IconWithName = ({
           isValidatedOnReview={isValidatedOnReview}
         />
       )}
-      {name ? <Name id="name">{name}</Name> : <Error>No name provided</Error>}
+      {name ? (
+        <LinkButton id="name" isBoldLink>
+          {name}
+        </LinkButton>
+      ) : (
+        <LinkButton isBoldLink>No name provided</LinkButton>
+      )}
     </Flex>
   )
 }
@@ -130,7 +126,11 @@ export const IconWithNameEvent = ({
         />
       )}
       <NameEventContainer id="nameEvent">
-        {name ? <Name>{name}</Name> : <Error>No name provided</Error>}
+        {name ? (
+          <LinkButton isBoldLink>{name}</LinkButton>
+        ) : (
+          <LinkButton isBoldLink>No name provided</LinkButton>
+        )}
         {event && <Event>{event}</Event>}
       </NameEventContainer>
     </Flex>
