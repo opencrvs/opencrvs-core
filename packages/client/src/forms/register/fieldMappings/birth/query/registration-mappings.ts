@@ -149,7 +149,7 @@ const convertToLocal = (
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
   const countryCode =
-    country.toUpperCase() === 'FAR' ? 'ZMB' : country.toUpperCase()
+    country.toUpperCase() === 'FAR' ? 'BGD' : country.toUpperCase()
 
   return (
     mobileWithCountryCode &&
