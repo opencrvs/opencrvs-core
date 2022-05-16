@@ -25,7 +25,6 @@ import { generateLocations } from '@client/utils/locationUtils'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
 import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
-import { FilterContainer } from '@client/views/SysAdmin/Performance/utils'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { SortArrow } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
@@ -405,7 +404,7 @@ function FieldAgentListComponent(props: IProps) {
         title={intl.formatMessage(messages.declarationsStartedFieldAgents)}
         size={ContentSize.LARGE}
         filterContent={
-          <FilterContainer>
+          <>
             <LocationPicker
               selectedLocationId={locationId}
               disabled={true}
@@ -483,7 +482,7 @@ function FieldAgentListComponent(props: IProps) {
                 }
               ]}
             />
-          </FilterContainer>
+          </>
         }
       >
         <Query

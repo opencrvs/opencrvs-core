@@ -128,6 +128,7 @@ function CorrectionReasonFormComponent(props: IFullProps) {
           title={group.title && intl.formatMessage(group.title)}
           bottomActionButtons={[continueButton]}
           size={ContentSize.LARGE}
+          showTitleOnMObile={true}
         >
           <FormFieldGenerator
             id={group.id}

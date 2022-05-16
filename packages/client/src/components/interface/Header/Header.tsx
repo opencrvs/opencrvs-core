@@ -458,6 +458,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   render() {
     const { intl, activeMenuItem, theme } = this.props
+    const headerProps: React.HTMLAttributes<HTMLDivElement> = this.props
 
     const title =
       this.props.title ||
@@ -527,12 +528,14 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     )
 
     return (
-      <AppHeader
-        id="register_app_header"
-        desktopRightMenu={rightMenu}
-        title={title}
-        {...mobileHeaderActionProps}
-      />
+      <div {...headerProps}>
+        <AppHeader
+          id="register_app_header"
+          desktopRightMenu={rightMenu}
+          title={title}
+          {...mobileHeaderActionProps}
+        />
+      </div>
     )
   }
 }

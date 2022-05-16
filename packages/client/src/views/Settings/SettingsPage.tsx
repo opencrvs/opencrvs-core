@@ -319,7 +319,10 @@ class SettingsView extends React.Component<IProps, IState> {
         <Header title={intl.formatMessage(messages.settingsTitle)} />
         <Navigation />
         <BodyContainer>
-          <Content title={intl.formatMessage(messages.settingsTitle)}>
+          <Content
+            title={intl.formatMessage(messages.settingsTitle)}
+            showTitleOnMObile={true}
+          >
             <ListViewSimplified>
               {items.map((item) => {
                 return (
