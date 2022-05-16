@@ -32,7 +32,7 @@ describe('FormConfigWizard', () => {
 
     const { store, history } = createStore()
     getItem.mockReturnValue(natlSysAdminToken)
-    await store.dispatch(checkAuth({ '?token': natlSysAdminToken }))
+    await store.dispatch(checkAuth())
     component = await createTestComponent(<FormConfigWizard />, {
       store,
       history
