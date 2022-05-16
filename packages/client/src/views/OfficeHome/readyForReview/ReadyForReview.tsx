@@ -55,8 +55,8 @@ import {
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -134,7 +134,7 @@ class ReadyForReviewComponent extends React.Component<
       return []
     }
     const transformedData = transformData(data, this.props.intl)
-    const items = transformedData.map((reg, index) => {
+    const items: IDynamicValues[] = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
@@ -170,7 +170,8 @@ class ReadyForReviewComponent extends React.Component<
             downloadConfigs={{
               event: reg.event,
               compositionId: reg.id,
-              action: Action.LOAD_REVIEW_DECLARATION
+              action: Action.LOAD_REVIEW_DECLARATION,
+              assignment: reg.assignment
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus}
