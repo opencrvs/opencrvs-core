@@ -241,6 +241,7 @@ class ReadyToPrintComponent extends React.Component<
           : new Date(Number(reg.modifiedAt))) || ''
       const NameComponent = reg.name ? (
         <LinkButton
+          id={`name_${index}`}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('printTab', reg.id)
           }
@@ -249,6 +250,7 @@ class ReadyToPrintComponent extends React.Component<
         </LinkButton>
       ) : (
         <NoNameContainer
+          id={`name_${index}`}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('printTab', reg.id)
           }

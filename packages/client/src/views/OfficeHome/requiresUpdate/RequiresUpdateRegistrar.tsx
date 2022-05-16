@@ -253,6 +253,7 @@ class RequiresUpdateRegistrarComponent extends React.Component<
         new Date(reg.dateOfEvent)
       const NameComponent = reg.name ? (
         <LinkButton
+          id={`name_${index}`}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
           }
@@ -261,6 +262,7 @@ class RequiresUpdateRegistrarComponent extends React.Component<
         </LinkButton>
       ) : (
         <NoNameContainer
+          id={`name_${index}`}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
           }

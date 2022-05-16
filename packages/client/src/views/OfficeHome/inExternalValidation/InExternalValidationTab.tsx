@@ -104,7 +104,7 @@ function InExternalValidationComponent(props: IProps) {
     }
     const transformedData = transformData(data, props.intl)
 
-    const items = transformedData.map((reg) => {
+    const items = transformedData.map((reg, index) => {
       const event =
         (reg.event &&
           intl.formatMessage(
@@ -121,6 +121,7 @@ function InExternalValidationComponent(props: IProps) {
           : new Date(Number(reg.modifiedAt))) || ''
       const NameComponent = reg.name ? (
         <LinkButton
+          id={`name_${index}`}
           onClick={() =>
             props.goToDeclarationRecordAudit('externalValidationTab', reg.id)
           }
@@ -129,6 +130,7 @@ function InExternalValidationComponent(props: IProps) {
         </LinkButton>
       ) : (
         <NoNameContainer
+          id={`name_${index}`}
           onClick={() =>
             props.goToDeclarationRecordAudit('externalValidationTab', reg.id)
           }

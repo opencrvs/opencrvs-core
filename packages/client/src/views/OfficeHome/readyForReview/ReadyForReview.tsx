@@ -208,6 +208,7 @@ class ReadyForReviewComponent extends React.Component<
       const createdAt = (reg.createdAt && parseInt(reg.createdAt)) || ''
       const NameComponent = reg.name ? (
         <LinkButton
+          id={`name_${index}`}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
           }
@@ -216,6 +217,7 @@ class ReadyForReviewComponent extends React.Component<
         </LinkButton>
       ) : (
         <NoNameContainer
+          id={`name_${index}`}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
           }

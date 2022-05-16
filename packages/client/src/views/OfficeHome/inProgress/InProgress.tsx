@@ -75,7 +75,6 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { constant } from 'lodash'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 
 interface IQueryData {
@@ -252,6 +251,7 @@ export class InProgressComponent extends React.Component<
       }
       const NameComponent = name ? (
         <LinkButton
+          id={`name_${index}`}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('inProgressTab', regId)
           }
@@ -260,6 +260,7 @@ export class InProgressComponent extends React.Component<
         </LinkButton>
       ) : (
         <NoNameContainer
+          id={`name_${index}`}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('inProgressTab', regId)
           }
@@ -331,7 +332,7 @@ export class InProgressComponent extends React.Component<
       this.props.drafts,
       this.props.paginationId.draftId
     )
-    const items = paginatedDrafts.map((draft: IDeclaration) => {
+    const items = paginatedDrafts.map((draft: IDeclaration, index) => {
       let pageRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
         pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
@@ -374,6 +375,7 @@ export class InProgressComponent extends React.Component<
       const dateOfEvent = (eventTime && new Date(eventTime as string)) || ''
       const NameComponent = name ? (
         <LinkButton
+          id={`name_${index}`}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('inProgressTab', draft.id)
           }
@@ -382,6 +384,7 @@ export class InProgressComponent extends React.Component<
         </LinkButton>
       ) : (
         <NoNameContainer
+          id={`name_${index}`}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('inProgressTab', draft.id)
           }

@@ -676,7 +676,7 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-      testComponent.find('#row_0').hostNodes().simulate('click')
+      testComponent.find('#name_0').hostNodes().simulate('click')
 
       await flushPromises()
       testComponent.update()
@@ -956,7 +956,7 @@ describe('Tablet tests', () => {
       setTimeout(resolve, 100)
     })
     testComponent.update()
-    testComponent.find('#row_0').hostNodes().simulate('click')
+    testComponent.find('#name_0').hostNodes().simulate('click')
 
     await new Promise((resolve) => {
       setTimeout(resolve, 100)

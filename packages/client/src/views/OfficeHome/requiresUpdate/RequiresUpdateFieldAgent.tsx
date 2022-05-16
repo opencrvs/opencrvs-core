@@ -98,7 +98,7 @@ const transformRejectedContent = (
     return []
   }
 
-  const items = data.searchEvents.results.map((reg) => {
+  const items = data.searchEvents.results.map((reg, index) => {
     const { intl } = props
     const registrationSearchSet = reg as GQLEventSearchSet
     let names
@@ -127,6 +127,7 @@ const transformRejectedContent = (
       (createNamesMap(names)[LANG_EN] as string)
     const NameComponent = name ? (
       <LinkButton
+        id={`name_${index}`}
         onClick={() =>
           props.isOnline &&
           props.goToDeclarationRecordAudit(
@@ -139,6 +140,7 @@ const transformRejectedContent = (
       </LinkButton>
     ) : (
       <NoNameContainer
+        id={`name_${index}`}
         onClick={() =>
           props.isOnline &&
           props.goToDeclarationRecordAudit(

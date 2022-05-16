@@ -160,7 +160,7 @@ class SentForApprovalComponent extends React.Component<
     }
     const transformedData = transformData(data, this.props.intl)
 
-    const items = transformedData.map((reg) => {
+    const items = transformedData.map((reg, index) => {
       const event =
         (reg.event &&
           intl.formatMessage(
@@ -177,6 +177,7 @@ class SentForApprovalComponent extends React.Component<
         new Date(reg.dateOfEvent)
       const NameComponent = reg.name ? (
         <LinkButton
+          id={`name_${index}`}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
           }
@@ -185,6 +186,7 @@ class SentForApprovalComponent extends React.Component<
         </LinkButton>
       ) : (
         <NoNameContainer
+          id={`name_${index}`}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
           }
