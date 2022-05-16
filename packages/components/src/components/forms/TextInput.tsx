@@ -97,10 +97,10 @@ const StyledInput = styled.input<ITextInputProps>`
     return !ignoreMediaQuery && !inputFieldWidth
       ? isSmallSized
         ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 234px;
+        width: 344px;
       }`
         : `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 535px;
+        width: 344px;
       }`
       : ''
   }}
