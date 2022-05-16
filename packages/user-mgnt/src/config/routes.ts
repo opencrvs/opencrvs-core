@@ -76,6 +76,9 @@ import changePhoneHandler, {
 } from '@user-mgnt/features/changePhone/handler'
 import * as Joi from 'joi'
 import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
+import getUserAvatar, {
+  getUserAvatarRequestSchema
+} from '@user-mgnt/features/getAvatar/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -275,6 +278,19 @@ export const getRoutes = () => {
         },
         response: {
           schema: resMobileSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/getUserAvatar',
+      handler: getUserAvatar,
+      config: {
+        tags: ['api'],
+        description: 'Retrieves a user avatar',
+        auth: false,
+        validate: {
+          payload: getUserAvatarRequestSchema
         }
       }
     },
