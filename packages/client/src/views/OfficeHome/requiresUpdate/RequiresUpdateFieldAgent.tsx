@@ -128,6 +128,7 @@ const transformRejectedContent = (
     const NameComponent = name ? (
       <LinkButton
         id={`name_${index}`}
+        isBoldLink={true}
         onClick={() =>
           props.isOnline &&
           props.goToDeclarationRecordAudit(

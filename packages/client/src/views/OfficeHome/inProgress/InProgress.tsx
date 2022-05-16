@@ -247,6 +247,7 @@ export class InProgressComponent extends React.Component<
       const NameComponent = name ? (
         <LinkButton
           id={`name_${index}`}
+          isBoldLink={true}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('inProgressTab', regId)
           }
@@ -371,6 +372,7 @@ export class InProgressComponent extends React.Component<
       const NameComponent = name ? (
         <LinkButton
           id={`name_${index}`}
+          isBoldLink={true}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('inProgressTab', draft.id)
           }

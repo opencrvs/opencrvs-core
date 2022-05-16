@@ -161,6 +161,8 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
           : draft.createdAt && parseInt(draft.createdAt)
       const NameComponent = name ? (
         <LinkButton
+          id={`name_${index}`}
+          isBoldLink={true}
           onClick={() => {
             if (!draft.compositionId) {
               throw new Error('No composition id found for this declaration')

@@ -254,6 +254,7 @@ class RequiresUpdateRegistrarComponent extends React.Component<
       const NameComponent = reg.name ? (
         <LinkButton
           id={`name_${index}`}
+          isBoldLink={true}
           onClick={() =>
             this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
           }
