@@ -392,7 +392,9 @@ describe('Correction summary', () => {
       wrapper.update()
       wrapper.find('#make_correction').hostNodes().simulate('click')
       wrapper.update()
-      expect(history.location.pathname).toContain('registration-home/review')
+      expect(history.location.pathname).toContain(
+        `registration-home/${WORKQUEUE_TABS.readyForReview}`
+      )
     })
   })
   describe('for a death declaration', () => {

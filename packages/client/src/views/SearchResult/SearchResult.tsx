@@ -412,7 +412,9 @@ export class SearchResultView extends React.Component<
               <Query<SearchEventsQuery>
                 query={SEARCH_EVENTS}
                 variables={{
-                  locationIds: userDetails
+                  locationIds: this.userHasRegisterScope()
+                    ? null
+                    : userDetails
                     ? [getUserLocation(userDetails).id]
                     : [],
                   sort: SEARCH_RESULT_SORT,
