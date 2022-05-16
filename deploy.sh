@@ -19,7 +19,7 @@ then
 fi
 
 print_usage_and_exit () {
-    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no HOST ENV VERSION COUNTRY_CONFIG_VERSION COUNTRY_CONFIG_PATH REPLICAS'
+    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no ENV HOST VERSION COUNTRY_CONFIG_VERSION COUNTRY_CONFIG_PATH REPLICAS'
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
     echo "  --restore-metadata must have a value of 'yes' or 'no' set e.g. --restore-metadata=yes"
     echo "  --update-metadata must have a value of 'yes' or 'no' set e.g. --update-metadata=yes"
@@ -232,7 +232,9 @@ if [[ "$ENV" = "development" ]]; then
 elif [[ "$ENV" = "qa" ]]; then
     docker_stack_deploy "docker-compose.countryconfig.qa-deploy.yml -c docker-compose.qa-deploy.yml"
 else
-  if [ "$REPLICAS" = "3" ]; then
+  if [ "$REPLICAS" = "1" ]; then
+    docker_stack_deploy "docker-compose.prod-deploy-1.yml -c docker-compose.countryconfig.prod-deploy.yml"
+  elif [ "$REPLICAS" = "3" ]; then
     docker_stack_deploy "docker-compose.prod-deploy-3.yml -c docker-compose.countryconfig.prod-deploy.yml"
   elif [ "$REPLICAS" = "5" ]; then
     docker_stack_deploy "docker-compose.prod-deploy-5.yml -c docker-compose.countryconfig.prod-deploy.yml"
