@@ -58,6 +58,7 @@ const inPreviewDraft: IFormDraft = {
 describe('PreviewTab', () => {
   let store: AppStore
   let history: History
+
   beforeEach(async () => {
     const Store = createStore()
     store = Store.store
