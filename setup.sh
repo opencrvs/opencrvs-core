@@ -328,6 +328,8 @@ if [ -d "data" ] ; then sudo rm -r data ; fi
 openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
 mkdir -p data/elasticsearch
 chmod 775 data/elasticsearch
+sudo chown -R 1000:root data/elasticsearch
+
 mkdir -p data/mongo
 chmod 775 data/mongo
 mkdir -p data/influxdb
@@ -340,7 +342,7 @@ echo
 if [ $OS == "MAC" ]; then
  export LOCAL_IP=host-gateway
 fi
-yarn compose:deps:detached
+yarn compose:deps
 DOCKER_STARTED=1
 echo "wait-on tcp:3447" && wait-on -l tcp:3447
 echo "wait-on http://localhost:9200" && wait-on -l http://localhost:9200
@@ -350,7 +352,9 @@ echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
 echo "wait-on tcp:8086" && wait-on -l tcp:8086
 
-
+if [ $CI == "true" ]; then
+ exit 0
+fi
 
 set -- $(stty size) #$1=rows, $2=columns
 
