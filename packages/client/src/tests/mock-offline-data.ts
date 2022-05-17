@@ -729,7 +729,7 @@ export const mockOfflineData = {
     EXTERNAL_VALIDATION_WORKQUEUE: true,
     _id: '61a8c105c04ac94fe46ceb27',
     BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
-    COUNTRY: 'bgd',
+    COUNTRY: 'BGD',
     COUNTRY_LOGO: {
       fileName: 'logo.png',
       file: `data:image;base64,${validImageB64String}`
