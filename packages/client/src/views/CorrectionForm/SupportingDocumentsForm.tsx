@@ -131,7 +131,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
       >
         <Content
           {...contentProps}
-          showTitleOnMObile={true}
+          showTitleOnMobile={true}
           bottomActionButtons={[
             <PrimaryButton
               id="confirm_form"

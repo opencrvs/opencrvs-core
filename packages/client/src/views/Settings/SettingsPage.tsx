@@ -321,7 +321,7 @@ class SettingsView extends React.Component<IProps, IState> {
         <BodyContainer>
           <Content
             title={intl.formatMessage(messages.settingsTitle)}
-            showTitleOnMObile={true}
+            showTitleOnMobile={true}
           >
             <ListViewSimplified>
               {items.map((item) => {

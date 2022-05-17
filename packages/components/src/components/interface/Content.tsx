@@ -158,7 +158,7 @@ interface IProps {
   backButtonAction?: () => void
   title?: string
   titleColor?: keyof typeof colors
-  showTitleOnMObile?: boolean
+  showTitleOnMobile?: boolean
   truncateTitleOnMobile?: boolean
   topActionButtons?: ReactElement[]
   tabBarContent?: React.ReactNode
@@ -177,7 +177,7 @@ export class Content extends React.Component<IProps> {
       backButtonAction,
       title,
       titleColor,
-      showTitleOnMObile,
+      showTitleOnMobile,
       truncateTitleOnMobile,
       topActionButtons,
       tabBarContent,
@@ -201,7 +201,7 @@ export class Content extends React.Component<IProps> {
               </TertiaryButton>
             </BackButtonContainer>
           )}
-          <TopBar keepShowing={showTitleOnMObile}>
+          <TopBar keepShowing={showTitleOnMobile}>
             <TitleContainer titleColor={titleColor}>
               {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
               {title && (

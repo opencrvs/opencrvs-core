@@ -180,7 +180,7 @@ class IDVerifierComponent extends React.Component<
       <div id={id}>
         <Content
           title={this.props.title}
-          showTitleOnMObile={true}
+          showTitleOnMobile={true}
           bottomActionButtons={[positiveActionButton, negativeActionButton]}
         >
           {correctorInformation && (

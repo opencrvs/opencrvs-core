@@ -205,7 +205,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             title={intl.formatMessage(messages.correctionSummaryTitle)}
             topActionButtons={[backToReviewButton]}
             bottomActionButtons={[continueButton]}
-            showTitleOnMObile={true}
+            showTitleOnMobile={true}
           >
             <TableView
               isLoading={false}
