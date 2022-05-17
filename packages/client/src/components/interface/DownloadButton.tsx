@@ -34,6 +34,8 @@ import { withApollo, WithApolloClient } from 'react-apollo'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
 import { IStoreState } from '@client/store'
+import { AvatarVerySmall } from '@client/components/Avatar'
+import { ROLE_LOCAL_REGISTRAR } from '@client/utils/constants'
 
 const { useState, useCallback } = React
 interface IDownloadConfig {
@@ -52,6 +54,7 @@ interface DownloadButtonProps {
 
 interface IConnectProps {
   userRole?: string
+  userId?: string
 }
 interface IDispatchProps {
   downloadDeclaration: typeof downloadDeclaration
@@ -96,9 +99,35 @@ function getAssignModalOptions(
     onUnAssign: () => void
     onHideModal: () => void
   },
-  userRole?: string
+  userRole?: string,
+  isDownloadedBySelf?: boolean
 ): AssignModalOptions {
-  if (assignment) {
+  let title: string
+  let content: string
+  let actions: IModalAction[]
+  if (isDownloadedBySelf) {
+    return {
+      title: 'Unassign record?',
+      content:
+        'Unassigning this record will mean that any current edits will be lost. Please confirm you wish to continue.',
+      actions: [
+        { label: 'Cancel', type: 'tertiary', handler: callbacks.onHideModal },
+        { label: 'Unassign', type: 'danger', handler: callbacks.onUnAssign }
+      ]
+    }
+  } else if (assignment) {
+    if (userRole === ROLE_LOCAL_REGISTRAR) {
+      return {
+        title: 'Unassign record?',
+        content: `${[assignment.firstName, assignment.lastName].join(' ')} at ${
+          assignment.officeName
+        } currently has sole editable access to this record. Unassigning this record will mean their current edits will be lost. Please confirm you wish to continue.`,
+        actions: [
+          { label: 'Cancel', type: 'tertiary', handler: callbacks.onHideModal },
+          { label: 'Unassign', type: 'danger', handler: callbacks.onUnAssign }
+        ]
+      }
+    }
     return {
       title: 'Assigned record',
       content: `${[assignment.firstName, assignment.lastName].join(' ')} at ${
@@ -106,23 +135,24 @@ function getAssignModalOptions(
       } has sole editable access to this record`,
       actions: []
     }
-  }
-  return {
-    title: 'Assign record?',
-    content:
-      'Please note you will have sole access to this record. Please make any updates promptly otherwise unassign the record.',
-    actions: [
-      {
-        label: 'Cancel',
-        type: 'tertiary',
-        handler: callbacks.onHideModal
-      },
-      {
-        label: 'Assign',
-        type: 'success',
-        handler: callbacks.onAssign
-      }
-    ]
+  } else {
+    return {
+      title: 'Assign record?',
+      content:
+        'Please note you will have sole access to this record. Please make any updates promptly otherwise unassign the record.',
+      actions: [
+        {
+          label: 'Cancel',
+          type: 'tertiary',
+          handler: callbacks.onHideModal
+        },
+        {
+          label: 'Assign',
+          type: 'success',
+          handler: callbacks.onAssign
+        }
+      ]
+    }
   }
 }
 
@@ -146,7 +176,8 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     downloadConfigs,
     client,
     downloadDeclaration,
-    userRole
+    userRole,
+    userId
   } = props
   const { assignment } = downloadConfigs
   const [assignModal, setAssignModal] = useState<AssignModalOptions | null>(
@@ -165,20 +196,28 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      setAssignModal(
-        getAssignModalOptions(
-          assignment,
-          {
-            onAssign: initiateDownload,
-            onUnAssign: () => console.log('To be implemented'),
-            onHideModal: () => setAssignModal(null)
-          },
-          userRole
+      if (
+        assignment?.userId != userId ||
+        status === DOWNLOAD_STATUS.DOWNLOADED
+      ) {
+        setAssignModal(
+          getAssignModalOptions(
+            assignment,
+            {
+              onAssign: initiateDownload,
+              onUnAssign: () => console.log('To be implemented'),
+              onHideModal: () => setAssignModal(null)
+            },
+            userRole,
+            status === DOWNLOAD_STATUS.DOWNLOADED
+          )
         )
-      )
+      } else {
+        initiateDownload()
+      }
       e.stopPropagation()
     },
-    [assignment, userRole, initiateDownload]
+    [assignment, userRole, initiateDownload, userId, status]
   )
 
   if (
@@ -202,13 +241,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   ) {
     return (
       <StatusIndicator className={className} id={`${id}-download-failed`}>
-        <DownloadAction
-          id={`${id}-icon`}
-          onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-            initiateDownload()
-            e.stopPropagation()
-          }}
-        >
+        <DownloadAction id={`${id}-icon`} onClick={onClickDownload}>
           <Download isFailed={true} />
         </DownloadAction>
       </StatusIndicator>
@@ -217,9 +250,28 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 
   if (status === DOWNLOAD_STATUS.DOWNLOADED) {
     return (
-      <StatusIndicator>
-        <Downloaded />
-      </StatusIndicator>
+      <>
+        <StatusIndicator>
+          <DownloadAction onClick={onClickDownload}>
+            <Downloaded />
+          </DownloadAction>
+        </StatusIndicator>
+        {assignModal !== null && (
+          <ResponsiveModal
+            show
+            title={assignModal.title}
+            actions={assignModal.actions.map(renderModalAction)}
+            autoHeight
+            responsive={false}
+            preventClickOnParent
+            handleClose={() => {
+              setAssignModal(null)
+            }}
+          >
+            {assignModal.content}
+          </ResponsiveModal>
+        )}
+      </>
     )
   }
 
@@ -230,7 +282,16 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
         onClick={onClickDownload}
         className={className}
       >
-        <Download />
+        {assignment && assignment.userId != userId ? (
+          <AvatarVerySmall
+            avatar={{
+              data: `${window.config.API_GATEWAY_URL}files/avatar/${assignment.userId}.jpg`,
+              type: 'image/jpg'
+            }}
+          />
+        ) : (
+          <Download />
+        )}
       </DownloadAction>
       {assignModal !== null && (
         <ResponsiveModal
@@ -252,7 +313,8 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 }
 
 const mapStateToProps = (state: IStoreState): IConnectProps => ({
-  userRole: state.profile.userDetails?.role
+  userRole: state.profile.userDetails?.role,
+  userId: state.profile.userDetails?.userMgntUserID
 })
 export const DownloadButton = connect(mapStateToProps, { downloadDeclaration })(
   withApollo(DownloadButtonComponent)
