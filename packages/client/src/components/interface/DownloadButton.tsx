@@ -27,7 +27,10 @@ import { connect } from 'react-redux'
 import {
   downloadDeclaration,
   makeDeclarationReadyToDownload,
-  DOWNLOAD_STATUS
+  DOWNLOAD_STATUS,
+  deleteDeclaration,
+  IDeclaration,
+  updateRegistrarWorkqueue
 } from '@client/declarations'
 import { Event, Action } from '@client/forms'
 import { withApollo, WithApolloClient } from 'react-apollo'
@@ -36,6 +39,7 @@ import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
 import { IStoreState } from '@client/store'
 import { AvatarVerySmall } from '@client/components/Avatar'
 import { ROLE_LOCAL_REGISTRAR } from '@client/utils/constants'
+import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 
 const { useState, useCallback } = React
 interface IDownloadConfig {
@@ -58,13 +62,11 @@ interface IConnectProps {
 }
 interface IDispatchProps {
   downloadDeclaration: typeof downloadDeclaration
+  deleteDeclaration: typeof deleteDeclaration
 }
 
 type HOCProps = IConnectProps & IDispatchProps & WithApolloClient<{}>
 
-const ModalContainer = styled.div`
-  max-height: 720px;
-`
 const StatusIndicator = styled.div<{
   isLoading?: boolean
 }>`
@@ -102,9 +104,6 @@ function getAssignModalOptions(
   userRole?: string,
   isDownloadedBySelf?: boolean
 ): AssignModalOptions {
-  let title: string
-  let content: string
-  let actions: IModalAction[]
   if (isDownloadedBySelf) {
     return {
       title: 'Unassign record?',
@@ -177,13 +176,14 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     client,
     downloadDeclaration,
     userRole,
-    userId
+    userId,
+    deleteDeclaration
   } = props
-  const { assignment } = downloadConfigs
+  const { assignment, compositionId } = downloadConfigs
   const [assignModal, setAssignModal] = useState<AssignModalOptions | null>(
     null
   )
-  const initiateDownload = useCallback(() => {
+  const download = useCallback(() => {
     const { event, compositionId, action } = downloadConfigs
     const downloadableDeclaration = makeDeclarationReadyToDownload(
       event.toLowerCase() as unknown as Event,
@@ -193,6 +193,14 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 
     downloadDeclaration(downloadableDeclaration, client)
   }, [downloadConfigs, client, downloadDeclaration])
+
+  const unassign = useCallback(async () => {
+    await client.mutate({
+      mutation: MARK_EVENT_UNASSIGNED,
+      variables: { id: compositionId }
+    })
+    deleteDeclaration({ id: compositionId as string } as IDeclaration)
+  }, [compositionId, client, deleteDeclaration])
 
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -204,8 +212,15 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
           getAssignModalOptions(
             assignment,
             {
-              onAssign: initiateDownload,
-              onUnAssign: () => console.log('To be implemented'),
+              onAssign: () => {
+                download()
+                setAssignModal(null)
+              },
+              onUnAssign: () => {
+                unassign()
+
+                setAssignModal(null)
+              },
               onHideModal: () => setAssignModal(null)
             },
             userRole,
@@ -213,11 +228,11 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
           )
         )
       } else {
-        initiateDownload()
+        download()
       }
       e.stopPropagation()
     },
-    [assignment, userRole, initiateDownload, userId, status]
+    [assignment, userRole, download, userId, status, unassign]
   )
 
   if (
@@ -235,46 +250,6 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     )
   }
 
-  if (
-    status === DOWNLOAD_STATUS.FAILED ||
-    status === DOWNLOAD_STATUS.FAILED_NETWORK
-  ) {
-    return (
-      <StatusIndicator className={className} id={`${id}-download-failed`}>
-        <DownloadAction id={`${id}-icon`} onClick={onClickDownload}>
-          <Download isFailed={true} />
-        </DownloadAction>
-      </StatusIndicator>
-    )
-  }
-
-  if (status === DOWNLOAD_STATUS.DOWNLOADED) {
-    return (
-      <>
-        <StatusIndicator>
-          <DownloadAction onClick={onClickDownload}>
-            <Downloaded />
-          </DownloadAction>
-        </StatusIndicator>
-        {assignModal !== null && (
-          <ResponsiveModal
-            show
-            title={assignModal.title}
-            actions={assignModal.actions.map(renderModalAction)}
-            autoHeight
-            responsive={false}
-            preventClickOnParent
-            handleClose={() => {
-              setAssignModal(null)
-            }}
-          >
-            {assignModal.content}
-          </ResponsiveModal>
-        )}
-      </>
-    )
-  }
-
   return (
     <>
       <DownloadAction
@@ -282,15 +257,22 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
         onClick={onClickDownload}
         className={className}
       >
-        {assignment && assignment.userId != userId ? (
+        {status === DOWNLOAD_STATUS.DOWNLOADED ? (
+          <Downloaded />
+        ) : assignment && assignment.userId != userId ? (
           <AvatarVerySmall
             avatar={{
               data: `${window.config.API_GATEWAY_URL}files/avatar/${assignment.userId}.jpg`,
-              type: 'image/jpg'
+              type: 'image/jpeg'
             }}
           />
         ) : (
-          <Download />
+          <Download
+            isFailed={
+              status === DOWNLOAD_STATUS.FAILED ||
+              status === DOWNLOAD_STATUS.FAILED_NETWORK
+            }
+          />
         )}
       </DownloadAction>
       {assignModal !== null && (
@@ -316,6 +298,7 @@ const mapStateToProps = (state: IStoreState): IConnectProps => ({
   userRole: state.profile.userDetails?.role,
   userId: state.profile.userDetails?.userMgntUserID
 })
-export const DownloadButton = connect(mapStateToProps, { downloadDeclaration })(
-  withApollo(DownloadButtonComponent)
-)
+export const DownloadButton = connect(mapStateToProps, {
+  downloadDeclaration,
+  deleteDeclaration
+})(withApollo(DownloadButtonComponent))
