@@ -1449,7 +1449,8 @@ export const mockUserResponse = {
             __typename: 'HumanName'
           }
         ]
-      }
+      },
+      role: 'LOCAL_REGISTRAR'
     }
   }
 }

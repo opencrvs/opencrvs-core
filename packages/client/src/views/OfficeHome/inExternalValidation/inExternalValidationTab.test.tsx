@@ -105,7 +105,7 @@ describe('Registrar home external validation tab tests', () => {
 
   it('clicking on a row redirect to recordAudit page', async () => {
     const tableElement = await waitForElement(component, GridTable)
-    const dataRow = tableElement.find('#row_0').hostNodes()
+    const dataRow = tableElement.find('#name_0').hostNodes()
     dataRow.simulate('click')
     component.update()
     expect(history.location.pathname).toContain('record-audit')
@@ -119,7 +119,7 @@ describe('Registrar home external validation tab tests', () => {
 
     it('clicking on row takes user to details page', async () => {
       const tableElement = await waitForElement(component, GridTable)
-      const dataRow = tableElement.find('#row_0').hostNodes()
+      const dataRow = tableElement.find('#name_0').hostNodes()
       dataRow.simulate('click')
       component.update()
       expect(history.location.pathname).toContain('record-audit')
