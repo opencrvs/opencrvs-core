@@ -194,6 +194,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     downloadDeclaration(downloadableDeclaration, client)
   }, [downloadConfigs, client, downloadDeclaration])
 
+  const hideModal = useCallback(() => setAssignModal(null), [])
   const unassign = useCallback(async () => {
     await client.mutate({
       mutation: MARK_EVENT_UNASSIGNED,
@@ -214,14 +215,13 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
             {
               onAssign: () => {
                 download()
-                setAssignModal(null)
+                hideModal()
               },
               onUnAssign: () => {
                 unassign()
-
-                setAssignModal(null)
+                hideModal()
               },
-              onHideModal: () => setAssignModal(null)
+              onHideModal: hideModal
             },
             userRole,
             status === DOWNLOAD_STATUS.DOWNLOADED
@@ -232,7 +232,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       }
       e.stopPropagation()
     },
-    [assignment, userRole, download, userId, status, unassign]
+    [assignment, userRole, download, userId, status, unassign, hideModal]
   )
 
   if (
