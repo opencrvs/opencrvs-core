@@ -24,6 +24,7 @@ import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { Store } from 'redux'
 import { History } from 'history'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 let wrapper: ReactWrapper<{}, {}>
 let store: Store
@@ -70,7 +71,7 @@ describe('Review form for an declaration', () => {
         groupId: 'review-view-group'
       })
     )
-    wrapper.update()
+    await waitForElement(wrapper, 'CorrectionReviewFormComponent')
   })
 
   it('should disable the continue button if there is an error', () => {
