@@ -79,6 +79,8 @@ export async function updateEventToAddAssignment(requestBundle: Hapi.Request) {
 
       await updateComposition(compositionId, body)
     }
+  } else {
+    throw new Error('No Task found!')
   }
 }
 
@@ -116,5 +118,7 @@ export async function updateEventToRemoveAssignment(
         regLastUserIdentifier.valueReference.reference.split('/')[1]
       await updateComposition(compositionId, body)
     }
+  } else {
+    throw new Error('No Task found!')
   }
 }
