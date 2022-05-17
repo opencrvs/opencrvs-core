@@ -32,11 +32,6 @@ services:
       - 'cluster.routing.allocation.disk.threshold_enabled=false'
       - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
       - bootstrap.system_call_filter=false
-  kibana:
-    ports:
-      - 5601:5601
-    volumes:
-      - ./infrastructure/monitoring/kibana/kibana.dev.yml:/usr/share/kibana/config/kibana.yml:ro,Z
 
   influxdb:
     ports:

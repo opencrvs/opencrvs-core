@@ -11,11 +11,14 @@
 name: E2E
 
 on: [pull_request]
-
+env:
+  CYPRESS_LOGIN_URL: http://localhost:3020/
+  CYPRESS_CLIENT_URL: http://localhost:3000/
+  CYPRESS_AUTH_URL: http://localhost:4040/
 jobs:
   test:
+    timeout-minutes: 120 # 2 hours
     runs-on: ubuntu-20.04
-
     strategy:
       matrix:
         node-version: [14.17.0]
@@ -29,6 +32,16 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-
-      - name: Install and run stack
+      - name: Install and start dependencies
         run: yes | bash ./setup.sh
+      - name: Run stack
+        run: |
+          LANGUAGES=en,fr && yarn start:prod &
+          bash setup-scripts/setup-countryconfig.sh $(pwd) &
+          wait-on -l tcp:3040
+      - name: Run E2E tests
+        run: |
+          cd ../opencrvs-farajaland
+          npm install -g cypress
+          sed -i 's/j9bgv5/x25ere/g' cypress.json
+          cypress run --headless --browser chrome --record --key 9c35dd66-f203-4336-b9f8-2a71c809c221

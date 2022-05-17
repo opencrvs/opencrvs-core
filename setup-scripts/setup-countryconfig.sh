@@ -28,55 +28,7 @@ if [ -z "$1" ] ; then
     print_usage_and_exit
 fi
 PATH_TO_OPEN_CRVS_CORE_DIRECTORY=$1
-echo
-echo -e "\033[32m::::::::::::::::::::::: Starting OpenCRVS Core :::::::::::::::::::::::\033[0m"
-echo
-echo -e "\033[32m:::::::: In the terminal above OpenCRVS core is starting ::::::::\033[0m"
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on auth microservice" && wait-on -l tcp:4040
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on notification microservice" && wait-on -l tcp:2020
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on gateway microservice" && wait-on -l tcp:7070
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on workflow microservice" && wait-on -l tcp:5050
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on search microservice" && wait-on -l tcp:9090
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on metrics microservice" && wait-on -l tcp:1050
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on user-mgnt microservice" && wait-on -l tcp:3030
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on application config microservice" && wait-on -l tcp:2021
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on OpenCRVS client.  This takes the longest time to build" && wait-on -l http://localhost:3000
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
-echo
-echo "wait-on OpenCRVS login client.  This takes the longest time to build" && wait-on -l http://localhost:3020
-echo
-echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
 
-echo
-echo -e "\033[32m:::::::: OpenCRVS Core is running, now we must checkout a config ::::::::\033[0m"
 echo
 echo -e "\033[32m::::::::::::::: Cloning the fictional Farajaland Country Configuration :::::::::::::::\033[0m"
 echo
@@ -90,6 +42,16 @@ echo -e "\033[32m:::::::::::::::::: Installing some Node dependencies ::::::::::
 echo
 yarn install
 echo
+echo -e "\033[32m::::::::::::::::::::::: Starting OpenCRVS Core :::::::::::::::::::::::\033[0m"
+echo
+echo -e "\033[32m:::::::: In the terminal above OpenCRVS core is starting ::::::::\033[0m"
+echo
+./setup-scripts/verify-dev-stack-running.sh
+echo
+echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
+echo
+echo -e "\033[32m:::::::: OpenCRVS Core is running, now we must checkout a config ::::::::\033[0m"
+
 echo -e "\033[32m:::::::::::::::::: Installing Farajaland Reference Data ::::::::::::::::::\033[0m"
 echo
 yarn db:clear:all

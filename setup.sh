@@ -342,7 +342,7 @@ echo
 if [ $OS == "MAC" ]; then
  export LOCAL_IP=host-gateway
 fi
-yarn compose:deps
+yarn compose:deps:detached
 DOCKER_STARTED=1
 echo "wait-on tcp:3447" && wait-on -l tcp:3447
 echo "wait-on http://localhost:9200" && wait-on -l http://localhost:9200
