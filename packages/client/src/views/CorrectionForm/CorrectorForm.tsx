@@ -189,6 +189,7 @@ function CorrectorFormComponent(props: IFullProps) {
               : undefined
           }
           bottomActionButtons={[continueButton]}
+          showTitleOnMobile={true}
         >
           <FormFieldGenerator
             id={group.id}
