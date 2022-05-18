@@ -22,6 +22,7 @@ import {
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { Store } from 'redux'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
@@ -90,20 +91,23 @@ describe('Review form for an declaration', () => {
     ).toBeTruthy()
   })
 
-  it('should cancel the correction when the cross button is pressed', () => {
+  it('should cancel the correction when the cross button is pressed', async () => {
+    await waitForElement(wrapper, '#crcl-btn')
+
     wrapper.find('#crcl-btn').hostNodes().simulate('click')
     wrapper.update()
 
     expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
   })
 
-  it('should disable the continue button if no changes have been made', () => {
+  it('should disable the continue button if no changes have been made', async () => {
+    await waitForElement(wrapper, '#continue_button')
     expect(
       wrapper.find('#continue_button').hostNodes().props().disabled
     ).toBeTruthy()
   })
 
-  it('should not disable the continue button if changes have been made', () => {
+  it('should not disable the continue button if changes have been made', async () => {
     store.dispatch(
       modifyDeclaration({
         ...declaration,
@@ -117,12 +121,13 @@ describe('Review form for an declaration', () => {
       })
     )
     wrapper.update()
+    await waitForElement(wrapper, '#continue_button')
     expect(
       wrapper.find('#continue_button').hostNodes().props().disabled
     ).toBeFalsy()
   })
 
-  it('should go to supporting documents form when continue is pressed', () => {
+  it('should go to supporting documents form when continue is pressed', async () => {
     store.dispatch(
       modifyDeclaration({
         ...declaration,
@@ -136,6 +141,7 @@ describe('Review form for an declaration', () => {
       })
     )
     wrapper.update()
+    await waitForElement(wrapper, '#continue_button')
     wrapper.find('#continue_button').hostNodes().simulate('click')
     wrapper.update()
 
