@@ -24,6 +24,7 @@ import { IDeclaration, storeDeclaration } from '@client/declarations'
 import { CorrectionForm } from './CorrectionForm'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 let wrapper: ReactWrapper<{}, {}>
 
@@ -248,7 +249,7 @@ describe('Corrector form', () => {
       wrapper.find('#crcl-btn').hostNodes().simulate('click')
       wrapper.update()
 
-      expect(history.location.pathname).toContain('/review')
+      expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
     })
   })
 })

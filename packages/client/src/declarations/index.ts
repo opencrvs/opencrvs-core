@@ -673,14 +673,14 @@ export function mergeDeclaredDeclarations(
     (declaration) => declaration.compositionId
   )
 
-  const transformedDeclaredDeclarations = declaredDeclarations
-    .filter(
-      (declaredDeclaration) =>
-        !localDeclarations.includes(declaredDeclaration.id)
-    )
-    .map((app) => {
+  const declarationsNotStoredLocally = declaredDeclarations.filter(
+    (declaredDeclaration) => !localDeclarations.includes(declaredDeclaration.id)
+  )
+  const transformedDeclaredDeclarations = declarationsNotStoredLocally.map(
+    (app) => {
       return transformSearchQueryDataToDraft(app)
-    })
+    }
+  )
   declarations.push(...transformedDeclaredDeclarations)
 }
 
@@ -994,7 +994,9 @@ function mergeWorkQueueData(
       if (declarationIndex >= 0) {
         const isDownloadFailed =
           currentApplications[declarationIndex].downloadStatus ===
-          SUBMISSION_STATUS.FAILED_NETWORK
+            SUBMISSION_STATUS.FAILED_NETWORK ||
+          currentApplications[declarationIndex].downloadStatus ===
+            SUBMISSION_STATUS.FAILED
 
         if (!isDownloadFailed) {
           updateWorkqueueData(
@@ -1749,9 +1751,21 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       if (action.payload) {
         const userData = JSON.parse(action.payload) as IUserData
 
+        /*
+         * This is here to ensure that even if the user manages to create a new declaration
+         * before the declarations are fetched from the server, the new declaration will still be
+         * persisted. This mostly happens in E2E tests
+         */
+        const userDeclarations = userData.declarations
+        const declarationsStoredBeforeFetch = state.declarations.filter(
+          (stateDeclaration) =>
+            !userDeclarations.find(({ id }) => stateDeclaration.id === id)
+        )
         return {
           ...state,
-          declarations: userData.declarations
+          declarations: userData.declarations.concat(
+            declarationsStoredBeforeFetch
+          )
         }
       }
       return state

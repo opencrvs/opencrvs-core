@@ -73,7 +73,7 @@ class ExpandableNotificationComponent extends React.Component<IProps, IState> {
     const { processingText, outboxText, children } = this.props
     return (
       <>
-        <NotificationBar onClick={this.handleClick}>
+        <NotificationBar id="notification" onClick={this.handleClick}>
           <Left>
             {this.state.expand ? (
               <>

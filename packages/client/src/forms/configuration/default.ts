@@ -115,7 +115,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.informantsRelationWithChild,
                       placeholder:
                         formMessageDescriptors.relationshipPlaceHolder,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -1062,10 +1062,6 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'dateInPast',
                     parameters: []
-                  },
-                  {
-                    operation: 'isValidParentsBirthDate',
-                    parameters: [5]
                   }
                 ],
                 mapping: {
@@ -2450,7 +2446,7 @@ export const registerForms: IDefaultRegisterForms = {
                         formMessageDescriptors.informantsRelationWithDeceased,
                       placeholder:
                         formMessageDescriptors.relationshipPlaceHolder,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {

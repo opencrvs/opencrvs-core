@@ -58,10 +58,11 @@ const StatusPill = styled(Pill)`
 `
 
 export interface IFormConfigElementCardProps {
+  id: string
   children: React.ReactNode
   selected?: boolean
   movable?: boolean
-  customField?: boolean
+  removable?: boolean
   status?: string
   isUpDisabled?: boolean
   isDownDisabled?: boolean
@@ -72,10 +73,11 @@ export interface IFormConfigElementCardProps {
 }
 
 export function FormConfigElementCard({
+  id,
   children,
   selected = false,
   movable = false,
-  customField = false,
+  removable = false,
   isUpDisabled = false,
   isDownDisabled = false,
   status,
@@ -95,9 +97,10 @@ export function FormConfigElementCard({
     >
       <ChildrenContainer>{children}</ChildrenContainer>
       <Controls>
-        {movable && selected && customField && (
+        {movable && selected && (
           <MovementControls>
             <CircleButton
+              id={`${id}_up`}
               size="small"
               disabled={isUpDisabled}
               onClick={onMoveUp}
@@ -105,6 +108,7 @@ export function FormConfigElementCard({
               <ArrowUp />
             </CircleButton>
             <CircleButton
+              id={`${id}_down`}
               size="small"
               disabled={isDownDisabled}
               onClick={onMoveDown}
@@ -113,12 +117,12 @@ export function FormConfigElementCard({
             </CircleButton>
           </MovementControls>
         )}
-        {customField && selected && (
-          <TrashButton size="small" onClick={onRemove}>
+        {removable && selected && (
+          <TrashButton id={`${id}_remove`} size="small" onClick={onRemove}>
             <Trash />
           </TrashButton>
         )}
-        {!customField && status && <StatusPill label={status} />}
+        {!removable && status && <StatusPill label={status} />}
       </Controls>
     </Card>
   )

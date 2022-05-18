@@ -22,7 +22,6 @@ import { messages } from '@client/i18n/messages/views/performance'
 import { goToCompletenessRates } from '@client/navigation'
 
 import {
-  FilterContainer,
   getJurisidictionType,
   CompletenessRateTime,
   getAdditionalLocations,
@@ -163,7 +162,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
           }
 
           return (
-            <FilterContainer>
+            <>
               {options.length > 1 && (
                 <SegmentedControl
                   id="base-select"
@@ -245,7 +244,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
                   }
                 ]}
               />
-            </FilterContainer>
+            </>
           )
         }}
       </Query>
