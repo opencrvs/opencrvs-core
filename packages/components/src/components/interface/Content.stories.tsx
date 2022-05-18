@@ -13,7 +13,6 @@ import { Meta, Story } from '@storybook/react'
 import { Content } from './Content'
 import React, { ReactElement } from 'react'
 import { LinkButton, PrimaryButton, SecondaryButton } from '../buttons'
-import { GridView } from './GridTable/GridTable.stories'
 import { DeclarationIcon } from '../icons'
 
 interface IProps {
@@ -26,13 +25,9 @@ interface IProps {
   maxWidth?: '778px' | '1140px'
 }
 
-const Template: Story<IProps> = (args) => (
-  <Content {...args}>
-    <GridView {...GridView.args} />
-  </Content>
-)
-export const ContentView = Template.bind({})
-ContentView.args = {
+const Template: Story<IProps> = (args) => <Content {...args}>Test</Content>
+export const Default = Template.bind({})
+Default.args = {
   icon: () => <DeclarationIcon />,
   title: 'Register',
   topActionButtons: [
