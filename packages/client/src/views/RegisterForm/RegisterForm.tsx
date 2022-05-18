@@ -352,16 +352,16 @@ class RegisterFormView extends React.Component<FullProps, State> {
     payload?: IPayload,
     downloadStatus?: string
   ) => {
-    declaration.submissionStatus = submissionStatus
-    declaration.action = action
-    declaration.payload = payload
-    declaration.downloadStatus = downloadStatus
-    if (!declaration.timeLoggedMS) {
-      declaration.timeLoggedMS = 0
+    const updatedDeclaration = {
+      ...declaration,
+      submissionStatus,
+      action,
+      payload,
+      downloadStatus,
+      timeLoggedMS:
+        (declaration.timeLoggedMS || 0) + Date.now() - this.state.startTime
     }
-    declaration.timeLoggedMS += Date.now() - this.state.startTime
-
-    this.props.writeDeclaration(declaration)
+    this.props.writeDeclaration(updatedDeclaration)
     this.props.history.push(HOME)
   }
 
