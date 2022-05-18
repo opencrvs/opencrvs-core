@@ -202,6 +202,7 @@ type State = {
   hasError: boolean
   showConfirmationModal: boolean
   isFileUploading: boolean
+  startTime: number
 }
 
 const fadeFromTop = keyframes`
@@ -230,7 +231,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       rejectFormOpen: false,
       hasError: false,
       showConfirmationModal: false,
-      isFileUploading: false
+      isFileUploading: false,
+      startTime: 0
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -265,6 +267,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
   userHasValidateScope() {
     return this.props.scope && this.props.scope.includes('validate')
+  }
+
+  componentDidMount() {
+    this.setState({ startTime: Date.now() })
   }
 
   componentDidUpdate(prevProps: FullProps) {
@@ -350,6 +356,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     declaration.action = action
     declaration.payload = payload
     declaration.downloadStatus = downloadStatus
+    if (!declaration.timeLoggedMS) {
+      declaration.timeLoggedMS = 0
+    }
+    declaration.timeLoggedMS += Date.now() - this.state.startTime
+
     this.props.writeDeclaration(declaration)
     this.props.history.push(HOME)
   }
