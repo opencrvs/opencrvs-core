@@ -143,7 +143,7 @@
                           "description": "Relationship place holder",
                           "id": "form.field.label.relationshipPlaceHolder"
                         },
-                        "required": true,
+                        "required": false,
                         "initialValue": "",
                         "validate": [
                           {
@@ -3084,7 +3084,7 @@
                           "description": "Relationship place holder",
                           "id": "form.field.label.relationshipPlaceHolder"
                         },
-                        "required": true,
+                        "required": false,
                         "initialValue": "",
                         "validate": [
                           {
