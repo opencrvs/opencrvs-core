@@ -40,6 +40,8 @@ import { IStoreState } from '@client/store'
 import { AvatarVerySmall } from '@client/components/Avatar'
 import { ROLE_LOCAL_REGISTRAR } from '@client/utils/constants'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
+import { Dispatch } from 'redux'
+import ApolloClient from 'apollo-client'
 
 const { useState, useCallback } = React
 interface IDownloadConfig {
@@ -63,6 +65,7 @@ interface IConnectProps {
 interface IDispatchProps {
   downloadDeclaration: typeof downloadDeclaration
   deleteDeclaration: typeof deleteDeclaration
+  syncWorkqueue: typeof updateRegistrarWorkqueue
 }
 
 type HOCProps = IConnectProps & IDispatchProps & WithApolloClient<{}>
@@ -98,8 +101,8 @@ function getAssignModalOptions(
   assignment: GQLAssignmentData | undefined,
   callbacks: {
     onAssign: () => void
-    onUnAssign: () => void
-    onHideModal: () => void
+    onUnassign: () => void
+    onCancel: () => void
   },
   userRole?: string,
   isDownloadedBySelf?: boolean
@@ -110,8 +113,8 @@ function getAssignModalOptions(
       content:
         'Unassigning this record will mean that any current edits will be lost. Please confirm you wish to continue.',
       actions: [
-        { label: 'Cancel', type: 'tertiary', handler: callbacks.onHideModal },
-        { label: 'Unassign', type: 'danger', handler: callbacks.onUnAssign }
+        { label: 'Cancel', type: 'tertiary', handler: callbacks.onCancel },
+        { label: 'Unassign', type: 'danger', handler: callbacks.onUnassign }
       ]
     }
   } else if (assignment) {
@@ -122,8 +125,8 @@ function getAssignModalOptions(
           assignment.officeName
         } currently has sole editable access to this record. Unassigning this record will mean their current edits will be lost. Please confirm you wish to continue.`,
         actions: [
-          { label: 'Cancel', type: 'tertiary', handler: callbacks.onHideModal },
-          { label: 'Unassign', type: 'danger', handler: callbacks.onUnAssign }
+          { label: 'Cancel', type: 'tertiary', handler: callbacks.onCancel },
+          { label: 'Unassign', type: 'danger', handler: callbacks.onUnassign }
         ]
       }
     }
@@ -143,7 +146,7 @@ function getAssignModalOptions(
         {
           label: 'Cancel',
           type: 'tertiary',
-          handler: callbacks.onHideModal
+          handler: callbacks.onCancel
         },
         {
           label: 'Assign',
@@ -177,7 +180,8 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     downloadDeclaration,
     userRole,
     userId,
-    deleteDeclaration
+    deleteDeclaration,
+    syncWorkqueue
   } = props
   const { assignment, compositionId } = downloadConfigs
   const [assignModal, setAssignModal] = useState<AssignModalOptions | null>(
@@ -193,16 +197,17 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
 
     downloadDeclaration(downloadableDeclaration, client)
   }, [downloadConfigs, client, downloadDeclaration])
-
   const hideModal = useCallback(() => setAssignModal(null), [])
   const unassign = useCallback(async () => {
     await client.mutate({
       mutation: MARK_EVENT_UNASSIGNED,
       variables: { id: compositionId }
     })
-    deleteDeclaration({ id: compositionId as string } as IDeclaration)
-  }, [compositionId, client, deleteDeclaration])
-
+  }, [compositionId, client])
+  const remove = useCallback(
+    () => deleteDeclaration({ id: compositionId as string } as IDeclaration),
+    [deleteDeclaration, compositionId]
+  )
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
@@ -217,11 +222,13 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
                 download()
                 hideModal()
               },
-              onUnAssign: () => {
-                unassign()
+              onUnassign: async () => {
                 hideModal()
+                await unassign()
+                remove()
+                syncWorkqueue()
               },
-              onHideModal: hideModal
+              onCancel: hideModal
             },
             userRole,
             status === DOWNLOAD_STATUS.DOWNLOADED
@@ -232,7 +239,17 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       }
       e.stopPropagation()
     },
-    [assignment, userRole, download, userId, status, unassign, hideModal]
+    [
+      assignment,
+      userRole,
+      download,
+      userId,
+      status,
+      unassign,
+      hideModal,
+      syncWorkqueue,
+      remove
+    ]
   )
 
   if (
@@ -283,9 +300,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
           autoHeight
           responsive={false}
           preventClickOnParent
-          handleClose={() => {
-            setAssignModal(null)
-          }}
+          handleClose={hideModal}
         >
           {assignModal.content}
         </ResponsiveModal>
@@ -298,7 +313,17 @@ const mapStateToProps = (state: IStoreState): IConnectProps => ({
   userRole: state.profile.userDetails?.role,
   userId: state.profile.userDetails?.userMgntUserID
 })
-export const DownloadButton = connect(mapStateToProps, {
-  downloadDeclaration,
-  deleteDeclaration
-})(withApollo(DownloadButtonComponent))
+
+const mapDispatchToProps = (dispatch: Dispatch): IDispatchProps => ({
+  downloadDeclaration: (declaration: IDeclaration, client: ApolloClient<any>) =>
+    dispatch(downloadDeclaration(declaration, client)),
+  deleteDeclaration: (declaration: IDeclaration) =>
+    dispatch(deleteDeclaration(declaration)),
+  syncWorkqueue: () =>
+    dispatch(updateRegistrarWorkqueue(10, 0, 0, 0, 0, 0, 0, 0))
+})
+
+export const DownloadButton = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withApollo(DownloadButtonComponent))
