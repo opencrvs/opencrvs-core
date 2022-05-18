@@ -47,6 +47,47 @@ export type CMethodParams = {
   goToTeamUserList?: typeof goToTeamUserList
 }
 
+export const ShowDownloadButton = ({
+  declaration,
+  draft,
+  userDetails
+}: {
+  declaration: IDeclarationData
+  draft: IDeclaration | null
+  userDetails: IUserDetails | null
+}) => {
+  const { id, type } = declaration || {}
+
+  if (declaration === null || id === null || type === null) return <></>
+
+  const downloadStatus = draft?.downloadStatus || undefined
+
+  if (
+    userDetails?.role === 'FIELD_AGENT' &&
+    draft?.submissionStatus === SUBMISSION_STATUS.DECLARED
+  )
+    return <></>
+  if (
+    draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
+    downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+  ) {
+    const downLoadConfig = {
+      event: type as string,
+      compositionId: id,
+      action: Action.LOAD_REVIEW_DECLARATION
+    }
+    return (
+      <DownloadButton
+        key={id}
+        downloadConfigs={downLoadConfig}
+        status={downloadStatus as DOWNLOAD_STATUS}
+      />
+    )
+  }
+
+  return <></>
+}
+
 export const ShowUpdateButton = ({
   declaration,
   intl,
@@ -60,7 +101,17 @@ export const ShowUpdateButton = ({
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
-  if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
+  if (!userDetails || !userDetails.role || !type || !isDownloaded)
+    return (
+      <PrimaryButton
+        key={id}
+        id={`update-application-${id}`}
+        size={'medium'}
+        disabled={true}
+      >
+        {intl.formatMessage(buttonMessages.update)}
+      </PrimaryButton>
+    )
   const { role } = userDetails
 
   const updateButtonRoleStatusMap: { [key: string]: string[] } = {
@@ -113,47 +164,6 @@ export const ShowUpdateButton = ({
   return <></>
 }
 
-export const ShowDownloadButton = ({
-  declaration,
-  draft,
-  userDetails
-}: {
-  declaration: IDeclarationData
-  draft: IDeclaration | null
-  userDetails: IUserDetails | null
-}) => {
-  const { id, type } = declaration || {}
-
-  if (declaration === null || id === null || type === null) return <></>
-
-  const downloadStatus = draft?.downloadStatus || undefined
-
-  if (
-    userDetails?.role === 'FIELD_AGENT' &&
-    draft?.submissionStatus === SUBMISSION_STATUS.DECLARED
-  )
-    return <></>
-  if (
-    draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
-    downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
-  ) {
-    const downLoadConfig = {
-      event: type as string,
-      compositionId: id,
-      action: Action.LOAD_REVIEW_DECLARATION
-    }
-    return (
-      <DownloadButton
-        key={id}
-        downloadConfigs={downLoadConfig}
-        status={downloadStatus as DOWNLOAD_STATUS}
-      />
-    )
-  }
-
-  return <></>
-}
-
 export const ShowPrintButton = ({
   declaration,
   intl,
@@ -167,7 +177,17 @@ export const ShowPrintButton = ({
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
-  if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
+  if (!userDetails || !userDetails.role || !type || !isDownloaded)
+    return (
+      <PrimaryButton
+        key={id}
+        size={'medium'}
+        id={`print-${id}`}
+        disabled={true}
+      >
+        {intl.formatMessage(buttonMessages.print)}
+      </PrimaryButton>
+    )
   const { role } = userDetails
 
   const printButtonRoleStatusMap: { [key: string]: string[] } = {
@@ -213,7 +233,17 @@ export const ShowReviewButton = ({
 
   const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
 
-  if (!userDetails || !userDetails.role || !type || !isDownloaded) return <></>
+  if (!userDetails || !userDetails.role || !type || !isDownloaded)
+    return (
+      <PrimaryButton
+        key={id}
+        size={'medium'}
+        id={`review-btn-${id}`}
+        disabled={true}
+      >
+        {intl.formatMessage(constantsMessages.review)}
+      </PrimaryButton>
+    )
   const { role } = userDetails
 
   const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
@@ -227,6 +257,7 @@ export const ShowReviewButton = ({
     return (
       <PrimaryButton
         key={id}
+        size={'medium'}
         id={`review-btn-${id}`}
         onClick={() => {
           goToPage &&

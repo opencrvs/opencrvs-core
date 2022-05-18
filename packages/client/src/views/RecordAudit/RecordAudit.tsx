@@ -62,7 +62,7 @@ import {
   IPageHeaderProps
 } from '@opencrvs/components/lib/interface'
 import { getScope } from '@client/profile/profileSelectors'
-import { Scope } from '@client/utils/authUtils'
+import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   PrimaryButton,
   TertiaryButton,
@@ -74,7 +74,8 @@ import {
   ARCHIVED,
   DECLARED,
   VALIDATED,
-  REJECTED
+  REJECTED,
+  FIELD_AGENT_ROLES
 } from '@client/utils/constants'
 import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import { Query } from '@client/components/Query'
@@ -313,71 +314,79 @@ function RecordAuditBody({
     desktopActionsView.push(actions[actions.length - 1])
   }
 
-  if (!isDownloaded) {
+  if (
+    (declaration.status === SUBMISSION_STATUS.DECLARED ||
+      declaration.status === SUBMISSION_STATUS.VALIDATED) &&
+    userDetails?.role &&
+    !FIELD_AGENT_ROLES.includes(userDetails.role)
+  ) {
     actions.push(
-      <ShowDownloadButton
-        declaration={declaration}
-        draft={draft}
-        userDetails={userDetails}
-      />
+      ShowReviewButton({
+        declaration,
+        intl,
+        userDetails,
+        draft,
+        goToPage
+      })
     )
+
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
+
+  if (
+    declaration.status === SUBMISSION_STATUS.DRAFT ||
+    declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
+    (declaration.status === SUBMISSION_STATUS.REJECTED &&
+      userDetails?.role &&
+      !FIELD_AGENT_ROLES.includes(userDetails.role))
+  ) {
+    actions.push(
+      ShowUpdateButton({
+        declaration,
+        intl,
+        userDetails,
+        draft,
+        goToPage
+      })
+    )
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
+
+  if (
+    declaration.status === SUBMISSION_STATUS.REGISTERED ||
+    declaration.status === SUBMISSION_STATUS.CERTIFIED
+  ) {
+    actions.push(
+      ShowPrintButton({
+        declaration,
+        intl,
+        userDetails,
+        draft,
+        goToPrintCertificate,
+        goToTeamUserList
+      })
+    )
+    mobileActions.push(actions[actions.length - 1])
+    desktopActionsView.push(
+      <DesktopDiv key={actions.length}>
+        {actions[actions.length - 1]}
+      </DesktopDiv>
+    )
+  }
+
+  if (!isDownloaded) {
+    actions.push(ShowDownloadButton({ declaration, draft, userDetails }))
     desktopActionsView.push(actions[actions.length - 1])
-  }
-
-  actions.push(
-    <ShowReviewButton
-      declaration={declaration}
-      intl={intl}
-      userDetails={userDetails}
-      draft={draft}
-      goToPage={goToPage}
-    />
-  )
-  if (actions[actions.length - 1].key) {
-    mobileActions.push(actions[actions.length - 1])
-    desktopActionsView.push(
-      <DesktopDiv key={actions.length}>
-        {actions[actions.length - 1]}
-      </DesktopDiv>
-    )
-  }
-
-  actions.push(
-    <ShowUpdateButton
-      declaration={declaration}
-      intl={intl}
-      userDetails={userDetails}
-      draft={draft}
-      goToPage={goToPage}
-    />
-  )
-
-  if (actions[actions.length - 1].key) {
-    mobileActions.push(actions[actions.length - 1])
-    desktopActionsView.push(
-      <DesktopDiv key={actions.length}>
-        {actions[actions.length - 1]}
-      </DesktopDiv>
-    )
-  }
-
-  actions.push(
-    <ShowPrintButton
-      declaration={declaration}
-      intl={intl}
-      userDetails={userDetails}
-      draft={draft}
-      goToPrintCertificate={goToPrintCertificate}
-      goToTeamUserList={goToTeamUserList}
-    />
-  )
-  if (actions[actions.length - 1].key) {
-    mobileActions.push(actions[actions.length - 1])
-    desktopActionsView.push(
-      <DesktopDiv key={actions.length}>
-        {actions[actions.length - 1]}
-      </DesktopDiv>
-    )
   }
 
   let regForm: IForm
@@ -410,6 +419,12 @@ function RecordAuditBody({
     mobileRight: desktopActionsView
   }
 
+  const isValidatedOnReview =
+    declaration.status === SUBMISSION_STATUS.VALIDATED &&
+    hasRegisterScope(scope)
+      ? true
+      : false
+
   return (
     <>
       <MobileHeader {...mobileProps} key={'record-audit-mobile-header'} />
@@ -423,6 +438,7 @@ function RecordAuditBody({
         icon={() => (
           <DeclarationIcon
             isArchive={declaration?.status === ARCHIVED}
+            isValidatedOnReview={isValidatedOnReview}
             color={
               STATUSTOCOLOR[
                 (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
@@ -520,7 +536,7 @@ function getBodyContent({
   workqueueDeclaration,
   ...actionProps
 }: IFullProps) {
-  if (!draft && tab === 'search') {
+  if (!draft?.trackingId && tab === 'search') {
     return (
       <>
         <Query
@@ -556,33 +572,34 @@ function getBodyContent({
         </Query>
       </>
     )
+  } else {
+    const trackingId =
+      draft?.data?.registration?.trackingId?.toString() ||
+      workqueueDeclaration?.registration?.trackingId ||
+      ''
+
+    const declaration =
+      draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
+        ? getDraftDeclarationData(draft, resources, intl, trackingId)
+        : getWQDeclarationData(
+            workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
+            language,
+            trackingId
+          )
+
+    return (
+      <RecordAuditBody
+        key={`record-audit-${declarationId}`}
+        {...actionProps}
+        declaration={declaration}
+        draft={draft}
+        tab={tab}
+        intl={intl}
+        scope={scope}
+        userDetails={userDetails}
+      />
+    )
   }
-
-  const trackingId =
-    draft?.data?.registration?.trackingId?.toString() ||
-    workqueueDeclaration?.registration?.trackingId ||
-    ''
-
-  const declaration =
-    draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
-      ? getDraftDeclarationData(draft, resources, intl, trackingId)
-      : getWQDeclarationData(
-          workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
-          language,
-          trackingId
-        )
-  return (
-    <RecordAuditBody
-      key={`record-audit-${declarationId}`}
-      {...actionProps}
-      declaration={declaration}
-      draft={draft}
-      tab={tab}
-      intl={intl}
-      scope={scope}
-      userDetails={userDetails}
-    />
-  )
 }
 
 const RecordAuditComp = (props: IFullProps) => {
