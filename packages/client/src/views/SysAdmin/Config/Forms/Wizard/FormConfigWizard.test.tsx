@@ -59,7 +59,7 @@ describe('FormConfigWizard', () => {
   })
 
   describe('for default customisable fields', () => {
-    it('toggle the hidden property properly', () => {
+    it('should toggle the hidden property', () => {
       component
         .find(
           'FormConfigElementCard[id="birth.child.child-view-group.attendantAtBirth"]'
@@ -87,13 +87,13 @@ describe('FormConfigWizard', () => {
       component.update()
     })
 
-    it('should add a custom field and select that field properly', () => {
+    it('should add a custom field and select that field', () => {
       expect(
         component.exists('[id="birth.child.child-view-group.customField1"]')
       ).toBeTruthy()
     })
 
-    it('should move the field up and down properly', () => {
+    it('should move the field up and down', () => {
       component
         .find('[id="birth.child.child-view-group.customField1_up"]')
         .hostNodes()
@@ -115,7 +115,7 @@ describe('FormConfigWizard', () => {
       )
     })
 
-    it('should remove the field properly', () => {
+    it('should remove the field', () => {
       component
         .find('[id="birth.child.child-view-group.customField1_remove"]')
         .hostNodes()

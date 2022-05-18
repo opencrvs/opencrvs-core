@@ -123,7 +123,7 @@ describe('DraftsTab', () => {
         component.update()
       })
 
-      const clickOptionsMenu = () => {
+      const openOptionsMenu = () => {
         component
           .find('#draftActionsToggleButton')
           .hostNodes()
@@ -132,7 +132,7 @@ describe('DraftsTab', () => {
         component.update()
       }
 
-      const clickMenuItem = (item: number) => {
+      const selectMenuItem = (item: number) => {
         component.find(`#draftActionsItem${item}`).first().simulate('click')
         component.update()
       }
@@ -142,16 +142,16 @@ describe('DraftsTab', () => {
       })
 
       it('should show preview modal when clicked', () => {
-        clickOptionsMenu()
-        clickMenuItem(0)
+        openOptionsMenu()
+        selectMenuItem(0)
         expect(
           component.find('ActionsModal').find('ResponsiveModal').prop('show')
         ).toBeTruthy()
       })
 
       it('should show delete modal when clicked', () => {
-        clickOptionsMenu()
-        clickMenuItem(1)
+        openOptionsMenu()
+        selectMenuItem(1)
         expect(
           component.find('ActionsModal').find('ResponsiveModal').prop('show')
         ).toBeTruthy()
