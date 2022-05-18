@@ -22,7 +22,6 @@ import {
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION_REVIEW } from '@client/navigation/routes'
 import { Store } from 'redux'
-import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { waitForElement } from '@client/tests/wait-for-element'
