@@ -12,7 +12,9 @@
 import * as React from 'react'
 import { ReactElement } from 'react'
 import styled from 'styled-components'
+import { ICON_ALIGNMENT, TertiaryButton } from '../buttons'
 import { colors } from '../colors'
+import { BackArrow } from '../icons'
 import { Box } from './Box'
 
 const Container = styled(Box)<{ size: string }>`
@@ -35,7 +37,6 @@ const Container = styled(Box)<{ size: string }>`
 const Header = styled.div`
   position: relative;
   display: flex;
-  align-items: center;
   flex-direction: column;
   margin: -24px -24px 24px;
   padding: 0 24px;
@@ -90,21 +91,33 @@ const TopTabBar = styled.div`
     margin: -16px 0;
   }
 `
-
-const TopBar = styled.div`
+const TopFilterBar = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+`
+const TopBar = styled.div<{ keepShowing?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   padding: 16px 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
+    ${({ keepShowing }) => {
+      return !keepShowing ? 'display:none;' : 'padding:16px;'
+    }}
   }
 `
 const BottomActionBar = styled.div`
   display: flex;
   gap: 16px;
   margin-right: auto;
+`
+const BackButtonContainer = styled.div`
+  padding-left: 8px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
   display: flex;
@@ -115,15 +128,23 @@ const TitleContainer = styled.div<{ titleColor?: keyof typeof colors }>`
   color: ${({ theme, titleColor }) => titleColor && theme.colors[titleColor]};
 `
 
-const Title = styled.div`
+const Title = styled.div<{ truncateOnMobile?: boolean }>`
   ${({ theme }) => theme.fonts.h2}
   color: ${({ theme }) => theme.colors.copy};
+
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    ${({ truncateOnMobile }) => !truncateOnMobile && 'white-space:normal'}
+  }
 `
 const Icon = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
 `
 
 export enum ContentSize {
@@ -133,8 +154,12 @@ export enum ContentSize {
 
 interface IProps {
   icon?: () => React.ReactNode
+  backButtonLabel?: string
+  backButtonAction?: () => void
   title?: string
   titleColor?: keyof typeof colors
+  showTitleOnMobile?: boolean
+  truncateTitleOnMobile?: boolean
   topActionButtons?: ReactElement[]
   tabBarContent?: React.ReactNode
   filterContent?: React.ReactNode
@@ -148,8 +173,12 @@ export class Content extends React.Component<IProps> {
   render() {
     const {
       icon,
+      backButtonLabel,
+      backButtonAction,
       title,
       titleColor,
+      showTitleOnMobile,
+      truncateTitleOnMobile,
       topActionButtons,
       tabBarContent,
       filterContent,
@@ -161,10 +190,28 @@ export class Content extends React.Component<IProps> {
     return (
       <Container size={size as string}>
         <Header>
-          <TopBar>
+          {backButtonLabel && (
+            <BackButtonContainer>
+              <TertiaryButton
+                align={ICON_ALIGNMENT.LEFT}
+                icon={() => <BackArrow />}
+                onClick={backButtonAction}
+              >
+                {backButtonLabel}
+              </TertiaryButton>
+            </BackButtonContainer>
+          )}
+          <TopBar keepShowing={showTitleOnMobile}>
             <TitleContainer titleColor={titleColor}>
               {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
-              {title && <Title id={`content-name`}>{title}</Title>}
+              {title && (
+                <Title
+                  id={`content-name`}
+                  truncateOnMobile={truncateTitleOnMobile}
+                >
+                  {title}
+                </Title>
+              )}
             </TitleContainer>
             {topActionButtons && (
               <TopActionBar>{topActionButtons}</TopActionBar>
@@ -173,7 +220,7 @@ export class Content extends React.Component<IProps> {
           {(filterContent || tabBarContent) && (
             <HeaderBottom>
               {tabBarContent && <TopTabBar>{tabBarContent}</TopTabBar>}
-              {filterContent}
+              {filterContent && <TopFilterBar>{filterContent}</TopFilterBar>}
             </HeaderBottom>
           )}
         </Header>

@@ -1561,7 +1561,7 @@ function RecordAuditBody({
 
   return (
     <>
-      <MobileHeader {...mobileProps} />
+      <MobileHeader {...mobileProps} key={'record-audit-mobile-header'} />
       <Content
         title={
           declaration.name || intl.formatMessage(recordAuditMessages.noName)
