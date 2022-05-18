@@ -21,6 +21,7 @@ import { FormConfigWizard } from './FormConfigWizard'
 import routeData from 'react-router'
 import { Event, BirthSection } from '@client/forms'
 import { checkAuth } from '@client/profile/profileActions'
+import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
 
 let component: ReactWrapper<{}, {}>
 
@@ -32,7 +33,7 @@ describe('FormConfigWizard', () => {
 
     const { store, history } = createStore()
     getItem.mockReturnValue(natlSysAdminToken)
-    await store.dispatch(checkAuth())
+    store.dispatch(checkAuth())
     component = await createTestComponent(<FormConfigWizard />, {
       store,
       history
@@ -41,5 +42,89 @@ describe('FormConfigWizard', () => {
 
   it('should load properly', () => {
     expect(component.exists('FormConfigWizard')).toBeTruthy()
+  })
+
+  describe('for default non customisable fields', () => {
+    it('it should not show toggle buttons', () => {
+      component
+        .find(
+          'FormConfigElementCard[id="birth.child.child-view-group.firstNamesEng"]'
+        )
+        .childAt(0)
+        .simulate('click')
+      component.update()
+
+      expect(component.exists('Toggle')).toBeFalsy()
+    })
+  })
+
+  describe('for default customisable fields', () => {
+    it('toggle the hidden property properly', () => {
+      component
+        .find(
+          'FormConfigElementCard[id="birth.child.child-view-group.attendantAtBirth"]'
+        )
+        .childAt(0)
+        .simulate('click')
+      component.update()
+
+      component
+        .find('[id="birth.child.child-view-group.attendantAtBirth_hide"]')
+        .hostNodes()
+        .first()
+        .simulate('change')
+      component.update()
+
+      expect(component.find('HideToggleAction').first().prop('enabled')).toBe(
+        FieldEnabled.DISABLED
+      )
+    })
+  })
+
+  describe('for custom fields', () => {
+    beforeEach(() => {
+      component.find('#add-TEXT-btn').hostNodes().first().simulate('click')
+      component.update()
+    })
+
+    it('should add a custom field and select that field properly', () => {
+      expect(
+        component.exists('[id="birth.child.child-view-group.customField1"]')
+      ).toBeTruthy()
+    })
+
+    it('should move the field up and down properly', () => {
+      component
+        .find('[id="birth.child.child-view-group.customField1_up"]')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      expect(
+        component.find('FormConfigElementCard').last().prop('id')
+      ).not.toBe('birth.child.child-view-group.customField1')
+
+      component
+        .find('[id="birth.child.child-view-group.customField1_down"]')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      expect(component.find('FormConfigElementCard').last().prop('id')).toBe(
+        'birth.child.child-view-group.customField1'
+      )
+    })
+
+    it('should remove the field properly', () => {
+      component
+        .find('[id="birth.child.child-view-group.customField1_remove"]')
+        .hostNodes()
+        .simulate('click')
+      component.update()
+
+      expect(
+        component.find('FormConfigElementCard').last().prop('id')
+      ).not.toBe('birth.child.child-view-group.customField1')
+    })
   })
 })

@@ -58,6 +58,7 @@ const StatusPill = styled(Pill)`
 `
 
 export interface IFormConfigElementCardProps {
+  id: string
   children: React.ReactNode
   selected?: boolean
   movable?: boolean
@@ -72,6 +73,7 @@ export interface IFormConfigElementCardProps {
 }
 
 export function FormConfigElementCard({
+  id,
   children,
   selected = false,
   movable = false,
@@ -98,6 +100,7 @@ export function FormConfigElementCard({
         {movable && selected && (
           <MovementControls>
             <CircleButton
+              id={`${id}_up`}
               size="small"
               disabled={isUpDisabled}
               onClick={onMoveUp}
@@ -105,6 +108,7 @@ export function FormConfigElementCard({
               <ArrowUp />
             </CircleButton>
             <CircleButton
+              id={`${id}_down`}
               size="small"
               disabled={isDownDisabled}
               onClick={onMoveDown}
@@ -114,7 +118,7 @@ export function FormConfigElementCard({
           </MovementControls>
         )}
         {removable && selected && (
-          <TrashButton size="small" onClick={onRemove}>
+          <TrashButton id={`${id}_remove`} size="small" onClick={onRemove}>
             <Trash />
           </TrashButton>
         )}

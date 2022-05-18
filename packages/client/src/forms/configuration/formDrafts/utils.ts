@@ -39,12 +39,3 @@ export interface IFormDraft {
 export function getEventDraft(formDrafts: IFormDraft[], event: Event) {
   return find(formDrafts, { event })
 }
-
-export function getFormDraft(formDrafts: IFormDraft[]) {
-  const birthDraft = getEventDraft(formDrafts, Event.BIRTH)
-  const deathDraft = getEventDraft(formDrafts, Event.DEATH)
-  return {
-    birth: birthDraft,
-    death: deathDraft
-  }
-}

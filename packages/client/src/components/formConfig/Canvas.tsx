@@ -176,6 +176,7 @@ export function Canvas({
 
         return (
           <FormConfigElementCard
+            id={fieldId}
             key={fieldId}
             selected={isSelected}
             onClick={() => setSelectedField(fieldId)}
