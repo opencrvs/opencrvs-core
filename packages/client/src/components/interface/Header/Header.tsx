@@ -123,7 +123,10 @@ enum ACTIVE_MENU_ITEM {
   CONFIG,
   PERFORMANCE,
   TEAM,
-  USERS
+  USERS,
+  CERTIFICATE,
+  APPLICATION,
+  FORM
 }
 
 const StyledPrimaryButton = styled(PrimaryButton)`
@@ -458,7 +461,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   render() {
     const { intl, activeMenuItem, theme } = this.props
-
     const title =
       this.props.title ||
       intl.formatMessage(
@@ -467,8 +469,12 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           : activeMenuItem === ACTIVE_MENU_ITEM.TEAM ||
             activeMenuItem === ACTIVE_MENU_ITEM.USERS
           ? messages.teamTitle
-          : activeMenuItem === ACTIVE_MENU_ITEM.CONFIG
-          ? constantsMessages.configTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.CERTIFICATE
+          ? constantsMessages.certificateTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.APPLICATION
+          ? constantsMessages.applicationTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.FORM
+          ? constantsMessages.formDeclarationTitle
           : constantsMessages.declarationTitle
       )
 
@@ -543,8 +549,12 @@ export const Header = connect(
       ? ACTIVE_MENU_ITEM.PERFORMANCE
       : window.location.href.includes('team')
       ? ACTIVE_MENU_ITEM.TEAM
-      : window.location.href.includes('config')
-      ? ACTIVE_MENU_ITEM.CONFIG
+      : window.location.href.includes('config/certificate')
+      ? ACTIVE_MENU_ITEM.CERTIFICATE
+      : window.location.href.includes('config/application')
+      ? ACTIVE_MENU_ITEM.APPLICATION
+      : window.location.href.includes('config/form')
+      ? ACTIVE_MENU_ITEM.FORM
       : ACTIVE_MENU_ITEM.DECLARATIONS,
     language: store.i18n.language,
     userDetails: getUserDetails(store)

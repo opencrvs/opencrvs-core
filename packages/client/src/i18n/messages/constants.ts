@@ -46,7 +46,9 @@ interface IConstantsMessages
   collected: MessageDescriptor
   collectedBy: MessageDescriptor
   comment: MessageDescriptor
-  configTitle: MessageDescriptor
+  certificateTitle: MessageDescriptor
+  applicationTitle: MessageDescriptor
+  formDeclarationTitle: MessageDescriptor
   customTimePeriod: MessageDescriptor
   dateOfDeclaration: MessageDescriptor
   death: MessageDescriptor
@@ -326,10 +328,20 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for rejection comment',
     id: 'constants.comment'
   },
-  configTitle: {
-    defaultMessage: 'Configuration',
-    description: 'Config title',
-    id: 'constants.config'
+  certificateTitle: {
+    defaultMessage: 'Certificate',
+    description: 'Certificate title',
+    id: 'constants.certificate.title'
+  },
+  applicationTitle: {
+    defaultMessage: 'Application',
+    description: 'Application title',
+    id: 'constants.application.title'
+  },
+  formDeclarationTitle: {
+    defaultMessage: 'Declaration forms',
+    description: 'Form Declaration title',
+    id: 'constants.form.title'
   },
   customTimePeriod: {
     defaultMessage: 'Custom time period',
