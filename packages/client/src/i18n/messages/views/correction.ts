@@ -179,7 +179,7 @@ const messagesToDefine: ICorrectionMessages = {
   },
   idCheckTitle: {
     id: 'correction.certificate.corrector.idCheck',
-    defaultMessage: 'Check proof of ID. Does it match the following details?',
+    defaultMessage: 'Check proof of ID',
     description: 'The title for id check component'
   },
   otherIdCheckTitle: {

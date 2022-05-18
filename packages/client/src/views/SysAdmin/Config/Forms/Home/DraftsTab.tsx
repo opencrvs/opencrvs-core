@@ -84,7 +84,7 @@ function OptionsMenu({ event }: { event: Event }) {
 
   return (
     <ToggleMenu
-      id="toggleMenu"
+      id="draftActions"
       toggleButton={<VerticalThreeDots />}
       menuItems={[
         {
@@ -160,7 +160,7 @@ function EventDrafts({ event }: { event: Event }) {
         }
       />
       {history
-        ?.filter((draftHistory) => !isDefaultDraft(draftHistory))
+        .filter((draftHistory) => !isDefaultDraft(draftHistory))
         .map(({ comment, version }) => (
           <ListViewItemSimplified
             key={version}

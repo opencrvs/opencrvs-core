@@ -176,12 +176,13 @@ export function Canvas({
 
         return (
           <FormConfigElementCard
+            id={fieldId}
             key={fieldId}
             selected={isSelected}
             onClick={() => setSelectedField(fieldId)}
-            movable={isSelected}
+            movable={custom && isSelected}
             status={isHidden ? intl.formatMessage(messages.hidden) : undefined}
-            customField={configField.custom}
+            removable={custom}
             isUpDisabled={preceedingFieldId === FieldPosition.TOP}
             isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}
             onMoveUp={() => dispatch(shiftConfigFieldUp(fieldId))}

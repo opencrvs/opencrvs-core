@@ -168,7 +168,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
     }
   }
   render = () => {
-    const { intl } = this.props
+    const { intl, goToPhoneNumberVerificationForm } = this.props
     const forgottenItem = FORGOTTEN_ITEMS.PASSWORD
 
     return (
