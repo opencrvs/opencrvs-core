@@ -35,8 +35,15 @@ echo
 
 cd ../
 git clone https://github.com/opencrvs/opencrvs-farajaland.git
+
 cd opencrvs-farajaland
-git checkout master
+
+if [ $CI == "true" ]; then
+  git checkout develop
+else
+  git checkout master
+fi
+
 echo
 echo -e "\033[32m:::::::::::::::::: Installing some Node dependencies ::::::::::::::::::\033[0m"
 echo
@@ -46,7 +53,7 @@ echo -e "\033[32m::::::::::::::::::::::: Starting OpenCRVS Core ::::::::::::::::
 echo
 echo -e "\033[32m:::::::: In the terminal above OpenCRVS core is starting ::::::::\033[0m"
 echo
-./setup-scripts/verify-dev-stack-running.sh
+bash $PATH_TO_OPEN_CRVS_CORE_DIRECTORY/setup-scripts/verify-dev-stack-running.sh
 echo
 echo -e "\033[32m:::::::::::::::::::::::::::::: PLEASE WAIT ::::::::::::::::::::::::::::::\033[0m"
 echo
