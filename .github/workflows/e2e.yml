@@ -15,6 +15,7 @@ env:
   CYPRESS_LOGIN_URL: http://localhost:3020/
   CYPRESS_CLIENT_URL: http://localhost:3000/
   CYPRESS_AUTH_URL: http://localhost:4040/
+  CYPRESS_GATEWAY_URL: http://localhost:7070/
 jobs:
   test:
     timeout-minutes: 120 # 2 hours
