@@ -157,12 +157,6 @@ const Devider = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   margin-bottom: 16px;
 `
-
-const PerformanceActions = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-`
 interface IConnectProps {
   locations: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
@@ -277,7 +271,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     const { id: locationId } = selectedLocation || {}
 
     return (
-      <PerformanceActions>
+      <>
         <LocationPicker
           additionalLocations={getAdditionalLocations(intl)}
           selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
@@ -322,7 +316,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
             })
           }}
         />
-      </PerformanceActions>
+      </>
     )
   }
 
