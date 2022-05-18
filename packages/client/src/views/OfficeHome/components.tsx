@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from '@client/styledComponents'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
-import { STATUSTOCOLOR } from '@client/views/Home/RecordAudit'
+import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { Duplicate, StatusFailed } from '@opencrvs/components/lib/icons'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
