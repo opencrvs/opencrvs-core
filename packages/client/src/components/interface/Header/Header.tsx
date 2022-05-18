@@ -58,6 +58,7 @@ import {
 import {
   AppHeader,
   ExpandingMenu,
+  IDomProps,
   ISearchType,
   SearchTool
 } from '@opencrvs/components/lib/interface'
@@ -111,7 +112,7 @@ type IFullProps = IntlShapeProps &
   IStateProps &
   IDispatchProps &
   IProps &
-  React.HTMLAttributes<HTMLDivElement>
+  IDomProps
 
 interface IState {
   showMenu: boolean
@@ -457,7 +458,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   }
 
   render() {
-    const { intl, activeMenuItem, theme } = this.props
+    const { className, intl, activeMenuItem, theme } = this.props
 
     const title =
       this.props.title ||
@@ -530,6 +531,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       <AppHeader
         id="register_app_header"
         desktopRightMenu={rightMenu}
+        className={className}
         title={title}
         {...mobileHeaderActionProps}
       />
