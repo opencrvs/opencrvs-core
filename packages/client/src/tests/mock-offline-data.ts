@@ -25,6 +25,7 @@ const formDrafts: IFormDraft[] = [
     event: Event.BIRTH,
     status: DraftStatus.DRAFT,
     version: 0,
+    history: [],
     updatedAt: 1649395100098,
     createdAt: 1649395100098
   },
@@ -32,6 +33,7 @@ const formDrafts: IFormDraft[] = [
     event: Event.DEATH,
     status: DraftStatus.DRAFT,
     version: 0,
+    history: [],
     updatedAt: 1649395100098,
     createdAt: 1649395100098
   }
@@ -40,66 +42,6 @@ const formDrafts: IFormDraft[] = [
 export const formConfig: IFormConfig = {
   formDrafts,
   questionConfig: [
-    {
-      fieldId: 'birth.child.child-view-group.vaccination',
-      label: [
-        {
-          lang: 'en',
-          descriptor: {
-            defaultMessage: 'What vaccinations has the child received?',
-            description: 'Label for form field: vaccination question',
-            id: 'form.field.label.vaccination'
-          }
-        }
-      ],
-      placeholder: [
-        {
-          lang: 'en',
-          descriptor: {
-            defaultMessage: 'E.G. Polio, Diptheria',
-            description: 'Placeholder for form field: vaccination question',
-            id: 'form.field.label.vaccinationPlaceholder'
-          }
-        }
-      ],
-      description: [
-        {
-          lang: 'en',
-          descriptor: {
-            defaultMessage: 'Vaccine name',
-            description: 'Input field for vaccination question',
-            id: 'form.field.label.vaccinationDescription'
-          }
-        }
-      ],
-      tooltip: [
-        {
-          lang: 'en',
-          descriptor: {
-            defaultMessage: 'Enter the Vaccine name',
-            description: 'Tooltip for form field: vaccination question',
-            id: 'form.field.label.vaccinationTooltip'
-          }
-        }
-      ],
-      errorMessage: [
-        {
-          lang: 'en',
-          descriptor: {
-            defaultMessage: 'Please enter the valid vaccine name',
-            description: 'Error Message for form field: vaccination question',
-            id: 'form.field.label.vaccinationErrorMessage'
-          }
-        }
-      ],
-      maxLength: 32,
-      fieldName: 'vaccination',
-      fieldType: QuestionConfigFieldType.TEXT,
-      preceedingFieldId: 'birth.child.child-view-group.attendantAtBirth',
-      required: false,
-      enabled: '',
-      custom: true
-    },
     {
       fieldId: 'birth.child.child-view-group.vaccination',
       label: [

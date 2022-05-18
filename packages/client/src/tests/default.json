@@ -143,7 +143,7 @@
                           "description": "Relationship place holder",
                           "id": "form.field.label.relationshipPlaceHolder"
                         },
-                        "required": false,
+                        "required": true,
                         "initialValue": "",
                         "validate": [
                           {
@@ -1414,12 +1414,6 @@
                     {
                       "operation": "dateInPast",
                       "parameters": []
-                    },
-                    {
-                      "operation": "isValidParentsBirthDate",
-                      "parameters": [
-                        5
-                      ]
                     }
                   ],
                   "mapping": {
@@ -3084,7 +3078,7 @@
                           "description": "Relationship place holder",
                           "id": "form.field.label.relationshipPlaceHolder"
                         },
-                        "required": false,
+                        "required": true,
                         "initialValue": "",
                         "validate": [
                           {
