@@ -19,7 +19,8 @@ interface IProps {
 
 const StyledList = styled.ul`
   width: 100%;
-  padding: 24px;
+  padding-inline-start: 32px;
+  margin-bottom: 40px;
   overflow: auto;
 `
 const StyledListItem = styled.li`
@@ -27,16 +28,13 @@ const StyledListItem = styled.li`
   &:last-child {
     margin-bottom: 0;
   }
-
   ${({ theme }) => `color: ${theme.colors.copy}`};
 `
 
 const StyledText = styled.div`
   margin-left: 8px;
-  ${({ theme }) => `${theme.fonts.h3};
-    font-family: ${theme.fonts.regularFont};
-    color: ${theme.colors.copy}
-  `}
+  ${({ theme }) => theme.fonts.reg18};
+  color: ${({ theme }) => theme.colors.copy};
 `
 
 function renderListItem(text: string, index: number) {

@@ -66,27 +66,6 @@ export const ActionContainer = styled.div`
   padding: 12px 24px 11px 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
-
-export const FilterContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-
-  & > :first-child {
-    margin: 0 8px 8px 0;
-  }
-
-  & > :nth-child(2) {
-    margin: 0 8px 8px 0;
-  }
-
-  & > :nth-child(3) {
-    margin: 0 8px 8px 0;
-  }
-
-  & > :last-child {
-    margin: 0;
-  }
-`
 export const PerformanceTitle = styled.div`
   ${({ theme }) => theme.fonts.bold16}
 `

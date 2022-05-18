@@ -17,7 +17,10 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
-import { Navigation } from '@client/components/interface/Navigation'
+import {
+  Navigation,
+  WORKQUEUE_TABS
+} from '@client/components/interface/Navigation'
 import { Divider } from '@opencrvs/components/lib/interface/Divider'
 import styled from '@client/styledComponents'
 import {
@@ -31,7 +34,7 @@ import { AvatarSmall } from '@client/components/Avatar'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
 import {
-  goToRegistrarHomeTab,
+  goToHomeTab,
   goToPage,
   goToCertificateCorrection,
   goToPrintCertificate,
@@ -89,7 +92,6 @@ import {
 } from '@client/utils/constants'
 import { IQueryData, EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
-import { generateLocationName } from '@client/utils/locationUtils'
 import { Query } from '@client/components/Query'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/Home/queries'
 import {
@@ -107,7 +109,6 @@ import {
   Action,
   IForm,
   IFormSection,
-  IFormSectionGroup,
   IFormField
 } from '@client/forms'
 import {
@@ -130,7 +131,7 @@ import NotificationToast from '@client/views/OfficeHome/NotificationToast'
 import { isEmpty, get, find, has, flatten, values } from 'lodash'
 import { IRegisterFormState } from '@client/forms/register/reducer'
 import { goBack } from 'connected-react-router'
-import { getFieldValue } from './utils'
+import { getFieldValue, getLocation } from './utils'
 import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import format, { formatLongDate } from '@client/utils/date-formatting'
 import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
@@ -176,11 +177,6 @@ const InfoContainer = styled.div`
     flex-flow: column;
   }
 `
-const IconDiv = styled.div`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none;
-  }
-`
 const BackButtonDiv = styled.div`
   display: inline;
 `
@@ -198,7 +194,6 @@ const KeyContainer = styled.div`
 `
 
 const ValueContainer = styled.div<{ value: undefined | string }>`
-  width: 325px;
   color: ${({ theme, value }) =>
     value ? theme.colors.grey600 : theme.colors.grey400};
   ${({ theme }) => theme.fonts.reg16};
@@ -286,7 +281,7 @@ interface IDispatchProps {
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToPage: typeof goToPage
   goToPrintCertificate: typeof goToPrintCertificate
-  goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+  goToHomeTab: typeof goToHomeTab
   goToUserProfile: typeof goToUserProfile
   goToTeamUserList: typeof goToTeamUserList
   goBack: typeof goBack
@@ -473,42 +468,6 @@ function notNull<T>(value: T | null): value is T {
 
 const getName = (name: (GQLHumanName | null)[], language: string) => {
   return createNamesMap(name.filter(notNull))[language]
-}
-
-const getLocation = (
-  declaration: IDeclaration,
-  resources: IOfflineData,
-  intl: IntlShape
-) => {
-  let locationType = ''
-  let locationId = ''
-  let locationDistrict = ''
-  let locationPrimary = ''
-  if (declaration.event === 'death') {
-    locationType = declaration.data?.deathEvent?.placeOfDeath?.toString() || ''
-    locationId = declaration.data?.deathEvent?.deathLocation?.toString() || ''
-    locationDistrict = declaration.data?.deathEvent?.district?.toString() || ''
-    locationPrimary =
-      declaration.data?.deceased?.districtPrimary?.toString() || ''
-  } else {
-    locationType = declaration.data?.child?.placeOfBirth?.toString() || ''
-    locationId = declaration.data?.child?.birthLocation?.toString() || ''
-    locationDistrict = declaration.data?.child?.district?.toString() || ''
-  }
-
-  if (locationType === 'HEALTH_FACILITY') {
-    const facility = resources.facilities[locationId]
-    return generateLocationName(facility, intl)
-  }
-  if (locationType === 'OTHER' || locationType === 'PRIVATE_HOME') {
-    const location = resources.locations[locationDistrict]
-    return generateLocationName(location, intl)
-  }
-  if (locationType === 'PRIMARY_ADDRESS') {
-    const district = resources.locations[locationPrimary]
-    return generateLocationName(district, intl)
-  }
-  return ''
 }
 
 const getDraftDeclarationData = (
@@ -1361,7 +1320,7 @@ function RecordAuditBody({
   goToCertificateCorrection,
   goToPrintCertificate,
   goToPage,
-  goToRegistrarHomeTab,
+  goToHomeTab,
   scope,
   userDetails,
   registerForm,
@@ -1558,7 +1517,7 @@ function RecordAuditBody({
 
   return (
     <>
-      <MobileHeader {...mobileProps} />
+      <MobileHeader {...mobileProps} key={'record-audit-mobile-header'} />
       <Content
         title={
           declaration.name || intl.formatMessage(recordAuditMessages.noName)
@@ -1629,7 +1588,7 @@ function RecordAuditBody({
               onClick={() => {
                 archiveDeclaration(declaration.id)
                 toggleDisplayDialog()
-                goToRegistrarHomeTab('review')
+                goToHomeTab(WORKQUEUE_TABS.readyForReview)
               }}
             >
               {intl.formatMessage(buttonMessages.archive)}
@@ -1774,7 +1733,7 @@ export const RecordAudit = connect<
   goToCertificateCorrection,
   goToPage,
   goToPrintCertificate,
-  goToRegistrarHomeTab,
+  goToHomeTab,
   goToUserProfile,
   goToTeamUserList,
   goBack

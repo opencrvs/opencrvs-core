@@ -30,6 +30,7 @@ if (process.env.CI) {
 }
 
 jest.mock('@client/forms/configuration/default', () => ({
+  ...jest.requireActual('@client/forms/configuration/default'),
   registerForms: mockOfflineData.forms.registerForm
 }))
 

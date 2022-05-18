@@ -120,6 +120,7 @@ export const FormTools = ({
             label={<Label>{intl.formatMessage(MESSAGE_MAP[fieldType])}</Label>}
             actions={
               <LinkButton
+                id={`add-${fieldType}-btn`}
                 onClick={() => createCustomField(fieldType)}
                 size="small"
                 /* TODO */
