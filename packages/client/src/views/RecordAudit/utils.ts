@@ -20,7 +20,10 @@ import { IOfflineData } from '@client/offline/reducer'
 import { get, has } from 'lodash'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { IDeclaration } from '@client/declarations'
-import { generateLocationName } from '@client/utils/locationUtils'
+import {
+  generateLocationName,
+  generateFullLocation
+} from '@client/utils/locationUtils'
 import {
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
@@ -30,6 +33,7 @@ import {
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { IDynamicValues } from '@client/navigation'
+import { countryMessages } from '@client/i18n/messages/constants'
 
 interface IStatus {
   [key: string]: MessageDescriptor
@@ -161,31 +165,103 @@ export const getLocation = (
 ) => {
   let locationType = ''
   let locationId = ''
-  let locationDistrict = ''
-  let locationPrimary = ''
+  let district = ''
+  let state = ''
+  let internationalDistrict = ''
+  let internationalState = ''
+  let country = ''
+
   if (declaration.event === 'death') {
     locationType = declaration.data?.deathEvent?.placeOfDeath?.toString() || ''
     locationId = declaration.data?.deathEvent?.deathLocation?.toString() || ''
-    locationDistrict = declaration.data?.deathEvent?.district?.toString() || ''
-    locationPrimary =
-      declaration.data?.deceased?.districtPrimary?.toString() || ''
+
+    district = declaration.data?.deathEvent?.district?.toString() || ''
+    state = declaration.data?.deathEvent?.state?.toString() || ''
+    country = declaration.data?.deathEvent?.country?.toString() || ''
+
+    // when address is outside of default country
+    internationalDistrict =
+      declaration.data?.deathEvent?.internationalDistrict?.toString() || ''
+    internationalState =
+      declaration.data?.deathEvent?.internationalState?.toString() || ''
   } else {
     locationType = declaration.data?.child?.placeOfBirth?.toString() || ''
     locationId = declaration.data?.child?.birthLocation?.toString() || ''
-    locationDistrict = declaration.data?.child?.district?.toString() || ''
-  }
 
-  if (locationType === 'HEALTH_FACILITY') {
+    district = declaration.data?.child?.district?.toString() || ''
+    state = declaration.data?.child?.state?.toString() || ''
+    country = declaration.data?.child?.country?.toString() || ''
+
+    // when address is outside of default country
+    internationalDistrict =
+      declaration.data?.child?.internationalDistrict?.toString() || ''
+    internationalState =
+      declaration.data?.child?.internationalState?.toString() || ''
+  }
+  if (locationType === 'HEALTH_FACILITY' && locationId) {
     const facility = resources.facilities[locationId]
-    return generateLocationName(facility, intl)
+    const district =
+      facility && resources.locations[facility.partOf.split('/')[1]]
+    const state = district && resources.locations[district.partOf.split('/')[1]]
+    const defaultCountry = intl.formatMessage(
+      countryMessages[window.config.COUNTRY]
+    )
+    const healthFacility = generateLocationName(facility, intl)
+
+    let location = healthFacility + ', '
+    if (district) location = location + district.name + ', '
+    if (state) location = location + state.name + ', '
+    location = location + defaultCountry
+    return location
   }
   if (locationType === 'OTHER' || locationType === 'PRIVATE_HOME') {
-    const location = resources.locations[locationDistrict]
-    return generateLocationName(location, intl)
+    if (country && country !== window.config.COUNTRY) {
+      let location = ''
+      if (internationalDistrict) location = internationalDistrict + ', '
+      if (internationalState) location = location + internationalState + ', '
+      location = location + intl.formatMessage(countryMessages[country])
+      return location
+    }
+
+    return generateFullLocation(district, state, country, resources, intl)
   }
-  if (locationType === 'PRIMARY_ADDRESS') {
-    const district = resources.locations[locationPrimary]
-    return generateLocationName(district, intl)
+
+  // when address is default residence address of deceased
+  if (locationType === 'DECEASED_USUAL_RESIDENCE') {
+    const countryResidence =
+      declaration.data?.deceased?.countryPrimary?.toString() || ''
+
+    if (countryResidence !== window.config.COUNTRY) {
+      // residence address is other than default country
+      const internationalDistrictResidence =
+        declaration.data?.deceased?.internationalDistrictPrimary?.toString() ||
+        ''
+      const internationalStateResidence =
+        declaration.data?.deceased?.internationalStatePrimary?.toString() || ''
+
+      let location = ''
+      if (internationalDistrictResidence)
+        location = internationalDistrictResidence + ', '
+      if (internationalStateResidence)
+        location = location + internationalStateResidence + ', '
+      location =
+        location + intl.formatMessage(countryMessages[countryResidence])
+
+      return location
+    } else {
+      const districtResidence =
+        declaration.data?.deceased?.districtPrimary?.toString() || ''
+      const stateResidence =
+        declaration.data?.deceased?.statePrimary?.toString() || ''
+
+      return generateFullLocation(
+        districtResidence,
+        stateResidence,
+        countryResidence,
+        resources,
+        intl
+      )
+    }
   }
   return ''
 }

@@ -10,9 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import gql from 'graphql-tag'
-import { client } from '@client/utils/apolloClient'
-import { ApolloQueryResult } from 'apollo-client'
-import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema'
 
 export const FORM_DRAFT_FIELDS = gql`
   fragment FormDraftFields on FormDraft {
@@ -30,29 +27,3 @@ export const FORM_DRAFT_FIELDS = gql`
     }
   }
 `
-
-export const GET_FORM_DRAFT = gql`
-  ${FORM_DRAFT_FIELDS}
-  query {
-    getFormDraft {
-      ...FormDraftFields
-    }
-  }
-`
-async function fetchFormDraft() {
-  try {
-    const queryResult: ApolloQueryResult<GQLQuery> = await client.query({
-      query: GET_FORM_DRAFT,
-      fetchPolicy: 'no-cache'
-    })
-    return {
-      formDrafts: queryResult.data.getFormDraft
-    }
-  } catch {
-    throw new Error('FormDraft fetch failed')
-  }
-}
-
-export const formDraftQueries = {
-  fetchFormDraft
-}

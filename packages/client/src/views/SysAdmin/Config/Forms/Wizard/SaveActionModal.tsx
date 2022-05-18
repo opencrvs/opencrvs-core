@@ -79,6 +79,7 @@ function SaveActionButton({ comment }: { comment: string }) {
     >
       {(createFormDraft) => (
         <PrimaryButton
+          id="save-btn"
           disabled={!comment}
           onClick={() => {
             setStatus(ActionStatus.PROCESSING)
@@ -132,9 +133,10 @@ export function SaveActionModal() {
         required
       >
         <TextArea
-          key="save_modal_comment"
+          key="save-comment"
           /* Text Area currently doesn't accept basic input props */
           {...{
+            id: 'save-comment',
             onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) =>
               setComment(event.target.value),
             onBlur: () => !touched && setTouched(true)
