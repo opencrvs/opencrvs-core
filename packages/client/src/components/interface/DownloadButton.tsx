@@ -26,7 +26,6 @@ import {
 import { connect } from 'react-redux'
 import {
   downloadDeclaration,
-  makeDeclarationReadyToDownload,
   DOWNLOAD_STATUS,
   deleteDeclaration,
   IDeclaration,
@@ -189,13 +188,12 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   )
   const download = useCallback(() => {
     const { event, compositionId, action } = downloadConfigs
-    const downloadableDeclaration = makeDeclarationReadyToDownload(
+    downloadDeclaration(
       event.toLowerCase() as unknown as Event,
       compositionId,
-      action
+      action,
+      client
     )
-
-    downloadDeclaration(downloadableDeclaration, client)
   }, [downloadConfigs, client, downloadDeclaration])
   const hideModal = useCallback(() => setAssignModal(null), [])
   const unassign = useCallback(async () => {
@@ -315,8 +313,12 @@ const mapStateToProps = (state: IStoreState): IConnectProps => ({
 })
 
 const mapDispatchToProps = (dispatch: Dispatch): IDispatchProps => ({
-  downloadDeclaration: (declaration: IDeclaration, client: ApolloClient<any>) =>
-    dispatch(downloadDeclaration(declaration, client)),
+  downloadDeclaration: (
+    event: Event,
+    compositionId: string,
+    action: string,
+    client: ApolloClient<any>
+  ) => dispatch(downloadDeclaration(event, compositionId, action, client)),
   deleteDeclaration: (declaration: IDeclaration) =>
     dispatch(deleteDeclaration(declaration)),
   syncWorkqueue: () =>

@@ -109,7 +109,8 @@ import {
   IForm,
   IFormSection,
   IFormSectionGroup,
-  IFormField
+  IFormField,
+  Event
 } from '@client/forms'
 import {
   constantsMessages,
@@ -808,7 +809,7 @@ const showDownloadButton = (
     downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
   ) {
     const downLoadConfig = {
-      event: type as string,
+      event: type as Event,
       compositionId: id,
       action: Action.LOAD_REVIEW_DECLARATION,
       assignment: declaration?.assignment

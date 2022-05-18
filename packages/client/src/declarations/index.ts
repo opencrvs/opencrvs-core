@@ -1126,9 +1126,16 @@ export async function deleteDeclarationByUser(
 }
 
 export function downloadDeclaration(
-  declaration: IDeclaration,
+  event: Event,
+  compositionId: string,
+  action: string,
   client: ApolloClient<{}>
 ): IDownloadDeclaration {
+  const declaration = makeDeclarationReadyToDownload(
+    event,
+    compositionId,
+    action
+  )
   return {
     type: ENQUEUE_DOWNLOAD_DECLARATION,
     payload: {
