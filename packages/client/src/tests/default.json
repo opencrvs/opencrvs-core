@@ -4301,7 +4301,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.causeOfDeathEstablished"
+                      "expression": "values.causeOfDeathEstablished !== \"true\""
                     }
                   ],
                   "options": [
@@ -4943,6 +4943,12 @@
                   "extraValue": "DECEASED_DEATH_CAUSE_PROOF",
                   "hideAsterisk": true,
                   "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "draftData?.deathEvent?.causeOfDeathEstablished !== \"true\""
+                    }
+                  ],
                   "options": [
                     {
                       "value": "MEDICALLY_CERTIFIED_CAUSE_OF_DEATH",
