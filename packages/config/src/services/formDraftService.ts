@@ -77,12 +77,12 @@ export async function clearHearthElasticInfluxData(request: Hapi.Request) {
     throw Error(`Failed to delete elastic, influx data. ${err}`)
   }
 
-  try {
-    Promise.all(
-      hearthCollectionList.map(async (collection) => {
-        const data = await fetchFHIR(`/${collection}`, {
-          Authorization: `Bearer ${token}`
-        })
+  Promise.all(
+    hearthCollectionList.map(async (collection) => {
+      const data = await fetchFHIR(`/${collection}`, {
+        Authorization: `Bearer ${token}`
+      })
+      return Promise.all(
         data.entry.map(async (entry: fhir.BundleEntry) => {
           await deleteFHIR(`/${collection}/${entry.resource?.id}`, {
             Authorization: `Bearer ${token}`
@@ -91,11 +91,9 @@ export async function clearHearthElasticInfluxData(request: Hapi.Request) {
             `Deleting '${collection}' collection's resource id: ${entry.resource?.id}`
           )
         })
-      })
-    )
-  } catch (err) {
-    throw Error(`Failed to delete hearth data. ${err}`)
-  }
+      )
+    })
+  )
 }
 
 export async function clearQuestionConfigs(event: string) {

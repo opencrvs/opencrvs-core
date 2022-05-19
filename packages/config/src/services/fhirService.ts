@@ -27,13 +27,9 @@ export const fetchFHIR = <T = any>(
       'Content-Type': 'application/fhir+json',
       ...authHeader
     }
+  }).then((response) => {
+    return response.json()
   })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
-    })
 }
 
 export const deleteFHIR = async (
@@ -41,15 +37,11 @@ export const deleteFHIR = async (
   authHeader: IAuthHeader,
   method: string = 'DELETE'
 ) => {
-  try {
-    return await fetch(`${FHIR_URL}${suffix}`, {
-      method,
-      headers: {
-        'Content-Type': 'application/fhir+json',
-        ...authHeader
-      }
-    })
-  } catch (error) {
-    return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
-  }
+  return fetch(`${FHIR_URL}${suffix}`, {
+    method,
+    headers: {
+      'Content-Type': 'application/fhir+json',
+      ...authHeader
+    }
+  })
 }
