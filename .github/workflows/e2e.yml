@@ -44,7 +44,5 @@ jobs:
         run: |
           cd ../opencrvs-farajaland
           npm install -g cypress
-          sed -i 's/j9bgv5/x25ere/g' cypress.json
-          sed -i 's/ayoz3q/x25ere/g' cypress.json
           cat cypress.json
-          cypress run --headless --browser chrome --record --key 9c35dd66-f203-4336-b9f8-2a71c809c221
+          cypress run --headless --browser chrome --record --key e0fc7a26-f292-4e48-9716-2009137fe646
