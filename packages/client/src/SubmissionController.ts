@@ -259,10 +259,6 @@ export class SubmissionController {
       }
     }
     const scopes = getScope(this.store.getState()) || []
-    //It needs some times to elasticSearch to update index
-    setTimeout(async () => {
-      await this.store.dispatch(updateRegistrarWorkqueue())
-    }, 100)
     await this.store.dispatch(modifyDeclaration(declaration))
 
     if (
@@ -290,6 +286,11 @@ export class SubmissionController {
     } else {
       await this.store.dispatch(writeDeclaration(declaration))
     }
+
+    /*
+     * We are updating the workqueue after all the status changes are done for single declaration
+     */
+    await this.store.dispatch(updateRegistrarWorkqueue())
   }
 
   private onError = async (declaration: IDeclaration, error: ApolloError) => {
