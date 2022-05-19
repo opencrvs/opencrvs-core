@@ -283,9 +283,9 @@ export class SubmissionController {
         ) {
           delete declaration.data[attachmentSectionKey]
         }
-        this.store.dispatch(writeDeclaration(declaration))
+        await this.store.dispatch(writeDeclaration(declaration))
       } else {
-        this.store.dispatch(deleteDeclaration(declaration))
+        await this.store.dispatch(deleteDeclaration(declaration))
       }
     } else {
       await this.store.dispatch(writeDeclaration(declaration))
