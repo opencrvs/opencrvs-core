@@ -9,12 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@config/server'
-import { fetchFHIR, deleteFHIR } from '@config/services/fhirService'
-import { HearthCollectionsName } from '@config/services/formDraftService'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchMock from 'jest-fetch-mock'
+import {
+  fetchFHIR,
+  deleteFHIR,
+  IAuthHeader
+} from '@config/services/fhirService'
+import { HearthCollectionsName } from '@config/services/formDraftService'
 
 const token = jwt.sign(
   { scope: ['natlsysadmin', 'demo'] },
@@ -25,6 +28,10 @@ const token = jwt.sign(
     audience: 'opencrvs:config-user'
   }
 )
+
+const authHeader: IAuthHeader = {
+  Authorization: token
+}
 
 const taskBundleMock = {
   resourceType: 'Bundle',
@@ -75,47 +82,41 @@ const taskBundleMock = {
 const fetch = fetchMock as fetchMock.FetchMock
 
 describe('fetchFHIR()', () => {
-  let server: any
-
   beforeEach(async () => {
-    server = await createServer()
     fetch.resetMocks()
     fetch.mockReject(new Error())
   })
 
   it('should return response from fhir', async () => {
     fetch.mockResponse(JSON.stringify(taskBundleMock))
-    const taskBundle = await fetchFHIR(HearthCollectionsName.Task, token)
+    const taskBundle = await fetchFHIR(HearthCollectionsName.Task, authHeader)
     expect(taskBundle.resourceType).toEqual('Bundle')
   })
 
   it('should return error if fhir failed to fetch', async () => {
     fetch.mockReject(new Error('error'))
     await expect(
-      fetchFHIR(HearthCollectionsName.Task, token)
+      fetchFHIR(HearthCollectionsName.Task, authHeader)
     ).rejects.toThrowError('error')
   })
 })
 
 describe('deleteFHIR()', () => {
-  let server: any
-
   beforeEach(async () => {
-    server = await createServer()
     fetch.resetMocks()
     fetch.mockReject(new Error())
   })
 
   it('should return response from fhir', async () => {
     fetch.mockResponse(JSON.stringify({ status: 'ok' }))
-    const res = await deleteFHIR(HearthCollectionsName.Task, token)
+    const res = await deleteFHIR(HearthCollectionsName.Task, authHeader)
     expect(res.status).toBe(200)
   })
 
   it('should return error if fhir failed to fetch', async () => {
     fetch.mockReject(new Error('error'))
     await expect(
-      deleteFHIR(HearthCollectionsName.Task, token)
+      deleteFHIR(HearthCollectionsName.Task, authHeader)
     ).rejects.toThrowError('error')
   })
 })
