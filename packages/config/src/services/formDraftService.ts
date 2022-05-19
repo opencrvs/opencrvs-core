@@ -19,7 +19,7 @@ import {
   SEARCH_URL
 } from '@config/config/constants'
 import { IModifyDraftStatus } from '@config/handlers/formDraft/updateFormDraft/handler'
-import { fetchFHIR, deleteFHIR } from '@config/service/fhirService'
+import { fetchFHIR, deleteFHIR } from '@config/services/fhirService'
 import { every } from 'lodash'
 
 export enum HearthCollectionsName {
