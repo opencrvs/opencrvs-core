@@ -20,7 +20,6 @@ import {
   ICON_ALIGNMENT,
   PrimaryButton,
   TertiaryButton,
-  LinkButton,
   SecondaryButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
@@ -107,7 +106,7 @@ const FormSectionTitle = styled.h4`
 `
 const FooterArea = styled.div`
   height: 260px;
-  padding: 24px 0;
+  padding: 16px 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     height: 160px;
   }
