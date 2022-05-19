@@ -15,14 +15,10 @@ import { Document, Page } from 'react-pdf'
 import { Pagination, Spinner } from '../../interface'
 
 const Container = styled.div`
-  margin: 10px 0;
+  ${({ theme }) => theme.shadows.heavy};
   display: flex;
   flex-direction: column;
   align-items: center;
-  @media (max-height: 900px) {
-    margin-top: 30%;
-    margin-bottom: 5%;
-  }
   background: ${({ theme }) => theme.colors.white};
 `
 

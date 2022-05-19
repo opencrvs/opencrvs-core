@@ -1062,10 +1062,6 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'dateInPast',
                     parameters: []
-                  },
-                  {
-                    operation: 'isValidParentsBirthDate',
-                    parameters: [5]
                   }
                 ],
                 mapping: {
@@ -3362,7 +3358,7 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.causeOfDeathEstablished'
+                    expression: 'values.causeOfDeathEstablished !== "true"'
                   }
                 ],
                 options: [
@@ -3836,6 +3832,13 @@ export const registerForms: IDefaultRegisterForms = {
                   deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF,
                 hideAsterisk: true,
                 validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      'draftData?.deathEvent?.causeOfDeathEstablished !== "true"'
+                  }
+                ],
                 options: [
                   {
                     value:

@@ -29,12 +29,10 @@ const DocumentUploader = styled(ImageUploader)`
   color: ${({ theme }) => theme.colors.primary};
   background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
-  border-radius: 2px;
+  border-radius: 4px;
   ${({ theme }) => theme.fonts.bold14};
   height: 40px;
   text-transform: initial;
-  padding: 0px 25px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-left: 0px;
@@ -43,8 +41,8 @@ const DocumentUploader = styled(ImageUploader)`
 `
 
 const FieldDescription = styled.div`
-  margin-top: -8px;
-  margin-bottom: 24px;
+  margin-top: 0px;
+  margin-bottom: 6px;
 `
 
 type IFullProps = {

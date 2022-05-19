@@ -45,9 +45,11 @@ import {
 import {
   IconWithName,
   IconWithNameEvent,
-  SubmissionStatusMap
+  SubmissionStatusMap,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 const DECLARATIONS_DAY_LIMIT = 7
 
 interface ISentForReviewProps {
@@ -157,7 +159,37 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
         draft && draft.savedOn
           ? new Date(draft.savedOn)
           : draft.createdAt && parseInt(draft.createdAt)
-
+      const NameComponent = name ? (
+        <LinkButton
+          id={`name_${index}`}
+          isBoldLink={true}
+          onClick={() => {
+            if (!draft.compositionId) {
+              throw new Error('No composition id found for this declaration')
+            }
+            this.props.goToDeclarationRecordAudit(
+              'reviewTab',
+              draft.compositionId
+            )
+          }}
+        >
+          {name}
+        </LinkButton>
+      ) : (
+        <NoNameContainer
+          onClick={() => {
+            if (!draft.compositionId) {
+              throw new Error('No composition id found for this declaration')
+            }
+            this.props.goToDeclarationRecordAudit(
+              'reviewTab',
+              draft.compositionId
+            )
+          }}
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
       return {
         id: draft.id,
         event: event || '',
@@ -167,7 +199,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
             status={
               (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
             }
-            name={name}
+            name={NameComponent}
           />
         ),
         iconWithNameEvent: (
@@ -175,7 +207,7 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
             status={
               (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
             }
-            name={name}
+            name={NameComponent}
             event={event}
           />
         ),
@@ -190,22 +222,6 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
                 index={index}
               />
             )
-          }
-        ],
-
-        rowClickable: Boolean(draft.compositionId),
-        rowClickHandler: [
-          {
-            label: 'rowClickHandler',
-            handler: () => {
-              if (!draft.compositionId) {
-                throw new Error('No composition id found for this declaration')
-              }
-              this.props.goToDeclarationRecordAudit(
-                'reviewTab',
-                draft.compositionId
-              )
-            }
           }
         ]
       }
