@@ -23,6 +23,7 @@ const HeaderContainer = styled.div`
   min-height: 288px;
   display: flex;
   justify-content: center;
+  border-radius: 4px;
   align-items: center;
   text-align: center;
   color: ${({ theme }) => theme.colors.copy};
@@ -38,16 +39,17 @@ const IconContainer = styled.div`
   margin: 16px auto 16px auto;
 `
 const TitleContainer = styled.div`
-  ${({ theme }) => theme.fonts.reg12}
+  ${({ theme }) => theme.fonts.bold14}
   text-transform: uppercase;
+  margin-bottom: 16px;
 `
 const SubjectContainer = styled.div`
-  ${({ theme }) => theme.fonts.h2}
+  ${({ theme }) => theme.fonts.h1}
   width:70%;
   margin: auto;
   overflow-wrap: break-word;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h3}
+    ${({ theme }) => theme.fonts.h2}
   }
 `
 const Image = styled.img`
