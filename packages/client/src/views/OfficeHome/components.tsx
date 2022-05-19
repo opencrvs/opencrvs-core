@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from '@client/styledComponents'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
-import { STATUSTOCOLOR } from '@client/views/Home/RecordAudit'
+import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { Duplicate, StatusFailed } from '@opencrvs/components/lib/icons'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
@@ -58,16 +58,19 @@ interface IIconWith {
   event?: string
   isDuplicate?: boolean
   isValidatedOnReview?: boolean
+  isArchived?: boolean
 }
 
 const IconComp = ({
   status,
   isDuplicateIcon,
-  isValidatedOnReview
+  isValidatedOnReview,
+  isArchived
 }: {
   status: string
   isDuplicateIcon?: boolean
   isValidatedOnReview?: boolean
+  isArchived?: boolean
 }) => {
   return (
     <Icon>
@@ -77,6 +80,7 @@ const IconComp = ({
         <DeclarationIcon
           color={STATUSTOCOLOR[status]}
           isValidatedOnReview={isValidatedOnReview}
+          isArchive={isArchived}
         />
       )}
     </Icon>
@@ -87,7 +91,8 @@ export const IconWithName = ({
   status,
   name,
   isDuplicate,
-  isValidatedOnReview
+  isValidatedOnReview,
+  isArchived
 }: IIconWith) => {
   return (
     <Flex id="flex">
@@ -96,6 +101,7 @@ export const IconWithName = ({
           status={status}
           isDuplicateIcon={isDuplicate}
           isValidatedOnReview={isValidatedOnReview}
+          isArchived={isArchived}
         />
       )}
       {name}
@@ -108,7 +114,8 @@ export const IconWithNameEvent = ({
   name,
   event,
   isDuplicate,
-  isValidatedOnReview
+  isValidatedOnReview,
+  isArchived
 }: IIconWith) => {
   return (
     <Flex id="flex">
@@ -117,6 +124,7 @@ export const IconWithNameEvent = ({
           status={status}
           isDuplicateIcon={isDuplicate}
           isValidatedOnReview={isValidatedOnReview}
+          isArchived={isArchived}
         />
       )}
       <NameEventContainer id="nameEvent">
