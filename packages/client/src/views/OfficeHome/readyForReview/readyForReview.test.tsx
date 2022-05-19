@@ -416,7 +416,7 @@ describe('OfficeHome sent for review tab related tests', () => {
       />,
       { store, history }
     )
-    const element = await waitForElement(testComponent, '#row_0')
+    const element = await waitForElement(testComponent, '#name_0')
     element.hostNodes().simulate('click')
 
     await waitFor(() =>
@@ -803,7 +803,7 @@ describe('Tablet tests', () => {
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth())
 
-    const row = await waitForElement(testComponent, '#row_0')
+    const row = await waitForElement(testComponent, '#name_0')
     row.hostNodes().simulate('click')
 
     expect(window.location.href).toContain(

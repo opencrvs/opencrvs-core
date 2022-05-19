@@ -10,7 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { getContentKeys, getCertificateHandlebar } from './utils'
+import {
+  getContentKeys,
+  getCertificateHandlebar,
+  isDefaultField,
+  IDefaultConfigField,
+  ICustomConfigField
+} from './utils'
 import { IFormField } from '@client/forms'
 
 const mockFormField: IFormField = {
@@ -25,8 +31,8 @@ const mockFormField: IFormField = {
   validate: [() => undefined]
 }
 
-describe('getContentKey', () => {
-  it('should return the key if available', () => {
+describe('getContentKeys', () => {
+  it('should return the keys if available', () => {
     expect(getContentKeys(mockFormField)).toEqual(['test.dummy'])
   })
 })
@@ -34,5 +40,32 @@ describe('getContentKey', () => {
 describe('getCertificateHandlebar', () => {
   it('should return the certificate handlebar if available', () => {
     expect(getCertificateHandlebar(mockFormField)).toBe('dummyHandlebar')
+  })
+})
+
+describe('isDefaultField', () => {
+  const defaultConfigField: IDefaultConfigField = {
+    fieldId: 'dummy.defaultFieldId',
+    enabled: '',
+    identifiers: {
+      fieldIndex: 0,
+      groupIndex: 0,
+      sectionIndex: 0
+    },
+    foregoingFieldId: 'dummy.foregoingFieldId'
+  }
+
+  const customConfigField: ICustomConfigField = {
+    fieldId: 'dummy.customFieldId',
+    enabled: '',
+    custom: true,
+    foregoingFieldId: 'dummy.foregoingFieldId'
+  }
+  it('should return true for defaultConfigField', () => {
+    expect(isDefaultField(defaultConfigField)).toBe(true)
+  })
+
+  it('should return false for customConfigField', () => {
+    expect(isDefaultField(customConfigField)).toBe(false)
   })
 })

@@ -11,6 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+import { IDomProps } from '../AppHeader'
 
 export interface IRightMenu {
   element: JSX.Element
@@ -33,12 +34,14 @@ const HeaderContainer = styled.div`
   z-index: 2;
   background: ${({ theme }) => theme.colors.white};
 `
-export class DesktopHeader extends React.Component<IDesktopHeaderProps> {
+export class DesktopHeader extends React.Component<
+  IDesktopHeaderProps & IDomProps
+> {
   render() {
-    const { desktopRightMenu } = this.props
+    const { id, className, desktopRightMenu } = this.props
 
     return (
-      <HeaderContainer>
+      <HeaderContainer id={id} className={className}>
         {desktopRightMenu &&
           desktopRightMenu.map((item: IRightMenu, index) => (
             <React.Fragment key={index}> {item.element}</React.Fragment>

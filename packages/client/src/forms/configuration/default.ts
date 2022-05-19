@@ -1062,10 +1062,6 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'dateInPast',
                     parameters: []
-                  },
-                  {
-                    operation: 'isValidParentsBirthDate',
-                    parameters: [5]
                   }
                 ],
                 mapping: {
