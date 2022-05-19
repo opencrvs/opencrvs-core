@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as mongoose from 'mongoose'
-import { HEARTH_MONGO_URL, MONGO_URL } from '@config/config/constants'
+import { MONGO_URL } from '@config/config/constants'
 import { logger } from '@config/config/logger'
 
 const db = mongoose.connection
@@ -37,49 +37,10 @@ const connect = async (): Promise<void> => {
   }
 }
 
-let hearthDb: mongoose.Connection | null
-
-async function connectToHearth(): Promise<void> {
-  try {
-    hearthDb = await mongoose.createConnection(HEARTH_MONGO_URL, {
-      autoReconnect: true
-    })
-    if (hearthDb.readyState) {
-      logger.info('Connected to Hearth MongoDB')
-    }
-  } catch (err) {
-    logger.info('Failed to connect Hearth MongoDB')
-    logger.error(err)
-    await wait(1000)
-    return connectToHearth()
-  }
-}
-
-export async function getHearthDb(): Promise<mongoose.Connection> {
-  if (hearthDb) {
-    return hearthDb
-  }
-  await connectToHearth()
-  return hearthDb as unknown as mongoose.Connection
-}
-
 export async function stop() {
   mongoose.disconnect()
 }
 
 export async function start() {
   return connect()
-}
-
-export async function stopHearth() {
-  if (hearthDb) {
-    await hearthDb.close()
-    if (!hearthDb.readyState) {
-      logger.info('Hearth MongoDB disconnected')
-    }
-  }
-}
-
-export async function startHearth() {
-  return connectToHearth()
 }

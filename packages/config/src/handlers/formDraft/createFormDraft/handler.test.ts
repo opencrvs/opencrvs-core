@@ -95,6 +95,25 @@ describe('createFormDraftHandler test', () => {
     fetch.mockReject(new Error())
   })
 
+  it('should create formDraft using mongoose', async () => {
+    mockingoose(FormDraft).toReturn('', 'findOne')
+    mockingoose(Question).toReturn(deathMockFormDraft, 'create')
+
+    const res = await server.server.inject({
+      method: 'PUT',
+      url: '/draftQuestions',
+      payload: {
+        event: 'birth',
+        comment: 'Modified question',
+        questions: []
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(201)
+  })
+
   it('should delete question using mongoose', async () => {
     mockingoose(FormDraft).toReturn(birthMockFormDraft, 'findOne')
     mockingoose(Question).toReturn(mockQuestion, 'findOne')

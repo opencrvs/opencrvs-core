@@ -66,14 +66,12 @@ export async function createServer() {
   async function stop() {
     await server.stop()
     await database.stop()
-    await database.stopHearth()
     server.log('info', 'Config server stopped')
   }
 
   async function start() {
     await server.start()
     await database.start()
-    await database.startHearth()
     server.log('info', `Config server started on ${HOST}:${PORT}`)
   }
 
