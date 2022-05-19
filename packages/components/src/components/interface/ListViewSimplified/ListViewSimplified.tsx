@@ -15,7 +15,7 @@ import { StyledPill } from '../Pill'
 
 const Grid = styled.div<{ bottomBorder: boolean }>`
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, 1fr) auto;
   grid-auto-rows: minmax(56px, auto);
   row-gap: 1px;
   ${({ bottomBorder }) => bottomBorder && 'border-bottom: 1px solid'};
@@ -31,25 +31,23 @@ const Grid = styled.div<{ bottomBorder: boolean }>`
   }
 `
 
-const LabelValueContainer = styled.div`
-  display: flex;
-  padding: 16px 0;
-  grid-column-start: 2;
-  gap: 20px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    display: none;
-  }
-`
-
 const ValueContainer = styled.div`
+  padding: 8px 0;
+  padding-left: 20px;
   display: flex;
-  flex: 0 1 50%;
   color: ${({ theme }) => theme.colors.grey600};
   > span {
     padding-top: 8px;
     padding-bottom: 8px;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+const MobileValueContainer = styled(ValueContainer)`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: block;
+    padding-left: 0;
     flex: 1;
     grid-row-start: 2;
     grid-column: 2;
@@ -58,6 +56,7 @@ const ValueContainer = styled.div`
 `
 
 const LabelContainer = styled.div`
+  padding: 8px 0;
   display: flex;
   flex: 1 0 50%;
   button > div {
@@ -67,6 +66,12 @@ const LabelContainer = styled.div`
     padding-top: 8px;
     padding-bottom: 8px;
   }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+
+const MobileLabelContainer = styled(LabelContainer)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: block;
     grid-column-start: 2;
@@ -135,23 +140,24 @@ export function ListViewItemSimplified({
 }: IListViewItemSimplifiedProps) {
   return (
     <>
-      {image && <ImageContainer>{image}</ImageContainer>}
-      <LabelValueContainer>
-        <LabelContainer>
-          {typeof label === 'string' ? <span>{label}</span> : label}
-        </LabelContainer>
-        {value && (
-          <ValueContainer>
-            {typeof value === 'string' ? <span>{value}</span> : value}
-          </ValueContainer>
-        )}
-      </LabelValueContainer>
-      <ActionsContainer>{actions}</ActionsContainer>
-      <MobileContainer>
+      <ImageContainer data-test-id="list-view-image">{image}</ImageContainer>
+
+      <LabelContainer data-test-id="list-view-label">
+        {typeof label === 'string' ? <span>{label}</span> : label}
+      </LabelContainer>
+
+      <ValueContainer data-test-id="list-view-value">
+        {value && typeof value === 'string' ? <span>{value}</span> : value}
+      </ValueContainer>
+
+      <ActionsContainer data-test-id="list-view-actions">
+        {actions}
+      </ActionsContainer>
+      <MobileContainer data-test-id="list-view-mobile">
         {image && <MobileImageContainer>{image}</MobileImageContainer>}
-        <LabelContainer>{label}</LabelContainer>
+        <MobileLabelContainer>{label}</MobileLabelContainer>
         <MobileActionsContainer>{actions}</MobileActionsContainer>
-        {value && <ValueContainer>{value}</ValueContainer>}
+        {value && <MobileValueContainer>{value}</MobileValueContainer>}
       </MobileContainer>
     </>
   )
