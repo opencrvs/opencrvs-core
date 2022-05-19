@@ -727,6 +727,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.empty'
                 },
                 initialValue: '',
+                ignoreBottomMargin: true,
                 validate: [],
                 conditionals: []
               },
@@ -861,6 +862,7 @@ export const registerForms: IDefaultRegisterForms = {
                 type: 'SUBSECTION',
                 label: formMessageDescriptors.placeOfBirthPreview,
                 previewGroup: 'placeOfBirth',
+                ignoreBottomMargin: true,
                 initialValue: '',
                 validate: []
               },
@@ -1459,6 +1461,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.empty'
                 },
                 initialValue: '',
+                ignoreBottomMargin: true,
                 validate: [],
                 conditionals: [
                   {
@@ -1949,6 +1952,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.empty'
                 },
                 initialValue: '',
+                ignoreBottomMargin: true,
                 validate: [],
                 conditionals: [
                   {
@@ -3150,6 +3154,7 @@ export const registerForms: IDefaultRegisterForms = {
                   id: 'form.field.label.empty'
                 },
                 initialValue: '',
+                ignoreBottomMargin: true,
                 validate: [],
                 conditionals: []
               },
