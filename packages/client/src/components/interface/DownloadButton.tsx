@@ -27,9 +27,7 @@ import { connect } from 'react-redux'
 import {
   downloadDeclaration,
   DOWNLOAD_STATUS,
-  deleteDeclaration,
-  IDeclaration,
-  updateRegistrarWorkqueue
+  unassignDeclaration
 } from '@client/declarations'
 import { Event, Action } from '@client/forms'
 import { withApollo, WithApolloClient } from 'react-apollo'
@@ -38,11 +36,10 @@ import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
 import { IStoreState } from '@client/store'
 import { AvatarVerySmall } from '@client/components/Avatar'
 import { ROLE_LOCAL_REGISTRAR } from '@client/utils/constants'
-import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 import { Dispatch } from 'redux'
 import ApolloClient from 'apollo-client'
 
-const { useState, useCallback } = React
+const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
   event: string
   compositionId: string
@@ -63,8 +60,7 @@ interface IConnectProps {
 }
 interface IDispatchProps {
   downloadDeclaration: typeof downloadDeclaration
-  deleteDeclaration: typeof deleteDeclaration
-  syncWorkqueue: typeof updateRegistrarWorkqueue
+  unassignDeclaration: typeof unassignDeclaration
 }
 
 type HOCProps = IConnectProps & IDispatchProps & WithApolloClient<{}>
@@ -170,6 +166,14 @@ function renderModalAction(action: IModalAction): JSX.Element {
 }
 
 function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
+  const LOADING_STATUSES = useMemo(function () {
+    return [
+      DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
+      DOWNLOAD_STATUS.DOWNLOADING,
+      DOWNLOAD_STATUS.READY_TO_UNASSIGN,
+      DOWNLOAD_STATUS.UNASSIGNING
+    ]
+  }, [])
   const {
     id,
     status,
@@ -179,8 +183,7 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     downloadDeclaration,
     userRole,
     userId,
-    deleteDeclaration,
-    syncWorkqueue
+    unassignDeclaration
   } = props
   const { assignment, compositionId } = downloadConfigs
   const [assignModal, setAssignModal] = useState<AssignModalOptions | null>(
@@ -197,15 +200,9 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   }, [downloadConfigs, client, downloadDeclaration])
   const hideModal = useCallback(() => setAssignModal(null), [])
   const unassign = useCallback(async () => {
-    await client.mutate({
-      mutation: MARK_EVENT_UNASSIGNED,
-      variables: { id: compositionId }
-    })
-  }, [compositionId, client])
-  const remove = useCallback(
-    () => deleteDeclaration({ id: compositionId as string } as IDeclaration),
-    [deleteDeclaration, compositionId]
-  )
+    unassignDeclaration(compositionId, client)
+  }, [compositionId, client, unassignDeclaration])
+
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
@@ -221,10 +218,8 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
                 hideModal()
               },
               onUnassign: async () => {
+                unassign()
                 hideModal()
-                await unassign()
-                remove()
-                syncWorkqueue()
               },
               onCancel: hideModal
             },
@@ -237,23 +232,10 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       }
       e.stopPropagation()
     },
-    [
-      assignment,
-      userRole,
-      download,
-      userId,
-      status,
-      unassign,
-      hideModal,
-      syncWorkqueue,
-      remove
-    ]
+    [assignment, userRole, download, userId, status, unassign, hideModal]
   )
 
-  if (
-    status === DOWNLOAD_STATUS.READY_TO_DOWNLOAD ||
-    status === DOWNLOAD_STATUS.DOWNLOADING
-  ) {
+  if (status && LOADING_STATUSES.includes(status)) {
     return (
       <StatusIndicator
         isLoading={true}
@@ -319,10 +301,8 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchProps => ({
     action: string,
     client: ApolloClient<any>
   ) => dispatch(downloadDeclaration(event, compositionId, action, client)),
-  deleteDeclaration: (declaration: IDeclaration) =>
-    dispatch(deleteDeclaration(declaration)),
-  syncWorkqueue: () =>
-    dispatch(updateRegistrarWorkqueue(10, 0, 0, 0, 0, 0, 0, 0))
+  unassignDeclaration: (id: string, client: ApolloClient<any>) =>
+    dispatch(unassignDeclaration(id, client))
 })
 
 export const DownloadButton = connect(

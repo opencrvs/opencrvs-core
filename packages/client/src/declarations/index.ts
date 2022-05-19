@@ -56,6 +56,7 @@ import {
   showDownloadDeclarationFailedToast,
   ShowDownloadDeclarationFailedToast
 } from '@client/notification/actions'
+import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -83,6 +84,9 @@ const UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS =
 const UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL =
   'DECLARATION/UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL'
 const CLEAR_CORRECTION_CHANGE = 'CLEAR_CORRECTION_CHANGE'
+const ENQUEUE_UNASSIGN_DECLARATION = 'DECLARATION/ENQUEUE_UNASSIGN'
+const UNASSIGN_DECLARATION = 'DECLARATION/UNASSIGN'
+const UNASSIGN_DECLARATION_SUCCESS = 'DECLARATION/UNASSIGN_SUCCESS'
 
 export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
@@ -121,7 +125,9 @@ export enum DOWNLOAD_STATUS {
   DOWNLOADING = 'DOWNLOADING',
   DOWNLOADED = 'DOWNLOADED',
   FAILED = 'FAILED',
-  FAILED_NETWORK = 'FAILED_NETWORK'
+  FAILED_NETWORK = 'FAILED_NETWORK',
+  READY_TO_UNASSIGN = 'READY_TO_UNASSIGN',
+  UNASSIGNING = 'UNASSIGNING'
 }
 
 export const processingStates = [
@@ -409,6 +415,30 @@ interface UpdateFieldAgentDeclaredDeclarationsFailAction {
   type: typeof UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL
 }
 
+interface IUnassignDeclaration {
+  type: typeof UNASSIGN_DECLARATION
+  payload: {
+    id: string
+    client: ApolloClient<{}>
+  }
+}
+
+interface IEnqueueUnassignDeclaration {
+  type: typeof ENQUEUE_UNASSIGN_DECLARATION
+  payload: {
+    id: string
+    client: ApolloClient<{}>
+  }
+}
+
+interface IUnassignDeclarationSuccess {
+  type: typeof UNASSIGN_DECLARATION_SUCCESS
+  payload: {
+    id: string
+    client: ApolloClient<{}>
+  }
+}
+
 export type Action =
   | IArchiveDeclarationAction
   | IStoreDeclarationAction
@@ -434,6 +464,9 @@ export type Action =
   | UpdateFieldAgentDeclaredDeclarationsSuccessAction
   | UpdateFieldAgentDeclaredDeclarationsFailAction
   | ShowDownloadDeclarationFailedToast
+  | IEnqueueUnassignDeclaration
+  | IUnassignDeclaration
+  | IUnassignDeclarationSuccess
 
 export interface IUserData {
   userID: string
@@ -1155,7 +1188,7 @@ export function updateRegistrarWorkqueue(
   approvalSkip = 0,
   externalValidationSkip = 0,
   printSkip = 0
-) {
+): UpdateRegistrarWorkqueueAction {
   return {
     type: UPDATE_REGISTRAR_WORKQUEUE,
     payload: {
@@ -1283,6 +1316,45 @@ function downloadDeclarationFail(
     payload: {
       error,
       declaration,
+      client
+    }
+  }
+}
+
+export function executeUnassignDeclaration(
+  id: string,
+  client: ApolloClient<{}>
+): IUnassignDeclaration {
+  return {
+    type: UNASSIGN_DECLARATION,
+    payload: {
+      id,
+      client
+    }
+  }
+}
+
+export function unassignDeclaration(
+  id: string,
+  client: ApolloClient<{}>
+): IEnqueueUnassignDeclaration {
+  return {
+    type: ENQUEUE_UNASSIGN_DECLARATION,
+    payload: {
+      id,
+      client
+    }
+  }
+}
+
+function unassignDeclarationSuccess(
+  id: string,
+  client: ApolloClient<{}>
+): IUnassignDeclarationSuccess {
+  return {
+    type: UNASSIGN_DECLARATION_SUCCESS,
+    payload: {
+      id,
       client
     }
   }
@@ -1774,7 +1846,83 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         return loop(state, Cmd.action(writeDeclaration(modifiedDeclaration)))
       }
       return state
+    case ENQUEUE_UNASSIGN_DECLARATION:
+      const queueIndex = state.declarations.findIndex(
+        ({ id }) => id === action.payload.id
+      )
+      const isQueueBusy = state.declarations.some((declaration) =>
+        [
+          DOWNLOAD_STATUS.READY_TO_UNASSIGN,
+          DOWNLOAD_STATUS.UNASSIGNING
+        ].includes(declaration.downloadStatus as DOWNLOAD_STATUS)
+      )
+      const updatedDeclarationsQueue = state.declarations
+      updatedDeclarationsQueue[queueIndex].downloadStatus =
+        DOWNLOAD_STATUS.READY_TO_UNASSIGN
 
+      return loop(
+        {
+          ...state,
+          declarations: updatedDeclarationsQueue
+        },
+        isQueueBusy
+          ? Cmd.none
+          : Cmd.action(executeUnassignDeclaration(action.payload.id, client))
+      )
+    case UNASSIGN_DECLARATION:
+      const unassignIndex = state.declarations.findIndex(
+        ({ id }) => id === action.payload.id
+      )
+      const updatedDeclarationsUnassign = state.declarations
+      updatedDeclarationsUnassign[unassignIndex].downloadStatus =
+        DOWNLOAD_STATUS.UNASSIGNING
+      return loop(
+        {
+          ...state,
+          declarations: updatedDeclarationsUnassign
+        },
+        Cmd.run(
+          async () => {
+            await action.payload.client.mutate({
+              mutation: MARK_EVENT_UNASSIGNED,
+              variables: { id: action.payload.id }
+            })
+            return [action.payload.id, action.payload.client]
+          },
+          {
+            successActionCreator: unassignDeclarationSuccess
+          }
+        )
+      )
+    case UNASSIGN_DECLARATION_SUCCESS:
+      const declarationNextToUnassign = state.declarations.find(
+        (declaration) =>
+          declaration.downloadStatus === DOWNLOAD_STATUS.READY_TO_UNASSIGN
+      )
+      return loop(
+        state,
+        Cmd.list<
+          | IDeleteDeclarationAction
+          | UpdateRegistrarWorkqueueAction
+          | IUnassignDeclaration
+        >(
+          [
+            Cmd.action(
+              deleteDeclaration({ id: action.payload.id } as IDeclaration)
+            ),
+            Cmd.action(updateRegistrarWorkqueue()),
+            declarationNextToUnassign
+              ? Cmd.action(
+                  executeUnassignDeclaration(
+                    declarationNextToUnassign.id,
+                    action.payload.client
+                  )
+                )
+              : Cmd.none
+          ],
+          { sequence: true }
+        )
+      )
     default:
       return state
   }

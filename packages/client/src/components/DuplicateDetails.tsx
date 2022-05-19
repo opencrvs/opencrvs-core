@@ -12,8 +12,7 @@
 import {
   downloadDeclaration,
   DOWNLOAD_STATUS,
-  IDeclaration,
-  makeDeclarationReadyToDownload
+  IDeclaration
 } from '@client/declarations'
 import {
   constantsMessages,
