@@ -253,7 +253,7 @@ function RecordAuditBody({
 
   if (
     isDownloaded &&
-    (userHasValidateScope || userHasRegisterScope) &&
+    userHasRegisterScope &&
     (declaration.status === SUBMISSION_STATUS.REGISTERED ||
       declaration.status === SUBMISSION_STATUS.CERTIFIED)
   ) {
