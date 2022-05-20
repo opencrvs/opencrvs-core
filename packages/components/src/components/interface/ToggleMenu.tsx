@@ -37,7 +37,6 @@ const MenuContainer = styled.ul`
   z-index: 999999;
   display: flex;
   flex-direction: column;
-  top: 100%;
   right: 0;
   padding: 8px 0;
   margin: 0;
@@ -128,13 +127,9 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     return (
       <>
         <ToggleMenuContainer>
-          <Button
-            id={`${id}ToggleButton`}
-            onClick={this.showMenu}
-            hasFocusRing={hasFocusRing}
-          >
+          <CircleButton id={`${id}ToggleButton`} onClick={this.showMenu}>
             {toggleButton}
-          </Button>
+          </CircleButton>
           {this.state.showSubmenu && (
             <MenuContainer id={`${id}SubMenu`}>
               {menuHeader && <MenuHeader>{menuHeader}</MenuHeader>}
