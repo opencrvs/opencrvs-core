@@ -79,12 +79,25 @@ export const userSectionFormType: ISerializedFormSection = {
       id: 'user-view-group',
       fields: [
         {
-          name: 'userDetails',
-          type: FIELD_GROUP_TITLE,
-          label: userMessages.userDetails,
-          required: false,
+          name: 'role',
+          type: SELECT_WITH_OPTIONS,
+          label: userMessages.labelRole,
+          required: true,
           initialValue: '',
-          validate: []
+          validate: [],
+          options: []
+        },
+        {
+          name: 'type',
+          type: SELECT_WITH_DYNAMIC_OPTIONS,
+          label: userMessages.type,
+          required: true,
+          initialValue: '',
+          validate: [],
+          dynamicOptions: {
+            dependency: 'role',
+            options: {}
+          }
         },
         {
           name: 'firstNamesEng',
@@ -161,35 +174,6 @@ export const userSectionFormType: ISerializedFormSection = {
               operation: 'identifierWithTypeToFieldTransformer',
               parameters: [NATIONAL_ID]
             }
-          }
-        },
-        {
-          name: 'accountDetails',
-          type: FIELD_GROUP_TITLE,
-          label: userMessages.accountDetails,
-          required: false,
-          initialValue: '',
-          validate: []
-        },
-        {
-          name: 'role',
-          type: SELECT_WITH_OPTIONS,
-          label: userMessages.labelRole,
-          required: true,
-          initialValue: '',
-          validate: [],
-          options: []
-        },
-        {
-          name: 'type',
-          type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: userMessages.type,
-          required: true,
-          initialValue: '',
-          validate: [],
-          dynamicOptions: {
-            dependency: 'role',
-            options: {}
           }
         },
         {

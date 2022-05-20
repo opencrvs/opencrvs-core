@@ -21,7 +21,7 @@ export const messages = {
     id: 'form.section.user.title'
   },
   userFormReviewTitle: {
-    defaultMessage: 'Please review the new users details',
+    defaultMessage: 'Review user details',
     description: 'The title of the review page of the user form',
     id: 'form.section.user.preview.title'
   },

@@ -38,6 +38,10 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { gqlToDraftTransformer } from '@client/transformer'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
 
 interface IMatchParams {
   userId?: string
@@ -71,14 +75,6 @@ export type Props = RouteComponentProps<IMatchParams> &
   IUserProps &
   IntlShapeProps
 
-const Container = styled.div`
-  display: flex;
-  min-height: 80vh;
-  flex-grow: 1;
-  align-items: center;
-  justify-content: center;
-`
-
 class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
   async componentDidMount() {
     const { userId, client } = this.props
@@ -105,9 +101,9 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
         }
         goBack={this.props.goBack}
       >
-        <Container>
+        <Content>
           <Spinner id="user-form-submitting-spinner" />
-        </Container>
+        </Content>
       </ActionPageLight>
     )
   }

@@ -154,7 +154,7 @@ describe('signature upload tests', () => {
 
     it('renders review header', () => {
       expect(testComponent.find('#preview_title').hostNodes().text()).toBe(
-        'Please review the new users details'
+        'Review user details'
       )
     })
 

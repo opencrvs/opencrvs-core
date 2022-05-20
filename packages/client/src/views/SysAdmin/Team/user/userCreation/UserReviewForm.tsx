@@ -67,6 +67,7 @@ import {
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import styled from 'styled-components'
+import { Content } from '@opencrvs/components/lib/interface/Content'
 
 export interface IUserReviewFormProps {
   userId?: string
@@ -229,46 +230,44 @@ class UserReviewFormComponent extends React.Component<
       )
     }
     return (
-      <ActionPageLight title={title} goBack={this.props.goBack}>
+      <ActionPageLight title={title} goBack={this.props.goBack} hideBackground>
         {!this.props.userId && (
-          <FormTitle id={`${section.id}_title`}>
-            {intl.formatMessage(section.name)}
-          </FormTitle>
+          <Content
+            title={intl.formatMessage(section.name)}
+            bottomActionButtons={[actionComponent]}
+          >
+            {this.transformSectionData().map((sec, index) => {
+              return (
+                <>
+                  <ListViewSimplified>
+                    {sec.items.map((item, index) => {
+                      return (
+                        <ListViewItemSimplified
+                          key={index}
+                          label={<Label>{item.label}</Label>}
+                          value={
+                            <Value id={item.label.split(' ')[0]}>
+                              {item.value}
+                            </Value>
+                          }
+                          actions={
+                            <LinkButton
+                              id={item.action?.id}
+                              disabled={item.action?.disabled}
+                              onClick={item.action?.handler}
+                            >
+                              {item.action?.label}
+                            </LinkButton>
+                          }
+                        />
+                      )
+                    })}
+                  </ListViewSimplified>
+                </>
+              )
+            })}
+          </Content>
         )}
-        <Container>
-          {this.transformSectionData().map((sec, index) => {
-            return (
-              <>
-                {sec.title && <Title>{sec.title}</Title>}
-                <ListViewSimplified>
-                  {sec.items.map((item, index) => {
-                    return (
-                      <ListViewItemSimplified
-                        key={index}
-                        label={<Label>{item.label}</Label>}
-                        value={
-                          <Value id={item.label.split(' ')[0]}>
-                            {item.value}
-                          </Value>
-                        }
-                        actions={
-                          <LinkButton
-                            id={item.action?.id}
-                            disabled={item.action?.disabled}
-                            onClick={item.action?.handler}
-                          >
-                            {item.action?.label}
-                          </LinkButton>
-                        }
-                      />
-                    )
-                  })}
-                </ListViewSimplified>
-              </>
-            )
-          })}
-          <Action>{actionComponent}</Action>
-        </Container>
       </ActionPageLight>
     )
   }
