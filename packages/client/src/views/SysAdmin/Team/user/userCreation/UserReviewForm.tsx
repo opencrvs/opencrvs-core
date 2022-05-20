@@ -41,10 +41,6 @@ import {
   submitUserFormData
 } from '@client/user/userReducer'
 import {
-  Action,
-  FormTitle
-} from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
-import {
   PrimaryButton,
   SuccessButton,
   ICON_ALIGNMENT,
@@ -95,12 +91,6 @@ interface ISectionData {
 type IFullProps = IUserReviewFormProps &
   IntlShapeProps &
   RouteComponentProps<{ userId?: string }>
-
-const Container = styled.div`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 24px;
-  }
-`
 
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
