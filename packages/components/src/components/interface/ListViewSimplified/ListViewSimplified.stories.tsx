@@ -19,6 +19,7 @@ import { ToggleMenu } from '../ToggleMenu'
 import { VerticalThreeDots, AvatarSmall, AvatarLarge } from '../../icons'
 import { LinkButton, PrimaryButton } from '../../buttons'
 import { Pill } from '../Pill'
+import styled from 'styled-components'
 
 const Template: Story = ({ children, ...args }) => {
   return <ListViewSimplified {...args}>{children}</ListViewSimplified>
@@ -65,12 +66,28 @@ const button = (
 
 const pill = <Pill label="Active" type="active" />
 
+const TopAlignedLabel = styled.span`
+  align-self: start;
+  padding-top: 8px;
+`
+
+const TopAlignedActions = styled.div`
+  align-self: start;
+  display: flex;
+  gap: 8px;
+`
+
 export const Default = Template.bind({})
 Default.args = {
   bottomBorder: true,
   children: (
     <>
       <ListViewItemSimplified label={linkLabel(1)} value="Value 1" />
+      <ListViewItemSimplified
+        label="A very long label to show what happens when text overflows. A very long label to show what happens when text overflows"
+        value="A very long value to show what happens when text overflows"
+        actions={linkButton}
+      />
       <ListViewItemSimplified
         label="A very long label to show what happens when text overflows"
         value="A very long value to show what happens when text overflows"
@@ -91,14 +108,15 @@ Default.args = {
         value="Value 4"
         actions={toggleMenu}
       />
+      <ListViewItemSimplified label="Label 4" actions={toggleMenu} />
       <ListViewItemSimplified
-        label="Label 5"
+        label={<TopAlignedLabel>Label 5</TopAlignedLabel>}
         value={<AvatarLarge />}
         actions={
-          <>
+          <TopAlignedActions>
             {linkButton}
             {toggleMenu}
-          </>
+          </TopAlignedActions>
         }
       />
     </>
@@ -149,6 +167,21 @@ WithAvatar.args = {
         value="Value 5"
         actions={toggleMenu}
       />
+    </>
+  )
+}
+export const PlainList = Template.bind({})
+PlainList.args = {
+  children: (
+    <>
+      <ListViewItemSimplified label="Name of user" actions={linkButton} />
+      <ListViewItemSimplified
+        label="A very long label to show what happens when text overflows"
+        actions={linkButton}
+      />
+      <ListViewItemSimplified label="Name of user" actions={toggleMenu} />
+      <ListViewItemSimplified label="Name of user" actions={linkButton} />
+      <ListViewItemSimplified label="Name of user" actions={toggleMenu} />
     </>
   )
 }
