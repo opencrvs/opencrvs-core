@@ -145,6 +145,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     return (
       <ActionPageLight
         goBack={this.props.goBack}
+        hideBackground
         title={intl.formatMessage(messages.certificateCollectionTitle)}
       >
         <IDVerifier

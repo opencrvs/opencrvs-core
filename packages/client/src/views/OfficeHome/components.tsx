@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from '@client/styledComponents'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
-import { STATUSTOCOLOR } from '@client/views/Home/RecordAudit'
+import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { Duplicate, StatusFailed } from '@opencrvs/components/lib/icons'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
@@ -22,20 +22,19 @@ import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 
 const Flex = styled.div`
   display: flex;
-  gap: 16px;
+  align-items: center;
+  gap: 8px;
 `
 
-const Name = styled.div`
-  color: ${({ theme }) => theme.colors.primary};
-  ${({ theme }) => theme.fonts.bold16}
-  margin-right: 8px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`
-
-const Error = styled.span`
+export const NoNameContainer = styled.span`
   color: ${({ theme }) => theme.colors.negative};
+  cursor: pointer;
+  padding: 0 8px;
+  &:hover {
+    color: ${({ theme }) => theme.colors.negative};
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+  }
 `
 
 const Event = styled.div`
@@ -55,20 +54,23 @@ const Icon = styled.div`
 `
 interface IIconWith {
   status?: string
-  name?: string
+  name: React.ReactNode
   event?: string
   isDuplicate?: boolean
   isValidatedOnReview?: boolean
+  isArchived?: boolean
 }
 
 const IconComp = ({
   status,
   isDuplicateIcon,
-  isValidatedOnReview
+  isValidatedOnReview,
+  isArchived
 }: {
   status: string
   isDuplicateIcon?: boolean
   isValidatedOnReview?: boolean
+  isArchived?: boolean
 }) => {
   return (
     <Icon>
@@ -78,6 +80,7 @@ const IconComp = ({
         <DeclarationIcon
           color={STATUSTOCOLOR[status]}
           isValidatedOnReview={isValidatedOnReview}
+          isArchive={isArchived}
         />
       )}
     </Icon>
@@ -88,7 +91,8 @@ export const IconWithName = ({
   status,
   name,
   isDuplicate,
-  isValidatedOnReview
+  isValidatedOnReview,
+  isArchived
 }: IIconWith) => {
   return (
     <Flex id="flex">
@@ -97,9 +101,10 @@ export const IconWithName = ({
           status={status}
           isDuplicateIcon={isDuplicate}
           isValidatedOnReview={isValidatedOnReview}
+          isArchived={isArchived}
         />
       )}
-      {name ? <Name id="name">{name}</Name> : <Error>No name provided</Error>}
+      {name}
     </Flex>
   )
 }
@@ -109,7 +114,8 @@ export const IconWithNameEvent = ({
   name,
   event,
   isDuplicate,
-  isValidatedOnReview
+  isValidatedOnReview,
+  isArchived
 }: IIconWith) => {
   return (
     <Flex id="flex">
@@ -118,10 +124,11 @@ export const IconWithNameEvent = ({
           status={status}
           isDuplicateIcon={isDuplicate}
           isValidatedOnReview={isValidatedOnReview}
+          isArchived={isArchived}
         />
       )}
       <NameEventContainer id="nameEvent">
-        {name ? <Name>{name}</Name> : <Error>No name provided</Error>}
+        {name}
         {event && <Event>{event}</Event>}
       </NameEventContainer>
     </Flex>

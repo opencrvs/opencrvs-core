@@ -15,6 +15,7 @@ import * as fetchMock from 'jest-fetch-mock'
 import * as mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
+import * as fhirService from '@config/services/fhirService'
 
 const token = jwt.sign(
   { scope: ['natlsysadmin', 'demo'] },
@@ -80,6 +81,52 @@ const deathMockFormDraft = {
   __v: 0
 }
 
+const taskBundleMock = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl: 'urn:uuid:104ad8fd-e7b8-4e3e-8193-abc2c473f2c9',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        focus: {
+          reference: 'Composition/95035079-ec2c-451c-b514-664e838e8a5b'
+        },
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'birth-registration'
+            }
+          ]
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/paper-form-id',
+            value: '12345678'
+          },
+          {
+            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+            value: 'B5WGYJE'
+          }
+        ],
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'MOTHER'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/configuration',
+            valueReference: { reference: 'IN_CONFIGURATION' }
+          }
+        ],
+        id: '104ad8fd-e7b8-4e3e-8193-abc2c473f2c9'
+      }
+    }
+  ]
+}
+
 describe('modifyDraftStatusHandler test', () => {
   let server: any
 
@@ -134,6 +181,85 @@ describe('modifyDraftStatusHandler test', () => {
       payload: {
         event: 'death',
         status: 'IN_PREVIEW'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(400)
+  })
+
+  it('should delete all elastic and influx and fhir data', async () => {
+    const birthMockForDeletedOperation = {
+      ...birthUpdatedMockFormDraft,
+      status: 'IN_PREVIEW'
+    }
+    const birthMockFormDraft = {
+      ...birthUpdatedMockFormDraft,
+      status: 'IN_PREVIEW'
+    }
+    mockingoose(FormDraft).toReturn(birthMockForDeletedOperation, 'findOne')
+    mockingoose(FormDraft).toReturn(birthMockFormDraft, 'updateOne')
+    fetch.mockResponse(
+      JSON.stringify([
+        {
+          status: 'ok'
+        },
+
+        {
+          status: 'ok'
+        }
+      ])
+    )
+    // @ts-ignore
+    jest.spyOn(fhirService, 'fetchFHIR').mockReturnValue(taskBundleMock)
+    // @ts-ignore
+    jest.spyOn(fhirService, 'deleteFHIR').mockReturnValue({ status: 'ok' })
+
+    const res = await server.server.inject({
+      method: 'PUT',
+      url: '/formDraftStatus',
+      payload: {
+        event: 'death',
+        status: 'DRAFT'
+      },
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(201)
+  })
+
+  it('should return error if any task has no configuration extension while update FormDraft to DELETE ', async () => {
+    const birthMockFormDraft = {
+      ...birthUpdatedMockFormDraft,
+      status: 'DELETED'
+    }
+    mockingoose(FormDraft).toReturn(birthUpdatedMockFormDraft, 'findOne')
+    mockingoose(FormDraft).toReturn(birthMockFormDraft, 'updateOne')
+    fetch.mockResponse(
+      JSON.stringify([
+        {
+          status: 'ok'
+        },
+
+        {
+          status: 'ok'
+        }
+      ])
+    )
+    delete taskBundleMock.entry[0].resource.extension[1]
+    // @ts-ignore
+    jest.spyOn(fhirService, 'fetchFHIR').mockReturnValue(taskBundleMock)
+    // @ts-ignore
+    jest.spyOn(fhirService, 'deleteFHIR').mockReturnValue({ status: 'ok' })
+
+    const res = await server.server.inject({
+      method: 'PUT',
+      url: '/formDraftStatus',
+      payload: {
+        event: 'death',
+        status: 'DELETED'
       },
       headers: {
         Authorization: `Bearer ${token}`

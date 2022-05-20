@@ -440,7 +440,7 @@ describe('OfficeHome sent for update tab related tests', () => {
       { store, history, graphqlMocks: graphqlMock }
     )
 
-    const element = await waitForElement(testComponent, '#row_0')
+    const element = await waitForElement(testComponent, '#name_0')
     element.hostNodes().simulate('click')
 
     await new Promise((resolve) => {
@@ -706,7 +706,7 @@ describe('Tablet tests', () => {
       { store, history }
     )
 
-    const element = await waitForElement(testComponent, '#row_0')
+    const element = await waitForElement(testComponent, '#name_0')
     element.hostNodes().simulate('click')
 
     await new Promise((resolve) => {

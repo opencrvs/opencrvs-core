@@ -13,13 +13,13 @@ import * as React from 'react'
 import { Hamburger } from '../../../icons/Hamburger'
 import styled from 'styled-components'
 import { CircleButton } from '../../../buttons'
+import { IDomProps } from '../AppHeader'
 
 interface IMenuAction {
   icon: () => React.ReactNode
   handler: () => void
 }
 export interface IMobileHeaderProps {
-  id?: string
   mobileLeft?: IMenuAction
   title: string
   mobileBody?: JSX.Element
@@ -86,11 +86,11 @@ const EndComponentContainer = styled.div`
     padding: 0;
   }
 `
-class MobileHeader extends React.Component<IMobileHeaderProps> {
+class MobileHeader extends React.Component<IMobileHeaderProps & IDomProps> {
   render() {
     const { id, mobileLeft, mobileRight, title, mobileBody } = this.props
     return (
-      <HeaderContainer id={id}>
+      <HeaderContainer id={id} className={this.props.className}>
         {mobileLeft && (
           <EndComponentContainer>
             <CircleButton
