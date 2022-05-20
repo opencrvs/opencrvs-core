@@ -16,6 +16,7 @@ interface IButtonsMessages
   archive: MessageDescriptor
   back: MessageDescriptor
   apply: MessageDescriptor
+  assign: MessageDescriptor
   cancel: MessageDescriptor
   change: MessageDescriptor
   confirm: MessageDescriptor
@@ -56,6 +57,7 @@ interface IButtonsMessages
   settings: MessageDescriptor
   start: MessageDescriptor
   status: MessageDescriptor
+  unassign: MessageDescriptor
   update: MessageDescriptor
   upload: MessageDescriptor
   verify: MessageDescriptor
@@ -80,6 +82,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Apply',
     description: 'Apply button label',
     id: 'buttons.apply'
+  },
+  assign: {
+    defaultMessage: 'Assign',
+    description: 'Assign button label',
+    id: 'buttons.assign'
   },
   back: {
     defaultMessage: 'Back',
@@ -290,6 +297,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Status',
     description: 'Label of status button',
     id: 'buttons.status'
+  },
+  unassign: {
+    defaultMessage: 'Unassign',
+    description: 'Unassign button label',
+    id: 'buttons.unassign'
   },
   update: {
     defaultMessage: 'Update',

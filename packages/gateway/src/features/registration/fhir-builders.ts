@@ -3610,7 +3610,10 @@ export function addOrUpdateExtension(
   return fhirBundle
 }
 
-export async function checkUserAssignment(id: string, authHeader: IAuthHeader) {
+export async function checkUserAssignment(
+  id: string,
+  authHeader: IAuthHeader
+): Promise<boolean> {
   if (!authHeader || !authHeader.Authorization) {
     return false
   }
@@ -3636,10 +3639,7 @@ export async function checkUserAssignment(id: string, authHeader: IAuthHeader) {
     return false
   }
   const practitionerId =
-    assignedExtensionData &&
-    assignedExtensionData.valueReference &&
-    assignedExtensionData.valueReference.reference &&
-    assignedExtensionData.valueReference.reference.split('/')[1]
+    assignedExtensionData?.valueReference?.reference?.split('/')[1]
 
   const userDetails = await getUser({ userId }, authHeader)
 

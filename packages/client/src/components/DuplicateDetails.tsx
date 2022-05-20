@@ -12,8 +12,7 @@
 import {
   downloadDeclaration,
   DOWNLOAD_STATUS,
-  IDeclaration,
-  makeDeclarationReadyToDownload
+  IDeclaration
 } from '@client/declarations'
 import {
   constantsMessages,
@@ -185,12 +184,12 @@ class DuplicateDetailsClass extends React.Component<
     compositionId: string,
     action: Action
   ) => {
-    const downloadableDeclaration = makeDeclarationReadyToDownload(
+    this.props.downloadDeclaration(
       event.toLowerCase() as Event,
       compositionId,
-      action
+      action,
+      this.props.client
     )
-    this.props.downloadDeclaration(downloadableDeclaration, this.props.client)
   }
 
   downloadAndReview = () => {

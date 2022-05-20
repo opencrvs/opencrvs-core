@@ -55,8 +55,8 @@ import {
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -134,44 +134,22 @@ class ReadyForReviewComponent extends React.Component<
       return []
     }
     const transformedData = transformData(data, this.props.intl)
-    const items = transformedData.map((reg, index) => {
+    const items: IDynamicValues[] = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
-      const downloadStatus =
-        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+      const downloadStatus = foundDeclaration?.downloadStatus
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
-      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-          actions.push({
-            label: this.props.intl.formatMessage(constantsMessages.review),
-            handler: () => {},
-            disabled: true
-          })
-        }
+      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
         actions.push({
-          actionComponent: (
-            <DownloadButton
-              downloadConfigs={{
-                event: reg.event,
-                compositionId: reg.id,
-                action: Action.LOAD_REVIEW_DECLARATION
-              }}
-              key={`DownloadButton-${index}`}
-              status={downloadStatus as DOWNLOAD_STATUS}
-            />
-          )
-        })
-      } else {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-          actions.push({
-            label: this.props.intl.formatMessage(constantsMessages.review),
-            handler: (
-              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-            ) => {
-              e && e.stopPropagation()
+          label: this.props.intl.formatMessage(constantsMessages.review),
+          handler: (
+            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+          ) => {
+            e && e.stopPropagation()
+            if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
               isDuplicate
                 ? this.props.goToReviewDuplicate(reg.id)
                 : this.props.goToPage(
@@ -181,12 +159,26 @@ class ReadyForReviewComponent extends React.Component<
                     reg.event ? reg.event.toLowerCase() : ''
                   )
             }
-          })
-        }
-        actions.push({
-          actionComponent: <Downloaded />
+          },
+          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
         })
       }
+
+      actions.push({
+        actionComponent: (
+          <DownloadButton
+            downloadConfigs={{
+              event: reg.event,
+              compositionId: reg.id,
+              action: Action.LOAD_REVIEW_DECLARATION,
+              assignment: reg.assignment
+            }}
+            key={`DownloadButton-${index}`}
+            status={downloadStatus}
+          />
+        )
+      })
+
       const event =
         (reg.event &&
           intl.formatMessage(

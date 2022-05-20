@@ -58,7 +58,8 @@ import {
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
-  GQLHumanName
+  GQLHumanName,
+  GQLAssignmentData
 } from '@opencrvs/gateway/src/graphql/schema'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData, ILocation } from '@client/offline/reducer'
@@ -108,7 +109,8 @@ import {
   IForm,
   IFormSection,
   IFormSectionGroup,
-  IFormField
+  IFormField,
+  Event
 } from '@client/forms'
 import {
   constantsMessages,
@@ -332,6 +334,7 @@ interface IDeclarationData {
   informant?: string
   informantContact?: string
   brnDrn?: string
+  assignment?: GQLAssignmentData
 }
 
 interface IGQLDeclaration {
@@ -342,6 +345,7 @@ interface IGQLDeclaration {
     trackingId: string
     type: string
     status: { type: string }[]
+    assignment?: GQLAssignmentData
   }
 }
 
@@ -568,7 +572,8 @@ const getWQDeclarationData = (
     trackingId: trackingId,
     dateOfBirth: '',
     placeOfBirth: '',
-    informant: ''
+    informant: '',
+    assignment: workqueueDeclaration?.registration?.assignment
   }
 }
 
@@ -588,6 +593,7 @@ const getGQLDeclaration = (
     type: data?.registration?.type,
     status: data?.registration?.status[0].type,
     trackingId: data?.registration?.trackingId,
+    assignment: data?.registration?.assignment,
     dateOfBirth: '',
     placeOfBirth: '',
     informant: ''
@@ -803,9 +809,10 @@ const showDownloadButton = (
     downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
   ) {
     const downLoadConfig = {
-      event: type as string,
+      event: type as Event,
       compositionId: id,
-      action: Action.LOAD_REVIEW_DECLARATION
+      action: Action.LOAD_REVIEW_DECLARATION,
+      assignment: declaration?.assignment
     }
     return (
       <DownloadButton

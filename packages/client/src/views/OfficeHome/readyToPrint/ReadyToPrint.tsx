@@ -182,47 +182,38 @@ class ReadyToPrintComponent extends React.Component<
         (declaration) => declaration.id === reg.id
       )
       const actions: IAction[] = []
-      const downloadStatus =
-        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+      const downloadStatus = foundDeclaration?.downloadStatus
 
-      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-          actions.push({
-            label: this.props.intl.formatMessage(buttonMessages.print),
-            handler: () => {},
-            disabled: true
-          })
-        }
+      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
         actions.push({
-          actionComponent: (
-            <DownloadButton
-              downloadConfigs={{
-                event: reg.event,
-                compositionId: reg.id,
-                action: Action.LOAD_REVIEW_DECLARATION
-              }}
-              key={`DownloadButton-${index}`}
-              status={downloadStatus as DOWNLOAD_STATUS}
-            />
-          )
-        })
-      } else {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-          actions.push({
-            label: this.props.intl.formatMessage(buttonMessages.print),
-            handler: (
-              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-            ) => {
-              e && e.stopPropagation()
+          label: this.props.intl.formatMessage(buttonMessages.print),
+          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED,
+          handler: (
+            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+          ) => {
+            e && e.stopPropagation()
+            if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
               this.props.goToPrintCertificate(
                 reg.id,
                 reg.event.toLocaleLowerCase() || ''
               )
             }
-          })
-        }
-        actions.push({ actionComponent: <Downloaded /> })
+          }
+        })
       }
+      actions.push({
+        actionComponent: (
+          <DownloadButton
+            downloadConfigs={{
+              event: reg.event,
+              compositionId: reg.id,
+              action: Action.LOAD_REVIEW_DECLARATION
+            }}
+            key={`DownloadButton-${index}`}
+            status={downloadStatus}
+          />
+        )
+      })
       const event =
         (reg.event &&
           intl.formatMessage(

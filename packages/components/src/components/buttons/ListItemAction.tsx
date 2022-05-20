@@ -64,7 +64,7 @@ const ArrowExpansionSecion = styled(ArrowExpansionButton)<{
   ${({ isFullHeight }) => isFullHeight && ` height: 100%;`}
 `
 const ActionButtonContainer = styled.div`
-  width: 36px;
+  width: 40px;
   display: flex;
 `
 

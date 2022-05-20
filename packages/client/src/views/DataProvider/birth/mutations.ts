@@ -96,6 +96,12 @@ export const COLLECT_BIRTH_CERTIFICATE = gql`
   }
 `
 
+export const MARK_EVENT_UNASSIGNED = gql`
+  mutation submitMutation($id: String!) {
+    markEventAsUnassigned(id: $id)
+  }
+`
+
 export function getBirthMutationMappings(
   action: Action,
   payload?: any,
