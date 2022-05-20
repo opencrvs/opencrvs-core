@@ -18,6 +18,8 @@ env:
   CYPRESS_CLIENT_URL: http://localhost:3000/
   CYPRESS_AUTH_URL: http://localhost:4040/
   CYPRESS_GATEWAY_URL: http://localhost:7070/
+  LANGUAGES: 'en,fr'
+  QA_ENV: true
 jobs:
   test:
     timeout-minutes: 120 # 2 hours
@@ -39,13 +41,21 @@ jobs:
         run: yes | bash ./setup.sh
       - name: Run stack
         run: |
-          LANGUAGES=en,fr && yarn start:prod &
+          NODE_ENV=production yarn start:prod &
           bash setup-scripts/setup-countryconfig.sh $(pwd) &
           wait-on -l tcp:3040
       - name: Run E2E tests
+        continue-on-error: true
         run: |
           cd ../opencrvs-farajaland
           rm -rf .git
           cp -r ../opencrvs-core/.git .git
           npm install -g cypress
           cypress run --headless --browser chrome --record --key e0fc7a26-f292-4e48-9716-2009137fe646 --spec cypress/integration/certificate.spec.ts
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
+        with:
+          ## limits ssh access and adds the ssh public key for the user which triggered the workflow
+          limit-access-to-actor: true
+          ## limits ssh access and adds the ssh public keys of the listed GitHub users
+          limit-access-to-users: rikukissa
