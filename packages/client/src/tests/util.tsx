@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { App } from '@client/App'
-import { Event, ISerializedForm } from '@client/forms'
+import { Event } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -32,7 +32,6 @@ import {
 } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import { readFileSync } from 'fs'
-import { join } from 'path'
 import { graphql, print } from 'graphql'
 import * as jwt from 'jsonwebtoken'
 import * as React from 'react'
@@ -43,16 +42,10 @@ import { Provider } from 'react-redux'
 import { AnyAction, Store } from 'redux'
 import { waitForElement } from './wait-for-element'
 import { setUserDetails } from '@client/profile/profileActions'
-import {
-  createBrowserHistory,
-  createLocation,
-  createMemoryHistory,
-  History
-} from 'history'
+import { createLocation, createMemoryHistory, History } from 'history'
 import { stringify } from 'query-string'
 import { match as Match } from 'react-router'
 import { ConnectedRouter } from 'connected-react-router'
-import { IVerifyIDCertificateCollectorDefinition } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 import { mockOfflineData } from './mock-offline-data'
 
 export const registerScopeToken =
@@ -1456,7 +1449,8 @@ export const mockUserResponse = {
             __typename: 'HumanName'
           }
         ]
-      }
+      },
+      role: 'LOCAL_REGISTRAR'
     }
   }
 }
@@ -1897,25 +1891,25 @@ export const mockFetchCertificatesTemplatesDefinition = [
 
 export const mockConfigResponse = {
   config: mockOfflineData.config,
-  certificates: mockFetchCertificatesTemplatesDefinition
+  certificates: mockFetchCertificatesTemplatesDefinition,
+  formConfig: mockOfflineData.formConfig
+}
+
+export const mockOfflineDataDispatch = {
+  languages: mockOfflineData.languages,
+  templates: mockOfflineData.templates,
+  locations: mockOfflineData.locations,
+  facilities: mockOfflineData.facilities,
+  pilotLocations: mockOfflineData.pilotLocations,
+  offices: mockOfflineData.offices,
+  assets: mockOfflineData.assets,
+  config: mockOfflineData.config,
+  formConfig: mockOfflineData.formConfig
 }
 
 export async function createTestStore() {
   const { store, history } = createStore()
-  await store.dispatch(
-    offlineDataReady({
-      languages: mockOfflineData.languages,
-      forms: mockOfflineData.forms,
-      templates: mockOfflineData.templates,
-      locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities,
-      pilotLocations: mockOfflineData.pilotLocations,
-      offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets,
-      config: mockOfflineData.config,
-      formConfig: mockOfflineData.formConfig
-    })
-  )
+  await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   return { store, history }
 }
 
@@ -1934,20 +1928,7 @@ export async function createTestComponent(
   },
   options?: MountRendererProps
 ) {
-  await store.dispatch(
-    offlineDataReady({
-      languages: mockOfflineData.languages,
-      forms: mockOfflineData.forms,
-      templates: mockOfflineData.templates,
-      locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities,
-      pilotLocations: mockOfflineData.pilotLocations,
-      offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets,
-      config: mockOfflineData.config,
-      formConfig: mockOfflineData.formConfig
-    })
-  )
+  await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
 
   const withGraphQL = (node: JSX.Element) => {
     if (apolloClient) {

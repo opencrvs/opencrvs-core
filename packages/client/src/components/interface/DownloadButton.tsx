@@ -39,8 +39,14 @@ import { ROLE_LOCAL_REGISTRAR } from '@client/utils/constants'
 import { Dispatch } from 'redux'
 import ApolloClient from 'apollo-client'
 import { useIntl, IntlShape, MessageDescriptor } from 'react-intl'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
+import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
+import {
+  withOnlineStatus,
+  IOnlineStatusProps
+} from '@client/views/OfficeHome/LoadingIndicator'
+import ReactTooltip from 'react-tooltip'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -175,6 +181,13 @@ function getAssignModalOptions(
     }
   }
 }
+const NoConnectionViewContainer = styled.div`
+  .no-connection {
+    ::after {
+      display: none;
+    }
+  }
+`
 
 function renderModalAction(action: IModalAction, intl: IntlShape): JSX.Element {
   let Button
@@ -190,7 +203,9 @@ function renderModalAction(action: IModalAction, intl: IntlShape): JSX.Element {
   )
 }
 
-function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
+function DownloadButtonComponent(
+  props: DownloadButtonProps & HOCProps & IOnlineStatusProps
+) {
   const intl = useIntl()
   const LOADING_STATUSES = useMemo(function () {
     return [
@@ -209,7 +224,8 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     downloadDeclaration,
     userRole,
     userId,
-    unassignDeclaration
+    unassignDeclaration,
+    isOnline
   } = props
   const { assignment, compositionId } = downloadConfigs
   const [assignModal, setAssignModal] = useState<AssignModalOptions | null>(
@@ -270,6 +286,23 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       >
         <Spinner id={`action-loading-${id}`} size={24} />
       </StatusIndicator>
+    )
+  }
+
+  if (!isOnline) {
+    return (
+      <NoConnectionViewContainer>
+        <div
+          data-tip
+          data-for={`${id}_noConnection`}
+          data-class="no-connection"
+        >
+          <ConnectionError id={`${id}_noConnection`} key={id} />
+        </div>
+        <ReactTooltip id={`${id}_noConnection`} place="top" effect="solid">
+          {intl.formatMessage(constantsMessages.noConnection)}
+        </ReactTooltip>
+      </NoConnectionViewContainer>
     )
   }
 
@@ -336,4 +369,4 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchProps => ({
 export const DownloadButton = connect(
   mapStateToProps,
   mapDispatchToProps
-)(withApollo(DownloadButtonComponent))
+)(withApollo(withOnlineStatus(DownloadButtonComponent)))

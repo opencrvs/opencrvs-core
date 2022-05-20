@@ -19,7 +19,7 @@ import {
 import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
 
 export const SUBMIT_BIRTH_DECLARATION = gql`
-  mutation submitMutation($details: BirthRegistrationInput!) {
+  mutation createBirthRegistration($details: BirthRegistrationInput!) {
     createBirthRegistration(details: $details) {
       trackingId
       compositionId
@@ -27,12 +27,12 @@ export const SUBMIT_BIRTH_DECLARATION = gql`
   }
 `
 export const APPROVE_BIRTH_DECLARATION = gql`
-  mutation submitMutation($id: ID!, $details: BirthRegistrationInput!) {
+  mutation markBirthAsValidated($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsValidated(id: $id, details: $details)
   }
 `
 export const REGISTER_BIRTH_DECLARATION = gql`
-  mutation submitMutation($id: ID!, $details: BirthRegistrationInput!) {
+  mutation markBirthAsRegistered($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsRegistered(id: $id, details: $details) {
       id
       registration {
@@ -72,12 +72,16 @@ export const REGISTER_BIRTH_DECLARATION = gql`
   }
 `
 export const REJECT_BIRTH_DECLARATION = gql`
-  mutation submitMutation($id: String!, $reason: String!, $comment: String!) {
+  mutation markEventAsVoided(
+    $id: String!
+    $reason: String!
+    $comment: String!
+  ) {
     markEventAsVoided(id: $id, reason: $reason, comment: $comment)
   }
 `
 export const REINSTATE_BIRTH_DECLARATION = gql`
-  mutation submitMutation($id: String!) {
+  mutation markEventAsReinstated($id: String!) {
     markEventAsReinstated(id: $id) {
       taskEntryResourceID
       registrationStatus
@@ -85,13 +89,13 @@ export const REINSTATE_BIRTH_DECLARATION = gql`
   }
 `
 export const ARCHIVE_BIRTH_DECLARATION = gql`
-  mutation submitMutation($id: String!) {
+  mutation markEventAsArchived($id: String!) {
     markEventAsArchived(id: $id)
   }
 `
 
 export const COLLECT_BIRTH_CERTIFICATE = gql`
-  mutation submitMutation($id: ID!, $details: BirthRegistrationInput!) {
+  mutation markBirthAsCertified($id: ID!, $details: BirthRegistrationInput!) {
     markBirthAsCertified(id: $id, details: $details)
   }
 `

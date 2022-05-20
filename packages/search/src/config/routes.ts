@@ -23,6 +23,7 @@ import {
   assignEventHandler,
   unassignEventHandler
 } from '@search/features/registration/assignment/handler'
+import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -30,6 +31,7 @@ const enum RouteScope {
   REGISTER = 'register',
   SYSADMIN = 'sysadmin',
   CERTIFY = 'certify',
+  NATLSYSADMIN = 'natlsysadmin',
   PERFORMANCE = 'performance'
 }
 
@@ -181,6 +183,18 @@ export const getRoutes = () => {
         },
         description:
           'Populates hierarchical location ids for the legacy indexes'
+      }
+    },
+    {
+      method: 'DELETE',
+      path: '/elasticIndex',
+      handler: deleteOCRVSIndexHandler,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        description: 'Delete ocrvs index from elasticsearch'
       }
     }
   ]

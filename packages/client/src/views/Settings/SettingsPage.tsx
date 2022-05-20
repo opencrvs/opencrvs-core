@@ -44,6 +44,7 @@ import {
   constantsMessages
 } from '@client/i18n/messages'
 import { modifyUserDetails as modifyUserDetailsAction } from '@client/profile/profileActions'
+import { changeLanguage as changeLanguageAction } from '@client/i18n/actions'
 import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
 import { IntlState } from '@client/i18n/reducer'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
@@ -92,6 +93,7 @@ type IProps = IntlShapeProps &
     languages: IntlState['languages']
     userDetails: IUserDetails | null
     modifyUserDetails: typeof modifyUserDetailsAction
+    changeLanguage: typeof changeLanguageAction
     goToPhoneSettingAction: typeof goToPhoneSettings
   }
 
@@ -101,6 +103,14 @@ enum NOTIFICATION_SUBJECT {
   AVATAR,
   PHONE
 }
+
+const TopAlignedListViewItemSimplified = styled(ListViewItemSimplified)`
+  align-items: start;
+  padding: 16px 0;
+`
+const DynamicHeightLinkButton = styled(LinkButton)`
+  height: auto;
+`
 
 interface IState {
   showLanguageSettings: boolean
@@ -188,10 +198,7 @@ class SettingsView extends React.Component<IProps, IState> {
 
   changeLanguage = () => {
     if (this.props.userDetails) {
-      this.props.modifyUserDetails({
-        ...this.props.userDetails,
-        language: this.state.selectedLanguage
-      })
+      this.props.changeLanguage({ language: this.state.selectedLanguage })
       this.toggleLanguageSettingsModal()
       this.toggleSuccessNotification(NOTIFICATION_SUBJECT.LANGUAGE)
     }
@@ -230,7 +237,6 @@ class SettingsView extends React.Component<IProps, IState> {
 
   render() {
     const { userDetails, intl, languages, goToPhoneSettingAction } = this.props
-
     const langChoice = [] as ILanguageOptions[]
     const availableLangs = getAvailableLanguages()
     availableLangs.forEach((lang: string) => {
@@ -321,7 +327,10 @@ class SettingsView extends React.Component<IProps, IState> {
         <Header title={intl.formatMessage(messages.settingsTitle)} />
         <Navigation />
         <BodyContainer>
-          <Content title={intl.formatMessage(messages.settingsTitle)}>
+          <Content
+            title={intl.formatMessage(messages.settingsTitle)}
+            showTitleOnMobile={true}
+          >
             <ListViewSimplified>
               {items.map((item) => {
                 return (
@@ -330,19 +339,19 @@ class SettingsView extends React.Component<IProps, IState> {
                     label={<LabelContainer>{item.label}</LabelContainer>}
                     value={<ValueContainer>{item.value}</ValueContainer>}
                     actions={
-                      <LinkButton
+                      <DynamicHeightLinkButton
                         id={item.action.id}
                         onClick={item.action.handler}
                         disabled={item.action.disabled}
                       >
                         {item.action.label}
-                      </LinkButton>
+                      </DynamicHeightLinkButton>
                     }
                   />
                 )
               })}
               {/* For Profile Image */}
-              <ListViewItemSimplified
+              <TopAlignedListViewItemSimplified
                 label={
                   <LabelContainer>
                     {intl.formatMessage(messages.profileImage)}
@@ -361,9 +370,9 @@ class SettingsView extends React.Component<IProps, IState> {
                       this.setState({ imageLoadingError })
                     }
                   >
-                    <LinkButton>
+                    <DynamicHeightLinkButton>
                       {intl.formatMessage(buttonMessages.change)}
-                    </LinkButton>
+                    </DynamicHeightLinkButton>
                   </ImageLoader>
                 }
               />
@@ -481,6 +490,7 @@ export const SettingsPage = connect(
   }),
   {
     modifyUserDetails: modifyUserDetailsAction,
+    changeLanguage: changeLanguageAction,
     goToPhoneSettingAction: goToPhoneSettings
   }
 )(injectIntl(SettingsView))

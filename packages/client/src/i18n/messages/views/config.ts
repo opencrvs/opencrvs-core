@@ -10,8 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
-import { Message } from 'typescript-react-intl'
-import { Description } from '@client/views/SysAdmin/Performance/utils'
 
 interface IConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
@@ -23,7 +21,6 @@ interface IConfigMessages
   govtLogoFileLimitError: MessageDescriptor
   applicationConfigChangeError: MessageDescriptor
   certificateConfiguration: MessageDescriptor
-  previewTemplate: MessageDescriptor
   printTemplate: MessageDescriptor
   downloadTemplate: MessageDescriptor
   uploadTemplate: MessageDescriptor
@@ -130,11 +127,6 @@ const messagesToDefine: IConfigMessages = {
     id: 'config.certificateConfiguration',
     defaultMessage: 'Certificate configuration',
     description: 'Link Text for Config Declaration Settings'
-  },
-  previewTemplate: {
-    id: 'config.previewTemplate',
-    defaultMessage: 'Preview',
-    description: 'Preview action in certificate config action menu'
   },
   printTemplate: {
     id: 'config.printTemplate',

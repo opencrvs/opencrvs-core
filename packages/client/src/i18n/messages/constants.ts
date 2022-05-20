@@ -46,7 +46,9 @@ interface IConstantsMessages
   collected: MessageDescriptor
   collectedBy: MessageDescriptor
   comment: MessageDescriptor
-  configTitle: MessageDescriptor
+  certificateTitle: MessageDescriptor
+  applicationTitle: MessageDescriptor
+  formDeclarationTitle: MessageDescriptor
   customTimePeriod: MessageDescriptor
   dateOfDeclaration: MessageDescriptor
   death: MessageDescriptor
@@ -147,9 +149,9 @@ interface IConstantsMessages
   viewAll: MessageDescriptor
   notAvailable: MessageDescriptor
   history: MessageDescriptor
-  noResult: MessageDescriptor
   requireUpdatesLoading: MessageDescriptor
   noRecords: MessageDescriptor
+  noConnection: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -326,10 +328,20 @@ const messagesToDefine: IConstantsMessages = {
     description: 'Label for rejection comment',
     id: 'constants.comment'
   },
-  configTitle: {
-    defaultMessage: 'Configuration',
-    description: 'Config title',
-    id: 'constants.config'
+  certificateTitle: {
+    defaultMessage: 'Certificate',
+    description: 'Certificate title',
+    id: 'constants.certificate.title'
+  },
+  applicationTitle: {
+    defaultMessage: 'Application',
+    description: 'Application title',
+    id: 'constants.application.title'
+  },
+  formDeclarationTitle: {
+    defaultMessage: 'Declaration forms',
+    description: 'Form Declaration title',
+    id: 'constants.form.title'
   },
   customTimePeriod: {
     defaultMessage: 'Custom time period',
@@ -497,15 +509,10 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.noNameProvided'
   },
   noResults: {
-    defaultMessage: 'No result to display',
+    defaultMessage: 'No result',
     description:
       'Text to display if the search return no results for the current filters',
     id: 'constants.noResults'
-  },
-  noResult: {
-    defaultMessage: 'No result',
-    description: 'Text to display if the search return no results',
-    id: 'constants.noResult'
   },
   over5Years: {
     defaultMessage: 'Over 5 years',
@@ -851,6 +858,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'No records {tab}',
     description: 'No Application in{tab} tab in officeHome',
     id: 'constants.noRecords'
+  },
+  noConnection: {
+    defaultMessage: 'No connection',
+    description: 'No Connection hover text',
+    id: 'constants.noConnection'
   }
 }
 

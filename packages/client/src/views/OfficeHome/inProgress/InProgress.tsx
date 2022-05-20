@@ -31,7 +31,7 @@ import {
 } from '@client/declarations'
 import {
   goToPage as goToPageAction,
-  goToRegistrarHomeTab as goToRegistrarHomeTabAction,
+  goToHomeTab,
   goToDeclarationRecordAudit
 } from '@client/navigation'
 import {
@@ -67,14 +67,16 @@ import { FormTabs } from '@opencrvs/components/lib/forms'
 import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
 import {
   IconWithName,
-  IconWithNameEvent
+  IconWithNameEvent,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { constant } from 'lodash'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 interface IQueryData {
   inProgressData: GQLEventSearchResultSet
@@ -84,7 +86,7 @@ interface IQueryData {
 interface IBaseRegistrarHomeProps {
   theme: ITheme
   goToPage: typeof goToPageAction
-  goToRegistrarHomeTab: typeof goToRegistrarHomeTabAction
+  goToHomeTab: typeof goToHomeTab
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   selectorId: string
   drafts: IDeclaration[]
@@ -114,12 +116,6 @@ interface IProps {
 
 type IRegistrarHomeProps = IntlShapeProps & IBaseRegistrarHomeProps & IProps
 
-export const TAB_ID = {
-  inProgress: 'progress',
-  readyForReview: 'review',
-  sentForUpdates: 'updates',
-  readyForPrint: 'print'
-}
 export const SELECTOR_ID = {
   ownDrafts: 'you',
   fieldAgentDrafts: 'field-agents',
@@ -238,6 +234,26 @@ export class InProgressComponent extends React.Component<
           />
         )
       })
+      const NameComponent = name ? (
+        <LinkButton
+          id={`name_${index}`}
+          isBoldLink={true}
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('inProgressTab', regId)
+          }
+        >
+          {name}
+        </LinkButton>
+      ) : (
+        <NoNameContainer
+          id={`name_${index}`}
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('inProgressTab', regId)
+          }
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
 
       window.__localeId__ = locale
       return {
@@ -252,27 +268,20 @@ export class InProgressComponent extends React.Component<
         iconWithName: (
           <IconWithName
             status={reg.registration?.status || SUBMISSION_STATUS.DRAFT}
-            name={name}
+            name={NameComponent}
           />
         ),
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.registration?.status || SUBMISSION_STATUS.DRAFT}
-            name={name}
+            name={NameComponent}
             event={event}
           />
         ),
         dateOfEvent,
         notificationSent:
           (lastModificationDate && parseInt(lastModificationDate)) || '',
-        actions,
-        rowClickHandler: [
-          {
-            label: 'rowClickHandler',
-            handler: () =>
-              this.props.goToDeclarationRecordAudit('inProgressTab', regId)
-          }
-        ]
+        actions
       }
     })
     const sortedItems = getSortedItems(
@@ -309,7 +318,7 @@ export class InProgressComponent extends React.Component<
       this.props.drafts,
       this.props.paginationId.draftId
     )
-    const items = paginatedDrafts.map((draft: IDeclaration) => {
+    const items = paginatedDrafts.map((draft: IDeclaration, index) => {
       let pageRoute: string
       if (draft.event && draft.event.toString() === 'birth') {
         pageRoute = DRAFT_BIRTH_PARENT_FORM_PAGE
@@ -350,7 +359,26 @@ export class InProgressComponent extends React.Component<
           ? draft.data.child?.childBirthDate || ''
           : draft.data.deathEvent?.deathDate || ''
       const dateOfEvent = (eventTime && new Date(eventTime as string)) || ''
-
+      const NameComponent = name ? (
+        <LinkButton
+          id={`name_${index}`}
+          isBoldLink={true}
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('inProgressTab', draft.id)
+          }
+        >
+          {name}
+        </LinkButton>
+      ) : (
+        <NoNameContainer
+          id={`name_${index}`}
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('inProgressTab', draft.id)
+          }
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
       return {
         id: draft.id,
         event,
@@ -360,7 +388,7 @@ export class InProgressComponent extends React.Component<
             status={
               (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
             }
-            name={name}
+            name={NameComponent}
           />
         ),
         iconWithNameEvent: (
@@ -368,20 +396,13 @@ export class InProgressComponent extends React.Component<
             status={
               (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
             }
-            name={name}
+            name={NameComponent}
             event={event}
           />
         ),
         lastUpdated: lastModificationDate || '',
         dateOfEvent,
-        actions,
-        rowClickHandler: [
-          {
-            label: 'rowClickHandler',
-            handler: () =>
-              this.props.goToDeclarationRecordAudit('inProgressTab', draft.id)
-          }
-        ]
+        actions
       }
     })
     const sortedItems = getSortedItems(
@@ -478,7 +499,7 @@ export class InProgressComponent extends React.Component<
     const tabs = {
       activeTabId: selectorId || SELECTOR_ID.ownDrafts,
       onTabClick: (tabId: string) => {
-        this.props.goToRegistrarHomeTab(TAB_ID.inProgress, tabId)
+        this.props.goToHomeTab(WORKQUEUE_TABS.inProgress, tabId)
       },
       sections: [
         {
@@ -519,7 +540,6 @@ export class InProgressComponent extends React.Component<
       <GridTable
         content={this.transformRemoteDraftsContent(data)}
         columns={this.getColumns()}
-        clickable={true}
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
         sortedCol={this.state.sortedCol}
@@ -533,7 +553,6 @@ export class InProgressComponent extends React.Component<
       <GridTable
         content={this.transformRemoteDraftsContent(data)}
         columns={this.getColumns()}
-        clickable={true}
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
         sortedCol={this.state.sortedCol}
@@ -630,7 +649,6 @@ export class InProgressComponent extends React.Component<
           <GridTable
             content={this.transformDraftContent()}
             columns={this.getColumns()}
-            clickable={true}
             loading={isFieldAgent ? false : this.props.loading}
             sortedCol={this.state.sortedCol}
             sortOrder={this.state.sortOrder}
@@ -657,6 +675,6 @@ function mapStateToProps(state: IStoreState) {
 
 export const InProgress = connect(mapStateToProps, {
   goToPage: goToPageAction,
-  goToRegistrarHomeTab: goToRegistrarHomeTabAction,
+  goToHomeTab: goToHomeTab,
   goToDeclarationRecordAudit
 })(injectIntl(withTheme(InProgressComponent)))

@@ -9,8 +9,15 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  PrimaryButton,
+  SuccessButton,
+  DangerButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
 import { Check } from '@opencrvs/components/lib/icons'
+import { Content } from '@opencrvs/components/lib/interface/Content'
+
 import {
   ResponsiveModal,
   ActionPageLight
@@ -28,13 +35,12 @@ import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
-  goToRegistrarHomeTab as goToRegistrarHomeTabAction,
+  goToHomeTab,
   goBack,
   goToCertificateCorrection
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { TAB_ID } from '@client/views/OfficeHome/inProgress/InProgress'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -59,19 +65,7 @@ import {
 import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/forms/countries'
 import { PDFViewer } from '@opencrvs/components/lib/forms'
-
-export const ActionPageWrapper = styled.div`
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: ${({ theme }) => theme.colors.background};
-  z-index: 4;
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
-`
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const CustomTertiaryButton = styled(TertiaryButton)`
   height: 48px;
@@ -91,33 +85,12 @@ const ButtonWrapper = styled.div`
   }
 `
 const PdfWrapper = styled.div`
-  background: ${({ theme }) => theme.colors.grey100};
   display: flex;
+  margin-top: 24px;
+  margin-bottom: 56px;
   height: 100%;
-  padding-top: 48px;
-  padding-bottom: 48px;
   align-items: center;
   justify-content: center;
-  margin-bottom: 32px;
-`
-const Certificate = styled.img`
-  display: block;
-  ${({ theme }) => theme.shadows.light};
-  width: 64%;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-`
-
-const Info = styled.div`
-  ${({ theme }) => theme.fonts.reg16};
-  margin-bottom: 30px;
-  color: ${({ theme }) => theme.colors.grey500};
-  width: 80%;
-`
-const Title = styled.h4`
-  ${({ theme }) => theme.fonts.h2};
-  margin: 0 0 20px 0;
 `
 
 type State = {
@@ -135,7 +108,7 @@ type IProps = {
   goBack: typeof goBack
   modifyDeclaration: typeof modifyDeclaration
   writeDeclaration: typeof writeDeclaration
-  goToRegistrarHomeTabAction: typeof goToRegistrarHomeTabAction
+  goToHomeTab: typeof goToHomeTab
   storeDeclaration: typeof storeDeclaration
   goToCertificateCorrection: typeof goToCertificateCorrection
 }
@@ -240,7 +213,7 @@ class ReviewCertificateActionComponent extends React.Component<
     this.props.modifyDeclaration(draft)
     this.props.writeDeclaration(draft)
     this.toggleModal()
-    this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
+    this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
   }
 
   getTitle = () => {
@@ -272,7 +245,7 @@ class ReviewCertificateActionComponent extends React.Component<
     if (navigatedFromInsideApp) {
       this.props.goBack()
     } else {
-      this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
+      this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
     }
   }
 
@@ -282,39 +255,43 @@ class ReviewCertificateActionComponent extends React.Component<
     return (
       <ActionPageLight
         id="collector_form"
+        hideBackground
         title={intl.formatMessage(
           certificateMessages.certificateCollectionTitle
         )}
         goBack={this.goBack}
       >
-        <Title>{this.getTitle()}</Title>
-        <Info>{intl.formatMessage(certificateMessages.reviewDescription)}</Info>
-
+        <Content
+          title={this.getTitle()}
+          subtitle={intl.formatMessage(certificateMessages.reviewDescription)}
+        >
+          <ButtonWrapper>
+            <SuccessButton
+              align={0}
+              id="confirm-print"
+              onClick={this.toggleModal}
+              icon={() => <Check />}
+            >
+              {intl.formatMessage(certificateMessages.confirmAndPrint)}
+            </SuccessButton>
+            <DangerButton
+              onClick={() =>
+                this.props.goToCertificateCorrection(
+                  this.props.registrationId,
+                  CorrectionSection.Corrector
+                )
+              }
+            >
+              {intl.formatMessage(buttonMessages.editRecord)}
+            </DangerButton>
+          </ButtonWrapper>
+        </Content>
         {this.state.certificatePdf && (
           <PdfWrapper id="pdfwrapper">
             <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
           </PdfWrapper>
         )}
-        <ButtonWrapper>
-          <PrimaryButton
-            align={0}
-            id="confirm-print"
-            onClick={this.toggleModal}
-            icon={() => <Check />}
-          >
-            {intl.formatMessage(certificateMessages.confirmAndPrint)}
-          </PrimaryButton>
-          <CustomTertiaryButton
-            onClick={() =>
-              this.props.goToCertificateCorrection(
-                this.props.registrationId,
-                CorrectionSection.Corrector
-              )
-            }
-          >
-            {intl.formatMessage(buttonMessages.editRecord)}
-          </CustomTertiaryButton>
-        </ButtonWrapper>
+
         <ResponsiveModal
           id="confirm-print-modal"
           title={intl.formatMessage(certificateMessages.modalTitle)}
@@ -384,7 +361,7 @@ function mapStatetoProps(
 const mapDispatchToProps = {
   modifyDeclaration,
   writeDeclaration,
-  goToRegistrarHomeTabAction,
+  goToHomeTab,
   storeDeclaration,
   goBack,
   goToCertificateCorrection

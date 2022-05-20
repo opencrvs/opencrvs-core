@@ -14,15 +14,15 @@ import {
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLHumanName,
-  GQLRegStatus,
-  GQLEventSearchResultSet
+  GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IntlShape } from 'react-intl'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
+import { SearchEventsQuery } from '@client/utils/gateway'
 
 export const transformData = (
-  data: GQLEventSearchResultSet,
+  data: SearchEventsQuery['searchEvents'],
   intl: IntlShape
 ) => {
   const { locale } = intl

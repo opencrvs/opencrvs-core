@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as mongoose from 'mongoose'
-
 import { MONGO_URL } from '@config/config/constants'
 import { logger } from '@config/config/logger'
 

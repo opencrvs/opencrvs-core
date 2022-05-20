@@ -9,9 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const HOST = process.env.HOST || 'localhost'
 export const PORT = process.env.PORT || 2021
+// Services
+export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
+export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
+export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const MONGO_URL =
   process.env.MONGO_URL || 'mongodb://localhost/application-config'
 export const SENTRY_DSN =

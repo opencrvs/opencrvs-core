@@ -54,5 +54,6 @@ export const mockFetchConfig = {
     isoCode: 'ZMW',
     languagesAndCountry: ['en-ZM']
   },
-  LANGUAGES: 'en'
+  LANGUAGES: 'en',
+  ADDRESSES: 1
 }

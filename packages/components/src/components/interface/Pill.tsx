@@ -11,6 +11,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
+import { IFonts } from '../fonts'
 
 type IPillType = 'active' | 'inactive' | 'pending' | 'default'
 
@@ -22,33 +23,26 @@ export interface IPillProps {
   size?: IPillSize
 }
 
-const heightMap = {
+const heightMap: Record<IPillSize, string> = {
   small: '24px',
   medium: '32px'
 }
 
-const colorMap = {
+const colorMap: Record<IPillType, string> = {
   active: 'rgba(73, 183, 141, 0.3)',
   default: 'rgba(206, 206, 206, 0.3)',
   inactive: 'rgba(245, 209, 209, 1)',
   pending: 'rgba(252, 236, 217, 1)'
 }
 
-const fontMap = {
-  small: 'captionBold',
-  medium: 'subtitleStyle'
-}
-
-const paddingMap = {
-  small: '10px',
-  medium: '14px'
+const fontMap: Record<IPillSize, keyof IFonts> = {
+  small: 'bold12',
+  medium: 'bold14'
 }
 
 const StyledPill = styled.span<{ size: IPillSize; type: IPillType }>`
   display: inline-flex;
-  padding: 0 ${({ size }) => paddingMap[size]};
-  /*This needs to have total height of 40px to aligned properly in ListView*/
-  margin: calc(0.5 * (40px - ${({ size }) => heightMap[size]})) 0;
+  padding: 0 0.85em;
   background-color: ${({ type }) => colorMap[type]};
   height: ${({ size }) => heightMap[size]};
   align-items: center;
@@ -56,9 +50,14 @@ const StyledPill = styled.span<{ size: IPillSize; type: IPillType }>`
   ${({ size, theme }) => theme.fonts[fontMap[size]]}
 `
 
-export function Pill({ label, type = 'default', size = 'small' }: IPillProps) {
+export function Pill({
+  label,
+  type = 'default',
+  size = 'small',
+  ...rest
+}: IPillProps) {
   return (
-    <StyledPill type={type} size={size}>
+    <StyledPill type={type} size={size} {...rest}>
       {label}
     </StyledPill>
   )

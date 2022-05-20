@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ILocation, LocationType } from '@client/offline/reducer'
+import { ILocation, LocationType, IOfflineData } from '@client/offline/reducer'
 import { IUserDetails, IGQLLocation, IIdentifier } from './userUtils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface/LocationSearch/LocationSearch'
 import { IntlShape } from 'react-intl'
-import { locationMessages } from '@client/i18n/messages'
+import { locationMessages, countryMessages } from '@client/i18n/messages'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
@@ -73,6 +73,24 @@ export function generateLocationName(
       intl.formatMessage(locationMessages[location.jurisdictionType]) || ''
     }`.trimEnd())
   return name
+}
+
+export function generateFullLocation(
+  districtId: string,
+  stateId: string,
+  countryCode: string,
+  resources: IOfflineData,
+  intl: IntlShape
+) {
+  const district = districtId && resources.locations[districtId]
+  const state = stateId && resources.locations[stateId]
+  const country =
+    countryCode && intl.formatMessage(countryMessages[countryCode])
+  let location = ''
+  if (district) location = district.name + ', '
+  if (state) location = location + state.name + ', '
+  location = location + country
+  return location
 }
 
 function generateSearchableLocations(

@@ -71,24 +71,9 @@ describe('ReviewForm tests', () => {
     store = testStore.store
     history = testStore.history
 
-    await store.dispatch(
-      offlineDataReady({
-        languages: mockOfflineData.languages,
-        forms: mockOfflineData.forms,
-        templates: mockOfflineData.templates,
-        locations: mockOfflineData.locations,
-        facilities: mockOfflineData.facilities,
-        pilotLocations: mockOfflineData.pilotLocations,
-        offices: mockOfflineData.offices,
-        assets: mockOfflineData.assets,
-        config: mockOfflineData.config,
-        formConfig
-      })
-    )
-
     form = await getReviewFormFromStore(store, Event.BIRTH)
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
   })
 
   it('it returns error while fetching', async () => {
@@ -875,7 +860,7 @@ describe('ReviewForm tests', () => {
   describe('ReviewForm tests for register scope', () => {
     beforeEach(async () => {
       getItem.mockReturnValue(declareScope)
-      await store.dispatch(checkAuth({ '?token': declareScope }))
+      await store.dispatch(checkAuth())
     })
 
     it('shows error message for user with declare scope', async () => {

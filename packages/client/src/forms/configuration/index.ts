@@ -21,20 +21,34 @@ import {
   Event
 } from '@client/forms/index'
 import {
-  configureCustomQuestions,
   createCustomField,
   createCustomGroup,
-  ISortedCustomGroup
+  ISortedCustomGroup,
+  getCustomFields
 } from '@client/forms/configuration/customUtils'
 import {
-  configureDefaultQuestions,
+  FieldEnabled,
   getDefaultField,
   IDefaultField,
   IDefaultFieldCustomisation
 } from '@client/forms/configuration/defaultUtils'
+import { getEventDraft } from '@client/forms/configuration/formDrafts/utils'
+import { registerForms } from './default'
+import { DraftStatus } from './formDrafts/utils'
+import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { populateRegisterFormsWithAddresses } from './administrative/addresses'
+import { cloneDeep, concat } from 'lodash'
 
 // THIS FILE SORTS & COMBINES CONFIGURATIONS WITH THE DEFAULT CONFIGURATION FOR RENDERING IN THE APPLICATION
+
+/*
+ * For preceedingFieldId & foregoingFieldId to
+ * denote front most and bottom most position
+ */
+export enum FieldPosition {
+  TOP = 'TOP',
+  BOTTOM = 'BOTTOM'
+}
 
 export interface IFormConfigurations {
   defaultFieldCustomisations: IDefaultFieldCustomisation[]
@@ -117,7 +131,7 @@ function sortCustomQuestionPosition(
 }
 
 export function sortFormCustomisations(
-  customQuestions: IQuestionConfig[],
+  questionConfig: IQuestionConfig[],
   defaultEventForm: ISerializedForm
 ): IFormConfigurations {
   // Separates default field customisations
@@ -128,22 +142,60 @@ export function sortFormCustomisations(
     customQuestionConfigurations: []
   }
   const customQsToBeSorted: IQuestionConfig[] = []
-  customQuestions.forEach((question, index) => {
+  questionConfig.forEach((question) => {
     const defaultField: IDefaultField | undefined = getDefaultField(
       defaultEventForm,
       question.fieldId
     )
     if (defaultField && !question.custom) {
-      formCustomisations.defaultFieldCustomisations?.push({
+      // this is a customisation to a default field
+      const defaultFieldCustomisation: IDefaultFieldCustomisation = {
         question,
-        defaultField
-      })
+        defaultField,
+        positionTop: question.preceedingFieldId === FieldPosition.TOP
+      }
+      if (question.preceedingFieldId !== FieldPosition.TOP) {
+        // check if the preceeding field is a custom field as those should be repositioned last
+        let preceedingFieldIsACustomField = false
+        questionConfig.forEach((obj) => {
+          if (
+            question.preceedingFieldId === obj.fieldId &&
+            obj.custom === true
+          ) {
+            preceedingFieldIsACustomField = true
+          }
+        })
+        if (!preceedingFieldIsACustomField && question.preceedingFieldId) {
+          defaultFieldCustomisation.preceedingDefaultField = getDefaultField(
+            defaultEventForm,
+            question.preceedingFieldId
+          )
+        }
+      }
+      formCustomisations.defaultFieldCustomisations?.push(
+        defaultFieldCustomisation
+      )
     } else if (question.custom && question.preceedingFieldId) {
+      // this is a configuration for a new custom field
+
+      if (question.preceedingFieldId === FieldPosition.TOP) {
+        createCustomGroup(
+          defaultEventForm,
+          formCustomisations.customQuestionConfigurations,
+          question,
+          null,
+          true
+        )
+        return
+      }
+
+      // custom questions may be stacked below each other in blocks, so we need to group those fields so that the whole block can be repositioned
       const preceedingDefaultField: IDefaultField | undefined = getDefaultField(
         defaultEventForm,
         question.preceedingFieldId
       )
 
+      // initialise blocks that either appear after a default field or at the top of the form
       if (preceedingDefaultField) {
         createCustomGroup(
           defaultEventForm,
@@ -152,15 +204,8 @@ export function sortFormCustomisations(
           preceedingDefaultField,
           false
         )
-      } else if (question.preceedingFieldId === 'TOP') {
-        createCustomGroup(
-          defaultEventForm,
-          formCustomisations.customQuestionConfigurations,
-          question,
-          null,
-          true
-        )
       } else {
+        // throw every other custom question in this storage array
         customQsToBeSorted.push(question)
       }
     }
@@ -199,39 +244,217 @@ export function sortFormCustomisations(
 }
 
 export function filterQuestionsByEventType(
-  formConfig: IFormConfig,
+  questions: IQuestionConfig[],
   event: string
-): IQuestionConfig[] {
-  const filteredQuestions: IQuestionConfig[] = []
-  if (
-    formConfig &&
-    formConfig.questionConfig &&
-    formConfig.questionConfig.length > 0
-  ) {
-    formConfig.questionConfig.forEach((question) => {
-      if (question.fieldId.includes(event)) {
-        filteredQuestions.push(question)
-      }
-    })
-  }
-  return filteredQuestions
+) {
+  return questions?.filter((question) => question.fieldId.includes(event)) || []
 }
 
 export function configureRegistrationForm(
   formCustomisations: IFormConfigurations,
   defaultEventForm: ISerializedForm,
-  event: Event
+  event: Event,
+  inConfig: boolean
 ): ISerializedForm {
+  // first fill form with addresses
   const formWithAddresses = populateRegisterFormsWithAddresses(
     defaultEventForm,
     event
   )
-  const defaultFormWithCustomisations = configureDefaultQuestions(
-    formCustomisations.defaultFieldCustomisations,
-    formWithAddresses
+  const newForm = cloneDeep(formWithAddresses)
+  // repositioning and configuration of fields
+
+  // TODO Reposition default fields
+  // ERROR: Repositioning default fields seems to cause an infinite loop in form config
+
+  /*
+  1. Loop through changes to default fields.  If any have been repositioned and the preceedingField is a default field, move the field, store any default field changes where the preceeding field is a custom field for processing in step 3
+  2. Reposition all custom fields
+  3. Reposition the remaining default fields that need to be positioned after custom fields
+  */
+
+  /*const defaultFieldsToBeRepositionedAfterCustomFields: IDefaultFieldCustomisation[] =
+    []
+  formCustomisations.defaultFieldCustomisations.forEach(
+    (defaultFieldCustomisation) => {
+      let groupFields =
+        newForm.sections[
+          defaultFieldCustomisation.defaultField.selectedSectionIndex
+        ].groups[defaultFieldCustomisation.defaultField.selectedGroupIndex]
+          .fields
+      // reposition default field if it is at the top, or if the preceeding field is a default field
+      if (defaultFieldCustomisation.positionTop) {
+        groupFields = concat(
+          defaultFieldCustomisation.defaultField.field,
+          groupFields
+        )
+      } else if (defaultFieldCustomisation.preceedingDefaultField) {
+        groupFields.splice(
+          defaultFieldCustomisation.preceedingDefaultField.index + 1,
+          0,
+          defaultFieldCustomisation.defaultField.field
+        )
+      } else if (!defaultFieldCustomisation.preceedingDefaultField) {
+        // if the preceeding field is a custom field, do not reposition now.
+        // reposition custom fields first
+        defaultFieldsToBeRepositionedAfterCustomFields.push(
+          defaultFieldCustomisation
+        )
+      }
+    }
+  )*/
+
+  formCustomisations.customQuestionConfigurations.forEach((customGroup) => {
+    let groupFields =
+      newForm.sections[customGroup.sectionIndex].groups[customGroup.groupIndex]
+        .fields
+    // reposition custom fields
+    if (customGroup.positionTop) {
+      groupFields = concat(getCustomFields(customGroup.questions), groupFields)
+    } else if (customGroup.preceedingDefaultField) {
+      // update preceedingDefaultField.index as it may have changed in the case of multiple groups
+      let newIndex = 0
+      groupFields.filter((field, index) => {
+        if (
+          customGroup.preceedingDefaultField &&
+          field.name === customGroup.preceedingDefaultField.field.name
+        ) {
+          newIndex = index
+        }
+      })
+      customGroup.preceedingDefaultField.index = newIndex
+      groupFields.splice(
+        customGroup.preceedingDefaultField.index + 1,
+        0,
+        ...getCustomFields(customGroup.questions)
+      )
+    }
+  })
+
+  // TODO reposition default fields
+  // repositioning default fields seems to cause an infinite loop in form config
+
+  /*defaultFieldsToBeRepositionedAfterCustomFields.forEach(
+    (defaultFieldsToBeRepositionedAfterCustomField) => {
+      let spliceIndex = 0
+      const customFieldIdentifiers = getIdentifiersFromFieldId(
+        defaultFieldsToBeRepositionedAfterCustomField.question
+          .preceedingFieldId as string
+      )
+      newForm.sections[
+        defaultFieldsToBeRepositionedAfterCustomField.defaultField
+          .selectedSectionIndex
+      ].groups[
+        defaultFieldsToBeRepositionedAfterCustomField.defaultField
+          .selectedGroupIndex
+      ].fields.filter((field, index) => {
+        if (field.name === customFieldIdentifiers.fieldName) {
+          spliceIndex = index + 1
+        }
+      })
+      newForm.sections[
+        defaultFieldsToBeRepositionedAfterCustomField.defaultField
+          .selectedSectionIndex
+      ].groups[
+        defaultFieldsToBeRepositionedAfterCustomField.defaultField
+          .selectedGroupIndex
+      ].fields.splice(
+        spliceIndex,
+        0,
+        defaultFieldsToBeRepositionedAfterCustomField.defaultField.field
+      )
+    }
+  )*/
+
+  formCustomisations.defaultFieldCustomisations.forEach(
+    (defaultPropCustomisation) => {
+      const groupFields =
+        newForm.sections[
+          defaultPropCustomisation.defaultField.selectedSectionIndex
+        ].groups[defaultPropCustomisation.defaultField.selectedGroupIndex]
+          .fields
+      // set default field as required or not depending on customisation
+      const field: SerializedFormField =
+        groupFields[defaultPropCustomisation.defaultField.index]
+      field.required = defaultPropCustomisation.question.required
+
+      // removing hidden fields should be the last thing to do after repositioning all default and custom fields vertically
+      if (
+        defaultPropCustomisation.question.enabled === FieldEnabled.DISABLED &&
+        !inConfig
+      ) {
+        /*
+         * Splice the disabled field away only when in registration, not in configuration mode
+         */
+
+        // update preceedingDefaultField.index as it may have changed now that custom groups are added
+        let newIndex = 0
+        groupFields.filter((field, index) => {
+          if (
+            defaultPropCustomisation.defaultField &&
+            field.name === defaultPropCustomisation.defaultField.field.name
+          ) {
+            newIndex = index
+          }
+        })
+        defaultPropCustomisation.defaultField.index = newIndex
+
+        groupFields.splice(defaultPropCustomisation.defaultField.index, 1)
+      }
+    }
   )
-  return configureCustomQuestions(
-    formCustomisations.customQuestionConfigurations,
-    defaultFormWithCustomisations
+  return newForm
+}
+
+export function getConfiguredForm(
+  questionConfig: IQuestionConfig[],
+  event: Event,
+  inConfig: boolean
+) {
+  const formWithAddresses = populateRegisterFormsWithAddresses(
+    registerForms[event],
+    event
   )
+  const form: ISerializedForm = configureRegistrationForm(
+    sortFormCustomisations(
+      filterQuestionsByEventType(questionConfig, event),
+      formWithAddresses
+    ),
+    registerForms[event],
+    event,
+    inConfig
+  )
+  return deserializeForm(form)
+}
+
+function isConfigured(status: DraftStatus | null) {
+  return status === DraftStatus.PUBLISHED || status === DraftStatus.PREVIEW
+}
+
+export function getConfiguredOrDefaultForm(
+  formConfig: IFormConfig,
+  event: Event,
+  inConfig: boolean
+) {
+  const { status } = getEventDraft(formConfig.formDrafts, event) || {
+    status: null
+  }
+
+  const formWithAddresses = populateRegisterFormsWithAddresses(
+    registerForms[event],
+    event
+  )
+
+  const form: ISerializedForm = isConfigured(status)
+    ? configureRegistrationForm(
+        sortFormCustomisations(
+          filterQuestionsByEventType(formConfig.questionConfig, event),
+          formWithAddresses
+        ),
+        registerForms[event],
+        event,
+        inConfig
+      )
+    : formWithAddresses
+  return deserializeForm(form)
 }

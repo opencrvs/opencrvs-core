@@ -10,7 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event, UserSection, CorrectionSection } from '@client/forms'
+import {
+  Event,
+  UserSection,
+  CorrectionSection,
+  WizardSection
+} from '@client/forms'
 import {
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
@@ -47,9 +52,10 @@ import {
   APPLICATION_CONFIG,
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
-  DECLARATION_RECORD_AUDIT
+  DECLARATION_RECORD_AUDIT,
+  FORM_CONFIG_WIZARD,
+  FORM_CONFIG_HOME
 } from '@client/navigation/routes'
-import { getCurrentUserScope } from '@client/utils/authUtils'
 import { NATL_ADMIN_ROLES } from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
@@ -66,7 +72,7 @@ import {
 } from 'connected-react-router'
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
-import { IRecordAuditTabs } from '@client/views/Home/RecordAudit'
+import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import subYears from 'date-fns/subYears'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
@@ -96,14 +102,6 @@ type GoToPageAction = {
   }
 }
 
-export const GO_TO_REGISTRAR_HOME = 'navigation/GO_TO_REGISTRAR_HOME'
-type GoToRegistrarHome = {
-  type: typeof GO_TO_REGISTRAR_HOME
-  payload: {
-    tabId: string
-  }
-}
-
 export const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
 type GoToReviewUserDetails = {
   type: typeof GO_TO_REVIEW_USER_DETAILS
@@ -122,7 +120,6 @@ type GoToUserProfile = {
 
 export type Action =
   | GoToPageAction
-  | GoToRegistrarHome
   | GoToSysAdminHome
   | GoToReviewUserDetails
   | GoToUserProfile
@@ -174,11 +171,15 @@ export function goToCertificateConfig() {
   return push(CERTIFICATE_CONFIG)
 }
 
+export function goToFormConfigHome() {
+  return push(FORM_CONFIG_HOME)
+}
+
 export function goToApplicationConfig() {
   return push(APPLICATION_CONFIG)
 }
 
-export function goToHomeTab(tabId: string, selectorId = '') {
+export function goToHomeTab(tabId: IWORKQUEUE_TABS, selectorId = '') {
   return push(formatUrl(REGISTRAR_HOME_TAB, { tabId, selectorId }))
 }
 
@@ -344,14 +345,13 @@ export function goToDeathRegistration(declarationId: string) {
   )
 }
 
-export function goToRegistrarHomeTab(
-  tabId: IWORKQUEUE_TABS,
-  selectorId?: string
-) {
-  return {
-    type: GO_TO_REGISTRAR_HOME,
-    payload: { tabId, selectorId }
-  }
+export function goToFormConfigWizard(event: Event, section: WizardSection) {
+  return push(
+    formatUrl(FORM_CONFIG_WIZARD, {
+      event: event,
+      section: section
+    })
+  )
 }
 
 export function goToSysAdminHomeTab(tabId: string) {
@@ -622,22 +622,6 @@ export function navigationReducer(state: INavigationState, action: any) {
               event
             }) + (fieldNameHash ? `#${fieldNameHash}` : ''),
             historyState
-          )
-        )
-      )
-    case GO_TO_REGISTRAR_HOME:
-      const {
-        tabId: RegistrarHomeTabId,
-        selectorId: RegistrarHomeSelectorId = ''
-      } = action.payload
-      return loop(
-        state,
-        Cmd.action(
-          push(
-            formatUrl(REGISTRAR_HOME_TAB, {
-              tabId: RegistrarHomeTabId,
-              selectorId: RegistrarHomeSelectorId
-            })
           )
         )
       )

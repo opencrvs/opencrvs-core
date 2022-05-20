@@ -48,10 +48,12 @@ import {
 } from '@client/views/OfficeHome/utils'
 import {
   IconWithName,
-  IconWithNameEvent
+  IconWithNameEvent,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -238,6 +240,26 @@ class RequiresUpdateRegistrarComponent extends React.Component<
         reg.dateOfEvent &&
         reg.dateOfEvent.length > 0 &&
         new Date(reg.dateOfEvent)
+      const NameComponent = reg.name ? (
+        <LinkButton
+          id={`name_${index}`}
+          isBoldLink={true}
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
+          }
+        >
+          {reg.name}
+        </LinkButton>
+      ) : (
+        <NoNameContainer
+          id={`name_${index}`}
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
+          }
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
       return {
         ...reg,
         event,
@@ -245,28 +267,21 @@ class RequiresUpdateRegistrarComponent extends React.Component<
         iconWithName: (
           <IconWithName
             status={reg.declarationStatus}
-            name={reg.name}
+            name={NameComponent}
             isDuplicate={isDuplicate}
           />
         ),
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.declarationStatus}
-            name={reg.name}
+            name={NameComponent}
             event={reg.event}
             isDuplicate={isDuplicate}
           />
         ),
         sentForUpdates,
         dateOfEvent,
-        actions,
-        rowClickHandler: [
-          {
-            label: 'rowClickHandler',
-            handler: () =>
-              this.props.goToDeclarationRecordAudit('rejectTab', reg.id)
-          }
-        ]
+        actions
       }
     })
     const sortedItems = getSortedItems(
@@ -314,7 +329,6 @@ class RequiresUpdateRegistrarComponent extends React.Component<
         <GridTable
           content={this.transformRejectedContent(data)}
           columns={this.getColumns()}
-          clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}
