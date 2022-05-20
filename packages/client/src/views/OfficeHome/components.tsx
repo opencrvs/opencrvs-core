@@ -12,11 +12,9 @@
 import * as React from 'react'
 import styled from '@client/styledComponents'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons/DeclarationIcon'
-import { STATUSTOCOLOR } from '@client/views/Home/RecordAudit'
+import { STATUSTOCOLOR } from '@client/views/RecordAudit/RecordAudit'
 import { Duplicate, StatusFailed } from '@opencrvs/components/lib/icons'
 import { SUBMISSION_STATUS } from '@client/declarations'
-import { LinkButton } from '@opencrvs/components/lib/buttons'
-
 import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
 import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
 import { WaitingToSent } from '@opencrvs/components/lib/icons/WaitingToSent'
@@ -31,8 +29,15 @@ const Flex = styled.div`
   }
 `
 
-const Error = styled.span`
+export const NoNameContainer = styled.span`
   color: ${({ theme }) => theme.colors.negative};
+  cursor: pointer;
+  padding: 0 8px;
+  &:hover {
+    color: ${({ theme }) => theme.colors.negative};
+    text-decoration-line: underline;
+    text-underline-offset: 4px;
+  }
 `
 
 const Event = styled.div`
@@ -54,20 +59,23 @@ const Icon = styled.div`
 `
 interface IIconWith {
   status?: string
-  name?: string
+  name: React.ReactNode
   event?: string
   isDuplicate?: boolean
   isValidatedOnReview?: boolean
+  isArchived?: boolean
 }
 
 const IconComp = ({
   status,
   isDuplicateIcon,
-  isValidatedOnReview
+  isValidatedOnReview,
+  isArchived
 }: {
   status: string
   isDuplicateIcon?: boolean
   isValidatedOnReview?: boolean
+  isArchived?: boolean
 }) => {
   return (
     <Icon>
@@ -77,6 +85,7 @@ const IconComp = ({
         <DeclarationIcon
           color={STATUSTOCOLOR[status]}
           isValidatedOnReview={isValidatedOnReview}
+          isArchive={isArchived}
         />
       )}
     </Icon>
@@ -87,7 +96,8 @@ export const IconWithName = ({
   status,
   name,
   isDuplicate,
-  isValidatedOnReview
+  isValidatedOnReview,
+  isArchived
 }: IIconWith) => {
   return (
     <Flex id="flex">
@@ -96,15 +106,10 @@ export const IconWithName = ({
           status={status}
           isDuplicateIcon={isDuplicate}
           isValidatedOnReview={isValidatedOnReview}
+          isArchived={isArchived}
         />
       )}
-      {name ? (
-        <LinkButton id="name" isBoldLink>
-          {name}
-        </LinkButton>
-      ) : (
-        <LinkButton isBoldLink>No name provided</LinkButton>
-      )}
+      {name}
     </Flex>
   )
 }
@@ -114,7 +119,8 @@ export const IconWithNameEvent = ({
   name,
   event,
   isDuplicate,
-  isValidatedOnReview
+  isValidatedOnReview,
+  isArchived
 }: IIconWith) => {
   return (
     <Flex id="flex">
@@ -123,14 +129,11 @@ export const IconWithNameEvent = ({
           status={status}
           isDuplicateIcon={isDuplicate}
           isValidatedOnReview={isValidatedOnReview}
+          isArchived={isArchived}
         />
       )}
       <NameEventContainer id="nameEvent">
-        {name ? (
-          <LinkButton isBoldLink>{name}</LinkButton>
-        ) : (
-          <LinkButton isBoldLink>No name provided</LinkButton>
-        )}
+        {name}
         {event && <Event>{event}</Event>}
       </NameEventContainer>
     </Flex>

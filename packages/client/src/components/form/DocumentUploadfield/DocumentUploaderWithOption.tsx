@@ -55,7 +55,7 @@ const Flex = styled.div<{ splitView?: boolean }>`
   }};
 `
 export const ErrorMessage = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 `
 const DocumentUploader = styled(ImageUploader)`
   margin-left: 16px;

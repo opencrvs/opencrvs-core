@@ -11,8 +11,9 @@
  */
 import gql from 'graphql-tag'
 
-const allSearchFields = `
-  id
+const EVENT_SEARCH_RESULT_FIELDS = gql`
+  fragment EventSearchFields on EventSearchSet {
+    id
     type
     registration {
       status
@@ -25,7 +26,7 @@ const allSearchFields = `
       duplicates
       createdAt
       modifiedAt
-    }    
+    }
     ... on BirthEventSearchSet {
       dateOfBirth
       childName {
@@ -42,9 +43,11 @@ const allSearchFields = `
         use
       }
     }
-  `
+  }
+`
 
 export const REGISTRATION_HOME_QUERY = gql`
+  ${EVENT_SEARCH_RESULT_FIELDS}
   query registrationHome(
     $locationIds: [String]
     $pageSize: Int
@@ -66,7 +69,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        ...EventSearchFields
       }
     }
     notificationTab: searchEvents(
@@ -78,7 +81,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        ...EventSearchFields
       }
     }
     reviewTab: searchEvents(
@@ -89,7 +92,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        ...EventSearchFields
       }
     }
     rejectTab: searchEvents(
@@ -102,7 +105,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        ...EventSearchFields
       }
     }
     approvalTab: searchEvents(
@@ -113,7 +116,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        ...EventSearchFields
       }
     }
     externalValidationTab: searchEvents(
@@ -124,7 +127,7 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        ...EventSearchFields
       }
     }
     printTab: searchEvents(
@@ -135,14 +138,15 @@ export const REGISTRATION_HOME_QUERY = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        ...EventSearchFields
       }
     }
   }
 `
 
 export const SEARCH_EVENTS = gql`
-  query(
+  ${EVENT_SEARCH_RESULT_FIELDS}
+  query searchEventsForWorkqueue(
     $sort: String
     $trackingId: String
     $contactNumber: String
@@ -164,14 +168,14 @@ export const SEARCH_EVENTS = gql`
     ) {
       totalItems
       results {
-        ${allSearchFields}
+        ...EventSearchFields
       }
     }
   }
 `
 
 export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
-  query data($id: ID!) {
+  query fetchRegistrationByComposition($id: ID!) {
     fetchRegistration(id: $id) {
       id
       registration {

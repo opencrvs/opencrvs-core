@@ -12,7 +12,7 @@
 import gql from 'graphql-tag'
 
 export const CORRECTION_TOTALS = gql`
-  query data(
+  query getTotalCorrections(
     $event: String!
     $timeStart: String!
     $timeEnd: String!
@@ -30,7 +30,7 @@ export const CORRECTION_TOTALS = gql`
   }
 `
 export const PERFORMANCE_METRICS = gql`
-  query data(
+  query getTotalMetrics(
     $event: String!
     $timeStart: String!
     $timeEnd: String!
@@ -62,7 +62,7 @@ export const PERFORMANCE_METRICS = gql`
 `
 
 export const PERFORMANCE_STATS = gql`
-  query data(
+  query getLocationStatistics(
     $locationId: String
     $populationYear: Int!
     $status: [String]!

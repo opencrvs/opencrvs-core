@@ -51,7 +51,7 @@ import {
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
+
 import {
   ColumnContentAlignment,
   GridTable,
@@ -59,10 +59,8 @@ import {
   Loader,
   COLUMNS
 } from '@opencrvs/components/lib/interface'
-import {
-  GQLEventSearchResultSet,
-  GQLQuery
-} from '@opencrvs/gateway/src/graphql/schema.d'
+
+import { SearchEventsQuery } from '@client/utils/gateway'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -73,10 +71,12 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { Navigation } from '@client/components/interface/Navigation'
 import {
   IconWithName,
-  IconWithNameEvent
+  IconWithNameEvent,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -161,6 +161,8 @@ type ISearchResultProps = IntlShapeProps &
 interface ISearchResultState {
   width: number
 }
+
+type QueryData = SearchEventsQuery['searchEvents']
 
 export class SearchResultView extends React.Component<
   ISearchResultProps,
@@ -251,7 +253,7 @@ export class SearchResultView extends React.Component<
     return this.userHasValidateScope() || this.userHasRegisterScope()
   }
 
-  transformSearchContent = (data: GQLEventSearchResultSet) => {
+  transformSearchContent = (data: QueryData) => {
     const { intl } = this.props
     if (!data || !data.results) {
       return []
@@ -358,6 +360,31 @@ export class SearchResultView extends React.Component<
         this.userHasRegisterScope()
           ? true
           : false
+      const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
+      const NameComponent = reg.name ? (
+        <LinkButton
+          isBoldLink={true}
+          id={`name_${index}`}
+          onClick={() =>
+            isDuplicate
+              ? this.props.goToReviewDuplicate(reg.id)
+              : this.props.goToDeclarationRecordAudit('search', reg.id)
+          }
+        >
+          {reg.name}
+        </LinkButton>
+      ) : (
+        <NoNameContainer
+          id={`name_${index}`}
+          onClick={() =>
+            isDuplicate
+              ? this.props.goToReviewDuplicate(reg.id)
+              : this.props.goToDeclarationRecordAudit('search', reg.id)
+          }
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
       return {
         ...reg,
         event,
@@ -365,31 +392,24 @@ export class SearchResultView extends React.Component<
         iconWithName: (
           <IconWithName
             status={reg.declarationStatus}
-            name={reg.name}
+            name={NameComponent}
             isValidatedOnReview={isValidatedOnReview}
             isDuplicate={isDuplicate}
+            isArchived={isArchived}
           />
         ),
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.declarationStatus}
-            name={reg.name}
+            name={NameComponent}
             event={event}
             isDuplicate={isDuplicate}
             isValidatedOnReview={isValidatedOnReview}
+            isArchived={isArchived}
           />
         ),
         dateOfEvent,
-        actions,
-        rowClickHandler: [
-          {
-            label: 'rowClickHandler',
-            handler: () =>
-              isDuplicate
-                ? this.props.goToReviewDuplicate(reg.id)
-                : this.props.goToDeclarationRecordAudit('search', reg.id)
-          }
-        ]
+        actions
       }
     })
   }
@@ -409,10 +429,12 @@ export class SearchResultView extends React.Component<
         <BodyContainer>
           <>
             {searchText && searchType && (
-              <Query
+              <Query<SearchEventsQuery>
                 query={SEARCH_EVENTS}
                 variables={{
-                  locationIds: userDetails
+                  locationIds: this.userHasRegisterScope()
+                    ? null
+                    : userDetails
                     ? [getUserLocation(userDetails).id]
                     : [],
                   sort: SEARCH_RESULT_SORT,
@@ -427,15 +449,7 @@ export class SearchResultView extends React.Component<
                 }}
                 fetchPolicy="no-cache"
               >
-                {({
-                  loading,
-                  error,
-                  data
-                }: {
-                  loading: boolean
-                  error?: Error
-                  data: GQLQuery
-                }) => {
+                {({ loading, error, data }) => {
                   if (loading) {
                     return (
                       <Loader
@@ -448,7 +462,7 @@ export class SearchResultView extends React.Component<
                     )
                   }
 
-                  if (error || !data.searchEvents) {
+                  if (error || !data?.searchEvents) {
                     return (
                       <ErrorText id="search-result-error-text">
                         {intl.formatMessage(errorMessages.queryError)}
@@ -488,7 +502,6 @@ export class SearchResultView extends React.Component<
                             noResultText={intl.formatMessage(
                               constantsMessages.noResults
                             )}
-                            clickable={true}
                             hideLastBorder={true}
                           />
                         </>

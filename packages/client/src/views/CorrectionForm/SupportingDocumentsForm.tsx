@@ -39,6 +39,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 type IProps = {
   declaration: IDeclaration
@@ -79,7 +80,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
       undefined &&
     declaration.data[section.id]?.supportDocumentRequiredForCorrection !== ''
 
-  group.fields = [
+  const fields = [
     group.fields[0],
     {
       ...group.fields[1],
@@ -126,10 +127,11 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
         title={intl.formatMessage(section.title)}
         hideBackground
         goBack={props.goBack}
-        goHome={() => props.goToHomeTab('review')}
+        goHome={() => props.goToHomeTab(WORKQUEUE_TABS.readyForReview)}
       >
         <Content
           {...contentProps}
+          showTitleOnMobile={true}
           bottomActionButtons={[
             <PrimaryButton
               id="confirm_form"
@@ -149,7 +151,7 @@ function SupportingDocumentsFormComoponent(props: IFullProps) {
               modifyDeclaration(values, section, declaration)
             }}
             setAllFieldsDirty={false}
-            fields={group.fields}
+            fields={fields}
             draftData={declaration.data}
             onUploadingStateChanged={onUploadingStateChanged}
           />

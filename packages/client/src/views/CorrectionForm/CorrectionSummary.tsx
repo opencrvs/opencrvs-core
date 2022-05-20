@@ -205,6 +205,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             title={intl.formatMessage(messages.correctionSummaryTitle)}
             topActionButtons={[backToReviewButton]}
             bottomActionButtons={[continueButton]}
+            showTitleOnMobile={true}
           >
             <TableView
               isLoading={false}
@@ -931,7 +932,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       userPrimaryOffice: this.props.userPrimaryOffice
     })
     this.props.writeDeclaration(declaration)
-    this.props.goToHomeTab('review')
+    this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
   }
 
   gotoReviewPage = () => {

@@ -28,6 +28,7 @@ import styled, {
 import { createClient } from '@client/utils/apolloClient'
 import { ReviewDuplicates } from '@client/views/Duplicates/ReviewDuplicates'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
+import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
@@ -35,7 +36,6 @@ import { ReviewCertificateAction } from '@client/views/PrintCertificate/ReviewCe
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
 import { DeclarationForm } from '@client/views/RegisterForm/DeclarationForm'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
-import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
@@ -54,13 +54,15 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
-import { RecordAudit } from './views/Home/RecordAudit'
+import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
+import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
+import { RecordAudit } from './views/RecordAudit/RecordAudit'
 import { ChangePhonePage } from './views/Settings/ChangePhonePage'
+import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
-import { ApplicationConfig } from './views/SysAdmin/Config/Application'
-import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
-import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
+import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
+import { Roles } from '@client/utils/authUtils'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -206,13 +208,29 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                            ]}
                                             path={routes.CERTIFICATE_CONFIG}
                                             component={CertificatesConfig}
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                            ]}
                                             path={routes.APPLICATION_CONFIG}
                                             component={ApplicationConfig}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.FORM_CONFIG_WIZARD}
+                                            component={FormConfigWizard}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.FORM_CONFIG_HOME}
+                                            component={FormConfigHome}
                                           />
                                           <ProtectedRoute
                                             path={
@@ -281,6 +299,13 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.LOCAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.PERFORMANCE_MANAGEMENT
+                                            ]}
                                             path={routes.TEAM_SEARCH}
                                             component={TeamSearch}
                                           />
@@ -318,6 +343,13 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.LOCAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.PERFORMANCE_MANAGEMENT
+                                            ]}
                                             path={routes.PERFORMANCE_HOME}
                                             component={PerformanceHome}
                                           />

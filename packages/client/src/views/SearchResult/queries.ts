@@ -12,7 +12,7 @@
 import gql from 'graphql-tag'
 
 export const FETCH_REGISTRATION_BY_COMPOSITION = gql`
-  query data($id: ID!) {
+  query fetchRegistration($id: ID!) {
     fetchRegistration(id: $id) {
       id
       registration {

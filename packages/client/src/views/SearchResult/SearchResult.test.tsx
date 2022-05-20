@@ -55,7 +55,7 @@ describe('SearchResult tests', () => {
   beforeEach(async () => {
     ;({ store, history } = createStore())
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
   })
 
   it('sets loading state while waiting for data', async () => {
@@ -86,7 +86,7 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            locationIds: null,
             sort: 'DESC',
             trackingId: '',
             registrationNumber: '',
@@ -402,7 +402,7 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            locationIds: null,
             sort: 'DESC',
             trackingId: 'DW0UTHR',
             registrationNumber: '',
@@ -500,7 +500,7 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            locationIds: null,
             sort: 'DESC',
             trackingId: 'DW0UTHR',
             registrationNumber: '',
@@ -611,7 +611,7 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            locationIds: null,
             sort: 'DESC',
             trackingId: 'DW0UTHR',
             registrationNumber: '',
@@ -717,7 +717,7 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            locationIds: null,
             sort: 'DESC',
             trackingId: 'DW0UTHR',
             registrationNumber: '',
@@ -807,7 +807,7 @@ describe('SearchResult downloadButton tests', () => {
   beforeEach(async () => {
     ;({ store, history } = createStore())
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
   })
   it('renders review button in search page', async () => {
     const declaration = {
@@ -826,7 +826,7 @@ describe('SearchResult downloadButton tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            locationIds: null,
             sort: 'DESC',
             trackingId: 'DW0UTHR',
             registrationNumber: '',
@@ -925,7 +925,7 @@ describe('SearchResult downloadButton tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            locationIds: null,
             sort: 'DESC',
             trackingId: 'DW0UTHR',
             registrationNumber: '',

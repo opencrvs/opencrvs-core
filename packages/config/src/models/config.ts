@@ -56,6 +56,7 @@ export interface IApplicationConfigurationModel extends Document {
   LOGROCKET: string
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: string
+  ADDRESSES: number
 }
 
 const birthSchema = new Schema<IBirth>({
@@ -126,7 +127,13 @@ const systemSchema = new Schema({
   PHONE_NUMBER_PATTERN: { type: String, required: false },
   NID_NUMBER_PATTERN: { type: String, required: false },
   SENTRY: { type: String, required: false },
-  LOGROCKET: { type: String, required: false }
+  LOGROCKET: { type: String, required: false },
+  ADDRESSES: {
+    type: Number,
+    required: false,
+    enum: [1, 2],
+    default: 1
+  }
 })
 
 export default model<IApplicationConfigurationModel>('Config', systemSchema)

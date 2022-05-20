@@ -2265,7 +2265,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.deceasedSpousesGivenNamesEng'
   },
   certificatePrintInAdvance: {
-    defaultMessage: 'Print in advance for signatures and collection',
+    defaultMessage: 'Print in advance',
     description: 'Label for certificate collection option',
     id: 'form.field.label.certificatePrintInAdvance'
   },

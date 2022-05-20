@@ -113,7 +113,8 @@ export enum SUBMISSION_STATUS {
   REQUESTING_CORRECTION = 'REQUESTING_CORRECTION',
   REQUESTED_CORRECTION = 'REQUESTED_CORRECTION',
   FAILED = 'FAILED',
-  FAILED_NETWORK = 'FAILED_NETWORK'
+  FAILED_NETWORK = 'FAILED_NETWORK',
+  IN_PROGRESS = 'IN_PROGRESS'
 }
 
 export enum DOWNLOAD_STATUS {
@@ -673,14 +674,14 @@ export function mergeDeclaredDeclarations(
     (declaration) => declaration.compositionId
   )
 
-  const transformedDeclaredDeclarations = declaredDeclarations
-    .filter(
-      (declaredDeclaration) =>
-        !localDeclarations.includes(declaredDeclaration.id)
-    )
-    .map((app) => {
+  const declarationsNotStoredLocally = declaredDeclarations.filter(
+    (declaredDeclaration) => !localDeclarations.includes(declaredDeclaration.id)
+  )
+  const transformedDeclaredDeclarations = declarationsNotStoredLocally.map(
+    (app) => {
       return transformSearchQueryDataToDraft(app)
-    })
+    }
+  )
   declarations.push(...transformedDeclaredDeclarations)
 }
 
@@ -971,10 +972,10 @@ export async function writeDeclarationByUser(
 function mergeWorkQueueData(
   state: IStoreState,
   workQueueIds: (keyof IQueryData)[],
-  currentApplicatons: IDeclaration[] | undefined,
+  currentApplications: IDeclaration[] | undefined,
   destinationWorkQueue: IWorkqueue
 ) {
-  if (!currentApplicatons) {
+  if (!currentApplications) {
     return destinationWorkQueue
   }
   workQueueIds.forEach((workQueueId) => {
@@ -987,16 +988,25 @@ function mergeWorkQueueData(
       if (declaration == null) {
         return
       }
-      const declarationIndex = currentApplicatons.findIndex(
+      const declarationIndex = currentApplications.findIndex(
         (app) => app && app.id === declaration.id
       )
+
       if (declarationIndex >= 0) {
-        updateWorkqueueData(
-          state,
-          currentApplicatons[declarationIndex],
-          workQueueId,
-          destinationWorkQueue
-        )
+        const isDownloadFailed =
+          currentApplications[declarationIndex].downloadStatus ===
+            SUBMISSION_STATUS.FAILED_NETWORK ||
+          currentApplications[declarationIndex].downloadStatus ===
+            SUBMISSION_STATUS.FAILED
+
+        if (!isDownloadFailed) {
+          updateWorkqueueData(
+            state,
+            currentApplications[declarationIndex],
+            workQueueId,
+            destinationWorkQueue
+          )
+        }
       }
     })
   })
@@ -1742,9 +1752,21 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       if (action.payload) {
         const userData = JSON.parse(action.payload) as IUserData
 
+        /*
+         * This is here to ensure that even if the user manages to create a new declaration
+         * before the declarations are fetched from the server, the new declaration will still be
+         * persisted. This mostly happens in E2E tests
+         */
+        const userDeclarations = userData.declarations
+        const declarationsStoredBeforeFetch = state.declarations.filter(
+          (stateDeclaration) =>
+            !userDeclarations.find(({ id }) => stateDeclaration.id === id)
+        )
         return {
           ...state,
-          declarations: userData.declarations
+          declarations: userData.declarations.concat(
+            declarationsStoredBeforeFetch
+          )
         }
       }
       return state

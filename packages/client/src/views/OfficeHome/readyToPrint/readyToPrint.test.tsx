@@ -234,7 +234,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
   beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
   })
 
   it('renders all items returned from graphql query in ready for print', async () => {
@@ -388,12 +388,12 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
       // wait for mocked data to load mockedProvider
       // after sorting (by default name) row's order will be changed
-      await waitForElement(testComponent, '#row_1')
+      await waitForElement(testComponent, '#name_0')
 
       testComponent.update()
-      testComponent.find('#row_1').hostNodes().simulate('click')
+      testComponent.find('#name_0').hostNodes().simulate('click')
 
-      await waitForElement(testComponent, '#row_1')
+      await waitForElement(testComponent, '#name_0')
       testComponent.update()
 
       expect(window.location.href).toContain(
@@ -740,7 +740,7 @@ describe('Tablet tests', () => {
 
   beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
     resizeWindow(800, 1280)
   })
 
@@ -762,7 +762,7 @@ describe('Tablet tests', () => {
     )
 
     testComponent.update()
-    const element = await waitForElement(testComponent, '#row_1')
+    const element = await waitForElement(testComponent, '#name_0')
     element.hostNodes().simulate('click')
 
     await new Promise((resolve) => {

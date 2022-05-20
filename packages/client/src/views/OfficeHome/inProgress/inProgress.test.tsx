@@ -37,12 +37,13 @@ import {
 } from '@client/tests/util'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { InProgress, SELECTOR_ID, TAB_ID } from './InProgress'
+import { InProgress, SELECTOR_ID } from './InProgress'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formattedDuration } from '@client/utils/date-formatting'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzMzQzMTMzLCJleHAiOjE1NjM5NDc5MzMsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDI1ZWM4YTI0YjExMGMyNWEyN2JhNjcifQ.C5v0fboxhawmzrHrO2kzdwfe9pNrF23UedkiPo_4PTBLuS6dm1UgPZWV7SXT9_JVS7djpH2lh-wZ24CR6S-QWI1QgGdvXGrzyUsayJxCdh2FSBnmgLpsD-LTvbDefpmliWzjLk_glbcqeoFX54hwjORZrsH6JMac4GSRRq2vL_Lq7bBUae7IdmB8itoZQLJJHi29bsCvGr3h1njV5BUvQ4N0Q9-w7QAd-ZPjTz4hYf_biFn52fWMwYaxY6_zA5GB6Bm_6ibI8cz14wY4fEME2cv33x4DwVRD8z4UL_Qq14nqWMO5EEf5mb_YKH-wTPl3kUzofngRsMY8cKI_YTr_1Q'
@@ -76,7 +77,7 @@ storage.setItem = jest.fn()
 const { store, history } = createStore()
 beforeAll(async () => {
   getItem.mockReturnValue(registerScopeToken)
-  await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+  await store.dispatch(checkAuth())
 })
 
 describe('In Progress tab', () => {
@@ -129,7 +130,7 @@ describe('In Progress tab', () => {
     })
     expect(history.location.pathname).toBe(
       formatUrl(REGISTRAR_HOME_TAB, {
-        tabId: TAB_ID.inProgress,
+        tabId: WORKQUEUE_TABS.inProgress,
         selectorId: SELECTOR_ID.ownDrafts
       })
     )
@@ -142,7 +143,7 @@ describe('In Progress tab', () => {
     })
     expect(history.location.pathname).toBe(
       formatUrl(REGISTRAR_HOME_TAB, {
-        tabId: TAB_ID.inProgress,
+        tabId: WORKQUEUE_TABS.inProgress,
         selectorId: SELECTOR_ID.fieldAgentDrafts
       })
     )
@@ -676,7 +677,7 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-      testComponent.find('#row_0').hostNodes().simulate('click')
+      testComponent.find('#name_0').hostNodes().simulate('click')
 
       await flushPromises()
       testComponent.update()
@@ -893,7 +894,7 @@ describe('Tablet tests', () => {
 
   beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
     resizeWindow(800, 1280)
   })
 
@@ -949,14 +950,14 @@ describe('Tablet tests', () => {
     )
 
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
     testComponent.update()
-    testComponent.find('#row_0').hostNodes().simulate('click')
+    testComponent.find('#name_0').hostNodes().simulate('click')
 
     await new Promise((resolve) => {
       setTimeout(resolve, 100)

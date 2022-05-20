@@ -19,6 +19,7 @@ interface IButtonsMessages
   cancel: MessageDescriptor
   change: MessageDescriptor
   confirm: MessageDescriptor
+  configure: MessageDescriptor
   continueButton: MessageDescriptor
   createUser: MessageDescriptor
   deactivate: MessageDescriptor
@@ -63,6 +64,8 @@ interface IButtonsMessages
   approve: MessageDescriptor
   editRecord: MessageDescriptor
   makeCorrection: MessageDescriptor
+  publish: MessageDescriptor
+  add: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
@@ -100,6 +103,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Confirm',
     description: 'Confirm button text',
     id: 'buttons.confirm'
+  },
+  configure: {
+    defaultMessage: 'Configure',
+    description: 'Configure button text',
+    id: 'buttons.configure'
   },
   continueButton: {
     defaultMessage: 'Continue',
@@ -313,8 +321,8 @@ const messagesToDefine: IButtonsMessages = {
   },
   editRecord: {
     id: 'buttons.editRecord',
-    defaultMessage: 'Edit record',
-    description: 'Edit record button text on review certificate'
+    defaultMessage: 'Correct record',
+    description: 'Correct record button text on review certificate'
   },
   makeCorrection: {
     id: 'buttons.makeCorrection',
@@ -325,6 +333,16 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.view',
     defaultMessage: 'View',
     description: 'Label for link button view'
+  },
+  publish: {
+    id: 'buttons.publish',
+    defaultMessage: 'Publish',
+    description: 'Publish button text on form config'
+  },
+  add: {
+    id: 'buttons.add',
+    defaultMessage: 'Add',
+    description: 'Add button text on form config'
   }
 }
 

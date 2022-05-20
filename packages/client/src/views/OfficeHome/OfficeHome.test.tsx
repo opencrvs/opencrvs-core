@@ -115,7 +115,7 @@ beforeEach(async () => {
   ;({ store, history } = createStore())
   client = createClient(store)
   getItem.mockReturnValue(registerScopeToken)
-  await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+  await store.dispatch(checkAuth())
 })
 
 describe('OfficeHome related tests', () => {

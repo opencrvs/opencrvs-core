@@ -12,11 +12,7 @@
 import { RadioSize } from '@opencrvs/components/lib/forms'
 import {
   BirthSection,
-  REVIEW_OVERRIDE_POSITION,
-  FLEX_DIRECTION,
   ISerializedForm,
-  Event,
-  IConditionals,
   DeathSection,
   TEXTAREA
 } from '@client/forms/index'
@@ -119,7 +115,7 @@ export const registerForms: IDefaultRegisterForms = {
                       label: formMessageDescriptors.informantsRelationWithChild,
                       placeholder:
                         formMessageDescriptors.relationshipPlaceHolder,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -864,7 +860,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'placeOfBirthTitle',
                 type: 'SUBSECTION',
                 label: formMessageDescriptors.placeOfBirthPreview,
-                previewGroup: 'placeOfBirtrh',
+                previewGroup: 'placeOfBirth',
                 initialValue: '',
                 validate: []
               },
@@ -984,7 +980,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
-                    ? window.config.COUNTRY.toUpperCase()
+                    ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -1066,10 +1062,6 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'dateInPast',
                     parameters: []
-                  },
-                  {
-                    operation: 'isValidParentsBirthDate',
-                    parameters: [5]
                   }
                 ],
                 mapping: {
@@ -1265,7 +1257,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
-                    ? window.config.COUNTRY.toUpperCase()
+                    ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -1755,7 +1747,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
-                    ? window.config.COUNTRY.toUpperCase()
+                    ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -2454,7 +2446,7 @@ export const registerForms: IDefaultRegisterForms = {
                         formMessageDescriptors.informantsRelationWithDeceased,
                       placeholder:
                         formMessageDescriptors.relationshipPlaceHolder,
-                      required: false,
+                      required: true,
                       initialValue: '',
                       validate: [
                         {
@@ -2986,7 +2978,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
-                    ? window.config.COUNTRY.toUpperCase()
+                    ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -3366,7 +3358,7 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.causeOfDeathEstablished'
+                    expression: 'values.causeOfDeathEstablished !== "true"'
                   }
                 ],
                 options: [
@@ -3510,7 +3502,7 @@ export const registerForms: IDefaultRegisterForms = {
         ]
       },
       {
-        id: DeathSection.Informants,
+        id: DeathSection.Informant,
         viewType: 'form',
         name: formMessageDescriptors.informantName,
         title: formMessageDescriptors.informantTitle,
@@ -3526,7 +3518,7 @@ export const registerForms: IDefaultRegisterForms = {
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
-                    ? window.config.COUNTRY.toUpperCase()
+                    ? (window as any).config.COUNTRY.toUpperCase()
                     : 'FAR',
                 validate: [],
                 placeholder: formMessageDescriptors.formSelectPlaceholder,
@@ -3840,6 +3832,13 @@ export const registerForms: IDefaultRegisterForms = {
                   deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF,
                 hideAsterisk: true,
                 validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      'draftData?.deathEvent?.causeOfDeathEstablished !== "true"'
+                  }
+                ],
                 options: [
                   {
                     value:
@@ -3871,3 +3870,10 @@ export const registerForms: IDefaultRegisterForms = {
     ]
   }
 }
+
+export const PlaceholderPreviewGroups = [
+  'placeOfBirth',
+  'placeOfDeath',
+  'secondaryAddress',
+  'primaryAddress'
+]

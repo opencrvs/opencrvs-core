@@ -155,7 +155,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
   beforeAll(async () => {
     getItem.mockReturnValue(registrationClerkScopeToken)
-    await store.dispatch(checkAuth({ '?token': registrationClerkScopeToken }))
+    await store.dispatch(checkAuth())
   })
 
   it('renders all items returned from graphql query in sent for update tab', async () => {
@@ -440,7 +440,7 @@ describe('OfficeHome sent for update tab related tests', () => {
       { store, history, graphqlMocks: graphqlMock }
     )
 
-    const element = await waitForElement(testComponent, '#row_0')
+    const element = await waitForElement(testComponent, '#name_0')
     element.hostNodes().simulate('click')
 
     await new Promise((resolve) => {
@@ -561,7 +561,7 @@ describe('OfficeHome sent for update tab related tests', () => {
       )
       testComponent = createdTestComponent
       getItem.mockReturnValue(registerScopeToken)
-      await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+      await store.dispatch(checkAuth())
     })
 
     it('downloads the declaration after clicking download button', async () => {
@@ -624,7 +624,7 @@ describe('Tablet tests', () => {
 
   beforeAll(async () => {
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
     resizeWindow(800, 1280)
   })
 
@@ -706,7 +706,7 @@ describe('Tablet tests', () => {
       { store, history }
     )
 
-    const element = await waitForElement(testComponent, '#row_0')
+    const element = await waitForElement(testComponent, '#name_0')
     element.hostNodes().simulate('click')
 
     await new Promise((resolve) => {

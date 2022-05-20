@@ -26,11 +26,12 @@ import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/Na
 import { NavigationSubItem } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
 import { connect } from 'react-redux'
 import {
-  goToRegistrarHomeTab,
+  goToHomeTab,
   goToCertificateConfig,
   goToSettings,
   goToPerformanceView,
   goToTeamView,
+  goToFormConfigHome,
   goToApplicationConfig
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
@@ -38,14 +39,13 @@ import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
-import { Activity, Avatar, Users } from '@opencrvs/components/lib/icons'
+import { Activity, Users } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
-import { ITheme, withTheme } from '@client/styledComponents'
 import { Query } from '@client/components/Query'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { getOfflineData } from '@client/offline/selectors'
@@ -60,6 +60,7 @@ export type IWORKQUEUE_TABS = typeof WORKQUEUE_TABS[Keys]
 
 export const WORKQUEUE_TABS = {
   inProgress: 'progress',
+  inProgressFieldAgent: 'progress/field-agents',
   sentForReview: 'sentForReview',
   requiresUpdateAgent: 'requiresUpdateAgent',
   readyForReview: 'readyForReview',
@@ -73,8 +74,9 @@ export const WORKQUEUE_TABS = {
   application: 'application',
   certificate: 'certificate',
   settings: 'settings',
-  logout: 'logout'
-}
+  logout: 'logout',
+  declarationForms: 'form'
+} as const
 
 const GROUP_ID = {
   declarationGroup: 'declarationGroup',
@@ -164,8 +166,9 @@ interface IProps {
 }
 
 interface IDispatchProps {
-  goToRegistrarHomeTab: typeof goToRegistrarHomeTab
+  goToHomeTab: typeof goToHomeTab
   goToCertificateConfigAction: typeof goToCertificateConfig
+  goToFormConfigAction: typeof goToFormConfigHome
   goToApplicationConfigAction: typeof goToApplicationConfig
   redirectToAuthentication: typeof redirectToAuthentication
   goToPerformanceViewAction: typeof goToPerformanceView
@@ -186,7 +189,8 @@ interface IStateProps {
 type IFullProps = IProps &
   IStateProps &
   IDispatchProps &
-  IntlShapeProps & { theme: ITheme } & RouteComponentProps<{ tabId: string }>
+  IntlShapeProps &
+  RouteComponentProps<{ tabId: string }>
 
 const getSettingsAndLogout = (props: IFullProps) => {
   const {
@@ -230,12 +234,12 @@ export const NavigationView = (props: IFullProps) => {
     enableMenuSelection = true,
     activeMenuItem,
     goToCertificateConfigAction,
+    goToFormConfigAction,
     goToApplicationConfigAction,
     navigationWidth,
     workqueue,
     storedDeclarations,
     draftDeclarations,
-    theme,
     menuCollapse,
     userInfo,
     offlineCountryConfiguration
@@ -247,7 +251,11 @@ export const NavigationView = (props: IFullProps) => {
     : activeMenuItem
     ? activeMenuItem
     : 'review'
-  const configTab = [WORKQUEUE_TABS.application, WORKQUEUE_TABS.certificate]
+  const configTab: string[] = [
+    WORKQUEUE_TABS.application,
+    WORKQUEUE_TABS.certificate,
+    WORKQUEUE_TABS.declarationForms
+  ]
   const [isConfigExpanded, setIsConfigExpanded] = React.useState(false)
   const { loading, error, data, initialSyncDone } = workqueue
   const filteredData = filterProcessingDeclarationsFromQuery(
@@ -299,7 +307,7 @@ export const NavigationView = (props: IFullProps) => {
               count={props.draftDeclarations.length}
               isSelected={tabId === WORKQUEUE_TABS.inProgress}
               onClick={() => {
-                props.goToRegistrarHomeTab(WORKQUEUE_TABS.inProgress)
+                props.goToHomeTab(WORKQUEUE_TABS.inProgress)
                 menuCollapse && menuCollapse()
               }}
             />
@@ -312,7 +320,7 @@ export const NavigationView = (props: IFullProps) => {
               count={props.declarationsReadyToSend.length}
               isSelected={tabId === WORKQUEUE_TABS.sentForReview}
               onClick={() => {
-                props.goToRegistrarHomeTab(WORKQUEUE_TABS.sentForReview)
+                props.goToHomeTab(WORKQUEUE_TABS.sentForReview)
                 menuCollapse && menuCollapse()
               }}
             />
@@ -344,9 +352,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={0}
                       isSelected={tabId === WORKQUEUE_TABS.requiresUpdateAgent}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(
-                          WORKQUEUE_TABS.requiresUpdateAgent
-                        )
+                        props.goToHomeTab(WORKQUEUE_TABS.requiresUpdateAgent)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -363,9 +369,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={data?.searchEvents?.totalItems}
                       isSelected={tabId === WORKQUEUE_TABS.requiresUpdateAgent}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(
-                          WORKQUEUE_TABS.requiresUpdateAgent
-                        )
+                        props.goToHomeTab(WORKQUEUE_TABS.requiresUpdateAgent)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -398,7 +402,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={declarationCount.inProgress}
                       isSelected={tabId === WORKQUEUE_TABS.inProgress}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(WORKQUEUE_TABS.inProgress)
+                        props.goToHomeTab(WORKQUEUE_TABS.inProgress)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -416,9 +420,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={declarationCount.readyForReview}
                       isSelected={tabId === WORKQUEUE_TABS.readyForReview}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(
-                          WORKQUEUE_TABS.readyForReview
-                        )
+                        props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -440,7 +442,7 @@ export const NavigationView = (props: IFullProps) => {
                         tabId === WORKQUEUE_TABS.requiresUpdateRegistrar
                       }
                       onClick={() => {
-                        props.goToRegistrarHomeTab(
+                        props.goToHomeTab(
                           WORKQUEUE_TABS.requiresUpdateRegistrar
                         )
                         menuCollapse && menuCollapse()
@@ -460,9 +462,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={declarationCount.sentForApproval}
                       isSelected={tabId === WORKQUEUE_TABS.sentForApproval}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(
-                          WORKQUEUE_TABS.sentForApproval
-                        )
+                        props.goToHomeTab(WORKQUEUE_TABS.sentForApproval)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -477,9 +477,7 @@ export const NavigationView = (props: IFullProps) => {
                     count={declarationCount.externalValidation}
                     isSelected={tabId === WORKQUEUE_TABS.externalValidation}
                     onClick={() => {
-                      props.goToRegistrarHomeTab(
-                        WORKQUEUE_TABS.externalValidation
-                      )
+                      props.goToHomeTab(WORKQUEUE_TABS.externalValidation)
                       menuCollapse && menuCollapse()
                     }}
                   />
@@ -497,7 +495,7 @@ export const NavigationView = (props: IFullProps) => {
                       count={declarationCount.readyToPrint}
                       isSelected={tabId === WORKQUEUE_TABS.readyToPrint}
                       onClick={() => {
-                        props.goToRegistrarHomeTab(WORKQUEUE_TABS.readyToPrint)
+                        props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
                         menuCollapse && menuCollapse()
                       }}
                     />
@@ -593,6 +591,19 @@ export const NavigationView = (props: IFullProps) => {
                               activeMenuItem === WORKQUEUE_TABS.certificate
                             }
                           />
+                          <NavigationSubItem
+                            id={`navigation_${WORKQUEUE_TABS.declarationForms}`}
+                            label={intl.formatMessage(
+                              navigationMessages[
+                                WORKQUEUE_TABS.declarationForms
+                              ]
+                            )}
+                            onClick={goToFormConfigAction}
+                            isSelected={
+                              enableMenuSelection &&
+                              activeMenuItem === WORKQUEUE_TABS.declarationForms
+                            }
+                          />
                         </>
                       )}
                     </>
@@ -638,6 +649,8 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
       ? WORKQUEUE_TABS.settings
       : window.location.href.includes(WORKQUEUE_TABS.certificate)
       ? WORKQUEUE_TABS.certificate
+      : window.location.href.includes(WORKQUEUE_TABS.declarationForms)
+      ? WORKQUEUE_TABS.declarationForms
       : ''
   }
 }
@@ -648,11 +661,12 @@ export const Navigation = connect<
   IProps,
   IStoreState
 >(mapStateToProps, {
-  goToRegistrarHomeTab,
+  goToHomeTab,
   goToCertificateConfigAction: goToCertificateConfig,
+  goToFormConfigAction: goToFormConfigHome,
   goToApplicationConfigAction: goToApplicationConfig,
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
   goToSettings
-})(injectIntl(withTheme(withRouter(NavigationView))))
+})(injectIntl(withRouter(NavigationView)))

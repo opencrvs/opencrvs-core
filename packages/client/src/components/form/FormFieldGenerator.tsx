@@ -647,7 +647,7 @@ class FormSectionComponent extends React.Component<Props> {
   componentDidUpdate(prevProps: Props) {
     const userChangedForm = !isEqual(this.props.values, prevProps.values)
     const sectionChanged = prevProps.id !== this.props.id
-    const fieldChanged = !isEqual(prevProps.fields, this.props.fields)
+
     if (userChangedForm) {
       prevProps.onChange(this.props.values)
     }
@@ -662,10 +662,6 @@ class FormSectionComponent extends React.Component<Props> {
       ) {
         this.showValidationErrors(this.props.fieldsToShowValidationErrors)
       }
-    }
-
-    if (fieldChanged) {
-      prevProps.resetForm()
     }
   }
 
@@ -831,6 +827,7 @@ class FormSectionComponent extends React.Component<Props> {
               touched[`${field.name}-mm`] &&
               touched[`${field.name}-yyyy`]
           }
+
           const withDynamicallyGeneratedFields =
             field.type === SELECT_WITH_DYNAMIC_OPTIONS
               ? ({
@@ -1045,34 +1042,34 @@ class FormSectionComponent extends React.Component<Props> {
           } else {
             return (
               <FormItem
-                key={`${field.name}${language}${
-                  isFieldDisabled ? 'disabled' : ''
-                }`}
+                key={`${field.name}${language}`}
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
-                <FastField name={field.name}>
-                  {(formikFieldProps: FieldProps<any>) => (
-                    <GeneratedInputField
-                      fieldDefinition={internationaliseFieldObject(
-                        intl,
-                        withDynamicallyGeneratedFields
-                      )}
-                      onSetFieldValue={setFieldValue}
-                      resetDependentSelectValues={
-                        this.resetDependentSelectValues
-                      }
-                      {...formikFieldProps.field}
-                      touched={touched[field.name] || false}
-                      error={isFieldDisabled ? '' : error}
-                      draftData={draftData}
-                      dynamicDispatch={dynamicDispatch}
-                      disabled={isFieldDisabled}
-                      onUploadingStateChanged={
-                        this.props.onUploadingStateChanged
-                      }
-                    />
-                  )}
-                </FastField>
+                <Field name={field.name}>
+                  {(formikFieldProps: FieldProps<any>) => {
+                    return (
+                      <GeneratedInputField
+                        fieldDefinition={internationaliseFieldObject(
+                          intl,
+                          withDynamicallyGeneratedFields
+                        )}
+                        onSetFieldValue={setFieldValue}
+                        resetDependentSelectValues={
+                          this.resetDependentSelectValues
+                        }
+                        {...formikFieldProps.field}
+                        touched={touched[field.name] || false}
+                        error={isFieldDisabled ? '' : error}
+                        draftData={draftData}
+                        dynamicDispatch={dynamicDispatch}
+                        disabled={isFieldDisabled}
+                        onUploadingStateChanged={
+                          this.props.onUploadingStateChanged
+                        }
+                      />
+                    )
+                  }}
+                </Field>
               </FormItem>
             )
           }

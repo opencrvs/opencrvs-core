@@ -30,6 +30,7 @@ if (process.env.CI) {
 }
 
 jest.mock('@client/forms/configuration/default', () => ({
+  ...jest.requireActual('@client/forms/configuration/default'),
   registerForms: mockOfflineData.forms.registerForm
 }))
 
@@ -147,10 +148,9 @@ const navigatorMock = {
   LANGUAGES: 'en,bn,fr',
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
-  BIRTH_REGISTRATION_TARGET: 45,
-  DEATH_REGISTRATION_TARGET: 45,
   NID_NUMBER_PATTERN: /^[0-9]{9}$/,
-  PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/
+  PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/,
+  ADDRESSES: 1
 }
 
 /*
@@ -176,10 +176,7 @@ jest.mock(
       loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
       loadContent: () =>
         Promise.resolve({
-          languages: mockOfflineData.languages,
-          forms: mockOfflineData.forms,
-          templates: mockOfflineData.templates,
-          formConfig: mockOfflineData.formConfig
+          languages: mockOfflineData.languages
         }),
       loadAssets: () => Promise.resolve(mockOfflineData.assets),
       loadConfig: () => Promise.resolve(mockConfigResponse)

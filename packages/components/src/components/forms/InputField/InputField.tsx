@@ -20,7 +20,6 @@ const InputHeader = styled.div`
 `
 const ComponentWrapper = styled.span`
   display: flex;
-  max-width: 344px;
 `
 
 const Padding = styled.span`
@@ -57,6 +56,7 @@ const InputDescription = styled.p<{
 export interface IInputFieldProps {
   id: string
   label?: string
+  className?: string
   helperText?: string
   tooltip?: string
   description?: string
@@ -116,7 +116,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
     )
 
     return (
-      <div id={`${id}-form-input`}>
+      <div id={`${id}-form-input`} className={this.props.className}>
         {!hideInputHeader && (
           <InputHeader>
             {label && (
