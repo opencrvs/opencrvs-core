@@ -8,4 +8,4 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 DIR=$(cd "$(dirname "$0")"; pwd)
-ts-node --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/generate-form.ts $DIR
+ts-node --files --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/generate-form.ts $DIR
