@@ -37,6 +37,7 @@ const MenuContainer = styled.ul`
   z-index: 999999;
   display: flex;
   flex-direction: column;
+  top: 100%;
   right: 0;
   padding: 8px 0;
   margin: 0;
