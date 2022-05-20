@@ -199,7 +199,9 @@ class Component extends React.Component<
             type={NOTIFICATION_TYPE.ALTERNATE_ERROR}
             callback={this.props.hideUnassignedModal}
           >
-            {`You were unassigned from ${unassignedModal.trackingId}.`}
+            {intl.formatMessage(messages.unassigned, {
+              trackingId: unassignedModal.trackingId
+            })}
           </FloatingNotification>
         )}
         {/* More notification types can be added here */}

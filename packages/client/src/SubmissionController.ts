@@ -219,7 +219,6 @@ export class SubmissionController {
 
     if (mutation) {
       try {
-        console.debug('before')
         const mutationResult = await this.client.mutate({
           mutation,
           variables,
@@ -300,7 +299,6 @@ export class SubmissionController {
     if (error.networkError) {
       status = SUBMISSION_STATUS.FAILED_NETWORK
     } else if (error.graphQLErrors[0].extensions.code === 'UNASSIGNED') {
-      console.debug(declaration)
       this.store.dispatch(
         showUnassigned({
           trackingId: declaration.data.registration.trackingId as string
