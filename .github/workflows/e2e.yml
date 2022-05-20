@@ -48,4 +48,4 @@ jobs:
           rm -rf .git
           cp -r ../opencrvs-core/.git .git
           npm install -g cypress
-          cypress run --headless --browser chrome --record --key e0fc7a26-f292-4e48-9716-2009137fe646
+          cypress run --headless --browser chrome --record --key e0fc7a26-f292-4e48-9716-2009137fe646 --spec cypress/integration/certificate.spec.ts
