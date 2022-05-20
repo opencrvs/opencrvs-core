@@ -119,26 +119,34 @@ interface IListViewItemSimplifiedProps {
   label: React.ReactNode
   value?: React.ReactNode
   actions?: React.ReactNode
+  className?: string
 }
 
 export function ListViewItemSimplified({
   image,
   label,
   value,
+  className,
   actions
 }: IListViewItemSimplifiedProps) {
   return (
     <>
-      <ImageContainer data-test-id="list-view-image">{image}</ImageContainer>
+      <ImageContainer className={className} data-test-id="list-view-image">
+        {image}
+      </ImageContainer>
 
-      <LabelContainer data-test-id="list-view-label">{label}</LabelContainer>
+      <LabelContainer className={className} data-test-id="list-view-label">
+        {label}
+      </LabelContainer>
 
-      <ValueContainer data-test-id="list-view-value">{value}</ValueContainer>
+      <ValueContainer className={className} data-test-id="list-view-value">
+        {value}
+      </ValueContainer>
 
-      <ActionsContainer data-test-id="list-view-actions">
+      <ActionsContainer className={className} data-test-id="list-view-actions">
         {actions}
       </ActionsContainer>
-      <MobileContainer data-test-id="list-view-mobile">
+      <MobileContainer className={className} data-test-id="list-view-mobile">
         {image && <MobileImageContainer>{image}</MobileImageContainer>}
         <MobileLabelContainer>{label}</MobileLabelContainer>
         <MobileActionsContainer>{actions}</MobileActionsContainer>
