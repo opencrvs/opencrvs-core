@@ -1857,8 +1857,16 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         ].includes(declaration.downloadStatus as DOWNLOAD_STATUS)
       )
       const updatedDeclarationsQueue = state.declarations
-      updatedDeclarationsQueue[queueIndex].downloadStatus =
-        DOWNLOAD_STATUS.READY_TO_UNASSIGN
+      if (queueIndex === -1) {
+        // Not found locally, unassigning others declaration
+        updatedDeclarationsQueue.push({
+          id: action.payload.id,
+          downloadStatus: DOWNLOAD_STATUS.READY_TO_UNASSIGN
+        } as IDeclaration)
+      } else {
+        updatedDeclarationsQueue[queueIndex].downloadStatus =
+          DOWNLOAD_STATUS.READY_TO_UNASSIGN
+      }
 
       return loop(
         {

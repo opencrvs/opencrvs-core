@@ -85,7 +85,6 @@ import {
 } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
-import { getLanguages } from '@gateway/constants'
 
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
@@ -3611,23 +3610,12 @@ export function addOrUpdateExtension(
   return fhirBundle
 }
 
-interface IRegLastUserData {
-  officeName: string
-  firstName: string
-  lastName: string
-}
-
-interface ICheckUserAssignmentResult {
-  hasAssignedToThisUser: boolean
-  data?: IRegLastUserData
-}
-
 export async function checkUserAssignment(
   id: string,
   authHeader: IAuthHeader
-): Promise<ICheckUserAssignmentResult> {
+): Promise<boolean> {
   if (!authHeader || !authHeader.Authorization) {
-    return { hasAssignedToThisUser: false }
+    return false
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
   const userId = tokenPayload.sub
@@ -3641,16 +3629,14 @@ export async function checkUserAssignment(
     !taskEntryData.resource ||
     !taskEntryData.resource.extension
   ) {
-    return { hasAssignedToThisUser: false }
+    return false
   }
   const assignedExtensionData = findExtension(
     ASSIGNED_EXTENSION_URL,
     taskEntryData.resource.extension
   )
-  let data: IRegLastUserData
   if (!assignedExtensionData) {
-    data = await getRegLastUserData(taskEntryData.resource, authHeader)
-    return { hasAssignedToThisUser: false, data }
+    return false
   }
   const practitionerId =
     assignedExtensionData?.valueReference?.reference?.split('/')[1]
@@ -3658,38 +3644,9 @@ export async function checkUserAssignment(
   const userDetails = await getUser({ userId }, authHeader)
 
   if (practitionerId === userDetails.practitionerId) {
-    return { hasAssignedToThisUser: true }
+    return true
   }
-  data = await getRegLastUserData(taskEntryData.resource, authHeader)
-  return {
-    hasAssignedToThisUser: false,
-    data
-  }
-}
-
-async function getRegLastUserData(
-  task: fhir.Task,
-  authHeader: IAuthHeader
-): Promise<IRegLastUserData> {
-  const regLastOfficeExtension = findExtension(
-    'http://opencrvs.org/specs/extension/regLastOffice',
-    task.extension || []
-  )
-  const regLastUserExtenstion = findExtension(
-    'http://opencrvs.org/specs/extension/regLastUser',
-    task.extension || []
-  )
-  const regLastUserPractionerId =
-    regLastUserExtenstion?.valueReference?.reference?.split('/')[1]
-  const officeName = regLastOfficeExtension?.valueString || ''
-  const assignedUser = await getUser(
-    { practitionerId: regLastUserPractionerId },
-    authHeader
-  )
-  const name = assignedUser.name.find(({ use }) => use === getLanguages()[0]) // Name of default locale
-  const firstName = name?.given.join(' ') || ''
-  const lastName = name?.family || ''
-  return { officeName, firstName, lastName }
+  return false
 }
 
 export interface ITemplatedComposition extends fhir.Composition {

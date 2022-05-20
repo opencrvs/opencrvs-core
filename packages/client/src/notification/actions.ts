@@ -34,6 +34,9 @@ export const HIDE_USER_AUDIT_SUCCESS_TOAST = 'HIDE_USER_AUDIT_SUCCESS_TOAST'
 export const SHOW_PIN_UPDATE_SUCCESS = 'SHOW_PIN_UPDATE_SUCCESS'
 export const HIDE_PIN_UPDATE_SUCCESS = 'HIDE_PIN_UPDATE_SUCCESS'
 
+export const SHOW_UNASSIGNED = 'SHOW_UNASSIGNED'
+export const HIDE_UNASSIGNED = 'HIDE_UNASSIGNED'
+
 export type ShowConfigurationErrorAction = {
   type: typeof SHOW_CONFIG_ERROR
 }
@@ -115,6 +118,19 @@ export type SessionExpiredAction = {
   type: typeof SESSION_EXPIRED
 }
 
+export interface ShowUnassignedPayload extends Record<string, string> {
+  trackingId: string
+}
+
+export type ShowUnassigned = {
+  type: typeof SHOW_UNASSIGNED
+  payload: ShowUnassignedPayload
+}
+
+export type HideUnassigned = {
+  type: typeof HIDE_UNASSIGNED
+}
+
 export const showBackgroundSyncedNotification =
   (): ShowBackgroundSyncedAction => ({
     type: SHOW_BACKGROUND_SYNC_TRIGGERED
@@ -191,6 +207,17 @@ export const hidePINUpdateSuccessToast = (): HidePINUpdateSuccessAction => ({
   type: HIDE_PIN_UPDATE_SUCCESS
 })
 
+export const showUnassigned = (
+  data: ShowUnassignedPayload
+): ShowUnassigned => ({
+  type: SHOW_UNASSIGNED,
+  payload: data
+})
+
+export const hideUnassignedModal = (): HideUnassigned => ({
+  type: HIDE_UNASSIGNED
+})
+
 export type Action =
   | ShowBackgroundSyncedAction
   | HideBackgroundSyncedAction
@@ -208,3 +235,5 @@ export type Action =
   | HidePINUpdateSuccessAction
   | ShowDownloadDeclarationFailedToast
   | HideDownloadDeclarationFailedToast
+  | ShowUnassigned
+  | HideUnassigned

@@ -18,7 +18,8 @@ import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import {
   NOTIFICATION_TYPE,
-  FloatingNotification
+  FloatingNotification,
+  ResponsiveModal
 } from '@opencrvs/components/lib/interface'
 import {
   hideBackgroundSyncedNotification,
@@ -28,7 +29,9 @@ import {
   hideSubmitFormErrorToast,
   hideUserAuditSuccessToast,
   hidePINUpdateSuccessToast,
-  hideDownloadDeclarationFailedToast
+  hideDownloadDeclarationFailedToast,
+  ShowUnassignedPayload,
+  hideUnassignedModal
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { NotificationState } from '@client/notification/reducer'
@@ -43,6 +46,7 @@ type NotificationProps = {
   userAuditSuccessToast: NotificationState['userAuditSuccessToast']
   showPINUpdateSuccess: boolean
   downloadDeclarationFailedToast: NotificationState['downloadDeclarationFailedToast']
+  unassignedModal: ShowUnassignedPayload | null
 }
 
 type DispatchProps = {
@@ -54,6 +58,7 @@ type DispatchProps = {
   hideUserAuditSuccessToast: typeof hideUserAuditSuccessToast
   hidePINUpdateSuccessToast: typeof hidePINUpdateSuccessToast
   hideDownloadDeclarationFailedToast: typeof hideDownloadDeclarationFailedToast
+  hideUnassignedModal: typeof hideUnassignedModal
 }
 
 class Component extends React.Component<
@@ -94,7 +99,8 @@ class Component extends React.Component<
       submitFormErrorToast,
       userAuditSuccessToast,
       showPINUpdateSuccess,
-      downloadDeclarationFailedToast
+      downloadDeclarationFailedToast,
+      unassignedModal
     } = this.props
 
     return (
@@ -186,6 +192,16 @@ class Component extends React.Component<
             {intl.formatMessage(messages.downloadDeclarationFailed)}
           </FloatingNotification>
         )}
+        {unassignedModal !== null && (
+          <FloatingNotification
+            id="unassignedModal"
+            show
+            type={NOTIFICATION_TYPE.ALTERNATE_ERROR}
+            callback={this.props.hideUnassignedModal}
+          >
+            {`You were unassigned from ${unassignedModal.trackingId}.`}
+          </FloatingNotification>
+        )}
         {/* More notification types can be added here */}
       </div>
     )
@@ -204,7 +220,8 @@ const mapStateToProps = (store: IStoreState) => {
     userAuditSuccessToast: store.notification.userAuditSuccessToast,
     showPINUpdateSuccess: store.notification.showPINUpdateSuccess,
     downloadDeclarationFailedToast:
-      store.notification.downloadDeclarationFailedToast
+      store.notification.downloadDeclarationFailedToast,
+    unassignedModal: store.notification.unassignedModal
   }
 }
 
@@ -217,6 +234,7 @@ export const NotificationComponent = withRouter(
     toggleDraftSavedNotification,
     hideUserAuditSuccessToast,
     hidePINUpdateSuccessToast,
-    hideDownloadDeclarationFailedToast
+    hideDownloadDeclarationFailedToast,
+    hideUnassignedModal
   })(injectIntl(Component))
 )

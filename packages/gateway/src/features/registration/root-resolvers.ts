@@ -281,12 +281,9 @@ export const resolvers: GQLResolver = {
       }
     },
     async markBirthAsValidated(_, { id, details }, authHeader) {
-      const { hasAssignedToThisUser, data } = await checkUserAssignment(
-        id,
-        authHeader
-      )
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('ASSIGNMENT_PROBLEM', '400', data)
+        throw new ApolloError('ASSIGNMENT_PROBLEM', 'UNASSIGNED')
       }
       if (!hasScope(authHeader, 'validate')) {
         return await Promise.reject(
@@ -302,12 +299,9 @@ export const resolvers: GQLResolver = {
       }
     },
     async markDeathAsValidated(_, { id, details }, authHeader) {
-      const { hasAssignedToThisUser, data } = await checkUserAssignment(
-        id,
-        authHeader
-      )
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('ASSIGNMENT_PROBLEM', '400', data)
+        throw new ApolloError('ASSIGNMENT_PROBLEM', 'UNASSIGNED')
       }
       if (!hasScope(authHeader, 'validate')) {
         return await Promise.reject(
@@ -322,12 +316,9 @@ export const resolvers: GQLResolver = {
       )
     },
     async markBirthAsRegistered(_, { id, details }, authHeader) {
-      const { hasAssignedToThisUser, data } = await checkUserAssignment(
-        id,
-        authHeader
-      )
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('ASSIGNMENT_PROBLEM', '400', data)
+        throw new ApolloError('ASSIGNMENT_PROBLEM', 'UNASSIGNED')
       }
       if (hasScope(authHeader, 'register')) {
         return markEventAsRegistered(id, authHeader, EVENT_TYPE.BIRTH, details)
@@ -338,12 +329,9 @@ export const resolvers: GQLResolver = {
       }
     },
     async markDeathAsRegistered(_, { id, details }, authHeader) {
-      const { hasAssignedToThisUser, data } = await checkUserAssignment(
-        id,
-        authHeader
-      )
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('ASSIGNMENT_PROBLEM', '400', data)
+        throw new ApolloError('ASSIGNMENT_PROBLEM', 'UNASSIGNED')
       }
       if (hasScope(authHeader, 'register')) {
         return await markEventAsRegistered(
@@ -359,12 +347,9 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsVoided(_, { id, reason, comment }, authHeader) {
-      const { hasAssignedToThisUser, data } = await checkUserAssignment(
-        id,
-        authHeader
-      )
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('ASSIGNMENT_PROBLEM', '400', data)
+        throw new ApolloError('ASSIGNMENT_PROBLEM', 'UNASSIGNED')
       }
       if (
         hasScope(authHeader, 'register') ||
@@ -400,12 +385,9 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsArchived(_, { id }, authHeader) {
-      const { hasAssignedToThisUser, data } = await checkUserAssignment(
-        id,
-        authHeader
-      )
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('ASSIGNMENT_PROBLEM', '400', data)
+        throw new ApolloError('ASSIGNMENT_PROBLEM', 'UNASSIGNED')
       }
       if (
         hasScope(authHeader, 'register') ||
@@ -450,12 +432,9 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsReinstated(_, { id }, authHeader) {
-      const { hasAssignedToThisUser, data } = await checkUserAssignment(
-        id,
-        authHeader
-      )
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('ASSIGNMENT_PROBLEM', '400', data)
+        throw new ApolloError('ASSIGNMENT_PROBLEM', 'UNASSIGNED')
       }
       if (
         hasScope(authHeader, 'register') ||
@@ -540,12 +519,9 @@ export const resolvers: GQLResolver = {
       }
     },
     async markBirthAsCertified(_, { id, details }, authHeader) {
-      const { hasAssignedToThisUser, data } = await checkUserAssignment(
-        id,
-        authHeader
-      )
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('ASSIGNMENT_PROBLEM', '400', data)
+        throw new ApolloError('ASSIGNMENT_PROBLEM', 'UNASSIGNED')
       }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
@@ -554,12 +530,9 @@ export const resolvers: GQLResolver = {
       }
     },
     async markDeathAsCertified(_, { id, details }, authHeader) {
-      const { hasAssignedToThisUser, data } = await checkUserAssignment(
-        id,
-        authHeader
-      )
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('ASSIGNMENT_PROBLEM', '400', data)
+        throw new ApolloError('ASSIGNMENT_PROBLEM', 'UNASSIGNED')
       }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
