@@ -193,8 +193,9 @@ export interface IWorkqueue {
 }
 
 interface IWorkqueuePaginationParams {
+  userId?: string
   pageSize: number
-
+  isFieldAgent: boolean
   inProgressSkip: number
   healthSystemSkip: number
   reviewSkip: number
@@ -862,7 +863,6 @@ async function updateWorkqueueData(
       (declaration.data.registration.contactPoint as IContactPoint).nestedFields
         .registrationPhone) ||
     ''
-
   if (declaration.event === 'birth') {
     ;(workqueueApp as GQLBirthEventSearchSet).childName = transformedName
     ;(workqueueApp as GQLBirthEventSearchSet).dateOfBirth = transformedBirthDate
@@ -978,7 +978,12 @@ function mergeWorkQueueData(
     return destinationWorkQueue
   }
   workQueueIds.forEach((workQueueId) => {
-    if (!destinationWorkQueue.data[workQueueId].results) {
+    if (
+      !(
+        destinationWorkQueue.data &&
+        destinationWorkQueue.data[workQueueId]?.results
+      )
+    ) {
       return
     }
     ;(
@@ -990,7 +995,6 @@ function mergeWorkQueueData(
       const declarationIndex = currentApplications.findIndex(
         (app) => app && app.id === declaration.id
       )
-
       if (declarationIndex >= 0) {
         const isDownloadFailed =
           currentApplications[declarationIndex].downloadStatus ===
@@ -1027,7 +1031,9 @@ async function getWorkqueueData(
       : [EVENT_STATUS.DECLARED]
 
   const {
+    userId,
     pageSize,
+    isFieldAgent,
     inProgressSkip,
     healthSystemSkip,
     reviewSkip,
@@ -1041,15 +1047,16 @@ async function getWorkqueueData(
     registrationLocationId,
     reviewStatuses,
     pageSize,
+    isFieldAgent,
     inProgressSkip,
     healthSystemSkip,
     reviewSkip,
     rejectSkip,
     approvalSkip,
     externalValidationSkip,
-    printSkip
+    printSkip,
+    userId
   )
-
   let workqueue
   if (result) {
     workqueue = {
@@ -1071,6 +1078,14 @@ async function getWorkqueueData(
   const { currentUserData } = await getUserData(
     userDetails.userMgntUserID || ''
   )
+  if (isFieldAgent) {
+    return mergeWorkQueueData(
+      state,
+      ['reviewTab', 'rejectTab'],
+      currentUserData && currentUserData.declarations,
+      workqueue
+    )
+  }
   return mergeWorkQueueData(
     state,
     ['inProgressTab', 'notificationTab', 'reviewTab', 'rejectTab'],
@@ -1097,7 +1112,6 @@ export async function writeRegistrarWorkqueueByUser(
     workqueuePaginationParams,
     currentUserData && currentUserData.workqueue
   )
-
   if (currentUserData) {
     currentUserData.workqueue = workqueue
   } else {
@@ -1148,8 +1162,9 @@ export function downloadDeclaration(
 }
 
 export function updateRegistrarWorkqueue(
+  userId?: string,
   pageSize = 10,
-
+  isFieldAgent = false,
   inProgressSkip = 0,
   healthSystemSkip = 0,
   reviewSkip = 0,
@@ -1161,8 +1176,9 @@ export function updateRegistrarWorkqueue(
   return {
     type: UPDATE_REGISTRAR_WORKQUEUE,
     payload: {
+      userId,
       pageSize,
-
+      isFieldAgent,
       inProgressSkip,
       healthSystemSkip,
       reviewSkip,
@@ -1857,7 +1873,7 @@ export function filterProcessingDeclarations(
   data: GQLEventSearchResultSet,
   processingDeclarationIds: string[]
 ): GQLEventSearchResultSet {
-  if (!data.results) {
+  if (!data?.results) {
     return data
   }
 

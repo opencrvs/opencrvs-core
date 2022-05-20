@@ -203,12 +203,25 @@ export class OfficeHomeView extends React.Component<
   }
 
   syncWorkQueueFieldAgent() {
-    this.props.updateFieldAgentDeclaredDeclarations()
+    this.props.updateRegistrarWorkqueue(
+      this.props.userDetails?.practitionerId,
+      this.pageSize,
+      true,
+      Math.max(this.state.progressCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.healthSystemCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.reviewCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.updatesCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.approvalCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.externalValidationCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.printCurrentPage - 1, 0) * this.pageSize
+    )
   }
 
   syncWorkqueueRegistrationClerk() {
     this.props.updateRegistrarWorkqueue(
+      this.props.userDetails?.practitionerId,
       this.pageSize,
+      false,
       Math.max(this.state.progressCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.healthSystemCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.reviewCurrentPage - 1, 0) * this.pageSize,
@@ -225,6 +238,9 @@ export class OfficeHomeView extends React.Component<
         () => this.syncWorkQueueFieldAgent(),
         PAGE_TRANSITIONS_ENTER_TIME
       )
+      this.interval = setInterval(() => {
+        this.syncWorkqueueRegistrationClerk()
+      }, 300000)
     } else {
       setTimeout(() => {
         this.syncWorkqueueRegistrationClerk()
@@ -261,7 +277,6 @@ export class OfficeHomeView extends React.Component<
       }
     }
   }
-
   userHasRegisterScope() {
     return this.props.scope && this.props.scope.includes('register')
   }
@@ -363,6 +378,7 @@ export class OfficeHomeView extends React.Component<
       data,
       storedDeclarations
     )
+
     return (
       <>
         {this.role &&

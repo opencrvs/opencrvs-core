@@ -144,6 +144,83 @@ export const REGISTRATION_HOME_QUERY = gql`
   }
 `
 
+export const FIELD_AGENT_HOME_QUERY = gql`
+  ${EVENT_SEARCH_RESULT_FIELDS}
+  query registrationHome(
+    $userId: String
+    $locationIds: [String]
+    $pageSize: Int
+    $reviewSkip: Int
+    $rejectSkip: Int
+    $approvalSkip: Int
+    $externalValidationSkip: Int
+    $printSkip: Int
+  ) {
+    reviewTab: searchEvents(
+      userId: $userId
+      locationIds: $locationIds
+      status: ["DECLARED", "IN_PROGRESS"]
+      count: $pageSize
+      skip: $reviewSkip
+    ) {
+      totalItems
+      results {
+        ...EventSearchFields
+      }
+    }
+    rejectTab: searchEvents(
+      userId: $userId
+      locationIds: $locationIds
+      status: ["REJECTED"]
+      count: $pageSize
+      skip: $rejectSkip
+      sortColumn: "createdAt.keyword"
+      sort: "asc"
+    ) {
+      totalItems
+      results {
+        ...EventSearchFields
+      }
+    }
+    approvalTab: searchEvents(
+      userId: $userId
+      locationIds: $locationIds
+      status: ["VALIDATED"]
+      count: $pageSize
+      skip: $approvalSkip
+    ) {
+      totalItems
+      results {
+        ...EventSearchFields
+      }
+    }
+    externalValidationTab: searchEvents(
+      userId: $userId
+      locationIds: $locationIds
+      status: ["WAITING_VALIDATION"]
+      count: $pageSize
+      skip: $externalValidationSkip
+    ) {
+      totalItems
+      results {
+        ...EventSearchFields
+      }
+    }
+    printTab: searchEvents(
+      userId: $userId
+      locationIds: $locationIds
+      status: ["REGISTERED"]
+      count: $pageSize
+      skip: $printSkip
+    ) {
+      totalItems
+      results {
+        ...EventSearchFields
+      }
+    }
+  }
+`
+
 export const SEARCH_EVENTS = gql`
   ${EVENT_SEARCH_RESULT_FIELDS}
   query searchEventsForWorkqueue(

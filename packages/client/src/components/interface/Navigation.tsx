@@ -273,8 +273,8 @@ export const NavigationView = (props: IFullProps) => {
             draft.submissionStatus ===
             SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
         ).length +
-        (filteredData.inProgressTab.totalItems || 0) +
-        (filteredData.notificationTab.totalItems || 0),
+        (filteredData.inProgressTab?.totalItems || 0) +
+        (filteredData.notificationTab?.totalItems || 0),
     readyForReview: !initialSyncDone ? 0 : filteredData.reviewTab.totalItems,
     requiresUpdateRegistrar: !initialSyncDone
       ? 0
