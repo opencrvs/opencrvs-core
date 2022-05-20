@@ -385,7 +385,7 @@ export const mockUserGraphqlOperation = {
               {
                 id: 'signature-attachment',
                 title: {
-                  defaultMessage: 'Attach the signature',
+                  defaultMessage: 'Upload a signature',
                   description: 'Title for user signature attachment',
                   id: 'form.field.label.userSignatureAttachmentTitle'
                 },

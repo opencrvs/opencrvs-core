@@ -65,7 +65,7 @@ describe('signature upload tests', () => {
 
       const title = testComponent.find('#form-title').hostNodes().text()
 
-      expect(title).toBe('Attach the signature')
+      expect(title).toBe('Upload a signature')
     })
 
     it('return if not file', async () => {

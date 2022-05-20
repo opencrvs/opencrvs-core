@@ -2012,7 +2012,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.declaration.whoseContactDetails'
   },
   userSignatureAttachmentTitle: {
-    defaultMessage: 'Attach the signature',
+    defaultMessage: 'Upload a signature',
     description: 'Title for user signature attachment',
     id: 'form.field.label.userSignatureAttachmentTitle'
   },

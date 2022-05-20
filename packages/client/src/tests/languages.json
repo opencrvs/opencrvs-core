@@ -1142,7 +1142,7 @@
         "validations.validNationalIDLengths": "10 or 17",
         "validations.validPassportNumber": "The Passport Number can only be alpha numeric and must be {validLength} characters long",
         "validations.nonDecimalPointNumber": "Can not have any decimal point number",
-        "form.field.label.userSignatureAttachmentTitle": "Attach the signature",
+        "form.field.label.userSignatureAttachmentTitle": "Upload a signature",
         "form.field.label.userSignatureAttachment": "User’s signature",
         "form.field.label.userSignatureAttachmentDesc": "Ask the user to sign a piece of paper and then scan or take a photo.",
         "form.field.label.userAttachmentSection": "Attachments",

@@ -86,7 +86,7 @@ export const messages = {
     id: 'form.field.label.userDevice'
   },
   userSignatureAttachmentTitle: {
-    defaultMessage: 'Attach the signature',
+    defaultMessage: 'Upload a signature',
     description: 'Title for user signature attachment',
     id: 'form.field.label.userSignatureAttachmentTitle'
   },
