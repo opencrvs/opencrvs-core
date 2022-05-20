@@ -298,7 +298,7 @@ export class SubmissionController {
     let status
     if (error.networkError) {
       status = SUBMISSION_STATUS.FAILED_NETWORK
-    } else if (error.graphQLErrors[0].extensions.code === 'UNASSIGNED') {
+    } else if (error.graphQLErrors?.[0].extensions.code === 'UNASSIGNED') {
       this.store.dispatch(
         showUnassigned({
           trackingId: declaration.data.registration.trackingId as string

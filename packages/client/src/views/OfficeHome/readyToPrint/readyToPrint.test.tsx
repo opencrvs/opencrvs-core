@@ -690,6 +690,9 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
       testComponent.update()
 
+      expect(testComponent.find('#assignment').hostNodes()).toHaveLength(1)
+
+      testComponent.find('#assign').hostNodes().simulate('click')
       expect(
         testComponent.find('#action-loading-ListItemAction-1').hostNodes()
       ).toHaveLength(1)
@@ -727,7 +730,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#ListItemAction-0-download-failed'
+        '#ListItemAction-0-icon-failed'
       )
 
       expect(errorIcon.hostNodes()).toHaveLength(1)

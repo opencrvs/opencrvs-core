@@ -574,6 +574,9 @@ describe('OfficeHome sent for update tab related tests', () => {
 
       testComponent.update()
 
+      expect(testComponent.find('#assignment').hostNodes()).toHaveLength(1)
+      testComponent.find('#assign').hostNodes().simulate('click')
+
       expect(
         testComponent.find('#action-loading-ListItemAction-0').hostNodes()
       ).toHaveLength(1)
@@ -611,7 +614,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#ListItemAction-1-download-failed'
+        '#ListItemAction-1-icon-failed'
       )
 
       expect(errorIcon.hostNodes()).toHaveLength(1)

@@ -330,6 +330,7 @@ export class SearchResultView extends React.Component<
               downloadConfigs={{
                 event: reg.event,
                 compositionId: reg.id,
+                assignment: reg.assignment,
                 action:
                   ((declarationIsRegistered || declarationIsCertified) &&
                     Action.LOAD_CERTIFICATE_DECLARATION) ||

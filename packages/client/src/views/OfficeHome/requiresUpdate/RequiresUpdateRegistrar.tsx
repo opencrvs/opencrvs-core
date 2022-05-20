@@ -219,7 +219,8 @@ class RequiresUpdateRegistrarComponent extends React.Component<
             downloadConfigs={{
               event: reg.event,
               compositionId: reg.id,
-              action: Action.LOAD_REVIEW_DECLARATION
+              action: Action.LOAD_REVIEW_DECLARATION,
+              assignment: reg.assignment
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus}

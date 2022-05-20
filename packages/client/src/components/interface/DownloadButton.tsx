@@ -94,6 +94,7 @@ const DownloadAction = styled(CircleButton)`
 `
 interface IModalAction extends Omit<IActionObject, 'label'> {
   type: 'success' | 'danger' | 'tertiary'
+  id: string
   label: MessageDescriptor
 }
 interface AssignModalOptions {
@@ -113,22 +114,30 @@ function getAssignModalOptions(
   userRole?: string,
   isDownloadedBySelf?: boolean
 ): AssignModalOptions {
+  const assignAction: IModalAction = {
+    id: 'assign',
+    label: buttonMessages.assign,
+    type: 'success',
+    handler: callbacks.onAssign
+  }
+  const unassignAction: IModalAction = {
+    id: 'unassign',
+    label: buttonMessages.unassign,
+    type: 'danger',
+    handler: callbacks.onUnassign
+  }
+  const cancelAction: IModalAction = {
+    id: 'cancel',
+    label: buttonMessages.cancel,
+    type: 'tertiary',
+    handler: callbacks.onCancel
+  }
+
   if (isDownloadedBySelf) {
     return {
       title: conflictsMessages.unassignTitle,
       content: conflictsMessages.selfUnassignDesc,
-      actions: [
-        {
-          label: buttonMessages.cancel,
-          type: 'tertiary',
-          handler: callbacks.onCancel
-        },
-        {
-          label: buttonMessages.unassign,
-          type: 'danger',
-          handler: callbacks.onUnassign
-        }
-      ]
+      actions: [cancelAction, unassignAction]
     }
   } else if (assignment) {
     if (userRole === ROLE_LOCAL_REGISTRAR) {
@@ -139,18 +148,7 @@ function getAssignModalOptions(
           name: [assignment.firstName, assignment.lastName].join(' '),
           officeName: assignment.officeName || ''
         },
-        actions: [
-          {
-            label: buttonMessages.cancel,
-            type: 'tertiary',
-            handler: callbacks.onCancel
-          },
-          {
-            label: buttonMessages.unassign,
-            type: 'danger',
-            handler: callbacks.onUnassign
-          }
-        ]
+        actions: [cancelAction, unassignAction]
       }
     }
     return {
@@ -166,18 +164,7 @@ function getAssignModalOptions(
     return {
       title: conflictsMessages.assignTitle,
       content: conflictsMessages.assignDesc,
-      actions: [
-        {
-          label: buttonMessages.cancel,
-          type: 'tertiary',
-          handler: callbacks.onCancel
-        },
-        {
-          label: buttonMessages.assign,
-          type: 'success',
-          handler: callbacks.onAssign
-        }
-      ]
+      actions: [cancelAction, assignAction]
     }
   }
 }
@@ -199,7 +186,9 @@ function renderModalAction(action: IModalAction, intl: IntlShape): JSX.Element {
     Button = TertiaryButton
   }
   return (
-    <Button onClick={action.handler}>{intl.formatMessage(action.label)}</Button>
+    <Button id={action.id} onClick={action.handler}>
+      {intl.formatMessage(action.label)}
+    </Button>
   )
 }
 
@@ -244,6 +233,12 @@ function DownloadButtonComponent(
   const unassign = useCallback(async () => {
     unassignDeclaration(compositionId, client)
   }, [compositionId, client, unassignDeclaration])
+  const isFailed = useMemo(
+    () =>
+      status === DOWNLOAD_STATUS.FAILED ||
+      status === DOWNLOAD_STATUS.FAILED_NETWORK,
+    [status]
+  )
 
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -309,7 +304,7 @@ function DownloadButtonComponent(
   return (
     <>
       <DownloadAction
-        id={`${id}-icon`}
+        id={`${id}-icon${isFailed ? `-failed` : ``}`}
         onClick={onClickDownload}
         className={className}
       >
@@ -323,16 +318,12 @@ function DownloadButtonComponent(
             }}
           />
         ) : (
-          <Download
-            isFailed={
-              status === DOWNLOAD_STATUS.FAILED ||
-              status === DOWNLOAD_STATUS.FAILED_NETWORK
-            }
-          />
+          <Download isFailed={isFailed} />
         )}
       </DownloadAction>
       {assignModal !== null && (
         <ResponsiveModal
+          id="assignment"
           show
           title={intl.formatMessage(assignModal.title)}
           actions={assignModal.actions.map((action) =>
