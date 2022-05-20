@@ -1062,10 +1062,6 @@ export const registerForms: IDefaultRegisterForms = {
                   {
                     operation: 'dateInPast',
                     parameters: []
-                  },
-                  {
-                    operation: 'isValidParentsBirthDate',
-                    parameters: [5]
                   }
                 ],
                 mapping: {
@@ -2224,7 +2220,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'Hidden for Parent Details none or Mother only',
                     action: 'hide',
                     expression:
-                      '!draftData.mother.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      'draftData && draftData.mother && !draftData.mother.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2268,7 +2264,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'Hidden for Parent Details none or Father only',
                     action: 'hide',
                     expression:
-                      '!draftData.father.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      'draftData && draftData.father && !draftData.father.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -3362,7 +3358,7 @@ export const registerForms: IDefaultRegisterForms = {
                 conditionals: [
                   {
                     action: 'hide',
-                    expression: '!values.causeOfDeathEstablished'
+                    expression: 'values.causeOfDeathEstablished !== "true"'
                   }
                 ],
                 options: [
@@ -3836,6 +3832,13 @@ export const registerForms: IDefaultRegisterForms = {
                   deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF,
                 hideAsterisk: true,
                 validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      'draftData?.deathEvent?.causeOfDeathEstablished !== "true"'
+                  }
+                ],
                 options: [
                   {
                     value:

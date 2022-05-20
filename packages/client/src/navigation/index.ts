@@ -72,7 +72,7 @@ import {
 } from 'connected-react-router'
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
-import { IRecordAuditTabs } from '@client/views/Home/RecordAudit'
+import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
 import subYears from 'date-fns/subYears'
 import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 

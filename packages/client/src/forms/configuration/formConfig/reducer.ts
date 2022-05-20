@@ -88,6 +88,7 @@ function getReadyState({ formDrafts, questionConfig }: IFormConfig) {
         version: 0,
         status: DraftStatus.DRAFT,
         event: Event.BIRTH,
+        history: [],
         createdAt: Date.now(),
         updatedAt: Date.now()
       },
@@ -99,6 +100,7 @@ function getReadyState({ formDrafts, questionConfig }: IFormConfig) {
         version: 0,
         status: DraftStatus.DRAFT,
         event: Event.DEATH,
+        history: [],
         createdAt: Date.now(),
         updatedAt: Date.now()
       },
