@@ -91,6 +91,7 @@ jobs:
       - name: Run Cypress tests
         run: |
           cd opencrvs-farajaland
+          rm -rf .git
           yarn install
           npm install -g cypress
           cypress run --record --key e0fc7a26-f292-4e48-9716-2009137fe646 --headless --browser chrome
