@@ -38,6 +38,9 @@ import { AvatarVerySmall } from '@client/components/Avatar'
 import { ROLE_LOCAL_REGISTRAR } from '@client/utils/constants'
 import { Dispatch } from 'redux'
 import ApolloClient from 'apollo-client'
+import { useIntl, IntlShape, MessageDescriptor } from 'react-intl'
+import { buttonMessages } from '@client/i18n/messages'
+import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -83,13 +86,15 @@ const DownloadAction = styled(CircleButton)`
     padding: 0px 0px;
   }
 `
-interface IModalAction extends IActionObject {
+interface IModalAction extends Omit<IActionObject, 'label'> {
   type: 'success' | 'danger' | 'tertiary'
+  label: MessageDescriptor
 }
 interface AssignModalOptions {
-  title: string
+  title: MessageDescriptor
   actions: IModalAction[]
-  content: string
+  content: MessageDescriptor
+  contentArgs?: Record<string, string>
 }
 
 function getAssignModalOptions(
@@ -104,47 +109,65 @@ function getAssignModalOptions(
 ): AssignModalOptions {
   if (isDownloadedBySelf) {
     return {
-      title: 'Unassign record?',
-      content:
-        'Unassigning this record will mean that any current edits will be lost. Please confirm you wish to continue.',
+      title: conflictsMessages.unassignTitle,
+      content: conflictsMessages.selfUnassignDesc,
       actions: [
-        { label: 'Cancel', type: 'tertiary', handler: callbacks.onCancel },
-        { label: 'Unassign', type: 'danger', handler: callbacks.onUnassign }
+        {
+          label: buttonMessages.cancel,
+          type: 'tertiary',
+          handler: callbacks.onCancel
+        },
+        {
+          label: buttonMessages.unassign,
+          type: 'danger',
+          handler: callbacks.onUnassign
+        }
       ]
     }
   } else if (assignment) {
     if (userRole === ROLE_LOCAL_REGISTRAR) {
       return {
-        title: 'Unassign record?',
-        content: `${[assignment.firstName, assignment.lastName].join(' ')} at ${
-          assignment.officeName
-        } currently has sole editable access to this record. Unassigning this record will mean their current edits will be lost. Please confirm you wish to continue.`,
+        title: conflictsMessages.unassignTitle,
+        content: conflictsMessages.regUnassignDesc,
+        contentArgs: {
+          name: [assignment.firstName, assignment.lastName].join(' '),
+          officeName: assignment.officeName || ''
+        },
         actions: [
-          { label: 'Cancel', type: 'tertiary', handler: callbacks.onCancel },
-          { label: 'Unassign', type: 'danger', handler: callbacks.onUnassign }
+          {
+            label: buttonMessages.cancel,
+            type: 'tertiary',
+            handler: callbacks.onCancel
+          },
+          {
+            label: buttonMessages.unassign,
+            type: 'danger',
+            handler: callbacks.onUnassign
+          }
         ]
       }
     }
     return {
-      title: 'Assigned record',
-      content: `${[assignment.firstName, assignment.lastName].join(' ')} at ${
-        assignment.officeName
-      } has sole editable access to this record`,
+      title: conflictsMessages.assignedTitle,
+      content: conflictsMessages.assignedDesc,
+      contentArgs: {
+        name: [assignment.firstName, assignment.lastName].join(' '),
+        officeName: assignment.officeName || ''
+      },
       actions: []
     }
   } else {
     return {
-      title: 'Assign record?',
-      content:
-        'Please note you will have sole access to this record. Please make any updates promptly otherwise unassign the record.',
+      title: conflictsMessages.assignTitle,
+      content: conflictsMessages.assignDesc,
       actions: [
         {
-          label: 'Cancel',
+          label: buttonMessages.cancel,
           type: 'tertiary',
           handler: callbacks.onCancel
         },
         {
-          label: 'Assign',
+          label: buttonMessages.assign,
           type: 'success',
           handler: callbacks.onAssign
         }
@@ -153,7 +176,7 @@ function getAssignModalOptions(
   }
 }
 
-function renderModalAction(action: IModalAction): JSX.Element {
+function renderModalAction(action: IModalAction, intl: IntlShape): JSX.Element {
   let Button
   if (action.type === 'success') {
     Button = SuccessButton
@@ -162,10 +185,13 @@ function renderModalAction(action: IModalAction): JSX.Element {
   } else {
     Button = TertiaryButton
   }
-  return <Button onClick={action.handler}>{action.label}</Button>
+  return (
+    <Button onClick={action.handler}>{intl.formatMessage(action.label)}</Button>
+  )
 }
 
 function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
+  const intl = useIntl()
   const LOADING_STATUSES = useMemo(function () {
     return [
       DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
@@ -275,14 +301,16 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
       {assignModal !== null && (
         <ResponsiveModal
           show
-          title={assignModal.title}
-          actions={assignModal.actions.map(renderModalAction)}
+          title={intl.formatMessage(assignModal.title)}
+          actions={assignModal.actions.map((action) =>
+            renderModalAction(action, intl)
+          )}
           autoHeight
           responsive={false}
           preventClickOnParent
           handleClose={hideModal}
         >
-          {assignModal.content}
+          {intl.formatMessage(assignModal.content, assignModal.contentArgs)}
         </ResponsiveModal>
       )}
     </>
