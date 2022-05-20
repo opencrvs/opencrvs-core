@@ -50,9 +50,6 @@ export const FormTitle = styled.div`
     display: none;
   }
 `
-export const Action = styled.div`
-  margin-top: 32px;
-`
 
 type IProps = {
   userId?: string
@@ -187,7 +184,6 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               requiredErrorMessage={messages.requiredForNewUser}
               onUploadingStateChanged={this.onUploadingStateChanged}
             />
-            <Action></Action>
           </Content>
         </ActionPageLight>
       </>

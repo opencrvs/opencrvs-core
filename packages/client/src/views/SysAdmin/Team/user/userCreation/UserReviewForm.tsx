@@ -102,10 +102,6 @@ const Container = styled.div`
   }
 `
 
-const Title = styled.div`
-  ${({ theme }) => theme.fonts.h2};
-  margin-bottom: 16px;
-`
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
 `
