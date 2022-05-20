@@ -169,7 +169,6 @@ const RightColumn = styled.div`
 
 const LeftColumn = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
-  border-radius: 4px;
   width: 60%;
   margin-bottom: 200px;
 
@@ -212,13 +211,16 @@ const FormData = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   padding: 32px;
+  border-radius: 4px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 24px;
   }
 `
 const Title = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   ${({ theme }) => theme.fonts.h3};
-  margin-bottom: 8px;
   padding: 16px 0;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 `

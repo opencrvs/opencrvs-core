@@ -44,12 +44,12 @@ const TitleContainer = styled.div`
   margin-bottom: 16px;
 `
 const SubjectContainer = styled.div`
-  ${({ theme }) => theme.fonts.h1}
+  ${({ theme }) => theme.fonts.h2}
   width:70%;
   margin: auto;
   overflow-wrap: break-word;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.h2}
+    ${({ theme }) => theme.fonts.h3}
   }
 `
 const Image = styled.img`
