@@ -11,16 +11,14 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { StyledPill } from '../Pill'
 
 const Grid = styled.div<{ bottomBorder: boolean }>`
   display: grid;
-  grid-template-columns: minmax(0, auto) minmax(0, 1fr) minmax(0, 1fr) auto;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) auto;
   grid-auto-rows: minmax(56px, auto);
-  row-gap: 1px;
   ${({ bottomBorder }) => bottomBorder && 'border-bottom: 1px solid'};
   border-color: ${({ theme }) => theme.colors.grey200};
-  > div:not(:nth-last-child(-n + 4)) {
+  > div:not(:nth-last-child(-n + 5)) {
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -32,14 +30,10 @@ const Grid = styled.div<{ bottomBorder: boolean }>`
 `
 
 const ValueContainer = styled.div`
-  padding: 8px 0;
-  padding-left: 20px;
+  padding: 8px 0px 8px 20px;
   display: flex;
+  align-items: center;
   color: ${({ theme }) => theme.colors.grey600};
-  > span {
-    padding-top: 8px;
-    padding-bottom: 8px;
-  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
@@ -59,12 +53,9 @@ const LabelContainer = styled.div`
   padding: 8px 0;
   display: flex;
   flex: 1 0 50%;
+  align-items: center;
   button > div {
     padding: 0;
-  }
-  > span {
-    padding-top: 8px;
-    padding-bottom: 8px;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
@@ -81,12 +72,10 @@ const MobileLabelContainer = styled(LabelContainer)`
 
 const ActionsContainer = styled.div`
   display: flex;
-  padding: 16px 0;
+  padding: 8px 0;
   gap: 8px;
+  align-items: center;
   justify-content: right;
-  ${StyledPill} {
-    margin-top: 8px;
-  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
@@ -142,13 +131,9 @@ export function ListViewItemSimplified({
     <>
       <ImageContainer data-test-id="list-view-image">{image}</ImageContainer>
 
-      <LabelContainer data-test-id="list-view-label">
-        {typeof label === 'string' ? <span>{label}</span> : label}
-      </LabelContainer>
+      <LabelContainer data-test-id="list-view-label">{label}</LabelContainer>
 
-      <ValueContainer data-test-id="list-view-value">
-        {value && typeof value === 'string' ? <span>{value}</span> : value}
-      </ValueContainer>
+      <ValueContainer data-test-id="list-view-value">{value}</ValueContainer>
 
       <ActionsContainer data-test-id="list-view-actions">
         {actions}
