@@ -161,7 +161,7 @@ services:
       - HOST=0.0.0.0
       - PORT=2021
       - MONGO_URL=mongodb://mongo1/application-config
-      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
+      - FHIR_URL=http://openhim-core:5001/fhir
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
       - CHECK_INVALID_TOKEN=true
