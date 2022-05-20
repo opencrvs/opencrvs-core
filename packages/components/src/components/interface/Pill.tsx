@@ -40,7 +40,7 @@ const fontMap: Record<IPillSize, keyof IFonts> = {
   medium: 'bold14'
 }
 
-export const StyledPill = styled.span<{ size: IPillSize; type: IPillType }>`
+const StyledPill = styled.span<{ size: IPillSize; type: IPillType }>`
   display: inline-flex;
   padding: 0 0.85em;
   background-color: ${({ type }) => colorMap[type]};

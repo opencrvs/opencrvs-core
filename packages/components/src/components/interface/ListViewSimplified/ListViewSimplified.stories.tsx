@@ -19,6 +19,7 @@ import { ToggleMenu } from '../ToggleMenu'
 import { VerticalThreeDots, AvatarSmall, AvatarLarge } from '../../icons'
 import { LinkButton, PrimaryButton } from '../../buttons'
 import { Pill } from '../Pill'
+import styled from 'styled-components'
 
 const Template: Story = ({ children, ...args }) => {
   return <ListViewSimplified {...args}>{children}</ListViewSimplified>
@@ -65,6 +66,17 @@ const button = (
 
 const pill = <Pill label="Active" type="active" />
 
+const TopAlignedLabel = styled.span`
+  align-self: start;
+  padding-top: 8px;
+`
+
+const TopAlignedActions = styled.div`
+  align-self: start;
+  display: flex;
+  gap: 8px;
+`
+
 export const Default = Template.bind({})
 Default.args = {
   bottomBorder: true,
@@ -98,13 +110,13 @@ Default.args = {
       />
       <ListViewItemSimplified label="Label 4" actions={toggleMenu} />
       <ListViewItemSimplified
-        label="Label 5"
+        label={<TopAlignedLabel>Label 5</TopAlignedLabel>}
         value={<AvatarLarge />}
         actions={
-          <>
+          <TopAlignedActions>
             {linkButton}
             {toggleMenu}
-          </>
+          </TopAlignedActions>
         }
       />
     </>
