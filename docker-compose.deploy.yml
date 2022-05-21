@@ -86,7 +86,9 @@ services:
       placement:
         constraints:
           - node.role == manager
+
   kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.0
     restart: always
     deploy:
       labels:

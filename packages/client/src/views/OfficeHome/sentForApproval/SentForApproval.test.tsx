@@ -418,7 +418,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     )
 
     testComponent.update()
-    const element = await waitForElement(testComponent, '#row_0')
+    const element = await waitForElement(testComponent, '#name_0')
     element.hostNodes().simulate('click')
 
     await new Promise((resolve) => {
@@ -525,7 +525,7 @@ describe('Tablet tests', () => {
     )
 
     testComponent.update()
-    const element = await waitForElement(testComponent, '#row_0')
+    const element = await waitForElement(testComponent, '#name_0')
     element.hostNodes().simulate('click')
 
     await new Promise((resolve) => {
