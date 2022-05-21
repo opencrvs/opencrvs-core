@@ -13,6 +13,7 @@ env:
   CYPRESS_LOGIN_URL: https://login.farajaland-staging.opencrvs.org/
   CYPRESS_CLIENT_URL: https://register.farajaland-staging.opencrvs.org/
   CYPRESS_AUTH_URL: https://auth.farajaland-staging.opencrvs.org/
+  CYPRESS_GATEWAY_URL: https://gateway.farajaland-staging.opencrvs.org/
 
 on:
   workflow_dispatch:
@@ -90,6 +91,7 @@ jobs:
       - name: Run Cypress tests
         run: |
           cd opencrvs-farajaland
+          rm -rf .git
           yarn install
           npm install -g cypress
           cypress run --record --key e0fc7a26-f292-4e48-9716-2009137fe646 --headless --browser chrome
