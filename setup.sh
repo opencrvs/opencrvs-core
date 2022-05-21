@@ -48,6 +48,12 @@ do_version_check() {
    fi
 }
 
+sleep_if_non_ci() {
+  if [ "$CI" != "true" ]; then
+    sleep $1
+  fi
+}
+
 DOCKER_STARTED=0
 TMUX_STARTED=0
 
@@ -89,29 +95,29 @@ echo -e "\033[32m:::::::::::::::::: THIS PROCESS CAN TAKE 15 MINUTES OR MORE :::
 echo
 echo "We will check your dependencies, build docker images, load and configure OpenCRVS. It takes a long time so please be patient and do not quit this process."
 echo
-sleep 5
+sleep_if_non_ci 5
 echo "If we recognise that you have not installed a dependency correctly, we will display links to instructions you can follow on 3rd party websites. The links worked at the time of writing but may change. Please let us know on Gitter if you encounter any broken links."
-sleep 5
+sleep_if_non_ci 5
 echo
 echo "Installing Docker and Node for example, is outside the scope of this script."
-sleep 10
+sleep_if_non_ci 10
 echo
 echo "As part of this script, we checkout another GIT repo: The fictional Farajaland country configuration module into the folder next to this one called: 'opencrvs-farajaland'. We do this to make it easy for you to try OpenCRVS.  If you are developing your own country configuration, you should delete this folder and fork the config repo somewhere else."
 [ -d "../opencrvs-farajaland" ] && echo "Enter your password to delete the existing Farajaland country configuration to reset OpenCRVS to factory settings." && sudo rm -r ../opencrvs-farajaland
 
-sleep 10
+sleep_if_non_ci 10
 echo
 echo -e "\033[32m:::::::::::::::: PLEASE WAIT FOR THE OPEN CRVS LOGO TO APPEAR ::::::::::::::::\033[0m"
 echo
-sleep 5
+sleep_if_non_ci 5
 
   echo -e "\033[32m:::::::::::::::::::::: Checking your operating system ::::::::::::::::::::::\033[0m"
   echo
-#sleep 1
+
 if [  -n "$(uname -a | grep Ubuntu)" ]; then
   echo -e "\033[32m:::::::::::::::: You are running Ubuntu.  Checking version ::::::::::::::::\033[0m"
   echo
-  #sleep 1
+
   OS="UBUNTU"
   ubuntuVersion="$(grep -oP 'VERSION_ID="\K[\d.]+' /etc/os-release)"
   ubuntuVersionTest=$(do_version_check $ubuntuVersion 18.04)
@@ -122,10 +128,10 @@ if [  -n "$(uname -a | grep Ubuntu)" ]; then
   else
     echo -e "Your Ubuntu version: $ubuntuVersion is \033[32msupported!\033[0m :)"
     echo
-    #sleep 1
+
     echo -e "\033[32m:::::::: Setting memory requirements for file watch limit and ElasticSearch ::::::::\033[0m"
     echo
-    #sleep 1
+
     if grep -Fxq "fs.inotify.max_user_watches=524288" /etc/sysctl.conf ; then
         echo "File watch limit already meets requirements."
     else
@@ -178,7 +184,7 @@ echo
 
 echo -e "\033[32m:::::::: Checking that you have the required dependencies installed ::::::::\033[0m"
 echo
-#sleep 1
+
 dependencies=( "docker" "node" "yarn" "tmux")
 if [ $OS == "UBUNTU" ]; then
   dependencies+=("docker-compose" "google-chrome")
@@ -190,7 +196,7 @@ do
 
         echo -e "$i \033[32minstalled!\033[0m :)"
 
-        sleep 1
+        sleep_if_non_ci 1
     else
         echo -e "OpenCRVS thinks $i is not installed.\r"
         if [ $i == "docker" ] ; then
@@ -256,7 +262,7 @@ echo -e "\033[32m:::::::::: Stopping any currently running Docker containers :::
 echo
 if [[ $(docker ps -aq) ]] ; then
   docker stop $(docker ps -aq)
-  sleep 5
+  sleep_if_non_ci 5
 fi
 
 
@@ -279,7 +285,7 @@ done
 echo
 echo -e "\033[32m:::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED ::::::\033[0m"
 echo
-#sleep 1
+
 myNodeVersion=`echo "$(node -v)" | sed 's/v//'`
 versionTest=$(do_version_check $myNodeVersion 14.15.0)
 if [ "$versionTest" == "LOWER" ] ; then
@@ -328,6 +334,8 @@ if [ -d "data" ] ; then sudo rm -r data ; fi
 openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
 mkdir -p data/elasticsearch
 chmod 775 data/elasticsearch
+sudo chown -R 1000:root data/elasticsearch
+
 mkdir -p data/mongo
 chmod 775 data/mongo
 mkdir -p data/influxdb
@@ -341,6 +349,13 @@ if [ $OS == "MAC" ]; then
  export LOCAL_IP=host-gateway
 fi
 yarn compose:deps:detached
+
+# As this script is also used when setting up E2E tests,
+# where we don't want to start the app in tmux. This script ends.
+if [ $CI == "true" ]; then
+ exit 0
+fi
+
 DOCKER_STARTED=1
 echo "wait-on tcp:3447" && wait-on -l tcp:3447
 echo "wait-on http://localhost:9200" && wait-on -l http://localhost:9200
@@ -349,7 +364,6 @@ echo "wait-on tcp:9200" && wait-on -l tcp:9200
 echo "wait-on tcp:27017" && wait-on -l tcp:27017
 echo "wait-on tcp:6379" && wait-on -l tcp:6379
 echo "wait-on tcp:8086" && wait-on -l tcp:8086
-
 
 
 set -- $(stty size) #$1=rows, $2=columns

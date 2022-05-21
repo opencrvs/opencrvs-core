@@ -360,6 +360,7 @@ export class SearchResultView extends React.Component<
         this.userHasRegisterScope()
           ? true
           : false
+      const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
       const NameComponent = reg.name ? (
         <LinkButton
           isBoldLink={true}
@@ -394,6 +395,7 @@ export class SearchResultView extends React.Component<
             name={NameComponent}
             isValidatedOnReview={isValidatedOnReview}
             isDuplicate={isDuplicate}
+            isArchived={isArchived}
           />
         ),
         iconWithNameEvent: (
@@ -403,6 +405,7 @@ export class SearchResultView extends React.Component<
             event={event}
             isDuplicate={isDuplicate}
             isValidatedOnReview={isValidatedOnReview}
+            isArchived={isArchived}
           />
         ),
         dateOfEvent,

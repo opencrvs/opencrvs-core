@@ -2744,7 +2744,7 @@
                     {
                       "description": "Hidden for Parent Details none or Mother only",
                       "action": "hide",
-                      "expression": "!draftData.mother.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
+                      "expression": "draftData && draftData.mother && !draftData.mother.detailsExist && !mothersDetailsExistBasedOnContactAndInformant"
                     }
                   ],
                   "mapping": {
@@ -2806,7 +2806,7 @@
                     {
                       "description": "Hidden for Parent Details none or Father only",
                       "action": "hide",
-                      "expression": "!draftData.father.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
+                      "expression": "draftData && draftData.father && !draftData.father.detailsExist && !fathersDetailsExistBasedOnContactAndInformant"
                     }
                   ],
                   "mapping": {
@@ -4306,7 +4306,7 @@
                   "conditionals": [
                     {
                       "action": "hide",
-                      "expression": "!values.causeOfDeathEstablished"
+                      "expression": "values.causeOfDeathEstablished !== \"true\""
                     }
                   ],
                   "options": [
@@ -4948,6 +4948,12 @@
                   "extraValue": "DECEASED_DEATH_CAUSE_PROOF",
                   "hideAsterisk": true,
                   "validate": [],
+                  "conditionals": [
+                    {
+                      "action": "hide",
+                      "expression": "draftData?.deathEvent?.causeOfDeathEstablished !== \"true\""
+                    }
+                  ],
                   "options": [
                     {
                       "value": "MEDICALLY_CERTIFIED_CAUSE_OF_DEATH",

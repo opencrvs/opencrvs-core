@@ -945,7 +945,7 @@ export async function getTotalMetrics(
 
   return {
     estimated: estimationOfTimeRange,
-    results: totalMetrics
+    results: totalMetrics || []
   }
 }
 
