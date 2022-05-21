@@ -18,6 +18,8 @@ env:
   CYPRESS_CLIENT_URL: http://localhost:3000/
   CYPRESS_AUTH_URL: http://localhost:4040/
   CYPRESS_GATEWAY_URL: http://localhost:7070/
+  LANGUAGES: 'en,fr'
+  QA_ENV: true
 jobs:
   test:
     timeout-minutes: 120 # 2 hours
@@ -39,10 +41,11 @@ jobs:
         run: yes | bash ./setup.sh
       - name: Run stack
         run: |
-          LANGUAGES=en,fr && yarn start:prod &
+          NODE_ENV=production yarn start:prod &
           bash setup-scripts/setup-countryconfig.sh $(pwd) &
           wait-on -l tcp:3040
       - name: Run E2E tests
+        continue-on-error: true
         run: |
           cd ../opencrvs-farajaland
           rm -rf .git
