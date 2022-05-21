@@ -25,16 +25,12 @@ services:
     environment:
       - discovery.type=single-node
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.17.0
-    restart: unless-stopped
-
   influxdb:
     image: influxdb:1.7.9
     restart: unless-stopped
 
   hearth:
-    image: jembi/hearth:v1.0.0-beta.3
+    image: opencrvs/hearth:1.0.1
     environment:
       - mongodb__url=mongodb://mongo1/hearth-dev
       - logger__level=warn
