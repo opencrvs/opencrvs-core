@@ -76,6 +76,7 @@ import {
   ListViewItemSimplified,
   ListViewSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { useCallback } from 'react'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -278,73 +279,82 @@ function UserListComponent(props: IProps) {
     ({ id }) => locationId === id
   )
 
-  function toggleUserActivationModal(user?: GQLUser) {
-    if (user !== undefined) {
-      setToggleActivation({
-        ...toggleActivation,
-        modalVisible: true,
-        selectedUser: user
-      })
-    } else {
-      setToggleActivation({
-        ...toggleActivation,
-        modalVisible: false,
-        selectedUser: null
-      })
-    }
-  }
+  const toggleUserActivationModal = useCallback(
+    function toggleUserActivationModal(user?: GQLUser) {
+      if (user !== undefined) {
+        setToggleActivation({
+          ...toggleActivation,
+          modalVisible: true,
+          selectedUser: user
+        })
+      } else {
+        setToggleActivation({
+          ...toggleActivation,
+          modalVisible: false,
+          selectedUser: null
+        })
+      }
+    },
+    [toggleActivation]
+  )
 
-  async function resendSMS(userId: string) {
-    try {
-      const res = await userMutations.resendSMSInvite(userId, [
+  const resendSMS = useCallback(
+    async function resendSMS(userId: string) {
+      try {
+        const res = await userMutations.resendSMSInvite(userId, [
+          {
+            query: SEARCH_USERS,
+            variables: { primaryOfficeId: locationId, count: recordCount }
+          }
+        ])
+        if (res && res.data && res.data.resendSMSInvite) {
+          setShowResendSMSSuccess(true)
+        }
+      } catch (err) {
+        setShowResendSMSError(true)
+      }
+    },
+    [locationId, recordCount]
+  )
+
+  const getMenuItems = useCallback(
+    function getMenuItems(user: GQLUser) {
+      const menuItems = [
         {
-          query: SEARCH_USERS,
-          variables: { primaryOfficeId: locationId, count: recordCount }
+          label: intl.formatMessage(messages.editUserDetailsTitle),
+          handler: () => {
+            goToReviewUserDetails(user.id as string)
+          }
         }
-      ])
-      if (res && res.data && res.data.resendSMSInvite) {
-        setShowResendSMSSuccess(true)
+      ]
+
+      if (user.status !== 'deactivated' && user.status !== 'disabled') {
+        menuItems.push({
+          label: intl.formatMessage(messages.resendSMS),
+          handler: () => {
+            resendSMS(user.id as string)
+          }
+        })
       }
-    } catch (err) {
-      setShowResendSMSError(true)
-    }
-  }
 
-  function getMenuItems(user: GQLUser) {
-    const menuItems = [
-      {
-        label: intl.formatMessage(messages.editUserDetailsTitle),
-        handler: () => {
-          goToReviewUserDetails(user.id as string)
-        }
+      if (user.status === 'active') {
+        menuItems.push({
+          label: intl.formatMessage(messages.deactivate),
+          handler: () => toggleUserActivationModal(user)
+        })
       }
-    ]
 
-    if (user.status !== 'deactivated' && user.status !== 'disabled') {
-      menuItems.push({
-        label: intl.formatMessage(messages.resendSMS),
-        handler: () => {
-          resendSMS(user.id as string)
-        }
-      })
-    }
+      if (user.status === 'deactivated') {
+        menuItems.push({
+          label: intl.formatMessage(messages.reactivate),
+          handler: () => toggleUserActivationModal(user)
+        })
+      }
 
-    if (user.status === 'active') {
-      menuItems.push({
-        label: intl.formatMessage(messages.deactivate),
-        handler: () => toggleUserActivationModal(user)
-      })
-    }
-
-    if (user.status === 'deactivated') {
-      menuItems.push({
-        label: intl.formatMessage(messages.reactivate),
-        handler: () => toggleUserActivationModal(user)
-      })
-    }
-
-    return menuItems
-  }
+      return menuItems
+    },
+    [goToReviewUserDetails, intl, resendSMS, toggleUserActivationModal]
+  )
 
   function getViewOnly(
     locationId: string,
@@ -371,107 +381,116 @@ function UserListComponent(props: IProps) {
     }
   }
 
-  function StatusMenu({
-    userDetails,
-    locationId,
-    user,
-    index,
-    status,
-    underInvestigation
-  }: {
-    userDetails: IUserDetails | null
-    locationId: string
-    user: GQLUser
-    index: number
-    status?: string
-    underInvestigation?: boolean
-  }) {
-    const canEditUserDetails =
-      userDetails?.role === 'NATIONAL_SYSTEM_ADMIN' ||
-      (userDetails?.role === 'LOCAL_SYSTEM_ADMIN' &&
-        userDetails?.primaryOffice?.id === locationId)
-        ? true
-        : false
-    return (
-      // TODO use Pill Component from #2780
-      <StatusMenuContainer>
-        {underInvestigation && <SearchRed />}
-        <Status status={status || 'pending'} />
-        {canEditUserDetails && (
-          <ToggleMenu
-            id={`user-item-${index}-menu`}
-            toggleButton={<VerticalThreeDots />}
-            menuItems={getMenuItems(user)}
-          />
-        )}
-      </StatusMenuContainer>
-    )
-  }
+  const StatusMenu = useCallback(
+    function StatusMenu({
+      userDetails,
+      locationId,
+      user,
+      index,
+      status,
+      underInvestigation
+    }: {
+      userDetails: IUserDetails | null
+      locationId: string
+      user: GQLUser
+      index: number
+      status?: string
+      underInvestigation?: boolean
+    }) {
+      const canEditUserDetails =
+        userDetails?.role === 'NATIONAL_SYSTEM_ADMIN' ||
+        (userDetails?.role === 'LOCAL_SYSTEM_ADMIN' &&
+          userDetails?.primaryOffice?.id === locationId)
+          ? true
+          : false
+      return (
+        // TODO use Pill Component from #2780
+        <StatusMenuContainer>
+          {underInvestigation && <SearchRed />}
+          <Status status={status || 'pending'} />
+          {canEditUserDetails && (
+            <ToggleMenu
+              id={`user-item-${index}-menu`}
+              toggleButton={<VerticalThreeDots />}
+              menuItems={getMenuItems(user)}
+            />
+          )}
+        </StatusMenuContainer>
+      )
+    },
+    [getMenuItems]
+  )
 
-  function generateUserContents(
-    data: GQLQuery,
-    locationId: string,
-    userDetails: IUserDetails | null
-  ) {
-    if (!data || !data.searchUsers || !data.searchUsers.results) {
-      return []
-    }
+  const generateUserContents = useCallback(
+    function generateUserContents(
+      data: GQLQuery,
+      locationId: string,
+      userDetails: IUserDetails | null
+    ) {
+      if (!data || !data.searchUsers || !data.searchUsers.results) {
+        return []
+      }
 
-    return data.searchUsers.results.map(
-      (user: GQLUser | null, index: number) => {
-        if (user !== null) {
-          const name =
-            (user &&
-              user.name &&
-              ((createNamesMap(user.name as GQLHumanName[])[
-                intl.locale
-              ] as string) ||
-                (createNamesMap(user.name as GQLHumanName[])[
-                  LANG_EN
-                ] as string))) ||
-            ''
-          const role =
-            (user.role && intl.formatMessage(userMessages[user.role])) || '-'
+      return data.searchUsers.results.map(
+        (user: GQLUser | null, index: number) => {
+          if (user !== null) {
+            const name =
+              (user &&
+                user.name &&
+                ((createNamesMap(user.name as GQLHumanName[])[
+                  intl.locale
+                ] as string) ||
+                  (createNamesMap(user.name as GQLHumanName[])[
+                    LANG_EN
+                  ] as string))) ||
+              ''
+            const role =
+              (user.role && intl.formatMessage(userMessages[user.role])) || '-'
 
-          const avatar = user.avatar
+            const avatar = user.avatar
 
+            return {
+              image: <AvatarSmall name={name} avatar={avatar} />,
+              label: (
+                <LinkButton
+                  isBoldLink={true}
+                  id={`name-link-${user.id}`}
+                  onClick={() => goToUserProfile(user.id || '')}
+                >
+                  {name}
+                </LinkButton>
+              ),
+              value: <Value>{role}</Value>,
+              actions: (
+                <StatusMenu
+                  userDetails={userDetails}
+                  locationId={locationId}
+                  user={user}
+                  index={index}
+                  status={user.status}
+                  underInvestigation={user.underInvestigation}
+                />
+              )
+            }
+          }
           return {
-            image: <AvatarSmall name={name} avatar={avatar} />,
-            label: (
-              <LinkButton
-                isBoldLink={true}
-                id={`name-link-${user.id}`}
-                onClick={() => goToUserProfile(user.id || '')}
-              >
-                {name}
-              </LinkButton>
-            ),
-            value: <Value>{role}</Value>,
-            actions: (
-              <StatusMenu
-                userDetails={userDetails}
-                locationId={locationId}
-                user={user}
-                index={index}
-                status={user.status}
-                underInvestigation={user.underInvestigation}
-              />
-            )
+            label: '',
+            value: <></>
           }
         }
-        return {
-          label: '',
-          value: <></>
-        }
-      }
-    )
-  }
+      )
+    },
+    [StatusMenu, goToUserProfile, intl]
+  )
 
-  function onClickAddUser() {
-    ;(searchedLocation &&
-      goToCreateNewUserWithLocationId(searchedLocation.id)) ||
-      goToCreateNewUser()
-  }
+  const onClickAddUser = useCallback(
+    function onClickAddUser() {
+      ;(searchedLocation &&
+        goToCreateNewUserWithLocationId(searchedLocation.id)) ||
+        goToCreateNewUser()
+    },
+    [goToCreateNewUser, goToCreateNewUserWithLocationId, searchedLocation]
+  )
 
   function onChangeLocation() {
     goToTeamSearch(
@@ -485,119 +504,132 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  function RenderUserList({
-    locationId,
-    userDetails
-  }: {
-    locationId: string
-    userDetails: IUserDetails | null
-  }) {
-    return (
-      <Query
-        query={SEARCH_USERS}
-        variables={{
-          primaryOfficeId: locationId,
-          count: DEFAULT_FIELD_AGENT_LIST_SIZE,
-          skip: (currentPageNumber - 1) * DEFAULT_FIELD_AGENT_LIST_SIZE
-        }}
-        fetchPolicy={'cache-and-network'}
-      >
-        {({ data, loading, error }) => {
-          if (error) {
-            return (
-              <ErrorText id="user_loading_error">
-                {intl.formatMessage(errorMessages.userQueryError)}
-              </ErrorText>
+  const RenderUserList = useCallback(
+    function RenderUserList({
+      locationId,
+      userDetails
+    }: {
+      locationId: string
+      userDetails: IUserDetails | null
+    }) {
+      return (
+        <Query
+          query={SEARCH_USERS}
+          variables={{
+            primaryOfficeId: locationId,
+            count: DEFAULT_FIELD_AGENT_LIST_SIZE,
+            skip: (currentPageNumber - 1) * DEFAULT_FIELD_AGENT_LIST_SIZE
+          }}
+          fetchPolicy={'cache-and-network'}
+        >
+          {({ data, loading, error }) => {
+            if (error) {
+              return (
+                <ErrorText id="user_loading_error">
+                  {intl.formatMessage(errorMessages.userQueryError)}
+                </ErrorText>
+              )
+            }
+            const totalData =
+              (data && data.searchUsers && data.searchUsers.totalItems) || 0
+            const userContent = generateUserContents(
+              data,
+              locationId,
+              userDetails
             )
-          }
-          const totalData =
-            (data && data.searchUsers && data.searchUsers.totalItems) || 0
-          const userContent = generateUserContents(
-            data,
-            locationId,
-            userDetails
-          )
-          return (
-            <UserTable id="user_list">
-              <TableHeader>
-                {(data && data.searchUsers && data.searchUsers.totalItems) || 0}{' '}
-                users
-                {!getViewOnly(locationId, userDetails, false) && (
-                  <AddUserContainer id="add-user" onClick={onClickAddUser}>
-                    <AddUserIcon />
-                    {' New user'}
-                  </AddUserContainer>
-                )}
-              </TableHeader>
-              <ListViewContainer>
-                <ListViewSimplified>
-                  {userContent.length <= 0 ? (
-                    <NoRecord id="no-record">
-                      {intl.formatMessage(constantsMessages.noResults)}
-                    </NoRecord>
-                  ) : (
-                    userContent.map((content, index) => {
-                      return (
-                        <ListViewItemSimplified
-                          key={index}
-                          image={content.image}
-                          label={content.label}
-                          value={content.value}
-                          actions={content.actions}
-                        />
-                      )
-                    })
+            return (
+              <UserTable id="user_list">
+                <TableHeader>
+                  {(data && data.searchUsers && data.searchUsers.totalItems) ||
+                    0}{' '}
+                  users
+                  {!getViewOnly(locationId, userDetails, false) && (
+                    <AddUserContainer id="add-user" onClick={onClickAddUser}>
+                      <AddUserIcon />
+                      {' New user'}
+                    </AddUserContainer>
                   )}
-                </ListViewSimplified>
-              </ListViewContainer>
-              {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
-                <PaginationWrapper>
-                  <DesktopWrapper>
-                    <PaginationModified
-                      size={'small'}
-                      initialPage={currentPageNumber}
-                      totalPages={Math.ceil(
-                        totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                      )}
-                      onPageChange={(currentPage: number) =>
-                        setCurrentPageNumber(currentPage)
+                </TableHeader>
+                <ListViewContainer>
+                  <ListViewSimplified>
+                    {userContent.length <= 0 ? (
+                      <NoRecord id="no-record">
+                        {intl.formatMessage(constantsMessages.noResults)}
+                      </NoRecord>
+                    ) : (
+                      userContent.map((content, index) => {
+                        return (
+                          <ListViewItemSimplified
+                            key={index}
+                            image={content.image}
+                            label={content.label}
+                            value={content.value}
+                            actions={content.actions}
+                          />
+                        )
+                      })
+                    )}
+                  </ListViewSimplified>
+                </ListViewContainer>
+                {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+                  <PaginationWrapper>
+                    <DesktopWrapper>
+                      <PaginationModified
+                        size={'small'}
+                        initialPage={currentPageNumber}
+                        totalPages={Math.ceil(
+                          totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                        )}
+                        onPageChange={(currentPage: number) =>
+                          setCurrentPageNumber(currentPage)
+                        }
+                      />
+                    </DesktopWrapper>
+                    <MobileWrapper>
+                      <PaginationModified
+                        size={'large'}
+                        initialPage={currentPageNumber}
+                        totalPages={Math.ceil(
+                          totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                        )}
+                        onPageChange={(currentPage: number) =>
+                          setCurrentPageNumber(currentPage)
+                        }
+                      />
+                    </MobileWrapper>
+                  </PaginationWrapper>
+                )}
+                <UserAuditActionModal
+                  show={toggleActivation.modalVisible}
+                  user={toggleActivation.selectedUser}
+                  onClose={() => toggleUserActivationModal()}
+                  onConfirmRefetchQueries={[
+                    {
+                      query: SEARCH_USERS,
+                      variables: {
+                        primaryOfficeId: locationId,
+                        count: recordCount
                       }
-                    />
-                  </DesktopWrapper>
-                  <MobileWrapper>
-                    <PaginationModified
-                      size={'large'}
-                      initialPage={currentPageNumber}
-                      totalPages={Math.ceil(
-                        totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                      )}
-                      onPageChange={(currentPage: number) =>
-                        setCurrentPageNumber(currentPage)
-                      }
-                    />
-                  </MobileWrapper>
-                </PaginationWrapper>
-              )}
-              <UserAuditActionModal
-                show={toggleActivation.modalVisible}
-                user={toggleActivation.selectedUser}
-                onClose={() => toggleUserActivationModal()}
-                onConfirmRefetchQueries={[
-                  {
-                    query: SEARCH_USERS,
-                    variables: {
-                      primaryOfficeId: locationId,
-                      count: recordCount
                     }
-                  }
-                ]}
-              />
-            </UserTable>
-          )
-        }}
-      </Query>
-    )
-  }
+                  ]}
+                />
+              </UserTable>
+            )
+          }}
+        </Query>
+      )
+    },
+    [
+      currentPageNumber,
+      generateUserContents,
+      intl,
+      onClickAddUser,
+      recordCount,
+      toggleActivation.modalVisible,
+      toggleActivation.selectedUser,
+      toggleUserActivationModal
+    ]
+  )
 
   return (
     <SysAdminContentWrapper

@@ -2220,7 +2220,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'Hidden for Parent Details none or Mother only',
                     action: 'hide',
                     expression:
-                      '!draftData.mother.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                      'draftData && draftData.mother && !draftData.mother.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
@@ -2264,7 +2264,7 @@ export const registerForms: IDefaultRegisterForms = {
                       'Hidden for Parent Details none or Father only',
                     action: 'hide',
                     expression:
-                      '!draftData.father.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
+                      'draftData && draftData.father && !draftData.father.detailsExist && !fathersDetailsExistBasedOnContactAndInformant'
                   }
                 ],
                 mapping: {
