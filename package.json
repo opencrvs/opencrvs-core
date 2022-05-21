@@ -13,7 +13,7 @@
   "scripts": {
     "postinstall": "patch-package",
     "start": "lerna run build --scope @opencrvs/commons && lerna run build --scope @opencrvs/components && lerna run --parallel --ignore @opencrvs/mobile-proxy --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start",
-    "start:prod": "yarn build && lerna run --parallel --ignore @opencrvs/mobile-proxy --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start:prod",
+    "start:prod": "yarn build && lerna run --parallel --ignore @opencrvs/components --ignore @opencrvs/mobile-proxy --ignore @opencrvs/integration $OTHER_LERNA_FLAGS start:prod",
     "demo": "bash demo.sh",
     "dev": "bash dev.sh",
     "dev:secrets:gen": "openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem",
