@@ -78,7 +78,7 @@ export interface IUser {
   catchmentAreaIds: string[]
   scope: string[]
   signature: ISignature
-  localRegistrar: ILocalRegistrar
+  localRegistrar?: ILocalRegistrar
   status: string
   device?: string
   securityQuestionAnswers?: ISecurityQuestionAnswer[]
