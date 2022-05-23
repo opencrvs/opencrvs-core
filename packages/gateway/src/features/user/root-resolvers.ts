@@ -41,6 +41,10 @@ export const resolvers: GQLResolver = {
       return await getUser({ userId }, authHeader)
     },
 
+    async getUserByMobile(_, { mobile }, authHeader) {
+      return await getUser({ mobile }, authHeader)
+    },
+
     async searchUsers(
       _,
       {

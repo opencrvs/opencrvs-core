@@ -38,10 +38,15 @@ import {
 import { EMPTY_STRING } from '@client/utils/constants'
 import { isAValidPhoneNumberFormat } from '@client/utils/validate'
 import { Mutation } from 'react-apollo'
-import gql from 'graphql-tag'
-import { get } from 'lodash'
-import { getCurrentUserScope } from '@client/utils/authUtils'
+import { get, isNull } from 'lodash'
+import { userMessages } from '@client/i18n/messages/user'
 import { convertToMSISDN } from '@client/forms/utils'
+import { queriesForUser } from './queries'
+import {
+  FloatingNotification,
+  NOTIFICATION_TYPE
+} from '@opencrvs/components/lib/interface'
+import { changePhoneMutation } from '@client/views/Settings/mutations'
 
 const Container = styled.div`
   ${({ theme }) => theme.shadows.light};
@@ -116,22 +121,6 @@ const BoxedError = styled.div`
   display: flex;
 `
 
-export const changePhoneMutation = gql`
-  mutation changePhone(
-    $userId: String!
-    $phoneNumber: String!
-    $nonce: String!
-    $verifyCode: String!
-  ) {
-    changePhone(
-      userId: $userId
-      phoneNumber: $phoneNumber
-      nonce: $nonce
-      verifyCode: $verifyCode
-    )
-  }
-`
-
 type IProps = IntlShapeProps & {
   userDetails: IUserDetails | null
   nonce: string | null
@@ -154,12 +143,9 @@ interface IState {
   phoneNumberFormatText: string
   view: string
   errorOccured: boolean
-  showSuccessNotification: boolean
+  showDuplicateMobileErrorNotification: boolean
 }
 
-interface ILanguageOptions {
-  [key: string]: string
-}
 interface IDispatchProps {
   sendVerifyCode: typeof SendVerifyCodeAction
 }
@@ -175,9 +161,17 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
       phoneNumberFormatText: EMPTY_STRING,
       view: VIEW_TYPE.CHANGE_NUMBER,
       errorOccured: false,
-      showSuccessNotification: false
+      showDuplicateMobileErrorNotification: false
     }
   }
+
+  toggleDuplicateMobileErrorNotification = () => {
+    this.setState((prevState) => ({
+      showDuplicateMobileErrorNotification:
+        !prevState.showDuplicateMobileErrorNotification
+    }))
+  }
+
   setPhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
     const phoneNumber = event.target.value
     this.setState(() => ({
@@ -192,18 +186,19 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
       isInvalidLength: verifyCode.length === 6
     }))
   }
-  continueButtonHandler = (
-    userId: string,
-    phoneNumber: string,
-    view: string,
-    scope: string[]
-  ) => {
+  continueButtonHandler = async (phoneNumber: string) => {
     if (!phoneNumber) return
-    if (VIEW_TYPE.CHANGE_NUMBER) {
+    const userData = await queriesForUser.fetchUserDetails(
+      convertToMSISDN(phoneNumber)
+    )
+    const userDetails = userData.data.getUserByMobile
+    if (VIEW_TYPE.CHANGE_NUMBER && isNull(userDetails.id)) {
       this.props.sendVerifyCode(convertToMSISDN(phoneNumber))
       this.setState({
         view: VIEW_TYPE.VERIFY_NUMBER
       })
+    } else {
+      this.toggleDuplicateMobileErrorNotification()
     }
   }
 
@@ -235,14 +230,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
   }
 
   render() {
-    const { userDetails, intl, nonce } = this.props
-    const mobile = (userDetails && userDetails.mobile) || ''
-    const userId = get(userDetails, 'userMgntUserID') || ''
-    const role =
-      userDetails && userDetails.role
-        ? intl.formatMessage(messages[userDetails.role])
-        : ''
-    const scope = getCurrentUserScope()
+    const { intl, nonce } = this.props
     return (
       <>
         <SysAdminContentWrapper
@@ -304,12 +292,7 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
                   id="continue-button"
                   key="continue"
                   onClick={() => {
-                    this.continueButtonHandler(
-                      userId,
-                      this.state.phoneNumber,
-                      this.state.view,
-                      scope
-                    )
+                    this.continueButtonHandler(this.state.phoneNumber)
                   }}
                   disabled={
                     !Boolean(this.state.phoneNumber.length) ||
@@ -400,6 +383,17 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
               </Content>
             </Container>
           )}
+
+          <FloatingNotification
+            id="duplicate-mobile-error-notification"
+            type={NOTIFICATION_TYPE.ERROR}
+            show={this.state.showDuplicateMobileErrorNotification}
+            callback={() => this.toggleDuplicateMobileErrorNotification()}
+          >
+            {intl.formatMessage(userMessages.duplicateUserMobileErrorMessege, {
+              number: this.state.phoneNumber
+            })}
+          </FloatingNotification>
         </SysAdminContentWrapper>
       </>
     )
