@@ -26,11 +26,11 @@ const Wrapper = styled.div`
 const TableHeader = styled.div`
   color: ${({ theme }) => theme.colors.grey600};
   background-color: ${({ theme }) => theme.colors.grey100};
-  ${({ theme }) => theme.fonts.bold12};
+  ${({ theme }) => theme.fonts.bold14};
   height: 36px;
   display: flex;
   align-items: center;
-  padding: 0 25px;
+  padding: 0 16px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
