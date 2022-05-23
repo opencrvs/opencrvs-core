@@ -20,7 +20,7 @@ import {
   ICON_ALIGNMENT,
   PrimaryButton,
   TertiaryButton,
-  LinkButton
+  SecondaryButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import {
@@ -105,9 +105,10 @@ const FormSectionTitle = styled.h4`
   margin-bottom: 24px;
 `
 const FooterArea = styled.div`
-  padding-top: 6px;
+  height: 260px;
+  padding: 16px 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding-top: 0px;
+    height: 160px;
   }
 `
 
@@ -120,8 +121,9 @@ const Notice = styled.div`
   margin: 30px -25px;
 `
 
-const StyledLinkButton = styled(LinkButton)`
-  margin-left: 32px;
+const BackReviewButton = styled(SecondaryButton)`
+  height: 48px;
+  margin-left: 16px;
 `
 const Required = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
@@ -155,7 +157,6 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-
 export interface IFormProps {
   declaration: IDeclaration
   registerForm: IForm
@@ -820,7 +821,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                               )}
                             </PrimaryButton>
                             {declaration.review && (
-                              <StyledLinkButton
+                              <BackReviewButton
                                 id="back-to-review-button"
                                 className="item"
                                 onClick={() => {
@@ -844,7 +845,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 {intl.formatMessage(
                                   messages.backToReviewButton
                                 )}
-                              </StyledLinkButton>
+                              </BackReviewButton>
                             )}
                           </FooterArea>
                         )}

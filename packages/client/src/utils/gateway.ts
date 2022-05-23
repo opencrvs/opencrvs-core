@@ -1646,7 +1646,7 @@ export type User = {
   email?: Maybe<Scalars['String']>
   id?: Maybe<Scalars['ID']>
   identifier?: Maybe<Identifier>
-  localRegistrar: LocalRegistrar
+  localRegistrar?: LocalRegistrar
   mobile?: Maybe<Scalars['String']>
   name?: Maybe<Array<Maybe<HumanName>>>
   practitionerId?: Maybe<Scalars['String']>
@@ -1874,7 +1874,7 @@ export type FetchUserQuery = {
       alias?: Array<string | null> | null
       status?: string | null
     } | null
-    localRegistrar: {
+    localRegistrar?: {
       __typename?: 'LocalRegistrar'
       role: string
       name: Array<{

@@ -32,6 +32,7 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { IAvatar, getIndividualNameObj } from '@client/utils/userUtils'
 import { goToUserProfile } from '@client/navigation'
 import { AvatarSmall } from '@client/components/Avatar'
+import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 
 const Heading = styled.h3`
   ${({ theme }) => theme.fonts.h3}
@@ -110,6 +111,7 @@ export const GetNameWithAvatar = ({
 export const GetHistory = ({
   intl,
   draft,
+  userDetails,
   goToUserProfile,
   goToTeamUserList,
   toggleActionDetails
@@ -121,7 +123,10 @@ export const GetHistory = ({
 
   const onPageChange = (currentPageNumber: number) =>
     setCurrentPageNumber(currentPageNumber)
-  if (!draft?.data?.history?.length)
+  if (
+    !(draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) &&
+    !(draft?.submissionStatus === SUBMISSION_STATUS.DRAFT)
+  )
     return (
       <>
         <Divider />
@@ -129,9 +134,25 @@ export const GetHistory = ({
         <LargeGreyedInfo />
       </>
     )
-  const allHistoryData = draft.data.history as unknown as {
+  const allHistoryData = (draft.data.history || []) as unknown as {
     [key: string]: any
   }[]
+  if (!allHistoryData.length && userDetails) {
+    allHistoryData.unshift({
+      date: new Date(draft.savedOn || Date.now()).toString(),
+      action: 'STARTED',
+      user: {
+        id: userDetails.userMgntUserID,
+        name: userDetails.name,
+        avatar: userDetails.avatar,
+        role: userDetails.role
+      },
+      office: userDetails.primaryOffice,
+      comments: [],
+      input: [],
+      output: []
+    })
+  }
   const historiesForDisplay = getDisplayItems(
     currentPageNumber,
     DEFAULT_HISTORY_RECORD_PAGE_SIZE,

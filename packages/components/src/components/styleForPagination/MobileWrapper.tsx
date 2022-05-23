@@ -12,7 +12,7 @@
 import styled from 'styled-components'
 export const MobileWrapper = styled.div`
   display: none;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media only screen and (max-width: 1023px) {
     display: inline-flex;
     align-items: center;
     margin-left: auto;
