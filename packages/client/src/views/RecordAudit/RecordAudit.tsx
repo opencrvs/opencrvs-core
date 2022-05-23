@@ -121,11 +121,9 @@ const MobileHeader = styled(PageHeader)`
 
 const BodyContainer = styled.div`
   margin-left: 0px;
-  margin-top: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 274px;
-    margin-top: 24px;
-    margin-right: 24px;
+    margin-left: 250px;
+    padding: 0px 24px;
   }
 `
 

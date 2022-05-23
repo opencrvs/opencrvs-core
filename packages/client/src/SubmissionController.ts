@@ -263,11 +263,9 @@ export class SubmissionController {
     const role = this.store.getState().offline.userDetails?.role
     const isFieldAgent = role && FIELD_AGENT_ROLES.includes(role) ? true : false
     const userId = this.store.getState().offline.userDetails?.practitionerId
-    setTimeout(async () => {
-      await this.store.dispatch(
-        updateRegistrarWorkqueue(userId, 10, isFieldAgent)
-      )
-    }, 100)
+    await this.store.dispatch(
+      updateRegistrarWorkqueue(userId, 10, isFieldAgent)
+    )
     await this.store.dispatch(modifyDeclaration(declaration))
 
     if (
@@ -279,7 +277,7 @@ export class SubmissionController {
       declaration.submissionStatus === SUBMISSION_STATUS.REINSTATED ||
       declaration.submissionStatus === SUBMISSION_STATUS.REQUESTED_CORRECTION
     ) {
-      this.store.dispatch(deleteDeclaration(declaration))
+      await this.store.dispatch(deleteDeclaration(declaration))
     } else {
       await this.store.dispatch(writeDeclaration(declaration))
     }
