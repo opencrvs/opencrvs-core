@@ -26,7 +26,7 @@ interface IButtonProps {
 
 const PaginationContainer = styled.div`
   width: 100%;
-  height: 60px;
+  height: 48px;
   padding: 0 ${({ theme }) => theme.grid.margin}px;
   color: ${({ theme }) => theme.colors.primary};
   display: flex;

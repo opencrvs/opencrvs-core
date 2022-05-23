@@ -230,7 +230,7 @@ export interface GQLUser {
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
-  localRegistrar: GQLLocalRegistrar
+  localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
   creationDate?: string
