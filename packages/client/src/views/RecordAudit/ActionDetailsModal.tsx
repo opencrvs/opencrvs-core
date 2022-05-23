@@ -127,7 +127,9 @@ export const ActionDetailsModalListTable = ({
         ) as IFormField
 
         result.push({
-          item: intl.formatMessage(fieldObj.label) || 'Not Found',
+          item: `${intl.formatMessage(fieldObj.label)} (${intl.formatMessage(
+            section.name
+          )})`,
           original: getFieldValue(
             item.valueString,
             fieldObj,
@@ -151,7 +153,9 @@ export const ActionDetailsModalListTable = ({
         ).find((field) => field.name === parentField) as IFormField
 
         result.push({
-          item: intl.formatMessage(fieldObj.label) || 'Not Found',
+          item: `${intl.formatMessage(fieldObj.label)} (${intl.formatMessage(
+            section.name
+          )})`,
           original: getFieldValue(
             item.valueString,
             fieldObj,
