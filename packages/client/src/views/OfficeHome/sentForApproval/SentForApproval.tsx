@@ -44,6 +44,8 @@ import {
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
+import { FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { Scope } from '@client/utils/authUtils'
 const ToolTipContainer = styled.span`
   text-align: center;
 `
@@ -52,6 +54,7 @@ interface IBaseApprovalTabProps {
   goToPage: typeof goToPage
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
+  scope: Scope | null
   queryData: {
     data: GQLEventSearchResultSet
   }
@@ -75,6 +78,8 @@ class SentForApprovalComponent extends React.Component<
   IApprovalTabState
 > {
   pageSize = 10
+  isFieldAgent = this.props.scope?.includes('declare')
+
   constructor(props: IApprovalTabProps) {
     super(props)
     this.state = {
@@ -159,7 +164,6 @@ class SentForApprovalComponent extends React.Component<
       return []
     }
     const transformedData = transformData(data, this.props.intl)
-
     const items = transformedData.map((reg, index) => {
       const event =
         (reg.event &&
@@ -180,7 +184,9 @@ class SentForApprovalComponent extends React.Component<
           id={`name_${index}`}
           isBoldLink={true}
           onClick={() =>
-            this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
+            this.isFieldAgent
+              ? this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
+              : this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
           }
         >
           {reg.name}
@@ -189,7 +195,9 @@ class SentForApprovalComponent extends React.Component<
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
+            this.isFieldAgent
+              ? this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
+              : this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -244,17 +252,26 @@ class SentForApprovalComponent extends React.Component<
       this.props.queryData.data.totalItems > pageSize
         ? true
         : false
+    const noResultText = this.isFieldAgent
+      ? intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'sent for review'
+        })
+      : intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'sent for approval'
+        })
+    const title = this.isFieldAgent
+      ? intl.formatMessage(navigationMessages.sentForReview)
+      : intl.formatMessage(navigationMessages.approvals)
+
     return (
       <WQContentWrapper
-        title={intl.formatMessage(navigationMessages.approvals)}
+        title={title}
         isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
         paginationId={paginationId}
         totalPages={totalPages}
         onPageChange={onPageChange}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'sent for approval'
-        })}
+        noResultText={noResultText}
         loading={this.props.loading}
         error={this.props.error}
         noContent={this.transformValidatedContent(data).length <= 0}

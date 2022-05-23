@@ -152,14 +152,17 @@ export const FIELD_AGENT_HOME_QUERY = gql`
     $pageSize: Int
     $reviewSkip: Int
     $rejectSkip: Int
-    $approvalSkip: Int
-    $externalValidationSkip: Int
-    $printSkip: Int
   ) {
     reviewTab: searchEvents(
       userId: $userId
       locationIds: $locationIds
-      status: ["DECLARED", "IN_PROGRESS"]
+      status: [
+        "DECLARED"
+        "IN_PROGRESS"
+        "VALIDATED"
+        "WAITING_VALIDATION"
+        "REGISTERED"
+      ]
       count: $pageSize
       skip: $reviewSkip
     ) {
@@ -176,42 +179,6 @@ export const FIELD_AGENT_HOME_QUERY = gql`
       skip: $rejectSkip
       sortColumn: "createdAt.keyword"
       sort: "asc"
-    ) {
-      totalItems
-      results {
-        ...EventSearchFields
-      }
-    }
-    approvalTab: searchEvents(
-      userId: $userId
-      locationIds: $locationIds
-      status: ["VALIDATED"]
-      count: $pageSize
-      skip: $approvalSkip
-    ) {
-      totalItems
-      results {
-        ...EventSearchFields
-      }
-    }
-    externalValidationTab: searchEvents(
-      userId: $userId
-      locationIds: $locationIds
-      status: ["WAITING_VALIDATION"]
-      count: $pageSize
-      skip: $externalValidationSkip
-    ) {
-      totalItems
-      results {
-        ...EventSearchFields
-      }
-    }
-    printTab: searchEvents(
-      userId: $userId
-      locationIds: $locationIds
-      status: ["REGISTERED"]
-      count: $pageSize
-      skip: $printSkip
     ) {
       totalItems
       results {

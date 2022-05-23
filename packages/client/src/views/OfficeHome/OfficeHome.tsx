@@ -202,26 +202,11 @@ export class OfficeHomeView extends React.Component<
     }
   }
 
-  syncWorkQueueFieldAgent() {
+  updateWorkqueue() {
     this.props.updateRegistrarWorkqueue(
       this.props.userDetails?.practitionerId,
       this.pageSize,
-      true,
-      Math.max(this.state.progressCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.healthSystemCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.reviewCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.updatesCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.approvalCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.externalValidationCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.printCurrentPage - 1, 0) * this.pageSize
-    )
-  }
-
-  syncWorkqueueRegistrationClerk() {
-    this.props.updateRegistrarWorkqueue(
-      this.props.userDetails?.practitionerId,
-      this.pageSize,
-      false,
+      this.isFieldAgent,
       Math.max(this.state.progressCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.healthSystemCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.reviewCurrentPage - 1, 0) * this.pageSize,
@@ -233,22 +218,10 @@ export class OfficeHomeView extends React.Component<
   }
 
   syncWorkqueue() {
-    if (this.isFieldAgent) {
-      setTimeout(
-        () => this.syncWorkQueueFieldAgent(),
-        PAGE_TRANSITIONS_ENTER_TIME
-      )
-      this.interval = setInterval(() => {
-        this.syncWorkqueueRegistrationClerk()
-      }, 300000)
-    } else {
-      setTimeout(() => {
-        this.syncWorkqueueRegistrationClerk()
-      }, PAGE_TRANSITIONS_ENTER_TIME)
-      this.interval = setInterval(() => {
-        this.syncWorkqueueRegistrationClerk()
-      }, 300000)
-    }
+    setTimeout(() => this.updateWorkqueue(), PAGE_TRANSITIONS_ENTER_TIME)
+    this.interval = setInterval(() => {
+      this.updateWorkqueue()
+    }, 300000)
   }
 
   componentDidMount() {
@@ -484,19 +457,27 @@ export class OfficeHomeView extends React.Component<
           ) : (
             <>
               {tabId === WORKQUEUE_TABS.sentForReview && (
-                <SentForReview
-                  declarationsReadyToSend={declarationsReadyToSend}
-                  paginationId={sentForReviewCurrentPage}
+                <SentForApproval
+                  queryData={{
+                    data: filteredData.reviewTab
+                  }}
+                  paginationId={approvalCurrentPage}
                   pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
+                  loading={loading}
+                  error={error}
                 />
               )}
               {tabId === WORKQUEUE_TABS.requiresUpdateAgent && (
-                <RequiresUpdateFieldAgent
-                  userDetails={this.props.userDetails}
+                <RequiresUpdateRegistrar
+                  queryData={{
+                    data: filteredData.rejectTab
+                  }}
+                  paginationId={updatesCurrentPage}
                   pageSize={this.pageSize}
-                  paginationId={requireUpdatePage}
                   onPageChange={this.onPageChange}
+                  loading={loading}
+                  error={error}
                 />
               )}
             </>

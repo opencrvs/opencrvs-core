@@ -38,10 +38,7 @@ export async function syncRegistrarWorkqueue(
           locationIds: [locationId],
           pageSize,
           reviewSkip: reviewSkip,
-          rejectSkip: rejectSkip,
-          approvalSkip: approvalSkip,
-          externalValidationSkip: externalValidationSkip,
-          printSkip: printSkip
+          rejectSkip: rejectSkip
         },
         fetchPolicy: 'no-cache'
       })

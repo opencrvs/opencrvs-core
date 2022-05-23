@@ -385,7 +385,13 @@ function RecordAuditBody({
   }
 
   if (!isDownloaded) {
-    actions.push(ShowDownloadButton({ declaration, draft, userDetails }))
+    actions.push(
+      ShowDownloadButton({
+        declaration,
+        draft,
+        userDetails
+      })
+    )
     desktopActionsView.push(actions[actions.length - 1])
   }
 
@@ -587,6 +593,26 @@ function getBodyContent({
             trackingId
           )
 
+    // let declaration
+
+    // const draftDeclaration =
+    //   draft && getDraftDeclarationData(draft, resources, intl, trackingId)
+    // const wqDeclaration = getWQDeclarationData(
+    //   workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
+    //   language,
+    //   trackingId
+    // )
+
+    // if (draftDeclaration?.id && wqDeclaration?.id) {
+    //   if (draft && draft.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
+    //     declaration = draftDeclaration
+    //   } else {
+    //     declaration = wqDeclaration
+    //   }
+    // } else {
+    //   declaration = draftDeclaration || wqDeclaration
+    // }
+
     return (
       <RecordAuditBody
         key={`record-audit-${declarationId}`}
@@ -632,7 +658,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     offlineData: state.offline.offlineData,
     workqueueDeclaration:
       (tab !== 'search' &&
-        state.workqueueState.workqueue.data[tab].results?.find(
+        state.workqueueState.workqueue.data[tab]?.results?.find(
           (gqlSearchSet) => gqlSearchSet?.id === declarationId
         )) ||
       null
