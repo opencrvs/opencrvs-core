@@ -340,8 +340,8 @@ class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
                     optionalLabel=""
                   >
                     <HalfWidthInput
-                      id="verifyCode"
-                      type="text"
+                      id="VerifyCode"
+                      type="number"
                       touched={true}
                       error={this.state.isInvalidPhoneNumber}
                       value={this.state.verifyCode}
