@@ -259,10 +259,7 @@ export class SubmissionController {
       }
     }
     const scopes = getScope(this.store.getState()) || []
-    //It needs some times to elasticSearch to update index
-    setTimeout(async () => {
-      await this.store.dispatch(updateRegistrarWorkqueue())
-    }, 100)
+    await this.store.dispatch(updateRegistrarWorkqueue())
     await this.store.dispatch(modifyDeclaration(declaration))
 
     if (
@@ -283,9 +280,9 @@ export class SubmissionController {
         ) {
           delete declaration.data[attachmentSectionKey]
         }
-        this.store.dispatch(writeDeclaration(declaration))
+        await this.store.dispatch(writeDeclaration(declaration))
       } else {
-        this.store.dispatch(deleteDeclaration(declaration))
+        await this.store.dispatch(deleteDeclaration(declaration))
       }
     } else {
       await this.store.dispatch(writeDeclaration(declaration))
