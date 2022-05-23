@@ -95,7 +95,7 @@ const messagesToDefine: IReviewMessages = {
   },
   headerSubjectWithName: {
     defaultMessage:
-      '{eventType, select, birth {Birth} death {Death} other {Birth}} Declaration for {name}',
+      '{eventType, select, birth {birth} death {death} other {birth}} declaration',
     description:
       'Header subject that shows which declaration type to review with informant name',
     id: 'review.header.subject.subjectWitName'

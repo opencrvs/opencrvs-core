@@ -76,11 +76,12 @@ const UnderLayBackground = styled.div<{ background: string }>`
       ? theme.colors.negative
       : theme.colors.primary};
   position: absolute;
+  border-radius: 4px;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.16;
+  opacity: 0.1;
 `
 
 const Title = styled.div`
