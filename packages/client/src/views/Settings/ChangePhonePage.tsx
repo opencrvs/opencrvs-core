@@ -41,7 +41,7 @@ import { Mutation } from 'react-apollo'
 import { get, isNull } from 'lodash'
 import { userMessages } from '@client/i18n/messages/user'
 import { convertToMSISDN } from '@client/forms/utils'
-import { queriesForUser } from './queries'
+import { queriesForUser } from '@client/views/Settings/queries'
 import {
   FloatingNotification,
   NOTIFICATION_TYPE

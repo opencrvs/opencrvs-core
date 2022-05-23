@@ -18,7 +18,8 @@ import {
 import { createStore } from '@client/store'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import { ReactWrapper } from 'enzyme'
-import { changePhoneMutation, ChangePhonePage } from './ChangePhonePage'
+import { ChangePhonePage } from './ChangePhonePage'
+import { changePhoneMutation } from '@client/views/Settings/mutations'
 
 const graphqlMocks = [
   {

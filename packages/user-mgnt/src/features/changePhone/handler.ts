@@ -48,7 +48,7 @@ export default async function changePhoneHandler(
   }
 
   try {
-    await User.updateOne({ _id: user._id }, user)
+    await User.update({ _id: user._id }, user)
   } catch (err) {
     // return 400 if there is a validation error when updating to mongo
     return h.response(err.message).code(400)
