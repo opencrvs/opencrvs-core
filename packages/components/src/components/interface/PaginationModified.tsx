@@ -31,8 +31,9 @@ interface IButtonProps {
 }
 
 const PaginationContainer = styled.div`
-  height: 60px;
-  padding: 0 ${({ theme }) => theme.grid.margin}px;
+  margin-top: 8px;
+  height: 48px;
+  padding: 16px;
   color: ${({ theme }) => theme.colors.primary};
   display: flex;
   align-items: center;

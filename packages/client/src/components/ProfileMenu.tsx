@@ -127,7 +127,6 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
           }
           menuHeader={this.getMenuHeader(intl, language, userDetails)}
           menuItems={this.getMenuItems(intl)}
-          hasFocusRing={true}
         />
       </>
     )

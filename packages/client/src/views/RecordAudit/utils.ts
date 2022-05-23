@@ -66,6 +66,11 @@ export interface IGQLDeclaration {
 }
 
 export const DECLARATION_STATUS_LABEL: IStatus = {
+  STARTED: {
+    defaultMessage: 'Started',
+    description: 'Label for declaration started',
+    id: 'recordAudit.history.started'
+  },
   REINSTATED: {
     defaultMessage: 'Reinstated to ',
     description: 'The prefix for reinstated declaration',
