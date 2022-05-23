@@ -114,6 +114,7 @@ export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGrou
         type: RADIO_GROUP,
         size: RadioSize.LARGE,
         label: certificateMessages.whoToCollect,
+        hideHeader: true,
         required: true,
         initialValue: '',
         validate: [],
@@ -140,6 +141,7 @@ export const certCollectorGroupForBirthAppWithoutMotherDetails: IFormSectionGrou
         type: RADIO_GROUP,
         size: RadioSize.LARGE,
         label: certificateMessages.whoToCollect,
+        hideHeader: true,
         required: true,
         initialValue: '',
         validate: [],
@@ -166,6 +168,7 @@ export const certCollectorGroupForBirthAppWithParentDetails: IFormSectionGroup =
         type: RADIO_GROUP,
         size: RadioSize.LARGE,
         label: certificateMessages.whoToCollect,
+        hideHeader: true,
         required: true,
         initialValue: '',
         validate: [],
@@ -193,6 +196,7 @@ export const certCollectorGroupForBirthAppWithoutParentDetails: IFormSectionGrou
         type: RADIO_GROUP,
         size: RadioSize.LARGE,
         label: certificateMessages.whoToCollect,
+        hideHeader: true,
         required: true,
         initialValue: '',
         validate: [],
@@ -219,13 +223,6 @@ export const collectBirthCertificateFormSection: IFormSection = {
       title: certificateMessages.otherCollectorFormTitle,
       error: certificateMessages.certificateOtherCollectorInfoError,
       fields: [
-        {
-          name: 'paragraph',
-          type: PARAGRAPH,
-          label: certificateMessages.otherCollectorFormParagraph,
-          initialValue: '',
-          validate: []
-        },
         {
           name: 'iDType',
           type: SELECT_WITH_OPTIONS,
@@ -359,6 +356,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           type: RADIO_GROUP,
           size: RadioSize.LARGE,
           label: certificateMessages.whoToCollect,
+          hideHeader: true,
           required: true,
           initialValue: true,
           validate: [],
@@ -379,13 +377,6 @@ export const collectDeathCertificateFormSection: IFormSection = {
       title: certificateMessages.otherCollectorFormTitle,
       error: certificateMessages.certificateOtherCollectorInfoError,
       fields: [
-        {
-          name: 'paragraph',
-          type: PARAGRAPH,
-          label: certificateMessages.otherCollectorFormParagraph,
-          initialValue: '',
-          validate: []
-        },
         {
           name: 'iDType',
           type: SELECT_WITH_OPTIONS,

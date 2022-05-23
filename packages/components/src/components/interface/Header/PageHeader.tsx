@@ -12,6 +12,7 @@
 import * as React from 'react'
 import { grid } from '../../grid'
 import styled from 'styled-components'
+import { IDomProps } from './AppHeader'
 
 const PageHeaderWrapper = styled.div`
   padding: 8px 16px;
@@ -46,8 +47,7 @@ const Title = styled.div`
   /* top: 14px; */
 `
 
-export interface IPageHeaderProps {
-  id?: string
+interface IProps {
   mobileLeft?: React.ReactElement[]
   mobileTitle?: string
   mobileRight?: React.ReactElement[]
@@ -56,12 +56,12 @@ export interface IPageHeaderProps {
   desktopRight?: React.ReactElement[]
 }
 
-export type IFullProps = IPageHeaderProps & React.HTMLAttributes<HTMLDivElement>
+export type IPageHeaderProps = IProps & IDomProps
 
 interface IState {
   width: number
 }
-export class PageHeader extends React.Component<IFullProps, IState> {
+export class PageHeader extends React.Component<IPageHeaderProps, IState> {
   state = {
     width: window.innerWidth
   }
@@ -78,13 +78,11 @@ export class PageHeader extends React.Component<IFullProps, IState> {
     this.setState({ width: window.innerWidth })
   }
   render() {
-    const props: IPageHeaderProps = this.props as IPageHeaderProps
-    const headerProps: React.HTMLAttributes<HTMLDivElement> = this
-      .props as React.HTMLAttributes<HTMLDivElement>
+    const props: IPageHeaderProps = this.props
 
     if (this.state.width > grid.breakpoints.lg) {
       return (
-        <PageHeaderWrapper id={props.id} {...headerProps}>
+        <PageHeaderWrapper id={this.props.id} className={this.props.className}>
           <Left>
             {props.desktopLeft && (
               <Actions>{props.desktopLeft.map((el) => el)}</Actions>
@@ -98,7 +96,7 @@ export class PageHeader extends React.Component<IFullProps, IState> {
       )
     } else {
       return (
-        <PageHeaderWrapper id={props.id} {...headerProps}>
+        <PageHeaderWrapper id={this.props.id} className={this.props.className}>
           <Left>
             {props.mobileLeft && (
               <Actions>{props.mobileLeft.map((el) => el)}</Actions>

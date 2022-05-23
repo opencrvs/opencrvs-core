@@ -152,13 +152,14 @@ const Row = styled.div`
 `
 const RightColumn = styled.div`
   width: 40%;
-  margin: 0px 15px;
+  border-radius: 4px;
+  margin-left: 24px;
 
   &:first-child {
     margin-left: 0px;
   }
   &:last-child {
-    margin-right: 0px;
+    margin-right: -24px;
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -167,8 +168,9 @@ const RightColumn = styled.div`
 `
 
 const LeftColumn = styled.div`
-  ${({ theme }) => theme.shadows.light};
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
   width: 60%;
+  margin-bottom: 200px;
 
   &:first-child {
     margin-left: 0px;
@@ -179,6 +181,10 @@ const LeftColumn = styled.div`
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     width: 100%;
+    margin-bottom: 0px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    border: 0;
   }
 `
 
@@ -205,13 +211,18 @@ const FormData = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   padding: 32px;
+  border-radius: 4px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 24px;
   }
 `
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.h2};
-  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  ${({ theme }) => theme.fonts.h3};
+  padding: 16px 0;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
@@ -220,7 +231,7 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 const SectionContainer = styled.div`
-  margin-bottom: 30px;
+  margin-bottom: 40px;
 `
 
 const DocumentListPreviewContainer = styled.div`

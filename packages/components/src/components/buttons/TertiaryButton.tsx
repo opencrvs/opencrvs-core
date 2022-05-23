@@ -46,8 +46,8 @@ export const TertiaryButton = styled(Button)`
     background: ${({ theme }) => theme.colors.grey200};
   }
 
-  &:disabled {
-    background: ${({ theme }) => theme.colors.disabled};
+  &:disabled:hover {
+    background: ${({ theme }) => theme.colors.white};
   }
 `
 
@@ -63,7 +63,8 @@ const ButtonBase = styled.button`
   cursor: pointer;
   background: transparent;
   &:disabled {
-    background: ${({ theme }) => theme.colors.disabled};
+    background: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }) => theme.colors.disabled};
     path {
       stroke: ${({ theme }) => theme.colors.disabled};
     }

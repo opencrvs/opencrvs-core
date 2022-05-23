@@ -71,10 +71,12 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { Navigation } from '@client/components/interface/Navigation'
 import {
   IconWithName,
-  IconWithNameEvent
+  IconWithNameEvent,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -84,8 +86,10 @@ const ErrorText = styled.div`
 `
 
 const BodyContainer = styled.div`
+  margin-left: 0px;
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 265px;
+    margin-left: 250px;
+    padding: 0px 24px;
   }
 `
 const ToolTipContainer = styled.span`
@@ -358,6 +362,31 @@ export class SearchResultView extends React.Component<
         this.userHasRegisterScope()
           ? true
           : false
+      const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
+      const NameComponent = reg.name ? (
+        <LinkButton
+          isBoldLink={true}
+          id={`name_${index}`}
+          onClick={() =>
+            isDuplicate
+              ? this.props.goToReviewDuplicate(reg.id)
+              : this.props.goToDeclarationRecordAudit('search', reg.id)
+          }
+        >
+          {reg.name}
+        </LinkButton>
+      ) : (
+        <NoNameContainer
+          id={`name_${index}`}
+          onClick={() =>
+            isDuplicate
+              ? this.props.goToReviewDuplicate(reg.id)
+              : this.props.goToDeclarationRecordAudit('search', reg.id)
+          }
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
       return {
         ...reg,
         event,
@@ -365,31 +394,24 @@ export class SearchResultView extends React.Component<
         iconWithName: (
           <IconWithName
             status={reg.declarationStatus}
-            name={reg.name}
+            name={NameComponent}
             isValidatedOnReview={isValidatedOnReview}
             isDuplicate={isDuplicate}
+            isArchived={isArchived}
           />
         ),
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.declarationStatus}
-            name={reg.name}
+            name={NameComponent}
             event={event}
             isDuplicate={isDuplicate}
             isValidatedOnReview={isValidatedOnReview}
+            isArchived={isArchived}
           />
         ),
         dateOfEvent,
-        actions,
-        rowClickHandler: [
-          {
-            label: 'rowClickHandler',
-            handler: () =>
-              isDuplicate
-                ? this.props.goToReviewDuplicate(reg.id)
-                : this.props.goToDeclarationRecordAudit('search', reg.id)
-          }
-        ]
+        actions
       }
     })
   }
@@ -482,7 +504,6 @@ export class SearchResultView extends React.Component<
                             noResultText={intl.formatMessage(
                               constantsMessages.noResults
                             )}
-                            clickable={true}
                             hideLastBorder={true}
                           />
                         </>

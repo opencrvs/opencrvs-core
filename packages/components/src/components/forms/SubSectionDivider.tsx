@@ -13,23 +13,19 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 const SubSectionWrapper = styled.div`
-  border-top: solid 1px ${({ theme }) => theme.colors.background};
-  width: calc(100% + 50px);
-  margin-left: -25px;
-  padding-top: 14px;
-  padding-left: 25px;
-  padding-right: 25px;
+  border-top: solid 1px ${({ theme }) => theme.colors.grey200};
+  padding: 24px 0;
   flex-direction: row;
 `
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.h2};
+  ${({ theme }) => theme.fonts.h3};
   color: ${({ theme }) => theme.colors.copy};
 `
 const Optional = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
-  ${({ theme }) => theme.fonts.h4};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ disabled, theme }) =>
     disabled ? theme.colors.disabled : theme.colors.placeholderCopy};
   flex-grow: 0;
