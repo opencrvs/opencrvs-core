@@ -25,10 +25,6 @@ services:
     environment:
       - discovery.type=single-node
 
-  kibana:
-    image: docker.elastic.co/kibana/kibana:7.17.0
-    restart: unless-stopped
-
   influxdb:
     image: influxdb:1.7.9
     restart: unless-stopped

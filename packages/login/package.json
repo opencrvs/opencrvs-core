@@ -55,7 +55,7 @@
     "open:cov": "yarn test && opener coverage/index.html",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "lint:ts": "eslint --fix './src/**/*.{ts,tsx}'",
-    "start:prod": "yarn build && yarn serve -s -l 3020 build",
+    "start:prod": "yarn serve -s -l 3020 build",
     "test:compilation": "tsc --noEmit",
     "build:clean": "rm -rf build",
     "extract:translations": "bash extract-translations.sh"
