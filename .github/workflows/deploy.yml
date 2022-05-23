@@ -23,8 +23,8 @@ on:
       core-image-tag:
         description: Core DockerHub image tag
         required: false
-      farajaland-image-tag:
-        description: Farajaland DockerHub image tag
+      countryconfig-image-tag:
+        description: Your Country Config DockerHub image tag
         required: false
 jobs:
   deploy:
@@ -41,22 +41,19 @@ jobs:
         run: |
           git clone https://github.com/opencrvs/opencrvs-farajaland.git
 
-      # Get latest version hashes from repos if they are not given as inputs
       - name: Get COUNTRY_CONFIG_VERSION
-        if: ${{ !github.event.inputs.farajaland-image-tag }}
+        if: ${{ !github.event.inputs.countryconfig-image-tag }}
         run: |
           cd opencrvs-farajaland
           echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           cd ../
 
-      # Set tag versions if they are given as inputs
       - name: Set COUNTRY_CONFIG_VERSION from inputs
-        if: ${{ github.event.inputs.farajaland-image-tag }}
+        if: ${{ github.event.inputs.countryconfig-image-tag }}
         run: |
-          echo "COUNTRY_CONFIG_VERSION=${{ github.event.inputs.farajaland-image-tag }}" >> $GITHUB_ENV
+          echo "COUNTRY_CONFIG_VERSION=${{ github.event.inputs.countryconfig-image-tag }}" >> $GITHUB_ENV
 
-      # Checkout farajaland at the commit hash associated in order for yarn deploy to pickup any deploy Docker Compose changes
-      - name: Checkout correct Farajaland branch
+      - name: Checkout correct country config branch
         run: |
           cd opencrvs-farajaland
           git checkout ${{ env.COUNTRY_CONFIG_VERSION }}
@@ -84,35 +81,47 @@ jobs:
       - name: Deploy to QA
         if: ${{ github.event.inputs.environment == 'qa' }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          QA_DOMAIN: ${{ secrets.QA_DOMAIN }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
           KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
           MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
         run: |
-          yarn deploy:qa farajaland-qa.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+          yarn deploy:qa ${{ env.QA_DOMAIN }} ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
 
       - name: Deploy to production
         if: ${{ github.event.inputs.environment == 'production' }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          PRODUCTION_DOMAIN: ${{ secrets.PRODUCTION_DOMAIN }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
           KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
           MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
         run: |
-          yarn deploy:prod farajaland.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 3
+          yarn deploy:prod ${{ env.PRODUCTION_DOMAIN }} ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 3
 
       - name: Deploy to staging
         if: ${{ github.event.inputs.environment == 'staging' }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          STAGING_DOMAIN: ${{ secrets.STAGING_DOMAIN }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
           KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
           MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
         run: |
-          yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+          yarn deploy:staging ${{ env.STAGING_DOMAIN }} ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1

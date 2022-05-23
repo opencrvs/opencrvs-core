@@ -125,7 +125,7 @@ becomes:
 ;data1_hostname=farajaland-staging
 ```
 
-3. Using a strong password generator, create a master mongo password and encrypt_passphrase along with an elasticsearch superuser password in order to prepare these required parameters:
+3. Using a strong password generator, such as [1Password](https://1password.com/) you should create and **safely store** a master mongo password and encrypt_passphrase along with an elasticsearch superuser password in order to prepare these required parameters. If you want to make use of the provided automated Github Actions for automated continuous deployment from your Git repo, you will need to set the same details as Github Action Secrets, so make sure that you save them for future use:
 
 **Required parameters:**
 
@@ -140,7 +140,7 @@ encrypt_passphrase
 
 **Optional parameters:**
 
-For the optional automated daily external data backup to another server, these parameters must be prepared:
+For the optional automated daily external data backup to another server, these parameters must be prepared. You can :
 
 external_backup_server_ip
 external_backup_server_user
@@ -190,24 +190,33 @@ manager_production_server_ip=<your_manager_production_server_ip> \
 external_backup_server_remote_directory=<your_external_backup_server_remote_directory>"
 ```
 
-Once this command is finished the servers are prepared for an OpenCRVS deployment.
+Once this command is finished the servers are prepared for an OpenCRVS deployment. You can read more about the external backups in the **Emergency Backup & Restore** section
 
 ### Create Docker Secrets
 
-Before the deployment can be done a few secrets need to be manually added to the docker swarm:
+Before the deployment can be done a few secrets need to be created and manually added to the docker swarm.
+[Docker secrets](https://docs.docker.com/engine/swarm/secrets/) are used as a secure alternative to serving passwords in environment variables without using .env files
 
-ssh into the manager server and run the following, replacing the values with the actual secrets:
+Using a strong password generator service such as [1Password](https://1password.com/) you should create and safely store the required passwords as you will need them regularly in other steps such as when populating your country configuration database.
+
+**ssh into the manager server and run the following commands, replacing the values with the actual secrets:**
+
+1. Running the following lines saves the login details to OpenHIM as Docker secrets. You will have created this password when setting up your country configuration. The username will likely be the default: root@openhim.org
 
 ```sh
-# Create login credentials for Kibana Basic Auth
-htpasswd -nb kibana-admin example-password
-printf 'kibana-admin:$apr1$LFvoLjiD$j/33/z/rI9xrMFUiIC5rM.' | docker secret create kibana-htpasswd -
-# For API integration mediators, allows API access to the OpenHIM
 printf "<openhim-user>" | docker secret create openhim-user -
 printf "<openhim-password>" | docker secret create openhim-password -
 ```
 
-ssh into the manager server and run the following, replacing the following values with the actual secrets for your SMS provider of choice:
+2. The next secrets store the choice of SMS provider and connection details. Currently you can only choose between [Clickatell](https://www.clickatell.com/) and [Infobip](https://www.infobip.com/). In a future version of OpenCRVS, we intend to refactor out the entire notification microservice from core into the country configuration server so that you can choose any communication provider and method that you wish. Currently if you would like to set up a different provider we would really appreciate it if you open a pull request.
+
+a) In your country configuration look at the file docker-compose.countryconfig.prod-deploy.yml file. You will notice that environment variables are passed to the notification service from this compose file. Set the choice of provider in the SMS_PROVIDER environment veriable. You can set the choice to be **clickatell** or **infobip**
+
+```
+- SMS_PROVIDER=infobip
+```
+
+b) Depending on your choice of provider, you need to set the following Docker secrets
 
 ```sh
 # In Zambia we have used Clickatell, we have found good Telco coverage in Africa with this provider
@@ -224,7 +233,7 @@ printf "<infobip-sender-id>" | docker secret create infobip-sender-id -
 
 After creating the secrets make sure the commands are removed from the shell history by running `history -c`
 
-Also, if you can't ssh into the manager as root you will need to add your ssh user to be able to run docker commands:
+Also note, if depending on your setup you can't ssh into the manager as **root** you will need to add your ssh user to Docker to be able to run docker commands:
 
 ```
 sudo groupadd docker
@@ -233,20 +242,28 @@ sudo usermod -aG docker $USER
 
 Note: the Ansible script will install the UFW firewall, however, Docker manages it's own iptables. This means that even if there are UFW rules to block certain ports these will be overridden for ports where Docker is publishing a container port. Ensure only the necessary ports are published via the docker-compose files. Only the necessary ports are published by default, however, you may want to check this when doing security audits.
 
-Synthetic records will need to be created, enabling SSL and permanently directing the following subdomains for the Traefik SSL cert to be succcessfully generated:
+### Manage DNS for your chosen domain
 
+Using your domain management system, A records will need to be created for all the services which are publicly exposed.
+
+This also enables the Traefik SSL cert to be succcessfully generated. The SSL cert is signed by [LetsEncrypt](https://letsencrypt.org/) in the infrastructure/traefik.toml config file by default. If you wish to use a different SSL cert provider, you can amend the code there to do so.
+
+Create A records for each of the following, with a TTL of 1 hour that forward the URL to your manager node's external IP address
+
+<your_domain>
 api.<your_domain>
 auth.<your_domain>
-gateway.<your_domain>
-login.<your_domain>
-openhim.<your_domain>
-openhim-api.<your_domain>
-register.<your_domain>
-countryconfig.<your_domain>
 config.<your_domain>
-styleguide.<your_domain>
-monitor.<your_domain>
+countryconfig.<your_domain>
+gateway.<your_domain>
+kibana.<your_domain>
+login.<your_domain>
+openhim-api.<your_domain>
+openhim.<your_domain>
+register.<your_domain>
 webhooks.<your_domain>
+
+### Run the deploy Github Ation
 
 Then, run the deployment using the example deploy commands in the root [package.json](https://github.com/opencrvs/opencrvs-core/blob/master/package.json) depending on your needs:
 
