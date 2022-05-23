@@ -140,7 +140,7 @@ export const GetHistory = ({
   if (!allHistoryData.length && userDetails) {
     allHistoryData.unshift({
       date: new Date(draft.savedOn || Date.now()).toString(),
-      action: 'CREATED',
+      action: 'STARTED',
       user: {
         id: userDetails.userMgntUserID,
         name: userDetails.name,

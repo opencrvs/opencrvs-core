@@ -66,10 +66,10 @@ export interface IGQLDeclaration {
 }
 
 export const DECLARATION_STATUS_LABEL: IStatus = {
-  CREATED: {
-    defaultMessage: 'Created',
-    description: 'Label for registration created',
-    id: 'recordAudit.history.created'
+  STARTED: {
+    defaultMessage: 'Started',
+    description: 'Label for declaration started',
+    id: 'recordAudit.history.started'
   },
   REINSTATED: {
     defaultMessage: 'Reinstated to ',
