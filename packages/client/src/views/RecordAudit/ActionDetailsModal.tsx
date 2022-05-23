@@ -153,9 +153,7 @@ export const ActionDetailsModalListTable = ({
         ).find((field) => field.name === parentField) as IFormField
 
         result.push({
-          item: `${intl.formatMessage(fieldObj.label)} (${intl.formatMessage(
-            section.name
-          )})`,
+          item: intl.formatMessage(fieldObj.label),
           original: getFieldValue(
             item.valueString,
             fieldObj,
