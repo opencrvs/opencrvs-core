@@ -1357,10 +1357,10 @@ export function unassignDeclaration(
   }
 }
 
-function unassignDeclarationSuccess(
-  id: string,
-  client: ApolloClient<{}>
-): IUnassignDeclarationSuccess {
+function unassignDeclarationSuccess([id, client]: [
+  string,
+  ApolloClient<{}>
+]): IUnassignDeclarationSuccess {
   return {
     type: UNASSIGN_DECLARATION_SUCCESS,
     payload: {
