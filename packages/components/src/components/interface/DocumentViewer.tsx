@@ -17,9 +17,10 @@ import { DocumentImage } from './components/DocumentImage'
 const Container = styled.div`
   width: calc(40vw - 50px);
   position: fixed;
-  top: 94px;
+  top: 80px;
   background-color: ${({ theme }) => theme.colors.grey100};
-  outline: 1px solid ${({ theme }) => theme.colors.grey300};
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-radius: 4px;
   box-sizing: border-box;
   height: 720px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {

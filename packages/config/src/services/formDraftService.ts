@@ -9,54 +9,46 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as mongoose from 'mongoose'
-import { every } from 'lodash'
-import fetch from 'node-fetch'
 import * as Hapi from '@hapi/hapi'
 import Question from '@config/models/question'
 import { logger } from '@config/config/logger'
+import fetch from 'node-fetch'
 import {
   METRICS_URL,
   OPENCRVS_SPECIFICATION_URL,
   SEARCH_URL
 } from '@config/config/constants'
-import { getHearthDb } from '@config/config/database'
 import { IModifyDraftStatus } from '@config/handlers/formDraft/updateFormDraft/handler'
+import { fetchFHIR, deleteFHIR } from '@config/services/fhirService'
+import { every } from 'lodash'
 
-enum HearthCollectionsName {
+export enum HearthCollectionsName {
   Composition = 'Composition',
-  Composition_history = 'Composition_history',
   DocumentReference = 'DocumentReference',
   Encounter = 'Encounter',
-  Encounter_history = 'Encounter_history',
   Observation = 'Observation',
-  Observation_history = 'Observation_history',
   Patient = 'Patient',
-  Patient_history = 'Patient_history',
   PaymentReconciliation = 'PaymentReconciliation',
   RelatedPerson = 'RelatedPerson',
-  RelatedPerson_history = 'RelatedPerson_history',
-  Task = 'Task',
-  Task_history = 'Task_history'
+  Task = 'Task'
 }
 
 export async function clearHearthElasticInfluxData(request: Hapi.Request) {
+  const token = request.headers.authorization.replace('Bearer ', '')
   const formDraft = request.payload as IModifyDraftStatus
-  let hearthDBConn: mongoose.Connection
-  //get hearthDB connection
-  try {
-    hearthDBConn = await getHearthDb()
-  } catch (err) {
-    throw Error(`Could not get hearthDB connection. ${err}`)
-  }
-  const tasks: fhir.Task[] = await hearthDBConn
-    .collection('Task')
-    .find()
-    .toArray()
+  const taskBundle = await fetchFHIR(`/${HearthCollectionsName.Task}`, {
+    Authorization: `Bearer ${token}`
+  })
+  const taskEntries = taskBundle.entry
+  const hearthCollectionList = Object.keys(HearthCollectionsName)
 
   //check if all the available tasks have configuration exrension
-  const hasTestExtensionOnAllTasks = every(tasks, {
-    extension: [{ url: `${OPENCRVS_SPECIFICATION_URL}extension/configuration` }]
+  const hasTestExtensionOnAllTasks = every(taskEntries, {
+    resource: {
+      extension: [
+        { url: `${OPENCRVS_SPECIFICATION_URL}extension/configuration` }
+      ]
+    }
   })
   if (!hasTestExtensionOnAllTasks) {
     throw Error(
@@ -65,7 +57,6 @@ export async function clearHearthElasticInfluxData(request: Hapi.Request) {
   }
   //deleting all elastic and influx data
   try {
-    const token = request.headers.authorization.replace('Bearer ', '')
     Promise.all([
       await fetch(`${SEARCH_URL}elasticIndex`, {
         method: 'DELETE',
@@ -86,28 +77,23 @@ export async function clearHearthElasticInfluxData(request: Hapi.Request) {
     throw Error(`Failed to delete elastic, influx data. ${err}`)
   }
 
-  hearthDBConn.db.listCollections().toArray((err, collections) => {
-    if (err) {
-      logger.error(`Error occured getting list of hearthDB collections: ${err}`)
-    } else {
-      Promise.all(
-        collections.map(async (collection) => {
-          if (Object.values(HearthCollectionsName).includes(collection.name)) {
-            try {
-              await hearthDBConn.dropCollection(collection.name)
-              logger.info(`Droped hearthDB collection :: ${collection.name} `)
-            } catch (err) {
-              logger.error(
-                `Error occured droping collection name (${collection.name}) : ${err}`
-              )
-            }
-          }
-        })
-      ).then(() => {
-        logger.info('Successfully droped all listed hearthDB collections')
+  Promise.all(
+    hearthCollectionList.map(async (collection) => {
+      const data = await fetchFHIR(`/${collection}`, {
+        Authorization: `Bearer ${token}`
       })
-    }
-  })
+      return Promise.all(
+        data.entry.map(async (entry: fhir.BundleEntry) => {
+          await deleteFHIR(`/${collection}/${entry.resource?.id}`, {
+            Authorization: `Bearer ${token}`
+          })
+          logger.info(
+            `Deleting '${collection}' collection's resource id: ${entry.resource?.id}`
+          )
+        })
+      )
+    })
+  )
 }
 
 export async function clearQuestionConfigs(event: string) {

@@ -31,20 +31,11 @@ export interface IFormDraft {
   status: DraftStatus
   comment?: string
   version: number
-  history?: IDraftHistory[]
+  history: IDraftHistory[]
   updatedAt: number
   createdAt: number
 }
 
 export function getEventDraft(formDrafts: IFormDraft[], event: Event) {
   return find(formDrafts, { event })
-}
-
-export function getFormDraft(formDrafts: IFormDraft[]) {
-  const birthDraft = getEventDraft(formDrafts, Event.BIRTH)
-  const deathDraft = getEventDraft(formDrafts, Event.DEATH)
-  return {
-    birth: birthDraft,
-    death: deathDraft
-  }
 }

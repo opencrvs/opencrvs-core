@@ -56,12 +56,13 @@ import { Switch } from 'react-router'
 import { AppStore } from './store'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
-import { RecordAudit } from './views/Home/RecordAudit'
+import { RecordAudit } from './views/RecordAudit/RecordAudit'
 import { ChangePhonePage } from './views/Settings/ChangePhonePage'
 import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
 import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
+import { Roles } from '@client/utils/authUtils'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -207,11 +208,17 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                            ]}
                                             path={routes.CERTIFICATE_CONFIG}
                                             component={CertificatesConfig}
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                            ]}
                                             path={routes.APPLICATION_CONFIG}
                                             component={ApplicationConfig}
                                           />
@@ -292,6 +299,13 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.LOCAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.PERFORMANCE_MANAGEMENT
+                                            ]}
                                             path={routes.TEAM_SEARCH}
                                             component={TeamSearch}
                                           />
@@ -329,6 +343,13 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.LOCAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.PERFORMANCE_MANAGEMENT
+                                            ]}
                                             path={routes.PERFORMANCE_HOME}
                                             component={PerformanceHome}
                                           />

@@ -29,7 +29,7 @@ const StyledBox = styled.div`
   box-sizing: border-box;
   border-radius: 4px;
   height: 80px;
-  max-width: 500px;
+  max-width: 520px;
   background-color: ${({ theme }) => theme.colors.white};
   margin: auto;
   margin-bottom: 8px;
@@ -39,9 +39,9 @@ const RowWrapper = styled.div<{
   clickable?: boolean
 }>`
   width: 100%;
-  padding: 16px 18px 12px;
+  padding: 16px 8px 16px 16px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
 `
 

@@ -29,23 +29,6 @@ export const BodyContent = styled.div`
   }
 `
 
-export const HomeContent = styled.div`
-  max-width: 1140px;
-  margin: 0 auto 64px auto;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
-    margin: 24px auto 64px auto;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: 24px auto 64px auto;
-    max-width: 100%;
-  }
-  @media (max-width: 1140px) and (min-width: ${({ theme }) =>
-      theme.grid.breakpoints.lg}px) {
-    max-width: calc(100% - 48px);
-  }
-  position: relative;
-`
-
 export const Container = styled.div<{ isCertificatesConfigPage?: boolean }>`
   background-color: ${({ isCertificatesConfigPage, theme }) =>
     isCertificatesConfigPage === true
@@ -61,7 +44,7 @@ export const FullBodyContent = styled.div`
   width: 100%;
   height: 100%;
   padding: 24px;
-  margin-top: 68px;
+  margin-top: 56px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0px;
   }

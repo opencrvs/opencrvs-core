@@ -49,7 +49,8 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   IconWithName,
-  IconWithNameEvent
+  IconWithNameEvent,
+  NoNameContainer
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
@@ -57,6 +58,7 @@ import {
 } from '@client/views/OfficeHome/utils'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -204,6 +206,26 @@ class ReadyForReviewComponent extends React.Component<
           new Date(reg.dateOfEvent)) ||
         ''
       const createdAt = (reg.createdAt && parseInt(reg.createdAt)) || ''
+      const NameComponent = reg.name ? (
+        <LinkButton
+          id={`name_${index}`}
+          isBoldLink={true}
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
+          }
+        >
+          {reg.name}
+        </LinkButton>
+      ) : (
+        <NoNameContainer
+          id={`name_${index}`}
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
+          }
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
       return {
         ...reg,
         event,
@@ -213,7 +235,7 @@ class ReadyForReviewComponent extends React.Component<
         iconWithName: (
           <IconWithName
             status={reg.declarationStatus}
-            name={reg.name}
+            name={NameComponent}
             isDuplicate={isDuplicate}
             isValidatedOnReview={isValidatedOnReview}
           />
@@ -221,20 +243,13 @@ class ReadyForReviewComponent extends React.Component<
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.declarationStatus}
-            name={reg.name}
+            name={NameComponent}
             event={event}
             isValidatedOnReview={isValidatedOnReview}
             isDuplicate={isDuplicate}
           />
         ),
-        actions,
-        rowClickHandler: [
-          {
-            label: 'rowClickHandler',
-            handler: () =>
-              this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
-          }
-        ]
+        actions
       }
     })
     const sortedItems = getSortedItems(
@@ -346,7 +361,6 @@ class ReadyForReviewComponent extends React.Component<
         <GridTable
           content={this.transformDeclaredContent(data)}
           columns={this.getColumns()}
-          clickable={true}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
           sortedCol={this.state.sortedCol}

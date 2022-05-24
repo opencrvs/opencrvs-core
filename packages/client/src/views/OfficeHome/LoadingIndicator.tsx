@@ -22,13 +22,6 @@ const ErrorText = styled.div`
   text-align: center;
   margin-top: 100px;
 `
-const Loading = styled(Spinner)`
-  width: 24px;
-  margin-right: auto;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: auto;
-  }
-`
 
 const ConnectivityContainer = styled.div`
   width: 100%;
@@ -36,7 +29,8 @@ const ConnectivityContainer = styled.div`
   flex-direction: column;
 `
 const NoConnectivity = styled(NoWifi)`
-  margin: auto;
+  width: 24px;
+  margin-right: auto;
 `
 const Wrapper = styled.div`
   display: flex;
@@ -46,8 +40,13 @@ const Wrapper = styled.div`
 
 const LoadingContainer = styled.div`
   width: 100%;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    padding-left: 20px;
+  padding-left: 8px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: flex;
+    padding-left: 0px;
+    margin: auto;
+    align-items: center;
+    justify-content: center;
   }
 `
 const Text = styled.div`
@@ -81,7 +80,7 @@ export class LoadingIndicatorComp extends React.Component<IProps> {
       <Wrapper>
         {this.props.isOnline && loading && (
           <LoadingContainer>
-            <Loading id="Spinner" baseColor="#4C68C1" />
+            <Spinner id="Spinner" size={24} baseColor="#4C68C1" />
           </LoadingContainer>
         )}
         <MobileViewContainer noDeclaration={noDeclaration}>

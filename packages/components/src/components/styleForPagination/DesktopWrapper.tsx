@@ -16,7 +16,7 @@ export const DesktopWrapper = styled.div`
   margin-right: 80%;
   float: left;
   width: 30%;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media only screen and (max-width: 1023px) {
     display: none;
   }
 `

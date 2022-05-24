@@ -104,6 +104,14 @@ enum NOTIFICATION_SUBJECT {
   PHONE
 }
 
+const TopAlignedListViewItemSimplified = styled(ListViewItemSimplified)`
+  align-items: start;
+  padding: 16px 0;
+`
+const DynamicHeightLinkButton = styled(LinkButton)`
+  height: auto;
+`
+
 interface IState {
   showLanguageSettings: boolean
   selectedLanguage: string
@@ -319,7 +327,10 @@ class SettingsView extends React.Component<IProps, IState> {
         <Header title={intl.formatMessage(messages.settingsTitle)} />
         <Navigation />
         <BodyContainer>
-          <Content title={intl.formatMessage(messages.settingsTitle)}>
+          <Content
+            title={intl.formatMessage(messages.settingsTitle)}
+            showTitleOnMobile={true}
+          >
             <ListViewSimplified>
               {items.map((item) => {
                 return (
@@ -328,19 +339,19 @@ class SettingsView extends React.Component<IProps, IState> {
                     label={<LabelContainer>{item.label}</LabelContainer>}
                     value={<ValueContainer>{item.value}</ValueContainer>}
                     actions={
-                      <LinkButton
+                      <DynamicHeightLinkButton
                         id={item.action.id}
                         onClick={item.action.handler}
                         disabled={item.action.disabled}
                       >
                         {item.action.label}
-                      </LinkButton>
+                      </DynamicHeightLinkButton>
                     }
                   />
                 )
               })}
               {/* For Profile Image */}
-              <ListViewItemSimplified
+              <TopAlignedListViewItemSimplified
                 label={
                   <LabelContainer>
                     {intl.formatMessage(messages.profileImage)}
@@ -359,9 +370,9 @@ class SettingsView extends React.Component<IProps, IState> {
                       this.setState({ imageLoadingError })
                     }
                   >
-                    <LinkButton>
+                    <DynamicHeightLinkButton>
                       {intl.formatMessage(buttonMessages.change)}
-                    </LinkButton>
+                    </DynamicHeightLinkButton>
                   </ImageLoader>
                 }
               />
