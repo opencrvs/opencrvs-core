@@ -85,8 +85,12 @@ describe('Correction root resolvers', () => {
         name: [{ use: 'en', firstNames: 'Khaby', familyName: 'Lame Corrected' }]
       },
       informant: {
-        name: [{ use: 'en', firstNames: 'Mother', familyName: 'Family Name' }],
-        telecom: [{ system: 'phone', value: '+8801622688231' }]
+        individual: {
+          name: [
+            { use: 'en', firstNames: 'Mother', familyName: 'Family Name' }
+          ],
+          telecom: [{ system: 'phone', value: '+8801622688231' }]
+        }
       },
       registration: {
         contact: 'MOTHER',
@@ -133,7 +137,7 @@ describe('Correction root resolvers', () => {
       try {
         await resolvers.Mutation.requestBirthRegistrationCorrection(
           {},
-          { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', birthDetails },
+          { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: birthDetails },
           authHeaderDeclare
         )
       } catch (e) {
@@ -159,7 +163,7 @@ describe('Correction root resolvers', () => {
       const result =
         await resolvers.Mutation.requestBirthRegistrationCorrection(
           {},
-          { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', birthDetails },
+          { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: birthDetails },
           authHeaderRegCert
         )
 
@@ -173,7 +177,7 @@ describe('Correction root resolvers', () => {
       try {
         await resolvers.Mutation.requestDeathRegistrationCorrection(
           {},
-          { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', deathDetails },
+          { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: deathDetails },
           authHeaderDeclare
         )
       } catch (e) {
@@ -195,11 +199,24 @@ describe('Correction root resolvers', () => {
           ]
         })
       )
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          resourceType: 'Bundle',
+          entry: [
+            {
+              response: {
+                location:
+                  'Task/12423/_history/80b90ac3-1032-4f98-af64-627d2b7443f3'
+              }
+            }
+          ]
+        })
+      )
 
       const result =
         await resolvers.Mutation.requestDeathRegistrationCorrection(
           {},
-          { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', deathDetails },
+          { id: '80b90ac3-1032-4f98-af64-627d2b7443f3', details: deathDetails },
           authHeaderRegCert
         )
 
