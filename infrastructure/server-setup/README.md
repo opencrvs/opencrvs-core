@@ -242,6 +242,10 @@ sudo usermod -aG docker $USER
 
 Note: the Ansible script will install the UFW firewall, however, Docker manages it's own iptables. This means that even if there are UFW rules to block certain ports these will be overridden for ports where Docker is publishing a container port. Ensure only the necessary ports are published via the docker-compose files. Only the necessary ports are published by default, however, you may want to check this when doing security audits.
 
+### Set up an SMTP server for OpenCRVS monitoring alerts
+
+We use [Elastalert](https://elastalert.readthedocs.io/en/latest/), in tandem with ElasticSearch and Kibana to monitor the health of the OpenCRVS stack in production. In order for OpenCRVS to alert your Technical System Administrator of any memory or hardware issues, we have set up email notifications as the Elastalert option. So you need to have an SMTP service available. [Google offers SMTP services for free](https://kinsta.com/blog/gmail-smtp-server/) linked to a Gmail account, but there are countless other paid for SMTP services such as [Mailchimp](https://mailchimp.com/). You will need to know your SMTP host, port, username and password. We have hardcoded the service to use SMTP SSL by default.
+
 ### Manage DNS for your chosen domain
 
 Using your domain management system, A records will need to be created for all the services which are publicly exposed.
@@ -265,13 +269,65 @@ webhooks.<your_domain>
 
 ### Run the deploy Github Ation
 
-Then, run the deployment using the example deploy commands in the root [package.json](https://github.com/opencrvs/opencrvs-core/blob/master/package.json) depending on your needs:
+The best way to deploy OpenCRVS to your stack is by using our supplied Github Actions in the country configuration repo.
 
-The commands are like this:
+1. First you need to ensure that you set up at least one, or optionally all, of the following Git [environments](https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment):
+
+These environments allow you to provision different subdomains, secrets and optional deployment properties depending on your chosen deployment environment.
+
+a) **staging** - A useful environment for developers, where the environment variable NODE_ENV is set to **development** and you can create test user accounts with a 6 zero "000000" 2FA code during login.
+
+b) **qa** - A quality assurance/pseudo production environment for software testers, where the environment variable NODE_ENV is set to **procuction** and a secondary exception variable QA_ENV is set to **true**, so that you can create test user accounts with a 6 zero "000000" 2FA code during login but be able to test all other production features.
+
+c) **production** - A live environment, where NODE_ENV is set to **production** & QA_ENV is set to **false**, SMS random 2FA is enabled.
+
+2. You need to create the following [Github secrets](https://docs.github.com/en/codespaces/managing-codespaces-for-your-organization/managing-encrypted-secrets-for-your-repository-and-organization-for-codespaces) for the usernames and passwords you created earlier when provisioning the servers using Ansible, along with other secrets Github will use to SSH into your servers, set the Traefik SSL hostname, connect to [Dockerhub](https://hub.docker.com/) etc.
+
+These secrets below can be set as global repository secrets in Github as they apply to all environments:
+
+ELASTICSEARCH_SUPERUSER_PASSWORD
+KIBANA_PASSWORD
+KIBANA_USERNAME
+MONGODB_ADMIN_PASSWORD
+MONGODB_ADMIN_USER
+DOCKER_USERNAME - Your [Dockerhub](https://hub.docker.com/) username
+DOCKER_PASSWORD - Your [Dockerhub](https://hub.docker.com/) password
+DOCKERHUB_ACCOUNT - The name of your Dockerhub account or organisation that forms the URL to your country config docker image before the slash. e.g: ocrvs
+DOCKERHUB_REPO - The name of your Dockerhub repository .. the name of your country config docker image after the slash. e.g. opencrvs-farajaland
+SMTP_HOST
+SMTP_PORT
+SMTP_USERNAME
+SMTP_PASSWORD
+
+The following secrets likely change for each environment so they should be duplicated as environment secrets in Github
+
+Github needs a [deployment SSH key](https://docs.github.com/en/developers/overview/managing-deploy-keys) to be enabled. FYI we use [this Github action](https://github.com/shimataro/ssh-key-action) to connect.
+
+KNOWN_HOSTS - You will need a copy of the KNOWN_HOSTS line in **.ssh/known_hosts** relevant to the host domain name for your environment. This will have been generated using a test SSH connection using your key
+SSH_KEY - Note: This is a copy of the **id_rsa** file for your deploy key ... Not the id_rsa.pub!
+STAGING_DOMAIN or QA_DOMAIN or PRODUCTION_DOMAIN - the host **domain name** (without www!) for your environment. **You must make sure that you can ping this domain and that the ping resolves to your manager server's IP address.** If this does not resolve, there must be a problem with your A record configuration explained previously
+REPLICAS - The number of replicas: **1, 3 or 5** depending on the setup introduced above.
+FACTORY_RESET - For production, set to **no** as you do not want each deployment to factory reset OpenCRVS. This is a process which deletes any registrations or users made and restores reference data. For staging and qa, you can optionally set this to **yes** and OpenCRVS will reset on each deploy, deleting registratons and restoring all data. A useful option for developers and testers.
+
+3. With these secrets the first Github action is set to automatically run on your country configuration repository whenever code is pushed to a branch named master, main or develop. This action will build and push your Docker image to Dockerhub. **The image will be tagged with the short Git commit hash. This is important to refer to and use in the next step.**
+
+**Publish image to Dockerhub: .github/workflows/publish-to-dockerhub.yml**
+
+4. When the previous action has completed, you can deploy to your server with this action.
+
+a) You will be required to select the environment to deploy to.
+b) You will be required to enter the short Git hash that is tagged in the OpenCRVS Core release of choice
+c) You will be required to enter the short Git hash that is tagged in your country configuration image created by the previous "Publish image to Dockerhub" action
+
+**Deploy: .github/workflows/deploy.yml.yml**
+
+Once the deployment is complete, wait a couple of minutes before browsing to OpenCRVS as it can take a little while for the Docker images to start up. If this is your first deployment, wait about 15 minutes.
+
+### The deployment script in OpenCRVS Core explained:
 
 Deploys to a staging environment, clearing and restoring all data every time:
 
-"deploy:staging": "bash deploy.sh --clear-data=yes --restore-metadata=yes --update-metadata=no development"
+bash deploy.sh --clear-data=yes --restore-metadata=yes --update-metadata=no development
 
 Deploys to a qa or production environment, without clearing any data. On production, SMS 2FA codes are used so an SMS provider must have been configured.
 
@@ -297,12 +353,11 @@ yarn deploy:qa farajaland-qa.opencrvs.org 7b994cd 88a5a83 opencrvs-farajaland 1 
 
 ## Emergency Backup & Restore
 
-Every day OpenCRVS automatically backs up all databases to the following directories on the manager node.
-Every 7 days the data is overwritten to save disk space.
+Every day OpenCRVS automatically backs up all databases to the following directories on the manager node. Every 7 days the data is overwritten to save disk space.
 
 These files can be automatically backed up to an external server, provisioned during the Ansible command above as a noted option.
 
-Servers can be stolen, so we highly recommend that once a week, these files should be saved to a
+We highly recommend that once a week, these files should be saved to a
 password protected and encrypted external harddrive and stored in a secure and approved location.
 
 Hearth, OpenHIM and the other databases are saved in mongo .gz zip files here:
