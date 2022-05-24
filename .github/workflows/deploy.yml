@@ -88,6 +88,7 @@ jobs:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
           DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
           DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
@@ -105,6 +106,7 @@ jobs:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
           DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
           DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
@@ -122,6 +124,7 @@ jobs:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
           DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
           DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}

@@ -25,6 +25,7 @@ KIBANA_ENCRYPTION_KEY=`uuidgen`
 sed -i "s/{{KIBANA_ENCRYPTION_KEY}}/$KIBANA_ENCRYPTION_KEY/g" /tmp/compose/infrastructure/monitoring/kibana/kibana.yml
 sed -i -e "s%{{SMTP_HOST}}%$SMTP_HOST%" /tmp/compose/infrastructure/monitoring/elastalert/rules/alert.yaml
 sed -i -e "s%{{SMTP_PORT}}%$SMTP_PORT%" /tmp/compose/infrastructure/monitoring/elastalert/rules/alert.yaml
+sed -i -e "s%{{ALERT_EMAIL}}%$ALERT_EMAIL%" /tmp/compose/infrastructure/monitoring/elastalert/rules/alert.yaml
 sed -i -e "s%{{SMTP_USERNAME}}%$SMTP_USERNAME%" /tmp/compose/infrastructure/monitoring/elastalert/rules/auth.yaml
 sed -i -e "s%{{SMTP_PASSWORD}}%$SMTP_PASSWORD%" /tmp/compose/infrastructure/monitoring/elastalert/rules/auth.yaml
 

@@ -298,6 +298,7 @@ SMTP_HOST
 SMTP_PORT
 SMTP_USERNAME
 SMTP_PASSWORD
+ALERT_EMAIL - the email address of your Technical System Administrator who should receive server health alerts
 
 The following secrets likely change for each environment so they should be duplicated as environment secrets in Github
 
