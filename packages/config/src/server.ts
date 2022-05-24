@@ -31,13 +31,7 @@ export const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 export async function createServer() {
   let whitelist: string[] = [HOSTNAME]
   if (HOSTNAME[0] !== '*') {
-    whitelist = [
-      `https://login.${HOSTNAME}`,
-      `https://register.${HOSTNAME}`,
-      'http://metrics:1050',
-      'http://gateway:7070',
-      'http://workflow:5050'
-    ]
+    whitelist = [`https://login.${HOSTNAME}`, `https://register.${HOSTNAME}`]
   }
   logger.info('Whitelist: ', JSON.stringify(whitelist))
   const server = new Hapi.Server({
