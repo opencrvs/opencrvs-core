@@ -18,7 +18,10 @@ import {
 import { createStore } from '@client/store'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import { ReactWrapper } from 'enzyme'
-import { changePhoneMutation, ChangePhonePage } from './ChangePhonePage'
+import { ChangePhonePage } from './ChangePhonePage'
+import { changePhoneMutation } from '@client/views/Settings/mutations'
+import { queriesForUser } from '@client/views/Settings/queries'
+import { waitForElement } from '@client/tests/wait-for-element'
 
 const graphqlMocks = [
   {
@@ -69,26 +72,56 @@ describe('Change phone page tests', () => {
   })
 
   it('should go to verify code page', async () => {
+    queriesForUser.fetchUserDetails = jest.fn(() =>
+      Promise.resolve({
+        data: {
+          getUserByMobile: {
+            id: null
+          }
+        }
+      })
+    )
     component.find('input').simulate('change', {
       target: { name: 'PhoneNumber', value: '01741234567' }
     })
     component.update()
     component.find('#continue-button').hostNodes().simulate('click')
     component.update()
+    await waitForElement(component, '#verify-button')
     expect(component.find('#verify-button').hostNodes().prop('disabled')).toBe(
       true
     )
   })
 
   it('should go to settings page after change phone number', async () => {
-    component.find('input').simulate('change', {
-      target: { name: 'PhoneNumber', value: '01741234567' }
-    })
+    queriesForUser.fetchUserDetails = jest.fn(() =>
+      Promise.resolve({
+        data: {
+          getUserByMobile: {
+            id: null
+          }
+        }
+      })
+    )
+    component
+      .find('#PhoneNumber')
+      .hostNodes()
+      .simulate('change', {
+        target: { value: '01741234567' }
+      })
     component.update()
     component.find('#continue-button').hostNodes().simulate('click')
-    component.find('input').simulate('change', {
-      target: { name: 'verifyCode', value: '000000' }
-    })
+    await waitForElement(component, '#VerifyCode')
+
+    component
+      .find('#VerifyCode')
+      .hostNodes()
+      .simulate('change', {
+        target: { value: '000000' }
+      })
+    component.update()
+
+    await waitForElement(component, '#verify-button')
     expect(component.find('#verify-button').hostNodes().prop('disabled')).toBe(
       false
     )

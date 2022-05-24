@@ -45,6 +45,7 @@ type Query {
   locationById(locationId: String): Location
   hasChildLocation(parentId: String): Location
   getUser(userId: String): User
+  getUserByMobile(mobile: String): User
   searchUsers(
     username: String
     mobile: String

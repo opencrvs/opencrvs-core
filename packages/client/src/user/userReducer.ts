@@ -19,6 +19,7 @@ import {
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
 import {
+  showCreateUserErrorToast,
   showSubmitFormErrorToast,
   showSubmitFormSuccessToast
 } from '@client/notification/actions'
@@ -28,7 +29,7 @@ import {
   alterRolesBasedOnUserRole,
   transformRoleDataToDefinitions
 } from '@client/views/SysAdmin/Team/utils'
-import ApolloClient, { ApolloQueryResult } from 'apollo-client'
+import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Action } from 'redux'
 import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
 import {
@@ -148,6 +149,12 @@ interface ISubmitSuccessAction {
     isUpdate: boolean
   }
 }
+interface ISubmitFailedAction {
+  type: typeof SUBMIT_USER_FORM_DATA_FAIL
+  payload: {
+    errorData: ApolloError
+  }
+}
 
 export function submitUserFormData(
   client: ApolloClient<unknown>,
@@ -187,9 +194,12 @@ export function submitSuccess(
   }
 }
 
-export function submitFail(): Action {
+export function submitFail(errorData: ApolloError): ISubmitFailedAction {
   return {
-    type: SUBMIT_USER_FORM_DATA_FAIL
+    type: SUBMIT_USER_FORM_DATA_FAIL,
+    payload: {
+      errorData
+    }
   }
 }
 
@@ -250,6 +260,7 @@ type UserFormAction =
   | IUserFormDataSubmitAction
   | IStoreUserFormDataAction
   | ISubmitSuccessAction
+  | ISubmitFailedAction
   | IProcessRoles
   | IFetchAndStoreUserData
   | IUpdateFormAndFormData
@@ -420,10 +431,19 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         ])
       )
     case SUBMIT_USER_FORM_DATA_FAIL:
-      return loop(
-        { ...state, submitting: false, submissionError: true },
-        Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
-      )
+      const { errorData } = (action as ISubmitFailedAction).payload
+      if (errorData.message.includes('DUPLICATE_MOBILE')) {
+        const mobile = errorData.message.split('-')[1]
+        return loop(
+          { ...state, submitting: false, submissionError: false },
+          Cmd.action(showCreateUserErrorToast(TOAST_MESSAGES.FAIL, mobile))
+        )
+      } else {
+        return loop(
+          { ...state, submitting: false, submissionError: true },
+          Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
+        )
+      }
     case STORE_USER_FORM_DATA:
       const { queryData } = (action as IStoreUserFormDataAction).payload
       const formData = gqlToDraftTransformer(
