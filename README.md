@@ -218,7 +218,7 @@ We innovatively extended [FHIR](https://www.hl7.org/fhir/) to support the civil 
 
 #### ElasticSearch
 
-ElasticSearch is used with Kibana for application and server health monitoring, along with optimisation. Kibana is integrated with Slack notifications for any system alerts.
+ElasticSearch is used with Kibana for application and server health monitoring, along with optimisation.
 
 The Kibana login details that we use by default are:
 
