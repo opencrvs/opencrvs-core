@@ -163,13 +163,12 @@ export async function generateAndSendVerificationCode(
 export default async function sendVerifyCodeHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
-): Promise<ISendVerifyCodeResponse> {
-  const token = request.headers.authorization.replace('Bearer ', '') as string
-  const tokenDecoded = verifyToken(token)
+) {
   const payload = request.payload as ISendVerifyCodePayload
   const { phoneNumber } = payload
+  const token = request.headers.authorization.replace('Bearer ', '') as string
+  const tokenDecoded = verifyToken(token)
   const { sub: userId, scope } = tokenDecoded
-
   const nonce = generateNonce()
   const response: ISendVerifyCodeResponse = {
     userId,
@@ -178,7 +177,7 @@ export default async function sendVerifyCodeHandler(
     status: 'Success'
   }
   await generateAndSendVerificationCode(nonce, phoneNumber, scope, token)
-  return response
+  return h.response(response).code(201)
 }
 
 export const requestSchema = Joi.object({

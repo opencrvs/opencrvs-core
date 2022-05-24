@@ -321,35 +321,7 @@ c) You will be required to enter the short Git hash that is tagged in your count
 
 **Deploy: .github/workflows/deploy.yml.yml**
 
-Once the deployment is complete, wait a couple of minutes before browsing to OpenCRVS as it can take a little while for the Docker images to start up. If this is your first deployment, wait about 15 minutes.
-
-### The deployment script in OpenCRVS Core explained:
-
-Deploys to a staging environment, clearing and restoring all data every time:
-
-bash deploy.sh --clear-data=yes --restore-metadata=yes --update-metadata=no development
-
-Deploys to a qa or production environment, without clearing any data. On production, SMS 2FA codes are used so an SMS provider must have been configured.
-
-"deploy:qa": "bash deploy.sh --clear-data=no --restore-metadata=no --update-metadata=no qa"
-"deploy:prod": "bash deploy.sh --clear-data=no --restore-metadata=no --update-metadata=no production"
-
-You must add some variables to the end of the script like this:
-
-HOST is the server to deploy to'
-VERSION can be any OpenCRVS Core docker image tag or 'latest'
-COUNTRY_CONFIG_VERSION can be any OpenCRVS Country Configuration docker image tag or 'latest': e.g.: **7b994cd** for [OpenCRVS - Alpha 3.1](https://github.com/opencrvs/opencrvs-core/releases)
-COUNTRY_CONFIG_PATH directory path to where your country configuration repository is locally checked out
-REPLICAS number of supported servers. Can be 1, 3 or 5
-
-The following options are currently required, but will be made configurable:
-SLACK_WEBHOOK_URL, KIBANA_USERNAME & KIBANA_PASSWORD must be set as environent variables and are used by Kibana to alert you of server issues and to protect access to Kibana
-
-E.G.:
-
-```
-yarn deploy:qa farajaland-qa.opencrvs.org 7b994cd 88a5a83 opencrvs-farajaland 1 env.SLACK_WEBHOOK_URL env.KIBANA_USERNAME env.KIBANA_PASSWORD
-```
+Once the deployment is complete, wait a couple of minutes before browsing to OpenCRVS as it can take a little while for the Docker images to start up. If this is your first deployment, wait about 15 minutes as Docker must download them first.
 
 ## Emergency Backup & Restore
 

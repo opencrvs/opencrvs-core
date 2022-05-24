@@ -88,6 +88,8 @@ jobs:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
+          DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
           KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
@@ -103,6 +105,8 @@ jobs:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
+          DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
           KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
@@ -118,6 +122,8 @@ jobs:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
+          DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
           KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
