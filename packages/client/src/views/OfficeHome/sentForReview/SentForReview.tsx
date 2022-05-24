@@ -46,7 +46,6 @@ import {
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { Scope } from '@client/utils/authUtils'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { Action } from '@client/forms'
@@ -78,7 +77,7 @@ interface IApprovalTabState {
 
 type IApprovalTabProps = IntlShapeProps & IBaseApprovalTabProps
 
-class SentForApprovalComponent extends React.Component<
+class SentForReviewComponent extends React.Component<
   IApprovalTabProps,
   IApprovalTabState
 > {
@@ -261,7 +260,8 @@ class SentForApprovalComponent extends React.Component<
           />
         ),
         eventTimeElapsed:
-          (reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))) ||
+          (reg.dateOfEvent?.length &&
+            formattedDuration(new Date(reg.dateOfEvent))) ||
           '',
         dateOfEvent,
         sentForApproval,
@@ -306,7 +306,6 @@ class SentForApprovalComponent extends React.Component<
     const title = this.isFieldAgent
       ? intl.formatMessage(navigationMessages.sentForReview)
       : intl.formatMessage(navigationMessages.approvals)
-    console.log('approvaal')
     return (
       <WQContentWrapper
         title={title}
@@ -327,7 +326,6 @@ class SentForApprovalComponent extends React.Component<
             )}
           </ToolTipContainer>
         </ReactTooltip>
-        {console.log(this.transformValidatedContent(data))}
         <GridTable
           content={this.transformValidatedContent(data)}
           columns={this.getColumns()}
@@ -348,7 +346,7 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const SentForApproval = connect(mapStateToProps, {
+export const SentForReview = connect(mapStateToProps, {
   goToPage,
   goToDeclarationRecordAudit
-})(injectIntl(withTheme(SentForApprovalComponent)))
+})(injectIntl(withTheme(SentForReviewComponent)))

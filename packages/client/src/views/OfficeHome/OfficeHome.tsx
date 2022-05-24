@@ -53,10 +53,10 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
-import { SentForApproval } from './sentForApproval/SentForApproval'
+import { SentForReview } from './sentForReview/SentForReview'
 import { InProgress, SELECTOR_ID } from './inProgress/InProgress'
 import { ReadyToPrint } from './readyToPrint/ReadyToPrint'
-import { RequiresUpdateRegistrar } from './requiresUpdate/RequiresUpdateRegistrar'
+import { RequiresUpdate } from './requiresUpdate/RequiresUpdate'
 import { ReadyForReview } from './readyForReview/ReadyForReview'
 import { InExternalValidationTab } from './inExternalValidation/InExternalValidationTab'
 import {
@@ -401,7 +401,7 @@ export class OfficeHomeView extends React.Component<
                 />
               )}
               {tabId === WORKQUEUE_TABS.requiresUpdateRegistrar && (
-                <RequiresUpdateRegistrar
+                <RequiresUpdate
                   queryData={{
                     data: filteredData.rejectTab
                   }}
@@ -427,7 +427,7 @@ export class OfficeHomeView extends React.Component<
                   />
                 )}
               {tabId === WORKQUEUE_TABS.sentForApproval && (
-                <SentForApproval
+                <SentForReview
                   queryData={{
                     data: filteredData.approvalTab
                   }}
@@ -454,7 +454,7 @@ export class OfficeHomeView extends React.Component<
           ) : (
             <>
               {tabId === WORKQUEUE_TABS.sentForReview && (
-                <SentForApproval
+                <SentForReview
                   queryData={{
                     data: filteredData.reviewTab
                   }}
@@ -466,7 +466,7 @@ export class OfficeHomeView extends React.Component<
                 />
               )}
               {tabId === WORKQUEUE_TABS.requiresUpdateAgent && (
-                <RequiresUpdateRegistrar
+                <RequiresUpdate
                   queryData={{
                     data: filteredData.rejectTab
                   }}

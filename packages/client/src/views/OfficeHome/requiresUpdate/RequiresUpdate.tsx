@@ -80,7 +80,7 @@ interface IRejectTabState {
 
 type IRejectTabProps = IntlShapeProps & IBaseRejectTabProps
 
-class RequiresUpdateRegistrarComponent extends React.Component<
+class RequiresUpdateComponent extends React.Component<
   IRejectTabProps,
   IRejectTabState
 > {
@@ -91,10 +91,6 @@ class RequiresUpdateRegistrarComponent extends React.Component<
       sortedCol: COLUMNS.NAME,
       sortOrder: SORT_ORDER.ASCENDING
     }
-  }
-
-  userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
   }
 
   componentDidMount() {
@@ -364,8 +360,8 @@ function mapStateToProps(state: IStoreState) {
   }
 }
 
-export const RequiresUpdateRegistrar = connect(mapStateToProps, {
+export const RequiresUpdate = connect(mapStateToProps, {
   goToPage,
   goToReviewDuplicate,
   goToDeclarationRecordAudit
-})(injectIntl(withTheme(RequiresUpdateRegistrarComponent)))
+})(injectIntl(withTheme(RequiresUpdateComponent)))

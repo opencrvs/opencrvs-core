@@ -22,7 +22,7 @@ import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { SentForApproval } from './SentForApproval'
+import { SentForReview } from './SentForReview'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
@@ -150,7 +150,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      <SentForApproval
+      <SentForReview
         queryData={{
           data: {
             totalItems: 2,
@@ -240,7 +240,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      <SentForApproval
+      <SentForReview
         queryData={{
           data: {
             totalItems: 2,
@@ -266,7 +266,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      <SentForApproval
+      <SentForReview
         queryData={{
           data: {
             totalItems: 14,
@@ -297,7 +297,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      <SentForApproval
+      <SentForReview
         queryData={{
           data: {
             totalItems: 24,
@@ -323,7 +323,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      <SentForApproval
+      <SentForReview
         queryData={{
           data: {
             totalItems: 2,
@@ -451,7 +451,7 @@ describe('Tablet tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      <SentForApproval
+      <SentForReview
         queryData={{
           data: {
             totalItems: 2,
