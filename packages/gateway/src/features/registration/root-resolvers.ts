@@ -44,7 +44,7 @@ import {
 import fetch from 'node-fetch'
 import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
 import { updateTaskTemplate } from '@gateway/features/fhir/templates'
-import { ApolloError } from 'apollo-server-hapi'
+import { UnassignError } from '@gateway/utils/unassignError'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -283,7 +283,7 @@ export const resolvers: GQLResolver = {
     async markBirthAsValidated(_, { id, details }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('User has been unassigned', 'UNASSIGNED')
+        throw new UnassignError('User has been unassigned')
       }
       if (!hasScope(authHeader, 'validate')) {
         return await Promise.reject(
@@ -301,7 +301,7 @@ export const resolvers: GQLResolver = {
     async markDeathAsValidated(_, { id, details }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('User has been unassigned', 'UNASSIGNED')
+        throw new UnassignError('User has been unassigned')
       }
       if (!hasScope(authHeader, 'validate')) {
         return await Promise.reject(
@@ -318,7 +318,7 @@ export const resolvers: GQLResolver = {
     async markBirthAsRegistered(_, { id, details }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('User has been unassigned', 'UNASSIGNED')
+        throw new UnassignError('User has been unassigned')
       }
       if (hasScope(authHeader, 'register')) {
         return markEventAsRegistered(id, authHeader, EVENT_TYPE.BIRTH, details)
@@ -331,7 +331,7 @@ export const resolvers: GQLResolver = {
     async markDeathAsRegistered(_, { id, details }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('User has been unassigned', 'UNASSIGNED')
+        throw new UnassignError('User has been unassigned')
       }
       if (hasScope(authHeader, 'register')) {
         return await markEventAsRegistered(
@@ -349,7 +349,7 @@ export const resolvers: GQLResolver = {
     async markEventAsVoided(_, { id, reason, comment }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('User has been unassigned', 'UNASSIGNED')
+        throw new UnassignError('User has been unassigned')
       }
       if (
         hasScope(authHeader, 'register') ||
@@ -387,7 +387,7 @@ export const resolvers: GQLResolver = {
     async markEventAsArchived(_, { id }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('User has been unassigned', 'UNASSIGNED')
+        throw new UnassignError('User has been unassigned')
       }
       if (
         hasScope(authHeader, 'register') ||
@@ -434,7 +434,7 @@ export const resolvers: GQLResolver = {
     async markEventAsReinstated(_, { id }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('User has been unassigned', 'UNASSIGNED')
+        throw new UnassignError('User has been unassigned')
       }
       if (
         hasScope(authHeader, 'register') ||
@@ -521,7 +521,7 @@ export const resolvers: GQLResolver = {
     async markBirthAsCertified(_, { id, details }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('User has been unassigned', 'UNASSIGNED')
+        throw new UnassignError('User has been unassigned')
       }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
@@ -532,7 +532,7 @@ export const resolvers: GQLResolver = {
     async markDeathAsCertified(_, { id, details }, authHeader) {
       const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
       if (!hasAssignedToThisUser) {
-        throw new ApolloError('User has been unassigned', 'UNASSIGNED')
+        throw new UnassignError('User has been unassigned')
       }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
