@@ -14,11 +14,11 @@ import styled from 'styled-components'
 
 const Grid = styled.div<{ bottomBorder: boolean }>`
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr) auto;
+  grid-template-columns: auto 1fr auto;
   grid-auto-rows: minmax(56px, auto);
   ${({ bottomBorder }) => bottomBorder && 'border-bottom: 1px solid'};
   border-color: ${({ theme }) => theme.colors.grey200};
-  > div:not(:nth-last-child(-n + 5)) {
+  > div:not(:nth-last-child(-n + 4)) {
     border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -29,9 +29,19 @@ const Grid = styled.div<{ bottomBorder: boolean }>`
   }
 `
 
-const ValueContainer = styled.div`
-  padding: 8px 0px 8px 20px;
+const LabelValueContainer = styled.div`
   display: flex;
+  padding: 8px 0;
+  grid-column-start: 2;
+  gap: 20px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    display: none;
+  }
+`
+
+const ValueContainer = styled.div`
+  display: flex;
+  flex: 0 1 50%;
   align-items: center;
   color: ${({ theme }) => theme.colors.grey600};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -50,7 +60,6 @@ const MobileValueContainer = styled(ValueContainer)`
 `
 
 const LabelContainer = styled.div`
-  padding: 8px 0;
   display: flex;
   flex: 1 0 50%;
   align-items: center;
@@ -131,17 +140,21 @@ export function ListViewItemSimplified({
 }: IListViewItemSimplifiedProps) {
   return (
     <>
-      <ImageContainer className={className} data-test-id="list-view-image">
-        {image}
-      </ImageContainer>
+      {image && (
+        <ImageContainer className={className} data-test-id="list-view-image">
+          {image}
+        </ImageContainer>
+      )}
 
-      <LabelContainer className={className} data-test-id="list-view-label">
-        {label}
-      </LabelContainer>
+      <LabelValueContainer className={className}>
+        <LabelContainer data-test-id="list-view-label">{label}</LabelContainer>
 
-      <ValueContainer className={className} data-test-id="list-view-value">
-        {value}
-      </ValueContainer>
+        {value && (
+          <ValueContainer data-test-id="list-view-value">
+            {value}
+          </ValueContainer>
+        )}
+      </LabelValueContainer>
 
       <ActionsContainer className={className} data-test-id="list-view-actions">
         {actions}
