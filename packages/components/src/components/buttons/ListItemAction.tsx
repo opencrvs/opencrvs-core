@@ -36,7 +36,7 @@ const ListItemActionsContainer = styled.div<{
   display: flex;
   flex: 1;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
   justify-content: ${({ alignment }) => {
     if (alignment === ColumnContentAlignment.LEFT) {
       return 'flex-start'

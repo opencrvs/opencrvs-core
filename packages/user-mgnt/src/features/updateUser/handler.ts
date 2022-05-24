@@ -117,8 +117,11 @@ export default async function updateUser(
     await rollbackUpdateUser(
       token,
       existingPractitioner,
-      existingPractitionerRole
+      existingPractitionerRole.entry[0].resource
     )
+    if (err.code === 11000) {
+      return h.response().code(403)
+    }
     // return 400 if there is a validation error when saving to mongo
     return h.response().code(400)
   }

@@ -93,6 +93,7 @@ interface IUserMessages
   name: MessageDescriptor
   systemLanguage: MessageDescriptor
   profileImage: MessageDescriptor
+  duplicateUserMobileErrorMessege: MessageDescriptor
 }
 interface IDynamicUserMessages
   extends Record<string | number | symbol, MessageDescriptor> {
@@ -457,6 +458,13 @@ const messagesToDefine: IUserMessages = {
     id: 'system.user.settings.profileImage',
     defaultMessage: 'Profile Image',
     description: 'Label for profile image'
+  },
+  duplicateUserMobileErrorMessege: {
+    defaultMessage:
+      '{number} is already used by another user. Please use a different phone number',
+    description:
+      'This error messege shows when user try to input already exsisted mobile number',
+    id: 'system.user.duplicateMobileError'
   }
 }
 

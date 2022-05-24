@@ -81,15 +81,12 @@ interface IProps {
   menuHeader?: JSX.Element
   toggleButton: JSX.Element
   menuItems: IToggleMenuItem[]
-  hasFocusRing?: boolean
   hide?: boolean
 }
 
 interface IState {
   showSubmenu: boolean
 }
-
-type ToggleButtonProps = Pick<IProps, 'hasFocusRing'>
 
 export class ToggleMenu extends React.Component<IProps, IState> {
   constructor(props: IProps & IState) {
@@ -120,21 +117,16 @@ export class ToggleMenu extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { id, toggleButton, menuHeader, menuItems, hasFocusRing, hide } =
-      this.props
+    const { id, toggleButton, menuHeader, menuItems, hide } = this.props
     if (hide) {
       return null
     }
     return (
       <>
         <ToggleMenuContainer>
-          <Button
-            id={`${id}ToggleButton`}
-            onClick={this.showMenu}
-            hasFocusRing={hasFocusRing}
-          >
+          <CircleButton id={`${id}ToggleButton`} onClick={this.showMenu}>
             {toggleButton}
-          </Button>
+          </CircleButton>
           {this.state.showSubmenu && (
             <MenuContainer id={`${id}SubMenu`}>
               {menuHeader && <MenuHeader>{menuHeader}</MenuHeader>}
@@ -155,30 +147,3 @@ export class ToggleMenu extends React.Component<IProps, IState> {
     )
   }
 }
-
-const Button = styled((props) => (
-  <CircleButton {...props} />
-))<ToggleButtonProps>`
-  height: 40px;
-  width: 40px;
-  &:hover {
-    background-color: transparent;
-  }
-  &:hover:not([data-focus-visible-added]):not(:active) {
-    background-color: transparent;
-  }
-  &:focus {
-    outline: none;
-    box-shadow: ${({ theme, hasFocusRing }) =>
-      hasFocusRing ? `0 0 0 2pt ${theme.colors.yellow}` : 'none'};
-  }
-  &:focus:not([data-focus-visible-added]) {
-    outline: none;
-    box-shadow: none;
-  }
-  &:active:not([data-focus-visible-added]) {
-    outline: none;
-    box-shadow: ${({ theme, hasFocusRing }) =>
-      hasFocusRing ? `0 0 0 2pt ${theme.colors.yellow}` : 'none'};
-  }
-`
