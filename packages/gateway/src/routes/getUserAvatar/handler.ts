@@ -13,25 +13,30 @@ import * as Hapi from '@hapi/hapi'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import fetch from 'node-fetch'
 import { resolve } from 'url'
+import { fromBuffer } from 'file-type'
 
 export async function getUserAvatarHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const params = {
-    userId: request.params.userId as string
-  }
-  return await fetch(resolve(USER_MANAGEMENT_URL, 'getUserAvatar'), {
-    method: 'POST',
-    body: JSON.stringify(params),
-    headers: {
-      'Content-Type': 'application/json'
+  const userId = request.params.userId
+  try {
+    const response = await fetch(
+      resolve(USER_MANAGEMENT_URL, `users/${userId}/avatar`),
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }
+    )
+    const fileBuffer = await response.buffer()
+    const fileType = await fromBuffer(fileBuffer)
+    if (fileType) {
+      return h.response(fileBuffer).type(fileType.mime).code(200)
     }
-  })
-    .then((response) => {
-      return response.buffer()
-    })
-    .catch((error) => {
-      return Promise.reject(new Error(` request failed: ${error.message}`))
-    })
+    return h.response(fileBuffer).code(200)
+  } catch (error) {
+    return Promise.reject(new Error(`request failed: ${error.message}`))
+  }
 }

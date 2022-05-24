@@ -77,9 +77,8 @@ describe('getUserAvatar tests', () => {
   it('Successfully returns user avatar with user id', async () => {
     mockingoose(User).toReturn(dummyUser, 'findOne')
     const res = await server.server.inject({
-      method: 'POST',
-      url: '/getUserAvatar',
-      payload: { userId: '5d027bc403b93b17526323f6' }
+      method: 'GET',
+      url: '/users/5d027bc403b93b17526323f6/avatar'
     })
     const parsedResult = res.result
     expect(parsedResult).toBeDefined()
@@ -89,18 +88,16 @@ describe('getUserAvatar tests', () => {
     mockingoose(User).toReturn(dummyUser, 'findOne')
     fetch.mockResponse(JSON.stringify({ data: 'buffer' }))
     const res = await server.server.inject({
-      method: 'POST',
-      url: '/getUserAvatar',
-      payload: { userId: '5d027bc403b93b17526323f6' }
+      method: 'GET',
+      url: '/users/5d027bc403b93b17526323f6/avatar'
     })
     expect(res.statusCode).toEqual(200)
   })
 
   it('returns 401 for if has no user for userId', async () => {
     const res = await server.server.inject({
-      method: 'POST',
-      url: '/getUserAvatar',
-      payload: { userId: '123' }
+      method: 'GET',
+      url: '/users/123/avatar'
     })
     expect(res.statusCode).toEqual(401)
   })

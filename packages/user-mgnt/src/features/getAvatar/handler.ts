@@ -10,28 +10,19 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
-import { unauthorized } from '@hapi/boom'
 import User, { IUserModel } from '@user-mgnt/model/user'
 import { AVATAR_API } from '@user-mgnt/constants'
 import fetch from 'node-fetch'
-
-interface IAvatarPayload {
-  userId: string
-}
 
 export default async function getUserAvatar(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { userId } = request.payload as IAvatarPayload
-
-  // tslint:disable-next-line
+  const userId = request.params.userId
   const user: IUserModel | null = await User.findById(userId)
 
   if (!user) {
-    // Don't return a 404 as this gives away that this user account exists
-    throw unauthorized()
+    return h.response().code(400)
   }
   if (!user.avatar) {
     const name = user.name[0]
@@ -43,14 +34,10 @@ export default async function getUserAvatar(
         'Content-Type': 'application/json'
       }
     })
-    return await avatarBuffer.buffer()
+    return avatarBuffer.buffer()
   }
   const avatarDataURL = user.avatar.data
   const base64String = avatarDataURL.split(',')[1]
   const base64Decode = Buffer.from(base64String, 'base64')
   return base64Decode
 }
-
-export const getUserAvatarRequestSchema = Joi.object({
-  userId: Joi.string().required()
-})
