@@ -31,8 +31,6 @@ services:
           - node.role == manager
     networks:
       - overlay_net
-    secrets:
-      - kibana-htpasswd
 
   metricbeat:
     image: docker.elastic.co/beats/metricbeat:7.17.0
@@ -533,8 +531,6 @@ secrets:
   jwt-public-key.{{ts}}:
     external: true
   jwt-private-key.{{ts}}:
-    external: true
-  kibana-htpasswd:
     external: true
 configs:
   openhim-console-conf.{{ts}}:

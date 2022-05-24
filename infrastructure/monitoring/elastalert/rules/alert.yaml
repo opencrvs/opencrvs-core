@@ -34,10 +34,9 @@ filter:
       query_string:
         query: '@timestamp:*'
 alert:
-  - 'slack'
-slack_webhook_url: '{{SLACK_WEBHOOK_URL}}'
-slack_channel_override: '#kibana-alerts'
-slack_emoji_override: ':kissing_cat:'
-slack_msg_color: 'warning'
-slack_parse_override: 'none'
-slack_username_override: 'elastalert'
+  - 'email'
+email: '{{ALERT_EMAIL}}'
+smtp_host: '{{SMTP_HOST}}'
+smtp_port: '{{SMTP_PORT}}'
+smtp_ssl: true
+smtp_auth_file: '/tmp/compose/infrastructure/monitoring/elastalert/rules/auth.yaml'
