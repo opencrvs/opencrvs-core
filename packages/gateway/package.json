@@ -41,6 +41,7 @@
     "country-data": "^0.0.31",
     "csv-stringify": "^5.3.4",
     "dotenv": "^6.1.0",
+    "file-type": "^16.5.3",
     "flat": "^5.0.0",
     "glob": "^7.1.2",
     "graphql": "^15.0.0",

@@ -34,6 +34,7 @@ import {
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
+  GQLAttachmentInput,
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
   GQLResolver,
@@ -42,6 +43,8 @@ import {
 import fetch from 'node-fetch'
 import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
 import { updateTaskTemplate } from '@gateway/features/fhir/templates'
+import { UserInputError } from 'apollo-server-hapi'
+import { validateAttachments } from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -248,18 +251,43 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createBirthRegistration(_, { details }, authHeader) {
-      return await createEventRegistration(
-        details,
-        authHeader,
-        EVENT_TYPE.BIRTH
-      )
+      const attachments = [
+        details.registration?.attachments,
+        details.informant?.affidavit,
+        details.mother?.photo,
+        details.father?.photo,
+        details.child?.photo
+      ]
+        .flat()
+        .filter((x): x is GQLAttachmentInput => x !== undefined)
+
+      try {
+        await validateAttachments(attachments)
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
+
+      return createEventRegistration(details, authHeader, EVENT_TYPE.BIRTH)
     },
     async createDeathRegistration(_, { details }, authHeader) {
-      return await createEventRegistration(
-        details,
-        authHeader,
-        EVENT_TYPE.DEATH
-      )
+      const attachments = [
+        details.registration?.attachments,
+        details.informant?.affidavit,
+        details.mother?.photo,
+        details.father?.photo,
+        details.deceased?.photo,
+        details.spouse?.photo
+      ]
+        .flat()
+        .filter((x): x is GQLAttachmentInput => x !== undefined)
+
+      try {
+        await validateAttachments(attachments)
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
+
+      return createEventRegistration(details, authHeader, EVENT_TYPE.DEATH)
     },
     async updateBirthRegistration(_, { details }, authHeader) {
       if (
@@ -532,13 +560,13 @@ export const resolvers: GQLResolver = {
 }
 
 async function createEventRegistration(
-  details: any,
+  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
   const duplicateCompostion = await lookForDuplicate(
-    details && details.registration && details.registration.draftId,
+    (details && details.registration && details.registration.draftId) || '',
     authHeader
   )
 

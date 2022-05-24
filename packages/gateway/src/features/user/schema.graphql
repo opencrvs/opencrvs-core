@@ -20,7 +20,7 @@ type UserIdentifier { # -> identifier
 }
 
 input SignatureInput {
-  data: String
+  data: String!
   type: String
 }
 

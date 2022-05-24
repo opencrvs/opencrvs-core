@@ -22,7 +22,7 @@ import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import { cloneDeep } from 'lodash'
 import { getStatusFromTask, findExtension } from '@gateway/features/fhir/utils'
-
+import { UserInputError } from 'apollo-server-hapi'
 const fetch = fetchAny as any
 
 const registerCertifyToken = jwt.sign(
@@ -2559,6 +2559,50 @@ describe('Registration root resolvers', () => {
           authHeaderCertify
         )
       ).rejects.toThrowError('User does not have enough scope')
+    })
+  })
+
+  describe('AttachmentInput type only accepts image/* mime type', () => {
+    it('throws an error if a non-supported file is uploaded', async () => {
+      return expect(
+        resolvers.Mutation.createBirthRegistration(
+          {},
+          {
+            details: {
+              registration: {
+                attachments: [
+                  {
+                    data: 'data:text/csv;base64,VHlwZSxEYXRldGltZSxBY2NvdW50LEFtb3VudCxWYWx1ZSxSYXRlLEZlZSxTdWIgVHlwZQ0K',
+                    subject: 'CHILD',
+                    type: 'NOTIFICATION_OF_BIRTH',
+                    contentType: 'text/csv'
+                  }
+                ]
+              }
+            }
+          }
+        )
+      ).rejects.toThrow(UserInputError)
+    })
+
+    it('throws an error if file base64 headers are manipulated', async () => {
+      return expect(
+        resolvers.Mutation.createDeathRegistration(
+          {},
+          {
+            details: {
+              registration: {
+                attachments: [
+                  {
+                    data: 'data:image/png;base64,VHlwZSxEYXRldGltZSxBY2NvdW50LEFtb3VudCxWYWx1ZSxSYXRlLEZlZSxTdWIgVHlwZQ0K',
+                    contentType: 'text/csv'
+                  }
+                ]
+              }
+            }
+          }
+        )
+      ).rejects.toThrow(UserInputError)
     })
   })
 })
