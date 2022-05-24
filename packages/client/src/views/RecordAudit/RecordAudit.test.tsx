@@ -18,7 +18,8 @@ import {
   registerScopeToken,
   getItem,
   flushPromises,
-  mockDeathDeclarationData
+  mockDeathDeclarationData,
+  userDetails
 } from '@client/tests/util'
 import { RecordAudit } from './RecordAudit'
 import { createStore } from '@client/store'
@@ -50,6 +51,23 @@ declaration.data.registration = {
     nestedFields: { registrationPhone: '01557394986' }
   }
 }
+
+// @ts-ignore
+declaration.data.history = [
+  {
+    date: new Date().toString(),
+    action: 'CREATED',
+    user: {
+      id: userDetails.userMgntUserID,
+      name: userDetails.name,
+      role: userDetails.role
+    },
+    office: userDetails.primaryOffice,
+    comments: [],
+    input: [],
+    output: []
+  }
+]
 
 describe('Record audit summary for a draft birth declaration', () => {
   let component: ReactWrapper<{}, {}>

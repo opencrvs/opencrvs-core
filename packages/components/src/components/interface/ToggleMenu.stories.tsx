@@ -20,7 +20,6 @@ interface IProps {
   menuHeader?: JSX.Element
   toggleButton: JSX.Element
   menuItems: IToggleMenuItem[]
-  hasFocusRing?: boolean
   hide?: boolean
   showSubmenu: boolean
 }

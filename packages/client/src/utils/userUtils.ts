@@ -48,7 +48,7 @@ export interface IUserDetails {
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]
   primaryOffice?: IGQLLocation
-  localRegistrar: {
+  localRegistrar?: {
     name: Array<GQLHumanName | null>
     role?: string
     signature?: GQLSignature
@@ -70,8 +70,9 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     localRegistrar,
     avatar
   } = user
-  const userDetails: IUserDetails = {
-    localRegistrar
+  const userDetails: IUserDetails = {}
+  if (localRegistrar) {
+    userDetails.localRegistrar = localRegistrar
   }
   if (userMgntUserID) {
     userDetails.userMgntUserID = userMgntUserID

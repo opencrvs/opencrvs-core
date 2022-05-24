@@ -23,6 +23,7 @@ export interface IProps extends IButtonProps {
 
 export const Tab = styled(Button)<IProps>`
   margin-right: 24px;
+  margin-top: 8px;
   padding: 0;
   color: ${({ theme }) => theme.colors.primary};
   color: ${({ theme, disabled }) => (disabled ? theme.colors.grey300 : 'none')};
@@ -37,8 +38,9 @@ export const Tab = styled(Button)<IProps>`
     width: max-content;
   }
   &:hover:enabled {
-    border-bottom: 2px solid ${({ theme }) => theme.colors.grey200};
+    border-bottom: 2px solid ${({ theme }) => theme.colors.grey300};
   }
+
   &:disabled {
     background: transparent;
   }

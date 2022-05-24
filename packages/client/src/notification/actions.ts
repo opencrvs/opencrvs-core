@@ -21,7 +21,9 @@ export const TOGGLE_DRAFT_SAVED_NOTIFICATION = 'TOGGLE_DRAFT_SAVED_NOTIFICATION'
 export const SHOW_SUBMIT_FORM_SUCCESS_TOAST = 'SUBMIT_FORM_SUCCESS_TOAST'
 export const HIDE_SUBMIT_FORM_SUCCESS_TOAST = 'HIDE_SUBMIT_FORM_SUCCESS_TOAST'
 export const SHOW_SUBMIT_FORM_ERROR_TOAST = 'SHOW_SUBMIT_FORM_ERROR_TOAST'
+export const SHOW_CREATE_USER_ERROR_TOAST = 'SHOW_CREATE_USER_ERROR_TOAST'
 export const HIDE_SUBMIT_FORM_ERROR_TOAST = 'HIDE_SUBMIT_FORM_ERROR_TOAST '
+export const HIDE_CREATE_USER_ERROR_TOAST = 'HIDE_CREATE_USER_ERROR_TOAST'
 
 export const HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST =
   'HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST'
@@ -66,6 +68,13 @@ export type ShowSubmitFormErrorToast = {
     data: string
   }
 }
+export type ShowCreateUserErrorToast = {
+  type: typeof SHOW_CREATE_USER_ERROR_TOAST
+  payload: {
+    data: string
+    mobile: string
+  }
+}
 
 export type HideDownloadDeclarationFailedToast = {
   type: typeof HIDE_DOWNLOAD_DECLARATION_FAILED_TOAST
@@ -77,6 +86,10 @@ export type ShowDownloadDeclarationFailedToast = {
 
 export type HideSubmitFormErrorToast = {
   type: typeof HIDE_SUBMIT_FORM_ERROR_TOAST
+}
+
+export type HideCreateUserErrorToast = {
+  type: typeof HIDE_CREATE_USER_ERROR_TOAST
 }
 
 export type ShowUserAuditSuccessToast = {
@@ -163,6 +176,14 @@ export const showSubmitFormErrorToast = (
   payload: { data }
 })
 
+export const showCreateUserErrorToast = (
+  data: string,
+  mobile: string
+): ShowCreateUserErrorToast => ({
+  type: SHOW_CREATE_USER_ERROR_TOAST,
+  payload: { data, mobile }
+})
+
 export const showDownloadDeclarationFailedToast =
   (): ShowDownloadDeclarationFailedToast => ({
     type: SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST
@@ -175,6 +196,10 @@ export const hideDownloadDeclarationFailedToast =
 
 export const hideSubmitFormErrorToast = (): HideSubmitFormErrorToast => ({
   type: HIDE_SUBMIT_FORM_ERROR_TOAST
+})
+
+export const hideCreateUserErrorToast = (): HideCreateUserErrorToast => ({
+  type: HIDE_CREATE_USER_ERROR_TOAST
 })
 
 export const showUserAuditSuccessToast = (
@@ -226,8 +251,8 @@ export type Action =
   | HideConfigurationErrorAction
   | toggleDraftSavedNotificationAction
   | ShowSubmitFormSuccessToast
-  | HideSubmitFormSuccessToast
   | ShowSubmitFormErrorToast
+  | HideSubmitFormSuccessToast
   | HideSubmitFormErrorToast
   | ShowUserAuditSuccessToast
   | HideUserAuditSuccessToast
@@ -237,3 +262,5 @@ export type Action =
   | HideDownloadDeclarationFailedToast
   | ShowUnassigned
   | HideUnassigned
+  | ShowCreateUserErrorToast
+  | HideCreateUserErrorToast

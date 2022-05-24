@@ -69,7 +69,7 @@ type User {
   underInvestigation: Boolean
   primaryOffice: Location
   catchmentArea: [Location]
-  localRegistrar: LocalRegistrar!
+  localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
   creationDate: String
@@ -121,6 +121,7 @@ input AvatarInput {
 
 type Query {
   getUser(userId: String): User
+  getUserByMobile(mobile: String): User
   searchUsers(
     username: String
     mobile: String

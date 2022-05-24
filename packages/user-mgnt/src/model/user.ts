@@ -78,7 +78,7 @@ export interface IUser {
   catchmentAreaIds: string[]
   scope: string[]
   signature: ISignature
-  localRegistrar: ILocalRegistrar
+  localRegistrar?: ILocalRegistrar
   status: string
   device?: string
   securityQuestionAnswers?: ISecurityQuestionAnswer[]
@@ -165,8 +165,8 @@ const userSchema = new Schema({
   name: { type: [UserNameSchema], required: true },
   username: { type: String, required: true },
   identifiers: [IdentifierSchema],
-  email: String,
-  mobile: String,
+  email: { type: String },
+  mobile: { type: String, unique: true },
   passwordHash: { type: String, required: true },
   salt: { type: String, required: true },
   role: String,

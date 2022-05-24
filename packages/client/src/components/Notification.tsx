@@ -13,6 +13,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { messages } from '@client/i18n/messages/views/notifications'
+import { userMessages } from '@client/i18n/messages/user'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
@@ -31,7 +32,8 @@ import {
   hidePINUpdateSuccessToast,
   hideDownloadDeclarationFailedToast,
   ShowUnassignedPayload,
-  hideUnassignedModal
+  hideUnassignedModal,
+  hideCreateUserErrorToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { NotificationState } from '@client/notification/reducer'
@@ -47,6 +49,7 @@ type NotificationProps = {
   showPINUpdateSuccess: boolean
   downloadDeclarationFailedToast: NotificationState['downloadDeclarationFailedToast']
   unassignedModal: ShowUnassignedPayload | null
+  userCreateDuplicateMobileFailedToast: NotificationState['userCreateDuplicateMobileFailedToast']
 }
 
 type DispatchProps = {
@@ -59,6 +62,7 @@ type DispatchProps = {
   hidePINUpdateSuccessToast: typeof hidePINUpdateSuccessToast
   hideDownloadDeclarationFailedToast: typeof hideDownloadDeclarationFailedToast
   hideUnassignedModal: typeof hideUnassignedModal
+  hideCreateUserErrorToast: typeof hideCreateUserErrorToast
 }
 
 class Component extends React.Component<
@@ -84,6 +88,10 @@ class Component extends React.Component<
     this.props.hideSubmitFormErrorToast()
   }
 
+  hideCreateUserFormErrorToast = () => {
+    this.props.hideCreateUserErrorToast()
+  }
+
   hideUserAuditSuccessToast = () => {
     this.props.hideUserAuditSuccessToast()
   }
@@ -100,7 +108,8 @@ class Component extends React.Component<
       userAuditSuccessToast,
       showPINUpdateSuccess,
       downloadDeclarationFailedToast,
-      unassignedModal
+      unassignedModal,
+      userCreateDuplicateMobileFailedToast
     } = this.props
 
     return (
@@ -204,6 +213,18 @@ class Component extends React.Component<
             })}
           </FloatingNotification>
         )}
+        {userCreateDuplicateMobileFailedToast.visible && (
+          <FloatingNotification
+            id="createUserDuplicateMobileFailedToast"
+            show={Boolean(userCreateDuplicateMobileFailedToast.visible)}
+            type={NOTIFICATION_TYPE.ERROR}
+            callback={this.hideCreateUserFormErrorToast}
+          >
+            {intl.formatMessage(userMessages.duplicateUserMobileErrorMessege, {
+              number: userCreateDuplicateMobileFailedToast.mobile
+            })}
+          </FloatingNotification>
+        )}
         {/* More notification types can be added here */}
       </div>
     )
@@ -223,7 +244,9 @@ const mapStateToProps = (store: IStoreState) => {
     showPINUpdateSuccess: store.notification.showPINUpdateSuccess,
     downloadDeclarationFailedToast:
       store.notification.downloadDeclarationFailedToast,
-    unassignedModal: store.notification.unassignedModal
+    unassignedModal: store.notification.unassignedModal,
+    userCreateDuplicateMobileFailedToast:
+      store.notification.userCreateDuplicateMobileFailedToast
   }
 }
 
@@ -237,6 +260,7 @@ export const NotificationComponent = withRouter(
     hideUserAuditSuccessToast,
     hidePINUpdateSuccessToast,
     hideDownloadDeclarationFailedToast,
-    hideUnassignedModal
+    hideUnassignedModal,
+    hideCreateUserErrorToast
   })(injectIntl(Component))
 )
