@@ -189,7 +189,11 @@ export const userTypeResolvers: GQLResolver = {
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
-      const signature = signatureExtension && signatureExtension.valueSignature
+      const signature =
+        userModel.role === 'FIELD_AGENT'
+          ? null
+          : signatureExtension && signatureExtension.valueSignature
+
       return {
         role: practitionerRole,
         name: practitioner.name,
@@ -206,6 +210,10 @@ export const userTypeResolvers: GQLResolver = {
       )
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
+
+      if (userModel.role === 'FIELD_AGENT') {
+        return null
+      }
 
       const signature = signatureExtension && signatureExtension.valueSignature
       return (
