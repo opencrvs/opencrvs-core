@@ -183,6 +183,7 @@ class RequiresUpdateRegistrarComponent extends React.Component<
     if (!data || !data.results) {
       return []
     }
+    const isFieldAgent = this.props.scope?.includes('declare') ? true : false
     const transformedData = transformData(data, this.props.intl)
     const items = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
@@ -194,7 +195,10 @@ class RequiresUpdateRegistrarComponent extends React.Component<
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+        if (
+          this.state.width > this.props.theme.grid.breakpoints.lg &&
+          !isFieldAgent
+        ) {
           actions.push({
             label: this.props.intl.formatMessage(buttonMessages.update),
             handler: () => {},
@@ -215,7 +219,10 @@ class RequiresUpdateRegistrarComponent extends React.Component<
           )
         })
       } else {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+        if (
+          this.state.width > this.props.theme.grid.breakpoints.lg &&
+          !isFieldAgent
+        ) {
           actions.push({
             label: this.props.intl.formatMessage(buttonMessages.update),
             handler: (

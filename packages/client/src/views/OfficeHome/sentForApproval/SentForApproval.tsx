@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IDeclaration } from '@client/declarations'
+import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import {
   constantsMessages,
   dynamicConstantsMessages
@@ -23,7 +23,9 @@ import styled, { ITheme } from '@client/styledComponents'
 import {
   GridTable,
   COLUMNS,
-  SORT_ORDER
+  SORT_ORDER,
+  ColumnContentAlignment,
+  IAction
 } from '@opencrvs/components/lib/interface'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
@@ -46,6 +48,9 @@ import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { Scope } from '@client/utils/authUtils'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { Action } from '@client/forms'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 const ToolTipContainer = styled.span`
   text-align: center;
 `
@@ -145,14 +150,26 @@ class SentForApprovalComponent extends React.Component<
           key: COLUMNS.SENT_FOR_APPROVAL,
           isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_APPROVAL,
           sortFunction: this.onColumnClick
+        },
+        {
+          width: 18,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
         }
       ]
     } else {
       return [
         {
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 90,
+          width: 70,
           key: COLUMNS.ICON_WITH_NAME_EVENT
+        },
+        {
+          width: 30,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
         }
       ]
     }
@@ -165,6 +182,32 @@ class SentForApprovalComponent extends React.Component<
     }
     const transformedData = transformData(data, this.props.intl)
     const items = transformedData.map((reg, index) => {
+      const actions = [] as IAction[]
+      const foundDeclaration = this.props.outboxDeclarations.find(
+        (declaration) => declaration.id === reg.id
+      )
+      const downloadStatus =
+        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        actions.push({
+          actionComponent: (
+            <DownloadButton
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                action: Action.LOAD_REVIEW_DECLARATION
+              }}
+              key={`DownloadButton-${index}`}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
+          )
+        })
+      } else {
+        actions.push({
+          actionComponent: <Downloaded />
+        })
+      }
       const event =
         (reg.event &&
           intl.formatMessage(
@@ -221,7 +264,8 @@ class SentForApprovalComponent extends React.Component<
           (reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))) ||
           '',
         dateOfEvent,
-        sentForApproval
+        sentForApproval,
+        actions
       }
     })
     const sortedItems = getSortedItems(
@@ -262,7 +306,7 @@ class SentForApprovalComponent extends React.Component<
     const title = this.isFieldAgent
       ? intl.formatMessage(navigationMessages.sentForReview)
       : intl.formatMessage(navigationMessages.approvals)
-
+    console.log('approvaal')
     return (
       <WQContentWrapper
         title={title}
@@ -283,6 +327,7 @@ class SentForApprovalComponent extends React.Component<
             )}
           </ToolTipContainer>
         </ReactTooltip>
+        {console.log(this.transformValidatedContent(data))}
         <GridTable
           content={this.transformValidatedContent(data)}
           columns={this.getColumns()}

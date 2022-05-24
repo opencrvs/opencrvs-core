@@ -76,12 +76,6 @@ const UPDATE_REGISTRAR_WORKQUEUE_FAIL =
 const ENQUEUE_DOWNLOAD_DECLARATION = 'DECLARATION/ENQUEUE_DOWNLOAD_DECLARATION'
 const DOWNLOAD_DECLARATION_SUCCESS = 'DECLARATION/DOWNLOAD_DECLARATION_SUCCESS'
 const DOWNLOAD_DECLARATION_FAIL = 'DECLARATION/DOWNLOAD_DECLARATION_FAIL'
-const UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS =
-  'DECLARATION/UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS'
-const UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS =
-  'DECLARATION/UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS'
-const UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL =
-  'DECLARATION/UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL'
 const CLEAR_CORRECTION_CHANGE = 'CLEAR_CORRECTION_CHANGE'
 
 export enum SUBMISSION_STATUS {
@@ -400,17 +394,6 @@ interface UpdateRegistrarWorkqueueAction {
   }
 }
 
-interface UpdateFieldAgentDeclaredDeclarationsAction {
-  type: typeof UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS
-}
-interface UpdateFieldAgentDeclaredDeclarationsSuccessAction {
-  type: typeof UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS
-  payload: string
-}
-interface UpdateFieldAgentDeclaredDeclarationsFailAction {
-  type: typeof UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL
-}
-
 export type Action =
   | IArchiveDeclarationAction
   | IStoreDeclarationAction
@@ -432,9 +415,6 @@ export type Action =
   | UpdateRegistrarWorkqueueAction
   | UpdateRegistrarWorkQueueSuccessAction
   | UpdateRegistrarWorkQueueFailAction
-  | UpdateFieldAgentDeclaredDeclarationsAction
-  | UpdateFieldAgentDeclaredDeclarationsSuccessAction
-  | UpdateFieldAgentDeclaredDeclarationsFailAction
   | ShowDownloadDeclarationFailedToast
 
 export interface IUserData {
@@ -684,72 +664,6 @@ export function mergeDeclaredDeclarations(
     }
   )
   declarations.push(...transformedDeclaredDeclarations)
-}
-
-async function updateFieldAgentDeclaredDeclarationsByUser(
-  getState: () => IStoreState
-) {
-  const state = getState()
-  const scope = getScope(state)
-
-  if (
-    !state.declarationsState.declarations ||
-    !scope ||
-    !scope.includes('declare')
-  ) {
-    return Promise.reject('Remote declared declaration merging not applicable')
-  }
-
-  const userDetails =
-    getUserDetails(state) ||
-    (JSON.parse(
-      (await storage.getItem('USER_DETAILS')) as string
-    ) as IUserDetails)
-
-  const uID = userDetails.userMgntUserID || ''
-  let { allUserData, currentUserData } = await getUserData(uID)
-
-  const declaredDeclarations = await getFieldAgentDeclaredDeclarations(
-    userDetails
-  )
-
-  const rejectedDeclarations = await getFieldAgentRejectedDeclarations(
-    userDetails
-  )
-
-  if (!currentUserData) {
-    currentUserData = {
-      userID: uID,
-      declarations: state.declarationsState.declarations
-    }
-    allUserData.push(currentUserData)
-  }
-  mergeDeclaredDeclarations(
-    currentUserData.declarations,
-    declaredDeclarations.results
-  )
-  mergeDeclaredDeclarations(
-    currentUserData.declarations,
-    rejectedDeclarations.results
-  )
-
-  allUserData = allUserData.map((userData) => {
-    if (userData.userID !== currentUserData!.userID) {
-      return {
-        ...userData
-      }
-    } else {
-      return {
-        ...userData,
-        ...currentUserData
-      }
-    }
-  })
-
-  return Promise.all([
-    storage.setItem('USER_DATA', JSON.stringify(allUserData)),
-    JSON.stringify(currentUserData)
-  ]).then(([_, currentUserData]) => currentUserData)
 }
 
 export async function getWorkqueueOfCurrentUser(): Promise<string> {
@@ -1203,24 +1117,6 @@ export const updateRegistrarWorkqueueFailActionCreator =
     type: UPDATE_REGISTRAR_WORKQUEUE_FAIL
   })
 
-export function updateFieldAgentDeclaredDeclarations() {
-  return {
-    type: UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS
-  }
-}
-
-export const updateFieldAgentDeclaredDeclarationsSuccessActionCreator = (
-  response: string
-): UpdateFieldAgentDeclaredDeclarationsSuccessAction => ({
-  type: UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS,
-  payload: response
-})
-
-export const updateFieldAgentDeclaredDeclarationsFailActionCreator =
-  (): UpdateFieldAgentDeclaredDeclarationsFailAction => ({
-    type: UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL
-  })
-
 function createRequestForDeclaration(
   declaration: IDeclaration,
   client: ApolloClient<{}>
@@ -1361,9 +1257,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           ...state
         },
         Cmd.run(deleteDeclarationByUser, {
-          successActionCreator: action.payload.shouldUpdateFieldAgentHome
-            ? updateFieldAgentDeclaredDeclarations
-            : getStorageDeclarationsSuccess,
+          successActionCreator: getStorageDeclarationsSuccess,
           failActionCreator: getStorageDeclarationsFailed,
           args: [state.userID, action.payload.declaration]
         })
@@ -1751,41 +1645,6 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           { sequence: true }
         )
       )
-
-    case UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS:
-      return loop(
-        state,
-        Cmd.run(updateFieldAgentDeclaredDeclarationsByUser, {
-          successActionCreator:
-            updateFieldAgentDeclaredDeclarationsSuccessActionCreator,
-          failActionCreator:
-            updateFieldAgentDeclaredDeclarationsFailActionCreator,
-          args: [Cmd.getState]
-        })
-      )
-
-    case UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS:
-      if (action.payload) {
-        const userData = JSON.parse(action.payload) as IUserData
-
-        /*
-         * This is here to ensure that even if the user manages to create a new declaration
-         * before the declarations are fetched from the server, the new declaration will still be
-         * persisted. This mostly happens in E2E tests
-         */
-        const userDeclarations = userData.declarations
-        const declarationsStoredBeforeFetch = state.declarations.filter(
-          (stateDeclaration) =>
-            !userDeclarations.find(({ id }) => stateDeclaration.id === id)
-        )
-        return {
-          ...state,
-          declarations: userData.declarations.concat(
-            declarationsStoredBeforeFetch
-          )
-        }
-      }
-      return state
 
     case ARCHIVE_DECLARATION:
       if (action.payload) {

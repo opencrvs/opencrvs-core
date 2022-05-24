@@ -14,8 +14,7 @@ import {
   IDeclaration,
   IWorkqueue,
   SUBMISSION_STATUS,
-  updateRegistrarWorkqueue,
-  updateFieldAgentDeclaredDeclarations
+  updateRegistrarWorkqueue
 } from '@client/declarations'
 import { Header } from '@client/components/interface/Header/Header'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
@@ -65,8 +64,6 @@ import {
   WORKQUEUE_TABS
 } from '@client/components/interface/Navigation'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
-import { SentForReview } from './sentForReview/SentForReview'
-import { RequiresUpdateFieldAgent } from './requiresUpdate/RequiresUpdateFieldAgent'
 import { PERFORMANCE_HOME } from '@client/navigation/routes'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
@@ -122,7 +119,6 @@ interface IDispatchProps {
   goToPrintCertificate: typeof goToPrintCertificate
   goToEvents: typeof goToEvents
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
-  updateFieldAgentDeclaredDeclarations: typeof updateFieldAgentDeclaredDeclarations
 }
 
 interface IBaseOfficeHomeStateProps {
@@ -599,6 +595,5 @@ export const OfficeHome = connect<
   goToPage,
   goToReviewDuplicate,
   goToPrintCertificate,
-  updateRegistrarWorkqueue,
-  updateFieldAgentDeclaredDeclarations
+  updateRegistrarWorkqueue
 })(injectIntl(OfficeHomeView))
