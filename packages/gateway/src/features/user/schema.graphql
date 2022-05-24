@@ -121,6 +121,7 @@ input AvatarInput {
 
 type Query {
   getUser(userId: String): User
+  getUserByMobile(mobile: String): User
   searchUsers(
     username: String
     mobile: String

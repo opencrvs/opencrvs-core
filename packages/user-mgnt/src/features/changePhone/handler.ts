@@ -50,9 +50,8 @@ export default async function changePhoneHandler(
   try {
     await User.update({ _id: user._id }, user)
   } catch (err) {
-    logger.error(err.message)
     // return 400 if there is a validation error when updating to mongo
-    return h.response().code(400)
+    return h.response(err.message).code(400)
   }
   return h.response().code(200)
 }

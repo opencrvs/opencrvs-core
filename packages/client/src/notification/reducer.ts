@@ -23,6 +23,11 @@ type UserAuditSuccessToastState =
       action: AUDIT_ACTION
     }
 
+type userCreateDuplicateMobileFailedToastState = {
+  visible: boolean
+  mobile: string | null
+}
+
 export type NotificationState = {
   backgroundSyncMessageVisible: boolean
   configurationErrorVisible: boolean
@@ -34,6 +39,7 @@ export type NotificationState = {
   userAuditSuccessToast: UserAuditSuccessToastState
   showPINUpdateSuccess: boolean
   downloadDeclarationFailedToast: boolean
+  userCreateDuplicateMobileFailedToast: userCreateDuplicateMobileFailedToastState
 }
 
 export const initialState: NotificationState = {
@@ -46,7 +52,11 @@ export const initialState: NotificationState = {
   submitFormErrorToast: null,
   userAuditSuccessToast: { visible: false },
   showPINUpdateSuccess: false,
-  downloadDeclarationFailedToast: false
+  downloadDeclarationFailedToast: false,
+  userCreateDuplicateMobileFailedToast: {
+    visible: false,
+    mobile: null
+  }
 }
 
 export const notificationReducer: LoopReducer<
@@ -102,6 +112,15 @@ export const notificationReducer: LoopReducer<
         ...state,
         submitFormErrorToast: action.payload.data
       }
+    case actions.SHOW_CREATE_USER_ERROR_TOAST:
+      const userCreateDuplicateMobileFailedToast = {
+        visible: true,
+        mobile: action.payload.mobile
+      }
+      return {
+        ...state,
+        userCreateDuplicateMobileFailedToast
+      }
     case actions.SHOW_DOWNLOAD_DECLARATION_FAILED_TOAST:
       return {
         ...state,
@@ -116,6 +135,14 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         submitFormErrorToast: null
+      }
+    case actions.HIDE_CREATE_USER_ERROR_TOAST:
+      return {
+        ...state,
+        userCreateDuplicateMobileFailedToast: {
+          visible: false,
+          mobile: null
+        }
       }
     case actions.SHOW_USER_AUDIT_SUCCESS_TOAST:
       const { userFullName, action: auditAction } = (

@@ -107,6 +107,9 @@ export default async function createUser(
   } catch (err) {
     logger.error(err)
     await rollbackCreateUser(token, practitionerId, roleId)
+    if (err.code === 11000) {
+      return h.response().code(403)
+    }
     // return 400 if there is a validation error when saving to mongo
     return h.response().code(400)
   }

@@ -41,6 +41,10 @@ export const resolvers: GQLResolver = {
       return await getUser({ userId }, authHeader)
     },
 
+    async getUserByMobile(_, { mobile }, authHeader) {
+      return await getUser({ mobile }, authHeader)
+    },
+
     async searchUsers(
       _,
       {
@@ -247,7 +251,11 @@ export const resolvers: GQLResolver = {
         }
       })
 
-      if (res.status !== 201) {
+      if (res.status === 403) {
+        return await Promise.reject(
+          new Error(`DUPLICATE_MOBILE-${userPayload.mobile}`)
+        )
+      } else if (res.status !== 201) {
         return await Promise.reject(
           new Error(
             `Something went wrong on user-mgnt service. Couldn't ${action} user`
