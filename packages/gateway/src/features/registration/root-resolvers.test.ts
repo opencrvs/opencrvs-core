@@ -755,7 +755,6 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
-        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -811,7 +810,6 @@ describe('Registration root resolvers', () => {
         }
       )
       fetch.mockResponses(
-        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -914,7 +912,6 @@ describe('Registration root resolvers', () => {
 
     it('throws an error when invalid composition is returned', async () => {
       fetch.mockResponses(
-        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
