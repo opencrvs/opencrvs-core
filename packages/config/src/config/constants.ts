@@ -11,6 +11,7 @@
  */
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
 export const HOST = process.env.HOST || 'localhost'
+export const HOSTNAME = process.env.HOSTNAME || '*'
 export const PORT = process.env.PORT || 2021
 // Services
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'

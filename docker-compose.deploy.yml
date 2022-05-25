@@ -339,6 +339,7 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PRIVATE_KEY_PATH=/run/secrets/jwt-private-key.{{ts}}
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - HOSTNAME={{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -378,6 +379,7 @@ services:
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - HOSTNAME={{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
@@ -429,6 +431,7 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MONGO_URL=mongodb://config:${CONFIG_MONGODB_PASSWORD}@mongo1/application-config?replicaSet=rs0
+      - HOSTNAME={{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
