@@ -18,6 +18,7 @@ env:
   CYPRESS_CLIENT_URL: http://localhost:3000/
   CYPRESS_AUTH_URL: http://localhost:4040/
   CYPRESS_GATEWAY_URL: http://localhost:7070/
+  CYPRESS_COUNTRYCONFIG_URL: http://localhost:3040/
   LANGUAGES: 'en,fr'
   QA_ENV: true
 jobs:
