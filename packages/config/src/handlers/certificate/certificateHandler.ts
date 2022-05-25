@@ -48,8 +48,10 @@ export async function getActiveCertificatesHandler(
   const { scope } = tokenDecoded
 
   if (
-    scope.includes(RouteScope.CERTIFY) ||
-    scope.includes(RouteScope.VALIDATE)
+    scope &&
+    (scope.includes(RouteScope.CERTIFY) ||
+      scope.includes(RouteScope.VALIDATE) ||
+      scope.includes(RouteScope.NATLSYSADMIN))
   ) {
     const activeCertificates = await Certificate.find({
       status: Status.ACTIVE,

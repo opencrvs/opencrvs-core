@@ -61,11 +61,14 @@ export interface IApplicationConfig {
   ADDRESSES: number
 }
 
-export async function getApplicationConfig(): Promise<IApplicationConfig> {
+export async function getApplicationConfig(
+  authorization: string
+): Promise<IApplicationConfig> {
   return fetch(`${CONFIG_API_URL}/config`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      Authorization: authorization
     }
   })
     .then((response) => {

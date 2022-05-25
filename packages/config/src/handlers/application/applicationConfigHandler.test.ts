@@ -93,7 +93,10 @@ describe('applicationHandler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url: '/config'
+      url: '/config',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
     expect(res.statusCode).toBe(200)
   })

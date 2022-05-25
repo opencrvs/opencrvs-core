@@ -69,7 +69,8 @@ export type Location = fhir.Location & { id: string }
 
 export async function getAgeIntervals() {
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
-    'BIRTH'
+    'BIRTH',
+    ''
   )
 
   return [
@@ -445,8 +446,11 @@ export function getMonthRangeFilterListFromTimeRage(
   return monthFilterList
 }
 
-export async function getRegistrationTargetDays(event: string) {
-  const applicationConfig = await getApplicationConfig()
+export async function getRegistrationTargetDays(
+  event: string,
+  authorization: string
+) {
+  const applicationConfig = await getApplicationConfig(authorization)
   const targetDays =
     event === EVENT_TYPE.BIRTH
       ? applicationConfig.BIRTH?.REGISTRATION_TARGET
@@ -455,9 +459,10 @@ export async function getRegistrationTargetDays(event: string) {
 }
 
 export async function getRegistrationLateTargetDays(
-  event: string
+  event: string,
+  authorization: string
 ): Promise<number | null> {
-  const applicationConfig = await getApplicationConfig()
+  const applicationConfig = await getApplicationConfig(authorization)
   const targetDays =
     event === EVENT_TYPE.BIRTH
       ? applicationConfig.BIRTH?.LATE_REGISTRATION_TARGET

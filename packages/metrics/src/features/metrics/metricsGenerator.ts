@@ -408,7 +408,8 @@ export async function fetchKeyFigures(
   const queryLocationId = `Location/${estimatedFigureForTargetDays.locationId}`
 
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
-    EVENT_TYPE.BIRTH
+    EVENT_TYPE.BIRTH,
+    authHeader.Authorization
   )
 
   /* Populating < 45D data */
@@ -769,7 +770,8 @@ export async function fetchLocationWiseEventEstimations(
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
-    event
+    event,
+    authHeader.Authorization
   )
   const registrationsInTargetDaysPoints: IGroupedByGender[] = await query(
     `SELECT COUNT(${column}) AS total
