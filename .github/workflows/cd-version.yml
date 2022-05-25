@@ -14,6 +14,7 @@ env:
   CYPRESS_CLIENT_URL: https://register.farajaland-staging.opencrvs.org/
   CYPRESS_AUTH_URL: https://auth.farajaland-staging.opencrvs.org/
   CYPRESS_GATEWAY_URL: https://gateway.farajaland-staging.opencrvs.org/
+  CYPRESS_COUNTRYCONFIG_URL: https://countryconfig.farajaland-staging.opencrvs.org/
 on:
   push:
     branches:
