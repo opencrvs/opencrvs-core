@@ -34,7 +34,6 @@ import {
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
-  GQLAttachmentInput,
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
   GQLResolver,
@@ -45,7 +44,6 @@ import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
 import { updateTaskTemplate } from '@gateway/features/fhir/templates'
 import { UserInputError } from 'apollo-server-hapi'
 import {
-  validateAttachments,
   validateBirthDeclarationAttachments,
   validateDeathDeclarationAttachments
 } from '@gateway/utils/validators'
