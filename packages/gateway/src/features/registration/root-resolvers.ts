@@ -546,10 +546,11 @@ async function createEventRegistration(
   event: EVENT_TYPE
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
-  const duplicateCompostion = await lookForDuplicate(
-    (details && details.registration && details.registration.draftId) || '',
-    authHeader
-  )
+  const draftId =
+    details && details.registration && details.registration.draftId
+
+  const duplicateCompostion =
+    draftId && (await lookForDuplicate(draftId, authHeader))
 
   if (duplicateCompostion) {
     if (hasScope(authHeader, 'register')) {
@@ -579,7 +580,7 @@ export async function lookForDuplicate(
   identifier: string,
   authHeader: IAuthHeader
 ) {
-  const taskBundle = await fetchFHIR(
+  const taskBundle = await fetchFHIR<fhir.Bundle>(
     `/Task?identifier=${identifier}`,
     authHeader
   )
