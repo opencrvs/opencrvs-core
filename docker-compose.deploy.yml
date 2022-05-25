@@ -290,6 +290,8 @@ services:
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customresponseheaders.Pragma=no-cache'
+        - 'traefik.frontend.headers.customresponseheaders.Cache-control=no-store'
         - 'traefik.port=80'
         - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
@@ -306,6 +308,8 @@ services:
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customresponseheaders.Pragma=no-cache'
+        - 'traefik.frontend.headers.customresponseheaders.Cache-control=no-store'
         - 'traefik.port=80'
         - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
@@ -322,6 +326,8 @@ services:
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customresponseheaders.Pragma=no-cache'
+        - 'traefik.frontend.headers.customresponseheaders.Cache-control=no-store'
       replicas: 2
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
@@ -341,6 +347,8 @@ services:
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customresponseheaders.Pragma=no-cache'
+        - 'traefik.frontend.headers.customresponseheaders.Cache-control=no-store'
       replicas: 2
     networks:
       - overlay_net
@@ -363,6 +371,8 @@ services:
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customresponseheaders.Pragma=no-cache'
+        - 'traefik.frontend.headers.customresponseheaders.Cache-control=no-store'
       replicas: 2
     networks:
       - overlay_net
@@ -405,6 +415,8 @@ services:
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customresponseheaders.Pragma=no-cache'
+        - 'traefik.frontend.headers.customresponseheaders.Cache-control=no-store'
       replicas: 2
     networks:
       - overlay_net
@@ -459,6 +471,8 @@ services:
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customresponseheaders.Pragma=no-cache'
+        - 'traefik.frontend.headers.customresponseheaders.Cache-control=no-store'
       replicas: 2
     networks:
       - overlay_net
@@ -556,6 +570,8 @@ services:
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customresponseheaders.Pragma=no-cache'
+        - 'traefik.frontend.headers.customresponseheaders.Cache-control=no-store'
       replicas: 2
     networks:
       - overlay_net
