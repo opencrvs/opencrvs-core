@@ -694,7 +694,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               }}
               id="event-select"
               withLightTheme={true}
-              defaultWidth={100}
+              defaultWidth={110}
               value={(event as unknown as EVENT_OPTIONS) || EVENT_OPTIONS.BIRTH}
               options={[
                 {
