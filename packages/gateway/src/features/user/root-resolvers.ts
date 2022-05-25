@@ -33,7 +33,9 @@ import {
 } from '@gateway/graphql/schema'
 import { logger } from '@gateway/logger'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
+import { UserInputError } from 'apollo-server-hapi'
 import fetch from 'node-fetch'
+import { validateAttachments } from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -240,6 +242,15 @@ export const resolvers: GQLResolver = {
           new Error('Create user is only allowed for sysadmin')
         )
       }
+
+      try {
+        if (user.signature) {
+          await validateAttachments([user.signature])
+        }
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
+
       const userPayload: IUserPayload = createOrUpdateUserPayload(user)
       const action = userPayload.id ? 'update' : 'create'
       const res = await fetch(`${USER_MANAGEMENT_URL}${action}User`, {
@@ -358,6 +369,12 @@ export const resolvers: GQLResolver = {
       return true
     },
     async changeAvatar(_, { userId, avatar }, authHeader) {
+      try {
+        await validateAttachments([avatar])
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
+
       // Only token owner should be able to change their avatar
       if (!isTokenOwner(authHeader, userId)) {
         return await Promise.reject(

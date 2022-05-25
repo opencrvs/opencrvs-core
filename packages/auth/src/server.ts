@@ -65,15 +65,18 @@ import {
 import { logger } from '@auth/logger'
 
 export async function createServer() {
+  logger.info(`HOSTNAME: ${HOSTNAME}`)
   let whitelist: string[] = [HOSTNAME]
+  logger.info(`Whitelist before: ${JSON.stringify(whitelist)}`)
   if (HOSTNAME[0] !== '*') {
+    logger.info('should populate:')
     whitelist = [
       `https://countryconfig.${HOSTNAME}`,
       `https://login.${HOSTNAME}`,
       `https://register.${HOSTNAME}`
     ]
   }
-  logger.info('Whitelist: ', JSON.stringify(whitelist))
+  logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
     host: AUTH_HOST,
     port: AUTH_PORT,

@@ -189,7 +189,11 @@ export const userTypeResolvers: GQLResolver = {
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
-      const signature = signatureExtension && signatureExtension.valueSignature
+      const signature =
+        userModel.role === 'FIELD_AGENT'
+          ? null
+          : signatureExtension && signatureExtension.valueSignature
+
       return {
         role: practitionerRole,
         name: practitioner.name,
@@ -198,22 +202,6 @@ export const userTypeResolvers: GQLResolver = {
           data: signature.blob
         }
       }
-    },
-    async signature(userModel: IUserModelData, _, authHeader) {
-      const practitioner: fhir.Practitioner = await fetchFHIR(
-        `/Practitioner/${userModel.practitionerId}`,
-        authHeader
-      )
-
-      const signatureExtension = getSignatureExtension(practitioner.extension)
-
-      const signature = signatureExtension && signatureExtension.valueSignature
-      return (
-        signature && {
-          type: signature.contentType,
-          data: signature.blob
-        }
-      )
     }
   }
 }
