@@ -65,11 +65,8 @@ import {
 import { logger } from '@auth/logger'
 
 export async function createServer() {
-  logger.info(`HOSTNAME: ${HOSTNAME}`)
   let whitelist: string[] = [HOSTNAME]
-  logger.info(`Whitelist before: ${JSON.stringify(whitelist)}`)
   if (HOSTNAME[0] !== '*') {
-    logger.info('should populate:')
     whitelist = [
       `https://countryconfig.${HOSTNAME}`,
       `https://login.${HOSTNAME}`,
