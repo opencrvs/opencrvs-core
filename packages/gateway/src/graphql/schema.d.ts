@@ -28,6 +28,7 @@ export interface GQLQuery {
   locationById?: GQLLocation
   hasChildLocation?: GQLLocation
   getUser?: GQLUser
+  getUserByMobile?: GQLUser
   searchUsers?: GQLSearchUserResult
   searchFieldAgents?: GQLSearchFieldAgentResult
   verifyPasswordById?: GQLVerifyPasswordResult
@@ -230,7 +231,7 @@ export interface GQLUser {
   underInvestigation?: boolean
   primaryOffice?: GQLLocation
   catchmentArea?: Array<GQLLocation | null>
-  localRegistrar: GQLLocalRegistrar
+  localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
   signature?: GQLSignature
   creationDate?: string
@@ -1429,6 +1430,7 @@ export interface GQLQueryTypeResolver<TParent = any> {
   locationById?: QueryToLocationByIdResolver<TParent>
   hasChildLocation?: QueryToHasChildLocationResolver<TParent>
   getUser?: QueryToGetUserResolver<TParent>
+  getUserByMobile?: QueryToGetUserByMobileResolver<TParent>
   searchUsers?: QueryToSearchUsersResolver<TParent>
   searchFieldAgents?: QueryToSearchFieldAgentsResolver<TParent>
   verifyPasswordById?: QueryToVerifyPasswordByIdResolver<TParent>
@@ -1693,6 +1695,18 @@ export interface QueryToGetUserResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: QueryToGetUserArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface QueryToGetUserByMobileArgs {
+  mobile?: string
+}
+export interface QueryToGetUserByMobileResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: QueryToGetUserByMobileArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult

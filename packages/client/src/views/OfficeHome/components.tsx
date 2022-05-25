@@ -23,7 +23,10 @@ import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 const Flex = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 16px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    align-items: flex-start;
+  }
 `
 
 export const NoNameContainer = styled.span`
@@ -50,6 +53,8 @@ const NameEventContainer = styled.div`
 
 const Icon = styled.div`
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
   width: 24px;
 `
 interface IIconWith {

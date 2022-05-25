@@ -130,7 +130,7 @@ const FormItem = styled.div<{
 }>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
-    ignoreBottomMargin ? '0px' : '32px'};
+    ignoreBottomMargin ? '0px' : '40px'};
 
   ${({ hideFakeMarginTop }) =>
     !hideFakeMarginTop &&

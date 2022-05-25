@@ -104,6 +104,25 @@ const mockPractitionerRole = {
   practitioner: {
     reference: 'Practitioner/4393c845-0d1c-42c7-a501-f0b4fcb031a2'
   },
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Task/e849ceb4-0adc-4be2-8fc8-8a4c41781bb5',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'BIRTH'
+            }
+          ]
+        },
+        id: 'e849ceb4-0adc-4be2-8fc8-8a4c41781bb5'
+      }
+    }
+  ],
   code: [
     {
       coding: [

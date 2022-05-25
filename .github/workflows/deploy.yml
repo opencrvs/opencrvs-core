@@ -84,7 +84,13 @@ jobs:
       - name: Deploy to QA
         if: ${{ github.event.inputs.environment == 'qa' }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+          DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
+          DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
           KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
@@ -96,7 +102,13 @@ jobs:
       - name: Deploy to production
         if: ${{ github.event.inputs.environment == 'production' }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+          DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
+          DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
           KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
@@ -108,7 +120,13 @@ jobs:
       - name: Deploy to staging
         if: ${{ github.event.inputs.environment == 'staging' }}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+          DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
+          DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
           KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}

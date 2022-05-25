@@ -297,5 +297,5 @@ export const registrarSignatureUserTransformer = (
   }
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'registrationOffice'
-  ] = userDetails.localRegistrar.signature?.data as string
+  ] = userDetails.localRegistrar?.signature?.data as string
 }

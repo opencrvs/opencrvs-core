@@ -955,6 +955,7 @@
                     "id": "form.field.label.empty"
                   },
                   "initialValue": "",
+                  "ignoreBottomMargin": true,
                   "validate": [],
                   "conditionals": []
                 },
@@ -1157,6 +1158,7 @@
                     "id": "form.field.label.placeOfBirthPreview"
                   },
                   "previewGroup": "placeOfBirth",
+                  "ignoreBottomMargin": true,
                   "initialValue": "",
                   "validate": []
                 },
@@ -1893,6 +1895,7 @@
                     "id": "form.field.label.empty"
                   },
                   "initialValue": "",
+                  "ignoreBottomMargin": true,
                   "validate": [],
                   "conditionals": [
                     {
@@ -2438,6 +2441,7 @@
                     "id": "form.field.label.empty"
                   },
                   "initialValue": "",
+                  "ignoreBottomMargin": true,
                   "validate": [],
                   "conditionals": [
                     {
@@ -4012,6 +4016,7 @@
                     "id": "form.field.label.empty"
                   },
                   "initialValue": "",
+                  "ignoreBottomMargin": true,
                   "validate": [],
                   "conditionals": []
                 },

@@ -41,7 +41,7 @@ export const PrimaryButton = styled(Button)`
 
   &:not([data-focus-visible-added]):disabled {
     cursor: not-allowed;
-    opacity: 0.6;
+    color: ${({ theme }) => theme.colors.grey300};
     path {
       stroke: ${({ theme }) => theme.colors.white};
     }

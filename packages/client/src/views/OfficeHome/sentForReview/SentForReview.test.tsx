@@ -233,7 +233,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     expect(data[0].name).toBe('iliyas khan')
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
-    expect(data[0].actions).toBeUndefined()
+    expect(data[0].actions).toBeDefined()
   })
 
   it('returns an empty array incase of invalid graphql query response', async () => {

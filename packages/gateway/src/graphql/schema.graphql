@@ -33,6 +33,7 @@ type Query {
   locationById(locationId: String): Location
   hasChildLocation(parentId: String): Location
   getUser(userId: String): User
+  getUserByMobile(mobile: String): User
   searchUsers(
     username: String
     mobile: String
@@ -354,7 +355,7 @@ type User {
   underInvestigation: Boolean
   primaryOffice: Location
   catchmentArea: [Location]
-  localRegistrar: LocalRegistrar!
+  localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
   creationDate: String

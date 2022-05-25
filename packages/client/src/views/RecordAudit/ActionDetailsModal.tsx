@@ -13,7 +13,7 @@
 import React from 'react'
 import styled from '@client/styledComponents'
 import { goToUserProfile, IDynamicValues } from '@client/navigation'
-import { IntlShape } from 'react-intl'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal, ListTable } from '@opencrvs/components/lib/interface'
@@ -97,6 +97,16 @@ export const ActionDetailsModalListTable = ({
     }
   ]
 
+  const getItemName = (
+    sectionName: MessageDescriptor,
+    fieldLabel: MessageDescriptor
+  ) => {
+    const label = intl.formatMessage(fieldLabel)
+    const section = intl.formatMessage(sectionName)
+
+    return (label && label.trim().length > 0 && `${label} (${section})`) || ''
+  }
+
   const dataChange = (
     actionDetailsData: IActionDetailsData
   ): IDynamicValues[] => {
@@ -127,7 +137,7 @@ export const ActionDetailsModalListTable = ({
         ) as IFormField
 
         result.push({
-          item: intl.formatMessage(fieldObj.label) || 'Not Found',
+          item: getItemName(section.name, fieldObj.label),
           original: getFieldValue(
             item.valueString,
             fieldObj,
@@ -151,7 +161,7 @@ export const ActionDetailsModalListTable = ({
         ).find((field) => field.name === parentField) as IFormField
 
         result.push({
-          item: intl.formatMessage(fieldObj.label) || 'Not Found',
+          item: getItemName(section.name, fieldObj.label),
           original: getFieldValue(
             item.valueString,
             fieldObj,

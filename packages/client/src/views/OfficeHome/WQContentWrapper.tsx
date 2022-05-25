@@ -56,7 +56,7 @@ const MobileChildrenContainer = styled.div`
 `
 
 const PaginationLoaderContainer = styled.div<{ isShowPagination?: boolean }>`
-  height: ${({ isShowPagination }) => (isShowPagination ? 110 : 48)}px;
+  height: auto;
 `
 
 const Body = (props: IProps) => {
