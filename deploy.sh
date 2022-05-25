@@ -78,8 +78,28 @@ if [ -z "$9" ] ; then
     print_usage_and_exit
 fi
 
-if [ -z "$SLACK_WEBHOOK_URL" ] ; then
-    echo 'Error: Missing environment variable SLACK_WEBHOOK_URL.'
+if [ -z "$SMTP_HOST" ] ; then
+    echo 'Error: Missing environment variable SMTP_HOST.'
+    print_usage_and_exit
+fi
+
+if [ -z "$SMTP_PORT" ] ; then
+    echo 'Error: Missing environment variable SMTP_PORT.'
+    print_usage_and_exit
+fi
+
+if [ -z "$SMTP_USERNAME" ] ; then
+    echo 'Error: Missing environment variable SMTP_USERNAME.'
+    print_usage_and_exit
+fi
+
+if [ -z "$SMTP_PASSWORD" ] ; then
+    echo 'Error: Missing environment variable SMTP_PASSWORD.'
+    print_usage_and_exit
+fi
+
+if [ -z "$ALERT_EMAIL" ] ; then
+    echo 'Error: Missing environment variable ALERT_EMAIL.'
     print_usage_and_exit
 fi
 
@@ -210,7 +230,7 @@ else
 fi
 
 # Setup configuration files and compose file for the deployment domain
-ssh $SSH_USER@$SSH_HOST "SLACK_WEBHOOK_URL=$SLACK_WEBHOOK_URL /tmp/compose/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
+ssh $SSH_USER@$SSH_HOST "SMTP_HOST=$SMTP_HOST SMTP_PORT=$SMTP_PORT SMTP_USERNAME=$SMTP_USERNAME SMTP_PASSWORD=$SMTP_PASSWORD ALERT_EMAIL=$ALERT_EMAIL /tmp/compose/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
 
 docker_stack_deploy() {
   local environment_compose=${1}
