@@ -25,10 +25,13 @@ export interface IPDFTemplate {
   transformers?: IFieldTransformer[]
 }
 export interface ISVGTemplate {
+  id: string
   definition: string
   fonts?: { [language: string]: { [name: string]: TFontFamilyTypes } }
   vfs?: { [file: string]: string }
   transformers?: IFieldTransformer[]
+  fileName: string
+  lastModifiedDate: number
 }
 
 export type TransformerPayload =

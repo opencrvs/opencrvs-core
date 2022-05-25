@@ -17,6 +17,12 @@ const UPDATE_CERTIFICATE_TEMPLATE = gql`
   mutation createOrUpdateCertificateSVG($certificateSVG: CertificateSVGInput!) {
     createOrUpdateCertificateSVG(certificateSVG: $certificateSVG) {
       svgCode
+      svgFilename
+      user
+      status
+      event
+      svgDateCreated
+      svgDateUpdated
     }
   }
 `
@@ -26,8 +32,7 @@ async function updateCertificateTemplate(
   svgFilename: string,
   user: string,
   status: string,
-  event: string,
-  refetchQueries: RefetchQueryDescription
+  event: string
 ) {
   const certificateSVG = {
     id: id,
@@ -41,8 +46,7 @@ async function updateCertificateTemplate(
     client &&
     client.mutate({
       mutation: UPDATE_CERTIFICATE_TEMPLATE,
-      variables: { certificateSVG },
-      refetchQueries
+      variables: { certificateSVG }
     })
   )
 }

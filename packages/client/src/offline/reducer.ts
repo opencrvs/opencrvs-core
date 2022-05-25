@@ -36,7 +36,6 @@ import {
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
 import { find, merge } from 'lodash'
-
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
@@ -48,10 +47,16 @@ export enum LocationType {
 
 interface IParsedCertificates {
   birth: {
+    id: string
     svgCode: string
+    svgFileName: string
+    lastModifiedDate: number
   }
   death: {
+    id: string
     svgCode: string
+    svgFileName: string
+    lastModifiedDate: number
   }
 }
 export interface ILocation {
@@ -367,6 +372,29 @@ function reducer(
         Cmd.action(actions.offlineFormConfigUpdated(newFormConfig))
       )
     }
+    case actions.UPDATE_OFFLINE_CERTIFICATE: {
+      const { templates } = state.offlineData
+      const { certificate } = action.payload
+      if (!templates) return state
+      return {
+        ...state,
+        offlineData: {
+          ...state.offlineData,
+          templates: {
+            ...templates,
+            certificates: {
+              ...templates.certificates,
+              [certificate.event]: {
+                ...templates.certificates[certificate.event],
+                definition: certificate.svgCode,
+                fileName: certificate.svgFilename,
+                lastModifiedDate: certificate.svgDateUpdated
+              }
+            }
+          }
+        }
+      }
+    }
     /*
      * Configurations
      */
@@ -384,8 +412,18 @@ function reducer(
       }) as ICertificateTemplateData
 
       const certificatesTemplates = {
-        birth: { svgCode: birthCertificateTemplate.svgCode },
-        death: { svgCode: deathCertificateTemplate.svgCode }
+        birth: {
+          id: birthCertificateTemplate._id,
+          svgCode: birthCertificateTemplate.svgCode,
+          svgFileName: birthCertificateTemplate.svgFilename,
+          lastModifiedDate: birthCertificateTemplate.svgDateUpdated
+        },
+        death: {
+          id: deathCertificateTemplate._id,
+          svgCode: deathCertificateTemplate.svgCode,
+          svgFileName: deathCertificateTemplate.svgFilename,
+          lastModifiedDate: deathCertificateTemplate.svgDateUpdated
+        }
       } as IParsedCertificates
 
       const newOfflineData = {
@@ -395,10 +433,16 @@ function reducer(
         templates: {
           certificates: {
             birth: {
-              definition: certificatesTemplates.birth.svgCode
+              id: certificatesTemplates.birth.id,
+              definition: certificatesTemplates.birth.svgCode,
+              fileName: certificatesTemplates.birth.svgFileName,
+              lastModifiedDate: certificatesTemplates.birth.lastModifiedDate
             },
             death: {
-              definition: certificatesTemplates.death.svgCode
+              id: certificatesTemplates.death.id,
+              definition: certificatesTemplates.death.svgCode,
+              fileName: certificatesTemplates.death.svgFileName,
+              lastModifiedDate: certificatesTemplates.death.lastModifiedDate
             }
           }
         }

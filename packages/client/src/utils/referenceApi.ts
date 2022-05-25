@@ -13,6 +13,7 @@ import { IFormConfig } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
+import { Event } from '@client/forms'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -33,7 +34,7 @@ export interface ICountryLogo {
 }
 
 export interface ICertificateTemplateData {
-  event: string
+  event: Event
   status: string
   svgCode: string
   svgDateCreated: number

@@ -39,11 +39,7 @@ import {
   ERROR_TYPES,
   validateCertificateTemplate
 } from '@client/utils/imageUtils'
-import { GET_ACTIVE_CERTIFICATES } from '@client/certificate/queries'
-import { Query } from '@client/components/Query'
-import { errorMessages } from '@client/i18n/messages/errors'
-import _ from 'lodash'
-import { formatLongDate } from '@client/utils/date-formatting'
+import { mapValues } from 'lodash'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
@@ -57,6 +53,7 @@ import {
   ListViewSimplified,
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { updateOfflineCertificate } from '@client/offline/actions'
 
 const HiddenInput = styled.input`
   display: none;
@@ -101,12 +98,11 @@ type Props = WrappedComponentProps &
     userDetails: IUserDetails | null
     scope: Scope | null
     offlineResources: IOfflineData
-    offlineCountryConfiguration: IOfflineData
     registerForm: {
       birth: IForm
       death: IForm
     }
-  }
+  } & { updateOfflineCertificate: typeof updateOfflineCertificate }
 
 interface State {
   selectedSubMenuItem: string
@@ -197,7 +193,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 
   getMenuItems(
     intl: IntlShape,
-    id: string,
     event: string,
     svgCode: string,
     svgFilename: string
@@ -327,15 +322,13 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         svgFilename,
         user,
         status,
-        event,
-        [
-          {
-            query: GET_ACTIVE_CERTIFICATES
-          }
-        ]
+        event
       )
       if (res && res.data) {
         this.setState({ imageUploading: false })
+        this.props.updateOfflineCertificate(
+          res.data.createOrUpdateCertificateSVG
+        )
       }
     } catch (err) {
       this.setState({
@@ -355,260 +348,190 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       showPrompt
     } = this.state
 
-    const { intl } = this.props
+    const { intl, offlineResources } = this.props
+    const birthLastModified =
+      offlineResources.templates.certificates.birth.lastModifiedDate
+    const deathLastModified =
+      offlineResources.templates.certificates.death.lastModifiedDate
+    const CertificateSection = {
+      title: intl.formatMessage(messages.listTitle),
+      items: [
+        {
+          id: 'birth',
+          label: intl.formatMessage(messages.birthTemplate),
+          value: intl.formatMessage(messages.birthDefaultTempDesc),
+          actionsMenu: (
+            <>
+              {offlineResources.templates.certificates.birth && (
+                <ToggleMenu
+                  id={`template-birth-action-menu`}
+                  toggleButton={<VerticalThreeDots />}
+                  menuItems={this.getMenuItems(
+                    intl,
+                    Event.BIRTH,
+                    offlineResources.templates.certificates.birth.definition,
+                    offlineResources.templates.certificates.birth.fileName
+                  )}
+                />
+              )}
+              <HiddenInput
+                ref={this.birthCertificatefileUploader}
+                id={`birth_file_uploader_field_${offlineResources.templates.certificates.birth.id}`}
+                type="file"
+                accept={ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.join(',')}
+                onChange={this.handleSelectFile}
+              />
+            </>
+          )
+        },
+        {
+          id: 'death',
+          label: intl.formatMessage(messages.deathTemplate),
+          value: intl.formatMessage(messages.deathDefaultTempDesc),
+          actionsMenu: (
+            <>
+              {offlineResources.templates.certificates.death && (
+                <ToggleMenu
+                  id={`template-death-action-menu`}
+                  toggleButton={<VerticalThreeDots />}
+                  menuItems={this.getMenuItems(
+                    intl,
+                    Event.DEATH,
+                    offlineResources.templates.certificates.death.definition,
+                    offlineResources.templates.certificates.death.fileName
+                  )}
+                />
+              )}
+              <HiddenInput
+                ref={this.deathCertificatefileUploader}
+                id={`death_file_uploader_field_${offlineResources.templates.certificates.death.id}`}
+                type="file"
+                accept={ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.join(',')}
+                onChange={this.handleSelectFile}
+              />
+            </>
+          )
+        }
+      ]
+    }
+    CertificateSection.items.map((item) =>
+      mapValues(item, (val) => {
+        if (val === Event.BIRTH) {
+          item.value = intl.formatMessage(messages.eventUpdatedTempDesc, {
+            lastModified: birthLastModified
+          })
+        } else if (val === Event.DEATH) {
+          item.value = intl.formatMessage(messages.eventUpdatedTempDesc, {
+            lastModified: deathLastModified
+          })
+        }
+      })
+    )
     return (
-      <Query query={GET_ACTIVE_CERTIFICATES} fetchPolicy={'cache-and-network'}>
-        {({ data, error }) => {
-          if (error) {
-            return (
-              <ErrorText id="user_loading_error">
-                {intl.formatMessage(errorMessages.userQueryError)}
-              </ErrorText>
-            )
-          } else {
-            const birthCertificateTemplate = _.find(
-              data.getActiveCertificatesSVG,
-              {
-                event: 'birth'
-              }
-            )
-            const deathCertificateTemplate = _.find(
-              data.getActiveCertificatesSVG,
-              {
-                event: 'death'
-              }
-            )
-            const birthLongDate =
-              birthCertificateTemplate &&
-              formatLongDate(
-                new Date(
-                  parseInt(birthCertificateTemplate.svgDateUpdated)
-                ).toString(),
-                intl.locale
-              )
-            const deathLongDate =
-              deathCertificateTemplate &&
-              formatLongDate(
-                new Date(
-                  parseInt(deathCertificateTemplate.svgDateUpdated)
-                ).toString(),
-                intl.locale
-              )
-            const CertificateSection = {
-              title: intl.formatMessage(messages.listTitle),
-              items: [
-                {
-                  id: 'birth',
-                  label: intl.formatMessage(messages.birthTemplate),
-                  value: intl.formatMessage(messages.birthDefaultTempDesc),
-                  actionsMenu: (
-                    <>
-                      {birthCertificateTemplate && (
-                        <ToggleMenu
-                          id={`template-birth-action-menu`}
-                          toggleButton={<VerticalThreeDots />}
-                          menuItems={this.getMenuItems(
-                            intl,
-                            birthCertificateTemplate._id,
-                            birthCertificateTemplate.event,
-                            birthCertificateTemplate.svgCode,
-                            birthCertificateTemplate.svgFilename
-                          )}
-                        />
-                      )}
-                      <HiddenInput
-                        ref={this.birthCertificatefileUploader}
-                        id={`birth_file_uploader_field_${
-                          birthCertificateTemplate &&
-                          birthCertificateTemplate._id
-                        }`}
-                        type="file"
-                        accept={ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.join(
-                          ','
-                        )}
-                        onChange={this.handleSelectFile}
+      <>
+        <SysAdminContentWrapper isCertificatesConfigPage={true}>
+          {this.state.selectedSubMenuItem ===
+            this.SUB_MENU_ID.certificatesConfig && (
+            <Content title={CertificateSection.title} titleColor={'copy'}>
+              <ListTitleDiv>
+                {intl.formatMessage(messages.listDetails)}
+                <BlueTitle>
+                  {intl.formatMessage(messages.listDetailsQsn)}
+                </BlueTitle>
+              </ListTitleDiv>
+              <ListViewContainer>
+                <ListViewSimplified>
+                  {CertificateSection.items.map((item) => {
+                    return (
+                      <ListViewItemSimplified
+                        key={item.id}
+                        label={
+                          <Label id={`${item.id}_label`}>{item.label}</Label>
+                        }
+                        value={
+                          <Value id={`${item.id}_value`}>{item.value}</Value>
+                        }
+                        actions={item.actionsMenu}
                       />
-                    </>
-                  )
-                },
-                {
-                  id: 'death',
-                  label: intl.formatMessage(messages.deathTemplate),
-                  value: intl.formatMessage(messages.deathDefaultTempDesc),
-                  actionsMenu: (
-                    <>
-                      {deathCertificateTemplate && (
-                        <ToggleMenu
-                          id={`template-death-action-menu`}
-                          toggleButton={<VerticalThreeDots />}
-                          menuItems={this.getMenuItems(
-                            intl,
-                            deathCertificateTemplate._id,
-                            deathCertificateTemplate.event,
-                            deathCertificateTemplate.svgCode,
-                            deathCertificateTemplate.svgFilename
-                          )}
-                        />
-                      )}
-                      <HiddenInput
-                        ref={this.deathCertificatefileUploader}
-                        id={`death_file_uploader_field_${
-                          deathCertificateTemplate &&
-                          deathCertificateTemplate._id
-                        }`}
-                        type="file"
-                        accept={ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.join(
-                          ','
-                        )}
-                        onChange={this.handleSelectFile}
-                      />
-                    </>
-                  )
-                }
-              ]
+                    )
+                  })}
+                </ListViewSimplified>
+              </ListViewContainer>
+            </Content>
+          )}
+          <FloatingNotification
+            type={
+              imageLoadingError
+                ? NOTIFICATION_TYPE.ERROR
+                : this.state.imageUploading
+                ? NOTIFICATION_TYPE.IN_PROGRESS
+                : NOTIFICATION_TYPE.SUCCESS
             }
-
-            CertificateSection.items.map((item) =>
-              _.mapValues(item, (val) => {
-                if (val === 'birth') {
-                  item.value = intl.formatMessage(
-                    messages.birthUpdatedTempDesc,
-                    { birthLongDate }
-                  )
-                } else if (val === 'death') {
-                  item.value = intl.formatMessage(
-                    messages.deathUpdatedTempDesc,
-                    { deathLongDate }
-                  )
-                }
-              })
-            )
-            return (
-              <>
-                <SysAdminContentWrapper isCertificatesConfigPage={true}>
-                  {this.state.selectedSubMenuItem ===
-                    this.SUB_MENU_ID.certificatesConfig && (
-                    <Content
-                      title={CertificateSection.title}
-                      titleColor={'copy'}
-                    >
-                      <ListTitleDiv>
-                        {intl.formatMessage(messages.listDetails)}
-                        <BlueTitle>
-                          {intl.formatMessage(messages.listDetailsQsn)}
-                        </BlueTitle>
-                      </ListTitleDiv>
-                      <ListViewContainer>
-                        <ListViewSimplified>
-                          {CertificateSection.items.map((item) => {
-                            return (
-                              <ListViewItemSimplified
-                                key={item.id}
-                                label={
-                                  <Label id={`${item.id}_label`}>
-                                    {item.label}
-                                  </Label>
-                                }
-                                value={
-                                  <Value id={`${item.id}_value`}>
-                                    {item.value}
-                                  </Value>
-                                }
-                                actions={item.actionsMenu}
-                              />
-                            )
-                          })}
-                        </ListViewSimplified>
-                      </ListViewContainer>
-                    </Content>
-                  )}
-                  <FloatingNotification
-                    type={
-                      imageLoadingError
-                        ? NOTIFICATION_TYPE.ERROR
-                        : this.state.imageUploading
-                        ? NOTIFICATION_TYPE.IN_PROGRESS
-                        : NOTIFICATION_TYPE.SUCCESS
-                    }
-                    show={showNotification}
-                    callback={
-                      imageUploading
-                        ? undefined
-                        : () => this.toggleNotification()
-                    }
-                  >
-                    <FormattedMessage
-                      {...(this.state.imageUploading
-                        ? messages.certificateUploading
-                        : !!this.state.imageLoadingError
-                        ? messages.certificateValidationError
-                        : messages.certificateUpdated)}
-                      values={{
-                        eventName: !this.state.imageUploading
-                          ? eventName.toUpperCase()[0] +
-                            eventName.toLowerCase().slice(1)
-                          : eventName
-                      }}
-                    />
-                  </FloatingNotification>
-                  <ResponsiveModal
-                    id="withoutVerificationPrompt"
-                    show={showPrompt}
-                    title={intl.formatMessage(
-                      messages.uploadCertificateDialogTitle
-                    )}
-                    contentHeight={96}
-                    handleClose={this.togglePrompt}
-                    actions={[
-                      <TertiaryButton
-                        id="cancel"
-                        key="cancel"
-                        onClick={this.togglePrompt}
-                      >
-                        {intl.formatMessage(
-                          messages.uploadCertificateDialogCancel
-                        )}
-                      </TertiaryButton>,
-                      <PrimaryButton
-                        id="send"
-                        key="continue"
-                        onClick={() => {
-                          this.togglePrompt()
-                          if (eventName === Event.BIRTH)
-                            this.birthCertificatefileUploader.current!.click()
-                          else if (eventName === Event.DEATH)
-                            this.deathCertificatefileUploader.current!.click()
-                        }}
-                      >
-                        {intl.formatMessage(
-                          messages.uploadCertificateDialogConfirm
-                        )}
-                      </PrimaryButton>
-                    ]}
-                  >
-                    {intl.formatMessage(
-                      messages.uploadCertificateDialogDescription
-                    )}
-                  </ResponsiveModal>
-                  {this.state.previewImage && (
-                    <DocumentPreview
-                      previewImage={this.state.previewImage}
-                      disableDelete={true}
-                      title={
-                        eventName === Event.BIRTH
-                          ? intl.formatMessage(messages.birthTemplate)
-                          : intl.formatMessage(messages.deathTemplate)
-                      }
-                      goBack={this.closePreviewSection}
-                      onDelete={this.onDelete}
-                    />
-                  )}
-                </SysAdminContentWrapper>
-              </>
-            )
-          }
-        }}
-      </Query>
+            show={showNotification}
+            callback={
+              imageUploading ? undefined : () => this.toggleNotification()
+            }
+          >
+            <FormattedMessage
+              {...(this.state.imageUploading
+                ? messages.certificateUploading
+                : !!this.state.imageLoadingError
+                ? messages.certificateValidationError
+                : messages.certificateUpdated)}
+              values={{
+                eventName: !this.state.imageUploading
+                  ? eventName.toUpperCase()[0] +
+                    eventName.toLowerCase().slice(1)
+                  : eventName
+              }}
+            />
+          </FloatingNotification>
+          <ResponsiveModal
+            id="withoutVerificationPrompt"
+            show={showPrompt}
+            title={intl.formatMessage(messages.uploadCertificateDialogTitle)}
+            contentHeight={96}
+            handleClose={this.togglePrompt}
+            actions={[
+              <TertiaryButton
+                id="cancel"
+                key="cancel"
+                onClick={this.togglePrompt}
+              >
+                {intl.formatMessage(messages.uploadCertificateDialogCancel)}
+              </TertiaryButton>,
+              <PrimaryButton
+                id="send"
+                key="continue"
+                onClick={() => {
+                  this.togglePrompt()
+                  if (eventName === Event.BIRTH)
+                    this.birthCertificatefileUploader.current!.click()
+                  else if (eventName === Event.DEATH)
+                    this.deathCertificatefileUploader.current!.click()
+                }}
+              >
+                {intl.formatMessage(messages.uploadCertificateDialogConfirm)}
+              </PrimaryButton>
+            ]}
+          >
+            {intl.formatMessage(messages.uploadCertificateDialogDescription)}
+          </ResponsiveModal>
+          {this.state.previewImage && (
+            <DocumentPreview
+              previewImage={this.state.previewImage}
+              disableDelete={true}
+              title={
+                eventName === Event.BIRTH
+                  ? intl.formatMessage(messages.birthTemplate)
+                  : intl.formatMessage(messages.deathTemplate)
+              }
+              goBack={this.closePreviewSection}
+              onDelete={this.onDelete}
+            />
+          )}
+        </SysAdminContentWrapper>
+      </>
     )
   }
 }
@@ -618,11 +541,10 @@ function mapStateToProps(state: IStoreState) {
     offlineResources: getOfflineData(state),
     registerForm: getRegisterForm(state),
     userDetails: getUserDetails(state),
-    scope: getScope(state),
-    offlineCountryConfiguration: getOfflineData(state)
+    scope: getScope(state)
   }
 }
 
-export const CertificatesConfig = connect(mapStateToProps)(
-  injectIntl(CertificatesConfigComponent)
-)
+export const CertificatesConfig = connect(mapStateToProps, {
+  updateOfflineCertificate
+})(injectIntl(CertificatesConfigComponent))
