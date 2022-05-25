@@ -204,16 +204,16 @@ export const userTypeResolvers: GQLResolver = {
       }
     },
     async signature(userModel: IUserModelData, _, authHeader) {
+      if (userModel.role === 'FIELD_AGENT') {
+        return null
+      }
+
       const practitioner: fhir.Practitioner = await fetchFHIR(
         `/Practitioner/${userModel.practitionerId}`,
         authHeader
       )
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
-
-      if (userModel.role === 'FIELD_AGENT') {
-        return null
-      }
 
       const signature = signatureExtension && signatureExtension.valueSignature
       return (
