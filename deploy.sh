@@ -98,6 +98,11 @@ if [ -z "$SMTP_PASSWORD" ] ; then
     print_usage_and_exit
 fi
 
+if [ -z "$ALERT_EMAIL" ] ; then
+    echo 'Error: Missing environment variable ALERT_EMAIL.'
+    print_usage_and_exit
+fi
+
 if [ -z "$KIBANA_USERNAME" ] ; then
     echo 'Error: Missing environment variable KIBANA_USERNAME.'
     print_usage_and_exit
@@ -225,7 +230,7 @@ else
 fi
 
 # Setup configuration files and compose file for the deployment domain
-ssh $SSH_USER@$SSH_HOST "SMTP_HOST=$SMTP_HOST SMTP_PORT=$SMTP_PORT SMTP_USERNAME=$SMTP_USERNAME SMTP_PASSWORD=$SMTP_PASSWORD /tmp/compose/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
+ssh $SSH_USER@$SSH_HOST "SMTP_HOST=$SMTP_HOST SMTP_PORT=$SMTP_PORT SMTP_USERNAME=$SMTP_USERNAME SMTP_PASSWORD=$SMTP_PASSWORD ALERT_EMAIL=$ALERT_EMAIL /tmp/compose/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
 
 docker_stack_deploy() {
   local environment_compose=${1}

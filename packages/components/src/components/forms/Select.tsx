@@ -87,6 +87,28 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   .react-select__value-container {
     padding: 0;
   }
+
+  .react-select__option {
+    background-color: ${({ theme }) => theme.colors.white};
+  }
+
+  .react-select__option--is-focused {
+    background-color: ${({ theme }) => theme.colors.grey100};
+    color: ${({ theme }) => theme.colors.copy};
+    &:active {
+      background: ${({ theme }) => theme.colors.grey200};
+      color: ${({ theme }) => theme.colors.copy};
+    }
+  }
+
+  .react-select__option--is-selected {
+    background-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.white};
+    &:active {
+      background: ${({ theme }) => theme.colors.indigoDark};
+      color: ${({ theme }) => theme.colors.white};
+    }
+  }
 `
 
 function getSelectedOption(
