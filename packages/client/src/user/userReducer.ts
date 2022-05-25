@@ -302,7 +302,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         Cmd.run(alterRolesBasedOnUserRole, {
           successActionCreator: (data: GQLRole[]) =>
             updateUserFormFieldDefinitions(data, fetchUserQueryData),
-          args: [primaryOfficeId]
+          args: [primaryOfficeId, Cmd.getState]
         })
       )
     case UPDATE_FORM_FIELD_DEFINITIONS:

@@ -57,7 +57,16 @@ export default async function getRoles(
 
 export const searchRoleSchema = Joi.object({
   title: Joi.string().optional(),
-  value: Joi.string().optional(),
+  value: Joi.object({
+    $eq: Joi.string().optional(),
+    $gt: Joi.string().optional(),
+    $lt: Joi.string().optional(),
+    $gte: Joi.string().optional(),
+    $lte: Joi.string().optional(),
+    $ne: Joi.string().optional(),
+    $in: Joi.array().items(Joi.string()).optional(),
+    $nin: Joi.array().items(Joi.string()).optional()
+  }).optional(),
   type: Joi.string().optional(),
   active: Joi.boolean().optional(),
   sortBy: Joi.string().optional(),

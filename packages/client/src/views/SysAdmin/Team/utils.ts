@@ -28,11 +28,16 @@ import {
   ROLE_REGISTRATION_AGENT,
   ROLE_TYPE_CHAIRMAN,
   ROLE_TYPE_MAYOR,
-  ROLE_TYPE_SECRETARY
+  ROLE_TYPE_SECRETARY,
+  SYS_ADMIN_ROLES,
+  NATL_ADMIN_ROLES,
+  NATIONAL_REGISTRAR_ROLES
 } from '@client/utils/constants'
 import { GQLRole, GQLUser } from '@opencrvs/gateway/src/graphql/schema'
 import { MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
+import { IStoreState } from '@client/store'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 export enum UserStatus {
   ACTIVE,
@@ -529,8 +534,22 @@ export const transformRoleDataToDefinitions = (
   })
 }
 
-export async function alterRolesBasedOnUserRole(primaryOfficeId: string) {
-  const roleData = await roleQueries.fetchRoles()
+function getRoleSearchCriteria(currentUserRole?: string) {
+  if (currentUserRole && SYS_ADMIN_ROLES.includes(currentUserRole)) {
+    return {
+      value: { nin: NATL_ADMIN_ROLES.concat(NATIONAL_REGISTRAR_ROLES) }
+    }
+  }
+  return {}
+}
+
+export async function alterRolesBasedOnUserRole(
+  primaryOfficeId: string,
+  getState: () => IStoreState
+) {
+  const userDetails = getUserDetails(getState())
+  const roleSearchCriteria = getRoleSearchCriteria(userDetails?.role)
+  const roleData = await roleQueries.fetchRoles(roleSearchCriteria)
   const userData = await userQueries.searchUsers(primaryOfficeId)
 
   const roles = roleData.data.getRoles as Array<GQLRole>
