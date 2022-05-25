@@ -16,23 +16,29 @@ import {
   HOST,
   CHECK_INVALID_TOKEN,
   CERT_PUBLIC_KEY_PATH,
-  AUTH_URL
+  AUTH_URL,
+  HOSTNAME
 } from '@config/config/constants'
 import getRoutes from '@config/config/routes'
 import getPlugins from '@config/config/plugins'
 import * as database from '@config/config/database'
 import { validateFunc } from '@opencrvs/commons'
-
 import { readFileSync } from 'fs'
+import { logger } from '@config/logger'
 
 export const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
+  let whitelist: string[] = [HOSTNAME]
+  if (HOSTNAME[0] !== '*') {
+    whitelist = [`https://login.${HOSTNAME}`, `https://register.${HOSTNAME}`]
+  }
+  logger.info('Whitelist: ', JSON.stringify(whitelist))
   const server = new Hapi.Server({
     host: HOST,
     port: PORT,
     routes: {
-      cors: { origin: ['*'] },
+      cors: { origin: whitelist },
       payload: { maxBytes: 52428800 }
     }
   })

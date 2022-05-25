@@ -22,7 +22,7 @@ import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
 import { cloneDeep } from 'lodash'
 import { getStatusFromTask, findExtension } from '@gateway/features/fhir/utils'
-
+import { UserInputError } from 'apollo-server-hapi'
 const fetch = fetchAny as any
 
 const registerCertifyToken = jwt.sign(
@@ -178,7 +178,7 @@ beforeEach(() => {
 describe('Registration root resolvers', () => {
   describe('searchBirthRegistrations()', () => {
     it('throws an error if the user does not have sysadmin scope', async () => {
-      expect(
+      return expect(
         resolvers.Query.searchBirthRegistrations(
           {},
           {
@@ -225,7 +225,7 @@ describe('Registration root resolvers', () => {
 
   describe('searchDeathRegistrations()', () => {
     it('throws an error if the user does not have sysadmin scope', async () => {
-      expect(
+      return expect(
         resolvers.Query.searchDeathRegistrations(
           {},
           {
@@ -755,7 +755,6 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
-        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -811,7 +810,6 @@ describe('Registration root resolvers', () => {
         }
       )
       fetch.mockResponses(
-        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -914,7 +912,6 @@ describe('Registration root resolvers', () => {
 
     it('throws an error when invalid composition is returned', async () => {
       fetch.mockResponses(
-        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2401,7 +2398,7 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have required scope", async () => {
-      expect(
+      return expect(
         resolvers.Query.queryPersonByIdentifier(
           {},
           { identifier: '1234567898765' },
@@ -2472,7 +2469,7 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have required scope", async () => {
-      expect(
+      return expect(
         resolvers.Query.queryPersonByNidIdentifier(
           {},
           {
@@ -2521,7 +2518,7 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have required scope", async () => {
-      expect(
+      return expect(
         resolvers.Query.fetchRegistrationCountByStatus(
           {},
           {
@@ -2531,6 +2528,50 @@ describe('Registration root resolvers', () => {
           authHeaderCertify
         )
       ).rejects.toThrowError('User does not have enough scope')
+    })
+  })
+
+  describe('AttachmentInput type only accepts image/* mime type', () => {
+    it('throws an error if a non-supported file is uploaded', async () => {
+      return expect(
+        resolvers.Mutation.createBirthRegistration(
+          {},
+          {
+            details: {
+              registration: {
+                attachments: [
+                  {
+                    data: 'data:text/csv;base64,VHlwZSxEYXRldGltZSxBY2NvdW50LEFtb3VudCxWYWx1ZSxSYXRlLEZlZSxTdWIgVHlwZQ0K',
+                    subject: 'CHILD',
+                    type: 'NOTIFICATION_OF_BIRTH',
+                    contentType: 'text/csv'
+                  }
+                ]
+              }
+            }
+          }
+        )
+      ).rejects.toThrow(UserInputError)
+    })
+
+    it('throws an error if file base64 headers are manipulated', async () => {
+      return expect(
+        resolvers.Mutation.createDeathRegistration(
+          {},
+          {
+            details: {
+              registration: {
+                attachments: [
+                  {
+                    data: 'data:image/png;base64,VHlwZSxEYXRldGltZSxBY2NvdW50LEFtb3VudCxWYWx1ZSxSYXRlLEZlZSxTdWIgVHlwZQ0K',
+                    contentType: 'text/csv'
+                  }
+                ]
+              }
+            }
+          }
+        )
+      ).rejects.toThrow(UserInputError)
     })
   })
 })

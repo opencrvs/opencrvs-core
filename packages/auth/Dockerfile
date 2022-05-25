@@ -1,6 +1,5 @@
 FROM node:erbium-alpine
 WORKDIR /usr/src/app
-
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
 

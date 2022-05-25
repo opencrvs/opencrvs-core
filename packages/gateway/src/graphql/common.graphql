@@ -127,7 +127,7 @@ input RelatedPersonInput {
   _fhirID: ID # -> .id
   relationship: String
   otherRelationship: String
-  affidavit: [AttachmentInput]
+  affidavit: [AttachmentInput!]
   individual: PersonInput
 }
 
@@ -166,7 +166,7 @@ input PersonInput {
   # For order of birth 3 equals 3rd born
   multipleBirth: Int # Not in BDRIS2
   address: [AddressInput]
-  photo: [AttachmentInput]
+  photo: [AttachmentInput!]
   deceased: DeceasedInput
   nationality: [String] # In BDRIS2 for father and mother only
   educationalAttainment: EducationType # Not in BDRIS2

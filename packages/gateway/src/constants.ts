@@ -12,6 +12,7 @@
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost'
 export const HOST = process.env.HOST || '0.0.0.0'
 export const PORT = process.env.PORT || 7070
+export const HOSTNAME = process.env.HOSTNAME || '*'
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
