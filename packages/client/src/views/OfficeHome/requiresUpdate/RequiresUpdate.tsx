@@ -327,7 +327,7 @@ class RequiresUpdateComponent extends React.Component<
         : false
     return (
       <WQContentWrapper
-        title={intl.formatMessage(navigationMessages.requiresUpdateRegistrar)}
+        title={intl.formatMessage(navigationMessages.requiresUpdate)}
         isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
         paginationId={paginationId}

@@ -106,6 +106,8 @@ import {
 } from './ActionButtons'
 import { IActionDetailsData, GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
+import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -381,7 +383,6 @@ function RecordAuditBody({
       </DesktopDiv>
     )
   }
-
   if (!isDownloaded) {
     actions.push(
       ShowDownloadButton({
@@ -390,6 +391,13 @@ function RecordAuditBody({
         userDetails
       })
     )
+    desktopActionsView.push(actions[actions.length - 1])
+  } else {
+    if (draft?.submissionStatus === SUBMISSION_STATUS.DRAFT) {
+      actions.push(<Uploaded />)
+    } else {
+      actions.push(<Downloaded />)
+    }
     desktopActionsView.push(actions[actions.length - 1])
   }
 
@@ -590,26 +598,6 @@ function getBodyContent({
             language,
             trackingId
           )
-
-    // let declaration
-
-    // const draftDeclaration =
-    //   draft && getDraftDeclarationData(draft, resources, intl, trackingId)
-    // const wqDeclaration = getWQDeclarationData(
-    //   workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
-    //   language,
-    //   trackingId
-    // )
-
-    // if (draftDeclaration?.id && wqDeclaration?.id) {
-    //   if (draft && draft.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-    //     declaration = draftDeclaration
-    //   } else {
-    //     declaration = wqDeclaration
-    //   }
-    // } else {
-    //   declaration = draftDeclaration || wqDeclaration
-    // }
 
     return (
       <RecordAuditBody

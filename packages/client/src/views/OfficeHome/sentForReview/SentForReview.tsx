@@ -286,6 +286,8 @@ class SentForReviewComponent extends React.Component<
   }
 
   render() {
+    // Approval tab for registration clerk and registrar
+    // Review tab for field agent
     const { intl, queryData, paginationId, pageSize, onPageChange } = this.props
     const { data } = queryData
     const totalPages = this.props.queryData.data.totalItems

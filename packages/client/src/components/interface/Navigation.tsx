@@ -62,9 +62,8 @@ export const WORKQUEUE_TABS = {
   inProgress: 'progress',
   inProgressFieldAgent: 'progress/field-agents',
   sentForReview: 'sentForReview',
-  requiresUpdateAgent: 'requiresUpdateAgent',
   readyForReview: 'readyForReview',
-  requiresUpdateRegistrar: 'requiresUpdateRegistrar',
+  requiresUpdate: 'requiresUpdate',
   sentForApproval: 'approvals',
   readyToPrint: 'print',
   externalValidation: 'waitingValidation',
@@ -91,13 +90,13 @@ const USER_SCOPE: IUSER_SCOPE = {
   FIELD_AGENT: [
     WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.sentForReview,
-    WORKQUEUE_TABS.requiresUpdateAgent,
+    WORKQUEUE_TABS.requiresUpdate,
     GROUP_ID.declarationGroup
   ],
   REGISTRATION_AGENT: [
     WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.readyForReview,
-    WORKQUEUE_TABS.requiresUpdateRegistrar,
+    WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.sentForApproval,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
@@ -108,7 +107,7 @@ const USER_SCOPE: IUSER_SCOPE = {
   DISTRICT_REGISTRAR: [
     WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.readyForReview,
-    WORKQUEUE_TABS.requiresUpdateRegistrar,
+    WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
@@ -118,7 +117,7 @@ const USER_SCOPE: IUSER_SCOPE = {
   LOCAL_REGISTRAR: [
     WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.readyForReview,
-    WORKQUEUE_TABS.requiresUpdateRegistrar,
+    WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
@@ -330,14 +329,14 @@ export const NavigationView = (props: IFullProps) => {
             />
             <NavigationItem
               icon={() => <DeclarationIconSmall color={'red'} />}
-              id={`navigation_${WORKQUEUE_TABS.requiresUpdateAgent}`}
+              id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
               label={intl.formatMessage(
-                navigationMessages[WORKQUEUE_TABS.requiresUpdateAgent]
+                navigationMessages[WORKQUEUE_TABS.requiresUpdate]
               )}
               count={declarationCount.requiresUpdate}
-              isSelected={tabId === WORKQUEUE_TABS.requiresUpdateAgent}
+              isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
               onClick={() => {
-                props.goToHomeTab(WORKQUEUE_TABS.requiresUpdateAgent)
+                props.goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
                 menuCollapse && menuCollapse()
               }}
             />
@@ -391,24 +390,18 @@ export const NavigationView = (props: IFullProps) => {
                   )}
                 {userDetails?.role &&
                   USER_SCOPE[userDetails.role].includes(
-                    WORKQUEUE_TABS.requiresUpdateRegistrar
+                    WORKQUEUE_TABS.requiresUpdate
                   ) && (
                     <NavigationItem
                       icon={() => <DeclarationIconSmall color={'red'} />}
-                      id={`navigation_${WORKQUEUE_TABS.requiresUpdateRegistrar}`}
+                      id={`navigation_${WORKQUEUE_TABS.requiresUpdate}`}
                       label={intl.formatMessage(
-                        navigationMessages[
-                          WORKQUEUE_TABS.requiresUpdateRegistrar
-                        ]
+                        navigationMessages[WORKQUEUE_TABS.requiresUpdate]
                       )}
                       count={declarationCount.requiresUpdate}
-                      isSelected={
-                        tabId === WORKQUEUE_TABS.requiresUpdateRegistrar
-                      }
+                      isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
                       onClick={() => {
-                        props.goToHomeTab(
-                          WORKQUEUE_TABS.requiresUpdateRegistrar
-                        )
+                        props.goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
                         menuCollapse && menuCollapse()
                       }}
                     />

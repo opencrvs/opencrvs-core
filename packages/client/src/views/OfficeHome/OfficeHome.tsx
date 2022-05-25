@@ -47,7 +47,6 @@ import {
   NOTIFICATION_TYPE,
   Spinner
 } from '@opencrvs/components/lib/interface'
-import subYears from 'date-fns/subYears'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -140,12 +139,10 @@ interface IOfficeHomeState {
   healthSystemCurrentPage: number
   progressCurrentPage: number
   reviewCurrentPage: number
-  updatesCurrentPage: number
   approvalCurrentPage: number
   printCurrentPage: number
   externalValidationCurrentPage: number
-  sentForReviewCurrentPage: number
-  requireUpdatePage: number
+  requireUpdateCurrentPage: number
   showCertificateToast: boolean
 }
 
@@ -185,11 +182,9 @@ export class OfficeHomeView extends React.Component<
       healthSystemCurrentPage: 1,
       progressCurrentPage: 1,
       reviewCurrentPage: 1,
-      updatesCurrentPage: 1,
       approvalCurrentPage: 1,
       printCurrentPage: 1,
-      sentForReviewCurrentPage: 1,
-      requireUpdatePage: 1,
+      requireUpdateCurrentPage: 1,
       externalValidationCurrentPage: 1,
       showCertificateToast: Boolean(
         this.props.declarations.filter(
@@ -207,7 +202,7 @@ export class OfficeHomeView extends React.Component<
       Math.max(this.state.progressCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.healthSystemCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.reviewCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.updatesCurrentPage - 1, 0) * this.pageSize,
+      Math.max(this.state.requireUpdateCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.approvalCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.externalValidationCurrentPage - 1, 0) * this.pageSize,
       Math.max(this.state.printCurrentPage - 1, 0) * this.pageSize
@@ -236,15 +231,12 @@ export class OfficeHomeView extends React.Component<
         healthSystemCurrentPage: 1,
         progressCurrentPage: 1,
         reviewCurrentPage: 1,
-        updatesCurrentPage: 1,
         approvalCurrentPage: 1,
         printCurrentPage: 1,
-        sentForReviewCurrentPage: 1,
-        requireUpdatePage: 1
+        requireUpdateCurrentPage: 1,
+        externalValidationCurrentPage: 1
       })
-      if (!this.isFieldAgent) {
-        this.syncWorkqueue()
-      }
+      this.syncWorkqueue()
     }
   }
   userHasRegisterScope() {
@@ -291,8 +283,8 @@ export class OfficeHomeView extends React.Component<
           this.syncWorkqueue()
         })
         break
-      case WORKQUEUE_TABS.requiresUpdateRegistrar:
-        this.setState({ updatesCurrentPage: newPageNumber }, () => {
+      case WORKQUEUE_TABS.requiresUpdate:
+        this.setState({ requireUpdateCurrentPage: newPageNumber }, () => {
           this.syncWorkqueue()
         })
         break
@@ -307,16 +299,14 @@ export class OfficeHomeView extends React.Component<
         })
         break
       case WORKQUEUE_TABS.externalValidation:
-        this.setState(
-          { externalValidationCurrentPage: newPageNumber },
-          this.syncWorkqueue
-        )
-        break
-      case WORKQUEUE_TABS.requiresUpdateAgent:
-        this.setState({ requireUpdatePage: newPageNumber })
+        this.setState({ externalValidationCurrentPage: newPageNumber }, () => {
+          this.syncWorkqueue()
+        })
         break
       case WORKQUEUE_TABS.sentForReview:
-        this.setState({ sentForReviewCurrentPage: newPageNumber })
+        this.setState({ reviewCurrentPage: newPageNumber }, () => {
+          this.syncWorkqueue()
+        })
         break
       default:
         throw new Error(`Unknown tab id when changing page ${this.props.tabId}`)
@@ -328,12 +318,10 @@ export class OfficeHomeView extends React.Component<
     healthSystemCurrentPage: number,
     progressCurrentPage: number,
     reviewCurrentPage: number,
-    updatesCurrentPage: number,
     approvalCurrentPage: number,
     printCurrentPage: number,
     externalValidationCurrentPage: number,
-    sentForReviewCurrentPage: number,
-    requireUpdatePage: number
+    requireUpdateCurrentPage: number
   ) => {
     const {
       workqueue,
@@ -400,12 +388,12 @@ export class OfficeHomeView extends React.Component<
                   error={error}
                 />
               )}
-              {tabId === WORKQUEUE_TABS.requiresUpdateRegistrar && (
+              {tabId === WORKQUEUE_TABS.requiresUpdate && (
                 <RequiresUpdate
                   queryData={{
                     data: filteredData.rejectTab
                   }}
-                  paginationId={updatesCurrentPage}
+                  paginationId={requireUpdateCurrentPage}
                   pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
                   loading={loading}
@@ -458,19 +446,19 @@ export class OfficeHomeView extends React.Component<
                   queryData={{
                     data: filteredData.reviewTab
                   }}
-                  paginationId={approvalCurrentPage}
+                  paginationId={reviewCurrentPage}
                   pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
                   loading={loading}
                   error={error}
                 />
               )}
-              {tabId === WORKQUEUE_TABS.requiresUpdateAgent && (
+              {tabId === WORKQUEUE_TABS.requiresUpdate && (
                 <RequiresUpdate
                   queryData={{
                     data: filteredData.rejectTab
                   }}
-                  paginationId={updatesCurrentPage}
+                  paginationId={requireUpdateCurrentPage}
                   pageSize={this.pageSize}
                   onPageChange={this.onPageChange}
                   loading={loading}
@@ -491,12 +479,10 @@ export class OfficeHomeView extends React.Component<
       healthSystemCurrentPage,
       progressCurrentPage,
       reviewCurrentPage,
-      updatesCurrentPage,
       approvalCurrentPage,
       printCurrentPage,
-      sentForReviewCurrentPage,
       externalValidationCurrentPage,
-      requireUpdatePage
+      requireUpdateCurrentPage
     } = this.state
 
     return (
@@ -509,12 +495,10 @@ export class OfficeHomeView extends React.Component<
           healthSystemCurrentPage,
           progressCurrentPage,
           reviewCurrentPage,
-          updatesCurrentPage,
           approvalCurrentPage,
           printCurrentPage,
           externalValidationCurrentPage,
-          sentForReviewCurrentPage,
-          requireUpdatePage
+          requireUpdateCurrentPage
         )}
 
         <FABContainer>

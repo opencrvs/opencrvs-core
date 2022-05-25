@@ -16,8 +16,7 @@ interface INavigationMessages
   progress: MessageDescriptor
   readyForReview: MessageDescriptor
   sentForReview: MessageDescriptor
-  requiresUpdateRegistrar: MessageDescriptor
-  requiresUpdateAgent: MessageDescriptor
+  requiresUpdate: MessageDescriptor
   approvals: MessageDescriptor
   waitingValidation: MessageDescriptor //Waiting for validation',
   print: MessageDescriptor
@@ -46,14 +45,9 @@ const messagesToDefine: INavigationMessages = {
     description: 'Sent for review label in navigation',
     id: 'navigation.sentForReview'
   },
-  requiresUpdateRegistrar: {
+  requiresUpdate: {
     defaultMessage: 'Requires update',
     description: 'Requires update label for registrar in navigation',
-    id: 'navigation.requiresUpdate'
-  },
-  requiresUpdateAgent: {
-    defaultMessage: 'Requires update',
-    description: 'Requires update label for field agent in navigation',
     id: 'navigation.requiresUpdate'
   },
   approvals: {
