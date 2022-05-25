@@ -19,6 +19,8 @@ import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
 import { badRequest } from '@hapi/boom'
 import { isValidSVGCode } from '@config/services/certificateService'
+import { verifyToken } from '@config/utils/verifyToken'
+import { RouteScope } from '@config/config/routes'
 interface IActivePayload {
   status: Status
   event: Event
@@ -41,12 +43,21 @@ export async function getActiveCertificatesHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const activeCertificates = await Certificate.find({
-    status: Status.ACTIVE,
-    event: { $in: [Event.BIRTH, Event.DEATH] }
-  })
+  const token = request.headers.authorization.replace('Bearer ', '')
+  const tokenDecoded = verifyToken(token)
+  const { scope } = tokenDecoded
 
-  return activeCertificates
+  if (
+    scope.includes(RouteScope.CERTIFY) ||
+    scope.includes(RouteScope.VALIDATE)
+  ) {
+    const activeCertificates = await Certificate.find({
+      status: Status.ACTIVE,
+      event: { $in: [Event.BIRTH, Event.DEATH] }
+    })
+    return activeCertificates
+  }
+  return {}
 }
 
 export async function createCertificateHandler(

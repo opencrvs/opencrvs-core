@@ -31,7 +31,7 @@ export default async function configHandler(
         getActiveCertificatesHandler(request, h),
         getQuestionsHandler(request, h),
         getFormDrafts(request, h),
-        ApplicationConfig.findOne({})
+        getApplicationConfig(request, h)
       ])
     return {
       config,
@@ -47,17 +47,30 @@ export default async function configHandler(
   }
 }
 
-export async function getApplicationConfigHandler(
+export async function getApplicationConfig(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  let appConfig: IApplicationConfigurationModel | null
+  let applicationConfig: IApplicationConfigurationModel | null
   try {
-    appConfig = await ApplicationConfig.findOne({})
+    applicationConfig = await ApplicationConfig.findOne({})
   } catch (error) {
     throw internal(error.message)
   }
-  const refineConfigResponse = pick(appConfig, [
+  return applicationConfig
+}
+
+export async function getLoginConfigHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  let loginConfig: IApplicationConfigurationModel | null
+  try {
+    loginConfig = await ApplicationConfig.findOne({})
+  } catch (error) {
+    throw internal(error.message)
+  }
+  const refineConfigResponse = pick(loginConfig, [
     'APPLICATION_NAME',
     'COUNTRY',
     'COUNTRY_LOGO',

@@ -373,37 +373,46 @@ function reducer(
     case actions.APPLICATION_CONFIG_LOADED: {
       const { certificates, config, formConfig } = action.payload
       merge(window.config, config)
-      const birthCertificateTemplate = find(certificates, {
-        event: 'birth',
-        status: 'ACTIVE'
-      }) as ICertificateTemplateData
+      let newOfflineData
 
-      const deathCertificateTemplate = find(certificates, {
-        event: 'death',
-        status: 'ACTIVE'
-      }) as ICertificateTemplateData
+      if (certificates.length) {
+        const birthCertificateTemplate = find(certificates, {
+          event: 'birth',
+          status: 'ACTIVE'
+        }) as ICertificateTemplateData
 
-      const certificatesTemplates = {
-        birth: { svgCode: birthCertificateTemplate.svgCode },
-        death: { svgCode: deathCertificateTemplate.svgCode }
-      } as IParsedCertificates
+        const deathCertificateTemplate = find(certificates, {
+          event: 'death',
+          status: 'ACTIVE'
+        }) as ICertificateTemplateData
 
-      const newOfflineData = {
-        ...state.offlineData,
-        config,
-        formConfig,
-        templates: {
-          certificates: {
-            birth: {
-              definition: certificatesTemplates.birth.svgCode
-            },
-            death: {
-              definition: certificatesTemplates.death.svgCode
+        const certificatesTemplates = {
+          birth: { svgCode: birthCertificateTemplate.svgCode },
+          death: { svgCode: deathCertificateTemplate.svgCode }
+        } as IParsedCertificates
+
+        newOfflineData = {
+          ...state.offlineData,
+          config,
+          formConfig,
+          templates: {
+            certificates: {
+              birth: {
+                definition: certificatesTemplates.birth.svgCode
+              },
+              death: {
+                definition: certificatesTemplates.death.svgCode
+              }
             }
           }
         }
+      } else {
+        newOfflineData = {
+          ...state.offlineData,
+          config,
+          formConfig
+        }
       }
-
       return {
         ...state,
         offlineDataLoaded: isOfflineDataLoaded(newOfflineData),
