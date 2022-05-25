@@ -984,7 +984,7 @@ input PersonInput {
   dateOfMarriage: Date
   multipleBirth: Int
   address: [AddressInput]
-  photo: [AttachmentInput]
+  photo: [AttachmentInput!]
   deceased: DeceasedInput
   nationality: [String]
   educationalAttainment: EducationType
@@ -1023,7 +1023,7 @@ input RegistrationInput {
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
-  attachments: [AttachmentInput]
+  attachments: [AttachmentInput!]
   certificates: [CertificateInput]
   location: LocationInput
   correction: CorrectionInput
@@ -1034,7 +1034,7 @@ input RelatedPersonInput {
   _fhirID: ID
   relationship: String
   otherRelationship: String
-  affidavit: [AttachmentInput]
+  affidavit: [AttachmentInput!]
   individual: PersonInput
 }
 
@@ -1076,7 +1076,7 @@ input UserIdentifierInput {
 }
 
 input SignatureInput {
-  data: String
+  data: String!
   type: String
 }
 
@@ -1328,7 +1328,7 @@ input AddressInput {
 input AttachmentInput {
   _fhirID: ID
   contentType: String
-  data: String
+  data: String!
   status: String
   originalFileName: String
   systemFileName: String
