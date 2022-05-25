@@ -18,7 +18,8 @@ import {
   CHECK_INVALID_TOKEN,
   AUTH_URL,
   PORT,
-  HOST
+  HOST,
+  HOSTNAME
 } from '@gateway/constants'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
@@ -28,15 +29,21 @@ import {
 } from 'apollo-server-hapi'
 import { getApolloConfig } from '@gateway/graphql/config'
 import * as database from '@gateway/features/user/database'
+import { logger } from '@gateway/logger'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
+  let whitelist: string[] = [HOSTNAME]
+  if (HOSTNAME[0] !== '*') {
+    whitelist = [`https://login.${HOSTNAME}`, `https://register.${HOSTNAME}`]
+  }
+  logger.info('Whitelist: ', JSON.stringify(whitelist))
   const app = new Hapi.Server({
     host: HOST,
     port: PORT,
     routes: {
-      cors: { origin: ['*'] },
+      cors: { origin: whitelist },
       payload: { maxBytes: 52428800 }
     }
   })

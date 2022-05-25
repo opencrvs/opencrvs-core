@@ -10,7 +10,5 @@
 
 echo 'environment variable COUNTRY_CONFIG_PATH must be set.  Currently:'
 echo $COUNTRY_CONFIG_PATH
-echo 'environment variable COUNTRY_CODE must be set: ie: bgd, zmb.  Currently:'
-echo $COUNTRY_CODE
 
-ts-node --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH $COUNTRY_CODE
+ts-node --compiler-options='{"module": "commonjs"}' -r tsconfig-paths/register src/extract-translations.ts -- $COUNTRY_CONFIG_PATH
