@@ -9,6 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import {
+  GQLAttachmentInput,
+  GQLBirthRegistrationInput,
+  GQLDeathRegistrationInput
+} from '@gateway/graphql/schema'
 import { fromBuffer } from 'file-type'
 
 export async function validateAttachments(
@@ -32,4 +37,37 @@ export async function validateAttachments(
       throw new Error(`File type doesn't match image/*`)
     }
   }
+}
+
+export function validateBirthDeclarationAttachments(
+  details: GQLBirthRegistrationInput
+) {
+  const attachments = [
+    details.registration?.attachments,
+    details.informant?.affidavit,
+    details.mother?.photo,
+    details.father?.photo,
+    details.child?.photo
+  ]
+    .flat()
+    .filter((x): x is GQLAttachmentInput => x !== undefined)
+
+  return validateAttachments(attachments)
+}
+
+export function validateDeathDeclarationAttachments(
+  details: GQLDeathRegistrationInput
+) {
+  const attachments = [
+    details.registration?.attachments,
+    details.informant?.affidavit,
+    details.mother?.photo,
+    details.father?.photo,
+    details.deceased?.photo,
+    details.spouse?.photo
+  ]
+    .flat()
+    .filter((x): x is GQLAttachmentInput => x !== undefined)
+
+  return validateAttachments(attachments)
 }

@@ -44,7 +44,11 @@ import fetch from 'node-fetch'
 import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
 import { updateTaskTemplate } from '@gateway/features/fhir/templates'
 import { UserInputError } from 'apollo-server-hapi'
-import { validateAttachments } from '@gateway/utils/validators'
+import {
+  validateAttachments,
+  validateBirthDeclarationAttachments,
+  validateDeathDeclarationAttachments
+} from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -251,18 +255,8 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createBirthRegistration(_, { details }, authHeader) {
-      const attachments = [
-        details.registration?.attachments,
-        details.informant?.affidavit,
-        details.mother?.photo,
-        details.father?.photo,
-        details.child?.photo
-      ]
-        .flat()
-        .filter((x): x is GQLAttachmentInput => x !== undefined)
-
       try {
-        await validateAttachments(attachments)
+        await validateBirthDeclarationAttachments(details)
       } catch (error) {
         throw new UserInputError(error.message)
       }
@@ -270,19 +264,8 @@ export const resolvers: GQLResolver = {
       return createEventRegistration(details, authHeader, EVENT_TYPE.BIRTH)
     },
     async createDeathRegistration(_, { details }, authHeader) {
-      const attachments = [
-        details.registration?.attachments,
-        details.informant?.affidavit,
-        details.mother?.photo,
-        details.father?.photo,
-        details.deceased?.photo,
-        details.spouse?.photo
-      ]
-        .flat()
-        .filter((x): x is GQLAttachmentInput => x !== undefined)
-
       try {
-        await validateAttachments(attachments)
+        await validateDeathDeclarationAttachments(details)
       } catch (error) {
         throw new UserInputError(error.message)
       }
