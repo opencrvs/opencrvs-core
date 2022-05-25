@@ -98,7 +98,12 @@ export default function getRoutes() {
         tags: ['api'],
         description: 'Retrieves certificate',
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: [
+            RouteScope.NATLSYSADMIN,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.VALIDATE
+          ]
         },
         validate: {
           payload: requestActiveCertificate
