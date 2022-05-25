@@ -1,7 +1,5 @@
 FROM node:erbium-alpine
 WORKDIR /usr/src/app
-ARG HOSTNAME
-ENV HOSTNAME=$HOSTNAME
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
 
