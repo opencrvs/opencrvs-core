@@ -378,7 +378,7 @@ input RegistrationInput {
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
-  attachments: [AttachmentInput]
+  attachments: [AttachmentInput!]
   certificates: [CertificateInput]
   location: LocationInput
   correction: CorrectionInput
@@ -431,7 +431,7 @@ input AttachmentInput {
   _fhirID: ID
   contentType: String
   # base64
-  data: String
+  data: String!
   # approved/validated/deleted
   status: String
   originalFileName: String

@@ -42,6 +42,11 @@ import {
 import fetch from 'node-fetch'
 import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
 import { updateTaskTemplate } from '@gateway/features/fhir/templates'
+import { UserInputError } from 'apollo-server-hapi'
+import {
+  validateBirthDeclarationAttachments,
+  validateDeathDeclarationAttachments
+} from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -248,18 +253,22 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createBirthRegistration(_, { details }, authHeader) {
-      return await createEventRegistration(
-        details,
-        authHeader,
-        EVENT_TYPE.BIRTH
-      )
+      try {
+        await validateBirthDeclarationAttachments(details)
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
+
+      return createEventRegistration(details, authHeader, EVENT_TYPE.BIRTH)
     },
     async createDeathRegistration(_, { details }, authHeader) {
-      return await createEventRegistration(
-        details,
-        authHeader,
-        EVENT_TYPE.DEATH
-      )
+      try {
+        await validateDeathDeclarationAttachments(details)
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
+
+      return createEventRegistration(details, authHeader, EVENT_TYPE.DEATH)
     },
     async updateBirthRegistration(_, { details }, authHeader) {
       if (
@@ -532,15 +541,16 @@ export const resolvers: GQLResolver = {
 }
 
 async function createEventRegistration(
-  details: any,
+  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
-  const duplicateCompostion = await lookForDuplicate(
-    details && details.registration && details.registration.draftId,
-    authHeader
-  )
+  const draftId =
+    details && details.registration && details.registration.draftId
+
+  const duplicateCompostion =
+    draftId && (await lookForDuplicate(draftId, authHeader))
 
   if (duplicateCompostion) {
     if (hasScope(authHeader, 'register')) {
@@ -570,7 +580,7 @@ export async function lookForDuplicate(
   identifier: string,
   authHeader: IAuthHeader
 ) {
-  const taskBundle = await fetchFHIR(
+  const taskBundle = await fetchFHIR<fhir.Bundle>(
     `/Task?identifier=${identifier}`,
     authHeader
   )
