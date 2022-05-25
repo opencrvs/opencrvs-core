@@ -17,71 +17,23 @@ export interface ICodeVerifyData {
   nonce: string
   code: string
 }
-interface IBirth {
-  REGISTRATION_TARGET: number
-  LATE_REGISTRATION_TARGET: number
-  FEE: {
-    ON_TIME: number
-    LATE: number
-    DELAYED: number
-  }
-}
-interface IDeath {
-  REGISTRATION_TARGET: number
-  FEE: {
-    ON_TIME: number
-    DELAYED: number
-  }
-}
-export interface ICertificateTemplateData {
-  event: string
-  status: string
-  svgCode: string
-  svgDateCreated: number
-  svgDateUpdated: number
-  svgFilename: string
-  user: string
-  _id: string
-}
-
 export interface ICountryLogo {
   fileName: string
   file: string
 }
-
-interface ICurrency {
-  isoCode: string
-  languagesAndCountry: string[]
-}
 export interface IApplicationConfig {
   APPLICATION_NAME: string
-  BACKGROUND_SYNC_BROADCAST_CHANNEL: string
-  BIRTH: IBirth
   COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
-  CURRENCY: ICurrency
   COUNTRY_LOGO_RENDER_WIDTH: number
   COUNTRY_LOGO_RENDER_HEIGHT: number
   DESKTOP_TIME_OUT_MILLISECONDS: number
-  DEATH: IDeath
-  LANGUAGES: string
-  UI_POLLING_INTERVAL: number
-  FIELD_AGENT_AUDIT_LOCATIONS: string
-  DECLARATION_AUDIT_LOCATIONS: string
-  INFORMANT_MINIMUM_AGE: number
-  HIDE_EVENT_REGISTER_INFORMATION: boolean
-  EXTERNAL_VALIDATION_WORKQUEUE: boolean
   SENTRY: string
   LOGROCKET: string
-  PHONE_NUMBER_PATTERN: string
-  NID_NUMBER_PATTERN: string
-  ADDRESSES: number
 }
 
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
-  certificates: ICertificateTemplateData[]
-  formConfig: any // using any because it is not used in login app.  No need to use type.
 }
 
 export interface IAuthenticationData {
@@ -137,7 +89,7 @@ function request<T>(options: AxiosRequestConfig) {
 
 const getApplicationConfig = () => {
   return request<IApplicationConfigResponse>({
-    url: resolve(window.config.CONFIG_API_URL, '/config'),
+    url: resolve(window.config.CONFIG_API_URL, '/applicationConfig'),
     method: 'GET'
   })
 }

@@ -19,7 +19,8 @@ import {
   updateCertificate,
   updateCertificateHandler
 } from '@config/handlers/certificate/certificateHandler'
-import applicationConfigHandler, {
+import configHandler, {
+  getApplicationConfigHandler,
   updateApplicationConfig,
   updateApplicationConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
@@ -72,7 +73,17 @@ export default function getRoutes() {
     {
       method: 'GET',
       path: '/config',
-      handler: applicationConfigHandler,
+      handler: configHandler,
+      config: {
+        auth: false,
+        tags: ['api'],
+        description: 'Retrieve all configuration'
+      }
+    },
+    {
+      method: 'GET',
+      path: '/applicationConfig',
+      handler: getApplicationConfigHandler,
       config: {
         auth: false,
         tags: ['api'],

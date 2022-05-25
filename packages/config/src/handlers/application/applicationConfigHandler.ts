@@ -14,14 +14,14 @@ import ApplicationConfig, {
   IApplicationConfigurationModel
 } from '@config/models/config' //   IApplicationConfigurationModel
 import { logger } from '@config/config/logger'
-import { badRequest } from '@hapi/boom'
+import { badRequest, internal } from '@hapi/boom'
 import * as Joi from 'joi'
-import { merge } from 'lodash'
+import { merge, pick } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
 import getFormDrafts from '@config/handlers/formDraft/getFormDraft/handler'
 
-export default async function applicationHandler(
+export default async function configHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -45,6 +45,29 @@ export default async function applicationHandler(
     logger.error(ex)
     return {}
   }
+}
+
+export async function getApplicationConfigHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  let appConfig: IApplicationConfigurationModel | null
+  try {
+    appConfig = await ApplicationConfig.findOne({})
+  } catch (error) {
+    throw internal(error.message)
+  }
+  const refineConfigResponse = pick(appConfig, [
+    'APPLICATION_NAME',
+    'COUNTRY',
+    'COUNTRY_LOGO',
+    'COUNTRY_LOGO_RENDER_WIDTH',
+    'COUNTRY_LOGO_RENDER_HEIGHT',
+    'DESKTOP_TIME_OUT_MILLISECONDS',
+    'SENTRY',
+    'LOGROCKET'
+  ])
+  return { config: refineConfigResponse }
 }
 
 export async function updateApplicationConfigHandler(
