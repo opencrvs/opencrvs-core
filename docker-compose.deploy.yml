@@ -95,6 +95,9 @@ services:
         - 'traefik.frontend.rule=Host: kibana.{{hostname}}'
         - 'traefik.port=5601'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
     networks:
       - overlay_net
     environment:
@@ -284,6 +287,9 @@ services:
         - 'traefik.frontend.rule=Host: register.{{hostname}},{{hostname}}'
         - 'traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)'
         - 'traefik.frontend.redirect.replacement=https://register.{{hostname}}/$${1}'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
         - 'traefik.port=80'
         - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
@@ -297,6 +303,9 @@ services:
         - 'traefik.frontend.rule=Host: styleguide.{{hostname}},{{hostname}}'
         - 'traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)'
         - 'traefik.frontend.redirect.replacement=https://styleguide.{{hostname}}/$${1}'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
         - 'traefik.port=80'
         - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
@@ -310,6 +319,9 @@ services:
         - 'traefik.frontend.rule=Host: countryconfig.{{hostname}}'
         - 'traefik.port=3040'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
       replicas: 2
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
@@ -326,6 +338,9 @@ services:
         - 'traefik.frontend.rule=Host: login.{{hostname}}'
         - 'traefik.port=80'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
       replicas: 2
     networks:
       - overlay_net
@@ -345,6 +360,9 @@ services:
         - 'traefik.frontend.rule=Host: auth.{{hostname}}'
         - 'traefik.port=4040'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
       replicas: 2
     networks:
       - overlay_net
@@ -384,6 +402,9 @@ services:
         - 'traefik.frontend.rule=Host: gateway.{{hostname}}'
         - 'traefik.port=7070'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
       replicas: 2
     networks:
       - overlay_net
@@ -435,6 +456,9 @@ services:
         - 'traefik.frontend.rule=Host: config.{{hostname}}'
         - 'traefik.port=2021'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
       replicas: 2
     networks:
       - overlay_net
@@ -473,6 +497,9 @@ services:
         - 'traefik.openhim-api.port=8080'
         - 'traefik.router.frontend.rule=Host: api.{{hostname}}'
         - 'traefik.router.port=5001'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
       replicas: 2
     networks:
       - overlay_net
@@ -484,6 +511,9 @@ services:
         - 'traefik.frontend.rule=Host: openhim.{{hostname}}'
         - 'traefik.port=80'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
       replicas: 2
     configs:
       - source: openhim-console-conf.{{ts}}
@@ -523,6 +553,9 @@ services:
         - 'traefik.frontend.rule=Host: webhooks.{{hostname}}'
         - 'traefik.port=2525'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
       replicas: 2
     networks:
       - overlay_net
