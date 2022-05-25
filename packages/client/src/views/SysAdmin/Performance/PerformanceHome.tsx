@@ -293,7 +293,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
           onChange={(option) => this.setState({ event: option.value as Event })}
           id="eventSelect"
           withLightTheme={true}
-          defaultWidth={100}
+          defaultWidth={110}
           value={this.state.event}
           options={[
             {

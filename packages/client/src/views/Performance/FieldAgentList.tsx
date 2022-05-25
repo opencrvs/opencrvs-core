@@ -425,7 +425,7 @@ function FieldAgentListComponent(props: IProps) {
               }}
               id="event-select"
               withLightTheme={true}
-              defaultWidth={100}
+              defaultWidth={110}
               value={event}
               options={[
                 {

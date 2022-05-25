@@ -18,7 +18,11 @@ import {
   ChevronLeft,
   ChevronRight
 } from '@opencrvs/components/lib/icons'
-import { CircleButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  CircleButton,
+  PrimaryButton,
+  SecondaryButton
+} from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { IActionObject } from '@opencrvs/components/lib/interface'
@@ -109,43 +113,16 @@ interface MonthSelectorProps {
   selectedDate: Date
 }
 
-export const PickerButton = styled.button`
-  min-width: 200px;
-  border: 2px solid ${({ theme }) => theme.colors.secondary};
-  border-radius: 2px;
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
-  }
-
-  &:active {
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
-  }
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.grey100};
-  }
-  &:disabled {
-    background: ${({ theme }) => theme.colors.grey100};
-    border: 2px solid ${({ theme }) => theme.colors.grey200};
-  }
-  white-space: nowrap;
-  padding: 0;
+export const PickerButton = styled(SecondaryButton)`
   height: 32px;
-  background: transparent;
-  & > div {
-    padding: 0 8px;
-    height: 100%;
-  }
+  padding: 0;
 `
-
 export const ContentWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
   align-items: center;
-  ${({ theme }) => theme.fonts.reg14};
-  color: ${({ theme }) => theme.colors.tertiary};
+  ${({ theme }) => theme.fonts.bold14};
 
   & > svg {
     margin-left: 8px;
