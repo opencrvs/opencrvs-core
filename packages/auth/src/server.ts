@@ -11,7 +11,7 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import { AUTH_HOST, AUTH_PORT } from '@auth/constants'
+import { AUTH_HOST, AUTH_PORT, HOSTNAME } from '@auth/constants'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
@@ -62,13 +62,26 @@ import {
   registerSystemClient,
   registerRquestSchema
 } from '@auth/features/system/handler'
+import { logger } from '@auth/logger'
 
 export async function createServer() {
+  logger.info('HOSTNAME: ', HOSTNAME)
+  let whitelist: string[] = [HOSTNAME]
+  logger.info('Whitelist before: ', JSON.stringify(whitelist))
+  if (HOSTNAME[0] !== '*') {
+    logger.info('should populate:')
+    whitelist = [
+      `https://countryconfig.${HOSTNAME}`,
+      `https://login.${HOSTNAME}`,
+      `https://register.${HOSTNAME}`
+    ]
+  }
+  logger.info('Whitelist: ', JSON.stringify(whitelist))
   const server = new Hapi.Server({
     host: AUTH_HOST,
     port: AUTH_PORT,
     routes: {
-      cors: { origin: ['*'] },
+      cors: { origin: whitelist },
       payload: { maxBytes: 52428800 }
     }
   })

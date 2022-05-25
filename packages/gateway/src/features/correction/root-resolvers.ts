@@ -15,11 +15,21 @@ import { hasScope } from '@gateway/features/user/utils'
 import { buildFHIRBundle } from '@gateway/features/registration/fhir-builders'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import { fetchFHIR, getIDFromResponse } from '@gateway/features/fhir/utils'
+import {
+  validateBirthDeclarationAttachments,
+  validateDeathDeclarationAttachments
+} from '@gateway/utils/validators'
+import { UserInputError } from 'apollo-server-hapi'
 
 export const resolvers: GQLResolver = {
   Mutation: {
     async requestBirthRegistrationCorrection(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'register')) {
+        try {
+          await validateBirthDeclarationAttachments(details)
+        } catch (error) {
+          throw new UserInputError(error.message)
+        }
         return await requestEventRegistrationCorrection(
           id,
           authHeader,
@@ -32,6 +42,11 @@ export const resolvers: GQLResolver = {
     },
     async requestDeathRegistrationCorrection(_, { id, details }, authHeader) {
       if (hasScope(authHeader, 'register')) {
+        try {
+          await validateDeathDeclarationAttachments(details)
+        } catch (error) {
+          throw new UserInputError(error.message)
+        }
         return await requestEventRegistrationCorrection(
           id,
           authHeader,
