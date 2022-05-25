@@ -33,7 +33,7 @@ export async function createServer() {
   if (HOSTNAME[0] !== '*') {
     whitelist = [`https://login.${HOSTNAME}`, `https://register.${HOSTNAME}`]
   }
-  logger.info('Whitelist: ', JSON.stringify(whitelist))
+  logger.info(`Whitelist: : ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
     host: HOST,
     port: PORT,

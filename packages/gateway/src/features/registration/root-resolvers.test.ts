@@ -1290,7 +1290,7 @@ describe('Registration root resolvers', () => {
       )
     })
 
-    it('throws error if no task entry found by given id', async () => {
+    it('throws error if no task entry found by given id', () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       fetch.mockResponseOnce(
         JSON.stringify({

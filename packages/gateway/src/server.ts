@@ -34,14 +34,14 @@ import { logger } from '@gateway/logger'
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 export async function createServer() {
-  logger.info('HOSTNAME: ', HOSTNAME)
+  logger.info(`HOSTNAME: ${HOSTNAME}`)
   let whitelist: string[] = [HOSTNAME]
-  logger.info('Whitelist before: ', JSON.stringify(whitelist))
+  logger.info(`Whitelist before: ${JSON.stringify(whitelist)}`)
   if (HOSTNAME[0] !== '*') {
     logger.info('should populate:')
     whitelist = [`https://login.${HOSTNAME}`, `https://register.${HOSTNAME}`]
   }
-  logger.info('Whitelist: ', JSON.stringify(whitelist))
+  logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const app = new Hapi.Server({
     host: HOST,
     port: PORT,
@@ -90,7 +90,10 @@ export async function createServer() {
     await app.start()
     await database.start()
     await apolloServer.applyMiddleware({
-      app
+      app,
+      cors: {
+        origin: whitelist
+      }
     })
     app.log('info', `server started on port ${PORT}`)
   }
