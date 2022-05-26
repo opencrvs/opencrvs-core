@@ -91,7 +91,7 @@ const CanvasContainer = styled.div`
   flex: 0 1 800px;
   margin-left: 40px;
   margin-right: 40px;
-  margin-top: 18px;
+  padding-top: 18px;
 `
 
 const CanvasWrapper = styled.div`
