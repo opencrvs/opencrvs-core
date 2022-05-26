@@ -377,6 +377,7 @@ export function configureRegistrationForm(
       const field: SerializedFormField =
         groupFields[defaultPropCustomisation.defaultField.index]
       field.required = defaultPropCustomisation.question.required
+      field.enabled = defaultPropCustomisation.question.enabled
 
       // removing hidden fields should be the last thing to do after repositioning all default and custom fields vertically
       if (

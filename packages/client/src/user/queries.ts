@@ -71,10 +71,6 @@ export const GET_USER = gql`
           value
         }
       }
-      signature {
-        type
-        data
-      }
       creationDate
       avatar {
         type

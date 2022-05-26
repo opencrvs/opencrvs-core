@@ -13,7 +13,7 @@ import * as React from 'react'
 import ReactSelect, { components } from 'react-select'
 import styled from 'styled-components'
 import { IndicatorProps } from 'react-select/lib/components/indicators'
-import { KeyboardArrowDown } from '../icons'
+import { ArrowDownBlue } from '../icons'
 
 export interface ISelectOption {
   value: string
@@ -40,37 +40,26 @@ const StyledSelect = styled(ReactSelect)<{
 
   .react-select__control {
     ${({ defaultWidth }) =>
-      defaultWidth ? `min-width: ${defaultWidth}px` : 'min-width: 160px'};
-    background-color: ${({ theme, withLightTheme }) =>
-      withLightTheme ? theme.colors.white : theme.colors.secondary} !important;
+      defaultWidth ? `min-width: ${defaultWidth}px` : 'min-width: 240px'};
+    background-color: ${({ theme }) => theme.colors.white};
     justify-content: center;
-    ${({ theme }) => theme.fonts.reg14};
-    text-transform: none;
     min-height: 32px;
     max-height: 32px;
-    border: 2px solid ${({ theme }) => theme.colors.secondary};
+    ${({ theme }) => theme.fonts.bold14};
+    text-transform: none;
+    border: 2px solid ${({ theme }) => theme.colors.primary};
     &:hover {
-      border: 2px solid ${({ theme }) => theme.colors.secondary};
-      ${({ theme, withLightTheme }) =>
-        withLightTheme ? theme.colors.grey200 : theme.colors.grey400}
+      border: 2px solid ${({ theme }) => theme.colors.primary};
+      background-color: ${({ theme }) => theme.colors.grey100};
     }
+  }
+
+  .react-select__control--is-focused {
+    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
   }
 
   .react-select__indicator-separator {
     display: none;
-  }
-
-  .react-select__indicator {
-    height: 28px;
-    min-height: 28px;
-  }
-
-  .react-select__dropdown-indicator {
-    padding-top: 2px;
-    & > svg > path {
-      color: ${({ theme, withLightTheme }) =>
-        withLightTheme ? theme.colors.primary : theme.colors.white};
-    }
   }
 
   .react-select__menu {
@@ -79,14 +68,30 @@ const StyledSelect = styled(ReactSelect)<{
     ${({ theme }) => theme.fonts.reg14};
   }
 
-  .react-select__single-value {
-    color: ${({ theme, withLightTheme }) =>
-      withLightTheme ? theme.colors.primary : theme.colors.white};
-    margin-top: -1px;
+  .react-select__option {
+    background-color: ${({ theme }) => theme.colors.white};
   }
-  .react-select__control--is-focused {
-    background: ${({ theme }) => theme.colors.secondary};
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
+
+  .react-select__option--is-focused {
+    background-color: ${({ theme }) => theme.colors.grey100};
+    color: ${({ theme }) => theme.colors.copy};
+    &:active {
+      background: ${({ theme }) => theme.colors.grey200};
+      color: ${({ theme }) => theme.colors.copy};
+    }
+  }
+
+  .react-select__option--is-selected {
+    background-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.white};
+    &:active {
+      background: ${({ theme }) => theme.colors.indigoDark};
+      color: ${({ theme }) => theme.colors.white};
+    }
+  }
+
+  .react-select__single-value {
+    color: ${({ theme }) => theme.colors.primary};
   }
 `
 
@@ -94,7 +99,7 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
   return (
     components.DropdownIndicator && (
       <components.DropdownIndicator {...props}>
-        <KeyboardArrowDown />
+        <ArrowDownBlue />
       </components.DropdownIndicator>
     )
   )

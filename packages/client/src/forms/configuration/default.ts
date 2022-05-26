@@ -1554,7 +1554,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: {
                   defaultMessage: 'No. of previous births',
                   description: 'Label for form field: multipleBirth',
-                  id: ' '
+                  id: 'form.field.label.multipleBirth'
                 },
                 conditionals: [
                   {

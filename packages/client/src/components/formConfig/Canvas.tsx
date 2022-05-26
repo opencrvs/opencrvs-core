@@ -192,11 +192,9 @@ export function Canvas({
                 dispatch(removeCustomField(selectedField.fieldId))
             }}
           >
-            {configField.previewGroupLabel && (
+            {configField.previewGroupLabel ? (
               <ConfigPlaceholder label={configField.previewGroupLabel} />
-            )}
-
-            {!configField.previewGroupLabel && (
+            ) : (
               <FormField configField={configField} />
             )}
           </FormConfigElementCard>
