@@ -20,12 +20,17 @@ import {
   IFormSectionGroup,
   SerializedFormField,
   IRadioOption,
+  ISelectOption,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   RADIO_GROUP,
   SELECT_WITH_OPTIONS,
   DOCUMENT_UPLOADER_WITH_OPTION,
   QuestionConfigFieldType,
-  ISerializedForm
+  ISerializedForm,
+  IRadioGroupFormField,
+  IRadioGroupWithNestedFieldsFormField,
+  ISelectFormFieldWithOptions,
+  IDocumentUploaderWithOptionsFormField
 } from '@client/forms'
 import { camelCase, keys } from 'lodash'
 import {
@@ -183,20 +188,38 @@ export function getFieldDefinition(
   return formField
 }
 
-export function getContentKeys(formField: IFormField) {
+function hasOptions(
+  formField: IFormField
+): formField is
+  | IRadioGroupFormField
+  | IRadioGroupWithNestedFieldsFormField
+  | ISelectFormFieldWithOptions
+  | IDocumentUploaderWithOptionsFormField {
   if (
-    (formField.type === RADIO_GROUP ||
-      formField.type === RADIO_GROUP_WITH_NESTED_FIELDS ||
-      formField.type === SELECT_WITH_OPTIONS ||
-      formField.type === DOCUMENT_UPLOADER_WITH_OPTION) &&
-    !['country', 'countryPermanent', 'nationality'].includes(formField.name)
+    formField.type === RADIO_GROUP ||
+    formField.type === RADIO_GROUP_WITH_NESTED_FIELDS ||
+    formField.type === SELECT_WITH_OPTIONS ||
+    formField.type === DOCUMENT_UPLOADER_WITH_OPTION
   ) {
-    const listedOptions = formField.options as IRadioOption[]
-    const listedContentKey = listedOptions.map((option) => option.label.id)
-    return listedContentKey
-  } else {
-    return [formField.label.id]
+    return true
   }
+  return false
+}
+
+export function getContentKeys(formField: IFormField) {
+  let contentKeys = [formField.label.id]
+  if (
+    hasOptions(formField) &&
+    !['country', 'countryPrimary', 'countrySecondary'].includes(formField.name)
+  ) {
+    contentKeys = contentKeys.concat(
+      /* We can remove this type assertion in typescript 4.2+ */
+      (formField.options as (ISelectOption | IRadioOption)[]).map(
+        (option) => option.label.id
+      )
+    )
+  }
+  return contentKeys
 }
 
 export function getCertificateHandlebar(formField: IFormField) {

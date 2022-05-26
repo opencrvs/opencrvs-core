@@ -1279,6 +1279,8 @@ export const typeResolvers: GQLResolver = {
         (observations &&
           observations.entry &&
           observations.entry[0] &&
+          observations.entry[0].resource &&
+          observations.entry[0].resource.valueQuantity &&
           observations.entry[0].resource.valueQuantity.value) ||
         null
       )
