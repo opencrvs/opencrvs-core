@@ -186,7 +186,6 @@ interface ICustomFieldState {
   selectedLanguage: string
   handleBars: string
   hideField: string
-  requiredField: boolean
   maxLength: number | undefined
   fieldForms: IFieldForms
 }
@@ -228,7 +227,6 @@ class CustomFieldFormsComp extends React.Component<
         camelCase(fieldForms[defaultLanguage].label),
       selectedLanguage: defaultLanguage,
       hideField: selectedField.enabled,
-      requiredField: selectedField.required || false,
       maxLength: selectedField.maxLength,
       fieldForms
     }
@@ -365,7 +363,6 @@ class CustomFieldFormsComp extends React.Component<
       description: optionalContent.description,
       errorMessage: optionalContent.errorMessage,
       fieldName: handleBars,
-      required: this.state.requiredField,
       enabled: this.state.hideField,
       fieldId: newFieldID,
       label
@@ -437,7 +434,11 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   toggleButtons() {
-    const { intl } = this.props
+    const {
+      intl,
+      selectedField: { fieldId, required },
+      modifyConfigField
+    } = this.props
     return (
       <ListContainer>
         <H3>{this.getHeadingText()}</H3>
@@ -449,9 +450,9 @@ class CustomFieldFormsComp extends React.Component<
           <ListColumn>
             <RightAlignment>
               <Toggle
-                defaultChecked={this.state.requiredField}
+                defaultChecked={required}
                 onChange={() => {
-                  this.setState({ requiredField: !this.state.requiredField })
+                  modifyConfigField(fieldId, { required: !required })
                 }}
               />
             </RightAlignment>
