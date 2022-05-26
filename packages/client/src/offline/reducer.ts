@@ -395,12 +395,12 @@ function reducer(
             }
           }
         }
-      }
-
-      newOfflineData = {
-        ...state.offlineData,
-        config,
-        formConfig
+      } else {
+        newOfflineData = {
+          ...state.offlineData,
+          config,
+          formConfig
+        }
       }
 
       return {
