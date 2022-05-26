@@ -172,6 +172,7 @@ class UserReviewFormComponent extends React.Component<
         <SimpleDocumentUploader
           label={intl.formatMessage(field.label)}
           disableDeleteInPreview={true}
+          hideTrashBtn={true}
           name={field.name}
           onComplete={(file) => {
             this.props.modify({ ...this.props.formData, [field.name]: file })

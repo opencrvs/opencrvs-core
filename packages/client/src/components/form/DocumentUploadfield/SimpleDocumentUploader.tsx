@@ -53,6 +53,7 @@ type IFullProps = {
   allowedDocType?: string[]
   error?: string
   disableDeleteInPreview?: boolean
+  hideTrashBtn?: boolean
   onComplete: (files: IAttachmentValue | {}) => void
   touched?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
@@ -185,6 +186,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
           label={label}
           onDelete={this.onDelete}
           processingDocuments={this.state.filesBeingUploaded}
+          hideTrashBtn={this.props.hideTrashBtn}
         />
         {this.state.previewImage && (
           <DocumentPreview

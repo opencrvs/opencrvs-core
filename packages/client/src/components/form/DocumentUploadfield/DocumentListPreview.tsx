@@ -65,6 +65,7 @@ type IProps = {
   onSelect: (document: IFileValue | IAttachmentValue) => void
   dropdownOptions?: ISelectOption[]
   onDelete?: (image: IFileValue | IAttachmentValue) => void
+  hideTrashBtn?: boolean
 }
 
 class DocumentListPreviewComponent extends React.Component<IProps> {
@@ -136,13 +137,15 @@ class DocumentListPreviewComponent extends React.Component<IProps> {
               <PaperClip />
               <span>{this.getFormattedLabelForDocType(label) || label}</span>
             </PreviewLink>
-            <IconContainer>
-              <TertiaryButton
-                id="preview_delete"
-                icon={() => <Delete color="red" />}
-                onClick={() => onDelete && onDelete(attachment)}
-              />
-            </IconContainer>
+            {!this.props.hideTrashBtn && (
+              <IconContainer>
+                <TertiaryButton
+                  id="preview_delete"
+                  icon={() => <Delete color="red" />}
+                  onClick={() => onDelete && onDelete(attachment)}
+                />
+              </IconContainer>
+            )}
           </PreviewContainer>
         )}
       </Wrapper>
