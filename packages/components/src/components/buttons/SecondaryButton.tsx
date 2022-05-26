@@ -29,10 +29,6 @@ const StyledButton = styled(Button)`
   border: ${({ theme }) => `2px solid ${theme.colors.secondary}`};
   ${({ theme }) => theme.fonts.bold16};
 
-  & div {
-    padding-top: 2px;
-  }
-
   &:hover:enabled {
     border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
     color: ${({ theme }) => theme.colors.indigoDark};
