@@ -45,15 +45,6 @@ export enum LocationType {
   CRVS_OFFICE = 'CRVS_OFFICE',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE'
 }
-
-interface IParsedCertificates {
-  birth: {
-    svgCode: string
-  }
-  death: {
-    svgCode: string
-  }
-}
 export interface ILocation {
   id: string
   name: string
@@ -374,23 +365,21 @@ function reducer(
       const { certificates, config, formConfig } = action.payload
       merge(window.config, config)
       let newOfflineData
+      const birthCertificateTemplate = find(certificates, {
+        event: 'birth',
+        status: 'ACTIVE'
+      })
 
-      if (certificates.length) {
-        const birthCertificateTemplate = find(certificates, {
-          event: 'birth',
-          status: 'ACTIVE'
-        }) as ICertificateTemplateData
+      const deathCertificateTemplate = find(certificates, {
+        event: 'death',
+        status: 'ACTIVE'
+      })
 
-        const deathCertificateTemplate = find(certificates, {
-          event: 'death',
-          status: 'ACTIVE'
-        }) as ICertificateTemplateData
-
+      if (birthCertificateTemplate && deathCertificateTemplate) {
         const certificatesTemplates = {
           birth: { svgCode: birthCertificateTemplate.svgCode },
           death: { svgCode: deathCertificateTemplate.svgCode }
-        } as IParsedCertificates
-
+        }
         newOfflineData = {
           ...state.offlineData,
           config,
@@ -406,13 +395,14 @@ function reducer(
             }
           }
         }
-      } else {
-        newOfflineData = {
-          ...state.offlineData,
-          config,
-          formConfig
-        }
       }
+
+      newOfflineData = {
+        ...state.offlineData,
+        config,
+        formConfig
+      }
+
       return {
         ...state,
         offlineDataLoaded: isOfflineDataLoaded(newOfflineData),

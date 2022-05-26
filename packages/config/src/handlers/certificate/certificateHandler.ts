@@ -59,7 +59,7 @@ export async function getActiveCertificatesHandler(
     })
     return activeCertificates
   }
-  return {}
+  return []
 }
 
 export async function createCertificateHandler(
