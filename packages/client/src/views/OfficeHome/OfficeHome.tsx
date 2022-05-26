@@ -19,12 +19,7 @@ import {
 } from '@client/declarations'
 import { Header } from '@client/components/interface/Header/Header'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
-import {
-  goToEvents,
-  goToPage,
-  goToPrintCertificate,
-  goToReviewDuplicate
-} from '@client/navigation'
+import { goToEvents, goToPage, goToPrintCertificate } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
@@ -48,7 +43,6 @@ import {
   NOTIFICATION_TYPE,
   Spinner
 } from '@opencrvs/components/lib/interface'
-import subYears from 'date-fns/subYears'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -118,7 +112,6 @@ const BodyContainer = styled.div`
 
 interface IDispatchProps {
   goToPage: typeof goToPage
-  goToReviewDuplicate: typeof goToReviewDuplicate
   goToPrintCertificate: typeof goToPrintCertificate
   goToEvents: typeof goToEvents
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
@@ -244,7 +237,7 @@ export class OfficeHomeView extends React.Component<
     clearInterval(this.interval)
   }
 
-  componentDidUpdate(prevProps: IOfficeHomeProps, prevState: IOfficeHomeState) {
+  componentDidUpdate(prevProps: IOfficeHomeProps) {
     if (prevProps.tabId !== this.props.tabId) {
       this.setState({
         draftCurrentPage: 1,
@@ -600,7 +593,6 @@ export const OfficeHome = connect<
 >(mapStateToProps, {
   goToEvents,
   goToPage,
-  goToReviewDuplicate,
   goToPrintCertificate,
   updateRegistrarWorkqueue,
   updateFieldAgentDeclaredDeclarations

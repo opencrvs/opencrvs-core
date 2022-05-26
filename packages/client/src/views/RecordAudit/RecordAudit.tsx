@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
 import {
@@ -106,6 +105,7 @@ import {
 } from './ActionButtons'
 import { IActionDetailsData, GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
+import { DuplicateWarning } from './DuplicateWarning'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -601,11 +601,19 @@ function getBodyContent({
 }
 
 const RecordAuditComp = (props: IFullProps) => {
+  const { workqueueDeclaration } = props
   return (
     <>
       <DesktopHeader />
       <Navigation deselectAllTabs={true} />
-      <BodyContainer>{getBodyContent(props)}</BodyContainer>
+      <BodyContainer>
+        <DuplicateWarning
+          duplicateIds={workqueueDeclaration?.registration?.duplicates?.filter(
+            (duplicate): duplicate is string => !!duplicate
+          )}
+        />
+        {getBodyContent(props)}
+      </BodyContainer>
       <NotificationToast />
     </>
   )
