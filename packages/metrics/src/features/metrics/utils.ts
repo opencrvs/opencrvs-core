@@ -67,35 +67,6 @@ export enum EVENT_TYPE {
 
 export type Location = fhir.Location & { id: string }
 
-export async function getAgeIntervals() {
-  const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
-    'BIRTH'
-  )
-
-  return [
-    {
-      title: `${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}d`,
-      minAgeInDays: -1,
-      maxAgeInDays: Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS)
-    },
-    {
-      title: `${Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS) + 1}d - 1yr`,
-      minAgeInDays: Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS),
-      maxAgeInDays: 365
-    },
-    { title: '1yr', minAgeInDays: 366, maxAgeInDays: 730 },
-    { title: '2yr', minAgeInDays: 731, maxAgeInDays: 1095 },
-    { title: '3yr', minAgeInDays: 1096, maxAgeInDays: 1460 },
-    { title: '4yr', minAgeInDays: 1461, maxAgeInDays: 1825 },
-    { title: '5yr', minAgeInDays: 1826, maxAgeInDays: 2190 },
-    { title: '6yr', minAgeInDays: 2191, maxAgeInDays: 2555 },
-    { title: '7yr', minAgeInDays: 2556, maxAgeInDays: 2920 },
-    { title: '8yr', minAgeInDays: 2921, maxAgeInDays: 3285 },
-    { title: '9r', minAgeInDays: 3286, maxAgeInDays: 3650 },
-    { title: '10yr', minAgeInDays: 3651, maxAgeInDays: 4015 }
-  ]
-}
-
 export const calculateInterval = (startTime: string, endTime: string) => {
   const timeStartInMil = parseInt(startTime.substr(0, 13), 10)
   const timeEndInMil = parseInt(endTime.substr(0, 13), 10)
@@ -445,8 +416,11 @@ export function getMonthRangeFilterListFromTimeRage(
   return monthFilterList
 }
 
-export async function getRegistrationTargetDays(event: string) {
-  const applicationConfig = await getApplicationConfig()
+export async function getRegistrationTargetDays(
+  event: string,
+  authorization: string
+) {
+  const applicationConfig = await getApplicationConfig(authorization)
   const targetDays =
     event === EVENT_TYPE.BIRTH
       ? applicationConfig.BIRTH?.REGISTRATION_TARGET
@@ -455,9 +429,10 @@ export async function getRegistrationTargetDays(event: string) {
 }
 
 export async function getRegistrationLateTargetDays(
-  event: string
+  event: string,
+  authorization: string
 ): Promise<number | null> {
-  const applicationConfig = await getApplicationConfig()
+  const applicationConfig = await getApplicationConfig(authorization)
   const targetDays =
     event === EVENT_TYPE.BIRTH
       ? applicationConfig.BIRTH?.LATE_REGISTRATION_TARGET

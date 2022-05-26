@@ -45,15 +45,6 @@ export enum LocationType {
   CRVS_OFFICE = 'CRVS_OFFICE',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE'
 }
-
-interface IParsedCertificates {
-  birth: {
-    svgCode: string
-  }
-  death: {
-    svgCode: string
-  }
-}
 export interface ILocation {
   id: string
   name: string
@@ -373,34 +364,42 @@ function reducer(
     case actions.APPLICATION_CONFIG_LOADED: {
       const { certificates, config, formConfig } = action.payload
       merge(window.config, config)
+      let newOfflineData
       const birthCertificateTemplate = find(certificates, {
         event: 'birth',
         status: 'ACTIVE'
-      }) as ICertificateTemplateData
+      })
 
       const deathCertificateTemplate = find(certificates, {
         event: 'death',
         status: 'ACTIVE'
-      }) as ICertificateTemplateData
+      })
 
-      const certificatesTemplates = {
-        birth: { svgCode: birthCertificateTemplate.svgCode },
-        death: { svgCode: deathCertificateTemplate.svgCode }
-      } as IParsedCertificates
-
-      const newOfflineData = {
-        ...state.offlineData,
-        config,
-        formConfig,
-        templates: {
-          certificates: {
-            birth: {
-              definition: certificatesTemplates.birth.svgCode
-            },
-            death: {
-              definition: certificatesTemplates.death.svgCode
+      if (birthCertificateTemplate && deathCertificateTemplate) {
+        const certificatesTemplates = {
+          birth: { svgCode: birthCertificateTemplate.svgCode },
+          death: { svgCode: deathCertificateTemplate.svgCode }
+        }
+        newOfflineData = {
+          ...state.offlineData,
+          config,
+          formConfig,
+          templates: {
+            certificates: {
+              birth: {
+                definition: certificatesTemplates.birth.svgCode
+              },
+              death: {
+                definition: certificatesTemplates.death.svgCode
+              }
             }
           }
+        }
+      } else {
+        newOfflineData = {
+          ...state.offlineData,
+          config,
+          formConfig
         }
       }
 
