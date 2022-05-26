@@ -15,7 +15,6 @@ import {
   WITHIN_1_YEAR
 } from '@metrics/features/metrics/constants'
 import {
-  getAgeIntervals,
   calculateInterval,
   fetchEstimateByLocation,
   fetchEstimateForTargetDaysByLocationId,
@@ -101,24 +100,6 @@ interface IGenderBasisPoint {
   locationLevel3?: string
   locationLevel4?: string
   locationLevel5?: string
-}
-
-export async function regByAge(timeStart: string, timeEnd: string) {
-  const metricsData: any[] = []
-  const ageIntervals = await getAgeIntervals()
-  for (const ageInterval of ageIntervals) {
-    const points = await query(
-      // tslint:disable-next-line
-      `SELECT COUNT(ageInDays) FROM birth_registration WHERE time > ${timeStart} AND time <= ${timeEnd} AND ageInDays > ${ageInterval.minAgeInDays} AND ageInDays <= ${ageInterval.maxAgeInDays}`
-    )
-
-    metricsData.push({
-      label: ageInterval.title,
-      value: (points && points.length > 0 && points[0].count) || 0
-    })
-  }
-
-  return metricsData
 }
 
 type Payment = {
