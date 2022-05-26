@@ -32,7 +32,6 @@ import { getDefaultLanguage } from '@client/i18n/utils'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
 import {
   InputField,
   Select,
@@ -40,8 +39,11 @@ import {
   TextInput
 } from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { Tooltip } from '@opencrvs/components/lib/icons'
-import { Box } from '@opencrvs/components/lib/interface'
+import {
+  Box,
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface'
 import { camelCase, debounce } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
@@ -49,6 +51,7 @@ import { connect } from 'react-redux'
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import { getConfigFieldIdentifiers } from '@client/forms/configuration/formConfig/motionUtils'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
+import { Title, Label, RequiredToggleAction, StyledTooltip } from './components'
 
 const CInputField = styled(InputField)`
   label {
@@ -93,23 +96,11 @@ const FieldContainer = styled.div<{ hide?: boolean }>`
   }}
 `
 
-const RightAlignment = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-`
-
-const H3 = styled.h3`
-  ${({ theme }) => theme.fonts.h3};
-`
-
 const ListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   margin-bottom: 26px;
-`
-
-const GreyText = styled.span`
-  ${({ theme }) => theme.fonts.reg14};
-  color: ${({ theme }) => theme.colors.grey400};
 `
 
 const ListRow = styled.div`
@@ -136,11 +127,6 @@ const LanguageSelect = styled(Select)`
     ${({ theme }) => theme.fonts.reg14};
     color: ${({ theme }) => theme.colors.indigoDark};
   }
-`
-
-const StyledTooltip = styled(Tooltip)`
-  height: 16px;
-  width: 16px;
 `
 
 const ListColumn = styled.div`
@@ -194,7 +180,7 @@ interface IOptionalContent {
   [key: string]: IMessage[]
 }
 
-class CustomFieldFormsComp extends React.Component<
+class CustomFieldToolsComp extends React.Component<
   IFullProps,
   ICustomFieldState
 > {
@@ -434,30 +420,21 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   toggleButtons() {
-    const {
-      intl,
-      selectedField: { fieldId, required },
-      modifyConfigField
-    } = this.props
+    const { intl, selectedField } = this.props
     return (
       <ListContainer>
-        <H3>{this.getHeadingText()}</H3>
-        <ListRow>
-          <ListColumn>
-            {intl.formatMessage(customFieldFormMessages.requiredFieldLabel)}
-            <StyledTooltip />
-          </ListColumn>
-          <ListColumn>
-            <RightAlignment>
-              <Toggle
-                defaultChecked={required}
-                onChange={() => {
-                  modifyConfigField(fieldId, { required: !required })
-                }}
-              />
-            </RightAlignment>
-          </ListColumn>
-        </ListRow>
+        <Title>{this.getHeadingText()}</Title>
+        <ListViewSimplified bottomBorder>
+          <ListViewItemSimplified
+            label={
+              <Label>
+                {intl.formatMessage(customFieldFormMessages.requiredFieldLabel)}
+                <StyledTooltip />
+              </Label>
+            }
+            actions={<RequiredToggleAction {...selectedField} />}
+          />
+        </ListViewSimplified>
       </ListContainer>
     )
   }
@@ -678,7 +655,7 @@ const mapDispatchToProps = {
   modifyConfigField
 }
 
-export const CustomFieldForms = connect(
+export const CustomFieldTools = connect(
   mapStateToProps,
   mapDispatchToProps
-)(injectIntl(withFieldDefinition(CustomFieldFormsComp)))
+)(injectIntl(withFieldDefinition(CustomFieldToolsComp)))
