@@ -316,6 +316,11 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         userQueryData.data.getUser.role &&
         userQueryData.data.getUser.type
       ) {
+        // This logic combined with the function alterRolesBasedOnUserRole
+        // controls only showing unique user types in the case where 1 mayor should exist per location
+        // this functionality may be reintroduced in the future.
+        // for now types should only exist for field agents as per this requirement:
+        //
         const { role: existingRole, type: existingType } =
           userQueryData.data.getUser
         const roleData = (
@@ -350,6 +355,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           ).push({ value: existingRole, types: [existingType] })
         }
       }
+      console.log('data: ', JSON.stringify(data))
       updatedSections.forEach((section) => {
         section.groups.forEach((group) => {
           group.fields = transformRoleDataToDefinitions(
