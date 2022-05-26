@@ -150,7 +150,7 @@ export type AttachmentInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   contentType?: InputMaybe<Scalars['String']>
   createdAt?: InputMaybe<Scalars['Date']>
-  data?: InputMaybe<Scalars['String']>
+  data: Scalars['String']
   description?: InputMaybe<Scalars['String']>
   originalFileName?: InputMaybe<Scalars['String']>
   status?: InputMaybe<Scalars['String']>
@@ -1180,7 +1180,7 @@ export type PersonInput = {
   name?: InputMaybe<Array<InputMaybe<HumanNameInput>>>
   nationality?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   occupation?: InputMaybe<Scalars['String']>
-  photo?: InputMaybe<Array<InputMaybe<AttachmentInput>>>
+  photo?: InputMaybe<Array<AttachmentInput>>
   reasonNotApplying?: InputMaybe<Scalars['String']>
   telecom?: InputMaybe<Array<InputMaybe<ContactPointInput>>>
 }
@@ -1554,7 +1554,7 @@ export type RegistrationCountResult = {
 
 export type RegistrationInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
-  attachments?: InputMaybe<Array<InputMaybe<AttachmentInput>>>
+  attachments?: InputMaybe<Array<AttachmentInput>>
   book?: InputMaybe<Scalars['String']>
   certificates?: InputMaybe<Array<InputMaybe<CertificateInput>>>
   contact?: InputMaybe<Scalars['String']>
@@ -1614,7 +1614,7 @@ export type RelatedPerson = {
 
 export type RelatedPersonInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
-  affidavit?: InputMaybe<Array<InputMaybe<AttachmentInput>>>
+  affidavit?: InputMaybe<Array<AttachmentInput>>
   id?: InputMaybe<Scalars['ID']>
   individual?: InputMaybe<PersonInput>
   otherRelationship?: InputMaybe<Scalars['String']>
@@ -1669,7 +1669,7 @@ export type Signature = {
 }
 
 export type SignatureInput = {
-  data?: InputMaybe<Scalars['String']>
+  data: Scalars['String']
   type?: InputMaybe<Scalars['String']>
 }
 
@@ -2202,11 +2202,6 @@ export type GetUserQuery = {
         value?: string | null
       } | null> | null
     } | null> | null
-    signature?: {
-      __typename?: 'Signature'
-      type?: string | null
-      data?: string | null
-    } | null
     avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
   } | null
 }

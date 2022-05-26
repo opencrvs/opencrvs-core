@@ -29,7 +29,6 @@ function existsInContentful(obj: any, value: string): boolean {
 
 async function extractMessages() {
   const COUNTRY_CONFIG_PATH = process.argv[2]
-  const COUNTRY_CODE = process.argv[3]
 
   let client: {
     data: Array<{
@@ -43,7 +42,7 @@ async function extractMessages() {
     client = JSON.parse(
       fs
         .readFileSync(
-          `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
+          `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/client/client.json`
         )
         .toString()
     )
@@ -51,13 +50,13 @@ async function extractMessages() {
     contentfulIds = JSON.parse(
       fs
         .readFileSync(
-          `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-ids.json`
+          `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/client/contentful-ids.json`
         )
         .toString()
     )
   } catch (err) {
     console.error(
-      `Your environment variables may not be set. Please add valid COUNTRY_CONFIG_PATH, COUNTRY_CODE as environment variables.  If they are set correctly, then something is wrong with this file: ${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json or this file: ${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-ids.json`
+      `Your environment variables may not be set. Please add valid COUNTRY_CONFIG_PATH, as an environment variable.  If they are set correctly, then something is wrong with this file: ${COUNTRY_CONFIG_PATH}/src/features/languages/generated/client/client.json or this file: ${COUNTRY_CONFIG_PATH}/src/features/languages/generated/client/contentful-ids.json`
     )
     process.exit(1)
   }
@@ -95,7 +94,7 @@ async function extractMessages() {
               `ERROR: Missing content key: ${chalk.white(
                 key
               )}  Translate it and add it here: ${chalk.white(
-                `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
+                `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/client/client.json`
               )}`
             )}`
           )
@@ -113,7 +112,7 @@ async function extractMessages() {
             `${chalk.yellow(
               'When this script passes, OpenCRVS will save the new key'
             )} here ${chalk.white(
-              `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-keys-to-migrate.json`
+              `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/client/contentful-keys-to-migrate.json`
             )} and save the description into descriptions.json so that later you can import it into an existing or new Contentful installation.`
           )
           contentfulKeysToMigrate.push(key)
@@ -126,7 +125,7 @@ async function extractMessages() {
           `${chalk.red(
             'ERROR: Fix the missing keys in the local files: '
           )}${chalk.white(
-            `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/client.json`
+            `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/client/client.json`
           )}`
         )
         process.exit(1)
@@ -134,11 +133,11 @@ async function extractMessages() {
       }
 
       fs.writeFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/descriptions.json`,
+        `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/client/descriptions.json`,
         JSON.stringify({ data: reactIntlDescriptions }, null, 2)
       )
       fs.writeFileSync(
-        `${COUNTRY_CONFIG_PATH}/src/${COUNTRY_CODE}/features/languages/generated/client/contentful-keys-to-migrate.json`,
+        `${COUNTRY_CONFIG_PATH}/src/features/languages/generated/client/contentful-keys-to-migrate.json`,
         JSON.stringify(contentfulKeysToMigrate, null, 2)
       )
     })

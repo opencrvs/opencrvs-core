@@ -28,52 +28,41 @@ import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
 import { Value, DraftVersion } from './components'
 import { Pill } from '@opencrvs/components/lib/interface'
-import {
-  ActionStatus,
-  isDefaultDraft
-} from '@client/views/SysAdmin/Config/Forms/utils'
+import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import { ActionContext, Actions } from './ActionsModal'
+
+function ActionButton({
+  action,
+  event
+}: {
+  action: Actions.EDIT | Actions.PUBLISH
+  event: Event
+}) {
+  const intl = useIntl()
+  const { setAction } = React.useContext(ActionContext)
+
+  return (
+    <LinkButton
+      id={`${action.toLowerCase()}-btn`}
+      onClick={() => {
+        setAction({
+          action: action,
+          event: event,
+          status: ActionStatus.MODAL
+        })
+      }}
+    >
+      {intl.formatMessage(buttonMessages[action.toLowerCase()])}
+    </LinkButton>
+  )
+}
 
 function EventDrafts({ event }: { event: Event }) {
   const intl = useIntl()
   const formDraft = useSelector((store: IStoreState) =>
     selectFormDraft(store, event)
   )
-  const { setAction } = React.useContext(ActionContext)
-  const { updatedAt, comment, status, version } = formDraft
-
-  if (status === DraftStatus.DRAFT || status === DraftStatus.DELETED) {
-    return <></>
-  }
-
-  const actions = (
-    <>
-      <LinkButton
-        id="edit-btn"
-        onClick={() => {
-          setAction({
-            action: Actions.EDIT,
-            event: event,
-            status: ActionStatus.MODAL
-          })
-        }}
-      >
-        {intl.formatMessage(buttonMessages.edit)}
-      </LinkButton>
-      <LinkButton
-        id="publish-btn"
-        onClick={() => {
-          setAction({
-            action: Actions.PUBLISH,
-            event: event,
-            status: ActionStatus.MODAL
-          })
-        }}
-      >
-        {intl.formatMessage(buttonMessages.publish)}
-      </LinkButton>
-    </>
-  )
+  const { updatedAt, status, version } = formDraft
 
   return (
     <ListViewItemSimplified
@@ -81,23 +70,28 @@ function EventDrafts({ event }: { event: Event }) {
       label={<DraftVersion event={event} version={version} />}
       value={
         <Value>
-          {isDefaultDraft(formDraft)
-            ? comment
+          {status === DraftStatus.DRAFT || status === DraftStatus.DELETED
+            ? intl.formatMessage(messages.defaultComment)
             : intl.formatMessage(messages.previewDate, {
                 updatedAt
               })}
         </Value>
       }
       actions={
-        status === DraftStatus.PREVIEW ? (
-          actions
-        ) : (
+        status === DraftStatus.PUBLISHED ? (
           <Pill
             label={intl.formatMessage(
               draftStatusMessages[DraftStatus.PUBLISHED]
             )}
             type="active"
           />
+        ) : (
+          <>
+            {status === DraftStatus.PREVIEW && (
+              <ActionButton action={Actions.EDIT} event={event} />
+            )}
+            <ActionButton action={Actions.PUBLISH} event={event} />
+          </>
         )
       }
     />

@@ -860,7 +860,7 @@ export interface GQLPersonInput {
   dateOfMarriage?: GQLDate
   multipleBirth?: number
   address?: Array<GQLAddressInput | null>
-  photo?: Array<GQLAttachmentInput | null>
+  photo?: Array<GQLAttachmentInput>
   deceased?: GQLDeceasedInput
   nationality?: Array<string | null>
   educationalAttainment?: GQLEducationType
@@ -899,7 +899,7 @@ export interface GQLRegistrationInput {
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
   inCompleteFields?: string
-  attachments?: Array<GQLAttachmentInput | null>
+  attachments?: Array<GQLAttachmentInput>
   certificates?: Array<GQLCertificateInput | null>
   location?: GQLLocationInput
   correction?: GQLCorrectionInput
@@ -910,7 +910,7 @@ export interface GQLRelatedPersonInput {
   _fhirID?: string
   relationship?: string
   otherRelationship?: string
-  affidavit?: Array<GQLAttachmentInput | null>
+  affidavit?: Array<GQLAttachmentInput>
   individual?: GQLPersonInput
 }
 
@@ -952,7 +952,7 @@ export interface GQLUserIdentifierInput {
 }
 
 export interface GQLSignatureInput {
-  data?: string
+  data: string
   type?: string
 }
 
@@ -1204,7 +1204,7 @@ export interface GQLAddressInput {
 export interface GQLAttachmentInput {
   _fhirID?: string
   contentType?: string
-  data?: string
+  data: string
   status?: string
   originalFileName?: string
   systemFileName?: string
