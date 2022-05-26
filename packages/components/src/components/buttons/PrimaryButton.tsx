@@ -40,7 +40,6 @@ export const PrimaryButton = styled(Button)`
   }
 
   &:not([data-focus-visible-added]):disabled {
-    cursor: not-allowed;
     background: ${({ theme }) => theme.colors.grey300};
     color: ${({ theme }) => theme.colors.white};
     path {
