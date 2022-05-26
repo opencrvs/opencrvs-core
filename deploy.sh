@@ -268,8 +268,10 @@ else
     docker_stack_deploy "docker-compose.prod-deploy-3.yml -c docker-compose.countryconfig.prod-deploy.yml"
   elif [ "$REPLICAS" = "5" ]; then
     docker_stack_deploy "docker-compose.prod-deploy-5.yml -c docker-compose.countryconfig.prod-deploy.yml"
+  elif [ "$REPLICAS" = "1" ]; then
+    docker_stack_deploy "docker-compose.prod-deploy-1.yml -c docker-compose.countryconfig.prod-deploy.yml"
   else
-    echo "Unknown error running docker-compose on server as REPLICAS is not 3 or 5 in production."
+    echo "Unknown error running docker-compose on server as REPLICAS is not 1, 3 or 5."
     exit 1
   fi
 fi
