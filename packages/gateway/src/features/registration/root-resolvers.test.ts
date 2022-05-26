@@ -1824,7 +1824,7 @@ describe('Registration root resolvers', () => {
           { id: compositionID },
           authHeaderRegCert
         )
-      ).rejects.toThrowError('Task does not exist')
+      ).rejects.toThrow()
     })
 
     it("throws an error when the user doesn't have register scope", async () => {

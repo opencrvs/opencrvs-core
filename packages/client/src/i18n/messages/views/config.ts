@@ -175,7 +175,7 @@ const messagesToDefine: IConfigMessages = {
   },
   eventUpdatedTempDesc: {
     id: 'config.eventUpdatedTempDesc',
-    defaultMessage: 'Updated {lastModified, date, ::dd MMMM yyyy}',
+    defaultMessage: 'Updated {lastModified, date, ::MMMMddyyyy}',
     description: 'Label for updated birth certificate template'
   },
   deathDefaultTempDesc: {

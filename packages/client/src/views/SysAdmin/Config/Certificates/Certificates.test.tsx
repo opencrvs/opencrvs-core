@@ -14,7 +14,6 @@ import { createStore } from '@client/store'
 import { createTestComponent, flushPromises } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { CertificatesConfig } from './Certificates'
-import { GET_ACTIVE_CERTIFICATES } from '@client/certificate/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 describe('ConfigHome page when already has uploaded certificate template', () => {

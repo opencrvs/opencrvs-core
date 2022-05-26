@@ -37,11 +37,11 @@ export interface ICertificateTemplateData {
   event: Event
   status: string
   svgCode: string
-  svgDateCreated: number
-  svgDateUpdated: number
+  svgDateCreated: string
+  svgDateUpdated: string
   svgFilename: string
   user: string
-  _id: string
+  id: string
 }
 
 interface ICurrency {
@@ -96,17 +96,18 @@ export interface IApplicationConfigResponse {
 
 async function loadConfig(): Promise<IApplicationConfigResponse> {
   const url = `${window.config.CONFIG_API_URL}/config`
-
   const res = await fetch(url, {
     method: 'GET'
   })
-
   if (res && res.status !== 200) {
     throw Error(res.statusText)
   }
-
   const response = await res.json()
-
+  response.certificates = response.certificates.map(
+    ({ _id, ...rest }: { id?: string; _id: string }) => {
+      return { ...rest, id: _id }
+    }
+  )
   return response
 }
 

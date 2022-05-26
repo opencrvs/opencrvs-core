@@ -54,6 +54,7 @@ import {
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { updateOfflineCertificate } from '@client/offline/actions'
+import { ICertificateTemplateData } from '@client/utils/referenceApi'
 
 const HiddenInput = styled.input`
   display: none;
@@ -324,10 +325,10 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         status,
         event
       )
-      if (res && res.data) {
+      if (res && res.createOrUpdateCertificateSVG) {
         this.setState({ imageUploading: false })
         this.props.updateOfflineCertificate(
-          res.data.createOrUpdateCertificateSVG
+          res.createOrUpdateCertificateSVG as ICertificateTemplateData
         )
       }
     } catch (err) {

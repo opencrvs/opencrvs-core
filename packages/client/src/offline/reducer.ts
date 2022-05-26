@@ -50,13 +50,13 @@ interface IParsedCertificates {
     id: string
     svgCode: string
     svgFileName: string
-    lastModifiedDate: number
+    lastModifiedDate: string
   }
   death: {
     id: string
     svgCode: string
     svgFileName: string
-    lastModifiedDate: number
+    lastModifiedDate: string
   }
 }
 export interface ILocation {
@@ -413,38 +413,25 @@ function reducer(
 
       const certificatesTemplates = {
         birth: {
-          id: birthCertificateTemplate._id,
-          svgCode: birthCertificateTemplate.svgCode,
-          svgFileName: birthCertificateTemplate.svgFilename,
+          id: birthCertificateTemplate.id,
+          definition: birthCertificateTemplate.svgCode,
+          fileName: birthCertificateTemplate.svgFilename,
           lastModifiedDate: birthCertificateTemplate.svgDateUpdated
         },
         death: {
-          id: deathCertificateTemplate._id,
-          svgCode: deathCertificateTemplate.svgCode,
-          svgFileName: deathCertificateTemplate.svgFilename,
+          id: deathCertificateTemplate.id,
+          definition: deathCertificateTemplate.svgCode,
+          fileName: deathCertificateTemplate.svgFilename,
           lastModifiedDate: deathCertificateTemplate.svgDateUpdated
         }
-      } as IParsedCertificates
+      }
 
       const newOfflineData = {
         ...state.offlineData,
         config,
         formConfig,
         templates: {
-          certificates: {
-            birth: {
-              id: certificatesTemplates.birth.id,
-              definition: certificatesTemplates.birth.svgCode,
-              fileName: certificatesTemplates.birth.svgFileName,
-              lastModifiedDate: certificatesTemplates.birth.lastModifiedDate
-            },
-            death: {
-              id: certificatesTemplates.death.id,
-              definition: certificatesTemplates.death.svgCode,
-              fileName: certificatesTemplates.death.svgFileName,
-              lastModifiedDate: certificatesTemplates.death.lastModifiedDate
-            }
-          }
+          certificates: certificatesTemplates
         }
       }
 

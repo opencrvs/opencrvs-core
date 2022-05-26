@@ -31,7 +31,7 @@ export interface ISVGTemplate {
   vfs?: { [file: string]: string }
   transformers?: IFieldTransformer[]
   fileName: string
-  lastModifiedDate: number
+  lastModifiedDate: string
 }
 
 export type TransformerPayload =

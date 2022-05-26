@@ -333,14 +333,14 @@ export interface GQLRole {
 }
 
 export interface GQLCertificateSVG {
-  _id?: string
-  svgCode?: string
-  svgFilename?: string
-  svgDateUpdated?: string
-  svgDateCreated?: string
-  user?: string
-  event?: string
-  status?: string
+  id: string
+  svgCode: string
+  svgFilename: string
+  svgDateUpdated: string
+  svgDateCreated: string
+  user: string
+  event: string
+  status: string
 }
 
 export interface GQLQuestion {
@@ -3657,7 +3657,7 @@ export interface RoleToActiveResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLCertificateSVGTypeResolver<TParent = any> {
-  _id?: CertificateSVGTo_idResolver<TParent>
+  id?: CertificateSVGToIdResolver<TParent>
   svgCode?: CertificateSVGToSvgCodeResolver<TParent>
   svgFilename?: CertificateSVGToSvgFilenameResolver<TParent>
   svgDateUpdated?: CertificateSVGToSvgDateUpdatedResolver<TParent>
@@ -3667,7 +3667,7 @@ export interface GQLCertificateSVGTypeResolver<TParent = any> {
   status?: CertificateSVGToStatusResolver<TParent>
 }
 
-export interface CertificateSVGTo_idResolver<TParent = any, TResult = any> {
+export interface CertificateSVGToIdResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
