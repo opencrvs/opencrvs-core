@@ -81,7 +81,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
       ).toHaveLength(1)
     })
 
-    it.skip('should preview certificate template when clicked on preview', async () => {
+    it('should preview certificate template when clicked on preview', async () => {
       await waitForElement(
         testComponent,
         '#template-birth-action-menuToggleButton'
@@ -105,7 +105,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
       ).toHaveLength(1)
     })
 
-    it.skip('should go back from preview page if click on back arrow', async () => {
+    it('should go back from preview page if click on back arrow', async () => {
       await waitForElement(
         testComponent,
         '#template-birth-action-menuToggleButton'
