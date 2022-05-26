@@ -115,7 +115,11 @@ Ilanga District in Sulaka Province is meant to demonstrate a provincial district
 
 ### Field Agent
 
+A Social Worker in the captial city:
+
 Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+
+A Local Leader in a provincial district:
 
 Username: **patrick.gondwe** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
