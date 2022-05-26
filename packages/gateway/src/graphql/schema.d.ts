@@ -332,6 +332,17 @@ export interface GQLRole {
   active?: boolean
 }
 
+export interface GQLComparisonInput {
+  eq?: string
+  gt?: string
+  lt?: string
+  gte?: string
+  lte?: string
+  in?: Array<string>
+  ne?: string
+  nin?: Array<string>
+}
+
 export interface GQLCertificateSVG {
   _id?: string
   svgCode?: string
@@ -1970,7 +1981,7 @@ export interface QueryToGetEventsWithProgressResolver<
 
 export interface QueryToGetRolesArgs {
   title?: string
-  value?: string
+  value?: GQLComparisonInput
   type?: string
   active?: boolean
   sortBy?: string

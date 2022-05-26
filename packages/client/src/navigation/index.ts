@@ -56,7 +56,10 @@ import {
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME
 } from '@client/navigation/routes'
-import { NATL_ADMIN_ROLES } from '@client/utils/constants'
+import {
+  NATL_ADMIN_ROLES,
+  NATIONAL_REGISTRAR_ROLES
+} from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import {
@@ -569,7 +572,10 @@ export function goToPage(
 
 export function goToPerformanceView(userDetails: IUserDetails) {
   if (userDetails && userDetails.role) {
-    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+    if (
+      NATL_ADMIN_ROLES.includes(userDetails.role) ||
+      NATIONAL_REGISTRAR_ROLES.includes(userDetails.role)
+    ) {
       return goToPerformanceHome()
     } else {
       const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
