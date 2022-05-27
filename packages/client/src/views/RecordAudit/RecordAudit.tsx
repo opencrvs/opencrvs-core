@@ -204,6 +204,7 @@ function RecordAuditBody({
   clearCorrectionChange,
   declaration,
   draft,
+  duplicates,
   intl,
   goToCertificateCorrection,
   goToPrintCertificate,
@@ -219,6 +220,7 @@ function RecordAuditBody({
 }: {
   declaration: IDeclarationData
   draft: IDeclaration | null
+  duplicates?: string[]
   intl: IntlShape
   scope: Scope | null
   userDetails: IUserDetails | null
@@ -426,6 +428,11 @@ function RecordAuditBody({
   return (
     <>
       <MobileHeader {...mobileProps} key={'record-audit-mobile-header'} />
+      <DuplicateWarning
+        duplicateIds={duplicates?.filter(
+          (duplicate): duplicate is string => !!duplicate
+        )}
+      />
       <Content
         title={
           declaration.name || intl.formatMessage(recordAuditMessages.noName)
@@ -560,6 +567,9 @@ function getBodyContent({
                 )}
                 tab={tab}
                 draft={draft}
+                duplicates={data.fetchRegistration?.registration?.duplicates?.filter(
+                  (duplicate: string | null): duplicate is string => !!duplicate
+                )}
                 intl={intl}
                 scope={scope}
                 userDetails={userDetails}
@@ -591,6 +601,9 @@ function getBodyContent({
         {...actionProps}
         declaration={declaration}
         draft={draft}
+        duplicates={workqueueDeclaration?.registration?.duplicates?.filter(
+          (duplicate): duplicate is string => !!duplicate
+        )}
         tab={tab}
         intl={intl}
         scope={scope}
@@ -601,19 +614,11 @@ function getBodyContent({
 }
 
 const RecordAuditComp = (props: IFullProps) => {
-  const { workqueueDeclaration } = props
   return (
     <>
       <DesktopHeader />
       <Navigation deselectAllTabs={true} />
-      <BodyContainer>
-        <DuplicateWarning
-          duplicateIds={workqueueDeclaration?.registration?.duplicates?.filter(
-            (duplicate): duplicate is string => !!duplicate
-          )}
-        />
-        {getBodyContent(props)}
-      </BodyContainer>
+      <BodyContainer>{getBodyContent(props)}</BodyContainer>
       <NotificationToast />
     </>
   )

@@ -158,6 +158,7 @@ export const EVENT_STATUS = {
   REJECTED: 'REJECTED',
   WAITING_VALIDATION: 'WAITING_VALIDATION'
 }
+
 export class OfficeHomeView extends React.Component<
   IOfficeHomeProps,
   IOfficeHomeState

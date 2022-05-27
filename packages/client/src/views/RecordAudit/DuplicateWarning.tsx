@@ -10,18 +10,30 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
-import {
-  GQLEventSearchResultSet,
-  GQLEventSearchSet
-} from '@opencrvs/gateway/src/graphql/schema'
 import styled from 'styled-components'
 import { Warning } from '@opencrvs/components/lib/interface'
+import gql from 'graphql-tag'
+import { Query } from '@client/components/Query'
+import { FetchDuplicateTrackingIdQuery } from '@client/utils/gateway'
+import { errorMessages } from '@client/i18n/messages/errors'
+import { useIntl } from 'react-intl'
 
 const StyledWarning = styled(Warning)`
-  margin: 24px auto 16px;
+  margin: 24px auto;
   max-width: 1140px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin: 24px;
+  }
+`
+
+const FETCH_DUPLICATE_TRACKING_ID = gql`
+  query fetchDuplicateTrackingId($id: ID!) {
+    fetchRegistration(id: $id) {
+      registration {
+        trackingId
+      }
+    }
+  }
 `
 
 export function DuplicateWarning({
@@ -29,34 +41,31 @@ export function DuplicateWarning({
 }: {
   duplicateIds: string[] | undefined
 }) {
-  const workqueue = useSelector(
-    (store: IStoreState) => store.workqueueState.workqueue.data
-  )
-  const duplicateDeclarations = React.useMemo(() => {
-    return (Object.values(workqueue) as GQLEventSearchResultSet[])
-      .map((resultSet) => resultSet.results)
-      .filter(
-        (searchSets): searchSets is (GQLEventSearchSet | null)[] =>
-          !!(searchSets && searchSets.length > 0)
-      )
-      .flat()
-      .filter((searchSet): searchSet is GQLEventSearchSet => !!searchSet)
-      .filter((searchSet) =>
-        duplicateIds?.some((duplicateId) => duplicateId === searchSet.id)
-      )
-  }, [workqueue, duplicateIds])
-
+  const intl = useIntl()
   return (
     <>
-      {duplicateDeclarations.map(
-        (duplicateDeclaration) =>
-          duplicateDeclaration?.registration?.trackingId && (
-            <StyledWarning
-              key={duplicateDeclaration.id}
-              label={duplicateDeclaration.registration.trackingId}
-            />
-          )
-      )}
+      {duplicateIds?.map((id) => (
+        <Query<FetchDuplicateTrackingIdQuery>
+          key={id}
+          query={FETCH_DUPLICATE_TRACKING_ID}
+          variables={{ id }}
+        >
+          {({ data }) => {
+            if (data?.fetchRegistration?.registration?.trackingId) {
+              return (
+                <StyledWarning
+                  label={intl.formatMessage(errorMessages.duplicateWarning, {
+                    trackingId: (
+                      <u>{data.fetchRegistration.registration.trackingId}</u>
+                    )
+                  })}
+                />
+              )
+            }
+            return <></>
+          }}
+        </Query>
+      ))}
     </>
   )
 }
