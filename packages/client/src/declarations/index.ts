@@ -42,7 +42,6 @@ import { EVENT_STATUS, IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
-  GQLHumanName,
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLRegistrationSearchSet
@@ -56,6 +55,7 @@ import {
   showDownloadDeclarationFailedToast,
   ShowDownloadDeclarationFailedToast
 } from '@client/notification/actions'
+import { getPotentialDuplicateIds } from '@client/transformer/index'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -166,6 +166,7 @@ export interface IVisitedGroupId {
 export interface IDeclaration {
   id: string
   data: IFormData
+  duplicates?: string[]
   originalData?: IFormData
   savedOn?: number
   createdAt?: string
@@ -506,11 +507,13 @@ export function createReviewDeclaration(
   declarationId: string,
   formData: IFormData,
   event: Event,
-  status?: string
+  status?: string,
+  duplicates?: string[]
 ): IDeclaration {
   return {
     id: declarationId,
     data: formData,
+    duplicates,
     originalData: formData,
     review: true,
     event,
@@ -1546,7 +1549,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           downloadingDeclaration.id,
           transData,
           downloadingDeclaration.event,
-          downloadedAppStatus
+          downloadedAppStatus,
+          getPotentialDuplicateIds(eventData)
         )
       newDeclarationsAfterDownload[downloadingDeclarationIndex].downloadStatus =
         DOWNLOAD_STATUS.DOWNLOADED

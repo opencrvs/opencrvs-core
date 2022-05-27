@@ -133,6 +133,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        duplicates
         attachments {
           data
           type

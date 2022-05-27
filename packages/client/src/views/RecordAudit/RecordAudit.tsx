@@ -106,6 +106,7 @@ import {
 import { IActionDetailsData, GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
+import { getPotentialDuplicateIds } from '@client/transformer/index'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -567,9 +568,7 @@ function getBodyContent({
                 )}
                 tab={tab}
                 draft={draft}
-                duplicates={data.fetchRegistration?.registration?.duplicates?.filter(
-                  (duplicate: string | null): duplicate is string => !!duplicate
-                )}
+                duplicates={getPotentialDuplicateIds(data.fetchRegistration)}
                 intl={intl}
                 scope={scope}
                 userDetails={userDetails}
@@ -601,9 +600,7 @@ function getBodyContent({
         {...actionProps}
         declaration={declaration}
         draft={draft}
-        duplicates={workqueueDeclaration?.registration?.duplicates?.filter(
-          (duplicate): duplicate is string => !!duplicate
-        )}
+        duplicates={getPotentialDuplicateIds(workqueueDeclaration)}
         tab={tab}
         intl={intl}
         scope={scope}
