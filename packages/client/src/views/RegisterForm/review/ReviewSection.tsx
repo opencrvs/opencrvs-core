@@ -91,7 +91,7 @@ import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -126,11 +126,15 @@ import { IValidationResult } from '@client/utils/validate'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
-import { isCorrection } from '@client/views/CorrectionForm/utils'
+import {
+  isCorrection,
+  isFileSizeExceeded
+} from '@client/views/CorrectionForm/utils'
 import {
   ListViewSimplified,
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { Warning } from '@opencrvs/components/lib/interface'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -1519,6 +1523,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       formSections,
       errorsOnFields
     )
+    const totalFileSizeExceeded = isFileSizeExceeded(declaration)
 
     return (
       <FullBodyContent>
@@ -1602,9 +1607,20 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputField>
                 </InputWrapper>
               )}
+
+              {totalFileSizeExceeded && (
+                <Warning
+                  label={intl.formatMessage(
+                    constantsMessages.totalFileSizeExceed,
+                    { fileSize: '20MB' }
+                  )}
+                />
+              )}
+
               {!isCorrection(declaration) && (
                 <ReviewAction
                   completeDeclaration={isComplete}
+                  totalFileSizeExceeded={totalFileSizeExceeded}
                   declarationToBeValidated={this.userHasValidateScope()}
                   declarationToBeRegistered={this.userHasRegisterScope()}
                   alreadyRejectedDeclaration={

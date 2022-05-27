@@ -56,7 +56,7 @@ import {
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
-import { flattenDeep, get, clone, isEqual } from 'lodash'
+import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
 import { IGQLLocation } from '@client/utils/userUtils'
 
 export function groupHasError(
@@ -96,6 +96,23 @@ export function isCorrection(declaration: IDeclaration) {
     registrationStatus === SUBMISSION_STATUS.REGISTERED ||
     registrationStatus === SUBMISSION_STATUS.CERTIFIED
   )
+}
+
+export function isFileSizeExceeded(declaration: IDeclaration) {
+  const {
+    data: { documents }
+  } = declaration
+  let totalFileSize = 0
+  for (const index in documents) {
+    if (!isArray(documents[index])) {
+      continue
+    }
+    ;(documents[index] as IFileValue[]).forEach((fieldValue) => {
+      totalFileSize += fieldValue.fileSize || 0
+    })
+  }
+
+  return totalFileSize > 20480000
 }
 
 export function updateDeclarationRegistrationWithCorrection(
