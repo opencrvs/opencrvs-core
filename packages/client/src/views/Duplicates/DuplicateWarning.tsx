@@ -24,9 +24,6 @@ const WarningContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 16px 24px;
-  }
 `
 
 const FETCH_DUPLICATE_TRACKING_ID = gql`
@@ -40,13 +37,15 @@ const FETCH_DUPLICATE_TRACKING_ID = gql`
 `
 
 export function DuplicateWarning({
-  duplicateIds
+  duplicateIds,
+  className
 }: {
   duplicateIds: string[] | undefined
+  className?: string
 }) {
   const intl = useIntl()
   return (
-    <WarningContainer>
+    <WarningContainer className={className}>
       {duplicateIds?.map((id) => (
         <Query<FetchDuplicateTrackingIdQuery>
           key={id}

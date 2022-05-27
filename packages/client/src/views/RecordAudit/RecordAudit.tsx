@@ -25,7 +25,8 @@ import {
   Archive,
   DeclarationIcon,
   Edit,
-  BackArrow
+  BackArrow,
+  Duplicate
 } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
@@ -140,6 +141,15 @@ const BackButton = styled(CircleButton)`
   color: ${({ theme }) => theme.colors.white};
   display: flex;
   margin-left: -8px;
+`
+
+const StyledDuplicateWarning = styled(DuplicateWarning)`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin: 16px 24px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 16px 0;
+  }
 `
 
 const DesktopDiv = styled.div`
@@ -426,10 +436,12 @@ function RecordAuditBody({
       ? true
       : false
 
+  const hasDuplicates = !!(duplicates && duplicates.length > 0)
+
   return (
     <>
       <MobileHeader {...mobileProps} key={'record-audit-mobile-header'} />
-      <DuplicateWarning
+      <StyledDuplicateWarning
         duplicateIds={duplicates?.filter(
           (duplicate): duplicate is string => !!duplicate
         )}
@@ -441,17 +453,21 @@ function RecordAuditBody({
         titleColor={declaration.name ? 'copy' : 'grey600'}
         size={ContentSize.LARGE}
         topActionButtons={desktopActionsView}
-        icon={() => (
-          <DeclarationIcon
-            isArchive={declaration?.status === ARCHIVED}
-            isValidatedOnReview={isValidatedOnReview}
-            color={
-              STATUSTOCOLOR[
-                (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
-              ]
-            }
-          />
-        )}
+        icon={() =>
+          hasDuplicates ? (
+            <Duplicate />
+          ) : (
+            <DeclarationIcon
+              isArchive={declaration?.status === ARCHIVED}
+              isValidatedOnReview={isValidatedOnReview}
+              color={
+                STATUSTOCOLOR[
+                  (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
+                ]
+              }
+            />
+          )
+        }
       >
         <GetDeclarationInfo
           declaration={declaration}
