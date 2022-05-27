@@ -105,7 +105,7 @@ import {
 } from './ActionButtons'
 import { IActionDetailsData, GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
-import { DuplicateWarning } from './DuplicateWarning'
+import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
