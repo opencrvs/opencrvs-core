@@ -14,7 +14,7 @@ import { ReactWrapper } from 'enzyme'
 import { createStore } from '@client/store'
 import { createTestComponent } from '@client/tests/util'
 import { FormConfigHome } from './FormConfigHome'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus } from '@client/utils/gateway'
 
 let component: ReactWrapper<{}, {}>
 
@@ -38,12 +38,12 @@ describe('FormConfigHome', () => {
     const selectTab = (tab: string) =>
       component.find(`#tab_${tab}`).hostNodes().simulate('click')
 
-    expect(selectedTab()).toBe(DraftStatus.DRAFT)
+    expect(selectedTab()).toBe(DraftStatus.Draft)
 
-    selectTab(DraftStatus.PREVIEW)
-    expect(selectedTab()).toBe(DraftStatus.PREVIEW)
+    selectTab(DraftStatus.InPreview)
+    expect(selectedTab()).toBe(DraftStatus.InPreview)
 
-    selectTab(DraftStatus.PUBLISHED)
-    expect(selectedTab()).toBe(DraftStatus.PUBLISHED)
+    selectTab(DraftStatus.Published)
+    expect(selectedTab()).toBe(DraftStatus.Published)
   })
 })

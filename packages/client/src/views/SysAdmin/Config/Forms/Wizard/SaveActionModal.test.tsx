@@ -12,10 +12,8 @@
 import React from 'react'
 import { MockedResponse } from 'react-apollo/test-links'
 import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
-import {
-  DraftStatus,
-  IFormDraft
-} from '@client/forms/configuration/formDrafts/utils'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus } from '@client/utils/gateway'
 import { Event } from '@client/forms'
 import { SaveActionContext, SaveActionModal } from './SaveActionModal'
 import { AppStore, createStore } from '@client/store'
@@ -27,7 +25,7 @@ import routeData from 'react-router'
 
 const draft: IFormDraft = {
   event: Event.BIRTH,
-  status: DraftStatus.DRAFT,
+  status: DraftStatus.Draft,
   version: 1,
   history: [],
   updatedAt: Date.now(),

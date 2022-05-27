@@ -25,7 +25,7 @@ import {
   draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus } from '@client/utils/gateway'
 import { Value, DraftVersion } from './components'
 import { Pill } from '@opencrvs/components/lib/interface'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
@@ -70,7 +70,7 @@ function EventDrafts({ event }: { event: Event }) {
       label={<DraftVersion event={event} version={version} />}
       value={
         <Value>
-          {status === DraftStatus.DRAFT || status === DraftStatus.DELETED
+          {status === DraftStatus.Draft
             ? intl.formatMessage(messages.defaultComment)
             : intl.formatMessage(messages.previewDate, {
                 updatedAt
@@ -78,16 +78,16 @@ function EventDrafts({ event }: { event: Event }) {
         </Value>
       }
       actions={
-        status === DraftStatus.PUBLISHED ? (
+        status === DraftStatus.Published ? (
           <Pill
             label={intl.formatMessage(
-              draftStatusMessages[DraftStatus.PUBLISHED]
+              draftStatusMessages[DraftStatus.Published]
             )}
             type="active"
           />
         ) : (
           <>
-            {status === DraftStatus.PREVIEW && (
+            {status === DraftStatus.InPreview && (
               <ActionButton action={Actions.EDIT} event={event} />
             )}
             <ActionButton action={Actions.PUBLISH} event={event} />

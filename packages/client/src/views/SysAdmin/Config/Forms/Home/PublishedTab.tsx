@@ -23,7 +23,7 @@ import {
   messages,
   draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus } from '@client/utils/gateway'
 import { Value, DraftVersion } from './components'
 import { Pill } from '@opencrvs/components/lib/interface'
 import { isDefaultDraft } from '@client/views/SysAdmin/Config/Forms/utils'
@@ -35,7 +35,7 @@ function EventDrafts({ event }: { event: Event }) {
   )
   const { updatedAt, comment, status, version } = formDraft
 
-  if (status !== DraftStatus.PUBLISHED) {
+  if (status !== DraftStatus.Published) {
     return <></>
   }
 
@@ -56,7 +56,7 @@ function EventDrafts({ event }: { event: Event }) {
         actions={
           <Pill
             label={intl.formatMessage(
-              draftStatusMessages[DraftStatus.PUBLISHED]
+              draftStatusMessages[DraftStatus.Published]
             )}
             type="active"
           />

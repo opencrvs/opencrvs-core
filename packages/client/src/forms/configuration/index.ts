@@ -34,7 +34,7 @@ import {
 } from '@client/forms/configuration/defaultUtils'
 import { getEventDraft } from '@client/forms/configuration/formDrafts/utils'
 import { registerForms } from './default'
-import { DraftStatus } from './formDrafts/utils'
+import { DraftStatus } from '@client/utils/gateway'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { populateRegisterFormsWithAddresses } from './administrative/addresses'
 import { cloneDeep, concat } from 'lodash'
@@ -429,7 +429,7 @@ export function getConfiguredForm(
 }
 
 function isConfigured(status: DraftStatus | null) {
-  return status === DraftStatus.PUBLISHED || status === DraftStatus.PREVIEW
+  return status === DraftStatus.Published || status === DraftStatus.InPreview
 }
 
 export function getConfiguredOrDefaultForm(

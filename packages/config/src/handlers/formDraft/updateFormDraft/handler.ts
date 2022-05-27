@@ -15,38 +15,25 @@ import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
 import FormDraft, { validEvent, DraftStatus } from '@config/models/formDraft'
 import { Event } from '@config/models/certificate'
-import {
-  clearHearthElasticInfluxData,
-  clearQuestionConfigs
-} from '@config/services/formDraftService'
+import { clearHearthElasticInfluxData } from '@config/services/formDraftService'
 
-export function isValidFormDraftOperation(
-  currentStatus: string,
-  newStatus: string
-) {
-  const validStatusMapping = {
-    [DraftStatus.DRAFT]: [
-      DraftStatus.DRAFT,
-      DraftStatus.IN_PREVIEW,
-      DraftStatus.DELETED
-    ],
-    [DraftStatus.IN_PREVIEW]: [DraftStatus.PUBLISHED, DraftStatus.DRAFT],
-    [DraftStatus.PUBLISHED]: [null],
-    [DraftStatus.DELETED]: [DraftStatus.DRAFT]
-  }
-
-  if (
-    currentStatus &&
-    validStatusMapping[currentStatus] &&
-    !validStatusMapping[currentStatus].includes(newStatus)
-  ) {
-    return false
-  }
-
-  return true
+const STATUS_TRANSITION: Record<DraftStatus, DraftStatus[]> = {
+  [DraftStatus.DRAFT]: [DraftStatus.DRAFT, DraftStatus.IN_PREVIEW],
+  [DraftStatus.IN_PREVIEW]: [DraftStatus.PUBLISHED, DraftStatus.DRAFT],
+  [DraftStatus.PUBLISHED]: []
 }
 
-export interface IModifyDraftStatus {
+export function isValidStatusTransition(
+  currentStatus: DraftStatus,
+  newStatus: DraftStatus
+) {
+  if (STATUS_TRANSITION[currentStatus].includes(newStatus)) {
+    return true
+  }
+  return false
+}
+
+export interface IModifyFormDraftPayload {
   event: Event
   status: DraftStatus
 }
@@ -54,7 +41,8 @@ export async function modifyDraftStatusHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { event, status: newStatus } = request.payload as IModifyDraftStatus
+  const { event, status: newStatus } =
+    request.payload as IModifyFormDraftPayload
 
   const draft = await FormDraft.findOne({
     event
@@ -66,7 +54,9 @@ export async function modifyDraftStatusHandler(
       .code(400)
   }
 
-  if (!isValidFormDraftOperation(draft.status, newStatus)) {
+  const currentStatus = draft.status
+
+  if (!isValidStatusTransition(currentStatus, newStatus)) {
     return h
       .response(
         `Invalid Operation. Can not update form draft status from ${draft.status} to ${newStatus}`
@@ -75,18 +65,8 @@ export async function modifyDraftStatusHandler(
   }
 
   try {
-    if (
-      (draft.status === DraftStatus.IN_PREVIEW &&
-        newStatus === DraftStatus.DRAFT) ||
-      newStatus === DraftStatus.DELETED
-    ) {
+    if (currentStatus === DraftStatus.IN_PREVIEW) {
       await clearHearthElasticInfluxData(request)
-      if (newStatus === DraftStatus.DELETED) {
-        await clearQuestionConfigs(event)
-        draft.history = []
-        draft.comment = ''
-        draft.version = 0
-      }
     }
     draft.status = newStatus
     draft.updatedAt = Date.now()
@@ -108,11 +88,6 @@ export const requestSchema = Joi.object({
     .valid(...validEvent)
     .required(),
   status: Joi.string()
-    .valid(
-      DraftStatus.DRAFT,
-      DraftStatus.IN_PREVIEW,
-      DraftStatus.PUBLISHED,
-      DraftStatus.DELETED
-    )
+    .valid(DraftStatus.DRAFT, DraftStatus.IN_PREVIEW, DraftStatus.PUBLISHED)
     .required()
 })

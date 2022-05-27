@@ -11,12 +11,25 @@
  */
 import { find } from 'lodash'
 import { Event } from '@client/forms'
+import { DraftStatus } from '@client/utils/gateway'
 
-export enum DraftStatus {
-  DRAFT = 'DRAFT',
-  PREVIEW = 'IN_PREVIEW',
-  PUBLISHED = 'PUBLISHED',
-  DELETED = 'DELETED'
+export const DEFAULT_FORM_DRAFT = {
+  [Event.BIRTH]: {
+    version: 0,
+    status: DraftStatus.Draft,
+    event: Event.BIRTH,
+    history: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  },
+  [Event.DEATH]: {
+    version: 0,
+    status: DraftStatus.Draft,
+    event: Event.DEATH,
+    history: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  }
 }
 
 export interface IDraftHistory {

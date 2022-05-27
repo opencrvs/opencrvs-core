@@ -12,10 +12,8 @@
 import { IFormConfig, QuestionConfigFieldType, Event } from '@client/forms'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import {
-  DraftStatus,
-  IFormDraft
-} from '@client/forms/configuration/formDrafts/utils'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus } from '@client/utils/gateway'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -23,7 +21,7 @@ export const validImageB64String =
 const formDrafts: IFormDraft[] = [
   {
     event: Event.BIRTH,
-    status: DraftStatus.DRAFT,
+    status: DraftStatus.Draft,
     version: 0,
     history: [],
     updatedAt: 1649395100098,
@@ -31,7 +29,7 @@ const formDrafts: IFormDraft[] = [
   },
   {
     event: Event.DEATH,
-    status: DraftStatus.DRAFT,
+    status: DraftStatus.Draft,
     version: 0,
     history: [],
     updatedAt: 1649395100098,

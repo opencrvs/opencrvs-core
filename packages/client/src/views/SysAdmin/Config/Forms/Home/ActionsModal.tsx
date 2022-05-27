@@ -26,11 +26,15 @@ import {
 import { useDispatch } from 'react-redux'
 import { Mutation } from 'react-apollo'
 import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
-import { CHANGE_FORM_DRAFT_STATUS } from '@client/views/SysAdmin/Config/Forms/mutations'
 import {
-  DraftStatus,
-  IFormDraft
+  CHANGE_FORM_DRAFT_STATUS,
+  DELETE_FORM_DRAFT
+} from '@client/views/SysAdmin/Config/Forms/mutations'
+import {
+  IFormDraft,
+  DEFAULT_FORM_DRAFT
 } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus } from '@client/utils/gateway'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
 
@@ -68,11 +72,13 @@ export type ActionState = {
   status: ActionStatus
 }
 
-const STATUS_CHANGE_MAP: Record<Actions, DraftStatus> = {
-  [Actions.PUBLISH]: DraftStatus.PUBLISHED,
-  [Actions.PREVIEW]: DraftStatus.PREVIEW,
-  [Actions.EDIT]: DraftStatus.DRAFT,
-  [Actions.DELETE]: DraftStatus.DELETED
+const STATUS_CHANGE_MAP: Record<
+  Exclude<Actions, Actions.DELETE>,
+  DraftStatus
+> = {
+  [Actions.PUBLISH]: DraftStatus.Published,
+  [Actions.PREVIEW]: DraftStatus.InPreview,
+  [Actions.EDIT]: DraftStatus.Draft
 }
 
 const ACTION_BUTTON_MESSAGE: Record<Actions, MessageDescriptor> = {
@@ -101,16 +107,19 @@ function ActionButton() {
     <Mutation<
       GQLMutation,
       {
-        status: DraftStatus
+        status?: DraftStatus
         event: Event
       }
     >
-      mutation={CHANGE_FORM_DRAFT_STATUS}
+      mutation={
+        action === Actions.DELETE ? DELETE_FORM_DRAFT : CHANGE_FORM_DRAFT_STATUS
+      }
       onCompleted={({ modifyDraftStatus: formDraft }) => {
-        if (formDraft) {
-          action === Actions.DELETE
-            ? dispatch(updateFormConfig(formDraft as IFormDraft, []))
-            : dispatch(updateFormConfig(formDraft as IFormDraft))
+        if (action === Actions.DELETE) {
+          dispatch(updateFormConfig(DEFAULT_FORM_DRAFT[event], []))
+          setAction({ status: ActionStatus.COMPLETED })
+        } else if (formDraft) {
+          dispatch(updateFormConfig(formDraft as IFormDraft))
           setAction({ status: ActionStatus.COMPLETED })
 
           /* uncommenting this causes issues with webpack compilation */
@@ -126,10 +135,13 @@ function ActionButton() {
           id: 'status-change-btn',
           onClick: () => {
             changeStatus({
-              variables: {
-                status: STATUS_CHANGE_MAP[action],
-                event: event
-              }
+              variables:
+                action === Actions.DELETE
+                  ? { event }
+                  : {
+                      status: STATUS_CHANGE_MAP[action],
+                      event: event
+                    }
             })
             setAction({ status: ActionStatus.PROCESSING })
           }

@@ -8,52 +8,29 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
+enum DraftStatus {
+  DRAFT
+  IN_PREVIEW
+  PUBLISHED
+}
+
 type DraftHistory {
-  _id: ID
-  version: Int
-  status: String
-  comment: String
-  updatedAt: Date
+  _id: ID!
+  version: Int!
+  status: DraftStatus!
+  comment: String!
+  updatedAt: Date!
 }
 
 type FormDraft {
-  _id: ID
+  _id: ID!
   event: String!
-  status: String!
-  comment: String
+  status: DraftStatus!
+  comment: String!
   version: Int!
-  history: [DraftHistory!]
+  history: [DraftHistory!]!
   updatedAt: Date!
   createdAt: Date!
-}
-
-input MesssageDescriptorInput {
-  id: String!
-  description: String
-  defaultMessage: String!
-}
-
-input MesssageInput {
-  lang: String!
-  descriptor: MesssageDescriptorInput!
-}
-
-input QuestionInput {
-  id: ID
-  fieldId: String!
-  label: [MesssageInput!]
-  placeholder: [MesssageInput!]
-  description: [MesssageInput!]
-  tooltip: [MesssageInput!]
-  errorMessage: [MesssageInput!]
-  maxLength: Int
-  fieldName: String
-  fieldType: String
-  preceedingFieldId: String
-  required: Boolean
-  enabled: String
-  custom: Boolean
-  initialValue: String
 }
 
 input FormDraftInput {
@@ -62,9 +39,13 @@ input FormDraftInput {
   comment: String!
 }
 
-input FormDraftStatusModify {
+input FormDraftStatusModifyInput {
   event: String!
-  status: String!
+  status: DraftStatus!
+}
+
+input DeleteFormDraftInput {
+  event: String!
 }
 
 type Query {
@@ -73,5 +54,6 @@ type Query {
 
 type Mutation {
   createFormDraft(formDraft: FormDraftInput!): FormDraft
-  modifyDraftStatus(formDraft: FormDraftStatusModify!): FormDraft
+  modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
+  deleteFormDraft(formDraft: DeleteFormDraftInput!): String
 }

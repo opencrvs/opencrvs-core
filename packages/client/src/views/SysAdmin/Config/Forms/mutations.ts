@@ -14,10 +14,16 @@ import { FORM_DRAFT_FIELDS } from '@client/forms/configuration/formDrafts/querie
 
 export const CHANGE_FORM_DRAFT_STATUS = gql`
   ${FORM_DRAFT_FIELDS}
-  mutation changeStatus($event: String!, $status: String!) {
+  mutation changeStatus($event: String!, $status: DraftStatus!) {
     modifyDraftStatus(formDraft: { event: $event, status: $status }) {
       ...FormDraftFields
     }
+  }
+`
+
+export const DELETE_FORM_DRAFT = gql`
+  mutation deleteFormDraft($event: String!) {
+    deleteFormDraft(formDraft: { event: $event })
   }
 `
 

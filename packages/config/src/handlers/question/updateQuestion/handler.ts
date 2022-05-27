@@ -41,7 +41,6 @@ export default async function updateQuestion(
   existingQuestion.required = question.required
   existingQuestion.enabled = question.enabled
   existingQuestion.custom = question.custom
-  existingQuestion.initialValue = question.initialValue
 
   try {
     await Question.update({ _id: existingQuestion._id }, existingQuestion)

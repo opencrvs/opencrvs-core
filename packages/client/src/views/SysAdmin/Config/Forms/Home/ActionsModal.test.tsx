@@ -12,10 +12,8 @@
 import React from 'react'
 import { MockedResponse } from 'react-apollo/test-links'
 import { CHANGE_FORM_DRAFT_STATUS } from '@client/views/SysAdmin/Config/Forms/mutations'
-import {
-  DraftStatus,
-  IFormDraft
-} from '@client/forms/configuration/formDrafts/utils'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus } from '@client/utils/gateway'
 import { Event } from '@client/forms'
 import {
   ActionState,
@@ -31,7 +29,7 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 
 const inPreviewDraft: IFormDraft = {
   event: Event.BIRTH,
-  status: DraftStatus.PREVIEW,
+  status: DraftStatus.InPreview,
   version: 1,
   history: [],
   updatedAt: Date.now(),
@@ -43,7 +41,7 @@ const graphqlMocks: MockedResponse[] = [
     request: {
       query: CHANGE_FORM_DRAFT_STATUS,
       variables: {
-        status: DraftStatus.PREVIEW,
+        status: DraftStatus.InPreview,
         event: Event.BIRTH
       }
     },
@@ -100,7 +98,7 @@ describe('ActionsModal', () => {
     component.find('#status-change-btn').hostNodes().simulate('click')
     await flushPromises()
     expect(store.getState().formConfig.birth?.formDraft.status).toBe(
-      DraftStatus.PREVIEW
+      DraftStatus.InPreview
     )
   })
 })

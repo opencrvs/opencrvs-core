@@ -121,7 +121,6 @@ export interface IQuestionConfig {
   required?: boolean
   enabled: string
   custom?: boolean
-  initialValue?: string
 }
 
 export interface IFormConfig {
