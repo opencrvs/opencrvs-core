@@ -18,11 +18,14 @@ import { FetchDuplicateTrackingIdQuery } from '@client/utils/gateway'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useIntl } from 'react-intl'
 
-const StyledWarning = styled(Warning)`
-  margin: 24px auto;
+const WarningContainer = styled.div`
+  margin: 16px auto;
   max-width: 1140px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 24px;
+    margin: 16px 24px;
   }
 `
 
@@ -43,7 +46,7 @@ export function DuplicateWarning({
 }) {
   const intl = useIntl()
   return (
-    <>
+    <WarningContainer>
       {duplicateIds?.map((id) => (
         <Query<FetchDuplicateTrackingIdQuery>
           key={id}
@@ -53,7 +56,7 @@ export function DuplicateWarning({
           {({ data }) => {
             if (data?.fetchRegistration?.registration?.trackingId) {
               return (
-                <StyledWarning
+                <Warning
                   label={intl.formatMessage(errorMessages.duplicateWarning, {
                     trackingId: (
                       <u>{data.fetchRegistration.registration.trackingId}</u>
@@ -66,6 +69,6 @@ export function DuplicateWarning({
           }}
         </Query>
       ))}
-    </>
+    </WarningContainer>
   )
 }
