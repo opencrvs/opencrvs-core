@@ -41,6 +41,14 @@ import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils'
 import { RESOURCE_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
+import {
+  DOWNLOADED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL,
+  REQUEST_CORRECTION_EXTENSION_URL
+} from '@workflow/features/task/fhir/constants'
+export interface ITaskBundleEntry extends fhir.BundleEntry {
+  resource: fhir.Task
+}
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
@@ -119,15 +127,23 @@ export async function markBundleAsRequestedForCorrection(
   bundle: fhir.Bundle & fhir.BundleEntry,
   token: string
 ): Promise<fhir.Bundle & fhir.BundleEntry> {
-  const taskResource = getTaskResource(bundle) as fhir.Task
-
+  const taskResource = getTaskResource(bundle)
   const practitioner = await getLoggedInPractitionerResource(token)
+  const regStatusCode =
+    taskResource &&
+    taskResource.businessStatus &&
+    taskResource.businessStatus.coding &&
+    taskResource.businessStatus.coding.find((code) => {
+      return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+    })
 
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.REQUESTED_CORRECTION
-  )
+  if (!taskResource.extension) {
+    taskResource.extension = []
+  }
+  taskResource.extension.push({
+    url: REQUEST_CORRECTION_EXTENSION_URL,
+    valueString: regStatusCode?.code
+  })
 
   await setupLastRegLocation(taskResource, practitioner)
 
@@ -135,6 +151,11 @@ export async function markBundleAsRequestedForCorrection(
 
   /* check if the status of any event draft is not published and setting configuration extension*/
   await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
+  removeExtensionFromBundle(bundle, [
+    DOWNLOADED_EXTENSION_URL,
+    REINSTATED_EXTENSION_URL
+  ])
 
   return bundle
 }
