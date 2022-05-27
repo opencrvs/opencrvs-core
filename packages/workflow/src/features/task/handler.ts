@@ -27,7 +27,8 @@ import {
 } from '@workflow/features/task/fhir/utils'
 import {
   DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL
+  REINSTATED_EXTENSION_URL,
+  REQUEST_CORRECTION_EXTENSION_URL
 } from '@workflow/features/task/fhir/constants'
 
 export default async function updateTaskHandler(
@@ -48,7 +49,11 @@ export default async function updateTaskHandler(
     if (taskResource.extension) {
       taskResource.extension = filterTaskExtensions(
         taskResource.extension,
-        [REINSTATED_EXTENSION_URL, DOWNLOADED_EXTENSION_URL],
+        [
+          REINSTATED_EXTENSION_URL,
+          DOWNLOADED_EXTENSION_URL,
+          REQUEST_CORRECTION_EXTENSION_URL
+        ],
         getTaskBusinessStatus(taskResource)
       )
     }

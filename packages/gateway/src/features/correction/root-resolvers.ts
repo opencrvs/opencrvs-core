@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IAuthHeader } from '@gateway/common-types'
-import { GQLBirthRegistrationInput, GQLResolver } from '@gateway/graphql/schema'
+import { GQLResolver } from '@gateway/graphql/schema'
 import { hasScope } from '@gateway/features/user/utils'
 import { buildFHIRBundle } from '@gateway/features/registration/fhir-builders'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
@@ -63,7 +63,7 @@ export const resolvers: GQLResolver = {
 async function requestEventRegistrationCorrection(
   id: string,
   authHeader: IAuthHeader,
-  reg: GQLBirthRegistrationInput,
+  reg: object,
   eventType: EVENT_TYPE
 ) {
   const fhirBundle = await buildFHIRBundle(reg, eventType, authHeader)
