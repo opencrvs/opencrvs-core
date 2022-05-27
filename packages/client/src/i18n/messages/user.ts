@@ -146,6 +146,26 @@ const messagesToDefine: IUserMessages = {
     description: 'The description for DISTRICT_REGISTRAR role',
     id: 'constants.districtRegistrar'
   },
+  POLICE_OFFICER: {
+    defaultMessage: 'Police Officer',
+    description: 'The description for Police Officer type',
+    id: 'constants.policeOfficer'
+  },
+  SOCIAL_WORKER: {
+    defaultMessage: 'Social Worker',
+    description: 'The description for Social Worker type',
+    id: 'constants.socialWorker'
+  },
+  LOCAL_LEADER: {
+    defaultMessage: 'Local Leader',
+    description: 'The description for Local Leader type',
+    id: 'constants.localLeader'
+  },
+  HEALTHCARE_WORKER: {
+    defaultMessage: 'Healthcare Worker',
+    description: 'The description for Healthcare Worker type',
+    id: 'constants.healthcareWorker'
+  },
   DNRPC: {
     defaultMessage: 'DNRPC',
     description: 'The description for DNRPC type',

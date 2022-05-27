@@ -28,7 +28,6 @@ const ButtonBase = styled.button<{ size: IButtonSize }>`
   justify-content: center;
   background: transparent;
   &:disabled {
-    background: ${({ theme }) => theme.colors.disabled};
     path {
       stroke: ${({ theme }) => theme.colors.disabled};
     }

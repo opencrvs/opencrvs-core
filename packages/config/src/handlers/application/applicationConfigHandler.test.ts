@@ -88,12 +88,25 @@ describe('applicationHandler', () => {
     fetch.resetMocks()
   })
 
-  it('get declaration config using mongoose', async () => {
+  it('get all config using mongoose', async () => {
     mockingoose(ApplicationConfig).toReturn(mockConfig, 'findOne')
 
     const res = await server.server.inject({
       method: 'GET',
-      url: '/config'
+      url: '/config',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
+  })
+
+  it('get application config using mongoose', async () => {
+    mockingoose(ApplicationConfig).toReturn(mockConfig, 'findOne')
+
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/loginConfig'
     })
     expect(res.statusCode).toBe(200)
   })
