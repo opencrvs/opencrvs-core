@@ -17,9 +17,9 @@ import {
   TEXTAREA,
   BirthSection,
   DeathSection,
-  Event,
   IFormField
 } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import {
   getCertificateHandlebar,

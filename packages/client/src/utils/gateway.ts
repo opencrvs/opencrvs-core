@@ -458,6 +458,15 @@ export type CurrencyInput = {
   languagesAndCountry?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
 }
 
+export enum CustomFieldType {
+  Number = 'NUMBER',
+  Paragraph = 'PARAGRAPH',
+  Subsection = 'SUBSECTION',
+  Tel = 'TEL',
+  Text = 'TEXT',
+  Textarea = 'TEXTAREA'
+}
+
 export type Death = {
   __typename?: 'Death'
   FEE?: Maybe<DeathFee>
@@ -659,15 +668,6 @@ export type EventSearchSet = {
   id: Scalars['ID']
   registration?: Maybe<RegistrationSearchSet>
   type?: Maybe<Scalars['String']>
-}
-
-export enum FieldType {
-  Number = 'NUMBER',
-  Paragraph = 'PARAGRAPH',
-  Subsection = 'SUBSECTION',
-  Tel = 'TEL',
-  Text = 'TEXT',
-  Textarea = 'TEXTAREA'
 }
 
 export type FormDraft = {
@@ -1462,7 +1462,7 @@ export type QuestionInput = {
   errorMessage?: InputMaybe<Array<MesssageInput>>
   fieldId: Scalars['String']
   fieldName?: InputMaybe<Scalars['String']>
-  fieldType?: InputMaybe<FieldType>
+  fieldType?: InputMaybe<CustomFieldType>
   label?: InputMaybe<Array<MesssageInput>>
   maxLength?: InputMaybe<Scalars['Int']>
   placeholder?: InputMaybe<Array<MesssageInput>>
@@ -4674,12 +4674,12 @@ export type UpdateApplicationConfigMutation = {
   } | null
 }
 
-export type ChangeStatusMutationVariables = Exact<{
+export type ChangeFormDraftStatusMutationVariables = Exact<{
   event: Event
   status: DraftStatus
 }>
 
-export type ChangeStatusMutation = {
+export type ChangeFormDraftStatusMutation = {
   __typename?: 'Mutation'
   modifyDraftStatus?: {
     __typename?: 'FormDraft'

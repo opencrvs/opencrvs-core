@@ -30,7 +30,7 @@ input MesssageInput {
   descriptor: MesssageDescriptorInput!
 }
 
-enum FieldType {
+enum CustomFieldType {
   TEXT
   TEL
   TEXTAREA
@@ -48,7 +48,7 @@ input QuestionInput {
   errorMessage: [MesssageInput!]
   maxLength: Int
   fieldName: String
-  fieldType: FieldType
+  fieldType: CustomFieldType
   preceedingFieldId: String
   required: Boolean
   enabled: String

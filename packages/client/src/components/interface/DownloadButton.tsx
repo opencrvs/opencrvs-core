@@ -21,7 +21,8 @@ import {
   makeDeclarationReadyToDownload,
   DOWNLOAD_STATUS
 } from '@client/declarations'
-import { Event, Action } from '@client/forms'
+import { Action } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { withApollo, WithApolloClient } from 'react-apollo'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import {

@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { QuestionConfigFieldType, Event } from '@client/forms'
+import { QuestionConfigFieldType } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import styled from '@client/styledComponents'

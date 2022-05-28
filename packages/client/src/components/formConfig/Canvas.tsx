@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
-import { BirthSection, DeathSection, Event, IFormSection } from '@client/forms'
+import { BirthSection, DeathSection, IFormSection } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { FieldPosition } from '@client/forms/configuration'
 import { PlaceholderPreviewGroups } from '@client/forms/configuration/default'
 import { FieldEnabled } from '@client/forms/configuration/defaultUtils'

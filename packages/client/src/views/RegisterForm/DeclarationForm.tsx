@@ -22,7 +22,7 @@ import {
 import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { connect } from 'react-redux'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 
 const pageRoute: { [key in Event]: string } = {
   birth: DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,

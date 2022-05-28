@@ -36,7 +36,7 @@ import {
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import subYears from 'date-fns/subYears'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
@@ -265,7 +265,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       timeStart:
         (timeStart && new Date(timeStart)) || subYears(new Date(Date.now()), 1),
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
-      event: event || Event.BIRTH,
+      event: event || Event.Birth,
       toggleStatus: false,
       queriesLoading: ['PERFORMANCE_METRICS', 'GET_TOTAL_PAYMENTS'],
       officeSelected: this.isOfficeSelected(selectedLocation),
@@ -341,11 +341,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
           options={[
             {
               label: intl.formatMessage(messages.eventOptionForBirths),
-              value: Event.BIRTH
+              value: Event.Birth
             },
             {
               label: intl.formatMessage(messages.eventOptionForDeaths),
-              value: Event.DEATH
+              value: Event.Death
             }
           ]}
         />

@@ -64,11 +64,6 @@ export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 
-export enum Event {
-  BIRTH = 'birth',
-  DEATH = 'death'
-}
-
 export enum Sort {
   ASC = 'asc',
   DESC = 'desc'

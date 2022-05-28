@@ -17,8 +17,7 @@ import { DraftsTab } from './DraftsTab'
 import { History } from 'history'
 import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { DraftStatus } from '@client/utils/gateway'
-import { Event } from '@client/forms'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import {
   ActionState,
   defaultActionState,
@@ -86,7 +85,7 @@ describe('DraftsTab', () => {
     describe('if not default draft', () => {
       beforeEach(() => {
         const newDraft: IFormDraft = {
-          event: Event.BIRTH,
+          event: Event.Birth,
           status: DraftStatus.Draft,
           version: 1,
           history: draftHistory,
@@ -135,7 +134,7 @@ describe('DraftsTab', () => {
 
   describe('when DraftStatus status is IN_PREVIEW', () => {
     const inPreviewDraft: IFormDraft = {
-      event: Event.BIRTH,
+      event: Event.Birth,
       status: DraftStatus.InPreview,
       version: 1,
       history: draftHistory,
@@ -155,7 +154,7 @@ describe('DraftsTab', () => {
 
   describe('when DraftStatus status is PUBLISHED', () => {
     const publishedDraft: IFormDraft = {
-      event: Event.BIRTH,
+      event: Event.Birth,
       status: DraftStatus.Published,
       version: 1,
       history: draftHistory,

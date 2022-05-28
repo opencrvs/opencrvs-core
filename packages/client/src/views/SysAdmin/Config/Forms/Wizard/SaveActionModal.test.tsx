@@ -13,8 +13,7 @@ import React from 'react'
 import { MockedResponse } from 'react-apollo/test-links'
 import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { DraftStatus } from '@client/utils/gateway'
-import { Event } from '@client/forms'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import { SaveActionContext, SaveActionModal } from './SaveActionModal'
 import { AppStore, createStore } from '@client/store'
 import { History } from 'history'
@@ -24,7 +23,7 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import routeData from 'react-router'
 
 const draft: IFormDraft = {
-  event: Event.BIRTH,
+  event: Event.Birth,
   status: DraftStatus.Draft,
   version: 1,
   history: [],
@@ -37,7 +36,7 @@ const graphqlMocks: MockedResponse[] = [
     request: {
       query: CREATE_FORM_DRAFT,
       variables: {
-        event: Event.BIRTH,
+        event: Event.Birth,
         comment: 'No comment',
         questions: [
           {
@@ -117,7 +116,7 @@ describe('SaveActionModal', () => {
   let history: History
 
   beforeEach(async () => {
-    jest.spyOn(routeData, 'useParams').mockReturnValue({ event: Event.BIRTH })
+    jest.spyOn(routeData, 'useParams').mockReturnValue({ event: Event.Birth })
     ;({ store, history } = createStore())
     component = await createTestComponent(<WrappedSaveActionModal />, {
       store,

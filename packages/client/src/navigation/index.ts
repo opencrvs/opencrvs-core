@@ -10,12 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import {
-  Event,
-  UserSection,
-  CorrectionSection,
-  WizardSection
-} from '@client/forms'
+import { UserSection, CorrectionSection, WizardSection } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import {
   CERTIFICATE_COLLECTOR,
   CREATE_USER,

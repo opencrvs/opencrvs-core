@@ -17,7 +17,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
-import { Event, BirthSection, DeathSection } from '@client/forms'
+import { BirthSection, DeathSection } from '@client/forms'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
 import {
@@ -29,7 +29,7 @@ import { ToggleMenu, Pill } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { goToFormConfigWizard } from '@client/navigation'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { DraftStatus } from '@client/utils/gateway'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import { Value, DraftVersion } from './components'
 import {
   ActionStatus,
@@ -54,7 +54,7 @@ function ActionButton({ event, version }: IFormDraft) {
             dispatch(
               goToFormConfigWizard(
                 event,
-                event === Event.BIRTH
+                event === Event.Birth
                   ? BirthSection.Child
                   : DeathSection.Deceased
               )
@@ -171,8 +171,8 @@ function EventDrafts({ event }: { event: Event }) {
 export function DraftsTab() {
   return (
     <ListViewSimplified>
-      <EventDrafts event={Event.BIRTH} />
-      <EventDrafts event={Event.DEATH} />
+      <EventDrafts event={Event.Birth} />
+      <EventDrafts event={Event.Death} />
     </ListViewSimplified>
   )
 }

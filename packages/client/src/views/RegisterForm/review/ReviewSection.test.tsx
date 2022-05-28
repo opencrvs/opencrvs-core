@@ -15,7 +15,6 @@ import {
   storeDeclaration
 } from '@client/declarations'
 import {
-  Event as DeclarationEvent,
   BirthSection,
   ViewType,
   RADIO_GROUP_WITH_NESTED_FIELDS,
@@ -26,6 +25,7 @@ import {
   DATE,
   DOCUMENT_UPLOADER_WITH_OPTION
 } from '@client/forms'
+import { Event as DeclarationEvent } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import * as profileSelectors from '@client/profile/profileSelectors'
 import * as declarationSelectors from '@client/forms/register/declaration-selectors'
@@ -34,8 +34,7 @@ import {
   createTestComponent,
   flushPromises,
   mockOfflineData,
-  resizeWindow,
-  wait
+  resizeWindow
 } from '@client/tests/util'
 import { REJECTED } from '@client/utils/constants'
 import {
@@ -45,7 +44,7 @@ import {
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { v4 as uuid } from 'uuid'
-import { waitForElement, waitFor } from '@client/tests/wait-for-element'
+import { waitForElement } from '@client/tests/wait-for-element'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { createIntl } from 'react-intl'
 import { phoneNumberFormat } from '@client/utils/validate'
@@ -55,7 +54,7 @@ import { LocationType } from '@client/offline/reducer'
 const { store, history } = createStore()
 const mockHandler = jest.fn()
 
-const draft = createDeclaration(DeclarationEvent.BIRTH)
+const draft = createDeclaration(DeclarationEvent.Birth)
 draft.data = {
   child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
   father: {
@@ -75,18 +74,18 @@ draft.data = {
 const declaredBirthDeclaration = createReviewDeclaration(
   uuid(),
   draft.data,
-  DeclarationEvent.BIRTH
+  DeclarationEvent.Birth
 )
 const rejectedDraftBirth = createReviewDeclaration(
   uuid(),
   draft.data,
-  DeclarationEvent.BIRTH,
+  DeclarationEvent.Birth,
   REJECTED
 )
 const rejectedDraftDeath = createReviewDeclaration(
   uuid(),
   draft.data,
-  DeclarationEvent.DEATH,
+  DeclarationEvent.Death,
   REJECTED
 )
 
@@ -472,7 +471,7 @@ describe('when in device of large viewport', () => {
       const simpleDraft = createReviewDeclaration(
         uuid(),
         data,
-        DeclarationEvent.BIRTH
+        DeclarationEvent.Birth
       )
 
       const testComponent = await createTestComponent(
@@ -488,10 +487,6 @@ describe('when in device of large viewport', () => {
     })
 
     it('renders values in review section', async () => {
-      const component = await waitForElement(
-        reviewSectionComponent,
-        '#Informant'
-      )
       expect(
         reviewSectionComponent.find('#Informant').hostNodes().first()
       ).toHaveLength(1)
@@ -575,7 +570,7 @@ describe('when in device of large viewport', () => {
       const simpleDraft = createReviewDeclaration(
         uuid(),
         data,
-        DeclarationEvent.BIRTH
+        DeclarationEvent.Birth
       )
 
       const testComponent = await createTestComponent(
@@ -693,7 +688,7 @@ describe('when in device of small viewport', () => {
     const simpleDraft = createReviewDeclaration(
       uuid(),
       data,
-      DeclarationEvent.BIRTH
+      DeclarationEvent.Birth
     )
 
     const testComponent = await createTestComponent(

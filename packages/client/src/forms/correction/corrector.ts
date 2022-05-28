@@ -14,9 +14,9 @@ import {
   CorrectionSection,
   IFormSection,
   IFormSectionGroup,
-  RADIO_GROUP_WITH_NESTED_FIELDS,
-  Event
+  RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/correction'
 import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
 
@@ -196,5 +196,5 @@ const deathCorrectorSection: IFormSection = {
 }
 
 export const getCorrectorSection = (event: Event) => {
-  return event === Event.BIRTH ? birthCorrectorSection : deathCorrectorSection
+  return event === Event.Birth ? birthCorrectorSection : deathCorrectorSection
 }

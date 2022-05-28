@@ -11,7 +11,6 @@
  */
 import {
   Action as DeclarationAction,
-  Event,
   IForm,
   IFormData,
   IFormFieldValue,
@@ -19,6 +18,7 @@ import {
   Sort,
   FieldValueMap
 } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
 import { Action as NavigationAction, GO_TO_PAGE } from '@client/navigation'

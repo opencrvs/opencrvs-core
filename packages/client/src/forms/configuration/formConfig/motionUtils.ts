@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { FieldPosition } from '@client/forms/configuration'
 import { IConfigField, IConfigFieldMap } from './utils'
 

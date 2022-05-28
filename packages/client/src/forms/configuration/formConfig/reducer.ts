@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Event, IForm, IFormConfig } from '@client/forms'
+import { IForm, IFormConfig } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { FieldPosition, getConfiguredForm } from '@client/forms/configuration'
 import * as actions from '@client/forms/configuration/formConfig/actions'
 import {
@@ -79,23 +80,23 @@ function getNextField(fieldMap: IConfigFieldMap, fieldId: string) {
 }
 
 function getReadyState({ formDrafts, questionConfig }: IFormConfig) {
-  const birthForm = getConfiguredForm(questionConfig, Event.BIRTH, true)
-  const deathForm = getConfiguredForm(questionConfig, Event.DEATH, true)
+  const birthForm = getConfiguredForm(questionConfig, Event.Birth, true)
+  const deathForm = getConfiguredForm(questionConfig, Event.Death, true)
   return {
     state: 'READY' as const,
     birth: {
       formDraft:
-        getEventDraft(formDrafts, Event.BIRTH) ||
-        DEFAULT_FORM_DRAFT[Event.BIRTH],
+        getEventDraft(formDrafts, Event.Birth) ||
+        DEFAULT_FORM_DRAFT[Event.Birth],
       registerForm: birthForm,
-      configFields: getSectionFieldsMap(Event.BIRTH, birthForm, questionConfig)
+      configFields: getSectionFieldsMap(Event.Birth, birthForm, questionConfig)
     },
     death: {
       formDraft:
-        getEventDraft(formDrafts, Event.DEATH) ||
-        DEFAULT_FORM_DRAFT[Event.DEATH],
+        getEventDraft(formDrafts, Event.Death) ||
+        DEFAULT_FORM_DRAFT[Event.Death],
       registerForm: deathForm,
-      configFields: getSectionFieldsMap(Event.DEATH, deathForm, questionConfig)
+      configFields: getSectionFieldsMap(Event.Death, deathForm, questionConfig)
     }
   }
 }

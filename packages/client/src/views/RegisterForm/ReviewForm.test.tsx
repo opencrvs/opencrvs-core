@@ -15,35 +15,28 @@ import {
   IDeclaration,
   storeDeclaration
 } from '@opencrvs/client/src/declarations'
-import { Event, IForm, IFormSectionData } from '@opencrvs/client/src/forms'
-
+import { IForm, IFormSectionData } from '@opencrvs/client/src/forms'
+import { Event } from '@client/utils/gateway'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { RegisterForm } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
 import * as React from 'react'
 import { queries } from '@client/profile/queries'
 import { AppStore } from '@client/store'
-
 import {
   createTestComponent,
   mockUserResponseWithName,
   getReviewFormFromStore,
-  mockOfflineData,
-  createTestStore,
-  graphQLPersonAddressMock,
-  graphQLEventLocationAddressMock
+  createTestStore
 } from '@client/tests/util'
 import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from '@client/views/DataProvider/birth/queries'
 import { GET_DEATH_REGISTRATION_FOR_REVIEW } from '@client/views/DataProvider/death/queries'
 import { v4 as uuid } from 'uuid'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
-import { offlineDataReady } from '@client/offline/actions'
 import { History } from 'history'
 import { waitForElement } from '@client/tests/wait-for-element'
-
-import { formConfig } from '@client/tests/mock-offline-data'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
-import { birthDraftData, deathReviewDraftData } from '@client/tests/mock-drafts'
+import { birthDraftData } from '@client/tests/mock-drafts'
 import {
   birthDeclarationForReview,
   deathDeclarationForReview
@@ -71,13 +64,13 @@ describe('ReviewForm tests', () => {
     store = testStore.store
     history = testStore.history
 
-    form = await getReviewFormFromStore(store, Event.BIRTH)
+    form = await getReviewFormFromStore(store, Event.Birth)
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth())
   })
 
   it('it returns error while fetching', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
     const graphqlMock = [
       {
         request: {
@@ -122,7 +115,7 @@ describe('ReviewForm tests', () => {
     ).toBe('An error occurred while fetching birth registration')
   })
   it('it returns birth registration', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
     const graphqlMock = [
       {
         request: {
@@ -197,7 +190,7 @@ describe('ReviewForm tests', () => {
     })
   })
   it('Shared contact phone number should be set properly', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
     const graphqlMock = [
       {
         request: {
@@ -251,7 +244,7 @@ describe('ReviewForm tests', () => {
     ).toBe('+260787878787')
   })
   it('when registration has attachment', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
     const graphqlMock = [
       {
         request: {
@@ -310,7 +303,7 @@ describe('ReviewForm tests', () => {
     ])
   })
   it('check registration', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
     const graphqlMock = [
       {
         request: {
@@ -380,7 +373,7 @@ describe('ReviewForm tests', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       {},
-      Event.BIRTH,
+      Event.Birth,
       'IN_PROGRESS'
     )
     declaration.data = birthDraftData
@@ -428,7 +421,7 @@ describe('ReviewForm tests', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       {},
-      Event.BIRTH,
+      Event.Birth,
       'DECLARED'
     )
     declaration.data = birthDraftData
@@ -476,7 +469,7 @@ describe('ReviewForm tests', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       {},
-      Event.BIRTH,
+      Event.Birth,
       'VALIDATED'
     )
     declaration.data = birthDraftData
@@ -524,7 +517,7 @@ describe('ReviewForm tests', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       {},
-      Event.BIRTH,
+      Event.Birth,
       'REJECTED'
     )
     declaration.data = birthDraftData
@@ -569,7 +562,7 @@ describe('ReviewForm tests', () => {
   })
 
   it('redirect to progress tab when exit button is clicked', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
     declaration.data = birthDraftData
     store.dispatch(
       getStorageDeclarationsSuccess(
@@ -612,7 +605,7 @@ describe('ReviewForm tests', () => {
   })
 
   it('should redirect to progress tab when close declaration button is clicked', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
     store.dispatch(storeDeclaration(declaration))
     const testComponent = await createTestComponent(
       <ReviewForm
@@ -662,7 +655,7 @@ describe('ReviewForm tests', () => {
   })
 
   it('it checked if review form is already in store and avoid loading from backend', async () => {
-    const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
+    const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
     declaration.data = birthDraftData
     store.dispatch(
       getStorageDeclarationsSuccess(
@@ -712,7 +705,7 @@ describe('ReviewForm tests', () => {
   })
   describe('Death review flow', () => {
     it('it returns death registration', async () => {
-      const declaration = createReviewDeclaration(uuid(), {}, Event.DEATH)
+      const declaration = createReviewDeclaration(uuid(), {}, Event.Death)
       const graphqlMock = [
         {
           request: {
@@ -733,7 +726,7 @@ describe('ReviewForm tests', () => {
           scope={scope}
           staticContext={mock}
           event={declaration.event}
-          registerForm={getReviewFormFromStore(store, Event.DEATH)}
+          registerForm={getReviewFormFromStore(store, Event.Death)}
           pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
           match={{
             params: {
@@ -788,7 +781,7 @@ describe('ReviewForm tests', () => {
       })
     })
     it('populates proper death event section', async () => {
-      const declaration = createReviewDeclaration(uuid(), {}, Event.DEATH)
+      const declaration = createReviewDeclaration(uuid(), {}, Event.Death)
       const graphqlMock = [
         {
           request: {
@@ -802,7 +795,7 @@ describe('ReviewForm tests', () => {
           }
         }
       ]
-      const form = await getReviewFormFromStore(store, Event.DEATH)
+      const form = await getReviewFormFromStore(store, Event.Death)
       const testComponent = await createTestComponent(
         <ReviewForm
           location={mock}
@@ -862,7 +855,7 @@ describe('ReviewForm tests', () => {
     })
 
     it('shows error message for user with declare scope', async () => {
-      const declaration = createReviewDeclaration(uuid(), {}, Event.BIRTH)
+      const declaration = createReviewDeclaration(uuid(), {}, Event.Birth)
       const graphqlMock = [
         {
           request: {

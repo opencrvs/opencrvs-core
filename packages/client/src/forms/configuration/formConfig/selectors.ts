@@ -11,7 +11,7 @@
  */
 
 import { IStoreState } from '@client/store'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { ISectionFieldMap, IConfigFieldMap } from './utils'
 
 export function isFormConfigLoaded(store: IStoreState) {

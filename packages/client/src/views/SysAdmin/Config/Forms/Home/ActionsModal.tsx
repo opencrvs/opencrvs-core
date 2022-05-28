@@ -25,28 +25,20 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { useDispatch } from 'react-redux'
 import { Mutation } from 'react-apollo'
-import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
 import {
   CHANGE_FORM_DRAFT_STATUS,
   DELETE_FORM_DRAFT
 } from '@client/views/SysAdmin/Config/Forms/mutations'
+import { DEFAULT_FORM_DRAFT } from '@client/forms/configuration/formDrafts/utils'
 import {
-  IFormDraft,
-  DEFAULT_FORM_DRAFT
-} from '@client/forms/configuration/formDrafts/utils'
-import { DraftStatus } from '@client/utils/gateway'
+  DraftStatus,
+  Event,
+  Mutation as GQLMutation,
+  DeleteFormDraftMutationVariables,
+  ChangeFormDraftStatusMutationVariables
+} from '@client/utils/gateway'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
-
-/*
- * There seems to be an issue with webpack
- * if Event is imported form '@client/forms'
- * similar to https://github.com/webpack/webpack/issues/12724
- */
-enum Event {
-  BIRTH = 'birth',
-  DEATH = 'death'
-}
 
 export enum Actions {
   PUBLISH = 'PUBLISH',
@@ -57,7 +49,7 @@ export enum Actions {
 
 export const defaultActionState = {
   action: Actions.EDIT,
-  event: Event.BIRTH,
+  event: Event.Birth,
   status: ActionStatus.IDLE
 }
 
@@ -106,10 +98,7 @@ function ActionButton() {
   return (
     <Mutation<
       GQLMutation,
-      {
-        status?: DraftStatus
-        event: Event
-      }
+      DeleteFormDraftMutationVariables | ChangeFormDraftStatusMutationVariables
     >
       mutation={
         action === Actions.DELETE ? DELETE_FORM_DRAFT : CHANGE_FORM_DRAFT_STATUS
@@ -119,12 +108,12 @@ function ActionButton() {
           dispatch(updateFormConfig(DEFAULT_FORM_DRAFT[event], []))
           setAction({ status: ActionStatus.COMPLETED })
         } else if (formDraft) {
-          dispatch(updateFormConfig(formDraft as unknown as IFormDraft))
+          dispatch(updateFormConfig(formDraft))
           setAction({ status: ActionStatus.COMPLETED })
 
           /* uncommenting this causes issues with webpack compilation */
           // if (action === Actions.EDIT) {
-          //   dispatch(goToFormConfigWizard(event, event === Event.BIRTH ? BirthSection.Registration : DeathSection.Registration))
+          //   dispatch(goToFormConfigWizard(event, event === Event.Birth ? BirthSection.Registration : DeathSection.Registration))
           // }
         }
       }}

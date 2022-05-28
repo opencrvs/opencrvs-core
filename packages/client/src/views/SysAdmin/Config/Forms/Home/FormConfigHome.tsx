@@ -19,14 +19,13 @@ import {
   messages,
   draftTabsMessages
 } from '@client/i18n/messages/views/formConfig'
-import { DraftStatus } from '@client/utils/gateway'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import { DraftsTab } from './DraftsTab'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
 import { PreviewTab } from './PreviewTab'
 import { PublishedTab } from './PublishedTab'
 import styled from '@client/styledComponents'
 import { Warning } from '@opencrvs/components/lib/interface'
-import { Event } from '@client/forms'
 import { constantsMessages } from '@client/i18n/messages'
 import {
   ActionState,
@@ -45,17 +44,17 @@ const StyledWarning = styled(Warning)`
 function UnbuplishedWarning() {
   const intl = useIntl()
   const { status: birthStatus } = useSelector((store: IStoreState) =>
-    selectFormDraft(store, Event.BIRTH)
+    selectFormDraft(store, Event.Birth)
   )
   const { status: deathStatus } = useSelector((store: IStoreState) =>
-    selectFormDraft(store, Event.DEATH)
+    selectFormDraft(store, Event.Death)
   )
   const events: string[] = []
   if (birthStatus !== DraftStatus.Published) {
-    events.push(intl.formatMessage(constantsMessages[Event.BIRTH]))
+    events.push(intl.formatMessage(constantsMessages[Event.Birth]))
   }
   if (deathStatus !== DraftStatus.Published) {
-    events.push(intl.formatMessage(constantsMessages[Event.DEATH]))
+    events.push(intl.formatMessage(constantsMessages[Event.Death]))
   }
 
   return (

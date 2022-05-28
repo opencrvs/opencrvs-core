@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  Event,
   IFormField,
   IForm,
   IQuestionConfig,
@@ -32,6 +31,7 @@ import {
   ISelectFormFieldWithOptions,
   IDocumentUploaderWithOptionsFormField
 } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { camelCase, keys } from 'lodash'
 import {
   FieldPosition,

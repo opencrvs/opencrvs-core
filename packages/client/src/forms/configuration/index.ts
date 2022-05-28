@@ -17,8 +17,7 @@ import {
   IQuestionConfig,
   SerializedFormField,
   ISerializedFormSection,
-  IFormSectionGroup,
-  Event
+  IFormSectionGroup
 } from '@client/forms/index'
 import {
   createCustomField,
@@ -34,7 +33,7 @@ import {
 } from '@client/forms/configuration/defaultUtils'
 import { getEventDraft } from '@client/forms/configuration/formDrafts/utils'
 import { registerForms } from './default'
-import { DraftStatus } from '@client/utils/gateway'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { populateRegisterFormsWithAddresses } from './administrative/addresses'
 import { cloneDeep, concat } from 'lodash'

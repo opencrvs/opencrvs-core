@@ -17,7 +17,6 @@ import {
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
-import { Event } from '@client/forms'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
 import {
@@ -25,7 +24,7 @@ import {
   draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { DraftStatus } from '@client/utils/gateway'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import { Value, DraftVersion } from './components'
 import { Pill } from '@opencrvs/components/lib/interface'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
@@ -101,8 +100,8 @@ function EventDrafts({ event }: { event: Event }) {
 export function PreviewTab() {
   return (
     <ListViewSimplified>
-      <EventDrafts event={Event.BIRTH} />
-      <EventDrafts event={Event.DEATH} />
+      <EventDrafts event={Event.Birth} />
+      <EventDrafts event={Event.Death} />
     </ListViewSimplified>
   )
 }
