@@ -24,7 +24,7 @@ type DraftHistory {
 
 type FormDraft {
   _id: ID!
-  event: String!
+  event: Event!
   status: DraftStatus!
   comment: String!
   version: Int!
@@ -35,17 +35,17 @@ type FormDraft {
 
 input FormDraftInput {
   questions: [QuestionInput!]!
-  event: String!
+  event: Event!
   comment: String!
 }
 
 input FormDraftStatusModifyInput {
-  event: String!
+  event: Event!
   status: DraftStatus!
 }
 
 input DeleteFormDraftInput {
-  event: String!
+  event: Event!
 }
 
 type Query {

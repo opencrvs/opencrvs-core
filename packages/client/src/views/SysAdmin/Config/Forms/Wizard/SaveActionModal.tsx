@@ -71,7 +71,9 @@ function SaveActionButton({ comment }: { comment: string }) {
       onError={() => setStatus(ActionStatus.ERROR)}
       onCompleted={({ createFormDraft: formDraft }) => {
         if (formDraft) {
-          dispatch(updateFormConfig(formDraft as IFormDraft, questions))
+          dispatch(
+            updateFormConfig(formDraft as unknown as IFormDraft, questions)
+          )
           setStatus(ActionStatus.COMPLETED)
           setTimeout(() => dispatch(goToFormConfigHome()), REDIRECT_DELAY)
         }
@@ -85,9 +87,9 @@ function SaveActionButton({ comment }: { comment: string }) {
             setStatus(ActionStatus.PROCESSING)
             createFormDraft({
               variables: {
-                event,
+                event: event as any,
                 comment,
-                questions
+                questions: questions as any
               }
             })
           }}

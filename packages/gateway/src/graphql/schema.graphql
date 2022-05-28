@@ -479,7 +479,7 @@ type CertificateSVG {
 
 type FormDraft {
   _id: ID!
-  event: String!
+  event: Event!
   status: DraftStatus!
   comment: String!
   version: Int!
@@ -643,17 +643,17 @@ input ApplicationConfigurationInput {
 
 input FormDraftInput {
   questions: [QuestionInput!]!
-  event: String!
+  event: Event!
   comment: String!
 }
 
 input FormDraftStatusModifyInput {
-  event: String!
+  event: Event!
   status: DraftStatus!
 }
 
 input DeleteFormDraftInput {
-  event: String!
+  event: Event!
 }
 
 scalar Map
@@ -924,6 +924,11 @@ type EventProgressSet {
   startedByFacility: String
   startedAt: Date
   progressReport: EventProgressData
+}
+
+enum Event {
+  birth
+  death
 }
 
 enum DraftStatus {

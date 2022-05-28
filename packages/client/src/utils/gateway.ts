@@ -555,7 +555,7 @@ export type DeclarationsStartedMetrics = {
 }
 
 export type DeleteFormDraftInput = {
-  event: Scalars['String']
+  event: Event
 }
 
 export type DraftHistory = {
@@ -597,6 +597,11 @@ export type Estimation = {
   locationLevel: Scalars['String']
   maleEstimation: Scalars['Int']
   totalEstimation: Scalars['Int']
+}
+
+export enum Event {
+  Birth = 'birth',
+  Death = 'death'
 }
 
 export type EventMetrics = {
@@ -670,7 +675,7 @@ export type FormDraft = {
   _id: Scalars['ID']
   comment: Scalars['String']
   createdAt: Scalars['Date']
-  event: Scalars['String']
+  event: Event
   history: Array<DraftHistory>
   status: DraftStatus
   updatedAt: Scalars['Date']
@@ -679,12 +684,12 @@ export type FormDraft = {
 
 export type FormDraftInput = {
   comment: Scalars['String']
-  event: Scalars['String']
+  event: Event
   questions: Array<QuestionInput>
 }
 
 export type FormDraftStatusModifyInput = {
-  event: Scalars['String']
+  event: Event
   status: DraftStatus
 }
 
@@ -1769,7 +1774,7 @@ export type CreateOrUpdateCertificateSvgMutation = {
 
 export type FormDraftFieldsFragment = {
   __typename?: 'FormDraft'
-  event: string
+  event: Event
   status: DraftStatus
   comment: string
   version: number
@@ -4670,19 +4675,15 @@ export type UpdateApplicationConfigMutation = {
 }
 
 export type ChangeStatusMutationVariables = Exact<{
-  event: Scalars['String']
+  event: Event
   status: DraftStatus
-}>
-
-export type DeleteFormDraftMutationVariables = Exact<{
-  event: Scalars['String']
 }>
 
 export type ChangeStatusMutation = {
   __typename?: 'Mutation'
   modifyDraftStatus?: {
     __typename?: 'FormDraft'
-    event: string
+    event: Event
     status: DraftStatus
     comment: string
     version: number
@@ -4698,8 +4699,17 @@ export type ChangeStatusMutation = {
   } | null
 }
 
+export type DeleteFormDraftMutationVariables = Exact<{
+  event: Event
+}>
+
+export type DeleteFormDraftMutation = {
+  __typename?: 'Mutation'
+  deleteFormDraft?: string | null
+}
+
 export type CreateFormDraftMutationVariables = Exact<{
-  event: Scalars['String']
+  event: Event
   comment: Scalars['String']
   questions: Array<QuestionInput> | QuestionInput
 }>
@@ -4708,7 +4718,7 @@ export type CreateFormDraftMutation = {
   __typename?: 'Mutation'
   createFormDraft?: {
     __typename?: 'FormDraft'
-    event: string
+    event: Event
     status: DraftStatus
     comment: string
     version: number

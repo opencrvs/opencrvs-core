@@ -355,7 +355,7 @@ export interface GQLCertificateSVG {
 
 export interface GQLFormDraft {
   _id: string
-  event: string
+  event: GQLEvent
   status: GQLDraftStatus
   comment: string
   version: number
@@ -519,17 +519,17 @@ export interface GQLApplicationConfigurationInput {
 
 export interface GQLFormDraftInput {
   questions: Array<GQLQuestionInput>
-  event: string
+  event: GQLEvent
   comment: string
 }
 
 export interface GQLFormDraftStatusModifyInput {
-  event: string
+  event: GQLEvent
   status: GQLDraftStatus
 }
 
 export interface GQLDeleteFormDraftInput {
-  event: string
+  event: GQLEvent
 }
 
 export type GQLMap = any
@@ -811,6 +811,11 @@ export interface GQLEventProgressSet {
   startedByFacility?: string
   startedAt?: GQLDate
   progressReport?: GQLEventProgressData
+}
+
+export const enum GQLEvent {
+  birth = 'birth',
+  death = 'death'
 }
 
 export const enum GQLDraftStatus {

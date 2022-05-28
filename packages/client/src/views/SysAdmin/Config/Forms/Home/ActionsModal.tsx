@@ -119,7 +119,7 @@ function ActionButton() {
           dispatch(updateFormConfig(DEFAULT_FORM_DRAFT[event], []))
           setAction({ status: ActionStatus.COMPLETED })
         } else if (formDraft) {
-          dispatch(updateFormConfig(formDraft as IFormDraft))
+          dispatch(updateFormConfig(formDraft as unknown as IFormDraft))
           setAction({ status: ActionStatus.COMPLETED })
 
           /* uncommenting this causes issues with webpack compilation */
