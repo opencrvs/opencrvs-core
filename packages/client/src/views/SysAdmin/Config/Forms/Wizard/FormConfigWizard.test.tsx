@@ -22,7 +22,7 @@ import routeData from 'react-router'
 import { BirthSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { checkAuth } from '@client/profile/profileActions'
-import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
+import { FieldEnabled } from '@client/forms/configuration'
 
 let component: ReactWrapper<{}, {}>
 

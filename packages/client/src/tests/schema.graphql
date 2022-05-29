@@ -490,7 +490,7 @@ type Question {
   maxLength: Int
   fieldName: String
   fieldType: String
-  preceedingFieldId: String
+  precedingFieldId: String
   required: Boolean
   enabled: String
   custom: Boolean
@@ -672,7 +672,7 @@ input QuestionInput {
   maxLength: Int
   fieldName: String
   fieldType: String
-  preceedingFieldId: String
+  precedingFieldId: String
   required: Boolean
   enabled: String
   custom: Boolean

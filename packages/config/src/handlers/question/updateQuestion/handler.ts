@@ -37,7 +37,7 @@ export default async function updateQuestion(
   existingQuestion.maxLength = question.maxLength
   existingQuestion.fieldName = question.fieldName
   existingQuestion.fieldType = question.fieldType
-  existingQuestion.preceedingFieldId = question.preceedingFieldId
+  existingQuestion.precedingFieldId = question.precedingFieldId
   existingQuestion.required = question.required
   existingQuestion.enabled = question.enabled
   existingQuestion.custom = question.custom
@@ -64,7 +64,7 @@ export const requestSchema = Joi.object({
   maxLength: Joi.number(),
   fieldName: Joi.string(),
   fieldType: Joi.string().valid(...validFieldType),
-  preceedingFieldId: Joi.string(),
+  precedingFieldId: Joi.string(),
   required: Joi.boolean(),
   enabled: Joi.string().allow(''),
   custom: Joi.boolean(),

@@ -10,62 +10,128 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import {
-  ISerializedForm,
-  IQuestionConfig,
-  SerializedFormField
-} from '@client/forms/index'
-import { getGroup, getIdentifiersFromFieldId, getSection } from '.'
+import { ISerializedForm } from '@client/forms'
+import { IFieldIdentifiers } from '@client/forms/questionConfig'
+import { FieldPosition } from '.'
+import { Event } from '@client/utils/gateway'
 
-// THIS FILE CONTAINS FUNCTIONS TO CONFIGURE THE DEFAULT CONFIGURATION
-
-/* For the enabled field in FormFields */
-export enum FieldEnabled {
-  DISABLED = 'DISABLED'
+export function getSection(
+  { sectionIndex }: IFieldIdentifiers,
+  defaultForm: ISerializedForm
+) {
+  return defaultForm.sections[sectionIndex]
 }
 
-export interface IDefaultField {
-  index: number
-  selectedSectionIndex: number
-  selectedGroupIndex: number
-  field: SerializedFormField
+export function getGroup(
+  identifiers: IFieldIdentifiers,
+  defaultForm: ISerializedForm
+) {
+  const section = getSection(identifiers, defaultForm)
+  return section.groups[identifiers.groupIndex]
 }
 
-export interface IDefaultFieldCustomisation {
-  question: IQuestionConfig
-  defaultField: IDefaultField
-  positionTop: boolean
-  preceedingDefaultField?: IDefaultField
+export function getField(
+  identifiers: IFieldIdentifiers,
+  defaultForm: ISerializedForm
+) {
+  const group = getGroup(identifiers, defaultForm)
+  return group.fields[identifiers.fieldIndex]
 }
 
-export function getDefaultField(
-  form: ISerializedForm,
-  fieldId: string
-): IDefaultField | undefined {
-  const questionIdentifiers = getIdentifiersFromFieldId(fieldId)
-  const selectedSection = getSection(
-    form.sections,
-    questionIdentifiers.sectionId
+export function getFieldId(
+  event: Event,
+  identifiers: IFieldIdentifiers,
+  defaultForm: ISerializedForm
+) {
+  const section = getSection(identifiers, defaultForm)
+  const group = getGroup(identifiers, defaultForm)
+  const field = getField(identifiers, defaultForm)
+  return [event, section.id, group.id, field.name].join('.')
+}
+
+export function getPrecedingDefaultFieldIdAcrossSections(
+  event: Event,
+  identifiers: IFieldIdentifiers,
+  defaultForm: ISerializedForm
+) {
+  const { sectionIndex } = identifiers
+  const precedingDefaultFieldId = getPrecedingDefaultFieldIdAcrossGroups(
+    event,
+    identifiers,
+    defaultForm
   )
-  const selectedGroup = getGroup(
-    selectedSection.section.groups,
-    questionIdentifiers.groupId
-  )
-
-  if (selectedGroup.group) {
-    const selectedField = selectedGroup.group.fields.filter(
-      (field) => field.name === questionIdentifiers.fieldName
-    )[0]
-    if (!selectedField) {
-      return undefined
+  const isFirstSection = !sectionIndex
+  if (precedingDefaultFieldId === FieldPosition.TOP && !isFirstSection) {
+    const previousSectionIdentifiers = {
+      sectionIndex: sectionIndex - 1,
+      groupIndex: -1,
+      fieldIndex: -1
     }
-    return {
-      index: selectedGroup.group.fields.indexOf(selectedField),
-      field: selectedField,
-      selectedGroupIndex: selectedGroup.index,
-      selectedSectionIndex: selectedSection.index
-    }
-  } else {
-    return undefined
+    const previousSection = getSection(previousSectionIdentifiers, defaultForm)
+    const lastGroup = getGroup(
+      {
+        ...previousSectionIdentifiers,
+        groupIndex: previousSection.groups.length - 1
+      },
+      defaultForm
+    )
+    return getFieldId(
+      event,
+      {
+        ...previousSectionIdentifiers,
+        groupIndex: previousSection.groups.length - 1,
+        fieldIndex: lastGroup.fields.length - 1
+      },
+      defaultForm
+    )
   }
+  return precedingDefaultFieldId
+}
+
+export function getPrecedingDefaultFieldIdAcrossGroups(
+  event: Event,
+  identifiers: IFieldIdentifiers,
+  defaultForm: ISerializedForm
+) {
+  const { sectionIndex, groupIndex } = identifiers
+  const precedingDefaultFieldId = getPrecedingDefaultFieldId(
+    event,
+    identifiers,
+    defaultForm
+  )
+  const isFirstGroupOfSection = !groupIndex
+  if (precedingDefaultFieldId === FieldPosition.TOP && !isFirstGroupOfSection) {
+    const previousGroupIdentifiers = {
+      sectionIndex,
+      groupIndex: groupIndex - 1,
+      fieldIndex: -1
+    }
+    const previousGroup = getGroup(previousGroupIdentifiers, defaultForm)
+    return getFieldId(
+      event,
+      {
+        ...previousGroupIdentifiers,
+        fieldIndex: previousGroup.fields.length - 1
+      },
+      defaultForm
+    )
+  }
+  return precedingDefaultFieldId
+}
+
+export function getPrecedingDefaultFieldId(
+  event: Event,
+  identifiers: IFieldIdentifiers,
+  defaultForm: ISerializedForm
+) {
+  const { sectionIndex, groupIndex, fieldIndex } = identifiers
+  const isFirstFieldOfGroup = !fieldIndex
+  if (isFirstFieldOfGroup) {
+    return FieldPosition.TOP
+  }
+  return getFieldId(
+    event,
+    { sectionIndex, groupIndex, fieldIndex: fieldIndex - 1 },
+    defaultForm
+  )
 }

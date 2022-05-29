@@ -12,7 +12,8 @@
 import { CustomFieldTools } from '@client/components/formConfig/formTools/CustomFieldTools'
 import {
   IConfigField,
-  isDefaultField
+  isDefaultConfigField,
+  isCustomConfigField
 } from '@client/forms/configuration/formConfig/utils'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
@@ -41,15 +42,11 @@ import { SaveActionModal, SaveActionContext } from './SaveActionModal'
 import { SaveActionNotification } from './SaveActionNotification'
 import { FormConfigSettings } from './FormConfigSettings'
 import {
-  selectConfigField,
   selectFormDraft,
   selectConfigFields
 } from '@client/forms/configuration/formConfig/selectors'
-import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
-import {
-  FieldPosition,
-  getIdentifiersFromFieldId
-} from '@client/forms/configuration'
+import { FieldPosition, FieldEnabled } from '@client/forms/configuration'
+import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
 
 const Container = styled.div`
   display: flex;
@@ -135,10 +132,10 @@ function useSelectedField() {
   const [selectedFieldId, setSelectedFieldId] = React.useState<string | null>(
     null
   )
-  const selectedField = useSelector((store: IStoreState) =>
-    selectConfigField(store, event, section, selectedFieldId)
+  const fields = useSelector((store: IStoreState) =>
+    selectConfigFields(store, event, section)
   )
-
+  const selectedField = selectedFieldId ? fields[selectedFieldId] : null
   /*
    * We need to clear the selected field if section changes
    * as the changed section won't have the previously selected field
@@ -164,10 +161,15 @@ function useHiddenFields({
    * hidden and we have the showHiddenFields set to false
    */
   React.useEffect(() => {
-    if (!showHiddenFields && selectedField?.enabled === FieldEnabled.DISABLED) {
+    if (
+      !showHiddenFields &&
+      selectedField &&
+      isDefaultConfigField(selectedField) &&
+      selectedField.enabled === FieldEnabled.DISABLED
+    ) {
       setSelectedField(null)
     }
-  }, [showHiddenFields, selectedField?.enabled, setSelectedField])
+  }, [showHiddenFields, selectedField, setSelectedField])
 
   return { showHiddenFields, setShowHiddenFields }
 }
@@ -194,7 +196,7 @@ export function FormConfigWizard() {
   let firstFieldIdentifiers
   if (section !== 'settings') {
     const firstField = Object.values(fieldsMap).find(
-      (formField) => formField.preceedingFieldId === FieldPosition.TOP
+      (formField) => formField.precedingFieldId === FieldPosition.TOP
     )
     if (!firstField) {
       throw new Error(`No starting field found in section`)
@@ -272,16 +274,17 @@ export function FormConfigWizard() {
                *  we need to make sure that the selectedField is valid
                */}
               {isSelectedFieldValid(selectedField, section) ? (
-                isDefaultField(selectedField) ? (
-                  <DefaultFieldTools configField={selectedField} />
-                ) : (
+                isCustomConfigField(selectedField) ? (
                   <CustomFieldTools
+                    key={selectedField.fieldId}
                     event={event}
                     section={section}
                     selectedField={selectedField}
                     setSelectedField={setSelectedField}
                     groupId={firstFieldIdentifiers.groupId}
                   />
+                ) : (
+                  <DefaultFieldTools configField={selectedField} />
                 )
               ) : (
                 <FormTools

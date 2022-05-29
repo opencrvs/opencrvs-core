@@ -49,8 +49,8 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
     case offlineActions.APPLICATION_CONFIG_LOADED:
       const { formConfig } = action.payload
 
-      const birth = getConfiguredOrDefaultForm(formConfig, Event.Birth, false)
-      const death = getConfiguredOrDefaultForm(formConfig, Event.Death, false)
+      const birth = getConfiguredOrDefaultForm(formConfig, Event.Birth)
+      const death = getConfiguredOrDefaultForm(formConfig, Event.Death)
 
       const preview = {
         viewType: 'preview' as const,

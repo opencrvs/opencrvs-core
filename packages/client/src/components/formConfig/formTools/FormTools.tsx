@@ -10,8 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { QuestionConfigFieldType } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, CustomFieldType } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import styled from '@client/styledComponents'
@@ -46,14 +45,14 @@ const CenteredToggle = styled(Toggle)`
   align-self: center;
 `
 
-const MESSAGE_MAP: Record<QuestionConfigFieldType, MessageDescriptor> = {
-  [QuestionConfigFieldType.TEXT]: messages.textInput,
-  [QuestionConfigFieldType.TEL]: messages.phoneNumberInput,
-  [QuestionConfigFieldType.NUMBER]: messages.numberInput,
-  [QuestionConfigFieldType.TEXTAREA]: messages.textAreaInput,
+const MESSAGE_MAP: Record<CustomFieldType, MessageDescriptor> = {
+  [CustomFieldType.Text]: messages.textInput,
+  [CustomFieldType.Tel]: messages.phoneNumberInput,
+  [CustomFieldType.Number]: messages.numberInput,
+  [CustomFieldType.Textarea]: messages.textAreaInput,
   /* TODO */
-  [QuestionConfigFieldType.SUBSECTION]: messages.supportingCopy,
-  [QuestionConfigFieldType.PARAGRAPH]: messages.heading
+  [CustomFieldType.Subsection]: messages.supportingCopy,
+  [CustomFieldType.Paragraph]: messages.heading
 }
 
 type IRouteProps = {
@@ -83,7 +82,7 @@ export const FormTools = ({
 
   const toggleShowHiddenFields = () => setShowHiddenFields((prev) => !prev)
 
-  const createCustomField = (fieldType: QuestionConfigFieldType) => {
+  const createCustomField = (fieldType: CustomFieldType) => {
     const customConfigField = prepareNewCustomFieldConfig(
       fieldsMap,
       event,
@@ -115,7 +114,7 @@ export const FormTools = ({
         {intl.formatMessage(messages.addInputContent)}
       </TitleContainer>
       <ListViewSimplified>
-        {Object.values(QuestionConfigFieldType).map((fieldType) => (
+        {Object.values(CustomFieldType).map((fieldType) => (
           <ListViewItemSimplified
             key={fieldType}
             label={<Label>{intl.formatMessage(MESSAGE_MAP[fieldType])}</Label>}
@@ -126,8 +125,8 @@ export const FormTools = ({
                 size="small"
                 /* TODO */
                 disabled={
-                  fieldType === QuestionConfigFieldType.PARAGRAPH ||
-                  fieldType === QuestionConfigFieldType.SUBSECTION
+                  fieldType === CustomFieldType.Paragraph ||
+                  fieldType === CustomFieldType.Subsection
                 }
               >
                 {intl.formatMessage(buttonMessages.add)}

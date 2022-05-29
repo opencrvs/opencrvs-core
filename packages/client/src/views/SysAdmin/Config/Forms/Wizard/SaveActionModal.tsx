@@ -39,6 +39,7 @@ import { updateFormConfig } from '@client/forms/configuration/formConfig/actions
 import { generateModifiedQuestionConfigs } from '@client/forms/configuration/formConfig/utils'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default'
+import { questionsTransformer } from '@client/forms/questionConfig'
 
 export const SaveActionContext = React.createContext({
   status: ActionStatus.IDLE,
@@ -70,7 +71,7 @@ function SaveActionButton({ comment }: { comment: string }) {
       onError={() => setStatus(ActionStatus.ERROR)}
       onCompleted={({ createFormDraft: formDraft }) => {
         if (formDraft) {
-          dispatch(updateFormConfig(formDraft, questions))
+          dispatch(updateFormConfig(formDraft, questionsTransformer(questions)))
           setStatus(ActionStatus.COMPLETED)
           setTimeout(() => dispatch(goToFormConfigHome()), REDIRECT_DELAY)
         }
