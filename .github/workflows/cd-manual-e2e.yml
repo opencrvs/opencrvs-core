@@ -51,7 +51,7 @@ jobs:
         if: ${{ !github.event.inputs.farajaland-image-tag }}
         run: |
           cd opencrvs-farajaland
-          echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "COUNTRY_CONFIG_VERSION=$(git log -1 --pretty=format:%h)" >> $GITHUB_ENV
           cd ../
       - name: Set COUNTRY_CONFIG_VERSION from inputs
         if: ${{ github.event.inputs.farajaland-image-tag }}
@@ -95,6 +95,8 @@ jobs:
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
         run: |
           yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+      - name: Summarise deployment
+        run: echo "### Staging deployment\nCore version **$CORE_VERSION**\nFarajaland version **$COUNTRY_CONFIG_VERSION**" >> $GITHUB_STEP_SUMMARY
       - name: Run Cypress tests
         run: |
           cd opencrvs-farajaland
