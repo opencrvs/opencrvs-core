@@ -31,10 +31,12 @@ import {
   NATIONAL_REGISTRAR_ROLES
 } from '@client/utils/constants'
 import { GQLRole, GQLUser } from '@opencrvs/gateway/src/graphql/schema'
-import { MessageDescriptor } from 'react-intl'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { IStoreState } from '@client/store'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { IUserData } from './user/userProfilie/UserProfile'
+import { Roles } from '@client/utils/authUtils'
 
 export enum UserStatus {
   ACTIVE,
@@ -624,4 +626,39 @@ export function checkExternalValidationStatus(status?: string | null): boolean {
 }
 export function checkIfLocalLanguageProvided() {
   return window.config.LANGUAGES.split(',').length > 1
+}
+
+export function getUserRole(
+  user: IUserData,
+  intl: IntlShape
+): string | undefined {
+  switch (user.role) {
+    case Roles.FIELD_AGENT:
+      return intl.formatMessage(userMessages.FIELD_AGENT)
+    case Roles.REGISTRATION_AGENT:
+      return intl.formatMessage(userMessages.REGISTRATION_AGENT)
+    case Roles.NATIONAL_REGISTRAR:
+      return intl.formatMessage(userMessages.NATIONAL_REGISTRAR)
+    case Roles.LOCAL_REGISTRAR:
+      return intl.formatMessage(userMessages.LOCAL_REGISTRAR)
+    case Roles.LOCAL_SYSTEM_ADMIN:
+      return intl.formatMessage(userMessages.LOCAL_SYSTEM_ADMIN)
+    case Roles.NATIONAL_SYSTEM_ADMIN:
+      return intl.formatMessage(userMessages.NATIONAL_SYSTEM_ADMIN)
+    case Roles.PERFORMANCE_MANAGEMENT:
+      return intl.formatMessage(userMessages.PERFORMANCE_MANAGEMENT)
+    default:
+      return undefined
+  }
+}
+
+export function getUserType(
+  user: IUserData,
+  intl: IntlShape
+): string | undefined {
+  if (user.type) {
+    return intl.formatMessage(userMessages[user.type as string])
+  } else {
+    return undefined
+  }
 }
