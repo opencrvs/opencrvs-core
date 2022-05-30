@@ -1796,7 +1796,7 @@ describe('Registration root resolvers', () => {
       )
     })
 
-    it('throws error if no task entry found given id', () => {
+    it('throws error if no task entry found given id', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -1816,7 +1816,7 @@ describe('Registration root resolvers', () => {
           entry: []
         })
       )
-      expect(
+      return expect(
         resolvers.Mutation.markBirthAsRegistered(
           {},
           { id: compositionID },

@@ -361,7 +361,11 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         {
           id: 'birth',
           label: intl.formatMessage(messages.birthTemplate),
-          value: intl.formatMessage(messages.birthDefaultTempDesc),
+          value: birthLastModified
+            ? intl.formatMessage(messages.eventUpdatedTempDesc, {
+                lastModified: birthLastModified
+              })
+            : intl.formatMessage(messages.birthDefaultTempDesc),
           actionsMenu: (
             <>
               {offlineResources.templates.certificates.birth && (
@@ -389,7 +393,11 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         {
           id: 'death',
           label: intl.formatMessage(messages.deathTemplate),
-          value: intl.formatMessage(messages.deathDefaultTempDesc),
+          value: deathLastModified
+            ? intl.formatMessage(messages.eventUpdatedTempDesc, {
+                lastModified: deathLastModified
+              })
+            : intl.formatMessage(messages.deathDefaultTempDesc),
           actionsMenu: (
             <>
               {offlineResources.templates.certificates.death && (
@@ -416,19 +424,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         }
       ]
     }
-    CertificateSection.items.map((item) =>
-      mapValues(item, (val) => {
-        if (val === Event.BIRTH) {
-          item.value = intl.formatMessage(messages.eventUpdatedTempDesc, {
-            lastModified: birthLastModified
-          })
-        } else if (val === Event.DEATH) {
-          item.value = intl.formatMessage(messages.eventUpdatedTempDesc, {
-            lastModified: deathLastModified
-          })
-        }
-      })
-    )
     return (
       <>
         <SysAdminContentWrapper isCertificatesConfigPage={true}>

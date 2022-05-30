@@ -149,7 +149,7 @@ describe('Certificate root resolvers', () => {
         { status: 400 }
       )
 
-      expect(
+      return expect(
         resolvers.Mutation.createOrUpdateCertificateSVG(
           {},
           { certificateSVG },
