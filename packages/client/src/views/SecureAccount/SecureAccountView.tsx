@@ -18,6 +18,7 @@ import { CreatePin } from '@client/views/PIN/CreatePin'
 const SecurePageContainer = styled.div`
   ${({ theme }) => theme.fonts.reg18};
   ${({ theme }) => theme.gradients.primary};
+  background: ${({ theme }) => theme.colors.backgroundPrimary};
   height: 100vh;
   text-align: center;
   width: 100%;
