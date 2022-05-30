@@ -71,7 +71,10 @@ function getGroupWithVisibleFields(
   if (event === Event.BIRTH) {
     const declarationData = declaration.data
 
-    const motherDataExists = declarationData && declarationData.mother
+    const motherDataExists =
+      declarationData &&
+      declarationData.mother &&
+      declarationData.mother.detailsExist
 
     const fatherDataExists =
       declarationData &&
