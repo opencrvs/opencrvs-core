@@ -102,7 +102,7 @@ export const DECLARATION_STATUS_LABEL: IStatus = {
     id: 'regHome.sentForApprovals'
   },
   REGISTERED: {
-    defaultMessage: 'Declaration registered',
+    defaultMessage: 'Registered',
     description: 'Label for registration status registered',
     id: 'recordAudit.history.registered'
   },
@@ -127,7 +127,7 @@ export const DECLARATION_STATUS_LABEL: IStatus = {
     id: 'recordAudit.history.requestedCorrection'
   },
   DECLARATION_UPDATED: {
-    defaultMessage: 'Updated declaration',
+    defaultMessage: 'Updated',
     description: 'Declaration has been updated',
     id: 'updated_declaration'
   }
