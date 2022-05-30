@@ -499,13 +499,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       case 'IN_PROGRESS':
         return WORKQUEUE_TABS.inProgressFieldAgent
       case 'REJECTED':
-        if (
-          hasRegisterScope(this.props.scope) ||
-          hasRegistrationClerkScope(this.props.scope)
-        ) {
-          return WORKQUEUE_TABS.requiresUpdateRegistrar
-        }
-        return WORKQUEUE_TABS.requiresUpdateAgent
+        return WORKQUEUE_TABS.requiresUpdate
       case 'VALIDATED':
         return WORKQUEUE_TABS.readyForReview
       default:
