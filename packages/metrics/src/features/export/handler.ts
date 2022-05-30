@@ -53,7 +53,8 @@ export async function monthlyExportHandler(
   const monthlyMetrics = await metricsHandler(request, h)
 
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
-    event
+    event,
+    auth.token
   )
 
   const csvStreams = []

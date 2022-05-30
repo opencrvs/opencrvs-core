@@ -73,7 +73,7 @@ export async function createServer() {
       `https://register.${HOSTNAME}`
     ]
   }
-  logger.info('Whitelist: ', JSON.stringify(whitelist))
+  logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const server = new Hapi.Server({
     host: AUTH_HOST,
     port: AUTH_PORT,

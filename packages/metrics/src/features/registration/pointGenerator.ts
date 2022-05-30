@@ -213,7 +213,12 @@ export const generateBirthRegPoint = async (
       ? `${compositionDate.getFullYear()}-${compositionDate.getMonth()}`
       : undefined,
     timeLabel:
-      (ageInDays && (await getTimeLabel(ageInDays, EVENT_TYPE.BIRTH))) ||
+      (ageInDays &&
+        (await getTimeLabel(
+          ageInDays,
+          EVENT_TYPE.BIRTH,
+          authHeader.Authorization
+        ))) ||
       undefined,
     officeLocation: getRegLastOffice(payload),
     ...(await generatePointLocations(payload, authHeader))
@@ -282,7 +287,12 @@ export const generateDeathRegPoint = async (
     ageLabel:
       (deceasedAgeInDays && getAgeLabel(deceasedAgeInDays)) || undefined,
     timeLabel:
-      (deathDays && (await getTimeLabel(deathDays, EVENT_TYPE.DEATH))) ||
+      (deathDays &&
+        (await getTimeLabel(
+          deathDays,
+          EVENT_TYPE.DEATH,
+          authHeader.Authorization
+        ))) ||
       undefined,
     dateLabel: !Number.isNaN(compositionDate.getTime())
       ? `${compositionDate.getFullYear()}-${compositionDate.getMonth()}`

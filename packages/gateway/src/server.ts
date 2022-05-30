@@ -38,7 +38,7 @@ export async function createServer() {
   if (HOSTNAME[0] !== '*') {
     whitelist = [`https://login.${HOSTNAME}`, `https://register.${HOSTNAME}`]
   }
-  logger.info('Whitelist: ', JSON.stringify(whitelist))
+  logger.info(`Whitelist: ${JSON.stringify(whitelist)}`)
   const app = new Hapi.Server({
     host: HOST,
     port: PORT,
@@ -87,7 +87,10 @@ export async function createServer() {
     await app.start()
     await database.start()
     await apolloServer.applyMiddleware({
-      app
+      app,
+      cors: {
+        origin: whitelist
+      }
     })
     app.log('info', `server started on port ${PORT}`)
   }

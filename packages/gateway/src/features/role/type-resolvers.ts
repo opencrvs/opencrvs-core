@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
+import { IMongoComparisonObject } from '@gateway/features/role/utils'
 
 interface IRoleModelData {
   _id: string
@@ -21,7 +22,7 @@ interface IRoleModelData {
 
 export interface IRoleSearchPayload {
   title?: string
-  value?: string
+  value?: IMongoComparisonObject
   type?: string
   active?: boolean
   sortBy?: string

@@ -15,11 +15,14 @@ env:
   CYPRESS_AUTH_URL: https://auth.farajaland-staging.opencrvs.org/
   CYPRESS_GATEWAY_URL: https://gateway.farajaland-staging.opencrvs.org/
   CYPRESS_COUNTRYCONFIG_URL: https://countryconfig.farajaland-staging.opencrvs.org/
-on:
-  push:
-    branches:
-      - 'develop'
 
+on:
+  workflow_run:
+    workflows: [Publish images to Dockerhub from any branch]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
 jobs:
   push-deploy-e2e:
     environment: staging
@@ -37,15 +40,22 @@ jobs:
       - name: Get COUNTRY_CONFIG_VERSION
         run: |
           cd opencrvs-farajaland
-          echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
           cd ../
+      - name: Get CORE_VERSION
+        run: |
+          echo "CORE_VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
+
+      - name: Display versions
+        run: |
+          echo "Core version: ${{ env.CORE_VERSION }}"
+          echo "Farajaland version: ${{ env.COUNTRY_CONFIG_VERSION }}"
+
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Push images to Dockerhub
-        run: yarn compose:push:version
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
@@ -66,7 +76,9 @@ jobs:
           MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
         run: |
-          yarn deploy:staging farajaland-staging.opencrvs.org $(git rev-parse --short HEAD) ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+          yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+      - name: Summarise deployment
+        run: echo "### Staging deployment\nCore version **${{ env.CORE_VERSION }}**\nFarajaland version **${{ env.COUNTRY_CONFIG_VERSION }}**" >> $GITHUB_STEP_SUMMARY
       - name: Run Cypress tests
         run: |
           cd opencrvs-farajaland

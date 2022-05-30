@@ -35,6 +35,10 @@ import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 
+const TableDiv = styled.div`
+  overflow: auto;
+`
+
 const Heading = styled.h3`
   ${({ theme }) => theme.fonts.h3}
   margin-bottom: 0px !important;
@@ -244,40 +248,43 @@ export const GetHistory = ({
     <>
       <Divider />
       <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
-      <TableView
-        id="task-history"
-        fixedWidth={1065}
-        noResultText=""
-        hideBoxShadow={true}
-        columns={columns}
-        content={historyData}
-        alignItemCenter={true}
-        pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
-      />
-      {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
-        <PaginationWrapper>
-          <DesktopWrapper>
-            <PaginationModified
-              size="small"
-              initialPage={currentPageNumber}
-              totalPages={Math.ceil(
-                allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
-              )}
-              onPageChange={onPageChange}
-            />
-          </DesktopWrapper>
-          <MobileWrapper>
-            <PaginationModified
-              size="large"
-              initialPage={currentPageNumber}
-              totalPages={Math.ceil(
-                allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
-              )}
-              onPageChange={onPageChange}
-            />
-          </MobileWrapper>
-        </PaginationWrapper>
-      )}
+      <TableDiv>
+        <TableView
+          id="task-history"
+          fixedWidth={1088}
+          noResultText=""
+          hideBoxShadow={true}
+          columns={columns}
+          content={historyData}
+          alignItemCenter={true}
+          highlightRowOnMouseOver
+          pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
+        />
+        {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+          <PaginationWrapper>
+            <DesktopWrapper>
+              <PaginationModified
+                size="small"
+                initialPage={currentPageNumber}
+                totalPages={Math.ceil(
+                  allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+                )}
+                onPageChange={onPageChange}
+              />
+            </DesktopWrapper>
+            <MobileWrapper>
+              <PaginationModified
+                size="large"
+                initialPage={currentPageNumber}
+                totalPages={Math.ceil(
+                  allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+                )}
+                onPageChange={onPageChange}
+              />
+            </MobileWrapper>
+          </PaginationWrapper>
+        )}
+      </TableDiv>
     </>
   )
 }

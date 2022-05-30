@@ -80,7 +80,7 @@ describe('getRoles tests', () => {
         sortBy: '_id',
         sortOrder: 'desc',
         title: 'Registrar',
-        value: 'LOCAL_REGISTRAR',
+        value: { $eq: 'LOCAL_REGISTRAR' },
         type: 'Mayor',
         active: true
       },

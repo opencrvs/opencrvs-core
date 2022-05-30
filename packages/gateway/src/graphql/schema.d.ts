@@ -332,6 +332,17 @@ export interface GQLRole {
   active?: boolean
 }
 
+export interface GQLComparisonInput {
+  eq?: string
+  gt?: string
+  lt?: string
+  gte?: string
+  lte?: string
+  in?: Array<string>
+  ne?: string
+  nin?: Array<string>
+}
+
 export interface GQLCertificateSVG {
   _id?: string
   svgCode?: string
@@ -760,11 +771,6 @@ export interface GQLLocalRegistrar {
   signature?: GQLSignature
 }
 
-export interface GQLSignature {
-  data?: string
-  type?: string
-}
-
 export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
@@ -860,7 +866,7 @@ export interface GQLPersonInput {
   dateOfMarriage?: GQLDate
   multipleBirth?: number
   address?: Array<GQLAddressInput | null>
-  photo?: Array<GQLAttachmentInput | null>
+  photo?: Array<GQLAttachmentInput>
   deceased?: GQLDeceasedInput
   nationality?: Array<string | null>
   educationalAttainment?: GQLEducationType
@@ -899,7 +905,7 @@ export interface GQLRegistrationInput {
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
   inCompleteFields?: string
-  attachments?: Array<GQLAttachmentInput | null>
+  attachments?: Array<GQLAttachmentInput>
   certificates?: Array<GQLCertificateInput | null>
   location?: GQLLocationInput
   correction?: GQLCorrectionInput
@@ -910,7 +916,7 @@ export interface GQLRelatedPersonInput {
   _fhirID?: string
   relationship?: string
   otherRelationship?: string
-  affidavit?: Array<GQLAttachmentInput | null>
+  affidavit?: Array<GQLAttachmentInput>
   individual?: GQLPersonInput
 }
 
@@ -952,7 +958,7 @@ export interface GQLUserIdentifierInput {
 }
 
 export interface GQLSignatureInput {
-  data?: string
+  data: string
   type?: string
 }
 
@@ -1128,6 +1134,11 @@ export const enum GQLAttachmentSubject {
   CORONERS_REPORT = 'CORONERS_REPORT'
 }
 
+export interface GQLSignature {
+  data?: string
+  type?: string
+}
+
 export interface GQLRegistrationSearchSet {
   status?: string
   contactNumber?: string
@@ -1204,7 +1215,7 @@ export interface GQLAddressInput {
 export interface GQLAttachmentInput {
   _fhirID?: string
   contentType?: string
-  data?: string
+  data: string
   status?: string
   originalFileName?: string
   systemFileName?: string
@@ -1383,7 +1394,6 @@ export interface GQLResolver {
   StatusWiseRegistrationCount?: GQLStatusWiseRegistrationCountTypeResolver
   Identifier?: GQLIdentifierTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
-  Signature?: GQLSignatureTypeResolver
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
@@ -1404,6 +1414,7 @@ export interface GQLResolver {
   StatusReason?: GQLStatusReasonTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
+  Signature?: GQLSignatureTypeResolver
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
@@ -1970,7 +1981,7 @@ export interface QueryToGetEventsWithProgressResolver<
 
 export interface QueryToGetRolesArgs {
   title?: string
-  value?: string
+  value?: GQLComparisonInput
   type?: string
   active?: boolean
   sortBy?: string
@@ -4596,19 +4607,6 @@ export interface LocalRegistrarToSignatureResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface GQLSignatureTypeResolver<TParent = any> {
-  data?: SignatureToDataResolver<TParent>
-  type?: SignatureToTypeResolver<TParent>
-}
-
-export interface SignatureToDataResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface SignatureToTypeResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface GQLSearchFieldAgentResponseTypeResolver<TParent = any> {
   practitionerId?: SearchFieldAgentResponseToPractitionerIdResolver<TParent>
   fullName?: SearchFieldAgentResponseToFullNameResolver<TParent>
@@ -5119,6 +5117,19 @@ export interface InputOutputToValueStringResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSignatureTypeResolver<TParent = any> {
+  data?: SignatureToDataResolver<TParent>
+  type?: SignatureToTypeResolver<TParent>
+}
+
+export interface SignatureToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SignatureToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
