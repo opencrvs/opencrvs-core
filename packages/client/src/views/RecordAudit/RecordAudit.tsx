@@ -534,7 +534,7 @@ function getBodyContent({
   workqueueDeclaration,
   ...actionProps
 }: IFullProps) {
-  if (!draft?.trackingId && tab === 'search') {
+  if (!draft?.data?.registration?.trackingId && tab === 'search') {
     return (
       <>
         <Query
