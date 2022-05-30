@@ -231,6 +231,7 @@ type History {
   date: Date
   action: RegStatus
   statusReason: StatusReason
+  reason: String
   reinstated: Boolean # -> extension(url='http://opencrvs.org/specs/extension/regReinstated')
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference

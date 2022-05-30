@@ -31,6 +31,7 @@ import {
 } from './utils'
 import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import { IActionDetailsData } from './History'
+import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 
 const CLinkButton = styled(LinkButton)`
   width: fit-content;
@@ -221,13 +222,19 @@ export const ActionDetailsModalListTable = ({
   return (
     <>
       {/* For Reject Reason */}
-      {actionDetailsData.statusReason &&
+      {actionDetailsData.reason &&
         actionDetailsData.action === SUBMISSION_STATUS.REJECTED && (
           <ListTable
             noResultText=" "
             hideBoxShadow={true}
             columns={reasonColumn}
-            content={[actionDetailsData.statusReason]}
+            content={[
+              {
+                text: intl.formatMessage(
+                  getRejectionReasonDisplayValue(actionDetailsData.reason)
+                )
+              }
+            ]}
           />
         )}
 
@@ -236,7 +243,9 @@ export const ActionDetailsModalListTable = ({
         noResultText=" "
         hideBoxShadow={true}
         columns={commentsColumn}
-        content={actionDetailsData.comments}
+        content={actionDetailsData.comments
+          .concat(actionDetailsData.statusReason?.text || [])
+          .map((text: string) => ({ comment: text }))}
       />
 
       {/* For Data Updated */}
