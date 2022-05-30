@@ -68,7 +68,8 @@ import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer
+  NoNameContainer,
+  NameContainer
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
@@ -245,7 +246,7 @@ export class InProgressComponent extends React.Component<
         })
       }
       const NameComponent = name ? (
-        <LinkButton
+        <NameContainer
           id={`name_${index}`}
           isBoldLink={true}
           onClick={() =>
@@ -253,7 +254,7 @@ export class InProgressComponent extends React.Component<
           }
         >
           {name}
-        </LinkButton>
+        </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}

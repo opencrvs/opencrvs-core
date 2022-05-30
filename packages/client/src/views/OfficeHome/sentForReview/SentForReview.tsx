@@ -42,7 +42,8 @@ import {
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer
+  NoNameContainer,
+  NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
@@ -222,7 +223,7 @@ class SentForReviewComponent extends React.Component<
         reg.dateOfEvent.length > 0 &&
         new Date(reg.dateOfEvent)
       const NameComponent = reg.name ? (
-        <LinkButton
+        <NameContainer
           id={`name_${index}`}
           isBoldLink={true}
           onClick={() =>
@@ -232,7 +233,7 @@ class SentForReviewComponent extends React.Component<
           }
         >
           {reg.name}
-        </LinkButton>
+        </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
