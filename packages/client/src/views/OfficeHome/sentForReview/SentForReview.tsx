@@ -246,18 +246,25 @@ class SentForReviewComponent extends React.Component<
           {intl.formatMessage(constantsMessages.noNameProvided)}
         </NoNameContainer>
       )
+      const isDuplicate = reg.duplicates && reg.duplicates.length > 0
+
       return {
         ...reg,
         event,
         name: reg.name && reg.name.toLowerCase(),
         iconWithName: (
-          <IconWithName status={reg.declarationStatus} name={NameComponent} />
+          <IconWithName
+            status={reg.declarationStatus}
+            name={NameComponent}
+            isDuplicate={isDuplicate}
+          />
         ),
         iconWithNameEvent: (
           <IconWithNameEvent
             status={reg.declarationStatus}
             name={NameComponent}
             event={event}
+            isDuplicate={isDuplicate}
           />
         ),
         eventTimeElapsed:

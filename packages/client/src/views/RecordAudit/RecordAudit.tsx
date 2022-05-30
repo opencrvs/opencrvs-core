@@ -337,11 +337,10 @@ function RecordAuditBody({
       </DesktopDiv>
     )
   }
-
   if (
     declaration.status === SUBMISSION_STATUS.DRAFT ||
-    declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
-    (declaration.status === SUBMISSION_STATUS.REJECTED &&
+    ((declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
+      declaration.status === SUBMISSION_STATUS.REJECTED) &&
       userDetails?.role &&
       !FIELD_AGENT_ROLES.includes(userDetails.role))
   ) {
@@ -546,9 +545,10 @@ function getBodyContent({
   tab,
   userDetails,
   workqueueDeclaration,
+  goBack,
   ...actionProps
 }: IFullProps) {
-  if (!draft?.trackingId && tab === 'search') {
+  if (tab === 'search') {
     return (
       <>
         <Query
@@ -564,14 +564,31 @@ function getBodyContent({
             } else if (error) {
               return <Redirect to={HOME} />
             }
+
+            let declaration
+            if (
+              draft?.data?.registration?.trackingId &&
+              draft?.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
+            ) {
+              declaration = getDraftDeclarationData(
+                draft,
+                resources,
+                intl,
+                draft?.data?.registration?.trackingId?.toString()
+              )
+              declaration = {
+                ...declaration,
+                status: data.fetchRegistration?.registration?.status[0].type
+              }
+            } else {
+              declaration = getGQLDeclaration(data.fetchRegistration, language)
+            }
+
             return (
               <RecordAuditBody
                 key={`record-audit-${declarationId}`}
                 {...actionProps}
-                declaration={getGQLDeclaration(
-                  data.fetchRegistration,
-                  language
-                )}
+                declaration={declaration}
                 tab={tab}
                 draft={draft}
                 intl={intl}
@@ -590,7 +607,7 @@ function getBodyContent({
       workqueueDeclaration?.registration?.trackingId ||
       ''
 
-    const declaration =
+    let declaration =
       draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
         ? getDraftDeclarationData(draft, resources, intl, trackingId)
         : getWQDeclarationData(
@@ -598,6 +615,17 @@ function getBodyContent({
             language,
             trackingId
           )
+
+    const wqStatus = workqueueDeclaration?.registration?.status
+    const draftStatus =
+      draft?.submissionStatus?.toString() ||
+      draft?.registrationStatus?.toString() ||
+      SUBMISSION_STATUS.DRAFT
+
+    declaration = {
+      ...declaration,
+      status: wqStatus || draftStatus
+    }
 
     return (
       <RecordAuditBody
@@ -609,6 +637,7 @@ function getBodyContent({
         intl={intl}
         scope={scope}
         userDetails={userDetails}
+        goBack={goBack}
       />
     )
   }
