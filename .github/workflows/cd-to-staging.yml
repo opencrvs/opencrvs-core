@@ -15,11 +15,12 @@ env:
   CYPRESS_AUTH_URL: https://auth.farajaland-staging.opencrvs.org/
   CYPRESS_GATEWAY_URL: https://gateway.farajaland-staging.opencrvs.org/
   CYPRESS_COUNTRYCONFIG_URL: https://countryconfig.farajaland-staging.opencrvs.org/
-on:
-  push:
-    branches:
-      - 'develop'
 
+on:
+  workflow_run:
+    workflows: [Publish images to Dockerhub from any branch]
+    types:
+      - completed
 jobs:
   push-deploy-e2e:
     environment: staging
@@ -44,8 +45,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Push images to Dockerhub
-        run: yarn compose:push:version
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
