@@ -180,7 +180,6 @@ const ContentWrapper = styled.span<{
     totalWidth && totalWidth > 100 ? (width * 100) / totalWidth : width}%;
   flex-shrink: 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
-  padding-right: 10px;
   cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
   color: ${({ theme }) => theme.colors.tertiary};
 `
@@ -229,15 +228,15 @@ const TableScrollerHorizontal = styled.div<{
   ${({ disableScrollOnOverflow }) =>
     !disableScrollOnOverflow && `overflow: auto`};
   padding-bottom: 8px;
-  padding-right: 10px;
-
   &::-webkit-scrollbar {
+    border-radius: 8px;
     width: 8px;
     height: 8px;
+    background: ${({ theme }) => theme.colors.grey200};
   }
 
   &::-webkit-scrollbar-thumb {
-    border-radius: 10px;
+    border-radius: 8px;
     background: ${({ theme }) => theme.colors.grey400};
   }
 `
