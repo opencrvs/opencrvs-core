@@ -127,7 +127,7 @@ const USER_SCOPE: IUSER_SCOPE = {
   NATIONAL_REGISTRAR: [
     WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.readyForReview,
-    WORKQUEUE_TABS.requiresUpdateRegistrar,
+    WORKQUEUE_TABS.requiresUpdate,
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
