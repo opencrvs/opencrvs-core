@@ -21,6 +21,8 @@ on:
     workflows: [Publish images to Dockerhub from any branch]
     types:
       - completed
+  workflow_dispatch:
+    inputs:
 jobs:
   push-deploy-e2e:
     environment: staging
@@ -38,7 +40,7 @@ jobs:
       - name: Get COUNTRY_CONFIG_VERSION
         run: |
           cd opencrvs-farajaland
-          echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "COUNTRY_CONFIG_VERSION=$(git log -1 --pretty=format:%h)" >> $GITHUB_ENV
           cd ../
       - name: Login to DockerHub
         uses: docker/login-action@v1
@@ -66,6 +68,8 @@ jobs:
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
         run: |
           yarn deploy:staging farajaland-staging.opencrvs.org $(git rev-parse --short HEAD) ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+      - name: Summarise deployment
+        run: echo "### Staging deployment\nCore version **$CORE_VERSION**\nFarajaland version **$COUNTRY_CONFIG_VERSION**" >> $GITHUB_STEP_SUMMARY
       - name: Run Cypress tests
         run: |
           cd opencrvs-farajaland
