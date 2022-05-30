@@ -19,7 +19,8 @@ import {
   updateCertificate,
   updateCertificateHandler
 } from '@config/handlers/certificate/certificateHandler'
-import applicationConfigHandler, {
+import configHandler, {
+  getLoginConfigHandler,
   updateApplicationConfig,
   updateApplicationConfigHandler
 } from '@config/handlers/application/applicationConfigHandler'
@@ -41,7 +42,7 @@ import {
 
 import getFormDrafts from '@config/handlers/formDraft/getFormDraft/handler'
 
-const enum RouteScope {
+export const enum RouteScope {
   DECLARE = 'declare',
   REGISTER = 'register',
   CERTIFY = 'certify',
@@ -72,7 +73,27 @@ export default function getRoutes() {
     {
       method: 'GET',
       path: '/config',
-      handler: applicationConfigHandler,
+      handler: configHandler,
+      config: {
+        auth: {
+          scope: [
+            RouteScope.NATLSYSADMIN,
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        tags: ['api'],
+        description: 'Retrieve all configuration'
+      }
+    },
+    {
+      method: 'GET',
+      path: '/loginConfig',
+      handler: getLoginConfigHandler,
       config: {
         auth: false,
         tags: ['api'],
@@ -87,7 +108,12 @@ export default function getRoutes() {
         tags: ['api'],
         description: 'Retrieves certificate',
         auth: {
-          scope: [RouteScope.NATLSYSADMIN]
+          scope: [
+            RouteScope.NATLSYSADMIN,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.VALIDATE
+          ]
         },
         validate: {
           payload: requestActiveCertificate

@@ -138,10 +138,14 @@ export async function populateBundleFromPayload(
 
 export async function getTimeLabel(
   timeInDays: number,
-  event: EVENT_TYPE
+  event: EVENT_TYPE,
+  authorization: string
 ): Promise<string> {
-  const regTargetDays = await getRegistrationTargetDays(event)
-  const regLateTargetDays = await getRegistrationLateTargetDays(event)
+  const regTargetDays = await getRegistrationTargetDays(event, authorization)
+  const regLateTargetDays = await getRegistrationLateTargetDays(
+    event,
+    authorization
+  )
   if (timeInDays <= regTargetDays) {
     return 'withinTarget'
   } else if (regLateTargetDays && timeInDays <= regLateTargetDays) {
