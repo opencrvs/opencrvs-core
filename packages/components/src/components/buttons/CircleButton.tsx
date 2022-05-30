@@ -64,7 +64,6 @@ const Button = styled.button<ICircleButtonProps & { size: IButtonSize }>`
     cursor: default;
     path {
       stroke: ${({ theme }) => theme.colors.disabled};
-      fill: ${({ theme }) => theme.colors.disabled};
     }
   }
 `

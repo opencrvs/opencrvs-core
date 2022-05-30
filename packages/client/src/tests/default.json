@@ -5239,7 +5239,64 @@
                 "required": true,
                 "initialValue": "",
                 "validate": [],
-                "options": []
+                "options": [
+                  {
+                    "value": "FIELD_AGENT",
+                    "label": {
+                      "defaultMessage": "Field Agent",
+                      "description": "The description for FIELD_AGENT role",
+                      "id": "constants.fieldAgent"
+                    }
+                  },
+                  {
+                    "value": "REGISTRATION_AGENT",
+                    "label": {
+                      "defaultMessage": "Registration Agent",
+                      "description": "The description for REGISTRATION_AGENT role",
+                      "id": "constants.registrationAgent"
+                    }
+                  },
+                  {
+                    "value": "LOCAL_REGISTRAR",
+                    "label": {
+                      "defaultMessage": "Registrar",
+                      "description": "The description for LOCAL_REGISTRAR role",
+                      "id": "constants.localRegistrar"
+                    }
+                  },
+                  {
+                    "value": "LOCAL_SYSTEM_ADMIN",
+                    "label": {
+                      "defaultMessage": "Sysadmin",
+                      "description": "The description for Sysadmin role",
+                      "id": "home.header.localSystemAdmin"
+                    }
+                  },
+                  {
+                    "value": "NATIONAL_SYSTEM_ADMIN",
+                    "label": {
+                      "defaultMessage": "System admin (national)",
+                      "description": "The description for System admin (national)",
+                      "id": "constants.nationalSystemAdmin"
+                    }
+                  },
+                  {
+                    "value": "PERFORMANCE_MANAGEMENT",
+                    "label": {
+                      "defaultMessage": "Performance Management",
+                      "description": "The description for Performance Management role",
+                      "id": "constants.performanceManagement"
+                    }
+                  },
+                  {
+                    "value": "NATIONAL_REGISTRAR",
+                    "label": {
+                      "defaultMessage": "National Registrar",
+                      "description": "The description for NATIONAL_REGISTRAR role",
+                      "id": "constants.nationalRegistrar"
+                    }
+                  }
+                ]
               },
               {
                 "name": "type",
@@ -5255,7 +5312,13 @@
                 "dynamicOptions": {
                   "dependency": "role",
                   "options": {}
-                }
+                },
+                "conditionals": [
+                  {
+                    "action": "hide",
+                    "expression": "(values.role!=\"FIELD_AGENT\")"
+                  }
+                ]
               },
               {
                 "name": "device",
@@ -5552,7 +5615,64 @@
                 "required": true,
                 "initialValue": "",
                 "validate": [],
-                "options": []
+                "options": [
+                  {
+                    "value": "FIELD_AGENT",
+                    "label": {
+                      "defaultMessage": "Field Agent",
+                      "description": "The description for FIELD_AGENT role",
+                      "id": "constants.fieldAgent"
+                    }
+                  },
+                  {
+                    "value": "REGISTRATION_AGENT",
+                    "label": {
+                      "defaultMessage": "Registration Agent",
+                      "description": "The description for REGISTRATION_AGENT role",
+                      "id": "constants.registrationAgent"
+                    }
+                  },
+                  {
+                    "value": "LOCAL_REGISTRAR",
+                    "label": {
+                      "defaultMessage": "Registrar",
+                      "description": "The description for LOCAL_REGISTRAR role",
+                      "id": "constants.localRegistrar"
+                    }
+                  },
+                  {
+                    "value": "LOCAL_SYSTEM_ADMIN",
+                    "label": {
+                      "defaultMessage": "Sysadmin",
+                      "description": "The description for Sysadmin role",
+                      "id": "home.header.localSystemAdmin"
+                    }
+                  },
+                  {
+                    "value": "NATIONAL_SYSTEM_ADMIN",
+                    "label": {
+                      "defaultMessage": "System admin (national)",
+                      "description": "The description for System admin (national)",
+                      "id": "constants.nationalSystemAdmin"
+                    }
+                  },
+                  {
+                    "value": "PERFORMANCE_MANAGEMENT",
+                    "label": {
+                      "defaultMessage": "Performance Management",
+                      "description": "The description for Performance Management role",
+                      "id": "constants.performanceManagement"
+                    }
+                  },
+                  {
+                    "value": "NATIONAL_REGISTRAR",
+                    "label": {
+                      "defaultMessage": "National Registrar",
+                      "description": "The description for NATIONAL_REGISTRAR role",
+                      "id": "constants.nationalRegistrar"
+                    }
+                  }
+                ]
               },
               {
                 "name": "type",
@@ -5568,7 +5688,13 @@
                 "dynamicOptions": {
                   "dependency": "role",
                   "options": {}
-                }
+                },
+                "conditionals": [
+                  {
+                    "action": "hide",
+                    "expression": "(values.role!=\"FIELD_AGENT\")"
+                  }
+                ]
               },
               {
                 "name": "device",

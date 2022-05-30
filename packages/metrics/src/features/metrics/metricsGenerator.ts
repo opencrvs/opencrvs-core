@@ -15,7 +15,6 @@ import {
   WITHIN_1_YEAR
 } from '@metrics/features/metrics/constants'
 import {
-  getAgeIntervals,
   calculateInterval,
   fetchEstimateByLocation,
   fetchEstimateForTargetDaysByLocationId,
@@ -101,24 +100,6 @@ interface IGenderBasisPoint {
   locationLevel3?: string
   locationLevel4?: string
   locationLevel5?: string
-}
-
-export async function regByAge(timeStart: string, timeEnd: string) {
-  const metricsData: any[] = []
-  const ageIntervals = await getAgeIntervals()
-  for (const ageInterval of ageIntervals) {
-    const points = await query(
-      // tslint:disable-next-line
-      `SELECT COUNT(ageInDays) FROM birth_registration WHERE time > ${timeStart} AND time <= ${timeEnd} AND ageInDays > ${ageInterval.minAgeInDays} AND ageInDays <= ${ageInterval.maxAgeInDays}`
-    )
-
-    metricsData.push({
-      label: ageInterval.title,
-      value: (points && points.length > 0 && points[0].count) || 0
-    })
-  }
-
-  return metricsData
 }
 
 type Payment = {
@@ -408,7 +389,8 @@ export async function fetchKeyFigures(
   const queryLocationId = `Location/${estimatedFigureForTargetDays.locationId}`
 
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
-    EVENT_TYPE.BIRTH
+    EVENT_TYPE.BIRTH,
+    authHeader.Authorization
   )
 
   /* Populating < 45D data */
@@ -769,7 +751,8 @@ export async function fetchLocationWiseEventEstimations(
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
   const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
-    event
+    event,
+    authHeader.Authorization
   )
   const registrationsInTargetDaysPoints: IGroupedByGender[] = await query(
     `SELECT COUNT(${column}) AS total

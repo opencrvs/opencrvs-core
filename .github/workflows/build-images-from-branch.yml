@@ -16,13 +16,20 @@ on:
         description: Branch to build from
         default: develop
         required: true
+  push:
+    branches:
+      - 'develop'
+
 jobs:
   push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        if: github.event_name == 'workflow_dispatch'
         with:
           ref: '${{ github.event.inputs.branch_name }}'
+      - uses: actions/checkout@v2
+        if: github.event_name == 'push'
       - name: Login to DockerHub
         uses: docker/login-action@v1
         with:

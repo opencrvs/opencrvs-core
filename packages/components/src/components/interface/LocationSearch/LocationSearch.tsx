@@ -145,6 +145,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
           break
         }
         if (
+          location.searchableText &&
           location.searchableText
             .toLowerCase()
             .startsWith(searchText.toLowerCase())

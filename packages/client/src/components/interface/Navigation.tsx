@@ -125,6 +125,16 @@ const USER_SCOPE: IUSER_SCOPE = {
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
+  NATIONAL_REGISTRAR: [
+    WORKQUEUE_TABS.inProgress,
+    WORKQUEUE_TABS.readyForReview,
+    WORKQUEUE_TABS.requiresUpdateRegistrar,
+    WORKQUEUE_TABS.readyToPrint,
+    WORKQUEUE_TABS.performance,
+    WORKQUEUE_TABS.team,
+    GROUP_ID.declarationGroup,
+    GROUP_ID.menuGroup
+  ],
   LOCAL_SYSTEM_ADMIN: [
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,

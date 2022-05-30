@@ -668,6 +668,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           (this.getLabelForDocType(title, document.optionValues[1] as string) ||
             document.optionValues[1])
 
+        /**
+         * Skip insertion if the value already exist
+         */
+        if (selectOptions.findIndex((elem) => elem.value === label) > -1) {
+          return true
+        }
+
         documentOptions.push({
           value: document.data,
           label

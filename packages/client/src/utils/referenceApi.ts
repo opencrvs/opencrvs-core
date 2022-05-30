@@ -97,7 +97,10 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
   const url = `${window.config.CONFIG_API_URL}/config`
 
   const res = await fetch(url, {
-    method: 'GET'
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
   })
 
   if (res && res.status !== 200) {

@@ -13,18 +13,19 @@ import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
 
 export const getRolesQuery = gql`
-  query getRoles {
-    getRoles(active: true) {
+  query getRoles($value: ComparisonInput) {
+    getRoles(active: true, value: $value) {
       value
       types
     }
   }
 `
-async function fetchRoles() {
+async function fetchRoles(criteria = {}) {
   return (
     client &&
     client.query({
       query: getRolesQuery,
+      variables: criteria,
       fetchPolicy: 'no-cache'
     })
   )
