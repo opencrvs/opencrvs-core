@@ -24,7 +24,6 @@ import {
   selectConfigRegisterForm
 } from '@client/forms/configuration/formConfig/selectors'
 import {
-  generateKeyFromObj,
   getFieldDefinition,
   IConfigField,
   IConfigFieldMap
@@ -126,7 +125,6 @@ function FormField({ configField }: { configField: IConfigField }) {
   const { fieldId } = configField
   return (
     <FormFieldGenerator
-      key={generateKeyFromObj(configField)}
       id={fieldId}
       onChange={() => {}}
       fields={[formField]}
