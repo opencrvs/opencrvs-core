@@ -45,15 +45,6 @@ export enum LocationType {
   CRVS_OFFICE = 'CRVS_OFFICE',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE'
 }
-
-interface IParsedCertificates {
-  birth: {
-    svgCode: string
-  }
-  death: {
-    svgCode: string
-  }
-}
 export interface ILocation {
   id: string
   name: string
@@ -73,7 +64,9 @@ export interface IOfflineData {
   languages: ILanguage[]
   templates: {
     receipt?: IPDFTemplate
-    certificates: {
+    // Certificates might not be defined in the case of
+    // a field agent using the app.
+    certificates?: {
       birth: ISVGTemplate
       death: ISVGTemplate
     }
@@ -373,34 +366,49 @@ function reducer(
     case actions.APPLICATION_CONFIG_LOADED: {
       const { certificates, config, formConfig } = action.payload
       merge(window.config, config)
+      let newOfflineData
       const birthCertificateTemplate = find(certificates, {
         event: 'birth',
         status: 'ACTIVE'
-      }) as ICertificateTemplateData
+      })
 
       const deathCertificateTemplate = find(certificates, {
         event: 'death',
         status: 'ACTIVE'
-      }) as ICertificateTemplateData
+      })
 
-      const certificatesTemplates = {
-        birth: { svgCode: birthCertificateTemplate.svgCode },
-        death: { svgCode: deathCertificateTemplate.svgCode }
-      } as IParsedCertificates
-
-      const newOfflineData = {
-        ...state.offlineData,
-        config,
-        formConfig,
-        templates: {
-          certificates: {
-            birth: {
-              definition: certificatesTemplates.birth.svgCode
-            },
-            death: {
-              definition: certificatesTemplates.death.svgCode
+      if (birthCertificateTemplate && deathCertificateTemplate) {
+        const certificatesTemplates = {
+          birth: { svgCode: birthCertificateTemplate.svgCode },
+          death: { svgCode: deathCertificateTemplate.svgCode }
+        }
+        newOfflineData = {
+          ...state.offlineData,
+          config,
+          formConfig,
+          templates: {
+            certificates: {
+              birth: {
+                definition: certificatesTemplates.birth.svgCode
+              },
+              death: {
+                definition: certificatesTemplates.death.svgCode
+              }
             }
           }
+        }
+      } else {
+        newOfflineData = {
+          ...state.offlineData,
+          config,
+          formConfig,
+
+          // Field agents do not get certificate templates from the config service.
+          // Our loading logic depends on certificates being present and the app would load infinitely
+          // without a value here.
+          // This is a quickfix for the issue. If done properly, we should amend the "is loading" check
+          // to not expect certificate templates when a field agent is logged in.
+          templates: {}
         }
       }
 
