@@ -145,6 +145,14 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           }
           type
           timestamp
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
         }
         type
         trackingId
