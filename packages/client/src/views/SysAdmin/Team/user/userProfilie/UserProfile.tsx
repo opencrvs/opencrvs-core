@@ -54,6 +54,7 @@ import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin
 import { IUserDetails } from '@client/utils/userUtils'
 import { userMutations } from '@client/user/mutations'
 import format from '@client/utils/date-formatting'
+import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;
@@ -342,6 +343,9 @@ class UserProfileComponent extends React.Component<Props, State> {
             } else {
               const user = this.transformUserQueryResult(data && data.getUser)
 
+              const userRole = getUserRole(user, intl)
+              const userType = getUserType(user, intl)
+
               return (
                 <SysAdminContentWrapper
                   id="user-profile"
@@ -391,18 +395,11 @@ class UserProfileComponent extends React.Component<Props, State> {
                     </InformationHolder>
                     <InformationHolder>
                       <InformationTitle>
-                        {(user.type && intl.formatMessage(messages.roleType)) ||
+                        {(userType && intl.formatMessage(messages.roleType)) ||
                           intl.formatMessage(userFormMessages.type)}
                       </InformationTitle>
                       <InformationValue>
-                        {(user.type &&
-                          `${intl.formatMessage(
-                            userMessages[user.role as string]
-                          )} /
-                        ${intl.formatMessage(
-                          userMessages[user.type as string]
-                        )}`) ||
-                          intl.formatMessage(userMessages[user.role as string])}
+                        {(userType && `${userRole} / ${userType}`) || userRole}
                       </InformationValue>
                     </InformationHolder>
                     <InformationHolder>
