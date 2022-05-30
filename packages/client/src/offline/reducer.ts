@@ -64,7 +64,9 @@ export interface IOfflineData {
   languages: ILanguage[]
   templates: {
     receipt?: IPDFTemplate
-    certificates: {
+    // Certificates might not be defined in the case of
+    // a field agent using the app.
+    certificates?: {
       birth: ISVGTemplate
       death: ISVGTemplate
     }
@@ -399,7 +401,14 @@ function reducer(
         newOfflineData = {
           ...state.offlineData,
           config,
-          formConfig
+          formConfig,
+
+          // Field agents do not get certificate templates from the config service.
+          // Our loading logic depends on certificates being present and the app would load infinitely
+          // without a value here.
+          // This is a quickfix for the issue. If done properly, we should amend the "is loading" check
+          // to not expect certificate templates when a field agent is logged in.
+          templates: {}
         }
       }
 

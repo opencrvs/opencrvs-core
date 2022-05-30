@@ -127,6 +127,14 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         status {
           type
           timestamp
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
         }
         type
         trackingId
