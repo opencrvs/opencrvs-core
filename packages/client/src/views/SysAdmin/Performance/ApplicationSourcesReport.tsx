@@ -118,7 +118,7 @@ export function ApplicationSourcesReport(
               <TotalDisplayWithPercentage
                 total={calculateTotal(
                   data.results.filter(
-                    (item) => item.practitionerRole === 'HOSPITAL_NOTIFICATION'
+                    (item) => item.practitionerRole === 'AUTOMATED'
                   )
                 )}
                 ofNumber={calculateTotal(data.results)}

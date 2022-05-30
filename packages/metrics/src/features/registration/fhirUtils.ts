@@ -382,10 +382,7 @@ export async function fetchDeclarationsBeginnerRole(
 ) {
   let startedByRole = ''
   const currentTask = getTask(fhirBundle)
-  const composition = getComposition(fhirBundle)
-  if (isNotification(composition as fhir.Composition)) {
-    return 'HOSPITAL_NOTIFICATION'
-  }
+
   if (currentTask) {
     const bundle = await fetchTaskHistory(currentTask.id, authHeader)
     const length = bundle.entry ? bundle.entry.length : 0
