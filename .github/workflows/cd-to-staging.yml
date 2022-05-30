@@ -40,11 +40,11 @@ jobs:
       - name: Get COUNTRY_CONFIG_VERSION
         run: |
           cd opencrvs-farajaland
-          echo "COUNTRY_CONFIG_VERSION=$(git log -1 --pretty=format:%h)" >> $GITHUB_ENV
+          echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
           cd ../
       - name: Get CORE_VERSION
         run: |
-          echo "CORE_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "CORE_VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
 
       - name: Display versions
         run: |
