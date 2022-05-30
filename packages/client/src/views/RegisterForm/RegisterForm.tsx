@@ -792,7 +792,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
                               <Warning
                                 label={intl.formatMessage(
                                   constantsMessages.totalFileSizeExceed,
-                                  { fileSize: '20MB' }
+                                  {
+                                    fileSize:
+                                      window.config.ACCUMULATED_FILE_SIZE
+                                  }
                                 )}
                               />
                             )}

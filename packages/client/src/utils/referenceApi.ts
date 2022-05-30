@@ -85,6 +85,7 @@ export interface IApplicationConfig {
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: RegExp
   ADDRESSES: number
+  ACCUMULATED_FILE_SIZE: string
 }
 
 export interface IApplicationConfigResponse {
