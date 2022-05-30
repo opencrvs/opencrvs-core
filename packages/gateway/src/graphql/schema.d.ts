@@ -634,6 +634,7 @@ export interface GQLHistory {
   date?: GQLDate
   action?: GQLRegStatus
   statusReason?: GQLStatusReason
+  reason?: string
   reinstated?: boolean
   location?: GQLLocation
   office?: GQLLocation
@@ -4264,6 +4265,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   date?: HistoryToDateResolver<TParent>
   action?: HistoryToActionResolver<TParent>
   statusReason?: HistoryToStatusReasonResolver<TParent>
+  reason?: HistoryToReasonResolver<TParent>
   reinstated?: HistoryToReinstatedResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
@@ -4286,6 +4288,10 @@ export interface HistoryToActionResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToStatusReasonResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToReasonResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

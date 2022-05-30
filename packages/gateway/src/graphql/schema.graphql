@@ -758,6 +758,7 @@ type History {
   date: Date
   action: RegStatus
   statusReason: StatusReason
+  reason: String
   reinstated: Boolean
   location: Location
   office: Location
