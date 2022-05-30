@@ -2534,6 +2534,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       contact?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -3151,6 +3152,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       otherInformantType?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -4229,30 +4231,6 @@ export type FetchRegistrationByCompositionQuery = {
     | null
 }
 
-export type FetchDuplicateTrackingIdQueryVariables = Exact<{
-  id: Scalars['ID']
-}>
-
-export type FetchDuplicateTrackingIdQuery = {
-  __typename?: 'Query'
-  fetchRegistration?:
-    | {
-        __typename?: 'BirthRegistration'
-        registration?: {
-          __typename?: 'Registration'
-          trackingId?: string | null
-        } | null
-      }
-    | {
-        __typename?: 'DeathRegistration'
-        registration?: {
-          __typename?: 'Registration'
-          trackingId?: string | null
-        } | null
-      }
-    | null
-}
-
 export type FetchDeclarationShortInfoQueryVariables = Exact<{
   id: Scalars['ID']
 }>
@@ -4276,6 +4254,7 @@ export type FetchDeclarationShortInfoQuery = {
           __typename?: 'Registration'
           type?: RegistrationType | null
           trackingId?: string | null
+          duplicates?: Array<string | null> | null
           status?: Array<{
             __typename?: 'RegWorkflow'
             type?: RegStatus | null
@@ -4298,6 +4277,7 @@ export type FetchDeclarationShortInfoQuery = {
           __typename?: 'Registration'
           type?: RegistrationType | null
           trackingId?: string | null
+          duplicates?: Array<string | null> | null
           status?: Array<{
             __typename?: 'RegWorkflow'
             type?: RegStatus | null

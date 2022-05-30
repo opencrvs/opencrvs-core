@@ -12,11 +12,13 @@
 import React from 'react'
 import styled from 'styled-components'
 import { Warning } from '@opencrvs/components/lib/interface'
-import gql from 'graphql-tag'
 import { Query } from '@client/components/Query'
-import { FetchDuplicateTrackingIdQuery } from '@client/utils/gateway'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { useIntl } from 'react-intl'
+import {
+  FetchDuplicateDeatilsQuery,
+  createDuplicateDetailsQuery
+} from './utils'
 
 const WarningContainer = styled.div`
   margin: 16px auto;
@@ -24,16 +26,6 @@ const WarningContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 8px;
-`
-
-const FETCH_DUPLICATE_TRACKING_ID = gql`
-  query fetchDuplicateTrackingId($id: ID!) {
-    fetchRegistration(id: $id) {
-      registration {
-        trackingId
-      }
-    }
-  }
 `
 
 export function DuplicateWarning({
@@ -46,28 +38,36 @@ export function DuplicateWarning({
   const intl = useIntl()
   return (
     <WarningContainer className={className}>
-      {duplicateIds?.map((id) => (
-        <Query<FetchDuplicateTrackingIdQuery>
-          key={id}
-          query={FETCH_DUPLICATE_TRACKING_ID}
-          variables={{ id }}
+      {duplicateIds && (
+        <Query<Record<string, FetchDuplicateDeatilsQuery>>
+          query={createDuplicateDetailsQuery(duplicateIds)}
+          variables={duplicateIds.reduce(
+            (accum, duplicateId, idx) => ({
+              ...accum,
+              [`duplicate${idx}Id`]: duplicateId
+            }),
+            {}
+          )}
         >
           {({ data }) => {
-            if (data?.fetchRegistration?.registration?.trackingId) {
-              return (
-                <Warning
-                  label={intl.formatMessage(errorMessages.duplicateWarning, {
-                    trackingId: (
-                      <u>{data.fetchRegistration.registration.trackingId}</u>
-                    )
-                  })}
-                />
-              )
-            }
-            return <></>
+            return duplicateIds.map((_, idx) => {
+              const duplicateQuery = data?.[`duplicate${idx}`]
+              if (duplicateQuery?.registration?.trackingId) {
+                return (
+                  <Warning
+                    label={intl.formatMessage(errorMessages.duplicateWarning, {
+                      trackingId: (
+                        <u>{duplicateQuery.registration.trackingId}</u>
+                      )
+                    })}
+                  />
+                )
+              }
+              return <></>
+            })
           }}
         </Query>
-      ))}
+      )}
     </WarningContainer>
   )
 }
