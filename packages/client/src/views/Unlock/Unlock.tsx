@@ -35,9 +35,7 @@ import differenceInMinutes from 'date-fns/differenceInMinutes'
 export const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bold16};
   ${({ theme }) => theme.colors.primary};
-  ${['ZMB', 'FAR'].includes(window.config.COUNTRY.toUpperCase())
-    ? `background: url(${zambiaBackground});`
-    : ''}
+  background: ${({ theme }) => theme.colors.backgroundPrimary};
   height: 100vh;
   display: flex;
   flex-direction: column;

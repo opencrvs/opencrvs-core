@@ -55,7 +55,10 @@ import {
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
-import { REINSTATED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
+import {
+  REINSTATED_EXTENSION_URL,
+  REQUEST_CORRECTION_EXTENSION_URL
+} from '@workflow/features/task/fhir/constants'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -427,7 +430,10 @@ export async function markEventAsDownloadedHandler(
       request.payload as fhir.Bundle,
       getToken(request)
     )
-    payload = removeExtensionFromBundle(payload, [REINSTATED_EXTENSION_URL])
+    payload = removeExtensionFromBundle(payload, [
+      REINSTATED_EXTENSION_URL,
+      REQUEST_CORRECTION_EXTENSION_URL
+    ])
     const newRequest = { ...request, payload } as Hapi.Request
     return await forwardToHearth(newRequest, h)
   } catch (error) {

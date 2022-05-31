@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { CustomFieldForms } from '@client/components/formConfig/CustomFieldForm'
+import { CustomFieldTools } from '@client/components/formConfig/formTools/CustomFieldTools'
 import {
   IConfigField,
   isDefaultField
@@ -274,8 +274,7 @@ export function FormConfigWizard() {
                 isDefaultField(selectedField) ? (
                   <DefaultFieldTools configField={selectedField} />
                 ) : (
-                  <CustomFieldForms
-                    key={selectedField.fieldId}
+                  <CustomFieldTools
                     event={event}
                     section={section}
                     selectedField={selectedField}

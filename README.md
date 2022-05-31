@@ -109,9 +109,17 @@ Open the url **[`http://localhost:3020/`](http://localhost:3020/)**
 
 Use one of the following authentication details for your user of choice. To learn about these user roles and to perform civil registration tasks, read our [documentation](http://documentation.opencrvs.org/)
 
+Ibombo District in Central Province is our fake country Farajaland's capital district.
+
+Ilanga District in Sulaka Province is meant to demonstrate a provincial district office in our fake country, Farajaland.
+
 ### Field Agent
 
+A Social Worker in the captial city:
+
 Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+
+A Local Leader in a provincial district:
 
 Username: **patrick.gondwe** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
@@ -136,6 +144,14 @@ Username: **alex.ngonga** / Password: **test** / SMS code: **000000** / Office: 
 ### National System Admin
 
 Username: **jonathan.campbell** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+
+### National Registrar
+
+Username: **joseph.musonda** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+
+### Performance Manager
+
+Username: **edgar.kazembe** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
 ## Starting and stopping OpenCRVS
 

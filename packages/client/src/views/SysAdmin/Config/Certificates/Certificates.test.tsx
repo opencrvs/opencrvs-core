@@ -28,16 +28,16 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
     testComponent.update()
   })
 
-  it('shows last birth certificate template updated date', async () => {
-    expect(
+  it('shows default birth certificate template text', async () => {
+    await expect(
       testComponent.find('#birth_value').hostNodes().first().text()
-    ).toContain('Updated ')
+    ).toContain('Default birth certificate template')
   })
 
-  it('shows last death certificate template updated date', async () => {
-    expect(
+  it('shows default death certificate template text', async () => {
+    await expect(
       testComponent.find('#death_value').hostNodes().first().text()
-    ).toContain('Updated ')
+    ).toContain('Default death certificate template')
   })
 
   it('shows sub menu link when VerticalThreeDots is clicked', async () => {

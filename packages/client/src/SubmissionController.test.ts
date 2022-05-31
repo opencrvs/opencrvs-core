@@ -147,6 +147,7 @@ describe('Submission Controller', () => {
             scope: ['declare']
           }
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         declarationsState: {
           declarations: [
             {
@@ -197,7 +198,9 @@ describe('Submission Controller', () => {
     expect(
       store.dispatch.mock.calls[1][0].payload.declaration.submissionStatus
     ).toBe(SUBMISSION_STATUS.SUBMITTED)
-    expect(store.dispatch.mock.calls[9][0].type).toBe('DECLARATION/WRITE_DRAFT')
+    expect(store.dispatch.mock.calls[9][0].type).toBe(
+      'DECLARATION/DELETE_DRAFT'
+    )
   })
 
   it('syncs all ready to approve birth declaration and deletes approved declaration', async () => {
@@ -212,6 +215,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         },
@@ -256,6 +260,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         },
@@ -300,6 +305,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         },
@@ -345,6 +351,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         },
@@ -390,6 +397,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         },
@@ -435,6 +443,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         },
@@ -480,6 +489,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         },
@@ -521,6 +531,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         },
@@ -562,6 +573,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         },
@@ -603,6 +615,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         },
@@ -652,6 +665,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         },
@@ -701,6 +715,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         },
@@ -743,6 +758,7 @@ describe('Submission Controller', () => {
             }
           ]
         },
+        offline: { userDetails: { role: 'FIELD_AGENT' } },
         registerForm: {
           registerForm: {}
         }

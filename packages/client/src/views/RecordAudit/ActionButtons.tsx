@@ -35,6 +35,7 @@ import { Action } from '@client/forms'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IDeclarationData } from './utils'
+import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 
 export type CMethodParams = {
   declaration: IDeclarationData
@@ -100,19 +101,16 @@ export const ShowUpdateButton = ({
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
+  const role = userDetails ? userDetails.role : ''
+  const showActionButton = role
+    ? FIELD_AGENT_ROLES.includes(role)
+      ? false
+      : true
+    : false
 
-  if (!userDetails || !userDetails.role || !type || !isDownloaded)
-    return (
-      <PrimaryButton
-        key={id}
-        id={`update-application-${id}`}
-        size={'medium'}
-        disabled={true}
-      >
-        {intl.formatMessage(buttonMessages.update)}
-      </PrimaryButton>
-    )
-  const { role } = userDetails
+  if (!showActionButton && !isDownloaded) {
+    return <></>
+  }
 
   const updateButtonRoleStatusMap: { [key: string]: string[] } = {
     FIELD_AGENT: [SUBMISSION_STATUS.DRAFT],
@@ -133,7 +131,11 @@ export const ShowUpdateButton = ({
     ]
   }
 
-  if (updateButtonRoleStatusMap[role].includes(declaration?.status as string)) {
+  if (
+    role &&
+    type &&
+    updateButtonRoleStatusMap[role].includes(declaration?.status as string)
+  ) {
     let PAGE_ROUTE: string, PAGE_ID: string
 
     if (declaration?.status === SUBMISSION_STATUS.DRAFT) {
@@ -146,6 +148,18 @@ export const ShowUpdateButton = ({
     } else {
       PAGE_ROUTE = REVIEW_EVENT_PARENT_FORM_PAGE
       PAGE_ID = 'review'
+    }
+    if (!isDownloaded) {
+      return (
+        <PrimaryButton
+          key={id}
+          id={`update-application-${id}`}
+          size={'medium'}
+          disabled={true}
+        >
+          {intl.formatMessage(buttonMessages.update)}
+        </PrimaryButton>
+      )
     }
     return (
       <PrimaryButton
@@ -172,23 +186,15 @@ export const ShowPrintButton = ({
   goToPrintCertificate
 }: CMethodParams) => {
   const { id, type } = declaration || {}
-
+  const role = userDetails ? userDetails.role : ''
+  const showActionButton = role
+    ? FIELD_AGENT_ROLES.includes(role)
+      ? false
+      : true
+    : false
   const isDownloaded =
     draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
-
-  if (!userDetails || !userDetails.role || !type || !isDownloaded)
-    return (
-      <PrimaryButton
-        key={id}
-        size={'medium'}
-        id={`print-${id}`}
-        disabled={true}
-      >
-        {intl.formatMessage(buttonMessages.print)}
-      </PrimaryButton>
-    )
-  const { role } = userDetails
 
   const printButtonRoleStatusMap: { [key: string]: string[] } = {
     REGISTRATION_AGENT: [
@@ -203,9 +209,24 @@ export const ShowPrintButton = ({
   }
 
   if (
+    role &&
+    type &&
     role in printButtonRoleStatusMap &&
-    printButtonRoleStatusMap[role].includes(declaration?.status as string)
-  )
+    printButtonRoleStatusMap[role].includes(declaration?.status as string) &&
+    showActionButton
+  ) {
+    if (!isDownloaded) {
+      return (
+        <PrimaryButton
+          key={id}
+          size={'medium'}
+          id={`print-${id}`}
+          disabled={true}
+        >
+          {intl.formatMessage(buttonMessages.print)}
+        </PrimaryButton>
+      )
+    }
     return (
       <PrimaryButton
         key={id}
@@ -219,6 +240,7 @@ export const ShowPrintButton = ({
         {intl.formatMessage(buttonMessages.print)}
       </PrimaryButton>
     )
+  }
   return <></>
 }
 
@@ -232,19 +254,12 @@ export const ShowReviewButton = ({
   const { id, type } = declaration || {}
 
   const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
-
-  if (!userDetails || !userDetails.role || !type || !isDownloaded)
-    return (
-      <PrimaryButton
-        key={id}
-        size={'medium'}
-        id={`review-btn-${id}`}
-        disabled={true}
-      >
-        {intl.formatMessage(constantsMessages.review)}
-      </PrimaryButton>
-    )
-  const { role } = userDetails
+  const role = userDetails ? userDetails.role : ''
+  const showActionButton = role
+    ? FIELD_AGENT_ROLES.includes(role)
+      ? false
+      : true
+    : false
 
   const reviewButtonRoleStatusMap: { [key: string]: string[] } = {
     FIELD_AGENT: [],
@@ -253,7 +268,24 @@ export const ShowReviewButton = ({
     LOCAL_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED]
   }
 
-  if (reviewButtonRoleStatusMap[role].includes(declaration?.status as string))
+  if (
+    role &&
+    type &&
+    reviewButtonRoleStatusMap[role].includes(declaration?.status as string) &&
+    showActionButton
+  ) {
+    if (!isDownloaded) {
+      return (
+        <PrimaryButton
+          key={id}
+          size={'medium'}
+          id={`review-btn-${id}`}
+          disabled={true}
+        >
+          {intl.formatMessage(constantsMessages.review)}
+        </PrimaryButton>
+      )
+    }
     return (
       <PrimaryButton
         key={id}
@@ -267,5 +299,6 @@ export const ShowReviewButton = ({
         {intl.formatMessage(constantsMessages.review)}
       </PrimaryButton>
     )
+  }
   return <></>
 }

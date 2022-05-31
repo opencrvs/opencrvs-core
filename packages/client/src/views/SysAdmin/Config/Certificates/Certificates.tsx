@@ -352,9 +352,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 
     const { intl, offlineResources } = this.props
     const birthLastModified =
-      offlineResources.templates.certificates.birth.lastModifiedDate
+      offlineResources.templates.certificates?.birth.lastModifiedDate
     const deathLastModified =
-      offlineResources.templates.certificates.death.lastModifiedDate
+      offlineResources.templates.certificates?.death.lastModifiedDate
     const CertificateSection = {
       title: intl.formatMessage(messages.listTitle),
       items: [
@@ -368,7 +368,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             : intl.formatMessage(messages.birthDefaultTempDesc),
           actionsMenu: (
             <>
-              {offlineResources.templates.certificates.birth && (
+              {offlineResources.templates.certificates?.birth && (
                 <ToggleMenu
                   id={`template-birth-action-menu`}
                   toggleButton={<VerticalThreeDots />}
@@ -382,7 +382,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               )}
               <HiddenInput
                 ref={this.birthCertificatefileUploader}
-                id={`birth_file_uploader_field_${offlineResources.templates.certificates.birth.id}`}
+                id={`birth_file_uploader_field_${offlineResources.templates.certificates?.birth.id}`}
                 type="file"
                 accept={ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.join(',')}
                 onChange={this.handleSelectFile}
@@ -400,7 +400,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             : intl.formatMessage(messages.deathDefaultTempDesc),
           actionsMenu: (
             <>
-              {offlineResources.templates.certificates.death && (
+              {offlineResources.templates.certificates?.death && (
                 <ToggleMenu
                   id={`template-death-action-menu`}
                   toggleButton={<VerticalThreeDots />}
@@ -414,7 +414,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               )}
               <HiddenInput
                 ref={this.deathCertificatefileUploader}
-                id={`death_file_uploader_field_${offlineResources.templates.certificates.death.id}`}
+                id={`death_file_uploader_field_${offlineResources.templates.certificates?.death.id}`}
                 type="file"
                 accept={ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.join(',')}
                 onChange={this.handleSelectFile}

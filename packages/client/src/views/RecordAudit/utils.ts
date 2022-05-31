@@ -339,10 +339,6 @@ export const getDraftDeclarationData = (
   return {
     id: declaration.id,
     name: getDraftDeclarationName(declaration),
-    status:
-      declaration.submissionStatus?.toString() ||
-      declaration.registrationStatus?.toString() ||
-      '',
     type: declaration.event || '',
     brnDrn:
       declaration.data?.registration?.registrationNumber?.toString() || '',
@@ -383,7 +379,6 @@ export const getWQDeclarationData = (
     id: workqueueDeclaration?.id,
     name,
     type: (workqueueDeclaration?.type && workqueueDeclaration.type) || '',
-    status: workqueueDeclaration?.registration?.status || '',
     trackingId: trackingId,
     dateOfBirth: '',
     placeOfBirth: '',

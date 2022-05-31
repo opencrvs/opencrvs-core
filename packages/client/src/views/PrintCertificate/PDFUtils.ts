@@ -148,9 +148,9 @@ function getPDFTemplateWithSVG(
 ): IPDFTemplate {
   let svgTemplate
   if (declaration.event === Event.BIRTH) {
-    svgTemplate = offlineResource.templates.certificates.birth.definition
+    svgTemplate = offlineResource.templates.certificates!.birth.definition
   } else {
-    svgTemplate = offlineResource.templates.certificates.death.definition
+    svgTemplate = offlineResource.templates.certificates!.death.definition
   }
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,

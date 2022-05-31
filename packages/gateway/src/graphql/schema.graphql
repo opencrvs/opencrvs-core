@@ -133,7 +133,7 @@ type Query {
   ): EventProgressResultSet
   getRoles(
     title: String
-    value: String
+    value: ComparisonInput
     type: String
     active: Boolean
     sortBy: String
@@ -357,7 +357,6 @@ type User {
   catchmentArea: [Location]
   localRegistrar: LocalRegistrar
   identifier: Identifier
-  signature: Signature
   creationDate: String
   avatar: Avatar
   device: String
@@ -454,6 +453,17 @@ type Role {
   value: String
   types: [String]
   active: Boolean
+}
+
+input ComparisonInput {
+  eq: String
+  gt: String
+  lt: String
+  gte: String
+  lte: String
+  in: [String!]
+  ne: String
+  nin: [String!]
 }
 
 type CertificateSVG {
@@ -748,6 +758,7 @@ type History {
   date: Date
   action: RegStatus
   statusReason: StatusReason
+  reason: String
   reinstated: Boolean
   location: Location
   office: Location
@@ -882,11 +893,6 @@ type LocalRegistrar {
   name: [HumanName]!
   role: String!
   signature: Signature
-}
-
-type Signature {
-  data: String
-  type: String
 }
 
 type SearchFieldAgentResponse {
@@ -1239,6 +1245,11 @@ enum AttachmentSubject {
   WARD_COUNCILLOR_PROOF
   CAUSE_OF_DEATH
   CORONERS_REPORT
+}
+
+type Signature {
+  data: String
+  type: String
 }
 
 type RegistrationSearchSet {
