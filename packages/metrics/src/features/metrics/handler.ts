@@ -74,7 +74,10 @@ export async function metricsHandler(
     authHeader
   )
 
-  const registrationTargetInDays = await getRegistrationTargetDays(event)
+  const registrationTargetInDays = await getRegistrationTargetDays(
+    event,
+    authHeader.Authorization
+  )
 
   const timeFrames = await fetchRegWithinTimeFrames(
     timeStart,

@@ -58,14 +58,11 @@ export const transformData = (
           (createNamesMap(names)['default'] as string) ||
           '',
         dob:
-          (birthReg &&
-            birthReg.dateOfBirth &&
-            birthReg.dateOfBirth.length &&
+          (birthReg?.dateOfBirth?.length &&
             formatLongDate(birthReg.dateOfBirth, locale)) ||
           '',
         dod:
-          (deathReg &&
-            deathReg.dateOfDeath &&
+          (deathReg?.dateOfDeath?.length &&
             formatLongDate(deathReg.dateOfDeath, locale)) ||
           '',
         dateOfEvent,

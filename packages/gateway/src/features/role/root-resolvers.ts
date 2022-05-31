@@ -13,6 +13,7 @@ import { GQLResolver } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { IRoleSearchPayload } from '@gateway/features/role/type-resolvers'
+import { transformMongoComparisonObject } from '@gateway/features/role/utils'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -33,7 +34,10 @@ export const resolvers: GQLResolver = {
         payload = { ...payload, title }
       }
       if (value) {
-        payload = { ...payload, value }
+        payload = {
+          ...payload,
+          value: transformMongoComparisonObject(value)
+        }
       }
       if (type) {
         payload = { ...payload, type }

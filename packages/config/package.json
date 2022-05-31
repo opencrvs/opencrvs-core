@@ -28,7 +28,9 @@
     "joi": "^17.5.0",
     "mongoose": "^5.11.0",
     "pino": "^6.0.0",
-    "tsconfig-paths": "^3.13.0"
+    "tsconfig-paths": "^3.13.0",
+    "jsonwebtoken": "^8.3.0",
+    "io-ts": "^1.2.1"
   },
   "devDependencies": {
     "@types/boom": "^7.3.1",

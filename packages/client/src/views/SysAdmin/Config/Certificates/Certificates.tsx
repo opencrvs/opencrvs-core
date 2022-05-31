@@ -132,9 +132,10 @@ async function updatePreviewSvgWithSampleSignature(
   const html = document.createElement('html')
   html.innerHTML = svgCode
   const certificateImages = html.querySelectorAll('image')
-  if (certificateImages[1]) {
-    const signatureImage = certificateImages[1]
-
+  const signatureImage = Array.from(certificateImages).find(
+    (image) => image.getAttribute('data-content') === 'signature'
+  )
+  if (signatureImage) {
     const res = await fetch('/assets/sample-signature.png')
     const blob = await res.blob()
     const base64signature = await blobToBase64(blob)
