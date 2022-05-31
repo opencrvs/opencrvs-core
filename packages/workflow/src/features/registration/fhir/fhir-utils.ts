@@ -368,3 +368,16 @@ export function generateEmptyBundle(): fhir.Bundle {
     entry: []
   }
 }
+
+export async function fetchExistingRegStatusCode(taskId: string | undefined) {
+  const existingTaskResource: fhir.Task = await getFromFhir(`/Task/${taskId}`)
+  const existingRegStatusCode =
+    existingTaskResource &&
+    existingTaskResource.businessStatus &&
+    existingTaskResource.businessStatus.coding &&
+    existingTaskResource.businessStatus.coding.find((code) => {
+      return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
+    })
+
+  return existingRegStatusCode
+}

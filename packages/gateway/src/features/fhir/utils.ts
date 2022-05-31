@@ -50,7 +50,8 @@ import {
   EVENT_TYPE,
   BIRTH_REG_NO,
   DEATH_REG_NO,
-  DOWNLOADED_EXTENSION_URL
+  DOWNLOADED_EXTENSION_URL,
+  REQUEST_CORRECTION_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
@@ -925,6 +926,8 @@ export function getActionFromTask(task: fhir.Task) {
   const extensionStatusWhileDownloaded = getDownloadedExtensionStatus(task)
   if (businessStatus === extensionStatusWhileDownloaded) {
     return GQLRegStatus.DOWNLOADED
+  } else if (hasRequestCorrectionExtension(task)) {
+    return GQLRegStatus.REQUESTED_CORRECTION
   }
   return businessStatus
 }
@@ -1254,4 +1257,11 @@ export async function setInformantReference(
       }
     }
   }
+}
+
+export function hasRequestCorrectionExtension(task: fhir.Task) {
+  const extension =
+    task.extension &&
+    findExtension(REQUEST_CORRECTION_EXTENSION_URL, task.extension)
+  return extension
 }

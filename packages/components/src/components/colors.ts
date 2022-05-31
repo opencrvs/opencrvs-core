@@ -55,7 +55,8 @@ export const colors = {
   supportingCopy: '#5B5B5B', // grey500
   placeholderCopy: '#959595', // grey400
   disabled: '#CCCCCC', // grey300
-  background: '#F5F5F5' // grey100
+  background: '#F5F5F5', // grey100
+  backgroundPrimary: '#36304E'
 }
 
 export const gradients = {

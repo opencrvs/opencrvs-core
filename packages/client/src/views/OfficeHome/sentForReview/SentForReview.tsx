@@ -9,79 +9,93 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
+import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
+import {
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/registrarHome'
+import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
+import { getScope } from '@client/profile/profileSelectors'
+import { transformData } from '@client/search/transformer'
+import { IStoreState } from '@client/store'
+import styled, { ITheme } from '@client/styledComponents'
 import {
   GridTable,
-  ColumnContentAlignment
-} from '@opencrvs/components/lib/interface'
-import {
   COLUMNS,
-  SORT_ORDER
-} from '@opencrvs/components/lib/interface/GridTable/GridTable'
-
+  SORT_ORDER,
+  ColumnContentAlignment,
+  IAction
+} from '@opencrvs/components/lib/interface'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import {
-  SUBMISSION_STATUS,
-  IDeclaration,
-  deleteDeclaration
-} from '@client/declarations'
-import { calculateDaysFromToday } from '@client/views/PrintCertificate/utils'
-import { goToDeclarationRecordAudit } from '@client/navigation'
-import {
-  constantsMessages as messages,
-  dynamicConstantsMessages,
-  constantsMessages
-} from '@client/i18n/messages'
-import { withTheme, ITheme } from '@client/styledComponents'
-import { getDraftInformantFullName } from '@client/utils/draftUtils'
-import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import ReactTooltip from 'react-tooltip'
+import { withTheme } from 'styled-components'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { Event } from '@client/forms'
+import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
-  getSortedItems,
-  changeSortedColumn
+  changeSortedColumn,
+  getSortedItems
 } from '@client/views/OfficeHome/utils'
 import {
   IconWithName,
   IconWithNameEvent,
-  SubmissionStatusMap,
-  NoNameContainer
+  NoNameContainer,
+  NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
-const DECLARATIONS_DAY_LIMIT = 7
-
-interface ISentForReviewProps {
+import { Scope } from '@client/utils/authUtils'
+import { DownloadButton } from '@client/components/interface/DownloadButton'
+import { Action } from '@client/forms'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+const ToolTipContainer = styled.span`
+  text-align: center;
+`
+interface IBaseApprovalTabProps {
   theme: ITheme
-  declarationsReadyToSend: IDeclaration[]
-  deleteDeclaration: typeof deleteDeclaration
+  goToPage: typeof goToPage
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+  outboxDeclarations: IDeclaration[]
+  scope: Scope | null
+  queryData: {
+    data: GQLEventSearchResultSet
+  }
   paginationId: number
   pageSize: number
   onPageChange: (newPageNumber: number) => void
+  loading?: boolean
+  error?: boolean
 }
 
-interface IState {
+interface IApprovalTabState {
   width: number
   sortedCol: COLUMNS
   sortOrder: SORT_ORDER
 }
 
-type IFullProps = ISentForReviewProps & IntlShapeProps
+type IApprovalTabProps = IntlShapeProps & IBaseApprovalTabProps
 
-class SentForReviewComponent extends React.Component<IFullProps, IState> {
-  pageSize: number
+class SentForReviewComponent extends React.Component<
+  IApprovalTabProps,
+  IApprovalTabState
+> {
+  pageSize = 10
+  isFieldAgent = this.props.scope?.includes('declare')
 
-  constructor(props: IFullProps) {
+  constructor(props: IApprovalTabProps) {
     super(props)
-
-    this.pageSize = 10
     this.state = {
       width: window.innerWidth,
       sortedCol: COLUMNS.NAME,
       sortOrder: SORT_ORDER.ASCENDING
     }
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.recordWindowWidth)
   }
 
   componentWillUnmount() {
@@ -90,23 +104,6 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
 
   recordWindowWidth = () => {
     this.setState({ width: window.innerWidth })
-  }
-
-  componentDidMount() {
-    window.addEventListener('resize', this.recordWindowWidth)
-    this.props.declarationsReadyToSend
-      .filter(
-        (declaration: IDeclaration) =>
-          declaration.submissionStatus ===
-            SUBMISSION_STATUS[SUBMISSION_STATUS.SUBMITTED] &&
-          declaration.modifiedOn &&
-          calculateDaysFromToday(
-            new Date(declaration.modifiedOn).toISOString().split('T')[0]
-          ) > DECLARATIONS_DAY_LIMIT
-      )
-      .forEach((declaration) => {
-        this.props.deleteDeclaration(declaration)
-      })
   }
 
   onColumnClick = (columnName: string) => {
@@ -121,157 +118,37 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     })
   }
 
-  getReadyToSendPaginatedData = (drafts: IDeclaration[], pageId: number) => {
-    return drafts.slice(
-      (pageId - 1) * this.props.pageSize,
-      pageId * this.props.pageSize
-    )
-  }
-
-  transformDeclarationsReadyToSend = () => {
-    if (
-      !this.props.declarationsReadyToSend ||
-      this.props.declarationsReadyToSend.length <= 0
-    ) {
-      return []
-    }
-    const paginatedDeclarations = this.getReadyToSendPaginatedData(
-      this.props.declarationsReadyToSend,
-      this.props.paginationId
-    )
-    const items = paginatedDeclarations.map((draft: IDeclaration, index) => {
-      const { intl } = this.props
-      const { locale } = intl
-      const name = getDraftInformantFullName(draft, locale)
-      const event =
-        (draft.event &&
-          intl.formatMessage(
-            dynamicConstantsMessages[draft.event.toLowerCase()]
-          )) ||
-        ''
-
-      const date =
-        draft &&
-        (draft.event === Event.BIRTH
-          ? draft.data.child?.childBirthDate
-          : draft.data.deathEvent?.deathDate || draft.data.deceased?.deathDate)
-      const savedDate =
-        draft && draft.savedOn
-          ? new Date(draft.savedOn)
-          : draft.createdAt && parseInt(draft.createdAt)
-      const NameComponent = name ? (
-        <LinkButton
-          id={`name_${index}`}
-          isBoldLink={true}
-          onClick={() => {
-            if (!draft.compositionId) {
-              throw new Error('No composition id found for this declaration')
-            }
-            this.props.goToDeclarationRecordAudit(
-              'reviewTab',
-              draft.compositionId
-            )
-          }}
-        >
-          {name}
-        </LinkButton>
-      ) : (
-        <NoNameContainer
-          onClick={() => {
-            if (!draft.compositionId) {
-              throw new Error('No composition id found for this declaration')
-            }
-            this.props.goToDeclarationRecordAudit(
-              'reviewTab',
-              draft.compositionId
-            )
-          }}
-        >
-          {intl.formatMessage(constantsMessages.noNameProvided)}
-        </NoNameContainer>
-      )
-      return {
-        id: draft.id,
-        event: event || '',
-        name: name && name.toLowerCase(),
-        iconWithName: (
-          <IconWithName
-            status={
-              (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
-            }
-            name={NameComponent}
-          />
-        ),
-        iconWithNameEvent: (
-          <IconWithNameEvent
-            status={
-              (draft && draft.submissionStatus) || SUBMISSION_STATUS.DRAFT
-            }
-            name={NameComponent}
-            event={event}
-          />
-        ),
-        dateOfEvent: date ? new Date(date as string) : '',
-        sentForReview: savedDate ? savedDate : '',
-        actions: [
-          {
-            actionComponent: (
-              <SubmissionStatusMap
-                status={draft.submissionStatus || ''}
-                online={navigator.onLine}
-                index={index}
-              />
-            )
-          }
-        ]
-      }
-    })
-    const sortedItems = getSortedItems(
-      items,
-      this.state.sortedCol,
-      this.state.sortOrder
-    ).map((item) => {
-      return {
-        ...item,
-        dateOfEvent:
-          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
-        sentForReview:
-          item.sentForReview && formattedDuration(item.sentForReview as Date)
-      }
-    })
-    return sortedItems
-  }
-
   getColumns = () => {
     if (this.state.width > this.props.theme.grid.breakpoints.lg) {
       return [
         {
           width: 30,
-          label: this.props.intl.formatMessage(messages.name),
+          label: this.props.intl.formatMessage(constantsMessages.name),
           key: COLUMNS.ICON_WITH_NAME,
-          errorValue: this.props.intl.formatMessage(messages.noNameProvided),
           isSorted: this.state.sortedCol === COLUMNS.NAME,
           sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(messages.event),
+          label: this.props.intl.formatMessage(constantsMessages.event),
           width: 16,
           key: COLUMNS.EVENT,
           isSorted: this.state.sortedCol === COLUMNS.EVENT,
           sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(messages.eventDate),
+          label: this.props.intl.formatMessage(constantsMessages.eventDate),
           width: 18,
           key: COLUMNS.DATE_OF_EVENT,
           isSorted: this.state.sortedCol === COLUMNS.DATE_OF_EVENT,
           sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(messages.sentForReview),
+          label: this.props.intl.formatMessage(
+            constantsMessages.sentForApproval
+          ),
           width: 18,
-          key: COLUMNS.SENT_FOR_REVIEW,
-          isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_REVIEW,
+          key: COLUMNS.SENT_FOR_APPROVAL,
+          isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_APPROVAL,
           sortFunction: this.onColumnClick
         },
         {
@@ -284,12 +161,11 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(messages.name),
+          label: this.props.intl.formatMessage(constantsMessages.name),
           width: 70,
           key: COLUMNS.ICON_WITH_NAME_EVENT
         },
         {
-          label: '',
           width: 30,
           alignment: ColumnContentAlignment.RIGHT,
           key: COLUMNS.ACTIONS,
@@ -299,35 +175,173 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
     }
   }
 
-  render() {
-    const { intl, paginationId, pageSize } = this.props
-    const totalPages = Math.ceil(
-      this.props.declarationsReadyToSend.length / pageSize
+  transformValidatedContent = (data: GQLEventSearchResultSet) => {
+    const { intl } = this.props
+    if (!data || !data.results) {
+      return []
+    }
+    const transformedData = transformData(data, this.props.intl)
+    const items = transformedData.map((reg, index) => {
+      const actions = [] as IAction[]
+      const foundDeclaration = this.props.outboxDeclarations.find(
+        (declaration) => declaration.id === reg.id
+      )
+      const downloadStatus =
+        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        actions.push({
+          actionComponent: (
+            <DownloadButton
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                action: Action.LOAD_REVIEW_DECLARATION
+              }}
+              key={`DownloadButton-${index}`}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
+          )
+        })
+      } else {
+        actions.push({
+          actionComponent: <Downloaded />
+        })
+      }
+      const event =
+        (reg.event &&
+          intl.formatMessage(
+            dynamicConstantsMessages[reg.event.toLowerCase()]
+          )) ||
+        ''
+      const sentForApproval =
+        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
+          ? new Date(reg.modifiedAt)
+          : new Date(Number(reg.modifiedAt))) || ''
+      const dateOfEvent =
+        reg.dateOfEvent &&
+        reg.dateOfEvent.length > 0 &&
+        new Date(reg.dateOfEvent)
+      const NameComponent = reg.name ? (
+        <NameContainer
+          id={`name_${index}`}
+          isBoldLink={true}
+          onClick={() =>
+            this.isFieldAgent
+              ? this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
+              : this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
+          }
+        >
+          {reg.name}
+        </NameContainer>
+      ) : (
+        <NoNameContainer
+          id={`name_${index}`}
+          onClick={() =>
+            this.isFieldAgent
+              ? this.props.goToDeclarationRecordAudit('reviewTab', reg.id)
+              : this.props.goToDeclarationRecordAudit('approvalTab', reg.id)
+          }
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
+      const isDuplicate = reg.duplicates && reg.duplicates.length > 0
+
+      return {
+        ...reg,
+        event,
+        name: reg.name && reg.name.toLowerCase(),
+        iconWithName: (
+          <IconWithName
+            status={reg.declarationStatus}
+            name={NameComponent}
+            isDuplicate={isDuplicate}
+          />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={reg.declarationStatus}
+            name={NameComponent}
+            event={event}
+            isDuplicate={isDuplicate}
+          />
+        ),
+        eventTimeElapsed:
+          (reg.dateOfEvent?.length &&
+            formattedDuration(new Date(reg.dateOfEvent))) ||
+          '',
+        dateOfEvent,
+        sentForApproval,
+        actions
+      }
+    })
+    const sortedItems = getSortedItems(
+      items,
+      this.state.sortedCol,
+      this.state.sortOrder
     )
+    return sortedItems.map((item) => {
+      return {
+        ...item,
+        dateOfEvent:
+          item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
+        sentForApproval:
+          item.sentForApproval &&
+          formattedDuration(item.sentForApproval as Date)
+      }
+    })
+  }
 
+  render() {
+    // Approval tab for registration clerk and registrar
+    // Review tab for field agent
+    const { intl, queryData, paginationId, pageSize, onPageChange } = this.props
+    const { data } = queryData
+    const totalPages = this.props.queryData.data.totalItems
+      ? Math.ceil(this.props.queryData.data.totalItems / pageSize)
+      : 0
     const isShowPagination =
-      this.props.declarationsReadyToSend.length > pageSize
-
+      this.props.queryData.data.totalItems &&
+      this.props.queryData.data.totalItems > pageSize
+        ? true
+        : false
+    const noResultText = this.isFieldAgent
+      ? intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'sent for review'
+        })
+      : intl.formatMessage(constantsMessages.noRecords, {
+          tab: 'sent for approval'
+        })
+    const title = this.isFieldAgent
+      ? intl.formatMessage(navigationMessages.sentForReview)
+      : intl.formatMessage(navigationMessages.approvals)
     return (
       <WQContentWrapper
-        title={intl.formatMessage(navigationMessages.sentForReview)}
+        title={title}
         isMobileSize={this.state.width < this.props.theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
         paginationId={paginationId}
         totalPages={totalPages}
-        onPageChange={this.props.onPageChange}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'sent for review'
-        })}
-        noContent={this.transformDeclarationsReadyToSend().length <= 0}
-        loading={false}
-        error={false}
+        onPageChange={onPageChange}
+        noResultText={noResultText}
+        loading={this.props.loading}
+        error={this.props.error}
+        noContent={this.transformValidatedContent(data).length <= 0}
       >
+        <ReactTooltip id="validatedTooltip">
+          <ToolTipContainer>
+            {this.props.intl.formatMessage(
+              messages.validatedDeclarationTooltipForRegistrationAgent
+            )}
+          </ToolTipContainer>
+        </ReactTooltip>
         <GridTable
-          content={this.transformDeclarationsReadyToSend()}
+          content={this.transformValidatedContent(data)}
           columns={this.getColumns()}
-          sortedCol={this.state.sortedCol}
+          loading={this.props.loading}
           sortOrder={this.state.sortOrder}
+          sortedCol={this.state.sortedCol}
           hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>
@@ -335,7 +349,14 @@ class SentForReviewComponent extends React.Component<IFullProps, IState> {
   }
 }
 
-export const SentForReview = connect(null, {
-  deleteDeclaration,
+function mapStateToProps(state: IStoreState) {
+  return {
+    scope: getScope(state),
+    outboxDeclarations: state.declarationsState.declarations
+  }
+}
+
+export const SentForReview = connect(mapStateToProps, {
+  goToPage,
   goToDeclarationRecordAudit
 })(injectIntl(withTheme(SentForReviewComponent)))

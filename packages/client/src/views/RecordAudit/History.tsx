@@ -32,6 +32,7 @@ import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { IAvatar, getIndividualNameObj } from '@client/utils/userUtils'
 import { goToUserProfile } from '@client/navigation'
 import { AvatarSmall } from '@client/components/Avatar'
+import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 
 const TableDiv = styled.div`
@@ -65,30 +66,40 @@ export interface IActionDetailsData {
 
 export const GetLink = ({
   status,
-  onClick
+  onClick,
+  isFieldAgent
 }: {
   status: string
   onClick: () => void
+  isFieldAgent: boolean
 }) => {
   return (
-    <LinkButton style={{ textAlign: 'left' }} onClick={onClick}>
-      {status}
-    </LinkButton>
+    <>
+      {!isFieldAgent ? (
+        <LinkButton style={{ textAlign: 'left' }} onClick={onClick}>
+          {status}
+        </LinkButton>
+      ) : (
+        <>{status}</>
+      )}
+    </>
   )
 }
 
-export const GetNameWithAvatar = ({
+const GetNameWithAvatar = ({
   id,
   nameObject,
   avatar,
   language,
-  goToUser
+  goToUser,
+  isFieldAgent
 }: {
   id: string
   nameObject: Array<GQLHumanName | null>
   avatar: IAvatar
   language: string
   goToUser?: typeof goToUserProfile
+  isFieldAgent: boolean
 }) => {
   const nameObj = getIndividualNameObj(nameObject, language)
   const userName = nameObj
@@ -99,14 +110,18 @@ export const GetNameWithAvatar = ({
     <NameAvatar>
       <AvatarSmall avatar={avatar} name={userName} />
       <span>
-        <LinkButton
-          id={'username-link'}
-          onClick={() => {
-            goToUser && goToUser(id)
-          }}
-        >
-          {userName}
-        </LinkButton>
+        {!isFieldAgent ? (
+          <LinkButton
+            id={'username-link'}
+            onClick={() => {
+              goToUser && goToUser(id)
+            }}
+          >
+            {userName}
+          </LinkButton>
+        ) : (
+          <>{userName}</>
+        )}
       </span>
     </NameAvatar>
   )
@@ -115,16 +130,15 @@ export const GetNameWithAvatar = ({
 export const GetHistory = ({
   intl,
   draft,
-  userDetails,
   goToUserProfile,
   goToTeamUserList,
-  toggleActionDetails
+  toggleActionDetails,
+  userDetails
 }: CMethodParams & {
   toggleActionDetails: (actionItem: IActionDetailsData) => void
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
-
   const onPageChange = (currentPageNumber: number) =>
     setCurrentPageNumber(currentPageNumber)
   if (
@@ -162,6 +176,10 @@ export const GetHistory = ({
     DEFAULT_HISTORY_RECORD_PAGE_SIZE,
     allHistoryData
   )
+  const isFieldAgent =
+    userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+      ? true
+      : false
   const historyData = (
     historiesForDisplay as unknown as { [key: string]: any }[]
   )
@@ -175,6 +193,7 @@ export const GetHistory = ({
         <GetLink
           status={getStatusLabel(item?.action, item.reinstated, intl)}
           onClick={() => toggleActionDetails(item)}
+          isFieldAgent={isFieldAgent}
         />
       ),
       user: (
@@ -184,6 +203,7 @@ export const GetHistory = ({
           avatar={item.user?.avatar}
           language={window.config.LANGUAGES}
           goToUser={goToUserProfile}
+          isFieldAgent={isFieldAgent}
         />
       ),
       type: intl.formatMessage(userMessages[item.user.role as string]),
@@ -198,6 +218,7 @@ export const GetHistory = ({
                 displayLabel: item.office.name
               } as ISearchLocation)
           }}
+          isFieldAgent={isFieldAgent}
         />
       )
     }))

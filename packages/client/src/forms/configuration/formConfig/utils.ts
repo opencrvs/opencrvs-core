@@ -384,10 +384,6 @@ function determineNextFieldIdNumber(
   return customFieldNumber.length ? Math.max(...customFieldNumber) + 1 : 1
 }
 
-export function generateKeyFromObj(obj: any) {
-  return btoa(JSON.stringify(obj))
-}
-
 function getLastConfigField(fieldsMap: IConfigFieldMap) {
   return Object.values(fieldsMap).find(
     ({ foregoingFieldId }) => foregoingFieldId === FieldPosition.BOTTOM

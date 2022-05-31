@@ -83,6 +83,9 @@ export async function modifyDraftStatusHandler(
       await clearHearthElasticInfluxData(request)
       if (newStatus === DraftStatus.DELETED) {
         await clearQuestionConfigs(event)
+        draft.history = []
+        draft.comment = ''
+        draft.version = 0
       }
     }
     draft.status = newStatus

@@ -19,13 +19,21 @@ import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
 import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
 import { WaitingToSent } from '@opencrvs/components/lib/icons/WaitingToSent'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
+import { LinkButton } from '@opencrvs/components/lib/buttons'
 
 const Flex = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     align-items: flex-start;
+  }
+`
+
+export const NameContainer = styled(LinkButton)`
+  height: auto;
+  div {
+    padding: 0;
   }
 `
 
@@ -54,7 +62,9 @@ const NameEventContainer = styled.div`
 const Icon = styled.div`
   flex-shrink: 0;
   display: flex;
-  align-items: center;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    align-items: flex-end;
+  }
   width: 24px;
 `
 interface IIconWith {
