@@ -467,14 +467,14 @@ input ComparisonInput {
 }
 
 type CertificateSVG {
-  _id: ID
-  svgCode: String
-  svgFilename: String
-  svgDateUpdated: String
-  svgDateCreated: String
-  user: String
-  event: String
-  status: String
+  id: ID!
+  svgCode: String!
+  svgFilename: String!
+  svgDateUpdated: String!
+  svgDateCreated: String!
+  user: String!
+  event: String!
+  status: String!
 }
 
 type Question {
