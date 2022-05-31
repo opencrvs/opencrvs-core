@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { constantsMessages } from '@client/i18n/messages'
 import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
 
 import {
@@ -31,9 +30,8 @@ import styled from 'styled-components'
 import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { getJurisidictionType } from '@client/utils/locationUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import { SYS_ADMIN_ROLES } from '@client/utils/constants'
+import { MANAGEMENT_ROLES } from '@client/utils/constants'
 import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 import { Event } from '@client/forms'
 
@@ -129,17 +127,12 @@ export const StatusWiseDeclarationCountView = connect<
 
   const isOfficeSelected = !!offlineOffices[ownProps.locationId]
 
-  let disableDeclarationLink = !(
-    isOfficeSelected ||
-    window.config.DECLARATION_AUDIT_LOCATIONS.includes(
-      getJurisidictionType(offlineLocations, ownProps.locationId) as string
-    )
-  )
+  let disableDeclarationLink = true
   const userDetails = getUserDetails(state)
   if (
     userDetails &&
     userDetails.role &&
-    !SYS_ADMIN_ROLES.includes(userDetails.role)
+    !MANAGEMENT_ROLES.includes(userDetails.role)
   ) {
     const jurisdictionLocation =
       getJurisdictionLocationIdFromUserDetails(userDetails)
