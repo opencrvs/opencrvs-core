@@ -80,11 +80,6 @@ import { goToWorkflowStatus, goToCompletenessRates } from '@client/navigation'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 
-const Text = styled.div`
-  ${({ theme }) => theme.fonts.reg16};
-  text-align: center;
-`
-
 const Layout = styled.div`
   display: flex;
   width: 100%;
@@ -141,18 +136,6 @@ const ResponsiveModalContent = styled.div`
   flex-direction: column;
 `
 
-const ConnectivityContainer = styled.div`
-  justify-content: center;
-  gap: 8px;
-  display: flex;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-top: 12px;
-  }
-`
-const NoConnectivity = styled(NoWifi)`
-  width: 24px;
-`
-
 const LocationStats = styled(Box)`
   margin: 0 auto;
   width: 100%;
@@ -176,6 +159,23 @@ const RegistrationStatus = styled(Box)`
 const Devider = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   margin-bottom: 16px;
+`
+
+const ConnectivityContainer = styled.div`
+  justify-content: center;
+  gap: 8px;
+  display: flex;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-top: 12px;
+  }
+`
+const NoConnectivity = styled(NoWifi)`
+  width: 24px;
+`
+
+const Text = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  text-align: center;
 `
 interface IConnectProps {
   locations: { [key: string]: ILocation }
@@ -207,7 +207,7 @@ interface State {
   queriesLoading: string[]
 }
 
-export type IOnlineStatusProps = {
+type IOnlineStatusProps = {
   isOnline: boolean
 }
 
@@ -388,7 +388,6 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               {isOnline ? (
                 <>
                   <Query
-                    fetchPolicy="no-cache"
                     query={PERFORMANCE_METRICS}
                     onCompleted={() => this.markFinished('PERFORMANCE_METRICS')}
                     onError={() => this.markFinished('PERFORMANCE_METRICS')}
@@ -542,7 +541,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               ) : (
                 <ConnectivityContainer>
                   <NoConnectivity />
-                  <Text id="wait-connection-text">
+                  <Text id="no-connection-text">
                     {intl.formatMessage(constantsMessages.noConnection)}
                   </Text>
                 </ConnectivityContainer>
