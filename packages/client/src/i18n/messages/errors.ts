@@ -14,7 +14,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IErrorMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   draftFailed: MessageDescriptor
-  duplicateQueryError: MessageDescriptor
+  duplicateWarning: MessageDescriptor
   errorCodeUnauthorized: MessageDescriptor
   unknownErrorTitle: MessageDescriptor
   unknownErrorDescription: MessageDescriptor
@@ -41,10 +41,11 @@ const messagesToDefine: IErrorMessages = {
     description: 'Tips for failed declarations',
     id: 'error.draftFailed'
   },
-  duplicateQueryError: {
-    defaultMessage: 'An error occurred while fetching data',
-    description: 'The error message shown when a search query fails',
-    id: 'duplicates.queryError'
+  duplicateWarning: {
+    defaultMessage: 'Potential duplicate with record {trackingId}',
+    description:
+      'The warning message shown when a declaration has potential duplicates',
+    id: 'duplicates.warning'
   },
   errorCodeUnauthorized: {
     defaultMessage: '401',

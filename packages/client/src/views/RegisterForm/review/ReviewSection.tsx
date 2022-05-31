@@ -22,7 +22,8 @@ import {
 import {
   DocumentViewer,
   IDocumentViewerOptions,
-  ResponsiveModal
+  ResponsiveModal,
+  Warning
 } from '@opencrvs/components/lib/interface'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import {
@@ -60,7 +61,6 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SUBSECTION,
-  TEXTAREA,
   WARNING,
   REVIEW_OVERRIDE_POSITION,
   DOCUMENT_UPLOADER_WITH_OPTION,
@@ -135,7 +135,7 @@ import {
   ListViewSimplified,
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
-import { Warning } from '@opencrvs/components/lib/interface'
+import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -1608,7 +1608,6 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputField>
                 </InputWrapper>
               )}
-
               {totalFileSizeExceeded && (
                 <Warning
                   label={intl.formatMessage(
@@ -1617,23 +1616,24 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   )}
                 />
               )}
-
-              {!isCorrection(declaration) && (
-                <ReviewAction
-                  completeDeclaration={isComplete}
-                  totalFileSizeExceeded={totalFileSizeExceeded}
-                  declarationToBeValidated={this.userHasValidateScope()}
-                  declarationToBeRegistered={this.userHasRegisterScope()}
-                  alreadyRejectedDeclaration={
-                    this.props.draft.registrationStatus === REJECTED
-                  }
-                  draftDeclaration={draft}
-                  declaration={declaration}
-                  submitDeclarationAction={submitClickEvent}
-                  rejectDeclarationAction={rejectDeclarationClickEvent}
-                />
-              )}
-              {isCorrection(declaration) && (
+              {!isCorrection(declaration) ? (
+                <>
+                  <DuplicateWarning duplicateIds={declaration.duplicates} />
+                  <ReviewAction
+                    completeDeclaration={isComplete}
+                    totalFileSizeExceeded={totalFileSizeExceeded}
+                    declarationToBeValidated={this.userHasValidateScope()}
+                    declarationToBeRegistered={this.userHasRegisterScope()}
+                    alreadyRejectedDeclaration={
+                      this.props.draft.registrationStatus === REJECTED
+                    }
+                    draftDeclaration={draft}
+                    declaration={declaration}
+                    submitDeclarationAction={submitClickEvent}
+                    rejectDeclarationAction={rejectDeclarationClickEvent}
+                  />
+                </>
+              ) : (
                 <FooterArea>
                   <PrimaryButton
                     id="continue_button"

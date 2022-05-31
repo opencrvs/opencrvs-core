@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
 import {
@@ -26,7 +25,8 @@ import {
   Archive,
   DeclarationIcon,
   Edit,
-  BackArrow
+  BackArrow,
+  Duplicate
 } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
@@ -106,6 +106,8 @@ import {
 } from './ActionButtons'
 import { IActionDetailsData, GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
+import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
+import { getPotentialDuplicateIds } from '@client/transformer/index'
 import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
@@ -141,6 +143,15 @@ const BackButton = styled(CircleButton)`
   color: ${({ theme }) => theme.colors.white};
   display: flex;
   margin-left: -8px;
+`
+
+const StyledDuplicateWarning = styled(DuplicateWarning)`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin: 16px 24px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 16px 0;
+  }
 `
 
 const DesktopDiv = styled.div`
@@ -206,6 +217,7 @@ function RecordAuditBody({
   clearCorrectionChange,
   declaration,
   draft,
+  duplicates,
   intl,
   goToCertificateCorrection,
   goToPrintCertificate,
@@ -221,6 +233,7 @@ function RecordAuditBody({
 }: {
   declaration: IDeclarationData
   draft: IDeclaration | null
+  duplicates?: string[]
   intl: IntlShape
   scope: Scope | null
   userDetails: IUserDetails | null
@@ -436,9 +449,16 @@ function RecordAuditBody({
       ? true
       : false
 
+  const hasDuplicates = !!(duplicates && duplicates.length > 0)
+
   return (
     <>
       <MobileHeader {...mobileProps} key={'record-audit-mobile-header'} />
+      <StyledDuplicateWarning
+        duplicateIds={duplicates?.filter(
+          (duplicate): duplicate is string => !!duplicate
+        )}
+      />
       <Content
         title={
           declaration.name || intl.formatMessage(recordAuditMessages.noName)
@@ -446,17 +466,21 @@ function RecordAuditBody({
         titleColor={declaration.name ? 'copy' : 'grey600'}
         size={ContentSize.LARGE}
         topActionButtons={desktopActionsView}
-        icon={() => (
-          <DeclarationIcon
-            isArchive={declaration?.status === ARCHIVED}
-            isValidatedOnReview={isValidatedOnReview}
-            color={
-              STATUSTOCOLOR[
-                (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
-              ]
-            }
-          />
-        )}
+        icon={() =>
+          hasDuplicates ? (
+            <Duplicate />
+          ) : (
+            <DeclarationIcon
+              isArchive={declaration?.status === ARCHIVED}
+              isValidatedOnReview={isValidatedOnReview}
+              color={
+                STATUSTOCOLOR[
+                  (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
+                ]
+              }
+            />
+          )
+        }
       >
         <GetDeclarationInfo
           declaration={declaration}
@@ -591,6 +615,7 @@ function getBodyContent({
                 declaration={declaration}
                 tab={tab}
                 draft={draft}
+                duplicates={getPotentialDuplicateIds(data.fetchRegistration)}
                 intl={intl}
                 scope={scope}
                 userDetails={userDetails}
@@ -633,6 +658,7 @@ function getBodyContent({
         {...actionProps}
         declaration={declaration}
         draft={draft}
+        duplicates={getPotentialDuplicateIds(workqueueDeclaration)}
         tab={tab}
         intl={intl}
         scope={scope}

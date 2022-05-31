@@ -2522,6 +2522,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       contact?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -3139,6 +3140,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       otherInformantType?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -4240,6 +4242,7 @@ export type FetchDeclarationShortInfoQuery = {
           __typename?: 'Registration'
           type?: RegistrationType | null
           trackingId?: string | null
+          duplicates?: Array<string | null> | null
           status?: Array<{
             __typename?: 'RegWorkflow'
             type?: RegStatus | null
@@ -4262,6 +4265,7 @@ export type FetchDeclarationShortInfoQuery = {
           __typename?: 'Registration'
           type?: RegistrationType | null
           trackingId?: string | null
+          duplicates?: Array<string | null> | null
           status?: Array<{
             __typename?: 'RegWorkflow'
             type?: RegStatus | null
