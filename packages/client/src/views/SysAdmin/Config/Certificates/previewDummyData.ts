@@ -1229,6 +1229,15 @@ const mockOfflineData: Partial<IOfflineData> = {
     }
   },
   locations: {
+    'f244b79e-16e7-40b2-834f-c1c57bd7eae8': {
+      id: 'f244b79e-16e7-40b2-834f-c1c57bd7eae8',
+      name: 'Abwe',
+      alias: 'Abwe',
+      physicalType: 'Jurisdiction',
+      jurisdictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/df669feb-61a3-4984-ab24-4b28511b472a'
+    },
     'ecc5a78b-e7d9-4640-ac65-e591a6a9590f': {
       id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
       name: 'Ibombo',
