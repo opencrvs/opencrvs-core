@@ -17,7 +17,8 @@ import {
   IContentResponse,
   IAssetResponse,
   IApplicationConfigResponse,
-  IApplicationConfig
+  IApplicationConfig,
+  ICertificateTemplateData
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
@@ -251,6 +252,14 @@ export type UpdateOfflineFormConfigAction = {
   }
 }
 
+export const UPDATE_OFFLINE_CERTIFICATE = 'OFFLINE/UPDATE_CERTIFICATE'
+export type UpdateOfflineCertificateAction = {
+  type: typeof UPDATE_OFFLINE_CERTIFICATE
+  payload: {
+    certificate: ICertificateTemplateData
+  }
+}
+
 export const updateOfflineFormConfig = (
   formDrafts: IFormDraft[],
   questionConfig?: IQuestionConfig[]
@@ -259,6 +268,15 @@ export const updateOfflineFormConfig = (
   payload: {
     formDrafts,
     questionConfig
+  }
+})
+
+export const updateOfflineCertificate = (
+  certificate: ICertificateTemplateData
+): UpdateOfflineCertificateAction => ({
+  type: UPDATE_OFFLINE_CERTIFICATE,
+  payload: {
+    certificate
   }
 })
 
@@ -298,6 +316,7 @@ export type Action =
   | ApplicationConfigFailedAction
   | ApplicationConfigUpdatedAction
   | UpdateOfflineFormConfigAction
+  | UpdateOfflineCertificateAction
   | OfflineFormConfigUpdatedAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>

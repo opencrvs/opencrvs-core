@@ -572,7 +572,7 @@ function getBodyContent({
   goBack,
   ...actionProps
 }: IFullProps) {
-  if (!draft?.data?.registration?.trackingId && tab === 'search') {
+  if (tab === 'search') {
     return (
       <>
         <Query

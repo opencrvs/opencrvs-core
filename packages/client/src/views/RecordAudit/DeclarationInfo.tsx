@@ -20,6 +20,7 @@ import { IntlShape } from 'react-intl'
 import styled from 'styled-components'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import format from '@client/utils/date-formatting'
+import { REGISTERED, CERTIFIED } from '@client/utils/constants'
 
 const MobileDiv = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -94,11 +95,17 @@ export const GetDeclarationInfo = ({
     trackingId: declaration?.trackingId
   }
 
+  /* TODO: This component needs refactor on how the data is being shown */
   if (info.type === 'Birth') {
-    if (declaration?.brnDrn) {
-      info.brn = declaration.brnDrn
-    } else if (!isDownloaded) {
-      info.brn = ''
+    if (
+      info.status &&
+      [REGISTERED, CERTIFIED].includes(info.status.toLowerCase())
+    ) {
+      if (declaration?.brnDrn) {
+        info.brn = declaration.brnDrn
+      } else if (!isDownloaded) {
+        info.brn = ''
+      }
     }
     info = {
       ...info,
@@ -107,10 +114,15 @@ export const GetDeclarationInfo = ({
       informant: removeUnderscore(informant)
     }
   } else if (info.type === 'Death') {
-    if (declaration?.brnDrn) {
-      info.drn = declaration.brnDrn
-    } else if (!isDownloaded) {
-      info.drn = ''
+    if (
+      info.status &&
+      [REGISTERED, CERTIFIED].includes(info.status.toLowerCase())
+    ) {
+      if (declaration?.brnDrn) {
+        info.drn = declaration.brnDrn
+      } else if (!isDownloaded) {
+        info.drn = ''
+      }
     }
     info = {
       ...info,

@@ -830,7 +830,7 @@
                   ],
                   "mapping": {
                     "template": {
-                      "fieldName": "informantFirstName",
+                      "fieldName": "childFirstName",
                       "operation": "nameToFieldTransformer",
                       "parameters": [
                         "en",
@@ -873,7 +873,7 @@
                   ],
                   "mapping": {
                     "template": {
-                      "fieldName": "informantFamilyName",
+                      "fieldName": "childFamilyName",
                       "operation": "nameToFieldTransformer",
                       "parameters": [
                         "en",

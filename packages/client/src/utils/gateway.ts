@@ -344,14 +344,14 @@ export type CertificateInput = {
 
 export type CertificateSvg = {
   __typename?: 'CertificateSVG'
-  _id?: Maybe<Scalars['ID']>
-  event?: Maybe<Scalars['String']>
-  status?: Maybe<Scalars['String']>
-  svgCode?: Maybe<Scalars['String']>
-  svgDateCreated?: Maybe<Scalars['String']>
-  svgDateUpdated?: Maybe<Scalars['String']>
-  svgFilename?: Maybe<Scalars['String']>
-  user?: Maybe<Scalars['String']>
+  event: Scalars['String']
+  id: Scalars['ID']
+  status: Scalars['String']
+  svgCode: Scalars['String']
+  svgDateCreated: Scalars['String']
+  svgDateUpdated: Scalars['String']
+  svgFilename: Scalars['String']
+  user: Scalars['String']
 }
 
 export type CertificateSvgInput = {
@@ -1765,27 +1765,15 @@ export type CreateOrUpdateCertificateSvgMutation = {
   __typename?: 'Mutation'
   createOrUpdateCertificateSVG?: {
     __typename?: 'CertificateSVG'
-    svgCode?: string | null
+    id: string
+    svgCode: string
+    svgFilename: string
+    user: string
+    status: string
+    event: string
+    svgDateCreated: string
+    svgDateUpdated: string
   } | null
-}
-
-export type GetActiveCertificatesSvgQueryVariables = Exact<{
-  [key: string]: never
-}>
-
-export type GetActiveCertificatesSvgQuery = {
-  __typename?: 'Query'
-  getActiveCertificatesSVG?: Array<{
-    __typename?: 'CertificateSVG'
-    _id?: string | null
-    svgCode?: string | null
-    svgFilename?: string | null
-    user?: string | null
-    event?: string | null
-    status?: string | null
-    svgDateUpdated?: string | null
-    svgDateCreated?: string | null
-  } | null> | null
 }
 
 export type FormDraftFieldsFragment = {
