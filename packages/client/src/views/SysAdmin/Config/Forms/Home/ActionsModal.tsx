@@ -108,7 +108,9 @@ function ActionButton() {
       mutation={CHANGE_FORM_DRAFT_STATUS}
       onCompleted={({ modifyDraftStatus: formDraft }) => {
         if (formDraft) {
-          dispatch(updateFormConfig(formDraft as IFormDraft))
+          action === Actions.DELETE
+            ? dispatch(updateFormConfig(formDraft as IFormDraft, []))
+            : dispatch(updateFormConfig(formDraft as IFormDraft))
           setAction({ status: ActionStatus.COMPLETED })
 
           /* uncommenting this causes issues with webpack compilation */
