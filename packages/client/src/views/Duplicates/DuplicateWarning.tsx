@@ -56,9 +56,7 @@ export function DuplicateWarning({
                 return (
                   <Warning
                     label={intl.formatMessage(errorMessages.duplicateWarning, {
-                      trackingId: (
-                        <u>{duplicateQuery.registration.trackingId}</u>
-                      )
+                      trackingId: duplicateQuery.registration.trackingId
                     })}
                   />
                 )
