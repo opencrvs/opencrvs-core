@@ -104,7 +104,7 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
   }
   const response = await res.json()
   response.certificates = response.certificates.map(
-    ({ _id, ...rest }: { id?: string; _id: string }) => {
+    ({ _id, ...rest }: { _id: string }) => {
       return { ...rest, id: _id }
     }
   )
