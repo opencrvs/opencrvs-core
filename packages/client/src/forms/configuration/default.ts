@@ -644,7 +644,7 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 mapping: {
                   template: {
-                    fieldName: 'informantFirstName',
+                    fieldName: 'childFirstName',
                     operation: 'nameToFieldTransformer',
                     parameters: ['en', 'firstNames']
                   },
@@ -674,7 +674,7 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 mapping: {
                   template: {
-                    fieldName: 'informantFamilyName',
+                    fieldName: 'childFamilyName',
                     operation: 'nameToFieldTransformer',
                     parameters: ['en', 'familyName']
                   },
