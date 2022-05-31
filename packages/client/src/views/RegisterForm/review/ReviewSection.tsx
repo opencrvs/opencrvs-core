@@ -108,7 +108,7 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { isMobileDevice } from '@client/utils/commonUtils'
-import { REJECTED } from '@client/utils/constants'
+import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
@@ -127,6 +127,7 @@ import { DocumentListPreview } from '@client/components/form/DocumentUploadfield
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
 import {
+  bytesToSize,
   isCorrection,
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
@@ -1612,7 +1613,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 <Warning
                   label={intl.formatMessage(
                     constantsMessages.totalFileSizeExceed,
-                    { fileSize: window.config.ACCUMULATED_FILE_SIZE }
+                    { fileSize: bytesToSize(ACCUMULATED_FILE_SIZE) }
                   )}
                 />
               )}

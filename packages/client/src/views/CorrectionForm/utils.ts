@@ -58,6 +58,7 @@ import {
 import { buttonMessages } from '@client/i18n/messages'
 import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
 import { IGQLLocation } from '@client/utils/userUtils'
+import { ACCUMULATED_FILE_SIZE } from '@client/utils/constants'
 
 export function groupHasError(
   group: IFormSectionGroup,
@@ -98,6 +99,14 @@ export function isCorrection(declaration: IDeclaration) {
   )
 }
 
+export function bytesToSize(bytes: number) {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+  if (bytes == 0) return '0 Byte'
+
+  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i]
+}
+
 export function isFileSizeExceeded(declaration: IDeclaration) {
   const {
     data: { documents }
@@ -112,7 +121,8 @@ export function isFileSizeExceeded(declaration: IDeclaration) {
     })
   }
 
-  return totalFileSize > 20480000
+  console.log(ACCUMULATED_FILE_SIZE, totalFileSize > ACCUMULATED_FILE_SIZE)
+  return totalFileSize > ACCUMULATED_FILE_SIZE
 }
 
 export function updateDeclarationRegistrationWithCorrection(

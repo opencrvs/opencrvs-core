@@ -108,3 +108,4 @@ export const DECLARED_DECLARATION_SEARCH_QUERY_COUNT =
   process.env.DECLARED_DECLARATION_SEARCH_QUERY_COUNT || 100
 
 export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
+export const ACCUMULATED_FILE_SIZE = 20480000

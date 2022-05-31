@@ -96,11 +96,13 @@ import {
   PAGE_TRANSITIONS_EXIT_TIME,
   DECLARED,
   REJECTED,
-  VALIDATED
+  VALIDATED,
+  ACCUMULATED_FILE_SIZE
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
 import {
+  bytesToSize,
   isCorrection,
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
@@ -793,8 +795,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                                 label={intl.formatMessage(
                                   constantsMessages.totalFileSizeExceed,
                                   {
-                                    fileSize:
-                                      window.config.ACCUMULATED_FILE_SIZE
+                                    fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
                                   }
                                 )}
                               />

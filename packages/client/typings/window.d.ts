@@ -60,7 +60,6 @@ interface Window {
     LOGROCKET: string
     SENTRY: string
     ADDRESSES: number
-    ACCUMULATED_FILE_SIZE: string
   }
   __localeId__: string
 }
