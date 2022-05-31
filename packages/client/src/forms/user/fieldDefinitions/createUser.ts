@@ -124,6 +124,17 @@ export const userSectionFormType: ISerializedFormSection = {
           }
         },
         {
+          name: 'username',
+          type: TEXT,
+          label: userFormMessages.userName,
+          previewGroup: 'userNameGroup',
+          required: false,
+          initialValue: '',
+          validate: [],
+          readonly: true,
+          hidden: true
+        },
+        {
           name: 'phoneNumber',
           type: TEXT,
           label: userFormMessages.phoneNumber,

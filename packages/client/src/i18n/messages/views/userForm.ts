@@ -15,6 +15,11 @@ export const messages = {
     description: 'The name of the user form',
     id: 'constants.user'
   },
+  userName: {
+    defaultMessage: 'User name',
+    description: 'The name of the user name form',
+    id: 'constants.userName'
+  },
   userFormTitle: {
     defaultMessage: 'Create new user',
     description: 'The title of user form',

@@ -131,29 +131,30 @@ class UserReviewFormComponent extends React.Component<
                 ? ''
                 : intl.formatMessage(field.label),
             value: this.getValue(field),
-            action: !(
-              field.name === 'registrationOffice' &&
-              this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
-            )
-              ? {
-                  id: `btn_change_${field.name}`,
-                  label: intl.formatMessage(messages.change),
-                  handler: () => {
-                    this.props.userId
-                      ? this.props.goToUserReviewForm(
-                          this.props.userId,
-                          userFormSection.id,
-                          group.id,
-                          field.name
-                        )
-                      : this.props.goToCreateUserSection(
-                          userFormSection.id,
-                          group.id,
-                          field.name
-                        )
+            action:
+              !(
+                field.name === 'registrationOffice' &&
+                this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
+              ) && !field.readonly
+                ? {
+                    id: `btn_change_${field.name}`,
+                    label: intl.formatMessage(messages.change),
+                    handler: () => {
+                      this.props.userId
+                        ? this.props.goToUserReviewForm(
+                            this.props.userId,
+                            userFormSection.id,
+                            group.id,
+                            field.name
+                          )
+                        : this.props.goToCreateUserSection(
+                            userFormSection.id,
+                            group.id,
+                            field.name
+                          )
+                    }
                   }
-                }
-              : undefined
+                : undefined
           })
         }
       })
