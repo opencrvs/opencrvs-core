@@ -256,6 +256,7 @@ describe('Record audit for a draft declaration', () => {
 
     declaration.submissionStatus = SUBMISSION_STATUS.DECLARED
     declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
+
     store.dispatch(storeDeclaration(declaration))
 
     component = await createTestComponent(

@@ -70,11 +70,11 @@ import { Navigation } from '@client/components/interface/Navigation'
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer
+  NoNameContainer,
+  NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -359,7 +359,7 @@ export class SearchResultView extends React.Component<
           : false
       const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
       const NameComponent = reg.name ? (
-        <LinkButton
+        <NameContainer
           isBoldLink={true}
           id={`name_${index}`}
           onClick={() =>
@@ -367,7 +367,7 @@ export class SearchResultView extends React.Component<
           }
         >
           {reg.name}
-        </LinkButton>
+        </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}

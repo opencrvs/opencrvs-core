@@ -34,7 +34,7 @@ import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
 import { Store } from 'redux'
-import { RequiresUpdateRegistrar } from './RequiresUpdateRegistrar'
+import { RequiresUpdate } from './RequiresUpdate'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
@@ -163,7 +163,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RequiresUpdateRegistrar
+      <RequiresUpdate
         queryData={{
           data: {
             totalItems: 2,
@@ -248,7 +248,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RequiresUpdateRegistrar
+      <RequiresUpdate
         queryData={{
           data: {
             totalItems: 2,
@@ -349,7 +349,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RequiresUpdateRegistrar
+      <RequiresUpdate
         queryData={{
           data: {
             totalItems: 2,
@@ -550,7 +550,7 @@ describe('OfficeHome sent for update tab related tests', () => {
         <OfficeHome
           match={{
             params: {
-              tabId: WORKQUEUE_TABS.requiresUpdateRegistrar
+              tabId: WORKQUEUE_TABS.requiresUpdate
             },
             isExact: true,
             path: '',
@@ -638,7 +638,7 @@ describe('Tablet tests', () => {
 
     const testComponent = await createTestComponent(
       // @ts-ignore
-      <RequiresUpdateRegistrar
+      <RequiresUpdate
         queryData={{
           data: {
             totalItems: 2,

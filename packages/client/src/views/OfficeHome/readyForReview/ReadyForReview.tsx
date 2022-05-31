@@ -46,7 +46,8 @@ import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer
+  NoNameContainer,
+  NameContainer
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
@@ -54,7 +55,6 @@ import {
 } from '@client/views/OfficeHome/utils'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -200,7 +200,7 @@ class ReadyForReviewComponent extends React.Component<
         ''
       const createdAt = (reg.createdAt && parseInt(reg.createdAt)) || ''
       const NameComponent = reg.name ? (
-        <LinkButton
+        <NameContainer
           id={`name_${index}`}
           isBoldLink={true}
           onClick={() =>
@@ -208,7 +208,7 @@ class ReadyForReviewComponent extends React.Component<
           }
         >
           {reg.name}
-        </LinkButton>
+        </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}

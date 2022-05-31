@@ -108,6 +108,8 @@ import { IActionDetailsData, GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
+import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -348,11 +350,10 @@ function RecordAuditBody({
       </DesktopDiv>
     )
   }
-
   if (
     declaration.status === SUBMISSION_STATUS.DRAFT ||
-    declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
-    (declaration.status === SUBMISSION_STATUS.REJECTED &&
+    ((declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
+      declaration.status === SUBMISSION_STATUS.REJECTED) &&
       userDetails?.role &&
       !FIELD_AGENT_ROLES.includes(userDetails.role))
   ) {
@@ -394,9 +395,21 @@ function RecordAuditBody({
       </DesktopDiv>
     )
   }
-
   if (!isDownloaded) {
-    actions.push(ShowDownloadButton({ declaration, draft, userDetails }))
+    actions.push(
+      ShowDownloadButton({
+        declaration,
+        draft,
+        userDetails
+      })
+    )
+    desktopActionsView.push(actions[actions.length - 1])
+  } else {
+    if (draft?.submissionStatus === SUBMISSION_STATUS.DRAFT) {
+      actions.push(<Uploaded />)
+    } else {
+      actions.push(<Downloaded />)
+    }
     desktopActionsView.push(actions[actions.length - 1])
   }
 
@@ -556,9 +569,10 @@ function getBodyContent({
   tab,
   userDetails,
   workqueueDeclaration,
+  goBack,
   ...actionProps
 }: IFullProps) {
-  if (!draft?.trackingId && tab === 'search') {
+  if (!draft?.data?.registration?.trackingId && tab === 'search') {
     return (
       <>
         <Query
@@ -574,14 +588,31 @@ function getBodyContent({
             } else if (error) {
               return <Redirect to={HOME} />
             }
+
+            let declaration
+            if (
+              draft?.data?.registration?.trackingId &&
+              draft?.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
+            ) {
+              declaration = getDraftDeclarationData(
+                draft,
+                resources,
+                intl,
+                draft?.data?.registration?.trackingId?.toString()
+              )
+              declaration = {
+                ...declaration,
+                status: data.fetchRegistration?.registration?.status[0].type
+              }
+            } else {
+              declaration = getGQLDeclaration(data.fetchRegistration, language)
+            }
+
             return (
               <RecordAuditBody
                 key={`record-audit-${declarationId}`}
                 {...actionProps}
-                declaration={getGQLDeclaration(
-                  data.fetchRegistration,
-                  language
-                )}
+                declaration={declaration}
                 tab={tab}
                 draft={draft}
                 duplicates={getPotentialDuplicateIds(data.fetchRegistration)}
@@ -601,7 +632,7 @@ function getBodyContent({
       workqueueDeclaration?.registration?.trackingId ||
       ''
 
-    const declaration =
+    let declaration =
       draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
         ? getDraftDeclarationData(draft, resources, intl, trackingId)
         : getWQDeclarationData(
@@ -609,6 +640,17 @@ function getBodyContent({
             language,
             trackingId
           )
+
+    const wqStatus = workqueueDeclaration?.registration?.status
+    const draftStatus =
+      draft?.submissionStatus?.toString() ||
+      draft?.registrationStatus?.toString() ||
+      SUBMISSION_STATUS.DRAFT
+
+    declaration = {
+      ...declaration,
+      status: wqStatus || draftStatus
+    }
 
     return (
       <RecordAuditBody
@@ -621,6 +663,7 @@ function getBodyContent({
         intl={intl}
         scope={scope}
         userDetails={userDetails}
+        goBack={goBack}
       />
     )
   }
@@ -656,7 +699,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     offlineData: state.offline.offlineData,
     workqueueDeclaration:
       (tab !== 'search' &&
-        state.workqueueState.workqueue.data[tab].results?.find(
+        state.workqueueState.workqueue.data[tab]?.results?.find(
           (gqlSearchSet) => gqlSearchSet?.id === declarationId
         )) ||
       null

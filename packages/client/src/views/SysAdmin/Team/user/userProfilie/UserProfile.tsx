@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/userSetup'
+import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { withTheme } from '@client/styledComponents'
 import { goToTeamUserList, goToReviewUserDetails } from '@client/navigation'
 import * as React from 'react'
@@ -53,6 +54,7 @@ import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin
 import { IUserDetails } from '@client/utils/userUtils'
 import { userMutations } from '@client/user/mutations'
 import format from '@client/utils/date-formatting'
+import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;
@@ -87,11 +89,9 @@ const InformationHolder = styled.div`
   }
 `
 
-export const InformationTitle = styled.div<{ paddingRight?: number }>`
+export const InformationTitle = styled.div`
   ${({ theme }) => theme.fonts.bold16};
-  ${({ paddingRight }) => {
-    return `padding-right: ${paddingRight ? paddingRight : 0}px`
-  }}
+  width: 320px;
 `
 const InformationValue = styled.div`
   ${({ theme }) => theme.fonts.reg16};
@@ -118,6 +118,12 @@ const HeaderMenuHolder = styled.div`
   & > :not(:last-child) {
     margin: auto 8px;
   }
+`
+const LinkButtonWithoutSpacing = styled(LinkButton)`
+  & > * {
+    padding: 0;
+  }
+  height: auto !important;
 `
 
 interface ISearchParams {
@@ -337,6 +343,9 @@ class UserProfileComponent extends React.Component<Props, State> {
             } else {
               const user = this.transformUserQueryResult(data && data.getUser)
 
+              const userRole = getUserRole(user, intl)
+              const userType = getUserType(user, intl)
+
               return (
                 <SysAdminContentWrapper
                   id="user-profile"
@@ -367,11 +376,11 @@ class UserProfileComponent extends React.Component<Props, State> {
                     <UserAvatar name={user.name} avatar={user.avatar} />
                     <NameHolder>{user.name}</NameHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={70}>
+                      <InformationTitle>
                         {intl.formatMessage(messages.assignedOffice)}
                       </InformationTitle>
                       <InformationValue>
-                        <LinkButton
+                        <LinkButtonWithoutSpacing
                           id="office-link"
                           onClick={() =>
                             this.props.goToTeamUserList(
@@ -381,33 +390,32 @@ class UserProfileComponent extends React.Component<Props, State> {
                         >
                           {user.primaryOffice &&
                             user.primaryOffice.displayLabel}
-                        </LinkButton>
+                        </LinkButtonWithoutSpacing>
                       </InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={208}>
-                        {intl.formatMessage(messages.roleType)}
+                      <InformationTitle>
+                        {(userType && intl.formatMessage(messages.roleType)) ||
+                          intl.formatMessage(userFormMessages.type)}
                       </InformationTitle>
                       <InformationValue>
-                        {intl.formatMessage(userMessages[user.role as string])}{' '}
-                        /{' '}
-                        {intl.formatMessage(userMessages[user.type as string])}
+                        {(userType && `${userRole} / ${userType}`) || userRole}
                       </InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={169}>
+                      <InformationTitle>
                         {intl.formatMessage(messages.phoneNumber)}
                       </InformationTitle>
                       <InformationValue>{user.number}</InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={205}>
+                      <InformationTitle>
                         {intl.formatMessage(messages.userName)}
                       </InformationTitle>
                       <InformationValue>{user.username}</InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={210}>
+                      <InformationTitle>
                         {intl.formatMessage(messages.startDate)}
                       </InformationTitle>
                       <InformationValue>{user.startDate}</InformationValue>

@@ -34,10 +34,10 @@ import {
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer
+  NoNameContainer,
+  NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 
 const { useState, useEffect } = React
 
@@ -120,7 +120,7 @@ function InExternalValidationComponent(props: IProps) {
           ? new Date(reg.modifiedAt)
           : new Date(Number(reg.modifiedAt))) || ''
       const NameComponent = reg.name ? (
-        <LinkButton
+        <NameContainer
           id={`name_${index}`}
           isBoldLink={true}
           onClick={() =>
@@ -128,7 +128,7 @@ function InExternalValidationComponent(props: IProps) {
           }
         >
           {reg.name}
-        </LinkButton>
+        </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
