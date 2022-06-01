@@ -24,6 +24,7 @@ import {
   showSubmitFormSuccessToast
 } from '@client/notification/actions'
 import * as offlineActions from '@client/offline/actions'
+import * as profileActions from '@client/profile/profileActions'
 import { SEARCH_USERS } from '@client/user/queries'
 import {
   alterRolesBasedOnUserRole,
@@ -31,7 +32,7 @@ import {
 } from '@client/views/SysAdmin/Team/utils'
 import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Action } from 'redux'
-import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
+import { ActionCmd, Cmd, Loop, loop, LoopReducer, RunCmd } from 'redux-loop'
 import {
   GQLQuery,
   GQLUser,
@@ -41,6 +42,9 @@ import {
 import { gqlToDraftTransformer } from '@client/transformer'
 import { userAuditForm, IUserAuditForm } from '@client/user/user-audit'
 import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
+import { getToken, getTokenPayload } from '@client/utils/authUtils'
+import { modifyUserDetails } from '@client/profile/profileActions'
+import { IUserDetails } from '@client/utils/userUtils'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -129,7 +133,7 @@ interface IUserFormDataSubmitAction {
   payload: {
     client: ApolloClient<unknown>
     mutation: any
-    variables: Record<string, unknown>
+    variables: { [key: string]: any }
     isUpdate: boolean
     officeLocationId: string
   }
@@ -159,7 +163,7 @@ interface ISubmitFailedAction {
 export function submitUserFormData(
   client: ApolloClient<unknown>,
   mutation: any,
-  variables: Record<string, unknown>,
+  variables: { [key: string]: any },
   officeLocationId: string,
   isUpdate = false
 ): IUserFormDataSubmitAction {
@@ -264,6 +268,7 @@ type UserFormAction =
   | IProcessRoles
   | IFetchAndStoreUserData
   | IUpdateFormAndFormData
+  | profileActions.Action
   | Action
 
 export interface IUserFormState {
@@ -355,7 +360,6 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           ).push({ value: existingRole, types: [existingType] })
         }
       }
-      console.log('data: ', JSON.stringify(data))
       updatedSections.forEach((section) => {
         section.groups.forEach((group) => {
           group.fields = transformRoleDataToDefinitions(
@@ -397,8 +401,11 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const { client, mutation, variables, officeLocationId, isUpdate } = (
         action as IUserFormDataSubmitAction
       ).payload
-      return loop(
-        { ...state, submitting: true },
+      const token = getToken()
+      const tokenPayload = getTokenPayload(token)
+      const userDetails = variables.user
+      const isSelfUpdate = userDetails.id === tokenPayload?.sub ? true : false
+      const commandList: (RunCmd<Action> | ActionCmd<Action>)[] = [
         Cmd.run(
           () =>
             client.mutate({
@@ -414,6 +421,15 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
             failActionCreator: submitFail
           }
         )
+      ]
+      if (isSelfUpdate) {
+        commandList.push(
+          Cmd.action(modifyUserDetails({ mobile: userDetails.mobile }))
+        )
+      }
+      return loop(
+        { ...state, submitting: true },
+        Cmd.list<UserFormAction>(commandList)
       )
     case SUBMIT_USER_FORM_DATA_SUCCESS:
       return loop(
