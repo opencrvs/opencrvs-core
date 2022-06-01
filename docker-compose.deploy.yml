@@ -231,6 +231,28 @@ services:
         constraints:
           - node.role == manager
 
+  logstash-agent:
+    image: logstash:7.17.0
+    command: logstash -f /etc/logstash/logstash.conf
+    depends_on:
+      - elasticsearch
+    ports:
+      - 12201:12201/udp
+    configs:
+      - source: logstash.{{ts}}
+        target: /etc/logstash/logstash.conf
+
+  logstash-central:
+    image: logstash:7.17.0
+    command: logstash -f /etc/logstash/logstash.conf
+    depends_on:
+      - elasticsearch
+    configs:
+      - source: logstash-central.{{ts}}
+        target: /etc/logstash/logstash.conf
+    environment:
+      - ELASTICSEARCH_SUPERUSER_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
+
   apm-server:
     image: docker.elastic.co/apm/apm-server:7.15.2
     depends_on:
@@ -296,6 +318,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'client'
 
   components:
     deploy:
@@ -313,6 +340,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'components'
 
   countryconfig:
     deploy:
@@ -330,7 +362,11 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'countryconfig'
   login:
     environment:
       - COUNTRY_CONFIG_URL=https://countryconfig.{{hostname}}
@@ -348,7 +384,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'login'
   # Configure other service with deployment specifc details
   auth:
     secrets:
@@ -372,6 +412,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'auth'
 
   user-mgnt:
     secrets:
@@ -384,7 +429,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'user-mgnt'
   notification:
     secrets:
       - jwt-public-key.{{ts}}
@@ -395,7 +444,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'notification'
   gateway:
     secrets:
       - jwt-public-key.{{ts}}
@@ -416,7 +469,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'gateway'
   workflow:
     secrets:
       - jwt-public-key.{{ts}}
@@ -427,7 +484,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'workflow'
   search:
     secrets:
       - jwt-public-key.{{ts}}
@@ -439,7 +500,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'search'
   metrics:
     secrets:
       - jwt-public-key.{{ts}}
@@ -450,7 +515,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'metrics'
   config:
     secrets:
       - jwt-public-key.{{ts}}
@@ -472,7 +541,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'config'
   # Configure other dependencies with deployment specifc details
   hearth:
     environment:
@@ -491,7 +564,11 @@ services:
         target: /src/hearth/config/queryparam-extensions.json
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'hearth'
   openhim-core:
     environment:
       - mongo_url=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1/openhim-dev?replicaSet=rs0
@@ -513,7 +590,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'openhim-core'
   openhim-console:
     deploy:
       labels:
@@ -530,25 +611,11 @@ services:
         target: /usr/share/nginx/html/config/default.json
     networks:
       - overlay_net
-
-  logspout:
-    image: gliderlabs/logspout:latest
-    restart: unless-stopped
-    volumes:
-      - /etc/hostname:/etc/host_hostname:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: syslog://${PAPERTRAIL:-logs5.papertrailapp.com:24584}
-    deploy:
-      mode: global
-      resources:
-        limits:
-          cpus: '0.20'
-          memory: 256M
-        reservations:
-          cpus: '0.10'
-          memory: 128M
-    networks:
-      - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'openhim-console'
 
   webhooks:
     secrets:
@@ -570,7 +637,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://logstash:12201'
+        tag: 'webhooks'
 secrets:
   jwt-public-key.{{ts}}:
     external: true
@@ -597,6 +668,10 @@ configs:
     file: ./infrastructure/monitoring/kibana/kibana.yml
   apm.{{ts}}:
     file: ./infrastructure/monitoring/apm/apm-server.yml
+  logstash.{{ts}}:
+    file: ./infrastructure/monitoring/logstash/logstash.conf
+  logstash-central.{{ts}}:
+    file: ./infrastructure/monitoring/logstash/logstash-central.conf
 networks:
   overlay_net:
     driver: overlay
