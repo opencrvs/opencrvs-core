@@ -126,7 +126,7 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'username',
           type: TEXT,
-          label: userFormMessages.userName,
+          label: userFormMessages.username,
           previewGroup: 'userNameGroup',
           required: false,
           initialValue: '',

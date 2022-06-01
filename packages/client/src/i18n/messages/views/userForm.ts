@@ -15,10 +15,10 @@ export const messages = {
     description: 'The name of the user form',
     id: 'constants.user'
   },
-  userName: {
-    defaultMessage: 'User name',
+  username: {
+    defaultMessage: 'Username',
     description: 'The name of the user name form',
-    id: 'constants.userName'
+    id: 'constants.username'
   },
   userFormTitle: {
     defaultMessage: 'Create new user',
