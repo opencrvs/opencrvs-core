@@ -233,26 +233,46 @@ services:
 
   logstash-agent:
     image: logstash:7.17.0
-    command: logstash -f /etc/logstash/logstash.conf
+    command: logstash -f /etc/logstash/logstash.conf --verbose
     depends_on:
       - elasticsearch
-    ports:
-      - 12201:12201/udp
     configs:
-      - source: logstash.{{ts}}
+      - source: logstash-agent.{{ts}}
         target: /etc/logstash/logstash.conf
-
+      - source: logstash.{{ts}}
+        target: /usr/share/logstash/config/logstash.yml
+    ports:
+      - '9000:9000'
+      - '12201:12201'
+      - '12201:12201/udp'
+      - '1514:1514'
+      - '1514:1514/udp'
+    networks:
+      - overlay_net
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
+    restart: always
   logstash-central:
     image: logstash:7.17.0
-    command: logstash -f /etc/logstash/logstash.conf
+    command: logstash -f /etc/logstash/logstash.conf --verbose
     depends_on:
       - elasticsearch
     configs:
       - source: logstash-central.{{ts}}
         target: /etc/logstash/logstash.conf
+      - source: logstash.{{ts}}
+        target: /usr/share/logstash/config/logstash.yml
     environment:
       - ELASTICSEARCH_SUPERUSER_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
-
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
+    networks:
+      - overlay_net
+    restart: always
   apm-server:
     image: docker.elastic.co/apm/apm-server:7.15.2
     depends_on:
@@ -321,7 +341,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'client'
 
   components:
@@ -343,7 +363,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'components'
 
   countryconfig:
@@ -365,7 +385,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'countryconfig'
   login:
     environment:
@@ -387,7 +407,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'login'
   # Configure other service with deployment specifc details
   auth:
@@ -415,7 +435,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'auth'
 
   user-mgnt:
@@ -432,7 +452,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'user-mgnt'
   notification:
     secrets:
@@ -447,7 +467,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'notification'
   gateway:
     secrets:
@@ -472,7 +492,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'gateway'
   workflow:
     secrets:
@@ -487,7 +507,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'workflow'
   search:
     secrets:
@@ -503,7 +523,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'search'
   metrics:
     secrets:
@@ -518,7 +538,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'metrics'
   config:
     secrets:
@@ -544,7 +564,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'config'
   # Configure other dependencies with deployment specifc details
   hearth:
@@ -567,7 +587,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'hearth'
   openhim-core:
     environment:
@@ -593,7 +613,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'openhim-core'
   openhim-console:
     deploy:
@@ -614,7 +634,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'openhim-console'
 
   webhooks:
@@ -640,7 +660,7 @@ services:
     logging:
       driver: gelf
       options:
-        gelf-address: 'udp://logstash:12201'
+        gelf-address: 'udp://127.0.0.1:12201'
         tag: 'webhooks'
 secrets:
   jwt-public-key.{{ts}}:
@@ -669,6 +689,8 @@ configs:
   apm.{{ts}}:
     file: ./infrastructure/monitoring/apm/apm-server.yml
   logstash.{{ts}}:
+    file: ./infrastructure/monitoring/logstash/logstash.yml
+  logstash-agent.{{ts}}:
     file: ./infrastructure/monitoring/logstash/logstash.conf
   logstash-central.{{ts}}:
     file: ./infrastructure/monitoring/logstash/logstash-central.conf
