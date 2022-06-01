@@ -32,7 +32,6 @@ import {
   PRINT_CERTIFICATE_PAYMENT,
   REGISTRAR_HOME_TAB,
   REVIEW_CERTIFICATE,
-  REVIEW_DUPLICATES,
   REVIEW_USER_DETAILS,
   REVIEW_USER_FORM,
   SEARCH,
@@ -263,11 +262,6 @@ export function goToDeclarationContact(informant: string) {
     formatUrl(DRAFT_BIRTH_INFORMANT_FORM, {
       informant: informant.toString()
     })
-  )
-}
-export function goToReviewDuplicate(declarationId: string) {
-  return push(
-    formatUrl(REVIEW_DUPLICATES, { declarationId: declarationId.toString() })
   )
 }
 

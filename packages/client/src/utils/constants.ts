@@ -21,6 +21,7 @@ export const REJECTION = 'rejection'
 export const COMPLETION = 'completed'
 export const APPROVED = 'approved'
 export const REGISTERED = 'registered'
+export const CERTIFIED = 'certified'
 export const EMPTY_STRING = ''
 export const DECLARATION_DATE_FORMAT = 'yyyy-MM-dd'
 export const CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT = 'dd.MM.yyyy'
@@ -114,3 +115,4 @@ export const DECLARED_DECLARATION_SEARCH_QUERY_COUNT =
   process.env.DECLARED_DECLARATION_SEARCH_QUERY_COUNT || 100
 
 export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
+export const ACCUMULATED_FILE_SIZE = 20480000

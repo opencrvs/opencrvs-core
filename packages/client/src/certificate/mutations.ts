@@ -11,12 +11,19 @@
  */
 import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
-import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
+import { CreateOrUpdateCertificateSvgMutation } from '@client/utils/gateway'
 
 const UPDATE_CERTIFICATE_TEMPLATE = gql`
   mutation createOrUpdateCertificateSVG($certificateSVG: CertificateSVGInput!) {
     createOrUpdateCertificateSVG(certificateSVG: $certificateSVG) {
+      id
       svgCode
+      svgFilename
+      user
+      status
+      event
+      svgDateCreated
+      svgDateUpdated
     }
   }
 `
@@ -26,9 +33,8 @@ async function updateCertificateTemplate(
   svgFilename: string,
   user: string,
   status: string,
-  event: string,
-  refetchQueries: RefetchQueryDescription
-) {
+  event: string
+): Promise<CreateOrUpdateCertificateSvgMutation> {
   const certificateSVG = {
     id: id,
     svgCode: svgCode,
@@ -37,14 +43,14 @@ async function updateCertificateTemplate(
     status: status,
     event: event
   }
-  return (
+  const response =
     client &&
-    client.mutate({
+    (await client.mutate({
       mutation: UPDATE_CERTIFICATE_TEMPLATE,
-      variables: { certificateSVG },
-      refetchQueries
-    })
-  )
+      variables: { certificateSVG }
+    }))
+
+  return response.data
 }
 
 export const certificateTemplateMutations = {

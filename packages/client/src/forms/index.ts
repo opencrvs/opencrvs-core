@@ -280,6 +280,7 @@ export interface IFileValue {
   optionValues: IFormFieldValue[]
   type: string
   data: string
+  fileSize: number
 }
 
 export interface IContactPointPhone {

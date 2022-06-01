@@ -12,8 +12,9 @@
 import { ILocation, LocationType, IOfflineData } from '@client/offline/reducer'
 import { IUserDetails, IGQLLocation, IIdentifier } from './userUtils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface/LocationSearch/LocationSearch'
-import { IntlShape } from 'react-intl'
+import { IntlShape, MessageDescriptor } from 'react-intl'
 import { locationMessages, countryMessages } from '@client/i18n/messages'
+import { countries } from '@client/forms/countries'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
@@ -172,4 +173,28 @@ export function getJurisidictionType(
   }
 
   return relevantLocation.jurisdictionType as string
+}
+
+export type LocationName = string | MessageDescriptor
+
+export function getFullLocationNameOfFacility(
+  facilityLocation: ILocation,
+  offlineLocations: Record<string, ILocation>
+) {
+  let location: ILocation = facilityLocation
+  const names: LocationName[] = [location.name]
+  while (location.partOf) {
+    const parent = location.partOf.split('/')[1]
+    if (parent === '0') {
+      location.partOf = ''
+      names.push(
+        countries.find(({ value }) => value === window.config.COUNTRY)
+          ?.label as MessageDescriptor
+      )
+    } else {
+      location = offlineLocations[parent]
+      names.push(location.name)
+    }
+  }
+  return names
 }

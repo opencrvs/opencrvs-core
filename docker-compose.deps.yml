@@ -30,7 +30,7 @@ services:
     restart: unless-stopped
 
   hearth:
-    image: opencrvs/hearth:1.0.1
+    image: opencrvs/hearth:1.1.0
     environment:
       - mongodb__url=mongodb://mongo1/hearth-dev
       - logger__level=warn
@@ -47,6 +47,7 @@ services:
       - mongo_url=mongodb://mongo1/openhim-dev
       - mongo_atnaUrl=mongodb://mongo1/openhim-dev
       - logger_level=error
+      - router_timeout=180000
     depends_on:
       - mongo1
     restart: unless-stopped

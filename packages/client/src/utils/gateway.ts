@@ -150,7 +150,7 @@ export type AttachmentInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
   contentType?: InputMaybe<Scalars['String']>
   createdAt?: InputMaybe<Scalars['Date']>
-  data?: InputMaybe<Scalars['String']>
+  data: Scalars['String']
   description?: InputMaybe<Scalars['String']>
   originalFileName?: InputMaybe<Scalars['String']>
   status?: InputMaybe<Scalars['String']>
@@ -344,14 +344,14 @@ export type CertificateInput = {
 
 export type CertificateSvg = {
   __typename?: 'CertificateSVG'
-  _id?: Maybe<Scalars['ID']>
-  event?: Maybe<Scalars['String']>
-  status?: Maybe<Scalars['String']>
-  svgCode?: Maybe<Scalars['String']>
-  svgDateCreated?: Maybe<Scalars['String']>
-  svgDateUpdated?: Maybe<Scalars['String']>
-  svgFilename?: Maybe<Scalars['String']>
-  user?: Maybe<Scalars['String']>
+  event: Scalars['String']
+  id: Scalars['ID']
+  status: Scalars['String']
+  svgCode: Scalars['String']
+  svgDateCreated: Scalars['String']
+  svgDateUpdated: Scalars['String']
+  svgFilename: Scalars['String']
+  user: Scalars['String']
 }
 
 export type CertificateSvgInput = {
@@ -1180,7 +1180,7 @@ export type PersonInput = {
   name?: InputMaybe<Array<InputMaybe<HumanNameInput>>>
   nationality?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
   occupation?: InputMaybe<Scalars['String']>
-  photo?: InputMaybe<Array<InputMaybe<AttachmentInput>>>
+  photo?: InputMaybe<Array<AttachmentInput>>
   reasonNotApplying?: InputMaybe<Scalars['String']>
   telecom?: InputMaybe<Array<InputMaybe<ContactPointInput>>>
 }
@@ -1554,7 +1554,7 @@ export type RegistrationCountResult = {
 
 export type RegistrationInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
-  attachments?: InputMaybe<Array<InputMaybe<AttachmentInput>>>
+  attachments?: InputMaybe<Array<AttachmentInput>>
   book?: InputMaybe<Scalars['String']>
   certificates?: InputMaybe<Array<InputMaybe<CertificateInput>>>
   contact?: InputMaybe<Scalars['String']>
@@ -1614,7 +1614,7 @@ export type RelatedPerson = {
 
 export type RelatedPersonInput = {
   _fhirID?: InputMaybe<Scalars['ID']>
-  affidavit?: InputMaybe<Array<InputMaybe<AttachmentInput>>>
+  affidavit?: InputMaybe<Array<AttachmentInput>>
   id?: InputMaybe<Scalars['ID']>
   individual?: InputMaybe<PersonInput>
   otherRelationship?: InputMaybe<Scalars['String']>
@@ -1669,7 +1669,7 @@ export type Signature = {
 }
 
 export type SignatureInput = {
-  data?: InputMaybe<Scalars['String']>
+  data: Scalars['String']
   type?: InputMaybe<Scalars['String']>
 }
 
@@ -1719,6 +1719,7 @@ export type User = {
   practitionerId?: Maybe<Scalars['String']>
   primaryOffice?: Maybe<Location>
   role?: Maybe<Scalars['String']>
+  signature?: Maybe<Signature>
   status?: Maybe<Scalars['String']>
   type?: Maybe<Scalars['String']>
   underInvestigation?: Maybe<Scalars['Boolean']>
@@ -1764,27 +1765,15 @@ export type CreateOrUpdateCertificateSvgMutation = {
   __typename?: 'Mutation'
   createOrUpdateCertificateSVG?: {
     __typename?: 'CertificateSVG'
-    svgCode?: string | null
+    id: string
+    svgCode: string
+    svgFilename: string
+    user: string
+    status: string
+    event: string
+    svgDateCreated: string
+    svgDateUpdated: string
   } | null
-}
-
-export type GetActiveCertificatesSvgQueryVariables = Exact<{
-  [key: string]: never
-}>
-
-export type GetActiveCertificatesSvgQuery = {
-  __typename?: 'Query'
-  getActiveCertificatesSVG?: Array<{
-    __typename?: 'CertificateSVG'
-    _id?: string | null
-    svgCode?: string | null
-    svgFilename?: string | null
-    user?: string | null
-    event?: string | null
-    status?: string | null
-    svgDateUpdated?: string | null
-    svgDateCreated?: string | null
-  } | null> | null
 }
 
 export type FormDraftFieldsFragment = {
@@ -2533,6 +2522,7 @@ export type FetchBirthRegistrationForReviewQuery = {
       contact?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -3150,6 +3140,7 @@ export type FetchDeathRegistrationForReviewQuery = {
       otherInformantType?: string | null
       contactRelationship?: string | null
       contactPhoneNumber?: string | null
+      duplicates?: Array<string | null> | null
       type?: RegistrationType | null
       trackingId?: string | null
       registrationNumber?: string | null
@@ -4251,6 +4242,7 @@ export type FetchDeclarationShortInfoQuery = {
           __typename?: 'Registration'
           type?: RegistrationType | null
           trackingId?: string | null
+          duplicates?: Array<string | null> | null
           status?: Array<{
             __typename?: 'RegWorkflow'
             type?: RegStatus | null
@@ -4273,6 +4265,7 @@ export type FetchDeclarationShortInfoQuery = {
           __typename?: 'Registration'
           type?: RegistrationType | null
           trackingId?: string | null
+          duplicates?: Array<string | null> | null
           status?: Array<{
             __typename?: 'RegWorkflow'
             type?: RegStatus | null

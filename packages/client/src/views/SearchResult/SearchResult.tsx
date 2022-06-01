@@ -32,8 +32,7 @@ import {
   goToDeclarationRecordAudit,
   goToEvents as goToEventsAction,
   goToPage as goToPageAction,
-  goToPrintCertificate as goToPrintCertificateAction,
-  goToReviewDuplicate as goToReviewDuplicateAction
+  goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
@@ -143,7 +142,6 @@ interface IBaseSearchResultProps {
   userDetails: IUserDetails | null
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
-  goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
@@ -307,14 +305,12 @@ export class SearchResultView extends React.Component<
                 ? this.props.intl.formatMessage(constantsMessages.update)
                 : this.props.intl.formatMessage(constantsMessages.review),
             handler: () =>
-              !isDuplicate
-                ? this.props.goToPage(
-                    REVIEW_EVENT_PARENT_FORM_PAGE,
-                    reg.id,
-                    'review',
-                    reg.event.toLowerCase()
-                  )
-                : this.props.goToReviewDuplicate(reg.id),
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.id,
+                'review',
+                reg.event.toLowerCase()
+              ),
             disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
           })
         }
@@ -367,9 +363,7 @@ export class SearchResultView extends React.Component<
           isBoldLink={true}
           id={`name_${index}`}
           onClick={() =>
-            isDuplicate
-              ? this.props.goToReviewDuplicate(reg.id)
-              : this.props.goToDeclarationRecordAudit('search', reg.id)
+            this.props.goToDeclarationRecordAudit('search', reg.id)
           }
         >
           {reg.name}
@@ -378,9 +372,7 @@ export class SearchResultView extends React.Component<
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            isDuplicate
-              ? this.props.goToReviewDuplicate(reg.id)
-              : this.props.goToDeclarationRecordAudit('search', reg.id)
+            this.props.goToDeclarationRecordAudit('search', reg.id)
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -528,7 +520,6 @@ export const SearchResult = connect(
   {
     goToEvents: goToEventsAction,
     goToPage: goToPageAction,
-    goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction,
     goToDeclarationRecordAudit
   }

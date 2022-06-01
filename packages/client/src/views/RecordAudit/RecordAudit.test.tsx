@@ -102,9 +102,7 @@ describe('Record audit summary for a draft birth declaration', () => {
   it('Check values for saved declarations', async () => {
     expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
     expect(component.find('#type_value').hostNodes().text()).toBe('Birth')
-    expect(component.find('#brn_value').hostNodes().text()).toBe(
-      '201908122365BDSS0SE1'
-    )
+    expect(component.exists('#brn_value')).toBeFalsy()
     expect(component.find('#placeOfBirth_value').hostNodes()).toHaveLength(1)
   })
 })
@@ -147,9 +145,7 @@ describe('Record audit summary for a draft death declaration', () => {
   it('Check values for saved declarations', async () => {
     expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
     expect(component.find('#type_value').hostNodes().text()).toBe('Death')
-    expect(component.find('#drn_value').hostNodes().text()).toBe(
-      '201908122365DDSS0SE1'
-    )
+    expect(component.exists('#drn_value')).toBeFalsy()
     expect(component.find('#placeOfDeath_value').hostNodes()).toHaveLength(1)
   })
 })
