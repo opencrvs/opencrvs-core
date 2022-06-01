@@ -343,7 +343,9 @@ export class OfficeHomeView extends React.Component<
           <Redirect
             to={{
               pathname: PERFORMANCE_HOME,
-              search: `?locationId=${this.jurisdictionLocationId}`
+              search: `?locationId=${
+                this.props.userDetails?.primaryOffice?.id || ''
+              }`
             }}
           />
         )}

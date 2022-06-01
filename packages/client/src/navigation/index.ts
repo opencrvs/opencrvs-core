@@ -57,7 +57,10 @@ import {
 } from '@client/navigation/routes'
 import {
   NATL_ADMIN_ROLES,
-  NATIONAL_REGISTRAR_ROLES
+  NATIONAL_REGISTRAR_ROLES,
+  PERFORMANCE_MANAGEMENT_ROLES,
+  REGISTRAR_ROLES,
+  SYS_ADMIN_ROLES
 } from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
@@ -564,21 +567,29 @@ export function goToPage(
   }
 }
 
-export function goToPerformanceView(userDetails: IUserDetails) {
-  if (userDetails && userDetails.role) {
-    if (
-      NATL_ADMIN_ROLES.includes(userDetails.role) ||
-      NATIONAL_REGISTRAR_ROLES.includes(userDetails.role)
+function getDefaultPerformanceLocationIdFromRole(userDetails: IUserDetails) {
+  const role = userDetails?.role
+  const primaryOfficeId = userDetails.primaryOffice?.id
+  if (role) {
+    if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
+      return primaryOfficeId
+    } else if (
+      NATL_ADMIN_ROLES.includes(role) ||
+      NATIONAL_REGISTRAR_ROLES.includes(role) ||
+      PERFORMANCE_MANAGEMENT_ROLES.includes(role)
     ) {
-      return goToPerformanceHome()
-    } else {
-      const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
-      return (
-        (locationId && goToPerformanceHome(undefined, undefined, locationId)) ||
-        goToPerformanceHome()
-      )
+      return // country wide
     }
   }
+  // default fallback country
+}
+
+export function goToPerformanceView(userDetails: IUserDetails) {
+  return goToPerformanceHome(
+    undefined,
+    undefined,
+    getDefaultPerformanceLocationIdFromRole(userDetails)
+  )
 }
 
 export function goToTeamView(userDetails: IUserDetails) {
