@@ -34,6 +34,8 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { IDynamicValues } from '@client/navigation'
 import { countryMessages } from '@client/i18n/messages/constants'
+import { IUserDetails } from '@client/utils/userUtils'
+import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 
 interface IStatus {
   [key: string]: MessageDescriptor
@@ -90,6 +92,11 @@ export const DECLARATION_STATUS_LABEL: IStatus = {
     defaultMessage: 'Declaration started',
     description: 'Label for registration status declared',
     id: 'recordAudit.history.declared'
+  },
+  DECLARED_FIELD_AGENT: {
+    defaultMessage: 'Sent notification for review',
+    description: 'Label for registration status declared',
+    id: 'recordAudit.history.declaredFieldAgent'
   },
   WAITING_VALIDATION: {
     defaultMessage: 'Waiting for validation',
@@ -425,13 +432,24 @@ export const getDisplayItems = (
 export const getStatusLabel = (
   status: string,
   reinstated: boolean,
-  intl: IntlShape
+  intl: IntlShape,
+  userDetails: IUserDetails
 ) => {
   if (status in DECLARATION_STATUS_LABEL)
-    return (
-      (reinstated
-        ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'])
-        : '') + intl.formatMessage(DECLARATION_STATUS_LABEL[status])
-    )
+    return (reinstated
+      ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'])
+      : '') +
+      status ===
+      'DECLARED'
+      ? findMessage(status, userDetails.role ? userDetails.role : '', intl)
+      : intl.formatMessage(DECLARATION_STATUS_LABEL[status])
   return ''
+}
+
+const findMessage = (status: string, userRole: string, intl: IntlShape) => {
+  if (userRole && FIELD_AGENT_ROLES.includes(userRole)) {
+    return intl.formatMessage(DECLARATION_STATUS_LABEL['DECLARED_FIELD_AGENT'])
+  } else {
+    return intl.formatMessage(DECLARATION_STATUS_LABEL[status])
+  }
 }
