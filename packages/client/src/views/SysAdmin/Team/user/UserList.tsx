@@ -43,7 +43,8 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   AddUser,
   VerticalThreeDots,
-  SearchRed
+  SearchRed,
+  NoWifi
 } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import {
@@ -77,6 +78,7 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { useCallback } from 'react'
+import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -207,8 +209,28 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
   margin-top: 20px;
 `
 
+const ConnectivityContainer = styled.div`
+  justify-content: center;
+  gap: 8px;
+  display: flex;
+  margin-top: 5vh;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-top: 12px;
+  }
+`
+const NoConnectivity = styled(NoWifi)`
+  width: 24px;
+`
+const Text = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  text-align: center;
+`
 interface ISearchParams {
   locationId: string
+}
+
+type IOnlineStatusProps = {
+  isOnline: boolean
 }
 
 type BaseProps = {
@@ -222,7 +244,10 @@ type BaseProps = {
   goToUserProfile: typeof goToUserProfile
 }
 
-type IProps = BaseProps & IntlShapeProps & RouteComponentProps
+type IProps = BaseProps &
+  IntlShapeProps &
+  RouteComponentProps &
+  IOnlineStatusProps
 
 interface IStatusProps {
   status: string
@@ -263,6 +288,7 @@ function UserListComponent(props: IProps) {
     goToTeamSearch,
     goToUserProfile,
     offlineOffices,
+    isOnline,
     location: { search }
   } = props
 
@@ -638,29 +664,41 @@ function UserListComponent(props: IProps) {
         undefined
       }
     >
-      <HeaderContainer>
-        <Header id="header">
-          {(searchedLocation && searchedLocation.name) || ''}
-        </Header>
-        {!getViewOnly(locationId, userDetails, true) && (
-          <ChangeButton id="chng-loc" onClick={onChangeLocation}>
-            {intl.formatMessage(buttonMessages.change)}
-          </ChangeButton>
-        )}
-      </HeaderContainer>
-      <LocationInfo>
-        <LocationInfoKey>
-          {intl.formatMessage(constantsMessages.address)}
-        </LocationInfoKey>
-        {searchedLocation && searchedLocation.address ? (
-          <LocationInfoValue>{searchedLocation.address}</LocationInfoValue>
-        ) : (
-          <LocationInfoEmptyValue>
-            {intl.formatMessage(constantsMessages.notAvailable)}
-          </LocationInfoEmptyValue>
-        )}
-      </LocationInfo>
-      <RenderUserList locationId={locationId} userDetails={userDetails} />
+      {isOnline ? (
+        <>
+          <HeaderContainer>
+            <Header id="header">
+              {(searchedLocation && searchedLocation.name) || ''}
+            </Header>
+            {!getViewOnly(locationId, userDetails, true) && (
+              <ChangeButton id="chng-loc" onClick={onChangeLocation}>
+                {intl.formatMessage(buttonMessages.change)}
+              </ChangeButton>
+            )}
+          </HeaderContainer>
+          <LocationInfo>
+            <LocationInfoKey>
+              {intl.formatMessage(constantsMessages.address)}
+            </LocationInfoKey>
+            {searchedLocation && searchedLocation.address ? (
+              <LocationInfoValue>{searchedLocation.address}</LocationInfoValue>
+            ) : (
+              <LocationInfoEmptyValue>
+                {intl.formatMessage(constantsMessages.notAvailable)}
+              </LocationInfoEmptyValue>
+            )}
+          </LocationInfo>
+          <RenderUserList locationId={locationId} userDetails={userDetails} />
+        </>
+      ) : (
+        <ConnectivityContainer>
+          <NoConnectivity />
+          <Text id="no-connection-text">
+            {intl.formatMessage(constantsMessages.noConnection)}
+          </Text>
+        </ConnectivityContainer>
+      )}
+
       {showResendSMSSuccess && (
         <FloatingNotification
           id="resend_invite_success"
@@ -697,4 +735,4 @@ export const UserList = connect(
     goToTeamSearch,
     goToUserProfile
   }
-)(withTheme(injectIntl(UserListComponent)))
+)(withTheme(injectIntl(withOnlineStatus(UserListComponent))))
