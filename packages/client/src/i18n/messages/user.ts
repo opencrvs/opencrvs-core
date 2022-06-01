@@ -122,7 +122,7 @@ const messagesToDefine: IUserMessages = {
     id: 'constants.chairman'
   },
   changeLanguageMessege: {
-    defaultMessage: 'Your prefered language that you want to use on OpenCRVS',
+    defaultMessage: '',
     description: 'Change language message',
     id: 'settings.message.changeLanguage'
   },

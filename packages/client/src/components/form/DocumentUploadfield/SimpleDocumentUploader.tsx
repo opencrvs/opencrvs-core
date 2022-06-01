@@ -134,7 +134,10 @@ class SimpleDocumentUploaderComponent extends React.Component<
             allowedDocType.length > 0 &&
             this.setState({
               error: this.props.intl.formatMessage(messages.fileUploadError, {
-                type: allowedDocType.join()
+                type:
+                  allowedDocType.join() === 'image/png'
+                    ? 'png'
+                    : allowedDocType.join()
               })
             })
         })
