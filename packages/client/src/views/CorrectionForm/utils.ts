@@ -121,7 +121,6 @@ export function isFileSizeExceeded(declaration: IDeclaration) {
     })
   }
 
-  console.log(ACCUMULATED_FILE_SIZE, totalFileSize > ACCUMULATED_FILE_SIZE)
   return totalFileSize > ACCUMULATED_FILE_SIZE
 }
 
