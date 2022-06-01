@@ -16,11 +16,16 @@ import {
   IFormData,
   IFormFieldValue,
   IContactPoint,
-  Sort
+  Sort,
+  IFormSectionData
 } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import { Action as NavigationAction, GO_TO_PAGE } from '@client/navigation'
+import {
+  Action as NavigationAction,
+  GO_TO_PAGE,
+  IDynamicValues
+} from '@client/navigation'
 import {
   UserDetailsAvailable,
   USER_DETAILS_AVAILABLE
@@ -56,6 +61,9 @@ import {
   showDownloadDeclarationFailedToast,
   ShowDownloadDeclarationFailedToast
 } from '@client/notification/actions'
+import differenceInMinutes from 'date-fns/differenceInMinutes'
+import { getUserRole } from '@client/views/SysAdmin/Team/utils'
+import { Roles } from '@client/utils/authUtils'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -581,6 +589,14 @@ export function writeDeclaration(
 ): IWriteDeclarationAction {
   return { type: WRITE_DECLARATION, payload: { declaration, callback } }
 }
+async function getCurrentUserRole(): Promise<string> {
+  const userDetails = await storage.getItem('USER_DETAILS')
+
+  if (!userDetails) {
+    return ''
+  }
+  return (JSON.parse(userDetails) as IUserDetails).role || ''
+}
 
 export async function getCurrentUserID(): Promise<string> {
   const userDetails = await storage.getItem('USER_DETAILS')
@@ -700,6 +716,7 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
     return JSON.stringify({ declarations: [] })
   }
 
+  const currentUserRole = await getCurrentUserRole()
   const currentUserID = await getCurrentUserID()
 
   const allUserData = JSON.parse(storageTable) as IUserData[]
@@ -717,8 +734,37 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   const currentUserData = allUserData.find(
     (uData) => uData.userID === currentUserID
   )
-  const currentUserDeclarations: IDeclaration[] =
+  let currentUserDeclarations: IDeclaration[] =
     (currentUserData && currentUserData.declarations) || []
+
+  if (Roles.FIELD_AGENT.includes(currentUserRole) && currentUserData) {
+    currentUserDeclarations = currentUserData.declarations.filter((d) => {
+      if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
+        const history = d.originalData?.history as unknown as IDynamicValues
+
+        const downloadedTime = (
+          history.filter((h: IDynamicValues) => {
+            return h.action === DOWNLOAD_STATUS.DOWNLOADED
+          }) as IDynamicValues[]
+        ).sort((fe, se) => {
+          return new Date(se.date).getTime() - new Date(fe.date).getTime()
+        })
+
+        return (
+          differenceInMinutes(new Date(), new Date(downloadedTime[0].date)) <
+          1440 // 24 hours, used munites for better accuracy
+        )
+      }
+      return true
+    })
+  }
+
+  // Storing the declarations again by excluding the 24 hours old downloaded declaration
+  if (currentUserData) {
+    currentUserData.declarations = currentUserDeclarations
+    await storage.setItem('USER_DATA', JSON.stringify(allUserData))
+  }
+
   const payload: IUserData = {
     userID: currentUserID,
     declarations: currentUserDeclarations
