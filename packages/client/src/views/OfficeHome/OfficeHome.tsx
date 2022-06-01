@@ -18,12 +18,7 @@ import {
 } from '@client/declarations'
 import { Header } from '@client/components/interface/Header/Header'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
-import {
-  goToEvents,
-  goToPage,
-  goToPrintCertificate,
-  goToReviewDuplicate
-} from '@client/navigation'
+import { goToEvents, goToPage, goToPrintCertificate } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
@@ -114,7 +109,6 @@ const BodyContainer = styled.div`
 
 interface IDispatchProps {
   goToPage: typeof goToPage
-  goToReviewDuplicate: typeof goToReviewDuplicate
   goToPrintCertificate: typeof goToPrintCertificate
   goToEvents: typeof goToEvents
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
@@ -158,6 +152,7 @@ export const EVENT_STATUS = {
   REJECTED: 'REJECTED',
   WAITING_VALIDATION: 'WAITING_VALIDATION'
 }
+
 export class OfficeHomeView extends React.Component<
   IOfficeHomeProps,
   IOfficeHomeState
@@ -224,7 +219,7 @@ export class OfficeHomeView extends React.Component<
     clearInterval(this.interval)
   }
 
-  componentDidUpdate(prevProps: IOfficeHomeProps, prevState: IOfficeHomeState) {
+  componentDidUpdate(prevProps: IOfficeHomeProps) {
     if (prevProps.tabId !== this.props.tabId) {
       this.setState({
         draftCurrentPage: 1,
@@ -577,7 +572,6 @@ export const OfficeHome = connect<
 >(mapStateToProps, {
   goToEvents,
   goToPage,
-  goToReviewDuplicate,
   goToPrintCertificate,
   updateRegistrarWorkqueue
 })(injectIntl(OfficeHomeView))

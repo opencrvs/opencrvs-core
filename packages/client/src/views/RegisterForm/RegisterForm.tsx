@@ -28,7 +28,8 @@ import {
   IEventTopBarProps,
   IEventTopBarMenuAction,
   ResponsiveModal,
-  Spinner
+  Spinner,
+  Warning
 } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
@@ -83,7 +84,11 @@ import {
 } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { buttonMessages, formMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  formMessages
+} from '@client/i18n/messages'
 import {
   PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_CLASSNAME,
@@ -91,11 +96,16 @@ import {
   PAGE_TRANSITIONS_EXIT_TIME,
   DECLARED,
   REJECTED,
-  VALIDATED
+  VALIDATED,
+  ACCUMULATED_FILE_SIZE
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
-import { isCorrection } from '@client/views/CorrectionForm/utils'
+import {
+  bytesToSize,
+  isCorrection,
+  isFileSizeExceeded
+} from '@client/views/CorrectionForm/utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const FormSectionTitle = styled.h4`
@@ -605,6 +615,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             label: intl.formatMessage(buttonMessages.closeDeclaration),
             handler: () => this.onCloseDeclaration()
           }
+    const isDocumentUploadPage = this.props.match.params.pageId === 'documents'
     return (
       <>
         <TimeMounted
@@ -772,6 +783,17 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             event.preventDefault()
                           }
                         >
+                          {isFileSizeExceeded(declaration) &&
+                            isDocumentUploadPage && (
+                              <Warning
+                                label={intl.formatMessage(
+                                  constantsMessages.totalFileSizeExceed,
+                                  {
+                                    fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
+                                  }
+                                )}
+                              />
+                            )}
                           <FormFieldGenerator
                             id={activeSectionGroup.id}
                             onChange={(values) => {

@@ -371,7 +371,7 @@ export class InProgressComponent extends React.Component<
           : draft.data.deathEvent?.deathDate || ''
       const dateOfEvent = (eventTime && new Date(eventTime as string)) || ''
       const NameComponent = name ? (
-        <LinkButton
+        <NameContainer
           id={`name_${index}`}
           isBoldLink={true}
           onClick={() =>
@@ -379,7 +379,7 @@ export class InProgressComponent extends React.Component<
           }
         >
           {name}
-        </LinkButton>
+        </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}

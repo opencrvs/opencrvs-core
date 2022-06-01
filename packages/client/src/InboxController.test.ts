@@ -12,8 +12,7 @@
 import { createStore } from '@client/store'
 import { InboxController } from '@client/InboxController'
 import { DOWNLOAD_STATUS } from '@client/declarations'
-import { Action } from './forms'
-import { Event } from './components/DuplicateDetails'
+import { Action, Event } from './forms'
 import { createMockClient } from 'mock-apollo-client'
 import { GET_BIRTH_REGISTRATION_FOR_REVIEW } from '@client/views/DataProvider/birth/queries'
 import { ApolloError } from 'apollo-client'
@@ -33,7 +32,7 @@ describe('Inbox Controller', () => {
           declarations: [
             {
               id: '1',
-              event: Event.BIRTH.toLowerCase(),
+              event: Event.BIRTH,
               action: Action.LOAD_REVIEW_DECLARATION,
               downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
             }
@@ -61,25 +60,25 @@ describe('Inbox Controller', () => {
           declarations: [
             {
               id: '1',
-              event: Event.BIRTH.toLowerCase(),
+              event: Event.BIRTH,
               action: Action.LOAD_REVIEW_DECLARATION,
               downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
             },
             {
               id: '2',
-              event: Event.BIRTH.toLowerCase(),
+              event: Event.BIRTH,
               action: Action.LOAD_REVIEW_DECLARATION,
               downoadStatus: DOWNLOAD_STATUS.FAILED_NETWORK
             },
             {
               id: '3',
-              event: Event.BIRTH.toLowerCase(),
+              event: Event.BIRTH,
               action: Action.LOAD_REVIEW_DECLARATION,
               downloadStatus: DOWNLOAD_STATUS.FAILED
             },
             {
               id: '4',
-              event: Event.BIRTH.toLowerCase(),
+              event: Event.BIRTH,
               action: Action.LOAD_REVIEW_DECLARATION,
               downloadStatus: DOWNLOAD_STATUS.DOWNLOADED
             }
@@ -128,7 +127,7 @@ describe('Inbox Controller', () => {
           declarations: [
             {
               id: '1',
-              event: Event.BIRTH.toLowerCase(),
+              event: Event.BIRTH,
               action: Action.LOAD_REVIEW_DECLARATION,
               downloadRetryAttempt: 1,
               downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
@@ -176,7 +175,7 @@ describe('Inbox Controller', () => {
           declarations: [
             {
               id: '1',
-              event: Event.BIRTH.toLowerCase(),
+              event: Event.BIRTH,
               action: Action.LOAD_REVIEW_DECLARATION,
               downloadRetryAttempt: 1,
               downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
@@ -223,7 +222,7 @@ describe('Inbox Controller', () => {
           declarations: [
             {
               id: '1',
-              event: Event.BIRTH.toLowerCase(),
+              event: Event.BIRTH,
               action: Action.LOAD_REVIEW_DECLARATION,
               downloadRetryAttempt: 2,
               downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
@@ -271,7 +270,7 @@ describe('Inbox Controller', () => {
           declarations: [
             {
               id: '1',
-              event: Event.BIRTH.toLowerCase(),
+              event: Event.BIRTH,
               action: Action.LOAD_REVIEW_DECLARATION,
               downloadRetryAttempt: 2,
               downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
