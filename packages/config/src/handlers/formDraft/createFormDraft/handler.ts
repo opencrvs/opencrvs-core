@@ -30,7 +30,7 @@ import { Event } from '@config/models/certificate'
 
 export interface ICreateDraft
   extends Pick<IFormDraftModel, 'event' | 'comment'> {
-  questions: IQuestion[] | []
+  questions: IQuestion[]
 }
 
 export interface IModifyDraftStatus {
@@ -61,6 +61,13 @@ export async function createFormDraftHandler(
         updatedAt: Date.now()
       }
       await FormDraft.create(formDraft)
+
+      try {
+        await Question.insertMany(newDraft.questions)
+      } catch (err) {
+        return h.response(`Failed to create new questions. ${err}`).code(400)
+      }
+
       return h.response(formDraft).code(201)
     } catch (e) {
       return h.response('Could not create draft').code(400)
