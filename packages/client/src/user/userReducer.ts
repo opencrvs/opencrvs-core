@@ -13,8 +13,7 @@ import {
   IForm,
   IFormSectionData,
   UserSection,
-  IFormSection,
-  ISerializedForm
+  IFormSection
 } from '@client/forms'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
@@ -355,7 +354,6 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           ).push({ value: existingRole, types: [existingType] })
         }
       }
-      console.log('data: ', JSON.stringify(data))
       updatedSections.forEach((section) => {
         section.groups.forEach((group) => {
           group.fields = transformRoleDataToDefinitions(
