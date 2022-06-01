@@ -84,10 +84,12 @@ export const GetDeclarationInfo = ({
 
   const finalStatus = removeUnderscore(getCaptitalizedWord(declaration?.status))
   const displayStatus =
-    finalStatus === 'Declared' || 'Submitted'
+    finalStatus === 'Declared' || finalStatus === 'Submitted'
       ? 'In Review'
       : finalStatus === 'In progress'
       ? 'Incomplete'
+      : finalStatus === 'Rejected'
+      ? 'Requires updates'
       : finalStatus
 
   if (declaration?.informantContact && informant) {
