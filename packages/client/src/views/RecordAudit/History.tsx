@@ -129,7 +129,7 @@ export const GetHistory = ({
         <LargeGreyedInfo />
       </>
     )
-  const allHistoryData = (draft.data.history || []) as unknown as {
+  let allHistoryData = (draft.data.history || []) as unknown as {
     [key: string]: any
   }[]
   if (!allHistoryData.length && userDetails) {
@@ -148,6 +148,13 @@ export const GetHistory = ({
       output: []
     })
   }
+
+  if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
+    allHistoryData = allHistoryData.filter((obj: { [key: string]: any }) => {
+      return obj.action !== 'WAITING_VALIDATION'
+    })
+  }
+
   const historiesForDisplay = getDisplayItems(
     currentPageNumber,
     DEFAULT_HISTORY_RECORD_PAGE_SIZE,
@@ -168,7 +175,12 @@ export const GetHistory = ({
       date: getFormattedDate(item?.date),
       action: (
         <GetLink
-          status={getStatusLabel(item?.action, item.reinstated, intl)}
+          status={getStatusLabel(
+            item?.action,
+            item.reinstated,
+            intl,
+            item.user
+          )}
           onClick={() => toggleActionDetails(item)}
         />
       ),
