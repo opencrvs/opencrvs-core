@@ -581,7 +581,9 @@ function getDefaultPerformanceLocationIdFromRole(userDetails: IUserDetails) {
       return // country wide
     }
   }
-  // default fallback country
+  throw new Error(
+    `Performance view no default location selected for role: ${role}`
+  )
 }
 
 export function goToPerformanceView(userDetails: IUserDetails) {
