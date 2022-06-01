@@ -89,8 +89,8 @@ class SentForReviewComponent extends React.Component<
     super(props)
     this.state = {
       width: window.innerWidth,
-      sortedCol: COLUMNS.NAME,
-      sortOrder: SORT_ORDER.ASCENDING
+      sortedCol: COLUMNS.SENT_FOR_APPROVAL,
+      sortOrder: SORT_ORDER.DESCENDING
     }
   }
 
