@@ -234,7 +234,8 @@ class DocumentUploaderWithOptionComp extends React.Component<
     const newDocument: IFileValue = {
       optionValues,
       type: uploadedImage.type,
-      data: fileAsBase64.toString()
+      data: fileAsBase64.toString(),
+      fileSize: uploadedImage.size
     }
 
     this.props.onComplete([...this.props.files, newDocument])

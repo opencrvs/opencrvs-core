@@ -13,6 +13,7 @@ import { IFormConfig } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
+import { Event } from '@client/forms'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -33,14 +34,14 @@ export interface ICountryLogo {
 }
 
 export interface ICertificateTemplateData {
-  event: string
+  event: Event
   status: string
   svgCode: string
-  svgDateCreated: number
-  svgDateUpdated: number
+  svgDateCreated: string
+  svgDateUpdated: string
   svgFilename: string
   user: string
-  _id: string
+  id: string
 }
 
 interface ICurrency {
@@ -95,20 +96,21 @@ export interface IApplicationConfigResponse {
 
 async function loadConfig(): Promise<IApplicationConfigResponse> {
   const url = `${window.config.CONFIG_API_URL}/config`
-
   const res = await fetch(url, {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${getToken()}`
     }
   })
-
   if (res && res.status !== 200) {
     throw Error(res.statusText)
   }
-
   const response = await res.json()
-
+  response.certificates = response.certificates.map(
+    ({ _id, ...rest }: { _id: string }) => {
+      return { ...rest, id: _id }
+    }
+  )
   return response
 }
 

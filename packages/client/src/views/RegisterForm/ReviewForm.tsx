@@ -39,6 +39,7 @@ import {
 
 import { REVIEW_EVENT_PARENT_FORM_PAGE_GROUP } from '@client/navigation/routes'
 import { errorMessages } from '@client/i18n/messages'
+import { getPotentialDuplicateIds } from '@client/transformer/index'
 
 interface IReviewProps {
   theme: ITheme
@@ -130,7 +131,8 @@ export class ReviewFormView extends React.Component<IProps> {
                 declarationId,
                 transData,
                 this.props.event,
-                status
+                status,
+                getPotentialDuplicateIds(eventData)
               )
               dispatch(storeDeclaration(reviewDraft))
 

@@ -152,6 +152,7 @@ interface IConstantsMessages
   requireUpdatesLoading: MessageDescriptor
   noRecords: MessageDescriptor
   noConnection: MessageDescriptor
+  totalFileSizeExceed: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -863,6 +864,12 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'No connection',
     description: 'No Connection hover text',
     id: 'constants.noConnection'
+  },
+  totalFileSizeExceed: {
+    defaultMessage:
+      'Total size of documents exceeds {fileSize}. Please reduce file size of your uploads',
+    description: 'Accumulated File size exceed message',
+    id: 'constants.totalFileSizeExceed'
   }
 }
 

@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  goToDeclarationRecordAudit,
-  goToPage,
-  goToReviewDuplicate
-} from '@client/navigation'
+import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
@@ -60,7 +56,6 @@ interface IBaseRejectTabProps {
   theme: ITheme
   scope: Scope | null
   goToPage: typeof goToPage
-  goToReviewDuplicate: typeof goToReviewDuplicate
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
   queryData: {
@@ -226,14 +221,12 @@ class RequiresUpdateComponent extends React.Component<
               e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
             ) => {
               e && e.stopPropagation()
-              isDuplicate
-                ? this.props.goToReviewDuplicate(reg.id)
-                : this.props.goToPage(
-                    REVIEW_EVENT_PARENT_FORM_PAGE,
-                    reg.id,
-                    'review',
-                    reg.event ? reg.event.toLowerCase() : ''
-                  )
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.id,
+                'review',
+                reg.event ? reg.event.toLowerCase() : ''
+              )
             }
           })
         }
@@ -363,6 +356,5 @@ function mapStateToProps(state: IStoreState) {
 
 export const RequiresUpdate = connect(mapStateToProps, {
   goToPage,
-  goToReviewDuplicate,
   goToDeclarationRecordAudit
 })(injectIntl(withTheme(RequiresUpdateComponent)))

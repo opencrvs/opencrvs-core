@@ -56,8 +56,9 @@ import {
   getVisibleSectionGroupsBasedOnConditions
 } from '@client/forms/utils'
 import { buttonMessages } from '@client/i18n/messages'
-import { flattenDeep, get, clone, isEqual } from 'lodash'
+import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
 import { IGQLLocation } from '@client/utils/userUtils'
+import { ACCUMULATED_FILE_SIZE } from '@client/utils/constants'
 
 export function groupHasError(
   group: IFormSectionGroup,
@@ -96,6 +97,32 @@ export function isCorrection(declaration: IDeclaration) {
     registrationStatus === SUBMISSION_STATUS.REGISTERED ||
     registrationStatus === SUBMISSION_STATUS.CERTIFIED
   )
+}
+
+export function bytesToSize(bytes: number) {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+  if (bytes == 0) return '0 Byte'
+
+  const i = Math.floor(Math.log(bytes) / Math.log(1024))
+  return Math.round(bytes / Math.pow(1024, i)) + ' ' + sizes[i]
+}
+
+export function isFileSizeExceeded(declaration: IDeclaration) {
+  const {
+    data: { documents }
+  } = declaration
+  let totalFileSize = 0
+  for (const index in documents) {
+    if (!isArray(documents[index])) {
+      continue
+    }
+    ;(documents[index] as IFileValue[]).forEach((fieldValue) => {
+      totalFileSize += fieldValue.fileSize || 0
+    })
+  }
+
+  console.log(ACCUMULATED_FILE_SIZE, totalFileSize > ACCUMULATED_FILE_SIZE)
+  return totalFileSize > ACCUMULATED_FILE_SIZE
 }
 
 export function updateDeclarationRegistrationWithCorrection(
