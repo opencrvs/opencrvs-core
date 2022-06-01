@@ -136,7 +136,7 @@ export const DECLARATION_STATUS_LABEL: IStatus = {
   DECLARATION_UPDATED: {
     defaultMessage: 'Updated',
     description: 'Declaration has been updated',
-    id: 'updated_declaration'
+    id: 'recordAudit.history.updatedDeclaration'
   }
 }
 
