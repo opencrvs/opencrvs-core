@@ -27,7 +27,6 @@ interface IUserMessages
   BIRTH_TOWN: MessageDescriptor
   CHA: MessageDescriptor
   CHAIRMAN: MessageDescriptor
-  changeLanguageMessege: MessageDescriptor
   changeLanguageSuccessMessage: MessageDescriptor
   changeLanguageTitle: MessageDescriptor
   DATA_ENTRY_CLERK: MessageDescriptor
@@ -120,11 +119,6 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Chairman',
     description: 'The description for CHAIRMAN type',
     id: 'constants.chairman'
-  },
-  changeLanguageMessege: {
-    defaultMessage: '',
-    description: 'Change language message',
-    id: 'settings.message.changeLanguage'
   },
   changeLanguageSuccessMessage: {
     defaultMessage: 'Language updated to {language}',
