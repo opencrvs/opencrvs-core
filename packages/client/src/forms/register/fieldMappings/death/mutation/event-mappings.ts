@@ -14,7 +14,8 @@ import {
   IFormData,
   ICertificate,
   TransformedData,
-  IFormFieldMutationMapFunction
+  IFormFieldMutationMapFunction,
+  DeathSection
 } from '@client/forms'
 import { cloneDeep } from 'lodash'
 import { transformCertificateData } from '@client/forms/register/fieldMappings/birth/mutation/registration-mappings'
@@ -86,6 +87,14 @@ export const deathEventLocationMutationTransformer =
       }`
     } else if (field.name === 'placeOfDeath' && transformedData.eventLocation) {
       transformedData.eventLocation.type = `${draftData[sectionId][field.name]}`
+      if (
+        transformedData.eventLocation.type === 'DECEASED_USUAL_RESIDENCE' &&
+        transformedData.deceased.address &&
+        transformedData.deceased.address[0]
+      ) {
+        transformedData.eventLocation.address =
+          transformedData.deceased.address[0]
+      }
     } else if (field.name === 'deathLocation') {
       transformedData.eventLocation._fhirID = draftData[sectionId][field.name]
       if (transformedData.eventLocation.address) {
