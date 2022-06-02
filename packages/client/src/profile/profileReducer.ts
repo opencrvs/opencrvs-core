@@ -34,7 +34,6 @@ import { queries } from '@client/profile/queries'
 import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { serviceApi } from '@client/profile/serviceApi'
-import { Action } from 'redux'
 
 export type ProfileState = {
   authenticated: boolean
@@ -144,22 +143,15 @@ export const profileReducer: LoopReducer<
       }
     case actions.MODIFY_USER_DETAILS:
       const details: IUserDetails = action.payload
-
-      const commandList: (
-        | RunCmd<Action>
-        | ActionCmd<changeLanguageActions.Action>
-      )[] = [
-        Cmd.run(storeUserDetails, {
-          args: [details]
-        })
-      ]
       if (details) {
         return loop(
           {
             ...state,
-            userDetails: details
+            userDetails: { ...state.userDetails, ...details }
           },
-          Cmd.list(commandList)
+          Cmd.run(storeUserDetails, {
+            args: [{ ...state.userDetails, ...details }]
+          })
         )
       } else {
         return {
