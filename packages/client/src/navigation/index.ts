@@ -567,7 +567,7 @@ export function goToPage(
   }
 }
 
-function getDefaultPerformanceLocationIdFromRole(userDetails: IUserDetails) {
+export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
   const role = userDetails?.role
   const primaryOfficeId = userDetails.primaryOffice?.id
   if (role) {
@@ -590,7 +590,7 @@ export function goToPerformanceView(userDetails: IUserDetails) {
   return goToPerformanceHome(
     undefined,
     undefined,
-    getDefaultPerformanceLocationIdFromRole(userDetails)
+    getDefaultPerformanceLocationId(userDetails)
   )
 }
 
