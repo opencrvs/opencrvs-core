@@ -205,6 +205,7 @@ interface State {
   timeEnd: Date
   toggleStatus: boolean
   queriesLoading: string[]
+  officeSelected: boolean
 }
 
 type IOnlineStatusProps = {
@@ -262,7 +263,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
       event: event || Event.BIRTH,
       toggleStatus: false,
-      queriesLoading: ['PERFORMANCE_METRICS', 'GET_TOTAL_PAYMENTS']
+      queriesLoading: ['PERFORMANCE_METRICS', 'GET_TOTAL_PAYMENTS'],
+      officeSelected: this.isOfficeSelected(selectedLocation)
     }
   }
 
@@ -271,6 +273,14 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     window.__localeId__ = this.props.intl.locale
 
     this.state = this.transformPropsToState(props)
+  }
+
+  componentDidUpdate(_: Props, prevState: State) {
+    if (this.state.selectedLocation !== prevState.selectedLocation) {
+      this.setState({
+        officeSelected: this.isOfficeSelected(this.state.selectedLocation)
+      })
+    }
   }
 
   togglePerformanceStatus = () => {
@@ -360,9 +370,20 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   isQueriesInProgress = () => {
     return this.state.queriesLoading.length > 0
   }
+
+  isOfficeSelected(selectedLocation?: ISearchLocation) {
+    if (selectedLocation) {
+      return Object.keys(this.props.offices).some(
+        (id) => id === selectedLocation.id
+      )
+    }
+    return false
+  }
+
   render() {
     const { intl, isOnline } = this.props
-    const { timeStart, timeEnd, event, toggleStatus } = this.state
+    const { timeStart, timeEnd, event, toggleStatus, officeSelected } =
+      this.state
     const queryVariablesWithoutLocationId = {
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString(),
@@ -565,7 +586,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 'VALIDATED',
                 'WAITING_VALIDATION',
                 'REGISTERED'
-              ]
+              ],
+              officeSelected: this.state.officeSelected
             }}
             fetchPolicy="no-cache"
           >
@@ -603,8 +625,34 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             onClickStatusDetails={this.onClickStatusDetails}
                           />
 
-                          <Devider />
+                          {!officeSelected && (
+                            <>
+                              <Devider />
 
+                              <LocationStatsView
+                                registrationOffices={
+                                  data.getLocationStatistics!.offices
+                                }
+                                totalRegistrars={
+                                  data.getLocationStatistics!.registrars
+                                }
+                                citizen={Math.round(
+                                  data.getLocationStatistics!.population /
+                                    data.getLocationStatistics!.registrars
+                                )}
+                              />
+                            </>
+                          )}
+                        </>
+                      )}
+                    </ResponsiveModalContent>
+                  </ResponsiveModal>
+                  <LayoutRight>
+                    {!officeSelected && (
+                      <LocationStats>
+                        {!isOnline ? null : loading ? (
+                          <Spinner id="location-stats-loading" />
+                        ) : (
                           <LocationStatsView
                             registrationOffices={
                               data.getLocationStatistics!.offices
@@ -612,38 +660,14 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             totalRegistrars={
                               data.getLocationStatistics!.registrars
                             }
-                            citizen={
-                              Math.round(
-                                data.getLocationStatistics!.population
-                              ) /
-                              Math.round(data.getLocationStatistics!.registrars)
-                            }
+                            citizen={Math.round(
+                              data.getLocationStatistics!.population /
+                                data.getLocationStatistics!.registrars
+                            )}
                           />
-                        </>
-                      )}
-                    </ResponsiveModalContent>
-                  </ResponsiveModal>
-                  <LayoutRight>
-                    <LocationStats>
-                      {!isOnline ? (
-                        <></>
-                      ) : loading ? (
-                        <Spinner id="location-stats-loading" />
-                      ) : (
-                        <LocationStatsView
-                          registrationOffices={
-                            data.getLocationStatistics!.offices
-                          }
-                          totalRegistrars={
-                            data.getLocationStatistics!.registrars
-                          }
-                          citizen={
-                            Math.round(data.getLocationStatistics!.population) /
-                            Math.round(data.getLocationStatistics!.registrars)
-                          }
-                        />
-                      )}
-                    </LocationStats>
+                        )}
+                      </LocationStats>
+                    )}
 
                     <RegistrationStatus>
                       {!isOnline ? (
