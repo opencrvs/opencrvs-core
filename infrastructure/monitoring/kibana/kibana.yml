@@ -54,13 +54,6 @@ monitoring.ui.container.elasticsearch.enabled: true
 xpack.encryptedSavedObjects.encryptionKey: '{{KIBANA_ENCRYPTION_KEY}}'
 xpack.reporting.encryptionKey: '{{KIBANA_ENCRYPTION_KEY}}'
 xpack.actions.preconfiguredAlertHistoryEsIndex: true
-xpack.infra:
-  sources:
-    default:
-      logAlias: 'logstash-*'
-      fields:
-        timestamp: '@timestamp'
-        tiebreaker: '_doc'
 # If your Elasticsearch is protected with basic authentication, these settings provide
 # the username and password that the Kibana server uses to perform maintenance on the Kibana
 # index at startup. Your Kibana users still need to authenticate with Elasticsearch, which

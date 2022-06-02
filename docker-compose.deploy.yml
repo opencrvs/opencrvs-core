@@ -63,20 +63,26 @@ services:
       - source: metricbeat-rollover-policy.{{ts}}
         target: /usr/share/metricbeat/rollover-policy.json
 
-  setup-kibana-alerts:
-    image: node:17.6.0-alpine
-    command: node /usr/app/setup-alerts.js
+  setup-kibana-config:
+    image: curlimages/curl:7.83.1
+    entrypoint:
+      [
+        'curl',
+        '-u',
+        'elastic:${ELASTICSEARCH_SUPERUSER_PASSWORD}',
+        '-X',
+        'POST',
+        'http://kibana:5601/api/saved_objects/_import?overwrite=true',
+        '-H',
+        'kbn-xsrf: true',
+        '--form',
+        'file=@/config.ndjson'
+      ]
     restart: on-failure
     depends_on:
       - kibana
-    environment:
-      - KIBANA_USERNAME=${KIBANA_USERNAME}
-      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
-      - KIBANA_HOST=kibana
-      - KIBANA_PORT=5601
     volumes:
-      - '/tmp/compose/infrastructure/monitoring/kibana/alert-rules.json:/usr/app/alert-rules.json'
-      - '/tmp/compose/infrastructure/monitoring/kibana/setup-alerts.js:/usr/app/setup-alerts.js'
+      - '/tmp/compose/infrastructure/monitoring/kibana/config.ndjson:/config.ndjson'
     networks:
       - overlay_net
     deploy:
@@ -231,37 +237,16 @@ services:
         constraints:
           - node.role == manager
 
-  logstash-agent:
+  logstash:
     image: logstash:7.17.0
     command: logstash -f /etc/logstash/logstash.conf --verbose
     depends_on:
       - elasticsearch
-    configs:
-      - source: logstash-agent.{{ts}}
-        target: /etc/logstash/logstash.conf
-      - source: logstash.{{ts}}
-        target: /usr/share/logstash/config/logstash.yml
     ports:
-      - '9000:9000'
       - '12201:12201'
       - '12201:12201/udp'
-      - '1514:1514'
-      - '1514:1514/udp'
-    networks:
-      - overlay_net
-    environment:
-      - ELASTICSEARCH_URL=http://elasticsearch:9200
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - ELASTICSEARCH_USERNAME=elastic
-      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
-    restart: always
-  logstash-central:
-    image: logstash:7.17.0
-    command: logstash -f /etc/logstash/logstash.conf --verbose
-    depends_on:
-      - elasticsearch
     configs:
-      - source: logstash-central.{{ts}}
+      - source: logstash-pipeline.{{ts}}
         target: /etc/logstash/logstash.conf
       - source: logstash.{{ts}}
         target: /usr/share/logstash/config/logstash.yml
@@ -690,10 +675,8 @@ configs:
     file: ./infrastructure/monitoring/apm/apm-server.yml
   logstash.{{ts}}:
     file: ./infrastructure/monitoring/logstash/logstash.yml
-  logstash-agent.{{ts}}:
+  logstash-pipeline.{{ts}}:
     file: ./infrastructure/monitoring/logstash/logstash.conf
-  logstash-central.{{ts}}:
-    file: ./infrastructure/monitoring/logstash/logstash-central.conf
 networks:
   overlay_net:
     driver: overlay
