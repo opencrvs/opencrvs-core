@@ -1,0 +1,22 @@
+diff --git a/node_modules/pdfmake/build/pdfmake.js b/node_modules/pdfmake/build/pdfmake.js
+index 105d4a5..2294253 100644
+--- a/node_modules/pdfmake/build/pdfmake.js
++++ b/node_modules/pdfmake/build/pdfmake.js
+@@ -23029,7 +23029,7 @@ var SVGtoPDF = function SVGtoPDF(doc, svg, x, y, options) {
+   }
+ 
+   function docFillColor(color) {
+-    if (color[0].constructor.name === 'PDFPattern') {
++    if (color[0].constructor.name === 'PDFPattern' || color[0].dx) {
+       doc.fillOpacity(color[1]);
+       docUsePattern(color[0], false);
+     } else {
+@@ -23038,7 +23038,7 @@ var SVGtoPDF = function SVGtoPDF(doc, svg, x, y, options) {
+   }
+ 
+   function docStrokeColor(color) {
+-    if (color[0].constructor.name === 'PDFPattern') {
++    if (color[0].constructor.name === 'PDFPattern' || color[0].dx) {
+       doc.strokeOpacity(color[1]);
+       docUsePattern(color[0], true);
+     } else {

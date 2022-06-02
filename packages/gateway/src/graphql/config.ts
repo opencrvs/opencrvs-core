@@ -42,6 +42,7 @@ import { readFileSync } from 'fs'
 import { GraphQLSchema } from 'graphql'
 import { IResolvers } from 'graphql-tools'
 import { merge, isEqual, uniqueId } from 'lodash'
+import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -57,6 +58,7 @@ const resolvers: StringIndexed<IResolvers> = merge(
   locationRootResolvers as IResolvers,
   userRootResolvers as IResolvers,
   userTypeResolvers as IResolvers,
+  certificateTypeResolvers as IResolvers,
   metricsRootResolvers as IResolvers,
   typeResolvers as IResolvers,
   searchRootResolvers as IResolvers,

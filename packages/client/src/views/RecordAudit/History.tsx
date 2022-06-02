@@ -34,6 +34,8 @@ import { goToUserProfile } from '@client/navigation'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
+import { useIntl } from 'react-intl'
+import { Box } from '@opencrvs/components/lib/icons/Box'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -66,23 +68,44 @@ export interface IActionDetailsData {
 
 export const GetLink = ({
   status,
-  onClick,
-  isFieldAgent
+  onClick
 }: {
   status: string
   onClick: () => void
-  isFieldAgent: boolean
 }) => {
   return (
     <>
-      {!isFieldAgent ? (
-        <LinkButton style={{ textAlign: 'left' }} onClick={onClick}>
-          {status}
-        </LinkButton>
-      ) : (
-        <>{status}</>
-      )}
+      <LinkButton style={{ textAlign: 'left' }} onClick={onClick}>
+        {status}
+      </LinkButton>
     </>
+  )
+}
+
+const HealthSystemLogo = styled.div`
+  border-radius: 100%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.colors.grey200};
+`
+
+const HealthSystemLocation = styled.p`
+  ${({ theme }) => theme.fonts.reg16}
+`
+
+function HealthSystemUser() {
+  const intl = useIntl()
+  return (
+    <NameAvatar>
+      <HealthSystemLogo>
+        <Box />
+      </HealthSystemLogo>
+      <span>{intl.formatMessage(userMessages.healthSystem)}</span>
+    </NameAvatar>
   )
 }
 
@@ -90,16 +113,12 @@ const GetNameWithAvatar = ({
   id,
   nameObject,
   avatar,
-  language,
-  goToUser,
-  isFieldAgent
+  language
 }: {
   id: string
   nameObject: Array<GQLHumanName | null>
   avatar: IAvatar
   language: string
-  goToUser?: typeof goToUserProfile
-  isFieldAgent: boolean
 }) => {
   const nameObj = getIndividualNameObj(nameObject, language)
   const userName = nameObj
@@ -109,20 +128,7 @@ const GetNameWithAvatar = ({
   return (
     <NameAvatar>
       <AvatarSmall avatar={avatar} name={userName} />
-      <span>
-        {!isFieldAgent ? (
-          <LinkButton
-            id={'username-link'}
-            onClick={() => {
-              goToUser && goToUser(id)
-            }}
-          >
-            {userName}
-          </LinkButton>
-        ) : (
-          <>{userName}</>
-        )}
-      </span>
+      <span>{userName}</span>
     </NameAvatar>
   )
 }
@@ -152,7 +158,7 @@ export const GetHistory = ({
         <LargeGreyedInfo />
       </>
     )
-  const allHistoryData = (draft.data.history || []) as unknown as {
+  let allHistoryData = (draft.data.history || []) as unknown as {
     [key: string]: any
   }[]
   if (!allHistoryData.length && userDetails) {
@@ -171,6 +177,13 @@ export const GetHistory = ({
       output: []
     })
   }
+
+  if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
+    allHistoryData = allHistoryData.filter((obj: { [key: string]: any }) => {
+      return obj.action !== 'WAITING_VALIDATION'
+    })
+  }
+
   const historiesForDisplay = getDisplayItems(
     currentPageNumber,
     DEFAULT_HISTORY_RECORD_PAGE_SIZE,
@@ -191,36 +204,47 @@ export const GetHistory = ({
       date: getFormattedDate(item?.date),
       action: (
         <GetLink
-          status={getStatusLabel(item?.action, item.reinstated, intl)}
+          status={getStatusLabel(
+            item?.action,
+            item.reinstated,
+            intl,
+            item.user
+          )}
           onClick={() => toggleActionDetails(item)}
-          isFieldAgent={isFieldAgent}
         />
       ),
-      user: (
-        <GetNameWithAvatar
-          id={item.user.id}
-          nameObject={item.user.name}
-          avatar={item.user?.avatar}
-          language={window.config.LANGUAGES}
-          goToUser={goToUserProfile}
-          isFieldAgent={isFieldAgent}
-        />
+      user:
+        item.dhis2Notification && !item.user?.id ? (
+          <HealthSystemUser />
+        ) : (
+          <GetNameWithAvatar
+            id={item.user.id}
+            nameObject={item.user.name}
+            avatar={item.user?.avatar}
+            language={window.config.LANGUAGES}
+          />
+        ),
+      type: intl.formatMessage(
+        item.dhis2Notification && !item.user?.role
+          ? userMessages.healthSystem
+          : userMessages[item.user.role as string]
       ),
-      type: intl.formatMessage(userMessages[item.user.role as string]),
-      location: (
-        <GetLink
-          status={item.office.name}
-          onClick={() => {
-            goToTeamUserList &&
-              goToTeamUserList({
-                id: item.office.id,
-                searchableText: item.office.name,
-                displayLabel: item.office.name
-              } as ISearchLocation)
-          }}
-          isFieldAgent={isFieldAgent}
-        />
-      )
+      location:
+        item.dhis2Notification && !item.user?.role ? (
+          <HealthSystemLocation>{item.office?.name}</HealthSystemLocation>
+        ) : (
+          <GetLink
+            status={item.office?.name}
+            onClick={() => {
+              goToTeamUserList &&
+                goToTeamUserList({
+                  id: item.office.id,
+                  searchableText: item.office.name,
+                  displayLabel: item.office.name
+                } as ISearchLocation)
+            }}
+          />
+        )
     }))
 
   const columns = [

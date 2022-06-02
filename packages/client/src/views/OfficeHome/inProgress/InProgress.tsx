@@ -131,8 +131,11 @@ export class InProgressComponent extends React.Component<
     super(props)
     this.state = {
       width: window.innerWidth,
-      sortedCol: COLUMNS.NAME,
-      sortOrder: SORT_ORDER.ASCENDING
+      sortedCol:
+        this.props.selectorId && this.props.selectorId !== SELECTOR_ID.ownDrafts
+          ? COLUMNS.NOTIFICATION_SENT
+          : COLUMNS.LAST_UPDATED,
+      sortOrder: SORT_ORDER.DESCENDING
     }
   }
 
@@ -371,7 +374,7 @@ export class InProgressComponent extends React.Component<
           : draft.data.deathEvent?.deathDate || ''
       const dateOfEvent = (eventTime && new Date(eventTime as string)) || ''
       const NameComponent = name ? (
-        <LinkButton
+        <NameContainer
           id={`name_${index}`}
           isBoldLink={true}
           onClick={() =>
@@ -379,7 +382,7 @@ export class InProgressComponent extends React.Component<
           }
         >
           {name}
-        </LinkButton>
+        </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
@@ -471,7 +474,11 @@ export class InProgressComponent extends React.Component<
             this.props.selectorId !== SELECTOR_ID.ownDrafts
               ? COLUMNS.NOTIFICATION_SENT
               : COLUMNS.LAST_UPDATED,
-          isSorted: this.state.sortedCol === COLUMNS.LAST_UPDATED,
+          isSorted:
+            this.props.selectorId &&
+            this.props.selectorId !== SELECTOR_ID.ownDrafts
+              ? this.state.sortedCol === COLUMNS.NOTIFICATION_SENT
+              : this.state.sortedCol === COLUMNS.LAST_UPDATED,
           sortFunction: this.onColumnClick
         },
         {

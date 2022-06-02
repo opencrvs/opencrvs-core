@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
+import { GQLResolver } from '@gateway/graphql/schema'
 export interface IGetCertificatePayload {
   status?: string
   event?: string
@@ -24,4 +24,23 @@ export interface ICertificateSVGPayload {
   user: string
   event: string
   status: string
+}
+
+export interface ICertificateSVG {
+  _id: string
+  svgCode: string
+  svgFilename: string
+  svgDateUpdated: string
+  svgDateCreated: string
+  user: string
+  event: string
+  status: string
+}
+
+export const certificateTypeResolvers: GQLResolver = {
+  CertificateSVG: {
+    id(certificate: ICertificateSVG) {
+      return certificate._id
+    }
+  }
 }

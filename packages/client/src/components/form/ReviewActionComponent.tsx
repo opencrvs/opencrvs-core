@@ -35,6 +35,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
   draftDeclaration?: boolean
   completeDeclaration: boolean
+  totalFileSizeExceeded: boolean
   declarationToBeValidated?: boolean
   declarationToBeRegistered?: boolean
   alreadyRejectedDeclaration: boolean
@@ -319,6 +320,7 @@ class ReviewActionComponent extends React.Component<
       declarationToBeRegistered,
       alreadyRejectedDeclaration,
       completeDeclaration,
+      totalFileSizeExceeded,
       declaration,
       submitDeclarationAction,
       draftDeclaration,
@@ -363,7 +365,7 @@ class ReviewActionComponent extends React.Component<
                 id="registerDeclarationBtn"
                 icon={() => <Check />}
                 onClick={this.toggleSubmitModalOpen}
-                disabled={!completeDeclaration}
+                disabled={!completeDeclaration || totalFileSizeExceeded}
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(buttonMessages.register)}
@@ -373,7 +375,7 @@ class ReviewActionComponent extends React.Component<
                 id="validateDeclarationBtn"
                 icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
-                disabled={!completeDeclaration}
+                disabled={!completeDeclaration || totalFileSizeExceeded}
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(buttonMessages.sendForApproval)}
@@ -383,7 +385,7 @@ class ReviewActionComponent extends React.Component<
                 id="submit_form"
                 icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
-                disabled={false}
+                disabled={totalFileSizeExceeded}
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(

@@ -152,6 +152,7 @@ interface IConstantsMessages
   requireUpdatesLoading: MessageDescriptor
   noRecords: MessageDescriptor
   noConnection: MessageDescriptor
+  totalFileSizeExceed: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -283,7 +284,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.declarationSentForExternalValidationOn'
   },
   areYouSure: {
-    defaultMessage: 'Are you sure?',
+    defaultMessage: ' ',
     description: 'Description for are you sure label in modals',
     id: 'constants.areYouSure'
   },
@@ -535,8 +536,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.reason'
   },
   registerConfirmModalDesc: {
-    defaultMessage:
-      'A {event, select, birth{birth} death{death}} certificate will be generated with your signature for issuance.',
+    defaultMessage: ' ',
     description:
       'Description for confirmation modal when registering declaration',
     id: 'constants.registerConfirmModalDesc'
@@ -863,6 +863,12 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'No connection',
     description: 'No Connection hover text',
     id: 'constants.noConnection'
+  },
+  totalFileSizeExceed: {
+    defaultMessage:
+      'Total size of documents exceeds {fileSize}. Please reduce file size of your uploads',
+    description: 'Accumulated File size exceed message',
+    id: 'constants.totalFileSizeExceed'
   }
 }
 

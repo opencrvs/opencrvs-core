@@ -40,7 +40,6 @@ import {
 } from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import {
-  Box,
   ListViewSimplified,
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface'
@@ -70,15 +69,6 @@ const CTextArea = styled(TextArea)`
   height: 32px;
   background: ${({ theme }) => theme.colors.white};
   border: solid 1px ${({ theme }) => theme.colors.grey600};
-`
-
-const CustomFieldFormContainer = styled(Box)`
-  box-shadow: none;
-  max-width: 348px;
-  min-height: 100vh;
-  margin-left: auto;
-  padding: 0px 3px;
-  border: none;
 `
 
 const CPrimaryButton = styled(PrimaryButton)`
@@ -546,6 +536,8 @@ class CustomFieldToolsComp extends React.Component<
                 </CInputField>
               </FieldContainer>
 
+              {/*
+              errorMessage is not implemented yet
               <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <CInputField
                   required={false}
@@ -566,6 +558,7 @@ class CustomFieldToolsComp extends React.Component<
                   />
                 </CInputField>
               </FieldContainer>
+            */}
 
               <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <CInputField
@@ -621,7 +614,7 @@ class CustomFieldToolsComp extends React.Component<
   render(): React.ReactNode {
     const { intl } = this.props
     return (
-      <CustomFieldFormContainer>
+      <>
         {this.toggleButtons()}
         {this.getLanguageDropDown()}
         {this.inputFields()}
@@ -630,7 +623,7 @@ class CustomFieldToolsComp extends React.Component<
             {intl.formatMessage(customFieldFormMessages.duplicateField)}
           </CErrorText>
         )}
-      </CustomFieldFormContainer>
+      </>
     )
   }
 }

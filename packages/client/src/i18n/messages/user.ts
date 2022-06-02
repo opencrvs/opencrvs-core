@@ -27,7 +27,6 @@ interface IUserMessages
   BIRTH_TOWN: MessageDescriptor
   CHA: MessageDescriptor
   CHAIRMAN: MessageDescriptor
-  changeLanguageMessege: MessageDescriptor
   changeLanguageSuccessMessage: MessageDescriptor
   changeLanguageTitle: MessageDescriptor
   DATA_ENTRY_CLERK: MessageDescriptor
@@ -41,6 +40,7 @@ interface IUserMessages
   HEALTH_DIVISION: MessageDescriptor
   HIGH_SCHOOL: MessageDescriptor
   HOSPITAL: MessageDescriptor
+  healthSystem: MessageDescriptor
   labelEnglishName: MessageDescriptor
   LOCAL_REGISTRAR: MessageDescriptor
   LOCAL_SYSTEM_ADMIN: MessageDescriptor
@@ -120,11 +120,6 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Chairman',
     description: 'The description for CHAIRMAN type',
     id: 'constants.chairman'
-  },
-  changeLanguageMessege: {
-    defaultMessage: 'Your prefered language that you want to use on OpenCRVS',
-    description: 'Change language message',
-    id: 'settings.message.changeLanguage'
   },
   changeLanguageSuccessMessage: {
     defaultMessage: 'Language updated to {language}',
@@ -220,6 +215,11 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Hospital',
     description: 'The description for HOSPITAL type',
     id: 'userSetup.type.hospital'
+  },
+  healthSystem: {
+    defaultMessage: 'Health System',
+    description: 'The description for health system type',
+    id: 'userSetup.type.healthSystem'
   },
   labelEnglishName: {
     defaultMessage: 'English name',

@@ -19,7 +19,7 @@ const Conatiner = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 12px 16px;
+  padding: 0 16px;
   /* stylelint-disable-next-line color-no-hex */
   background-color: #fff3f3;
   border-radius: 4px;
@@ -31,11 +31,11 @@ const Conatiner = styled.div`
 export function Warning({
   label,
   ...props
-}: { label: string } & React.HTMLAttributes<HTMLDivElement>) {
+}: { label: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <Conatiner {...props}>
       <Alert color="invert" />
-      {label}
+      <p>{label}</p>
     </Conatiner>
   )
 }

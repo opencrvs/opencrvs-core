@@ -168,20 +168,10 @@ function updatePDFTemplateWithSVGContent(
   svg: string,
   pageSize: PageSize
 ) {
-  if (hasTemplateEmptyArrayContent(template)) {
-    ;(template.definition.content as Array<Content>).push({
-      svg,
-      fit: getPageDimensions(pageSize)
-    })
+  template.definition['content'] = {
+    svg,
+    fit: getPageDimensions(pageSize)
   }
-}
-
-function hasTemplateEmptyArrayContent(template: IPDFTemplate): boolean {
-  return Boolean(
-    template?.definition?.content &&
-      Array.isArray(template.definition.content) &&
-      template.definition.content.length === 0
-  )
 }
 
 const standardPageSizes: Record<string, [number, number]> = {
