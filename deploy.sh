@@ -254,7 +254,7 @@ docker_stack_deploy() {
     ROTATING_SEARCH_ELASTIC_PASSWORD='$ROTATING_SEARCH_ELASTIC_PASSWORD' \
     KIBANA_USERNAME='$KIBANA_USERNAME' \
     KIBANA_PASSWORD='$KIBANA_PASSWORD' \
-    docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c '$environment_compose' --with-registry-auth opencrvs'
+    docker stack deploy --prune -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c '$environment_compose' --with-registry-auth opencrvs'
 }
 
 
