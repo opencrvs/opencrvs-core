@@ -33,7 +33,7 @@ const messagesToDefine = {
   },
   phoneNumberConfirmationFormBodySubheader: {
     id: 'resetCredentials.phoneNumberConfirmation.form.body.subheader',
-    defaultMessage: 'This is the number assoricated with your account',
+    defaultMessage: '',
     description:
       'Form body subheader used in the body of phone number confirmation step'
   },

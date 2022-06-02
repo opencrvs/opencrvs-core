@@ -284,7 +284,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.declarationSentForExternalValidationOn'
   },
   areYouSure: {
-    defaultMessage: 'Are you sure?',
+    defaultMessage: '',
     description: 'Description for are you sure label in modals',
     id: 'constants.areYouSure'
   },
@@ -536,8 +536,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.reason'
   },
   registerConfirmModalDesc: {
-    defaultMessage:
-      'A {event, select, birth{birth} death{death}} certificate will be generated with your signature for issuance.',
+    defaultMessage: '',
     description:
       'Description for confirmation modal when registering declaration',
     id: 'constants.registerConfirmModalDesc'
