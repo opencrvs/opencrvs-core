@@ -86,16 +86,6 @@ export const PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE = 'ease-in-out both'
 export const PAGE_TRANSITIONS_ENTER_TIME = 500
 export const PAGE_TRANSITIONS_EXIT_TIME = PAGE_TRANSITIONS_ENTER_TIME - 10
 
-export const JURISDICTION_TYPE: { [key: string]: string } = {
-  UNION: 'Union Parishad',
-  MUNICIPALITY: 'Municipality',
-  CITY_CORPORATION: 'City Corporation',
-  UPAZILA: 'Upazila',
-  STATE: 'Province',
-  DISTRICT: 'District',
-  DIVISION: 'Division'
-}
-
 export const REFRESH_TOKEN_CHECK_MILLIS = 4 * 60 * 1000 // 4 minutes
 export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
 

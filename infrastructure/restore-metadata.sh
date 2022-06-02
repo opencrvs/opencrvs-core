@@ -68,14 +68,10 @@ restore_metadata () {
   docker run --rm -v $DIR/default_backups:/default_backups --network=$NETWORK mongo:4.4 bash -c "$COMMAND"
 }
 
-if [[ "$ENV" != "qa" ]] ; then
-  restore_metadata "/default_backups/hearth-dev.gz";
-fi
+restore_metadata "/default_backups/hearth-dev.gz";
 
 restore_metadata "/default_backups/openhim-dev.gz"
 
-if [[ "$ENV" != "qa" ]] ; then
-  restore_metadata "/default_backups/user-mgnt.gz";
-fi
+restore_metadata "/default_backups/user-mgnt.gz";
 
 restore_metadata "/default_backups/application-config.gz"

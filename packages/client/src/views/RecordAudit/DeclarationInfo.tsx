@@ -84,13 +84,21 @@ export const GetDeclarationInfo = ({
   let informant = getCaptitalizedWord(declaration?.informant)
 
   const finalStatus = removeUnderscore(getCaptitalizedWord(declaration?.status))
+  const displayStatus =
+    finalStatus === 'Declared' || finalStatus === 'Submitted'
+      ? 'In Review'
+      : finalStatus === 'In progress'
+      ? 'Incomplete'
+      : finalStatus === 'Rejected'
+      ? 'Requires updates'
+      : finalStatus
 
   if (declaration?.informantContact && informant) {
     informant = informant + ' · ' + declaration.informantContact
   }
 
   let info: ILabel = {
-    status: declaration?.status && finalStatus,
+    status: declaration?.status && displayStatus,
     type: getCaptitalizedWord(declaration?.type),
     trackingId: declaration?.trackingId
   }

@@ -18,7 +18,12 @@ import {
 } from '@client/declarations'
 import { Header } from '@client/components/interface/Header/Header'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
-import { goToEvents, goToPage, goToPrintCertificate } from '@client/navigation'
+import {
+  goToEvents,
+  goToPage,
+  goToPrintCertificate,
+  getDefaultPerformanceLocationId
+} from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
@@ -59,7 +64,6 @@ import {
 } from '@client/components/interface/Navigation'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { PERFORMANCE_HOME } from '@client/navigation/routes'
-import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 
 export interface IProps extends IButtonProps {
@@ -161,9 +165,6 @@ export class OfficeHomeView extends React.Component<
   showPaginated = false
   interval: any = undefined
   role = this.props.userDetails && this.props.userDetails.role
-  jurisdictionLocationId =
-    this.props.userDetails &&
-    getJurisdictionLocationIdFromUserDetails(this.props.userDetails)
   isFieldAgent = this.role
     ? FIELD_AGENT_ROLES.includes(this.role)
       ? true
@@ -343,7 +344,9 @@ export class OfficeHomeView extends React.Component<
           <Redirect
             to={{
               pathname: PERFORMANCE_HOME,
-              search: `?locationId=${this.jurisdictionLocationId}`
+              search: `?locationId=${getDefaultPerformanceLocationId(
+                this.props.userDetails as IUserDetails
+              )}`
             }}
           />
         )}
