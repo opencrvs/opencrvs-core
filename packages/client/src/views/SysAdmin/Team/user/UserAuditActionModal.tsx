@@ -217,7 +217,7 @@ function UserAuditActionModalComponent(
       title={modalTitle}
       hideHeaderBoxShadow
       show={show}
-      contentHeight={432}
+      contentHeight={504}
       width={920}
       handleClose={onClose}
       responsive
