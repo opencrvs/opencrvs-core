@@ -241,7 +241,7 @@ export const ActionDetailsModalListTable = ({
         columns={commentsColumn}
         content={actionDetailsData.comments
           .concat(actionDetailsData.statusReason?.text || [])
-          .map((text: string) => ({ comment: text }))}
+          .map((text: any) => ({ comment: text.comment }))}
       />
 
       {/* For Data Updated */}

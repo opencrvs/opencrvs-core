@@ -160,10 +160,7 @@ export const GetHistory = ({
     DEFAULT_HISTORY_RECORD_PAGE_SIZE,
     allHistoryData
   )
-  const isFieldAgent =
-    userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
-      ? true
-      : false
+
   const historyData = (
     historiesForDisplay as unknown as { [key: string]: any }[]
   )
