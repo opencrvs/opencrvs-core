@@ -1596,7 +1596,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </SectionContainer>
                 )
               })}
-              {event === Event.BIRTH && !isCorrection(declaration) && (
+              {!isCorrection(declaration) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"

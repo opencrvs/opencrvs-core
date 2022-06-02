@@ -132,6 +132,25 @@ export function setDeathRegistrationSectionTransformer(
       transformedData.registration.registrationNumber =
         draftData.registration.registrationNumber
     }
+
+    if (!transformedData[sectionId].status) {
+      transformedData[sectionId].status = [
+        {
+          timestamp: new Date()
+        }
+      ]
+    }
+
+    if (draftData[sectionId].commentsOrNotes) {
+      if (!transformedData[sectionId].status[0].comments) {
+        transformedData[sectionId].status[0].comments = []
+      }
+      transformedData[sectionId].status[0].comments.push({
+        comment: draftData[sectionId].commentsOrNotes,
+        createdAt: new Date()
+      })
+    }
+
     if (draftData.registration.certificates) {
       transformCertificateData(
         transformedData,

@@ -126,6 +126,9 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           subject
         }
         status {
+          comments {
+            comment
+          }
           type
           timestamp
           office {
