@@ -205,7 +205,7 @@ interface State {
   timeEnd: Date
   toggleStatus: boolean
   queriesLoading: string[]
-  officeSelected?: boolean
+  officeSelected: boolean
 }
 
 type IOnlineStatusProps = {
@@ -586,7 +586,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 'VALIDATED',
                 'WAITING_VALIDATION',
                 'REGISTERED'
-              ]
+              ],
+              officeSelected: this.state.officeSelected
             }}
             fetchPolicy="no-cache"
           >
@@ -635,14 +636,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                                 totalRegistrars={
                                   data.getLocationStatistics!.registrars
                                 }
-                                citizen={
-                                  Math.round(
-                                    data.getLocationStatistics!.population
-                                  ) /
-                                  Math.round(
+                                citizen={Math.round(
+                                  data.getLocationStatistics!.population /
                                     data.getLocationStatistics!.registrars
-                                  )
-                                }
+                                )}
                               />
                             </>
                           )}
@@ -663,12 +660,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             totalRegistrars={
                               data.getLocationStatistics!.registrars
                             }
-                            citizen={
-                              Math.round(
-                                data.getLocationStatistics!.population
-                              ) /
-                              Math.round(data.getLocationStatistics!.registrars)
-                            }
+                            citizen={Math.round(
+                              data.getLocationStatistics!.population /
+                                data.getLocationStatistics!.registrars
+                            )}
                           />
                         )}
                       </LocationStats>
