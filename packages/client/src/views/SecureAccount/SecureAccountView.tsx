@@ -62,7 +62,7 @@ export class SecureAccount extends React.Component<{
             <Item margin="50px 0px">
               <Bold>Secure your Account</Bold>
               <p>
-                Create a personal identification number to protect your account.
+                Create a personal identification number to protect your account
               </p>
             </Item>
 
