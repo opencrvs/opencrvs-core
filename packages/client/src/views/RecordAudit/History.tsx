@@ -34,6 +34,8 @@ import { goToUserProfile } from '@client/navigation'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
+import { useIntl } from 'react-intl'
+import { Box } from '@opencrvs/components/lib/icons/Box'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -77,6 +79,33 @@ export const GetLink = ({
         {status}
       </LinkButton>
     </>
+  )
+}
+
+const HealthSystemLogo = styled.div`
+  border-radius: 100%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  margin-right: 10px;
+  justify-content: center;
+  background-color: ${({ theme }) => theme.colors.grey200};
+`
+
+const HealthSystemLocation = styled.p`
+  ${({ theme }) => theme.fonts.reg16}
+`
+
+function HealthSystemUser() {
+  const intl = useIntl()
+  return (
+    <NameAvatar>
+      <HealthSystemLogo>
+        <Box />
+      </HealthSystemLogo>
+      <span>{intl.formatMessage(userMessages.healthSystem)}</span>
+    </NameAvatar>
   )
 }
 
@@ -184,28 +213,38 @@ export const GetHistory = ({
           onClick={() => toggleActionDetails(item)}
         />
       ),
-      user: (
-        <GetNameWithAvatar
-          id={item.user.id}
-          nameObject={item.user.name}
-          avatar={item.user?.avatar}
-          language={window.config.LANGUAGES}
-        />
+      user:
+        item.dhis2Notification && !item.user?.id ? (
+          <HealthSystemUser />
+        ) : (
+          <GetNameWithAvatar
+            id={item.user.id}
+            nameObject={item.user.name}
+            avatar={item.user?.avatar}
+            language={window.config.LANGUAGES}
+          />
+        ),
+      type: intl.formatMessage(
+        item.dhis2Notification && !item.user?.role
+          ? userMessages.healthSystem
+          : userMessages[item.user.role as string]
       ),
-      type: intl.formatMessage(userMessages[item.user.role as string]),
-      location: (
-        <GetLink
-          status={item.office.name}
-          onClick={() => {
-            goToTeamUserList &&
-              goToTeamUserList({
-                id: item.office.id,
-                searchableText: item.office.name,
-                displayLabel: item.office.name
-              } as ISearchLocation)
-          }}
-        />
-      )
+      location:
+        item.dhis2Notification && !item.user?.role ? (
+          <HealthSystemLocation>{item.office?.name}</HealthSystemLocation>
+        ) : (
+          <GetLink
+            status={item.office?.name}
+            onClick={() => {
+              goToTeamUserList &&
+                goToTeamUserList({
+                  id: item.office.id,
+                  searchableText: item.office.name,
+                  displayLabel: item.office.name
+                } as ISearchLocation)
+            }}
+          />
+        )
     }))
 
   const columns = [

@@ -385,6 +385,17 @@ export type CommentInput = {
   user?: InputMaybe<UserInput>
 }
 
+export type ComparisonInput = {
+  eq?: InputMaybe<Scalars['String']>
+  gt?: InputMaybe<Scalars['String']>
+  gte?: InputMaybe<Scalars['String']>
+  in?: InputMaybe<Array<Scalars['String']>>
+  lt?: InputMaybe<Scalars['String']>
+  lte?: InputMaybe<Scalars['String']>
+  ne?: InputMaybe<Scalars['String']>
+  nin?: InputMaybe<Array<Scalars['String']>>
+}
+
 export type ContactPoint = {
   __typename?: 'ContactPoint'
   system?: Maybe<Scalars['String']>
@@ -670,10 +681,12 @@ export type History = {
   certificates?: Maybe<Array<Maybe<Certificate>>>
   comments?: Maybe<Array<Maybe<Comment>>>
   date?: Maybe<Scalars['Date']>
+  dhis2Notification?: Maybe<Scalars['Boolean']>
   input?: Maybe<Array<Maybe<InputOutput>>>
   location?: Maybe<Location>
   office?: Maybe<Location>
   output?: Maybe<Array<Maybe<InputOutput>>>
+  reason?: Maybe<Scalars['String']>
   reinstated?: Maybe<Scalars['Boolean']>
   statusReason?: Maybe<StatusReason>
   user?: Maybe<User>
@@ -1300,7 +1313,7 @@ export type QueryGetRolesArgs = {
   sortOrder?: InputMaybe<Scalars['String']>
   title?: InputMaybe<Scalars['String']>
   type?: InputMaybe<Scalars['String']>
-  value?: InputMaybe<Scalars['String']>
+  value?: InputMaybe<ComparisonInput>
 }
 
 export type QueryGetTotalCertificationsArgs = {
@@ -1719,7 +1732,6 @@ export type User = {
   practitionerId?: Maybe<Scalars['String']>
   primaryOffice?: Maybe<Location>
   role?: Maybe<Scalars['String']>
-  signature?: Maybe<Signature>
   status?: Maybe<Scalars['String']>
   type?: Maybe<Scalars['String']>
   underInvestigation?: Maybe<Scalars['Boolean']>
@@ -1896,7 +1908,9 @@ export type CreateOrUpdateUserMutation = {
   createOrUpdateUser: { __typename?: 'User'; username?: string | null }
 }
 
-export type GetRolesQueryVariables = Exact<{ [key: string]: never }>
+export type GetRolesQueryVariables = Exact<{
+  value?: InputMaybe<ComparisonInput>
+}>
 
 export type GetRolesQuery = {
   __typename?: 'Query'
@@ -2541,6 +2555,16 @@ export type FetchBirthRegistrationForReviewQuery = {
           __typename?: 'Comment'
           comment?: string | null
         } | null> | null
+        office?: {
+          __typename?: 'Location'
+          name?: string | null
+          alias?: Array<string | null> | null
+          address?: {
+            __typename?: 'Address'
+            district?: string | null
+            state?: string | null
+          } | null
+        } | null
       } | null> | null
     } | null
     eventLocation?: {
@@ -2567,6 +2591,8 @@ export type FetchBirthRegistrationForReviewQuery = {
       date?: any | null
       action?: RegStatus | null
       reinstated?: boolean | null
+      dhis2Notification?: boolean | null
+      reason?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -2842,6 +2868,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       date?: any | null
       action?: RegStatus | null
       reinstated?: boolean | null
+      dhis2Notification?: boolean | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -3155,6 +3182,16 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'RegWorkflow'
         type?: RegStatus | null
         timestamp?: any | null
+        office?: {
+          __typename?: 'Location'
+          name?: string | null
+          alias?: Array<string | null> | null
+          address?: {
+            __typename?: 'Address'
+            district?: string | null
+            state?: string | null
+          } | null
+        } | null
       } | null> | null
     } | null
     eventLocation?: {
@@ -3182,6 +3219,8 @@ export type FetchDeathRegistrationForReviewQuery = {
       date?: any | null
       action?: RegStatus | null
       reinstated?: boolean | null
+      dhis2Notification?: boolean | null
+      reason?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -3446,6 +3485,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       date?: any | null
       action?: RegStatus | null
       reinstated?: boolean | null
+      dhis2Notification?: boolean | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -3942,6 +3982,134 @@ export type RegistrationHomeQuery = {
     > | null
   } | null
   printTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+          } | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+          } | null
+        }
+      | null
+    > | null
+  } | null
+}
+
+export type FieldAgentHomeQueryVariables = Exact<{
+  userId?: InputMaybe<Scalars['String']>
+  locationIds?: InputMaybe<
+    Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
+  >
+  pageSize?: InputMaybe<Scalars['Int']>
+  reviewSkip?: InputMaybe<Scalars['Int']>
+  rejectSkip?: InputMaybe<Scalars['Int']>
+}>
+
+export type FieldAgentHomeQuery = {
+  __typename?: 'Query'
+  reviewTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+          } | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+          } | null
+        }
+      | null
+    > | null
+  } | null
+  rejectTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
     results?: Array<
@@ -4616,6 +4784,7 @@ export type GetLocationStatisticsQueryVariables = Exact<{
   populationYear: Scalars['Int']
   status: Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
   event?: InputMaybe<Scalars['String']>
+  officeSelected: Scalars['Boolean']
 }>
 
 export type GetLocationStatisticsQuery = {
