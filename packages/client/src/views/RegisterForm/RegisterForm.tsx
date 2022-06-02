@@ -568,7 +568,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
               : goToHomeTab(this.getRedirectionTabOnSaveOrExit())
           },
           label: declaration.review
-            ? intl.formatMessage(buttonMessages.saveExitButton)
+            ? intl.formatMessage(buttonMessages.save)
             : intl.formatMessage(buttonMessages.exitButton)
         }
       }
@@ -577,7 +577,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
         ...eventTopBarProps,
         saveAction: {
           handler: this.onSaveAsDraftClicked,
-          label: intl.formatMessage(buttonMessages.saveExitButton)
+          label: intl.formatMessage(buttonMessages.save)
         },
         menuItems: [menuOption]
       }
@@ -650,7 +650,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     }
                     saveAction={{
                       handler: this.onSaveAsDraftClicked,
-                      label: intl.formatMessage(buttonMessages.saveExitButton)
+                      label: intl.formatMessage(buttonMessages.save)
                     }}
                     menuItems={[menuItemDeleteOrClose]}
                   />
