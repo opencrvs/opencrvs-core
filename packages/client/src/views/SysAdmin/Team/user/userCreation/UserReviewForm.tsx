@@ -131,29 +131,30 @@ class UserReviewFormComponent extends React.Component<
                 ? ''
                 : intl.formatMessage(field.label),
             value: this.getValue(field),
-            action: !(
-              field.name === 'registrationOffice' &&
-              this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
-            )
-              ? {
-                  id: `btn_change_${field.name}`,
-                  label: intl.formatMessage(messages.change),
-                  handler: () => {
-                    this.props.userId
-                      ? this.props.goToUserReviewForm(
-                          this.props.userId,
-                          userFormSection.id,
-                          group.id,
-                          field.name
-                        )
-                      : this.props.goToCreateUserSection(
-                          userFormSection.id,
-                          group.id,
-                          field.name
-                        )
+            action:
+              !(
+                field.name === 'registrationOffice' &&
+                this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
+              ) && !field.readonly
+                ? {
+                    id: `btn_change_${field.name}`,
+                    label: intl.formatMessage(messages.change),
+                    handler: () => {
+                      this.props.userId
+                        ? this.props.goToUserReviewForm(
+                            this.props.userId,
+                            userFormSection.id,
+                            group.id,
+                            field.name
+                          )
+                        : this.props.goToCreateUserSection(
+                            userFormSection.id,
+                            group.id,
+                            field.name
+                          )
+                    }
                   }
-                }
-              : undefined
+                : undefined
           })
         }
       })
@@ -222,6 +223,10 @@ class UserReviewFormComponent extends React.Component<
       actionComponent = (
         <PrimaryButton
           id="submit_user_form"
+          disabled={
+            this.props.formData.role === 'LOCAL_REGISTRAR' &&
+            !this.props.formData.signature
+          }
           onClick={() => this.props.submitForm(userFormSection)}
         >
           {intl.formatMessage(messages.createUser)}

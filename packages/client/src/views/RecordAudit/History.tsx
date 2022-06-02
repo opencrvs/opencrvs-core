@@ -66,22 +66,16 @@ export interface IActionDetailsData {
 
 export const GetLink = ({
   status,
-  onClick,
-  isFieldAgent
+  onClick
 }: {
   status: string
   onClick: () => void
-  isFieldAgent: boolean
 }) => {
   return (
     <>
-      {!isFieldAgent ? (
-        <LinkButton style={{ textAlign: 'left' }} onClick={onClick}>
-          {status}
-        </LinkButton>
-      ) : (
-        <>{status}</>
-      )}
+      <LinkButton style={{ textAlign: 'left' }} onClick={onClick}>
+        {status}
+      </LinkButton>
     </>
   )
 }
@@ -90,16 +84,12 @@ const GetNameWithAvatar = ({
   id,
   nameObject,
   avatar,
-  language,
-  goToUser,
-  isFieldAgent
+  language
 }: {
   id: string
   nameObject: Array<GQLHumanName | null>
   avatar: IAvatar
   language: string
-  goToUser?: typeof goToUserProfile
-  isFieldAgent: boolean
 }) => {
   const nameObj = getIndividualNameObj(nameObject, language)
   const userName = nameObj
@@ -109,20 +99,7 @@ const GetNameWithAvatar = ({
   return (
     <NameAvatar>
       <AvatarSmall avatar={avatar} name={userName} />
-      <span>
-        {!isFieldAgent ? (
-          <LinkButton
-            id={'username-link'}
-            onClick={() => {
-              goToUser && goToUser(id)
-            }}
-          >
-            {userName}
-          </LinkButton>
-        ) : (
-          <>{userName}</>
-        )}
-      </span>
+      <span>{userName}</span>
     </NameAvatar>
   )
 }
@@ -152,7 +129,7 @@ export const GetHistory = ({
         <LargeGreyedInfo />
       </>
     )
-  const allHistoryData = (draft.data.history || []) as unknown as {
+  let allHistoryData = (draft.data.history || []) as unknown as {
     [key: string]: any
   }[]
   if (!allHistoryData.length && userDetails) {
@@ -171,6 +148,13 @@ export const GetHistory = ({
       output: []
     })
   }
+
+  if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
+    allHistoryData = allHistoryData.filter((obj: { [key: string]: any }) => {
+      return obj.action !== 'WAITING_VALIDATION'
+    })
+  }
+
   const historiesForDisplay = getDisplayItems(
     currentPageNumber,
     DEFAULT_HISTORY_RECORD_PAGE_SIZE,
@@ -191,9 +175,13 @@ export const GetHistory = ({
       date: getFormattedDate(item?.date),
       action: (
         <GetLink
-          status={getStatusLabel(item?.action, item.reinstated, intl)}
+          status={getStatusLabel(
+            item?.action,
+            item.reinstated,
+            intl,
+            item.user
+          )}
           onClick={() => toggleActionDetails(item)}
-          isFieldAgent={isFieldAgent}
         />
       ),
       user: (
@@ -202,8 +190,6 @@ export const GetHistory = ({
           nameObject={item.user.name}
           avatar={item.user?.avatar}
           language={window.config.LANGUAGES}
-          goToUser={goToUserProfile}
-          isFieldAgent={isFieldAgent}
         />
       ),
       type: intl.formatMessage(userMessages[item.user.role as string]),
@@ -218,7 +204,6 @@ export const GetHistory = ({
                 displayLabel: item.office.name
               } as ISearchLocation)
           }}
-          isFieldAgent={isFieldAgent}
         />
       )
     }))
