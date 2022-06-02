@@ -79,6 +79,7 @@ import {
 import { goToWorkflowStatus, goToCompletenessRates } from '@client/navigation'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
+import { REGISTRAR_ROLES } from '@client/utils/constants'
 
 const Layout = styled.div`
   display: flex;
@@ -206,6 +207,7 @@ interface State {
   toggleStatus: boolean
   queriesLoading: string[]
   officeSelected: boolean
+  isAccessibleOffice: boolean
 }
 
 type IOnlineStatusProps = {
@@ -264,7 +266,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       event: event || Event.BIRTH,
       toggleStatus: false,
       queriesLoading: ['PERFORMANCE_METRICS', 'GET_TOTAL_PAYMENTS'],
-      officeSelected: this.isOfficeSelected(selectedLocation)
+      officeSelected: this.isOfficeSelected(selectedLocation),
+      isAccessibleOffice: this.isAccessibleOfficeSelected(selectedLocation)
     }
   }
 
@@ -278,7 +281,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   componentDidUpdate(_: Props, prevState: State) {
     if (this.state.selectedLocation !== prevState.selectedLocation) {
       this.setState({
-        officeSelected: this.isOfficeSelected(this.state.selectedLocation)
+        officeSelected: this.isOfficeSelected(this.state.selectedLocation),
+        isAccessibleOffice: this.isAccessibleOfficeSelected(
+          this.state.selectedLocation
+        )
       })
     }
   }
@@ -380,10 +386,35 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     return false
   }
 
+  isAccessibleOfficeSelected(selectedLocation?: ISearchLocation) {
+    if (
+      selectedLocation &&
+      this.isOfficeSelected(selectedLocation) &&
+      this.props.userDetails &&
+      this.props.userDetails.role
+    ) {
+      if (this.props.userDetails?.role === 'NATIONAL_REGISTRAR') {
+        return true
+      } else if (
+        REGISTRAR_ROLES.includes(this.props.userDetails?.role) &&
+        this.props.userDetails.primaryOffice?.id === selectedLocation.id
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+
   render() {
     const { intl, isOnline } = this.props
-    const { timeStart, timeEnd, event, toggleStatus, officeSelected } =
-      this.state
+    const {
+      timeStart,
+      timeEnd,
+      event,
+      toggleStatus,
+      officeSelected,
+      isAccessibleOffice
+    } = this.state
     const queryVariablesWithoutLocationId = {
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString(),
@@ -444,13 +475,15 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
 
                       return (
                         <>
-                          <CompletenessReport
-                            data={data!.getTotalMetrics}
-                            selectedEvent={
-                              event.toUpperCase() as 'BIRTH' | 'DEATH'
-                            }
-                            onClickDetails={this.onClickDetails}
-                          />
+                          {!officeSelected && (
+                            <CompletenessReport
+                              data={data!.getTotalMetrics}
+                              selectedEvent={
+                                event.toUpperCase() as 'BIRTH' | 'DEATH'
+                              }
+                              onClickDetails={this.onClickDetails}
+                            />
+                          )}
                           <RegistrationsReport
                             data={data!.getTotalMetrics}
                             selectedEvent={
@@ -669,25 +702,23 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       </LocationStats>
                     )}
 
-                    <RegistrationStatus>
-                      {!isOnline ? (
-                        <></>
-                      ) : loading ? (
-                        <Spinner id="registration-status-loading" />
-                      ) : (
-                        <StatusWiseDeclarationCountView
-                          selectedEvent={this.state.event}
-                          locationId={
-                            isCountry(this.state.selectedLocation)
-                              ? undefined
-                              : this.state.selectedLocation?.id
-                          }
-                          statusMapping={StatusMapping}
-                          data={data.fetchRegistrationCountByStatus}
-                          onClickStatusDetails={this.onClickStatusDetails}
-                        />
-                      )}
-                    </RegistrationStatus>
+                    {officeSelected && isAccessibleOffice && (
+                      <RegistrationStatus>
+                        {!isOnline ? (
+                          <></>
+                        ) : loading ? (
+                          <Spinner id="registration-status-loading" />
+                        ) : (
+                          <StatusWiseDeclarationCountView
+                            selectedEvent={this.state.event}
+                            locationId={this.state.selectedLocation?.id}
+                            statusMapping={StatusMapping}
+                            data={data.fetchRegistrationCountByStatus}
+                            onClickStatusDetails={this.onClickStatusDetails}
+                          />
+                        )}
+                      </RegistrationStatus>
+                    )}
                   </LayoutRight>
                 </>
               )
