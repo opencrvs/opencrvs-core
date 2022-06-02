@@ -1160,7 +1160,7 @@
         "config.printTemplate": "Print",
         "config.downloadTemplate": "Download",
         "config.uploadTemplate": "Upload",
-        "config.listTitle": "Certificates templates",
+        "config.listTitle": "Certificate templates",
         "config.birthTemplate": "Birth certificate",
         "config.deathTemplate": "Death certificate",
         "config.birthDefaultTempDesc": "Default birth certificate template",

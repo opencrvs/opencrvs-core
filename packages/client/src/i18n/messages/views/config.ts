@@ -144,7 +144,7 @@ const messagesToDefine: IConfigMessages = {
   },
   listTitle: {
     id: 'config.listTitle',
-    defaultMessage: 'Certificates templates',
+    defaultMessage: 'Certificate templates',
     description: 'Title for certificates templates list'
   },
   listDetails: {
