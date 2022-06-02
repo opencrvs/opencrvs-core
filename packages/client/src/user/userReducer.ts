@@ -13,8 +13,7 @@ import {
   IForm,
   IFormSectionData,
   UserSection,
-  IFormSection,
-  ISerializedForm
+  IFormSection
 } from '@client/forms'
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'

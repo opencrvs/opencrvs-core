@@ -91,12 +91,6 @@ const graphqlMocks: MockedResponse[] = [
               }
             ],
             fieldType: 'TEXT'
-          },
-          {
-            fieldId: 'birth.child.child-view-group.birthType',
-            enabled: '',
-            required: false,
-            preceedingFieldId: 'birth.child.child-view-group.vaccination'
           }
         ]
       }
