@@ -556,6 +556,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                           />
                         )
                       }
+
+                      return <></>
                     }}
                   </Query>
                 </>
