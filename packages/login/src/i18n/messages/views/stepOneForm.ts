@@ -14,7 +14,7 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 interface IStepOneFormMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   networkError: MessageDescriptor
-  stepOneTitle: MessageDescriptor
+  login: MessageDescriptor
   stepOneInstruction: MessageDescriptor
   submit: MessageDescriptor
   forgotPassword: MessageDescriptor
@@ -31,10 +31,10 @@ const messagesToDefine: IStepOneFormMessages = {
     defaultMessage: 'Unable to connect to server',
     description: 'The error that appears when there is no internet connection'
   },
-  stepOneTitle: {
+  login: {
     id: 'buttons.login',
     defaultMessage: 'Login',
-    description: 'The title that appears in step one of the form'
+    description: 'The label that appears on the login button of the form'
   },
   stepOneInstruction: {
     id: 'login.stepOneInstruction',

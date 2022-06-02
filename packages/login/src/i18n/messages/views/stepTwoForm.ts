@@ -49,7 +49,7 @@ const messagesToDefine: IStepTwoFormMessages = {
   },
   submit: {
     id: 'login.submit',
-    defaultMessage: 'Submit',
+    defaultMessage: 'Verify',
     description: 'The label that appears on the submit button'
   },
   codeSubmissionError: {
