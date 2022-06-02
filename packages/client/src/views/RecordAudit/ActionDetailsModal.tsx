@@ -219,6 +219,10 @@ export const ActionDetailsModalListTable = ({
   const declarationUpdates = dataChange(actionDetailsData)
   const collectorData = certificateCollectorData(actionDetailsData)
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
+  const content = actionDetailsData.comments
+    .map((comment: IDynamicValues) => comment.comment)
+    .concat(actionDetailsData.statusReason?.text || [])
+    .map((comment: string) => ({ comment }))
   return (
     <>
       {/* For Reject Reason */}
@@ -243,9 +247,7 @@ export const ActionDetailsModalListTable = ({
         noResultText=" "
         hideBoxShadow={true}
         columns={commentsColumn}
-        content={actionDetailsData.comments
-          .concat(actionDetailsData.statusReason?.text || [])
-          .map((text: string) => ({ comment: text }))}
+        content={content}
       />
 
       {/* For Data Updated */}
