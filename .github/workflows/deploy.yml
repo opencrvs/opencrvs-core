@@ -17,9 +17,9 @@ on:
         description: Environment to deploy to
         required: true
         options:
-          - production
-          - qa
           - staging
+          - qa
+          - production
       core-image-tag:
         description: Core DockerHub image tag
         required: false
