@@ -62,8 +62,7 @@ export class SecureAccount extends React.Component<{
             <Item margin="50px 0px">
               <Bold>Secure your Account</Bold>
               <p>
-                A personal identification number protects your account. Your pin
-                will be required before each use of the OpenCRVS app.
+                Create a personal identification number to protect your account.
               </p>
             </Item>
 
@@ -72,7 +71,7 @@ export class SecureAccount extends React.Component<{
                 id="createPinBtn"
                 onClick={() => this.setState({ collectPin: true })}
               >
-                CREATE A PIN
+                Create PIN
               </PinButton>
             </Item>
           </Wrapper>
