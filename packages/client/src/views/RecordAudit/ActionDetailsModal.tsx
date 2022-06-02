@@ -33,11 +33,6 @@ import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import { IActionDetailsData } from './History'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 
-const CLinkButton = styled(LinkButton)`
-  width: fit-content;
-  display: inline-block;
-`
-
 interface IActionDetailsModalListTable {
   actionDetailsData: IActionDetailsData
   registerForm: IForm
@@ -114,7 +109,8 @@ export const ActionDetailsModalListTable = ({
     const result: IDynamicValues[] = []
     actionDetailsData.input.forEach((item: { [key: string]: any }) => {
       const editedValue = actionDetailsData.output.find(
-        (oi: { valueId: string }) => oi.valueId === item.valueId
+        (oi: { valueId: string; valueCode: string }) =>
+          oi.valueId === item.valueId && oi.valueCode === item.valueCode
       )
 
       const section = find(
@@ -333,13 +329,7 @@ export const ActionDetailsModal = ({
     >
       <>
         <div>
-          <CLinkButton
-            onClick={() => {
-              goToUser && goToUser(actionDetailsData.user.id)
-            }}
-          >
-            {userName}
-          </CLinkButton>
+          <>{userName}</>
           <span> — {getFormattedDate(actionDetailsData.date)}</span>
         </div>
         <ActionDetailsModalListTable
