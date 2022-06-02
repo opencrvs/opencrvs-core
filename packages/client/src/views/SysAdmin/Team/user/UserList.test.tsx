@@ -347,54 +347,6 @@ describe('User list tests', () => {
           }
         }
       ]
-      it('redirecting to user profile for smaller devices', async () => {
-        Object.defineProperty(window, 'location', {
-          value: { href: 'location:3000/team/users' }
-        })
-        Object.defineProperty(window, 'innerWidth', {
-          writable: true,
-          configurable: true,
-          value: 400
-        })
-        const testComponent = await createTestComponent(
-          <UserList
-            // @ts-ignore
-            location={{
-              search: stringify({
-                locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-              })
-            }}
-          />,
-          { store, history, graphqlMocks: userListMock }
-        )
-
-        // wait for mocked data to load mockedProvider
-        await new Promise((resolve) => {
-          setTimeout(resolve, 100)
-        })
-
-        testComponent.update()
-        component = await waitForElement(
-          testComponent,
-          '#name-link-5d08e102542c7a19fc55b790'
-        )
-        component
-          .find('#name-link-5d08e102542c7a19fc55b790')
-          .hostNodes()
-          .first()
-          .simulate('click')
-
-        // wait for mocked data to load mockedProvider
-        await new Promise((resolve) => {
-          setTimeout(resolve, 100)
-        })
-
-        testComponent.update()
-
-        expect(history.location.pathname).toContain(
-          '/userProfile/5d08e102542c7a19fc55b790'
-        )
-      })
     })
 
     describe('when there is a result from query', () => {
@@ -632,19 +584,6 @@ describe('User list tests', () => {
         menuOptionButton.first().simulate('click')
         component.update()
         expect(component.exists('#user-audit-modal')).toBeTruthy()
-      })
-
-      it('clicking on name link takes to user preview page', async () => {
-        const nameLink = await waitForElement(
-          component,
-          '#name-link-5d08e102542c7a19fc55b790'
-        )
-
-        nameLink.first().simulate('click')
-        await flushPromises()
-        expect(history.location.pathname).toBe(
-          '/userProfile/5d08e102542c7a19fc55b790'
-        )
       })
     })
   })

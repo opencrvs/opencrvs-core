@@ -911,7 +911,8 @@ export async function getTotalMetrics(
           ? `AND ( locationLevel2 = '${locationId}'
       OR locationLevel3 = '${locationId}'
       OR locationLevel4 = '${locationId}'
-      OR locationLevel5 = '${locationId}')`
+      OR locationLevel5 = '${locationId}'
+      OR officeLocation = '${locationId}')`
           : ``
       }
     GROUP BY gender, timeLabel, eventLocationType, practitionerRole`

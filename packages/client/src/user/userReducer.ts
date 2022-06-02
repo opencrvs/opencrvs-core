@@ -355,7 +355,6 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
           ).push({ value: existingRole, types: [existingType] })
         }
       }
-      console.log('data: ', JSON.stringify(data))
       updatedSections.forEach((section) => {
         section.groups.forEach((group) => {
           group.fields = transformRoleDataToDefinitions(

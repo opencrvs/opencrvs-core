@@ -5154,6 +5154,21 @@
                 }
               },
               {
+                "name": "username",
+                "type": "TEXT",
+                "label": {
+                  "defaultMessage": "Username",
+                  "description": "The name of the user name form",
+                  "id": "constants.username"
+                },
+                "previewGroup": "userNameGroup",
+                "required": false,
+                "initialValue": "",
+                "validate": [],
+                "readonly": true,
+                "hidden": true
+              },
+              {
                 "name": "phoneNumber",
                 "type": "TEXT",
                 "label": {
@@ -5528,6 +5543,21 @@
                     ]
                   }
                 }
+              },
+              {
+                "name": "username",
+                "type": "TEXT",
+                "label": {
+                  "defaultMessage": "Username",
+                  "description": "The name of the user name form",
+                  "id": "constants.username"
+                },
+                "previewGroup": "userNameGroup",
+                "required": false,
+                "initialValue": "",
+                "validate": [],
+                "readonly": true,
+                "hidden": true
               },
               {
                 "name": "phoneNumber",
