@@ -638,6 +638,7 @@ export interface GQLHistory {
   reinstated?: boolean
   location?: GQLLocation
   office?: GQLLocation
+  dhis2Notification?: boolean
   comments?: Array<GQLComment | null>
   input?: Array<GQLInputOutput | null>
   output?: Array<GQLInputOutput | null>
@@ -4269,6 +4270,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   reinstated?: HistoryToReinstatedResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
+  dhis2Notification?: HistoryToDhis2NotificationResolver<TParent>
   comments?: HistoryToCommentsResolver<TParent>
   input?: HistoryToInputResolver<TParent>
   output?: HistoryToOutputResolver<TParent>
@@ -4304,6 +4306,13 @@ export interface HistoryToLocationResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToOfficeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToDhis2NotificationResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

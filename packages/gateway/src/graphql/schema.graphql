@@ -762,6 +762,7 @@ type History {
   reinstated: Boolean
   location: Location
   office: Location
+  dhis2Notification: Boolean
   comments: [Comment]
   input: [InputOutput]
   output: [InputOutput]

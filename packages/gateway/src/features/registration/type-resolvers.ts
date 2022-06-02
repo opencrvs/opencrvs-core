@@ -714,6 +714,11 @@ export const typeResolvers: GQLResolver = {
     statusReason: (task: fhir.Task) => task.statusReason || null,
     reason: (task: fhir.Task) => task.reason?.text || null,
     date: (task: fhir.Task) => task.meta?.lastUpdated,
+    dhis2Notification: (task: fhir.Task) =>
+      task.identifier?.some(
+        ({ system }) =>
+          system === `${OPENCRVS_SPECIFICATION_URL}id/dhis2_event_identifier`
+      ),
     user: async (task: fhir.Task, _: any, authHeader: any) => {
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
