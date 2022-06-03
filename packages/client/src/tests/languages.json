@@ -1059,6 +1059,7 @@
         "settings.account.tile": "Account",
         "settings.changeLanguage": "Change language",
         "settings.changeLanguage.success": "Language updated to {language}",
+        "settings.message.changeLanguage": "Your prefered language that you want to use on OpenCRVS",
         "settings.changePassword": "Change password",
         "settings.profile.tile": "Profile",
         "settings.security.tile": "Security",
