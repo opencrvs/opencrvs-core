@@ -71,6 +71,7 @@ type User {
   catchmentArea: [Location]
   localRegistrar: LocalRegistrar
   identifier: Identifier
+  signature: Signature
   creationDate: String
   avatar: Avatar
   device: String
