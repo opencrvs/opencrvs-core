@@ -30,7 +30,7 @@ const ConnectivityContainer = styled.div`
 `
 const NoConnectivity = styled(NoWifi)`
   width: 24px;
-  margin-right: auto;
+  margin: auto;
 `
 const Wrapper = styled.div`
   display: flex;
@@ -66,7 +66,7 @@ const MobileViewContainer = styled.div<{ noDeclaration?: boolean }>`
 
 type IBaseLoadingProps = {
   loading: boolean
-  hasError: boolean
+  hasError?: boolean
   noDeclaration?: boolean
 }
 
