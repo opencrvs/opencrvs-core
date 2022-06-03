@@ -272,7 +272,7 @@ class ReadyForReviewComponent extends React.Component<
           isSorted: this.state.sortedCol === COLUMNS.NAME
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: this.props.intl.formatMessage(constantsMessages.event),
           width: 16,
           key: COLUMNS.EVENT,
           sortFunction: this.onColumnClick,
