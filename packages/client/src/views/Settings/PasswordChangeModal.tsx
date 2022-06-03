@@ -234,7 +234,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
         id="ChangePasswordModal"
         title={intl.formatMessage(messages.changePassword)}
         show={showPasswordChange}
-        fullscreen
+        contentHeight={420}
         actions={[
           <Mutation
             mutation={changePasswordMutation}

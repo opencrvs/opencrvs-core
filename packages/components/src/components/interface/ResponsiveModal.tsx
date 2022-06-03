@@ -20,11 +20,10 @@ const ModalContainer = styled.div<{ fullscreen?: boolean }>`
   left: 0;
   right: 0;
   bottom: 0;
-  padding-top: ${({ fullscreen }) => (fullscreen ? 0 : 160)}px;
   z-index: 5;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding-top: 0px;
   }
