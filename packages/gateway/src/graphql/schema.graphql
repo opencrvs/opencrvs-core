@@ -357,6 +357,7 @@ type User {
   catchmentArea: [Location]
   localRegistrar: LocalRegistrar
   identifier: Identifier
+  signature: Signature
   creationDate: String
   avatar: Avatar
   device: String
@@ -896,6 +897,11 @@ type LocalRegistrar {
   signature: Signature
 }
 
+type Signature {
+  data: String
+  type: String
+}
+
 type SearchFieldAgentResponse {
   practitionerId: String
   fullName: String
@@ -1246,11 +1252,6 @@ enum AttachmentSubject {
   WARD_COUNCILLOR_PROOF
   CAUSE_OF_DEATH
   CORONERS_REPORT
-}
-
-type Signature {
-  data: String
-  type: String
 }
 
 type RegistrationSearchSet {

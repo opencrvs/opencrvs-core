@@ -233,6 +233,7 @@ export interface GQLUser {
   catchmentArea?: Array<GQLLocation | null>
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
+  signature?: GQLSignature
   creationDate?: string
   avatar?: GQLAvatar
   device?: string
@@ -772,6 +773,11 @@ export interface GQLLocalRegistrar {
   signature?: GQLSignature
 }
 
+export interface GQLSignature {
+  data?: string
+  type?: string
+}
+
 export interface GQLSearchFieldAgentResponse {
   practitionerId?: string
   fullName?: string
@@ -1135,11 +1141,6 @@ export const enum GQLAttachmentSubject {
   CORONERS_REPORT = 'CORONERS_REPORT'
 }
 
-export interface GQLSignature {
-  data?: string
-  type?: string
-}
-
 export interface GQLRegistrationSearchSet {
   status?: string
   contactNumber?: string
@@ -1395,6 +1396,7 @@ export interface GQLResolver {
   StatusWiseRegistrationCount?: GQLStatusWiseRegistrationCountTypeResolver
   Identifier?: GQLIdentifierTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
+  Signature?: GQLSignatureTypeResolver
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
@@ -1415,7 +1417,6 @@ export interface GQLResolver {
   StatusReason?: GQLStatusReasonTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
-  Signature?: GQLSignatureTypeResolver
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
@@ -3175,6 +3176,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
   identifier?: UserToIdentifierResolver<TParent>
+  signature?: UserToSignatureResolver<TParent>
   creationDate?: UserToCreationDateResolver<TParent>
   avatar?: UserToAvatarResolver<TParent>
   device?: UserToDeviceResolver<TParent>
@@ -3240,6 +3242,10 @@ export interface UserToLocalRegistrarResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToIdentifierResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToSignatureResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4616,6 +4622,19 @@ export interface LocalRegistrarToSignatureResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLSignatureTypeResolver<TParent = any> {
+  data?: SignatureToDataResolver<TParent>
+  type?: SignatureToTypeResolver<TParent>
+}
+
+export interface SignatureToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SignatureToTypeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLSearchFieldAgentResponseTypeResolver<TParent = any> {
   practitionerId?: SearchFieldAgentResponseToPractitionerIdResolver<TParent>
   fullName?: SearchFieldAgentResponseToFullNameResolver<TParent>
@@ -5126,19 +5145,6 @@ export interface InputOutputToValueStringResolver<
   TParent = any,
   TResult = any
 > {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLSignatureTypeResolver<TParent = any> {
-  data?: SignatureToDataResolver<TParent>
-  type?: SignatureToTypeResolver<TParent>
-}
-
-export interface SignatureToDataResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface SignatureToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
