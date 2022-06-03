@@ -395,7 +395,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     ) {
       if (
         this.props.userDetails?.role === 'NATIONAL_REGISTRAR' ||
-        'NATIONAL_SYSTEM_ADMIN'
+        this.props.userDetails?.role === 'NATIONAL_SYSTEM_ADMIN'
       ) {
         return true
       } else if (
