@@ -140,6 +140,11 @@ const messagesToDefine = {
     defaultMessage: 'Registrars',
     description: 'Label for registrars in application sources'
   },
+  performanceNationalRegistrarsApplicationsLabel: {
+    id: 'performance.appSrc.labels.nationalRegistrars',
+    defaultMessage: 'National Registrars',
+    description: 'Label for national registrars in application sources'
+  },
   performanceRegistrationAgentsApplicationsLabel: {
     id: 'performance.appSrc.labels.registrationAgents',
     defaultMessage: 'Registration agents',
