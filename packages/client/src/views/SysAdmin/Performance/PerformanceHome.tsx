@@ -638,7 +638,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   </>
                 )
               }
-
+              if (!data) return <></>
               return (
                 <>
                   <ResponsiveModal
