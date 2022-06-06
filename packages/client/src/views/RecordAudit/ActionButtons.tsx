@@ -284,6 +284,7 @@ export const ShowReviewButton = ({
   if (
     role &&
     type &&
+    role in reviewButtonRoleStatusMap &&
     reviewButtonRoleStatusMap[role].includes(declaration?.status as string) &&
     showActionButton
   ) {
