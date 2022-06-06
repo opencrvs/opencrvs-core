@@ -395,10 +395,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       this.props.userDetails &&
       this.props.userDetails.role
     ) {
-      if (
-        this.props.userDetails?.role === 'NATIONAL_REGISTRAR' ||
-        this.props.userDetails?.role === 'NATIONAL_SYSTEM_ADMIN'
-      ) {
+      if (this.props.userDetails?.role === 'NATIONAL_REGISTRAR') {
         return true
       } else if (
         REGISTRAR_ROLES.includes(this.props.userDetails?.role) &&
@@ -509,6 +506,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                           />
                           <AppSources
                             data={data!.getTotalMetrics}
+                            isAccessibleOffice={this.state.isAccessibleOffice}
                             locationId={
                               isCountry(this.state.selectedLocation)
                                 ? undefined
@@ -628,8 +626,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 'WAITING_VALIDATION',
                 'REGISTERED'
               ],
-              officeSelected: this.state.officeSelected,
-              showStatusCount: this.state.officeSelected && isAccessibleOffice
+              officeSelected: this.state.officeSelected
             }}
             fetchPolicy="no-cache"
           >
@@ -657,11 +654,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         <>
                           <StatusWiseDeclarationCountView
                             selectedEvent={this.state.event}
-                            locationId={
-                              isCountry(this.state.selectedLocation)
-                                ? undefined
-                                : this.state.selectedLocation?.id
-                            }
+                            isAccessibleOffice={this.state.isAccessibleOffice}
                             statusMapping={StatusMapping}
                             data={data.fetchRegistrationCountByStatus}
                             onClickStatusDetails={this.onClickStatusDetails}
@@ -711,23 +704,21 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       </LocationStats>
                     )}
 
-                    {officeSelected && isAccessibleOffice && (
-                      <RegistrationStatus>
-                        {!isOnline ? (
-                          <></>
-                        ) : loading ? (
-                          <Spinner id="registration-status-loading" />
-                        ) : (
-                          <StatusWiseDeclarationCountView
-                            selectedEvent={this.state.event}
-                            locationId={this.state.selectedLocation?.id}
-                            statusMapping={StatusMapping}
-                            data={data.fetchRegistrationCountByStatus}
-                            onClickStatusDetails={this.onClickStatusDetails}
-                          />
-                        )}
-                      </RegistrationStatus>
-                    )}
+                    <RegistrationStatus>
+                      {!isOnline ? (
+                        <></>
+                      ) : loading ? (
+                        <Spinner id="registration-status-loading" />
+                      ) : (
+                        <StatusWiseDeclarationCountView
+                          selectedEvent={this.state.event}
+                          isAccessibleOffice={this.state.isAccessibleOffice}
+                          statusMapping={StatusMapping}
+                          data={data.fetchRegistrationCountByStatus}
+                          onClickStatusDetails={this.onClickStatusDetails}
+                        />
+                      )}
+                    </RegistrationStatus>
                   </LayoutRight>
                 </>
               )

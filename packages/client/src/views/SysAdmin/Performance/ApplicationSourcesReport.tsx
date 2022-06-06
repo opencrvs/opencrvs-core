@@ -32,6 +32,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult
   locationId?: string
+  isAccessibleOffice: boolean
   timeStart: string
   timeEnd: string
 }
@@ -42,10 +43,9 @@ interface IDispatchProps {
 export function ApplicationSourcesReport(
   props: ApplicationSourcesProps & IDispatchProps
 ) {
-  const { data, locationId } = props
+  const { data, isAccessibleOffice } = props
   const intl = useIntl()
   const userDetails = useSelector(getUserDetails)
-  const ownOffice = userDetails?.primaryOffice?.id === locationId
 
   return (
     <ListContainer>
@@ -88,7 +88,7 @@ export function ApplicationSourcesReport(
             </PerformanceValue>
           }
           actions={
-            ownOffice && (
+            isAccessibleOffice && (
               <LinkButton
                 id="field-agent-list-view"
                 onClick={() =>
