@@ -415,7 +415,7 @@ export const getGQLDeclaration = (
   }
 }
 
-export const getDisplayItems = (
+export const getPageItems = (
   currentPage: number,
   pageSize: number,
   allData: IDynamicValues
@@ -425,8 +425,8 @@ export const getDisplayItems = (
   }
 
   const offset = (currentPage - 1) * pageSize
-  const displayItems = allData.slice(offset, offset + pageSize)
-  return displayItems
+  const pageItems = allData.slice(offset, offset + pageSize)
+  return pageItems
 }
 
 export const getStatusLabel = (
