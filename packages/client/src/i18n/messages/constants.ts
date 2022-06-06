@@ -87,6 +87,9 @@ interface IConstantsMessages
   performanceTitle: MessageDescriptor
   reason: MessageDescriptor
   registered: MessageDescriptor
+  inReviewStatus: MessageDescriptor
+  incompleteStatus: MessageDescriptor
+  requiresUpdatesStatus: MessageDescriptor
   rejected: MessageDescriptor
   rejectedDays: MessageDescriptor
   relationship: MessageDescriptor
@@ -152,6 +155,8 @@ interface IConstantsMessages
   requireUpdatesLoading: MessageDescriptor
   noRecords: MessageDescriptor
   noConnection: MessageDescriptor
+  action: MessageDescriptor
+  date: MessageDescriptor
   totalFileSizeExceed: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
@@ -302,6 +307,16 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'By',
     description: 'Label for By (the person who performed the action)',
     id: 'constants.by'
+  },
+  action: {
+    defaultMessage: 'Action',
+    description: 'Action Label',
+    id: 'constants.label.action'
+  },
+  date: {
+    defaultMessage: 'Date',
+    description: 'Date Label',
+    id: 'constants.label.date'
   },
   certificationPaymentTitle: {
     defaultMessage:
@@ -546,6 +561,21 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Registered',
     description: 'A label for registered',
     id: 'constants.registered'
+  },
+  inReviewStatus: {
+    defaultMessage: 'In Review',
+    description: 'A label for In Review',
+    id: 'constants.inReview.status'
+  },
+  incompleteStatus: {
+    defaultMessage: 'Incomplete',
+    description: 'A label for Incomplete',
+    id: 'constants.incomplete.status'
+  },
+  requiresUpdatesStatus: {
+    defaultMessage: 'Requires updates',
+    description: 'A label for Requires updates',
+    id: 'constants.requiresUpdates.status'
   },
   rejected: {
     defaultMessage: 'rejected',

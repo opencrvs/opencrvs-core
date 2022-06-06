@@ -74,9 +74,9 @@ export const DECLARATION_STATUS_LABEL: IStatus = {
     id: 'recordAudit.history.started'
   },
   REINSTATED: {
-    defaultMessage: 'Reinstated to ',
+    defaultMessage: 'Reinstated to {status}',
     description: 'The prefix for reinstated declaration',
-    id: 'recordAudit.history.reinstated.prefix'
+    id: 'recordAudit.history.reinstated'
   },
   ARCHIVED: {
     defaultMessage: 'Archived',
@@ -435,14 +435,17 @@ export const getStatusLabel = (
   intl: IntlShape,
   userDetails: IUserDetails
 ) => {
-  if (status in DECLARATION_STATUS_LABEL)
-    return (reinstated
-      ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'])
-      : '') +
-      status ===
-      'DECLARED'
+  const label =
+    status === 'DECLARED'
       ? findMessage(status, userDetails.role ? userDetails.role : '', intl)
       : intl.formatMessage(DECLARATION_STATUS_LABEL[status])
+  if (status in DECLARATION_STATUS_LABEL)
+    return reinstated
+      ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'], {
+          status: label
+        })
+      : label
+
   return ''
 }
 
