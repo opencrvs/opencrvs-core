@@ -565,7 +565,7 @@ function UserListComponent(props: IProps) {
                   {!getViewOnly(locationId, userDetails, false) && (
                     <AddUserContainer id="add-user" onClick={onClickAddUser}>
                       <AddUserIcon />
-                      {' New user'}
+                      {intl.formatMessage(messages.newUser)}
                     </AddUserContainer>
                   )}
                 </TableHeader>
