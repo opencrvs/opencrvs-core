@@ -2043,7 +2043,7 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.uploadFile'
   },
   fileUploadError: {
-    defaultMessage: '{type} supported only',
+    defaultMessage: '{type} supported image only',
     description: 'text for error on file upload',
     id: 'form.field.label.fileUploadError'
   },

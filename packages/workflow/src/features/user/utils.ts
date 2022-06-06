@@ -14,9 +14,6 @@ import fetch from 'node-fetch'
 import { callingCountries } from 'country-data'
 import { getTokenPayload } from '@workflow/utils/authUtils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
-const JURISDICTION_TYPE_DISTRICT = 'district'
-const JURISDICTION_TYPE_UPAZILA = 'upazila'
-const JURISDICTION_TYPE_UNION = 'union'
 
 export async function getUser(
   userId: string,
@@ -200,23 +197,6 @@ export async function getPractitionerLocations(
     locList.push(locationResponse)
   }
   return locList as [fhir.Location]
-}
-
-export function getJurisDictionalLocations() {
-  return [
-    {
-      jurisdictionType: JURISDICTION_TYPE_DISTRICT,
-      bbsCode: ''
-    },
-    {
-      jurisdictionType: JURISDICTION_TYPE_UPAZILA,
-      bbsCode: ''
-    },
-    {
-      jurisdictionType: JURISDICTION_TYPE_UNION,
-      bbsCode: ''
-    }
-  ]
 }
 
 export function getPractitionerRef(practitioner: fhir.Practitioner): string {

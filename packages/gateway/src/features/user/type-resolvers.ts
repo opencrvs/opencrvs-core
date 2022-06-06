@@ -202,6 +202,22 @@ export const userTypeResolvers: GQLResolver = {
           data: signature.blob
         }
       }
+    },
+    async signature(userModel: IUserModelData, _, authHeader) {
+      const practitioner: fhir.Practitioner = await fetchFHIR(
+        `/Practitioner/${userModel.practitionerId}`,
+        authHeader
+      )
+
+      const signatureExtension = getSignatureExtension(practitioner.extension)
+
+      const signature = signatureExtension && signatureExtension.valueSignature
+      return (
+        signature && {
+          type: signature.contentType,
+          data: signature.blob
+        }
+      )
     }
   }
 }

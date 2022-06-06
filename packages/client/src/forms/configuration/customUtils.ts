@@ -109,12 +109,11 @@ export function createCustomField(
   if (
     baseField.type === 'TEXT' ||
     baseField.type === 'NUMBER' ||
-    baseField.type === 'TEXTAREA'
+    baseField.type === 'TEXTAREA' ||
+    baseField.type === 'TEL'
   ) {
     baseField.required = question.required
-    baseField.placeholder = getDefaultLanguageMessage(
-      question.placeholder
-    ) as MessageDescriptor
+    baseField.placeholder = getDefaultLanguageMessage(question.placeholder)
   }
   if (baseField.type === 'TEL') {
     baseField.validate = [

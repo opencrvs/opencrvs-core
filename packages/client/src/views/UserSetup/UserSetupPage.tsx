@@ -26,6 +26,8 @@ import {
   IProtectedAccountSetupData
 } from '@client/components/ProtectedAccount'
 import { messages } from '@client/i18n/messages/views/userSetup'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 export const Page = styled.div`
   ${({ theme }) => theme.fonts.regularFont};
@@ -87,6 +89,7 @@ interface IOwnProps {
 
 interface IStateData {
   userDetails: IUserDetails | null
+  offlineCountryConfig: IOfflineData
 }
 
 type IUserSetupPageProp = IOwnProps & IStateData
@@ -95,7 +98,11 @@ export class UserSetupView extends React.Component<
   IUserSetupPageProp & IntlShapeProps
 > {
   render() {
-    const { intl, userDetails, goToStep } = this.props
+    const { intl, userDetails, goToStep, offlineCountryConfig } = this.props
+    console.log(
+      'offlineCountryConfig.config.APPLICATION_NAME',
+      offlineCountryConfig.config.APPLICATION_NAME
+    )
 
     return (
       <Page>
@@ -104,7 +111,9 @@ export class UserSetupView extends React.Component<
             <LightLogo />
           </LogoContainer>
           <TitleHolder>
-            {intl.formatMessage(messages.userSetupWelcomeTitle)}
+            {intl.formatMessage(messages.userSetupWelcomeTitle, {
+              applicationName: offlineCountryConfig.config.APPLICATION_NAME
+            })}
           </TitleHolder>
           <InfoHolder>
             <NameHolder id="user-setup-name-holder">
@@ -152,7 +161,8 @@ export class UserSetupView extends React.Component<
 export const UserSetupPage = connect<IStateData, {}, IOwnProps, IStoreState>(
   (state: IStoreState) => {
     return {
-      userDetails: getUserDetails(state)
+      userDetails: getUserDetails(state),
+      offlineCountryConfig: getOfflineData(state)
     }
   }
 )(injectIntl(UserSetupView))

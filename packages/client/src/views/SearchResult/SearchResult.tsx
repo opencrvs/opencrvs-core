@@ -32,8 +32,7 @@ import {
   goToDeclarationRecordAudit,
   goToEvents as goToEventsAction,
   goToPage as goToPageAction,
-  goToPrintCertificate as goToPrintCertificateAction,
-  goToReviewDuplicate as goToReviewDuplicateAction
+  goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
@@ -55,7 +54,6 @@ import {
   ColumnContentAlignment,
   GridTable,
   IAction,
-  Loader,
   COLUMNS
 } from '@opencrvs/components/lib/interface'
 
@@ -76,6 +74,7 @@ import {
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -143,7 +142,6 @@ interface IBaseSearchResultProps {
   userDetails: IUserDetails | null
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
-  goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
@@ -307,14 +305,12 @@ export class SearchResultView extends React.Component<
                 ? this.props.intl.formatMessage(constantsMessages.update)
                 : this.props.intl.formatMessage(constantsMessages.review),
             handler: () =>
-              !isDuplicate
-                ? this.props.goToPage(
-                    REVIEW_EVENT_PARENT_FORM_PAGE,
-                    reg.id,
-                    'review',
-                    reg.event.toLowerCase()
-                  )
-                : this.props.goToReviewDuplicate(reg.id),
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.id,
+                'review',
+                reg.event.toLowerCase()
+              ),
             disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
           })
         }
@@ -367,9 +363,7 @@ export class SearchResultView extends React.Component<
           isBoldLink={true}
           id={`name_${index}`}
           onClick={() =>
-            isDuplicate
-              ? this.props.goToReviewDuplicate(reg.id)
-              : this.props.goToDeclarationRecordAudit('search', reg.id)
+            this.props.goToDeclarationRecordAudit('search', reg.id)
           }
         >
           {reg.name}
@@ -378,9 +372,7 @@ export class SearchResultView extends React.Component<
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            isDuplicate
-              ? this.props.goToReviewDuplicate(reg.id)
-              : this.props.goToDeclarationRecordAudit('search', reg.id)
+            this.props.goToDeclarationRecordAudit('search', reg.id)
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -451,31 +443,10 @@ export class SearchResultView extends React.Component<
                 fetchPolicy="no-cache"
               >
                 {({ loading, error, data }) => {
-                  if (loading) {
-                    return (
-                      <Loader
-                        id="search_loader"
-                        marginPercent={35}
-                        loadingText={intl.formatMessage(messages.searchingFor, {
-                          param: searchText
-                        })}
-                      />
-                    )
-                  }
+                  const total = loading
+                    ? -1
+                    : data?.searchEvents?.results?.length || 0
 
-                  if (error || !data?.searchEvents) {
-                    return (
-                      <ErrorText id="search-result-error-text">
-                        {intl.formatMessage(errorMessages.queryError)}
-                      </ErrorText>
-                    )
-                  }
-
-                  const total =
-                    (data.searchEvents &&
-                      data.searchEvents.results &&
-                      data.searchEvents.results.length) ||
-                    0
                   return (
                     <WQContentWrapper
                       title={intl.formatMessage(messages.searchResultFor, {
@@ -486,26 +457,37 @@ export class SearchResultView extends React.Component<
                         this.state.width < this.props.theme.grid.breakpoints.lg
                       }
                     >
-                      {total > 0 && (
-                        <>
-                          <ReactTooltip id="validateTooltip">
-                            <ToolTipContainer>
-                              {this.props.intl.formatMessage(
-                                registrarHomeMessages.validatedDeclarationTooltipForRegistrar
+                      {loading ? (
+                        <div id="search_loader">
+                          <LoadingIndicator loading={true} />
+                        </div>
+                      ) : error ? (
+                        <ErrorText id="search-result-error-text">
+                          {intl.formatMessage(errorMessages.queryError)}
+                        </ErrorText>
+                      ) : (
+                        data?.searchEvents &&
+                        total > 0 && (
+                          <>
+                            <ReactTooltip id="validateTooltip">
+                              <ToolTipContainer>
+                                {this.props.intl.formatMessage(
+                                  registrarHomeMessages.validatedDeclarationTooltipForRegistrar
+                                )}
+                              </ToolTipContainer>
+                            </ReactTooltip>
+                            <GridTable
+                              content={this.transformSearchContent(
+                                data.searchEvents
                               )}
-                            </ToolTipContainer>
-                          </ReactTooltip>
-                          <GridTable
-                            content={this.transformSearchContent(
-                              data.searchEvents
-                            )}
-                            columns={this.getColumns()}
-                            noResultText={intl.formatMessage(
-                              constantsMessages.noResults
-                            )}
-                            hideLastBorder={true}
-                          />
-                        </>
+                              columns={this.getColumns()}
+                              noResultText={intl.formatMessage(
+                                constantsMessages.noResults
+                              )}
+                              hideLastBorder={true}
+                            />
+                          </>
+                        )
                       )}
                     </WQContentWrapper>
                   )
@@ -528,7 +510,6 @@ export const SearchResult = connect(
   {
     goToEvents: goToEventsAction,
     goToPage: goToPageAction,
-    goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction,
     goToDeclarationRecordAudit
   }

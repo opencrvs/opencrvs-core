@@ -21,22 +21,17 @@ import {
 import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
-import {
-  IApplicationConfig,
-  referenceApi,
-  ICertificateTemplateData
-} from '@client/utils/referenceApi'
+import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
-import { IFormConfig, IQuestionConfig } from '@client/forms'
-import { isOfflineDataLoaded, isNationalSystemAdmin } from './selectors'
+import { Event, IFormConfig, IQuestionConfig } from '@client/forms'
+import { isOfflineDataLoaded } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
 import { find, merge } from 'lodash'
-
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
@@ -367,34 +362,35 @@ function reducer(
       const { certificates, config, formConfig } = action.payload
       merge(window.config, config)
       let newOfflineData
-      const birthCertificateTemplate = find(certificates, {
-        event: 'birth',
-        status: 'ACTIVE'
-      })
+      const birthCertificateTemplate = certificates.find(
+        ({ event, status }) => event === Event.BIRTH && status === 'ACTIVE'
+      )
 
-      const deathCertificateTemplate = find(certificates, {
-        event: 'death',
-        status: 'ACTIVE'
-      })
+      const deathCertificateTemplate = certificates.find(
+        ({ event, status }) => event === Event.DEATH && status === 'ACTIVE'
+      )
 
       if (birthCertificateTemplate && deathCertificateTemplate) {
         const certificatesTemplates = {
-          birth: { svgCode: birthCertificateTemplate.svgCode },
-          death: { svgCode: deathCertificateTemplate.svgCode }
+          birth: {
+            id: birthCertificateTemplate.id,
+            definition: birthCertificateTemplate.svgCode,
+            fileName: birthCertificateTemplate.svgFilename,
+            lastModifiedDate: birthCertificateTemplate.svgDateUpdated
+          },
+          death: {
+            id: deathCertificateTemplate.id,
+            definition: deathCertificateTemplate.svgCode,
+            fileName: deathCertificateTemplate.svgFilename,
+            lastModifiedDate: deathCertificateTemplate.svgDateUpdated
+          }
         }
         newOfflineData = {
           ...state.offlineData,
           config,
           formConfig,
           templates: {
-            certificates: {
-              birth: {
-                definition: certificatesTemplates.birth.svgCode
-              },
-              death: {
-                definition: certificatesTemplates.death.svgCode
-              }
-            }
+            certificates: certificatesTemplates
           }
         }
       } else {
@@ -492,7 +488,12 @@ function reducer(
 
       const offices = filterLocations(
         action.payload,
-        LocationType.CRVS_OFFICE,
+        LocationType.CRVS_OFFICE
+        /*
+
+        // This is used to filter office locations available offline
+        // It was important in an older design and may become important again
+
         {
           locationLevel: 'id',
           locationId: isNationalSystemAdmin(state.userDetails)
@@ -500,7 +501,7 @@ function reducer(
             : state.userDetails &&
               state.userDetails.primaryOffice &&
               state.userDetails.primaryOffice.id
-        }
+        }*/
       )
       return {
         ...state,

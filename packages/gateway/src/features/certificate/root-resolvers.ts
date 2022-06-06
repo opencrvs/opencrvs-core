@@ -58,7 +58,9 @@ export const resolvers: GQLResolver = {
       // Only natlsysadmin should be able to create certificate
       if (!hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(
-          new Error('Create certificate is only allowed for natlsysadmin')
+          new Error(
+            'Create or update certificate is only allowed for natlsysadmin'
+          )
         )
       }
 

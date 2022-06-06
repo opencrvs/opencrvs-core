@@ -133,6 +133,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contact
         contactRelationship
         contactPhoneNumber
+        duplicates
         attachments {
           data
           type
@@ -181,6 +182,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         date
         action
         reinstated
+        dhis2Notification
         statusReason {
           text
         }
@@ -418,6 +420,7 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         date
         action
         reinstated
+        dhis2Notification
         statusReason {
           text
         }

@@ -816,9 +816,9 @@
                   "customisable": false,
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in English",
-                    "description": "Label for form field: First names in english",
-                    "id": "form.field.label.childFirstNamesEng"
+                    "defaultMessage": "নামের প্রথমাংশ বাংলায়",
+                    "description": "Label for form field: First names",
+                    "id": "form.field.label.childFirstNames"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -830,7 +830,7 @@
                   ],
                   "mapping": {
                     "template": {
-                      "fieldName": "informantFirstName",
+                      "fieldName": "childFirstName",
                       "operation": "nameToFieldTransformer",
                       "parameters": [
                         "en",
@@ -859,9 +859,9 @@
                   "customisable": false,
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in English",
-                    "description": "Label for form field: Family name in english",
-                    "id": "form.field.label.childFamilyNameEng"
+                    "defaultMessage": "নামের শেষাংশ বাংলায়",
+                    "description": "Label for form field: Family name",
+                    "id": "form.field.label.childFamilyName"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -873,7 +873,7 @@
                   ],
                   "mapping": {
                     "template": {
-                      "fieldName": "informantFamilyName",
+                      "fieldName": "childFamilyName",
                       "operation": "nameToFieldTransformer",
                       "parameters": [
                         "en",
@@ -1453,7 +1453,7 @@
                   "label": {
                     "defaultMessage": "First name(s)",
                     "description": "Label for form field: Given names",
-                    "id": "form.field.label.childFirstNamesEng"
+                    "id": "form.field.label.childFirstNames"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -1500,7 +1500,7 @@
                   "label": {
                     "defaultMessage": "Last name",
                     "description": "Label for form field: Last name in english",
-                    "id": "form.field.label.childFamilyNameEng"
+                    "id": "form.field.label.childFamilyName"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -4614,9 +4614,9 @@
                   "previewGroup": "informantNameInEnglish",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in English",
-                    "description": "Label for form field: First names in english",
-                    "id": "form.field.label.childFirstNamesEng"
+                    "defaultMessage": "নামের প্রথমাংশ বাংলায়",
+                    "description": "Label for form field: First names",
+                    "id": "form.field.label.childFirstNames"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -4661,9 +4661,9 @@
                   "previewGroup": "informantNameInEnglish",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in English",
-                    "description": "Label for form field: Family name in english",
-                    "id": "form.field.label.childFamilyNameEng"
+                    "defaultMessage": "নামের শেষাংশ বাংলায়",
+                    "description": "Label for form field: Family name",
+                    "id": "form.field.label.childFamilyName"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -5154,6 +5154,21 @@
                 }
               },
               {
+                "name": "username",
+                "type": "TEXT",
+                "label": {
+                  "defaultMessage": "Username",
+                  "description": "The name of the user name form",
+                  "id": "constants.username"
+                },
+                "previewGroup": "userNameGroup",
+                "required": false,
+                "initialValue": "",
+                "validate": [],
+                "readonly": true,
+                "hidden": true
+              },
+              {
                 "name": "phoneNumber",
                 "type": "TEXT",
                 "label": {
@@ -5528,6 +5543,21 @@
                     ]
                   }
                 }
+              },
+              {
+                "name": "username",
+                "type": "TEXT",
+                "label": {
+                  "defaultMessage": "Username",
+                  "description": "The name of the user name form",
+                  "id": "constants.username"
+                },
+                "previewGroup": "userNameGroup",
+                "required": false,
+                "initialValue": "",
+                "validate": [],
+                "readonly": true,
+                "hidden": true
               },
               {
                 "name": "phoneNumber",

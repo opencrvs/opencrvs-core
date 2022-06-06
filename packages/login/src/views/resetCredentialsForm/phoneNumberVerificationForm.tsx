@@ -129,9 +129,6 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
                 messages.phoneNumberConfirmationFormBodyHeader
               )}
             </Title>
-            {intl.formatMessage(
-              messages.phoneNumberConfirmationFormBodySubheader
-            )}
 
             <Actions id="phone-number-verification">
               <InputField

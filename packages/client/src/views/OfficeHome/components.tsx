@@ -32,6 +32,7 @@ const Flex = styled.div`
 
 export const NameContainer = styled(LinkButton)`
   height: auto;
+  margin-left: 0;
   div {
     padding: 0;
   }
@@ -40,7 +41,6 @@ export const NameContainer = styled(LinkButton)`
 export const NoNameContainer = styled.span`
   color: ${({ theme }) => theme.colors.negative};
   cursor: pointer;
-  padding: 0 8px;
   &:hover {
     color: ${({ theme }) => theme.colors.negative};
     text-decoration-line: underline;

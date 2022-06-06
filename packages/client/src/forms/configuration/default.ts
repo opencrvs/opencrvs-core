@@ -633,7 +633,7 @@ export const registerForms: IDefaultRegisterForms = {
                 previewGroup: 'childNameInEnglish',
                 customisable: false,
                 type: 'TEXT',
-                label: formMessageDescriptors.childFirstNamesEng,
+                label: formMessageDescriptors.childFirstNames,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -644,7 +644,7 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 mapping: {
                   template: {
-                    fieldName: 'informantFirstName',
+                    fieldName: 'childFirstName',
                     operation: 'nameToFieldTransformer',
                     parameters: ['en', 'firstNames']
                   },
@@ -663,7 +663,7 @@ export const registerForms: IDefaultRegisterForms = {
                 previewGroup: 'childNameInEnglish',
                 customisable: false,
                 type: 'TEXT',
-                label: formMessageDescriptors.childFamilyNameEng,
+                label: formMessageDescriptors.childFamilyName,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -674,7 +674,7 @@ export const registerForms: IDefaultRegisterForms = {
                 ],
                 mapping: {
                   template: {
-                    fieldName: 'informantFamilyName',
+                    fieldName: 'childFamilyName',
                     operation: 'nameToFieldTransformer',
                     parameters: ['en', 'familyName']
                   },
@@ -1097,7 +1097,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: {
                   defaultMessage: 'First name(s)',
                   description: 'Label for form field: Given names',
-                  id: 'form.field.label.childFirstNamesEng'
+                  id: 'form.field.label.childFirstNames'
                 },
                 maxLength: 32,
                 required: true,
@@ -1138,7 +1138,7 @@ export const registerForms: IDefaultRegisterForms = {
                 label: {
                   defaultMessage: 'Last name',
                   description: 'Label for form field: Last name in english',
-                  id: 'form.field.label.childFamilyNameEng'
+                  id: 'form.field.label.childFamilyName'
                 },
                 maxLength: 32,
                 required: true,
@@ -3595,7 +3595,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'firstNamesEng',
                 previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
-                label: formMessageDescriptors.childFirstNamesEng,
+                label: formMessageDescriptors.childFirstNames,
                 maxLength: 32,
                 required: true,
                 initialValue: '',
@@ -3632,7 +3632,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'familyNameEng',
                 previewGroup: 'informantNameInEnglish',
                 type: 'TEXT',
-                label: formMessageDescriptors.childFamilyNameEng,
+                label: formMessageDescriptors.childFamilyName,
                 maxLength: 32,
                 required: true,
                 initialValue: '',

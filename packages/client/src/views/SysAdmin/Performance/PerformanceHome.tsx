@@ -61,7 +61,6 @@ import { GET_TOTAL_PAYMENTS } from '@client/views/SysAdmin/Performance/queries'
 import { PaymentsAmountComponent } from '@client/views/SysAdmin/Performance/PaymentsAmountComponent'
 import { CertificationRatesReport } from '@client/views/SysAdmin/Performance/CertificationRatesReport'
 import {
-  certificationRatesDummyData,
   StatusMapping,
   getAdditionalLocations,
   CompletenessRateTime,
@@ -71,7 +70,6 @@ import {
 } from '@client/views/SysAdmin/Performance/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import { CorrectionsReport } from '@client/views/SysAdmin/Performance/CorrectionsReport'
-
 import { AppSources } from './ApplicationSourcesReport'
 import { LocationStatsView } from './LocationStatsView'
 import {
@@ -79,12 +77,13 @@ import {
   StatusWiseDeclarationCountView
 } from './reports/operational/StatusWiseDeclarationCountView'
 import { goToWorkflowStatus, goToCompletenessRates } from '@client/navigation'
-import { DocumentNode } from 'graphql'
+import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import { NoWifi } from '@opencrvs/components/lib/icons'
+import { REGISTRAR_ROLES } from '@client/utils/constants'
 
 const Layout = styled.div`
   display: flex;
   width: 100%;
-
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
     flex-direction: column;
   }
@@ -92,8 +91,8 @@ const Layout = styled.div`
 `
 const LayoutLeft = styled.div`
   flex-grow: 1;
-
   & > div {
+    min-height: 80vh;
     flex-grow: 1;
     @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
       width: auto;
@@ -103,6 +102,9 @@ const LayoutLeft = styled.div`
     @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
       max-width: none;
       margin-bottom: 24px;
+    }
+    @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+      min-height: 100vh;
     }
   }
 
@@ -139,6 +141,7 @@ const LocationStats = styled(Box)`
   margin: 0 auto;
   width: 100%;
   height: auto;
+  flex-basis: 20vh;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     border: 0;
     padding: 0;
@@ -147,6 +150,7 @@ const LocationStats = styled(Box)`
 const RegistrationStatus = styled(Box)`
   width: 100%;
   height: auto;
+  flex-basis: 48vh;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     border: 0;
     padding: 0;
@@ -156,6 +160,23 @@ const RegistrationStatus = styled(Box)`
 const Devider = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   margin-bottom: 16px;
+`
+
+const ConnectivityContainer = styled.div`
+  justify-content: center;
+  gap: 8px;
+  display: flex;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-top: 12px;
+  }
+`
+const NoConnectivity = styled(NoWifi)`
+  width: 24px;
+`
+
+const Text = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  text-align: center;
 `
 interface IConnectProps {
   locations: { [key: string]: ILocation }
@@ -185,6 +206,12 @@ interface State {
   timeEnd: Date
   toggleStatus: boolean
   queriesLoading: string[]
+  officeSelected: boolean
+  isAccessibleOffice: boolean
+}
+
+type IOnlineStatusProps = {
+  isOnline: boolean
 }
 
 interface IDispatchProps {
@@ -194,6 +221,7 @@ interface IDispatchProps {
 
 type Props = WrappedComponentProps &
   IDispatchProps &
+  IOnlineStatusProps &
   RouteComponentProps & { userDetails: IUserDetails | null } & IConnectProps & {
     theme: ITheme
   }
@@ -237,7 +265,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
       event: event || Event.BIRTH,
       toggleStatus: false,
-      queriesLoading: ['PERFORMANCE_METRICS', 'GET_TOTAL_PAYMENTS']
+      queriesLoading: ['PERFORMANCE_METRICS', 'GET_TOTAL_PAYMENTS'],
+      officeSelected: this.isOfficeSelected(selectedLocation),
+      isAccessibleOffice: this.isAccessibleOfficeSelected(selectedLocation)
     }
   }
 
@@ -246,6 +276,17 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
     window.__localeId__ = this.props.intl.locale
 
     this.state = this.transformPropsToState(props)
+  }
+
+  componentDidUpdate(_: Props, prevState: State) {
+    if (this.state.selectedLocation !== prevState.selectedLocation) {
+      this.setState({
+        officeSelected: this.isOfficeSelected(this.state.selectedLocation),
+        isAccessibleOffice: this.isAccessibleOfficeSelected(
+          this.state.selectedLocation
+        )
+      })
+    }
   }
 
   togglePerformanceStatus = () => {
@@ -335,9 +376,48 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
   isQueriesInProgress = () => {
     return this.state.queriesLoading.length > 0
   }
+
+  isOfficeSelected(selectedLocation?: ISearchLocation) {
+    if (selectedLocation) {
+      return Object.keys(this.props.offices).some(
+        (id) => id === selectedLocation.id
+      )
+    }
+    return false
+  }
+
+  isAccessibleOfficeSelected(selectedLocation?: ISearchLocation) {
+    if (
+      selectedLocation &&
+      this.isOfficeSelected(selectedLocation) &&
+      this.props.userDetails &&
+      this.props.userDetails.role
+    ) {
+      if (
+        this.props.userDetails?.role === 'NATIONAL_REGISTRAR' ||
+        this.props.userDetails?.role === 'NATIONAL_SYSTEM_ADMIN'
+      ) {
+        return true
+      } else if (
+        REGISTRAR_ROLES.includes(this.props.userDetails?.role) &&
+        this.props.userDetails.primaryOffice?.id === selectedLocation.id
+      ) {
+        return true
+      }
+    }
+    return false
+  }
+
   render() {
-    const { intl } = this.props
-    const { timeStart, timeEnd, event, toggleStatus } = this.state
+    const { intl, isOnline } = this.props
+    const {
+      timeStart,
+      timeEnd,
+      event,
+      toggleStatus,
+      officeSelected,
+      isAccessibleOffice
+    } = this.state
     const queryVariablesWithoutLocationId = {
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString(),
@@ -360,149 +440,171 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               size={ContentSize.LARGE}
               filterContent={this.getFilter(intl, this.state.selectedLocation)}
             >
-              <Query
-                fetchPolicy="no-cache"
-                query={PERFORMANCE_METRICS}
-                onCompleted={() => this.markFinished('PERFORMANCE_METRICS')}
-                onError={() => this.markFinished('PERFORMANCE_METRICS')}
-                variables={
-                  this.state.selectedLocation &&
-                  !isCountry(this.state.selectedLocation)
-                    ? {
-                        ...queryVariablesWithoutLocationId,
-                        locationId: this.state.selectedLocation.id
+              {isOnline ? (
+                <>
+                  <Query
+                    query={PERFORMANCE_METRICS}
+                    onCompleted={() => this.markFinished('PERFORMANCE_METRICS')}
+                    onError={() => this.markFinished('PERFORMANCE_METRICS')}
+                    variables={
+                      this.state.selectedLocation &&
+                      !isCountry(this.state.selectedLocation)
+                        ? {
+                            ...queryVariablesWithoutLocationId,
+                            locationId: this.state.selectedLocation.id
+                          }
+                        : queryVariablesWithoutLocationId
+                    }
+                  >
+                    {({
+                      error,
+                      data
+                    }: {
+                      loading: boolean
+                      error?: ApolloError
+                      data?: IMetricsQueryResult
+                    }) => {
+                      if (error) {
+                        return (
+                          <>
+                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                          </>
+                        )
                       }
-                    : queryVariablesWithoutLocationId
-                }
-              >
-                {({
-                  error,
-                  data
-                }: {
-                  loading: boolean
-                  error?: ApolloError
-                  data?: IMetricsQueryResult
-                }) => {
-                  if (error) {
-                    return (
-                      <>
-                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                      </>
-                    )
-                  }
 
-                  if (this.isQueriesInProgress()) {
-                    return <Spinner id="performance-home-loading" />
-                  }
+                      if (this.isQueriesInProgress()) {
+                        return <Spinner id="performance-home-loading" />
+                      }
 
-                  return (
-                    <>
-                      <CompletenessReport
-                        data={data!.getTotalMetrics}
-                        selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
-                        onClickDetails={this.onClickDetails}
-                      />
-                      <RegistrationsReport
-                        data={data!.getTotalMetrics}
-                        selectedEvent={event.toUpperCase() as 'BIRTH' | 'DEATH'}
-                      />
-                      <CertificationRatesReport
-                        totalRegistrations={calculateTotal(
-                          data?.getTotalMetrics.results || []
-                        )}
-                        {...(this.state.selectedLocation &&
-                        !isCountry(this.state.selectedLocation)
-                          ? {
-                              ...queryVariablesWithoutLocationId,
-                              locationId: this.state.selectedLocation.id
+                      return (
+                        <>
+                          {!officeSelected && (
+                            <CompletenessReport
+                              data={data!.getTotalMetrics}
+                              selectedEvent={
+                                event.toUpperCase() as 'BIRTH' | 'DEATH'
+                              }
+                              onClickDetails={this.onClickDetails}
+                            />
+                          )}
+                          <RegistrationsReport
+                            data={data!.getTotalMetrics}
+                            selectedEvent={
+                              event.toUpperCase() as 'BIRTH' | 'DEATH'
                             }
-                          : queryVariablesWithoutLocationId)}
-                      />
-                      <AppSources
-                        data={data!.getTotalMetrics}
-                        locationId={
-                          isCountry(this.state.selectedLocation)
-                            ? undefined
-                            : this.state.selectedLocation.id
-                        }
-                        timeStart={timeStart.toISOString()}
-                        timeEnd={timeEnd.toISOString()}
-                      />
-                    </>
-                  )
-                }}
-              </Query>
-              <Query
-                fetchPolicy="no-cache"
-                query={CORRECTION_TOTALS}
-                onCompleted={() => this.markFinished('CORRECTION_TOTALS')}
-                onError={() => this.markFinished('CORRECTION_TOTALS')}
-                variables={
-                  this.state.selectedLocation &&
-                  !isCountry(this.state.selectedLocation)
-                    ? {
-                        ...queryVariablesWithoutLocationId,
-                        locationId: this.state.selectedLocation.id
+                          />
+                          <CertificationRatesReport
+                            totalRegistrations={calculateTotal(
+                              data?.getTotalMetrics.results || []
+                            )}
+                            {...(this.state.selectedLocation &&
+                            !isCountry(this.state.selectedLocation)
+                              ? {
+                                  ...queryVariablesWithoutLocationId,
+                                  locationId: this.state.selectedLocation.id
+                                }
+                              : queryVariablesWithoutLocationId)}
+                          />
+                          <AppSources
+                            data={data!.getTotalMetrics}
+                            locationId={
+                              isCountry(this.state.selectedLocation)
+                                ? undefined
+                                : this.state.selectedLocation.id
+                            }
+                            timeStart={timeStart.toISOString()}
+                            timeEnd={timeEnd.toISOString()}
+                          />
+                        </>
+                      )
+                    }}
+                  </Query>
+                  <Query
+                    fetchPolicy="no-cache"
+                    query={CORRECTION_TOTALS}
+                    onCompleted={() => this.markFinished('CORRECTION_TOTALS')}
+                    onError={() => this.markFinished('CORRECTION_TOTALS')}
+                    variables={
+                      this.state.selectedLocation &&
+                      !isCountry(this.state.selectedLocation)
+                        ? {
+                            ...queryVariablesWithoutLocationId,
+                            locationId: this.state.selectedLocation.id
+                          }
+                        : queryVariablesWithoutLocationId
+                    }
+                  >
+                    {({
+                      loading,
+                      error,
+                      data
+                    }: {
+                      loading: boolean
+                      error?: ApolloError
+                      data?: ICorrectionsQueryResult
+                    }) => {
+                      if (error) {
+                        return (
+                          <>
+                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                          </>
+                        )
                       }
-                    : queryVariablesWithoutLocationId
-                }
-              >
-                {({
-                  loading,
-                  error,
-                  data
-                }: {
-                  loading: boolean
-                  error?: ApolloError
-                  data?: ICorrectionsQueryResult
-                }) => {
-                  if (error) {
-                    return (
-                      <>
-                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                      </>
-                    )
-                  }
 
-                  if (this.isQueriesInProgress()) {
-                    return null
-                  }
-                  return <CorrectionsReport data={data!.getTotalCorrections} />
-                }}
-              </Query>
-              <Query
-                fetchPolicy="no-cache"
-                query={GET_TOTAL_PAYMENTS}
-                onCompleted={() => this.markFinished('GET_TOTAL_PAYMENTS')}
-                onError={() => this.markFinished('GET_TOTAL_PAYMENTS')}
-                variables={
-                  this.state.selectedLocation &&
-                  !isCountry(this.state.selectedLocation)
-                    ? {
-                        ...queryVariablesWithoutLocationId,
-                        locationId: this.state.selectedLocation.id
+                      if (this.isQueriesInProgress()) {
+                        return null
                       }
-                    : queryVariablesWithoutLocationId
-                }
-              >
-                {({ data, error }) => {
-                  if (error) {
-                    return (
-                      <>
-                        <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                      </>
-                    )
-                  }
-                  if (this.isQueriesInProgress()) {
-                    return null
-                  }
-                  if (data && data.getTotalPayments) {
-                    return (
-                      <PaymentsAmountComponent data={data!.getTotalPayments} />
-                    )
-                  }
-                }}
-              </Query>
+                      return (
+                        <CorrectionsReport data={data!.getTotalCorrections} />
+                      )
+                    }}
+                  </Query>
+                  <Query
+                    fetchPolicy="no-cache"
+                    query={GET_TOTAL_PAYMENTS}
+                    onCompleted={() => this.markFinished('GET_TOTAL_PAYMENTS')}
+                    onError={() => this.markFinished('GET_TOTAL_PAYMENTS')}
+                    variables={
+                      this.state.selectedLocation &&
+                      !isCountry(this.state.selectedLocation)
+                        ? {
+                            ...queryVariablesWithoutLocationId,
+                            locationId: this.state.selectedLocation.id
+                          }
+                        : queryVariablesWithoutLocationId
+                    }
+                  >
+                    {({ data, error }) => {
+                      if (error) {
+                        return (
+                          <>
+                            <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                          </>
+                        )
+                      }
+                      if (this.isQueriesInProgress()) {
+                        return null
+                      }
+                      if (data && data.getTotalPayments) {
+                        return (
+                          <PaymentsAmountComponent
+                            data={data!.getTotalPayments}
+                          />
+                        )
+                      }
+
+                      return <></>
+                    }}
+                  </Query>
+                </>
+              ) : (
+                <ConnectivityContainer>
+                  <NoConnectivity />
+                  <Text id="no-connection-text">
+                    {intl.formatMessage(constantsMessages.noConnection)}
+                  </Text>
+                </ConnectivityContainer>
+              )}
             </Content>
           </LayoutLeft>
           <Query
@@ -522,7 +624,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 'VALIDATED',
                 'WAITING_VALIDATION',
                 'REGISTERED'
-              ]
+              ],
+              officeSelected: this.state.officeSelected,
+              showStatusCount: this.state.officeSelected && isAccessibleOffice
             }}
             fetchPolicy="no-cache"
           >
@@ -560,8 +664,34 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             onClickStatusDetails={this.onClickStatusDetails}
                           />
 
-                          <Devider />
+                          {!officeSelected && (
+                            <>
+                              <Devider />
 
+                              <LocationStatsView
+                                registrationOffices={
+                                  data.getLocationStatistics!.offices
+                                }
+                                totalRegistrars={
+                                  data.getLocationStatistics!.registrars
+                                }
+                                citizen={Math.round(
+                                  data.getLocationStatistics!.population /
+                                    data.getLocationStatistics!.registrars
+                                )}
+                              />
+                            </>
+                          )}
+                        </>
+                      )}
+                    </ResponsiveModalContent>
+                  </ResponsiveModal>
+                  <LayoutRight>
+                    {!officeSelected && (
+                      <LocationStats>
+                        {!isOnline ? null : loading ? (
+                          <Spinner id="location-stats-loading" />
+                        ) : (
                           <LocationStatsView
                             registrationOffices={
                               data.getLocationStatistics!.offices
@@ -569,54 +699,32 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                             totalRegistrars={
                               data.getLocationStatistics!.registrars
                             }
-                            citizen={
-                              Math.round(
-                                data.getLocationStatistics!.population
-                              ) /
-                              Math.round(data.getLocationStatistics!.registrars)
-                            }
+                            citizen={Math.round(
+                              data.getLocationStatistics!.population /
+                                data.getLocationStatistics!.registrars
+                            )}
                           />
-                        </>
-                      )}
-                    </ResponsiveModalContent>
-                  </ResponsiveModal>
-                  <LayoutRight>
-                    <LocationStats>
-                      {loading ? (
-                        <Spinner id="location-stats-loading" />
-                      ) : (
-                        <LocationStatsView
-                          registrationOffices={
-                            data.getLocationStatistics!.offices
-                          }
-                          totalRegistrars={
-                            data.getLocationStatistics!.registrars
-                          }
-                          citizen={
-                            Math.round(data.getLocationStatistics!.population) /
-                            Math.round(data.getLocationStatistics!.registrars)
-                          }
-                        />
-                      )}
-                    </LocationStats>
+                        )}
+                      </LocationStats>
+                    )}
 
-                    <RegistrationStatus>
-                      {loading ? (
-                        <Spinner id="registration-status-loading" />
-                      ) : (
-                        <StatusWiseDeclarationCountView
-                          selectedEvent={this.state.event}
-                          locationId={
-                            isCountry(this.state.selectedLocation)
-                              ? undefined
-                              : this.state.selectedLocation?.id
-                          }
-                          statusMapping={StatusMapping}
-                          data={data.fetchRegistrationCountByStatus}
-                          onClickStatusDetails={this.onClickStatusDetails}
-                        />
-                      )}
-                    </RegistrationStatus>
+                    {officeSelected && isAccessibleOffice && (
+                      <RegistrationStatus>
+                        {!isOnline ? (
+                          <></>
+                        ) : loading ? (
+                          <Spinner id="registration-status-loading" />
+                        ) : (
+                          <StatusWiseDeclarationCountView
+                            selectedEvent={this.state.event}
+                            locationId={this.state.selectedLocation?.id}
+                            statusMapping={StatusMapping}
+                            data={data.fetchRegistrationCountByStatus}
+                            onClickStatusDetails={this.onClickStatusDetails}
+                          />
+                        )}
+                      </RegistrationStatus>
+                    )}
                   </LayoutRight>
                 </>
               )
@@ -640,4 +748,4 @@ function mapStateToProps(state: IStoreState) {
 export const PerformanceHome = connect(mapStateToProps, {
   goToWorkflowStatus,
   goToCompletenessRates
-})(withTheme(injectIntl(PerformanceHomeComponent)))
+})(withTheme(injectIntl(withOnlineStatus(PerformanceHomeComponent))))

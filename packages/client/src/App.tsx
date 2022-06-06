@@ -26,7 +26,6 @@ import styled, {
   ThemeProvider
 } from '@client/styledComponents'
 import { createClient } from '@client/utils/apolloClient'
-import { ReviewDuplicates } from '@client/views/Duplicates/ReviewDuplicates'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
@@ -245,10 +244,6 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             path={routes.SEARCH_RESULT}
                                             component={SearchResult}
-                                          />
-                                          <ProtectedRoute
-                                            path={routes.REVIEW_DUPLICATES}
-                                            component={ReviewDuplicates}
                                           />
                                           <ProtectedRoute
                                             exact

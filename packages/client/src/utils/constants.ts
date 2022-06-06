@@ -21,6 +21,7 @@ export const REJECTION = 'rejection'
 export const COMPLETION = 'completed'
 export const APPROVED = 'approved'
 export const REGISTERED = 'registered'
+export const CERTIFIED = 'certified'
 export const EMPTY_STRING = ''
 export const DECLARATION_DATE_FORMAT = 'yyyy-MM-dd'
 export const CERTIFICATE_MONEY_RECEIPT_DATE_FORMAT = 'dd.MM.yyyy'
@@ -85,16 +86,6 @@ export const PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE = 'ease-in-out both'
 export const PAGE_TRANSITIONS_ENTER_TIME = 500
 export const PAGE_TRANSITIONS_EXIT_TIME = PAGE_TRANSITIONS_ENTER_TIME - 10
 
-export const JURISDICTION_TYPE: { [key: string]: string } = {
-  UNION: 'Union Parishad',
-  MUNICIPALITY: 'Municipality',
-  CITY_CORPORATION: 'City Corporation',
-  UPAZILA: 'Upazila',
-  STATE: 'Province',
-  DISTRICT: 'District',
-  DIVISION: 'Division'
-}
-
 export const REFRESH_TOKEN_CHECK_MILLIS = 4 * 60 * 1000 // 4 minutes
 export const TOKEN_EXPIRE_MILLIS = 10 * 60 * 1000 // 10 minutes
 
@@ -108,3 +99,4 @@ export const DECLARED_DECLARATION_SEARCH_QUERY_COUNT =
   process.env.DECLARED_DECLARATION_SEARCH_QUERY_COUNT || 100
 
 export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
+export const ACCUMULATED_FILE_SIZE = 20480000

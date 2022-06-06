@@ -22,7 +22,7 @@ import {
   goToEvents,
   goToPage,
   goToPrintCertificate,
-  goToReviewDuplicate
+  getDefaultPerformanceLocationId
 } from '@client/navigation'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
@@ -64,7 +64,6 @@ import {
 } from '@client/components/interface/Navigation'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { PERFORMANCE_HOME } from '@client/navigation/routes'
-import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 
 export interface IProps extends IButtonProps {
@@ -114,7 +113,6 @@ const BodyContainer = styled.div`
 
 interface IDispatchProps {
   goToPage: typeof goToPage
-  goToReviewDuplicate: typeof goToReviewDuplicate
   goToPrintCertificate: typeof goToPrintCertificate
   goToEvents: typeof goToEvents
   updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
@@ -158,6 +156,7 @@ export const EVENT_STATUS = {
   REJECTED: 'REJECTED',
   WAITING_VALIDATION: 'WAITING_VALIDATION'
 }
+
 export class OfficeHomeView extends React.Component<
   IOfficeHomeProps,
   IOfficeHomeState
@@ -166,9 +165,6 @@ export class OfficeHomeView extends React.Component<
   showPaginated = false
   interval: any = undefined
   role = this.props.userDetails && this.props.userDetails.role
-  jurisdictionLocationId =
-    this.props.userDetails &&
-    getJurisdictionLocationIdFromUserDetails(this.props.userDetails)
   isFieldAgent = this.role
     ? FIELD_AGENT_ROLES.includes(this.role)
       ? true
@@ -224,7 +220,7 @@ export class OfficeHomeView extends React.Component<
     clearInterval(this.interval)
   }
 
-  componentDidUpdate(prevProps: IOfficeHomeProps, prevState: IOfficeHomeState) {
+  componentDidUpdate(prevProps: IOfficeHomeProps) {
     if (prevProps.tabId !== this.props.tabId) {
       this.setState({
         draftCurrentPage: 1,
@@ -348,7 +344,9 @@ export class OfficeHomeView extends React.Component<
           <Redirect
             to={{
               pathname: PERFORMANCE_HOME,
-              search: `?locationId=${this.jurisdictionLocationId}`
+              search: `?locationId=${getDefaultPerformanceLocationId(
+                this.props.userDetails as IUserDetails
+              )}`
             }}
           />
         )}
@@ -577,7 +575,6 @@ export const OfficeHome = connect<
 >(mapStateToProps, {
   goToEvents,
   goToPage,
-  goToReviewDuplicate,
   goToPrintCertificate,
   updateRegistrarWorkqueue
 })(injectIntl(OfficeHomeView))
