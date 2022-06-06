@@ -1236,18 +1236,6 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "ASSIGNED_RESPONSIBILITY_PROOF",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "CAUSE_OF_DEATH",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "CHILD",
             "description": null,
             "isDeprecated": false,
@@ -1260,13 +1248,7 @@
             "deprecationReason": null
           },
           {
-            "name": "CORONERS_REPORT",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "DECEASED_BIRTH_PROOF",
+            "name": "DECEASED_DEATH_CAUSE_PROOF",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -1284,19 +1266,7 @@
             "deprecationReason": null
           },
           {
-            "name": "DECEASED_PARMANENT_ADDRESS_PROOF",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "FATHER",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "INFORMANT_ATHORITY_TO_APPLY_PROOF",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
@@ -1327,12 +1297,6 @@
           },
           {
             "name": "PARENT",
-            "description": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "WARD_COUNCILLOR_PROOF",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null
