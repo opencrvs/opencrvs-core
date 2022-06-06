@@ -165,9 +165,30 @@ export function ApplicationSourcesReport(
                     [
                       'LOCAL_REGISTRAR',
                       'DISTRICT_REGISTRAR',
-                      'STATE_REGISTRAR',
-                      'NATIONAL_REGISTRAR'
+                      'STATE_REGISTRAR'
                     ].includes(item.practitionerRole)
+                  )
+                )}
+                ofNumber={calculateTotal(data.results)}
+              ></TotalDisplayWithPercentage>
+            </PerformanceValue>
+          }
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {' '}
+              {intl.formatMessage(
+                messages.performanceNationalRegistrarsApplicationsLabel
+              )}
+            </PerformanceTitle>
+          }
+          value={
+            <PerformanceValue>
+              <TotalDisplayWithPercentage
+                total={calculateTotal(
+                  data.results.filter((item) =>
+                    ['NATIONAL_REGISTRAR'].includes(item.practitionerRole)
                   )
                 )}
                 ofNumber={calculateTotal(data.results)}
