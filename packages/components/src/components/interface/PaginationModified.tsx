@@ -52,8 +52,7 @@ const StyledPagination = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-left: 2px;
-  margin-right: 2px;
+  gap: 2px;
 `
 const StyledPageNumber = styled.span<{ isCurrentPage: boolean; size?: string }>`
   ${({ theme, size }) =>
@@ -61,6 +60,14 @@ const StyledPageNumber = styled.span<{ isCurrentPage: boolean; size?: string }>`
   color: ${({ theme, isCurrentPage }) =>
     isCurrentPage ? theme.colors.grey600 : theme.colors.grey400};
 `
+
+const ModifiedCircleButton = styled(CircleButton)`
+  height: auto;
+  width: auto;
+  min-height: 24px;
+  min-width: 24px;
+`
+
 interface IState {
   canPrevious: boolean
   canNext: boolean
@@ -159,7 +166,7 @@ export class PaginationModified extends React.Component<
         </Icon>
         <StyledPagination>
           {pages.map((page, id) => (
-            <CircleButton
+            <ModifiedCircleButton
               size={this.props.size ? this.props.size : 'small'}
               id={`page-number-${id}`}
               onClick={() => this.changePage(page)}
@@ -172,7 +179,7 @@ export class PaginationModified extends React.Component<
               >
                 {page}
               </StyledPageNumber>
-            </CircleButton>
+            </ModifiedCircleButton>
           ))}
         </StyledPagination>
         <Icon
