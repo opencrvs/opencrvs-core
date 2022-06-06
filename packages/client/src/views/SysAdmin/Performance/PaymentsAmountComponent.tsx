@@ -25,6 +25,7 @@ import { messages } from '@client/i18n/messages/views/performance'
 
 interface PaymentsAmountProps {
   data: Array<GQLPaymentMetric>
+  currency: string
 }
 
 const enum PAYMENT_TYPE {
@@ -55,7 +56,7 @@ export function PaymentsAmountComponent(props: PaymentsAmountProps) {
           }
           value={
             <PerformanceValue>
-              $ {calculateTotalPaymentAmount(data)}
+              {props.currency} {calculateTotalPaymentAmount(data)}
             </PerformanceValue>
           }
         />
@@ -67,7 +68,7 @@ export function PaymentsAmountComponent(props: PaymentsAmountProps) {
           }
           value={
             <PerformanceValue>
-              ${' '}
+              {props.currency}{' '}
               {calculateTotalPaymentAmount(
                 data.filter(
                   (payment) =>
@@ -85,7 +86,7 @@ export function PaymentsAmountComponent(props: PaymentsAmountProps) {
           }
           value={
             <PerformanceValue>
-              ${' '}
+              {props.currency}{' '}
               {calculateTotalPaymentAmount(
                 data.filter(
                   (payment) => payment.paymentType === PAYMENT_TYPE.CORRECTION
