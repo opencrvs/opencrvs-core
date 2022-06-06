@@ -164,7 +164,7 @@ export const printDummyCertificate = async (
   } else {
     certEvent = Event.BIRTH
   }
-  const updatedOffileData: IOfflineData = {
+  const updatedOfflineData: IOfflineData = {
     ...offlineData,
     templates: {
       ...offlineData.templates,
@@ -184,7 +184,7 @@ export const printDummyCertificate = async (
     intl,
     { data, event } as IDeclaration,
     userDetails,
-    updatedOffileData
+    updatedOfflineData
   )
 }
 
