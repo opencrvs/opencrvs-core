@@ -18,7 +18,7 @@ export async function getTotalCertifications(
   locationId: string | undefined
 ) {
   const totalMetrics = await query<Array<{ total: number; eventType: string }>>(
-    `SELECT COUNT(compositionId) AS total
+    `SELECT COUNT(DISTINCT(compositionId)) AS total
       FROM certification
     WHERE time > $timeFrom
       AND time <= $timeTo

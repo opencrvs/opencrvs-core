@@ -1732,6 +1732,7 @@ export type User = {
   practitionerId?: Maybe<Scalars['String']>
   primaryOffice?: Maybe<Location>
   role?: Maybe<Scalars['String']>
+  signature?: Maybe<Signature>
   status?: Maybe<Scalars['String']>
   type?: Maybe<Scalars['String']>
   underInvestigation?: Maybe<Scalars['Boolean']>
@@ -2216,6 +2217,11 @@ export type GetUserQuery = {
         value?: string | null
       } | null> | null
     } | null> | null
+    signature?: {
+      __typename?: 'Signature'
+      type?: string | null
+      data?: string | null
+    } | null
     avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
   } | null
 }
@@ -3182,6 +3188,10 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'RegWorkflow'
         type?: RegStatus | null
         timestamp?: any | null
+        comments?: Array<{
+          __typename?: 'Comment'
+          comment?: string | null
+        } | null> | null
         office?: {
           __typename?: 'Location'
           name?: string | null
