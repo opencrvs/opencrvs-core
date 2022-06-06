@@ -191,12 +191,12 @@ const messagesToDefine: ICorrectionMessages = {
   },
   idCheckVerify: {
     id: 'correction.certificate.corrector.idCheckVerify',
-    defaultMessage: 'Yes',
+    defaultMessage: 'ID verfied',
     description: 'The label for id check component action when verify details'
   },
   idCheckWithoutVerify: {
     id: 'correction.certificate.corrector.idCheckWithoutVerify',
-    defaultMessage: 'No',
+    defaultMessage: 'No ID match',
     description:
       'The label for id check component action when does not verify details'
   },
