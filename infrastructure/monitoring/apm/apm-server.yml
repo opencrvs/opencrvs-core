@@ -469,11 +469,11 @@ apm-server:
 # The memory queue will present all available events (up to the outputs
 # bulk_max_size) to the output, the moment the output is ready to serve
 # another batch of events.
-#queue:
-# Queue type by name (default 'mem').
-#mem:
-# Max number of events the queue can buffer.
-#events: 4096
+queue:
+  # Queue type by name (default 'mem').
+  mem:
+    # Max number of events the queue can buffer.
+    events: 12096
 
 # Hints the minimum number of events stored in the queue,
 # before providing a batch of events to the outputs.
@@ -549,7 +549,7 @@ output.elasticsearch:
   # In case you specify and additional path, the scheme is required: `http://localhost:9200/path`.
   # IPv6 addresses should always be defined as: `https://[2001:db8::1]:9200`.
   hosts: ['elasticsearch:9200']
-  bulk_max_size: 5120
+  bulk_max_size: 12120
   #hosts: ["http://dev.elasticsearch.apps.okd.leanovia.net:80"]
 
   # Boolean flag to enable or disable the output module.
