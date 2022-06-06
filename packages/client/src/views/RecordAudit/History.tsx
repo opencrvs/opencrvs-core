@@ -184,6 +184,7 @@ export const GetHistory = ({
     })
   }
 
+  // TODO: We need to figure out a way to sort the history in backend
   const sortedHistory = allHistoryData.sort((fe, se) => {
     return new Date(fe.date).getTime() - new Date(se.date).getTime()
   })
