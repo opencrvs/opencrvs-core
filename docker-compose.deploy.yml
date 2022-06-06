@@ -291,12 +291,13 @@ services:
   influxdb:
     volumes:
       - '/data/influxdb:/var/lib/influxdb'
-      - '/data/backups/influxdb:/data/backups/influxdb'
     deploy:
       replicas: 1
       placement:
         constraints:
           - node.labels.data1 == true
+    ports:
+      - 8086:8086
     networks:
       - overlay_net
 
