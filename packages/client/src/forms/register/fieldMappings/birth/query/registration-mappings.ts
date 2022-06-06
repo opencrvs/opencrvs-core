@@ -242,7 +242,7 @@ export const registrarNameUserTransformer = (
     return
   }
   transformedData[targetSectionId || sectionId][targetFieldName || 'userName'] =
-    getUserName(userDetails)
+    userDetails.localRegistrar ? getUserName(userDetails.localRegistrar) : ''
 }
 
 export const roleUserTransformer = (
