@@ -40,6 +40,10 @@ interface ISysAdminMessages
   resendSMSSuccess: MessageDescriptor
   resendSMSError: MessageDescriptor
   newUser: MessageDescriptor
+  active: MessageDescriptor
+  pending: MessageDescriptor
+  disabled: MessageDescriptor
+  deactivated: MessageDescriptor
 }
 
 const messagesToDefine: ISysAdminMessages = {
@@ -180,6 +184,26 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage: 'New User',
     description: 'This text will show to create new user button',
     id: 'system.user.newUser'
+  },
+  active: {
+    defaultMessage: 'Active',
+    description: 'Pill label for active user',
+    id: 'system.user.active'
+  },
+  pending: {
+    defaultMessage: 'Pending',
+    description: 'Pill label for pending user',
+    id: 'system.user.pending'
+  },
+  disabled: {
+    defaultMessage: 'Disabled',
+    description: 'Pill label for disabled user',
+    id: 'system.user.disabled'
+  },
+  deactivated: {
+    defaultMessage: 'Deactivated',
+    description: 'Pill label for deactivated user',
+    id: 'system.user.deactivated'
   }
 }
 
