@@ -31,7 +31,8 @@ import { withTheme } from 'styled-components'
 import {
   buttonMessages,
   constantsMessages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import { Action } from '@client/forms'
@@ -329,9 +330,7 @@ class RequiresUpdateComponent extends React.Component<
         onPageChange={onPageChange}
         loading={this.props.loading}
         error={this.props.error}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'sent for updates'
-        })}
+        noResultText={intl.formatMessage(wqMessages.noRecordsRequireUpdates)}
         noContent={this.transformRejectedContent(data).length <= 0}
       >
         <GridTable
