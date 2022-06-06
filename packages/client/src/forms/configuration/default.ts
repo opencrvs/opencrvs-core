@@ -574,10 +574,6 @@ export const registerForms: IDefaultRegisterForms = {
               operation: 'roleUserTransformer'
             },
             {
-              fieldName: 'registrarSignature',
-              operation: 'registrarSignatureUserTransformer'
-            },
-            {
               fieldName: 'registrationLocation',
               operation: 'registrationLocationUserTransformer'
             }
@@ -2947,10 +2943,6 @@ export const registerForms: IDefaultRegisterForms = {
             {
               fieldName: 'role',
               operation: 'roleUserTransformer'
-            },
-            {
-              fieldName: 'registrarSignature',
-              operation: 'registrarSignatureUserTransformer'
             },
             {
               fieldName: 'registrationLocation',
