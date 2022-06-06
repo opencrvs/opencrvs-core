@@ -150,7 +150,6 @@ interface IConstantsMessages
   notAvailable: MessageDescriptor
   history: MessageDescriptor
   requireUpdatesLoading: MessageDescriptor
-  noRecords: MessageDescriptor
   noConnection: MessageDescriptor
   totalFileSizeExceed: MessageDescriptor
 }
@@ -853,11 +852,6 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.requireUpdatesLoading',
     defaultMessage: 'Checking your declarations',
     description: 'The text when all rejected declarations are loading'
-  },
-  noRecords: {
-    defaultMessage: 'No records {tab}',
-    description: 'No Application in{tab} tab in officeHome',
-    id: 'constants.noRecords'
   },
   noConnection: {
     defaultMessage: 'No connection',
