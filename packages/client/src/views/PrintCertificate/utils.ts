@@ -247,3 +247,21 @@ export function isCertificateForPrintInAdvance(
   }
   return false
 }
+
+export function getRegistrarSignatureHandlebarName(
+  offlineCountryConfig: IOfflineData,
+  event: Event
+) {
+  const svgCode = offlineCountryConfig.templates.certificates![event].definition
+  const html = document.createElement('html')
+  html.innerHTML = svgCode
+  const certificateImages = html.querySelectorAll('image')
+  const signatureImage = Array.from(certificateImages).find(
+    (image) => image.getAttribute('data-content') === 'signature'
+  )
+  const handlebarText =
+    signatureImage?.getAttribute('href') ||
+    signatureImage?.getAttribute('xlink:href') ||
+    ''
+  return handlebarText?.match(/^{{(\w+)}}$/)?.[1] || ''
+}

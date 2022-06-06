@@ -56,7 +56,8 @@ import {
   getEventDate,
   isFreeOfCost,
   calculatePrice,
-  getRegisteredDate
+  getRegisteredDate,
+  getRegistrarSignatureHandlebarName
 } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/forms/countries'
@@ -331,15 +332,31 @@ function mapStatetoProps(
 
   const draft = getDraft(declarations, registrationId, eventType)
   const event = getEvent(draft.event)
+  const offlineCountryConfig = getOfflineData(state)
+  const signatureKey = getRegistrarSignatureHandlebarName(
+    offlineCountryConfig,
+    event
+  )
 
   return {
     event,
     registrationId,
-    draft,
+    draft: {
+      ...draft,
+      data: {
+        ...draft.data,
+        template: {
+          ...draft.data.template,
+          [signatureKey]: isCertificateForPrintInAdvance(draft)
+            ? ''
+            : draft.data.template[signatureKey]
+        }
+      }
+    },
     scope: getScope(state),
     countries: getCountryTranslations(state.i18n.languages, countries),
     userDetails: getUserDetails(state),
-    offlineCountryConfig: getOfflineData(state),
+    offlineCountryConfig,
     registerForm: getEventRegisterForm(state, event)
   }
 }
