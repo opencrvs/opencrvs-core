@@ -25,7 +25,7 @@ import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
 import { Event, IFormConfig, IQuestionConfig } from '@client/forms'
-import { isOfflineDataLoaded, isNationalSystemAdmin } from './selectors'
+import { isOfflineDataLoaded } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
   IPDFTemplate,
@@ -488,7 +488,12 @@ function reducer(
 
       const offices = filterLocations(
         action.payload,
-        LocationType.CRVS_OFFICE,
+        LocationType.CRVS_OFFICE
+        /*
+
+        // This is used to filter office locations available offline
+        // It was important in an older design and may become important again
+
         {
           locationLevel: 'id',
           locationId: isNationalSystemAdmin(state.userDetails)
@@ -496,7 +501,7 @@ function reducer(
             : state.userDetails &&
               state.userDetails.primaryOffice &&
               state.userDetails.primaryOffice.id
-        }
+        }*/
       )
       return {
         ...state,

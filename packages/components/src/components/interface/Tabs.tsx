@@ -14,6 +14,8 @@ import { Button, IButtonProps } from '../buttons'
 
 export const Tabs = styled.div`
   position: relative;
+  overflow: auto;
+  white-space: nowrap;
 `
 export interface IProps extends IButtonProps {
   active?: boolean

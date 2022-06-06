@@ -18,7 +18,7 @@ export async function getTotalCertifications(
   locationId: string | undefined
 ) {
   const totalMetrics = await query<Array<{ total: number; eventType: string }>>(
-    `SELECT COUNT(compositionId) AS total
+    `SELECT COUNT(DISTINCT(compositionId)) AS total
       FROM certification
     WHERE time > $timeFrom
       AND time <= $timeTo
@@ -27,7 +27,8 @@ export async function getTotalCertifications(
           ? `AND ( locationLevel2 = $locationId
       OR locationLevel3 = $locationId
       OR locationLevel4 = $locationId
-      OR locationLevel5 = $locationId)`
+      OR locationLevel5 = $locationId
+      OR officeLocation = $locationId)`
           : ``
       }
     GROUP BY eventType`,

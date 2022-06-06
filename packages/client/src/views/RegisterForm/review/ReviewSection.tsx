@@ -373,9 +373,9 @@ const getFormFieldValue = (
   let tempField: IFormField
   for (const key in sectionDraftData) {
     tempField = sectionDraftData[key] as IFormField
-    return (tempField &&
-      tempField.nestedFields &&
-      tempField.nestedFields[field.name]) as IFormFieldValue
+    if (tempField?.nestedFields?.[field.name]) {
+      return tempField.nestedFields[field.name] as IFormFieldValue
+    }
   }
   return ''
 }
@@ -1035,7 +1035,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               field,
               errorsOnFields,
               undefined,
-              !!index
+              !index
             )
           )
           .filter((value) => value)
@@ -1596,7 +1596,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </SectionContainer>
                 )
               })}
-              {event === Event.BIRTH && !isCorrection(declaration) && (
+              {!isCorrection(declaration) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"

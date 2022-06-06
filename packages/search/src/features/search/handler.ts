@@ -118,6 +118,12 @@ export async function getStatusWiseRegistrationCountHandler(
                 }
               },
               {
+                match: {
+                  declarationLocationHirarchyIds:
+                    payload.declarationLocationHirarchyId
+                }
+              },
+              {
                 terms: {
                   'type.keyword': payload.status
                 }

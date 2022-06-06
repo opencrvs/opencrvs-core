@@ -19,7 +19,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal, ListTable } from '@opencrvs/components/lib/interface'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { IForm, IFormSection, IFormField } from '@client/forms'
-import { constantsMessages } from '@client/i18n/messages'
+import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { getIndividualNameObj } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/correction'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
@@ -215,6 +215,10 @@ export const ActionDetailsModalListTable = ({
   const declarationUpdates = dataChange(actionDetailsData)
   const collectorData = certificateCollectorData(actionDetailsData)
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
+  const content = actionDetailsData.comments
+    .map((comment: IDynamicValues) => comment.comment)
+    .concat(actionDetailsData.statusReason?.text || [])
+    .map((comment: string) => ({ comment }))
   return (
     <>
       {/* For Reject Reason */}
@@ -239,9 +243,7 @@ export const ActionDetailsModalListTable = ({
         noResultText=" "
         hideBoxShadow={true}
         columns={commentsColumn}
-        content={actionDetailsData.comments
-          .concat(actionDetailsData.statusReason?.text || [])
-          .map((text: string) => ({ comment: text }))}
+        content={content}
       />
 
       {/* For Data Updated */}
@@ -309,13 +311,19 @@ export const ActionDetailsModal = ({
       )) ||
     ''
 
-  const nameObj = getIndividualNameObj(
-    actionDetailsData.user.name,
-    window.config.LANGUAGES
-  )
-  const userName = nameObj
-    ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-    : ''
+  let userName = ''
+
+  if (!actionDetailsData.dhis2Notification) {
+    const nameObj = getIndividualNameObj(
+      actionDetailsData.user.name,
+      window.config.LANGUAGES
+    )
+    userName = nameObj
+      ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+      : ''
+  } else {
+    userName = intl.formatMessage(userMessages.healthSystem)
+  }
 
   return (
     <ResponsiveModal

@@ -92,8 +92,8 @@ class ReadyForReviewComponent extends React.Component<
     super(props)
     this.state = {
       width: window.innerWidth,
-      sortedCol: COLUMNS.NAME,
-      sortOrder: SORT_ORDER.ASCENDING
+      sortedCol: COLUMNS.SENT_FOR_REVIEW,
+      sortOrder: SORT_ORDER.DESCENDING
     }
   }
 
@@ -272,7 +272,7 @@ class ReadyForReviewComponent extends React.Component<
           isSorted: this.state.sortedCol === COLUMNS.NAME
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: this.props.intl.formatMessage(constantsMessages.event),
           width: 16,
           key: COLUMNS.EVENT,
           sortFunction: this.onColumnClick,
