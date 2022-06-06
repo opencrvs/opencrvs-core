@@ -211,6 +211,10 @@ class UserReviewFormComponent extends React.Component<
       actionComponent = (
         <SuccessButton
           id="submit-edit-user-form"
+          disabled={
+            this.props.formData.role === 'LOCAL_REGISTRAR' &&
+            !this.props.formData.signature
+          }
           onClick={() => this.props.submitForm(userFormSection)}
           icon={() => <Check />}
           align={ICON_ALIGNMENT.LEFT}

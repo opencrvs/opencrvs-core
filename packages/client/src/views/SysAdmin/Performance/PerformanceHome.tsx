@@ -393,7 +393,10 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       this.props.userDetails &&
       this.props.userDetails.role
     ) {
-      if (this.props.userDetails?.role === 'NATIONAL_REGISTRAR') {
+      if (
+        this.props.userDetails?.role === 'NATIONAL_REGISTRAR' ||
+        this.props.userDetails?.role === 'NATIONAL_SYSTEM_ADMIN'
+      ) {
         return true
       } else if (
         REGISTRAR_ROLES.includes(this.props.userDetails?.role) &&
@@ -622,7 +625,8 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 'WAITING_VALIDATION',
                 'REGISTERED'
               ],
-              officeSelected: this.state.officeSelected
+              officeSelected: this.state.officeSelected,
+              showStatusCount: this.state.officeSelected && isAccessibleOffice
             }}
             fetchPolicy="no-cache"
           >
