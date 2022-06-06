@@ -123,7 +123,7 @@ const MobileActionsContainer = styled.div`
   justify-content: right;
 `
 
-interface IListViewItemSimplifiedProps {
+export interface IListViewItemSimplifiedProps {
   image?: React.ReactNode
   label: React.ReactNode
   value?: React.ReactNode
