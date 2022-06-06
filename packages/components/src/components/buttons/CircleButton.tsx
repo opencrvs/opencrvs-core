@@ -17,7 +17,8 @@ type IButtonSize = 'small' | 'medium' | 'large'
 const dimensionMap = {
   small: '24px',
   medium: '32px',
-  large: '40px'
+  large: '40px',
+  extraLarge: '48px'
 }
 
 const Button = styled.button<ICircleButtonProps & { size: IButtonSize }>`

@@ -61,17 +61,23 @@ const StyledPageNumber = styled.span<{ isCurrentPage: boolean; size?: string }>`
     isCurrentPage ? theme.colors.grey600 : theme.colors.grey400};
 `
 
-const ModifiedCircleButton = styled(CircleButton)`
-  height: auto;
-  width: auto;
-  min-height: 24px;
-  min-width: 24px;
-`
-
 interface IState {
   canPrevious: boolean
   canNext: boolean
   currentPage: number
+}
+
+const getCricleSize = (page: React.ReactText, size: IPaginationVariant) => {
+  if (Number.isInteger(page)) {
+    if (page > 99) {
+      if (size === 'small') {
+        return 'large'
+      } else {
+        return 'extraLarge'
+      }
+    }
+  }
+  return size
 }
 
 export class PaginationModified extends React.Component<
@@ -166,8 +172,8 @@ export class PaginationModified extends React.Component<
         </Icon>
         <StyledPagination>
           {pages.map((page, id) => (
-            <ModifiedCircleButton
-              size={this.props.size ? this.props.size : 'small'}
+            <CircleButton
+              size={getCricleSize(page, this.props.size || 'small')}
               id={`page-number-${id}`}
               onClick={() => this.changePage(page)}
             >
@@ -179,7 +185,7 @@ export class PaginationModified extends React.Component<
               >
                 {page}
               </StyledPageNumber>
-            </ModifiedCircleButton>
+            </CircleButton>
           ))}
         </StyledPagination>
         <Icon
