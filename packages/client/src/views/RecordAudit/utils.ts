@@ -129,7 +129,7 @@ export const DECLARATION_STATUS_LABEL: IStatus = {
     id: 'recordAudit.history.downloaded'
   },
   REQUESTED_CORRECTION: {
-    defaultMessage: 'Requested correction',
+    defaultMessage: 'Corrected record',
     description: 'Status for declaration being requested for correction',
     id: 'recordAudit.history.requestedCorrection'
   },
