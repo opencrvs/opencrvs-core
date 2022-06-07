@@ -347,9 +347,11 @@ function mapStatetoProps(
         ...draft.data,
         template: {
           ...draft.data.template,
-          [signatureKey]: isCertificateForPrintInAdvance(draft)
-            ? ''
-            : draft.data.template[signatureKey]
+          [signatureKey]:
+            !draft.data.template?.[signatureKey] ||
+            isCertificateForPrintInAdvance(draft)
+              ? ''
+              : draft.data.template[signatureKey]
         }
       }
     },
