@@ -35,35 +35,46 @@ import {
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { withTheme } from 'styled-components'
+import { Square } from '@opencrvs/components/lib/icons'
 
 const Container = styled.div`
   align-self: center;
-  flex-grow: 1;
   position: relative;
-  width: 800px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 500px;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 300px;
-  }
+  width: min(600px, 90%);
+  aspect-ratio: 1;
 `
 
 const Description = styled.div`
   margin-bottom: 20px;
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 10px;
 `
 
-const Slider = styled.input`
-  width: 312px;
+const SliderContainer = styled.div`
+  width: min(600px, 90%);
+  display: flex;
   align-self: center;
-  margin: 30px 0px 30px 0px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    width: 272px;
-  }
+  align-items: center;
+  margin: 30px 0;
+  padding: 0 16px;
+  gap: 8px;
 `
+
+const StyledInput = styled.input`
+  flex-grow: 1;
+`
+
+function Slider(props: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <SliderContainer>
+      <Square width={12} height={12} color="grey400" />
+      <StyledInput {...props} />
+      <Square width={18} height={18} color="grey400" />
+    </SliderContainer>
+  )
+}
 
 const DefaultImage = styled.div<{ width: number; height: number }>`
   border-radius: 50%;
@@ -177,9 +188,10 @@ function AvatarChangeModalComp({
   return (
     <ResponsiveModal
       id="ChangeAvatarModal"
+      width={1080}
+      contentHeight={720}
       show={showChangeAvatar}
       title={intl.formatMessage(messages.changeAvatar)}
-      fullscreen
       actions={[
         <TertiaryButton key="cancel" id="modal_cancel" onClick={handleCancel}>
           {intl.formatMessage(buttonMessages.cancel)}
@@ -235,7 +247,9 @@ function AvatarChangeModalComp({
           }}
           onError={(error) => setError(error)}
         >
-          <LinkButton>{intl.formatMessage(messages.changeImage)}</LinkButton>
+          <LinkButton size="small">
+            {intl.formatMessage(messages.changeImage)}
+          </LinkButton>
         </ImageLoader>
       </Description>
       {error ? (
