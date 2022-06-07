@@ -165,7 +165,7 @@ export class StepTwoForm extends React.Component<FullProps> {
               disabled={submitting}
               type="submit"
             >
-              {intl.formatMessage(messages.submit)}
+              {intl.formatMessage(messages.verify)}
             </PrimaryButton>{' '}
             <br />
             <StyledButtonWrapper>
