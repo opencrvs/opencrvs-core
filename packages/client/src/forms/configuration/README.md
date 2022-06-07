@@ -721,27 +721,16 @@ This object holds sections for death declaration forms. All sections are in sect
 
   - #### `uploadDocForDeceased`
 
-    This is a document uploader with options and is used to take the documents for the deceased. The document of this field actually stands for the deceased id proof. So, the extraValue of this is `DECEASED_ID_PROOF`. The options are National ID (front), National ID (back), Birth Registration, Passport.
+    This is a document uploader with options and is used to take the documents for the deceased. The document of this field actually stands for the deceased id proof. So, the `extraValue` of this is `DECEASED_ID_PROOF`. The options are National ID, Passport, Birth Registration & Other.
 
   - #### `uploadDocForInformant`
 
     This “document uploader with options” field stands for the documents for the informant as proof of his/her id. So the `extraValue` of this field is `INFORMANT_ID_PROOF`. The options are the same as the deceased.
 
-  - #### `uploadDocForInformantAthorityToApply`
-
-    This field is conditional and only appears when the informant is someone else. The `extraValue` of this field is `INFORMANT_ATHORITY_TO_APPLY_PROOF`. This has only one option which is Signed Affidavit.
-
   - #### `uploadDocForDeceasedDeath`
 
-    This field takes proof of the death of the deceased. It has several options, which are: Certified Post Mortem Report, Hospital Discharge Certificate, Attested Letter of Death, Attested Certificate of Death, Certified Copy of Burial Receipt, Certified Copy of Funeral Receipt. The `extraValue` of this field `DECEASED_DEATH_PROOF`, which is self-descriptive.
+    This field takes proof of the death of the deceased. It has several options, which are: Attested Letter of Death, Police Certificate of Death, Hospital Certificate of Death, Coroner's Report, Burial Receipt & Other. The `extraValue` of this field `DECEASED_DEATH_PROOF`, which is self-descriptive.
 
-  - #### `uploadDocForDeceasedPrimaryAddress`
+  - #### `uploadDocForCauseOfDeath`
 
-    This field stands for the proof of the deceased’s permanent address having extraValue of DECEASED_PARMANENT_ADDRESS_PROOF. The options are the same as the [uploadDocForDeceased](#uploadDocForDeceased).
-
-  - #### `uploadDocForDeceasedDOB`
-
-    This field stands for the deceased birth proof, having only one option Proof of Date of Birth of Deceased.
-
-  - #### `uploadDocFromCounsilor`
-    This field stands for the ward councilor proof having only one option Letter from ward councillor.
+    This field is conditional and only appears if the Cause of Death has been established. The `extraValue` of this field is DECEASED_DEATH_CAUSE_PROOF. The options are Medically Certified Cause of Death, Verbal Autopsy Report & Other.

@@ -19,7 +19,7 @@ import {
   ColumnContentAlignment
 } from '@opencrvs/components/lib/interface'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
-import { getFormattedDate, getDisplayItems, getStatusLabel } from './utils'
+import { getFormattedDate, getPageItems, getStatusLabel } from './utils'
 import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
 import {
   PaginationWrapper,
@@ -184,68 +184,60 @@ export const GetHistory = ({
     })
   }
 
-  const historiesForDisplay = getDisplayItems(
+  // TODO: We need to figure out a way to sort the history in backend
+  const sortedHistory = allHistoryData.sort((fe, se) => {
+    return new Date(fe.date).getTime() - new Date(se.date).getTime()
+  })
+
+  const historiesForDisplay = getPageItems(
     currentPageNumber,
     DEFAULT_HISTORY_RECORD_PAGE_SIZE,
-    allHistoryData
+    sortedHistory
   )
-  const isFieldAgent =
-    userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
-      ? true
-      : false
+
   const historyData = (
     historiesForDisplay as unknown as { [key: string]: any }[]
-  )
-    // TODO: We need to figure out a way to sort the history in backend
-    .sort((fe, se) => {
-      return new Date(fe.date).getTime() - new Date(se.date).getTime()
-    })
-    .map((item) => ({
-      date: getFormattedDate(item?.date),
-      action: (
-        <GetLink
-          status={getStatusLabel(
-            item?.action,
-            item.reinstated,
-            intl,
-            item.user
-          )}
-          onClick={() => toggleActionDetails(item)}
+  ).map((item) => ({
+    date: getFormattedDate(item?.date),
+    action: (
+      <GetLink
+        status={getStatusLabel(item?.action, item.reinstated, intl, item.user)}
+        onClick={() => toggleActionDetails(item)}
+      />
+    ),
+    user:
+      item.dhis2Notification && !item.user?.id ? (
+        <HealthSystemUser />
+      ) : (
+        <GetNameWithAvatar
+          id={item.user.id}
+          nameObject={item.user.name}
+          avatar={item.user?.avatar}
+          language={window.config.LANGUAGES}
         />
       ),
-      user:
-        item.dhis2Notification && !item.user?.id ? (
-          <HealthSystemUser />
-        ) : (
-          <GetNameWithAvatar
-            id={item.user.id}
-            nameObject={item.user.name}
-            avatar={item.user?.avatar}
-            language={window.config.LANGUAGES}
-          />
-        ),
-      type: intl.formatMessage(
-        item.dhis2Notification && !item.user?.role
-          ? userMessages.healthSystem
-          : userMessages[item.user.role as string]
-      ),
-      location:
-        item.dhis2Notification && !item.user?.role ? (
-          <HealthSystemLocation>{item.office?.name}</HealthSystemLocation>
-        ) : (
-          <GetLink
-            status={item.office?.name}
-            onClick={() => {
-              goToTeamUserList &&
-                goToTeamUserList({
-                  id: item.office.id,
-                  searchableText: item.office.name,
-                  displayLabel: item.office.name
-                } as ISearchLocation)
-            }}
-          />
-        )
-    }))
+    type: intl.formatMessage(
+      item.dhis2Notification && !item.user?.role
+        ? userMessages.healthSystem
+        : userMessages[item.user.role as string]
+    ),
+    location:
+      item.dhis2Notification && !item.user?.role ? (
+        <HealthSystemLocation>{item.office?.name}</HealthSystemLocation>
+      ) : (
+        <GetLink
+          status={item.office?.name}
+          onClick={() => {
+            goToTeamUserList &&
+              goToTeamUserList({
+                id: item.office.id,
+                searchableText: item.office.name,
+                displayLabel: item.office.name
+              } as ISearchLocation)
+          }}
+        />
+      )
+  }))
 
   const columns = [
     {

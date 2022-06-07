@@ -12,7 +12,8 @@
 import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import {
   constantsMessages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
@@ -307,12 +308,8 @@ class SentForReviewComponent extends React.Component<
         ? true
         : false
     const noResultText = this.isFieldAgent
-      ? intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'sent for review'
-        })
-      : intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'sent for approval'
-        })
+      ? intl.formatMessage(wqMessages.noRecordsSentForReview)
+      : intl.formatMessage(wqMessages.noRecordsSentForApproval)
     const title = this.isFieldAgent
       ? intl.formatMessage(navigationMessages.sentForReview)
       : intl.formatMessage(navigationMessages.approvals)

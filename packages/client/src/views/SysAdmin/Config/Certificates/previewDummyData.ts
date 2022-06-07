@@ -1334,7 +1334,7 @@ const mockUserDetails = {
   ]
 }
 
-export const getDummyCertificateTemplateData = (
+export const getDummyDeclarationData = (
   event: string,
   registerForm: { birth: IForm; death: IForm }
 ) => {
@@ -1346,12 +1346,18 @@ export const getDummyCertificateTemplateData = (
     response = dummyDeathRegistrationResponse
     form = registerForm.death
   }
-  const declaration = gqlToDraftTransformer(
+  return gqlToDraftTransformer(
     form,
     response,
     mockOfflineData as IOfflineData,
     mockUserDetails
   )
+}
 
-  return declaration.template
+export const getDummyCertificateTemplateData = (
+  event: string,
+  registerForm: { birth: IForm; death: IForm }
+) => {
+  const data = getDummyDeclarationData(event, registerForm)
+  return data.template
 }

@@ -21,8 +21,8 @@ export const Previous = (props: React.HTMLAttributes<SVGElement>) => {
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M5.78033 1.09467C6.07322 1.38756 6.07322 1.86244 5.78033 2.15533L1.81066 6.125L5.78033 10.0947C6.07322 10.3876 6.07322 10.8624 5.78033 11.1553C5.48744 11.4482 5.01256 11.4482 4.71967 11.1553L0.21967 6.65533C-0.0732233 6.36244 -0.0732233 5.88756 0.21967 5.59467L4.71967 1.09467C5.01256 0.801777 5.48744 0.801777 5.78033 1.09467Z"
         fill="#A5A5A5"
       />
