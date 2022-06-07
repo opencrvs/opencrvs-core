@@ -30,6 +30,7 @@ import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import { userMessages } from '@client/i18n/messages'
 import { MessageDescriptor } from 'react-intl'
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
+import { History } from '@client/utils/gateway'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -241,8 +242,12 @@ export const registrarNameUserTransformer = (
   if (!userDetails) {
     return
   }
+
+  const history = _.history.find(
+    (historyItem: History) => historyItem?.action === 'REGISTERED'
+  )
   transformedData[targetSectionId || sectionId][targetFieldName || 'userName'] =
-    userDetails.localRegistrar ? getUserName(userDetails.localRegistrar) : ''
+    history.user ? getUserName(history.user) : ''
 }
 
 export const roleUserTransformer = (
