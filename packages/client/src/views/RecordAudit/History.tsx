@@ -144,6 +144,10 @@ export const GetHistory = ({
   toggleActionDetails: (actionItem: IActionDetailsData) => void
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const isFieldAgent =
+    userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+      ? true
+      : false
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
   const onPageChange = (currentPageNumber: number) =>
     setCurrentPageNumber(currentPageNumber)
@@ -224,6 +228,8 @@ export const GetHistory = ({
     location:
       item.dhis2Notification && !item.user?.role ? (
         <HealthSystemLocation>{item.office?.name}</HealthSystemLocation>
+      ) : isFieldAgent ? (
+        <>{item.office?.name}</>
       ) : (
         <GetLink
           status={item.office?.name}

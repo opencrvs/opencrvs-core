@@ -144,9 +144,9 @@ class SentForReviewComponent extends React.Component<
           sortFunction: this.onColumnClick
         },
         {
-          label: this.props.intl.formatMessage(
-            constantsMessages.sentForApproval
-          ),
+          label: this.isFieldAgent
+            ? this.props.intl.formatMessage(navigationMessages.sentForReview)
+            : this.props.intl.formatMessage(navigationMessages.approvals),
           width: 18,
           key: COLUMNS.SENT_FOR_APPROVAL,
           isSorted: this.state.sortedCol === COLUMNS.SENT_FOR_APPROVAL,

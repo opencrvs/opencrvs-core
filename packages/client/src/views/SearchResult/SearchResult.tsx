@@ -315,11 +315,7 @@ export class SearchResultView extends React.Component<
           })
         }
       }
-      if (
-        downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED &&
-        ((!declarationIsValidated && this.userHasValidateOrRegistrarScope()) ||
-          (declarationIsValidated && this.userHasRegisterScope()))
-      ) {
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         actions.push({
           actionComponent: (
             <DownloadButton
