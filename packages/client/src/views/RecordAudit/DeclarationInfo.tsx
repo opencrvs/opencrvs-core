@@ -93,7 +93,7 @@ export const GetDeclarationInfo = ({
       : finalStatus === 'Rejected'
       ? intl.formatMessage(constantsMessages.requiresUpdatesStatus)
       : finalStatus === 'Registered'
-      ? intl.formatMessage(constantsMessages.registered)
+      ? intl.formatMessage(constantsMessages.registeredStatus)
       : finalStatus
 
   if (declaration?.informantContact && informant) {

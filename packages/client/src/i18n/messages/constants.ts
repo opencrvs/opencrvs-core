@@ -90,6 +90,7 @@ interface IConstantsMessages
   inReviewStatus: MessageDescriptor
   incompleteStatus: MessageDescriptor
   requiresUpdatesStatus: MessageDescriptor
+  registeredStatus: MessageDescriptor
   rejected: MessageDescriptor
   rejectedDays: MessageDescriptor
   relationship: MessageDescriptor
@@ -575,6 +576,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Requires updates',
     description: 'A label for Requires updates',
     id: 'constants.requiresUpdates.status'
+  },
+  registeredStatus: {
+    defaultMessage: 'Registered',
+    description: 'A label for registered',
+    id: 'constants.registered.status'
   },
   rejected: {
     defaultMessage: 'rejected',

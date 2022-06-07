@@ -435,17 +435,14 @@ export const getStatusLabel = (
   intl: IntlShape,
   userDetails: IUserDetails
 ) => {
-  const label =
-    status === 'DECLARED'
+  if (status in DECLARATION_STATUS_LABEL)
+    return (reinstated
+      ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'])
+      : '') +
+      status ===
+      'DECLARED'
       ? findMessage(status, userDetails.role ? userDetails.role : '', intl)
       : intl.formatMessage(DECLARATION_STATUS_LABEL[status])
-  if (status in DECLARATION_STATUS_LABEL)
-    return reinstated
-      ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'], {
-          status: label
-        })
-      : label
-
   return ''
 }
 
