@@ -355,9 +355,12 @@ export function hasDefaultFieldChanged(
     defaultFieldIdentifiers,
     defaultForm
   )
-  if (precedingDefaultFieldId !== defaultConfigField.preceedingFieldId) {
+
+  /* Changing the positions of the default field is not implemented yet*/
+  /*if (precedingDefaultFieldId !== defaultConfigField.preceedingFieldId) {
     return true
-  }
+  }*/
+
   return (
     defaultConfigField.enabled === FieldEnabled.DISABLED ||
     /* These can be undefined so need to be converted to boolean */

@@ -34,6 +34,8 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { IDynamicValues } from '@client/navigation'
 import { countryMessages } from '@client/i18n/messages/constants'
+import { IUserDetails } from '@client/utils/userUtils'
+import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 
 interface IStatus {
   [key: string]: MessageDescriptor
@@ -91,6 +93,11 @@ export const DECLARATION_STATUS_LABEL: IStatus = {
     description: 'Label for registration status declared',
     id: 'recordAudit.history.declared'
   },
+  DECLARED_FIELD_AGENT: {
+    defaultMessage: 'Sent notification for review',
+    description: 'Label for registration status declared',
+    id: 'recordAudit.history.declaredFieldAgent'
+  },
   WAITING_VALIDATION: {
     defaultMessage: 'Waiting for validation',
     description: 'Label for registration status waitingValidation',
@@ -102,7 +109,7 @@ export const DECLARATION_STATUS_LABEL: IStatus = {
     id: 'regHome.sentForApprovals'
   },
   REGISTERED: {
-    defaultMessage: 'Declaration registered',
+    defaultMessage: 'Registered',
     description: 'Label for registration status registered',
     id: 'recordAudit.history.registered'
   },
@@ -127,9 +134,9 @@ export const DECLARATION_STATUS_LABEL: IStatus = {
     id: 'recordAudit.history.requestedCorrection'
   },
   DECLARATION_UPDATED: {
-    defaultMessage: 'Updated declaration',
+    defaultMessage: 'Updated',
     description: 'Declaration has been updated',
-    id: 'updated_declaration'
+    id: 'recordAudit.history.updatedDeclaration'
   }
 }
 
@@ -408,7 +415,7 @@ export const getGQLDeclaration = (
   }
 }
 
-export const getDisplayItems = (
+export const getPageItems = (
   currentPage: number,
   pageSize: number,
   allData: IDynamicValues
@@ -418,20 +425,31 @@ export const getDisplayItems = (
   }
 
   const offset = (currentPage - 1) * pageSize
-  const displayItems = allData.slice(offset, offset + pageSize)
-  return displayItems
+  const pageItems = allData.slice(offset, offset + pageSize)
+  return pageItems
 }
 
 export const getStatusLabel = (
   status: string,
   reinstated: boolean,
-  intl: IntlShape
+  intl: IntlShape,
+  userDetails: IUserDetails
 ) => {
   if (status in DECLARATION_STATUS_LABEL)
-    return (
-      (reinstated
-        ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'])
-        : '') + intl.formatMessage(DECLARATION_STATUS_LABEL[status])
-    )
+    return (reinstated
+      ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'])
+      : '') +
+      status ===
+      'DECLARED'
+      ? findMessage(status, userDetails.role ? userDetails.role : '', intl)
+      : intl.formatMessage(DECLARATION_STATUS_LABEL[status])
   return ''
+}
+
+const findMessage = (status: string, userRole: string, intl: IntlShape) => {
+  if (userRole && FIELD_AGENT_ROLES.includes(userRole)) {
+    return intl.formatMessage(DECLARATION_STATUS_LABEL['DECLARED_FIELD_AGENT'])
+  } else {
+    return intl.formatMessage(DECLARATION_STATUS_LABEL[status])
+  }
 }

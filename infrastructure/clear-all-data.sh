@@ -79,15 +79,11 @@ drop_database () {
 
 # Delete all data from mongo
 #---------------------------
-if [[ "$ENV" != "qa" ]] ; then
-  drop_database hearth-dev;
-fi
+drop_database hearth-dev;
 
 drop_database openhim-dev
 
-if [[ "$ENV" != "qa" ]] ; then
-  drop_database user-mgnt;
-fi
+drop_database user-mgnt;
 
 drop_database application-config
 

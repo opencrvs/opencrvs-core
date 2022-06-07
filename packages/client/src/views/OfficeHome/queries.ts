@@ -146,7 +146,7 @@ export const REGISTRATION_HOME_QUERY = gql`
 
 export const FIELD_AGENT_HOME_QUERY = gql`
   ${EVENT_SEARCH_RESULT_FIELDS}
-  query registrationHome(
+  query fieldAgentHome(
     $userId: String
     $locationIds: [String]
     $pageSize: Int

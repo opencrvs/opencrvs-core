@@ -769,6 +769,7 @@ export const eventLocationAddressOfflineTransformer =
       queryData.eventLocation?.type &&
       queryData.eventLocation.type !== 'PRIVATE_HOME' &&
       queryData.eventLocation.type !== 'PRIMARY_ADDRESS' &&
+      queryData.eventLocation.type !== 'DECEASED_USUAL_RESIDENCE' &&
       queryData.eventLocation.type !== 'OTHER'
     ) {
       return

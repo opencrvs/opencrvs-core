@@ -22,6 +22,7 @@ interface ILocationMessages
 }
 
 const messagesToDefine: ILocationMessages = {
+  /* UNION & DIVISION is needed for unit tests. Can be removed after the tests are refactored */
   UNION: {
     id: 'location.jurisdictionType.UNION',
     defaultMessage: 'Union',

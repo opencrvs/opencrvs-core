@@ -101,16 +101,10 @@ enum AttachmentSubject {
   PARENT
   CHILD_AGE
   DECEASED_ID_PROOF
-  DECEASED_PARMANENT_ADDRESS_PROOF
   DECEASED_DEATH_PROOF
-  DECEASED_BIRTH_PROOF
+  DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
-  INFORMANT_ATHORITY_TO_APPLY_PROOF
   LEGAL_GUARDIAN_PROOF
-  ASSIGNED_RESPONSIBILITY_PROOF
-  WARD_COUNCILLOR_PROOF
-  CAUSE_OF_DEATH
-  CORONERS_REPORT
 }
 
 enum RegistrationType {
@@ -235,6 +229,7 @@ type History {
   reinstated: Boolean # -> extension(url='http://opencrvs.org/specs/extension/regReinstated')
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
+  dhis2Notification: Boolean # -> identitifier(system='http://opencrvs.org/specs/extension/dhis2_event_identifier')
   comments: [Comment]
   input: [InputOutput]
   output: [InputOutput]

@@ -67,6 +67,8 @@ const nameObj = {
   }
 }
 
+const TIME_STAMP = '1544188309380'
+
 const mockUserData = {
   id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
   type: 'Birth',
@@ -77,8 +79,8 @@ const mockUserData = {
     registrationNumber: null,
     registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
     duplicates: null,
-    createdAt: '2018-05-23T14:44:58+02:00',
-    modifiedAt: '2018-05-23T14:44:58+02:00'
+    createdAt: TIME_STAMP,
+    modifiedAt: TIME_STAMP
   },
   dateOfBirth: '2010-10-10',
   childName: [
@@ -179,8 +181,8 @@ describe('OfficeHome sent for update tab related tests', () => {
                   eventLocationId: undefined,
                   registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
                   duplicates: [null],
-                  createdAt: '2018-05-23T14:44:58+02:00',
-                  modifiedAt: '2018-05-23T14:44:58+02:00'
+                  createdAt: TIME_STAMP,
+                  modifiedAt: TIME_STAMP + 1
                 },
                 dateOfBirth: '2010-10-10',
                 childName: [
@@ -481,8 +483,8 @@ describe('OfficeHome sent for update tab related tests', () => {
                     registeredLocationId:
                       '308c35b4-04f8-4664-83f5-9790e790cde1',
                     duplicates: null,
-                    createdAt: '2018-05-23T14:44:58+02:00',
-                    modifiedAt: '2018-05-23T14:44:58+02:00'
+                    createdAt: TIME_STAMP,
+                    modifiedAt: TIME_STAMP + 1
                   },
                   dateOfBirth: '2010-10-10',
                   childName: [
@@ -654,8 +656,8 @@ describe('Tablet tests', () => {
                   eventLocationId: undefined,
                   registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
                   duplicates: [null],
-                  createdAt: '2018-05-23T14:44:58+02:00',
-                  modifiedAt: '2018-05-23T14:44:58+02:00'
+                  createdAt: TIME_STAMP,
+                  modifiedAt: TIME_STAMP + 1
                 },
                 dateOfBirth: '2010-10-10',
                 childName: [

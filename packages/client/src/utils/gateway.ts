@@ -160,23 +160,17 @@ export type AttachmentInput = {
 }
 
 export enum AttachmentSubject {
-  AssignedResponsibilityProof = 'ASSIGNED_RESPONSIBILITY_PROOF',
-  CauseOfDeath = 'CAUSE_OF_DEATH',
   Child = 'CHILD',
   ChildAge = 'CHILD_AGE',
-  CoronersReport = 'CORONERS_REPORT',
-  DeceasedBirthProof = 'DECEASED_BIRTH_PROOF',
+  DeceasedDeathCauseProof = 'DECEASED_DEATH_CAUSE_PROOF',
   DeceasedDeathProof = 'DECEASED_DEATH_PROOF',
   DeceasedIdProof = 'DECEASED_ID_PROOF',
-  DeceasedParmanentAddressProof = 'DECEASED_PARMANENT_ADDRESS_PROOF',
   Father = 'FATHER',
-  InformantAthorityToApplyProof = 'INFORMANT_ATHORITY_TO_APPLY_PROOF',
   InformantIdProof = 'INFORMANT_ID_PROOF',
   LegalGuardianProof = 'LEGAL_GUARDIAN_PROOF',
   Mother = 'MOTHER',
   Other = 'OTHER',
-  Parent = 'PARENT',
-  WardCouncillorProof = 'WARD_COUNCILLOR_PROOF'
+  Parent = 'PARENT'
 }
 
 export enum AttachmentType {
@@ -383,6 +377,17 @@ export type CommentInput = {
   comment?: InputMaybe<Scalars['String']>
   createdAt?: InputMaybe<Scalars['Date']>
   user?: InputMaybe<UserInput>
+}
+
+export type ComparisonInput = {
+  eq?: InputMaybe<Scalars['String']>
+  gt?: InputMaybe<Scalars['String']>
+  gte?: InputMaybe<Scalars['String']>
+  in?: InputMaybe<Array<Scalars['String']>>
+  lt?: InputMaybe<Scalars['String']>
+  lte?: InputMaybe<Scalars['String']>
+  ne?: InputMaybe<Scalars['String']>
+  nin?: InputMaybe<Array<Scalars['String']>>
 }
 
 export type ContactPoint = {
@@ -670,10 +675,12 @@ export type History = {
   certificates?: Maybe<Array<Maybe<Certificate>>>
   comments?: Maybe<Array<Maybe<Comment>>>
   date?: Maybe<Scalars['Date']>
+  dhis2Notification?: Maybe<Scalars['Boolean']>
   input?: Maybe<Array<Maybe<InputOutput>>>
   location?: Maybe<Location>
   office?: Maybe<Location>
   output?: Maybe<Array<Maybe<InputOutput>>>
+  reason?: Maybe<Scalars['String']>
   reinstated?: Maybe<Scalars['Boolean']>
   statusReason?: Maybe<StatusReason>
   user?: Maybe<User>
@@ -1300,7 +1307,7 @@ export type QueryGetRolesArgs = {
   sortOrder?: InputMaybe<Scalars['String']>
   title?: InputMaybe<Scalars['String']>
   type?: InputMaybe<Scalars['String']>
-  value?: InputMaybe<Scalars['String']>
+  value?: InputMaybe<ComparisonInput>
 }
 
 export type QueryGetTotalCertificationsArgs = {
@@ -1896,7 +1903,9 @@ export type CreateOrUpdateUserMutation = {
   createOrUpdateUser: { __typename?: 'User'; username?: string | null }
 }
 
-export type GetRolesQueryVariables = Exact<{ [key: string]: never }>
+export type GetRolesQueryVariables = Exact<{
+  value?: InputMaybe<ComparisonInput>
+}>
 
 export type GetRolesQuery = {
   __typename?: 'Query'
@@ -2202,6 +2211,11 @@ export type GetUserQuery = {
         value?: string | null
       } | null> | null
     } | null> | null
+    signature?: {
+      __typename?: 'Signature'
+      type?: string | null
+      data?: string | null
+    } | null
     avatar?: { __typename?: 'Avatar'; type: string; data: string } | null
   } | null
 }
@@ -2541,6 +2555,16 @@ export type FetchBirthRegistrationForReviewQuery = {
           __typename?: 'Comment'
           comment?: string | null
         } | null> | null
+        office?: {
+          __typename?: 'Location'
+          name?: string | null
+          alias?: Array<string | null> | null
+          address?: {
+            __typename?: 'Address'
+            district?: string | null
+            state?: string | null
+          } | null
+        } | null
       } | null> | null
     } | null
     eventLocation?: {
@@ -2567,6 +2591,8 @@ export type FetchBirthRegistrationForReviewQuery = {
       date?: any | null
       action?: RegStatus | null
       reinstated?: boolean | null
+      dhis2Notification?: boolean | null
+      reason?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -2842,6 +2868,7 @@ export type FetchBirthRegistrationForCertificateQuery = {
       date?: any | null
       action?: RegStatus | null
       reinstated?: boolean | null
+      dhis2Notification?: boolean | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -3155,6 +3182,20 @@ export type FetchDeathRegistrationForReviewQuery = {
         __typename?: 'RegWorkflow'
         type?: RegStatus | null
         timestamp?: any | null
+        comments?: Array<{
+          __typename?: 'Comment'
+          comment?: string | null
+        } | null> | null
+        office?: {
+          __typename?: 'Location'
+          name?: string | null
+          alias?: Array<string | null> | null
+          address?: {
+            __typename?: 'Address'
+            district?: string | null
+            state?: string | null
+          } | null
+        } | null
       } | null> | null
     } | null
     eventLocation?: {
@@ -3182,6 +3223,8 @@ export type FetchDeathRegistrationForReviewQuery = {
       date?: any | null
       action?: RegStatus | null
       reinstated?: boolean | null
+      dhis2Notification?: boolean | null
+      reason?: string | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -3446,6 +3489,7 @@ export type FetchDeathRegistrationForCertificationQuery = {
       date?: any | null
       action?: RegStatus | null
       reinstated?: boolean | null
+      dhis2Notification?: boolean | null
       statusReason?: {
         __typename?: 'StatusReason'
         text?: string | null
@@ -3942,6 +3986,134 @@ export type RegistrationHomeQuery = {
     > | null
   } | null
   printTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+          } | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+          } | null
+        }
+      | null
+    > | null
+  } | null
+}
+
+export type FieldAgentHomeQueryVariables = Exact<{
+  userId?: InputMaybe<Scalars['String']>
+  locationIds?: InputMaybe<
+    Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
+  >
+  pageSize?: InputMaybe<Scalars['Int']>
+  reviewSkip?: InputMaybe<Scalars['Int']>
+  rejectSkip?: InputMaybe<Scalars['Int']>
+}>
+
+export type FieldAgentHomeQuery = {
+  __typename?: 'Query'
+  reviewTab?: {
+    __typename?: 'EventSearchResultSet'
+    totalItems?: number | null
+    results?: Array<
+      | {
+          __typename?: 'BirthEventSearchSet'
+          dateOfBirth?: any | null
+          id: string
+          type?: string | null
+          childName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+          } | null
+        }
+      | {
+          __typename?: 'DeathEventSearchSet'
+          dateOfDeath?: any | null
+          id: string
+          type?: string | null
+          deceasedName?: Array<{
+            __typename?: 'HumanName'
+            firstNames?: string | null
+            familyName?: string | null
+            use?: string | null
+          } | null> | null
+          registration?: {
+            __typename?: 'RegistrationSearchSet'
+            status?: string | null
+            contactRelationship?: string | null
+            contactNumber?: string | null
+            trackingId?: string | null
+            eventLocationId?: string | null
+            registrationNumber?: string | null
+            registeredLocationId?: string | null
+            duplicates?: Array<string | null> | null
+            createdAt?: string | null
+            modifiedAt?: string | null
+          } | null
+        }
+      | null
+    > | null
+  } | null
+  rejectTab?: {
     __typename?: 'EventSearchResultSet'
     totalItems?: number | null
     results?: Array<
@@ -4616,6 +4788,8 @@ export type GetLocationStatisticsQueryVariables = Exact<{
   populationYear: Scalars['Int']
   status: Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
   event?: InputMaybe<Scalars['String']>
+  officeSelected: Scalars['Boolean']
+  showStatusCount: Scalars['Boolean']
 }>
 
 export type GetLocationStatisticsQuery = {

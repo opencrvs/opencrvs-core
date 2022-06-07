@@ -33,8 +33,14 @@ export const correctionFeesPayment: IFormSectionGroup = {
       initialValue: '',
       validate: [],
       options: [
-        { value: 'REQUIRED', label: messages.idCheckVerify },
-        { value: 'NOT_REQUIRED', label: messages.idCheckWithoutVerify }
+        {
+          value: 'REQUIRED',
+          label: messages.correctionSummaryFeesRequiredPositive
+        },
+        {
+          value: 'NOT_REQUIRED',
+          label: messages.correctionSummaryFeesRequiredNegative
+        }
       ],
       nestedFields: {
         REQUIRED: [

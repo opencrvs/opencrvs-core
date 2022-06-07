@@ -254,7 +254,7 @@ docker_stack_deploy() {
     ROTATING_SEARCH_ELASTIC_PASSWORD='$ROTATING_SEARCH_ELASTIC_PASSWORD' \
     KIBANA_USERNAME='$KIBANA_USERNAME' \
     KIBANA_PASSWORD='$KIBANA_PASSWORD' \
-    docker stack deploy -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c '$environment_compose' --with-registry-auth opencrvs'
+    docker stack deploy --prune -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml -c '$environment_compose' --with-registry-auth opencrvs'
 }
 
 
@@ -278,7 +278,9 @@ fi
 
 
 echo
-echo "Waiting 2 mins for stack to deploy before working with data..."
+echo "This script doesnt ensure that all docker containers successfully start, just that docker_stack_deploy ran successfully."
+echo
+echo "Waiting 2 mins for mongo to deploy before working with data. Please note it can take up to 10 minutes for the entire stack to deploy in some scenarios."
 echo
 sleep 120
 

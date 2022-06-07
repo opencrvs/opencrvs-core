@@ -357,6 +357,7 @@ type User {
   catchmentArea: [Location]
   localRegistrar: LocalRegistrar
   identifier: Identifier
+  signature: Signature
   creationDate: String
   avatar: Avatar
   device: String
@@ -762,6 +763,7 @@ type History {
   reinstated: Boolean
   location: Location
   office: Location
+  dhis2Notification: Boolean
   comments: [Comment]
   input: [InputOutput]
   output: [InputOutput]
@@ -893,6 +895,11 @@ type LocalRegistrar {
   name: [HumanName]!
   role: String!
   signature: Signature
+}
+
+type Signature {
+  data: String
+  type: String
 }
 
 type SearchFieldAgentResponse {
@@ -1235,21 +1242,10 @@ enum AttachmentSubject {
   PARENT
   CHILD_AGE
   DECEASED_ID_PROOF
-  DECEASED_PARMANENT_ADDRESS_PROOF
   DECEASED_DEATH_PROOF
-  DECEASED_BIRTH_PROOF
+  DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
-  INFORMANT_ATHORITY_TO_APPLY_PROOF
   LEGAL_GUARDIAN_PROOF
-  ASSIGNED_RESPONSIBILITY_PROOF
-  WARD_COUNCILLOR_PROOF
-  CAUSE_OF_DEATH
-  CORONERS_REPORT
-}
-
-type Signature {
-  data: String
-  type: String
 }
 
 type RegistrationSearchSet {

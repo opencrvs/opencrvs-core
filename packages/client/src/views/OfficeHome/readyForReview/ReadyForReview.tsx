@@ -30,7 +30,8 @@ import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import {
   constantsMessages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import {
@@ -92,8 +93,8 @@ class ReadyForReviewComponent extends React.Component<
     super(props)
     this.state = {
       width: window.innerWidth,
-      sortedCol: COLUMNS.NAME,
-      sortOrder: SORT_ORDER.ASCENDING
+      sortedCol: COLUMNS.SENT_FOR_REVIEW,
+      sortOrder: SORT_ORDER.DESCENDING
     }
   }
 
@@ -272,7 +273,7 @@ class ReadyForReviewComponent extends React.Component<
           isSorted: this.state.sortedCol === COLUMNS.NAME
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: this.props.intl.formatMessage(constantsMessages.event),
           width: 16,
           key: COLUMNS.EVENT,
           sortFunction: this.onColumnClick,
@@ -339,9 +340,7 @@ class ReadyForReviewComponent extends React.Component<
         onPageChange={onPageChange}
         loading={this.props.loading}
         error={this.props.error}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'are ready for review'
-        })}
+        noResultText={intl.formatMessage(wqMessages.noRecordsReadyForReview)}
         noContent={this.transformDeclaredContent(data).length <= 0}
       >
         <ReactTooltip id="validateTooltip">

@@ -67,11 +67,12 @@ export const PERFORMANCE_STATS = gql`
     $populationYear: Int!
     $status: [String]!
     $event: String
+    $officeSelected: Boolean!
   ) {
     getLocationStatistics(
       locationId: $locationId
       populationYear: $populationYear
-    ) {
+    ) @skip(if: $officeSelected) {
       population
       offices
       registrars

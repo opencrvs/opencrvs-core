@@ -72,14 +72,16 @@ class LocationStatsViewComponent extends React.Component<Props> {
           </span>
           <span>{totalRegistrars || 0}</span>
         </StatsRow>
-        <StatsRow>
-          <span>{intl.formatMessage(messages.registrarsToCitizen)}</span>
-          <span>
-            {intl.formatMessage(messages.registrarsToCitizenValue, {
-              citizen: citizen || 0
-            })}
-          </span>
-        </StatsRow>
+        {totalRegistrars > 0 && (
+          <StatsRow>
+            <span>{intl.formatMessage(messages.registrarsToCitizen)}</span>
+            <span>
+              {intl.formatMessage(messages.registrarsToCitizenValue, {
+                citizen: citizen || 0
+              })}
+            </span>
+          </StatsRow>
+        )}
       </>
     )
   }

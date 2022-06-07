@@ -160,7 +160,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       {
         config: AddressCases.PRIMARY_ADDRESS,
         informant: false,
-        conditionalCase: `(((${fathersDetailsDontExist} && ${fathersDetailsExistBasedOnContactAndInformant}) || ${primaryAddressSameAsOtherPrimaryAddress}) && !(${mothersDetailsDontExistOnOtherPage}))`
+        conditionalCase: `(((${fathersDetailsDontExist} && ${fathersDetailsExistBasedOnContactAndInformant}) || ${primaryAddressSameAsOtherPrimaryAddress}) && !(${mothersDetailsDontExistOnOtherPage}) || ((${fathersDetailsDontExist}) && (${mothersDetailsDontExistOnOtherPage})))`
       },
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,

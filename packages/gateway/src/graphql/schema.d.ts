@@ -233,6 +233,7 @@ export interface GQLUser {
   catchmentArea?: Array<GQLLocation | null>
   localRegistrar?: GQLLocalRegistrar
   identifier?: GQLIdentifier
+  signature?: GQLSignature
   creationDate?: string
   avatar?: GQLAvatar
   device?: string
@@ -638,6 +639,7 @@ export interface GQLHistory {
   reinstated?: boolean
   location?: GQLLocation
   office?: GQLLocation
+  dhis2Notification?: boolean
   comments?: Array<GQLComment | null>
   input?: Array<GQLInputOutput | null>
   output?: Array<GQLInputOutput | null>
@@ -769,6 +771,11 @@ export interface GQLLocalRegistrar {
   name: Array<GQLHumanName | null>
   role: string
   signature?: GQLSignature
+}
+
+export interface GQLSignature {
+  data?: string
+  type?: string
 }
 
 export interface GQLSearchFieldAgentResponse {
@@ -1122,21 +1129,10 @@ export const enum GQLAttachmentSubject {
   PARENT = 'PARENT',
   CHILD_AGE = 'CHILD_AGE',
   DECEASED_ID_PROOF = 'DECEASED_ID_PROOF',
-  DECEASED_PARMANENT_ADDRESS_PROOF = 'DECEASED_PARMANENT_ADDRESS_PROOF',
   DECEASED_DEATH_PROOF = 'DECEASED_DEATH_PROOF',
-  DECEASED_BIRTH_PROOF = 'DECEASED_BIRTH_PROOF',
+  DECEASED_DEATH_CAUSE_PROOF = 'DECEASED_DEATH_CAUSE_PROOF',
   INFORMANT_ID_PROOF = 'INFORMANT_ID_PROOF',
-  INFORMANT_ATHORITY_TO_APPLY_PROOF = 'INFORMANT_ATHORITY_TO_APPLY_PROOF',
-  LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF',
-  ASSIGNED_RESPONSIBILITY_PROOF = 'ASSIGNED_RESPONSIBILITY_PROOF',
-  WARD_COUNCILLOR_PROOF = 'WARD_COUNCILLOR_PROOF',
-  CAUSE_OF_DEATH = 'CAUSE_OF_DEATH',
-  CORONERS_REPORT = 'CORONERS_REPORT'
-}
-
-export interface GQLSignature {
-  data?: string
-  type?: string
+  LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF'
 }
 
 export interface GQLRegistrationSearchSet {
@@ -1394,6 +1390,7 @@ export interface GQLResolver {
   StatusWiseRegistrationCount?: GQLStatusWiseRegistrationCountTypeResolver
   Identifier?: GQLIdentifierTypeResolver
   LocalRegistrar?: GQLLocalRegistrarTypeResolver
+  Signature?: GQLSignatureTypeResolver
   SearchFieldAgentResponse?: GQLSearchFieldAgentResponseTypeResolver
   Estimation?: GQLEstimationTypeResolver
   EventMetrics?: GQLEventMetricsTypeResolver
@@ -1414,7 +1411,6 @@ export interface GQLResolver {
   StatusReason?: GQLStatusReasonTypeResolver
   Comment?: GQLCommentTypeResolver
   InputOutput?: GQLInputOutputTypeResolver
-  Signature?: GQLSignatureTypeResolver
   RegistrationSearchSet?: GQLRegistrationSearchSetTypeResolver
   BirthEventSearchSet?: GQLBirthEventSearchSetTypeResolver
   DeathEventSearchSet?: GQLDeathEventSearchSetTypeResolver
@@ -3174,6 +3170,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   catchmentArea?: UserToCatchmentAreaResolver<TParent>
   localRegistrar?: UserToLocalRegistrarResolver<TParent>
   identifier?: UserToIdentifierResolver<TParent>
+  signature?: UserToSignatureResolver<TParent>
   creationDate?: UserToCreationDateResolver<TParent>
   avatar?: UserToAvatarResolver<TParent>
   device?: UserToDeviceResolver<TParent>
@@ -3239,6 +3236,10 @@ export interface UserToLocalRegistrarResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToIdentifierResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface UserToSignatureResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4269,6 +4270,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   reinstated?: HistoryToReinstatedResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
+  dhis2Notification?: HistoryToDhis2NotificationResolver<TParent>
   comments?: HistoryToCommentsResolver<TParent>
   input?: HistoryToInputResolver<TParent>
   output?: HistoryToOutputResolver<TParent>
@@ -4304,6 +4306,13 @@ export interface HistoryToLocationResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToOfficeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToDhis2NotificationResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4604,6 +4613,19 @@ export interface LocalRegistrarToSignatureResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLSignatureTypeResolver<TParent = any> {
+  data?: SignatureToDataResolver<TParent>
+  type?: SignatureToTypeResolver<TParent>
+}
+
+export interface SignatureToDataResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface SignatureToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -5117,19 +5139,6 @@ export interface InputOutputToValueStringResolver<
   TParent = any,
   TResult = any
 > {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLSignatureTypeResolver<TParent = any> {
-  data?: SignatureToDataResolver<TParent>
-  type?: SignatureToTypeResolver<TParent>
-}
-
-export interface SignatureToDataResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface SignatureToTypeResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

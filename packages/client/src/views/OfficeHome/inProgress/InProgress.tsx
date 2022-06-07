@@ -52,7 +52,8 @@ import { connect } from 'react-redux'
 import {
   buttonMessages,
   constantsMessages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IOfflineData } from '@client/offline/reducer'
@@ -131,8 +132,11 @@ export class InProgressComponent extends React.Component<
     super(props)
     this.state = {
       width: window.innerWidth,
-      sortedCol: COLUMNS.NAME,
-      sortOrder: SORT_ORDER.ASCENDING
+      sortedCol:
+        this.props.selectorId && this.props.selectorId !== SELECTOR_ID.ownDrafts
+          ? COLUMNS.NOTIFICATION_SENT
+          : COLUMNS.LAST_UPDATED,
+      sortOrder: SORT_ORDER.DESCENDING
     }
   }
 
@@ -471,7 +475,11 @@ export class InProgressComponent extends React.Component<
             this.props.selectorId !== SELECTOR_ID.ownDrafts
               ? COLUMNS.NOTIFICATION_SENT
               : COLUMNS.LAST_UPDATED,
-          isSorted: this.state.sortedCol === COLUMNS.LAST_UPDATED,
+          isSorted:
+            this.props.selectorId &&
+            this.props.selectorId !== SELECTOR_ID.ownDrafts
+              ? this.state.sortedCol === COLUMNS.NOTIFICATION_SENT
+              : this.state.sortedCol === COLUMNS.LAST_UPDATED,
           sortFunction: this.onColumnClick
         },
         {
@@ -546,7 +554,10 @@ export class InProgressComponent extends React.Component<
     )
   }
 
-  renderFieldAgentTable = (data: GQLEventSearchResultSet, intl: IntlShape) => {
+  renderFieldAgentTable = (
+    data: GQLEventSearchResultSet,
+    isShowPagination: boolean
+  ) => {
     return (
       <GridTable
         content={this.transformRemoteDraftsContent(data)}
@@ -554,12 +565,15 @@ export class InProgressComponent extends React.Component<
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
         sortedCol={this.state.sortedCol}
-        hideLastBorder={!this.isShowPagination}
+        hideLastBorder={!isShowPagination}
       />
     )
   }
 
-  renderHospitalTable = (data: GQLEventSearchResultSet, intl: IntlShape) => {
+  renderHospitalTable = (
+    data: GQLEventSearchResultSet,
+    isShowPagination: boolean
+  ) => {
     return (
       <GridTable
         content={this.transformRemoteDraftsContent(data)}
@@ -567,31 +581,31 @@ export class InProgressComponent extends React.Component<
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
         sortedCol={this.state.sortedCol}
-        hideLastBorder={!this.isShowPagination}
+        hideLastBorder={!isShowPagination}
       />
     )
   }
-
-  isShowPagination =
-    !this.props.selectorId || this.props.selectorId === SELECTOR_ID.ownDrafts
-      ? this.props.drafts.length > this.props.pageSize
-        ? true
-        : false
-      : this.props.selectorId === SELECTOR_ID.fieldAgentDrafts
-      ? this.props.queryData.inProgressData.totalItems &&
-        this.props.queryData.inProgressData.totalItems > this.props.pageSize
-        ? true
-        : false
-      : this.props.queryData.notificationData.totalItems &&
-        this.props.queryData.notificationData.totalItems > this.props.pageSize
-      ? true
-      : false
 
   render() {
     const { intl, selectorId, drafts, queryData, onPageChange, isFieldAgent } =
       this.props
-    const { inProgressData, notificationData } = queryData
 
+    const isShowPagination =
+      !this.props.selectorId || this.props.selectorId === SELECTOR_ID.ownDrafts
+        ? this.props.drafts.length > this.props.pageSize
+          ? true
+          : false
+        : this.props.selectorId === SELECTOR_ID.fieldAgentDrafts
+        ? this.props.queryData.inProgressData.totalItems &&
+          this.props.queryData.inProgressData.totalItems > this.props.pageSize
+          ? true
+          : false
+        : this.props.queryData.notificationData.totalItems &&
+          this.props.queryData.notificationData.totalItems > this.props.pageSize
+        ? true
+        : false
+
+    const { inProgressData, notificationData } = queryData
     const paginationId =
       !selectorId || selectorId === SELECTOR_ID.ownDrafts
         ? this.props.paginationId.draftId
@@ -622,10 +636,11 @@ export class InProgressComponent extends React.Component<
 
     const noResultMessage =
       !selectorId || selectorId === SELECTOR_ID.ownDrafts
-        ? 'in progress'
+        ? intl.formatMessage(wqMessages.noRecordsDraft)
         : selectorId === SELECTOR_ID.fieldAgentDrafts
-        ? 'from field agents'
-        : 'from health system'
+        ? intl.formatMessage(wqMessages.noRecordsFieldAgents)
+        : intl.formatMessage(wqMessages.noRecordsHealthSystem)
+
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.progress)}
@@ -641,7 +656,7 @@ export class InProgressComponent extends React.Component<
             notificationData.totalItems || 0
           )
         }
-        isShowPagination={this.isShowPagination}
+        isShowPagination={isShowPagination}
         paginationId={paginationId}
         totalPages={totalPages}
         onPageChange={onPageChange}
@@ -651,9 +666,7 @@ export class InProgressComponent extends React.Component<
             ? false
             : this.props.error
         }
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: noResultMessage
-        })}
+        noResultText={noResultMessage}
         noContent={noContent}
       >
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
@@ -663,15 +676,15 @@ export class InProgressComponent extends React.Component<
             loading={isFieldAgent ? false : this.props.loading}
             sortedCol={this.state.sortedCol}
             sortOrder={this.state.sortOrder}
-            hideLastBorder={!this.isShowPagination}
+            hideLastBorder={!isShowPagination}
           />
         )}
         {selectorId === SELECTOR_ID.fieldAgentDrafts &&
           !isFieldAgent &&
-          this.renderFieldAgentTable(inProgressData, intl)}
+          this.renderFieldAgentTable(inProgressData, isShowPagination)}
         {selectorId === SELECTOR_ID.hospitalDrafts &&
           !isFieldAgent &&
-          this.renderHospitalTable(notificationData, intl)}
+          this.renderHospitalTable(notificationData, isShowPagination)}
       </WQContentWrapper>
     )
   }

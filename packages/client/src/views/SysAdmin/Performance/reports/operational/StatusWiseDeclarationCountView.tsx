@@ -9,15 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { constantsMessages } from '@client/i18n/messages'
 import { messages as performanceMessages } from '@client/i18n/messages/views/performance'
 
 import {
   Description,
-  SubHeader,
-  getJurisdictionLocationIdFromUserDetails,
-  getPrimaryLocationIdOfOffice,
-  isUnderJurisdictionOfUser
+  SubHeader
 } from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
 import { ProgressBar } from '@opencrvs/components/lib/forms'
 import { GQLRegistrationCountResult } from '@opencrvs/gateway/src/graphql/schema'
@@ -28,16 +24,10 @@ import {
   WrappedComponentProps
 } from 'react-intl'
 import styled from 'styled-components'
-import { getOfflineData } from '@client/offline/selectors'
-import { connect } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { getJurisidictionType } from '@client/utils/locationUtils'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { SYS_ADMIN_ROLES } from '@client/utils/constants'
 import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
 import { Event } from '@client/forms'
 
-type Props = WrappedComponentProps & IStateProps & BaseProps
+type Props = WrappedComponentProps & BaseProps
 
 export interface IStatusMapping {
   [status: string]: { labelDescriptor: MessageDescriptor; color: string }
@@ -47,12 +37,8 @@ interface BaseProps {
   data?: GQLRegistrationCountResult
   statusMapping?: IStatusMapping
   onClickStatusDetails: (status?: keyof IStatusMapping) => void
-  locationId?: string
+  isAccessibleOffice: boolean
   selectedEvent: Event
-}
-
-interface IStateProps {
-  disableDeclarationLink: boolean
 }
 
 const ContentHolder = styled.div``
@@ -66,7 +52,7 @@ class StatusWiseDeclarationCountViewComponent extends React.Component<
   {}
 > {
   getStatusCountView(data: GQLRegistrationCountResult) {
-    const { intl, statusMapping, disableDeclarationLink, selectedEvent } =
+    const { intl, statusMapping, selectedEvent, isAccessibleOffice } =
       this.props
     const { results, total } = data
     return (
@@ -95,7 +81,7 @@ class StatusWiseDeclarationCountViewComponent extends React.Component<
                     )}
                     color={statusMapping![statusCount.status].color}
                     totalPoints={total}
-                    disabled={disableDeclarationLink || false}
+                    disabled={!isAccessibleOffice}
                     onClick={() =>
                       this.props.onClickStatusDetails(statusCount.status)
                     }
@@ -115,46 +101,6 @@ class StatusWiseDeclarationCountViewComponent extends React.Component<
   }
 }
 
-export const StatusWiseDeclarationCountView = connect<
-  IStateProps,
-  {},
-  BaseProps,
-  IStoreState
->((state: IStoreState, ownProps: BaseProps) => {
-  if (!ownProps.locationId) {
-    return { disableDeclarationLink: true }
-  }
-  const offlineLocations = getOfflineData(state).locations
-  const offlineOffices = getOfflineData(state).offices
-
-  const isOfficeSelected = !!offlineOffices[ownProps.locationId]
-
-  let disableDeclarationLink = !(
-    isOfficeSelected ||
-    window.config.DECLARATION_AUDIT_LOCATIONS.includes(
-      getJurisidictionType(offlineLocations, ownProps.locationId) as string
-    )
-  )
-  const userDetails = getUserDetails(state)
-  if (
-    userDetails &&
-    userDetails.role &&
-    !SYS_ADMIN_ROLES.includes(userDetails.role)
-  ) {
-    const jurisdictionLocation =
-      getJurisdictionLocationIdFromUserDetails(userDetails)
-    disableDeclarationLink = !isUnderJurisdictionOfUser(
-      offlineLocations,
-      isOfficeSelected
-        ? getPrimaryLocationIdOfOffice(
-            offlineLocations,
-            offlineOffices[ownProps.locationId]
-          )
-        : ownProps.locationId,
-      jurisdictionLocation
-    )
-  }
-  return {
-    disableDeclarationLink
-  }
-})(injectIntl(StatusWiseDeclarationCountViewComponent))
+export const StatusWiseDeclarationCountView = injectIntl(
+  StatusWiseDeclarationCountViewComponent
+)

@@ -155,7 +155,7 @@ const messagesToDefine: IUserSetupMessages = {
     id: 'userSetup.instruction'
   },
   userSetupWelcomeTitle: {
-    defaultMessage: 'Welcome to OpenCRVS',
+    defaultMessage: 'Welcome to {applicationName}',
     description: 'Title for the landing page',
     id: 'userSetup.landing.title'
   },
