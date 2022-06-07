@@ -146,6 +146,22 @@ class ReviewCertificateActionComponent extends React.Component<
     const eventDate = getEventDate(draft.data, draft.event)
     let submittableCertificate
     if (isCertificateForPrintInAdvance(draft)) {
+      const paymentAmount = calculatePrice(
+        draft.event,
+        eventDate,
+        registeredDate,
+        this.props.offlineCountryConfig
+      )
+      submittableCertificate = {
+        payments: {
+          type: 'MANUAL' as const,
+          total: Number(paymentAmount),
+          amount: Number(paymentAmount),
+          outcome: 'COMPLETED' as const,
+          date: Date.now()
+        }
+      }
+    } else {
       if (
         isFreeOfCost(
           draft.event,
@@ -154,25 +170,14 @@ class ReviewCertificateActionComponent extends React.Component<
           this.props.offlineCountryConfig
         )
       ) {
-        submittableCertificate = {}
-      } else {
-        const paymentAmount = calculatePrice(
-          draft.event,
-          eventDate,
-          registeredDate,
-          this.props.offlineCountryConfig
-        )
-        submittableCertificate = {
-          payments: {
-            type: 'MANUAL' as const,
-            total: Number(paymentAmount),
-            amount: Number(paymentAmount),
-            outcome: 'COMPLETED' as const,
-            date: Date.now()
-          }
+        certificate.payments = {
+          type: 'MANUAL' as const,
+          total: 0,
+          amount: 0,
+          outcome: 'COMPLETED' as const,
+          date: Date.now()
         }
       }
-    } else {
       submittableCertificate = certificate
     }
     draft.data.registration = {
