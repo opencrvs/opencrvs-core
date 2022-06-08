@@ -174,6 +174,7 @@ interface IProps {
   menuCollapse?: () => void
   userInfo?: IUserInfo
   deselectAllTabs?: boolean
+  loadWorkqueueStatuses?: boolean
 }
 
 interface IDispatchProps {
@@ -244,6 +245,7 @@ export const NavigationView = (props: IFullProps) => {
     userDetails,
     deselectAllTabs,
     enableMenuSelection = true,
+    loadWorkqueueStatuses = true,
     activeMenuItem,
     goToCertificateConfigAction,
     goToFormConfigAction,
@@ -279,8 +281,7 @@ export const NavigationView = (props: IFullProps) => {
   const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
 
   React.useEffect(() => {
-    const isRegistrationHome = match.path.startsWith(REGISTRAR_HOME)
-    if (!userDetails || isRegistrationHome) {
+    if (!userDetails || !loadWorkqueueStatuses) {
       return
     }
     updateRegistrarWorkqueue(
@@ -288,7 +289,7 @@ export const NavigationView = (props: IFullProps) => {
       10, // Page size shouldn't matter here as we're only interested in totals
       userDetails.role === 'FIELD_AGENT'
     )
-  }, [userDetails, updateRegistrarWorkqueue, match])
+  }, [userDetails, updateRegistrarWorkqueue, loadWorkqueueStatuses])
 
   const declarationCount = {
     inProgress: !initialSyncDone
