@@ -239,7 +239,7 @@ export const registrarNameUserTransformer = (
   __?: IOfflineData,
   userDetails?: IUserDetails
 ) => {
-  if (!userDetails) {
+  if (!_.history) {
     return
   }
 
@@ -297,6 +297,10 @@ export const registrarSignatureUserTransformer = (
   __?: IOfflineData,
   userDetails?: IUserDetails
 ) => {
+  if (!_.history) {
+    return
+  }
+
   const history = _.history.find(
     (historyItem: History) => historyItem?.action === RegStatus.Registered
   )
