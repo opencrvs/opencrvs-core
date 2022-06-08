@@ -96,13 +96,13 @@ describe('when user is previewing the form data', () => {
         await goToEndOfForm(app)
       })
 
-      it.skip('check whether submit button is enabled or not', async () => {
+      it('check whether submit button is enabled or not', async () => {
         expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
           false
         )
       })
       describe('All sections visited', () => {
-        it.skip('Should be able to click SEND FOR REVIEW Button', () => {
+        it('Should be able to click SEND FOR REVIEW Button', () => {
           expect(app.find('#submit_form').hostNodes().prop('disabled')).toBe(
             false
           )
