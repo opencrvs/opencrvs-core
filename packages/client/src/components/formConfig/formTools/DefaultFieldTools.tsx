@@ -34,6 +34,7 @@ import {
   StyledTooltip,
   RequiredToggleAction
 } from './components'
+import ReactTooltip from 'react-tooltip'
 
 const Container = styled.div`
   display: flex;
@@ -63,6 +64,17 @@ const Body = styled.span`
   color: ${({ theme }) => theme.colors.grey500};
   text-overflow: ellipsis;
   overflow: hidden;
+`
+
+const TooltipContainer = styled.div`
+  .tooltip {
+    opacity: 1 !important;
+    width: 248px;
+    text-align: center;
+    ::after {
+      display: none;
+    }
+  }
 `
 
 function HideToggleAction({ fieldId, enabled }: IDefaultConfigField) {
@@ -108,27 +120,60 @@ export function DefaultFieldTools({
             label={
               <Label>
                 {intl.formatMessage(messages.requiredForRegistration)}
-                <StyledTooltip />
+                <TooltipContainer>
+                  <div
+                    data-tip
+                    data-for={`required-for-registration`}
+                    data-class="tooltip"
+                  >
+                    <StyledTooltip />
+                  </div>
+                  <ReactTooltip
+                    id={`required-for-registration`}
+                    place="top"
+                    effect="solid"
+                  >
+                    {intl.formatMessage(
+                      messages.requiredForRegistrationTooltip
+                    )}
+                  </ReactTooltip>
+                </TooltipContainer>
               </Label>
             }
             actions={<RequiredToggleAction {...configField} />}
           />
         </ListViewSimplified>
       )}
+
       <Content>
         <Subtitle>
           {intl.formatMessage(messages.contentKey)}
-          <StyledTooltip />
+          <TooltipContainer>
+            <div data-tip data-for={`content-key`} data-class="tooltip">
+              <StyledTooltip />
+            </div>
+            <ReactTooltip id={`content-key`} place="top" effect="solid">
+              {intl.formatMessage(messages.contentKeyTooltip)}
+            </ReactTooltip>
+          </TooltipContainer>
         </Subtitle>
         {contentKeys.map((content, index) => (
           <Body key={index}>{content}</Body>
         ))}
       </Content>
+
       {handleBar && (
         <HandleBar>
           <Subtitle>
             {intl.formatMessage(messages.certificateHandlebars)}
-            <StyledTooltip />
+            <TooltipContainer>
+              <div data-tip data-for={`cert-handelbars`} data-class="tooltip">
+                <StyledTooltip />
+              </div>
+              <ReactTooltip id={`cert-handelbars`} place="top" effect="solid">
+                {intl.formatMessage(messages.certHandelbarsTooltip)}
+              </ReactTooltip>
+            </TooltipContainer>
           </Subtitle>
           <Body>{`{{ ${handleBar} }}`}</Body>
         </HandleBar>
