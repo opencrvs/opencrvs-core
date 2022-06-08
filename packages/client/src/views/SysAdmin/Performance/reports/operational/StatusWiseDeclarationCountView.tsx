@@ -37,7 +37,7 @@ interface BaseProps {
   data?: GQLRegistrationCountResult
   statusMapping?: IStatusMapping
   onClickStatusDetails: (status?: keyof IStatusMapping) => void
-  locationId?: string
+  isAccessibleOffice: boolean
   selectedEvent: Event
 }
 
@@ -52,7 +52,8 @@ class StatusWiseDeclarationCountViewComponent extends React.Component<
   {}
 > {
   getStatusCountView(data: GQLRegistrationCountResult) {
-    const { intl, statusMapping, selectedEvent } = this.props
+    const { intl, statusMapping, selectedEvent, isAccessibleOffice } =
+      this.props
     const { results, total } = data
     return (
       <ContentHolder id="declaration-statuses">
@@ -80,6 +81,7 @@ class StatusWiseDeclarationCountViewComponent extends React.Component<
                     )}
                     color={statusMapping![statusCount.status].color}
                     totalPoints={total}
+                    disabled={!isAccessibleOffice}
                     onClick={() =>
                       this.props.onClickStatusDetails(statusCount.status)
                     }

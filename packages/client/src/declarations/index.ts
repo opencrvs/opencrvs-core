@@ -16,7 +16,8 @@ import {
   IFormData,
   IFormFieldValue,
   IContactPoint,
-  Sort
+  Sort,
+  FieldValueMap
 } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
@@ -1270,7 +1271,15 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       const currentDeclarationIndex = newDeclarations.findIndex(
         (declaration) => declaration.id === action.payload.declaration.id
       )
-      newDeclarations[currentDeclarationIndex] = action.payload.declaration
+      const modifiedDeclaration = { ...action.payload.declaration }
+
+      if (modifiedDeclaration.data?.informant?.relationship) {
+        modifiedDeclaration.data.informant.relationship = (
+          modifiedDeclaration.data.registration.informantType as FieldValueMap
+        )?.value
+      }
+
+      newDeclarations[currentDeclarationIndex] = modifiedDeclaration
 
       return {
         ...state,

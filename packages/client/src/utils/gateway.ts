@@ -160,23 +160,17 @@ export type AttachmentInput = {
 }
 
 export enum AttachmentSubject {
-  AssignedResponsibilityProof = 'ASSIGNED_RESPONSIBILITY_PROOF',
-  CauseOfDeath = 'CAUSE_OF_DEATH',
   Child = 'CHILD',
   ChildAge = 'CHILD_AGE',
-  CoronersReport = 'CORONERS_REPORT',
-  DeceasedBirthProof = 'DECEASED_BIRTH_PROOF',
+  DeceasedDeathCauseProof = 'DECEASED_DEATH_CAUSE_PROOF',
   DeceasedDeathProof = 'DECEASED_DEATH_PROOF',
   DeceasedIdProof = 'DECEASED_ID_PROOF',
-  DeceasedParmanentAddressProof = 'DECEASED_PARMANENT_ADDRESS_PROOF',
   Father = 'FATHER',
-  InformantAthorityToApplyProof = 'INFORMANT_ATHORITY_TO_APPLY_PROOF',
   InformantIdProof = 'INFORMANT_ID_PROOF',
   LegalGuardianProof = 'LEGAL_GUARDIAN_PROOF',
   Mother = 'MOTHER',
   Other = 'OTHER',
-  Parent = 'PARENT',
-  WardCouncillorProof = 'WARD_COUNCILLOR_PROOF'
+  Parent = 'PARENT'
 }
 
 export enum AttachmentType {
@@ -4795,6 +4789,7 @@ export type GetLocationStatisticsQueryVariables = Exact<{
   status: Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
   event?: InputMaybe<Scalars['String']>
   officeSelected: Scalars['Boolean']
+  showStatusCount: Scalars['Boolean']
 }>
 
 export type GetLocationStatisticsQuery = {

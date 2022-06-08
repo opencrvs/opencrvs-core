@@ -68,7 +68,6 @@ export const PERFORMANCE_STATS = gql`
     $status: [String]!
     $event: String
     $officeSelected: Boolean!
-    $showStatusCount: Boolean!
   ) {
     getLocationStatistics(
       locationId: $locationId
@@ -83,7 +82,7 @@ export const PERFORMANCE_STATS = gql`
       locationId: $locationId
       status: $status
       event: $event
-    ) @include(if: $showStatusCount) {
+    ) {
       results {
         status
         count

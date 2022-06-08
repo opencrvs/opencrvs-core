@@ -47,8 +47,8 @@ export const ConnectionError = (props: React.HTMLAttributes<SVGElement>) => {
         stroke="#CCCCCC"
       />
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M9.30481 11.4633C8.83708 11.6915 8.39972 11.9773 8.00288 12.3141L9.30481 11.4633Z"
         fill="#CCCCCC"
       />

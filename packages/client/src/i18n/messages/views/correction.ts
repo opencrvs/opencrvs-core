@@ -58,6 +58,8 @@ interface ICorrectionMessages
   correctionSummaryComments: MessageDescriptor
   correctionSummaryAddComments: MessageDescriptor
   correctionSummaryFeesRequired: MessageDescriptor
+  correctionSummaryFeesRequiredPositive: MessageDescriptor
+  correctionSummaryFeesRequiredNegative: MessageDescriptor
   correctionSummaryProofOfPaymentRequired: MessageDescriptor
   correctionSummaryProofOfPayment: MessageDescriptor
   correctionSummaryproofOfPaymentError: MessageDescriptor
@@ -189,12 +191,12 @@ const messagesToDefine: ICorrectionMessages = {
   },
   idCheckVerify: {
     id: 'correction.certificate.corrector.idCheckVerify',
-    defaultMessage: 'Yes',
+    defaultMessage: 'ID verified',
     description: 'The label for id check component action when verify details'
   },
   idCheckWithoutVerify: {
     id: 'correction.certificate.corrector.idCheckWithoutVerify',
-    defaultMessage: 'No',
+    defaultMessage: 'No ID match',
     description:
       'The label for id check component action when does not verify details'
   },
@@ -316,6 +318,18 @@ const messagesToDefine: ICorrectionMessages = {
     id: 'correction.summary.feesRequired',
     defaultMessage: 'Fees required?',
     description: 'Fees required for certificate correction summary'
+  },
+  correctionSummaryFeesRequiredPositive: {
+    id: 'correction.summary.feesRequiredPositive',
+    defaultMessage: 'Yes',
+    description:
+      'Positive label for Fees required for certificate correction summary'
+  },
+  correctionSummaryFeesRequiredNegative: {
+    id: 'correction.summary.feesRequiredNegative',
+    defaultMessage: 'No',
+    description:
+      'Negative label for Fees required for certificate correction summary'
   },
   correctionSummaryProofOfPaymentRequired: {
     id: 'correction.summary.proofOfPaymentRequired',

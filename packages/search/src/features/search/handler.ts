@@ -96,6 +96,25 @@ export async function getStatusWiseRegistrationCountHandler(
 ) {
   try {
     const payload = request.payload as ICountQueryParam
+    const matchRules: Record<string, any>[] = [
+      {
+        match: {
+          event: capitalize(payload.event || EVENT.BIRTH)
+        }
+      },
+      {
+        terms: {
+          'type.keyword': payload.status
+        }
+      }
+    ]
+    if (payload.declarationLocationHirarchyId) {
+      matchRules.push({
+        match: {
+          declarationLocationHirarchyIds: payload.declarationLocationHirarchyId
+        }
+      })
+    }
 
     const response = await client.search<{
       aggregations?: {
@@ -111,24 +130,7 @@ export async function getStatusWiseRegistrationCountHandler(
         size: 0,
         query: {
           bool: {
-            must: [
-              {
-                match: {
-                  event: capitalize(payload.event || EVENT.BIRTH)
-                }
-              },
-              {
-                match: {
-                  declarationLocationHirarchyIds:
-                    payload.declarationLocationHirarchyId
-                }
-              },
-              {
-                terms: {
-                  'type.keyword': payload.status
-                }
-              }
-            ]
+            must: matchRules
           }
         },
         aggs: {

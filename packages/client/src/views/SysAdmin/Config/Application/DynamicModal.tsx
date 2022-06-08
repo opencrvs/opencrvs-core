@@ -250,7 +250,11 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
     const value = event.target.value.toString()
     if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
       this.setState(() => ({
-        birthRegistrationTarget: value
+        birthRegistrationTarget: value,
+        birthLateRegistrationTarget:
+          Number(value) > Number(this.state.birthLateRegistrationTarget)
+            ? String(Number(value) + 2)
+            : this.state.birthLateRegistrationTarget
       }))
     }
   }

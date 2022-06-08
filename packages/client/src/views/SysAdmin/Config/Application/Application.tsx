@@ -439,7 +439,7 @@ function DeathTabContent({
       ),
       items: [
         {
-          label: intl.formatMessage(messages.lateRegistrationLabel),
+          label: intl.formatMessage(messages.withinLegallySpecifiedTimeLabel),
           value: (
             <FormattedNumberCurrency
               value={offlineCountryConfiguration.config.DEATH.FEE.ON_TIME}

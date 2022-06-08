@@ -52,6 +52,11 @@ const messagesToDefine: IStepTwoFormMessages = {
     defaultMessage: 'Submit',
     description: 'The label that appears on the submit button'
   },
+  verify: {
+    id: 'login.verify',
+    defaultMessage: 'Verify',
+    description: 'The label that appears on the verify code button'
+  },
   codeSubmissionError: {
     id: 'login.codeSubmissionError',
     defaultMessage: 'Sorry that code did not work.',
