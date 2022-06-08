@@ -16,7 +16,8 @@ import {
   IDeclaration,
   SUBMISSION_STATUS,
   IWorkqueue,
-  filterProcessingDeclarationsFromQuery
+  filterProcessingDeclarationsFromQuery,
+  updateRegistrarWorkqueue
 } from '@client/declarations'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
@@ -52,6 +53,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { REGISTRAR_HOME } from '@client/navigation/routes'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -183,6 +185,7 @@ interface IDispatchProps {
   goToPerformanceViewAction: typeof goToPerformanceView
   goToTeamViewAction: typeof goToTeamView
   goToSettings: typeof goToSettings
+  updateRegistrarWorkqueue: typeof updateRegistrarWorkqueue
 }
 
 interface IStateProps {
@@ -251,7 +254,8 @@ export const NavigationView = (props: IFullProps) => {
     draftDeclarations,
     menuCollapse,
     userInfo,
-    offlineCountryConfiguration
+    offlineCountryConfiguration,
+    updateRegistrarWorkqueue
   } = props
   const tabId = deselectAllTabs
     ? ''
@@ -273,6 +277,18 @@ export const NavigationView = (props: IFullProps) => {
   )
 
   const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
+
+  React.useEffect(() => {
+    const isRegistrationHome = match.path.startsWith(REGISTRAR_HOME)
+    if (!userDetails || isRegistrationHome) {
+      return
+    }
+    updateRegistrarWorkqueue(
+      userDetails.practitionerId,
+      10, // Page size shouldn't matter here as we're only interested in totals
+      userDetails.role === 'FIELD_AGENT'
+    )
+  }, [userDetails, updateRegistrarWorkqueue, match])
 
   const declarationCount = {
     inProgress: !initialSyncDone
@@ -635,5 +651,6 @@ export const Navigation = connect<
   goToPerformanceViewAction: goToPerformanceView,
   goToTeamViewAction: goToTeamView,
   redirectToAuthentication,
-  goToSettings
+  goToSettings,
+  updateRegistrarWorkqueue
 })(injectIntl(withRouter(NavigationView)))
