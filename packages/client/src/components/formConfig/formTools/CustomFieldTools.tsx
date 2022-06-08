@@ -176,17 +176,23 @@ class CustomFieldToolsComp extends React.Component<
 > {
   constructor(props: IFullProps) {
     super(props)
-    this.initialize()
+    this.state = this.getInitialState()
   }
 
-  initialize() {
+  componentDidUpdate({ selectedField: { fieldId } }: IFullProps) {
+    if (fieldId !== this.props.selectedField.fieldId) {
+      this.setState(this.getInitialState())
+    }
+  }
+
+  getInitialState() {
     const defaultLanguage = getDefaultLanguage()
     const languages = this.getLanguages()
     const { selectedField, formField } = this.props
 
     const fieldForms: { [key: string]: ICustomField } = {}
 
-    Object.keys(languages).map((lang) => {
+    Object.keys(languages).forEach((lang) => {
       const label = this.getIntlMessage(selectedField.label, lang)
       fieldForms[lang] = {
         label,
@@ -196,7 +202,7 @@ class CustomFieldToolsComp extends React.Component<
         errorMessage: this.getIntlMessage(selectedField.errorMessage, lang)
       }
     })
-    this.state = {
+    return {
       isFieldDuplicate: false,
       handleBars:
         getCertificateHandlebar(formField) ||
@@ -286,8 +292,8 @@ class CustomFieldToolsComp extends React.Component<
     }
   }
 
-  prepareModifiedFormField(defaultLanguage: string): ICustomConfigField {
-    const { selectedField, formField } = this.props
+  prepareModifiedFormField(): ICustomConfigField {
+    const { selectedField } = this.props
     const { fieldForms, handleBars } = this.state
     const languages = this.getLanguages()
     const newFieldID = this.generateNewFieldID()
@@ -595,8 +601,7 @@ class CustomFieldToolsComp extends React.Component<
                     })
                     return
                   }
-                  const modifiedField =
-                    this.prepareModifiedFormField(defaultLanguage)
+                  const modifiedField = this.prepareModifiedFormField()
                   modifyConfigField(selectedField.fieldId, modifiedField)
                   debouncedNullifySelectedField()
                 }}
