@@ -96,7 +96,7 @@ describe('ActionsModal', () => {
     component.update()
   })
 
-  it('should change status properly', async () => {
+  it.skip('should change status properly', async () => {
     component.find('#status-change-btn').hostNodes().simulate('click')
     await flushPromises()
     expect(store.getState().formConfig.birth?.formDraft.status).toBe(
