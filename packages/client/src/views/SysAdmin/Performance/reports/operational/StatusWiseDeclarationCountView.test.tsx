@@ -73,7 +73,7 @@ describe('Status wise registration count', () => {
         <StatusWiseDeclarationCountView
           selectedEvent={Event.BIRTH}
           data={data}
-          locationId={'c879ce5c-545b-4042-98a6-77015b0e13df'}
+          isAccessibleOffice={true}
           statusMapping={StatusMapping}
           onClickStatusDetails={onClickStatusDetailsMock}
         />,

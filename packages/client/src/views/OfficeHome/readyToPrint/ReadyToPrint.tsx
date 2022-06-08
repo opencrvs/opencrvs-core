@@ -31,7 +31,8 @@ import { withTheme } from 'styled-components'
 import {
   buttonMessages,
   constantsMessages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { IStoreState } from '@client/store'
 import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
@@ -317,9 +318,7 @@ class ReadyToPrintComponent extends React.Component<
         onPageChange={onPageChange}
         loading={this.props.loading}
         error={this.props.error}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'are ready to print'
-        })}
+        noResultText={intl.formatMessage(wqMessages.noRecordsReadyToPrint)}
         noContent={this.transformRegisteredContent(data).length <= 0}
       >
         <GridTable

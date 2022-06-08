@@ -136,7 +136,7 @@ const messagesToDefine: IReviewMessages = {
     id: 'review.actions.title.registerActionTitle'
   },
   registerConfirmationTitle: {
-    defaultMessage: '',
+    defaultMessage: 'Register the {event}?',
     description: 'Title for register confirmation modal',
     id: 'review.modal.title.registerConfirmation'
   },

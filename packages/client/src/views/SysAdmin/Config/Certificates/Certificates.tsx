@@ -45,9 +45,15 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { Event, IAttachmentValue, IFormFieldValue, IForm } from '@client/forms'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
-import { getDummyCertificateTemplateData } from './previewDummyData'
+import {
+  getDummyCertificateTemplateData,
+  getDummyDeclarationData
+} from './previewDummyData'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
-import { executeHandlebarsTemplate } from '@client/views/PrintCertificate/PDFUtils'
+import {
+  executeHandlebarsTemplate,
+  printCertificate
+} from '@client/views/PrintCertificate/PDFUtils'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import {
   ListViewSimplified,
@@ -55,6 +61,7 @@ import {
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { updateOfflineCertificate } from '@client/offline/actions'
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
+import { IDeclaration } from '@client/declarations'
 
 const HiddenInput = styled.input`
   display: none;
@@ -143,6 +150,44 @@ async function updatePreviewSvgWithSampleSignature(
   return unescape(encodeURIComponent(svgCode))
 }
 
+export const printDummyCertificate = async (
+  event: string,
+  registerForm: { birth: IForm; death: IForm },
+  intl: IntlShape,
+  userDetails: IUserDetails,
+  offlineData: IOfflineData
+) => {
+  const data = getDummyDeclarationData(event, registerForm)
+  let certEvent: Event
+  if (event === 'death') {
+    certEvent = Event.DEATH
+  } else {
+    certEvent = Event.BIRTH
+  }
+  const updatedOfflineData: IOfflineData = {
+    ...offlineData,
+    templates: {
+      ...offlineData.templates,
+      certificates: {
+        ...offlineData.templates.certificates!,
+        [certEvent]: {
+          ...offlineData.templates.certificates![certEvent]!,
+          definition: await updatePreviewSvgWithSampleSignature(
+            offlineData.templates.certificates![certEvent].definition
+          )
+        }
+      }
+    }
+  }
+
+  printCertificate(
+    intl,
+    { data, event } as IDeclaration,
+    userDetails,
+    updatedOfflineData
+  )
+}
+
 export function printFile(data: string, fileName: string) {
   const html =
     '<html><head><title>' +
@@ -225,8 +270,14 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       },
       {
         label: intl.formatMessage(buttonMessages.print),
-        handler: () => {
-          printFile(svgCode, svgFilename)
+        handler: async () => {
+          await printDummyCertificate(
+            event,
+            this.props.registerForm,
+            intl,
+            this.props.userDetails as IUserDetails,
+            this.props.offlineResources
+          )
         }
       },
       {

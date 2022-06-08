@@ -30,7 +30,8 @@ import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import {
   constantsMessages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import {
@@ -339,9 +340,7 @@ class ReadyForReviewComponent extends React.Component<
         onPageChange={onPageChange}
         loading={this.props.loading}
         error={this.props.error}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'are ready for review'
-        })}
+        noResultText={intl.formatMessage(wqMessages.noRecordsReadyForReview)}
         noContent={this.transformDeclaredContent(data).length <= 0}
       >
         <ReactTooltip id="validateTooltip">

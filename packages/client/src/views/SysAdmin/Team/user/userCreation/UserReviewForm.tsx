@@ -64,7 +64,8 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
   ListViewSimplified,
-  ListViewItemSimplified
+  ListViewItemSimplified,
+  IListViewItemSimplifiedProps
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import styled from 'styled-components'
 
@@ -88,7 +89,7 @@ interface IDispatchProps {
 
 interface ISectionData {
   title: string
-  items: IDataProps[]
+  items: IListViewItemSimplifiedProps[]
 }
 
 type IFullProps = IUserReviewFormProps &
@@ -107,10 +108,19 @@ const Title = styled.div`
 `
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
+  width: 100%;
 `
+
+const DocumentUploaderContainer = styled.div`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding-right: 8px;
+  }
+`
+
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
+
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
@@ -121,40 +131,64 @@ class UserReviewFormComponent extends React.Component<
       userFormSection,
       this.props.formData
     ).forEach((group) => {
-      group.fields.forEach((field: IFormField) => {
+      group.fields.forEach((field: IFormField, idx) => {
         if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
         } else if (field && sections.length > 0) {
+          const label =
+            field.type === SIMPLE_DOCUMENT_UPLOADER ? (
+              <DocumentUploaderContainer>
+                <SimpleDocumentUploader
+                  label={intl.formatMessage(field.label)}
+                  disableDeleteInPreview={true}
+                  name={field.name}
+                  onComplete={(file) => {
+                    this.props.modify({
+                      ...this.props.formData,
+                      [field.name]: file
+                    })
+                  }}
+                  files={
+                    this.props.formData[
+                      field.name
+                    ] as unknown as IAttachmentValue
+                  }
+                />
+              </DocumentUploaderContainer>
+            ) : (
+              intl.formatMessage(field.label)
+            )
+
           sections[sections.length - 1].items.push({
-            label:
-              field.type === SIMPLE_DOCUMENT_UPLOADER
-                ? ''
-                : intl.formatMessage(field.label),
-            value: this.getValue(field),
-            action:
+            label: <Label>{label}</Label>,
+            value: <Value id={`value_${idx}`}>{this.getValue(field)}</Value>,
+            actions:
               !(
                 field.name === 'registrationOffice' &&
                 this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
-              ) && !field.readonly
-                ? {
-                    id: `btn_change_${field.name}`,
-                    label: intl.formatMessage(messages.change),
-                    handler: () => {
-                      this.props.userId
-                        ? this.props.goToUserReviewForm(
-                            this.props.userId,
-                            userFormSection.id,
-                            group.id,
-                            field.name
-                          )
-                        : this.props.goToCreateUserSection(
-                            userFormSection.id,
-                            group.id,
-                            field.name
-                          )
-                    }
-                  }
-                : undefined
+              ) && !field.readonly ? (
+                <LinkButton
+                  id={`btn_change_${field.name}`}
+                  onClick={() => {
+                    this.props.userId
+                      ? this.props.goToUserReviewForm(
+                          this.props.userId,
+                          userFormSection.id,
+                          group.id,
+                          field.name
+                        )
+                      : this.props.goToCreateUserSection(
+                          userFormSection.id,
+                          group.id,
+                          field.name
+                        )
+                  }}
+                >
+                  {intl.formatMessage(messages.change)}
+                </LinkButton>
+              ) : (
+                <></>
+              )
           })
         }
       })
@@ -165,22 +199,6 @@ class UserReviewFormComponent extends React.Component<
 
   getValue = (field: IFormField) => {
     const { intl, formData } = this.props
-
-    if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
-      const files = formData[field.name] as unknown as IAttachmentValue
-
-      return (
-        <SimpleDocumentUploader
-          label={intl.formatMessage(field.label)}
-          disableDeleteInPreview={true}
-          name={field.name}
-          onComplete={(file) => {
-            this.props.modify({ ...this.props.formData, [field.name]: file })
-          }}
-          files={files}
-        />
-      )
-    }
 
     if (field.type === LOCATION_SEARCH_INPUT) {
       const offlineLocations =
@@ -254,21 +272,9 @@ class UserReviewFormComponent extends React.Component<
                     return (
                       <ListViewItemSimplified
                         key={index}
-                        label={<Label>{item.label}</Label>}
-                        value={
-                          <Value id={item.label.split(' ')[0]}>
-                            {item.value}
-                          </Value>
-                        }
-                        actions={
-                          <LinkButton
-                            id={item.action?.id}
-                            disabled={item.action?.disabled}
-                            onClick={item.action?.handler}
-                          >
-                            {item.action?.label}
-                          </LinkButton>
-                        }
+                        label={item.label}
+                        value={item.value}
+                        actions={item.actions}
                       />
                     )
                   })}
