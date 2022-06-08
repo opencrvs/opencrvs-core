@@ -77,14 +77,21 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { useCallback } from 'react'
-import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import {
+  withOnlineStatus,
+  LoadingIndicator
+} from '@client/views/OfficeHome/LoadingIndicator'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
-  margin: 32px auto 0;
+  margin: 8px auto 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0px;
   }
@@ -165,14 +172,9 @@ const LocationInfo = styled.div`
   padding: 8px 0px;
 `
 
-const LocationInfoKey = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bold16};
-`
-
 const LocationInfoValue = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.supportingCopy};
+  ${({ theme }) => theme.fonts.reg18};
 `
 
 const LocationInfoEmptyValue = styled.div`
@@ -198,10 +200,6 @@ const Value = styled.span`
 
 const Name = styled.span`
   ${({ theme }) => theme.fonts.reg16}
-`
-
-const ListViewContainer = styled.div`
-  margin-top: 24px;
 `
 
 const NoRecord = styled.div<{ isFullPage?: boolean }>`
@@ -502,14 +500,14 @@ function UserListComponent(props: IProps) {
     [StatusMenu, intl]
   )
 
-  const onClickAddUser = useCallback(
-    function onClickAddUser() {
-      ;(searchedLocation &&
-        goToCreateNewUserWithLocationId(searchedLocation.id)) ||
-        goToCreateNewUser()
-    },
-    [goToCreateNewUser, goToCreateNewUserWithLocationId, searchedLocation]
-  )
+  // const onClickAddUser = useCallback(
+  //   function onClickAddUser() {
+  //     ;(searchedLocation &&
+  //       goToCreateNewUserWithLocationId(searchedLocation.id)) ||
+  //       goToCreateNewUser()
+  //   },
+  //   [goToCreateNewUser, goToCreateNewUserWithLocationId, searchedLocation]
+  // )
 
   function onChangeLocation() {
     goToTeamSearch(
@@ -549,6 +547,9 @@ function UserListComponent(props: IProps) {
                 </ErrorText>
               )
             }
+            if (loading) {
+              return <LoadingIndicator loading={true} />
+            }
             const totalData =
               (data && data.searchUsers && data.searchUsers.totalItems) || 0
             const userContent = generateUserContents(
@@ -558,7 +559,7 @@ function UserListComponent(props: IProps) {
             )
             return (
               <UserTable id="user_list">
-                <TableHeader>
+                {/* <TableHeader>
                   {(data && data.searchUsers && data.searchUsers.totalItems) ||
                     0}{' '}
                   users
@@ -568,28 +569,26 @@ function UserListComponent(props: IProps) {
                       {' New user'}
                     </AddUserContainer>
                   )}
-                </TableHeader>
-                <ListViewContainer>
-                  <ListViewSimplified>
-                    {userContent.length <= 0 ? (
-                      <NoRecord id="no-record">
-                        {intl.formatMessage(constantsMessages.noResults)}
-                      </NoRecord>
-                    ) : (
-                      userContent.map((content, index) => {
-                        return (
-                          <ListViewItemSimplified
-                            key={index}
-                            image={content.image}
-                            label={content.label}
-                            value={content.value}
-                            actions={content.actions}
-                          />
-                        )
-                      })
-                    )}
-                  </ListViewSimplified>
-                </ListViewContainer>
+                </TableHeader> */}
+                <ListViewSimplified>
+                  {userContent.length <= 0 ? (
+                    <NoRecord id="no-record">
+                      {intl.formatMessage(constantsMessages.noResults)}
+                    </NoRecord>
+                  ) : (
+                    userContent.map((content, index) => {
+                      return (
+                        <ListViewItemSimplified
+                          key={index}
+                          image={content.image}
+                          label={content.label}
+                          value={content.value}
+                          actions={content.actions}
+                        />
+                      )
+                    })
+                  )}
+                </ListViewSimplified>
                 {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
                   <PaginationWrapper>
                     <DesktopWrapper>
@@ -642,12 +641,12 @@ function UserListComponent(props: IProps) {
       currentPageNumber,
       generateUserContents,
       intl,
-      onClickAddUser,
       recordCount,
       toggleActivation.modalVisible,
       toggleActivation.selectedUser,
       toggleUserActivationModal
     ]
+    // onClickAddUser,
   )
 
   return (
@@ -656,10 +655,11 @@ function UserListComponent(props: IProps) {
         (!getViewOnly(locationId, userDetails, true) && onChangeLocation) ||
         undefined
       }
+      isCertificatesConfigPage={true}
     >
       {isOnline ? (
-        <>
-          <HeaderContainer>
+        <Content title={searchedLocation?.name || ''} size={ContentSize.LARGE}>
+          {/* <HeaderContainer>
             <Header id="header">
               {(searchedLocation && searchedLocation.name) || ''}
             </Header>
@@ -668,11 +668,11 @@ function UserListComponent(props: IProps) {
                 {intl.formatMessage(buttonMessages.change)}
               </ChangeButton>
             )}
-          </HeaderContainer>
+          </HeaderContainer> */}
           <LocationInfo>
-            <LocationInfoKey>
+            {/* <LocationInfoKey>
               {intl.formatMessage(constantsMessages.address)}
-            </LocationInfoKey>
+            </LocationInfoKey> */}
             {searchedLocation && searchedLocation.address ? (
               <LocationInfoValue>{searchedLocation.address}</LocationInfoValue>
             ) : (
@@ -682,7 +682,7 @@ function UserListComponent(props: IProps) {
             )}
           </LocationInfo>
           <RenderUserList locationId={locationId} userDetails={userDetails} />
-        </>
+        </Content>
       ) : (
         <ConnectivityContainer>
           <NoConnectivity />
