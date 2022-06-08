@@ -117,7 +117,7 @@ async function getPractitionerByOfficeId(
   }
 }
 
-function getSignatureExtension(
+export function getSignatureExtension(
   extensions: fhir.Extension[] | undefined
 ): fhir.Extension | undefined {
   return findExtension(

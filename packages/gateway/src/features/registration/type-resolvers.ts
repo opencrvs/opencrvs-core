@@ -60,6 +60,7 @@ import { ITemplatedComposition } from '@gateway/features/registration/fhir-build
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
+import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
@@ -773,6 +774,33 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return await getCertificatesFromTask(task, _, authHeader)
+    },
+    signature: async (task: fhir.Task, _: any, authHeader: any) => {
+      const action = getActionFromTask(task)
+      if (action !== GQLRegStatus.REGISTERED) {
+        return null
+      }
+      const user = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+        task.extension as fhir.Extension[]
+      )
+      if (!user || !user.valueReference || !user.valueReference.reference) {
+        return null
+      }
+
+      const practitionerId = user.valueReference.reference.split('/')[1]
+      const practitioner: fhir.Practitioner = await fetchFHIR(
+        `/Practitioner/${practitionerId}`,
+        authHeader
+      )
+      const signatureExtension = getSignatureExtension(practitioner.extension)
+      const signature = signatureExtension && signatureExtension.valueSignature
+      return (
+        signature && {
+          type: signature.contentType,
+          data: signature.blob
+        }
+      )
     }
   },
 

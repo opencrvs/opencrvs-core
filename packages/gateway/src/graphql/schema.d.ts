@@ -644,6 +644,7 @@ export interface GQLHistory {
   input?: Array<GQLInputOutput | null>
   output?: Array<GQLInputOutput | null>
   certificates?: Array<GQLCertificate | null>
+  signature?: GQLSignature
 }
 
 export const enum GQLMannerOfDeath {
@@ -4281,6 +4282,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   input?: HistoryToInputResolver<TParent>
   output?: HistoryToOutputResolver<TParent>
   certificates?: HistoryToCertificatesResolver<TParent>
+  signature?: HistoryToSignatureResolver<TParent>
 }
 
 export interface HistoryToUserResolver<TParent = any, TResult = any> {
@@ -4335,6 +4337,10 @@ export interface HistoryToOutputResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToCertificatesResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToSignatureResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
