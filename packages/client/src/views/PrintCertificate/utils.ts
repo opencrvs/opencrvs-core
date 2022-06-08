@@ -162,7 +162,6 @@ export function getServiceMessage(
   offlineData: IOfflineData
 ) {
   const days = calculateDays(eventDate, registeredDate)
-
   if (event === Event.BIRTH) {
     if (days <= offlineData.config.BIRTH.REGISTRATION_TARGET) {
       return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
@@ -178,8 +177,7 @@ export function getServiceMessage(
       })
     } else {
       return intl.formatMessage(dynamicMessages[`${event}ServiceAfter`], {
-        target: offlineData.config.BIRTH.REGISTRATION_TARGET,
-        latetarget: offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
+        target: offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
       })
     }
   } else {

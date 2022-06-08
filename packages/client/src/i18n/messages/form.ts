@@ -200,7 +200,6 @@ interface IFormMessages
   iDTypePassport: MessageDescriptor
   iDTypeRefugeeNumber: MessageDescriptor
   informantAttestation: MessageDescriptor
-  lastNameBn: MessageDescriptor
   lastNameEn: MessageDescriptor
   manner: MessageDescriptor
   mannerAccident: MessageDescriptor
@@ -1350,11 +1349,6 @@ export const formMessageDescriptors: IFormMessages = {
     defaultMessage: 'Attestation of the informant, or',
     description: 'Attested document of the informant',
     id: 'form.section.documents.list.informantAttestation'
-  },
-  lastNameBn: {
-    defaultMessage: 'Bengali last name',
-    description: 'Bengali last name',
-    id: 'form.field.label.lastNameBN'
   },
   lastNameEn: {
     defaultMessage: 'English last name',
