@@ -294,33 +294,6 @@ describe('Workflow status tests', () => {
       component.update()
       expect(parse(history.location.search).status).toBe('REGISTERED')
     })
-
-    it('changing location id from location picker updates the query params', async () => {
-      const locationIdBeforeChange = parse(history.location.search).locationId
-      const locationPickerElement = await waitForElement(
-        component,
-        '#location-range-picker-action'
-      )
-
-      locationPickerElement.hostNodes().simulate('click')
-
-      const locationSearchInput = await waitForElement(
-        component,
-        '#locationSearchInput'
-      )
-      locationSearchInput.hostNodes().simulate('change', {
-        target: { value: 'Duaz', id: 'locationSearchInput' }
-      })
-
-      const searchResultOption = await waitForElement(
-        component,
-        '#locationOptiond3cef1d4-6187-4f0e-a024-61abd3fce9d4'
-      )
-      searchResultOption.hostNodes().simulate('click')
-      const newLocationId = parse(history.location.search).locationId
-      expect(newLocationId).not.toBe(locationIdBeforeChange)
-      expect(newLocationId).toBe('d3cef1d4-6187-4f0e-a024-61abd3fce9d4')
-    })
   })
 
   describe('events with progress fetched with failure', () => {

@@ -123,7 +123,7 @@ const MobileActionsContainer = styled.div`
   justify-content: right;
 `
 
-interface IListViewItemSimplifiedProps {
+export interface IListViewItemSimplifiedProps {
   image?: React.ReactNode
   label: React.ReactNode
   value?: React.ReactNode
@@ -173,8 +173,7 @@ export function ListViewSimplified({
   className,
   bottomBorder = false,
   children,
-  id,
-  ...rest
+  id
 }: {
   bottomBorder?: boolean
   className?: string
@@ -182,7 +181,7 @@ export function ListViewSimplified({
   id?: string
 }) {
   return (
-    <Grid {...rest} id={id} bottomBorder={bottomBorder}>
+    <Grid id={id} bottomBorder={bottomBorder} className={className}>
       {children}
     </Grid>
   )

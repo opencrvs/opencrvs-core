@@ -43,7 +43,7 @@ const messagesToDefine: IStepOneFormMessages = {
   },
   submit: {
     id: 'login.submit',
-    defaultMessage: 'Submit',
+    defaultMessage: 'Login',
     description: 'The label that appears on the submit button'
   },
   forgotPassword: {

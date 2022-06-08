@@ -1126,6 +1126,48 @@ export const typeResolvers: GQLResolver = {
         ? observations.entry[0].resource.valueString
         : null
     },
+    async questionnaire(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const response = await fetchFHIR(
+        `/QuestionnaireResponse?subject=${encounterSection.entry[0].reference}`,
+        authHeader
+      )
+      let questionnaireResponse: fhir.QuestionnaireResponse | null = null
+
+      if (
+        response &&
+        response.entry &&
+        response.entry[0] &&
+        response.entry[0].resource
+      ) {
+        questionnaireResponse = response.entry[0].resource
+      }
+
+      if (!questionnaireResponse) {
+        return null
+      }
+      const questionnaire: GQLQuestionnaireQuestion[] = []
+
+      if (questionnaireResponse.item && questionnaireResponse.item.length) {
+        questionnaireResponse.item.forEach((item) => {
+          if (item.answer && item.answer[0]) {
+            questionnaire.push({
+              fieldId: item.text,
+              value: item.answer[0].valueString
+            })
+          }
+        })
+        return questionnaire
+      } else {
+        return null
+      }
+    },
     async medicalPractitioner(
       composition: ITemplatedComposition,
       _,

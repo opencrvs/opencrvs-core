@@ -1179,7 +1179,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 id: 'informantNameInEnglish',
                 label: {
-                  defaultMessage: "Informant's English name",
+                  defaultMessage: "Informant's fullname",
                   description: "Label for informant's name in english",
                   id: 'form.preview.group.label.informant.english.name'
                 },
@@ -1377,7 +1377,7 @@ export const registerForms: IDefaultRegisterForms = {
                 previewGroup: 'motherNameInEnglish',
                 type: 'TEXT',
                 label: {
-                  defaultMessage: 'First Name',
+                  defaultMessage: 'First name(s)',
                   description: 'Label for form field: First names in english',
                   id: 'form.field.label.motherFirstNamesEng'
                 },
@@ -2125,7 +2125,7 @@ export const registerForms: IDefaultRegisterForms = {
               {
                 id: 'fatherNameInEnglish',
                 label: {
-                  defaultMessage: "Father's English name",
+                  defaultMessage: "Father's fullname",
                   description: "Group label for father's name in english",
                   id: 'form.preview.group.label.father.english.name'
                 },

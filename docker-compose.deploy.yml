@@ -192,10 +192,10 @@ services:
       placement:
         constraints:
           - node.labels.data1 == true
-    ports:
-      - 9200:9200
     environment:
       - ELASTIC_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
+    ports:
+      - 9200:9200
     networks:
       - overlay_net
 

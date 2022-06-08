@@ -21,7 +21,8 @@ import { transformData } from '@client/search/transformer'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
   dynamicConstantsMessages,
-  constantsMessages
+  constantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { connect } from 'react-redux'
 import { goToPage, goToDeclarationRecordAudit } from '@client/navigation'
@@ -226,9 +227,7 @@ function InExternalValidationComponent(props: IProps) {
       paginationId={paginationId}
       totalPages={totalPages}
       onPageChange={onPageChange}
-      noResultText={intl.formatMessage(constantsMessages.noRecords, {
-        tab: 'in external validation '
-      })}
+      noResultText={intl.formatMessage(wqMessages.noRecordsExternalValidation)}
       loading={props.loading}
       error={props.error}
       noContent={transformWaitingValidationContent(data).length <= 0}
