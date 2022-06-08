@@ -406,13 +406,9 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
         return goToTeamSearchAction()
       } else {
-        return goToTeamUserListAction({
-          id: (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
-          searchableText:
-            (userDetails.primaryOffice && userDetails.primaryOffice.name) || '',
-          displayLabel:
-            (userDetails.primaryOffice && userDetails.primaryOffice.name) || ''
-        })
+        return goToTeamUserListAction(
+          (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
+        )
       }
     }
   }

@@ -21,7 +21,8 @@ import {
   goToCreateNewUser,
   goToCreateNewUserWithLocationId,
   goToReviewUserDetails,
-  goToTeamSearch
+  goToTeamSearch,
+  goToTeamUserList
 } from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -85,6 +86,11 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
+import { LocationPicker } from '@client/components/LocationPicker'
+import {
+  getAdditionalLocations,
+  NATIONAL_ADMINISTRATIVE_LEVEL
+} from '@client/views/SysAdmin/Performance/utils'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -242,6 +248,7 @@ type BaseProps = {
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToReviewUserDetails: typeof goToReviewUserDetails
   goToTeamSearch: typeof goToTeamSearch
+  goToTeamUserList: typeof goToTeamUserList
 }
 
 type IProps = BaseProps &
@@ -521,6 +528,31 @@ function UserListComponent(props: IProps) {
     )
   }
 
+  const LocationButton = ({
+    locationId,
+    userDetails,
+    onlyNational
+  }: {
+    locationId: string
+    userDetails: IUserDetails | null
+    onlyNational: boolean
+  }) => {
+    if (!getViewOnly(locationId, userDetails, onlyNational)) {
+      return (
+        <>
+          <LocationPicker
+            selectedLocationId={locationId}
+            onChangeLocation={(locationId) => {
+              props.goToTeamUserList(locationId)
+            }}
+            requiredJurisdictionTypes={'CRVS_OFFICE'}
+          />
+        </>
+      )
+    }
+    return <></>
+  }
+
   const RenderUserList = useCallback(
     function RenderUserList({
       locationId,
@@ -658,7 +690,17 @@ function UserListComponent(props: IProps) {
       isCertificatesConfigPage={true}
     >
       {isOnline ? (
-        <Content title={searchedLocation?.name || ''} size={ContentSize.LARGE}>
+        <Content
+          title={searchedLocation?.name || ''}
+          size={ContentSize.LARGE}
+          topActionButtons={[
+            <LocationButton
+              locationId={locationId}
+              userDetails={userDetails}
+              onlyNational={true}
+            />
+          ]}
+        >
           {/* <HeaderContainer>
             <Header id="header">
               {(searchedLocation && searchedLocation.name) || ''}
@@ -725,6 +767,7 @@ export const UserList = connect(
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToReviewUserDetails,
-    goToTeamSearch
+    goToTeamSearch,
+    goToTeamUserList
   }
 )(withTheme(injectIntl(withOnlineStatus(UserListComponent))))

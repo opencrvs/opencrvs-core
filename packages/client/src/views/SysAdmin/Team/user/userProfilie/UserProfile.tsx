@@ -384,7 +384,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                           id="office-link"
                           onClick={() =>
                             this.props.goToTeamUserList(
-                              user.primaryOffice as ISearchLocation
+                              (user.primaryOffice as ISearchLocation).id
                             )
                           }
                         >

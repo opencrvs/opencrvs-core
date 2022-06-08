@@ -436,11 +436,9 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         Cmd.list([
           Cmd.action(clearUserFormData()),
           Cmd.action(
-            goToTeamUserList({
-              id: (action as ISubmitSuccessAction).payload.locationId,
-              searchableText: '',
-              displayLabel: ''
-            })
+            goToTeamUserList(
+              (action as ISubmitSuccessAction).payload.locationId
+            )
           ),
           Cmd.action(
             showSubmitFormSuccessToast(
