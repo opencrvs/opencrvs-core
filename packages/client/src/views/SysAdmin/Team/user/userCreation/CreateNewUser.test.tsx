@@ -348,13 +348,13 @@ describe('edit user tests', () => {
             name: [
               {
                 use: 'bn',
-                firstNames: '',
+                firstNames: 'Jeff',
                 familyName: 'মায়ের পারিবারিক নাম ',
                 __typename: 'HumanName'
               },
               {
                 use: 'en',
-                firstNames: '',
+                firstNames: 'Jeff',
                 familyName: 'Shakib al Hasan',
                 __typename: 'HumanName'
               }
