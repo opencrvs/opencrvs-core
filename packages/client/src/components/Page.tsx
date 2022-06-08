@@ -32,7 +32,6 @@ import { Ii18n } from '@client/type/i18n'
 import { getPreferredLanguage } from '@client/i18n/utils'
 import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
-import { LOADING_SCREEN_TEXT } from '@client/utils/constants'
 import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
 
 const languageFromProps = ({ language }: IPageProps) => language
@@ -86,7 +85,7 @@ const StyledSpinner = styled(Spinner)`
   position: absolute;
   margin-left: -24px;
   margin-top: -24px;
-  top: 38%;
+  top: calc(50% - 20px);
   left: 50%;
   width: 40px;
   height: 40px;
@@ -179,7 +178,6 @@ class Component extends React.Component<
       return (
         <>
           <StyledSpinner id="appSpinner" />
-          <StyledText>{LOADING_SCREEN_TEXT}</StyledText>
         </>
       )
     }
