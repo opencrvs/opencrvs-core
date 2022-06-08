@@ -566,7 +566,7 @@ describe('OfficeHome sent for update tab related tests', () => {
       await store.dispatch(checkAuth())
     })
 
-    it.skip('downloads the declaration after clicking download button', async () => {
+    it('downloads the declaration after clicking download button', async () => {
       const downloadButton = await waitForElement(
         testComponent,
         '#ListItemAction-0-icon'
@@ -600,7 +600,7 @@ describe('OfficeHome sent for update tab related tests', () => {
       )
     })
 
-    it.skip('shows error when download is failed', async () => {
+    it('shows error when download is failed', async () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
         Event.DEATH,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',

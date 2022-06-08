@@ -714,7 +714,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       )
     })
 
-    it.skip('shows error when download is failed', async () => {
+    it('shows error when download is failed', async () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
         Event.DEATH,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',

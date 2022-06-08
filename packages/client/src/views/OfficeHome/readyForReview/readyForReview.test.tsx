@@ -426,7 +426,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     )
   })
 
-  describe.skip('handles download status', () => {
+  describe('handles download status', () => {
     let testComponent: ReactWrapper<{}, {}>
     let createdTestComponent: ReactWrapper<{}, {}>
     beforeEach(async () => {
