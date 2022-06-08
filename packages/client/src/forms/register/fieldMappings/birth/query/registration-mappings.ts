@@ -10,26 +10,27 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  IFormData,
   Event,
-  TransformedData,
+  IFormData,
   IFormField,
   IFormFieldQueryMapFunction,
-  IQuestionnaireQuestion
+  IQuestionnaireQuestion,
+  TransformedData
 } from '@client/forms'
-import {
-  GQLRegWorkflow,
-  GQLRegStatus
-} from '@opencrvs/gateway/src/graphql/schema'
-import { get, cloneDeep } from 'lodash'
-import { callingCountries } from 'country-data'
-import format from '@client/utils/date-formatting'
-import { IOfflineData } from '@client/offline/reducer'
-import { IUserDetails } from '@client/utils/userUtils'
-import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
-import { userMessages } from '@client/i18n/messages'
-import { MessageDescriptor } from 'react-intl'
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
+import { userMessages } from '@client/i18n/messages'
+import { IOfflineData } from '@client/offline/reducer'
+import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
+import format from '@client/utils/date-formatting'
+import { History, RegStatus } from '@client/utils/gateway'
+import { IUserDetails } from '@client/utils/userUtils'
+import {
+  GQLRegStatus,
+  GQLRegWorkflow
+} from '@opencrvs/gateway/src/graphql/schema'
+import { callingCountries } from 'country-data'
+import { cloneDeep, get } from 'lodash'
+import { MessageDescriptor } from 'react-intl'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -238,11 +239,15 @@ export const registrarNameUserTransformer = (
   __?: IOfflineData,
   userDetails?: IUserDetails
 ) => {
-  if (!userDetails) {
+  if (!_.history) {
     return
   }
+
+  const history = _.history.find(
+    (historyItem: History) => historyItem?.action === RegStatus.Registered
+  )
   transformedData[targetSectionId || sectionId][targetFieldName || 'userName'] =
-    getUserName(userDetails)
+    history?.user ? getUserName(history.user) : ''
 }
 
 export const roleUserTransformer = (
@@ -292,10 +297,15 @@ export const registrarSignatureUserTransformer = (
   __?: IOfflineData,
   userDetails?: IUserDetails
 ) => {
-  if (!userDetails?.primaryOffice) {
+  if (!_.history) {
     return
   }
+
+  const history = _.history.find(
+    (historyItem: History) => historyItem?.action === RegStatus.Registered
+  )
+
   transformedData[targetSectionId || sectionId][
     targetFieldName || 'registrationOffice'
-  ] = userDetails.localRegistrar?.signature?.data as string
+  ] = history?.signature?.data as string
 }
