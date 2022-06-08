@@ -135,6 +135,7 @@ class UserReviewFormComponent extends React.Component<
         if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
         } else if (field && sections.length > 0) {
+          if (field.name === 'username' && !this.getValue(field)) return
           const label =
             field.type === SIMPLE_DOCUMENT_UPLOADER ? (
               <DocumentUploaderContainer>

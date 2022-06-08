@@ -213,14 +213,17 @@ export const getLocation = (
   if (locationType === 'HEALTH_FACILITY' && locationId) {
     const facility = resources.facilities[locationId]
     const district =
-      facility && resources.locations[facility.partOf.split('/')[1]]
+      facility &&
+      facility.partOf &&
+      resources.locations[facility.partOf.split('/')[1]]
     const state = district && resources.locations[district.partOf.split('/')[1]]
     const defaultCountry = intl.formatMessage(
       countryMessages[window.config.COUNTRY]
     )
     const healthFacility = generateLocationName(facility, intl)
 
-    let location = healthFacility + ', '
+    let location = ''
+    if (healthFacility) location = healthFacility + ', '
     if (district) location = location + district.name + ', '
     if (state) location = location + state.name + ', '
     location = location + defaultCountry
