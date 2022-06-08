@@ -91,7 +91,7 @@ export const userSectionFormType: ISerializedFormSection = {
           name: 'firstNamesEng',
           type: TEXT,
           label: userFormMessages.firstNameEn,
-          required: false,
+          required: true,
           initialValue: '',
           validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
