@@ -31,8 +31,8 @@ import {
   Title,
   Label,
   CenteredToggle,
-  StyledTooltip,
-  RequiredToggleAction
+  RequiredToggleAction,
+  ToolTip
 } from './components'
 
 const Container = styled.div`
@@ -108,27 +108,40 @@ export function DefaultFieldTools({
             label={
               <Label>
                 {intl.formatMessage(messages.requiredForRegistration)}
-                <StyledTooltip />
+                <ToolTip
+                  label={intl.formatMessage(
+                    messages.requiredForRegistrationTooltip
+                  )}
+                  id={'required-for-registration'}
+                />
               </Label>
             }
             actions={<RequiredToggleAction {...configField} />}
           />
         </ListViewSimplified>
       )}
+
       <Content>
         <Subtitle>
           {intl.formatMessage(messages.contentKey)}
-          <StyledTooltip />
+          <ToolTip
+            label={intl.formatMessage(messages.contentKeyTooltip)}
+            id={'content-key'}
+          />
         </Subtitle>
         {contentKeys.map((content, index) => (
           <Body key={index}>{content}</Body>
         ))}
       </Content>
+
       {handleBar && (
         <HandleBar>
           <Subtitle>
             {intl.formatMessage(messages.certificateHandlebars)}
-            <StyledTooltip />
+            <ToolTip
+              label={intl.formatMessage(messages.certHandelbarsTooltip)}
+              id={'cert-handelbars'}
+            />
           </Subtitle>
           <Body>{`{{ ${handleBar} }}`}</Body>
         </HandleBar>

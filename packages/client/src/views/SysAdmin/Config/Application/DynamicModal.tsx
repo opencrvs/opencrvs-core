@@ -60,7 +60,7 @@ const Text = styled.div<{
 }>`
   margin-left: ${({ align }) => (align === 'left' ? '0px' : '8px')};
   margin-right: ${({ align }) => (align === 'left' ? '8px' : '0px')};
-  margin-top: 34px;
+  margin-top: 36px;
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.reg16};
 `
