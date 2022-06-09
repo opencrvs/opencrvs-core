@@ -18,7 +18,6 @@ import { IStoreState } from '@client/store'
 import { IUserDetails } from '@client/utils/userUtils'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { LightLogo } from '@opencrvs/components/lib/icons'
 import { userMessages, buttonMessages } from '@client/i18n/messages'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import {
@@ -99,16 +98,16 @@ export class UserSetupView extends React.Component<
 > {
   render() {
     const { intl, userDetails, goToStep, offlineCountryConfig } = this.props
-    console.log(
-      'offlineCountryConfig.config.APPLICATION_NAME',
-      offlineCountryConfig.config.APPLICATION_NAME
-    )
 
     return (
       <Page>
         <Container id="user-setup-landing-page">
           <LogoContainer>
-            <LightLogo />
+            <img
+              src={offlineCountryConfig.config.COUNTRY_LOGO.file}
+              width={offlineCountryConfig.config.COUNTRY_LOGO_RENDER_HEIGHT}
+              height={offlineCountryConfig.config.COUNTRY_LOGO_RENDER_WIDTH}
+            />
           </LogoContainer>
           <TitleHolder>
             {intl.formatMessage(messages.userSetupWelcomeTitle, {
