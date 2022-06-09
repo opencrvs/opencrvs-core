@@ -37,7 +37,6 @@ import {
 } from '@login/utils/authUtils'
 import { goToForgottenItemForm } from '@login/login/actions'
 import { useSelector } from 'react-redux'
-import { IStoreState } from '@login/store'
 import { selectCountryLogo } from '@login/login/selectors'
 
 export const Container = styled.div`
@@ -209,8 +208,9 @@ export function StepOneForm({
   submissionError,
   errorCode
 }: FullProps) {
+  /* This might need to be converted into a state */
   const isOffline: boolean = navigator.onLine ? false : true
-  const logo = useSelector((store: IStoreState) => selectCountryLogo(store))
+  const logo = useSelector(selectCountryLogo)
 
   return (
     <Container id="login-step-one-box">
