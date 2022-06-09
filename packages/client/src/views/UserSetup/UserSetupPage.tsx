@@ -27,6 +27,7 @@ import {
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 
 export const Page = styled.div`
   ${({ theme }) => theme.fonts.regularFont};
@@ -103,11 +104,7 @@ export class UserSetupView extends React.Component<
       <Page>
         <Container id="user-setup-landing-page">
           <LogoContainer>
-            <img
-              src={offlineCountryConfig.config.COUNTRY_LOGO.file}
-              width={offlineCountryConfig.config.COUNTRY_LOGO_RENDER_HEIGHT}
-              height={offlineCountryConfig.config.COUNTRY_LOGO_RENDER_WIDTH}
-            />
+            <CountryLogo src={offlineCountryConfig.config.COUNTRY_LOGO.file} />
           </LogoContainer>
           <TitleHolder>
             {intl.formatMessage(messages.userSetupWelcomeTitle, {
