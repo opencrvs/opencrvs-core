@@ -91,7 +91,7 @@ export const userSectionFormType: ISerializedFormSection = {
           name: 'firstNamesEng',
           type: TEXT,
           label: userFormMessages.firstNameEn,
-          required: false,
+          required: true,
           initialValue: '',
           validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
@@ -255,7 +255,8 @@ export const userSectionFormType: ISerializedFormSection = {
       conditionals: [
         {
           action: 'hide',
-          expression: 'values.role!=="LOCAL_REGISTRAR"'
+          expression:
+            'values.role!=="LOCAL_REGISTRAR" && values.role!=="NATIONAL_REGISTRAR"'
         }
       ],
       fields: [

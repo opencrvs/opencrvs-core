@@ -24,7 +24,6 @@ import * as LogRocket from 'logrocket'
 import { refreshToken } from '@client/utils/authUtils'
 import {
   LOADER_MIN_DISPLAY_TIME,
-  LOADING_SCREEN_TEXT,
   REFRESH_TOKEN_CHECK_MILLIS
 } from '@client/utils/constants'
 import { connect } from 'react-redux'
@@ -65,7 +64,7 @@ const StyledSpinner = styled(Spinner)`
   position: absolute;
   margin-left: -24px;
   margin-top: -24px;
-  top: 38%;
+  top: calc(50% - 20px);
   left: 50%;
   width: 40px;
   height: 40px;
@@ -186,7 +185,6 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
     return (
       <SpinnerBackground>
         <StyledSpinner id="pin_loading_spinner" />
-        <StyledText>{LOADING_SCREEN_TEXT}</StyledText>
       </SpinnerBackground>
     )
   }
