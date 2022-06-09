@@ -60,12 +60,6 @@ const deathBulletListItemsToDefine: MessageDescriptor[] = [
     defaultMessage:
       'Wait for an SMS to tell you when to visit the office to collect the certificate - Take your ID with you.',
     description: 'Event info bullet list item for death'
-  },
-  {
-    id: 'register.eventInfo.death.listItem3',
-    defaultMessage:
-      'Make sure you go and collect the certificate. A death certificate is critical to support with inheritance claims and to resolve the affairs of the deceased e.g. closing bank accounts and settling loans.',
-    description: 'Event info bullet list item for death'
   }
 ]
 
