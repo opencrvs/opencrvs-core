@@ -16,21 +16,21 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
-import { IUserDetails } from '@client/utils/userUtils'
+import { SECURITY_PIN_EXPIRED_AT, LANG_EN } from '@client/utils/constants'
+import { IUserDetails, getUserName } from '@client/utils/userUtils'
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
 import { ErrorMessage } from '@opencrvs/components/lib/forms'
-import { Logo, Logout } from '@opencrvs/components/lib/icons'
+import { Logout } from '@opencrvs/components/lib/icons'
 import { PINKeypad, Spinner } from '@opencrvs/components/lib/interface'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import zambiaBackground from './background-zmb.jpg'
 import { Button } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
+import { AvatarLarge } from '@client/components/Avatar'
 
 export const PageWrapper = styled.div`
   ${({ theme }) => theme.fonts.bold16};
@@ -53,10 +53,6 @@ const SpinnerWrapper = styled.div`
   justify-content: center;
   align-items: center;
   padding: 20px;
-`
-
-const StyledLogo = styled(Logo)`
-  margin-top: -80px;
 `
 
 export const LogoutHeader = styled.a`
@@ -259,6 +255,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
   }
 
   render() {
+    const { userDetails } = this.props
     return this.state.showSpinner ? (
       <SpinnerWrapper>
         <Spinner id="hashingSpinner" />
@@ -270,7 +267,10 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
           <Logout />
         </LogoutHeader>
         <Container onClick={this.focusKeypad}>
-          <StyledLogo />
+          <AvatarLarge
+            name={getUserName(userDetails)}
+            avatar={userDetails?.avatar}
+          />
           {this.showName()}
 
           {this.showErrorMessage()}
