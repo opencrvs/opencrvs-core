@@ -17,6 +17,7 @@ import {
   userMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
+import { messages as headerMessages } from '@client/i18n/messages/views/header'
 import {
   goToCreateNewUser,
   goToCreateNewUserWithLocationId,
@@ -150,27 +151,15 @@ const AddUserContainer = styled.div`
   }
 `
 const AddUserIcon = styled(AddUser)`
-  padding: 4px;
+  cursor: pointer;
 `
 
 const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h1};
-`
-
-const HeaderContainer = styled.div`
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  margin-top: -32px;
-
-  & > :first-child {
-    margin-right: 24px;
-  }
-
-  & > :nth-child(2) {
-    position: relative;
-    bottom: 2px;
+  ${({ theme }) => theme.fonts.h2};
+  margin: 8px 0;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
   }
 `
 
@@ -217,12 +206,13 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
 `
 
 const ConnectivityContainer = styled.div`
-  justify-content: center;
-  gap: 8px;
+  height: 328px;
+  margin-top: 16px;
   display: flex;
-  margin-top: 5vh;
+  gap: 12px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-top: 12px;
+    height: calc(100vh - 104px);
   }
 `
 const NoConnectivity = styled(NoWifi)`
@@ -507,14 +497,14 @@ function UserListComponent(props: IProps) {
     [StatusMenu, intl]
   )
 
-  // const onClickAddUser = useCallback(
-  //   function onClickAddUser() {
-  //     ;(searchedLocation &&
-  //       goToCreateNewUserWithLocationId(searchedLocation.id)) ||
-  //       goToCreateNewUser()
-  //   },
-  //   [goToCreateNewUser, goToCreateNewUserWithLocationId, searchedLocation]
-  // )
+  const onClickAddUser = useCallback(
+    function onClickAddUser() {
+      ;(searchedLocation &&
+        goToCreateNewUserWithLocationId(searchedLocation.id)) ||
+        goToCreateNewUser()
+    },
+    [goToCreateNewUser, goToCreateNewUserWithLocationId, searchedLocation]
+  )
 
   function onChangeLocation() {
     goToTeamSearch(
@@ -528,29 +518,29 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  const LocationButton = ({
-    locationId,
-    userDetails,
-    onlyNational
-  }: {
-    locationId: string
-    userDetails: IUserDetails | null
+  const LocationButton = (
+    locationId: string,
+    userDetails: IUserDetails | null,
     onlyNational: boolean
-  }) => {
+  ) => {
+    const buttons: React.ReactElement[] = []
     if (!getViewOnly(locationId, userDetails, onlyNational)) {
-      return (
-        <>
-          <LocationPicker
-            selectedLocationId={locationId}
-            onChangeLocation={(locationId) => {
-              props.goToTeamUserList(locationId)
-            }}
-            requiredJurisdictionTypes={'CRVS_OFFICE'}
-          />
-        </>
+      const LocationButton = (
+        <LocationPicker
+          selectedLocationId={locationId}
+          onChangeLocation={(locationId) => {
+            props.goToTeamUserList(locationId)
+          }}
+          requiredJurisdictionTypes={'CRVS_OFFICE'}
+        />
       )
+      const AddUserButton = (
+        <AddUserIcon id="add-user" onClick={onClickAddUser} />
+      )
+      buttons.push(LocationButton)
+      buttons.push(AddUserButton)
     }
-    return <></>
+    return buttons
   }
 
   const RenderUserList = useCallback(
@@ -590,80 +580,82 @@ function UserListComponent(props: IProps) {
               userDetails
             )
             return (
-              <UserTable id="user_list">
-                {/* <TableHeader>
-                  {(data && data.searchUsers && data.searchUsers.totalItems) ||
-                    0}{' '}
-                  users
-                  {!getViewOnly(locationId, userDetails, false) && (
-                    <AddUserContainer id="add-user" onClick={onClickAddUser}>
-                      <AddUserIcon />
-                      {' New user'}
-                    </AddUserContainer>
-                  )}
-                </TableHeader> */}
-                <ListViewSimplified>
-                  {userContent.length <= 0 ? (
-                    <NoRecord id="no-record">
-                      {intl.formatMessage(constantsMessages.noResults)}
-                    </NoRecord>
+              <>
+                <LocationInfo>
+                  {searchedLocation && searchedLocation.address ? (
+                    <LocationInfoValue>
+                      {searchedLocation.address}
+                    </LocationInfoValue>
                   ) : (
-                    userContent.map((content, index) => {
-                      return (
-                        <ListViewItemSimplified
-                          key={index}
-                          image={content.image}
-                          label={content.label}
-                          value={content.value}
-                          actions={content.actions}
-                        />
-                      )
-                    })
+                    <LocationInfoEmptyValue>
+                      {intl.formatMessage(constantsMessages.notAvailable)}
+                    </LocationInfoEmptyValue>
                   )}
-                </ListViewSimplified>
-                {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
-                  <PaginationWrapper>
-                    <DesktopWrapper>
-                      <PaginationModified
-                        size={'small'}
-                        initialPage={currentPageNumber}
-                        totalPages={Math.ceil(
-                          totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                        )}
-                        onPageChange={(currentPage: number) =>
-                          setCurrentPageNumber(currentPage)
+                </LocationInfo>
+                <UserTable id="user_list">
+                  <ListViewSimplified>
+                    {userContent.length <= 0 ? (
+                      <NoRecord id="no-record">
+                        {intl.formatMessage(constantsMessages.noResults)}
+                      </NoRecord>
+                    ) : (
+                      userContent.map((content, index) => {
+                        return (
+                          <ListViewItemSimplified
+                            key={index}
+                            image={content.image}
+                            label={content.label}
+                            value={content.value}
+                            actions={content.actions}
+                          />
+                        )
+                      })
+                    )}
+                  </ListViewSimplified>
+                  {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+                    <PaginationWrapper>
+                      <DesktopWrapper>
+                        <PaginationModified
+                          size={'small'}
+                          initialPage={currentPageNumber}
+                          totalPages={Math.ceil(
+                            totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                          )}
+                          onPageChange={(currentPage: number) =>
+                            setCurrentPageNumber(currentPage)
+                          }
+                        />
+                      </DesktopWrapper>
+                      <MobileWrapper>
+                        <PaginationModified
+                          size={'large'}
+                          initialPage={currentPageNumber}
+                          totalPages={Math.ceil(
+                            totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                          )}
+                          onPageChange={(currentPage: number) =>
+                            setCurrentPageNumber(currentPage)
+                          }
+                        />
+                      </MobileWrapper>
+                    </PaginationWrapper>
+                  )}
+                  <UserAuditActionModal
+                    show={toggleActivation.modalVisible}
+                    user={toggleActivation.selectedUser}
+                    onClose={() => toggleUserActivationModal()}
+                    onConfirmRefetchQueries={[
+                      {
+                        query: SEARCH_USERS,
+                        variables: {
+                          primaryOfficeId: locationId,
+                          count: recordCount
                         }
-                      />
-                    </DesktopWrapper>
-                    <MobileWrapper>
-                      <PaginationModified
-                        size={'large'}
-                        initialPage={currentPageNumber}
-                        totalPages={Math.ceil(
-                          totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                        )}
-                        onPageChange={(currentPage: number) =>
-                          setCurrentPageNumber(currentPage)
-                        }
-                      />
-                    </MobileWrapper>
-                  </PaginationWrapper>
-                )}
-                <UserAuditActionModal
-                  show={toggleActivation.modalVisible}
-                  user={toggleActivation.selectedUser}
-                  onClose={() => toggleUserActivationModal()}
-                  onConfirmRefetchQueries={[
-                    {
-                      query: SEARCH_USERS,
-                      variables: {
-                        primaryOfficeId: locationId,
-                        count: recordCount
                       }
-                    }
-                  ]}
-                />
-              </UserTable>
+                    ]}
+                  />
+                </UserTable>
+              </>
             )
           }}
         </Query>
@@ -673,12 +665,12 @@ function UserListComponent(props: IProps) {
       currentPageNumber,
       generateUserContents,
       intl,
+      searchedLocation,
       recordCount,
       toggleActivation.modalVisible,
       toggleActivation.selectedUser,
       toggleUserActivationModal
     ]
-    // onClickAddUser,
   )
 
   return (
@@ -689,50 +681,31 @@ function UserListComponent(props: IProps) {
       }
       isCertificatesConfigPage={true}
     >
-      {isOnline ? (
-        <Content
-          title={searchedLocation?.name || ''}
-          size={ContentSize.LARGE}
-          topActionButtons={[
-            <LocationButton
-              locationId={locationId}
-              userDetails={userDetails}
-              onlyNational={true}
-            />
-          ]}
-        >
-          {/* <HeaderContainer>
+      <Content
+        title={
+          isOnline
+            ? searchedLocation?.name || ''
+            : intl.formatMessage(headerMessages.teamTitle)
+        }
+        size={ContentSize.LARGE}
+        topActionButtons={LocationButton(locationId, userDetails, true)}
+      >
+        {isOnline ? (
+          <>
             <Header id="header">
               {(searchedLocation && searchedLocation.name) || ''}
             </Header>
-            {!getViewOnly(locationId, userDetails, true) && (
-              <ChangeButton id="chng-loc" onClick={onChangeLocation}>
-                {intl.formatMessage(buttonMessages.change)}
-              </ChangeButton>
-            )}
-          </HeaderContainer> */}
-          <LocationInfo>
-            {/* <LocationInfoKey>
-              {intl.formatMessage(constantsMessages.address)}
-            </LocationInfoKey> */}
-            {searchedLocation && searchedLocation.address ? (
-              <LocationInfoValue>{searchedLocation.address}</LocationInfoValue>
-            ) : (
-              <LocationInfoEmptyValue>
-                {intl.formatMessage(constantsMessages.notAvailable)}
-              </LocationInfoEmptyValue>
-            )}
-          </LocationInfo>
-          <RenderUserList locationId={locationId} userDetails={userDetails} />
-        </Content>
-      ) : (
-        <ConnectivityContainer>
-          <NoConnectivity />
-          <Text id="no-connection-text">
-            {intl.formatMessage(constantsMessages.noConnection)}
-          </Text>
-        </ConnectivityContainer>
-      )}
+            <RenderUserList locationId={locationId} userDetails={userDetails} />
+          </>
+        ) : (
+          <ConnectivityContainer>
+            <NoConnectivity />
+            <Text id="no-connection-text">
+              {intl.formatMessage(constantsMessages.noConnection)}
+            </Text>
+          </ConnectivityContainer>
+        )}
+      </Content>
 
       {showResendSMSSuccess && (
         <FloatingNotification

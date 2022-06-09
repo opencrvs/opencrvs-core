@@ -22,7 +22,9 @@ import {
   goToSearchResult,
   goToSettings,
   goToTeamSearch,
-  goToTeamUserList
+  goToTeamUserList,
+  goToCreateNewUserWithLocationId,
+  goToCreateNewUser
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -53,7 +55,9 @@ import {
   SearchDark,
   TrackingID,
   User,
-  Activity
+  Activity,
+  SearchBlue,
+  AddUser
 } from '@opencrvs/components/lib/icons'
 import {
   AppHeader,
@@ -91,7 +95,8 @@ type IDispatchProps = {
   goBack: typeof goBack
   goForward: typeof goForward
   goToPerformanceHomeAction: typeof goToPerformanceHome
-
+  goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
+  goToCreateNewUser: typeof goToCreateNewUser
   goToTeamSearchAction: typeof goToTeamSearch
   goToTeamUserListAction: typeof goToTeamUserList
 }
@@ -218,7 +223,6 @@ class HeaderComp extends React.Component<IFullProps, IState> {
 
   hamburger = () => {
     const { userDetails, language, intl } = this.props
-
     let name = ''
     if (userDetails && userDetails.name) {
       const nameObj = getIndividualNameObj(userDetails.name, language)
@@ -254,17 +258,61 @@ class HeaderComp extends React.Component<IFullProps, IState> {
   }
 
   getMobileHeaderActionProps(activeMenuItem: ACTIVE_MENU_ITEM, theme: ITheme) {
+    const locationId = new URLSearchParams(this.props.location.search).get(
+      'locationId'
+    )
     if (activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE) {
       return {
-        mobileLeft: {
-          icon: () => this.hamburger(),
-          handler: this.toggleMenu
-        },
-        mobileRight: {
-          icon: () => <Activity stroke={theme.colors.primary} />,
-          handler: () =>
-            this.props.mapPerformanceClickHandler &&
-            this.props.mapPerformanceClickHandler()
+        mobileLeft: [
+          {
+            icon: () => this.hamburger(),
+            handler: this.toggleMenu
+          }
+        ],
+        mobileRight: [
+          {
+            icon: () => <Activity stroke={theme.colors.primary} />,
+            handler: () =>
+              this.props.mapPerformanceClickHandler &&
+              this.props.mapPerformanceClickHandler()
+          }
+        ]
+      }
+    } else if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
+      if (this.props.mapPinClickHandler) {
+        return {
+          mobileLeft: [
+            {
+              icon: () => this.hamburger(),
+              handler: this.toggleMenu
+            }
+          ],
+          mobileRight: [
+            {
+              icon: () => <SearchBlue />,
+              handler: () =>
+                this.props.mapPinClickHandler && this.props.mapPinClickHandler()
+            },
+            {
+              icon: () => <AddUser />,
+              handler: () => {
+                if (locationId) {
+                  this.props.goToCreateNewUserWithLocationId(locationId)
+                } else {
+                  this.props.goToCreateNewUser()
+                }
+              }
+            }
+          ]
+        }
+      } else {
+        return {
+          mobileLeft: [
+            {
+              icon: () => this.hamburger(),
+              handler: this.toggleMenu
+            }
+          ]
         }
       }
     } else if (
@@ -272,51 +320,38 @@ class HeaderComp extends React.Component<IFullProps, IState> {
       USERS_WITHOUT_SEARCH.includes(this.props.userDetails?.role)
     ) {
       return {
-        mobileLeft: {
-          icon: () => this.hamburger(),
-          handler: this.toggleMenu
-        }
-      }
-    } else if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
-      if (this.props.mapPinClickHandler) {
-        return {
-          mobileLeft: {
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
-          },
-          mobileRight: {
-            icon: () => <Location inverse />,
-            handler: () =>
-              this.props.mapPinClickHandler && this.props.mapPinClickHandler()
-          }
-        }
-      } else {
-        return {
-          mobileLeft: {
+        mobileLeft: [
+          {
             icon: () => this.hamburger(),
             handler: this.toggleMenu
           }
-        }
+        ]
       }
     } else {
       if (this.props.mobileSearchBar) {
         return {
-          mobileLeft: {
-            icon: () => <ArrowBack />,
-            handler: () => window.history.back()
-          },
+          mobileLeft: [
+            {
+              icon: () => <ArrowBack />,
+              handler: () => window.history.back()
+            }
+          ],
           mobileBody: this.renderSearchInput(this.props, true)
         }
       } else {
         return {
-          mobileLeft: {
-            icon: () => this.hamburger(),
-            handler: this.toggleMenu
-          },
-          mobileRight: {
-            icon: () => <SearchDark />,
-            handler: () => this.props.goToSearch()
-          }
+          mobileLeft: [
+            {
+              icon: () => this.hamburger(),
+              handler: this.toggleMenu
+            }
+          ],
+          mobileRight: [
+            {
+              icon: () => <SearchDark />,
+              handler: () => this.props.goToSearch()
+            }
+          ]
         }
       }
     }
@@ -546,6 +581,8 @@ export const Header = connect(
   (store: IStoreState) => ({
     activeMenuItem: window.location.href.includes('performance')
       ? ACTIVE_MENU_ITEM.PERFORMANCE
+      : window.location.href.includes('team/users')
+      ? ACTIVE_MENU_ITEM.USERS
       : window.location.href.includes('team')
       ? ACTIVE_MENU_ITEM.TEAM
       : window.location.href.includes('config/certificate')
@@ -567,7 +604,8 @@ export const Header = connect(
     goForward,
     goToEvents: goToEventsAction,
     goToPerformanceHomeAction: goToPerformanceHome,
-
+    goToCreateNewUserWithLocationId,
+    goToCreateNewUser,
     goToTeamSearchAction: goToTeamSearch,
     goToTeamUserListAction: goToTeamUserList
   }
