@@ -629,18 +629,14 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               officeSelected: this.state.officeSelected
             }}
             fetchPolicy="no-cache"
+            key={Number(isOnline)} // To re-render when online
           >
             {({ loading, data, error }) => {
-              if (error) {
-                return (
-                  <>
-                    <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                  </>
-                )
-              }
-              if (!data) return <></>
               return (
                 <>
+                  {error && (
+                    <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                  )}
                   <ResponsiveModal
                     title={intl.formatMessage(constantsMessages.status)}
                     show={toggleStatus}
@@ -652,15 +648,17 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         <Spinner id="modal-data-loading" />
                       ) : (
                         <>
-                          <StatusWiseDeclarationCountView
-                            selectedEvent={this.state.event}
-                            isAccessibleOffice={this.state.isAccessibleOffice}
-                            statusMapping={StatusMapping}
-                            data={data.fetchRegistrationCountByStatus}
-                            onClickStatusDetails={this.onClickStatusDetails}
-                          />
+                          {isOnline && (
+                            <StatusWiseDeclarationCountView
+                              selectedEvent={this.state.event}
+                              isAccessibleOffice={this.state.isAccessibleOffice}
+                              statusMapping={StatusMapping}
+                              data={data.fetchRegistrationCountByStatus}
+                              onClickStatusDetails={this.onClickStatusDetails}
+                            />
+                          )}
 
-                          {!officeSelected && (
+                          {!officeSelected && isOnline && (
                             <>
                               <Devider />
 
