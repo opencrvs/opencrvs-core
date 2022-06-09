@@ -58,7 +58,7 @@ import {
 import { buttonMessages } from '@client/i18n/messages'
 import { flattenDeep, get, clone, isEqual, isArray } from 'lodash'
 import { IGQLLocation } from '@client/utils/userUtils'
-import { ACCUMULATED_FILE_SIZE } from '@client/utils/constants'
+import { ACCUMULATED_FILE_SIZE, EMPTY_STRING } from '@client/utils/constants'
 
 export function groupHasError(
   group: IFormSectionGroup,
@@ -187,6 +187,21 @@ export function updateDeclarationRegistrationWithCorrection(
           nestedFields?.proofOfPayment as IFileValue
         ).data
       }
+    } else if (
+      (data.currectionFeesPayment.correctionFees as IFormSectionData)?.value &&
+      (data.currectionFeesPayment.correctionFees as IFormSectionData).value ===
+        'NOT_REQUIRED'
+    ) {
+      correctionValues.payments = [
+        {
+          type: 'MANUAL',
+          total: 0,
+          amount: 0,
+          outcome: 'COMPLETED' as const,
+          data: EMPTY_STRING,
+          date: Date.now()
+        }
+      ]
     }
   }
 
