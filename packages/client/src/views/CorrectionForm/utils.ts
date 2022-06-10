@@ -454,6 +454,12 @@ export function hasNestedDataChanged(
   if (nestedFieldData.value === previousNestedFieldData.value) {
     for (const key of Object.keys(nestedFieldData.nestedFields)) {
       if (
+        !previousNestedFieldData.nestedFields[key] &&
+        nestedFieldData.nestedFields[key] === ''
+      ) {
+        continue
+      }
+      if (
         nestedFieldData.nestedFields[key] !==
         previousNestedFieldData.nestedFields[key]
       ) {

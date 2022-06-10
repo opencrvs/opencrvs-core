@@ -199,6 +199,8 @@ export const draftToGqlTransformer = (
         }
         if (Object.keys(originalDraftData).length) {
           if (
+            !conditionalActions.includes('hide') &&
+            !conditionalActions.includes('disable') &&
             hasFieldChanged(
               fieldDef,
               draftData[section.id],
