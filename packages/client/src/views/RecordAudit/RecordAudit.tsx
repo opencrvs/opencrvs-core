@@ -572,7 +572,11 @@ function getBodyContent({
   goBack,
   ...actionProps
 }: IFullProps) {
-  if (tab === 'search' || !workqueueDeclaration) {
+  if (
+    tab === 'search' ||
+    (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
+      !workqueueDeclaration)
+  ) {
     return (
       <>
         <Query
