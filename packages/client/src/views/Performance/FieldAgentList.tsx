@@ -62,7 +62,7 @@ const DEFAULT_FIELD_AGENT_LIST_SIZE = 25
 const { useState } = React
 interface SortMap {
   totalDeclarations: SORT_ORDER
-  name: SORT_ORDER
+  rawName: SORT_ORDER
   startMonth: SORT_ORDER
   avgCompleteDeclarationTime: SORT_ORDER
   type: SORT_ORDER
@@ -72,7 +72,7 @@ interface SortMap {
 }
 const INITIAL_SORT_MAP = {
   totalDeclarations: SORT_ORDER.DESCENDING,
-  name: SORT_ORDER.ASCENDING,
+  rawName: SORT_ORDER.ASCENDING,
   startMonth: SORT_ORDER.ASCENDING,
   avgCompleteDeclarationTime: SORT_ORDER.ASCENDING,
   type: SORT_ORDER.ASCENDING,
@@ -227,9 +227,10 @@ function FieldAgentListComponent(props: IProps) {
         }),
         width: 20,
         isSortable: true,
-        sortFunction: () => toggleSort('name'),
-        icon: columnToBeSort === 'name' ? <SortArrow active={true} /> : <></>,
-        isSorted: columnToBeSort === 'name' ? true : false
+        sortFunction: () => toggleSort('rawName'),
+        icon:
+          columnToBeSort === 'rawName' ? <SortArrow active={true} /> : <></>,
+        isSorted: columnToBeSort === 'rawName' ? true : false
       },
       {
         key: 'type',
@@ -348,6 +349,7 @@ function FieldAgentListComponent(props: IProps) {
           offices.find(({ id }) => id === row.primaryOfficeId)
         return {
           name: getNameWithAvatar(row.fullName || '', row.avatar),
+          rawName: row.fullName || '',
           type: row.type,
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
@@ -371,7 +373,7 @@ function FieldAgentListComponent(props: IProps) {
       (content &&
         orderBy(
           content,
-          columnToBeSort === 'name'
+          columnToBeSort === 'rawName'
             ? [(content) => content[columnToBeSort]!.toString().toLowerCase()]
             : [columnToBeSort],
           [sortOrder[columnToBeSort]]
