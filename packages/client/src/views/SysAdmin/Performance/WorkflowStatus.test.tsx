@@ -49,7 +49,7 @@ describe('Workflow status tests', () => {
             skip: 0,
             locationId: locationId,
             status: ['REGISTERED'],
-            type: ['birth-declaration']
+            type: ['birth-declaration', 'birth-notification']
           }
         },
         result: {
@@ -306,7 +306,7 @@ describe('Workflow status tests', () => {
             skip: 0,
             parentLocationId: locationId,
             status: ['REGISTERED'],
-            type: ['birth-declaration']
+            type: ['birth-declaration', 'birth-notification']
           }
         },
         result: {

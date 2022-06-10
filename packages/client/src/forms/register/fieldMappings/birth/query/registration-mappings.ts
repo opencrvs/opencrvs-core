@@ -259,11 +259,19 @@ export const roleUserTransformer = (
   __?: IOfflineData,
   userDetails?: IUserDetails
 ) => {
-  if (!userDetails?.role) {
+  if (!_.history) {
     return
   }
+
+  const history = _.history.find(
+    (historyItem: History) => historyItem?.action === RegStatus.Registered
+  )
+
   transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
-    userMessages[userDetails.role] as MessageDescriptor & Record<string, string>
+    history?.user?.role
+      ? (userMessages[history.user.role] as MessageDescriptor &
+          Record<string, string>)
+      : ''
 }
 
 export const registrationLocationUserTransformer = (

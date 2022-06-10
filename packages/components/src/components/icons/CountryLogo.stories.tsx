@@ -11,13 +11,20 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { Logo } from '.'
+import { CountryLogo } from '.'
 
 export default {
-  title: 'Components/icons/Logo',
-  component: Logo
+  title: 'Components/icons/CountryLogo',
+  component: CountryLogo
 } as Meta
 
-const Template: Story<{}> = () => <Logo />
+const Template: Story<{ size: 'small' | 'medium' }> = (args) => (
+  <CountryLogo src="./logo.png" {...args} />
+)
 
-export const LogoView = Template.bind({})
+export const Default = Template.bind({})
+
+export const Small = Template.bind({})
+Small.args = {
+  size: 'small'
+}

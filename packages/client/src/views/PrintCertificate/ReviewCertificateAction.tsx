@@ -249,6 +249,7 @@ class ReviewCertificateActionComponent extends React.Component<
           certificateMessages.certificateCollectionTitle
         )}
         goBack={this.goBack}
+        goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
       >
         <Content
           title={this.getTitle()}

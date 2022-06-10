@@ -23,30 +23,46 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
+import { EMPTY_STRING } from '@client/utils/constants'
+
+const getInformantEngName = (sectionData: IFormSectionData): string => {
+  if (sectionData.firstNamesEng) {
+    return `${sectionData.firstNamesEng as string} ${
+      sectionData.familyNameEng as string
+    }`
+  } else {
+    return sectionData.familyNameEng as string
+  }
+}
+
+const getInformantOthreName = (sectionData: IFormSectionData): string => {
+  if (sectionData.firstNames) {
+    return `${sectionData.firstNames as string} ${
+      sectionData.familyName as string
+    }`
+  } else {
+    return sectionData.familyName as string
+  }
+}
 
 const getInformantFullName = (
   sectionData: IFormSectionData,
   language = 'en'
 ): string => {
-  let fullName = ''
+  let fullName: string
   if (!sectionData) {
-    return fullName
+    return EMPTY_STRING
   }
   if (language === 'en') {
-    if (sectionData.firstNamesEng) {
-      fullName = `${sectionData.firstNamesEng as string} ${
-        sectionData.familyNameEng as string
-      }`
-    } else {
-      fullName = sectionData.familyNameEng as string
-    }
+    fullName = getInformantEngName(sectionData)
   } else {
-    if (sectionData.firstNames) {
+    if (sectionData.firstNames && sectionData.familyName) {
       fullName = `${sectionData.firstNames as string} ${
         sectionData.familyName as string
       }`
     } else {
-      fullName = sectionData.familyName as string
+      fullName =
+        getInformantOthreName(sectionData) || getInformantEngName(sectionData)
     }
   }
   return fullName

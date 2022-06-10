@@ -684,7 +684,7 @@ describe('In Progress tab', () => {
       testComponent.update()
 
       expect(window.location.href).toContain(
-        '/record-audit/inProgressTab/956281c9-1f47-4c26-948a-970dd23c4094'
+        '/record-audit/notificationTab/956281c9-1f47-4c26-948a-970dd23c4094'
       )
     })
 
