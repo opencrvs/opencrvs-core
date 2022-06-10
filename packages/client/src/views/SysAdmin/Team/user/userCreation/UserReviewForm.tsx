@@ -239,9 +239,9 @@ class UserReviewFormComponent extends React.Component<
     let actionComponent: JSX.Element
     const locationId = formData['registrationOffice']
     const locationDetails =
-      offlineCountryConfiguration['locations'][String(locationId)] ||
-      offlineCountryConfiguration['facilities'][String(locationId)] ||
-      offlineCountryConfiguration['offices'][String(locationId)]
+      offlineCountryConfiguration['locations'][`${locationId}`] ||
+      offlineCountryConfiguration['facilities'][`${locationId}`] ||
+      offlineCountryConfiguration['offices'][`${locationId}`]
     if (userId) {
       title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
       actionComponent = (
