@@ -50,7 +50,8 @@ import { connect } from 'react-redux'
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import { getConfigFieldIdentifiers } from '@client/forms/configuration/formConfig/motionUtils'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
-import { Title, Label, RequiredToggleAction, StyledTooltip } from './components'
+import { Title, Label, RequiredToggleAction, ToolTip } from './components'
+import { messages } from '@client/i18n/messages/views/formConfig'
 
 const DEFAULT_MAX_LENGTH = 250
 
@@ -428,7 +429,12 @@ class CustomFieldToolsComp extends React.Component<
             label={
               <Label>
                 {intl.formatMessage(customFieldFormMessages.requiredFieldLabel)}
-                <StyledTooltip />
+                <ToolTip
+                  label={intl.formatMessage(
+                    messages.requiredForRegistrationTooltip
+                  )}
+                  id={'required-field-label'}
+                />
               </Label>
             }
             actions={<RequiredToggleAction {...selectedField} />}
