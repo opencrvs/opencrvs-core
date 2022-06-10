@@ -572,7 +572,7 @@ function getBodyContent({
   goBack,
   ...actionProps
 }: IFullProps) {
-  if (tab === 'search') {
+  if (tab === 'search' || !workqueueDeclaration) {
     return (
       <>
         <Query
