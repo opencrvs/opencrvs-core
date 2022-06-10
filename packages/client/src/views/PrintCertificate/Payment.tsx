@@ -20,6 +20,7 @@ import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
   goBack as goBackAction,
+  goToHomeTab,
   goToReviewCertificate as goToReviewCertificateAction
 } from '@client/navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -40,6 +41,7 @@ import {
 } from './utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const Action = styled.div`
   margin-top: 32px;
@@ -78,6 +80,7 @@ interface IProps {
   modifyDeclaration: typeof modifyDeclaration
   goToReviewCertificate: typeof goToReviewCertificateAction
   goBack: typeof goBackAction
+  goToHomeTab: typeof goToHomeTab
   userDetails: IUserDetails | null
   offlineCountryConfig: IOfflineData
 }
@@ -168,6 +171,7 @@ class PaymentComponent extends React.Component<IFullProps> {
           title={'Print certificate'}
           goBack={goBack}
           hideBackground
+          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
           <Content
             title={intl.formatMessage(messages.payment)}
@@ -242,6 +246,7 @@ function mapStatetoProps(
 
 export const Payment = connect(mapStatetoProps, {
   goBack: goBackAction,
+  goToHomeTab,
   modifyDeclaration,
   goToReviewCertificate: goToReviewCertificateAction
 })(injectIntl(withTheme(PaymentComponent)))
