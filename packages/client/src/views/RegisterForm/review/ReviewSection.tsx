@@ -1083,6 +1083,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     if (nestedFieldData.value === previousNestedFieldData.value) {
       for (const key in nestedFieldData.nestedFields) {
         if (
+          !previousNestedFieldData.nestedFields[key] &&
+          nestedFieldData.nestedFields[key] === ''
+        ) {
+          continue
+        }
+        if (
           nestedFieldData.nestedFields[key] !==
           previousNestedFieldData.nestedFields[key]
         ) {

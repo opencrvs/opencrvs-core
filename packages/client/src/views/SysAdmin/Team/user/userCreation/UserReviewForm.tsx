@@ -33,6 +33,7 @@ import {
 import {
   goBack,
   goToCreateUserSection,
+  goToTeamUserList,
   goToUserReviewForm
 } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
@@ -54,7 +55,10 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
-import { ActionPageLight, IDataProps } from '@opencrvs/components/lib/interface'
+import {
+  ActionPageLight,
+  ISearchLocation
+} from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -86,6 +90,7 @@ interface IDispatchProps {
   userFormSection: IFormSection
   offlineCountryConfiguration: IOfflineData
   goBack: typeof goBack
+  goToTeamUserList: typeof goToTeamUserList
   modify: (values: IFormSectionData) => void
   userDetails: IUserDetails | null
 }
@@ -229,10 +234,22 @@ class UserReviewFormComponent extends React.Component<
   }
 
   render() {
-    const { intl, section, userId, userFormSection } = this.props
+    const {
+      intl,
+      section,
+      userId,
+      userFormSection,
+      formData,
+      goToTeamUserList,
+      offlineCountryConfiguration
+    } = this.props
     let title: string
     let actionComponent: JSX.Element
-
+    const locationId = formData['registrationOffice']
+    const locationDetails =
+      offlineCountryConfiguration['locations'][`${locationId}`] ||
+      offlineCountryConfiguration['facilities'][`${locationId}`] ||
+      offlineCountryConfiguration['offices'][`${locationId}`]
     if (userId) {
       title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
       actionComponent = (
@@ -265,7 +282,18 @@ class UserReviewFormComponent extends React.Component<
       )
     }
     return (
-      <ActionPageLight title={title} goBack={this.props.goBack}>
+      <ActionPageLight
+        title={title}
+        goBack={this.props.goBack}
+        goHome={() =>
+          locationDetails &&
+          goToTeamUserList({
+            id: locationDetails.id,
+            searchableText: locationDetails.name,
+            displayLabel: locationDetails.name
+          })
+        }
+      >
         {!this.props.userId && (
           <FormTitle id={`${section.id}_title`}>
             {intl.formatMessage(section.name)}
@@ -309,6 +337,8 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
       fieldName?: string
     ) => dispatch(goToUserReviewForm(userId, sec, group, fieldName)),
     goBack: () => dispatch(goBack()),
+    goToTeamUserList: (selectedLocation: ISearchLocation) =>
+      dispatch(goToTeamUserList(selectedLocation)),
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
     submitForm: (userFormSection: IFormSection) => {
       const variables = draftToGqlTransformer(

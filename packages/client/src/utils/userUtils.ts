@@ -17,7 +17,8 @@ import {
   GQLSignature
 } from '@opencrvs/gateway/src/graphql/schema'
 import { storage } from '@opencrvs/client/src/storage'
-import { getDefaultLanguage } from '@client/i18n/utils'
+import { createNamesMap } from './data-formatting'
+import { LANG_EN } from './constants'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
@@ -162,5 +163,16 @@ export function getIndividualNameObj(
     individualNameArr.find((name: GQLHumanName | null) => {
       return name && name.use === language ? true : false
     }) || individualNameArr[0]
+  )
+}
+
+export function getUserName(userDetails: IUserDetails | null) {
+  return (
+    (userDetails &&
+      userDetails.name &&
+      createNamesMap(
+        userDetails.name.filter((name): name is GQLHumanName => !!name)
+      )[LANG_EN]) ||
+    ''
   )
 }

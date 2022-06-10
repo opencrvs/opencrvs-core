@@ -28,3 +28,7 @@ export const getResentSMS = (store: IStoreState): LoginState['resentSMS'] =>
 
 export const getsubmitting = (store: IStoreState): LoginState['submitting'] =>
   getKey(store, 'submitting')
+
+export function selectCountryLogo(store: IStoreState) {
+  return getKey(store, 'config').COUNTRY_LOGO?.file
+}

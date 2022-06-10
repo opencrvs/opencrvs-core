@@ -74,9 +74,9 @@ export const DECLARATION_STATUS_LABEL: IStatus = {
     id: 'recordAudit.history.started'
   },
   REINSTATED: {
-    defaultMessage: 'Reinstated to ',
+    defaultMessage: 'Reinstated to {status}',
     description: 'The prefix for reinstated declaration',
-    id: 'recordAudit.history.reinstated.prefix'
+    id: 'recordAudit.history.reinstated'
   },
   ARCHIVED: {
     defaultMessage: 'Archived',
