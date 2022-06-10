@@ -117,6 +117,13 @@ const ErrorText = styled.div`
     height: calc(100vh - 104px);
   }
 `
+
+const Loading = styled.div`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    height: calc(100vh - 104px);
+  }
+`
+
 const StatusBox = styled.div`
   padding: 4px 8px;
   ${({ theme }) => theme.fonts.bold12};
@@ -163,12 +170,6 @@ const LocationInfoValue = styled.div`
 const LocationInfoEmptyValue = styled.div`
   color: ${({ theme }) => theme.colors.supportingCopy};
   ${({ theme }) => theme.fonts.reg16};
-`
-
-const ChangeButton = styled(LinkButton)`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
 `
 
 const StatusMenuContainer = styled.div`
@@ -552,14 +553,10 @@ function UserListComponent(props: IProps) {
   const RenderUserList = useCallback(
     function RenderUserList({
       data,
-      loading,
-      error,
       locationId,
       userDetails
     }: {
       data: any
-      loading: boolean
-      error: ApolloError | undefined
       locationId: string
       userDetails: IUserDetails | null
     }) {
@@ -569,93 +566,69 @@ function UserListComponent(props: IProps) {
 
       return (
         <>
-          {error ? (
-            <ErrorText id="user_loading_error">
-              <>{intl.formatMessage(errorMessages.userQueryError)}</>
-              <LinkButtonModified onClick={() => window.location.reload()}>
-                {intl.formatMessage(constantsMessages.refresh)}
-              </LinkButtonModified>
-            </ErrorText>
-          ) : loading ? (
-            <LoadingIndicator loading={true} />
-          ) : (
-            <>
-              <LocationInfo>
-                {searchedLocation && searchedLocation.address ? (
-                  <LocationInfoValue>
-                    {searchedLocation.address}
-                  </LocationInfoValue>
-                ) : (
-                  <LocationInfoEmptyValue>
-                    {intl.formatMessage(constantsMessages.notAvailable)}
-                  </LocationInfoEmptyValue>
-                )}
-              </LocationInfo>
-              <UserTable id="user_list">
-                <ListViewSimplified>
-                  {userContent.length <= 0 ? (
-                    <NoRecord id="no-record">
-                      {intl.formatMessage(constantsMessages.noResults)}
-                    </NoRecord>
-                  ) : (
-                    userContent.map((content, index) => {
-                      return (
-                        <ListViewItemSimplified
-                          key={index}
-                          image={content.image}
-                          label={content.label}
-                          value={content.value}
-                          actions={content.actions}
-                        />
-                      )
-                    })
-                  )}
-                </ListViewSimplified>
-                {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
-                  <PaginationWrapper>
-                    <DesktopWrapper>
-                      <PaginationModified
-                        size={'small'}
-                        initialPage={currentPageNumber}
-                        totalPages={Math.ceil(
-                          totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                        )}
-                        onPageChange={(currentPage: number) =>
-                          setCurrentPageNumber(currentPage)
-                        }
-                      />
-                    </DesktopWrapper>
-                    <MobileWrapper>
-                      <PaginationModified
-                        size={'large'}
-                        initialPage={currentPageNumber}
-                        totalPages={Math.ceil(
-                          totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                        )}
-                        onPageChange={(currentPage: number) =>
-                          setCurrentPageNumber(currentPage)
-                        }
-                      />
-                    </MobileWrapper>
-                  </PaginationWrapper>
-                )}
-                <UserAuditActionModal
-                  show={toggleActivation.modalVisible}
-                  user={toggleActivation.selectedUser}
-                  onClose={() => toggleUserActivationModal()}
-                  onConfirmRefetchQueries={[
-                    {
-                      query: SEARCH_USERS,
-                      variables: {
-                        primaryOfficeId: locationId,
-                        count: recordCount
-                      }
+          <UserTable id="user_list">
+            <ListViewSimplified>
+              {userContent.length <= 0 ? (
+                <NoRecord id="no-record">
+                  {intl.formatMessage(constantsMessages.noResults)}
+                </NoRecord>
+              ) : (
+                userContent.map((content, index) => {
+                  return (
+                    <ListViewItemSimplified
+                      key={index}
+                      image={content.image}
+                      label={content.label}
+                      value={content.value}
+                      actions={content.actions}
+                    />
+                  )
+                })
+              )}
+            </ListViewSimplified>
+            {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+              <PaginationWrapper>
+                <DesktopWrapper>
+                  <PaginationModified
+                    size={'small'}
+                    initialPage={currentPageNumber}
+                    totalPages={Math.ceil(
+                      totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                    )}
+                    onPageChange={(currentPage: number) =>
+                      setCurrentPageNumber(currentPage)
                     }
-                  ]}
-                />
-              </UserTable>
-            </>
-          )}
+                  />
+                </DesktopWrapper>
+                <MobileWrapper>
+                  <PaginationModified
+                    size={'large'}
+                    initialPage={currentPageNumber}
+                    totalPages={Math.ceil(
+                      totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                    )}
+                    onPageChange={(currentPage: number) =>
+                      setCurrentPageNumber(currentPage)
+                    }
+                  />
+                </MobileWrapper>
+              </PaginationWrapper>
+            )}
+            <UserAuditActionModal
+              show={toggleActivation.modalVisible}
+              user={toggleActivation.selectedUser}
+              onClose={() => toggleUserActivationModal()}
+              onConfirmRefetchQueries={[
+                {
+                  query: SEARCH_USERS,
+                  variables: {
+                    primaryOfficeId: locationId,
+                    count: recordCount
+                  }
+                }
+              ]}
+            />
+          </UserTable>
         </>
       )
     },
@@ -663,7 +636,6 @@ function UserListComponent(props: IProps) {
       currentPageNumber,
       generateUserContents,
       intl,
-      searchedLocation,
       recordCount,
       toggleActivation.modalVisible,
       toggleActivation.selectedUser,
@@ -704,16 +676,42 @@ function UserListComponent(props: IProps) {
                   isNatlSysAdmin
                 )}
               >
-                <Header id="header">
-                  {(searchedLocation && searchedLocation.name) || ''}
-                </Header>
-                <RenderUserList
-                  data={data}
-                  loading={loading}
-                  error={error}
-                  locationId={locationId}
-                  userDetails={userDetails}
-                />
+                {error ? (
+                  <ErrorText id="user_loading_error">
+                    <>{intl.formatMessage(errorMessages.userQueryError)}</>
+                    <LinkButtonModified
+                      onClick={() => window.location.reload()}
+                    >
+                      {intl.formatMessage(constantsMessages.refresh)}
+                    </LinkButtonModified>
+                  </ErrorText>
+                ) : loading ? (
+                  <Loading>
+                    <LoadingIndicator loading={true} />
+                  </Loading>
+                ) : (
+                  <>
+                    <Header id="header">
+                      {(searchedLocation && searchedLocation.name) || ''}
+                    </Header>
+                    <LocationInfo>
+                      {searchedLocation && searchedLocation.address ? (
+                        <LocationInfoValue>
+                          {searchedLocation.address}
+                        </LocationInfoValue>
+                      ) : (
+                        <LocationInfoEmptyValue>
+                          {intl.formatMessage(constantsMessages.notAvailable)}
+                        </LocationInfoEmptyValue>
+                      )}
+                    </LocationInfo>
+                    <RenderUserList
+                      data={data}
+                      locationId={locationId}
+                      userDetails={userDetails}
+                    />
+                  </>
+                )}
               </Content>
             )
           }}
