@@ -5093,11 +5093,11 @@
                 "name": "firstNamesEng",
                 "type": "TEXT",
                 "label": {
-                  "defaultMessage": "English first name",
+                  "defaultMessage": "First name",
                   "description": "English first name",
                   "id": "form.field.label.firstNameEN"
                 },
-                "required": false,
+                "required": true,
                 "initialValue": "",
                 "validate": [
                   {
@@ -5125,7 +5125,7 @@
                 "name": "familyNameEng",
                 "type": "TEXT",
                 "label": {
-                  "defaultMessage": "English last name",
+                  "defaultMessage": "Last name",
                   "description": "English last name",
                   "id": "form.field.label.lastNameEN"
                 },
@@ -5359,7 +5359,7 @@
             "conditionals": [
               {
                 "action": "hide",
-                "expression": "values.role!==\"LOCAL_REGISTRAR\""
+                "expression": "values.role!==\"LOCAL_REGISTRAR\" && values.role!==\"NATIONAL_REGISTRAR\""
               }
             ],
             "fields": [
@@ -5484,11 +5484,11 @@
                 "name": "firstNamesEng",
                 "type": "TEXT",
                 "label": {
-                  "defaultMessage": "English first name",
+                  "defaultMessage": "First name",
                   "description": "English first name",
                   "id": "form.field.label.firstNameEN"
                 },
-                "required": false,
+                "required": true,
                 "initialValue": "",
                 "validate": [
                   {
@@ -5516,7 +5516,7 @@
                 "name": "familyNameEng",
                 "type": "TEXT",
                 "label": {
-                  "defaultMessage": "English last name",
+                  "defaultMessage": "Last name",
                   "description": "English last name",
                   "id": "form.field.label.lastNameEN"
                 },

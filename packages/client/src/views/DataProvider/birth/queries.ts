@@ -209,6 +209,10 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
             type
           }
         }
+        signature {
+          data
+          type
+        }
         comments {
           user {
             id
@@ -445,6 +449,10 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
             data
             type
           }
+        }
+        signature {
+          data
+          type
         }
         comments {
           user {

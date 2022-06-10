@@ -234,6 +234,7 @@ type History {
   input: [InputOutput]
   output: [InputOutput]
   certificates: [Certificate]
+  signature: Signature
 }
 
 interface EventRegistration {

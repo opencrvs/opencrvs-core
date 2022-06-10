@@ -1940,15 +1940,16 @@ export const builders: IFieldBuilders = {
         INFORMANT_TITLE,
         fhirBundle
       )
-
-      relatedPersonResource.relationship = {
-        coding: [
-          {
-            system:
-              'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-            code: fieldValue
-          }
-        ]
+      if (fieldValue !== 'OTHER') {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: fieldValue
+            }
+          ]
+        }
       }
       if (context.event === EVENT_TYPE.BIRTH) {
         if (fieldValue === 'MOTHER') {

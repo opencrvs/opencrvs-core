@@ -62,7 +62,11 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import {
+  injectIntl,
+  useIntl,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
@@ -88,10 +92,6 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { LocationPicker } from '@client/components/LocationPicker'
-import {
-  getAdditionalLocations,
-  NATIONAL_ADMINISTRATIVE_LEVEL
-} from '@client/views/SysAdmin/Performance/utils'
 import { ApolloError } from 'apollo-client'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
@@ -248,18 +248,32 @@ interface ToggleUserActivation {
 }
 
 export const Status = (statusProps: IStatusProps) => {
-  const status =
-    statusProps.status.charAt(0).toUpperCase() + statusProps.status.slice(1)
-  switch (status.toLowerCase()) {
+  const status = statusProps.status
+  const intl = useIntl()
+  switch (status) {
     case UserStatus[UserStatus.ACTIVE].toLowerCase():
-      return <ActiveStatusBox>{status}</ActiveStatusBox>
+      return (
+        <ActiveStatusBox>{intl.formatMessage(messages.active)}</ActiveStatusBox>
+      )
     case UserStatus[UserStatus.DEACTIVATED].toLowerCase():
-      return <DeactivatedStatusBox>{status}</DeactivatedStatusBox>
+      return (
+        <DeactivatedStatusBox>
+          {intl.formatMessage(messages.deactivated)}
+        </DeactivatedStatusBox>
+      )
     case UserStatus[UserStatus.DISABLED].toLowerCase():
-      return <DisabledStatusBox>{status}</DisabledStatusBox>
+      return (
+        <DisabledStatusBox>
+          {intl.formatMessage(messages.disabled)}
+        </DisabledStatusBox>
+      )
     case UserStatus[UserStatus.PENDING].toLowerCase():
     default:
-      return <PendingStatusBox>{status}</PendingStatusBox>
+      return (
+        <PendingStatusBox>
+          {intl.formatMessage(messages.pending)}
+        </PendingStatusBox>
+      )
   }
 }
 
