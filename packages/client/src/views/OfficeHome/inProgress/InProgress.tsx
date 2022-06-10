@@ -254,7 +254,12 @@ export class InProgressComponent extends React.Component<
           id={`name_${index}`}
           isBoldLink={true}
           onClick={() =>
-            this.props.goToDeclarationRecordAudit('inProgressTab', regId)
+            this.props.goToDeclarationRecordAudit(
+              this.props.selectorId === SELECTOR_ID.hospitalDrafts
+                ? 'notificationTab'
+                : 'inProgressTab',
+              regId
+            )
           }
         >
           {name}
