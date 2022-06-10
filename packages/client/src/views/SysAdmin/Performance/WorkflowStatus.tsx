@@ -737,7 +737,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             skip: 0,
             count: recordCount,
             status: (status && [status]) || undefined,
-            type: (event && [`${event.toLowerCase()}-declaration`]) || undefined
+            type:
+              (event && [
+                `${event.toLowerCase()}-declaration`,
+                `${event.toLowerCase()}-notification`
+              ]) ||
+              undefined
           }}
           fetchPolicy={'no-cache'}
         >
