@@ -45,6 +45,7 @@ import { buttonMessages, errorMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
   goBack,
+  goToHomeTab,
   goToPrintCertificate,
   goToPrintCertificatePayment,
   goToReviewCertificate,
@@ -85,6 +86,7 @@ import {
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const ErrorWrapper = styled.div`
   margin-top: -3px;
@@ -102,6 +104,7 @@ interface IBaseProps {
   offlineCountryConfiguration: IOfflineData
   theme: ITheme
   goBack: typeof goBack
+  goToHomeTab: typeof goToHomeTab
   storeDeclaration: typeof storeDeclaration
   writeDeclaration: typeof writeDeclaration
   modifyDeclaration: typeof modifyDeclaration
@@ -408,6 +411,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           hideBackground
           title={intl.formatMessage(formSection.title)}
           goBack={goBack}
+          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
           <Content
             title={
@@ -601,6 +605,7 @@ const mapStateToProps = (
 
 export const CollectorForm = connect(mapStateToProps, {
   goBack,
+  goToHomeTab,
   storeDeclaration,
   writeDeclaration,
   modifyDeclaration,
