@@ -267,7 +267,6 @@ function UserListComponent(props: IProps) {
   const [showResendSMSSuccess, setShowResendSMSSuccess] =
     useState<boolean>(false)
   const [showResendSMSError, setShowResendSMSError] = useState<boolean>(false)
-
   const {
     intl,
     userDetails,
@@ -279,6 +278,11 @@ function UserListComponent(props: IProps) {
     isOnline,
     location: { search }
   } = props
+  const isNatlSysAdmin = userDetails?.role
+    ? NATL_ADMIN_ROLES.includes(userDetails.role)
+      ? true
+      : false
+    : false
 
   const { locationId } = parse(search) as unknown as ISearchParams
   const [toggleActivation, setToggleActivation] =
@@ -517,7 +521,7 @@ function UserListComponent(props: IProps) {
   ) => {
     const buttons: React.ReactElement[] = []
     if (!getViewOnly(locationId, userDetails, onlyNational)) {
-      const LocationButton = (
+      buttons.push(
         <LocationPicker
           selectedLocationId={locationId}
           onChangeLocation={(locationId) => {
@@ -526,11 +530,7 @@ function UserListComponent(props: IProps) {
           requiredJurisdictionTypes={'CRVS_OFFICE'}
         />
       )
-      const AddUserButton = (
-        <AddUserIcon id="add-user" onClick={onClickAddUser} />
-      )
-      buttons.push(LocationButton)
-      buttons.push(AddUserButton)
+      buttons.push(<AddUserIcon id="add-user" onClick={onClickAddUser} />)
     }
     return buttons
   }
@@ -552,6 +552,7 @@ function UserListComponent(props: IProps) {
       const totalData =
         (data && data.searchUsers && data.searchUsers.totalItems) || 0
       const userContent = generateUserContents(data, locationId, userDetails)
+
       return (
         <>
           {error ? (
@@ -683,7 +684,11 @@ function UserListComponent(props: IProps) {
                     : intl.formatMessage(headerMessages.teamTitle)
                 }
                 size={ContentSize.LARGE}
-                topActionButtons={LocationButton(locationId, userDetails, true)}
+                topActionButtons={LocationButton(
+                  locationId,
+                  userDetails,
+                  isNatlSysAdmin
+                )}
               >
                 <Header id="header">
                   {(searchedLocation && searchedLocation.name) || ''}
