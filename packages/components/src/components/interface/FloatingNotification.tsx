@@ -16,6 +16,8 @@ import { Spinner } from './Spinner'
 import { ITheme } from '../theme'
 import NotificationError from '../icons/NotificationError'
 
+const NOTIFICATION_AUTO_HIDE_TIMEOUT = 3000 // Three seconds
+
 export enum NOTIFICATION_TYPE {
   SUCCESS = 'success',
   WARNING = 'warning',
@@ -28,7 +30,7 @@ interface IProps {
   id?: string
   show: boolean
   type?: NOTIFICATION_TYPE
-  callback?: (event: React.MouseEvent<HTMLDivElement>) => void
+  callback?: (event?: React.MouseEvent<HTMLDivElement>) => void
   className?: string
   children: React.ReactNode
 }
@@ -121,6 +123,13 @@ const NotificationMessage = styled.div`
 class FloatingNotificationComp extends React.Component<FullProps> {
   render() {
     const { id, type, show, children, callback, className, theme } = this.props
+
+    // Issue 3203: The notification will be disappeared automatically
+    if (callback) {
+      setTimeout(() => {
+        callback()
+      }, NOTIFICATION_AUTO_HIDE_TIMEOUT)
+    }
 
     return (
       <NotificationContainer
