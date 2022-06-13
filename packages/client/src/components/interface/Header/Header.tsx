@@ -109,7 +109,7 @@ interface IProps extends RouteComponentProps {
   selectedSearchType?: string
   mobileSearchBar?: boolean
   enableMenuSelection?: boolean
-  mapPinClickHandler?: () => void
+  changeTeamLocation?: () => void
   mapPerformanceClickHandler?: () => void
 }
 
@@ -279,7 +279,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
         ]
       }
     } else if (activeMenuItem === ACTIVE_MENU_ITEM.USERS) {
-      if (this.props.mapPinClickHandler) {
+      if (this.props.changeTeamLocation) {
         return {
           mobileLeft: [
             {
@@ -291,7 +291,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
             {
               icon: () => <SearchBlue />,
               handler: () =>
-                this.props.mapPinClickHandler && this.props.mapPinClickHandler()
+                this.props.changeTeamLocation && this.props.changeTeamLocation()
             },
             {
               icon: () => <AddUser />,

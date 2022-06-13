@@ -903,7 +903,7 @@ const messagesToDefine: IConstantsMessages = {
   },
   refresh: {
     defaultMessage: 'Refresh',
-    description: 'level for refresh',
+    description: 'label for refresh',
     id: 'constants.refresh'
   }
 }

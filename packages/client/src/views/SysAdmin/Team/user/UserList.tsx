@@ -645,7 +645,7 @@ function UserListComponent(props: IProps) {
 
   return (
     <SysAdminContentWrapper
-      mapPinClickHandler={
+      changeTeamLocation={
         (!getViewOnly(locationId, userDetails, true) && onChangeLocation) ||
         undefined
       }
