@@ -547,6 +547,36 @@ function GeneratedInputField({
   )
 }
 
+export function getInitialValueForSelectDynamicValue(
+  field: IFormField,
+  userDetails: IUserDetails | null
+) {
+  let fieldInitialValue = field.initialValue as IFormFieldValue
+  const catchmentAreas = userDetails?.catchmentArea
+  let district = ''
+  let state = ''
+
+  if (catchmentAreas) {
+    catchmentAreas.forEach((catchmentArea) => {
+      if (catchmentArea.identifier?.find(({ value }) => value === 'DISTRICT')) {
+        district = catchmentArea.id
+      } else if (
+        catchmentArea.identifier?.find(({ value }) => value === 'STATE')
+      ) {
+        state = catchmentArea.id
+      }
+    })
+  }
+
+  if (field.name.includes('district') && !field.initialValue && district) {
+    fieldInitialValue = district as IFormFieldValue
+  }
+  if (field.name.includes('state') && !field.initialValue && state) {
+    fieldInitialValue = state as IFormFieldValue
+  }
+  return fieldInitialValue
+}
+
 const mapFieldsToValues = (
   fields: IFormField[],
   userDetails: IUserDetails | null
@@ -576,30 +606,10 @@ const mapFieldsToValues = (
       !field.initialValue &&
       field.dynamicOptions.initialValue === 'agentDefault'
     ) {
-      const catchmentAreas = userDetails?.catchmentArea
-      let district = ''
-      let state = ''
-
-      if (catchmentAreas) {
-        catchmentAreas.forEach((catchmentArea) => {
-          if (
-            catchmentArea.identifier?.find(({ value }) => value === 'DISTRICT')
-          ) {
-            district = catchmentArea.id
-          } else if (
-            catchmentArea.identifier?.find(({ value }) => value === 'STATE')
-          ) {
-            state = catchmentArea.id
-          }
-        })
-      }
-
-      if (field.name.includes('district') && !field.initialValue && district) {
-        fieldInitialValue = district as IFormFieldValue
-      }
-      if (field.name.includes('state') && !field.initialValue && state) {
-        fieldInitialValue = state as IFormFieldValue
-      }
+      fieldInitialValue = getInitialValueForSelectDynamicValue(
+        field,
+        userDetails
+      )
     }
     return { ...memo, [field.name]: fieldInitialValue }
   }, {})
