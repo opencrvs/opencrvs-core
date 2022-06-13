@@ -146,14 +146,12 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         this.props.offlineResources.config.CURRENCY['isoCode']
     })[0].symbol
 
-    if (
-      (this.group.fields[0].nestedFields as any).REQUIRED[0].label
-        .defaultMessage === 'Total'
-    ) {
-      ;(
-        this.group.fields[0].nestedFields as any
-      ).REQUIRED[0].label.defaultMessage += ` ${currency}`
-    }
+    ;(
+      this.group.fields[0].nestedFields as any
+    ).REQUIRED[0].label.defaultMessage = this.props.intl.formatMessage(
+      messages.correctionSummaryTotalPaymentLabel,
+      { currency }
+    )
   }
 
   onUploadingStateChanged = (isUploading: boolean) => {
