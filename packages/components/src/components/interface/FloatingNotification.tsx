@@ -121,16 +121,24 @@ const NotificationMessage = styled.div`
 `
 
 class FloatingNotificationComp extends React.Component<FullProps> {
+  autoHideTimeout = setTimeout(
+    this.closeNotification,
+    NOTIFICATION_AUTO_HIDE_TIMEOUT
+  )
+
+  componentWillUnmount() {
+    clearTimeout(this.autoHideTimeout)
+  }
+
+  // Issue 3203: The notification will be disappeared automatically
+  closeNotification() {
+    if (this.props.callback) {
+      this.props.callback()
+    }
+  }
+
   render() {
     const { id, type, show, children, callback, className, theme } = this.props
-
-    // Issue 3203: The notification will be disappeared automatically
-    if (callback) {
-      setTimeout(() => {
-        callback()
-      }, NOTIFICATION_AUTO_HIDE_TIMEOUT)
-    }
-
     return (
       <NotificationContainer
         id={id}
