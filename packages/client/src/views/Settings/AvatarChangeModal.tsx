@@ -35,6 +35,7 @@ import {
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { withTheme } from 'styled-components'
+import { DynamicHeightLinkButton } from './SettingsPage'
 
 const Container = styled.div`
   align-self: center;
@@ -235,7 +236,9 @@ function AvatarChangeModalComp({
           }}
           onError={(error) => setError(error)}
         >
-          <LinkButton>{intl.formatMessage(messages.changeImage)}</LinkButton>
+          <DynamicHeightLinkButton>
+            {intl.formatMessage(messages.changeImage)}
+          </DynamicHeightLinkButton>
         </ImageLoader>
       </Description>
       {error ? (

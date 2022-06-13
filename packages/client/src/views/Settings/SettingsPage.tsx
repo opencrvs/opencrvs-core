@@ -112,7 +112,7 @@ const TopAlignedListViewItemSimplified = styled(ListViewItemSimplified)`
   align-items: start;
   padding: 16px 0;
 `
-const DynamicHeightLinkButton = styled(LinkButton)`
+export const DynamicHeightLinkButton = styled(LinkButton)`
   height: auto;
 `
 
