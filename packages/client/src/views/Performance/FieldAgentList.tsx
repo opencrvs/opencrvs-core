@@ -107,7 +107,7 @@ export enum EVENT_OPTIONS {
 
 enum STATUS_OPTIONS {
   ACTIVE = 'active',
-  DEACTIVE = 'deactive',
+  DEACTIVE = 'deactivated',
   PENDING = 'pending'
 }
 
