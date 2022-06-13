@@ -18,6 +18,7 @@ import {
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
 import {
+  ShowCreateUserErrorToast,
   showCreateUserErrorToast,
   showSubmitFormErrorToast,
   showSubmitFormSuccessToast
@@ -31,7 +32,15 @@ import {
 } from '@client/views/SysAdmin/Team/utils'
 import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Action } from 'redux'
-import { ActionCmd, Cmd, Loop, loop, LoopReducer, RunCmd } from 'redux-loop'
+import {
+  ActionCmd,
+  Cmd,
+  CmdType,
+  Loop,
+  loop,
+  LoopReducer,
+  RunCmd
+} from 'redux-loop'
 import {
   GQLQuery,
   GQLUser,
@@ -47,7 +56,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
-const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA'
+const CLEAR_USER_FORM_DATA = 'USER_FORM/CLEAR_USER_FORM_DATA' as const
 const SUBMIT_USER_FORM_DATA = 'USER_FORM/SUBMIT_USER_FORM_DATA'
 const STORE_USER_FORM_DATA = 'USER_FORM/STORE_USER_FORM_DATA'
 const SUBMIT_USER_FORM_DATA_SUCCESS = 'USER_FORM/SUBMIT_USER_FORM_DATA_SUCCESS'
@@ -178,7 +187,7 @@ export function submitUserFormData(
   }
 }
 
-export function clearUserFormData(): Action {
+export function clearUserFormData() {
   return {
     type: CLEAR_USER_FORM_DATA
   }
@@ -259,6 +268,7 @@ function updateFormAndFormData(
   }
 }
 type UserFormAction =
+  | IUpdateUserFormFieldDefsAction
   | IUserFormDataModifyAction
   | IUserFormDataSubmitAction
   | IStoreUserFormDataAction
@@ -268,7 +278,10 @@ type UserFormAction =
   | IFetchAndStoreUserData
   | IUpdateFormAndFormData
   | profileActions.Action
-  | Action
+  | ShowCreateUserErrorToast
+  | ReturnType<typeof clearUserFormData>
+  | ReturnType<typeof showSubmitFormSuccessToast>
+  | ReturnType<typeof showSubmitFormErrorToast>
 
 export interface IUserFormState {
   userForm: IForm | null
@@ -431,24 +444,23 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         Cmd.list<UserFormAction>(commandList)
       )
     case SUBMIT_USER_FORM_DATA_SUCCESS:
-      return loop(
-        { ...state, submitting: false, submissionError: false },
-        Cmd.list([
-          Cmd.action(clearUserFormData()),
-          Cmd.action(
-            goToTeamUserList(
-              (action as ISubmitSuccessAction).payload.locationId
-            )
-          ),
-          Cmd.action(
-            showSubmitFormSuccessToast(
-              (action as ISubmitSuccessAction).payload.isUpdate
-                ? TOAST_MESSAGES.UPDATE_SUCCESS
-                : TOAST_MESSAGES.SUCCESS
-            )
+      const list = Cmd.list<
+        | ReturnType<typeof clearUserFormData>
+        | ReturnType<typeof goToTeamUserList>
+        | ReturnType<typeof showSubmitFormSuccessToast>
+      >([
+        Cmd.action(clearUserFormData()),
+        Cmd.action(goToTeamUserList(action.payload.locationId)),
+        Cmd.action(
+          showSubmitFormSuccessToast(
+            action.payload.isUpdate
+              ? TOAST_MESSAGES.UPDATE_SUCCESS
+              : TOAST_MESSAGES.SUCCESS
           )
-        ])
-      )
+        )
+      ])
+      return loop({ ...state, submitting: false, submissionError: false }, list)
+
     case SUBMIT_USER_FORM_DATA_FAIL:
       const { errorData } = (action as ISubmitFailedAction).payload
       if (errorData.message.includes('DUPLICATE_MOBILE')) {

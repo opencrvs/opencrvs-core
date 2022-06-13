@@ -78,7 +78,8 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import {
   HOME,
   PERFORMANCE_HOME,
-  REGISTRAR_HOME
+  REGISTRAR_HOME,
+  TEAM_USER_LIST
 } from '@client/navigation/routes'
 
 type IStateProps = {
@@ -581,7 +582,7 @@ export const Header = connect(
   (store: IStoreState) => ({
     activeMenuItem: window.location.href.includes('performance')
       ? ACTIVE_MENU_ITEM.PERFORMANCE
-      : window.location.href.includes('team/users')
+      : window.location.href.includes(TEAM_USER_LIST)
       ? ACTIVE_MENU_ITEM.USERS
       : window.location.href.includes('team')
       ? ACTIVE_MENU_ITEM.TEAM
