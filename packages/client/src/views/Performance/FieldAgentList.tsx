@@ -54,6 +54,8 @@ import {
   MobileWrapper,
   DesktopWrapper
 } from '@opencrvs/components/lib/styleForPagination'
+import { userMessages } from '@client/i18n/messages'
+import { useCallback } from 'react'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -327,6 +329,13 @@ function FieldAgentListComponent(props: IProps) {
     ]
   }
 
+  const getFieldAgentTypeLabel = useCallback(
+    (type) => {
+      return userMessages[type] ? intl.formatMessage(userMessages[type]) : type
+    },
+    [intl]
+  )
+
   function getContent(data?: GQLSearchFieldAgentResult) {
     const content =
       data &&
@@ -350,7 +359,7 @@ function FieldAgentListComponent(props: IProps) {
         return {
           name: getNameWithAvatar(row.fullName || '', row.avatar),
           rawName: row.fullName || '',
-          type: row.type,
+          type: (row.type && getFieldAgentTypeLabel(row.type)) || '',
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
           totalDeclarations: String(row.totalNumberOfDeclarationStarted),
