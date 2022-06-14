@@ -27,6 +27,7 @@ import { gqlToDraftTransformer } from './transformer'
 import { getQueryMapping } from './views/DataProvider/QueryProvider'
 import { RequestHandler } from 'mock-apollo-client'
 import { DocumentNode } from 'apollo-link'
+import { getPotentialDuplicateIds } from '@client/transformer/index'
 
 const INTERVAL_TIME = 5000
 const MAX_RETRY_ATTEMPT = 3
@@ -145,7 +146,9 @@ export class InboxController {
     const app: IDeclaration = createReviewDeclaration(
       declaration.id,
       transData,
-      declaration.event
+      declaration.event,
+      undefined,
+      getPotentialDuplicateIds(result)
     )
     app.downloadStatus =
       SUCCESS_DOWNLOAD_STATUS[declaration.action as string] ||

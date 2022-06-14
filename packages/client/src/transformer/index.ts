@@ -33,6 +33,7 @@ import { get } from 'lodash'
 import { sectionTransformer } from '@client/forms/mappings/query'
 import { IOfflineData } from '@client/offline/reducer'
 import { IUserDetails } from '@client/utils/userUtils'
+import { EventRegistration, EventSearchSet } from '@client/utils/gateway'
 
 const nestedFieldsMapping = (
   transformedData: TransformedData,
@@ -198,6 +199,8 @@ export const draftToGqlTransformer = (
         }
         if (Object.keys(originalDraftData).length) {
           if (
+            !conditionalActions.includes('hide') &&
+            !conditionalActions.includes('disable') &&
             hasFieldChanged(
               fieldDef,
               draftData[section.id],
@@ -397,4 +400,12 @@ export const gqlToDraftTransformer = (
     transformedData.history = queryData.history
   }
   return transformedData
+}
+
+export function getPotentialDuplicateIds(
+  eventRegistration: EventRegistration | EventSearchSet | null
+) {
+  return eventRegistration?.registration?.duplicates?.filter(
+    (duplicate): duplicate is string => !!duplicate
+  )
 }

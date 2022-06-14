@@ -21,7 +21,8 @@ import {
 } from '@workflow/features/registration/fhir/fhir-template'
 import {
   getFromFhir,
-  getRegStatusCode
+  getRegStatusCode,
+  fetchExistingRegStatusCode
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   generateBirthTrackingId,
@@ -41,6 +42,14 @@ import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils'
 import { RESOURCE_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
 import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
+import {
+  DOWNLOADED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL,
+  REQUEST_CORRECTION_EXTENSION_URL
+} from '@workflow/features/task/fhir/constants'
+export interface ITaskBundleEntry extends fhir.BundleEntry {
+  resource: fhir.Task
+}
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
@@ -119,19 +128,33 @@ export async function markBundleAsRequestedForCorrection(
   bundle: fhir.Bundle & fhir.BundleEntry,
   token: string
 ): Promise<fhir.Bundle & fhir.BundleEntry> {
-  const taskResource = getTaskResource(bundle) as fhir.Task
-
+  const taskResource = getTaskResource(bundle)
   const practitioner = await getLoggedInPractitionerResource(token)
+  const regStatusCode = await fetchExistingRegStatusCode(taskResource.id)
 
-  await setupRegistrationWorkflow(
-    taskResource,
-    getTokenPayload(token),
-    RegStatus.REQUESTED_CORRECTION
-  )
+  if (!taskResource.extension) {
+    taskResource.extension = []
+  }
+  taskResource.extension.push({
+    url: REQUEST_CORRECTION_EXTENSION_URL,
+    valueString: regStatusCode?.code
+  })
 
   await setupLastRegLocation(taskResource, practitioner)
 
   setupLastRegUser(taskResource, practitioner)
+
+  /* setting registration workflow status here */
+  await setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    regStatusCode?.code
+  )
+
+  removeExtensionFromBundle(bundle, [
+    DOWNLOADED_EXTENSION_URL,
+    REINSTATED_EXTENSION_URL
+  ])
 
   /* check if the status of any event draft is not published and setting configuration extension*/
   await checkFormDraftStatusToAddTestExtension(taskResource, token)
@@ -573,16 +596,9 @@ export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
   ) {
     return
   }
-  const existingTaskResource: fhir.Task = await getFromFhir(
-    `/Task/${taskResource.id}`
+  const existingRegStatusCode = await fetchExistingRegStatusCode(
+    taskResource.id
   )
-  const existingRegStatusCode =
-    existingTaskResource &&
-    existingTaskResource.businessStatus &&
-    existingTaskResource.businessStatus.coding &&
-    existingTaskResource.businessStatus.coding.find((code) => {
-      return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
-    })
   if (existingRegStatusCode && existingRegStatusCode.code === regStatusCode) {
     logger.error(`Declaration is already in ${regStatusCode} state`)
     throw new Error(`Declaration is already in ${regStatusCode} state`)

@@ -14,6 +14,7 @@ env:
   CYPRESS_CLIENT_URL: https://register.farajaland-staging.opencrvs.org/
   CYPRESS_AUTH_URL: https://auth.farajaland-staging.opencrvs.org/
   CYPRESS_GATEWAY_URL: https://gateway.farajaland-staging.opencrvs.org/
+  CYPRESS_COUNTRYCONFIG_URL: https://countryconfig.farajaland-staging.opencrvs.org/
 
 on:
   workflow_dispatch:
@@ -50,7 +51,7 @@ jobs:
         if: ${{ !github.event.inputs.farajaland-image-tag }}
         run: |
           cd opencrvs-farajaland
-          echo "COUNTRY_CONFIG_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "COUNTRY_CONFIG_VERSION=$(git log -1 --pretty=format:%h)" >> $GITHUB_ENV
           cd ../
       - name: Set COUNTRY_CONFIG_VERSION from inputs
         if: ${{ github.event.inputs.farajaland-image-tag }}
@@ -64,7 +65,7 @@ jobs:
 
       - name: Get CORE_VERSION
         if: ${{ !github.event.inputs.core-image-tag }}
-        run: echo "CORE_VERSION=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+        run: echo "CORE_VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
       - name: Set CORE_VERSION from inputs
         if: ${{ github.event.inputs.core-image-tag }}
         run: echo "CORE_VERSION=${{ github.event.inputs.core-image-tag }}" >> $GITHUB_ENV
@@ -84,6 +85,9 @@ jobs:
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+          DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
+          DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
           KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
           KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
@@ -91,6 +95,8 @@ jobs:
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
         run: |
           yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+      - name: Summarise deployment
+        run: echo "### Staging deployment\nCore version **$CORE_VERSION**\nFarajaland version **$COUNTRY_CONFIG_VERSION**" >> $GITHUB_STEP_SUMMARY
       - name: Run Cypress tests
         run: |
           cd opencrvs-farajaland

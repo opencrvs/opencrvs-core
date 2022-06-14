@@ -24,13 +24,12 @@ import {
 } from '@opencrvs/components/lib/interface'
 import {
   IPrintableDeclaration,
-  IDeclarationsState,
   modifyDeclaration,
   writeDeclaration,
   storeDeclaration,
   SUBMISSION_STATUS
 } from '@opencrvs/client/src/declarations'
-import { Action, Event, IForm, CorrectionSection } from '@client/forms'
+import { Action, Event, CorrectionSection } from '@client/forms'
 import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
@@ -45,27 +44,26 @@ import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
+import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import {
   previewCertificate,
   printCertificate
 } from '@client/views/PrintCertificate/PDFUtils'
 import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
-import { IOfflineData } from '@client/offline/reducer'
 import {
   getCountryTranslations,
-  IAvailableCountries,
   isCertificateForPrintInAdvance,
   getEventDate,
   isFreeOfCost,
   calculatePrice,
-  getRegisteredDate
+  getRegisteredDate,
+  getRegistrarSignatureHandlebarName
 } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/forms/countries'
 import { PDFViewer } from '@opencrvs/components/lib/forms'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { hasRegisterScope } from '@client/utils/authUtils'
 
 const CustomTertiaryButton = styled(TertiaryButton)`
   height: 48px;
@@ -97,25 +95,11 @@ type State = {
   certificatePdf: string | null
   showConfirmationModal: boolean
 }
-type IProps = {
-  event: Event
-  registrationId: string
-  draft: IPrintableDeclaration
-  userDetails: IUserDetails | null
-  countries: IAvailableCountries[]
-  registerForm: IForm
-  offlineCountryConfig: IOfflineData
-  goBack: typeof goBack
-  modifyDeclaration: typeof modifyDeclaration
-  writeDeclaration: typeof writeDeclaration
-  goToHomeTab: typeof goToHomeTab
-  storeDeclaration: typeof storeDeclaration
-  goToCertificateCorrection: typeof goToCertificateCorrection
-}
 
 type IFullProps = IntlShapeProps &
   RouteComponentProps<{}, {}, { isNavigatedInsideApp: boolean }> &
-  IProps & { drafts: IDeclarationsState }
+  ReturnType<typeof mapStatetoProps> &
+  typeof mapDispatchToProps
 
 class ReviewCertificateActionComponent extends React.Component<
   IFullProps,
@@ -163,6 +147,22 @@ class ReviewCertificateActionComponent extends React.Component<
     const eventDate = getEventDate(draft.data, draft.event)
     let submittableCertificate
     if (isCertificateForPrintInAdvance(draft)) {
+      const paymentAmount = calculatePrice(
+        draft.event,
+        eventDate,
+        registeredDate,
+        this.props.offlineCountryConfig
+      )
+      submittableCertificate = {
+        payments: {
+          type: 'MANUAL' as const,
+          total: Number(paymentAmount),
+          amount: Number(paymentAmount),
+          outcome: 'COMPLETED' as const,
+          date: Date.now()
+        }
+      }
+    } else {
       if (
         isFreeOfCost(
           draft.event,
@@ -171,25 +171,14 @@ class ReviewCertificateActionComponent extends React.Component<
           this.props.offlineCountryConfig
         )
       ) {
-        submittableCertificate = {}
-      } else {
-        const paymentAmount = calculatePrice(
-          draft.event,
-          eventDate,
-          registeredDate,
-          this.props.offlineCountryConfig
-        )
-        submittableCertificate = {
-          payments: {
-            type: 'MANUAL' as const,
-            total: Number(paymentAmount),
-            amount: Number(paymentAmount),
-            outcome: 'COMPLETED' as const,
-            date: Date.now()
-          }
+        certificate.payments = {
+          type: 'MANUAL' as const,
+          total: 0,
+          amount: 0,
+          outcome: 'COMPLETED' as const,
+          date: Date.now()
         }
       }
-    } else {
       submittableCertificate = certificate
     }
     draft.data.registration = {
@@ -250,7 +239,7 @@ class ReviewCertificateActionComponent extends React.Component<
   }
 
   render = () => {
-    const { intl } = this.props
+    const { intl, scope } = this.props
 
     return (
       <ActionPageLight
@@ -260,6 +249,7 @@ class ReviewCertificateActionComponent extends React.Component<
           certificateMessages.certificateCollectionTitle
         )}
         goBack={this.goBack}
+        goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
       >
         <Content
           title={this.getTitle()}
@@ -274,16 +264,18 @@ class ReviewCertificateActionComponent extends React.Component<
             >
               {intl.formatMessage(certificateMessages.confirmAndPrint)}
             </SuccessButton>
-            <DangerButton
-              onClick={() =>
-                this.props.goToCertificateCorrection(
-                  this.props.registrationId,
-                  CorrectionSection.Corrector
-                )
-              }
-            >
-              {intl.formatMessage(buttonMessages.editRecord)}
-            </DangerButton>
+            {hasRegisterScope(scope) && (
+              <DangerButton
+                onClick={() =>
+                  this.props.goToCertificateCorrection(
+                    this.props.registrationId,
+                    CorrectionSection.Corrector
+                  )
+                }
+              >
+                {intl.formatMessage(buttonMessages.editRecord)}
+              </DangerButton>
+            )}
           </ButtonWrapper>
         </Content>
         {this.state.certificatePdf && (
@@ -346,18 +338,37 @@ function mapStatetoProps(
 
   const draft = getDraft(declarations, registrationId, eventType)
   const event = getEvent(draft.event)
+  const offlineCountryConfig = getOfflineData(state)
+  const signatureKey = getRegistrarSignatureHandlebarName(
+    offlineCountryConfig,
+    event
+  )
 
   return {
     event,
     registrationId,
-    draft,
+    draft: {
+      ...draft,
+      data: {
+        ...draft.data,
+        template: {
+          ...draft.data.template,
+          [signatureKey]:
+            !draft.data.template?.[signatureKey] ||
+            isCertificateForPrintInAdvance(draft)
+              ? ''
+              : draft.data.template[signatureKey]
+        }
+      }
+    },
+    scope: getScope(state),
     countries: getCountryTranslations(state.i18n.languages, countries),
-    drafts: state.declarationsState,
     userDetails: getUserDetails(state),
-    offlineCountryConfig: getOfflineData(state),
+    offlineCountryConfig,
     registerForm: getEventRegisterForm(state, event)
   }
 }
+
 const mapDispatchToProps = {
   modifyDeclaration,
   writeDeclaration,
@@ -366,7 +377,8 @@ const mapDispatchToProps = {
   goBack,
   goToCertificateCorrection
 }
+
 export const ReviewCertificateAction = connect(
   mapStatetoProps,
   mapDispatchToProps
-)(injectIntl<'intl', IFullProps>(ReviewCertificateActionComponent))
+)(injectIntl(ReviewCertificateActionComponent))

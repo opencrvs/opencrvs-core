@@ -12,7 +12,7 @@
 import { loop, LoopReducer, Cmd, Loop, RunCmd } from 'redux-loop'
 import { push } from 'connected-react-router'
 import * as actions from '@login/login/actions'
-import { authApi } from '@login/utils/authApi'
+import { authApi, IApplicationConfig } from '@login/utils/authApi'
 import * as routes from '@login/navigation/routes'
 import { merge } from 'lodash'
 import { IStoreState } from '@login/store'
@@ -24,12 +24,14 @@ export type LoginState = {
   submissionError: boolean
   resentSMS: boolean
   stepOneDetails: { username: string }
+  config: Partial<IApplicationConfig>
   errorCode?: number
 }
 
 export const initialState: LoginState = {
   submitting: false,
   token: '',
+  config: {},
   authenticationDetails: {
     nonce: '',
     mobile: ''
@@ -63,7 +65,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
       return loop(state, CONFIG_CMD)
     case actions.CONFIG_LOADED:
       return loop(
-        state,
+        { ...state, config: action.payload },
         Cmd.run(() => merge(window.config, action.payload))
       )
     case actions.CONFIG_LOAD_ERROR:

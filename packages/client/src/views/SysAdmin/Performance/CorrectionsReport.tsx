@@ -31,6 +31,7 @@ interface CorrectionsReportProps {
 
 export function CorrectionsReport({ data }: CorrectionsReportProps) {
   const intl = useIntl()
+  if (!data) return <></>
   return (
     <ListContainer>
       <ReportContainer>

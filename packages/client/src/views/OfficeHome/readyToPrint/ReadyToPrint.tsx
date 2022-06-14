@@ -31,7 +31,8 @@ import { withTheme } from 'styled-components'
 import {
   buttonMessages,
   constantsMessages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { IStoreState } from '@client/store'
 import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
@@ -46,7 +47,8 @@ import {
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer
+  NoNameContainer,
+  NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
@@ -82,8 +84,8 @@ class ReadyToPrintComponent extends React.Component<
     super(props)
     this.state = {
       width: window.innerWidth,
-      sortedCol: COLUMNS.NAME,
-      sortOrder: SORT_ORDER.ASCENDING
+      sortedCol: COLUMNS.REGISTERED,
+      sortOrder: SORT_ORDER.DESCENDING
     }
   }
 
@@ -231,7 +233,7 @@ class ReadyToPrintComponent extends React.Component<
           ? new Date(reg.modifiedAt)
           : new Date(Number(reg.modifiedAt))) || ''
       const NameComponent = reg.name ? (
-        <LinkButton
+        <NameContainer
           id={`name_${index}`}
           isBoldLink={true}
           onClick={() =>
@@ -239,7 +241,7 @@ class ReadyToPrintComponent extends React.Component<
           }
         >
           {reg.name}
-        </LinkButton>
+        </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
@@ -307,9 +309,7 @@ class ReadyToPrintComponent extends React.Component<
         onPageChange={onPageChange}
         loading={this.props.loading}
         error={this.props.error}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'are ready to print'
-        })}
+        noResultText={intl.formatMessage(wqMessages.noRecordsReadyToPrint)}
         noContent={this.transformRegisteredContent(data).length <= 0}
       >
         <GridTable

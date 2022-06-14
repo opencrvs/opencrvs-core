@@ -60,6 +60,9 @@ export const changeSortedColumn = (
     case COLUMNS.NOTIFICATION_SENT:
       newSortedCol = COLUMNS.NOTIFICATION_SENT
       break
+    case COLUMNS.LAST_UPDATED:
+      newSortedCol = COLUMNS.LAST_UPDATED
+      break
     default:
       newSortedCol = COLUMNS.NAME
   }

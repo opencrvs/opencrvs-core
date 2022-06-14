@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-window.config = {
-  AUTH_API_URL: 'http://localhost:4040/',
-  CONFIG_API_URL: 'http://localhost:2021',
-  COUNTRY: 'FAR',
-  LANGUAGES: 'en',
-  CLIENT_APP_URL: 'http://localhost:3000/'
+import * as pino from 'pino'
+export const logger = pino()
+
+const level = process.env.NODE_ENV === 'test' ? 'silent' : process.env.LOG_LEVEL
+if (level) {
+  logger.level = level
 }

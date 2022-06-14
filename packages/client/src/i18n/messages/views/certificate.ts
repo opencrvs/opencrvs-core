@@ -186,7 +186,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.idCheck.title'
   },
   idCheckVerify: {
-    defaultMessage: 'ID verfied',
+    defaultMessage: 'ID verified',
     description: 'The label for id check component action when verify details',
     id: 'print.cert.coll.idCheck.actions.ver'
   },

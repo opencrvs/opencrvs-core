@@ -42,6 +42,7 @@ import {
 
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { isString } from 'lodash'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 
 export const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
@@ -147,10 +148,8 @@ function GeneralTabContent({
     {
       label: intl.formatMessage(messages.govermentLogoLabel),
       value: (
-        <img
+        <CountryLogo
           src={offlineCountryConfiguration.config.COUNTRY_LOGO.file}
-          width={offlineCountryConfiguration.config.COUNTRY_LOGO_RENDER_HEIGHT}
-          height={offlineCountryConfiguration.config.COUNTRY_LOGO_RENDER_WIDTH}
         />
       ),
       action: {
@@ -439,7 +438,7 @@ function DeathTabContent({
       ),
       items: [
         {
-          label: intl.formatMessage(messages.lateRegistrationLabel),
+          label: intl.formatMessage(messages.withinLegallySpecifiedTimeLabel),
           value: (
             <FormattedNumberCurrency
               value={offlineCountryConfiguration.config.DEATH.FEE.ON_TIME}

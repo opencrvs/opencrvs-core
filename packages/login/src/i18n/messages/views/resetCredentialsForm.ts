@@ -31,12 +31,6 @@ const messagesToDefine = {
     description:
       'Form body header used in the body of phone number confirmation step'
   },
-  phoneNumberConfirmationFormBodySubheader: {
-    id: 'resetCredentials.phoneNumberConfirmation.form.body.subheader',
-    defaultMessage: 'This is the number assoricated with your account',
-    description:
-      'Form body subheader used in the body of phone number confirmation step'
-  },
   // Recovery code entry form messages
   recoveryCodeEntryFormBodyHeader: {
     id: 'resetCredentials.recoveryCodeEntry.form.body.header',

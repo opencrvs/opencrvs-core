@@ -40,6 +40,7 @@ import { mergeArraysRemovingEmptyStrings } from '@client/utils/data-formatting'
 import { countries } from '@client/forms/countries'
 import { MessageDescriptor } from 'react-intl'
 import { getSelectedOption } from '@client/forms/utils'
+import { getFullLocationNameOfFacility } from '@client/utils/locationUtils'
 
 interface IName {
   [key: string]: any
@@ -493,7 +494,10 @@ export const eventLocationNameQueryOfflineTransformer =
       selectedLocation = offlineData[resourceKey][locationId]
 
       if (selectedLocation) {
-        transformedData[sectionId][field.name] = selectedLocation.name
+        transformedData[sectionId][field.name] = getFullLocationNameOfFacility(
+          selectedLocation,
+          offlineData.locations
+        ) as Record<string, string | MessageDescriptor>[]
       }
     }
   }
@@ -765,6 +769,7 @@ export const eventLocationAddressOfflineTransformer =
       queryData.eventLocation?.type &&
       queryData.eventLocation.type !== 'PRIVATE_HOME' &&
       queryData.eventLocation.type !== 'PRIMARY_ADDRESS' &&
+      queryData.eventLocation.type !== 'DECEASED_USUAL_RESIDENCE' &&
       queryData.eventLocation.type !== 'OTHER'
     ) {
       return

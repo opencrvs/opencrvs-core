@@ -28,7 +28,7 @@ import { stepOneFields } from '@login/views/StepOne/stepOneFields'
 import { messages } from '@login/i18n/messages/views/stepOneForm'
 
 import { IAuthenticationData } from '@login/utils/authApi'
-import { Logo } from '@opencrvs/components/lib/icons'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 import {
   ERROR_CODE_FIELD_MISSING,
   ERROR_CODE_INVALID_CREDENTIALS,
@@ -36,6 +36,8 @@ import {
   ERROR_CODE_PHONE_NUMBER_VALIDATE
 } from '@login/utils/authUtils'
 import { goToForgottenItemForm } from '@login/login/actions'
+import { useSelector } from 'react-redux'
+import { selectCountryLogo } from '@login/login/selectors'
 
 export const Container = styled.div`
   position: relative;
@@ -197,75 +199,74 @@ const Password = injectIntl((props: Props) => {
   )
 })
 
-export class StepOneForm extends React.Component<FullProps> {
-  render() {
-    const {
-      intl,
-      handleSubmit,
-      formId,
-      submitAction,
-      forgetAction,
-      submissionError,
-      errorCode
-    } = this.props
-    const isOffline: boolean = navigator.onLine ? false : true
+export function StepOneForm({
+  intl,
+  handleSubmit,
+  formId,
+  submitAction,
+  forgetAction,
+  submissionError,
+  errorCode
+}: FullProps) {
+  /* This might need to be converted into a state */
+  const isOffline: boolean = navigator.onLine ? false : true
+  const logo = useSelector(selectCountryLogo)
 
-    return (
-      <Container id="login-step-one-box">
-        <LogoContainer>
-          <Logo />
-        </LogoContainer>
-        <Title>
-          {submissionError && errorCode ? (
+  return (
+    <Container id="login-step-one-box">
+      <LogoContainer>
+        <CountryLogo src={logo} />
+      </LogoContainer>
+      <Title>
+        {submissionError && errorCode ? (
+          <ErrorMessage>
+            {errorCode === ERROR_CODE_FIELD_MISSING &&
+              intl.formatMessage(messages.fieldMissing)}
+            {errorCode === ERROR_CODE_INVALID_CREDENTIALS &&
+              intl.formatMessage(messages.submissionError)}
+            {errorCode === ERROR_CODE_FORBIDDEN_CREDENTIALS &&
+              intl.formatMessage(messages.forbiddenCredentialError)}
+            {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
+              intl.formatMessage(messages.phoneNumberFormat)}
+          </ErrorMessage>
+        ) : (
+          isOffline && (
             <ErrorMessage>
-              {errorCode === ERROR_CODE_FIELD_MISSING &&
-                intl.formatMessage(messages.fieldMissing)}
-              {errorCode === ERROR_CODE_INVALID_CREDENTIALS &&
-                intl.formatMessage(messages.submissionError)}
-              {errorCode === ERROR_CODE_FORBIDDEN_CREDENTIALS &&
-                intl.formatMessage(messages.forbiddenCredentialError)}
-              {errorCode === ERROR_CODE_PHONE_NUMBER_VALIDATE &&
-                intl.formatMessage(messages.phoneNumberFormat)}
+              {intl.formatMessage(messages.networkError)}
             </ErrorMessage>
-          ) : (
-            isOffline && (
-              <ErrorMessage>
-                {intl.formatMessage(messages.networkError)}
-              </ErrorMessage>
-            )
-          )}
-        </Title>
-        <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
-          <FieldWrapper>
-            <Field
-              name={userNameField.name}
-              validate={userNameField.validate}
-              component={UserNameInput}
-            />
-          </FieldWrapper>
-          <FieldWrapper>
-            <Field
-              name={passwordField.name}
-              validate={passwordField.validate}
-              component={Password}
-            />
-          </FieldWrapper>
-          <ActionWrapper>
-            <PrimaryButton id="login-mobile-submit" type="submit">
-              {intl.formatMessage(messages.submit)}
-            </PrimaryButton>
-            <StyledButtonWrapper>
-              <StyledButton
-                id="login-forgot-password"
-                type="button"
-                onClick={forgetAction}
-              >
-                {intl.formatMessage(messages.forgotPassword)}
-              </StyledButton>
-            </StyledButtonWrapper>
-          </ActionWrapper>
-        </FormWrapper>
-      </Container>
-    )
-  }
+          )
+        )}
+      </Title>
+      <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
+        <FieldWrapper>
+          <Field
+            name={userNameField.name}
+            validate={userNameField.validate}
+            component={UserNameInput}
+          />
+        </FieldWrapper>
+        <FieldWrapper>
+          <Field
+            name={passwordField.name}
+            validate={passwordField.validate}
+            component={Password}
+          />
+        </FieldWrapper>
+        <ActionWrapper>
+          <PrimaryButton id="login-mobile-submit" type="submit">
+            {intl.formatMessage(messages.submit)}
+          </PrimaryButton>
+          <StyledButtonWrapper>
+            <StyledButton
+              id="login-forgot-password"
+              type="button"
+              onClick={forgetAction}
+            >
+              {intl.formatMessage(messages.forgotPassword)}
+            </StyledButton>
+          </StyledButtonWrapper>
+        </ActionWrapper>
+      </FormWrapper>
+    </Container>
+  )
 }

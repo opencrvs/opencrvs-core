@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  goToDeclarationRecordAudit,
-  goToPage,
-  goToReviewDuplicate
-} from '@client/navigation'
+import { goToDeclarationRecordAudit, goToPage } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { transformData } from '@client/search/transformer'
@@ -34,7 +30,8 @@ import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import {
   constantsMessages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import {
@@ -50,7 +47,8 @@ import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer
+  NoNameContainer,
+  NameContainer
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
@@ -67,7 +65,6 @@ interface IBaseReviewTabProps {
   theme: ITheme
   scope: Scope | null
   goToPage: typeof goToPage
-  goToReviewDuplicate: typeof goToReviewDuplicate
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
   outboxDeclarations: IDeclaration[]
   queryData: {
@@ -97,8 +94,8 @@ class ReadyForReviewComponent extends React.Component<
     super(props)
     this.state = {
       width: window.innerWidth,
-      sortedCol: COLUMNS.NAME,
-      sortOrder: SORT_ORDER.ASCENDING
+      sortedCol: COLUMNS.SENT_FOR_REVIEW,
+      sortOrder: SORT_ORDER.DESCENDING
     }
   }
 
@@ -144,28 +141,32 @@ class ReadyForReviewComponent extends React.Component<
       const downloadStatus = foundDeclaration?.downloadStatus
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
-      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-        actions.push({
-          label: this.props.intl.formatMessage(constantsMessages.review),
-          handler: (
-            e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-          ) => {
-            e && e.stopPropagation()
-            if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
-              isDuplicate
-                ? this.props.goToReviewDuplicate(reg.id)
-                : this.props.goToPage(
-                    REVIEW_EVENT_PARENT_FORM_PAGE,
-                    reg.id,
-                    'review',
-                    reg.event ? reg.event.toLowerCase() : ''
-                  )
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
+        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+          actions.push({
+            label: this.props.intl.formatMessage(constantsMessages.review),
+            handler: () => {},
+            disabled: true
+          })
+        }
+      } else {
+        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+          actions.push({
+            label: this.props.intl.formatMessage(constantsMessages.review),
+            handler: (
+              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+            ) => {
+              e && e.stopPropagation()
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.id,
+                'review',
+                reg.event ? reg.event.toLowerCase() : ''
+              )
             }
-          },
-          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
-        })
+          })
+        }
       }
-
       actions.push({
         actionComponent: (
           <DownloadButton
@@ -176,7 +177,7 @@ class ReadyForReviewComponent extends React.Component<
               assignment: reg.assignment
             }}
             key={`DownloadButton-${index}`}
-            status={downloadStatus}
+            status={downloadStatus as DOWNLOAD_STATUS}
           />
         )
       })
@@ -199,7 +200,7 @@ class ReadyForReviewComponent extends React.Component<
         ''
       const createdAt = (reg.createdAt && parseInt(reg.createdAt)) || ''
       const NameComponent = reg.name ? (
-        <LinkButton
+        <NameContainer
           id={`name_${index}`}
           isBoldLink={true}
           onClick={() =>
@@ -207,7 +208,7 @@ class ReadyForReviewComponent extends React.Component<
           }
         >
           {reg.name}
-        </LinkButton>
+        </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
@@ -271,7 +272,7 @@ class ReadyForReviewComponent extends React.Component<
           isSorted: this.state.sortedCol === COLUMNS.NAME
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.name),
+          label: this.props.intl.formatMessage(constantsMessages.event),
           width: 16,
           key: COLUMNS.EVENT,
           sortFunction: this.onColumnClick,
@@ -338,9 +339,7 @@ class ReadyForReviewComponent extends React.Component<
         onPageChange={onPageChange}
         loading={this.props.loading}
         error={this.props.error}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'are ready for review'
-        })}
+        noResultText={intl.formatMessage(wqMessages.noRecordsReadyForReview)}
         noContent={this.transformDeclaredContent(data).length <= 0}
       >
         <ReactTooltip id="validateTooltip">
@@ -372,6 +371,5 @@ function mapStateToProps(state: IStoreState) {
 
 export const ReadyForReview = connect(mapStateToProps, {
   goToPage,
-  goToReviewDuplicate,
   goToDeclarationRecordAudit
 })(injectIntl(withTheme(ReadyForReviewComponent)))

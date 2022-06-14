@@ -32,6 +32,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 interface ApplicationSourcesProps {
   data: GQLTotalMetricsResult
   locationId?: string
+  isAccessibleOffice: boolean
   timeStart: string
   timeEnd: string
 }
@@ -42,10 +43,9 @@ interface IDispatchProps {
 export function ApplicationSourcesReport(
   props: ApplicationSourcesProps & IDispatchProps
 ) {
-  const { data, locationId } = props
+  const { data, isAccessibleOffice } = props
   const intl = useIntl()
   const userDetails = useSelector(getUserDetails)
-  const ownOffice = userDetails?.primaryOffice?.id === locationId
 
   return (
     <ListContainer>
@@ -88,7 +88,7 @@ export function ApplicationSourcesReport(
             </PerformanceValue>
           }
           actions={
-            ownOffice && (
+            isAccessibleOffice && (
               <LinkButton
                 id="field-agent-list-view"
                 onClick={() =>
@@ -118,7 +118,7 @@ export function ApplicationSourcesReport(
               <TotalDisplayWithPercentage
                 total={calculateTotal(
                   data.results.filter(
-                    (item) => item.practitionerRole === 'HOSPITAL_NOTIFICATION'
+                    (item) => item.practitionerRole === 'AUTOMATED'
                   )
                 )}
                 ofNumber={calculateTotal(data.results)}
@@ -165,9 +165,30 @@ export function ApplicationSourcesReport(
                     [
                       'LOCAL_REGISTRAR',
                       'DISTRICT_REGISTRAR',
-                      'STATE_REGISTRAR',
-                      'NATIONAL_REGISTRAR'
+                      'STATE_REGISTRAR'
                     ].includes(item.practitionerRole)
+                  )
+                )}
+                ofNumber={calculateTotal(data.results)}
+              ></TotalDisplayWithPercentage>
+            </PerformanceValue>
+          }
+        />
+        <ListViewItemSimplified
+          label={
+            <PerformanceTitle>
+              {' '}
+              {intl.formatMessage(
+                messages.performanceNationalRegistrarsApplicationsLabel
+              )}
+            </PerformanceTitle>
+          }
+          value={
+            <PerformanceValue>
+              <TotalDisplayWithPercentage
+                total={calculateTotal(
+                  data.results.filter((item) =>
+                    ['NATIONAL_REGISTRAR'].includes(item.practitionerRole)
                   )
                 )}
                 ofNumber={calculateTotal(data.results)}

@@ -118,6 +118,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        duplicates
         attachments {
           data
           type
@@ -125,8 +126,19 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           subject
         }
         status {
+          comments {
+            comment
+          }
           type
           timestamp
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
         }
         type
         trackingId
@@ -160,9 +172,11 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         date
         action
         reinstated
+        dhis2Notification
         statusReason {
           text
         }
+        reason
         location {
           id
           name
@@ -184,6 +198,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
             data
             type
           }
+        }
+        signature {
+          data
+          type
         }
         comments {
           user {
@@ -388,6 +406,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         date
         action
         reinstated
+        dhis2Notification
         statusReason {
           text
         }
@@ -412,6 +431,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             data
             type
           }
+        }
+        signature {
+          data
+          type
         }
         comments {
           user {

@@ -21,22 +21,17 @@ import {
 import * as actions from '@client/offline/actions'
 import * as profileActions from '@client/profile/profileActions'
 import { storage } from '@client/storage'
-import {
-  IApplicationConfig,
-  referenceApi,
-  ICertificateTemplateData
-} from '@client/utils/referenceApi'
+import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
-import { IFormConfig, IQuestionConfig } from '@client/forms'
-import { isOfflineDataLoaded, isNationalSystemAdmin } from './selectors'
+import { Event, IFormConfig, IQuestionConfig } from '@client/forms'
+import { isOfflineDataLoaded } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
   IPDFTemplate,
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
 import { find, merge } from 'lodash'
-
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
@@ -44,15 +39,6 @@ export enum LocationType {
   HEALTH_FACILITY = 'HEALTH_FACILITY',
   CRVS_OFFICE = 'CRVS_OFFICE',
   ADMIN_STRUCTURE = 'ADMIN_STRUCTURE'
-}
-
-interface IParsedCertificates {
-  birth: {
-    svgCode: string
-  }
-  death: {
-    svgCode: string
-  }
 }
 export interface ILocation {
   id: string
@@ -73,7 +59,9 @@ export interface IOfflineData {
   languages: ILanguage[]
   templates: {
     receipt?: IPDFTemplate
-    certificates: {
+    // Certificates might not be defined in the case of
+    // a field agent using the app.
+    certificates?: {
       birth: ISVGTemplate
       death: ISVGTemplate
     }
@@ -373,34 +361,50 @@ function reducer(
     case actions.APPLICATION_CONFIG_LOADED: {
       const { certificates, config, formConfig } = action.payload
       merge(window.config, config)
-      const birthCertificateTemplate = find(certificates, {
-        event: 'birth',
-        status: 'ACTIVE'
-      }) as ICertificateTemplateData
+      let newOfflineData
+      const birthCertificateTemplate = certificates.find(
+        ({ event, status }) => event === Event.BIRTH && status === 'ACTIVE'
+      )
 
-      const deathCertificateTemplate = find(certificates, {
-        event: 'death',
-        status: 'ACTIVE'
-      }) as ICertificateTemplateData
+      const deathCertificateTemplate = certificates.find(
+        ({ event, status }) => event === Event.DEATH && status === 'ACTIVE'
+      )
 
-      const certificatesTemplates = {
-        birth: { svgCode: birthCertificateTemplate.svgCode },
-        death: { svgCode: deathCertificateTemplate.svgCode }
-      } as IParsedCertificates
-
-      const newOfflineData = {
-        ...state.offlineData,
-        config,
-        formConfig,
-        templates: {
-          certificates: {
-            birth: {
-              definition: certificatesTemplates.birth.svgCode
-            },
-            death: {
-              definition: certificatesTemplates.death.svgCode
-            }
+      if (birthCertificateTemplate && deathCertificateTemplate) {
+        const certificatesTemplates = {
+          birth: {
+            id: birthCertificateTemplate.id,
+            definition: birthCertificateTemplate.svgCode,
+            fileName: birthCertificateTemplate.svgFilename,
+            lastModifiedDate: birthCertificateTemplate.svgDateUpdated
+          },
+          death: {
+            id: deathCertificateTemplate.id,
+            definition: deathCertificateTemplate.svgCode,
+            fileName: deathCertificateTemplate.svgFilename,
+            lastModifiedDate: deathCertificateTemplate.svgDateUpdated
           }
+        }
+        newOfflineData = {
+          ...state.offlineData,
+          config,
+          formConfig,
+          templates: {
+            certificates: certificatesTemplates
+          }
+        }
+      } else {
+        newOfflineData = {
+          ...state.offlineData,
+          config,
+          formConfig,
+
+          // Field agents do not get certificate templates from the config service.
+          // Our loading logic depends on certificates being present and the app would load infinitely
+          // without a value here.
+          // This is a quickfix for the issue. If done properly, we should amend the "is loading" check
+          // to not expect certificate templates when a field agent is logged in.
+          templates: {}
         }
       }
 
@@ -484,7 +488,12 @@ function reducer(
 
       const offices = filterLocations(
         action.payload,
-        LocationType.CRVS_OFFICE,
+        LocationType.CRVS_OFFICE
+        /*
+
+        // This is used to filter office locations available offline
+        // It was important in an older design and may become important again
+
         {
           locationLevel: 'id',
           locationId: isNationalSystemAdmin(state.userDetails)
@@ -492,7 +501,7 @@ function reducer(
             : state.userDetails &&
               state.userDetails.primaryOffice &&
               state.userDetails.primaryOffice.id
-        }
+        }*/
       )
       return {
         ...state,

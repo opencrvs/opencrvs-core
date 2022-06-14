@@ -117,10 +117,7 @@ describe('Navigation for national system admin related tests', () => {
     expect(testComponent.exists('#navigation_progress')).toBeFalsy()
     expect(testComponent.exists('#navigation_sentForReview')).toBeFalsy()
     expect(testComponent.exists('#navigation_readyForReview')).toBeFalsy()
-    expect(testComponent.exists('#navigation_requiresUpdateAgent')).toBeFalsy()
-    expect(
-      testComponent.exists('#navigation_requiresUpdateRegistrar')
-    ).toBeFalsy()
+    expect(testComponent.exists('#navigation_requiresUpdate')).toBeFalsy()
     expect(testComponent.exists('#navigation_print')).toBeFalsy()
     expect(testComponent.exists('#navigation_waitingValidation')).toBeFalsy()
   })
@@ -179,10 +176,7 @@ describe('Navigation for Registration agent related tests', () => {
     expect(testComponent.exists('#navigation_progress')).toBeTruthy()
     expect(testComponent.exists('#navigation_sentForReview')).toBeFalsy()
     expect(testComponent.exists('#navigation_readyForReview')).toBeTruthy()
-    expect(testComponent.exists('#navigation_requiresUpdateAgent')).toBeFalsy()
-    expect(
-      testComponent.exists('#navigation_requiresUpdateRegistrar')
-    ).toBeTruthy()
+    expect(testComponent.exists('#navigation_requiresUpdate')).toBeTruthy()
     expect(testComponent.exists('#navigation_print')).toBeTruthy()
     expect(testComponent.exists('#navigation_waitingValidation')).toBeTruthy()
     expect(testComponent.exists('#navigation_approvals')).toBeTruthy()
@@ -197,11 +191,11 @@ describe('Navigation for Registration agent related tests', () => {
     expect(window.location.href).toContain('readyForReview')
 
     testComponent
-      .find('#navigation_requiresUpdateRegistrar')
+      .find('#navigation_requiresUpdate')
       .hostNodes()
       .simulate('click')
     await flushPromises()
-    expect(window.location.href).toContain('requiresUpdateRegistrar')
+    expect(window.location.href).toContain('requiresUpdate')
 
     testComponent.find('#navigation_approvals').hostNodes().simulate('click')
     await flushPromises()

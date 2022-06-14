@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
 import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
 import {
@@ -26,7 +25,8 @@ import {
   Archive,
   DeclarationIcon,
   Edit,
-  BackArrow
+  BackArrow,
+  Duplicate
 } from '@opencrvs/components/lib/icons'
 import { connect } from 'react-redux'
 import { RouteComponentProps, Redirect } from 'react-router'
@@ -106,6 +106,10 @@ import {
 } from './ActionButtons'
 import { IActionDetailsData, GetHistory } from './History'
 import { ActionDetailsModal } from './ActionDetailsModal'
+import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
+import { getPotentialDuplicateIds } from '@client/transformer/index'
+import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -139,6 +143,15 @@ const BackButton = styled(CircleButton)`
   color: ${({ theme }) => theme.colors.white};
   display: flex;
   margin-left: -8px;
+`
+
+const StyledDuplicateWarning = styled(DuplicateWarning)`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin: 16px 24px;
+  }
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin: 16px 0;
+  }
 `
 
 const DesktopDiv = styled.div`
@@ -204,6 +217,7 @@ function RecordAuditBody({
   clearCorrectionChange,
   declaration,
   draft,
+  duplicates,
   intl,
   goToCertificateCorrection,
   goToPrintCertificate,
@@ -219,6 +233,7 @@ function RecordAuditBody({
 }: {
   declaration: IDeclarationData
   draft: IDeclaration | null
+  duplicates?: string[]
   intl: IntlShape
   scope: Scope | null
   userDetails: IUserDetails | null
@@ -335,11 +350,10 @@ function RecordAuditBody({
       </DesktopDiv>
     )
   }
-
   if (
     declaration.status === SUBMISSION_STATUS.DRAFT ||
-    declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
-    (declaration.status === SUBMISSION_STATUS.REJECTED &&
+    ((declaration.status === SUBMISSION_STATUS.IN_PROGRESS ||
+      declaration.status === SUBMISSION_STATUS.REJECTED) &&
       userDetails?.role &&
       !FIELD_AGENT_ROLES.includes(userDetails.role))
   ) {
@@ -381,9 +395,21 @@ function RecordAuditBody({
       </DesktopDiv>
     )
   }
-
   if (!isDownloaded) {
-    actions.push(ShowDownloadButton({ declaration, draft, userDetails }))
+    actions.push(
+      ShowDownloadButton({
+        declaration,
+        draft,
+        userDetails
+      })
+    )
+    desktopActionsView.push(actions[actions.length - 1])
+  } else {
+    if (draft?.submissionStatus === SUBMISSION_STATUS.DRAFT) {
+      actions.push(<Uploaded />)
+    } else {
+      actions.push(<Downloaded />)
+    }
     desktopActionsView.push(actions[actions.length - 1])
   }
 
@@ -423,9 +449,16 @@ function RecordAuditBody({
       ? true
       : false
 
+  const hasDuplicates = !!(duplicates && duplicates.length > 0)
+
   return (
     <>
       <MobileHeader {...mobileProps} key={'record-audit-mobile-header'} />
+      <StyledDuplicateWarning
+        duplicateIds={duplicates?.filter(
+          (duplicate): duplicate is string => !!duplicate
+        )}
+      />
       <Content
         title={
           declaration.name || intl.formatMessage(recordAuditMessages.noName)
@@ -433,17 +466,21 @@ function RecordAuditBody({
         titleColor={declaration.name ? 'copy' : 'grey600'}
         size={ContentSize.LARGE}
         topActionButtons={desktopActionsView}
-        icon={() => (
-          <DeclarationIcon
-            isArchive={declaration?.status === ARCHIVED}
-            isValidatedOnReview={isValidatedOnReview}
-            color={
-              STATUSTOCOLOR[
-                (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
-              ]
-            }
-          />
-        )}
+        icon={() =>
+          hasDuplicates ? (
+            <Duplicate />
+          ) : (
+            <DeclarationIcon
+              isArchive={declaration?.status === ARCHIVED}
+              isValidatedOnReview={isValidatedOnReview}
+              color={
+                STATUSTOCOLOR[
+                  (declaration && declaration.status) || SUBMISSION_STATUS.DRAFT
+                ]
+              }
+            />
+          )
+        }
       >
         <GetDeclarationInfo
           declaration={declaration}
@@ -532,9 +569,14 @@ function getBodyContent({
   tab,
   userDetails,
   workqueueDeclaration,
+  goBack,
   ...actionProps
 }: IFullProps) {
-  if (!draft?.trackingId && tab === 'search') {
+  if (
+    tab === 'search' ||
+    (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
+      !workqueueDeclaration)
+  ) {
     return (
       <>
         <Query
@@ -550,16 +592,34 @@ function getBodyContent({
             } else if (error) {
               return <Redirect to={HOME} />
             }
+
+            let declaration
+            if (
+              draft?.data?.registration?.trackingId &&
+              draft?.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
+            ) {
+              declaration = getDraftDeclarationData(
+                draft,
+                resources,
+                intl,
+                draft?.data?.registration?.trackingId?.toString()
+              )
+              declaration = {
+                ...declaration,
+                status: data.fetchRegistration?.registration?.status[0].type
+              }
+            } else {
+              declaration = getGQLDeclaration(data.fetchRegistration, language)
+            }
+
             return (
               <RecordAuditBody
                 key={`record-audit-${declarationId}`}
                 {...actionProps}
-                declaration={getGQLDeclaration(
-                  data.fetchRegistration,
-                  language
-                )}
+                declaration={declaration}
                 tab={tab}
                 draft={draft}
+                duplicates={getPotentialDuplicateIds(data.fetchRegistration)}
                 intl={intl}
                 scope={scope}
                 userDetails={userDetails}
@@ -576,7 +636,7 @@ function getBodyContent({
       workqueueDeclaration?.registration?.trackingId ||
       ''
 
-    const declaration =
+    let declaration =
       draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
         ? getDraftDeclarationData(draft, resources, intl, trackingId)
         : getWQDeclarationData(
@@ -585,16 +645,29 @@ function getBodyContent({
             trackingId
           )
 
+    const wqStatus = workqueueDeclaration?.registration?.status
+    const draftStatus =
+      draft?.submissionStatus?.toString() ||
+      draft?.registrationStatus?.toString() ||
+      SUBMISSION_STATUS.DRAFT
+
+    declaration = {
+      ...declaration,
+      status: wqStatus || draftStatus
+    }
+
     return (
       <RecordAuditBody
         key={`record-audit-${declarationId}`}
         {...actionProps}
         declaration={declaration}
         draft={draft}
+        duplicates={getPotentialDuplicateIds(workqueueDeclaration)}
         tab={tab}
         intl={intl}
         scope={scope}
         userDetails={userDetails}
+        goBack={goBack}
       />
     )
   }
@@ -630,7 +703,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     offlineData: state.offline.offlineData,
     workqueueDeclaration:
       (tab !== 'search' &&
-        state.workqueueState.workqueue.data[tab].results?.find(
+        state.workqueueState.workqueue.data[tab]?.results?.find(
           (gqlSearchSet) => gqlSearchSet?.id === declarationId
         )) ||
       null

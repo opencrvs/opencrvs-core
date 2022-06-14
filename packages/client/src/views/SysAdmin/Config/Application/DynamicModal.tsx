@@ -60,7 +60,7 @@ const Text = styled.div<{
 }>`
   margin-left: ${({ align }) => (align === 'left' ? '0px' : '8px')};
   margin-right: ${({ align }) => (align === 'left' ? '8px' : '0px')};
-  margin-top: 34px;
+  margin-top: 36px;
   color: ${({ theme }) => theme.colors.grey600};
   ${({ theme }) => theme.fonts.reg16};
 `
@@ -250,7 +250,11 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
     const value = event.target.value.toString()
     if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
       this.setState(() => ({
-        birthRegistrationTarget: value
+        birthRegistrationTarget: value,
+        birthLateRegistrationTarget:
+          Number(value) > Number(this.state.birthLateRegistrationTarget)
+            ? String(Number(value) + 2)
+            : this.state.birthLateRegistrationTarget
       }))
     }
   }

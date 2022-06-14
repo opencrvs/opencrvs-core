@@ -187,7 +187,7 @@ export const customFieldToQuestionnaireTransformer = (
   }
   transformedData.questionnaire.push({
     fieldId: field.customQuesstionMappingId,
-    value: value
+    value: String(value)
   })
 
   return transformedData

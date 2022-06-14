@@ -20,17 +20,18 @@ import {
   ISerializedFormSection
 } from '@client/forms/index'
 import { NATIONAL_ID } from '@client/forms/identity'
-import { messages as userMessages } from '@client/i18n/messages/views/userForm'
+import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
+import { userMessages } from '@client/i18n/messages/user'
 
 export const userSectionFormType: ISerializedFormSection = {
   id: UserSection.User,
   viewType: 'form',
-  name: userMessages.user,
-  title: userMessages.userFormTitle,
+  name: userFormMessages.user,
+  title: userFormMessages.userFormTitle,
   groups: [
     {
       id: 'registration-office',
-      title: userMessages.assignedRegistrationOffice,
+      title: userFormMessages.assignedRegistrationOffice,
       conditionals: [
         {
           action: 'hide',
@@ -42,7 +43,7 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'assignedRegistrationOffice',
           type: FIELD_GROUP_TITLE,
-          label: userMessages.assignedRegistrationOfficeGroupTitle,
+          label: userFormMessages.assignedRegistrationOfficeGroupTitle,
           required: false,
           hidden: true,
           initialValue: '',
@@ -51,7 +52,7 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'registrationOffice',
           type: LOCATION_SEARCH_INPUT,
-          label: userMessages.registrationOffice,
+          label: userFormMessages.registrationOffice,
           required: true,
           initialValue: '',
           searchableResource: 'offices',
@@ -81,7 +82,7 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'userDetails',
           type: FIELD_GROUP_TITLE,
-          label: userMessages.userDetails,
+          label: userFormMessages.userDetails,
           required: false,
           initialValue: '',
           validate: []
@@ -89,8 +90,8 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'firstNamesEng',
           type: TEXT,
-          label: userMessages.firstNameEn,
-          required: false,
+          label: userFormMessages.firstNameEn,
+          required: true,
           initialValue: '',
           validate: [{ operation: 'englishOnlyNameFormat' }],
           mapping: {
@@ -107,7 +108,7 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'familyNameEng',
           type: TEXT,
-          label: userMessages.lastNameEn,
+          label: userFormMessages.lastNameEn,
           required: true,
           initialValue: '',
           validate: [{ operation: 'englishOnlyNameFormat' }],
@@ -123,9 +124,20 @@ export const userSectionFormType: ISerializedFormSection = {
           }
         },
         {
+          name: 'username',
+          type: TEXT,
+          label: userFormMessages.username,
+          previewGroup: 'userNameGroup',
+          required: false,
+          initialValue: '',
+          validate: [],
+          readonly: true,
+          hidden: true
+        },
+        {
           name: 'phoneNumber',
           type: TEXT,
-          label: userMessages.phoneNumber,
+          label: userFormMessages.phoneNumber,
           required: true,
           initialValue: '',
           validate: [{ operation: 'phoneNumberFormat' }],
@@ -143,7 +155,7 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'nid',
           type: TEXT,
-          label: userMessages.NID,
+          label: userFormMessages.NID,
           required: false,
           initialValue: '',
           validate: [
@@ -166,7 +178,7 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'accountDetails',
           type: FIELD_GROUP_TITLE,
-          label: userMessages.accountDetails,
+          label: userFormMessages.accountDetails,
           required: false,
           initialValue: '',
           validate: []
@@ -174,28 +186,63 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'role',
           type: SELECT_WITH_OPTIONS,
-          label: userMessages.labelRole,
+          label: userFormMessages.labelRole,
           required: true,
           initialValue: '',
           validate: [],
-          options: []
+          options: [
+            {
+              value: 'FIELD_AGENT',
+              label: userMessages.FIELD_AGENT
+            },
+            {
+              value: 'REGISTRATION_AGENT',
+              label: userMessages.REGISTRATION_AGENT
+            },
+            {
+              value: 'LOCAL_REGISTRAR',
+              label: userMessages.LOCAL_REGISTRAR
+            },
+            {
+              value: 'LOCAL_SYSTEM_ADMIN',
+              label: userMessages.LOCAL_SYSTEM_ADMIN
+            },
+            {
+              value: 'NATIONAL_SYSTEM_ADMIN',
+              label: userMessages.NATIONAL_SYSTEM_ADMIN
+            },
+            {
+              value: 'PERFORMANCE_MANAGEMENT',
+              label: userMessages.PERFORMANCE_MANAGEMENT
+            },
+            {
+              value: 'NATIONAL_REGISTRAR',
+              label: userMessages.NATIONAL_REGISTRAR
+            }
+          ]
         },
         {
           name: 'type',
           type: SELECT_WITH_DYNAMIC_OPTIONS,
-          label: userMessages.type,
+          label: userFormMessages.type,
           required: true,
           initialValue: '',
           validate: [],
           dynamicOptions: {
             dependency: 'role',
             options: {}
-          }
+          },
+          conditionals: [
+            {
+              action: 'hide',
+              expression: '(values.role!="FIELD_AGENT")'
+            }
+          ]
         },
         {
           name: 'device',
           type: TEXT,
-          label: userMessages.userDevice,
+          label: userFormMessages.userDevice,
           required: false,
           initialValue: '',
           validate: []
@@ -204,11 +251,12 @@ export const userSectionFormType: ISerializedFormSection = {
     },
     {
       id: 'signature-attachment',
-      title: userMessages.userSignatureAttachmentTitle,
+      title: userFormMessages.userSignatureAttachmentTitle,
       conditionals: [
         {
           action: 'hide',
-          expression: 'values.role!=="LOCAL_REGISTRAR"'
+          expression:
+            'values.role!=="LOCAL_REGISTRAR" && values.role!=="NATIONAL_REGISTRAR"'
         }
       ],
       fields: [
@@ -216,7 +264,7 @@ export const userSectionFormType: ISerializedFormSection = {
           name: 'attachmentTitle',
           type: FIELD_GROUP_TITLE,
           hidden: true,
-          label: userMessages.userAttachmentSection,
+          label: userFormMessages.userAttachmentSection,
           required: false,
           initialValue: '',
           validate: []
@@ -224,8 +272,8 @@ export const userSectionFormType: ISerializedFormSection = {
         {
           name: 'signature',
           type: SIMPLE_DOCUMENT_UPLOADER,
-          label: userMessages.userSignatureAttachment,
-          description: userMessages.userSignatureAttachmentDesc,
+          label: userFormMessages.userSignatureAttachment,
+          description: userFormMessages.userSignatureAttachmentDesc,
           allowedDocType: ['image/png'],
           initialValue: '',
           required: true,
@@ -248,8 +296,8 @@ const getPreviewGroups = () => {
 export const userSectionPreviewType: ISerializedFormSection = {
   id: UserSection.Preview,
   viewType: 'preview',
-  name: userMessages.userFormReviewTitle,
-  title: userMessages.userFormTitle,
+  name: userFormMessages.userFormReviewTitle,
+  title: userFormMessages.userFormTitle,
   groups: getPreviewGroups()
 }
 

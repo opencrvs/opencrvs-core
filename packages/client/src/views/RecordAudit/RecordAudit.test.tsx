@@ -29,7 +29,9 @@ import {
   storeDeclaration,
   IDeclaration,
   SUBMISSION_STATUS,
-  DOWNLOAD_STATUS
+  DOWNLOAD_STATUS,
+  IWorkqueue,
+  getCurrentUserWorkqueuSuccess
 } from '@client/declarations'
 import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
@@ -69,6 +71,22 @@ declaration.data.history = [
   }
 ]
 
+const workqueue: IWorkqueue = {
+  data: {
+    inProgressTab: {},
+    notificationTab: {},
+    reviewTab: {
+      results: [{ id: declaration.id, registration: {} }],
+      totalItems: 1
+    },
+    rejectTab: {},
+    approvalTab: {},
+    printTab: {},
+    externalValidationTab: {}
+  },
+  initialSyncDone: true
+}
+
 describe('Record audit summary for a draft birth declaration', () => {
   let component: ReactWrapper<{}, {}>
 
@@ -102,9 +120,7 @@ describe('Record audit summary for a draft birth declaration', () => {
   it('Check values for saved declarations', async () => {
     expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
     expect(component.find('#type_value').hostNodes().text()).toBe('Birth')
-    expect(component.find('#brn_value').hostNodes().text()).toBe(
-      '201908122365BDSS0SE1'
-    )
+    expect(component.exists('#brn_value')).toBeFalsy()
     expect(component.find('#placeOfBirth_value').hostNodes()).toHaveLength(1)
   })
 })
@@ -147,9 +163,7 @@ describe('Record audit summary for a draft death declaration', () => {
   it('Check values for saved declarations', async () => {
     expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
     expect(component.find('#type_value').hostNodes().text()).toBe('Death')
-    expect(component.find('#drn_value').hostNodes().text()).toBe(
-      '201908122365DDSS0SE1'
-    )
+    expect(component.exists('#drn_value')).toBeFalsy()
     expect(component.find('#placeOfDeath_value').hostNodes()).toHaveLength(1)
   })
 })
@@ -256,7 +270,9 @@ describe('Record audit for a draft declaration', () => {
 
     declaration.submissionStatus = SUBMISSION_STATUS.DECLARED
     declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
+
     store.dispatch(storeDeclaration(declaration))
+    store.dispatch(getCurrentUserWorkqueuSuccess(JSON.stringify(workqueue)))
 
     component = await createTestComponent(
       <RecordAudit
@@ -443,6 +459,7 @@ describe('Record audit for a reinstate declaration', () => {
     declaration.submissionStatus = SUBMISSION_STATUS.ARCHIVED
     declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
     store.dispatch(storeDeclaration(declaration))
+    store.dispatch(getCurrentUserWorkqueuSuccess(JSON.stringify(workqueue)))
 
     component = await createTestComponent(
       <RecordAudit

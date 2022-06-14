@@ -816,9 +816,9 @@
                   "customisable": false,
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in English",
-                    "description": "Label for form field: First names in english",
-                    "id": "form.field.label.childFirstNamesEng"
+                    "defaultMessage": "নামের প্রথমাংশ বাংলায়",
+                    "description": "Label for form field: First names",
+                    "id": "form.field.label.childFirstNames"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -830,7 +830,7 @@
                   ],
                   "mapping": {
                     "template": {
-                      "fieldName": "informantFirstName",
+                      "fieldName": "childFirstName",
                       "operation": "nameToFieldTransformer",
                       "parameters": [
                         "en",
@@ -859,9 +859,9 @@
                   "customisable": false,
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in English",
-                    "description": "Label for form field: Family name in english",
-                    "id": "form.field.label.childFamilyNameEng"
+                    "defaultMessage": "নামের শেষাংশ বাংলায়",
+                    "description": "Label for form field: Family name",
+                    "id": "form.field.label.childFamilyName"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -873,7 +873,7 @@
                   ],
                   "mapping": {
                     "template": {
-                      "fieldName": "informantFamilyName",
+                      "fieldName": "childFamilyName",
                       "operation": "nameToFieldTransformer",
                       "parameters": [
                         "en",
@@ -1453,7 +1453,7 @@
                   "label": {
                     "defaultMessage": "First name(s)",
                     "description": "Label for form field: Given names",
-                    "id": "form.field.label.childFirstNamesEng"
+                    "id": "form.field.label.childFirstNames"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -1500,7 +1500,7 @@
                   "label": {
                     "defaultMessage": "Last name",
                     "description": "Label for form field: Last name in english",
-                    "id": "form.field.label.childFamilyNameEng"
+                    "id": "form.field.label.childFamilyName"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -1545,7 +1545,7 @@
                 {
                   "id": "informantNameInEnglish",
                   "label": {
-                    "defaultMessage": "Informant's English name",
+                    "defaultMessage": "Informant's fullname",
                     "description": "Label for informant's name in english",
                     "id": "form.preview.group.label.informant.english.name"
                   },
@@ -1795,7 +1795,7 @@
                   "previewGroup": "motherNameInEnglish",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name",
+                    "defaultMessage": "First name(s)",
                     "description": "Label for form field: First names in english",
                     "id": "form.field.label.motherFirstNamesEng"
                   },
@@ -1990,7 +1990,7 @@
                   "label": {
                     "defaultMessage": "No. of previous births",
                     "description": "Label for form field: multipleBirth",
-                    "id": " "
+                    "id": "form.field.label.multipleBirth"
                   },
                   "conditionals": [
                     {
@@ -2612,7 +2612,7 @@
                 {
                   "id": "fatherNameInEnglish",
                   "label": {
-                    "defaultMessage": "Father's English name",
+                    "defaultMessage": "Father's fullname",
                     "description": "Group label for father's name in english",
                     "id": "form.preview.group.label.father.english.name"
                   },
@@ -4614,9 +4614,9 @@
                   "previewGroup": "informantNameInEnglish",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name(s) in English",
-                    "description": "Label for form field: First names in english",
-                    "id": "form.field.label.childFirstNamesEng"
+                    "defaultMessage": "নামের প্রথমাংশ বাংলায়",
+                    "description": "Label for form field: First names",
+                    "id": "form.field.label.childFirstNames"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -4661,9 +4661,9 @@
                   "previewGroup": "informantNameInEnglish",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "Last Name(s) in English",
-                    "description": "Label for form field: Family name in english",
-                    "id": "form.field.label.childFamilyNameEng"
+                    "defaultMessage": "নামের শেষাংশ বাংলায়",
+                    "description": "Label for form field: Family name",
+                    "id": "form.field.label.childFamilyName"
                   },
                   "maxLength": 32,
                   "required": true,
@@ -5093,11 +5093,11 @@
                 "name": "firstNamesEng",
                 "type": "TEXT",
                 "label": {
-                  "defaultMessage": "English first name",
+                  "defaultMessage": "First name",
                   "description": "English first name",
                   "id": "form.field.label.firstNameEN"
                 },
-                "required": false,
+                "required": true,
                 "initialValue": "",
                 "validate": [
                   {
@@ -5125,7 +5125,7 @@
                 "name": "familyNameEng",
                 "type": "TEXT",
                 "label": {
-                  "defaultMessage": "English last name",
+                  "defaultMessage": "Last name",
                   "description": "English last name",
                   "id": "form.field.label.lastNameEN"
                 },
@@ -5152,6 +5152,21 @@
                     ]
                   }
                 }
+              },
+              {
+                "name": "username",
+                "type": "TEXT",
+                "label": {
+                  "defaultMessage": "Username",
+                  "description": "The name of the user name form",
+                  "id": "constants.username"
+                },
+                "previewGroup": "userNameGroup",
+                "required": false,
+                "initialValue": "",
+                "validate": [],
+                "readonly": true,
+                "hidden": true
               },
               {
                 "name": "phoneNumber",
@@ -5239,7 +5254,64 @@
                 "required": true,
                 "initialValue": "",
                 "validate": [],
-                "options": []
+                "options": [
+                  {
+                    "value": "FIELD_AGENT",
+                    "label": {
+                      "defaultMessage": "Field Agent",
+                      "description": "The description for FIELD_AGENT role",
+                      "id": "constants.fieldAgent"
+                    }
+                  },
+                  {
+                    "value": "REGISTRATION_AGENT",
+                    "label": {
+                      "defaultMessage": "Registration Agent",
+                      "description": "The description for REGISTRATION_AGENT role",
+                      "id": "constants.registrationAgent"
+                    }
+                  },
+                  {
+                    "value": "LOCAL_REGISTRAR",
+                    "label": {
+                      "defaultMessage": "Registrar",
+                      "description": "The description for LOCAL_REGISTRAR role",
+                      "id": "constants.localRegistrar"
+                    }
+                  },
+                  {
+                    "value": "LOCAL_SYSTEM_ADMIN",
+                    "label": {
+                      "defaultMessage": "Sysadmin",
+                      "description": "The description for Sysadmin role",
+                      "id": "home.header.localSystemAdmin"
+                    }
+                  },
+                  {
+                    "value": "NATIONAL_SYSTEM_ADMIN",
+                    "label": {
+                      "defaultMessage": "System admin (national)",
+                      "description": "The description for System admin (national)",
+                      "id": "constants.nationalSystemAdmin"
+                    }
+                  },
+                  {
+                    "value": "PERFORMANCE_MANAGEMENT",
+                    "label": {
+                      "defaultMessage": "Performance Management",
+                      "description": "The description for Performance Management role",
+                      "id": "constants.performanceManagement"
+                    }
+                  },
+                  {
+                    "value": "NATIONAL_REGISTRAR",
+                    "label": {
+                      "defaultMessage": "National Registrar",
+                      "description": "The description for NATIONAL_REGISTRAR role",
+                      "id": "constants.nationalRegistrar"
+                    }
+                  }
+                ]
               },
               {
                 "name": "type",
@@ -5255,7 +5327,13 @@
                 "dynamicOptions": {
                   "dependency": "role",
                   "options": {}
-                }
+                },
+                "conditionals": [
+                  {
+                    "action": "hide",
+                    "expression": "(values.role!=\"FIELD_AGENT\")"
+                  }
+                ]
               },
               {
                 "name": "device",
@@ -5281,7 +5359,7 @@
             "conditionals": [
               {
                 "action": "hide",
-                "expression": "values.role!==\"LOCAL_REGISTRAR\""
+                "expression": "values.role!==\"LOCAL_REGISTRAR\" && values.role!==\"NATIONAL_REGISTRAR\""
               }
             ],
             "fields": [
@@ -5406,11 +5484,11 @@
                 "name": "firstNamesEng",
                 "type": "TEXT",
                 "label": {
-                  "defaultMessage": "English first name",
+                  "defaultMessage": "First name",
                   "description": "English first name",
                   "id": "form.field.label.firstNameEN"
                 },
-                "required": false,
+                "required": true,
                 "initialValue": "",
                 "validate": [
                   {
@@ -5438,7 +5516,7 @@
                 "name": "familyNameEng",
                 "type": "TEXT",
                 "label": {
-                  "defaultMessage": "English last name",
+                  "defaultMessage": "Last name",
                   "description": "English last name",
                   "id": "form.field.label.lastNameEN"
                 },
@@ -5465,6 +5543,21 @@
                     ]
                   }
                 }
+              },
+              {
+                "name": "username",
+                "type": "TEXT",
+                "label": {
+                  "defaultMessage": "Username",
+                  "description": "The name of the user name form",
+                  "id": "constants.username"
+                },
+                "previewGroup": "userNameGroup",
+                "required": false,
+                "initialValue": "",
+                "validate": [],
+                "readonly": true,
+                "hidden": true
               },
               {
                 "name": "phoneNumber",
@@ -5552,7 +5645,64 @@
                 "required": true,
                 "initialValue": "",
                 "validate": [],
-                "options": []
+                "options": [
+                  {
+                    "value": "FIELD_AGENT",
+                    "label": {
+                      "defaultMessage": "Field Agent",
+                      "description": "The description for FIELD_AGENT role",
+                      "id": "constants.fieldAgent"
+                    }
+                  },
+                  {
+                    "value": "REGISTRATION_AGENT",
+                    "label": {
+                      "defaultMessage": "Registration Agent",
+                      "description": "The description for REGISTRATION_AGENT role",
+                      "id": "constants.registrationAgent"
+                    }
+                  },
+                  {
+                    "value": "LOCAL_REGISTRAR",
+                    "label": {
+                      "defaultMessage": "Registrar",
+                      "description": "The description for LOCAL_REGISTRAR role",
+                      "id": "constants.localRegistrar"
+                    }
+                  },
+                  {
+                    "value": "LOCAL_SYSTEM_ADMIN",
+                    "label": {
+                      "defaultMessage": "Sysadmin",
+                      "description": "The description for Sysadmin role",
+                      "id": "home.header.localSystemAdmin"
+                    }
+                  },
+                  {
+                    "value": "NATIONAL_SYSTEM_ADMIN",
+                    "label": {
+                      "defaultMessage": "System admin (national)",
+                      "description": "The description for System admin (national)",
+                      "id": "constants.nationalSystemAdmin"
+                    }
+                  },
+                  {
+                    "value": "PERFORMANCE_MANAGEMENT",
+                    "label": {
+                      "defaultMessage": "Performance Management",
+                      "description": "The description for Performance Management role",
+                      "id": "constants.performanceManagement"
+                    }
+                  },
+                  {
+                    "value": "NATIONAL_REGISTRAR",
+                    "label": {
+                      "defaultMessage": "National Registrar",
+                      "description": "The description for NATIONAL_REGISTRAR role",
+                      "id": "constants.nationalRegistrar"
+                    }
+                  }
+                ]
               },
               {
                 "name": "type",
@@ -5568,7 +5718,13 @@
                 "dynamicOptions": {
                   "dependency": "role",
                   "options": {}
-                }
+                },
+                "conditionals": [
+                  {
+                    "action": "hide",
+                    "expression": "(values.role!=\"FIELD_AGENT\")"
+                  }
+                ]
               },
               {
                 "name": "device",

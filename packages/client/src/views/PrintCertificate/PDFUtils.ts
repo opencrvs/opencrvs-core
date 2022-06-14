@@ -148,9 +148,9 @@ function getPDFTemplateWithSVG(
 ): IPDFTemplate {
   let svgTemplate
   if (declaration.event === Event.BIRTH) {
-    svgTemplate = offlineResource.templates.certificates.birth.definition
+    svgTemplate = offlineResource.templates.certificates!.birth.definition
   } else {
-    svgTemplate = offlineResource.templates.certificates.death.definition
+    svgTemplate = offlineResource.templates.certificates!.death.definition
   }
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,
@@ -168,20 +168,10 @@ function updatePDFTemplateWithSVGContent(
   svg: string,
   pageSize: PageSize
 ) {
-  if (hasTemplateEmptyArrayContent(template)) {
-    ;(template.definition.content as Array<Content>).push({
-      svg,
-      fit: getPageDimensions(pageSize)
-    })
+  template.definition['content'] = {
+    svg,
+    fit: getPageDimensions(pageSize)
   }
-}
-
-function hasTemplateEmptyArrayContent(template: IPDFTemplate): boolean {
-  return Boolean(
-    template?.definition?.content &&
-      Array.isArray(template.definition.content) &&
-      template.definition.content.length === 0
-  )
 }
 
 const standardPageSizes: Record<string, [number, number]> = {

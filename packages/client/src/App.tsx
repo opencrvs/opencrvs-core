@@ -26,7 +26,6 @@ import styled, {
   ThemeProvider
 } from '@client/styledComponents'
 import { createClient } from '@client/utils/apolloClient'
-import { ReviewDuplicates } from '@client/views/Duplicates/ReviewDuplicates'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
@@ -247,10 +246,6 @@ export class App extends React.Component<IAppProps> {
                                             component={SearchResult}
                                           />
                                           <ProtectedRoute
-                                            path={routes.REVIEW_DUPLICATES}
-                                            component={ReviewDuplicates}
-                                          />
-                                          <ProtectedRoute
                                             exact
                                             path={routes.CERTIFICATE_COLLECTOR}
                                             component={CollectorForm}
@@ -348,7 +343,8 @@ export class App extends React.Component<IAppProps> {
                                               Roles.LOCAL_REGISTRAR,
                                               Roles.LOCAL_SYSTEM_ADMIN,
                                               Roles.NATIONAL_SYSTEM_ADMIN,
-                                              Roles.PERFORMANCE_MANAGEMENT
+                                              Roles.PERFORMANCE_MANAGEMENT,
+                                              Roles.NATIONAL_REGISTRAR
                                             ]}
                                             path={routes.PERFORMANCE_HOME}
                                             component={PerformanceHome}

@@ -61,11 +61,15 @@ export interface IApplicationConfig {
   ADDRESSES: number
 }
 
-export async function getApplicationConfig(): Promise<IApplicationConfig> {
+export async function getApplicationConfig(
+  authorization: string
+): Promise<IApplicationConfig> {
+  const token = authorization.replace('Bearer ', '')
   return fetch(`${CONFIG_API_URL}/config`, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
     }
   })
     .then((response) => {

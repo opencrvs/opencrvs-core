@@ -15,6 +15,11 @@ export const messages = {
     description: 'The name of the user form',
     id: 'constants.user'
   },
+  username: {
+    defaultMessage: 'Username',
+    description: 'The name of the user name form',
+    id: 'constants.username'
+  },
   userFormTitle: {
     defaultMessage: 'Create new user',
     description: 'The title of user form',
@@ -46,12 +51,12 @@ export const messages = {
     id: 'form.section.userDetails'
   },
   firstNameEn: {
-    defaultMessage: 'English first name',
+    defaultMessage: 'First name',
     description: 'English first name',
     id: 'form.field.label.firstNameEN'
   },
   lastNameEn: {
-    defaultMessage: 'English last name',
+    defaultMessage: 'Last name',
     description: 'English last name',
     id: 'form.field.label.lastNameEN'
   },

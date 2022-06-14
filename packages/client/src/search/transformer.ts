@@ -20,6 +20,7 @@ import { IntlShape } from 'react-intl'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { SearchEventsQuery } from '@client/utils/gateway'
+import { LANG_EN } from '@client/utils/constants'
 
 export const transformData = (
   data: SearchEventsQuery['searchEvents'],
@@ -55,17 +56,14 @@ export const transformData = (
         id: assignedReg.id,
         name:
           (createNamesMap(names)[locale] as string) ||
-          (createNamesMap(names)['default'] as string) ||
+          (createNamesMap(names)[LANG_EN] as string) ||
           '',
         dob:
-          (birthReg &&
-            birthReg.dateOfBirth &&
-            birthReg.dateOfBirth.length &&
+          (birthReg?.dateOfBirth?.length &&
             formatLongDate(birthReg.dateOfBirth, locale)) ||
           '',
         dod:
-          (deathReg &&
-            deathReg.dateOfDeath &&
+          (deathReg?.dateOfDeath?.length &&
             formatLongDate(deathReg.dateOfDeath, locale)) ||
           '',
         dateOfEvent,

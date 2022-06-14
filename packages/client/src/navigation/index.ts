@@ -32,7 +32,6 @@ import {
   PRINT_CERTIFICATE_PAYMENT,
   REGISTRAR_HOME_TAB,
   REVIEW_CERTIFICATE,
-  REVIEW_DUPLICATES,
   REVIEW_USER_DETAILS,
   REVIEW_USER_FORM,
   SEARCH,
@@ -56,7 +55,13 @@ import {
   FORM_CONFIG_WIZARD,
   FORM_CONFIG_HOME
 } from '@client/navigation/routes'
-import { NATL_ADMIN_ROLES } from '@client/utils/constants'
+import {
+  NATL_ADMIN_ROLES,
+  NATIONAL_REGISTRAR_ROLES,
+  PERFORMANCE_MANAGEMENT_ROLES,
+  REGISTRAR_ROLES,
+  SYS_ADMIN_ROLES
+} from '@client/utils/constants'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
 import {
@@ -260,11 +265,6 @@ export function goToDeclarationContact(informant: string) {
     formatUrl(DRAFT_BIRTH_INFORMANT_FORM, {
       informant: informant.toString()
     })
-  )
-}
-export function goToReviewDuplicate(declarationId: string) {
-  return push(
-    formatUrl(REVIEW_DUPLICATES, { declarationId: declarationId.toString() })
   )
 }
 
@@ -567,18 +567,31 @@ export function goToPage(
   }
 }
 
-export function goToPerformanceView(userDetails: IUserDetails) {
-  if (userDetails && userDetails.role) {
-    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
-      return goToPerformanceHome()
-    } else {
-      const locationId = getJurisdictionLocationIdFromUserDetails(userDetails)
-      return (
-        (locationId && goToPerformanceHome(undefined, undefined, locationId)) ||
-        goToPerformanceHome()
-      )
+export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
+  const role = userDetails?.role
+  const primaryOfficeId = userDetails.primaryOffice?.id
+  if (role) {
+    if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
+      return primaryOfficeId
+    } else if (
+      NATL_ADMIN_ROLES.includes(role) ||
+      NATIONAL_REGISTRAR_ROLES.includes(role) ||
+      PERFORMANCE_MANAGEMENT_ROLES.includes(role)
+    ) {
+      return // country wide
     }
   }
+  throw new Error(
+    `Performance view no default location selected for role: ${role}`
+  )
+}
+
+export function goToPerformanceView(userDetails: IUserDetails) {
+  return goToPerformanceHome(
+    undefined,
+    undefined,
+    getDefaultPerformanceLocationId(userDetails)
+  )
 }
 
 export function goToTeamView(userDetails: IUserDetails) {

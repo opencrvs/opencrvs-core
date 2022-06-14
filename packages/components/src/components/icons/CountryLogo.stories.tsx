@@ -9,12 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-window.config = {
-  API_GATEWAY_URL: 'http://localhost:7070/',
-  CONFIG_API_URL: 'http://localhost:2021',
-  LOGIN_URL: 'http://localhost:3020',
-  AUTH_URL: 'http://localhost:4040',
-  COUNTRY_CONFIG_URL: 'http://localhost:3040',
-  COUNTRY: 'FAR',
-  LANGUAGES: 'en,fr'
+import React from 'react'
+import { Meta, Story } from '@storybook/react'
+import { CountryLogo } from '.'
+
+export default {
+  title: 'Components/icons/CountryLogo',
+  component: CountryLogo
+} as Meta
+
+const Template: Story<{ size: 'small' | 'medium' }> = (args) => (
+  <CountryLogo src="./logo.png" {...args} />
+)
+
+export const Default = Template.bind({})
+
+export const Small = Template.bind({})
+Small.args = {
+  size: 'small'
 }

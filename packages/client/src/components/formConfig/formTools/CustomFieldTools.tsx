@@ -32,7 +32,6 @@ import { getDefaultLanguage } from '@client/i18n/utils'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
 import {
   InputField,
   Select,
@@ -40,8 +39,10 @@ import {
   TextInput
 } from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { Tooltip } from '@opencrvs/components/lib/icons'
-import { Box } from '@opencrvs/components/lib/interface'
+import {
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface'
 import { camelCase, debounce } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
@@ -49,6 +50,10 @@ import { connect } from 'react-redux'
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
 import { getConfigFieldIdentifiers } from '@client/forms/configuration/formConfig/motionUtils'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
+import { Title, Label, RequiredToggleAction, ToolTip } from './components'
+import { messages } from '@client/i18n/messages/views/formConfig'
+
+const DEFAULT_MAX_LENGTH = 250
 
 const CInputField = styled(InputField)`
   label {
@@ -69,15 +74,6 @@ const CTextArea = styled(TextArea)`
   border: solid 1px ${({ theme }) => theme.colors.grey600};
 `
 
-const CustomFieldFormContainer = styled(Box)`
-  box-shadow: none;
-  max-width: 348px;
-  min-height: 100vh;
-  margin-left: auto;
-  padding: 0px 3px;
-  border: none;
-`
-
 const CPrimaryButton = styled(PrimaryButton)`
   border-radius: 4px;
   margin-bottom: 24px;
@@ -93,23 +89,11 @@ const FieldContainer = styled.div<{ hide?: boolean }>`
   }}
 `
 
-const RightAlignment = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-`
-
-const H3 = styled.h3`
-  ${({ theme }) => theme.fonts.h3};
-`
-
 const ListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   margin-bottom: 26px;
-`
-
-const GreyText = styled.span`
-  ${({ theme }) => theme.fonts.reg14};
-  color: ${({ theme }) => theme.colors.grey400};
 `
 
 const ListRow = styled.div`
@@ -136,11 +120,6 @@ const LanguageSelect = styled(Select)`
     ${({ theme }) => theme.fonts.reg14};
     color: ${({ theme }) => theme.colors.indigoDark};
   }
-`
-
-const StyledTooltip = styled(Tooltip)`
-  height: 16px;
-  width: 16px;
 `
 
 const ListColumn = styled.div`
@@ -186,8 +165,7 @@ interface ICustomFieldState {
   selectedLanguage: string
   handleBars: string
   hideField: string
-  requiredField: boolean
-  maxLength: number | undefined
+  maxLength: number
   fieldForms: IFieldForms
 }
 
@@ -195,23 +173,29 @@ interface IOptionalContent {
   [key: string]: IMessage[]
 }
 
-class CustomFieldFormsComp extends React.Component<
+class CustomFieldToolsComp extends React.Component<
   IFullProps,
   ICustomFieldState
 > {
   constructor(props: IFullProps) {
     super(props)
-    this.initialize()
+    this.state = this.getInitialState()
   }
 
-  initialize() {
+  componentDidUpdate({ selectedField: { fieldId } }: IFullProps) {
+    if (fieldId !== this.props.selectedField.fieldId) {
+      this.setState(this.getInitialState())
+    }
+  }
+
+  getInitialState() {
     const defaultLanguage = getDefaultLanguage()
     const languages = this.getLanguages()
     const { selectedField, formField } = this.props
 
     const fieldForms: { [key: string]: ICustomField } = {}
 
-    Object.keys(languages).map((lang) => {
+    Object.keys(languages).forEach((lang) => {
       const label = this.getIntlMessage(selectedField.label, lang)
       fieldForms[lang] = {
         label,
@@ -221,15 +205,14 @@ class CustomFieldFormsComp extends React.Component<
         errorMessage: this.getIntlMessage(selectedField.errorMessage, lang)
       }
     })
-    this.state = {
+    return {
       isFieldDuplicate: false,
       handleBars:
         getCertificateHandlebar(formField) ||
         camelCase(fieldForms[defaultLanguage].label),
       selectedLanguage: defaultLanguage,
       hideField: selectedField.enabled,
-      requiredField: selectedField.required || false,
-      maxLength: selectedField.maxLength,
+      maxLength: selectedField.maxLength ?? DEFAULT_MAX_LENGTH,
       fieldForms
     }
   }
@@ -312,8 +295,8 @@ class CustomFieldFormsComp extends React.Component<
     }
   }
 
-  prepareModifiedFormField(defaultLanguage: string): ICustomConfigField {
-    const { selectedField, formField } = this.props
+  prepareModifiedFormField(): ICustomConfigField {
+    const { selectedField } = this.props
     const { fieldForms, handleBars } = this.state
     const languages = this.getLanguages()
     const newFieldID = this.generateNewFieldID()
@@ -365,12 +348,12 @@ class CustomFieldFormsComp extends React.Component<
       description: optionalContent.description,
       errorMessage: optionalContent.errorMessage,
       fieldName: handleBars,
-      required: this.state.requiredField,
       enabled: this.state.hideField,
       fieldId: newFieldID,
+      /* We can't let maxlength be 0 as it doesn't make any sense */
+      maxLength: this.state.maxLength || DEFAULT_MAX_LENGTH,
       label
     }
-    modifiedField.maxLength = this.state.maxLength
     return modifiedField
   }
 
@@ -437,26 +420,26 @@ class CustomFieldFormsComp extends React.Component<
   }
 
   toggleButtons() {
-    const { intl } = this.props
+    const { intl, selectedField } = this.props
     return (
       <ListContainer>
-        <H3>{this.getHeadingText()}</H3>
-        <ListRow>
-          <ListColumn>
-            {intl.formatMessage(customFieldFormMessages.requiredFieldLabel)}
-            <StyledTooltip />
-          </ListColumn>
-          <ListColumn>
-            <RightAlignment>
-              <Toggle
-                defaultChecked={this.state.requiredField}
-                onChange={() => {
-                  this.setState({ requiredField: !this.state.requiredField })
-                }}
-              />
-            </RightAlignment>
-          </ListColumn>
-        </ListRow>
+        <Title>{this.getHeadingText()}</Title>
+        <ListViewSimplified bottomBorder>
+          <ListViewItemSimplified
+            label={
+              <Label>
+                {intl.formatMessage(customFieldFormMessages.requiredFieldLabel)}
+                <ToolTip
+                  label={intl.formatMessage(
+                    messages.requiredForRegistrationTooltip
+                  )}
+                  id={'required-field-label'}
+                />
+              </Label>
+            }
+            actions={<RequiredToggleAction {...selectedField} />}
+          />
+        </ListViewSimplified>
       </ListContainer>
     )
   }
@@ -568,6 +551,8 @@ class CustomFieldFormsComp extends React.Component<
                 </CInputField>
               </FieldContainer>
 
+              {/*errorMessage is not implemented yet*/}
+              {/*
               <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <CInputField
                   required={false}
@@ -588,31 +573,28 @@ class CustomFieldFormsComp extends React.Component<
                   />
                 </CInputField>
               </FieldContainer>
-
-              <FieldContainer hide={language !== this.state.selectedLanguage}>
-                <CInputField
-                  required={true}
-                  id={`custom-form-max-length-${language}`}
-                  label={intl.formatMessage(
-                    customFieldFormMessages.maxLengthLabel
-                  )}
-                  touched={false}
-                >
-                  <CTextInput
-                    type="number"
-                    maxLength={this.state.maxLength || 250}
-                    value={this.state.maxLength || 250}
-                    onChange={(event: any) =>
-                      this.setState({
-                        maxLength: event.target.value
-                      })
-                    }
-                  />
-                </CInputField>
-              </FieldContainer>
+            */}
             </React.Fragment>
           )
         })}
+        <FieldContainer>
+          <CInputField
+            required={false}
+            id="custom-form-max-length"
+            label={intl.formatMessage(customFieldFormMessages.maxLengthLabel)}
+            touched={false}
+          >
+            <CTextInput
+              type="number"
+              defaultValue={this.state.maxLength}
+              onChange={(event) =>
+                this.setState({
+                  maxLength: +event.target.value
+                })
+              }
+            />
+          </CInputField>
+        </FieldContainer>
         <ListContainer>
           <ListRow>
             <ListColumn>
@@ -624,8 +606,7 @@ class CustomFieldFormsComp extends React.Component<
                     })
                     return
                   }
-                  const modifiedField =
-                    this.prepareModifiedFormField(defaultLanguage)
+                  const modifiedField = this.prepareModifiedFormField()
                   modifyConfigField(selectedField.fieldId, modifiedField)
                   debouncedNullifySelectedField()
                 }}
@@ -643,7 +624,7 @@ class CustomFieldFormsComp extends React.Component<
   render(): React.ReactNode {
     const { intl } = this.props
     return (
-      <CustomFieldFormContainer>
+      <>
         {this.toggleButtons()}
         {this.getLanguageDropDown()}
         {this.inputFields()}
@@ -652,7 +633,7 @@ class CustomFieldFormsComp extends React.Component<
             {intl.formatMessage(customFieldFormMessages.duplicateField)}
           </CErrorText>
         )}
-      </CustomFieldFormContainer>
+      </>
     )
   }
 }
@@ -677,7 +658,7 @@ const mapDispatchToProps = {
   modifyConfigField
 }
 
-export const CustomFieldForms = connect(
+export const CustomFieldTools = connect(
   mapStateToProps,
   mapDispatchToProps
-)(injectIntl(withFieldDefinition(CustomFieldFormsComp)))
+)(injectIntl(withFieldDefinition(CustomFieldToolsComp)))

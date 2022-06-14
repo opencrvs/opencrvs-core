@@ -63,20 +63,26 @@ services:
       - source: metricbeat-rollover-policy.{{ts}}
         target: /usr/share/metricbeat/rollover-policy.json
 
-  setup-kibana-alerts:
-    image: node:17.6.0-alpine
-    command: node /usr/app/setup-alerts.js
+  setup-kibana-config:
+    image: curlimages/curl:7.83.1
+    entrypoint:
+      [
+        'curl',
+        '-u',
+        'elastic:${ELASTICSEARCH_SUPERUSER_PASSWORD}',
+        '-X',
+        'POST',
+        'http://kibana:5601/api/saved_objects/_import?overwrite=true',
+        '-H',
+        'kbn-xsrf: true',
+        '--form',
+        'file=@/config.ndjson'
+      ]
     restart: on-failure
     depends_on:
       - kibana
-    environment:
-      - KIBANA_USERNAME=${KIBANA_USERNAME}
-      - KIBANA_PASSWORD=${KIBANA_PASSWORD}
-      - KIBANA_HOST=kibana
-      - KIBANA_PORT=5601
     volumes:
-      - '/tmp/compose/infrastructure/monitoring/kibana/alert-rules.json:/usr/app/alert-rules.json'
-      - '/tmp/compose/infrastructure/monitoring/kibana/setup-alerts.js:/usr/app/setup-alerts.js'
+      - '/tmp/compose/infrastructure/monitoring/kibana/config.ndjson:/config.ndjson'
     networks:
       - overlay_net
     deploy:
@@ -95,6 +101,9 @@ services:
         - 'traefik.frontend.rule=Host: kibana.{{hostname}}'
         - 'traefik.port=5601'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
     networks:
       - overlay_net
     environment:
@@ -183,10 +192,10 @@ services:
       placement:
         constraints:
           - node.labels.data1 == true
-    ports:
-      - 9200:9200
     environment:
       - ELASTIC_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
+    ports:
+      - 9200:9200
     networks:
       - overlay_net
 
@@ -228,6 +237,27 @@ services:
         constraints:
           - node.role == manager
 
+  logstash:
+    image: logstash:7.17.0
+    command: logstash -f /etc/logstash/logstash.conf --verbose
+    depends_on:
+      - elasticsearch
+    ports:
+      - '12201:12201'
+      - '12201:12201/udp'
+    configs:
+      - source: logstash-pipeline.{{ts}}
+        target: /etc/logstash/logstash.conf
+      - source: logstash.{{ts}}
+        target: /usr/share/logstash/config/logstash.yml
+    environment:
+      - ELASTICSEARCH_SUPERUSER_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
+    networks:
+      - overlay_net
+    restart: always
   apm-server:
     image: docker.elastic.co/apm/apm-server:7.15.2
     depends_on:
@@ -284,11 +314,20 @@ services:
         - 'traefik.frontend.rule=Host: register.{{hostname}},{{hostname}}'
         - 'traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)'
         - 'traefik.frontend.redirect.replacement=https://register.{{hostname}}/$${1}'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
         - 'traefik.port=80'
         - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     networks:
       - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'client'
 
   components:
     deploy:
@@ -297,11 +336,20 @@ services:
         - 'traefik.frontend.rule=Host: styleguide.{{hostname}},{{hostname}}'
         - 'traefik.frontend.redirect.regex=^https?://{{hostname}}/(.*)'
         - 'traefik.frontend.redirect.replacement=https://styleguide.{{hostname}}/$${1}'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
         - 'traefik.port=80'
         - 'traefik.docker.network=opencrvs_overlay_net'
       replicas: 2
     networks:
       - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'components'
 
   countryconfig:
     deploy:
@@ -310,12 +358,20 @@ services:
         - 'traefik.frontend.rule=Host: countryconfig.{{hostname}}'
         - 'traefik.port=3040'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
       replicas: 2
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'countryconfig'
   login:
     environment:
       - COUNTRY_CONFIG_URL=https://countryconfig.{{hostname}}
@@ -326,10 +382,18 @@ services:
         - 'traefik.frontend.rule=Host: login.{{hostname}}'
         - 'traefik.port=80'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'login'
   # Configure other service with deployment specifc details
   auth:
     secrets:
@@ -339,15 +403,25 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PRIVATE_KEY_PATH=/run/secrets/jwt-private-key.{{ts}}
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - HOSTNAME={{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
         - 'traefik.frontend.rule=Host: auth.{{hostname}}'
         - 'traefik.port=4040'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
       replicas: 2
     networks:
       - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'auth'
 
   user-mgnt:
     secrets:
@@ -360,7 +434,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'user-mgnt'
   notification:
     secrets:
       - jwt-public-key.{{ts}}
@@ -371,23 +449,36 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'notification'
   gateway:
     secrets:
       - jwt-public-key.{{ts}}
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
+      - HOSTNAME={{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
         - 'traefik.frontend.rule=Host: gateway.{{hostname}}'
         - 'traefik.port=7070'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'gateway'
   workflow:
     secrets:
       - jwt-public-key.{{ts}}
@@ -398,7 +489,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'workflow'
   search:
     secrets:
       - jwt-public-key.{{ts}}
@@ -410,7 +505,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'search'
   metrics:
     secrets:
       - jwt-public-key.{{ts}}
@@ -421,7 +520,11 @@ services:
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'metrics'
   config:
     secrets:
       - jwt-public-key.{{ts}}
@@ -429,16 +532,25 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MONGO_URL=mongodb://config:${CONFIG_MONGODB_PASSWORD}@mongo1/application-config?replicaSet=rs0
+      - HOSTNAME={{hostname}}
     deploy:
       labels:
         - 'traefik.enable=true'
         - 'traefik.frontend.rule=Host: config.{{hostname}}'
         - 'traefik.port=2021'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'config'
   # Configure other dependencies with deployment specifc details
   hearth:
     environment:
@@ -457,7 +569,11 @@ services:
         target: /src/hearth/config/queryparam-extensions.json
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'hearth'
   openhim-core:
     environment:
       - mongo_url=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1/openhim-dev?replicaSet=rs0
@@ -473,10 +589,17 @@ services:
         - 'traefik.openhim-api.port=8080'
         - 'traefik.router.frontend.rule=Host: api.{{hostname}}'
         - 'traefik.router.port=5001'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'openhim-core'
   openhim-console:
     deploy:
       labels:
@@ -484,31 +607,20 @@ services:
         - 'traefik.frontend.rule=Host: openhim.{{hostname}}'
         - 'traefik.port=80'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
       replicas: 2
     configs:
       - source: openhim-console-conf.{{ts}}
         target: /usr/share/nginx/html/config/default.json
     networks:
       - overlay_net
-
-  logspout:
-    image: gliderlabs/logspout:latest
-    restart: unless-stopped
-    volumes:
-      - /etc/hostname:/etc/host_hostname:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: syslog://${PAPERTRAIL:-logs5.papertrailapp.com:24584}
-    deploy:
-      mode: global
-      resources:
-        limits:
-          cpus: '0.20'
-          memory: 256M
-        reservations:
-          cpus: '0.10'
-          memory: 128M
-    networks:
-      - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'openhim-console'
 
   webhooks:
     secrets:
@@ -523,10 +635,18 @@ services:
         - 'traefik.frontend.rule=Host: webhooks.{{hostname}}'
         - 'traefik.port=2525'
         - 'traefik.docker.network=opencrvs_overlay_net'
+        - 'traefik.frontend.headers.STSSeconds=31536000'
+        - 'traefik.frontend.headers.STSIncludeSubdomains=true'
+        - 'traefik.frontend.headers.STSPreload=true'
+        - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
       replicas: 2
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'webhooks'
 secrets:
   jwt-public-key.{{ts}}:
     external: true
@@ -553,6 +673,10 @@ configs:
     file: ./infrastructure/monitoring/kibana/kibana.yml
   apm.{{ts}}:
     file: ./infrastructure/monitoring/apm/apm-server.yml
+  logstash.{{ts}}:
+    file: ./infrastructure/monitoring/logstash/logstash.yml
+  logstash-pipeline.{{ts}}:
+    file: ./infrastructure/monitoring/logstash/logstash.conf
 networks:
   overlay_net:
     driver: overlay

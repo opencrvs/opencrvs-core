@@ -333,15 +333,26 @@ export interface GQLRole {
   active?: boolean
 }
 
+export interface GQLComparisonInput {
+  eq?: string
+  gt?: string
+  lt?: string
+  gte?: string
+  lte?: string
+  in?: Array<string>
+  ne?: string
+  nin?: Array<string>
+}
+
 export interface GQLCertificateSVG {
-  _id?: string
-  svgCode?: string
-  svgFilename?: string
-  svgDateUpdated?: string
-  svgDateCreated?: string
-  user?: string
-  event?: string
-  status?: string
+  id: string
+  svgCode: string
+  svgFilename: string
+  svgDateUpdated: string
+  svgDateCreated: string
+  user: string
+  event: string
+  status: string
 }
 
 export interface GQLQuestion {
@@ -625,13 +636,16 @@ export interface GQLHistory {
   date?: GQLDate
   action?: GQLRegStatus
   statusReason?: GQLStatusReason
+  reason?: string
   reinstated?: boolean
   location?: GQLLocation
   office?: GQLLocation
+  dhis2Notification?: boolean
   comments?: Array<GQLComment | null>
   input?: Array<GQLInputOutput | null>
   output?: Array<GQLInputOutput | null>
   certificates?: Array<GQLCertificate | null>
+  signature?: GQLSignature
 }
 
 export const enum GQLMannerOfDeath {
@@ -861,7 +875,7 @@ export interface GQLPersonInput {
   dateOfMarriage?: GQLDate
   multipleBirth?: number
   address?: Array<GQLAddressInput | null>
-  photo?: Array<GQLAttachmentInput | null>
+  photo?: Array<GQLAttachmentInput>
   deceased?: GQLDeceasedInput
   nationality?: Array<string | null>
   educationalAttainment?: GQLEducationType
@@ -900,7 +914,7 @@ export interface GQLRegistrationInput {
   status?: Array<GQLRegWorkflowInput | null>
   type?: GQLRegistrationType
   inCompleteFields?: string
-  attachments?: Array<GQLAttachmentInput | null>
+  attachments?: Array<GQLAttachmentInput>
   certificates?: Array<GQLCertificateInput | null>
   location?: GQLLocationInput
   correction?: GQLCorrectionInput
@@ -911,7 +925,7 @@ export interface GQLRelatedPersonInput {
   _fhirID?: string
   relationship?: string
   otherRelationship?: string
-  affidavit?: Array<GQLAttachmentInput | null>
+  affidavit?: Array<GQLAttachmentInput>
   individual?: GQLPersonInput
 }
 
@@ -953,7 +967,7 @@ export interface GQLUserIdentifierInput {
 }
 
 export interface GQLSignatureInput {
-  data?: string
+  data: string
   type?: string
 }
 
@@ -1117,16 +1131,10 @@ export const enum GQLAttachmentSubject {
   PARENT = 'PARENT',
   CHILD_AGE = 'CHILD_AGE',
   DECEASED_ID_PROOF = 'DECEASED_ID_PROOF',
-  DECEASED_PARMANENT_ADDRESS_PROOF = 'DECEASED_PARMANENT_ADDRESS_PROOF',
   DECEASED_DEATH_PROOF = 'DECEASED_DEATH_PROOF',
-  DECEASED_BIRTH_PROOF = 'DECEASED_BIRTH_PROOF',
+  DECEASED_DEATH_CAUSE_PROOF = 'DECEASED_DEATH_CAUSE_PROOF',
   INFORMANT_ID_PROOF = 'INFORMANT_ID_PROOF',
-  INFORMANT_ATHORITY_TO_APPLY_PROOF = 'INFORMANT_ATHORITY_TO_APPLY_PROOF',
-  LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF',
-  ASSIGNED_RESPONSIBILITY_PROOF = 'ASSIGNED_RESPONSIBILITY_PROOF',
-  WARD_COUNCILLOR_PROOF = 'WARD_COUNCILLOR_PROOF',
-  CAUSE_OF_DEATH = 'CAUSE_OF_DEATH',
-  CORONERS_REPORT = 'CORONERS_REPORT'
+  LEGAL_GUARDIAN_PROOF = 'LEGAL_GUARDIAN_PROOF'
 }
 
 export interface GQLRegistrationSearchSet {
@@ -1206,7 +1214,7 @@ export interface GQLAddressInput {
 export interface GQLAttachmentInput {
   _fhirID?: string
   contentType?: string
-  data?: string
+  data: string
   status?: string
   originalFileName?: string
   systemFileName?: string
@@ -1980,7 +1988,7 @@ export interface QueryToGetEventsWithProgressResolver<
 
 export interface QueryToGetRolesArgs {
   title?: string
-  value?: string
+  value?: GQLComparisonInput
   type?: string
   active?: boolean
   sortBy?: string
@@ -3683,7 +3691,7 @@ export interface RoleToActiveResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLCertificateSVGTypeResolver<TParent = any> {
-  _id?: CertificateSVGTo_idResolver<TParent>
+  id?: CertificateSVGToIdResolver<TParent>
   svgCode?: CertificateSVGToSvgCodeResolver<TParent>
   svgFilename?: CertificateSVGToSvgFilenameResolver<TParent>
   svgDateUpdated?: CertificateSVGToSvgDateUpdatedResolver<TParent>
@@ -3693,7 +3701,7 @@ export interface GQLCertificateSVGTypeResolver<TParent = any> {
   status?: CertificateSVGToStatusResolver<TParent>
 }
 
-export interface CertificateSVGTo_idResolver<TParent = any, TResult = any> {
+export interface CertificateSVGToIdResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4285,13 +4293,16 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   date?: HistoryToDateResolver<TParent>
   action?: HistoryToActionResolver<TParent>
   statusReason?: HistoryToStatusReasonResolver<TParent>
+  reason?: HistoryToReasonResolver<TParent>
   reinstated?: HistoryToReinstatedResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
+  dhis2Notification?: HistoryToDhis2NotificationResolver<TParent>
   comments?: HistoryToCommentsResolver<TParent>
   input?: HistoryToInputResolver<TParent>
   output?: HistoryToOutputResolver<TParent>
   certificates?: HistoryToCertificatesResolver<TParent>
+  signature?: HistoryToSignatureResolver<TParent>
 }
 
 export interface HistoryToUserResolver<TParent = any, TResult = any> {
@@ -4310,6 +4321,10 @@ export interface HistoryToStatusReasonResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface HistoryToReasonResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface HistoryToReinstatedResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
@@ -4319,6 +4334,13 @@ export interface HistoryToLocationResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToOfficeResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToDhis2NotificationResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
@@ -4335,6 +4357,10 @@ export interface HistoryToOutputResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToCertificatesResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToSignatureResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

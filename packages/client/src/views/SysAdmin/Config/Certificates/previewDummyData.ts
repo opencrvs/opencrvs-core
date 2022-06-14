@@ -17,7 +17,7 @@ const dummyBirthRegistrationResponse = {
   _fhirIDMap: {
     composition: '1e09f4b5-43f4-415c-b2ab-f24a4b0be20a',
     encounter: '65f436b8-562a-4a35-8df9-ff41205a7770',
-    eventLocation: '5c6abc88-26b8-4834-a1a6-2992807e3a72',
+    eventLocation: 'ec396045-3437-4224-8e03-f299e17158e5',
     observation: {
       birthType: 'ca45479d-365b-4883-9980-e3687f5eafb3',
       weightAtBirth: '22c18ced-5fad-4ec4-8dad-29bd05b20fd9',
@@ -32,8 +32,8 @@ const dummyBirthRegistrationResponse = {
     name: [
       {
         use: 'en',
-        firstNames: 'Test Application',
-        familyName: 'Will Be Updated',
+        firstNames: 'Jane',
+        familyName: 'Smith',
         __typename: 'HumanName'
       }
     ],
@@ -367,14 +367,16 @@ const dummyBirthRegistrationResponse = {
   birthType: 'SINGLE',
   questionnaire: null,
   eventLocation: {
-    type: 'HEALTH_FACILITY',
+    id: 'f0517084-664e-434c-8ed3-2dc58ceabcfb',
+    type: 'PRIMARY_ADDRESS',
     address: {
-      line: [],
-      district: null,
-      state: null,
+      type: 'PRIMARY_ADDRESS',
+      line: ['', '', '', '', '', '', 'URBAN'],
+      district: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
+      state: 'df669feb-61a3-4984-ab24-4b28511b472a',
       city: null,
       postalCode: null,
-      country: null,
+      country: 'FAR',
       __typename: 'Address'
     },
     __typename: 'Location'
@@ -927,8 +929,8 @@ const dummyDeathRegistrationResponse = {
     name: [
       {
         use: 'en',
-        firstNames: 'Courage',
-        familyName: 'The Cowardly Dog',
+        firstNames: 'Michael',
+        familyName: 'Jones',
         __typename: 'HumanName'
       }
     ],
@@ -1229,6 +1231,15 @@ const mockOfflineData: Partial<IOfflineData> = {
     }
   },
   locations: {
+    'f244b79e-16e7-40b2-834f-c1c57bd7eae8': {
+      id: 'f244b79e-16e7-40b2-834f-c1c57bd7eae8',
+      name: 'Abwe',
+      alias: 'Abwe',
+      physicalType: 'Jurisdiction',
+      jurisdictionType: 'DISTRICT',
+      type: 'ADMIN_STRUCTURE',
+      partOf: 'Location/df669feb-61a3-4984-ab24-4b28511b472a'
+    },
     'ecc5a78b-e7d9-4640-ac65-e591a6a9590f': {
       id: 'ecc5a78b-e7d9-4640-ac65-e591a6a9590f',
       name: 'Ibombo',
@@ -1323,7 +1334,7 @@ const mockUserDetails = {
   ]
 }
 
-export const getDummyCertificateTemplateData = (
+export const getDummyDeclarationData = (
   event: string,
   registerForm: { birth: IForm; death: IForm }
 ) => {
@@ -1335,12 +1346,18 @@ export const getDummyCertificateTemplateData = (
     response = dummyDeathRegistrationResponse
     form = registerForm.death
   }
-  const declaration = gqlToDraftTransformer(
+  return gqlToDraftTransformer(
     form,
     response,
     mockOfflineData as IOfflineData,
     mockUserDetails
   )
+}
 
-  return declaration.template
+export const getDummyCertificateTemplateData = (
+  event: string,
+  registerForm: { birth: IForm; death: IForm }
+) => {
+  const data = getDummyDeclarationData(event, registerForm)
+  return data.template
 }

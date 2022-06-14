@@ -60,6 +60,7 @@ import { ITemplatedComposition } from '@gateway/features/registration/fhir-build
 import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
+import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
@@ -712,7 +713,13 @@ export const typeResolvers: GQLResolver = {
       return extension !== undefined
     },
     statusReason: (task: fhir.Task) => task.statusReason || null,
+    reason: (task: fhir.Task) => task.reason?.text || null,
     date: (task: fhir.Task) => task.meta?.lastUpdated,
+    dhis2Notification: (task: fhir.Task) =>
+      task.identifier?.some(
+        ({ system }) =>
+          system === `${OPENCRVS_SPECIFICATION_URL}id/dhis2_event_identifier`
+      ),
     user: async (task: fhir.Task, _: any, authHeader: any) => {
       const user = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
@@ -767,6 +774,33 @@ export const typeResolvers: GQLResolver = {
         return null
       }
       return await getCertificatesFromTask(task, _, authHeader)
+    },
+    signature: async (task: fhir.Task, _: any, authHeader: any) => {
+      const action = getActionFromTask(task)
+      if (action !== GQLRegStatus.REGISTERED) {
+        return null
+      }
+      const user = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastUser`,
+        task.extension as fhir.Extension[]
+      )
+      if (!user || !user.valueReference || !user.valueReference.reference) {
+        return null
+      }
+
+      const practitionerId = user.valueReference.reference.split('/')[1]
+      const practitioner: fhir.Practitioner = await fetchFHIR(
+        `/Practitioner/${practitionerId}`,
+        authHeader
+      )
+      const signatureExtension = getSignatureExtension(practitioner.extension)
+      const signature = signatureExtension && signatureExtension.valueSignature
+      return (
+        signature && {
+          type: signature.contentType,
+          data: signature.blob
+        }
+      )
     }
   },
 
@@ -1092,6 +1126,48 @@ export const typeResolvers: GQLResolver = {
         ? observations.entry[0].resource.valueString
         : null
     },
+    async questionnaire(composition: ITemplatedComposition, _, authHeader) {
+      const encounterSection = findCompositionSection(
+        DEATH_ENCOUNTER_CODE,
+        composition
+      )
+      if (!encounterSection || !encounterSection.entry) {
+        return null
+      }
+      const response = await fetchFHIR(
+        `/QuestionnaireResponse?subject=${encounterSection.entry[0].reference}`,
+        authHeader
+      )
+      let questionnaireResponse: fhir.QuestionnaireResponse | null = null
+
+      if (
+        response &&
+        response.entry &&
+        response.entry[0] &&
+        response.entry[0].resource
+      ) {
+        questionnaireResponse = response.entry[0].resource
+      }
+
+      if (!questionnaireResponse) {
+        return null
+      }
+      const questionnaire: GQLQuestionnaireQuestion[] = []
+
+      if (questionnaireResponse.item && questionnaireResponse.item.length) {
+        questionnaireResponse.item.forEach((item) => {
+          if (item.answer && item.answer[0]) {
+            questionnaire.push({
+              fieldId: item.text,
+              value: item.answer[0].valueString
+            })
+          }
+        })
+        return questionnaire
+      } else {
+        return null
+      }
+    },
     async medicalPractitioner(
       composition: ITemplatedComposition,
       _,
@@ -1279,6 +1355,8 @@ export const typeResolvers: GQLResolver = {
         (observations &&
           observations.entry &&
           observations.entry[0] &&
+          observations.entry[0].resource &&
+          observations.entry[0].resource.valueQuantity &&
           observations.entry[0].resource.valueQuantity.value) ||
         null
       )

@@ -14,10 +14,17 @@ import { Shield } from '@opencrvs/components/lib/icons'
 import styled from '@client/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { CreatePin } from '@client/views/PIN/CreatePin'
+import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { secureAccountMessages as messages } from '@client/i18n/messages/views/secureAccount'
+import { getOfflineData } from '@client/offline/selectors'
+import { IStoreState } from '@client/store'
+import { connect } from 'react-redux'
+import { IApplicationConfig } from '@client/utils/referenceApi'
 
 const SecurePageContainer = styled.div`
   ${({ theme }) => theme.fonts.reg18};
   ${({ theme }) => theme.gradients.primary};
+  background: ${({ theme }) => theme.colors.backgroundPrimary};
   height: 100vh;
   text-align: center;
   width: 100%;
@@ -41,15 +48,24 @@ const PinButton = styled(PrimaryButton)`
 const Bold = styled.span`
   ${({ theme }) => theme.fonts.h2};
 `
+interface IStateProps {
+  config: IApplicationConfig
+}
 
-export class SecureAccount extends React.Component<{
-  onComplete: () => void
-  collectPin?: boolean
-}> {
+class SecureAccountComponent extends React.Component<
+  {
+    onComplete: () => void
+    collectPin?: boolean
+  } & IStateProps &
+    IntlShapeProps
+> {
   state = {
     collectPin: this.props.collectPin || false
   }
+
   render() {
+    const { intl, config } = this.props
+
     return (
       (!this.state.collectPin && (
         <SecurePageContainer>
@@ -59,10 +75,11 @@ export class SecureAccount extends React.Component<{
             </Item>
 
             <Item margin="50px 0px">
-              <Bold>Secure your Account</Bold>
+              <Bold>{intl.formatMessage(messages.secureAccountPageTitle)}</Bold>
               <p>
-                A personal identification number protects your account. Your pin
-                will be required before each use of the OpenCRVS app.
+                {intl.formatMessage(messages.secureAccountPageDesc, {
+                  applicationName: config.APPLICATION_NAME
+                })}
               </p>
             </Item>
 
@@ -71,7 +88,7 @@ export class SecureAccount extends React.Component<{
                 id="createPinBtn"
                 onClick={() => this.setState({ collectPin: true })}
               >
-                CREATE A PIN
+                {intl.formatMessage(messages.createPin)}
               </PinButton>
             </Item>
           </Wrapper>
@@ -80,3 +97,14 @@ export class SecureAccount extends React.Component<{
     )
   }
 }
+
+function mapStateToProps(state: IStoreState) {
+  const offlineCountryConfiguration = getOfflineData(state)
+  return {
+    config: offlineCountryConfiguration.config
+  }
+}
+
+export const SecureAccount = connect(mapStateToProps)(
+  injectIntl(SecureAccountComponent)
+)

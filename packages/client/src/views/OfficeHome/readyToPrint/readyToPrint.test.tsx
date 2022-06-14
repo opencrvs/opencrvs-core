@@ -683,7 +683,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
     it('downloads declaration after clicking download button', async () => {
       const downloadButton = await waitForElement(
         testComponent,
-        '#ListItemAction-1-icon'
+        '#ListItemAction-0-icon'
       )
 
       downloadButton.hostNodes().simulate('click')
@@ -694,7 +694,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
       testComponent.find('#assign').hostNodes().simulate('click')
       expect(
-        testComponent.find('#action-loading-ListItemAction-1').hostNodes()
+        testComponent.find('#action-loading-ListItemAction-0').hostNodes()
       ).toHaveLength(1)
 
       await new Promise((resolve) => {
@@ -704,7 +704,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
       const action = await waitForElement(
         testComponent,
-        '#ListItemAction-1-Print'
+        '#ListItemAction-0-Print'
       )
       action.hostNodes().simulate('click')
 
@@ -732,7 +732,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
         testComponent,
         '#ListItemAction-0-icon-failed'
       )
-
       expect(errorIcon.hostNodes()).toHaveLength(1)
     })
   })

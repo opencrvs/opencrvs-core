@@ -21,8 +21,7 @@ import {
   goToCreateNewUser,
   goToCreateNewUserWithLocationId,
   goToReviewUserDetails,
-  goToTeamSearch,
-  goToUserProfile
+  goToTeamSearch
 } from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -43,7 +42,8 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   AddUser,
   VerticalThreeDots,
-  SearchRed
+  SearchRed,
+  NoWifi
 } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import {
@@ -60,7 +60,11 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import {
+  injectIntl,
+  useIntl,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
@@ -77,6 +81,7 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { useCallback } from 'react'
+import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
@@ -195,6 +200,10 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
+const Name = styled.span`
+  ${({ theme }) => theme.fonts.reg16}
+`
+
 const ListViewContainer = styled.div`
   margin-top: 24px;
 `
@@ -207,8 +216,28 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
   margin-top: 20px;
 `
 
+const ConnectivityContainer = styled.div`
+  justify-content: center;
+  gap: 8px;
+  display: flex;
+  margin-top: 5vh;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-top: 12px;
+  }
+`
+const NoConnectivity = styled(NoWifi)`
+  width: 24px;
+`
+const Text = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  text-align: center;
+`
 interface ISearchParams {
   locationId: string
+}
+
+type IOnlineStatusProps = {
+  isOnline: boolean
 }
 
 type BaseProps = {
@@ -219,10 +248,12 @@ type BaseProps = {
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToReviewUserDetails: typeof goToReviewUserDetails
   goToTeamSearch: typeof goToTeamSearch
-  goToUserProfile: typeof goToUserProfile
 }
 
-type IProps = BaseProps & IntlShapeProps & RouteComponentProps
+type IProps = BaseProps &
+  IntlShapeProps &
+  RouteComponentProps &
+  IOnlineStatusProps
 
 interface IStatusProps {
   status: string
@@ -234,18 +265,32 @@ interface ToggleUserActivation {
 }
 
 export const Status = (statusProps: IStatusProps) => {
-  const status =
-    statusProps.status.charAt(0).toUpperCase() + statusProps.status.slice(1)
-  switch (status.toLowerCase()) {
+  const status = statusProps.status
+  const intl = useIntl()
+  switch (status) {
     case UserStatus[UserStatus.ACTIVE].toLowerCase():
-      return <ActiveStatusBox>{status}</ActiveStatusBox>
+      return (
+        <ActiveStatusBox>{intl.formatMessage(messages.active)}</ActiveStatusBox>
+      )
     case UserStatus[UserStatus.DEACTIVATED].toLowerCase():
-      return <DeactivatedStatusBox>{status}</DeactivatedStatusBox>
+      return (
+        <DeactivatedStatusBox>
+          {intl.formatMessage(messages.deactivated)}
+        </DeactivatedStatusBox>
+      )
     case UserStatus[UserStatus.DISABLED].toLowerCase():
-      return <DisabledStatusBox>{status}</DisabledStatusBox>
+      return (
+        <DisabledStatusBox>
+          {intl.formatMessage(messages.disabled)}
+        </DisabledStatusBox>
+      )
     case UserStatus[UserStatus.PENDING].toLowerCase():
     default:
-      return <PendingStatusBox>{status}</PendingStatusBox>
+      return (
+        <PendingStatusBox>
+          {intl.formatMessage(messages.pending)}
+        </PendingStatusBox>
+      )
   }
 }
 
@@ -261,8 +306,8 @@ function UserListComponent(props: IProps) {
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToTeamSearch,
-    goToUserProfile,
     offlineOffices,
+    isOnline,
     location: { search }
   } = props
 
@@ -451,15 +496,7 @@ function UserListComponent(props: IProps) {
 
             return {
               image: <AvatarSmall name={name} avatar={avatar} />,
-              label: (
-                <LinkButton
-                  isBoldLink={true}
-                  id={`name-link-${user.id}`}
-                  onClick={() => goToUserProfile(user.id || '')}
-                >
-                  {name}
-                </LinkButton>
-              ),
+              label: <Name>{name}</Name>,
               value: <Value>{role}</Value>,
               actions: (
                 <StatusMenu
@@ -480,7 +517,7 @@ function UserListComponent(props: IProps) {
         }
       )
     },
-    [StatusMenu, goToUserProfile, intl]
+    [StatusMenu, intl]
   )
 
   const onClickAddUser = useCallback(
@@ -546,7 +583,7 @@ function UserListComponent(props: IProps) {
                   {!getViewOnly(locationId, userDetails, false) && (
                     <AddUserContainer id="add-user" onClick={onClickAddUser}>
                       <AddUserIcon />
-                      {' New user'}
+                      {intl.formatMessage(messages.newUser)}
                     </AddUserContainer>
                   )}
                 </TableHeader>
@@ -638,29 +675,41 @@ function UserListComponent(props: IProps) {
         undefined
       }
     >
-      <HeaderContainer>
-        <Header id="header">
-          {(searchedLocation && searchedLocation.name) || ''}
-        </Header>
-        {!getViewOnly(locationId, userDetails, true) && (
-          <ChangeButton id="chng-loc" onClick={onChangeLocation}>
-            {intl.formatMessage(buttonMessages.change)}
-          </ChangeButton>
-        )}
-      </HeaderContainer>
-      <LocationInfo>
-        <LocationInfoKey>
-          {intl.formatMessage(constantsMessages.address)}
-        </LocationInfoKey>
-        {searchedLocation && searchedLocation.address ? (
-          <LocationInfoValue>{searchedLocation.address}</LocationInfoValue>
-        ) : (
-          <LocationInfoEmptyValue>
-            {intl.formatMessage(constantsMessages.notAvailable)}
-          </LocationInfoEmptyValue>
-        )}
-      </LocationInfo>
-      <RenderUserList locationId={locationId} userDetails={userDetails} />
+      {isOnline ? (
+        <>
+          <HeaderContainer>
+            <Header id="header">
+              {(searchedLocation && searchedLocation.name) || ''}
+            </Header>
+            {!getViewOnly(locationId, userDetails, true) && (
+              <ChangeButton id="chng-loc" onClick={onChangeLocation}>
+                {intl.formatMessage(buttonMessages.change)}
+              </ChangeButton>
+            )}
+          </HeaderContainer>
+          <LocationInfo>
+            <LocationInfoKey>
+              {intl.formatMessage(constantsMessages.address)}
+            </LocationInfoKey>
+            {searchedLocation && searchedLocation.address ? (
+              <LocationInfoValue>{searchedLocation.address}</LocationInfoValue>
+            ) : (
+              <LocationInfoEmptyValue>
+                {intl.formatMessage(constantsMessages.notAvailable)}
+              </LocationInfoEmptyValue>
+            )}
+          </LocationInfo>
+          <RenderUserList locationId={locationId} userDetails={userDetails} />
+        </>
+      ) : (
+        <ConnectivityContainer>
+          <NoConnectivity />
+          <Text id="no-connection-text">
+            {intl.formatMessage(constantsMessages.noConnection)}
+          </Text>
+        </ConnectivityContainer>
+      )}
+
       {showResendSMSSuccess && (
         <FloatingNotification
           id="resend_invite_success"
@@ -694,7 +743,6 @@ export const UserList = connect(
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToReviewUserDetails,
-    goToTeamSearch,
-    goToUserProfile
+    goToTeamSearch
   }
-)(withTheme(injectIntl(UserListComponent)))
+)(withTheme(injectIntl(withOnlineStatus(UserListComponent))))

@@ -16,7 +16,8 @@ import {
   IFormData,
   IFormFieldValue,
   IContactPoint,
-  Sort
+  Sort,
+  FieldValueMap
 } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
@@ -42,7 +43,6 @@ import { EVENT_STATUS, IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
-  GQLHumanName,
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
   GQLRegistrationSearchSet
@@ -57,6 +57,7 @@ import {
   ShowDownloadDeclarationFailedToast
 } from '@client/notification/actions'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
+import { getPotentialDuplicateIds } from '@client/transformer/index'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -77,12 +78,6 @@ const UPDATE_REGISTRAR_WORKQUEUE_FAIL =
 const ENQUEUE_DOWNLOAD_DECLARATION = 'DECLARATION/ENQUEUE_DOWNLOAD_DECLARATION'
 const DOWNLOAD_DECLARATION_SUCCESS = 'DECLARATION/DOWNLOAD_DECLARATION_SUCCESS'
 const DOWNLOAD_DECLARATION_FAIL = 'DECLARATION/DOWNLOAD_DECLARATION_FAIL'
-const UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS =
-  'DECLARATION/UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS'
-const UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS =
-  'DECLARATION/UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS'
-const UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL =
-  'DECLARATION/UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL'
 const CLEAR_CORRECTION_CHANGE = 'CLEAR_CORRECTION_CHANGE'
 const ENQUEUE_UNASSIGN_DECLARATION = 'DECLARATION/ENQUEUE_UNASSIGN'
 const UNASSIGN_DECLARATION = 'DECLARATION/UNASSIGN'
@@ -172,6 +167,7 @@ export interface IVisitedGroupId {
 export interface IDeclaration {
   id: string
   data: IFormData
+  duplicates?: string[]
   originalData?: IFormData
   savedOn?: number
   createdAt?: string
@@ -200,8 +196,9 @@ export interface IWorkqueue {
 }
 
 interface IWorkqueuePaginationParams {
+  userId?: string
   pageSize: number
-
+  isFieldAgent: boolean
   inProgressSkip: number
   healthSystemSkip: number
   reviewSkip: number
@@ -461,9 +458,6 @@ export type Action =
   | UpdateRegistrarWorkqueueAction
   | UpdateRegistrarWorkQueueSuccessAction
   | UpdateRegistrarWorkQueueFailAction
-  | UpdateFieldAgentDeclaredDeclarationsAction
-  | UpdateFieldAgentDeclaredDeclarationsSuccessAction
-  | UpdateFieldAgentDeclaredDeclarationsFailAction
   | ShowDownloadDeclarationFailedToast
   | IEnqueueUnassignDeclaration
   | IUnassignDeclaration
@@ -539,11 +533,13 @@ export function createReviewDeclaration(
   declarationId: string,
   formData: IFormData,
   event: Event,
-  status?: string
+  status?: string,
+  duplicates?: string[]
 ): IDeclaration {
   return {
     id: declarationId,
     data: formData,
+    duplicates,
     originalData: formData,
     review: true,
     event,
@@ -718,72 +714,6 @@ export function mergeDeclaredDeclarations(
   declarations.push(...transformedDeclaredDeclarations)
 }
 
-async function updateFieldAgentDeclaredDeclarationsByUser(
-  getState: () => IStoreState
-) {
-  const state = getState()
-  const scope = getScope(state)
-
-  if (
-    !state.declarationsState.declarations ||
-    !scope ||
-    !scope.includes('declare')
-  ) {
-    return Promise.reject('Remote declared declaration merging not applicable')
-  }
-
-  const userDetails =
-    getUserDetails(state) ||
-    (JSON.parse(
-      (await storage.getItem('USER_DETAILS')) as string
-    ) as IUserDetails)
-
-  const uID = userDetails.userMgntUserID || ''
-  let { allUserData, currentUserData } = await getUserData(uID)
-
-  const declaredDeclarations = await getFieldAgentDeclaredDeclarations(
-    userDetails
-  )
-
-  const rejectedDeclarations = await getFieldAgentRejectedDeclarations(
-    userDetails
-  )
-
-  if (!currentUserData) {
-    currentUserData = {
-      userID: uID,
-      declarations: state.declarationsState.declarations
-    }
-    allUserData.push(currentUserData)
-  }
-  mergeDeclaredDeclarations(
-    currentUserData.declarations,
-    declaredDeclarations.results
-  )
-  mergeDeclaredDeclarations(
-    currentUserData.declarations,
-    rejectedDeclarations.results
-  )
-
-  allUserData = allUserData.map((userData) => {
-    if (userData.userID !== currentUserData!.userID) {
-      return {
-        ...userData
-      }
-    } else {
-      return {
-        ...userData,
-        ...currentUserData
-      }
-    }
-  })
-
-  return Promise.all([
-    storage.setItem('USER_DATA', JSON.stringify(allUserData)),
-    JSON.stringify(currentUserData)
-  ]).then(([_, currentUserData]) => currentUserData)
-}
-
 export async function getWorkqueueOfCurrentUser(): Promise<string> {
   // returns a 'stringified' IWorkqueue
   const initialWorkqueue = workqueueInitialState.workqueue
@@ -896,7 +826,6 @@ async function updateWorkqueueData(
       (declaration.data.registration.contactPoint as IContactPoint).nestedFields
         .registrationPhone) ||
     ''
-
   if (declaration.event === 'birth') {
     ;(workqueueApp as GQLBirthEventSearchSet).childName = transformedName
     ;(workqueueApp as GQLBirthEventSearchSet).dateOfBirth = transformedBirthDate
@@ -1012,7 +941,12 @@ function mergeWorkQueueData(
     return destinationWorkQueue
   }
   workQueueIds.forEach((workQueueId) => {
-    if (!destinationWorkQueue.data[workQueueId].results) {
+    if (
+      !(
+        destinationWorkQueue.data &&
+        destinationWorkQueue.data[workQueueId]?.results
+      )
+    ) {
       return
     }
     ;(
@@ -1024,7 +958,6 @@ function mergeWorkQueueData(
       const declarationIndex = currentApplications.findIndex(
         (app) => app && app.id === declaration.id
       )
-
       if (declarationIndex >= 0) {
         const isDownloadFailed =
           currentApplications[declarationIndex].submissionStatus ===
@@ -1061,7 +994,9 @@ async function getWorkqueueData(
       : [EVENT_STATUS.DECLARED]
 
   const {
+    userId,
     pageSize,
+    isFieldAgent,
     inProgressSkip,
     healthSystemSkip,
     reviewSkip,
@@ -1075,15 +1010,16 @@ async function getWorkqueueData(
     registrationLocationId,
     reviewStatuses,
     pageSize,
+    isFieldAgent,
     inProgressSkip,
     healthSystemSkip,
     reviewSkip,
     rejectSkip,
     approvalSkip,
     externalValidationSkip,
-    printSkip
+    printSkip,
+    userId
   )
-
   let workqueue
   if (result) {
     workqueue = {
@@ -1105,6 +1041,14 @@ async function getWorkqueueData(
   const { currentUserData } = await getUserData(
     userDetails.userMgntUserID || ''
   )
+  if (isFieldAgent) {
+    return mergeWorkQueueData(
+      state,
+      ['reviewTab', 'rejectTab'],
+      currentUserData && currentUserData.declarations,
+      workqueue
+    )
+  }
   return mergeWorkQueueData(
     state,
     ['inProgressTab', 'notificationTab', 'reviewTab', 'rejectTab'],
@@ -1131,7 +1075,6 @@ export async function writeRegistrarWorkqueueByUser(
     workqueuePaginationParams,
     currentUserData && currentUserData.workqueue
   )
-
   if (currentUserData) {
     currentUserData.workqueue = workqueue
   } else {
@@ -1189,8 +1132,9 @@ export function downloadDeclaration(
 }
 
 export function updateRegistrarWorkqueue(
+  userId?: string,
   pageSize = 10,
-
+  isFieldAgent = false,
   inProgressSkip = 0,
   healthSystemSkip = 0,
   reviewSkip = 0,
@@ -1202,8 +1146,9 @@ export function updateRegistrarWorkqueue(
   return {
     type: UPDATE_REGISTRAR_WORKQUEUE,
     payload: {
+      userId,
       pageSize,
-
+      isFieldAgent,
       inProgressSkip,
       healthSystemSkip,
       reviewSkip,
@@ -1225,24 +1170,6 @@ export const updateRegistrarWorkqueueSuccessActionCreator = (
 export const updateRegistrarWorkqueueFailActionCreator =
   (): UpdateRegistrarWorkQueueFailAction => ({
     type: UPDATE_REGISTRAR_WORKQUEUE_FAIL
-  })
-
-export function updateFieldAgentDeclaredDeclarations() {
-  return {
-    type: UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS
-  }
-}
-
-export const updateFieldAgentDeclaredDeclarationsSuccessActionCreator = (
-  response: string
-): UpdateFieldAgentDeclaredDeclarationsSuccessAction => ({
-  type: UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS,
-  payload: response
-})
-
-export const updateFieldAgentDeclaredDeclarationsFailActionCreator =
-  (): UpdateFieldAgentDeclaredDeclarationsFailAction => ({
-    type: UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL
   })
 
 function createRequestForDeclaration(
@@ -1424,9 +1351,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           ...state
         },
         Cmd.run(deleteDeclarationByUser, {
-          successActionCreator: action.payload.shouldUpdateFieldAgentHome
-            ? updateFieldAgentDeclaredDeclarations
-            : getStorageDeclarationsSuccess,
+          successActionCreator: getStorageDeclarationsSuccess,
           failActionCreator: getStorageDeclarationsFailed,
           args: [state.userID, action.payload.declaration]
         })
@@ -1436,7 +1361,15 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       const currentDeclarationIndex = newDeclarations.findIndex(
         (declaration) => declaration.id === action.payload.declaration.id
       )
-      newDeclarations[currentDeclarationIndex] = action.payload.declaration
+      const modifiedDeclaration = { ...action.payload.declaration }
+
+      if (modifiedDeclaration.data?.informant?.relationship) {
+        modifiedDeclaration.data.informant.relationship = (
+          modifiedDeclaration.data.registration.informantType as FieldValueMap
+        )?.value
+      }
+
+      newDeclarations[currentDeclarationIndex] = modifiedDeclaration
 
       return {
         ...state,
@@ -1625,7 +1558,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           downloadingDeclaration.id,
           transData,
           downloadingDeclaration.event,
-          downloadedAppStatus
+          downloadedAppStatus,
+          getPotentialDuplicateIds(eventData)
         )
       newDeclarationsAfterDownload[downloadingDeclarationIndex].downloadStatus =
         DOWNLOAD_STATUS.DOWNLOADED
@@ -1815,41 +1749,6 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         )
       )
 
-    case UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS:
-      return loop(
-        state,
-        Cmd.run(updateFieldAgentDeclaredDeclarationsByUser, {
-          successActionCreator:
-            updateFieldAgentDeclaredDeclarationsSuccessActionCreator,
-          failActionCreator:
-            updateFieldAgentDeclaredDeclarationsFailActionCreator,
-          args: [Cmd.getState]
-        })
-      )
-
-    case UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS:
-      if (action.payload) {
-        const userData = JSON.parse(action.payload) as IUserData
-
-        /*
-         * This is here to ensure that even if the user manages to create a new declaration
-         * before the declarations are fetched from the server, the new declaration will still be
-         * persisted. This mostly happens in E2E tests
-         */
-        const userDeclarations = userData.declarations
-        const declarationsStoredBeforeFetch = state.declarations.filter(
-          (stateDeclaration) =>
-            !userDeclarations.find(({ id }) => stateDeclaration.id === id)
-        )
-        return {
-          ...state,
-          declarations: userData.declarations.concat(
-            declarationsStoredBeforeFetch
-          )
-        }
-      }
-      return state
-
     case ARCHIVE_DECLARATION:
       if (action.payload) {
         const declaration = state.declarations.find(
@@ -2021,7 +1920,7 @@ export function filterProcessingDeclarations(
   data: GQLEventSearchResultSet,
   processingDeclarationIds: string[]
 ): GQLEventSearchResultSet {
-  if (!data.results) {
+  if (!data?.results) {
     return data
   }
 

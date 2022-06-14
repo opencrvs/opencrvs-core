@@ -56,6 +56,10 @@ import { AvatarChangeModal } from './AvatarChangeModal'
 import { IImage } from '@client/utils/imageUtils'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { ImageLoader } from './ImageLoader'
+import {
+  IOnlineStatusProps,
+  withOnlineStatus
+} from '@client/views/OfficeHome/LoadingIndicator'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -95,7 +99,7 @@ type IProps = IntlShapeProps &
     modifyUserDetails: typeof modifyUserDetailsAction
     changeLanguage: typeof changeLanguageAction
     goToPhoneSettingAction: typeof goToPhoneSettings
-  }
+  } & IOnlineStatusProps
 
 enum NOTIFICATION_SUBJECT {
   LANGUAGE,
@@ -236,7 +240,8 @@ class SettingsView extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { userDetails, intl, languages, goToPhoneSettingAction } = this.props
+    const { userDetails, intl, languages, goToPhoneSettingAction, isOnline } =
+      this.props
     const langChoice = [] as ILanguageOptions[]
     const availableLangs = getAvailableLanguages()
     availableLangs.forEach((lang: string) => {
@@ -282,7 +287,7 @@ class SettingsView extends React.Component<IProps, IState> {
         value: mobile,
         action: {
           label: intl.formatMessage(buttonMessages.change),
-          disabled: false,
+          disabled: isOnline ? false : true,
           handler: goToPhoneSettingAction
         }
       },
@@ -493,4 +498,4 @@ export const SettingsPage = connect(
     changeLanguage: changeLanguageAction,
     goToPhoneSettingAction: goToPhoneSettings
   }
-)(injectIntl(SettingsView))
+)(injectIntl(withOnlineStatus(SettingsView)))

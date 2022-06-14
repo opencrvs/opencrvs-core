@@ -164,7 +164,13 @@ const statusOptions = [
 const PrimaryContactLabelMapping = {
   MOTHER: formMessages.contactDetailsMother,
   FATHER: formMessages.contactDetailsFather,
-  INFORMANT: formMessages.contactDetailsInformant
+  INFORMANT: formMessages.contactDetailsInformant,
+  OTHER_FAMILY_MEMBER: formMessages.otherFamilyMember,
+  LEGAL_GUARDIAN: formMessages.legalGuardian,
+  GRANDMOTHER: formMessages.grandmother,
+  GRANDFATHER: formMessages.grandfather,
+  BROTHER: formMessages.brother,
+  SISTER: formMessages.sister
 }
 
 type PrimaryContact = keyof typeof PrimaryContactLabelMapping
@@ -357,7 +363,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
         label: intl.formatMessage(constantsMessages.timeReadyToPrint),
         key: 'timeLoggedRegistered',
         width: 12,
-        alignment: ColumnContentAlignment.RIGHT,
+        alignment: ColumnContentAlignment.LEFT,
         isSortable: true,
         sortFunction: () => toggleSort('timeLoggedRegistered'),
         icon:
@@ -669,6 +675,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           <>
             <LocationPicker
               selectedLocationId={locationId}
+              disabled={true}
               onChangeLocation={(newLocationId: string) => {
                 props.goToWorkflowStatus(
                   newLocationId,
@@ -736,7 +743,12 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
             skip: 0,
             count: recordCount,
             status: (status && [status]) || undefined,
-            type: (event && [`${event.toLowerCase()}-declaration`]) || undefined
+            type:
+              (event && [
+                `${event.toLowerCase()}-declaration`,
+                `${event.toLowerCase()}-notification`
+              ]) ||
+              undefined
           }}
           fetchPolicy={'no-cache'}
         >

@@ -27,14 +27,12 @@ import {
 } from '@client/i18n/messages'
 import { messages as registrarHomeMessages } from '@client/i18n/messages/views/registrarHome'
 import { messages as rejectMessages } from '@client/i18n/messages/views/reject'
-import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import { messages } from '@client/i18n/messages/views/search'
 import {
   goToDeclarationRecordAudit,
   goToEvents as goToEventsAction,
   goToPage as goToPageAction,
-  goToPrintCertificate as goToPrintCertificateAction,
-  goToReviewDuplicate as goToReviewDuplicateAction
+  goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
@@ -56,7 +54,6 @@ import {
   ColumnContentAlignment,
   GridTable,
   IAction,
-  Loader,
   COLUMNS
 } from '@opencrvs/components/lib/interface'
 
@@ -72,11 +69,12 @@ import { Navigation } from '@client/components/interface/Navigation'
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer
+  NoNameContainer,
+  NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -144,7 +142,6 @@ interface IBaseSearchResultProps {
   userDetails: IUserDetails | null
   outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
-  goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
@@ -308,23 +305,17 @@ export class SearchResultView extends React.Component<
                 ? this.props.intl.formatMessage(constantsMessages.update)
                 : this.props.intl.formatMessage(constantsMessages.review),
             handler: () =>
-              !isDuplicate
-                ? this.props.goToPage(
-                    REVIEW_EVENT_PARENT_FORM_PAGE,
-                    reg.id,
-                    'review',
-                    reg.event.toLowerCase()
-                  )
-                : this.props.goToReviewDuplicate(reg.id),
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.id,
+                'review',
+                reg.event.toLowerCase()
+              ),
             disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
           })
         }
       }
-      if (
-        downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED &&
-        ((!declarationIsValidated && this.userHasValidateOrRegistrarScope()) ||
-          (declarationIsValidated && this.userHasRegisterScope()))
-      ) {
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         actions.push({
           actionComponent: (
             <DownloadButton
@@ -365,24 +356,20 @@ export class SearchResultView extends React.Component<
           : false
       const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
       const NameComponent = reg.name ? (
-        <LinkButton
+        <NameContainer
           isBoldLink={true}
           id={`name_${index}`}
           onClick={() =>
-            isDuplicate
-              ? this.props.goToReviewDuplicate(reg.id)
-              : this.props.goToDeclarationRecordAudit('search', reg.id)
+            this.props.goToDeclarationRecordAudit('search', reg.id)
           }
         >
           {reg.name}
-        </LinkButton>
+        </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
           onClick={() =>
-            isDuplicate
-              ? this.props.goToReviewDuplicate(reg.id)
-              : this.props.goToDeclarationRecordAudit('search', reg.id)
+            this.props.goToDeclarationRecordAudit('search', reg.id)
           }
         >
           {intl.formatMessage(constantsMessages.noNameProvided)}
@@ -453,31 +440,10 @@ export class SearchResultView extends React.Component<
                 fetchPolicy="no-cache"
               >
                 {({ loading, error, data }) => {
-                  if (loading) {
-                    return (
-                      <Loader
-                        id="search_loader"
-                        marginPercent={35}
-                        loadingText={intl.formatMessage(messages.searchingFor, {
-                          param: searchText
-                        })}
-                      />
-                    )
-                  }
+                  const total = loading
+                    ? -1
+                    : data?.searchEvents?.results?.length || 0
 
-                  if (error || !data?.searchEvents) {
-                    return (
-                      <ErrorText id="search-result-error-text">
-                        {intl.formatMessage(errorMessages.queryError)}
-                      </ErrorText>
-                    )
-                  }
-
-                  const total =
-                    (data.searchEvents &&
-                      data.searchEvents.results &&
-                      data.searchEvents.results.length) ||
-                    0
                   return (
                     <WQContentWrapper
                       title={intl.formatMessage(messages.searchResultFor, {
@@ -488,26 +454,37 @@ export class SearchResultView extends React.Component<
                         this.state.width < this.props.theme.grid.breakpoints.lg
                       }
                     >
-                      {total > 0 && (
-                        <>
-                          <ReactTooltip id="validateTooltip">
-                            <ToolTipContainer>
-                              {this.props.intl.formatMessage(
-                                registrarHomeMessages.validatedDeclarationTooltipForRegistrar
+                      {loading ? (
+                        <div id="search_loader">
+                          <LoadingIndicator loading={true} />
+                        </div>
+                      ) : error ? (
+                        <ErrorText id="search-result-error-text">
+                          {intl.formatMessage(errorMessages.queryError)}
+                        </ErrorText>
+                      ) : (
+                        data?.searchEvents &&
+                        total > 0 && (
+                          <>
+                            <ReactTooltip id="validateTooltip">
+                              <ToolTipContainer>
+                                {this.props.intl.formatMessage(
+                                  registrarHomeMessages.validatedDeclarationTooltipForRegistrar
+                                )}
+                              </ToolTipContainer>
+                            </ReactTooltip>
+                            <GridTable
+                              content={this.transformSearchContent(
+                                data.searchEvents
                               )}
-                            </ToolTipContainer>
-                          </ReactTooltip>
-                          <GridTable
-                            content={this.transformSearchContent(
-                              data.searchEvents
-                            )}
-                            columns={this.getColumns()}
-                            noResultText={intl.formatMessage(
-                              constantsMessages.noResults
-                            )}
-                            hideLastBorder={true}
-                          />
-                        </>
+                              columns={this.getColumns()}
+                              noResultText={intl.formatMessage(
+                                constantsMessages.noResults
+                              )}
+                              hideLastBorder={true}
+                            />
+                          </>
+                        )
                       )}
                     </WQContentWrapper>
                   )
@@ -530,7 +507,6 @@ export const SearchResult = connect(
   {
     goToEvents: goToEventsAction,
     goToPage: goToPageAction,
-    goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction,
     goToDeclarationRecordAudit
   }

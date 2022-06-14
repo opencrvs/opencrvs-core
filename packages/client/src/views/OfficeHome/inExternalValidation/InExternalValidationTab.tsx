@@ -21,7 +21,8 @@ import { transformData } from '@client/search/transformer'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
   dynamicConstantsMessages,
-  constantsMessages
+  constantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { connect } from 'react-redux'
 import { goToPage, goToDeclarationRecordAudit } from '@client/navigation'
@@ -34,10 +35,10 @@ import {
 import {
   IconWithName,
   IconWithNameEvent,
-  NoNameContainer
+  NoNameContainer,
+  NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 
 const { useState, useEffect } = React
 
@@ -120,7 +121,7 @@ function InExternalValidationComponent(props: IProps) {
           ? new Date(reg.modifiedAt)
           : new Date(Number(reg.modifiedAt))) || ''
       const NameComponent = reg.name ? (
-        <LinkButton
+        <NameContainer
           id={`name_${index}`}
           isBoldLink={true}
           onClick={() =>
@@ -128,7 +129,7 @@ function InExternalValidationComponent(props: IProps) {
           }
         >
           {reg.name}
-        </LinkButton>
+        </NameContainer>
       ) : (
         <NoNameContainer
           id={`name_${index}`}
@@ -226,9 +227,7 @@ function InExternalValidationComponent(props: IProps) {
       paginationId={paginationId}
       totalPages={totalPages}
       onPageChange={onPageChange}
-      noResultText={intl.formatMessage(constantsMessages.noRecords, {
-        tab: 'in external validation '
-      })}
+      noResultText={intl.formatMessage(wqMessages.noRecordsExternalValidation)}
       loading={props.loading}
       error={props.error}
       noContent={transformWaitingValidationContent(data).length <= 0}

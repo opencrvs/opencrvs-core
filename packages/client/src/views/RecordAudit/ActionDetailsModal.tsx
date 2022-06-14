@@ -19,7 +19,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal, ListTable } from '@opencrvs/components/lib/interface'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { IForm, IFormSection, IFormField } from '@client/forms'
-import { constantsMessages } from '@client/i18n/messages'
+import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { getIndividualNameObj } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/correction'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
@@ -31,11 +31,7 @@ import {
 } from './utils'
 import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import { IActionDetailsData } from './History'
-
-const CLinkButton = styled(LinkButton)`
-  width: fit-content;
-  display: inline-block;
-`
+import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: IActionDetailsData
@@ -113,7 +109,8 @@ export const ActionDetailsModalListTable = ({
     const result: IDynamicValues[] = []
     actionDetailsData.input.forEach((item: { [key: string]: any }) => {
       const editedValue = actionDetailsData.output.find(
-        (oi: { valueId: string }) => oi.valueId === item.valueId
+        (oi: { valueId: string; valueCode: string }) =>
+          oi.valueId === item.valueId && oi.valueCode === item.valueCode
       )
 
       const section = find(
@@ -218,16 +215,26 @@ export const ActionDetailsModalListTable = ({
   const declarationUpdates = dataChange(actionDetailsData)
   const collectorData = certificateCollectorData(actionDetailsData)
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
+  const content = actionDetailsData.comments
+    .map((comment: IDynamicValues) => comment.comment)
+    .concat(actionDetailsData.statusReason?.text || [])
+    .map((comment: string) => ({ comment }))
   return (
     <>
       {/* For Reject Reason */}
-      {actionDetailsData.statusReason &&
+      {actionDetailsData.reason &&
         actionDetailsData.action === SUBMISSION_STATUS.REJECTED && (
           <ListTable
             noResultText=" "
             hideBoxShadow={true}
             columns={reasonColumn}
-            content={[actionDetailsData.statusReason]}
+            content={[
+              {
+                text: intl.formatMessage(
+                  getRejectionReasonDisplayValue(actionDetailsData.reason)
+                )
+              }
+            ]}
           />
         )}
 
@@ -236,7 +243,7 @@ export const ActionDetailsModalListTable = ({
         noResultText=" "
         hideBoxShadow={true}
         columns={commentsColumn}
-        content={actionDetailsData.comments}
+        content={content}
       />
 
       {/* For Data Updated */}
@@ -304,13 +311,19 @@ export const ActionDetailsModal = ({
       )) ||
     ''
 
-  const nameObj = getIndividualNameObj(
-    actionDetailsData.user.name,
-    window.config.LANGUAGES
-  )
-  const userName = nameObj
-    ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-    : ''
+  let userName = ''
+
+  if (!actionDetailsData.dhis2Notification) {
+    const nameObj = getIndividualNameObj(
+      actionDetailsData.user.name,
+      window.config.LANGUAGES
+    )
+    userName = nameObj
+      ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
+      : ''
+  } else {
+    userName = intl.formatMessage(userMessages.healthSystem)
+  }
 
   return (
     <ResponsiveModal
@@ -324,13 +337,7 @@ export const ActionDetailsModal = ({
     >
       <>
         <div>
-          <CLinkButton
-            onClick={() => {
-              goToUser && goToUser(actionDetailsData.user.id)
-            }}
-          >
-            {userName}
-          </CLinkButton>
+          <>{userName}</>
           <span> — {getFormattedDate(actionDetailsData.date)}</span>
         </div>
         <ActionDetailsModalListTable

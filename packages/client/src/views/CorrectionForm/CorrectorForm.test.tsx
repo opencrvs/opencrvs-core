@@ -77,7 +77,7 @@ describe('Corrector form', () => {
 
     it('should not disable the continue button if an option is selected', () => {
       wrapper
-        .find('#relationship_MOTHER')
+        .find('#relationship_FATHER')
         .hostNodes()
         .simulate('change', { target: { checked: true } })
       wrapper.update()
@@ -89,7 +89,7 @@ describe('Corrector form', () => {
     it('should go to verify section', () => {
       wrapper.find('#confirm_form').hostNodes().simulate('click')
       wrapper.update()
-      expect(history.location.pathname).toContain('/verify/mother')
+      expect(history.location.pathname).toContain('/verify/father')
     })
   })
   describe('for a birth registration with father details', () => {

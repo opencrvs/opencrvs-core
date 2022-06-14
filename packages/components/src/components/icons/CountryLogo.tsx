@@ -9,26 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import { Header } from '@opencrvs/components/lib/interface'
+import React from 'react'
 import styled from 'styled-components'
-import { Logo } from '@opencrvs/components/lib/icons'
 
-const StretchedHeader = styled(Header)`
-  justify-content: flex-end;
-  min-height: 280px;
+const Logo = styled.img<{ size: ISize }>`
+  max-height: ${({ size }) => (size === 'small' ? 96 : 120)}px;
 `
 
-const StyledLogo = styled(Logo)`
-  margin: 23px auto auto 5%;
-`
+type ISize = 'small' | 'medium'
 
-export class LoginHeader extends React.Component {
-  render() {
-    return (
-      <StretchedHeader {...this.props}>
-        <StyledLogo />
-      </StretchedHeader>
-    )
-  }
+export function CountryLogo({
+  size = 'medium',
+  ...props
+}: React.ImgHTMLAttributes<HTMLImageElement> & { size?: ISize }) {
+  return <Logo alt="country-logo" size={size} {...props} />
 }

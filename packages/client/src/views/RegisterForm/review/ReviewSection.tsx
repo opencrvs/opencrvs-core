@@ -22,7 +22,8 @@ import {
 import {
   DocumentViewer,
   IDocumentViewerOptions,
-  ResponsiveModal
+  ResponsiveModal,
+  Warning
 } from '@opencrvs/components/lib/interface'
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import {
@@ -61,7 +62,6 @@ import {
   SELECT_WITH_DYNAMIC_OPTIONS,
   SELECT_WITH_OPTIONS,
   SUBSECTION,
-  TEXTAREA,
   WARNING,
   REVIEW_OVERRIDE_POSITION,
   DOCUMENT_UPLOADER_WITH_OPTION,
@@ -92,7 +92,7 @@ import {
   getValidationErrorsForForm,
   IFieldErrors
 } from '@client/forms/validation'
-import { buttonMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/review'
 import { getLanguage } from '@client/i18n/selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
@@ -109,7 +109,7 @@ import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { Scope } from '@client/utils/authUtils'
 import { isMobileDevice } from '@client/utils/commonUtils'
-import { REJECTED } from '@client/utils/constants'
+import { ACCUMULATED_FILE_SIZE, REJECTED } from '@client/utils/constants'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { flatten, isArray, flattenDeep, get, clone } from 'lodash'
@@ -127,11 +127,16 @@ import { IValidationResult } from '@client/utils/validate'
 import { DocumentListPreview } from '@client/components/form/DocumentUploadfield/DocumentListPreview'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { generateLocations } from '@client/utils/locationUtils'
-import { isCorrection } from '@client/views/CorrectionForm/utils'
+import {
+  bytesToSize,
+  isCorrection,
+  isFileSizeExceeded
+} from '@client/views/CorrectionForm/utils'
 import {
   ListViewSimplified,
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -369,9 +374,9 @@ const getFormFieldValue = (
   let tempField: IFormField
   for (const key in sectionDraftData) {
     tempField = sectionDraftData[key] as IFormField
-    return (tempField &&
-      tempField.nestedFields &&
-      tempField.nestedFields[field.name]) as IFormFieldValue
+    if (tempField?.nestedFields?.[field.name]) {
+      return tempField.nestedFields[field.name] as IFormFieldValue
+    }
   }
   return ''
 }
@@ -668,6 +673,13 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
           ' ' +
           (this.getLabelForDocType(title, document.optionValues[1] as string) ||
             document.optionValues[1])
+
+        /**
+         * Skip insertion if the value already exist
+         */
+        if (selectOptions.findIndex((elem) => elem.value === label) > -1) {
+          return true
+        }
 
         documentOptions.push({
           value: document.data,
@@ -1024,7 +1036,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
               field,
               errorsOnFields,
               undefined,
-              !!index
+              !index
             )
           )
           .filter((value) => value)
@@ -1071,6 +1083,12 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
   ) {
     if (nestedFieldData.value === previousNestedFieldData.value) {
       for (const key in nestedFieldData.nestedFields) {
+        if (
+          !previousNestedFieldData.nestedFields[key] &&
+          nestedFieldData.nestedFields[key] === ''
+        ) {
+          continue
+        }
         if (
           nestedFieldData.nestedFields[key] !==
           previousNestedFieldData.nestedFields[key]
@@ -1513,6 +1531,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       formSections,
       errorsOnFields
     )
+    const totalFileSizeExceeded = isFileSizeExceeded(declaration)
 
     return (
       <FullBodyContent>
@@ -1584,7 +1603,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </SectionContainer>
                 )
               })}
-              {event === Event.BIRTH && !isCorrection(declaration) && (
+              {!isCorrection(declaration) && (
                 <InputWrapper>
                   <InputField
                     id="additional_comments"
@@ -1596,21 +1615,32 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   </InputField>
                 </InputWrapper>
               )}
-              {!isCorrection(declaration) && (
-                <ReviewAction
-                  completeDeclaration={isComplete}
-                  declarationToBeValidated={this.userHasValidateScope()}
-                  declarationToBeRegistered={this.userHasRegisterScope()}
-                  alreadyRejectedDeclaration={
-                    this.props.draft.registrationStatus === REJECTED
-                  }
-                  draftDeclaration={draft}
-                  declaration={declaration}
-                  submitDeclarationAction={submitClickEvent}
-                  rejectDeclarationAction={rejectDeclarationClickEvent}
+              {totalFileSizeExceeded && (
+                <Warning
+                  label={intl.formatMessage(
+                    constantsMessages.totalFileSizeExceed,
+                    { fileSize: bytesToSize(ACCUMULATED_FILE_SIZE) }
+                  )}
                 />
               )}
-              {isCorrection(declaration) && (
+              {!isCorrection(declaration) ? (
+                <>
+                  <DuplicateWarning duplicateIds={declaration.duplicates} />
+                  <ReviewAction
+                    completeDeclaration={isComplete}
+                    totalFileSizeExceeded={totalFileSizeExceeded}
+                    declarationToBeValidated={this.userHasValidateScope()}
+                    declarationToBeRegistered={this.userHasRegisterScope()}
+                    alreadyRejectedDeclaration={
+                      this.props.draft.registrationStatus === REJECTED
+                    }
+                    draftDeclaration={draft}
+                    declaration={declaration}
+                    submitDeclarationAction={submitClickEvent}
+                    rejectDeclarationAction={rejectDeclarationClickEvent}
+                  />
+                </>
+              ) : (
                 <FooterArea>
                   <PrimaryButton
                     id="continue_button"

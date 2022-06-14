@@ -29,9 +29,8 @@ interface IConfigMessages
   birthTemplate: MessageDescriptor
   deathTemplate: MessageDescriptor
   birthDefaultTempDesc: MessageDescriptor
-  birthUpdatedTempDesc: MessageDescriptor
+  eventUpdatedTempDesc: MessageDescriptor
   deathDefaultTempDesc: MessageDescriptor
-  deathUpdatedTempDesc: MessageDescriptor
   listDetailsQsn: MessageDescriptor
   applicationNameLabel: MessageDescriptor
   govermentLogoLabel: MessageDescriptor
@@ -105,7 +104,7 @@ const messagesToDefine: IConfigMessages = {
   govtLogoChangeMessage: {
     id: 'config.application.govtLogoChangeMessage',
     defaultMessage:
-      'Upload the Government logo to be used on the login and form decalation. Note certificate logo is uploaded as part of the certificate template.',
+      'Upload the Government logo to be used on the login and form declaration. Note certificate logo is uploaded as part of the certificate template.',
     description: 'Message for government logo change modal'
   },
   govtLogoChangeNotification: {
@@ -174,20 +173,15 @@ const messagesToDefine: IConfigMessages = {
     defaultMessage: 'Default birth certificate template',
     description: 'Label for default birth certificate template'
   },
-  birthUpdatedTempDesc: {
-    id: 'config.birthUpdatedTempDesc',
-    defaultMessage: 'Updated {birthLongDate}',
+  eventUpdatedTempDesc: {
+    id: 'config.eventUpdatedTempDesc',
+    defaultMessage: 'Updated {lastModified, date, ::MMMMddyyyy}',
     description: 'Label for updated birth certificate template'
   },
   deathDefaultTempDesc: {
     id: 'config.deathDefaultTempDesc',
     defaultMessage: 'Default death certificate template',
     description: 'Label for default death certificate template'
-  },
-  deathUpdatedTempDesc: {
-    id: 'config.deathUpdatedTempDesc',
-    defaultMessage: 'Updated {deathLongDate}',
-    description: 'Label for updated death certificate template'
   },
   certificateUploading: {
     id: 'config.certificate.certificateUploading',

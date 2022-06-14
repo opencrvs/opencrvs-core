@@ -44,7 +44,6 @@ export const SEARCH = '/search'
 export const SEARCH_RESULT = '/search-result/:searchType/:searchText'
 export const MY_RECORDS = '/my-records'
 export const MY_DRAFTS = '/my-drafts'
-export const REVIEW_DUPLICATES = '/duplicates/:declarationId'
 export const CONFIRMATION_SCREEN = '/confirm'
 export const CERTIFICATE_COLLECTOR =
   '/cert/collector/:registrationId/:eventType/:groupId'

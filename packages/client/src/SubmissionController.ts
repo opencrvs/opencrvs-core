@@ -34,6 +34,7 @@ import { RequestHandler } from 'mock-apollo-client'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { GraphQLError } from 'graphql'
 import { showUnassigned } from '@client/notification/actions'
+import { FIELD_AGENT_ROLES } from './utils/constants'
 
 const INTERVAL_TIME = 5000
 const HANGING_EXPIRE_MINUTES = 15
@@ -260,8 +261,13 @@ export class SubmissionController {
         declaration.trackingId = trackingId
       }
     }
-    const scopes = getScope(this.store.getState()) || []
-    await this.store.dispatch(updateRegistrarWorkqueue())
+    //It needs some times to elasticSearch to update index
+    const role = this.store.getState().offline.userDetails?.role
+    const isFieldAgent = role && FIELD_AGENT_ROLES.includes(role) ? true : false
+    const userId = this.store.getState().offline.userDetails?.practitionerId
+    await this.store.dispatch(
+      updateRegistrarWorkqueue(userId, 10, isFieldAgent)
+    )
     await this.store.dispatch(modifyDeclaration(declaration))
 
     if (
@@ -273,19 +279,7 @@ export class SubmissionController {
       declaration.submissionStatus === SUBMISSION_STATUS.REINSTATED ||
       declaration.submissionStatus === SUBMISSION_STATUS.REQUESTED_CORRECTION
     ) {
-      if (scopes.includes('declare')) {
-        const attachmentSectionKey = getAttachmentSectionKey(declaration.event)
-        if (
-          declaration.data &&
-          declaration.data[attachmentSectionKey] &&
-          Object.keys(declaration.data[attachmentSectionKey]).length > 0
-        ) {
-          delete declaration.data[attachmentSectionKey]
-        }
-        await this.store.dispatch(writeDeclaration(declaration))
-      } else {
-        await this.store.dispatch(deleteDeclaration(declaration))
-      }
+      await this.store.dispatch(deleteDeclaration(declaration))
     } else {
       await this.store.dispatch(writeDeclaration(declaration))
     }

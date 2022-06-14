@@ -199,7 +199,7 @@ describe('User root resolvers', () => {
         })
       )
 
-      expect(
+      return expect(
         resolvers.Query.searchUsers({}, {}, authHeaderFieldAgent)
       ).rejects.toThrow(
         'Search user is only allowed for sysadmin or registrar or registration agent'
@@ -445,7 +445,7 @@ describe('User root resolvers', () => {
         })
       )
 
-      expect(
+      return expect(
         resolvers.Query.searchFieldAgents(
           {},
           {
@@ -624,7 +624,7 @@ describe('User root resolvers', () => {
         })
       )
 
-      expect(
+      return expect(
         resolvers.Mutation.activateUser(
           {},
           {
@@ -690,7 +690,7 @@ describe('User root resolvers', () => {
     it('throws error if @user-mgnt/changeUserPassword sends anything but 200', async () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
 
-      expect(
+      return expect(
         resolvers.Mutation.changePassword(
           {},
           {
@@ -774,17 +774,13 @@ describe('User root resolvers', () => {
       expect(response).toEqual(true)
     })
     it('throws error if @user-mgnt/changeUserPhone sends anything but 201', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          statusCode: '401'
-        })
-      )
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
 
       const nonce = '12345'
       const mobile = '0711111111'
       const code = await generateVerificationCode(nonce, mobile)
 
-      expect(
+      return expect(
         resolvers.Mutation.changePhone(
           {},
           {
@@ -804,7 +800,7 @@ describe('User root resolvers', () => {
       const mobile = '0711111111'
       const code = await generateVerificationCode(nonce, mobile)
 
-      expect(
+      return expect(
         resolvers.Mutation.changePhone(
           {},
           {
@@ -858,8 +854,8 @@ describe('User root resolvers', () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
       const avatar = {
-        type: 'image/png;base64',
-        data: 'aGVsbG8gd29ybGQ='
+        type: 'image/jpeg',
+        data: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gIoSUNDX1BST0ZJTEUAAQEAAAIYAAAAAAQwAABtbnRyUkdCIFhZWiAAAAAAAAAAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAAHRyWFlaAAABZAAAABRnWFlaAAABeAAAABRiWFlaAAABjAAAABRyVFJDAAABoAAAAChnVFJDAAABoAAAAChiVFJDAAABoAAAACh3dHB0AAAByAAAABRjcHJ0AAAB3AAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAFgAAAAcAHMAUgBHAEIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFhZWiAAAAAAAABvogAAOPUAAAOQWFlaIAAAAAAAAGKZAAC3hQAAGNpYWVogAAAAAAAAJKAAAA+EAAC2z3BhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABYWVogAAAAAAAA9tYAAQAAAADTLW1sdWMAAAAAAAAAAQAAAAxlblVTAAAAIAAAABwARwBvAG8AZwBsAGUAIABJAG4AYwAuACAAMgAwADEANv/bAEMAAwICAgICAwICAgMDAwMEBgQEBAQECAYGBQYJCAoKCQgJCQoMDwwKCw4LCQkNEQ0ODxAQERAKDBITEhATDxAQEP/bAEMBAwMDBAMECAQECBALCQsQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEP/AABEIAAEAAQMBIgACEQEDEQH/xAAVAAEBAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAVAQEBAAAAAAAAAAAAAAAAAAAFCP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AJngKoCP/9k='
       }
 
       const response = await resolvers.Mutation.changeAvatar(
@@ -876,14 +872,14 @@ describe('User root resolvers', () => {
     it('throws error if @user-mgnt/changeUserAvatar sends anything but 200', async () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
 
-      expect(
+      return expect(
         resolvers.Mutation.changeAvatar(
           {},
           {
             userId: 'ba7022f0ff4822',
             avatar: {
               type: 'image/png;base64',
-              data: 'aGVsbG8gd29ybGQ='
+              data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAQSURBVHgBAQUA+v8AAAAA/wEEAQB5fl4xAAAAAElFTkSuQmCC'
             }
           },
           authHeaderValidUser
@@ -893,14 +889,14 @@ describe('User root resolvers', () => {
       )
     })
     it("throws error if any user tries to update some other user's avatar", async () => {
-      expect(
+      return expect(
         resolvers.Mutation.changeAvatar(
           {},
           {
             userId: 'ba7022f0ff4822',
             avatar: {
               type: 'image/png;base64',
-              data: 'aGVsbG8gd29ybGQ='
+              data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAQSURBVHgBAQUA+v8AAAAA/wEEAQB5fl4xAAAAAElFTkSuQmCC'
             }
           },
           authHeaderInValidUser

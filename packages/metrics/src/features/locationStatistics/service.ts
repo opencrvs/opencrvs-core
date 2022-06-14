@@ -11,61 +11,60 @@
  */
 import {
   fetchLocation,
-  fetchChildLocationsWithTypeByParentId,
   fetchChildLocationsByParentId,
   fetchLocationsByType,
   countUsersByLocation,
-  ICountByLocation
+  ICountByLocation,
+  fetchAllChildLocationsByParentId
 } from '@metrics/api'
 import { getPopulation, getLocationType } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
 
 interface ILocationStatisticsResponse {
   registrars: number
-  population?: number
+  population: number
   offices: number
-}
-
-function getCRVSOfficeStatistics(
-  location: fhir.Location,
-  registrarsCountByLocation: Array<ICountByLocation>
-) {
-  const registrars =
-    registrarsCountByLocation.find(
-      ({ locationId }) => locationId === location.id
-    )?.total || 0
-  return {
-    registrars,
-    offices: 1
-  }
 }
 
 async function getAdminLocationStatistics(
   location: fhir.Location,
   registrarsCountByLocation: Array<ICountByLocation>,
   populationYear: number,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  cumulativeResult: ILocationStatisticsResponse = {
+    population: 0,
+    offices: 0,
+    registrars: 0
+  }
 ): Promise<ILocationStatisticsResponse> {
-  const population = getPopulation(location, populationYear)
-  let offices = 0
-  let registrars = 0
-  const locationOffices = await fetchChildLocationsWithTypeByParentId(
+  if (!cumulativeResult.population) {
+    cumulativeResult.population = getPopulation(location, populationYear)
+  }
+
+  const childLocations = await fetchAllChildLocationsByParentId(
     location.id as string,
-    'CRVS_OFFICE',
     authHeader
   )
-  for (const office of locationOffices) {
-    offices += 1
-    registrars +=
-      registrarsCountByLocation.find(
-        ({ locationId }) => locationId === office.id
-      )?.total || 0
+
+  for (const each of childLocations) {
+    if (getLocationType(each) === 'CRVS_OFFICE') {
+      cumulativeResult.offices += 1
+      cumulativeResult.registrars +=
+        registrarsCountByLocation.find(
+          ({ locationId }) => locationId === each.id
+        )?.total || 0
+    } else {
+      await getAdminLocationStatistics(
+        each,
+        registrarsCountByLocation,
+        populationYear,
+        authHeader,
+        cumulativeResult
+      )
+    }
   }
-  return {
-    population,
-    offices,
-    registrars
-  }
+
+  return cumulativeResult
 }
 
 async function getCountryWideLocationStatistics(
@@ -109,16 +108,12 @@ export async function getLocationStatistics(
   )
   if (locationId) {
     const location = await fetchLocation(locationId, authHeader)
-    if (getLocationType(location) !== 'CRVS_OFFICE') {
-      return getAdminLocationStatistics(
-        location,
-        registrarsCountByLocation,
-        populationYear,
-        authHeader
-      )
-    } else {
-      return getCRVSOfficeStatistics(location, registrarsCountByLocation)
-    }
+    return getAdminLocationStatistics(
+      location,
+      registrarsCountByLocation,
+      populationYear,
+      authHeader
+    )
   } else {
     return getCountryWideLocationStatistics(
       populationYear,

@@ -371,6 +371,7 @@ describe('In Progress tab', () => {
           id: 'bd22s7c5-ad87-4117-91c1-35eaf2ese32bw',
           event: Event.BIRTH,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
+          modifiedOn: TIME_STAMP,
           data: {
             child: {
               familyNameEng: 'Hoque'
@@ -403,7 +404,7 @@ describe('In Progress tab', () => {
         {
           id: 'cc66d69c-7f0a-4047-9283-f066571830f4',
           event: Event.DEATH,
-          modifiedOn: TIME_STAMP,
+          modifiedOn: TIME_STAMP + 1,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
             '': {}
@@ -683,7 +684,7 @@ describe('In Progress tab', () => {
       testComponent.update()
 
       expect(window.location.href).toContain(
-        '/record-audit/inProgressTab/956281c9-1f47-4c26-948a-970dd23c4094'
+        '/record-audit/notificationTab/956281c9-1f47-4c26-948a-970dd23c4094'
       )
     })
 
