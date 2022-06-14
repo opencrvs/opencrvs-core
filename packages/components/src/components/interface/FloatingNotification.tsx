@@ -16,7 +16,7 @@ import { Spinner } from './Spinner'
 import { ITheme } from '../theme'
 import NotificationError from '../icons/NotificationError'
 
-const NOTIFICATION_AUTO_HIDE_TIMEOUT = 3000 // Three seconds
+const NOTIFICATION_AUTO_HIDE_TIMEOUT = 20000 // 20 seconds
 
 export enum NOTIFICATION_TYPE {
   SUCCESS = 'success',
