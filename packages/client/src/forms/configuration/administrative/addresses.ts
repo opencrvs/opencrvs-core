@@ -60,7 +60,7 @@ const primaryAddressSameAsOtherPrimaryAddress =
   'values.primaryAddressSameAsOtherPrimary'
 
 // secondary addresses are not enabled
-const secondaryAddressesDisabled = '!window.config.ADDRESSES==2'
+const secondaryAddressesDisabled = 'window.config.ADDRESSES!=2'
 
 export enum AddressSubsections {
   PRIMARY_ADDRESS_SUBSECTION = 'primaryAddress',
@@ -130,12 +130,12 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.secondaryAddress,
-        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant} && ${secondaryAddressesDisabled}) || (${secondaryAddressesDisabled})`
+        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant}) || (${secondaryAddressesDisabled})`
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
         informant: false,
-        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant} && ${secondaryAddressesDisabled}) || (${secondaryAddressesDisabled})`
+        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant}) || (${secondaryAddressesDisabled})`
       }
     ]
   },
@@ -442,26 +442,6 @@ export const getXAddressSameAsY = (
   return [copyAddressField]
 }
 
-const shouldAddAddressFields = (
-  configuration: AllowedAddressConfigurations
-) => {
-  if (
-    (configuration.config === AddressSubsections.SECONDARY_ADDRESS_SUBSECTION ||
-      configuration.config === AddressCases.SECONDARY_ADDRESS) &&
-    window.config.ADDRESSES === 2
-  ) {
-    return true
-  } else if (
-    (configuration.config === AddressSubsections.SECONDARY_ADDRESS_SUBSECTION ||
-      configuration.config === AddressCases.SECONDARY_ADDRESS) &&
-    window.config.ADDRESSES === 1
-  ) {
-    return false
-  } else {
-    return true
-  }
-}
-
 export function populateRegisterFormsWithAddresses(
   defaultEventForm: ISerializedForm,
   event: string
@@ -479,14 +459,8 @@ export function populateRegisterFormsWithAddresses(
         let addressFields: SerializedFormField[] = []
         let previewGroups: IPreviewGroup[] = []
         configurations.forEach((configuration) => {
-          if (shouldAddAddressFields(configuration)) {
-            addressFields = addressFields.concat(
-              getAddressFields(configuration)
-            )
-            previewGroups = previewGroups.concat(
-              getPreviewGroups(configuration)
-            )
-          }
+          addressFields = addressFields.concat(getAddressFields(configuration))
+          previewGroups = previewGroups.concat(getPreviewGroups(configuration))
         })
         newForm.sections[sectionIndex].groups[groupIndex].fields.splice(
           fieldIndex + 1,
