@@ -696,7 +696,10 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
               id="event-select"
               withLightTheme={true}
               defaultWidth={110}
-              value={(event as unknown as EVENT_OPTIONS) || EVENT_OPTIONS.BIRTH}
+              value={
+                (event?.toUpperCase() as unknown as EVENT_OPTIONS) ||
+                EVENT_OPTIONS.BIRTH
+              }
               options={[
                 {
                   label: intl.formatMessage(messages.eventOptionForBirths),
