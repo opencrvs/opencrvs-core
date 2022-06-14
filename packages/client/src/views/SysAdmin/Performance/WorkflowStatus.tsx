@@ -164,7 +164,13 @@ const statusOptions = [
 const PrimaryContactLabelMapping = {
   MOTHER: formMessages.contactDetailsMother,
   FATHER: formMessages.contactDetailsFather,
-  INFORMANT: formMessages.contactDetailsInformant
+  INFORMANT: formMessages.contactDetailsInformant,
+  OTHER_FAMILY_MEMBER: formMessages.otherFamilyMember,
+  LEGAL_GUARDIAN: formMessages.legalGuardian,
+  GRANDMOTHER: formMessages.grandmother,
+  GRANDFATHER: formMessages.grandfather,
+  BROTHER: formMessages.brother,
+  SISTER: formMessages.sister
 }
 
 type PrimaryContact = keyof typeof PrimaryContactLabelMapping
