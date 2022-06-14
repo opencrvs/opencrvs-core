@@ -135,7 +135,9 @@ function useSelectedField() {
   const fields = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
-  const selectedField = selectedFieldId ? fields[selectedFieldId] : null
+  /* fields can be undefined if section is 'settings'*/
+  const selectedField =
+    selectedFieldId && fields ? fields[selectedFieldId] : null
   /*
    * We need to clear the selected field if section changes
    * as the changed section won't have the previously selected field
