@@ -15,7 +15,6 @@ import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import styled from '@client/styledComponents'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
 import {
   ListViewItemSimplified,
   ListViewSimplified
@@ -29,6 +28,7 @@ import { selectConfigFields } from '@client/forms/configuration/formConfig/selec
 import { useParams } from 'react-router'
 import { addCustomField } from '@client/forms/configuration/formConfig/actions'
 import { flushSync } from 'react-dom'
+import { CenteredToggle } from './components'
 
 const TitleContainer = styled.div`
   margin-top: 24px;
@@ -39,10 +39,6 @@ const TitleContainer = styled.div`
 const Label = styled.span`
   ${({ theme }) => theme.fonts.reg14};
   color: ${({ theme }) => theme.colors.grey600};
-`
-
-const CenteredToggle = styled(Toggle)`
-  align-self: center;
 `
 
 const MESSAGE_MAP: Record<CustomFieldType, MessageDescriptor> = {
