@@ -574,12 +574,12 @@ function UserListComponent(props: IProps) {
               locationId,
               userDetails
             )
+            const totalUser =
+              (data && data.searchUsers && data.searchUsers.totalItems) || 0
             return (
               <UserTable id="user_list">
                 <TableHeader>
-                  {(data && data.searchUsers && data.searchUsers.totalItems) ||
-                    0}{' '}
-                  users
+                  {intl.formatMessage(messages.totalUsers, { totalUser })}
                   {!getViewOnly(locationId, userDetails, false) && (
                     <AddUserContainer id="add-user" onClick={onClickAddUser}>
                       <AddUserIcon />
