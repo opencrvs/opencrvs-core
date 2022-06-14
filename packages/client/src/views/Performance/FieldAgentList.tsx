@@ -55,7 +55,6 @@ import {
   DesktopWrapper
 } from '@opencrvs/components/lib/styleForPagination'
 import { userMessages } from '@client/i18n/messages'
-import { useCallback } from 'react'
 
 const ToolTipContainer = styled.span`
   text-align: center;
