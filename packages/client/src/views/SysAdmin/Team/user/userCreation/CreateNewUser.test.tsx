@@ -478,11 +478,11 @@ describe('edit user tests', () => {
     it('clicking on any change button takes user to form', async () => {
       const changeButtonOfType = await waitForElement(
         component,
-        '#btn_change_type'
+        '#btn_change_device'
       )
       changeButtonOfType.hostNodes().first().simulate('click')
       await flushPromises()
-      expect(history.location.hash).toBe('#type')
+      expect(history.location.hash).toBe('#device')
     })
 
     it('clicking confirm button starts submitting the form', async () => {
