@@ -17,7 +17,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: row;
   width: auto;
-  align-items: center;
+  align-items: flex-start;
 `
 
 const Label = styled.label<{
@@ -29,6 +29,7 @@ const Label = styled.label<{
   color: ${({ theme, disabled }) =>
     disabled ? theme.colors.disabled : theme.colors.copy};
   cursor: pointer;
+  align-self: center;
   ${({ size, theme }) =>
     size === 'large'
       ? `
@@ -77,12 +78,15 @@ const Check = styled.span<{ size?: string; disabled?: boolean }>`
   }
 `
 
-const Input = styled.input<{ disabled?: boolean }>`
+const Input = styled.input<{ size?: string; disabled?: boolean }>`
   position: absolute;
   opacity: 0;
+  margin: 0;
   z-index: 2;
-  width: 40px;
-  height: 40px;
+  ${({ size }) =>
+    size === 'large'
+      ? `height: 40px; width: 40px;`
+      : `height: 24px; width: 24px;`}
   cursor: pointer;
   &:focus ~ ${Check} {
     box-shadow: ${({ theme, disabled }) =>
@@ -134,6 +138,7 @@ export class RadioButton extends React.Component<IRadioButton> {
         <CheckOuter>
           <Input
             id={id}
+            size={size}
             disabled={disabled}
             role="radio"
             checked={value === selected}
