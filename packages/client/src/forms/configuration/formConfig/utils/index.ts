@@ -346,10 +346,6 @@ export function generateConfigFields(
   )
 }
 
-export function generateKeyFromObj(obj: any) {
-  return btoa(JSON.stringify(obj))
-}
-
 function configFieldsToQuestionConfigs(configFields: ISectionFieldMap) {
   const getPrecedingFieldId = ({ precedingFieldId, fieldId }: IConfigField) => {
     if (precedingFieldId === FieldPosition.TOP) {
