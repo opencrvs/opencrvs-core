@@ -43,6 +43,7 @@ import {
 } from '@client/declarations'
 import {
   FormFieldGenerator,
+  getInitialValueForSelectDynamicValue,
   ITouchedNestedFields
 } from '@client/components/form'
 import { RejectRegistrationForm } from '@client/components/review/RejectRegistrationForm'
@@ -55,7 +56,8 @@ import {
   IFormSectionGroup,
   IFormData,
   CorrectionSection,
-  IFormFieldValue
+  IFormFieldValue,
+  SELECT_WITH_DYNAMIC_OPTIONS
 } from '@client/forms'
 import {
   goBack as goBackAction,
@@ -66,7 +68,7 @@ import {
 } from '@client/navigation'
 import { toggleDraftSavedNotification } from '@client/notification/actions'
 import { HOME } from '@client/navigation/routes'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled, { keyframes } from '@client/styledComponents'
 import {
@@ -108,6 +110,7 @@ import {
   isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { IUserDetails } from '@client/utils/userUtils'
 
 const FormSectionTitle = styled.h4`
   ${({ theme }) => theme.fonts.h2};
@@ -919,11 +922,24 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 }
 
-function getInitialValue(field: IFormField, data: IFormData) {
+function getInitialValue(
+  field: IFormField,
+  data: IFormData,
+  userDetails?: IUserDetails | null
+) {
   let fieldInitialValue = field.initialValue
   if (field.initialValueKey) {
     fieldInitialValue =
       getValueFromDeclarationDataByKey(data, field.initialValueKey) || ''
+  }
+
+  if (
+    field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
+    !field.initialValue &&
+    field.dynamicOptions.initialValue === 'agentDefault' &&
+    userDetails !== undefined
+  ) {
+    fieldInitialValue = getInitialValueForSelectDynamicValue(field, userDetails)
   }
   return fieldInitialValue
 }
@@ -931,14 +947,15 @@ function getInitialValue(field: IFormField, data: IFormData) {
 export function replaceInitialValues(
   fields: IFormField[],
   sectionValues: any,
-  data?: IFormData
+  data?: IFormData,
+  userDetails?: IUserDetails | null
 ) {
   return fields.map((field) => ({
     ...field,
     initialValue:
       isUndefined(sectionValues[field.name]) ||
       isNull(sectionValues[field.name])
-        ? getInitialValue(field, data || {})
+        ? getInitialValue(field, data || {}, userDetails)
         : sectionValues[field.name]
   }))
 }
@@ -989,7 +1006,8 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
   const fields = replaceInitialValues(
     activeSectionGroup.fields,
     declaration.data[activeSection.id] || {},
-    declaration.data
+    declaration.data,
+    getUserDetails(state)
   )
 
   let updatedFields: IFormField[] = []

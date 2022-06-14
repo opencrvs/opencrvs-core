@@ -29,6 +29,7 @@ import styled from 'styled-components'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { constantsMessages } from '@client/i18n/messages/constants'
+import { buttonMessages } from '@client/i18n/messages/buttons'
 
 interface BaseProps {
   goToTeamUserList: typeof goToTeamUserList
@@ -100,6 +101,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
 
             <LocationSearch
               selectedLocation={this.state.selectedLocation}
+              buttonLabel={intl.formatMessage(buttonMessages.search)}
               locationList={Object.values(
                 offlineCountryConfiguration.offices
               ).map((location: ILocation) => {

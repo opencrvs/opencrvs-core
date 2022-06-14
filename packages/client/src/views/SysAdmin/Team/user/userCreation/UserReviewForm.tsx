@@ -21,7 +21,10 @@ import {
   SIMPLE_DOCUMENT_UPLOADER
 } from '@client/forms'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
-import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
+import {
+  getVisibleSectionGroupsBasedOnConditions,
+  getConditionalActionsForField
+} from '@client/forms/utils'
 import {
   buttonMessages as messages,
   userMessages,
@@ -164,38 +167,43 @@ class UserReviewFormComponent extends React.Component<
             ) : (
               intl.formatMessage(field.label)
             )
-
-          sections[sections.length - 1].items.push({
-            label: <Label>{label}</Label>,
-            value: <Value id={`value_${idx}`}>{this.getValue(field)}</Value>,
-            actions:
-              !(
-                field.name === 'registrationOffice' &&
-                this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
-              ) && !field.readonly ? (
-                <LinkButton
-                  id={`btn_change_${field.name}`}
-                  onClick={() => {
-                    this.props.userId
-                      ? this.props.goToUserReviewForm(
-                          this.props.userId,
-                          userFormSection.id,
-                          group.id,
-                          field.name
-                        )
-                      : this.props.goToCreateUserSection(
-                          userFormSection.id,
-                          group.id,
-                          field.name
-                        )
-                  }}
-                >
-                  {intl.formatMessage(messages.change)}
-                </LinkButton>
-              ) : (
-                <></>
-              )
-          })
+          if (
+            !getConditionalActionsForField(field, this.props.formData).includes(
+              'hide'
+            )
+          ) {
+            sections[sections.length - 1].items.push({
+              label: <Label>{label}</Label>,
+              value: <Value id={`value_${idx}`}>{this.getValue(field)}</Value>,
+              actions:
+                !(
+                  field.name === 'registrationOffice' &&
+                  this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
+                ) && !field.readonly ? (
+                  <LinkButton
+                    id={`btn_change_${field.name}`}
+                    onClick={() => {
+                      this.props.userId
+                        ? this.props.goToUserReviewForm(
+                            this.props.userId,
+                            userFormSection.id,
+                            group.id,
+                            field.name
+                          )
+                        : this.props.goToCreateUserSection(
+                            userFormSection.id,
+                            group.id,
+                            field.name
+                          )
+                    }}
+                  >
+                    {intl.formatMessage(messages.change)}
+                  </LinkButton>
+                ) : (
+                  <></>
+                )
+            })
+          }
         }
       })
     })
@@ -233,6 +241,7 @@ class UserReviewFormComponent extends React.Component<
       userFormSection,
       formData,
       goToTeamUserList,
+      userDetails,
       offlineCountryConfiguration
     } = this.props
     let title: string
@@ -248,7 +257,8 @@ class UserReviewFormComponent extends React.Component<
         <SuccessButton
           id="submit-edit-user-form"
           disabled={
-            this.props.formData.role === 'LOCAL_REGISTRAR' &&
+            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
+              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}
@@ -264,7 +274,8 @@ class UserReviewFormComponent extends React.Component<
         <PrimaryButton
           id="submit_user_form"
           disabled={
-            this.props.formData.role === 'LOCAL_REGISTRAR' &&
+            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
+              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}
@@ -277,14 +288,21 @@ class UserReviewFormComponent extends React.Component<
       <ActionPageLight
         title={title}
         goBack={this.props.goBack}
-        goHome={() =>
-          locationDetails &&
-          goToTeamUserList({
-            id: locationDetails.id,
-            searchableText: locationDetails.name,
-            displayLabel: locationDetails.name
-          })
-        }
+        goHome={() => {
+          if (locationDetails) {
+            goToTeamUserList({
+              id: locationDetails.id,
+              searchableText: locationDetails.name,
+              displayLabel: locationDetails.name
+            })
+          } else if (userDetails?.primaryOffice?.id) {
+            goToTeamUserList({
+              id: userDetails.primaryOffice.id,
+              searchableText: '',
+              displayLabel: ''
+            })
+          }
+        }}
       >
         {!this.props.userId && (
           <FormTitle id={`${section.id}_title`}>

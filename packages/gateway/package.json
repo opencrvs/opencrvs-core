@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/gateway",
-  "version": "1.0.0-alpha.3.2",
+  "version": "1.0.0",
   "description": "OpenCRVS API Gateway with GraphQL",
   "license": "MPL-2.0",
   "scripts": {
@@ -26,7 +26,7 @@
     "@graphql-tools/load": "^6.0.9",
     "@graphql-tools/schema": "^6.0.9",
     "@hapi/hapi": "^20.0.1",
-    "@opencrvs/commons": "^1.0.0-alpha.3.2",
+    "@opencrvs/commons": "^1.0.0",
     "@sentry/node": "^5.10.2",
     "@types/archiver": "^3.0.0",
     "@types/flat": "^0.0.28",
