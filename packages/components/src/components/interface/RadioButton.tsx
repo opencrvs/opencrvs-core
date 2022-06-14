@@ -78,13 +78,13 @@ const Check = styled.span<{ size?: string; disabled?: boolean }>`
   }
 `
 
-const Input = styled.input<{ size?: string; disabled?: boolean }>`
+const Input = styled.input<{ buttonSize?: string; disabled?: boolean }>`
   position: absolute;
   opacity: 0;
   margin: 0;
   z-index: 2;
-  ${({ size }) =>
-    size === 'large'
+  ${({ buttonSize }) =>
+    buttonSize === 'large'
       ? `height: 40px; width: 40px;`
       : `height: 24px; width: 24px;`}
   cursor: pointer;
@@ -138,7 +138,7 @@ export class RadioButton extends React.Component<IRadioButton> {
         <CheckOuter>
           <Input
             id={id}
-            size={size}
+            buttonSize={size}
             disabled={disabled}
             role="radio"
             checked={value === selected}
