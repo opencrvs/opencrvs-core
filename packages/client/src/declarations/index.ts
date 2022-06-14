@@ -759,10 +759,8 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
       }
       return true
     })
-  }
 
-  // Storing the declarations again by excluding the 24 hours old downloaded declaration
-  if (currentUserData) {
+    // Storing the declarations again by excluding the 24 hours old downloaded declaration
     currentUserData.declarations = currentUserDeclarations
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))
   }
