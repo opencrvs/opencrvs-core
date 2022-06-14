@@ -62,6 +62,10 @@ import {
 } from '@opencrvs/components/lib/interface/Content'
 import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
 import { TableView } from '@opencrvs/components/lib/interface/TableView'
+import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
+import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -105,8 +109,6 @@ const INITIAL_SORT_MAP = {
   timeLoggedWaitingValidation: SORT_ORDER.ASCENDING,
   timeLoggedRegistered: SORT_ORDER.ASCENDING
 }
-
-const DEFAULT_DECLARATION_STATUS_PAGE_SIZE = 25
 
 export const StatusMapping: IStatusMapping = {
   IN_PROGRESS: {
@@ -206,7 +208,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   const [columnToBeSort, setColumnToBeSort] = useState<keyof SortMap>(
     'declarationStartedOn'
   )
-  const recordCount = DEFAULT_DECLARATION_STATUS_PAGE_SIZE * currentPageNumber
+  const pageSize = 10
 
   let timeStart: string | Date = subYears(new Date(Date.now()), 1)
   let timeEnd: string | Date = new Date(Date.now())
@@ -666,6 +668,10 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     })
   }
 
+  const onPageChange = (paginationId: number) => {
+    setCurrentPageNumber(paginationId)
+  }
+
   return (
     <SysAdminContentWrapper id="workflow-status" isCertificatesConfigPage>
       <Content
@@ -740,8 +746,8 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           query={FETCH_EVENTS_WITH_PROGRESS}
           variables={{
             locationId: locationId,
-            skip: 0,
-            count: recordCount,
+            skip: pageSize * (currentPageNumber - 1),
+            count: pageSize,
             status: (status && [status]) || undefined,
             type:
               (event && [
@@ -776,22 +782,31 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   hideBoxShadow
                   fixedWidth={2050}
                   tableHeight={150}
-                  currentPage={currentPageNumber}
-                  pageSize={recordCount}
-                  totalItems={total}
                   highlightRowOnMouseOver
-                  onPageChange={(currentPage: number) => {
-                    setCurrentPageNumber(currentPage)
-                  }}
-                  loadMoreText={intl.formatMessage(
-                    messages.showMoreUsersLinkLabel,
-                    {
-                      pageSize: DEFAULT_DECLARATION_STATUS_PAGE_SIZE
-                    }
-                  )}
+                  noPagination
                   isFullPage
                 />
                 {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
+                {total > pageSize && (
+                  <PaginationWrapper id="pagination_container">
+                    <DesktopWrapper>
+                      <PaginationModified
+                        size="small"
+                        initialPage={currentPageNumber}
+                        totalPages={Math.ceil(total / pageSize)}
+                        onPageChange={onPageChange}
+                      />
+                    </DesktopWrapper>
+                    <MobileWrapper>
+                      <PaginationModified
+                        size="large"
+                        initialPage={currentPageNumber}
+                        totalPages={Math.ceil(total / pageSize)}
+                        onPageChange={onPageChange}
+                      />
+                    </MobileWrapper>
+                  </PaginationWrapper>
+                )}
               </>
             )
           }}
