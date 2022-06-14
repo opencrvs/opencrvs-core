@@ -329,12 +329,9 @@ function FieldAgentListComponent(props: IProps) {
     ]
   }
 
-  const getFieldAgentTypeLabel = useCallback(
-    (type) => {
-      return userMessages[type] ? intl.formatMessage(userMessages[type]) : type
-    },
-    [intl]
-  )
+  function getFieldAgentTypeLabel(type: string) {
+    return userMessages[type] ? intl.formatMessage(userMessages[type]) : type
+  }
 
   function getContent(data?: GQLSearchFieldAgentResult) {
     const content =
