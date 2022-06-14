@@ -257,7 +257,8 @@ class UserReviewFormComponent extends React.Component<
         <SuccessButton
           id="submit-edit-user-form"
           disabled={
-            this.props.formData.role === 'LOCAL_REGISTRAR' &&
+            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
+              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}
@@ -273,7 +274,8 @@ class UserReviewFormComponent extends React.Component<
         <PrimaryButton
           id="submit_user_form"
           disabled={
-            this.props.formData.role === 'LOCAL_REGISTRAR' &&
+            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
+              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}
