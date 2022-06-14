@@ -167,16 +167,6 @@ function isFromDifferentSections(fieldIdA: string, fieldIdB: string) {
   return sectionA !== sectionB
 }
 
-function removePrecedingFieldIdAcrossSections({
-  precedingFieldId,
-  fieldId
-}: IConfigField) {
-  return precedingFieldId === FieldPosition.TOP ||
-    isFromDifferentSections(precedingFieldId, fieldId)
-    ? FieldPosition.TOP
-    : precedingFieldId
-}
-
 function removeForegoingFieldIdAcrossSections({
   foregoingFieldId,
   fieldId
@@ -358,7 +348,6 @@ export function generateConfigFields(
     })
     .map((configField) => ({
       ...configField,
-      precedingFieldId: removePrecedingFieldIdAcrossSections(configField),
       foregoingFieldId: removeForegoingFieldIdAcrossSections(configField)
     }))
 

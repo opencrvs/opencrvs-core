@@ -11,9 +11,9 @@
  */
 import { CustomFieldType, Event } from '@client/utils/gateway'
 import { Message } from 'typescript-react-intl'
-import { ISerializedForm } from '@client/forms'
+import { ISerializedForm, BirthSection, DeathSection } from '@client/forms'
 import { FieldPosition } from '@client/forms/configuration'
-import { defaultFormToQuestionConfigs } from './transformers'
+import { defaultFormSectionToQuestionConfigs } from './transformers'
 
 export * from './transformers'
 
@@ -161,17 +161,29 @@ export function getConfiguredQuestions(
   defaultForm: ISerializedForm,
   customizedQuestions: IQuestionConfig[]
 ) {
-  const customizedQuestionsMap = customizedQuestions.reduce<
-    Record<string, IQuestionConfig>
-  >((accum, question) => ({ ...accum, [question.fieldId]: question }), {})
+  const sections = Object.values<BirthSection | DeathSection>(
+    event === Event.Birth ? BirthSection : DeathSection
+  )
+  return sections.reduce<IQuestionConfig[]>((orderedQuestions, section) => {
+    const isPreviouslyCustomized = (fieldId: string) =>
+      customizedQuestions.some(
+        (customizedQuestion) => customizedQuestion.fieldId === fieldId
+      )
 
-  const isPreviouslyCustomized = (fieldId: string) =>
-    fieldId in customizedQuestionsMap
+    const nonCustomizedQuestions = defaultFormSectionToQuestionConfigs(
+      event,
+      section,
+      defaultForm
+    ).filter((question) => !isPreviouslyCustomized(question.fieldId))
 
-  const nonCustomizedQuestions = defaultFormToQuestionConfigs(
-    event,
-    defaultForm
-  ).filter((question) => !isPreviouslyCustomized(question.fieldId))
-
-  return orderByPosition([...customizedQuestions, ...nonCustomizedQuestions])
+    return [
+      ...orderedQuestions,
+      ...orderByPosition([
+        ...customizedQuestions.filter(({ fieldId }) =>
+          fieldId.includes(section)
+        ),
+        ...nonCustomizedQuestions
+      ])
+    ]
+  }, [])
 }

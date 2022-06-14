@@ -22,11 +22,11 @@ import {
   getFieldIdentifiers,
   IQuestionConfig
 } from '.'
-import { ISerializedForm } from '@client/forms'
+import { ISerializedForm, BirthSection, DeathSection } from '@client/forms'
 import {
   getField,
   getFieldId,
-  getPrecedingDefaultFieldIdAcrossSections
+  getPrecedingDefaultFieldIdAcrossGroups
 } from '@client/forms/configuration/defaultUtils'
 import { Event, QuestionInput } from '@client/utils/gateway'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
@@ -53,7 +53,7 @@ function fieldIdentifiersToQuestionConfig(
     enabled: '',
     required,
     identifiers,
-    precedingFieldId: getPrecedingDefaultFieldIdAcrossSections(
+    precedingFieldId: getPrecedingDefaultFieldIdAcrossGroups(
       event,
       identifiers,
       defaultForm
@@ -61,9 +61,13 @@ function fieldIdentifiersToQuestionConfig(
   }
 }
 
-function formToFieldIdentifiers(defaultForm: ISerializedForm) {
+function formSectionToFieldIdentifiers(
+  defaultForm: ISerializedForm,
+  section: BirthSection | DeathSection
+) {
   return defaultForm.sections
     .map((section, sectionIndex) => ({ ...section, sectionIndex }))
+    .filter(({ id }) => id === section)
     .map(({ groups, sectionIndex }) =>
       groups.map((group, groupIndex) => ({
         ...group,
@@ -82,12 +86,14 @@ function formToFieldIdentifiers(defaultForm: ISerializedForm) {
     .flat()
 }
 
-export function defaultFormToQuestionConfigs(
+export function defaultFormSectionToQuestionConfigs(
   event: Event,
+  section: BirthSection | DeathSection,
   defaultForm: ISerializedForm
 ) {
-  return formToFieldIdentifiers(defaultForm).map((identifiers) =>
-    fieldIdentifiersToQuestionConfig(event, defaultForm, identifiers)
+  return formSectionToFieldIdentifiers(defaultForm, section).map(
+    (identifiers) =>
+      fieldIdentifiersToQuestionConfig(event, defaultForm, identifiers)
   )
 }
 
