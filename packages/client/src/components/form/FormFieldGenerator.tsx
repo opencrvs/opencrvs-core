@@ -94,7 +94,8 @@ import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
   FormattedMessage,
-  MessageDescriptor
+  MessageDescriptor,
+  useIntl
 } from 'react-intl'
 import {
   withFormik,
@@ -118,6 +119,7 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { buttonMessages } from '@client/i18n/messages/buttons'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -229,6 +231,7 @@ function GeneratedInputField({
     mode: fieldDefinition.mode
   }
 
+  const intl = useIntl()
   const inputProps = {
     id: fieldDefinition.name,
     onChange,
@@ -503,6 +506,7 @@ function GeneratedInputField({
     return (
       <InputField {...inputFieldProps}>
         <LocationSearchFormField
+          buttonLabel={intl.formatMessage(buttonMessages.search)}
           {...inputProps}
           selectedLocation={selectedLocation}
           locationList={fieldDefinition.locationList}
