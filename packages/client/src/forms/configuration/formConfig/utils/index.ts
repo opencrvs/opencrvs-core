@@ -213,6 +213,38 @@ function getConfigFieldsWithoutPreviewGroups(
 function getPreviewGroupConfigFields(
   previewGroupDefaultFields: IDefaultConfigFieldWithPreviewGroup[]
 ) {
+  /*
+   * We need to check if the precedingField or foregoingField
+   * is also a field with a previewGroup or not
+   */
+  const getPrecedingFieldId = (precedingFieldId: string) => {
+    if (precedingFieldId === FieldPosition.TOP) {
+      return precedingFieldId
+    }
+    const precedingPreviewGroupDefaultField = previewGroupDefaultFields.find(
+      ({ fieldId }) => fieldId === precedingFieldId
+    )
+    if (!precedingPreviewGroupDefaultField) {
+      return precedingFieldId
+    }
+    const { fieldId, previewGroup } = precedingPreviewGroupDefaultField
+    return getPreviewGroupFieldId(fieldId, previewGroup)
+  }
+
+  const getForegoingFieldId = (foregoingFieldId: string) => {
+    if (foregoingFieldId === FieldPosition.BOTTOM) {
+      return foregoingFieldId
+    }
+    const foregoingPreviewGroupDefaultField = previewGroupDefaultFields.find(
+      ({ fieldId }) => fieldId === foregoingFieldId
+    )
+    if (!foregoingPreviewGroupDefaultField) {
+      return foregoingFieldId
+    }
+    const { fieldId, previewGroup } = foregoingPreviewGroupDefaultField
+    return getPreviewGroupFieldId(fieldId, previewGroup)
+  }
+
   return previewGroupDefaultFields.reduce<IPreviewGroupConfigField[]>(
     (previewGroupConfigFields, previewGroupDefaultField) => {
       const { previewGroup, previewGroupLabel, ...defaultConfigField } =
@@ -229,13 +261,17 @@ function getPreviewGroupConfigFields(
           previewGroup,
           previewGroupLabel,
           configFields: [],
-          precedingFieldId: defaultConfigField.precedingFieldId,
+          precedingFieldId: getPrecedingFieldId(
+            defaultConfigField.precedingFieldId
+          ),
           foregoingFieldId: FieldPosition.BOTTOM
         })
       }
       previewGroupConfigField = {
         ...previewGroupConfigField,
-        foregoingFieldId: defaultConfigField.foregoingFieldId,
+        foregoingFieldId: getForegoingFieldId(
+          defaultConfigField.foregoingFieldId
+        ),
         configFields: [
           ...previewGroupConfigField.configFields,
           defaultConfigField
@@ -368,22 +404,17 @@ function configFieldsToQuestionConfigs(configFields: ISectionFieldMap) {
     Array<IDefaultQuestionConfig | ICustomQuestionConfig>
   >(
     (questionConfigs, sectionConfigFields) =>
-      Object.values(sectionConfigFields).reduce(
-        (sectionQuestionConfigs, configField) => {
+      Object.values(sectionConfigFields)
+        .map((configField) => ({
+          ...configField,
+          precedingFieldId: getPrecedingFieldId(configField)
+        }))
+        .reduce((sectionQuestionConfigs, configField) => {
           return [
             ...sectionQuestionConfigs,
-            ...configFieldToQuestionConfig(configField).map(
-              (questionConfig) => ({
-                ...questionConfig,
-                precedingFieldId: isPreviewGroupConfigField(configField)
-                  ? questionConfig.precedingFieldId
-                  : getPrecedingFieldId(configField)
-              })
-            )
+            ...configFieldToQuestionConfig(configField)
           ]
-        },
-        questionConfigs
-      ),
+        }, questionConfigs),
     []
   )
 }
