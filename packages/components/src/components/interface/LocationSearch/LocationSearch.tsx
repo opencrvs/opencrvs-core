@@ -111,6 +111,7 @@ interface IProps {
   error?: boolean
   touched?: boolean
   className?: string
+  buttonLabel: string
 }
 export class LocationSearch extends React.Component<IProps, IState> {
   searchTimeout: NodeJS.Timeout | undefined
@@ -288,7 +289,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
               onClick={this.props.searchButtonHandler}
               disabled={!(this.state.selectedItem && this.state.selectedText)}
             >
-              Search
+              {this.props.buttonLabel}
             </SearchButton>
           )}
         </LocationSearchContainer>
