@@ -391,7 +391,8 @@ interface UpdateRegistrarWorkqueueAction {
   type: typeof UPDATE_REGISTRAR_WORKQUEUE
   payload: {
     pageSize: number
-
+    userId?: string
+    isFieldAgent: boolean
     inProgressSkip: number
     healthSystemSkip: number
     reviewSkip: number
@@ -400,17 +401,6 @@ interface UpdateRegistrarWorkqueueAction {
     externalValidationSkip: number
     printSkip: number
   }
-}
-
-interface UpdateFieldAgentDeclaredDeclarationsAction {
-  type: typeof UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS
-}
-interface UpdateFieldAgentDeclaredDeclarationsSuccessAction {
-  type: typeof UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_SUCCESS
-  payload: string
-}
-interface UpdateFieldAgentDeclaredDeclarationsFailAction {
-  type: typeof UPDATE_FIELD_AGENT_DECLARED_DECLARATIONS_FAIL
 }
 
 interface IUnassignDeclaration {
