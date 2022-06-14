@@ -54,16 +54,16 @@ const NotificationContainer = styled.div`
   &.error,
   &.inProgress,
   &.warning {
-    background: ${({ theme }) => theme.colors.placeholder};
+    background: ${({ theme }) => theme.colors.supportingCopy};
     border-top: 10px solid;
   }
 
   &.success {
-    border-color: ${({ theme }) => theme.colors.success};
+    border-color: ${({ theme }) => theme.colors.positive};
   }
 
   &.error {
-    border-color: ${({ theme }) => theme.colors.error};
+    border-color: ${({ theme }) => theme.colors.negative};
   }
 
   &.inProgress {
@@ -71,7 +71,7 @@ const NotificationContainer = styled.div`
   }
 
   &.warning {
-    border-color: ${({ theme }) => theme.colors.warning};
+    border-color: ${({ theme }) => theme.colors.neutral};
   }
 
   &.clickable {

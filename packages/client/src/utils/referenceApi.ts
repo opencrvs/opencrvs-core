@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ISerializedForm } from '@client/forms'
+import { IFormConfig } from '@client/forms'
 import { ILanguage } from '@client/i18n/reducer'
 import { ILocation } from '@client/offline/reducer'
-import { IPDFTemplate } from '@client/pdfRenderer/transformer/types'
 import { getToken } from '@client/utils/authUtils'
-import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
+import { Event } from '@client/forms'
 
 export interface ILocationDataResponse {
   [locationId: string]: ILocation
@@ -22,30 +21,101 @@ export interface ILocationDataResponse {
 export interface IFacilitiesDataResponse {
   [facilityId: string]: ILocation
 }
-export interface IDefinitionsResponse {
+export interface IContentResponse {
   languages: ILanguage[]
-  forms: {
-    registerForm: { birth: ISerializedForm; death: ISerializedForm }
-    certificateCollectorDefinition: {
-      birth: ICertificateCollectorDefinition
-      death: ICertificateCollectorDefinition
-    }
-    userForm: ISerializedForm
-  }
-  templates: {
-    receipt?: IPDFTemplate
-    certificates: {
-      birth: IPDFTemplate
-      death: IPDFTemplate
-    }
-  }
 }
+
 export interface IAssetResponse {
   logo: string
 }
+export interface ICountryLogo {
+  fileName: string
+  file: string
+}
 
-async function loadDefinitions(): Promise<IDefinitionsResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/definitions/client`
+export interface ICertificateTemplateData {
+  event: Event
+  status: string
+  svgCode: string
+  svgDateCreated: string
+  svgDateUpdated: string
+  svgFilename: string
+  user: string
+  id: string
+}
+
+interface ICurrency {
+  isoCode: string
+  languagesAndCountry: string[]
+}
+
+export interface IApplicationConfig {
+  APPLICATION_NAME: string
+  BACKGROUND_SYNC_BROADCAST_CHANNEL: string
+  BIRTH: {
+    REGISTRATION_TARGET: number
+    LATE_REGISTRATION_TARGET: number
+    FEE: {
+      ON_TIME: number
+      LATE: number
+      DELAYED: number
+    }
+  }
+  COUNTRY: string
+  COUNTRY_LOGO: ICountryLogo
+  CURRENCY: ICurrency
+  COUNTRY_LOGO_RENDER_WIDTH: number
+  COUNTRY_LOGO_RENDER_HEIGHT: number
+  DESKTOP_TIME_OUT_MILLISECONDS: number
+  DEATH: {
+    REGISTRATION_TARGET: number
+    FEE: {
+      ON_TIME: number
+      DELAYED: number
+    }
+  }
+  LANGUAGES: string
+  UI_POLLING_INTERVAL: number
+  FIELD_AGENT_AUDIT_LOCATIONS: string
+  DECLARATION_AUDIT_LOCATIONS: string
+  INFORMANT_MINIMUM_AGE: number
+  HIDE_EVENT_REGISTER_INFORMATION: boolean
+  EXTERNAL_VALIDATION_WORKQUEUE: boolean
+  SENTRY: string
+  LOGROCKET: string
+  PHONE_NUMBER_PATTERN: RegExp
+  NID_NUMBER_PATTERN: RegExp
+  ADDRESSES: number
+}
+
+export interface IApplicationConfigResponse {
+  config: IApplicationConfig
+  certificates: ICertificateTemplateData[]
+  formConfig: IFormConfig
+}
+
+async function loadConfig(): Promise<IApplicationConfigResponse> {
+  const url = `${window.config.CONFIG_API_URL}/config`
+  const res = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+  if (res && res.status !== 200) {
+    throw Error(res.statusText)
+  }
+  const response = await res.json()
+  response.certificates = response.certificates.map(
+    ({ _id, ...rest }: { _id: string }) => {
+      return { ...rest, id: _id }
+    }
+  )
+  return response
+}
+
+async function loadContent(): Promise<IContentResponse> {
+  const url = `${window.config.COUNTRY_CONFIG_URL}/content/client`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -59,7 +129,10 @@ async function loadDefinitions(): Promise<IDefinitionsResponse> {
   }
 
   const response = await res.json()
-  return response
+
+  return {
+    ...response
+  }
 }
 
 async function loadLocations(): Promise<ILocationDataResponse> {
@@ -127,9 +200,12 @@ const toDataURL = (url: string) =>
           reader.readAsDataURL(blob)
         })
     )
+    .catch((error) => {
+      throw error
+    })
 
 async function loadAssets(): Promise<IAssetResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/assets/${window.config.COUNTRY_LOGO_FILE}`
+  const url = `${window.config.COUNTRY_CONFIG_URL}/assets/${window.config.COUNTRY_LOGO.fileName}`
 
   return toDataURL(url).then((dataUrl) => {
     return {
@@ -142,6 +218,7 @@ export const referenceApi = {
   loadLocations,
   loadFacilities,
   loadPilotLocations,
-  loadDefinitions,
-  loadAssets
+  loadContent,
+  loadAssets,
+  loadConfig
 }

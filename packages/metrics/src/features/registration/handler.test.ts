@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@metrics/index'
+import { createServer } from '@metrics/server'
 import * as api from '@metrics/api'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -29,6 +29,15 @@ const token = jwt.sign(
     audience: 'opencrvs:metrics-user'
   }
 )
+
+jest.mock('../metrics/utils', () => {
+  const originalModule = jest.requireActual('../metrics//utils')
+  return {
+    __esModule: true,
+    ...originalModule,
+    getRegistrationTargetDays: () => 45
+  }
+})
 
 describe('When a new registration event is received', () => {
   let server: any
@@ -110,10 +119,10 @@ describe('When a new registration event is received', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -249,6 +258,34 @@ describe('When a new registration event is received', () => {
         {
           fullUrl: 'urn:uuid:97de26f7-a9ea-4c46-a974-9be38cac41ca',
           resource: {
+            _id: '625baca6c347200032c3b72b',
+            resourceType: 'Encounter',
+            status: 'finished',
+            location: [
+              {
+                location: {
+                  reference: 'Location/f05c6382-4781-4fa4-98f2-72c4433dc2f7'
+                }
+              }
+            ],
+            meta: {
+              lastUpdated: '2022-04-17T05:59:02.686+00:00',
+              versionId: '3484c5eb-20c0-46df-82dc-2c138ff3c800'
+            },
+            _transforms: {
+              meta: {
+                lastUpdated: '2022-04-17T05:59:02.686Z'
+              }
+            },
+            _request: {
+              method: 'POST'
+            },
+            id: '039bcc8e-bb36-4ab1-97fb-95b92b07b7c1'
+          }
+        },
+        {
+          fullUrl: 'urn:uuid:97de26f7-a9ea-4c46-a974-9be38cac41ca',
+          resource: {
             resourceType: 'Patient',
             active: true,
             id: '6e33c50b-7e68-405e-a3a4-c8337c04a2f3',
@@ -277,7 +314,7 @@ describe('When a new registration event is received', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -291,7 +328,7 @@ describe('When a new registration event is received', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -307,8 +344,7 @@ describe('When a new registration event is received', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -367,10 +403,10 @@ describe('When a new registration event is received', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -422,6 +458,34 @@ describe('When a new registration event is received', () => {
             date: '2019-03-12T05:42:50.887Z',
             author: [],
             id: '61e34caf-3137-41b3-ac15-975a8a763d4c'
+          }
+        },
+        {
+          fullUrl: 'urn:uuid:97de26f7-a9ea-4c46-a974-9be38cac41ca',
+          resource: {
+            _id: '625baca6c347200032c3b72b',
+            resourceType: 'Encounter',
+            status: 'finished',
+            location: [
+              {
+                location: {
+                  reference: 'Location/f05c6382-4781-4fa4-98f2-72c4433dc2f7'
+                }
+              }
+            ],
+            meta: {
+              lastUpdated: '2022-04-17T05:59:02.686+00:00',
+              versionId: '3484c5eb-20c0-46df-82dc-2c138ff3c800'
+            },
+            _transforms: {
+              meta: {
+                lastUpdated: '2022-04-17T05:59:02.686Z'
+              }
+            },
+            _request: {
+              method: 'POST'
+            },
+            id: '039bcc8e-bb36-4ab1-97fb-95b92b07b7c1'
           }
         },
         {
@@ -534,7 +598,7 @@ describe('When a new registration event is received', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -548,7 +612,7 @@ describe('When a new registration event is received', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -564,8 +628,7 @@ describe('When a new registration event is received', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -624,10 +687,10 @@ describe('When a new registration event is received', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -775,7 +838,7 @@ describe('When a new registration event is received', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -789,7 +852,7 @@ describe('When a new registration event is received', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -805,8 +868,7 @@ describe('When a new registration event is received', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -865,10 +927,10 @@ describe('When a new registration event is received', () => {
               coding: [
                 {
                   system: 'http://opencrvs.org/doc-types',
-                  code: 'birth-application'
+                  code: 'birth-declaration'
                 }
               ],
-              text: 'Birth Application'
+              text: 'Birth Declaration'
             },
             class: {
               coding: [
@@ -1016,7 +1078,7 @@ describe('When a new registration event is received', () => {
             multipleBirthInteger: 1,
             address: [
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -1030,7 +1092,7 @@ describe('When a new registration event is received', () => {
                 country: 'BGD'
               },
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -1046,8 +1108,7 @@ describe('When a new registration event is received', () => {
             ],
             extension: [
               {
-                url:
-                  'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+                url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
                 extension: [
                   {
                     url: 'code',
@@ -1090,7 +1151,7 @@ describe('When a new registration event is received', () => {
   })
 })
 
-describe('When an existing application is marked registered', () => {
+describe('When an existing declaration is marked registered', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1107,12 +1168,13 @@ describe('When an existing application is marked registered', () => {
       },
       payload
     })
-    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-      ({ measurement }: { measurement: string }) =>
-        measurement === 'application_event_duration'
-    )
+    const declarationEventPoint =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'declaration_event_duration'
+      )
     expect(res.statusCode).toBe(200)
-    expect(applicationEventPoint).toMatchSnapshot()
+    expect(declarationEventPoint).toMatchSnapshot()
   })
   it('writes the delta between DECLARED and REGISTERED states to influxdb', async () => {
     const influxClient = require('@metrics/influxdb/client')
@@ -1125,12 +1187,13 @@ describe('When an existing application is marked registered', () => {
       },
       payload
     })
-    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-      ({ measurement }: { measurement: string }) =>
-        measurement === 'application_event_duration'
-    )
+    const declarationEventPoint =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'declaration_event_duration'
+      )
     expect(res.statusCode).toBe(200)
-    expect(applicationEventPoint).toMatchSnapshot()
+    expect(declarationEventPoint).toMatchSnapshot()
   })
   it('writes the delta between VALIDATED and WAITING_VALIDATION states to influxdb', async () => {
     const influxClient = require('@metrics/influxdb/client')
@@ -1140,18 +1203,19 @@ describe('When an existing application is marked registered', () => {
     fetchTaskHistory.mockResolvedValue(taskHistory)
     const res = await server.server.inject({
       method: 'POST',
-      url: '/events/birth/waiting-validation',
+      url: '/events/birth/waiting-external-resource-validation',
       headers: {
         Authorization: `Bearer ${token}`
       },
       payload
     })
-    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-      ({ measurement }: { measurement: string }) =>
-        measurement === 'application_event_duration'
-    )
+    const declarationEventPoint =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'declaration_event_duration'
+      )
     expect(res.statusCode).toBe(200)
-    expect(applicationEventPoint).toMatchSnapshot()
+    expect(declarationEventPoint).toMatchSnapshot()
   })
 
   it('writes the delta between VALIDATED and REGISTERED states to influxdb', async () => {
@@ -1168,15 +1232,16 @@ describe('When an existing application is marked registered', () => {
       },
       payload
     })
-    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-      ({ measurement }: { measurement: string }) =>
-        measurement === 'application_event_duration'
-    )
+    const declarationEventPoint =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'declaration_event_duration'
+      )
     expect(res.statusCode).toBe(200)
-    expect(applicationEventPoint).toMatchSnapshot()
+    expect(declarationEventPoint).toMatchSnapshot()
   })
 
-  describe('a death application', () => {
+  describe('a death declaration', () => {
     it('writes the delta between REGISTERED and CERTIFIED states to influxdb', async () => {
       const influxClient = require('@metrics/influxdb/client')
       const payload = require('./test-data/mark-death-registered-request.json')
@@ -1188,17 +1253,18 @@ describe('When an existing application is marked registered', () => {
         },
         payload
       })
-      const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-        ({ measurement }: { measurement: string }) =>
-          measurement === 'application_event_duration'
-      )
+      const declarationEventPoint =
+        influxClient.writePoints.mock.calls[0][0].find(
+          ({ measurement }: { measurement: string }) =>
+            measurement === 'declaration_event_duration'
+        )
 
       expect(res.statusCode).toBe(200)
-      expect(applicationEventPoint).toMatchSnapshot()
+      expect(declarationEventPoint).toMatchSnapshot()
     })
   })
 })
-describe('When an existing application is marked certified', () => {
+describe('When an existing declaration is marked certified', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1216,15 +1282,16 @@ describe('When an existing application is marked certified', () => {
       },
       payload
     })
-    const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-      ({ measurement }: { measurement: string }) =>
-        measurement === 'application_event_duration'
-    )
+    const declarationEventPoint =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'declaration_event_duration'
+      )
 
     expect(res.statusCode).toBe(200)
-    expect(applicationEventPoint).toMatchSnapshot()
+    expect(declarationEventPoint).toMatchSnapshot()
   })
-  describe('a death application', () => {
+  describe('a death declaration', () => {
     it('writes the delta between REGISTERED and CERTIFIED states to influxdb', async () => {
       const influxClient = require('@metrics/influxdb/client')
       const payload = require('./test-data/mark-death-certified-request.json')
@@ -1237,15 +1304,16 @@ describe('When an existing application is marked certified', () => {
         payload
       })
       expect(res.statusCode).toBe(200)
-      const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-        ({ measurement }: { measurement: string }) =>
-          measurement === 'application_event_duration'
-      )
+      const declarationEventPoint =
+        influxClient.writePoints.mock.calls[0][0].find(
+          ({ measurement }: { measurement: string }) =>
+            measurement === 'declaration_event_duration'
+        )
 
-      expect(applicationEventPoint).toMatchSnapshot()
+      expect(declarationEventPoint).toMatchSnapshot()
     })
   })
-  describe('a birth application', () => {
+  describe('a birth declaration', () => {
     it('writes the payment total to influxdb', async () => {
       const influxClient = require('@metrics/influxdb/client')
       const payload = require('./test-data/mark-certified-request.json')
@@ -1258,17 +1326,18 @@ describe('When an existing application is marked certified', () => {
         payload
       })
       expect(res.statusCode).toBe(200)
-      const applicationEventPoint = influxClient.writePoints.mock.calls[0][0].find(
-        ({ measurement }: { measurement: string }) =>
-          measurement === 'certification_payment'
-      )
+      const declarationEventPoint =
+        influxClient.writePoints.mock.calls[0][0].find(
+          ({ measurement }: { measurement: string }) =>
+            measurement === 'payment'
+        )
 
-      expect(applicationEventPoint).toMatchSnapshot()
+      expect(declarationEventPoint).toMatchSnapshot()
     })
   })
 })
 
-describe('When an in-progress application is received', () => {
+describe('When an in-progress declaration is received', () => {
   let server: any
 
   beforeEach(async () => {
@@ -1286,10 +1355,11 @@ describe('When an in-progress application is received', () => {
       },
       payload
     })
-    const inCompleteFieldPoints = influxClient.writePoints.mock.calls[0][0].find(
-      ({ measurement }: { measurement: string }) =>
-        measurement === 'in_complete_fields'
-    )
+    const inCompleteFieldPoints =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'in_complete_fields'
+      )
 
     expect(res.statusCode).toBe(200)
     expect(inCompleteFieldPoints).toMatchSnapshot()
@@ -1321,7 +1391,7 @@ describe('When an in-progress application is received', () => {
     })
     const rejectedPoints = influxClient.writePoints.mock.calls[0][0].find(
       ({ measurement }: { measurement: string }) =>
-        measurement === 'applications_rejected'
+        measurement === 'declarations_rejected'
     )
 
     expect(res.statusCode).toBe(200)
@@ -1339,5 +1409,78 @@ describe('When an in-progress application is received', () => {
       payload
     })
     expect(res.statusCode).toBe(500)
+  })
+})
+
+describe('When an existing declaration requested correction', () => {
+  let server: any
+
+  beforeEach(async () => {
+    server = await createServer()
+  })
+
+  it('writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb', async () => {
+    const influxClient = require('@metrics/influxdb/client')
+    const payload = require('./test-data/request-correction-birth-request.json')
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/events/birth/request-correction',
+      headers: {
+        Authorization: `Bearer ${token}`
+      },
+      payload
+    })
+    const declarationEventPoint =
+      influxClient.writePoints.mock.calls[0][0].find(
+        ({ measurement }: { measurement: string }) =>
+          measurement === 'declaration_event_duration'
+      )
+
+    expect(res.statusCode).toBe(200)
+    expect(declarationEventPoint).toMatchSnapshot()
+  })
+  describe('a death declaration', () => {
+    it('writes the delta between REGISTERED and REQUESTED_FOR_CORRECTION states to influxdb', async () => {
+      const influxClient = require('@metrics/influxdb/client')
+      const payload = require('./test-data/request-correction-death-request.json')
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/death/request-correction',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        payload
+      })
+      expect(res.statusCode).toBe(200)
+      const declarationEventPoint =
+        influxClient.writePoints.mock.calls[0][0].find(
+          ({ measurement }: { measurement: string }) =>
+            measurement === 'declaration_event_duration'
+        )
+
+      expect(declarationEventPoint).toMatchSnapshot()
+    })
+  })
+  describe('a birth declaration', () => {
+    it('writes the payment total to influxdb', async () => {
+      const influxClient = require('@metrics/influxdb/client')
+      const payload = require('./test-data/request-correction-birth-request.json')
+      const res = await server.server.inject({
+        method: 'POST',
+        url: '/events/birth/request-correction',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        payload
+      })
+      expect(res.statusCode).toBe(200)
+      const declarationEventPoint =
+        influxClient.writePoints.mock.calls[0][0].find(
+          ({ measurement }: { measurement: string }) =>
+            measurement === 'payment'
+        )
+
+      expect(declarationEventPoint).toMatchSnapshot()
+    })
   })
 })

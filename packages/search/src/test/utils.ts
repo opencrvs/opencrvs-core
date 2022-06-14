@@ -26,10 +26,10 @@ export const mockBirthFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -173,8 +173,7 @@ export const mockBirthFhirBundle = {
             valueString: 'FATHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01711111111'
           },
           {
@@ -303,14 +302,14 @@ export const mockBirthFhirBundle = {
         multipleBirthInteger: 1,
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
@@ -406,14 +405,14 @@ export const mockBirthFhirBundle = {
         ],
         address: [
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
             country: 'BGD'
           },
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
@@ -664,10 +663,10 @@ export const mockBirthFhirBundleWithoutCompositionId = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -759,8 +758,7 @@ export const mockBirthFhirBundleWithoutCompositionId = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01722222222'
           },
           {
@@ -851,14 +849,14 @@ export const mockBirthFhirBundleWithoutCompositionId = {
         multipleBirthInteger: 1,
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -954,10 +952,10 @@ export const mockDeathFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-application'
+              code: 'death-declaration'
             }
           ],
-          text: 'Death Application'
+          text: 'Death Declaration'
         },
         class: {
           coding: [
@@ -1112,14 +1110,14 @@ export const mockDeathFhirBundle = {
         },
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1259,14 +1257,14 @@ export const mockDeathFhirBundle = {
         ],
         address: [
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1326,12 +1324,12 @@ export const mockDeathFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/location-type',
-              code: 'PERMANENT'
+              code: 'PRIMARY_ADDRESS'
             }
           ]
         },
         address: {
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
           district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
           state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1413,8 +1411,7 @@ export const mockDeathFhirBundle = {
             valueString: 'EXTENDED_FAMILY'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01711111114'
           },
           {
@@ -1462,10 +1459,10 @@ export const mockDeathFhirBundleWithoutCompositionId = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-application'
+              code: 'death-declaration'
             }
           ],
-          text: 'Death Application'
+          text: 'Death Declaration'
         },
         class: {
           coding: [
@@ -1569,14 +1566,14 @@ export const mockDeathFhirBundleWithoutCompositionId = {
         },
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1659,14 +1656,14 @@ export const mockDeathFhirBundleWithoutCompositionId = {
         ],
         address: [
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1726,12 +1723,12 @@ export const mockDeathFhirBundleWithoutCompositionId = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/location-type',
-              code: 'PERMANENT'
+              code: 'PRIMARY_ADDRESS'
             }
           ]
         },
         address: {
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
           district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
           state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -1813,8 +1810,7 @@ export const mockDeathFhirBundleWithoutCompositionId = {
             valueString: 'EXTENDED_FAMILY'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01711111114'
           },
           {
@@ -2156,9 +2152,9 @@ export const mockCompositionResponse = {
   status: 'preliminary',
   type: {
     coding: [
-      { system: 'http://opencrvs.org/doc-types', code: 'birth-application' }
+      { system: 'http://opencrvs.org/doc-types', code: 'birth-declaration' }
     ],
-    text: 'Birth Application'
+    text: 'Birth Declaration'
   },
   class: {
     coding: [
@@ -2277,8 +2273,7 @@ export const mockBirthRejectionTaskBundle = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01722222222'
           },
           {
@@ -2360,8 +2355,7 @@ export const mockBirthRejectionTaskBundleWithoutCompositionReference = {
             valueString: 'MOTHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01722222222'
           },
           {
@@ -2593,7 +2587,7 @@ export const mockSearchResult = {
             event: 'BIRTH',
             childFamilyName: 'Moajjem',
             childFamilyNameLocal: 'মোয়াজ্জেম',
-            applicationLocationId: '123',
+            declarationLocationId: '123',
             childDoB: '2011-11-11',
             gender: 'male',
             motherFamilyName: 'Moajjem',
@@ -2610,7 +2604,7 @@ export const mockSearchResult = {
             event: 'DEATH',
             deceasedFamilyName: 'Moajjem',
             deceasedFamilyNameLocal: 'মোয়াজ্জেম',
-            applicationLocationId: '123',
+            declarationLocationId: '123',
             deceasedDoB: '2011-11-11',
             gender: 'male',
             motherFamilyName: 'Moajjem',
@@ -2619,6 +2613,18 @@ export const mockSearchResult = {
           }
         }
       ]
+    }
+  }
+}
+
+export const mockAggregationSearchResult = {
+  body: {
+    aggregations: {
+      statusCounts: {
+        doc_count_error_upper_bound: 0,
+        sum_other_doc_count: 0,
+        buckets: [{ key: 'REGISTERED', doc_count: 1 }]
+      }
     }
   }
 }
@@ -2640,10 +2646,10 @@ export const mockBirthFhirBundleWithoutParents = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -2719,8 +2725,7 @@ export const mockBirthFhirBundleWithoutParents = {
             valueString: 'FATHER'
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '01711111111'
           },
           {
@@ -2849,14 +2854,14 @@ export const mockBirthFhirBundleWithoutParents = {
         multipleBirthInteger: 1,
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
@@ -2933,14 +2938,14 @@ export const mockBirthFhirBundleWithoutParents = {
         ],
         address: [
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
             country: 'BGD'
           },
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', '265abf9c-09d4-4b34-a0c6-336a53e23e4a'],
             district: 'a5010297-2d10-4109-8cb3-353ff9c084c2',
             state: '2414fc3f-7670-4d22-a053-5694858d72a2',
@@ -3140,10 +3145,10 @@ export const mockMinimalDeathFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'death-application'
+              code: 'death-declaration'
             }
           ],
-          text: 'Death Application'
+          text: 'Death Declaration'
         },
         class: {
           coding: [
@@ -3247,14 +3252,14 @@ export const mockMinimalDeathFhirBundle = {
         },
         address: [
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -3337,14 +3342,14 @@ export const mockMinimalDeathFhirBundle = {
         ],
         address: [
           {
-            type: 'CURRENT',
+            type: 'SECONDARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
             country: 'BGD'
           },
           {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
             district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
             state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -3404,12 +3409,12 @@ export const mockMinimalDeathFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/location-type',
-              code: 'PERMANENT'
+              code: 'PRIMARY_ADDRESS'
             }
           ]
         },
         address: {
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           line: ['', '', '', '', '', 'ee72f497-343f-4f0f-9062-d618fafc175c'],
           district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
           state: '9a236522-0c3d-40eb-83ad-e8567518c763',
@@ -3644,4 +3649,59 @@ export const mockFacilityResponse = {
     versionId: '25b82e56-003f-4da7-975a-e9395100e819'
   },
   id: 'f1ea7c2f-0b71-43e8-a199-a92a0e17102c'
+}
+
+export const mockTaskBirthCorrectionBundle = {
+  resourceType: 'Bundle',
+  type: 'document',
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Task/e849ceb4-0adc-4be2-8fc8-8a4c41781bb5',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        intent: '',
+        input: [
+          {
+            type: {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/action-type',
+                  code: 'update'
+                }
+              ]
+            },
+            valueCode: 'child',
+            valueId: 'name',
+            valueString: 'Old name'
+          }
+        ],
+        output: [
+          {
+            type: {
+              coding: [
+                {
+                  system: 'http://terminology.hl7.org/CodeSystem/action-type',
+                  code: 'update'
+                }
+              ]
+            },
+            valueCode: 'child',
+            valueId: 'name',
+            valueString: 'New name'
+          }
+        ],
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'BIRTH'
+            }
+          ]
+        },
+        id: 'e849ceb4-0adc-4be2-8fc8-8a4c41781bb5'
+      }
+    }
+  ]
 }

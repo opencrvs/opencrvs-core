@@ -12,7 +12,7 @@
 import gql from 'graphql-tag'
 
 export const HAS_CHILD_LOCATION = gql`
-  query data($parentId: String!) {
+  query hasChildLocation($parentId: String!) {
     hasChildLocation(parentId: $parentId) {
       id
       type
@@ -25,10 +25,10 @@ export const HAS_CHILD_LOCATION = gql`
 `
 
 export const FETCH_MONTH_WISE_EVENT_ESTIMATIONS = gql`
-  query data(
+  query fetchMonthWiseEventMetrics(
     $timeStart: String!
     $timeEnd: String!
-    $locationId: String!
+    $locationId: String
     $event: String!
   ) {
     fetchMonthWiseEventMetrics(
@@ -37,30 +37,22 @@ export const FETCH_MONTH_WISE_EVENT_ESTIMATIONS = gql`
       locationId: $locationId
       event: $event
     ) {
-      details {
-        actualTotalRegistration
-        actual45DayRegistration
-        estimatedRegistration
-        estimated45DayPercentage
-        month
-        year
-        startOfMonth
-      }
-      total {
-        actualTotalRegistration
-        actual45DayRegistration
-        estimatedRegistration
-        estimated45DayPercentage
-      }
+      total
+      estimated
+      withinTarget
+      within1Year
+      within5Years
+      month
+      year
     }
   }
 `
 
 export const FETCH_LOCATION_WISE_EVENT_ESTIMATIONS = gql`
-  query data(
+  query fetchLocationWiseEventMetrics(
     $timeStart: String!
     $timeEnd: String!
-    $locationId: String!
+    $locationId: String
     $event: String!
   ) {
     fetchLocationWiseEventMetrics(
@@ -69,26 +61,22 @@ export const FETCH_LOCATION_WISE_EVENT_ESTIMATIONS = gql`
       locationId: $locationId
       event: $event
     ) {
-      details {
-        actualTotalRegistration
-        actual45DayRegistration
-        estimatedRegistration
-        estimated45DayPercentage
-        locationId
-        locationName
-      }
-      total {
-        actualTotalRegistration
-        actual45DayRegistration
-        estimatedRegistration
-        estimated45DayPercentage
-      }
+      total
+      withinTarget
+      within1Year
+      within5Years
+      estimated
+      locationId
+      locationName
     }
   }
 `
 
 export const FETCH_STATUS_WISE_REGISTRATION_COUNT = gql`
-  query data($locationId: String!, $status: [String]!) {
+  query fetchRegistrationCountByStatus(
+    $locationId: String!
+    $status: [String]!
+  ) {
     fetchRegistrationCountByStatus(locationId: $locationId, status: $status) {
       results {
         status
@@ -100,7 +88,7 @@ export const FETCH_STATUS_WISE_REGISTRATION_COUNT = gql`
 `
 
 export const FETCH_EVENTS_WITH_PROGRESS = gql`
-  query data(
+  query getEventsWithProgress(
     $locationId: String!
     $count: Int
     $skip: Int
@@ -128,7 +116,7 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
           status
           contactNumber
           contactRelationship
-          dateOfApplication
+          dateOfDeclaration
           trackingId
           registrationNumber
           createdAt
@@ -157,7 +145,7 @@ export const FETCH_EVENTS_WITH_PROGRESS = gql`
   }
 `
 export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
-  query data(
+  query searchFieldAgents(
     $locationId: String
     $primaryOfficeId: String
     $timeStart: String!
@@ -186,14 +174,52 @@ export const FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA = gql`
         fullName
         type
         status
+        avatar {
+          type
+          data
+        }
         primaryOfficeId
         creationDate
-        totalNumberOfApplicationStarted
+        totalNumberOfDeclarationStarted
         totalNumberOfInProgressAppStarted
-        totalNumberOfRejectedApplications
-        averageTimeForDeclaredApplications
+        totalNumberOfRejectedDeclarations
+        averageTimeForDeclaredDeclarations
       }
       totalItems
+    }
+  }
+`
+export const GET_TOTAL_PAYMENTS = gql`
+  query getTotalPayments(
+    $timeStart: String!
+    $timeEnd: String!
+    $locationId: String
+    $event: String!
+  ) {
+    getTotalPayments(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+      event: $event
+    ) {
+      total
+      paymentType
+    }
+  }
+`
+export const GET_TOTAL_CERTIFICATIONS = gql`
+  query getTotalCertifications(
+    $timeStart: String!
+    $timeEnd: String!
+    $locationId: String
+  ) {
+    getTotalCertifications(
+      timeStart: $timeStart
+      timeEnd: $timeEnd
+      locationId: $locationId
+    ) {
+      total
+      eventType
     }
   }
 `

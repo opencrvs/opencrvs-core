@@ -12,12 +12,15 @@
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { Print } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { IPrintableApplication, modifyApplication } from '@client/applications'
+import { Content } from '@opencrvs/components/lib/interface/Content'
+import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
+import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
 import { Event } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
   goBack as goBackAction,
+  goToHomeTab,
   goToReviewCertificate as goToReviewCertificateAction
 } from '@client/navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -30,39 +33,26 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled, { withTheme } from 'styled-components'
-import { calculatePrice, getEventDate, getServiceMessage } from './utils'
+import {
+  calculatePrice,
+  getEventDate,
+  getRegisteredDate,
+  getServiceMessage
+} from './utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
-const Header = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
-  color: ${({ theme }) => theme.colors.black};
-  margin-bottom: 16px;
-  margin-top: 0;
-`
-
-const Instruction = styled.p`
-  color: ${({ theme }) => theme.colors.copy};
-`
 const Action = styled.div`
   margin-top: 32px;
 `
-const GreyBody = styled.div`
-  background: ${({ theme }) => theme.colors.background};
-  padding: 16px 24px;
-
-  & button {
-    margin-top: 16px;
-    padding: 0;
-  }
-`
 
 const StyledLabel = styled.label`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-  margin-right: 3px;
+  ${({ theme }) => theme.fonts.bold18};
+  margin-right: 2px;
 `
 const StyledValue = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
 `
 
 function LabelValue({
@@ -72,7 +62,7 @@ function LabelValue({
 }: {
   id: string
   label: string
-  value: string
+  value: React.ReactNode | string
 }) {
   return (
     <div id={id}>
@@ -85,11 +75,12 @@ interface IProps {
   event: Event
   registrationId: string
   language: string
-  application: IPrintableApplication
+  declaration: IPrintableDeclaration
   theme: ITheme
-  modifyApplication: typeof modifyApplication
+  modifyDeclaration: typeof modifyDeclaration
   goToReviewCertificate: typeof goToReviewCertificateAction
   goBack: typeof goBackAction
+  goToHomeTab: typeof goToHomeTab
   userDetails: IUserDetails | null
   offlineCountryConfig: IOfflineData
 }
@@ -98,18 +89,18 @@ type IFullProps = IProps & IntlShapeProps
 
 class PaymentComponent extends React.Component<IFullProps> {
   continue = (paymentAmount: string) => {
-    const { application } = this.props
+    const { declaration } = this.props
     const certificates =
-      application && application.data.registration.certificates
+      declaration && declaration.data.registration.certificates
 
     const certificate = (certificates && certificates[0]) || {}
 
-    this.props.modifyApplication({
-      ...application,
+    this.props.modifyDeclaration({
+      ...declaration,
       data: {
-        ...application.data,
+        ...declaration.data,
         registration: {
-          ...application.data.registration,
+          ...declaration.data.registration,
           certificates: [
             {
               ...certificate,
@@ -133,57 +124,86 @@ class PaymentComponent extends React.Component<IFullProps> {
   }
 
   render = () => {
-    const { intl, application, event, goBack } = this.props
-    const eventDate = getEventDate(application.data, event)
+    const { intl, declaration, event, goBack, offlineCountryConfig } =
+      this.props
 
-    const paymentAmount = calculatePrice(event, eventDate)
+    const registeredDate = getRegisteredDate(declaration.data)
 
-    const serviceMessage = getServiceMessage(event, eventDate)
+    const eventDate = getEventDate(declaration.data, event)
+
+    const paymentAmount = calculatePrice(
+      event,
+      eventDate,
+      registeredDate,
+      offlineCountryConfig
+    )
+
+    const serviceMessage = getServiceMessage(
+      intl,
+      event,
+      eventDate,
+      registeredDate,
+      offlineCountryConfig
+    )
+
+    const RecieptPrint = (
+      <TertiaryButton
+        id="print-receipt"
+        icon={() => <Print />}
+        align={0}
+        disabled={true}
+        onClick={() =>
+          printMoneyReceipt(
+            this.props.intl,
+            this.props.declaration,
+            this.props.userDetails,
+            this.props.offlineCountryConfig
+          )
+        }
+      >
+        {intl.formatMessage(messages.printReceipt)}
+      </TertiaryButton>
+    )
 
     return (
       <>
-        <ActionPageLight title={'Certificate collection'} goBack={goBack}>
-          <Header>{intl.formatMessage(messages.payment)}</Header>
-          <Instruction>
-            {intl.formatMessage(messages.paymentInstruction)}
-          </Instruction>
-          <GreyBody>
+        <ActionPageLight
+          title={'Print certificate'}
+          goBack={goBack}
+          hideBackground
+          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
+        >
+          <Content
+            title={intl.formatMessage(messages.payment)}
+            topActionButtons={[RecieptPrint]}
+          >
             <LabelValue
               id="service"
               label={intl.formatMessage(messages.receiptService)}
-              value={intl.formatMessage(serviceMessage)}
+              value={serviceMessage}
             />
             <LabelValue
               id="amountDue"
               label={intl.formatMessage(messages.amountDue)}
-              value={intl.formatMessage(messages.paymentAmount, {
-                paymentAmount
-              })}
-            />
-            <TertiaryButton
-              id="print-receipt"
-              icon={() => <Print />}
-              align={0}
-              onClick={() =>
-                printMoneyReceipt(
-                  this.props.intl,
-                  this.props.application,
-                  this.props.userDetails,
-                  this.props.offlineCountryConfig
-                )
+              value={
+                <FormattedNumberCurrency
+                  value={paymentAmount}
+                  currency={offlineCountryConfig.config.CURRENCY.isoCode}
+                  languagesAndCountry={
+                    offlineCountryConfig.config.CURRENCY.languagesAndCountry[0]
+                  }
+                />
               }
-            >
-              {intl.formatMessage(messages.printReceipt)}
-            </TertiaryButton>
-          </GreyBody>
-          <Action>
-            <PrimaryButton
-              id="Continue"
-              onClick={() => this.continue(paymentAmount)}
-            >
-              {intl.formatMessage(buttonMessages.continueButton)}
-            </PrimaryButton>
-          </Action>
+            />
+            <Action>
+              <PrimaryButton
+                id="Continue"
+                onClick={() => this.continue(paymentAmount.toString())}
+              >
+                {intl.formatMessage(buttonMessages.continueButton)}
+              </PrimaryButton>
+            </Action>
+          </Content>
         </ActionPageLight>
       </>
     )
@@ -206,19 +226,19 @@ function mapStatetoProps(
 ) {
   const { registrationId, eventType } = props.match.params
   const event = getEvent(eventType)
-  const application = state.applicationsState.applications.find(
+  const declaration = state.declarationsState.declarations.find(
     (app) => app.id === registrationId && app.event === event
-  ) as IPrintableApplication | undefined
+  ) as IPrintableDeclaration | undefined
 
-  if (!application) {
-    throw new Error(`Application "${registrationId}" missing!`)
+  if (!declaration) {
+    throw new Error(`Declaration "${registrationId}" missing!`)
   }
 
   return {
-    event: application.event,
+    event: declaration.event,
     registrationId,
     language: state.i18n.language,
-    application,
+    declaration,
     userDetails: getUserDetails(state),
     offlineCountryConfig: getOfflineData(state)
   }
@@ -226,6 +246,7 @@ function mapStatetoProps(
 
 export const Payment = connect(mapStatetoProps, {
   goBack: goBackAction,
-  modifyApplication,
+  goToHomeTab,
+  modifyDeclaration,
   goToReviewCertificate: goToReviewCertificateAction
 })(injectIntl(withTheme(PaymentComponent)))

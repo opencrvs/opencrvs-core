@@ -22,14 +22,15 @@ export const LOCATION_ID = 'locationId'
 export const COUNT = 'count'
 export const MALE = 'male'
 export const FEMALE = 'female'
-export const WITHIN_45_DAYS = 'DAYS_0_TO_45'
-export const WITHIN_45_DAYS_TO_1_YEAR = 'DAYS_46_TO_365'
+export const POPULATION_YEAR = 'populationYear'
+//export const WITHIN_45_DAYS = 'DAYS_0_TO_45'
+//export const WITHIN_45_DAYS_TO_1_YEAR = 'DAYS_46_TO_365'
 export const WITHIN_1_YEAR = 'DAYS_0_TO_365'
 export const EVENT = 'event'
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export enum Events {
   IN_PROGRESS_DEC = 'in-progress-declaration', // Field agent or DHIS2 in progress
   NEW_DEC = 'new-declaration', // Field agent complete
-  NEW_WAITING_VALIDATION = 'new-waiting-validation', // Registrar
-  NEW_VALIDATE = 'new-validation' // Registration agent new event
+  REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION = 'registrar-registration-waiting-external-resource-validation', // Registrar
+  REQUEST_FOR_REGISTRAR_VALIDATION = 'request-for-registrar-validation' // Registration agent new event
 }

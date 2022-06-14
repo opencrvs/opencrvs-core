@@ -37,7 +37,7 @@ interface IList {
 }
 
 const StyledList = styled.ul`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   list-style-type: none;
   padding: 0;
   margin: 0;
@@ -45,7 +45,7 @@ const StyledList = styled.ul`
 `
 
 const ListItemContainer = styled.li`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   background-color: ${({ theme }) => theme.colors.white};
   display: flex;
   flex-flow: row wrap;
@@ -78,12 +78,12 @@ const StatusDiv = styled.div`
 `
 
 const StyledLabel = styled.label`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   margin-right: 3px;
 `
 
 const StyledValue = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 function LabelValue({ label, value }: IProp) {

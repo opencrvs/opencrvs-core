@@ -12,7 +12,7 @@
 // @ts-ignore
 import * as fakerModule from 'cdnjs.cloudflare.com/ajax/libs/Faker/3.1.0/faker.min.js'
 
-export default rates => {
+export default (rates) => {
   // Add typing for faker, needed due to url import
   const faker: Faker.FakerStatic = fakerModule
 
@@ -75,10 +75,10 @@ export default rates => {
             coding: [
               {
                 system: 'http://opencrvs.org/doc-types',
-                code: 'birth-application'
+                code: 'birth-declaration'
               }
             ],
-            text: 'Birth Application'
+            text: 'Birth Declaration'
           },
           class: {
             coding: [
@@ -174,8 +174,7 @@ export default rates => {
               valueString: 'FATHER'
             },
             {
-              url:
-                'http://opencrvs.org/specs/extension/contact-person-phone-number',
+              url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
               valueString: '01711111111'
             }
           ],
@@ -231,8 +230,7 @@ export default rates => {
               valueDateTime: dateOfMarriage.toISOString().substring(0, 10)
             },
             {
-              url:
-                'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+              url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
               extension: [
                 {
                   url: 'code',
@@ -251,7 +249,7 @@ export default rates => {
           multipleBirthInteger: 1,
           address: [
             {
-              type: 'PERMANENT',
+              type: 'PRIMARY_ADDRESS',
               line: [
                 addressNumber,
                 '',
@@ -266,7 +264,7 @@ export default rates => {
               country: 'BGD'
             },
             {
-              type: 'CURRENT',
+              type: 'SECONDARY_ADDRESS',
               line: [
                 addressNumber,
                 '',
@@ -314,8 +312,7 @@ export default rates => {
               valueDateTime: dateOfMarriage.toISOString().substring(0, 10)
             },
             {
-              url:
-                'http://hl7.org/fhir/StructureDefinition/patient-nationality',
+              url: 'http://hl7.org/fhir/StructureDefinition/patient-nationality',
               extension: [
                 {
                   url: 'code',
@@ -333,7 +330,7 @@ export default rates => {
           ],
           address: [
             {
-              type: 'CURRENT',
+              type: 'SECONDARY_ADDRESS',
               line: [
                 addressNumber,
                 '',
@@ -348,7 +345,7 @@ export default rates => {
               country: 'BGD'
             },
             {
-              type: 'PERMANENT',
+              type: 'PRIMARY_ADDRESS',
               line: [
                 addressNumber,
                 '',

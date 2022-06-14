@@ -10,68 +10,47 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { GQLResolver } from '@gateway/graphql/schema'
-import {
-  getMetrics,
-  timeFrameTotalCalculator,
-  genderBasisTotalCalculator,
-  paymentTotalCalculator,
-  estimated45DayMetricsTotalCalculator,
-  eventIn45DayEstimationCalculator
-} from '@gateway/features/fhir/utils'
+import { getMetrics } from '@gateway/features/fhir/utils'
 
 export interface IMetricsParam {
-  timeStart: string
-  timeEnd: string
-  locationId: string
+  timeStart?: string
+  timeEnd?: string
+  locationId?: string
   event?: string
   practitionerIds?: string[]
   practitionerId?: string
   count?: number
+  populationYear?: number
 }
 
 export const resolvers: GQLResolver = {
   Query: {
-    async fetchRegistrationMetrics(
+    async getTotalMetrics(_, variables, authHeader) {
+      return getMetrics('/totalMetrics', variables, authHeader)
+    },
+    async getTotalPayments(
       _,
       { timeStart, timeEnd, locationId, event },
       authHeader
     ) {
-      const params: IMetricsParam = {
-        timeStart,
-        timeEnd,
-        locationId,
-        event
-      }
-      const metricsData = await getMetrics('/metrics', params, authHeader)
-
-      return {
-        timeFrames: {
-          details: metricsData.timeFrames,
-          total: timeFrameTotalCalculator(metricsData.timeFrames)
+      return getMetrics(
+        '/totalPayments',
+        {
+          timeStart,
+          timeEnd,
+          locationId,
+          event
         },
-        genderBasisMetrics: {
-          details: metricsData.genderBasisMetrics,
-          total: genderBasisTotalCalculator(metricsData.genderBasisMetrics)
-        },
-        estimated45DayMetrics: {
-          details: metricsData.estimated45DayMetrics,
-          total: estimated45DayMetricsTotalCalculator(
-            metricsData.estimated45DayMetrics
-          )
-        },
-        payments: {
-          details: metricsData.payments,
-          total: paymentTotalCalculator(metricsData.payments)
-        }
-      }
+        authHeader
+      )
     },
-    async getEventEstimationMetrics(
+    async getTotalCertifications(
       _,
       { timeStart, timeEnd, locationId },
       authHeader
     ) {
       return getMetrics(
-        '/eventEstimations',
+        '/totalCertifications',
         {
           timeStart,
           timeEnd,
@@ -80,13 +59,29 @@ export const resolvers: GQLResolver = {
         authHeader
       )
     },
-    async getApplicationsStartedMetrics(
+    async getTotalCorrections(
+      _,
+      { timeStart, timeEnd, locationId, event },
+      authHeader
+    ) {
+      return getMetrics(
+        '/totalCorrections',
+        {
+          timeStart,
+          timeEnd,
+          locationId,
+          event
+        },
+        authHeader
+      )
+    },
+    async getDeclarationsStartedMetrics(
       _,
       { timeStart, timeEnd, locationId },
       authHeader
     ) {
       return getMetrics(
-        '/applicationsStarted',
+        '/declarationsStarted',
         {
           timeStart,
           timeEnd,
@@ -102,18 +97,21 @@ export const resolvers: GQLResolver = {
     ) {
       const metricsData = await getMetrics(
         '/monthWiseEventEstimations',
-        {
-          timeStart,
-          timeEnd,
-          locationId,
-          event
-        },
+        locationId
+          ? {
+              timeStart,
+              timeEnd,
+              locationId,
+              event
+            }
+          : {
+              timeStart,
+              timeEnd,
+              event
+            },
         authHeader
       )
-      return {
-        details: metricsData,
-        total: eventIn45DayEstimationCalculator(metricsData)
-      }
+      return metricsData
     },
     async fetchLocationWiseEventMetrics(
       _,
@@ -122,18 +120,21 @@ export const resolvers: GQLResolver = {
     ) {
       const metricsData = await getMetrics(
         '/locationWiseEventEstimations',
-        {
-          timeStart,
-          timeEnd,
-          locationId,
-          event
-        },
+        locationId
+          ? {
+              timeStart,
+              timeEnd,
+              locationId,
+              event
+            }
+          : {
+              timeStart,
+              timeEnd,
+              event
+            },
         authHeader
       )
-      return {
-        details: metricsData,
-        total: eventIn45DayEstimationCalculator(metricsData)
-      }
+      return metricsData
     },
     async fetchTimeLoggedMetricsByPractitioner(
       _,
@@ -149,6 +150,13 @@ export const resolvers: GQLResolver = {
           locationId,
           count
         },
+        authHeader
+      )
+    },
+    async getLocationStatistics(_, { locationId, populationYear }, authHeader) {
+      return getMetrics(
+        '/locationStatistics',
+        locationId ? { locationId, populationYear } : { populationYear },
         authHeader
       )
     }

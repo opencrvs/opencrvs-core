@@ -45,23 +45,21 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
 
 const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   width: 100%;
-
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   .react-select__control {
-    background: ${({ theme, color }) =>
-      color ? color : theme.colors.background};
-    border-radius: 0;
+    background: ${({ theme }) => theme.colors.white};
+    border-radius: 2px;
     height: 40px;
     box-shadow: none;
-    ${({ theme }) => theme.fonts.bodyStyle};
+    ${({ theme }) => theme.fonts.reg16};
     padding: 0 8px;
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
     ${({ error, touched, theme }) =>
-      error && touched ? theme.colors.error : theme.colors.copy};
+      error && touched ? theme.colors.negative : theme.colors.copy};
     &:hover {
       border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
       ${({ error, touched, theme }) =>
-        error && touched ? theme.colors.error : theme.colors.copy};
+        error && touched ? theme.colors.negative : theme.colors.copy};
     }
     &:focus {
       outline: none;
@@ -73,7 +71,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__control--is-focused {
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.focus};
+    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
     ${({ theme }) => theme.colors.copy};
   }
@@ -88,6 +86,28 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
 
   .react-select__value-container {
     padding: 0;
+  }
+
+  .react-select__option {
+    background-color: ${({ theme }) => theme.colors.white};
+  }
+
+  .react-select__option--is-focused {
+    background-color: ${({ theme }) => theme.colors.grey100};
+    color: ${({ theme }) => theme.colors.copy};
+    &:active {
+      background: ${({ theme }) => theme.colors.grey200};
+      color: ${({ theme }) => theme.colors.copy};
+    }
+  }
+
+  .react-select__option--is-selected {
+    background-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.white};
+    &:active {
+      background: ${({ theme }) => theme.colors.indigoDark};
+      color: ${({ theme }) => theme.colors.white};
+    }
   }
 `
 

@@ -71,9 +71,9 @@ enum AddressType {
   ADMIN_STRUCTURE
   CRVS_OFFICE
   PRIVATE_HOME
-  PLACE_OF_HERITAGE
-  CURRENT
-  PERMANENT
+  DECEASED_USUAL_RESIDENCE
+  SECONDARY_ADDRESS
+  PRIMARY_ADDRESS
   MILITARY_BASE_OR_CANTONMENT
   IDP_CAMP # -> Disaster Camp
   UNHCR_CAMP # -> UNHCR Camp
@@ -125,16 +125,16 @@ type IdentityType { # -> Identifier
 input RelatedPersonInput {
   id: ID
   _fhirID: ID # -> .id
-  relationship: RelationshipType
+  relationship: String
   otherRelationship: String
-  affidavit: [AttachmentInput]
+  affidavit: [AttachmentInput!]
   individual: PersonInput
 }
 
 type RelatedPerson { # -> Related Person
   id: ID
   _fhirID: ID # -> .id
-  relationship: RelationshipType # -> .relationship.coding
+  relationship: String # -> .relationship.coding
   otherRelationship: String # -> .relationship.coding
   affidavit: [Attachment] # -> .extension
   individual: Person # -> .patient.reference
@@ -160,11 +160,13 @@ input PersonInput {
   age: Float
   maritalStatus: MaritalStatusType # Not in BDRIS2 - keep as optional
   occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
   dateOfMarriage: Date # Not in BDRIS2
   # For order of birth 3 equals 3rd born
   multipleBirth: Int # Not in BDRIS2
   address: [AddressInput]
-  photo: [AttachmentInput]
+  photo: [AttachmentInput!]
   deceased: DeceasedInput
   nationality: [String] # In BDRIS2 for father and mother only
   educationalAttainment: EducationType # Not in BDRIS2
@@ -181,6 +183,8 @@ type Person { # -> Patient
   age: Float # -> .extension(url='http://opencrvs.org/specs/age').valueInteger
   maritalStatus: MaritalStatusType # -> .maritalStatus
   occupation: String
+  detailsExist: Boolean
+  reasonNotApplying: String
   dateOfMarriage: Date # -> .extension(url='http://opencrvs.org/specs/date-of-marriage').valueDateTime
   # For order of birth 3 equals 3rd born
   multipleBirth: Int # -> .multipleBirthInteger

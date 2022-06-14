@@ -40,12 +40,13 @@ const StyledInput = styled.input<IPasswordInputProps>`
   width: 100%;
   padding: 8px 10px;
   height: 40px;
+  border-radius: 2px;
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.background};
+  background: ${({ theme }) => theme.colors.white};
 
   ${({ hideBorder, error, touched, theme }) =>
     hideBorder
@@ -53,34 +54,34 @@ const StyledInput = styled.input<IPasswordInputProps>`
       border:none;
       ${
         error && touched
-          ? `box-shadow: 0 0 0px 2px ${theme.colors.error};`
+          ? `box-shadow: 0 0 0px 2px ${theme.colors.negative};`
           : 'box-shadow: none;'
       }
       &:focus {
         box-shadow: 0 0 0px 2px ${
-          error && touched ? theme.colors.error : theme.colors.focus
+          error && touched ? theme.colors.negative : theme.colors.yellow
         };
       }
         `
       : `
       border: 2px solid ${
-        error && touched ? theme.colors.error : theme.colors.copy
+        error && touched ? theme.colors.negative : theme.colors.copy
       };
       &:focus {
-        box-shadow: 0 0 0px 3px ${theme.colors.focus};
+        box-shadow: 0 0 0px 3px ${theme.colors.yellow};
       }
       `}
 
   &::-webkit-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   &::-moz-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   &::-webkit-outer-spin-button,
@@ -105,7 +106,7 @@ const StyledInput = styled.input<IPasswordInputProps>`
   }}
 `
 
-const IconButton = styled(props => <CircleButton {...props} />)`
+const IconButton = styled((props) => <CircleButton {...props} />)`
   height: 32px;
   width: 32px;
   margin-right: 4px;
@@ -116,7 +117,7 @@ const IconButton = styled(props => <CircleButton {...props} />)`
   background: ${({ theme }) => theme.colors.background};
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
   &:not([data-focus-visible-added]) {
@@ -126,7 +127,7 @@ const IconButton = styled(props => <CircleButton {...props} />)`
   }
   &:active:not([data-focus-visible-added]) {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
 `

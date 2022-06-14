@@ -35,7 +35,7 @@ export interface ISearchResponse<T> {
   _scroll_id?: string
   _shards: IShardsResponse
   hits: {
-    total: number
+    total: { value: number; eq: string }
     max_score: number
     hits: Array<{
       _index: string
@@ -82,7 +82,7 @@ export const resolvers: GQLResolver = {
         if (locationIds.length <= 0 || locationIds.includes('')) {
           return await Promise.reject(new Error('Invalid location id'))
         }
-        searchCriteria.applicationLocationId = locationIds.join(',')
+        searchCriteria.declarationLocationId = locationIds.join(',')
       } else if (authHeader && !hasScope(authHeader, 'register')) {
         // Only register scope user can search without locationIds
         return await Promise.reject(new Error('User does not have permission'))
@@ -126,7 +126,7 @@ export const resolvers: GQLResolver = {
         totalItems:
           (searchResult &&
             searchResult.body.hits &&
-            searchResult.body.hits.total) ||
+            searchResult.body.hits.total.value) ||
           0,
         results:
           (searchResult &&
@@ -149,7 +149,7 @@ export const resolvers: GQLResolver = {
       }
 
       const searchCriteria: ISearchCriteria = {
-        applicationLocationHirarchyId: locationId,
+        declarationLocationHirarchyId: locationId,
         sort
       }
 
@@ -177,7 +177,7 @@ export const resolvers: GQLResolver = {
           (searchResult &&
             searchResult.body &&
             searchResult.body.hits &&
-            searchResult.body.hits.total) ||
+            searchResult.body.hits.total.value) ||
           0,
         results:
           (searchResult &&

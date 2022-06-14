@@ -16,9 +16,9 @@ export const Link = styled.a<{ error?: boolean }>`
   width: auto;
   min-height: 44px;
   color: ${({ error, theme }) =>
-    error ? theme.colors.error : theme.colors.copy};
+    error ? theme.colors.negative : theme.colors.copy};
   cursor: pointer;
   border: 0;
   text-decoration: underline;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `

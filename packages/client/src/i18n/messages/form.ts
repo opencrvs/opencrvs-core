@@ -17,33 +17,33 @@ interface IFormMessages
   addressLine1: MessageDescriptor
   addressLine2: MessageDescriptor
   addressLine3: MessageDescriptor
-  addressLine3CityOption: MessageDescriptor
+  addressLine3UrbanOption: MessageDescriptor
   addressLine4: MessageDescriptor
-  addressSameAsMother: MessageDescriptor
   answer: MessageDescriptor
-  applicantIDProof: MessageDescriptor
-  applicantName: MessageDescriptor
-  applicantOtherRelationship: MessageDescriptor
-  applicantsDateOfBirth: MessageDescriptor
-  applicantsFamilyName: MessageDescriptor
-  applicantsFamilyNameEng: MessageDescriptor
-  applicantsGivenNames: MessageDescriptor
-  applicantsGivenNamesEng: MessageDescriptor
-  applicantsIdType: MessageDescriptor
-  applicantsNationality: MessageDescriptor
-  applicantsRelationWithChild: MessageDescriptor
-  applicantsRelationWithDeceased: MessageDescriptor
-  applicantTitle: MessageDescriptor
+  proofOfInformantsID: MessageDescriptor
+  informantName: MessageDescriptor
+  otherInformantType: MessageDescriptor
+  informantsDateOfBirth: MessageDescriptor
+  informantsFamilyName: MessageDescriptor
+  informantsFamilyNameEng: MessageDescriptor
+  informantsGivenNames: MessageDescriptor
+  informantsGivenNamesEng: MessageDescriptor
+  informantsIdType: MessageDescriptor
+  informantsNationality: MessageDescriptor
+  informantsRelationWithChild: MessageDescriptor
+  informantsRelationWithDeceased: MessageDescriptor
+  informantTitle: MessageDescriptor
   assignedRegistrationOffice: MessageDescriptor
   assignedRegistrationOfficeGroupTitle: MessageDescriptor
   attendantAtBirth: MessageDescriptor
   attendantAtBirthLayperson: MessageDescriptor
   attendantAtBirthMidwife: MessageDescriptor
+  attendantAtBirthTraditionalBirthAttendant: MessageDescriptor
   attendantAtBirthNone: MessageDescriptor
   attendantAtBirthNurse: MessageDescriptor
   attendantAtBirthOther: MessageDescriptor
   attendantAtBirthOtherParamedicalPersonnel: MessageDescriptor
-  attendantAtBirthPhysician: MessageDescriptor
+  physician: MessageDescriptor
   attestedBirthRecord: MessageDescriptor
   attestedVaccination: MessageDescriptor
   birthAttendant: MessageDescriptor
@@ -55,7 +55,7 @@ interface IFormMessages
   birthTypeSingle: MessageDescriptor
   birthTypeTriplet: MessageDescriptor
   birthTypeTwin: MessageDescriptor
-  causeOfDeathCode: MessageDescriptor
+  causeOfDeathMethod: MessageDescriptor
   causeOfDeathEstablished: MessageDescriptor
   causeOfDeathName: MessageDescriptor
   causeOfDeathNotice: MessageDescriptor
@@ -78,13 +78,12 @@ interface IFormMessages
   commentsOrNotesLabel: MessageDescriptor
   confirm: MessageDescriptor
   confirmMotherDetails: MessageDescriptor
-  contactDetailsApplicant: MessageDescriptor
+  contactDetailsInformant: MessageDescriptor
   contactDetailsBoth: MessageDescriptor
   contactDetailsFather: MessageDescriptor
   contactDetailsMother: MessageDescriptor
   country: MessageDescriptor
-  currentAddress: MessageDescriptor
-  currentAddressSameAsPermanent: MessageDescriptor
+  secondaryAddress: MessageDescriptor
   dateOfMarriage: MessageDescriptor
   daughter: MessageDescriptor
   daughterInLaw: MessageDescriptor
@@ -96,12 +95,12 @@ interface IFormMessages
   deathEventName: MessageDescriptor
   deathEventTitle: MessageDescriptor
   deathPlace: MessageDescriptor
-  deathPlaceAddress: MessageDescriptor
-  deathPlaceAddressOther: MessageDescriptor
-  deathPlaceAddressSameAsCurrent: MessageDescriptor
-  deathPlaceAddressSameAsPermanent: MessageDescriptor
-  deathPlaceAddressType: MessageDescriptor
-  deceasedCurrentAddressSameAsPermanent: MessageDescriptor
+  placeOfDeath: MessageDescriptor
+  placeOfDeathOther: MessageDescriptor
+  placeOfDeathSameAsCurrent: MessageDescriptor
+  placeOfDeathSameAsPrimary: MessageDescriptor
+  placeOfDeathType: MessageDescriptor
+  deceasedCurrentAddressSameAsPrimary: MessageDescriptor
   deceasedDateOfBirth: MessageDescriptor
   deceasedDeathProof: MessageDescriptor
   deceasedDoBProof: MessageDescriptor
@@ -113,10 +112,11 @@ interface IFormMessages
   deceasedIdType: MessageDescriptor
   deceasedName: MessageDescriptor
   deceasedParagraph: MessageDescriptor
-  deceasedPermanentAddressProof: MessageDescriptor
+  deceasedPrimaryAddressProof: MessageDescriptor
   deceasedSex: MessageDescriptor
   deceasedSexFemale: MessageDescriptor
   deceasedSexMale: MessageDescriptor
+  nameInEnglishPreviewGroup: MessageDescriptor
   deceasedSexOther: MessageDescriptor
   deceasedSexUnknown: MessageDescriptor
   deceasedTitle: MessageDescriptor
@@ -124,23 +124,20 @@ interface IFormMessages
   deliveryAddress: MessageDescriptor
   deliveryInstitution: MessageDescriptor
   deny: MessageDescriptor
-  dischargeCertificate: MessageDescriptor
   district: MessageDescriptor
   docTaxReceipt: MessageDescriptor
-  docTypeBR: MessageDescriptor
+  docTypeBirthCert: MessageDescriptor
   docTypeChildAgeProof: MessageDescriptor
   docTypeChildBirthProof: MessageDescriptor
-  docTypeChildUnderFiveCard: MessageDescriptor
   docTypeCopyOfBurialReceipt: MessageDescriptor
   docTypeDeathCertificate: MessageDescriptor
+  docTypePoliceCertificate: MessageDescriptor
   docTypeDoctorCertificate: MessageDescriptor
   docTypeEPICard: MessageDescriptor
   docTypeEPIStaffCertificate: MessageDescriptor
   docTypeFuneralReceipt: MessageDescriptor
-  docTypeHospitalDischargeCertificate: MessageDescriptor
   docTypeLetterOfDeath: MessageDescriptor
-  docTypeNIDBack: MessageDescriptor
-  docTypeNIDFront: MessageDescriptor
+  docTypeNID: MessageDescriptor
   docTypeOther: MessageDescriptor
   docTypePassport: MessageDescriptor
   docTypePostMortemReport: MessageDescriptor
@@ -164,6 +161,7 @@ interface IFormMessages
   fatherFirstNamesEng: MessageDescriptor
   fatherName: MessageDescriptor
   fathersDetailsExist: MessageDescriptor
+  mothersDetailsExist: MessageDescriptor
   fatherTitle: MessageDescriptor
   fetchDeceasedDetails: MessageDescriptor
   fetchFatherDetails: MessageDescriptor
@@ -202,7 +200,6 @@ interface IFormMessages
   iDTypePassport: MessageDescriptor
   iDTypeRefugeeNumber: MessageDescriptor
   informantAttestation: MessageDescriptor
-  lastNameBn: MessageDescriptor
   lastNameEn: MessageDescriptor
   manner: MessageDescriptor
   mannerAccident: MessageDescriptor
@@ -218,6 +215,7 @@ interface IFormMessages
   maritalStatusSingle: MessageDescriptor
   maritalStatusWidowed: MessageDescriptor
   medicallyCertified: MessageDescriptor
+  deathDescription: MessageDescriptor
   methodOfCauseOfDeath: MessageDescriptor
   mother: MessageDescriptor
   motherDateOfBirth: MessageDescriptor
@@ -238,12 +236,13 @@ interface IFormMessages
   otherHealthInstitution: MessageDescriptor
   otherInstitution: MessageDescriptor
   otherOption: MessageDescriptor
-  paragraph45daysTo5Years: MessageDescriptor
-  paragraph: MessageDescriptor
+  paragraphTargetDaysTo5Years: MessageDescriptor
+  documentsParagraph: MessageDescriptor
   paragraphAbove5Years: MessageDescriptor
-  permanentAddress: MessageDescriptor
-  permanentAddressSameAsCurrent: MessageDescriptor
-  permanentAddressSameAsMother: MessageDescriptor
+  deceasedPrimaryAddress: MessageDescriptor
+  primaryAddressSameAsCurrent: MessageDescriptor
+  primaryAddressSameAsOtherPrimary: MessageDescriptor
+  primaryAddressSameAsDeceasedsPrimary: MessageDescriptor
   phoneNumber: MessageDescriptor
   phoneVerificationWarning: MessageDescriptor
   placeOfBirth: MessageDescriptor
@@ -254,12 +253,15 @@ interface IFormMessages
   presentOther: MessageDescriptor
   privateHome: MessageDescriptor
   prompt: MessageDescriptor
-  proofOfBirthPlaceAndDate: MessageDescriptor
+  proofOfBirth: MessageDescriptor
   proofOfDocCertificateOfChild: MessageDescriptor
   proofOfEPICardOfChild: MessageDescriptor
   proofOfFathersID: MessageDescriptor
+  otherBirthSupportingDocuments: MessageDescriptor
+  legalGuardianProof: MessageDescriptor
   proofOfMothersID: MessageDescriptor
-  proofOfParentPermanentAddress: MessageDescriptor
+  proofOfParentPrimaryAddress: MessageDescriptor
+  placeOfBirthPreview: MessageDescriptor
   registrationName: MessageDescriptor
   registrationOffice: MessageDescriptor
   registrationPhoneLabel: MessageDescriptor
@@ -280,6 +282,11 @@ interface IFormMessages
   sonInLaw: MessageDescriptor
   grandson: MessageDescriptor
   spouse: MessageDescriptor
+  grandfather: MessageDescriptor
+  grandmother: MessageDescriptor
+  brother: MessageDescriptor
+  sister: MessageDescriptor
+  legalGuardian: MessageDescriptor
   headOfTheInstitute: MessageDescriptor
   driverOfTheVehicle: MessageDescriptor
   ownerOfTheHouse: MessageDescriptor
@@ -300,6 +307,7 @@ interface IFormMessages
   userFormSecurityQuestionsTitle: MessageDescriptor
   userFormTitle: MessageDescriptor
   verbalAutopsy: MessageDescriptor
+  verbalAutopsyReport: MessageDescriptor
   warningNotVerified: MessageDescriptor
   weightAtBirth: MessageDescriptor
   whatDocToUpload: MessageDescriptor
@@ -307,26 +315,26 @@ interface IFormMessages
   whoseContactDetailsLabel: MessageDescriptor
   uploadedList: MessageDescriptor
   userSignatureAttachmentTitle: MessageDescriptor
+  docTypeCoronersReport: MessageDescriptor
   userSignatureAttachment: MessageDescriptor
   userAttachmentSection: MessageDescriptor
   userSignatureAttachmentDesc: MessageDescriptor
   addFile: MessageDescriptor
+  uploadFile: MessageDescriptor
   fileUploadError: MessageDescriptor
   typeOfId: MessageDescriptor
   firstName: MessageDescriptor
   lastName: MessageDescriptor
   relationship: MessageDescriptor
-  informantPermanentAdress: MessageDescriptor
-  primaryCaregiverNameOrTitle: MessageDescriptor
+  primaryAddress: MessageDescriptor
   parentDetailsType: MessageDescriptor
   motherRadioButton: MessageDescriptor
   fatherRadioButton: MessageDescriptor
-  reasonMotherNotApplying: MessageDescriptor
-  reasonFatherNotApplying: MessageDescriptor
+  reasonMNA: MessageDescriptor
+  reasonFNA: MessageDescriptor
   reasonParentsNotApplying: MessageDescriptor
   motherDeceasedLabel: MessageDescriptor
   fatherDeceasedLabel: MessageDescriptor
-  primaryCaregiverTypeLabel: MessageDescriptor
   motherCaregiverTypeLabel: MessageDescriptor
   fatherCaregiverTypeLabel: MessageDescriptor
   legalGuardianCaregiverTypeLabel: MessageDescriptor
@@ -335,8 +343,8 @@ interface IFormMessages
   otherCaregiverTypeLabel: MessageDescriptor
   nameFieldLabel: MessageDescriptor
   reasonNotApplyingFieldLabel: MessageDescriptor
-  reasonMotherNotApplyingPreview: MessageDescriptor
-  reasonFatherNotApplyingPreview: MessageDescriptor
+  reasonMNAPreview: MessageDescriptor
+  reasonFNAPreview: MessageDescriptor
   tooltipNationalID: MessageDescriptor
   deceasedFatherSectionName: MessageDescriptor
   deceasedFatherSectionTitle: MessageDescriptor
@@ -362,9 +370,70 @@ interface IFormMessages
   nationalIdOption: MessageDescriptor
   brnOption: MessageDescriptor
   helperTextNID: MessageDescriptor
+  formSelectPlaceholder: MessageDescriptor
+  selectContactPoint: MessageDescriptor
+  reviewLabelMainContact: MessageDescriptor
+  deceasedSecondaryAddressSameAsPrimary: MessageDescriptor
+  deceasedSecondaryAddress: MessageDescriptor
+  informantSecondaryAddressSameAsPrimary: MessageDescriptor
+  informantSecondaryAddress: MessageDescriptor
+  emptyStringForSubSection: MessageDescriptor
+  assignedResponsibilityProof: MessageDescriptor
 }
 
-const messagesToDefine: IFormMessages = {
+export const formMessageDescriptors: IFormMessages = {
+  docTypeCoronersReport: {
+    defaultMessage: "Coroner's report",
+    description: "Label for select option Coroner's report",
+    id: 'form.field.label.docTypeCoronersReport'
+  },
+  docTypePoliceCertificate: {
+    defaultMessage: 'Police certificate of death',
+    description: 'Label for select option Police death certificate',
+    id: 'form.field.label.docTypePoliceCertificate'
+  },
+  primaryAddressSameAsDeceasedsPrimary: {
+    defaultMessage: "Same as deceased's usual place of residence",
+    description:
+      "Label for informant's address to be same as deceased's usual place of residence",
+    id: 'form.field.label.primaryAddressSameAsDeceasedsPrimary'
+  },
+  deathDescription: {
+    defaultMessage: 'Description',
+    description:
+      'Description of cause of death by lay person or verbal autopsy',
+    id: 'form.field.label.deathDescription'
+  },
+  causeOfDeathMethod: {
+    defaultMessage: 'Source of cause of death',
+    description: 'Source of cause of death',
+    id: 'form.field.label.causeOfDeathMethod'
+  },
+  assignedResponsibilityProof: {
+    defaultMessage: 'Proof of assigned responsibility',
+    description: 'Label for docuemnt option Proof of assigned responsibility',
+    id: 'form.field.label.assignedResponsibilityProof'
+  },
+  legalGuardianProof: {
+    defaultMessage: 'Proof of legal guardianship',
+    description: 'Label for document option Proof of legal guardianship',
+    id: 'form.field.label.legalGuardianProof'
+  },
+  otherBirthSupportingDocuments: {
+    defaultMessage: 'Other',
+    description: 'Option for other supporting documents',
+    id: 'form.field.label.otherBirthSupportingDocuments'
+  },
+  reviewLabelMainContact: {
+    defaultMessage: 'Main Contact',
+    description: 'Label for point of contact on the review page',
+    id: 'form.review.label.mainContact'
+  },
+  selectContactPoint: {
+    defaultMessage: 'Who is the main point of contact for this declaration?',
+    description: 'Form section title for contact point',
+    id: 'register.SelectContactPoint.heading'
+  },
   accountDetails: {
     defaultMessage: 'Account details',
     description: 'Account details section',
@@ -373,7 +442,7 @@ const messagesToDefine: IFormMessages = {
   addressLine1: {
     defaultMessage: 'Street and house number',
     description: 'Title for the address line 1',
-    id: 'form.field.label.addressLine1'
+    id: 'form.field.label.addressLine5'
   },
   addressLine2: {
     defaultMessage: 'Area / Ward / Mouja / Village',
@@ -385,91 +454,85 @@ const messagesToDefine: IFormMessages = {
     description: 'Title for the address line 3 option 1',
     id: 'form.field.label.addressLine3'
   },
-  addressLine3CityOption: {
+  addressLine3UrbanOption: {
     defaultMessage: 'Ward',
     description: 'Title for the address line 3 option 2',
-    id: 'form.field.label.addressLine3CityOption'
+    id: 'form.field.label.addressLine3UrbanOption'
   },
   addressLine4: {
     defaultMessage: 'Upazila (Thana) / City',
     description: 'Title for the address line 4',
     id: 'form.field.label.addressLine4'
   },
-  addressSameAsMother: {
-    defaultMessage: "Is his current address the same as the mother's?",
-    description:
-      "Title for the radio button to select that the father's current address is the same as the mother's address",
-    id: 'form.field.label.addressSameAsMother'
-  },
   answer: {
     defaultMessage: 'Answer',
     description: 'Label to show answer to a security question',
     id: 'user.form.securityquestion.answer'
   },
-  applicantIDProof: {
-    defaultMessage: "Proof of applicant's ID",
+  proofOfInformantsID: {
+    defaultMessage: "Proof of informant's ID",
     description: 'Option for radio group field: Type of Document To Upload',
-    id: 'form.field.label.applicantIDProof'
+    id: 'form.field.label.proofOfInformantsID'
   },
-  applicantName: {
-    defaultMessage: 'Applicant',
-    description: 'Form section name for Applicant',
-    id: 'form.section.applicant.name'
+  informantName: {
+    defaultMessage: 'Informant',
+    description: 'Form section name for Informant',
+    id: 'form.section.informant.name'
   },
-  applicantOtherRelationship: {
+  otherInformantType: {
     defaultMessage: 'Other relation',
     description: 'Label for form field: Other relation',
-    id: 'form.field.label.applicantOtherRelationship'
+    id: 'form.field.label.otherInformantType'
   },
-  applicantsDateOfBirth: {
+  informantsDateOfBirth: {
     defaultMessage: 'Date of Birth',
     description: 'Label for form field: Date of birth',
-    id: 'form.field.label.applicantsDateOfBirth'
+    id: 'form.field.label.informantsDateOfBirth'
   },
-  applicantsFamilyName: {
+  informantsFamilyName: {
     defaultMessage: 'নামের শেষাংশ বাংলায়',
     description: 'Label for form field: Family name',
-    id: 'form.field.label.applicantsFamilyName'
+    id: 'form.field.label.informantsFamilyName'
   },
-  applicantsFamilyNameEng: {
+  informantsFamilyNameEng: {
     defaultMessage: 'Last Name(s) in English',
     description: 'Label for form field: Family name in english',
-    id: 'form.field.label.applicantsFamilyNameEng'
+    id: 'form.field.label.informantsFamilyNameEng'
   },
-  applicantsGivenNames: {
+  informantsGivenNames: {
     defaultMessage: 'নামের প্রথমাংশ বাংলায়',
     description: 'Label for form field: Given names',
-    id: 'form.field.label.applicantsGivenNames'
+    id: 'form.field.label.informantsGivenNames'
   },
-  applicantsGivenNamesEng: {
+  informantsGivenNamesEng: {
     defaultMessage: 'First Name(s) in English',
     description: 'Label for form field: Given names in english',
-    id: 'form.field.label.applicantsGivenNamesEng'
+    id: 'form.field.label.informantsGivenNamesEng'
   },
-  applicantsIdType: {
+  informantsIdType: {
     defaultMessage: 'Type of ID',
     description: 'Label for form field: Existing ID',
-    id: 'form.field.label.applicantsIdType'
+    id: 'form.field.label.informantsIdType'
   },
-  applicantsNationality: {
+  informantsNationality: {
     defaultMessage: 'Nationality',
     description: 'Label for form field: Nationality',
-    id: 'form.field.label.applicants.nationality'
+    id: 'form.field.label.informants.nationality'
   },
-  applicantsRelationWithChild: {
+  informantsRelationWithChild: {
     defaultMessage: 'Relationship to child',
     description: 'Label for Relationship to child',
-    id: 'form.field.label.applicantsRelationWithChild'
+    id: 'form.field.label.informantsRelationWithChild'
   },
-  applicantsRelationWithDeceased: {
+  informantsRelationWithDeceased: {
     defaultMessage: 'Relationship to Deceased',
     description: 'Label for Relationship to Deceased select',
-    id: 'form.field.label.applicantsRelationWithDeceased'
+    id: 'form.field.label.informantsRelationWithDeceased'
   },
-  applicantTitle: {
-    defaultMessage: "What are the applicant's details?",
-    description: 'Form section title for applicants',
-    id: 'form.section.applicant.title'
+  informantTitle: {
+    defaultMessage: "What are the informant's details?",
+    description: 'Form section title for informants',
+    id: 'form.section.informant.title'
   },
   assignedRegistrationOffice: {
     defaultMessage: 'Assigned Registration Office',
@@ -496,6 +559,11 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for form field: Attendant at birth',
     id: 'form.field.label.attendantAtBirthMidwife'
   },
+  attendantAtBirthTraditionalBirthAttendant: {
+    defaultMessage: 'Traditional birth attendant',
+    description: 'Label for form field: Attendant at birth',
+    id: 'form.field.label.attendantAtBirthTraditionalBirthAttendant'
+  },
   attendantAtBirthNone: {
     defaultMessage: 'None',
     description: 'Label for form field: Attendant at birth',
@@ -516,10 +584,15 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for form field: Attendant at birth',
     id: 'form.field.label.attBirthOtherParaPers'
   },
-  attendantAtBirthPhysician: {
+  physician: {
     defaultMessage: 'Physician',
-    description: 'Label for form field: Attendant at birth',
-    id: 'form.field.label.attendantAtBirthPhysician'
+    description: 'Label for form field: physician',
+    id: 'form.field.label.physician'
+  },
+  layReported: {
+    defaultMessage: 'Lay reported',
+    description: 'Label for form field: Lay reported',
+    id: 'form.field.label.layReported'
   },
   attestedBirthRecord: {
     defaultMessage: 'Attested copy of hospital document or birth record, or',
@@ -577,13 +650,13 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for form field: Type of birth',
     id: 'form.field.label.birthTypeTwin'
   },
-  causeOfDeathCode: {
-    defaultMessage: 'Cause of Death Code',
-    description: 'Label for form field: Cause of Death Code',
-    id: 'form.field.label.causeOfDeathCode'
+  causeOfDeathProof: {
+    defaultMessage: 'Proof of cause of death',
+    description: 'Label for doc section: Proof of cause of death',
+    id: 'form.field.label.causeOfDeathProof'
   },
   causeOfDeathEstablished: {
-    defaultMessage: 'Has an official cause of death been established ?',
+    defaultMessage: 'Has a cause of death been established ?',
     description: 'Label for form field: Cause of Death Established',
     id: 'form.field.label.causeOfDeathEstablished'
   },
@@ -594,7 +667,7 @@ const messagesToDefine: IFormMessages = {
   },
   causeOfDeathNotice: {
     defaultMessage:
-      'A Medically Certified Cause of Death is not mandatory to submit the application. This can be added at a later date.',
+      'A Medically Certified Cause of Death is not mandatory to submit the declaration. This can be added at a later date.',
     description: 'Form section notice for Cause of Death',
     id: 'form.section.causeOfDeathNotice'
   },
@@ -673,12 +746,12 @@ const messagesToDefine: IFormMessages = {
     defaultMessage:
       'Use this section to add any comments or notes that might be relevant to the completion and certification of this registration. This information won’t be shared with the informants.',
     description: 'Help text for the notes field',
-    id: 'form.field.label.application.comment.desc'
+    id: 'form.field.label.declaration.comment.desc'
   },
   commentsOrNotesLabel: {
     defaultMessage: 'Comments or notes',
     description: 'Input label for comments or notes textarea',
-    id: 'form.field.label.application.commentsOrNotes'
+    id: 'form.field.label.declaration.commentsOrNotes'
   },
   confirm: {
     defaultMessage: 'Yes',
@@ -691,10 +764,10 @@ const messagesToDefine: IFormMessages = {
     description: 'The label for mother details paragraph',
     id: 'form.field.label.print.confirmMotherInformation'
   },
-  contactDetailsApplicant: {
+  contactDetailsInformant: {
     id: 'form.field.label.app.whoContDet.app',
-    defaultMessage: 'Applicant',
-    description: 'Label for "Applicant" select option'
+    defaultMessage: 'Informant',
+    description: 'Label for "Informant" select option'
   },
   contactDetailsBoth: {
     defaultMessage: 'Both Parents',
@@ -716,21 +789,15 @@ const messagesToDefine: IFormMessages = {
     description: 'Title for the country select',
     id: 'form.field.label.country'
   },
-  currentAddress: {
-    defaultMessage: 'Current Address',
-    description: 'Title for the current address fields',
-    id: 'form.field.label.currentAddress'
+  secondaryAddress: {
+    defaultMessage: 'Secondary Address',
+    description: 'Title for the secondary address fields',
+    id: 'form.field.label.secondaryAddress'
   },
-  currentAddressSameAsPermanent: {
-    defaultMessage: 'Is her current address the same as her permanent address?',
-    description:
-      'Title for the radio button to select that the mothers current address is the same as her permanent address',
-    id: 'form.field.label.currentAddressSameAsPermanent'
-  },
-  informantPermanentAdress: {
-    defaultMessage: 'What is their permanent address?',
-    description: 'Title of informant permanent adress ',
-    id: 'form.field.label.informantPermanentAddress'
+  primaryAddress: {
+    defaultMessage: 'Usual place of residence',
+    description: 'Title of the primary adress ',
+    id: 'form.field.label.primaryAddress'
   },
   dateOfMarriage: {
     defaultMessage: 'Date of marriage',
@@ -740,17 +807,17 @@ const messagesToDefine: IFormMessages = {
   daughter: {
     defaultMessage: 'Daughter',
     description: 'Label for option Daughter',
-    id: 'form.field.label.applicantRelation.daughter'
+    id: 'form.field.label.informantRelation.daughter'
   },
   daughterInLaw: {
     defaultMessage: 'Daughter in law',
     description: 'Label for option Daughter in law',
-    id: 'form.field.label.applicantRelation.daughterInLaw'
+    id: 'form.field.label.informantRelation.daughterInLaw'
   },
   granddaughter: {
     defaultMessage: 'Granddaughter',
     description: 'Label for option Granddaughter',
-    id: 'form.field.label.applicantRelation.granddaughter'
+    id: 'form.field.label.informantRelation.granddaughter'
   },
   deathAtFacility: {
     defaultMessage: 'What hospital did the death occur at?',
@@ -773,12 +840,17 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deathDate'
   },
   deathEventName: {
-    defaultMessage: 'When did the death occur?',
+    defaultMessage: 'Death event details',
     description: 'Form section name for Death Event',
     id: 'form.section.deathEvent.name'
   },
+  deathEventDate: {
+    defaultMessage: 'Date of death',
+    description: 'Form section title for date of Death Event',
+    id: 'form.section.deathEvent.date'
+  },
   deathEventTitle: {
-    defaultMessage: 'When did the death occur?',
+    defaultMessage: 'Death details?',
     description: 'Form section title for Death Event',
     id: 'form.section.deathEvent.title'
   },
@@ -787,32 +859,33 @@ const messagesToDefine: IFormMessages = {
     description: 'Title for place of occurrence of death',
     id: 'form.field.label.deathPlace'
   },
-  deathPlaceAddress: {
+  placeOfDeath: {
     defaultMessage: 'Where did the death occur?',
     description: 'Label for form field: Place of occurrence of death',
-    id: 'form.field.label.deathPlaceAddress'
+    id: 'form.field.label.placeOfDeath'
   },
-  deathPlaceAddressOther: {
+  placeOfDeathOther: {
     defaultMessage: 'Different Address',
     description: 'Option for form field: Place of occurrence of death',
-    id: 'form.field.label.deathPlaceAddressOther'
+    id: 'form.field.label.placeOfDeathOther'
   },
-  deathPlaceAddressSameAsCurrent: {
+  placeOfDeathSameAsCurrent: {
     defaultMessage: 'Current address of the deceased',
     description: 'Option for form field: Place of occurrence of death',
-    id: 'form.field.label.deathPlaceAddressSameAsCurrent'
+    id: 'form.field.label.placeOfDeathSameAsCurrent'
   },
-  deathPlaceAddressSameAsPermanent: {
-    defaultMessage: 'Permanent address of the deceased',
-    description: 'Option for form field: Place of occurrence of death',
-    id: 'form.field.label.deathPlaceAddressSameAsPermanent'
+  placeOfDeathSameAsPrimary: {
+    defaultMessage: "Deceased's usual place of residence",
+    description:
+      'Option for place of occurrence of death same as deceased primary address  ',
+    id: 'form.field.label.placeOfDeathSameAsPrimary'
   },
-  deathPlaceAddressType: {
+  placeOfDeathType: {
     defaultMessage: 'Type of Place',
     description: 'Label for form field: Type of place of death occurrence',
-    id: 'form.field.label.deathPlaceAddressType'
+    id: 'form.field.label.placeOfDeathType'
   },
-  deceasedCurrentAddressSameAsPermanent: {
+  deceasedCurrentAddressSameAsPrimary: {
     defaultMessage:
       'Is deceased’s current address the same as their permanent address?',
     description:
@@ -875,10 +948,10 @@ const messagesToDefine: IFormMessages = {
     description: 'Documents Paragraph text',
     id: 'form.field.label.deceasedDocumentParagraph'
   },
-  deceasedPermanentAddressProof: {
+  deceasedPrimaryAddressProof: {
     defaultMessage: 'Proof of permanent address of deceased',
     description: 'Option for radio group field: Type of Document To Upload',
-    id: 'form.field.label.deceasedPermanentAddressProof'
+    id: 'form.field.label.deceasedPrimaryAddressProof'
   },
   deceasedSex: {
     defaultMessage: 'Sex',
@@ -930,11 +1003,6 @@ const messagesToDefine: IFormMessages = {
     description: 'deny label for yes / no radio button',
     id: 'form.field.label.deny'
   },
-  dischargeCertificate: {
-    defaultMessage: 'Discharge Certificate',
-    description: 'Document type label for Discharge Certificate',
-    id: 'form.field.label.docHospDischCert'
-  },
   district: {
     defaultMessage: 'District',
     description: 'Title for the district select',
@@ -945,10 +1013,10 @@ const messagesToDefine: IFormMessages = {
     description: 'Document type label for tax receipt',
     id: 'form.field.label.docTypeTaxReceipt'
   },
-  docTypeBR: {
-    defaultMessage: 'Birth registration certificate',
-    description: 'Label for select option Birth Registration',
-    id: 'form.field.label.docTypeBR'
+  docTypeBirthCert: {
+    defaultMessage: 'Birth certificate',
+    description: 'Label for select option birth certificate',
+    id: 'form.field.label.docTypeBirthCert'
   },
   docTypeChildAgeProof: {
     defaultMessage: 'Proof of child age',
@@ -956,14 +1024,9 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.docTypeChildAgeProof'
   },
   docTypeChildBirthProof: {
-    defaultMessage: 'Proof of place and date of birth',
-    description: 'Label for select option Child Birth Proof',
+    defaultMessage: 'Notification of birth',
+    description: 'Label for select option Notification of birth',
     id: 'form.field.label.docTypeChildBirthProof'
-  },
-  docTypeChildUnderFiveCard: {
-    defaultMessage: 'Under five card',
-    description: 'Label for select option Under five card',
-    id: 'form.field.label.docTypeChildUnderFiveCard'
   },
   docTypeCopyOfBurialReceipt: {
     defaultMessage: 'Certified copy of burial receipt',
@@ -995,25 +1058,20 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for select option Certified Copy of Funeral Receipt',
     id: 'form.field.label.docTypeFuneralReceipt'
   },
-  docTypeHospitalDischargeCertificate: {
-    defaultMessage: 'Hospital discharge certificate',
-    description: 'Label for select option Hospital Discharge Certificate',
-    id: 'form.field.label.docHospDischCert'
+  docTypeHospitalDeathCertificate: {
+    defaultMessage: 'Hospital certificate of death',
+    description: 'Label for select option Hospital certificate of death',
+    id: 'form.field.label.docTypeHospitalDeathCertificate'
   },
   docTypeLetterOfDeath: {
     defaultMessage: 'Attested letter of death',
     description: 'Label for select option Attested Letter of Death',
     id: 'form.field.label.docTypeLetterOfDeath'
   },
-  docTypeNIDBack: {
-    defaultMessage: 'National ID (back)',
-    description: 'Label for select option radio option NID back',
-    id: 'form.field.label.docTypeNIDBack'
-  },
-  docTypeNIDFront: {
-    defaultMessage: 'National ID (front)',
-    description: 'Label for select option radio option NID front',
-    id: 'form.field.label.docTypeNIDFront'
+  docTypeNID: {
+    defaultMessage: 'National ID',
+    description: 'Label for select option radio option NID',
+    id: 'form.field.label.docTypeNID'
   },
   docTypeOther: {
     defaultMessage: 'Other',
@@ -1088,7 +1146,7 @@ const messagesToDefine: IFormMessages = {
   father: {
     defaultMessage: 'Father',
     description: 'Label for option Father',
-    id: 'form.field.label.applicantRelation.father'
+    id: 'form.field.label.informantRelation.father'
   },
   fatherDateOfBirth: {
     defaultMessage: 'Date of birth',
@@ -1124,6 +1182,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Father',
     description: 'Form section name for Father',
     id: 'form.section.father.name'
+  },
+  mothersDetailsExist: {
+    defaultMessage: "Do you have the mother's details?",
+    description: "Question to ask the user if they have the mother's details",
+    id: 'form.field.label.mothersDetailsExist'
   },
   fathersDetailsExist: {
     defaultMessage: "Do you have the father's details?",
@@ -1287,18 +1350,13 @@ const messagesToDefine: IFormMessages = {
     description: 'Attested document of the informant',
     id: 'form.section.documents.list.informantAttestation'
   },
-  lastNameBn: {
-    defaultMessage: 'Bengali last name',
-    description: 'Bengali last name',
-    id: 'form.field.label.lastNameBN'
-  },
   lastNameEn: {
     defaultMessage: 'English last name',
     description: 'English last name',
     id: 'form.field.label.lastNameEN'
   },
   manner: {
-    defaultMessage: 'What was the manner of death?',
+    defaultMessage: 'Manner of death',
     description: 'Label for form field: Manner of death',
     id: 'form.field.label.mannerOfDeath'
   },
@@ -1353,7 +1411,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.maritalStatusNotStated'
   },
   maritalStatusSingle: {
-    defaultMessage: 'Unmarried',
+    defaultMessage: 'Single',
     description: 'Option for form field: Marital status',
     id: 'form.field.label.maritalStatusSingle'
   },
@@ -1375,7 +1433,7 @@ const messagesToDefine: IFormMessages = {
   mother: {
     defaultMessage: 'Mother',
     description: 'Label for option Mother',
-    id: 'form.field.label.applicantRelation.mother'
+    id: 'form.field.label.informantRelation.mother'
   },
   motherDateOfBirth: {
     defaultMessage: 'Date of birth',
@@ -1388,22 +1446,22 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.motherEducationAttainment'
   },
   motherFamilyName: {
-    defaultMessage: 'নামের শেষাংশ বাংলায়',
+    defaultMessage: 'Last name',
     description: 'Label for form field: Family name',
     id: 'form.field.label.motherFamilyName'
   },
   motherFamilyNameEng: {
-    defaultMessage: 'Last Name(s) in English',
+    defaultMessage: 'Last name',
     description: 'Label for form field: Family name in english',
     id: 'form.field.label.motherFamilyNameEng'
   },
   motherFirstNames: {
-    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
+    defaultMessage: 'First name(s)',
     description: 'Label for form field: First names',
     id: 'form.field.label.motherFirstNames'
   },
   motherFirstNamesEng: {
-    defaultMessage: 'First Name(s) in English',
+    defaultMessage: 'First name(s)',
     description: 'Label for form field: First names in english',
     id: 'form.field.label.motherFirstNamesEng'
   },
@@ -1418,8 +1476,8 @@ const messagesToDefine: IFormMessages = {
     id: 'form.section.mother.title'
   },
   multipleBirth: {
-    defaultMessage: 'Order of birth (number)',
-    description: 'Label for form field: Order of birth',
+    defaultMessage: 'No. of previous births',
+    description: 'Label for form field: multipleBirth',
     id: 'form.field.label.multipleBirth'
   },
   nationality: {
@@ -1459,8 +1517,8 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.otherHealthInstitution'
   },
   otherInstitution: {
-    defaultMessage: 'Other Institution',
-    description: 'Select item for Other Institution',
+    defaultMessage: 'Other',
+    description: 'Select item for Other location',
     id: 'form.field.label.otherInstitution'
   },
   otherOption: {
@@ -1468,17 +1526,17 @@ const messagesToDefine: IFormMessages = {
     description: 'Other option for select',
     id: 'form.field.label.otherOption'
   },
-  paragraph: {
+  documentsParagraph: {
     defaultMessage:
       'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
     description: 'Documents Paragraph text',
     id: 'form.section.documents.birth.requirements'
   },
-  paragraph45daysTo5Years: {
+  paragraphTargetDaysTo5Years: {
     defaultMessage:
       'For birth regiatration of children below 5 years old, one of the documents listed below is required:',
     description: 'Documents Paragraph text',
-    id: 'form.section.documents.paragraph45daysTo5Years'
+    id: 'form.section.documents.paragraphTargetDaysTo5Years'
   },
   paragraphAbove5Years: {
     defaultMessage:
@@ -1486,23 +1544,52 @@ const messagesToDefine: IFormMessages = {
     description: 'Documents Paragraph text',
     id: 'form.section.documents.paragraphAbove5Years'
   },
-  permanentAddress: {
-    defaultMessage: 'What was their permanent address?',
-    description: 'Title for the permanent address fields',
-    id: 'form.field.label.permanentAddress'
+  deceasedPrimaryAddress: {
+    defaultMessage: 'Usual place of residence',
+    description: 'Title for the primary address fields for the deceased',
+    id: 'form.field.label.deceasedPrimaryAddress'
   },
-  permanentAddressSameAsCurrent: {
+  deceasedSecondaryAddress: {
+    defaultMessage: 'Secondary address?',
+    description: 'Title for the secondary address fields for the deceased',
+    id: 'form.field.label.deceasedSecondaryAddress'
+  },
+  deceasedSecondaryAddressSameAsPrimary: {
     defaultMessage:
-      'Is applicant’s permanent address the same as their current address?',
+      'Was their secondary address the same as their primary address?',
     description:
-      'Title for the radio button to select that the applicants current address is the same as their permanent address',
+      'Title for the checkbox for the deceased secondary address being the same as the primary address',
+    id: 'form.field.label.deceasedSecondaryAddressSameAsPrimary'
+  },
+  informantSecondaryAddressSameAsPrimary: {
+    defaultMessage:
+      'Is their secondary address the same as their primary address?',
+    description:
+      'Title for the checkbox for the informant secondary address being the same as the informant primary address',
+    id: 'form.field.label.informantSecondaryAddressSameAsPrimary'
+  },
+  informantSecondaryAddress: {
+    defaultMessage: 'Secondary Address',
+    description: 'Title for the secondary address fields for the informant',
+    id: 'form.field.label.informantSecondaryAddress'
+  },
+  informantPrimaryAddress: {
+    defaultMessage: 'Usual place of residence',
+    description: 'Title for the primary address fields for the informant',
+    id: 'form.field.label.informantPrimaryAddress'
+  },
+  primaryAddressSameAsCurrent: {
+    defaultMessage:
+      'Is the permanent address the same as their current address?',
+    description:
+      'Title for the radio button to select that the informants current address is the same as their permanent address',
     id: 'form.field.label.appCurrAddSameAsPerm'
   },
-  permanentAddressSameAsMother: {
-    defaultMessage: "Is his permanent address the same as the mother's?",
+  primaryAddressSameAsOtherPrimary: {
+    defaultMessage: "Same as mother's usual place of residence?",
     description:
-      "Title for the radio button to select that the father's permanent address is the same as the mother's address",
-    id: 'form.field.label.permanentAddressSameAsMother'
+      "Title for the radio button to select that the persons primary address is the same as the mother's primary address",
+    id: 'form.field.label.primaryAddressSameAsOtherPrimary'
   },
   phoneNumber: {
     defaultMessage: 'Phone number',
@@ -1511,14 +1598,19 @@ const messagesToDefine: IFormMessages = {
   },
   phoneVerificationWarning: {
     defaultMessage:
-      'Check with the applicant that the mobile phone number you have entered is correct',
-    description: 'Warning message to verify applicant phone number ',
+      'Check with the informant that the mobile phone number you have entered is correct',
+    description: 'Warning message to verify informant phone number ',
     id: 'form.field.label.app.phoneVerWarn'
   },
   placeOfBirth: {
-    defaultMessage: 'Place of delivery',
+    defaultMessage: 'Location',
     description: 'Label for form field: Place of delivery',
     id: 'form.field.label.placeOfBirth'
+  },
+  nameInEnglishPreviewGroup: {
+    defaultMessage: 'English name',
+    description: 'Label for child name in english',
+    id: 'form.preview.group.label.english.name'
   },
   postCode: {
     defaultMessage: 'Postcode',
@@ -1528,25 +1620,25 @@ const messagesToDefine: IFormMessages = {
   presentBoth: {
     defaultMessage: 'Both Parents',
     description: 'Label for "Both Parents" select option',
-    id: 'form.field.label.application.whoIsPresent.both'
+    id: 'form.field.label.declaration.whoIsPresent.both'
   },
   presentFather: {
     defaultMessage: 'Father',
     description: 'Label for "Father" select option',
-    id: 'form.field.label.application.whoIsPresent.father'
+    id: 'form.field.label.declaration.whoIsPresent.father'
   },
   presentMother: {
     defaultMessage: 'Mother',
     description: 'Label for "Mother" select option',
-    id: 'form.field.label.application.whoIsPresent.mother'
+    id: 'form.field.label.declaration.whoIsPresent.mother'
   },
   presentOther: {
     defaultMessage: 'Other',
     description: 'Label for "Other" select option',
-    id: 'form.field.label.application.whoIsPresent.other'
+    id: 'form.field.label.declaration.whoIsPresent.other'
   },
   privateHome: {
-    defaultMessage: 'Private Home',
+    defaultMessage: 'Residential address',
     description: 'Select item for Private Home',
     id: 'form.field.label.privateHome'
   },
@@ -1557,10 +1649,10 @@ const messagesToDefine: IFormMessages = {
       'Labal for prompt in case of other person collects certificate',
     id: 'form.field.label.print.otherPersonPrompt'
   },
-  proofOfBirthPlaceAndDate: {
-    defaultMessage: 'Proof of place and date of birth of child',
-    description: 'Label for list item Child Birth Proof',
-    id: 'form.field.label.proofOfBirthPlaceAndDate'
+  proofOfBirth: {
+    defaultMessage: 'Proof of birth',
+    description: 'Label for list item Proof of birth',
+    id: 'form.field.label.proofOfBirth'
   },
   proofOfDocCertificateOfChild: {
     defaultMessage:
@@ -1574,24 +1666,24 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.proofOfEPICardOfChild'
   },
   proofOfFathersID: {
-    defaultMessage: "Proof of Father's ID",
+    defaultMessage: "Father's identity",
     description: 'Label for list item Father ID Proof',
     id: 'form.field.label.proofOfFathersID'
   },
   proofOfMothersID: {
-    defaultMessage: "Proof of Mother's ID",
+    defaultMessage: "Mother's identity",
     description: 'Label for list item Mother ID Proof',
     id: 'form.field.label.proofOfMothersID'
   },
-  proofOfParentPermanentAddress: {
-    defaultMessage: 'Proof of Permanent Address of Parent',
-    description: 'Label for list item Parent Permanent Address Proof',
-    id: 'form.field.label.proofOfParentPermanentAddress'
+  proofOfParentPrimaryAddress: {
+    defaultMessage: 'Proof of Primary Address of Parent',
+    description: 'Label for list item Parent Primary Address Proof',
+    id: 'form.field.label.proofOfParentPrimaryAddress'
   },
   registrationName: {
     defaultMessage: 'Registration',
     description: 'Form section name for Registration',
-    id: 'form.section.application.name'
+    id: 'form.section.declaration.name'
   },
   registrationOffice: {
     defaultMessage: 'Registration Office',
@@ -1601,22 +1693,22 @@ const messagesToDefine: IFormMessages = {
   registrationPhoneLabel: {
     defaultMessage: 'Phone number',
     description: 'Input label for phone input',
-    id: 'form.field.label.application.phone'
+    id: 'form.field.label.declaration.phone'
   },
   registrationTitle: {
     defaultMessage: 'Registration',
     description: 'Form section title for Registration',
-    id: 'form.section.application.title'
+    id: 'form.section.declaration.title'
   },
   relationExtendedFamily: {
     defaultMessage: 'Extended Family',
     description: 'Label for option Extended Family',
-    id: 'form.field.label.applicantRelation.extendedFamily'
+    id: 'form.field.label.informantRelation.extendedFamily'
   },
   relationOther: {
     defaultMessage: 'Other (Specify)',
     description: 'Label for option Other',
-    id: 'form.field.label.applicantRelation.other'
+    id: 'form.field.label.informantRelation.other'
   },
   relationshipPlaceHolder: {
     defaultMessage: 'eg. Grandmother',
@@ -1637,6 +1729,11 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Search',
     description: 'Place holder text ',
     id: 'form.field.SearchField.placeHolderText'
+  },
+  formSelectPlaceholder: {
+    defaultMessage: 'Select',
+    description: 'Placeholder text for a select',
+    id: 'form.field.select.placeholder'
   },
   securityQuestionLabel: {
     defaultMessage: 'Security question {count}',
@@ -1668,6 +1765,11 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for signed affidavit confirmation radio group',
     id: 'form.field.label.print.signedAffidavit'
   },
+  informantRelation: {
+    defaultMessage: 'Who is the informant?',
+    description: 'Form section title for contact point',
+    id: 'register.selectInformant.relation'
+  },
   someoneElse: {
     defaultMessage: 'Someone else',
     description: 'Other Label',
@@ -1676,44 +1778,74 @@ const messagesToDefine: IFormMessages = {
   son: {
     defaultMessage: 'Son',
     description: 'Label for option Son',
-    id: 'form.field.label.applicantRelation.son'
+    id: 'form.field.label.informantRelation.son'
   },
   sonInLaw: {
     defaultMessage: 'Son in law',
     description: 'Label for option Son in law',
-    id: 'form.field.label.applicantRelation.sonInLaw'
+    id: 'form.field.label.informantRelation.sonInLaw'
   },
   grandson: {
     defaultMessage: 'Grandson',
     description: 'Label for option Grandson',
-    id: 'form.field.label.applicantRelation.grandson'
+    id: 'form.field.label.informantRelation.grandson'
+  },
+  grandfather: {
+    defaultMessage: 'Grandfather',
+    description: 'Label for option Grandfather',
+    id: 'form.field.label.informantRelation.grandfather'
+  },
+  otherFamilyMember: {
+    defaultMessage: 'Other family member',
+    description: 'Label for option Other family member',
+    id: 'form.field.label.relationOtherFamilyMember'
+  },
+  grandmother: {
+    defaultMessage: 'Grandmother',
+    description: 'Label for option Grandmother',
+    id: 'form.field.label.informantRelation.grandmother'
+  },
+  brother: {
+    defaultMessage: 'Brother',
+    description: 'Label for option brother',
+    id: 'form.field.label.informantRelation.brother'
+  },
+  sister: {
+    defaultMessage: 'Sister',
+    description: 'Label for option Sister',
+    id: 'form.field.label.informantRelation.sister'
+  },
+  legalGuardian: {
+    defaultMessage: 'Legal guardian',
+    description: 'Label for option Legal Guardian',
+    id: 'form.field.label.informantRelation.legalGuardian'
   },
   spouse: {
     defaultMessage: 'Spouse',
     description: 'Label for option Spouse',
-    id: 'form.field.label.applicantRelation.spouse'
+    id: 'form.field.label.informantRelation.spouse'
   },
   headOfTheInstitute: {
     defaultMessage: 'Head of the institution where the death occurred',
     description: 'Option for form field: Head of the institute',
-    id: 'form.field.label.applicantRelation.headInst'
+    id: 'form.field.label.informantRelation.headInst'
   },
   driverOfTheVehicle: {
     defaultMessage:
       'Driver or operator of the land or water vehicle or aircraft where the death occurred',
     description: 'Option for form field: Driver of the vehicle',
-    id: 'form.field.label.applicantRelation.driver'
+    id: 'form.field.label.informantRelation.driver'
   },
   ownerOfTheHouse: {
     defaultMessage: 'Owner of the house or building where the death occurred',
     description: 'Option for form field: Owner of the house',
-    id: 'form.field.label.applicantRelation.owner'
+    id: 'form.field.label.informantRelation.owner'
   },
   officerInCharge: {
     defaultMessage:
       'Officer-in-charge of the Thana of a road or public space where the death occurred',
     description: 'Option for form field: Officer-in-charge',
-    id: 'form.field.label.applicantRelation.officer'
+    id: 'form.field.label.informantRelation.officer'
   },
   state: {
     defaultMessage: 'Division',
@@ -1831,9 +1963,14 @@ const messagesToDefine: IFormMessages = {
     description: 'The title of user form',
     id: 'form.section.user.title'
   },
+  verbalAutopsyReport: {
+    defaultMessage: 'Verbal autopsy report',
+    description: 'Option for form field: verbalAutopsyReport',
+    id: 'form.field.label.verbalAutopsyReport'
+  },
   verbalAutopsy: {
     defaultMessage: 'Verbal autopsy',
-    description: 'Option for form field: Method of Cause of Death',
+    description: 'Option for form field: verbalAutopsy',
     id: 'form.field.label.verbalAutopsy'
   },
   warningNotVerified: {
@@ -1847,6 +1984,11 @@ const messagesToDefine: IFormMessages = {
     description: 'Label for form field: Weight at birth',
     id: 'form.field.label.weightAtBirth'
   },
+  placeOfBirthPreview: {
+    defaultMessage: 'Place of delivery',
+    description: 'Title for place of birth sub section',
+    id: 'form.field.label.placeOfBirthPreview'
+  },
   whatDocToUpload: {
     defaultMessage: 'Which document type are you uploading?',
     description:
@@ -1856,12 +1998,12 @@ const messagesToDefine: IFormMessages = {
   whoIsPresentLabel: {
     defaultMessage: 'Who is present for the registration',
     description: 'Input label for who is present input',
-    id: 'form.field.label.application.whoIsPresent'
+    id: 'form.field.label.declaration.whoIsPresent'
   },
   whoseContactDetailsLabel: {
-    defaultMessage: 'Who is the contact person for this application?',
+    defaultMessage: 'Who is the contact person for this declaration?',
     description: 'Input label for contact details person',
-    id: 'form.field.label.application.whoseContactDetails'
+    id: 'form.field.label.declaration.whoseContactDetails'
   },
   userSignatureAttachmentTitle: {
     defaultMessage: 'Attach the signature',
@@ -1889,8 +2031,13 @@ const messagesToDefine: IFormMessages = {
     description: 'text for add file button',
     id: 'form.field.label.addFile'
   },
+  uploadFile: {
+    defaultMessage: 'Upload',
+    description: 'text for file uploader button',
+    id: 'form.field.label.uploadFile'
+  },
   fileUploadError: {
-    defaultMessage: '{type} supported only',
+    defaultMessage: '{type} supported image only',
     description: 'text for error on file upload',
     id: 'form.field.label.fileUploadError'
   },
@@ -1915,11 +2062,6 @@ const messagesToDefine: IFormMessages = {
       "Input label for certificate collector's relationship to the subject",
     id: 'form.field.label.relationship'
   },
-  primaryCaregiverNameOrTitle: {
-    defaultMessage: 'Parents details',
-    description: 'Form section name or title for primary caregiver',
-    id: 'form.section.primaryCaregiver.nameOrTitle'
-  },
   parentDetailsType: {
     defaultMessage: "Do you have the mother and father's details?",
     description: 'Question to ask the user if they have the parents details',
@@ -1935,22 +2077,22 @@ const messagesToDefine: IFormMessages = {
     description: 'confirmation label for father radio button',
     id: 'form.field.label.radio.father'
   },
-  reasonMotherNotApplying: {
+  reasonMNA: {
     defaultMessage: 'Reason for mother',
     description: 'Label for form field: reasonMotherNotApplying',
     id: 'form.field.label.reasonMotherNotApplying'
   },
-  reasonFatherNotApplying: {
+  reasonFNA: {
     defaultMessage: 'Reason for father',
     description: 'Label for form field: reasonFatherNotApplying',
     id: 'form.field.label.reasonFatherNotApplying'
   },
-  reasonMotherNotApplyingPreview: {
+  reasonMNAPreview: {
     defaultMessage: 'Reason for mother not applying',
     description: 'Label for form field: reasonMotherNotApplyingPreview',
     id: 'form.field.label.reasonMotherNotApplyingPreview'
   },
-  reasonFatherNotApplyingPreview: {
+  reasonFNAPreview: {
     defaultMessage: 'Reason for father not applying',
     description: 'Label for form field: reasonFatherNotApplyingPreview',
     id: 'form.field.label.reasonFatherNotApplyingPreview'
@@ -1969,11 +2111,6 @@ const messagesToDefine: IFormMessages = {
     defaultMessage: 'Father has died',
     description: 'Label for form field: fatherIsDeceased',
     id: 'form.field.label.fatherIsDeceased'
-  },
-  primaryCaregiverTypeLabel: {
-    defaultMessage: 'Who is looking after the child?',
-    description: 'Question to ask the user about caregiver',
-    id: 'form.field.label.primaryCaregiverType'
   },
   motherCaregiverTypeLabel: {
     defaultMessage: 'Mother',
@@ -1996,7 +2133,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.caregiver.legalGuardian'
   },
   informantCaregiverTypeLabel: {
-    defaultMessage: 'Applicant is the primary caregiver',
+    defaultMessage: 'Informant is the primary caregiver',
     description: 'label for informant radio button',
     id: 'form.field.label.caregiver.informant'
   },
@@ -2122,7 +2259,7 @@ const messagesToDefine: IFormMessages = {
     id: 'form.field.label.deceasedSpousesGivenNamesEng'
   },
   certificatePrintInAdvance: {
-    defaultMessage: 'Print in advance for signatures and collection',
+    defaultMessage: 'Print in advance',
     description: 'Label for certificate collection option',
     id: 'form.field.label.certificatePrintInAdvance'
   },
@@ -2141,7 +2278,14 @@ const messagesToDefine: IFormMessages = {
       'If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.',
     description: 'Helper text for nid input field',
     id: 'form.field.helpertext.nid'
+  },
+  emptyStringForSubSection: {
+    defaultMessage: ' ',
+    description: 'empty string',
+    id: 'form.field.label.empty'
   }
 }
 
-export const formMessages: IFormMessages = defineMessages(messagesToDefine)
+export const formMessages: IFormMessages = defineMessages(
+  formMessageDescriptors
+)

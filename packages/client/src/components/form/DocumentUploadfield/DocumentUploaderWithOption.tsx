@@ -19,13 +19,18 @@ import { DocumentPreview } from '@client/components/form/DocumentUploadfield/Doc
 import { IFileValue, IFormFieldValue, IAttachmentValue } from '@client/forms'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@client/utils/constants'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  MessageDescriptor
+} from 'react-intl'
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { remove, clone } from 'lodash'
 import { buttonMessages, formMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/imageUpload'
 import imageCompression from 'browser-image-compression'
+import { FACILITIES_FAILED } from '@client/offline/actions'
 
 const options = {
   maxSizeMB: 0.4,
@@ -34,39 +39,29 @@ const options = {
 }
 
 const UploaderWrapper = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 `
 const Label = styled.label`
   position: relative;
-  top: -2px;
+  top: -6px;
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 const Flex = styled.div<{ splitView?: boolean }>`
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   margin-bottom: ${({ splitView }) => {
     return splitView ? '10px' : '0px'
   }};
 `
 export const ErrorMessage = styled.div`
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 `
 const DocumentUploader = styled(ImageUploader)`
-  color: ${({ theme }) => theme.colors.primary};
-  background: ${({ theme }) => theme.colors.white};
-  border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
-  border-radius: 2px;
-  ${({ theme }) => theme.fonts.buttonStyle};
-  height: 40px;
-  text-transform: initial;
-  margin-left: 10px;
-  padding: 0px 30px;
+  margin-left: 16px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-left: 0px;
-    margin-top: 10px;
+    margin-left: 8px;
   }
 `
 
@@ -76,9 +71,12 @@ type IFullProps = {
   extraValue: IFormFieldValue
   options: ISelectOption[]
   splitView?: boolean
-  files?: IFileValue[]
+  files: IFileValue[]
   hideOnEmptyOption?: boolean
   onComplete: (files: IFileValue[]) => void
+  touched?: boolean
+  onUploadingStateChanged?: (isUploading: boolean) => void
+  requiredErrorMessage?: MessageDescriptor
 } & IntlShapeProps
 
 type DocumentFields = {
@@ -89,7 +87,6 @@ type DocumentFields = {
 type IState = {
   errorMessage: string
   fields: DocumentFields
-  uploadedDocuments: IFileValue[]
   previewImage: IFileValue | null
   filesBeingProcessed: Array<{ label: string }>
   dropDownOptions: ISelectOption[]
@@ -117,7 +114,6 @@ class DocumentUploaderWithOptionComp extends React.Component<
     this.state = {
       errorMessage: EMPTY_STRING,
       previewImage: null,
-      uploadedDocuments: this.props.files || [],
       dropDownOptions: this.initializeDropDownOption(),
       filesBeingProcessed: [],
       fields: {
@@ -202,6 +198,9 @@ class DocumentUploaderWithOptionComp extends React.Component<
       ]
     }))
 
+    this.props.onUploadingStateChanged &&
+      this.props.onUploadingStateChanged(true)
+
     const minimumProcessingTime = new Promise<void>((resolve) =>
       setTimeout(resolve, 2000)
     )
@@ -232,33 +231,32 @@ class DocumentUploaderWithOptionComp extends React.Component<
       (option: ISelectOption) => option.value === this.state.fields.documentType
     )
 
-    this.setState(
-      (prevState) => {
-        const newDocument: IFileValue = {
-          optionValues,
-          type: uploadedImage.type,
-          data: fileAsBase64.toString()
-        }
+    const newDocument: IFileValue = {
+      optionValues,
+      type: uploadedImage.type,
+      data: fileAsBase64.toString(),
+      fileSize: uploadedImage.size
+    }
 
-        return {
-          ...prevState,
-          errorMessage: EMPTY_STRING,
-          fields: {
-            documentType: EMPTY_STRING,
-            documentData: EMPTY_STRING
-          },
-          uploadedDocuments: [...prevState.uploadedDocuments, newDocument],
-          dropDownOptions: tempOptions,
-          // Remove from processing files
-          filesBeingProcessed: this.state.filesBeingProcessed.filter(
-            ({ label }) => label !== optionValues[1]
-          )
-        }
-      },
-      () => {
-        this.props.onComplete(this.state.uploadedDocuments)
+    this.props.onComplete([...this.props.files, newDocument])
+    this.props.onUploadingStateChanged &&
+      this.props.onUploadingStateChanged(false)
+
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        errorMessage: EMPTY_STRING,
+        fields: {
+          documentType: EMPTY_STRING,
+          documentData: EMPTY_STRING
+        },
+        dropDownOptions: tempOptions,
+        // Remove from processing files
+        filesBeingProcessed: this.state.filesBeingProcessed.filter(
+          ({ label }) => label !== optionValues[1]
+        )
       }
-    )
+    })
   }
 
   onDelete = (image: IFileValue | IAttachmentValue) => {
@@ -268,12 +266,9 @@ class DocumentUploaderWithOptionComp extends React.Component<
     ) as ISelectOption
     const dropDownOptions = this.state.dropDownOptions.concat(addableOption)
     this.setState(() => ({ dropDownOptions }))
-    remove(
-      this.state.uploadedDocuments,
-      (item: IFileValue) => item === previewImage
+    this.props.onComplete(
+      this.props.files.filter((file) => file !== previewImage)
     )
-
-    this.props.onComplete(this.state.uploadedDocuments)
     this.closePreviewSection()
   }
 
@@ -289,7 +284,7 @@ class DocumentUploaderWithOptionComp extends React.Component<
     const { name, intl } = this.props
     return this.props.splitView ? (
       this.state.dropDownOptions.map((opt, idx) => (
-        <Flex splitView>
+        <Flex splitView key={idx}>
           <Select
             id={`${name}${idx}`}
             options={[opt]}
@@ -330,22 +325,27 @@ class DocumentUploaderWithOptionComp extends React.Component<
   }
 
   render() {
-    const { label, intl } = this.props
+    const { label, intl, requiredErrorMessage } = this.props
 
     return (
       <UploaderWrapper>
         <ErrorMessage id="upload-error">
           {this.state.errorMessage && (
-            <ErrorText>{this.state.errorMessage}</ErrorText>
+            <ErrorText>
+              {(requiredErrorMessage &&
+                intl.formatMessage(requiredErrorMessage)) ||
+                this.state.errorMessage}
+            </ErrorText>
           )}
         </ErrorMessage>
 
         <Label>{label}</Label>
         <DocumentListPreview
           processingDocuments={this.state.filesBeingProcessed}
-          documents={this.state.uploadedDocuments}
+          documents={this.props.files}
           onSelect={this.selectForPreview}
           dropdownOptions={this.props.options}
+          onDelete={this.onDelete}
         />
         {this.props.hideOnEmptyOption && this.state.dropDownOptions.length === 0
           ? null

@@ -12,7 +12,7 @@
 import gql from 'graphql-tag'
 
 export const SEARCH_EVENTS = gql`
-  query (
+  query searchEvents(
     $sort: String
     $trackingId: String
     $contactNumber: String
@@ -42,22 +42,6 @@ export const SEARCH_EVENTS = gql`
           createdAt
           modifiedAt
         }
-        operationHistories {
-          operationType
-          operatedOn
-          operatorRole
-          operatorName {
-            firstNames
-            familyName
-            use
-          }
-          operatorOfficeName
-          operatorOfficeAlias
-          notificationFacilityName
-          notificationFacilityAlias
-          rejectReason
-          rejectComment
-        }
         ... on BirthEventSearchSet {
           dateOfBirth
           childName {
@@ -78,8 +62,8 @@ export const SEARCH_EVENTS = gql`
     }
   }
 `
-export const SEARCH_APPLICATIONS_USER_WISE = gql`
-  query (
+export const SEARCH_DECLARATIONS_USER_WISE = gql`
+  query searchDeclarationsUserWise(
     $status: [String]
     $userId: String
     $locationIds: [String]
@@ -102,26 +86,13 @@ export const SEARCH_APPLICATIONS_USER_WISE = gql`
         registration {
           contactNumber
           trackingId
-          dateOfApplication
+          dateOfDeclaration
+          modifiedAt
+          createdAt
           status
         }
-        operationHistories {
-          operationType
-          operatedOn
-          operatorRole
-          operatorName {
-            firstNames
-            familyName
-            use
-          }
-          operatorOfficeName
-          operatorOfficeAlias
-          notificationFacilityName
-          notificationFacilityAlias
-          rejectReason
-          rejectComment
-        }
         ... on BirthEventSearchSet {
+          dateOfBirth
           childName {
             use
             firstNames
@@ -129,6 +100,7 @@ export const SEARCH_APPLICATIONS_USER_WISE = gql`
           }
         }
         ... on DeathEventSearchSet {
+          dateOfDeath
           deceasedName {
             use
             firstNames
@@ -140,8 +112,12 @@ export const SEARCH_APPLICATIONS_USER_WISE = gql`
   }
 `
 
-export const COUNT_USER_WISE_APPLICATIONS = gql`
-  query ($status: [String], $userId: String, $locationIds: [String]) {
+export const COUNT_USER_WISE_DECLARATIONS = gql`
+  query countUserWiseDeclarations(
+    $status: [String]
+    $userId: String
+    $locationIds: [String]
+  ) {
     searchEvents(status: $status, userId: $userId, locationIds: $locationIds) {
       totalItems
     }

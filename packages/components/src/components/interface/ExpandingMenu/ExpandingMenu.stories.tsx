@@ -14,8 +14,8 @@ import { useState } from 'react'
 import { ExpandingMenu } from './ExpandingMenu'
 import styled from 'styled-components'
 import {
-  ApplicationBlack,
-  ApplicationBlue,
+  DeclarationBlack,
+  DeclarationBlue,
   StatsBlack,
   StatsBlue,
   SettingsBlack,
@@ -62,9 +62,9 @@ export default {
 
 const menuItems = [
   {
-    icon: <ApplicationBlack />,
-    iconHover: <ApplicationBlue />,
-    label: 'Applications',
+    icon: <DeclarationBlack />,
+    iconHover: <DeclarationBlue />,
+    label: 'Declarations',
     onClick: () => alert('on Click Event')
   },
   {
@@ -112,13 +112,7 @@ const Template: Story<IProps> = () => {
   return (
     <>
       <Hamburger onClick={() => setMenu(true)} />
-      <ExpandingMenu
-        showMenu={showMenu}
-        userDetails={userDetails}
-        menuItems={menuItems}
-        menuCollapse={() => setMenu(false)}
-        avatar={avatar}
-      />
+      <ExpandingMenu showMenu={showMenu} menuCollapse={() => setMenu(false)} />
     </>
   )
 }

@@ -27,6 +27,7 @@ import {
 import {
   goBack,
   goToCreateUserSection,
+  goToTeamUserList,
   goToUserReviewForm
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
@@ -43,7 +44,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 
 export const FormTitle = styled.div`
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   height: 72px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
@@ -65,10 +66,12 @@ type IProps = {
 
 type IState = {
   disableContinueOnLocation: boolean
+  fileUploading: boolean
 }
 
 type IDispatchProps = {
   goBack: typeof goBack
+  goToTeamUserList: typeof goToTeamUserList
   modifyUserFormData: typeof modifyUserFormData
   goToCreateUserSection: typeof goToCreateUserSection
   goToUserReviewForm: typeof goToUserReviewForm
@@ -81,7 +84,8 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   constructor(props: IFullProps) {
     super(props)
     this.state = {
-      disableContinueOnLocation: false
+      disableContinueOnLocation: false,
+      fileUploading: false
     }
   }
 
@@ -103,11 +107,18 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
     }
   }
 
+  onUploadingStateChanged = (isUploading: boolean) => {
+    this.setState({
+      ...this.state,
+      fileUploading: isUploading
+    })
+  }
+
   showAllValidationErrors = () => {
-    const touched = getSectionFields(this.props.section).reduce(
-      (memo, { name }) => ({ ...memo, [name]: true }),
-      {}
-    )
+    const touched = getSectionFields(
+      this.props.section,
+      this.props.formData
+    ).reduce((memo, { name }) => ({ ...memo, [name]: true }), {})
     this.setAllFormFieldsTouched(touched)
   }
 
@@ -133,7 +144,8 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   render = () => {
-    const { section, intl, activeGroup, userId } = this.props
+    const { section, intl, activeGroup, userId, formData, goToTeamUserList } =
+      this.props
 
     return (
       <>
@@ -144,6 +156,13 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               : intl.formatMessage(section.title)
           }
           goBack={this.handleBackAction}
+          goHome={() =>
+            goToTeamUserList({
+              id: String(formData.registrationOffice),
+              searchableText: '',
+              displayLabel: ''
+            })
+          }
         >
           <FormTitle id="form-title">
             {userId
@@ -160,12 +179,15 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               this.setAllFormFieldsTouched = setTouchedFunc
             }}
             requiredErrorMessage={messages.requiredForNewUser}
+            onUploadingStateChanged={this.onUploadingStateChanged}
           />
           <Action>
             <PrimaryButton
               id="confirm_form"
               onClick={this.handleFormAction}
-              disabled={this.state.disableContinueOnLocation}
+              disabled={
+                this.state.disableContinueOnLocation || this.state.fileUploading
+              }
             >
               {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>
@@ -189,5 +211,6 @@ export const UserForm = connect(mapStateToProps, {
   goToCreateUserSection,
   goToUserReviewForm,
   goBack,
+  goToTeamUserList,
   clearUserFormData
 })(injectIntl(UserFormComponent))

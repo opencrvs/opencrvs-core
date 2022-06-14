@@ -10,15 +10,58 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { createTestComponent, userDetails } from '@client/tests/util'
+import {
+  createTestComponent,
+  userDetails,
+  flushPromises,
+  getFileFromBase64String,
+  validImageB64String
+} from '@client/tests/util'
 import { createStore } from '@client/store'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import { DataSection } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
+import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
+import { changeAvatarMutation } from './AvatarChangeModal'
+import * as imageUtils from '@client/utils/imageUtils'
+
+const graphqlMocks = [
+  {
+    request: {
+      query: COUNT_USER_WISE_DECLARATIONS,
+      variables: {
+        status: ['REJECTED'],
+        locationIds: ['6327dbd9-e118-4dbe-9246-cb0f7649a666']
+      }
+    },
+    result: {
+      data: {
+        searchEvents: {
+          totalItems: 1
+        }
+      }
+    }
+  },
+  {
+    request: {
+      query: changeAvatarMutation,
+      variables: {
+        userId: '123',
+        avatar: {
+          type: 'image/jpeg',
+          data: validImageB64String
+        }
+      }
+    },
+    result: {
+      data: []
+    }
+  }
+]
 
 describe('Settings page tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   let component: ReactWrapper
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
@@ -26,29 +69,9 @@ describe('Settings page tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <SettingsPage />,
-      store
+      { store, history, graphqlMocks }
     )
-    component = testComponent.component
-  })
-  it('shows nothing', async () => {
-    const { store } = createStore()
-    store.dispatch(
-      getStorageUserDetailsSuccess(
-        JSON.stringify({
-          language: 'en',
-          catchmentArea: []
-        })
-      )
-    )
-    const comp = (
-      await createTestComponent(
-        // @ts-ignore
-        <SettingsPage />,
-        store
-      )
-    ).component
-    expect(comp.find('#English-name').first().text()).toBe('English nameChange')
-    expect(comp.find('#Phone-number').first().text()).toBe('Phone numberChange')
+    component = testComponent
   })
 
   it('it checks component has loaded', () => {
@@ -56,19 +79,21 @@ describe('Settings page tests', () => {
     expect(component.containsMatchingElement(DataSection)).toBe(true)
   })
   it('it checks modal is open when button clicked', () => {
-    component.find('#BtnChangeLanguage').hostNodes().simulate('click')
+    component.find('#BtnChangeLanguage').hostNodes().first().simulate('click')
 
-    expect(component.find('#ChangeLanguageModal').hostNodes()).toHaveLength(1)
+    expect(
+      component.find('#ChangeLanguageModal').hostNodes().first()
+    ).toHaveLength(1)
   })
   it('it checks cancel button clicked', () => {
-    component.find('#BtnChangeLanguage').hostNodes().simulate('click')
+    component.find('#BtnChangeLanguage').hostNodes().first().simulate('click')
 
     const modal = component.find('#ChangeLanguageModal').hostNodes()
 
     modal.find('#modal_cancel').hostNodes().simulate('click')
   })
   it('it checks cancel button clicked', () => {
-    component.find('#BtnChangeLanguage').hostNodes().simulate('click')
+    component.find('#BtnChangeLanguage').hostNodes().first().simulate('click')
 
     const modal = component.find('#ChangeLanguageModal').hostNodes()
 
@@ -77,7 +102,7 @@ describe('Settings page tests', () => {
 
   describe('When user changes password', () => {
     beforeEach(() => {
-      component.find('#BtnChangePassword').hostNodes().simulate('click')
+      component.find('#BtnChangePassword').hostNodes().first().simulate('click')
     })
 
     it('Should display password change modal', () => {
@@ -125,6 +150,104 @@ describe('Settings page tests', () => {
         component.find('#ChangePasswordModal').hostNodes().length
       )
       expect(modalIsClosed).toBe(true)
+    })
+  })
+
+  describe('When user changes profile image', () => {
+    const file = new File(['(⌐□_□)'], 'chucknorris.png', { type: 'image/png' })
+
+    it('should display apply change modal', async () => {
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .first()
+        .simulate('change', { target: { files: [file] } })
+
+      component.update()
+      expect(
+        component.find('SettingsView').state('showChangeAvatar')
+      ).toBeTruthy()
+    })
+
+    it('should show error for invalid image', async () => {
+      const invalidFile = new File(['(⌐□_□)'], 'chucknorris.png', {
+        type: 'image/svg+xml'
+      })
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .first()
+        .simulate('change', { target: { files: [invalidFile] } })
+
+      await flushPromises()
+      component.update()
+      expect(
+        component.find('SettingsView').state('imageLoadingError')
+      ).toBeTruthy()
+    })
+
+    it('should change profile image', async () => {
+      jest
+        .spyOn(imageUtils, 'getCroppedImage')
+        .mockImplementation((img, crop) =>
+          Promise.resolve({
+            type: 'image/jpeg',
+            data: validImageB64String
+          })
+        )
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .first()
+        .simulate('change', {
+          target: {
+            files: [
+              getFileFromBase64String(
+                validImageB64String,
+                'img.png',
+                'image/png'
+              )
+            ]
+          }
+        })
+
+      await flushPromises()
+
+      component.update()
+
+      component
+        .find('SettingsView')
+        .find('#apply_change')
+        .hostNodes()
+        .simulate('click')
+
+      await flushPromises()
+
+      component.update()
+
+      expect(
+        component.find('SettingsView').state('showChangeAvatar')
+      ).toBeFalsy()
+    })
+
+    it('Should close change avater modal', () => {
+      component
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .first()
+        .simulate('change', {
+          target: {
+            files: [file]
+          }
+        })
+
+      component.update()
+      component.find('#close-btn').hostNodes().simulate('click')
+      component.update()
+
+      expect(
+        component.find('SettingsView').state('showChangeAvatar')
+      ).toBeFalsy()
     })
   })
 })

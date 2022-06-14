@@ -1,12 +1,12 @@
 {
   "name": "@opencrvs/metrics",
-  "version": "1.0.0-alpha.3.2",
+  "version": "1.0.0",
   "description": "OpenCRVS metrics service",
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
     "start": "cross-env NODE_ENV=development nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:prod": "node build/dist/src/index.js",
+    "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "yarn test:compilation && jest --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
@@ -14,17 +14,17 @@
     "precommit": "yarn lint && lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
-    "postbuild": "ef-tspm --tsconfig tsconfig.build.json",
     "build:clean": "rm -rf build"
   },
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
-    "@opencrvs/commons": "^1.0.0-alpha.3.2",
+    "@opencrvs/commons": "^1.0.0",
     "@types/pino": "^6.3.12",
     "app-module-path": "^2.2.0",
     "archiver": "^3.1.1",
     "csv-stringify": "^5.3.4",
+    "date-fns": "^2.28.0",
     "hapi-auth-jwt2": "10.2.0",
     "hapi-pino": "^8.5.0",
     "hapi-sentry": "^3.1.0",
@@ -32,13 +32,12 @@
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
-    "moment": "^2.22.2",
+    "tsconfig-paths": "^3.13.0",
     "node-fetch": "^2.6.7",
     "pino": "^6.0.0",
     "typescript": "^3.7.2"
   },
   "devDependencies": {
-    "@ef-carbon/tspm": "^2.2.5",
     "@types/archiver": "^3.0.0",
     "@types/fhir": "^0.0.30",
     "@types/hapi-pino": "^8.0.5",
@@ -56,7 +55,6 @@
     "prettier": "^2.5.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^6.1.1",
-    "tsconfig-paths": "^3.8.0",
     "tslint": "^5.17.0",
     "tslint-microsoft-contrib": "^6.2.0"
   },
@@ -70,7 +68,7 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
     "moduleFileExtensions": [
       "ts",
       "tsx",

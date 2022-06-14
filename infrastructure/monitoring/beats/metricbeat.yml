@@ -1,0 +1,103 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+---
+#-------------------------------- Autodiscovery -------------------------------
+# Autodiscover allows you to detect changes in the system and spawn new modules as they happen.
+metricbeat.autodiscover:
+  providers:
+    - type: docker
+      # https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-autodiscover-hints.html
+      hints.enabled: true
+
+metricbeat.modules:
+  #------------------------------- System Module -------------------------------
+  - module: system
+    metricsets:
+      [
+        'cpu',
+        'load',
+        'memory',
+        'network',
+        'process',
+        'process_summary',
+        'core',
+        'diskio',
+        'socket'
+      ]
+    processes: ['.*']
+    process.include_top_n:
+      by_cpu: 5
+      by_memory: 5
+    period: 10s
+    cpu.metrics: ['percentages']
+    core.metrics: ['percentages']
+
+  - module: system
+    period: 1m
+    metricsets:
+      - filesystem
+      - fsstat
+    processors:
+      - drop_event.when.regexp:
+          system.filesystem.mount_point: '^/(sys|cgroup|proc|dev|etc|host|lib)($|/)'
+
+  - module: system
+    period: 15m
+    metricsets:
+      - uptime
+
+  #------------------------------- Docker Module -------------------------------
+  - module: docker
+    metricsets:
+      ['container', 'cpu', 'diskio', 'healthcheck', 'info', 'memory', 'network']
+    hosts: ['unix:///var/run/docker.sock']
+    period: 10s
+
+#================================ Processors ===================================
+processors:
+  - add_cloud_metadata: ~
+  - add_docker_metadata: ~
+  - add_locale:
+      format: offset
+  - add_host_metadata:
+      netinfo.enabled: true
+
+#========================== Elasticsearch output ===============================
+output.elasticsearch:
+  hosts: ['${ELASTICSEARCH_HOST}']
+  username: ${ELASTICSEARCH_USERNAME}
+  password: ${ELASTICSEARCH_PASSWORD}
+
+#============================== Dashboards =====================================
+setup.dashboards:
+  enabled: true
+
+#============================== Kibana =========================================
+setup.kibana:
+  host: '${KIBANA_HOST}'
+  username: ${KIBANA_USERNAME}
+  password: ${KIBANA_PASSWORD}
+
+#============================== Xpack Monitoring ===============================
+xpack.monitoring:
+  enabled: true
+  elasticsearch:
+    username: ${BEATS_USERNAME}
+    password: ${BEATS_PASSWORD}
+#============================== Index lifecycle management ===============================
+setup.ilm.enabled: true
+setup.ilm.policy_name: 'metricbeat-opencrvs-rollover-policy'
+setup.ilm.policy_file: /usr/share/metricbeat/rollover-policy.json
+setup.ilm.check_exists: true
+setup.ilm.overwrite: true
+
+#============================== Logging ===============================
+logging.level: info
+logging.to_stderr: true

@@ -19,9 +19,13 @@ import {
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getAuthenticated } from '@client/profile/profileSelectors'
+import { hasAccessToRoute, Roles } from '@client/utils/authUtils'
+import { IUserDetails } from '@client/utils/userUtils'
 
 export interface IProps {
+  roles?: Roles[]
   authenticated: boolean
+  userDetails: IUserDetails | null
   userDetailsFetched: boolean
 }
 
@@ -32,6 +36,11 @@ class ProtectedRouteWrapper extends Route<
     if (!this.props.authenticated && !this.props.userDetailsFetched) {
       return <div />
     }
+    if (this.props.roles && this.props.userDetails) {
+      if (!hasAccessToRoute(this.props.roles, this.props.userDetails)) {
+        throw new Error('Unauthorised!')
+      }
+    }
     return <Route {...this.props} />
   }
 }
@@ -39,6 +48,7 @@ class ProtectedRouteWrapper extends Route<
 const mapStateToProps = (store: IStoreState): IProps => {
   return {
     authenticated: getAuthenticated(store),
+    userDetails: store.profile.userDetails,
     userDetailsFetched: store.profile.userDetailsFetched
   }
 }

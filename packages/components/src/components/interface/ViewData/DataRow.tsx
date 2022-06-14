@@ -17,7 +17,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   padding: 16px 0px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-direction: column;
@@ -28,6 +28,7 @@ const DataContainer = styled.div`
   display: flex;
   flex-grow: 1;
   max-width: 90%;
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-direction: column;
     width: 100%;
@@ -38,29 +39,29 @@ const ValueContainer = styled.div`
   width: 100%;
 `
 const Label = styled.label`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   flex: 1;
   margin-right: 16px;
   max-width: 40%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     max-width: 100%;
-    ${({ theme }) => theme.fonts.bodyBoldStyle};
+    ${({ theme }) => theme.fonts.bold16};
   }
 `
 const Value = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   flex: 1;
   overflow-wrap: break-word;
   max-width: 50%;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bodyStyle};
+    ${({ theme }) => theme.fonts.reg16};
     max-width: 100%;
   }
 `
 
 const PlaceHolder = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
-  color: ${({ theme }) => theme.colors.placeholder};
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   flex: 1;
 `
 const Action = styled.div`
@@ -79,11 +80,12 @@ export interface IDataProps {
   value?: React.ReactNode
   placeHolder?: string
   action?: IAction
+  actionsMenu?: React.ReactNode
 }
 
 export class DataRow extends React.Component<IDataProps> {
   render() {
-    const { id, label, value, placeHolder, action } = this.props
+    const { id, label, value, placeHolder, action, actionsMenu } = this.props
 
     return (
       <Container id={id}>
@@ -109,6 +111,7 @@ export class DataRow extends React.Component<IDataProps> {
                 </LinkButton>
               </Action>
             )}
+            {actionsMenu && <div>{actionsMenu}</div>}
           </>
         )}
         {!label && <ValueContainer>{value}</ValueContainer>}

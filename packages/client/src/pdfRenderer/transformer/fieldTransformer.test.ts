@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  mockApplicationData,
+  mockDeclarationData,
   userDetails,
   mockOfflineData
 } from '@client/tests/util'
@@ -21,9 +21,9 @@ import { TemplateTransformerData } from './types'
 
 describe('PDF template field transformer tests', () => {
   const data: TemplateTransformerData = {
-    application: {
+    declaration: {
       id: 'sample',
-      data: mockApplicationData,
+      data: mockDeclarationData,
       event: Event.BIRTH
     },
     userDetails,
@@ -63,14 +63,14 @@ describe('PDF template field transformer tests', () => {
       )
     })
   })
-  describe('ApplicantName transformer tests', () => {
+  describe('InformantName transformer tests', () => {
     it('Returns proper name based on event and local', () => {
       const intl = createIntl({
         locale: 'bn',
         defaultLocale: 'bn'
       })
 
-      const transformedValue = fieldTransformers.ApplicantName(data, intl, {
+      const transformedValue = fieldTransformers.InformantName(data, intl, {
         conditions: [
           {
             key: {
@@ -89,7 +89,7 @@ describe('PDF template field transformer tests', () => {
         locale: 'en'
       })
 
-      expect(() => fieldTransformers.ApplicantName(data, intl)).toThrowError(
+      expect(() => fieldTransformers.InformantName(data, intl)).toThrowError(
         'No payload found for this transformer'
       )
     })
@@ -99,7 +99,7 @@ describe('PDF template field transformer tests', () => {
       })
 
       expect(() =>
-        fieldTransformers.ApplicantName(data, intl, {
+        fieldTransformers.InformantName(data, intl, {
           conditions: [
             {
               key: {
@@ -143,7 +143,7 @@ describe('PDF template field transformer tests', () => {
 
       const transformedValue = fieldTransformers.DateFieldValue(data, intl, {
         key: { birth: 'mother.dateOfMarriage' },
-        format: 'DD.MM.YYYY'
+        format: 'dd.MM.yyyy'
       })
       expect(transformedValue).toEqual('19.09.1972')
     })
@@ -217,7 +217,7 @@ describe('PDF template field transformer tests', () => {
           9: '৯'
         }
       })
-      expect(data.application.data.mother.iD).toEqual('6546511876932')
+      expect(data.declaration.data.mother.iD).toEqual('6546511876932')
       expect(transformedValue).toEqual('৬৫৪৬৫১১৮৭৬৯৩২')
     })
     it('Throws exception if payload is not provided', () => {

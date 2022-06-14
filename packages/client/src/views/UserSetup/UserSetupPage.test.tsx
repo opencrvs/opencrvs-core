@@ -27,6 +27,7 @@ import {
 } from '@client/profile/profileActions'
 import { UserSetupPage } from '@client/views/UserSetup/UserSetupPage'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
+import { History } from 'history'
 
 const nameObj = {
   data: {
@@ -51,8 +52,9 @@ merge(mockUserResponse, nameObj)
 
 describe('UserSetupPage tests', () => {
   let store: AppStore
+  let history: History
   beforeEach(() => {
-    store = createStore().store
+    ;({ history, store } = createStore())
   })
   it('renders page successfully without type', async () => {
     await store.dispatch(
@@ -61,10 +63,10 @@ describe('UserSetupPage tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupPage />,
-      store
+      { store, history }
     )
 
-    const app = testComponent.component
+    const app = testComponent
     expect(app.find('#user-setup-landing-page').hostNodes()).toHaveLength(1)
     expect(app.find('#user-setup-name-holder').hostNodes().text()).toEqual(
       'Shakib Al Hasan'
@@ -74,23 +76,23 @@ describe('UserSetupPage tests', () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <ProtectedAccount />,
-      store
+      { store, history }
     )
-    const app = testComponent.component
+    const app = testComponent
 
     app.find('#user-setup-start-button').hostNodes().simulate('click')
     await flushPromises()
     expect(app.find('#NewPassword')).toBeDefined()
   })
   it('go to password page without userDetails', async () => {
-    await store.dispatch(checkAuth({ '?token': validToken }))
+    await store.dispatch(checkAuth())
     store.dispatch(getStorageUserDetailsSuccess('null'))
     const testComponent = await createTestComponent(
       // @ts-ignore
       <UserSetupPage goToStep={() => {}} />,
-      store
+      { store, history }
     )
-    const app = testComponent.component
+    const app = testComponent
 
     app.find('#user-setup-start-button').hostNodes().simulate('click')
     await flushPromises()

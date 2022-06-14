@@ -72,7 +72,10 @@ describe('Test apollo server config', () => {
       },
       h: {}
     })
-    expect(context).toStrictEqual({ Authorization: `Bearer ${token}` })
+    expect(context).toStrictEqual({
+      Authorization: `Bearer ${token}`,
+      'x-correlation-id': '1'
+    })
   })
   it('throws authentication error when the token holder does not exist', async () => {
     fetch.mockResponseOnce(JSON.stringify(null), { status: 200 })

@@ -11,6 +11,7 @@
  */
 import { ValidationInitializer } from '@client/utils/validate'
 import { MessageDescriptor } from 'react-intl'
+import { Message } from 'typescript-react-intl'
 import {
   ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
@@ -29,9 +30,12 @@ import * as labels from './mappings/label'
 import * as types from './mappings/type'
 import * as responseTransformers from './mappings/response-transformers'
 import * as validators from '@opencrvs/client/src/utils/validate'
-import { ICertificate as IApplicationCertificate } from '@client/applications'
+import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
+import { IUserDetails } from '@client/utils/userUtils'
+import { messages } from '@client/i18n/messages/views/formConfig'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -56,7 +60,6 @@ export const DOCUMENT_UPLOADER_WITH_OPTION = 'DOCUMENT_UPLOADER_WITH_OPTION'
 export const SIMPLE_DOCUMENT_UPLOADER = 'SIMPLE_DOCUMENT_UPLOADER'
 export const WARNING = 'WARNING'
 export const LINK = 'LINK'
-export const PDF_DOCUMENT_VIEWER = 'PDF_DOCUMENT_VIEWER'
 export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
@@ -73,12 +76,57 @@ export enum Sort {
 
 export enum Action {
   SUBMIT_FOR_REVIEW = 'submit for review',
-  APPROVE_APPLICATION = 'approve',
-  REGISTER_APPLICATION = 'register',
+  APPROVE_DECLARATION = 'approve',
+  REGISTER_DECLARATION = 'register',
   COLLECT_CERTIFICATE = 'collect certificate',
-  REJECT_APPLICATION = 'reject',
-  LOAD_REVIEW_APPLICATION = 'load application data for review',
-  LOAD_CERTIFICATE_APPLICATION = 'load application data for certificate collection'
+  REJECT_DECLARATION = 'reject',
+  LOAD_REVIEW_DECLARATION = 'load declaration data for review',
+  LOAD_CERTIFICATE_DECLARATION = 'load declaration data for certificate collection',
+  REINSTATE_DECLARATION = 'reinstate',
+  ARCHIVE_DECLARATION = 'archive',
+  LOAD_REQUESTED_CORRECTION_DECLARATION = 'load declaration data for which is requested correction',
+  REQUEST_CORRECTION_DECLARATION = 'request correction'
+}
+
+export enum QuestionConfigFieldType {
+  TEXT = 'TEXT',
+  TEXTAREA = 'TEXTAREA',
+  NUMBER = 'NUMBER',
+  TEL = 'TEL',
+  PARAGRAPH = 'PARAGRAPH',
+  SUBSECTION = 'SUBSECTION'
+}
+
+export interface IIdentifiers {
+  event: string
+  sectionId: string
+  groupId: string
+  fieldName: string
+}
+export interface IMessage {
+  lang: string
+  descriptor: Message
+}
+export interface IQuestionConfig {
+  fieldId: string
+  label?: IMessage[]
+  placeholder?: IMessage[]
+  description?: IMessage[]
+  tooltip?: IMessage[]
+  errorMessage?: IMessage[]
+  maxLength?: number
+  fieldName?: string
+  fieldType?: QuestionConfigFieldType
+  preceedingFieldId?: string
+  required?: boolean
+  enabled: string
+  custom?: boolean
+  initialValue?: string
+}
+
+export interface IFormConfig {
+  questionConfig: IQuestionConfig[]
+  formDrafts: IFormDraft[]
 }
 
 export interface ISelectOption {
@@ -96,10 +144,11 @@ export interface ICheckboxOption {
 }
 
 export interface IDynamicOptions {
-  dependency: string
+  dependency?: string
   jurisdictionType?: string
   resource?: string
   options?: { [key: string]: ISelectOption[] }
+  initialValue?: string
 }
 
 export interface IDispatchOptions {
@@ -156,7 +205,7 @@ export interface ISerializedDynamicFormFieldDefinitions {
       }
   validate?: Array<{
     dependencies: string[]
-    validator: FactoryOperation<typeof validators>
+    validator: FactoryOperation<typeof validators, IQueryDescriptor>
   }>
 }
 
@@ -206,33 +255,53 @@ export type IFormFieldValue =
   | number
   | boolean
   | Date
-  | IApplicationCertificate
+  | IDeclarationCertificate
   | IFileValue
   | IAttachmentValue
   | FieldValueArray
   | FieldValueMap
-  | IRegistration
+  | IContactPoint
+  | IInformant
 
 interface FieldValueArray extends Array<IFormFieldValue> {}
 export interface FieldValueMap {
   [key: string]: IFormFieldValue
 }
 
+export interface IQuestionnaireQuestion {
+  fieldId: string
+  value: string
+}
+export interface IQuestionnaire {
+  data: IQuestionnaireQuestion[]
+}
+
 export interface IFileValue {
   optionValues: IFormFieldValue[]
   type: string
   data: string
+  fileSize: number
+}
+
+export interface IContactPointPhone {
+  registrationPhone: string
+}
+
+interface IInformantOtherInformantType {
+  otherInformantType: string
+}
+export interface IInformant {
+  value: string
+  nestedFields: IInformantOtherInformantType
 }
 
 export interface IContactPoint {
-  contactRelationship: string
-  registrationPhone: string
-}
-export interface IRegistration {
-  nestedFields: IContactPoint
+  value: string
+  nestedFields: IContactPointPhone
 }
 
 export interface IAttachmentValue {
+  name?: string
   type: string
   data: string
 }
@@ -250,32 +319,35 @@ export type IFormFieldQueryMapFunction = (
   queryData: any,
   sectionId: string,
   fieldDefinition: IFormField,
-  nestedFieldDefinition?: IFormField
+  nestedFieldDefinition?: IFormField,
+  offlineData?: IOfflineData
 ) => void
 
+export type IFormFieldTemplateMapOperation =
+  | [string, IFormFieldQueryMapFunction]
+  | [string]
 /*
  * Takes in an array of function arguments (array, number, string, function)
  * and replaces all functions with the descriptor type
  *
- * So type Array<number | Function | string> would become
- * Array<number | Descriptor | string>
+ * So type Array<number | Function | string> would become
+ * Array<number | Descriptor | string>
  */
-type FunctionParamsToDescriptor<T> =
+type FunctionParamsToDescriptor<T, Descriptor> =
   // It's an array - recursively call this type for all items
   T extends Array<any>
-    ? { [K in keyof T]: FunctionParamsToDescriptor<T[K]> }
-    : T extends IFormFieldQueryMapFunction // It's a query transformation function - return a query transformation descriptor
-    ? IQueryDescriptor
-    : T extends IFormFieldMutationMapFunction // It's a mutation transformation function - return a mutation transformation descriptor
-    ? IMutationDescriptor
+    ? { [K in keyof T]: FunctionParamsToDescriptor<T[K], Descriptor> }
+    : T extends IFormFieldQueryMapFunction | IFormFieldMutationMapFunction // It's a query transformation function - return a query transformation descriptor
+    ? Descriptor
     : T // It's a none of the above - return self
 
 interface FactoryOperation<
   OperationMap,
+  Descriptor extends IQueryDescriptor | IMutationDescriptor,
   Key extends keyof OperationMap = keyof OperationMap
 > {
   operation: Key
-  parameters: FunctionParamsToDescriptor<Params<OperationMap[Key]>>
+  parameters: FunctionParamsToDescriptor<Params<OperationMap[Key]>, Descriptor>
 }
 interface Operation<
   OperationMap,
@@ -288,12 +360,16 @@ export type IFormFieldQueryMapDescriptor<
   T extends keyof typeof queries = keyof typeof queries
 > = {
   operation: T
-  parameters: FunctionParamsToDescriptor<Params<typeof queries[T]>>
+  parameters: FunctionParamsToDescriptor<
+    Params<typeof queries[T]>,
+    IQueryDescriptor
+  >
 }
 
 export type IFormFieldMapping = {
   mutation?: IFormFieldMutationMapFunction
   query?: IFormFieldQueryMapFunction
+  template?: IFormFieldTemplateMapOperation
 }
 
 /*
@@ -354,6 +430,7 @@ export type SerializedFormField = UnionOmit<
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
+    template?: ITemplateDescriptor
   }
 }
 export interface IAttachment {
@@ -380,6 +457,8 @@ export interface IFormFieldBase {
   prefix?: string
   postfix?: string
   disabled?: boolean
+  enabled?: string
+  custom?: boolean
   initialValue?: IFormFieldValue
   initialValueKey?: string
   extraValue?: IFormFieldValue
@@ -412,6 +491,8 @@ export interface IFormFieldBase {
   }
   ignoreFieldLabelOnErrorMessage?: boolean
   ignoreBottomMargin?: boolean
+  customisable?: boolean
+  customQuesstionMappingId?: string
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -432,11 +513,21 @@ export type INestedInputFields = {
   [key: string]: IFormField[]
 }
 
+export enum FLEX_DIRECTION {
+  ROW = 'row',
+  ROW_REVERSE = 'row-reverse',
+  COLUMN = 'column',
+  COLUMN_REVERSE = 'column-reverse',
+  INITIAL = 'initial',
+  INHERIT = 'inherit'
+}
+
 export interface IRadioGroupFormField extends IFormFieldBase {
   type: typeof RADIO_GROUP
   options: IRadioOption[]
   size?: RadioSize
   notice?: MessageDescriptor
+  flexDirection?: FLEX_DIRECTION
 }
 
 export interface IRadioGroupWithNestedFieldsFormField
@@ -465,6 +556,7 @@ export interface INumberFormField extends IFormFieldBase {
   type: typeof NUMBER
   step?: number
   max?: number
+  inputFieldWidth?: string
 }
 export interface IBigNumberFormField extends IFormFieldBase {
   type: typeof BIG_NUMBER
@@ -526,9 +618,10 @@ export interface ILocationSearchInputFormField extends IFormFieldBase {
     keyof IOfflineData,
     'facilities' | 'locations' | 'offices'
   >
-  locationList: ISearchLocation[]
+  locationList?: ISearchLocation[]
   searchableType: string
   dispatchOptions?: IDispatchOptions
+  dynamicOptions?: IDynamicOptions
 }
 
 export interface IWarningField extends IFormFieldBase {
@@ -539,9 +632,6 @@ export interface ILink extends IFormFieldBase {
   type: typeof LINK
 }
 
-export interface IPDFDocumentViewerFormField extends IFormFieldBase {
-  type: typeof PDF_DOCUMENT_VIEWER
-}
 export interface IQuery {
   query: any
   inputs: IFieldInput[]
@@ -595,17 +685,18 @@ export type IFormField =
   | IDocumentUploaderWithOptionsFormField
   | IWarningField
   | ILink
-  | IPDFDocumentViewerFormField
   | IDynamicListFormField
   | ILoaderButton
   | ISimpleDocumentUploaderFormField
   | ILocationSearchInputFormField
 
-export interface IFormTag {
+export interface IPreviewGroup {
   id: string
   label: MessageDescriptor
   fieldToRedirect?: string
   delimiter?: string
+  required?: boolean
+  initialValue?: string
 }
 
 export interface IDynamicFormField
@@ -620,15 +711,16 @@ export interface IConditional {
 }
 
 export interface IConditionals {
+  informantType: IConditional
   iDType: IConditional
+  isOfficePreSelected: IConditional
   fathersDetailsExist: IConditional
-  permanentAddressSameAsMother: IConditional
-  addressSameAsMother: IConditional
-  countryPermanent: IConditional
-  statePermanent: IConditional
-  districtPermanent: IConditional
-  addressLine4Permanent: IConditional
-  addressLine3Permanent: IConditional
+  primaryAddressSameAsOtherPrimary: IConditional
+  countryPrimary: IConditional
+  statePrimary: IConditional
+  districtPrimary: IConditional
+  addressLine4Primary: IConditional
+  addressLine3Primary: IConditional
   country: IConditional
   state: IConditional
   district: IConditional
@@ -641,17 +733,16 @@ export interface IConditionals {
   otherPersonCollectsCertificate: IConditional
   birthCertificateCollectorNotVerified: IConditional
   deathCertificateCollectorNotVerified: IConditional
-  currentAddressSameAsPermanent: IConditional
   placeOfBirthHospital: IConditional
-  deathPlaceAddressTypeHeathInstitue: IConditional
+  placeOfDeathTypeHeathInstitue: IConditional
   otherBirthEventLocation: IConditional
   isNotCityLocation: IConditional
   isCityLocation: IConditional
   isDefaultCountry: IConditional
-  isNotCityLocationPermanent: IConditional
-  isDefaultCountryPermanent: IConditional
-  isCityLocationPermanent: IConditional
-  applicantPermanentAddressSameAsCurrent: IConditional
+  isNotCityLocationPrimary: IConditional
+  isDefaultCountryPrimary: IConditional
+  isCityLocationPrimary: IConditional
+  informantPrimaryAddressSameAsCurrent: IConditional
   iDAvailable: IConditional
   deathPlaceOther: IConditional
   deathPlaceAtPrivateHome: IConditional
@@ -659,9 +750,8 @@ export interface IConditionals {
   causeOfDeathEstablished: IConditional
   isMarried: IConditional
   identifierIDSelected: IConditional
-  otherRelationship: IConditional
   fatherContactDetailsRequired: IConditional
-  withIn45Days: IConditional
+  withInTargetDays: IConditional
   between46daysTo5yrs: IConditional
   after5yrs: IConditional
   deceasedNationIdSelected: IConditional
@@ -726,7 +816,10 @@ export type QueryFactoryOperation<
   T extends QueryFactoryOperationKeys = QueryFactoryOperationKeys
 > = {
   operation: T
-  parameters: FunctionParamsToDescriptor<Params<typeof queries[T]>>
+  parameters: FunctionParamsToDescriptor<
+    Params<typeof queries[T]>,
+    IQueryDescriptor
+  >
 }
 
 type QueryDefaultOperation<
@@ -737,6 +830,12 @@ type QueryDefaultOperation<
 
 export type IQueryDescriptor = QueryFactoryOperation | QueryDefaultOperation
 
+type ISimpleTemplateDescriptor = { fieldName: string }
+export type IQueryTemplateDescriptor = ISimpleTemplateDescriptor &
+  IQueryDescriptor
+export type ITemplateDescriptor =
+  | IQueryTemplateDescriptor
+  | ISimpleTemplateDescriptor
 // Mutations
 
 type MutationFactoryOperationKeys = FilterType<
@@ -753,7 +852,10 @@ export type MutationFactoryOperation<
   T extends MutationFactoryOperationKeys = MutationFactoryOperationKeys
 > = {
   operation: T
-  parameters: FunctionParamsToDescriptor<Params<typeof mutations[T]>>
+  parameters: FunctionParamsToDescriptor<
+    Params<typeof mutations[T]>,
+    IMutationDescriptor
+  >
 }
 
 type MutationDefaultOperation<
@@ -773,6 +875,7 @@ export type TransformedData = { [key: string]: any }
 export type IFormSectionMapping = {
   mutation?: IFormSectionMutationMapFunction
   query?: IFormSectionQueryMapFunction
+  template?: [string, IFormSectionQueryMapFunction][]
 }
 
 export type IFormSectionMutationMapFunction = (
@@ -784,43 +887,63 @@ export type IFormSectionMutationMapFunction = (
 export type IFormSectionQueryMapFunction = (
   transFormedData: IFormData,
   queryData: any,
-  sectionId: string
+  sectionId: string,
+  targetSectionId?: string, // used for template query mappings
+  targetFieldName?: string, // used for template query mappings
+  offlineData?: IOfflineData, // used for template offline mappings
+  userDetails?: IUserDetails // user for template user mappings
 ) => void
 
 export enum BirthSection {
+  Registration = 'registration',
   Child = 'child',
   Mother = 'mother',
   Father = 'father',
-  Applicant = 'informant',
-  Parent = 'primaryCaregiver',
-  Registration = 'registration',
+  Informant = 'informant',
   Documents = 'documents',
   Preview = 'preview'
 }
 
 export enum DeathSection {
+  Registration = 'registration',
   Deceased = 'deceased',
   Event = 'deathEvent',
-  CauseOfDeath = 'causeOfDeath',
-  Applicants = 'informant',
+  Informant = 'informant',
   DeathDocuments = 'documents',
   Preview = 'preview'
 }
+
+export type WizardSection = BirthSection | DeathSection | 'settings'
+
 export enum UserSection {
   User = 'user',
   Preview = 'preview'
 }
+
 export enum CertificateSection {
   Collector = 'collector',
   CollectCertificate = 'collectCertificate',
-  CollectDeathCertificate = 'collectDeathCertificate',
-  CertificatePreview = 'certificatePreview'
+  CollectDeathCertificate = 'collectDeathCertificate'
 }
+
+export enum CorrectionSection {
+  Corrector = 'corrector',
+  Reason = 'reason',
+  SupportingDocuments = 'supportingDocuments',
+  CorrectionFeesPayment = 'currectionFeesPayment',
+  Summary = 'summary'
+}
+
 export enum PaymentSection {
   Payment = 'payment'
 }
+
 export enum ReviewSection {
   Review = 'review'
+}
+
+export enum InformantSection {
+  Registration = 'registration'
 }
 
 export type Section =
@@ -830,6 +953,8 @@ export type Section =
   | DeathSection
   | UserSection
   | CertificateSection
+  | CorrectionSection
+  | InformantSection
 
 export interface IFormSection {
   id: Section
@@ -844,16 +969,19 @@ export interface IFormSection {
   hasDocumentSection?: boolean
 }
 
+export type ISerializedFormSectionGroup = Omit<IFormSectionGroup, 'fields'> & {
+  fields: SerializedFormField[]
+}
+
 export type ISerializedFormSection = Omit<
   IFormSection,
   'groups' | 'mapping'
 > & {
-  groups: Array<
-    Omit<IFormSectionGroup, 'fields'> & { fields: SerializedFormField[] }
-  >
+  groups: ISerializedFormSectionGroup[]
   mapping?: {
     mutation?: IMutationDescriptor
     query?: IQueryDescriptor
+    template?: (IQueryDescriptor & { fieldName: string })[]
   }
 }
 
@@ -861,7 +989,7 @@ export interface IFormSectionGroup {
   id: string
   title?: MessageDescriptor
   fields: IFormField[]
-  previewGroups?: IFormTag[]
+  previewGroups?: IPreviewGroup[]
   disabled?: boolean
   ignoreSingleFieldView?: boolean
   conditionals?: IConditional[]
@@ -920,6 +1048,7 @@ export interface Ii18nRadioGroupFormField extends Ii18nFormFieldBase {
   options: RadioComponentOption[]
   size?: RadioSize
   notice?: string
+  flexDirection?: string
 }
 
 export interface Ii18nRadioGroupWithNestedFieldsFormField
@@ -1024,8 +1153,10 @@ export interface Ii18nLocationSearchInputFormField extends Ii18nFormFieldBase {
     'facilities' | 'locations' | 'offices'
   >
   searchableType: string
-  locationList: ISearchLocation[]
+  locationList?: ISearchLocation[]
   dispatchOptions?: IDispatchOptions
+
+  dynamicOptions?: IDynamicOptions
 }
 
 export interface Ii18nWarningField extends Ii18nFormFieldBase {
@@ -1034,10 +1165,6 @@ export interface Ii18nWarningField extends Ii18nFormFieldBase {
 
 export interface Ii18nLinkField extends Ii18nFormFieldBase {
   type: typeof LINK
-}
-
-export interface Ii18nPDFDocumentViewerFormField extends Ii18nFormFieldBase {
-  type: typeof PDF_DOCUMENT_VIEWER
 }
 
 export interface Ii18nLoaderButtonField extends Ii18nFormFieldBase {
@@ -1074,7 +1201,6 @@ export type Ii18nFormField =
   | Ii18nDocumentUploaderWithOptions
   | Ii18nWarningField
   | Ii18nLinkField
-  | Ii18nPDFDocumentViewerFormField
   | Ii18nLoaderButtonField
   | Ii18nSimpleDocumentUploaderFormField
   | Ii18nLocationSearchInputFormField
@@ -1105,4 +1231,39 @@ export interface ICertificate {
   hasShowedVerifiedDocument?: boolean
   payments?: Payment[]
   data?: string
+}
+
+export function fieldTypeLabel(type: IFormField['type']) {
+  const labelDict: {
+    [key in IFormField['type']]: MessageDescriptor
+  } = {
+    TEXT: messages.textInput,
+    TEXTAREA: messages.textAreaInput,
+    SUBSECTION: messages.heading,
+    FIELD_GROUP_TITLE: messages.fieldGroup,
+    DOCUMENTS: messages.documents,
+    LIST: messages.list,
+    PARAGRAPH: messages.paragraph,
+    IMAGE_UPLOADER_WITH_OPTIONS: messages.imageUploader,
+    DOCUMENT_UPLOADER_WITH_OPTION: messages.documentUploader,
+    SIMPLE_DOCUMENT_UPLOADER: messages.simpleDocumentUploader,
+    LOCATION_SEARCH_INPUT: messages.locationSearch,
+    WARNING: messages.warning,
+    LINK: messages.link,
+    FETCH_BUTTON: messages.fetchButton,
+    TEL: messages.tel,
+    NUMBER: messages.numberInput,
+    BIG_NUMBER: messages.numberInput,
+    SELECT_WITH_OPTIONS: messages.selectWithOption,
+    SELECT_WITH_DYNAMIC_OPTIONS: messages.selectWithDynamicOption,
+    FIELD_WITH_DYNAMIC_DEFINITIONS: messages.fieldWithDynamicDefinition,
+    RADIO_GROUP: messages.radioGroup,
+    RADIO_GROUP_WITH_NESTED_FIELDS: messages.radioGroupWithNestedField,
+    INFORMATIVE_RADIO_GROUP: messages.informativeRadioGroup,
+    CHECKBOX_GROUP: messages.checkboxGroup,
+    DATE: messages.date,
+    DYNAMIC_LIST: messages.dynamicList
+  }
+
+  return labelDict[type]
 }

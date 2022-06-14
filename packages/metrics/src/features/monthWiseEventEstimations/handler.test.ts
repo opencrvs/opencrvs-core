@@ -9,12 +9,20 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@metrics/index'
+import { createServer } from '@metrics/server'
 import * as influx from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 
 const readPoints = influx.query as jest.Mock
+jest.mock('../metrics/utils', () => {
+  const originalModule = jest.requireActual('../metrics//utils')
+  return {
+    __esModule: true,
+    ...originalModule,
+    getRegistrationTargetDays: () => 45
+  }
+})
 
 describe('verify monthWiseEventEstimations handler', () => {
   let server: any
@@ -45,7 +53,7 @@ describe('verify monthWiseEventEstimations handler', () => {
       }
     ])
     jest
-      .spyOn(utilService, 'fetchEstimateFor45DaysByLocationId')
+      .spyOn(utilService, 'fetchEstimateForTargetDaysByLocationId')
       .mockReturnValue({
         totalEstimation: 100,
         maleEstimation: 60,

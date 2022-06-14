@@ -16,7 +16,8 @@ import {
   flushPromises,
   getFileFromBase64String,
   mockOfflineData,
-  validImageB64String
+  validImageB64String,
+  mockOfflineDataDispatch
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { modifyUserFormData } from '@client/user/userReducer'
@@ -34,39 +35,26 @@ describe('signature upload tests', () => {
   let testComponent: ReactWrapper
 
   beforeEach(async () => {
-    await store.dispatch(
-      offlineDataReady({
-        languages: mockOfflineData.languages,
-        forms: mockOfflineData.forms,
-        templates: mockOfflineData.templates,
-        locations: mockOfflineData.locations,
-        facilities: mockOfflineData.facilities,
-        pilotLocations: mockOfflineData.pilotLocations,
-        offices: mockOfflineData.offices,
-        assets: mockOfflineData.assets
-      })
-    )
+    await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   })
 
   describe('when user is in signature upload form page', () => {
     beforeEach(async () => {
-      testComponent = (
-        await createTestComponent(
-          // @ts-ignore
-          <CreateNewUser
-            match={{
-              params: {
-                sectionId: mockOfflineData.forms.userForm.sections[0].id,
-                groupId: mockOfflineData.forms.userForm.sections[0].groups[2].id
-              },
-              isExact: true,
-              path: '/createUser',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      testComponent = await createTestComponent(
+        // @ts-ignore
+        <CreateNewUser
+          match={{
+            params: {
+              sectionId: mockOfflineData.forms.userForm.sections[0].id,
+              groupId: mockOfflineData.forms.userForm.sections[0].groups[2].id
+            },
+            isExact: true,
+            path: '/createUser',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
     })
 
     it('show the signature form page', async () => {
@@ -78,6 +66,25 @@ describe('signature upload tests', () => {
       const title = testComponent.find('#form-title').hostNodes().text()
 
       expect(title).toBe('Attach the signature')
+    })
+
+    it('return if not file', async () => {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
+      testComponent.update()
+      testComponent
+        .find('#image_file_uploader_field')
+        .hostNodes()
+        .simulate('change', {
+          target: {
+            files: []
+          }
+        })
+      await flushPromises()
+      testComponent.update()
+
+      expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
     })
 
     it('No error while uploading if valid file', async () => {
@@ -105,25 +112,6 @@ describe('signature upload tests', () => {
       expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
     })
 
-    it('return if not file', async () => {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 100)
-      })
-      testComponent.update()
-      testComponent
-        .find('#image_file_uploader_field')
-        .hostNodes()
-        .simulate('change', {
-          target: {
-            files: []
-          }
-        })
-      await flushPromises()
-      testComponent.update()
-
-      expect(testComponent.find('#field-error').hostNodes().length).toBe(0)
-    })
-
     it('clicking on confirm button will go to review page', async () => {
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
       const confirmButton = await waitForElement(testComponent, '#confirm_form')
@@ -140,24 +128,28 @@ describe('signature upload tests', () => {
   describe('when user in review page', () => {
     beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
-      testComponent = (
-        await createTestComponent(
-          // @ts-ignore
-          <CreateNewUser
-            match={{
-              params: {
-                sectionId: mockOfflineData.forms.userForm.sections[1].id,
-                groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
-              },
-              isExact: true,
-              path: '/createUser',
-              url: ''
-            }}
-          />,
+      testComponent = await createTestComponent(
+        // @ts-ignore
+        <CreateNewUser
+          match={{
+            params: {
+              sectionId: mockOfflineData.forms.userForm.sections[1].id,
+              groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
+            },
+            isExact: true,
+            path: '/createUser',
+            url: ''
+          }}
+        />,
+        {
           store,
-          [mockFetchRoleGraphqlOperation, mockUserGraphqlOperation]
-        )
-      ).component
+          history,
+          graphqlMocks: [
+            mockFetchRoleGraphqlOperation,
+            mockUserGraphqlOperation
+          ]
+        }
+      )
     })
 
     it('renders review header', () => {

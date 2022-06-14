@@ -10,16 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { SearchBlue, ArrowDownBlue, ClearText } from '../../icons'
-import { CircleButton } from '../../buttons'
+import { SearchBlue, ClearText } from '../../icons'
+import { Button } from '../../buttons'
 import styled from 'styled-components'
 
 const Wrapper = styled.form`
   align-items: center;
-  background: ${({ theme }) => theme.colors.white};
   border-radius: 2px;
   display: flex;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   padding: 0px 10px;
   padding-right: 0;
   margin-bottom: 1px;
@@ -27,96 +26,79 @@ const Wrapper = styled.form`
 `
 const SearchTextInput = styled.input`
   border: none;
-  margin: 0px 10px;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  margin: 0px 4px;
+  ${({ theme }) => theme.fonts.reg16};
+  background-color: ${({ theme }) => theme.colors.grey200};
   flex-grow: 1;
   &:focus {
     outline: none;
+    background-color: ${({ theme }) => theme.colors.white};
   }
-  &:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0px 1000px ${({ theme }) => theme.colors.white}
-      inset;
-  }
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin: 0px 4px;
     width: 40%;
   }
 `
-const DropDownWrapper = styled.ul`
-  background: ${({ theme }) => theme.colors.white};
+export const LabelButton = styled(Button)`
+  width: auto;
+  height: auto;
   border-radius: 2px;
-  box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
-  position: absolute;
-  width: 100%;
-  z-index: 9999;
-  list-style: none;
-  padding: 0px;
-  top: 100%;
-  left: 0px;
-  margin: 3px 0px;
-  cursor: pointer;
+  color: ${({ theme }) => theme.colors.primary};
+  ${({ theme }) => theme.fonts.bold14};
 `
 
-export const IconRingButton = styled(props => <CircleButton {...props} />)`
-  background: transparent;
-  border: none;
-  height: 24px;
-  width: 24px;
-  margin: 0 5px;
-  padding: 0;
-  & > svg {
-    display: block;
-    margin: 0 auto;
-  }
-  &:focus {
-    outline: none;
-    border: 3px solid ${({ theme }) => theme.colors.focus};
-    background: transparent;
-  }
-  &:not([data-focus-visible-added]) {
-    background: transparent;
-    outline: none;
-    border: none;
-  }
-  &:active:not([data-focus-visible-added]) {
-    border: 3px solid ${({ theme }) => theme.colors.focus};
-    background: transparent;
-    outline: none;
-  }
+const DropDownWrapper = styled.ul`
+  background: ${({ theme }) => theme.colors.white};
+  border-radius: 4px;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
+  ${({ theme }) => theme.shadows.light};
+  position: absolute;
+  padding: 8px 0px;
+  width: 240px;
+  z-index: 9999;
+  list-style: none;
+  top: 100%;
+  right: 0px;
+  margin: 4px 0px;
+  cursor: pointer;
 `
 const DropDownItem = styled.li`
+  ${({ theme }) => theme.fonts.reg16};
   display: flex;
   align-items: center;
-  border-bottom: solid 1px ${({ theme }) => theme.colors.background};
-  padding: 0px 15px;
   cursor: pointer;
   &:nth-last-child {
     border-bottom: none;
   }
   &:hover {
-    background: ${({ theme }) => theme.colors.dropdownHover};
+    background: ${({ theme }) => theme.colors.grey100};
+  }
+  &:hover span {
+    color: ${({ theme }) => theme.colors.copy};
   }
 `
 const IconWrapper = styled.span`
   display: flex;
-  padding: 8px 16px;
+  padding: 8px 12px 8px 16px;
 `
 const Label = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
 const SelectedSearchCriteria = styled.span`
-  background: ${({ theme }) => theme.colors.secondary};
-  border-radius: 2px;
-  padding: 5px 10px;
-  color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.captionStyle};
   display: flex;
+  margin-right: 16px;
+  &:hover:enabled {
+    background: none;
+  }
   & .selected-icon {
     display: none;
+    margin-right: 8px;
   }
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    padding: 2px;
+    margin-right: 0;
     & .selected-icon {
       display: flex;
     }
@@ -133,7 +115,7 @@ const DropDown = styled.div`
     margin-left: auto;
   }
 `
-const ClearTextIcon = styled(props => <ClearText {...props} />)`
+const ClearTextIcon = styled((props) => <ClearText {...props} />)`
   margin: 0 5px;
 `
 export interface ISearchType {
@@ -211,7 +193,7 @@ export class SearchTool extends React.Component<IProps, IState> {
     return (
       this.state.dropDownIsVisible && (
         <DropDownWrapper>
-          {this.props.searchTypeList.map(item => {
+          {this.props.searchTypeList.map((item) => {
             return (
               <DropDownItem
                 id={item.value}
@@ -228,7 +210,7 @@ export class SearchTool extends React.Component<IProps, IState> {
     )
   }
   dropDownItemSelect = (item: ISearchType) => {
-    this.setState(_ => ({
+    this.setState((_) => ({
       selectedSearchType: item,
       dropDownIsVisible: false
     }))
@@ -242,7 +224,7 @@ export class SearchTool extends React.Component<IProps, IState> {
       document.addEventListener('click', handler)
     }
 
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       dropDownIsVisible: !prevState.dropDownIsVisible
     }))
   }
@@ -267,6 +249,7 @@ export class SearchTool extends React.Component<IProps, IState> {
         <SearchTextInput
           id="searchText"
           type="text"
+          autoComplete="off"
           placeholder={placeHolderText}
           onChange={this.onChangeHandler}
           value={this.state.searchParam}
@@ -283,9 +266,6 @@ export class SearchTool extends React.Component<IProps, IState> {
               {this.state.selectedSearchType.label}
             </span>
           </SelectedSearchCriteria>
-          <IconRingButton>
-            <ArrowDownBlue />
-          </IconRingButton>
         </DropDown>
         {this.dropdown()}
       </Wrapper>

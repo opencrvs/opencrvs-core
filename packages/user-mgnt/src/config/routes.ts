@@ -71,6 +71,11 @@ import * as Hapi from '@hapi/hapi'
 import resendSMSInviteHandler, {
   requestSchema as resendSMSRequestSchema
 } from '@user-mgnt/features/resendSMSInvite/handler'
+import changePhoneHandler, {
+  changePhoneRequestSchema
+} from '@user-mgnt/features/changePhone/handler'
+import * as Joi from 'joi'
+import { countUsersByLocationHandler } from '@user-mgnt/features/countUsersByLocation/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
@@ -192,6 +197,31 @@ export const getRoutes = () => {
         },
         validate: {
           payload: changePasswordRequestSchema
+        },
+        response: {
+          schema: false
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/changeUserPhone',
+      handler: changePhoneHandler,
+      config: {
+        tags: ['api'],
+        description: 'Changes password for logged-in user',
+        auth: {
+          scope: [
+            RouteScope.DECLARE,
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          payload: changePhoneRequestSchema
         },
         response: {
           schema: false
@@ -477,6 +507,29 @@ export const getRoutes = () => {
         },
         response: {
           schema: getSystemResponseSchema
+        }
+      }
+    },
+    {
+      method: 'GET',
+      path: '/countUsersByLocation',
+      handler: countUsersByLocationHandler,
+      config: {
+        tags: ['api'],
+        description: 'Gets count of users group by office ids',
+        auth: {
+          scope: [
+            RouteScope.REGISTER,
+            RouteScope.CERTIFY,
+            RouteScope.PERFORMANCE,
+            RouteScope.SYSADMIN,
+            RouteScope.VALIDATE
+          ]
+        },
+        validate: {
+          query: Joi.object({
+            role: Joi.string().required()
+          })
         }
       }
     }

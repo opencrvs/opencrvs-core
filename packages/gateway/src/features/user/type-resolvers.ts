@@ -117,7 +117,7 @@ async function getPractitionerByOfficeId(
   }
 }
 
-function getSignatureExtension(
+export function getSignatureExtension(
   extensions: fhir.Extension[] | undefined
 ): fhir.Extension | undefined {
   return findExtension(
@@ -189,7 +189,11 @@ export const userTypeResolvers: GQLResolver = {
 
       const signatureExtension = getSignatureExtension(practitioner.extension)
 
-      const signature = signatureExtension && signatureExtension.valueSignature
+      const signature =
+        userModel.role === 'FIELD_AGENT'
+          ? null
+          : signatureExtension && signatureExtension.valueSignature
+
       return {
         role: practitionerRole,
         name: practitioner.name,

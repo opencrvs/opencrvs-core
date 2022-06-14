@@ -18,18 +18,20 @@ import {
 import { deserializeForm } from '@client/forms/mappings/deserializer'
 import { goToTeamUserList } from '@client/navigation'
 import {
+  showCreateUserErrorToast,
   showSubmitFormErrorToast,
   showSubmitFormSuccessToast
 } from '@client/notification/actions'
 import * as offlineActions from '@client/offline/actions'
+import * as profileActions from '@client/profile/profileActions'
 import { SEARCH_USERS } from '@client/user/queries'
 import {
   alterRolesBasedOnUserRole,
   transformRoleDataToDefinitions
 } from '@client/views/SysAdmin/Team/utils'
-import ApolloClient, { ApolloQueryResult } from 'apollo-client'
+import ApolloClient, { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { Action } from 'redux'
-import { Cmd, Loop, loop, LoopReducer } from 'redux-loop'
+import { ActionCmd, Cmd, Loop, loop, LoopReducer, RunCmd } from 'redux-loop'
 import {
   GQLQuery,
   GQLUser,
@@ -38,6 +40,10 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { userAuditForm, IUserAuditForm } from '@client/user/user-audit'
+import { createUserForm } from '@client/forms/user/fieldDefinitions/createUser'
+import { getToken, getTokenPayload } from '@client/utils/authUtils'
+import { modifyUserDetails } from '@client/profile/profileActions'
+import { IUserDetails } from '@client/utils/userUtils'
 
 const UPDATE_FORM_FIELD_DEFINITIONS = 'USER_FORM/UPDATE_FORM_FIELD_DEFINITIONS'
 const MODIFY_USER_FORM_DATA = 'USER_FORM/MODIFY_USER_FORM_DATA'
@@ -126,7 +132,7 @@ interface IUserFormDataSubmitAction {
   payload: {
     client: ApolloClient<unknown>
     mutation: any
-    variables: Record<string, unknown>
+    variables: { [key: string]: any }
     isUpdate: boolean
     officeLocationId: string
   }
@@ -146,11 +152,17 @@ interface ISubmitSuccessAction {
     isUpdate: boolean
   }
 }
+interface ISubmitFailedAction {
+  type: typeof SUBMIT_USER_FORM_DATA_FAIL
+  payload: {
+    errorData: ApolloError
+  }
+}
 
 export function submitUserFormData(
   client: ApolloClient<unknown>,
   mutation: any,
-  variables: Record<string, unknown>,
+  variables: { [key: string]: any },
   officeLocationId: string,
   isUpdate = false
 ): IUserFormDataSubmitAction {
@@ -185,9 +197,12 @@ export function submitSuccess(
   }
 }
 
-export function submitFail(): Action {
+export function submitFail(errorData: ApolloError): ISubmitFailedAction {
   return {
-    type: SUBMIT_USER_FORM_DATA_FAIL
+    type: SUBMIT_USER_FORM_DATA_FAIL,
+    payload: {
+      errorData
+    }
   }
 }
 
@@ -248,9 +263,11 @@ type UserFormAction =
   | IUserFormDataSubmitAction
   | IStoreUserFormDataAction
   | ISubmitSuccessAction
+  | ISubmitFailedAction
   | IProcessRoles
   | IFetchAndStoreUserData
   | IUpdateFormAndFormData
+  | profileActions.Action
   | Action
 
 export interface IUserFormState {
@@ -269,10 +286,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
 ): IUserFormState | Loop<IUserFormState, UserFormAction> => {
   switch (action.type) {
     case offlineActions.READY:
-    case offlineActions.DEFINITIONS_LOADED:
-      const { userForm } = (action as offlineActions.DefinitionsLoadedAction)
-        .payload.forms
-      const form = deserializeForm(userForm)
+      const form = deserializeForm(createUserForm)
 
       return {
         ...state,
@@ -292,7 +306,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         Cmd.run(alterRolesBasedOnUserRole, {
           successActionCreator: (data: GQLRole[]) =>
             updateUserFormFieldDefinitions(data, fetchUserQueryData),
-          args: [primaryOfficeId]
+          args: [primaryOfficeId, Cmd.getState]
         })
       )
     case UPDATE_FORM_FIELD_DEFINITIONS:
@@ -306,6 +320,11 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         userQueryData.data.getUser.role &&
         userQueryData.data.getUser.type
       ) {
+        // This logic combined with the function alterRolesBasedOnUserRole
+        // controls only showing unique user types in the case where 1 mayor should exist per location
+        // this functionality may be reintroduced in the future.
+        // for now types should only exist for field agents as per this requirement:
+        //
         const { role: existingRole, type: existingType } =
           userQueryData.data.getUser
         const roleData = (
@@ -381,8 +400,11 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const { client, mutation, variables, officeLocationId, isUpdate } = (
         action as IUserFormDataSubmitAction
       ).payload
-      return loop(
-        { ...state, submitting: true },
+      const token = getToken()
+      const tokenPayload = getTokenPayload(token)
+      const userDetails = variables.user
+      const isSelfUpdate = userDetails.id === tokenPayload?.sub ? true : false
+      const commandList: (RunCmd<Action> | ActionCmd<Action>)[] = [
         Cmd.run(
           () =>
             client.mutate({
@@ -398,6 +420,15 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
             failActionCreator: submitFail
           }
         )
+      ]
+      if (isSelfUpdate) {
+        commandList.push(
+          Cmd.action(modifyUserDetails({ mobile: userDetails.mobile }))
+        )
+      }
+      return loop(
+        { ...state, submitting: true },
+        Cmd.list<UserFormAction>(commandList)
       )
     case SUBMIT_USER_FORM_DATA_SUCCESS:
       return loop(
@@ -421,10 +452,19 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
         ])
       )
     case SUBMIT_USER_FORM_DATA_FAIL:
-      return loop(
-        { ...state, submitting: false, submissionError: true },
-        Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
-      )
+      const { errorData } = (action as ISubmitFailedAction).payload
+      if (errorData.message.includes('DUPLICATE_MOBILE')) {
+        const mobile = errorData.message.split('-')[1]
+        return loop(
+          { ...state, submitting: false, submissionError: false },
+          Cmd.action(showCreateUserErrorToast(TOAST_MESSAGES.FAIL, mobile))
+        )
+      } else {
+        return loop(
+          { ...state, submitting: false, submissionError: true },
+          Cmd.action(showSubmitFormErrorToast(TOAST_MESSAGES.FAIL))
+        )
+      }
     case STORE_USER_FORM_DATA:
       const { queryData } = (action as IStoreUserFormDataAction).payload
       const formData = gqlToDraftTransformer(

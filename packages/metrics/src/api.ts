@@ -11,7 +11,12 @@
  */
 import fetch from 'node-fetch'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fhirUrl, COUNTRY_CONFIG_URL, SEARCH_URL } from '@metrics/constants'
+import {
+  fhirUrl,
+  COUNTRY_CONFIG_URL,
+  SEARCH_URL,
+  USER_MANAGEMENT_URL
+} from '@metrics/constants'
 
 export function fetchFHIR<T = any>(
   suffix: string,
@@ -44,10 +49,18 @@ export const fetchLocation = async (
   locationId: string,
   authHeader: IAuthHeader
 ) => {
-  return await fetchFHIR(
+  return await fetchFHIR<fhir.Location>(
     locationId.startsWith('Location/') ? locationId : `Location/${locationId}`,
     authHeader
   )
+}
+
+export async function fetchLocationsByType(
+  type: string,
+  authHeader: IAuthHeader
+): Promise<fhir.Location[]> {
+  const bundle = await fetchFHIR(`Location?_count=0&type=${type}`, authHeader)
+  return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
 }
 
 export async function fetchParentLocationByLocationID(
@@ -82,6 +95,30 @@ export async function fetchChildLocationsByParentId(
   )
   return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
 }
+
+export async function fetchAllChildLocationsByParentId(
+  locationId: string,
+  authHeader: IAuthHeader
+): Promise<fhir.Location[]> {
+  const bundle = await fetchFHIR(
+    `Location?_count=0&partof=${locationId}`,
+    authHeader
+  )
+  return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
+}
+
+export async function fetchChildLocationsWithTypeByParentId(
+  locationId: string,
+  locationType: string,
+  authHeader: IAuthHeader
+): Promise<fhir.Location[]> {
+  const bundle = await fetchFHIR(
+    `Location?_count=0&type=${locationType}&partof=${locationId}`,
+    authHeader
+  )
+  return bundle?.entry?.map((entry: fhir.BundleEntry) => entry.resource) ?? []
+}
+
 export function fetchFromResource(
   suffix: string,
   authHeader: IAuthHeader,
@@ -151,4 +188,31 @@ export const fetchPractitionerRole = async (
   } else {
     return Promise.reject(new Error(`Role code cannot be found`))
   }
+}
+
+interface IUserCountSearchCriteria {
+  role: string
+}
+
+export interface ICountByLocation {
+  total: number
+  locationId: string
+}
+
+export async function countUsersByLocation(
+  searchCriteria: Partial<IUserCountSearchCriteria>,
+  authHeader: IAuthHeader
+): Promise<ICountByLocation[]> {
+  const { role } = searchCriteria
+  const res = await fetch(
+    `${USER_MANAGEMENT_URL}/countUsersByLocation?role=${role}`,
+    {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...authHeader
+      }
+    }
+  )
+  return res.json()
 }

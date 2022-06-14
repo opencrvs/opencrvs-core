@@ -30,16 +30,25 @@ export const enum EVENT {
 }
 
 export const IN_PROGRESS_STATUS = 'IN_PROGRESS'
+export const ARCHIVED_STATUS = 'ARCHIVED'
 const DECLARED_STATUS = 'DECLARED'
 export const REJECTED_STATUS = 'REJECTED'
 const VALIDATED_STATUS = 'VALIDATED'
 const WAITING_VALIDATION_STATUS = 'WAITING_VALIDATION'
 const REGISTERED_STATUS = 'REGISTERED'
+const REINSTATED_STATUS = 'REINSTATED'
 const CERTIFIED_STATUS = 'CERTIFIED'
+const REQUESTED_CORRECTION_STATUS = 'REQUESTED_CORRECTION'
 
 export const NOTIFICATION_TYPES = ['birth-notification', 'death-notification']
 export const NAME_EN = 'en'
 
+export interface ICorrection {
+  section: string
+  fieldName: string
+  oldValue: string
+  newValue: string
+}
 export interface IOperationHistory {
   operationType: string
   operatedOn: string
@@ -54,6 +63,7 @@ export interface IOperationHistory {
   rejectComment?: string
   notificationFacilityName?: string
   notificationFacilityAlias?: string[]
+  correction?: ICorrection[]
 }
 
 export interface ICompositionBody {
@@ -63,12 +73,12 @@ export interface ICompositionBody {
   type?: string
   contactRelationship?: string
   contactNumber?: string
-  dateOfApplication?: string
+  dateOfDeclaration?: string
   trackingId?: string
   registrationNumber?: string
   eventLocationId?: string
-  applicationLocationId?: string
-  applicationLocationHirarchyIds?: string[]
+  declarationLocationId?: string
+  declarationLocationHirarchyIds?: string[]
   rejectReason?: string
   rejectComment?: string
   relatesTo?: string[]
@@ -105,10 +115,6 @@ export interface IBirthCompositionBody extends ICompositionBody {
   informantFamilyName?: string
   informantFirstNamesLocal?: string
   informantFamilyNameLocal?: string
-  primaryCaregiverFirstNames?: string
-  primaryCaregiverFamilyName?: string
-  primaryCaregiverFirstNamesLocal?: string
-  primaryCaregiverFamilyNameLocal?: string
 }
 
 export interface IDeathCompositionBody extends ICompositionBody {
@@ -204,7 +210,7 @@ export const createStatusHistory = async (
   } as IOperationHistory
 
   if (
-    isApplicationInStatus(body, IN_PROGRESS_STATUS) &&
+    isDeclarationInStatus(body, IN_PROGRESS_STATUS) &&
     isNotification(body) &&
     body.eventLocationId
   ) {
@@ -214,11 +220,15 @@ export const createStatusHistory = async (
     operationHistory.notificationFacilityName = facility?.name || ''
     operationHistory.notificationFacilityAlias = facility?.alias || []
   }
+
+  if (isDeclarationInStatus(body, REQUESTED_CORRECTION_STATUS)) {
+    updateOperationHistoryWithCorrection(operationHistory, task)
+  }
   body.operationHistories = body.operationHistories || []
   body.operationHistories.push(operationHistory)
 }
 
-function isApplicationInStatus(
+function isDeclarationInStatus(
   body: ICompositionBody,
   status: string
 ): boolean {
@@ -240,10 +250,10 @@ function findDuplicateIds(
   const hits = (results && results.body.hits.hits) || []
   return hits
     .filter(
-      hit =>
+      (hit) =>
         hit._id !== compositionIdentifier && hit._score > MATCH_SCORE_THRESHOLD
     )
-    .map(hit => hit._id)
+    .map((hit) => hit._id)
 }
 
 export function buildQuery(body: IBirthCompositionBody) {
@@ -385,13 +395,20 @@ function getPreviousStatus(body: IBirthCompositionBody) {
 
 export function isValidOperationHistory(body: IBirthCompositionBody) {
   const validStatusMapping = {
+    [ARCHIVED_STATUS]: [DECLARED_STATUS, REJECTED_STATUS, VALIDATED_STATUS],
     [IN_PROGRESS_STATUS]: [null],
-    [DECLARED_STATUS]: [null],
-    [REJECTED_STATUS]: [DECLARED_STATUS, IN_PROGRESS_STATUS, VALIDATED_STATUS],
+    [DECLARED_STATUS]: [ARCHIVED_STATUS],
+    [REJECTED_STATUS]: [
+      DECLARED_STATUS,
+      IN_PROGRESS_STATUS,
+      VALIDATED_STATUS,
+      ARCHIVED_STATUS
+    ],
     [VALIDATED_STATUS]: [
       DECLARED_STATUS,
       IN_PROGRESS_STATUS,
       REJECTED_STATUS,
+      ARCHIVED_STATUS,
       null
     ],
     [WAITING_VALIDATION_STATUS]: [
@@ -409,6 +426,9 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
       VALIDATED_STATUS,
       WAITING_VALIDATION_STATUS
     ],
+    [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
+    [REQUESTED_CORRECTION_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS],
+    [REINSTATED_STATUS]: [ARCHIVED_STATUS],
     [CERTIFIED_STATUS]: [REGISTERED_STATUS, CERTIFIED_STATUS]
   }
 
@@ -417,10 +437,40 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
 
   if (
     currentStatus &&
+    validStatusMapping[currentStatus] &&
     !validStatusMapping[currentStatus].includes(previousStatus)
   ) {
     return false
   }
 
   return true
+}
+
+function updateOperationHistoryWithCorrection(
+  operationHistory: IOperationHistory,
+  task?: fhir.Task
+) {
+  if (
+    task?.input?.length &&
+    task?.output?.length &&
+    task.input.length === task.output.length
+  ) {
+    if (!operationHistory.correction) {
+      operationHistory.correction = []
+    }
+
+    for (let i = 0; i < task.input.length; i += 1) {
+      const section = task.input[i].valueCode || ''
+      const fieldName = task.input[i].valueId || ''
+      const oldValue = task.input[i].valueString || ''
+      const newValue = task.output[i].valueString || ''
+
+      operationHistory.correction?.push({
+        section,
+        fieldName,
+        oldValue,
+        newValue
+      })
+    }
+  }
 }

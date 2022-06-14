@@ -15,7 +15,11 @@ import { DocumentPreview } from '@client/components/form/DocumentUploadfield/Doc
 import { IFormFieldValue, IAttachmentValue } from '@client/forms'
 import Jimp from 'jimp'
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import {
+  WrappedComponentProps as IntlShapeProps,
+  injectIntl,
+  MessageDescriptor
+} from 'react-intl'
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
@@ -25,12 +29,10 @@ const DocumentUploader = styled(ImageUploader)`
   color: ${({ theme }) => theme.colors.primary};
   background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
-  border-radius: 2px;
-  ${({ theme }) => theme.fonts.buttonStyle};
+  border-radius: 4px;
+  ${({ theme }) => theme.fonts.bold14};
   height: 40px;
   text-transform: initial;
-  padding: 0px 25px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-left: 0px;
@@ -39,8 +41,8 @@ const DocumentUploader = styled(ImageUploader)`
 `
 
 const FieldDescription = styled.div`
-  margin-top: -8px;
-  margin-bottom: 24px;
+  margin-top: 0px;
+  margin-bottom: 6px;
 `
 
 type IFullProps = {
@@ -52,13 +54,16 @@ type IFullProps = {
   error?: string
   disableDeleteInPreview?: boolean
   onComplete: (files: IAttachmentValue | {}) => void
+  touched?: boolean
+  onUploadingStateChanged?: (isUploading: boolean) => void
+  requiredErrorMessage?: MessageDescriptor
 } & IntlShapeProps
 
 type IState = {
   error: string
   previewImage: IAttachmentValue | null
+  filesBeingUploaded: Array<{ label: string }>
 }
-
 class SimpleDocumentUploaderComponent extends React.Component<
   IFullProps,
   IState
@@ -67,7 +72,8 @@ class SimpleDocumentUploaderComponent extends React.Component<
     super(props)
     this.state = {
       error: '',
-      previewImage: null
+      previewImage: null,
+      filesBeingUploaded: []
     }
   }
 
@@ -76,6 +82,19 @@ class SimpleDocumentUploaderComponent extends React.Component<
       return
     }
     const allowedDocType = this.props.allowedDocType
+
+    this.setState(() => ({
+      filesBeingUploaded: [
+        ...this.state.filesBeingUploaded,
+        {
+          label: uploadedImage.name
+        }
+      ]
+    }))
+
+    this.props.onUploadingStateChanged &&
+      this.props.onUploadingStateChanged(true)
+
     getBase64String(uploadedImage).then((data) => {
       let base64String = data as string
       base64String = base64String.split('base64,')[1]
@@ -91,20 +110,34 @@ class SimpleDocumentUploaderComponent extends React.Component<
           return data as string
         })
         .then((buffer) => {
+          this.props.onUploadingStateChanged &&
+            this.props.onUploadingStateChanged(false)
           this.props.onComplete({
+            name: uploadedImage.name,
             type: uploadedImage.type,
             data: buffer
           })
           this.setState({
             error: ''
           })
+          this.setState({
+            filesBeingUploaded: []
+          })
         })
         .catch(() => {
+          this.props.onUploadingStateChanged &&
+            this.props.onUploadingStateChanged(false)
+          this.setState({
+            filesBeingUploaded: []
+          })
           allowedDocType &&
             allowedDocType.length > 0 &&
             this.setState({
               error: this.props.intl.formatMessage(messages.fileUploadError, {
-                type: allowedDocType.join()
+                type:
+                  allowedDocType.join() === 'image/png'
+                    ? 'png'
+                    : allowedDocType.join()
               })
             })
         })
@@ -125,29 +158,36 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   render() {
-    const { label, intl, files, description, error, disableDeleteInPreview } =
-      this.props
-    const errorMessage = this.state.error || error || ''
+    const {
+      label,
+      intl,
+      files,
+      description,
+      error,
+      disableDeleteInPreview,
+      requiredErrorMessage,
+      touched
+    } = this.props
+    const errorMessage =
+      (requiredErrorMessage && intl.formatMessage(requiredErrorMessage)) ||
+      this.state.error ||
+      error ||
+      ''
 
     return (
       <>
         {description && <FieldDescription>{description}</FieldDescription>}
         <ErrorMessage>
-          {errorMessage && (
+          {errorMessage && (touched || this.state.error) && (
             <ErrorText id="field-error">{errorMessage}</ErrorText>
           )}
         </ErrorMessage>
-        {(!files || !files.data) && (
-          <DocumentUploader
-            id="upload_document"
-            title={intl.formatMessage(messages.addFile)}
-            handleFileChange={this.handleFileChange}
-          />
-        )}
         <DocumentListPreview
           attachment={files}
           onSelect={this.selectForPreview}
           label={label}
+          onDelete={this.onDelete}
+          processingDocuments={this.state.filesBeingUploaded}
         />
         {this.state.previewImage && (
           <DocumentPreview
@@ -156,6 +196,13 @@ class SimpleDocumentUploaderComponent extends React.Component<
             title={intl.formatMessage(buttonMessages.preview)}
             goBack={this.closePreviewSection}
             onDelete={this.onDelete}
+          />
+        )}
+        {(!files || !files.data) && (
+          <DocumentUploader
+            id="upload_document"
+            title={intl.formatMessage(messages.uploadFile)}
+            handleFileChange={this.handleFileChange}
           />
         )}
       </>

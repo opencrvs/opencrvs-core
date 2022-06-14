@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@metrics/index'
+import { createServer } from '@metrics/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import * as influx from '@metrics/influxdb/client'
@@ -18,7 +18,7 @@ const clearPoints = influx.query as jest.Mock
 
 const response = [
   {
-    measurement: 'applications_started',
+    measurement: 'declarations_started',
     tags: {
       eventType: 'BIRTH',
       locationLevel5: 'Location/bfe8306c-0910-48fe-8bf5-0db906cf3155',
@@ -33,7 +33,7 @@ const response = [
     timestamp: '1587384348363000000'
   },
   {
-    measurement: 'applications_started',
+    measurement: 'declarations_started',
     tags: {
       eventType: 'BIRTH',
       locationLevel5: 'Location/bfe8306c-0910-48fe-8bf5-0db906cf3155',
@@ -48,7 +48,7 @@ const response = [
     timestamp: '1587384430106000000'
   },
   {
-    measurement: 'applications_started',
+    measurement: 'declarations_started',
     tags: {
       eventType: 'BIRTH',
       locationLevel5: 'Location/bfe8306c-0910-48fe-8bf5-0db906cf3155',
@@ -63,7 +63,7 @@ const response = [
     timestamp: '1587384453470000000'
   },
   {
-    measurement: 'applications_started',
+    measurement: 'declarations_started',
     tags: {
       eventType: 'BIRTH',
       locationLevel5: 'Location/bfe8306c-0910-48fe-8bf5-0db906cf3155',
@@ -78,7 +78,7 @@ const response = [
     timestamp: '1587384532791000000'
   },
   {
-    measurement: 'applications_started',
+    measurement: 'declarations_started',
     tags: {
       eventType: 'BIRTH',
       locationLevel5: 'Location/bfe8306c-0910-48fe-8bf5-0db906cf3155',
@@ -93,7 +93,7 @@ const response = [
     timestamp: '1587384621467000000'
   },
   {
-    measurement: 'applications_started',
+    measurement: 'declarations_started',
     tags: {
       eventType: 'BIRTH',
       locationLevel5: 'Location/bfe8306c-0910-48fe-8bf5-0db906cf3155',
@@ -109,7 +109,7 @@ const response = [
   }
 ]
 
-describe('verify applicationsStarted handler', () => {
+describe('verify declarationsStarted handler', () => {
   let server: any
   const token = jwt.sign(
     { scope: ['declare'] },
@@ -139,7 +139,7 @@ describe('verify applicationsStarted handler', () => {
         timed_out: false,
         _shards: { total: 5, successful: 5, skipped: 0, failed: 0 },
         hits: {
-          total: 6,
+          total: { value: 6 },
           max_score: null,
           hits: [
             {
@@ -198,10 +198,10 @@ describe('verify applicationsStarted handler', () => {
                 informantFamilyNameLocal: 'বেগম',
                 contactNumber: '+8801529148197',
                 type: 'REGISTERED',
-                dateOfApplication: '2020-04-20T12:05:48.163Z',
+                dateOfDeclaration: '2020-04-20T12:05:48.163Z',
                 trackingId: 'BYW6MFW',
-                applicationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
-                compositionType: 'birth-application',
+                declarationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
+                compositionType: 'birth-declaration',
                 createdBy: 'f361cae7-205a-4251-9f31-125118da1625',
                 updatedBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
                 modifiedAt: '1587384350751',
@@ -277,10 +277,10 @@ describe('verify applicationsStarted handler', () => {
                 informantFamilyNameLocal: 'আক্তার',
                 contactNumber: '+8801526972106',
                 type: 'REGISTERED',
-                dateOfApplication: '2020-04-20T12:07:10.000Z',
+                dateOfDeclaration: '2020-04-20T12:07:10.000Z',
                 trackingId: 'BPWW3PW',
-                applicationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
-                compositionType: 'birth-application',
+                declarationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
+                compositionType: 'birth-declaration',
                 createdBy: 'f361cae7-205a-4251-9f31-125118da1625',
                 updatedBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
                 modifiedAt: '1587384432456',
@@ -336,10 +336,10 @@ describe('verify applicationsStarted handler', () => {
                 informantFamilyNameLocal: 'আক্তার',
                 contactNumber: '+8801526972106',
                 type: 'REJECTED',
-                dateOfApplication: '2020-04-20T12:07:33.230Z',
+                dateOfDeclaration: '2020-04-20T12:07:33.230Z',
                 trackingId: 'B5DU8KU',
-                applicationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
-                compositionType: 'birth-application',
+                declarationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
+                compositionType: 'birth-declaration',
                 createdBy: 'f361cae7-205a-4251-9f31-125118da1625',
                 updatedBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
                 rejectReason: 'other',
@@ -409,10 +409,10 @@ describe('verify applicationsStarted handler', () => {
                 informantFamilyNameLocal: 'বেগম',
                 contactNumber: '+8801526972106',
                 type: 'REJECTED',
-                dateOfApplication: '2020-04-20T12:08:52.456Z',
+                dateOfDeclaration: '2020-04-20T12:08:52.456Z',
                 trackingId: 'BQOPG9I',
-                applicationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
-                compositionType: 'birth-application',
+                declarationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
+                compositionType: 'birth-declaration',
                 createdBy: 'f361cae7-205a-4251-9f31-125118da1625',
                 updatedBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
                 rejectReason: 'other',
@@ -479,10 +479,10 @@ describe('verify applicationsStarted handler', () => {
                 informantFamilyNameLocal: 'আক্তার',
                 contactNumber: '+8801526972106',
                 type: 'REGISTERED',
-                dateOfApplication: '2020-04-20T12:10:21.368Z',
+                dateOfDeclaration: '2020-04-20T12:10:21.368Z',
                 trackingId: 'BEDYGYJ',
-                applicationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
-                compositionType: 'birth-application',
+                declarationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
+                compositionType: 'birth-declaration',
                 createdBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
                 updatedBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
                 relatesTo: ['ca09dfa9-9e31-40ed-8aa6-9446b4ceb71a'],
@@ -543,10 +543,10 @@ describe('verify applicationsStarted handler', () => {
                 informantFamilyNameLocal: 'বেগম',
                 contactNumber: '+8801526972106',
                 type: 'REGISTERED',
-                dateOfApplication: '2020-04-20T12:11:01.315Z',
+                dateOfDeclaration: '2020-04-20T12:11:01.315Z',
                 trackingId: 'BFY2ECB',
-                applicationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
-                compositionType: 'birth-application',
+                declarationLocationId: '5d88627e-879c-4631-aff8-f5789551cb2b',
+                compositionType: 'birth-declaration',
                 createdBy: 'f361cae7-205a-4251-9f31-125118da1625',
                 updatedBy: '8d14843a-1c2e-4456-b5d1-420c7c9d9d78',
                 modifiedAt: '1587384663775',
@@ -569,8 +569,7 @@ describe('verify applicationsStarted handler', () => {
           params: {
             method: 'POST',
             path: '/ocrvs/_search',
-            body:
-              '{"query":{"match_all":{}},"sort":[{"dateOfApplication":"asc"}]}',
+            body: '{"query":{"match_all":{}},"sort":[{"dateOfDeclaration":"asc"}]}',
             querystring: '',
             headers: {
               'User-Agent':
@@ -688,7 +687,7 @@ describe('verify applicationsStarted handler', () => {
   })
 })
 
-describe('applicationsStarted errors', () => {
+describe('declarationsStarted errors', () => {
   let server: any
   const token = jwt.sign(
     { scope: ['declare'] },

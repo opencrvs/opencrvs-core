@@ -14,12 +14,14 @@ import styled, { keyframes, withTheme } from 'styled-components'
 import { CrossLarge, Error, Success, Warning } from '../icons'
 import { Spinner } from './Spinner'
 import { ITheme } from '../theme'
+import NotificationError from '../icons/NotificationError'
 
-enum NOTIFICATION_TYPE {
+export enum NOTIFICATION_TYPE {
   SUCCESS = 'success',
   WARNING = 'warning',
   IN_PROGRESS = 'inProgress',
-  ERROR = 'error'
+  ERROR = 'error',
+  ALTERNATE_ERROR = 'alternateError'
 }
 
 interface IProps {
@@ -62,17 +64,24 @@ const NotificationContainer = styled.div`
     bottom: 100px;
   }
 
+  &.hide {
+    display: none;
+  }
+
   &.success {
-    background: ${({ theme }) => theme.colors.success};
+    background: ${({ theme }) => theme.colors.positive};
   }
   &.inProgress {
     background: ${({ theme }) => theme.colors.primary};
   }
   &.error {
-    background: ${({ theme }) => theme.colors.error};
+    background: ${({ theme }) => theme.colors.negative};
   }
   &.warning {
-    background: ${({ theme }) => theme.colors.warning};
+    background: ${({ theme }) => theme.colors.neutral};
+  }
+  &.alternateError {
+    background: ${({ theme }) => theme.colors.negative};
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
@@ -102,7 +111,7 @@ const Cancel = styled.div`
 
 const NotificationMessage = styled.div`
   position: relative;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   padding: 8px 16px;
   margin: 8px;
   color: ${({ theme }) => theme.colors.white};
@@ -116,11 +125,14 @@ class FloatingNotificationComp extends React.Component<FullProps> {
     return (
       <NotificationContainer
         id={id}
-        className={(type ? type : '') + (show ? ' show' : '') + ' ' + className}
+        className={
+          (type ? type : '') + (show ? ' show' : ' hide') + ' ' + className
+        }
       >
         <Content>
           {type === NOTIFICATION_TYPE.SUCCESS && <Success />}
           {type === NOTIFICATION_TYPE.WARNING && <Warning />}
+          {type === NOTIFICATION_TYPE.ALTERNATE_ERROR && <NotificationError />}
           {type === NOTIFICATION_TYPE.ERROR && <Error />}
           {type === NOTIFICATION_TYPE.IN_PROGRESS && (
             <Spinner

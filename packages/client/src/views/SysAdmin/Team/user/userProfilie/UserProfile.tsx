@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { messages } from '@client/i18n/messages/views/userSetup'
+import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import { withTheme } from '@client/styledComponents'
 import { goToTeamUserList, goToReviewUserDetails } from '@client/navigation'
 import * as React from 'react'
@@ -28,7 +29,6 @@ import { SearchRed, VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { Avatar } from '@client/components/Avatar'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import moment from 'moment'
 import { userMessages } from '@client/i18n/messages'
 import { LANG_EN } from '@client/utils/constants'
 import {
@@ -53,6 +53,8 @@ import { UserAuditList } from '@client/views/SysAdmin/Team/user/userProfilie/Use
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { userMutations } from '@client/user/mutations'
+import format from '@client/utils/date-formatting'
+import { getUserRole, getUserType } from '@client/views/SysAdmin//Team/utils'
 
 const ContentWrapper = styled.div`
   margin: 40px auto 0;
@@ -69,7 +71,7 @@ const UserAvatar = styled(Avatar)`
 `
 
 const NameHolder = styled.div`
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
   margin: 20px auto 30px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
@@ -87,14 +89,12 @@ const InformationHolder = styled.div`
   }
 `
 
-export const InformationTitle = styled.div<{ paddingRight?: number }>`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-  ${({ paddingRight }) => {
-    return `padding-right: ${paddingRight ? paddingRight : 0}px`
-  }}
+export const InformationTitle = styled.div`
+  ${({ theme }) => theme.fonts.bold16};
+  width: 320px;
 `
 const InformationValue = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const LoadingTitle = styled.span<{ width: number; marginRight: number }>`
@@ -118,6 +118,12 @@ const HeaderMenuHolder = styled.div`
   & > :not(:last-child) {
     margin: auto 8px;
   }
+`
+const LinkButtonWithoutSpacing = styled(LinkButton)`
+  & > * {
+    padding: 0;
+  }
+  height: auto !important;
 `
 
 interface ISearchParams {
@@ -164,7 +170,7 @@ export interface IUserData {
 class UserProfileComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
-    moment.locale(props.intl.locale)
+    window.__localeId__ = props.intl.locale
     this.state = {
       modalVisible: false,
       viewportWidth: 0,
@@ -273,12 +279,11 @@ class UserProfileComponent extends React.Component<Props, State> {
       locationId:
         getJurisdictionLocationIdFromUserDetails(userData as IUserDetails) ||
         '0',
-      startDate:
-        (userData.creationDate &&
-          moment(new Date(Number(userData.creationDate))).format(
-            'MMMM DD, YYYY'
-          )) ||
-        '',
+      startDate: userData.creationDate
+        ? Number.isNaN(Number(userData.creationDate))
+          ? format(new Date(userData.creationDate), 'MMMM dd, yyyy')
+          : format(new Date(Number(userData.creationDate)), 'MMMM dd, yyyy')
+        : '',
       avatar: userData.avatar
     }
   }
@@ -338,6 +343,9 @@ class UserProfileComponent extends React.Component<Props, State> {
             } else {
               const user = this.transformUserQueryResult(data && data.getUser)
 
+              const userRole = getUserRole(user, intl)
+              const userType = getUserType(user, intl)
+
               return (
                 <SysAdminContentWrapper
                   id="user-profile"
@@ -355,10 +363,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                           user.id as string,
                           user.status as string
                         )}
-                        hide={
-                          viewOnlyMode ||
-                          this.state.viewportWidth <= theme.grid.breakpoints.md
-                        }
+                        hide={viewOnlyMode}
                       />
                     </HeaderMenuHolder>
                   }
@@ -371,13 +376,12 @@ class UserProfileComponent extends React.Component<Props, State> {
                     <UserAvatar name={user.name} avatar={user.avatar} />
                     <NameHolder>{user.name}</NameHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={70}>
+                      <InformationTitle>
                         {intl.formatMessage(messages.assignedOffice)}
                       </InformationTitle>
                       <InformationValue>
-                        <LinkButton
+                        <LinkButtonWithoutSpacing
                           id="office-link"
-                          textDecoration={'none'}
                           onClick={() =>
                             this.props.goToTeamUserList(
                               user.primaryOffice as ISearchLocation
@@ -386,33 +390,32 @@ class UserProfileComponent extends React.Component<Props, State> {
                         >
                           {user.primaryOffice &&
                             user.primaryOffice.displayLabel}
-                        </LinkButton>
+                        </LinkButtonWithoutSpacing>
                       </InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={208}>
-                        {intl.formatMessage(messages.roleType)}
+                      <InformationTitle>
+                        {(userType && intl.formatMessage(messages.roleType)) ||
+                          intl.formatMessage(userFormMessages.type)}
                       </InformationTitle>
                       <InformationValue>
-                        {intl.formatMessage(userMessages[user.role as string])}{' '}
-                        /{' '}
-                        {intl.formatMessage(userMessages[user.type as string])}
+                        {(userType && `${userRole} / ${userType}`) || userRole}
                       </InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={169}>
+                      <InformationTitle>
                         {intl.formatMessage(messages.phoneNumber)}
                       </InformationTitle>
                       <InformationValue>{user.number}</InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={205}>
+                      <InformationTitle>
                         {intl.formatMessage(messages.userName)}
                       </InformationTitle>
                       <InformationValue>{user.username}</InformationValue>
                     </InformationHolder>
                     <InformationHolder>
-                      <InformationTitle paddingRight={210}>
+                      <InformationTitle>
                         {intl.formatMessage(messages.startDate)}
                       </InformationTitle>
                       <InformationValue>{user.startDate}</InformationValue>

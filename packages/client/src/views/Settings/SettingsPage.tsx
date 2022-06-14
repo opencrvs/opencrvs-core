@@ -22,134 +22,99 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import styled from '@client/styledComponents'
 import { Header } from '@client/components/interface/Header/Header'
-import { AvatarLarge, Avatar } from '@client/components/Avatar'
-import { DataSection } from '@opencrvs/components/lib/interface/ViewData'
+import { Avatar } from '@client/components/Avatar'
+import {
+  ListViewSimplified,
+  ListViewItemSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import {
   ResponsiveModal,
   NOTIFICATION_TYPE,
-  Notification,
   FloatingNotification
 } from '@opencrvs/components/lib/interface'
 import { Select } from '@opencrvs/components/lib/forms'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  PrimaryButton,
+  TertiaryButton,
+  LinkButton
+} from '@opencrvs/components/lib/buttons'
 import {
   userMessages as messages,
   buttonMessages,
   constantsMessages
 } from '@client/i18n/messages'
 import { modifyUserDetails as modifyUserDetailsAction } from '@client/profile/profileActions'
+import { changeLanguage as changeLanguageAction } from '@client/i18n/actions'
 import { getDefaultLanguage, getAvailableLanguages } from '@client/i18n/utils'
 import { IntlState } from '@client/i18n/reducer'
 import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
+import { goToPhoneSettings } from '@client/navigation'
+import { RouteComponentProps, StaticContext } from 'react-router'
+import { SETTINGS } from '@client/navigation/routes'
+import { Navigation } from '@client/components/interface/Navigation'
 import { AvatarChangeModal } from './AvatarChangeModal'
-import { ImageLoader } from './ImageLoader'
 import { IImage } from '@client/utils/imageUtils'
+import { Content } from '@opencrvs/components/lib/interface/Content'
+import { ImageLoader } from './ImageLoader'
+import {
+  IOnlineStatusProps,
+  withOnlineStatus
+} from '@client/views/OfficeHome/LoadingIndicator'
 
-const Container = styled.div`
-  ${({ theme }) => theme.shadows.mistyShadow};
-  color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.white};
-  padding: 40px 77px;
-  margin: 36px auto;
-  width: 1140px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 0;
-    padding: 24px 0;
-    width: 100%;
-    min-height: 100vh;
-    margin-top: 0;
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0);
-  }
-`
-
-const SettingsTitle = styled.div`
-  ${({ theme }) => theme.fonts.h1Style};
-  height: 72px;
-  margin-left: 16px;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
+const BodyContainer = styled.div`
+  margin-left: 0px;
+  margin-top: 0px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 274px;
+    margin-top: 24px;
+    margin-right: 24px;
   }
 `
 
-const Content = styled.div`
-  display: flex;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    flex-direction: column-reverse;
-  }
+const LabelContainer = styled.span`
+  ${({ theme }) => theme.fonts.bold16}
 `
-const Left = styled.div`
-  margin: 0 16px;
-  flex-grow: 1;
+
+const ValueContainer = styled.span`
+  ${({ theme }) => theme.fonts.reg16}
 `
-const Right = styled.div`
-  display: flex;
-  padding-top: 80px;
-  margin-left: 112px;
-  & .desktop {
-    display: block;
-  }
-  & .tablet {
-    display: none;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    padding-top: 0;
-    margin-left: 24px;
-    & .desktop {
-      display: none;
-    }
-    & .tablet {
-      display: block;
-    }
-  }
-`
-const Version = styled.div`
-  color: ${({ theme }) => theme.colors.disabled};
-  ${({ theme }) => theme.fonts.smallButtonStyle};
-  text-transform: none;
-  margin-top: 2rem;
-  span:last-child {
-    display: none;
-  }
-  :hover {
-    span:first-child {
-      display: none;
-    }
-    span:last-child {
-      display: inline;
-    }
-  }
-`
+
 const Message = styled.div`
   margin-bottom: 16px;
 `
 const Label = styled.label`
   margin-bottom: 8px;
 `
-const ApplyButton = styled(PrimaryButton)`
-  height: 40px;
-  & div {
-    padding: 0 8px;
-  }
-`
-const CancelButton = styled(TertiaryButton)`
-  height: 40px;
-  & div {
-    padding: 0;
-  }
-`
-
-type IProps = IntlShapeProps & {
-  language: string
-  languages: IntlState['languages']
-  userDetails: IUserDetails | null
-  modifyUserDetails: typeof modifyUserDetailsAction
-}
+type IProps = IntlShapeProps &
+  RouteComponentProps<
+    {},
+    StaticContext,
+    {
+      phonedNumberUpdated: boolean
+    }
+  > & {
+    language: string
+    languages: IntlState['languages']
+    userDetails: IUserDetails | null
+    modifyUserDetails: typeof modifyUserDetailsAction
+    changeLanguage: typeof changeLanguageAction
+    goToPhoneSettingAction: typeof goToPhoneSettings
+  } & IOnlineStatusProps
 
 enum NOTIFICATION_SUBJECT {
   LANGUAGE,
+  PASSWORD,
   AVATAR,
-  PASSWORD
+  PHONE
 }
+
+const TopAlignedListViewItemSimplified = styled(ListViewItemSimplified)`
+  align-items: start;
+  padding: 16px 0;
+`
+const DynamicHeightLinkButton = styled(LinkButton)`
+  height: auto;
+`
 
 interface IState {
   showLanguageSettings: boolean
@@ -188,6 +153,21 @@ class SettingsView extends React.Component<IProps, IState> {
     }
   }
 
+  componentDidMount() {
+    if (this.props.history && this.props.history.location.state) {
+      let phonedNumberUpdated = false
+      const historyState = this.props.history.location.state
+      phonedNumberUpdated = historyState.phonedNumberUpdated
+      if (phonedNumberUpdated) {
+        this.changePhoneNumber()
+        this.props.history.replace({
+          pathname: SETTINGS,
+          state: { phonedNumberUpdated: false }
+        })
+      }
+    }
+  }
+
   toggleLanguageSettingsModal = () => {
     this.setState((state) => ({
       showLanguageSettings: !state.showLanguageSettings
@@ -198,12 +178,6 @@ class SettingsView extends React.Component<IProps, IState> {
     this.setState((state) => ({
       showSuccessNotification: !state.showSuccessNotification,
       notificationSubject: subject
-    }))
-  }
-
-  toggleAvatarNotification = () => {
-    this.setState((state) => ({
-      showAvatarNotification: !state.showAvatarNotification
     }))
   }
 
@@ -228,9 +202,7 @@ class SettingsView extends React.Component<IProps, IState> {
 
   changeLanguage = () => {
     if (this.props.userDetails) {
-      this.props.userDetails.language = this.state.selectedLanguage
-      this.props.modifyUserDetails(this.props.userDetails)
-
+      this.props.changeLanguage({ language: this.state.selectedLanguage })
       this.toggleLanguageSettingsModal()
       this.toggleSuccessNotification(NOTIFICATION_SUBJECT.LANGUAGE)
     }
@@ -240,18 +212,24 @@ class SettingsView extends React.Component<IProps, IState> {
     this.togglePasswordChangeModal()
     this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PASSWORD)
   }
+  changePhoneNumber = () => {
+    this.toggleSuccessNotification(NOTIFICATION_SUBJECT.PHONE)
+  }
 
   handleConfirmAvatarChange = () => {
     this.setState({ imageUploading: true })
     this.toggleAvatarChangeModal()
-    this.toggleAvatarNotification()
+    this.toggleSuccessNotification(NOTIFICATION_SUBJECT.AVATAR)
   }
 
   changeAvatar = (avatar: IImage) => {
     if (this.props.userDetails) {
       this.setState({ imageUploading: false })
-      this.props.userDetails.avatar = avatar
-      this.props.modifyUserDetails(this.props.userDetails)
+      const { userDetails } = this.props
+      this.props.modifyUserDetails({
+        ...userDetails,
+        avatar
+      })
     }
   }
 
@@ -262,7 +240,8 @@ class SettingsView extends React.Component<IProps, IState> {
   }
 
   render() {
-    const { userDetails, intl, languages } = this.props
+    const { userDetails, intl, languages, goToPhoneSettingAction, isOnline } =
+      this.props
     const langChoice = [] as ILanguageOptions[]
     const availableLangs = getAvailableLanguages()
     availableLangs.forEach((lang: string) => {
@@ -294,136 +273,136 @@ class SettingsView extends React.Component<IProps, IState> {
       userDetails && userDetails.role
         ? intl.formatMessage(messages[userDetails.role])
         : ''
-    const sections = [
+    const items = [
       {
-        title: intl.formatMessage(messages.profileTitle),
-        items: [
-          {
-            label: intl.formatMessage(messages.labelEnglishName),
-            value: englishName,
-            action: {
-              label: intl.formatMessage(buttonMessages.change),
-              disabled: true
-            }
-          },
-          {
-            label: intl.formatMessage(constantsMessages.labelPhone),
-            value: mobile,
-            action: {
-              label: intl.formatMessage(buttonMessages.change),
-              disabled: true
-            }
-          }
-        ]
+        label: intl.formatMessage(messages.labelEnglishName),
+        value: englishName,
+        action: {
+          label: intl.formatMessage(buttonMessages.change),
+          disabled: true
+        }
       },
       {
-        title: intl.formatMessage(messages.accountTitle),
-        items: [
-          {
-            label: intl.formatMessage(constantsMessages.labelRole),
-            value: role,
-            action: {
-              label: intl.formatMessage(buttonMessages.change),
-              disabled: true
-            }
-          }
-        ]
+        label: intl.formatMessage(constantsMessages.labelPhone),
+        value: mobile,
+        action: {
+          label: intl.formatMessage(buttonMessages.change),
+          disabled: isOnline ? false : true,
+          handler: goToPhoneSettingAction
+        }
       },
       {
-        title: intl.formatMessage(messages.securityTitle),
-        items: [
-          {
-            label: intl.formatMessage(constantsMessages.labelPassword),
-            placeHolder: '********',
-            action: {
-              id: 'BtnChangePassword',
-              label: intl.formatMessage(buttonMessages.change),
-              handler: this.togglePasswordChangeModal
-            }
-          },
-          {
-            label: intl.formatMessage(constantsMessages.labelPin),
-            placeHolder: '****',
-            action: {
-              label: intl.formatMessage(buttonMessages.change),
-              disabled: true
-            }
-          }
-        ]
+        label: intl.formatMessage(constantsMessages.labelRole),
+        value: role,
+        action: {
+          label: intl.formatMessage(buttonMessages.change),
+          disabled: true
+        }
       },
       {
-        title: intl.formatMessage(messages.systemTitle),
-        items: [
-          {
-            label: intl.formatMessage(constantsMessages.labelLanguage),
-            value: languages[this.props.language].displayName,
-            action: {
-              id: 'BtnChangeLanguage',
-              label: intl.formatMessage(buttonMessages.change),
-              handler: this.toggleLanguageSettingsModal
-            }
-          }
-        ]
+        label: intl.formatMessage(messages.systemLanguage),
+        value: languages[this.props.language].displayName,
+        action: {
+          id: 'BtnChangeLanguage',
+          label: intl.formatMessage(buttonMessages.change),
+          handler: this.toggleLanguageSettingsModal
+        }
+      },
+      {
+        label: intl.formatMessage(constantsMessages.labelPassword),
+        value: '********',
+        action: {
+          id: 'BtnChangePassword',
+          label: intl.formatMessage(buttonMessages.change),
+          handler: this.togglePasswordChangeModal
+        }
+      },
+      {
+        label: intl.formatMessage(constantsMessages.labelPin),
+        value: '****',
+        action: {
+          label: intl.formatMessage(buttonMessages.change),
+          disabled: true
+        }
       }
     ]
+
     return (
       <>
         <Header title={intl.formatMessage(messages.settingsTitle)} />
-        <Container>
-          <SettingsTitle>
-            {intl.formatMessage(messages.settingsTitle)}
-          </SettingsTitle>
-          <Content>
-            <Left>
-              {sections.map((sec, index: number) => (
-                <DataSection key={index} {...sec} />
-              ))}
-              <Version>
-                <span>OpenCRVS v1.1.0</span>
-                <span>{process.env.REACT_APP_VERSION || 'development'}</span>
-              </Version>
-            </Left>
-            <Right>
-              <ImageLoader
-                onImageLoaded={this.handleImageLoaded}
-                onLoadingStarted={this.toggleAvatarChangeModal}
-                onError={(imageLoadingError) =>
-                  this.setState({ imageLoadingError })
+        <Navigation />
+        <BodyContainer>
+          <Content
+            title={intl.formatMessage(messages.settingsTitle)}
+            showTitleOnMobile={true}
+          >
+            <ListViewSimplified>
+              {items.map((item) => {
+                return (
+                  <ListViewItemSimplified
+                    key={item.label}
+                    label={<LabelContainer>{item.label}</LabelContainer>}
+                    value={<ValueContainer>{item.value}</ValueContainer>}
+                    actions={
+                      <DynamicHeightLinkButton
+                        id={item.action.id}
+                        onClick={item.action.handler}
+                        disabled={item.action.disabled}
+                      >
+                        {item.action.label}
+                      </DynamicHeightLinkButton>
+                    }
+                  />
+                )
+              })}
+              {/* For Profile Image */}
+              <TopAlignedListViewItemSimplified
+                label={
+                  <LabelContainer>
+                    {intl.formatMessage(messages.profileImage)}
+                  </LabelContainer>
                 }
-              >
-                <Avatar
-                  className="tablet clickable"
-                  avatar={userDetails?.avatar}
-                  name={englishName}
-                />
-                <AvatarLarge
-                  className="desktop clickable"
-                  avatar={userDetails?.avatar}
-                  name={englishName}
-                />
-              </ImageLoader>
-            </Right>
+                value={
+                  <ValueContainer>
+                    <Avatar avatar={userDetails?.avatar} name={englishName} />
+                  </ValueContainer>
+                }
+                actions={
+                  <ImageLoader
+                    onImageLoaded={this.handleImageLoaded}
+                    onLoadingStarted={this.toggleAvatarChangeModal}
+                    onError={(imageLoadingError) =>
+                      this.setState({ imageLoadingError })
+                    }
+                  >
+                    <DynamicHeightLinkButton>
+                      {intl.formatMessage(buttonMessages.change)}
+                    </DynamicHeightLinkButton>
+                  </ImageLoader>
+                }
+              />
+            </ListViewSimplified>
           </Content>
-        </Container>
+        </BodyContainer>
         <ResponsiveModal
           id="ChangeLanguageModal"
           title={intl.formatMessage(messages.changeLanguageTitle)}
           show={this.state.showLanguageSettings}
           actions={[
-            <CancelButton
+            <TertiaryButton
               key="cancel"
               id="modal_cancel"
               onClick={this.cancelLanguageSettings}
             >
               {intl.formatMessage(buttonMessages.cancel)}
-            </CancelButton>,
-            <ApplyButton
+            </TertiaryButton>,
+            <PrimaryButton
               key="apply"
               id="apply_change"
               onClick={this.changeLanguage}
             >
               {intl.formatMessage(buttonMessages.apply)}
-            </ApplyButton>
+            </PrimaryButton>
           ]}
           handleClose={this.cancelLanguageSettings}
           contentHeight={175}
@@ -462,10 +441,18 @@ class SettingsView extends React.Component<IProps, IState> {
           showPasswordChange={this.state.showPasswordChange}
           passwordChanged={this.changePassword}
         />
-        <Notification
-          type={NOTIFICATION_TYPE.SUCCESS}
+        <FloatingNotification
+          type={
+            this.state.imageUploading
+              ? NOTIFICATION_TYPE.IN_PROGRESS
+              : NOTIFICATION_TYPE.SUCCESS
+          }
           show={this.state.showSuccessNotification}
-          callback={() => this.toggleSuccessNotification()}
+          callback={
+            this.state.imageUploading
+              ? undefined
+              : () => this.toggleSuccessNotification()
+          }
         >
           {/* Success notification message for Language Change */}
           {this.state.notificationSubject === NOTIFICATION_SUBJECT.LANGUAGE && (
@@ -476,30 +463,24 @@ class SettingsView extends React.Component<IProps, IState> {
               }}
             />
           )}
-
           {/* Success notification message for Password Change */}
           {this.state.notificationSubject === NOTIFICATION_SUBJECT.PASSWORD && (
             <FormattedMessage {...messages.passwordUpdated} />
           )}
-        </Notification>
-        <FloatingNotification
-          type={
-            this.state.imageUploading
-              ? NOTIFICATION_TYPE.IN_PROGRESS
-              : NOTIFICATION_TYPE.SUCCESS
-          }
-          show={this.state.showAvatarNotification}
-          callback={
-            this.state.imageUploading
-              ? undefined
-              : () => this.toggleAvatarNotification()
-          }
-        >
-          <FormattedMessage
-            {...(this.state.imageUploading
-              ? messages.avatarUpdating
-              : messages.avatarUpdated)}
-          />
+
+          {/* Success notification message for Phone Change */}
+          {this.state.notificationSubject === NOTIFICATION_SUBJECT.PHONE && (
+            <FormattedMessage {...messages.phoneNumberUpdated} />
+          )}
+
+          {/* Success notification message for Avatar Change */}
+          {this.state.notificationSubject === NOTIFICATION_SUBJECT.AVATAR && (
+            <FormattedMessage
+              {...(this.state.imageUploading
+                ? messages.avatarUpdating
+                : messages.avatarUpdated)}
+            />
+          )}
         </FloatingNotification>
       </>
     )
@@ -513,6 +494,8 @@ export const SettingsPage = connect(
     userDetails: getUserDetails(store)
   }),
   {
-    modifyUserDetails: modifyUserDetailsAction
+    modifyUserDetails: modifyUserDetailsAction,
+    changeLanguage: changeLanguageAction,
+    goToPhoneSettingAction: goToPhoneSettings
   }
-)(injectIntl(SettingsView))
+)(injectIntl(withOnlineStatus(SettingsView)))

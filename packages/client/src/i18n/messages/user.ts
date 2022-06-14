@@ -24,9 +24,7 @@ export enum QUESTION_KEYS {
 interface IUserMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   accountTitle: MessageDescriptor
-  BBS: MessageDescriptor
   BIRTH_TOWN: MessageDescriptor
-  CABINET_DIVISION: MessageDescriptor
   CHA: MessageDescriptor
   CHAIRMAN: MessageDescriptor
   changeLanguageMessege: MessageDescriptor
@@ -43,6 +41,7 @@ interface IUserMessages
   HEALTH_DIVISION: MessageDescriptor
   HIGH_SCHOOL: MessageDescriptor
   HOSPITAL: MessageDescriptor
+  healthSystem: MessageDescriptor
   labelEnglishName: MessageDescriptor
   LOCAL_REGISTRAR: MessageDescriptor
   LOCAL_SYSTEM_ADMIN: MessageDescriptor
@@ -52,7 +51,6 @@ interface IUserMessages
   NATIONAL_SYSTEM_ADMIN: MessageDescriptor
   ORG_DIVISION: MessageDescriptor
   PERFORMANCE_MANAGEMENT: MessageDescriptor
-  PERFORMANCE_OVERSIGHT: MessageDescriptor
   profileTitle: MessageDescriptor
   REGISTRATION_AGENT: MessageDescriptor
   SECRETARY: MessageDescriptor
@@ -68,6 +66,12 @@ interface IUserMessages
   currentPassword: MessageDescriptor
   changePassword: MessageDescriptor
   changePasswordMessage: MessageDescriptor
+  changePhoneTitle: MessageDescriptor
+  verifyPhoneTitle: MessageDescriptor
+  changePhoneLabel: MessageDescriptor
+  verifyPhoneLabel: MessageDescriptor
+  confirmationPhoneMsg: MessageDescriptor
+  phoneNumberChangeFormValidationMsg: MessageDescriptor
   changeAvatar: MessageDescriptor
   changeImage: MessageDescriptor
   resizeAvatar: MessageDescriptor
@@ -82,11 +86,16 @@ interface IUserMessages
   confirmButtonLabel: MessageDescriptor
   requiredfield: MessageDescriptor
   incorrectPassword: MessageDescriptor
+  incorrectVerifyCode: MessageDescriptor
   passwordUpdated: MessageDescriptor
+  phoneNumberUpdated: MessageDescriptor
   avatarUpdating: MessageDescriptor
   avatarUpdated: MessageDescriptor
+  name: MessageDescriptor
+  systemLanguage: MessageDescriptor
+  profileImage: MessageDescriptor
+  duplicateUserMobileErrorMessege: MessageDescriptor
 }
-
 interface IDynamicUserMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   [key: string]: MessageDescriptor
@@ -98,20 +107,10 @@ const messagesToDefine: IUserMessages = {
     description: 'Account header',
     id: 'settings.account.tile'
   },
-  BBS: {
-    defaultMessage: 'BBS',
-    description: 'The description for BBS type',
-    id: 'constants.bbs'
-  },
   BIRTH_TOWN: {
     defaultMessage: 'What city were you born in?',
     description: 'The description for BIRTH_TOWN key',
     id: 'userSetup.securityQuestions.birthTown'
-  },
-  CABINET_DIVISION: {
-    defaultMessage: 'Cabinet Division',
-    description: 'The description for CABINET_DIVISION type',
-    id: 'constants.cabinetDivision'
   },
   CHA: {
     defaultMessage: 'CHA',
@@ -147,6 +146,26 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'District Registrar',
     description: 'The description for DISTRICT_REGISTRAR role',
     id: 'constants.districtRegistrar'
+  },
+  POLICE_OFFICER: {
+    defaultMessage: 'Police Officer',
+    description: 'The description for Police Officer type',
+    id: 'constants.policeOfficer'
+  },
+  SOCIAL_WORKER: {
+    defaultMessage: 'Social Worker',
+    description: 'The description for Social Worker type',
+    id: 'constants.socialWorker'
+  },
+  LOCAL_LEADER: {
+    defaultMessage: 'Local Leader',
+    description: 'The description for Local Leader type',
+    id: 'constants.localLeader'
+  },
+  HEALTHCARE_WORKER: {
+    defaultMessage: 'Healthcare Worker',
+    description: 'The description for Healthcare Worker type',
+    id: 'constants.healthcareWorker'
   },
   DNRPC: {
     defaultMessage: 'DNRPC',
@@ -203,6 +222,11 @@ const messagesToDefine: IUserMessages = {
     description: 'The description for HOSPITAL type',
     id: 'userSetup.type.hospital'
   },
+  healthSystem: {
+    defaultMessage: 'Health System',
+    description: 'The description for health system type',
+    id: 'userSetup.type.healthSystem'
+  },
   labelEnglishName: {
     defaultMessage: 'English name',
     description: 'English name label',
@@ -247,11 +271,6 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Performance Management',
     description: 'The description for Performance Management role',
     id: 'constants.performanceManagement'
-  },
-  PERFORMANCE_OVERSIGHT: {
-    defaultMessage: 'Performance Oversight',
-    description: 'The description for Performance Oversight role',
-    id: 'constants.performanceOversight'
   },
   profileTitle: {
     defaultMessage: 'Profile',
@@ -324,6 +343,37 @@ const messagesToDefine: IUserMessages = {
     description: 'Password change message',
     id: 'misc.newPass.instruction'
   },
+  changePhoneTitle: {
+    defaultMessage: 'Change phone number',
+    description: 'Change phone number title',
+    id: 'settings.changePhone'
+  },
+  verifyPhoneTitle: {
+    defaultMessage: 'Verify phone number',
+    description: 'Verify phone number title',
+    id: 'settings.verifyPhone'
+  },
+  changePhoneLabel: {
+    defaultMessage: 'What is your new number?',
+    description: 'Change phone number label',
+    id: 'phone.label.changeNumber'
+  },
+  verifyPhoneLabel: {
+    defaultMessage: 'Enter 6 digit verification code',
+    description: 'Verify phone number label',
+    id: 'phone.label.verify'
+  },
+  confirmationPhoneMsg: {
+    defaultMessage: 'A confirmational SMS has been sent to {num}',
+    description: 'Confirmation phone number message',
+    id: 'phone.label.confirmation'
+  },
+  phoneNumberChangeFormValidationMsg: {
+    id: 'changePhone.validation.msg',
+    defaultMessage:
+      'Must be a valid {num} digit number that starts with {start}',
+    description: 'Phone number validation message'
+  },
   changeAvatar: {
     id: 'settings.changeAvatar',
     defaultMessage: 'Change profile image',
@@ -394,10 +444,21 @@ const messagesToDefine: IUserMessages = {
     defaultMessage: 'Current password incorrect. Please try again.',
     description: 'Response message for incorrect password for password change'
   },
+  incorrectVerifyCode: {
+    id: 'system.user.settings.incorrectVerifyCode',
+    defaultMessage: 'Verify code incorrect. Please try again.',
+    description:
+      'Response message for incorrect Verify code for phone number change'
+  },
   passwordUpdated: {
     id: 'system.user.settings.passwordUpdated',
     defaultMessage: 'Password was successfully changed',
     description: 'Password change message on success'
+  },
+  phoneNumberUpdated: {
+    id: 'system.user.settings.phonedNumberUpdated',
+    defaultMessage: 'Phone number updated',
+    description: 'Phone change message on success'
   },
   avatarUpdating: {
     id: 'system.user.settings.avatarUpdating',
@@ -408,6 +469,28 @@ const messagesToDefine: IUserMessages = {
     id: 'system.user.settings.avatarUpdated',
     defaultMessage: 'Profile image successfully updated',
     description: 'Profile image change message on success'
+  },
+  name: {
+    id: 'system.user.settings.name',
+    defaultMessage: 'Name',
+    description: 'label for Name'
+  },
+  systemLanguage: {
+    id: 'system.user.settings.systemLanguage',
+    defaultMessage: 'System language',
+    description: 'Label for system language'
+  },
+  profileImage: {
+    id: 'system.user.settings.profileImage',
+    defaultMessage: 'Profile Image',
+    description: 'Label for profile image'
+  },
+  duplicateUserMobileErrorMessege: {
+    defaultMessage:
+      '{number} is already used by another user. Please use a different phone number',
+    description:
+      'This error messege shows when user try to input already exsisted mobile number',
+    id: 'system.user.duplicateMobileError'
   }
 }
 

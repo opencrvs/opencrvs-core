@@ -11,48 +11,55 @@
  */
 interface Window {
   config: {
+    APPLICATION_NAME: string
     API_GATEWAY_URL: string
+    BIRTH: {
+      REGISTRATION_TARGET: number
+      LATE_REGISTRATION_TARGET: number
+      FEE: {
+        ON_TIME: number
+        LATE: number
+        DELAYED: number
+      }
+    }
+    CONFIG_API_URL: string
     BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
-    COUNTRY_LOGO_FILE: string
+    COUNTRY_LOGO: {
+      fileName: string
+      file: string
+    }
+    CURRENCY: {
+      isoCode: string
+      languagesAndCountry: string[]
+    }
     COUNTRY_LOGO_RENDER_WIDTH: number // in px
     COUNTRY_LOGO_RENDER_HEIGHT: number // in px
     DESKTOP_TIME_OUT_MILLISECONDS: number
+    DEATH: {
+      REGISTRATION_TARGET: number
+      FEE: {
+        ON_TIME: number
+        DELAYED: number
+      }
+    }
     LANGUAGES: string
     LOGIN_URL: string
     AUTH_URL: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
-    /**
-     * @deprecated HEALTH_FACILITY_FILTER is no longer used
-     */
-    HEALTH_FACILITY_FILTER: string
-    CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: number
-    CERTIFICATE_PRINT_CHARGE_UP_LIMIT: number
-    CERTIFICATE_PRINT_LOWEST_CHARGE: number
-    CERTIFICATE_PRINT_HIGHEST_CHARGE: number
     UI_POLLING_INTERVAL: number
     INFORMANT_MINIMUM_AGE: number
     HIDE_EVENT_REGISTER_INFORMATION: boolean
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string
     APPLICATION_AUDIT_LOCATIONS: string
-    PHONE_NUMBER_PATTERN: {
-      pattern: RegExp
-      example: string
-      start?: string
-      num: string
-      mask: {
-        startForm: number
-        endBefore: number
-      }
-    }
-    NID_NUMBER_PATTERN: {
-      pattern: RegExp
-      example: string
-      num: string
-    }
+    PHONE_NUMBER_PATTERN: RegExp
+    NID_NUMBER_PATTERN: RegExp
+    DECLARATION_AUDIT_LOCATIONS: string
     LOGROCKET: string
     SENTRY: string
+    ADDRESSES: number
   }
+  __localeId__: string
 }

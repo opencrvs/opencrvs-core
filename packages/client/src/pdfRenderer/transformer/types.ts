@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import { TDocumentDefinitions, TFontFamilyTypes } from 'pdfmake/interfaces'
@@ -21,14 +21,23 @@ export type OptionalData = IAvailableCountries[]
 export interface IPDFTemplate {
   definition: TDocumentDefinitions
   fonts: { [language: string]: { [name: string]: TFontFamilyTypes } }
-  vfs: { [file: string]: string }
+  vfs?: { [file: string]: string }
   transformers?: IFieldTransformer[]
+}
+export interface ISVGTemplate {
+  id: string
+  definition: string
+  fonts?: { [language: string]: { [name: string]: TFontFamilyTypes } }
+  vfs?: { [file: string]: string }
+  transformers?: IFieldTransformer[]
+  fileName: string
+  lastModifiedDate: string
 }
 
 export type TransformerPayload =
   | IIntLabelPayload
   | IConditionExecutorPayload
-  | IApplicantNamePayload
+  | IInformantNamePayload
   | IFeildValuePayload
   | IDateFeildValuePayload
   | IFormattedFeildValuePayload
@@ -39,7 +48,7 @@ export type TransformerPayload =
   | IPersonIdentifierValuePayload
   | IArithmeticOperationPayload
 
-export type Condition = IApplicantNameCondition | IOfflineAddressCondition
+export type Condition = IInformantNameCondition | IOfflineAddressCondition
 
 export interface IFieldTransformer {
   field: string
@@ -49,7 +58,7 @@ export interface IFieldTransformer {
 }
 
 export type TemplateTransformerData = {
-  application: IApplication
+  declaration: IDeclaration
   userDetails: IUserDetails
   resource: IOfflineData
 }
@@ -79,7 +88,7 @@ export interface ICondition {
   values: string[]
 }
 
-export interface IApplicantNameCondition {
+export interface IInformantNameCondition {
   condition?: ICondition
   key: {
     [event: string]: string // data key: child || deceased
@@ -89,8 +98,8 @@ export interface IApplicantNameCondition {
   }
 }
 
-export interface IApplicantNamePayload {
-  conditions: IApplicantNameCondition[]
+export interface IInformantNamePayload {
+  conditions: IInformantNameCondition[]
   language?: string
   allCapital?: boolean
 }

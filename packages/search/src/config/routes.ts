@@ -19,13 +19,16 @@ import {
   populateHierarchicalLocationIdsHandler
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
+import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
 
 const enum RouteScope {
   DECLARE = 'declare',
   VALIDATE = 'validate',
   REGISTER = 'register',
   SYSADMIN = 'sysadmin',
-  CERTIFY = 'certify'
+  CERTIFY = 'certify',
+  NATLSYSADMIN = 'natlsysadmin',
+  PERFORMANCE = 'performance'
 }
 
 export const getRoutes = () => {
@@ -71,7 +74,7 @@ export const getRoutes = () => {
             RouteScope.SYSADMIN
           ]
         },
-        description: 'Handles searching from applications'
+        description: 'Handles searching from declarations'
       }
     },
     {
@@ -81,7 +84,7 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description:
-          'Handles indexing a new application and searching for duplicates or updating an existing application'
+          'Handles indexing a new declaration and searching for duplicates or updating an existing declaration'
       }
     },
     {
@@ -91,7 +94,7 @@ export const getRoutes = () => {
       config: {
         tags: ['api'],
         description:
-          'Handles indexing a new application or updating an existing application'
+          'Handles indexing a new declaration or updating an existing declaration'
       }
     },
     {
@@ -100,7 +103,7 @@ export const getRoutes = () => {
       handler: deduplicateHandler,
       config: {
         tags: ['api'],
-        description: 'Marks the application as not a duplicate'
+        description: 'Marks the declaration as not a duplicate'
       }
     },
     {
@@ -131,13 +134,15 @@ export const getRoutes = () => {
             RouteScope.DECLARE,
             RouteScope.VALIDATE,
             RouteScope.REGISTER,
-            RouteScope.SYSADMIN
+            RouteScope.SYSADMIN,
+            RouteScope.PERFORMANCE
           ]
         },
         validate: {
           payload: Joi.object({
-            applicationLocationHirarchyId: Joi.string().required(),
-            status: Joi.array().required()
+            declarationLocationHirarchyId: Joi.string(),
+            status: Joi.array().required(),
+            event: Joi.string()
           })
         },
         description: 'Returns all the documents in the index'
@@ -154,6 +159,18 @@ export const getRoutes = () => {
         },
         description:
           'Populates hierarchical location ids for the legacy indexes'
+      }
+    },
+    {
+      method: 'DELETE',
+      path: '/elasticIndex',
+      handler: deleteOCRVSIndexHandler,
+      config: {
+        tags: ['api'],
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        description: 'Delete ocrvs index from elasticsearch'
       }
     }
   ]

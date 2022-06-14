@@ -13,7 +13,7 @@ import gql from 'graphql-tag'
 import { Action } from '@client/forms'
 
 export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
-  query data($id: ID!) {
+  query fetchDeathRegistrationForReview($id: ID!) {
     fetchDeathRegistration(id: $id) {
       _fhirIDMap
       id
@@ -114,8 +114,11 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       registration {
         id
         contact
+        informantType
+        otherInformantType
         contactRelationship
         contactPhoneNumber
+        duplicates
         attachments {
           data
           type
@@ -123,148 +126,11 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           subject
         }
         status {
-          type
-          timestamp
-        }
-        type
-        trackingId
-        registrationNumber
-      }
-      eventLocation {
-        id
-        type
-        address {
-          type
-          line
-          district
-          state
-          city
-          postalCode
-          country
-        }
-      }
-      mannerOfDeath
-      causeOfDeath
-      maleDependentsOfDeceased
-      femaleDependentsOfDeceased
-    }
-  }
-`
-
-export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
-  query data($id: ID!) {
-    fetchDeathRegistration(id: $id) {
-      _fhirIDMap
-      id
-      deceased {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-        birthDate
-        age
-        gender
-        maritalStatus
-        nationality
-        identifier {
-          id
-          type
-          otherType
-        }
-        gender
-        deceased {
-          deathDate
-        }
-        address {
-          type
-          line
-          district
-          state
-          city
-          postalCode
-          country
-        }
-      }
-      informant {
-        id
-        relationship
-        otherRelationship
-        individual {
-          id
-          identifier {
-            id
-            type
-            otherType
-          }
-          name {
-            use
-            firstNames
-            familyName
-          }
-          nationality
-          occupation
-          birthDate
-          telecom {
-            system
-            value
-          }
-          address {
-            type
-            line
-            district
-            state
-            city
-            postalCode
-            country
-          }
-        }
-      }
-      father {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-      }
-      mother {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-      }
-      spouse {
-        id
-        name {
-          use
-          firstNames
-          familyName
-        }
-      }
-      medicalPractitioner {
-        name
-        qualification
-        lastVisitDate
-      }
-      registration {
-        id
-        contact
-        contactRelationship
-        contactPhoneNumber
-        status {
           comments {
             comment
           }
           type
           timestamp
-          location {
-            name
-            alias
-          }
           office {
             name
             alias
@@ -291,23 +157,346 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
           country
         }
       }
+      questionnaire {
+        fieldId
+        value
+      }
       mannerOfDeath
+      causeOfDeathEstablished
       causeOfDeathMethod
       causeOfDeath
+      deathDescription
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
+      history {
+        date
+        action
+        reinstated
+        dhis2Notification
+        statusReason {
+          text
+        }
+        reason
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          id
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+        signature {
+          data
+          type
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
+export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
+  query fetchDeathRegistrationForCertification($id: ID!) {
+    fetchDeathRegistration(id: $id) {
+      _fhirIDMap
+      id
+      deceased {
+        id
+        name {
+          use
+          firstNames
+          familyName
+        }
+        birthDate
+        age
+        gender
+        maritalStatus
+        nationality
+        identifier {
+          id
+          type
+          otherType
+        }
+        gender
+        deceased {
+          deathDate
+        }
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+      }
+      informant {
+        id
+        relationship
+        otherRelationship
+        individual {
+          id
+          identifier {
+            id
+            type
+            otherType
+          }
+          name {
+            use
+            firstNames
+            familyName
+          }
+          nationality
+          occupation
+          birthDate
+          telecom {
+            system
+            value
+          }
+          address {
+            type
+            line
+            district
+            state
+            city
+            postalCode
+            country
+          }
+        }
+      }
+      father {
+        id
+        name {
+          use
+          firstNames
+          familyName
+        }
+      }
+      mother {
+        id
+        name {
+          use
+          firstNames
+          familyName
+        }
+      }
+      spouse {
+        id
+        name {
+          use
+          firstNames
+          familyName
+        }
+      }
+      medicalPractitioner {
+        name
+        qualification
+        lastVisitDate
+      }
+      registration {
+        id
+        contact
+        informantType
+        otherInformantType
+        contactRelationship
+        contactPhoneNumber
+        status {
+          comments {
+            comment
+          }
+          type
+          timestamp
+          location {
+            name
+            alias
+          }
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
+        }
+        type
+        trackingId
+        registrationNumber
+      }
+      questionnaire {
+        fieldId
+        value
+      }
+      eventLocation {
+        id
+        type
+        address {
+          type
+          line
+          district
+          state
+          city
+          postalCode
+          country
+        }
+      }
+      mannerOfDeath
+      causeOfDeathEstablished
+      causeOfDeathMethod
+      causeOfDeath
+      deathDescription
+      maleDependentsOfDeceased
+      femaleDependentsOfDeceased
+      history {
+        date
+        action
+        reinstated
+        dhis2Notification
+        statusReason {
+          text
+        }
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          id
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+        signature {
+          data
+          type
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
+        }
+      }
     }
   }
 `
 
 export function getDeathQueryMappings(action: Action) {
   switch (action) {
-    case Action.LOAD_REVIEW_APPLICATION:
+    case Action.LOAD_REVIEW_DECLARATION:
       return {
         query: GET_DEATH_REGISTRATION_FOR_REVIEW,
         dataKey: 'fetchDeathRegistration'
       }
-    case Action.LOAD_CERTIFICATE_APPLICATION:
+    case Action.LOAD_CERTIFICATE_DECLARATION:
+      return {
+        query: GET_DEATH_REGISTRATION_FOR_CERTIFICATION,
+        dataKey: 'fetchDeathRegistration'
+      }
+    case Action.LOAD_REQUESTED_CORRECTION_DECLARATION:
+      // TODO: Apply seperate query; currently using it
+      // because the actual query is yet to be developed
       return {
         query: GET_DEATH_REGISTRATION_FOR_CERTIFICATION,
         dataKey: 'fetchDeathRegistration'

@@ -29,11 +29,11 @@ import { profileReducer, ProfileState } from '@client/profile/profileReducer'
 import { offlineDataReducer, IOfflineDataState } from '@client/offline/reducer'
 import { intlReducer, IntlState } from '@client/i18n/reducer'
 import {
-  applicationsReducer,
-  IApplicationsState,
+  declarationsReducer,
+  IDeclarationsState,
   WorkqueueState,
   registrarWorkqueueReducer
-} from '@client/applications'
+} from '@client/declarations'
 import {
   reviewReducer,
   IReviewFormState
@@ -59,12 +59,16 @@ import {
 import * as Sentry from '@sentry/browser'
 import createSentryMiddleware from 'redux-sentry-middleware'
 import { userFormReducer, IUserFormState } from '@client/user/userReducer'
+import {
+  formConfigReducer,
+  IFormConfigState
+} from './forms/configuration/formConfig/reducer'
 
 export interface IStoreState {
   profile: ProfileState
   router: RouterState
   i18n: IntlState
-  applicationsState: IApplicationsState
+  declarationsState: IDeclarationsState
   registerForm: IRegisterFormState
   navigation: INavigationState
   notification: NotificationState
@@ -74,6 +78,7 @@ export interface IStoreState {
   offline: IOfflineDataState
   userForm: IUserFormState
   workqueueState: WorkqueueState
+  formConfig: IFormConfigState
 }
 
 const enhancedCreateStore = createReduxStore as StoreCreator
@@ -90,7 +95,7 @@ export const createStore = <T>(
     profile: profileReducer,
     router: connectRouter(history) as any, // @todo
     i18n: intlReducer,
-    applicationsState: applicationsReducer,
+    declarationsState: declarationsReducer,
     registerForm: registerFormReducer,
     navigation: navigationReducer,
     notification: notificationReducer,
@@ -99,7 +104,8 @@ export const createStore = <T>(
     printCertificateForm: printReducer,
     offline: offlineDataReducer,
     userForm: userFormReducer,
-    workqueueState: registrarWorkqueueReducer
+    workqueueState: registrarWorkqueueReducer,
+    formConfig: formConfigReducer
   })
   const enhancer = compose(
     install(config),

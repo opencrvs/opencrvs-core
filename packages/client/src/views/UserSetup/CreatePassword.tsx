@@ -28,7 +28,7 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 import { buttonMessages } from '@client/i18n/messages'
 
 const Header = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.black};
   margin: 0px;
 `
@@ -41,16 +41,16 @@ const Action = styled.div`
 `
 
 const GlobalError = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 const PasswordMatch = styled.div`
   ${({ theme }) => theme.fonts.semiBoldFont};
-  color: ${({ theme }) => theme.colors.success};
+  color: ${({ theme }) => theme.colors.positive};
   margin-top: 8px;
 `
 const PasswordMismatch = styled.div`
   ${({ theme }) => theme.fonts.semiBoldFont};
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
   margin-top: 8px;
 `
 
@@ -265,7 +265,15 @@ class CreatePasswordComponent extends React.Component<IFullProps, State> {
             )}
           </PasswordContents>
           <Action>
-            <PrimaryButton id="Continue" onClick={this.whatNext}>
+            <PrimaryButton
+              id="Continue"
+              onClick={this.whatNext}
+              disabled={
+                !this.state.hasCases ||
+                !this.state.hasNumber ||
+                !this.state.validLength
+              }
+            >
               {intl.formatMessage(buttonMessages.continueButton)}
             </PrimaryButton>
           </Action>

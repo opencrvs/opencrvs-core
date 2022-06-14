@@ -15,7 +15,7 @@ import {
   getCurrentAndLowerLocationLevels,
   fetchCertificationPayments,
   fetchGenderBasisMetrics,
-  fetchEstimated45DayMetrics
+  fetchEstimatedTargetDayMetrics
 } from '@metrics/features/metrics/metricsGenerator'
 
 import {
@@ -26,9 +26,12 @@ import {
 } from '@metrics/features/metrics/constants'
 import {
   EVENT_TYPE,
-  fetchChildLocationIdsByParentId
+  fetchChildLocationIdsByParentId,
+  getRegistrationTargetDays
 } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration/'
+import { deleteMeasurements } from '@metrics/influxdb/client'
+import { INFLUX_DB } from '@metrics/influxdb/constants'
 
 export async function metricsHandler(
   request: Hapi.Request,
@@ -55,12 +58,13 @@ export async function metricsHandler(
       timeFrames: [],
       payments: [],
       genderBasisMetrics: [],
-      estimated45DayMetrics: []
+      estimatedTargetDayMetrics: []
     }
   }
 
   const authHeader: IAuthHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
 
   const childLocationIds = await fetchChildLocationIdsByParentId(
@@ -70,6 +74,11 @@ export async function metricsHandler(
     authHeader
   )
 
+  const registrationTargetInDays = await getRegistrationTargetDays(
+    event,
+    authHeader.Authorization
+  )
+
   const timeFrames = await fetchRegWithinTimeFrames(
     timeStart,
     timeEnd,
@@ -77,7 +86,8 @@ export async function metricsHandler(
     currentLocationLevel,
     lowerLocationLevel,
     event,
-    childLocationIds
+    childLocationIds,
+    registrationTargetInDays
   )
 
   const payments = await fetchCertificationPayments(
@@ -100,7 +110,7 @@ export async function metricsHandler(
     childLocationIds
   )
 
-  const estimated45DayMetrics = await fetchEstimated45DayMetrics(
+  const estimatedTargetDayMetrics = await fetchEstimatedTargetDayMetrics(
     timeStart,
     timeEnd,
     locationId,
@@ -108,8 +118,21 @@ export async function metricsHandler(
     lowerLocationLevel,
     event,
     childLocationIds,
-    authHeader
+    authHeader,
+    registrationTargetInDays
   )
 
-  return { timeFrames, payments, genderBasisMetrics, estimated45DayMetrics }
+  return { timeFrames, payments, genderBasisMetrics, estimatedTargetDayMetrics }
+}
+
+export async function metricsDeleteMeasurementHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const res = await deleteMeasurements()
+    return h.response(res).code(200)
+  } catch (err) {
+    throw new Error(`Could not delete influx database ${INFLUX_DB}`)
+  }
 }

@@ -10,11 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop } from 'redux-loop'
-import { IForm, BirthSection, DeathSection } from '@client/forms'
+import { IForm, BirthSection, DeathSection, Event } from '@client/forms'
 import * as offlineActions from '@client/offline/actions'
-import { deserializeForm } from '@client/forms/mappings/deserializer'
-
 import { messages } from '@client/i18n/messages/views/review'
+import { getConfiguredOrDefaultForm } from '@client/forms/configuration'
 
 export type IRegisterFormState =
   | {
@@ -46,9 +45,11 @@ export const registerFormReducer: LoopReducer<IRegisterFormState, Action> = (
 ): IRegisterFormState | Loop<IRegisterFormState, Action> => {
   switch (action.type) {
     case offlineActions.READY:
-    case offlineActions.DEFINITIONS_LOADED:
-      const birth = deserializeForm(action.payload.forms.registerForm.birth)
-      const death = deserializeForm(action.payload.forms.registerForm.death)
+    case offlineActions.APPLICATION_CONFIG_LOADED:
+      const { formConfig } = action.payload
+
+      const birth = getConfiguredOrDefaultForm(formConfig, Event.BIRTH, false)
+      const death = getConfiguredOrDefaultForm(formConfig, Event.DEATH, false)
 
       const preview = {
         viewType: 'preview' as const,

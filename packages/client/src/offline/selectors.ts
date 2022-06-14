@@ -13,6 +13,7 @@ import { IOfflineDataState, IOfflineData } from '@client/offline/reducer'
 import { IStoreState } from '@client/store'
 import { IUserDetails } from '@client/utils/userUtils'
 import { NATL_ADMIN_ROLES, SYS_ADMIN_ROLES } from '@client/utils/constants'
+import { merge } from 'lodash'
 
 export const getOfflineState = (store: IStoreState): IOfflineDataState =>
   store.offline
@@ -25,17 +26,16 @@ export function isOfflineDataLoaded(
   state: Partial<IOfflineData>
 ): state is IOfflineData {
   const hasAllRequiredData =
-    state.locations &&
     state.facilities &&
-    state.forms &&
-    state.forms.registerForm &&
-    state.forms.certificateCollectorDefinition &&
-    state.forms.userForm &&
-    state.languages &&
-    state.assets &&
-    state.templates
+    state.locations &&
+    state.config &&
+    state.formConfig &&
+    state.templates &&
+    state.languages
 
-  return Boolean(hasAllRequiredData)
+  const isOfflineDataLoaded = Boolean(hasAllRequiredData)
+  if (isOfflineDataLoaded) merge(window.config, state.config)
+  return isOfflineDataLoaded
 }
 
 export function isSystemAdmin(userDetails: IUserDetails | undefined) {

@@ -12,30 +12,23 @@
 import { deserializeFormSection } from '@client/forms/mappings/deserializer'
 import { offlineDataReady } from '@client/offline/actions'
 import { createStore } from '@client/store'
-import { createTestComponent, mockOfflineData } from '@client/tests/util'
+import {
+  createTestComponent,
+  mockOfflineData,
+  mockOfflineDataDispatch
+} from '@client/tests/util'
 import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { waitForElement } from '@client/tests/wait-for-element'
 
-const { store } = createStore()
+const { store, history } = createStore()
 
 describe('Create new user page tests', () => {
   let component: ReactWrapper
   beforeEach(async () => {
-    await store.dispatch(
-      offlineDataReady({
-        languages: mockOfflineData.languages,
-        forms: mockOfflineData.forms,
-        templates: mockOfflineData.templates,
-        locations: mockOfflineData.locations,
-        facilities: mockOfflineData.facilities,
-        pilotLocations: mockOfflineData.pilotLocations,
-        offices: mockOfflineData.offices,
-        assets: mockOfflineData.assets
-      })
-    )
+    await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     const testComponent = await createTestComponent(
       // @ts-ignore
       <UserForm
@@ -49,9 +42,9 @@ describe('Create new user page tests', () => {
         nextGroupId="preview-user-view-group"
         nextSectionId="preview"
       />,
-      store
+      { store, history }
     )
-    component = testComponent.component
+    component = testComponent
   })
 
   it('it checks component has loaded', () => {

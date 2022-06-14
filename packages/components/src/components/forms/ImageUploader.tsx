@@ -15,9 +15,7 @@ import { SecondaryButton } from '../buttons'
 
 const ImageBase = styled(SecondaryButton)`
   width: auto;
-  height: 48px;
-  padding: 0 35px;
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   align-items: center;
   display: inline-flex;
   border: 0;
@@ -46,7 +44,11 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
   fileUploader: React.RefObject<HTMLInputElement> = React.createRef()
   handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = event.target
-    return files && this.props.handleFileChange(files[0])
+    if (files) {
+      this.props.handleFileChange(files[0])
+    }
+    // Required to select the same file again
+    event.target.value = ''
   }
 
   render() {
@@ -54,7 +56,7 @@ export class ImageUploader extends React.Component<IImagePickerProps, {}> {
     return (
       <ImageBase
         {...otherProps}
-        onClick={event => {
+        onClick={(event) => {
           if (this.props.onClick) {
             this.props.onClick(event)
           }

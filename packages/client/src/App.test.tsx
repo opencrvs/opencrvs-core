@@ -12,9 +12,9 @@
 import * as React from 'react'
 import {
   createTestApp,
-  createTestComponent,
   getItem,
-  flushPromises
+  flushPromises,
+  createTestComponent
 } from '@client/tests/util'
 
 import { createClient } from '@client/utils/apolloClient'
@@ -116,20 +116,20 @@ describe('when user has a valid token in local storage', () => {
 
   it('loads languages, facilities and locations on startup', async () => {
     const loadFacilities = jest.spyOn(referenceApi, 'loadFacilities')
-    const loadDefinitions = jest.spyOn(referenceApi, 'loadDefinitions')
+    const loadContent = jest.spyOn(referenceApi, 'loadContent')
     const loadLocations = jest.spyOn(referenceApi, 'loadLocations')
 
     createTestApp()
     await flushPromises()
     expect(loadFacilities).toHaveBeenCalled()
-    expect(loadDefinitions).toHaveBeenCalled()
+    expect(loadContent).toHaveBeenCalled()
     expect(loadLocations).toHaveBeenCalled()
   })
 })
 
 describe('it handles react errors', () => {
-  const { store } = createStore()
   it('displays react error page', async () => {
+    const { store, history } = createStore()
     function Problem(): JSX.Element {
       throw new Error('Error thrown.')
     }
@@ -137,18 +137,16 @@ describe('it handles react errors', () => {
       <StyledErrorBoundary>
         <Problem />
       </StyledErrorBoundary>,
-      store
+      { store, history }
     )
-    // @ts-ignore
-    expect(
-      testComponent.component.find('#GoToHomepage').hostNodes()
-    ).toHaveLength(1)
+
+    expect(testComponent.find('#GoToHomepage').hostNodes()).toHaveLength(1)
   })
 })
 
 describe('it handles react unauthorized errors', () => {
-  const { store } = createStore()
   it('displays react error page', async () => {
+    const { store, history } = createStore()
     function Problem(): JSX.Element {
       throw new Error('401')
     }
@@ -156,13 +154,11 @@ describe('it handles react unauthorized errors', () => {
       <StyledErrorBoundary>
         <Problem />
       </StyledErrorBoundary>,
-      store
+      { store, history }
     )
 
-    expect(
-      testComponent.component.find('#GoToHomepage').hostNodes()
-    ).toHaveLength(1)
+    expect(testComponent.find('#GoToHomepage').hostNodes()).toHaveLength(1)
 
-    testComponent.component.find('#GoToHomepage').hostNodes().simulate('click')
+    testComponent.find('#GoToHomepage').hostNodes().simulate('click')
   })
 })

@@ -15,6 +15,21 @@ import { ReactWrapper } from 'enzyme'
 
 const MAX_TIME = process.env.CI ? 10000 : 2000
 const INTERVAL = 10
+const SECONDS_INTERVAL = 1000
+
+export async function waitForSeconds(time: number) {
+  return new Promise((resolve, reject) => {
+    let remainingTime = time * 1000
+
+    const intervalId = setInterval(() => {
+      if (remainingTime < 0) {
+        clearInterval(intervalId)
+        return resolve()
+      }
+      remainingTime = remainingTime - SECONDS_INTERVAL
+    }, INTERVAL)
+  })
+}
 
 export async function waitFor(condition: () => boolean) {
   return new Promise((resolve, reject) => {

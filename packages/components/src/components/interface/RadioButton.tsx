@@ -20,18 +20,25 @@ const Wrapper = styled.div`
   align-items: center;
 `
 
-const Label = styled.label<{ size?: string; disabled?: boolean }>`
+const Label = styled.label<{
+  size?: string
+  disabled?: boolean
+  marginLeft?: number
+  hasFlexDirection?: boolean
+}>`
   color: ${({ theme, disabled }) =>
     disabled ? theme.colors.disabled : theme.colors.copy};
   cursor: pointer;
   ${({ size, theme }) =>
     size === 'large'
       ? `
-    ${theme.fonts.bigBodyStyle};
+    ${theme.fonts.reg18};
     margin-left: 14px`
       : `
-    ${theme.fonts.bodyStyle};
+    ${theme.fonts.reg16};
     margin-left: 16px;`}
+
+  ${({ hasFlexDirection }) => hasFlexDirection && `margin-left: 8px;`}
 `
 const CheckOuter = styled.div`
   background: ${({ theme }) => theme.colors.white};
@@ -79,7 +86,7 @@ const Input = styled.input<{ disabled?: boolean }>`
   cursor: pointer;
   &:focus ~ ${Check} {
     box-shadow: ${({ theme, disabled }) =>
-        disabled ? theme.colors.white : theme.colors.focus}
+        disabled ? theme.colors.white : theme.colors.yellow}
       0 0 0 4px;
   }
   /* stylelint-disable */
@@ -101,6 +108,7 @@ interface IRadioButton {
   selected?: string
   disabled?: boolean
   size?: string
+  hasFlexDirection?: boolean
   onChange?: (value: Value) => void
 }
 
@@ -111,7 +119,16 @@ export class RadioButton extends React.Component<IRadioButton> {
     }
   }
   render() {
-    const { id, name, selected, label, value, size, disabled } = this.props
+    const {
+      id,
+      name,
+      selected,
+      label,
+      value,
+      size,
+      disabled,
+      hasFlexDirection
+    } = this.props
     return (
       <Wrapper>
         <CheckOuter>
@@ -129,7 +146,12 @@ export class RadioButton extends React.Component<IRadioButton> {
             {disabled ? '' : <span />}
           </Check>
         </CheckOuter>
-        <Label disabled={disabled} size={size} htmlFor={id}>
+        <Label
+          disabled={disabled}
+          size={size}
+          htmlFor={id}
+          hasFlexDirection={hasFlexDirection}
+        >
           {label}
         </Label>
       </Wrapper>

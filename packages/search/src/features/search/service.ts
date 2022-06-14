@@ -14,6 +14,7 @@ import { ApiResponse } from '@elastic/elasticsearch'
 import { ISearchQuery, SortOrder } from '@search/features/search/types'
 import { queryBuilder, EMPTY_STRING } from '@search/features/search/utils'
 import { logger } from '@search/logger'
+import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
 export const DEFAULT_SIZE = 10
 const DEFAULT_SEARCH_TYPE = 'compositions'
@@ -46,8 +47,8 @@ export function formatSearchParams(params: ISearchQuery) {
     event = EMPTY_STRING,
     status,
     type,
-    applicationLocationId = EMPTY_STRING,
-    applicationLocationHirarchyId = EMPTY_STRING,
+    declarationLocationId = EMPTY_STRING,
+    declarationLocationHirarchyId = EMPTY_STRING,
     eventLocationId = EMPTY_STRING,
     gender = EMPTY_STRING,
     name = EMPTY_STRING,
@@ -56,7 +57,7 @@ export function formatSearchParams(params: ISearchQuery) {
     from = 0,
     size = DEFAULT_SIZE,
     sort = SortOrder.ASC,
-    sortColumn = 'dateOfApplication'
+    sortColumn = 'dateOfDeclaration'
   } = params
 
   if (nameCombinations.length === 0 && name !== EMPTY_STRING) {
@@ -67,7 +68,7 @@ export function formatSearchParams(params: ISearchQuery) {
   }
 
   return {
-    index: 'ocrvs',
+    index: OPENCRVS_INDEX_NAME,
     type: DEFAULT_SEARCH_TYPE,
     from,
     size,
@@ -80,8 +81,8 @@ export function formatSearchParams(params: ISearchQuery) {
         eventLocationId,
         gender,
         nameCombinations,
-        applicationLocationId,
-        applicationLocationHirarchyId,
+        declarationLocationId,
+        declarationLocationHirarchyId,
         createdBy,
         { event, status, type }
       ),

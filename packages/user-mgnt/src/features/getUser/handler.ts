@@ -17,19 +17,23 @@ import User, { IUserModel } from '@user-mgnt/model/user'
 interface IVerifyPayload {
   userId: string
   practitionerId: string
+  mobile: string
 }
 
 export default async function getUser(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { userId, practitionerId } = request.payload as IVerifyPayload
+  const { userId, practitionerId, mobile } = request.payload as IVerifyPayload
   let criteria = {}
   if (userId) {
     criteria = { ...criteria, _id: userId }
   }
   if (practitionerId) {
     criteria = { ...criteria, practitionerId }
+  }
+  if (mobile) {
+    criteria = { ...criteria, mobile }
   }
   // tslint:disable-next-line
   const user: IUserModel | null = await User.findOne(criteria)
@@ -43,5 +47,6 @@ export default async function getUser(
 
 export const getUserRequestSchema = Joi.object({
   userId: Joi.string().optional(),
-  practitionerId: Joi.string().optional()
+  practitionerId: Joi.string().optional(),
+  mobile: Joi.string().optional()
 })

@@ -20,7 +20,7 @@ type UserIdentifier { # -> identifier
 }
 
 input SignatureInput {
-  data: String
+  data: String!
   type: String
 }
 
@@ -69,7 +69,7 @@ type User {
   underInvestigation: Boolean
   primaryOffice: Location
   catchmentArea: [Location]
-  localRegistrar: LocalRegistrar!
+  localRegistrar: LocalRegistrar
   identifier: Identifier
   signature: Signature
   creationDate: String
@@ -97,12 +97,13 @@ type SearchFieldAgentResponse {
   fullName: String
   type: String
   status: String
+  avatar: Avatar
   primaryOfficeId: String
   creationDate: String
-  totalNumberOfApplicationStarted: Int
+  totalNumberOfDeclarationStarted: Int
   totalNumberOfInProgressAppStarted: Int
-  totalNumberOfRejectedApplications: Int
-  averageTimeForDeclaredApplications: Int
+  totalNumberOfRejectedDeclarations: Int
+  averageTimeForDeclaredDeclarations: Int
 }
 
 type VerifyPasswordResult {
@@ -120,6 +121,7 @@ input AvatarInput {
 
 type Query {
   getUser(userId: String): User
+  getUserByMobile(mobile: String): User
   searchUsers(
     username: String
     mobile: String
@@ -158,7 +160,13 @@ type Mutation {
     existingPassword: String!
     password: String!
   ): String
-  changeAvatar(userId: String!, avatar: AvatarInput!): String
+  changePhone(
+    userId: String!
+    phoneNumber: String!
+    nonce: String!
+    verifyCode: String!
+  ): String
+  changeAvatar(userId: String!, avatar: AvatarInput!): Avatar
   auditUser(
     userId: String!
     action: String!

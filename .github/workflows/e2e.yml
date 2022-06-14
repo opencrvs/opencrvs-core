@@ -1,0 +1,55 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+
+name: E2E
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+on: [pull_request]
+env:
+  CYPRESS_LOGIN_URL: http://localhost:3020/
+  CYPRESS_CLIENT_URL: http://localhost:3000/
+  CYPRESS_AUTH_URL: http://localhost:4040/
+  CYPRESS_GATEWAY_URL: http://localhost:7070/
+  CYPRESS_COUNTRYCONFIG_URL: http://localhost:3040/
+  LANGUAGES: 'en,fr'
+  QA_ENV: true
+jobs:
+  test:
+    timeout-minutes: 120 # 2 hours
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [14.17.0]
+
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - name: Install and start dependencies
+        run: yes | bash ./setup.sh
+      - name: Run stack
+        run: |
+          NODE_ENV=production yarn start:prod &
+          bash setup-scripts/setup-countryconfig.sh $(pwd) &
+          wait-on -l tcp:3040
+      - name: Run E2E tests
+        continue-on-error: true
+        run: |
+          cd ../opencrvs-farajaland
+          rm -rf .git
+          cp -r ../opencrvs-core/.git .git
+          npm install -g cypress
+          cypress run --headless --browser chrome --record --key e0fc7a26-f292-4e48-9716-2009137fe646

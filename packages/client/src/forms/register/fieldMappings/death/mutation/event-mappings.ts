@@ -14,7 +14,8 @@ import {
   IFormData,
   ICertificate,
   TransformedData,
-  IFormFieldMutationMapFunction
+  IFormFieldMutationMapFunction,
+  DeathSection
 } from '@client/forms'
 import { cloneDeep } from 'lodash'
 import { transformCertificateData } from '@client/forms/register/fieldMappings/birth/mutation/registration-mappings'
@@ -59,29 +60,49 @@ export const deathEventLocationMutationTransformer =
     sectionId: string,
     field: IFormField
   ) => {
-    if (!transformedData.eventLocation.address) {
-      transformedData.eventLocation = {
-        ...transformedData.eventLocation,
+    let defaultLocation: fhir.Location = {}
+    if (
+      (transformedData.eventLocation &&
+        !transformedData.eventLocation.address) ||
+      !transformedData.eventLocation
+    ) {
+      defaultLocation = {
         address: {
           country: '',
           state: '',
           district: '',
+          city: '',
           postalCode: '',
           line: ['', '', '', '', '', '']
         }
       } as fhir.Location
+      if (transformedData.eventLocation && transformedData.eventLocation.type) {
+        defaultLocation['type'] = transformedData.eventLocation.type
+      }
+      transformedData.eventLocation = defaultLocation
     }
-
     if (lineNumber > 0) {
       transformedData.eventLocation.address.line[lineNumber - 1] = `${
         draftData[sectionId][field.name]
       }`
+    } else if (field.name === 'placeOfDeath' && transformedData.eventLocation) {
+      transformedData.eventLocation.type = `${draftData[sectionId][field.name]}`
+      if (
+        transformedData.eventLocation.type === 'DECEASED_USUAL_RESIDENCE' &&
+        transformedData.deceased.address &&
+        transformedData.deceased.address[0]
+      ) {
+        transformedData.eventLocation.address =
+          transformedData.deceased.address[0]
+      }
     } else if (field.name === 'deathLocation') {
-      transformedData.eventLocation._fhirID = `${
-        draftData[sectionId][field.name]
-      }`
-      delete transformedData.eventLocation.address
-      delete transformedData.eventLocation.type
+      transformedData.eventLocation._fhirID = draftData[sectionId][field.name]
+      if (transformedData.eventLocation.address) {
+        delete transformedData.eventLocation.address
+      }
+      if (transformedData.eventLocation.type) {
+        delete transformedData.eventLocation.type
+      }
     } else if (transformedFieldName) {
       transformedData.eventLocation.address[transformedFieldName] = `${
         draftData[sectionId][field.name]
@@ -120,6 +141,25 @@ export function setDeathRegistrationSectionTransformer(
       transformedData.registration.registrationNumber =
         draftData.registration.registrationNumber
     }
+
+    if (!transformedData[sectionId].status) {
+      transformedData[sectionId].status = [
+        {
+          timestamp: new Date()
+        }
+      ]
+    }
+
+    if (draftData[sectionId].commentsOrNotes) {
+      if (!transformedData[sectionId].status[0].comments) {
+        transformedData[sectionId].status[0].comments = []
+      }
+      transformedData[sectionId].status[0].comments.push({
+        comment: draftData[sectionId].commentsOrNotes,
+        createdAt: new Date()
+      })
+    }
+
     if (draftData.registration.certificates) {
       transformCertificateData(
         transformedData,

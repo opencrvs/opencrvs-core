@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@user-mgnt/index'
+import { createServer } from '@user-mgnt/server'
 import User, { IUser } from '@user-mgnt/model/user'
 import UsernameRecord from '@user-mgnt/model/usernameRecord'
 import { readFileSync } from 'fs'
@@ -20,7 +20,7 @@ import mockingoose from 'mockingoose'
 const fetch = fetchMock as fetchMock.FetchMock
 
 const token = jwt.sign(
-  { scope: ['sysadmin', 'demo'] },
+  { scope: ['natlsysadmin', 'sysadmin', 'demo'] },
   readFileSync('../auth/test/cert.key'),
   {
     algorithm: 'RS256',
@@ -29,7 +29,7 @@ const token = jwt.sign(
   }
 )
 
-const mockUser = ({
+const mockUser = {
   id: '12345',
   name: [
     {
@@ -51,8 +51,7 @@ const mockUser = ({
   password: 'test',
   signature: {
     type: 'image/png',
-    data:
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
+    data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
   },
   localRegistrar: {
     name: [
@@ -64,11 +63,10 @@ const mockUser = ({
     ],
     signature: {
       type: 'image/png',
-      data:
-        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
+      data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlwAAAK8CAYAAAA6WGEyAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2h'
     }
   }
-} as unknown) as IUser & { password: string }
+} as unknown as IUser & { password: string }
 
 const mockPractitioner = {
   resourceType: 'Practitioner',
@@ -106,6 +104,25 @@ const mockPractitionerRole = {
   practitioner: {
     reference: 'Practitioner/4393c845-0d1c-42c7-a501-f0b4fcb031a2'
   },
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Task/e849ceb4-0adc-4be2-8fc8-8a4c41781bb5',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'BIRTH'
+            }
+          ]
+        },
+        id: 'e849ceb4-0adc-4be2-8fc8-8a4c41781bb5'
+      }
+    }
+  ],
   code: [
     {
       coding: [

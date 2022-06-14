@@ -69,10 +69,10 @@ interface IUserAuditVariables {
 }
 
 const Subtitle = styled.h2`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ theme }) => theme.colors.copy};
   padding-bottom: 16px;
-  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
 export enum AUDIT_ACTION {
@@ -217,8 +217,7 @@ function UserAuditActionModalComponent(
       title={modalTitle}
       hideHeaderBoxShadow
       show={show}
-      contentHeight={432}
-      width={920}
+      fullscreen
       handleClose={onClose}
       responsive
       actions={actions}

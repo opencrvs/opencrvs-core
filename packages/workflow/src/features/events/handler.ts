@@ -9,62 +9,77 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { HEARTH_URL, OPENHIM_URL } from '@workflow/constants'
+import { OPENHIM_URL } from '@workflow/constants'
 import { isUserAuthorized } from '@workflow/features/events/auth'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import {
   hasBirthRegistrationNumber,
-  hasDeathRegistrationNumber
+  hasDeathRegistrationNumber,
+  forwardToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   createRegistrationHandler,
   markEventAsCertifiedHandler,
+  markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
-  markEventAsWaitingValidationHandler
+  markEventAsWaitingValidationHandler,
+  markEventAsDownloadedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
-  isInProgressApplication
+  hasCorrectionEncounterSection,
+  isInProgressDeclaration
 } from '@workflow/features/registration/utils'
+import {
+  hasReinstatedExtension,
+  isRejectedTask,
+  isArchiveTask
+} from '@workflow/features/task/fhir/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
 import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
-import fetch, { RequestInit } from 'node-fetch'
+import fetch from 'node-fetch'
+import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 
 // TODO: Change these event names to be closer in definition to the comments
 // https://jembiprojects.jira.com/browse/OCRVS-2767
 export enum Events {
-  BIRTH_IN_PROGRESS_DEC = '/events/birth/in-progress-declaration', // Field agent or DHIS2in progress application
-  BIRTH_NEW_DEC = '/events/birth/new-declaration', // Field agent completed application
-  BIRTH_UPDATE_DEC = '/events/birth/update-declaration',
-  BIRTH_WAITING_VALIDATION = '/events/birth/waiting-validation',
-  BIRTH_NEW_WAITING_VALIDATION = '/events/birth/new-waiting-validation', // Registrar new registration application
+  BIRTH_IN_PROGRESS_DEC = '/events/birth/in-progress-declaration', // Field agent or DHIS2in progress declaration
+  BIRTH_NEW_DEC = '/events/birth/new-declaration', // Field agent completed declaration
+  BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION = '/events/birth/request-for-registrar-validation', // Registration agent new declaration
+  BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION = '/events/birth/waiting-external-resource-validation',
+  REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION = '/events/birth/registrar-registration-waiting-external-resource-validation', // Registrar new registration declaration
   BIRTH_MARK_REG = '/events/birth/mark-registered',
   BIRTH_MARK_VALID = '/events/birth/mark-validated',
   BIRTH_MARK_CERT = '/events/birth/mark-certified',
   BIRTH_MARK_VOID = '/events/birth/mark-voided',
-  DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration', /// Field agent or DHIS2in progress application
-  DEATH_NEW_DEC = '/events/death/new-declaration', // Field agent completed application
-  DEATH_UPDATE_DEC = '/events/death/update-declaration',
-  DEATH_WAITING_VALIDATION = '/events/death/waiting-validation',
-  DEATH_NEW_WAITING_VALIDATION = '/events/death/new-waiting-validation', // Registrar new registration application
+  BIRTH_MARK_ARCHIVED = '/events/birth/mark-archived',
+  BIRTH_MARK_REINSTATED = '/events/birth/mark-reinstated',
+  BIRTH_REQUEST_CORRECTION = '/events/birth/request-correction',
+  DEATH_IN_PROGRESS_DEC = '/events/death/in-progress-declaration', /// Field agent or DHIS2in progress declaration
+  DEATH_NEW_DEC = '/events/death/new-declaration', // Field agent completed declaration
+  DEATH_REQUEST_FOR_REGISTRAR_VALIDATION = '/events/death/request-for-registrar-validation', // Registration agent new declaration
+  DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION = '/events/death/waiting-external-resource-validation',
+  REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION = '/events/death/registrar-registration-waiting-external-resource-validation', // Registrar new registration declaration
   DEATH_MARK_REG = '/events/death/mark-registered',
   DEATH_MARK_VALID = '/events/death/mark-validated',
   DEATH_MARK_CERT = '/events/death/mark-certified',
   DEATH_MARK_VOID = '/events/death/mark-voided',
-  BIRTH_NEW_VALIDATE = '/events/birth/new-validation', // Registration agent new application
-  DEATH_NEW_VALIDATE = '/events/death/new-validation', // Registration agent new application
+  DEATH_MARK_ARCHIVED = '/events/death/mark-archived',
+  DEATH_MARK_REINSTATED = '/events/death/mark-reinstated',
+  DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
+  DOWNLOADED = '/events/downloaded',
   UNKNOWN = 'unknown'
 }
 
 function detectEvent(request: Hapi.Request): Events {
+  const fhirBundle = request.payload as fhir.Bundle
   if (
     request.method === 'post' &&
     (request.path === '/fhir' || request.path === '/fhir/')
   ) {
-    const fhirBundle = request.payload as fhir.Bundle
     if (
       fhirBundle.entry &&
       fhirBundle.entry[0] &&
@@ -80,21 +95,28 @@ function detectEvent(request: Hapi.Request): Events {
                 return Events.BIRTH_MARK_VALID
               }
               if (hasRegisterScope(request)) {
-                return Events.BIRTH_WAITING_VALIDATION
+                return Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION
               }
             } else {
-              return Events.BIRTH_MARK_CERT
+              if (
+                hasRegisterScope(request) &&
+                hasCorrectionEncounterSection(firstEntry as fhir.Composition)
+              ) {
+                return Events.BIRTH_REQUEST_CORRECTION
+              } else {
+                return Events.BIRTH_MARK_CERT
+              }
             }
           } else {
             if (hasRegisterScope(request)) {
-              return Events.BIRTH_NEW_WAITING_VALIDATION
+              return Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
             }
 
             if (hasValidateScope(request)) {
-              return Events.BIRTH_NEW_VALIDATE
+              return Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION
             }
 
-            return isInProgressApplication(fhirBundle)
+            return isInProgressDeclaration(fhirBundle)
               ? Events.BIRTH_IN_PROGRESS_DEC
               : Events.BIRTH_NEW_DEC
           }
@@ -105,27 +127,38 @@ function detectEvent(request: Hapi.Request): Events {
                 return Events.DEATH_MARK_VALID
               }
               if (hasRegisterScope(request)) {
-                return Events.DEATH_WAITING_VALIDATION
+                return Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION
               }
             } else {
-              return Events.DEATH_MARK_CERT
+              if (
+                hasRegisterScope(request) &&
+                hasCorrectionEncounterSection(firstEntry as fhir.Composition)
+              ) {
+                return Events.DEATH_REQUEST_CORRECTION
+              } else {
+                return Events.DEATH_MARK_CERT
+              }
             }
           } else {
             if (hasRegisterScope(request)) {
-              return Events.DEATH_NEW_WAITING_VALIDATION
+              return Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
             }
 
             if (hasValidateScope(request)) {
-              return Events.DEATH_NEW_VALIDATE
+              return Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION
             }
 
-            return isInProgressApplication(fhirBundle)
+            return isInProgressDeclaration(fhirBundle)
               ? Events.DEATH_IN_PROGRESS_DEC
               : Events.DEATH_NEW_DEC
           }
         }
       }
       if (firstEntry.resourceType === 'Task' && firstEntry.id) {
+        if (fhirBundle?.signature?.type[0]?.code === 'downloaded') {
+          return Events.DOWNLOADED
+        }
+
         const eventType = getEventType(fhirBundle)
         if (eventType === EVENT_TYPE.BIRTH) {
           if (hasValidateScope(request)) {
@@ -147,11 +180,28 @@ function detectEvent(request: Hapi.Request): Events {
   }
 
   if (request.method === 'put' && request.path.includes('/fhir/Task')) {
-    const eventType = getEventType(request.payload as fhir.Bundle)
+    const taskResource = getTaskResource(fhirBundle)
+    const eventType = getEventType(fhirBundle)
     if (eventType === EVENT_TYPE.BIRTH) {
-      return Events.BIRTH_MARK_VOID
+      if (isRejectedTask(taskResource)) {
+        return Events.BIRTH_MARK_VOID
+      }
+      if (isArchiveTask(taskResource)) {
+        return Events.BIRTH_MARK_ARCHIVED
+      }
+      if (hasReinstatedExtension(taskResource)) {
+        return Events.BIRTH_MARK_REINSTATED
+      }
     } else if (eventType === EVENT_TYPE.DEATH) {
-      return Events.DEATH_MARK_VOID
+      if (isRejectedTask(taskResource)) {
+        return Events.DEATH_MARK_VOID
+      }
+      if (isArchiveTask(taskResource)) {
+        return Events.DEATH_MARK_ARCHIVED
+      }
+      if (hasReinstatedExtension(taskResource)) {
+        return Events.DEATH_MARK_REINSTATED
+      }
     }
   }
 
@@ -160,36 +210,6 @@ function detectEvent(request: Hapi.Request): Events {
   }
 
   return Events.UNKNOWN
-}
-
-async function forwardToHearth(request: Hapi.Request, h: Hapi.ResponseToolkit) {
-  logger.info(
-    `Forwarding to Hearth unchanged: ${request.method} ${request.path}`
-  )
-
-  const requestOpts: RequestInit = {
-    method: request.method,
-    headers: {
-      'Content-Type': 'application/fhir+json'
-    }
-  }
-
-  let path = request.path
-  if (request.method === 'post' || request.method === 'put') {
-    requestOpts.body = JSON.stringify(request.payload)
-  } else if (request.method === 'get') {
-    path = `${request.path}${request.url.search}`
-  }
-  const res = await fetch(HEARTH_URL + path.replace('/fhir', ''), requestOpts)
-  const resBody = await res.text()
-  const response = h.response(resBody)
-
-  response.code(res.status)
-  res.headers.forEach((headerVal, headerName) => {
-    response.header(headerName, headerVal)
-  })
-
-  return response
 }
 
 export async function fhirWorkflowEventHandler(
@@ -216,79 +236,92 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_IN_PROGRESS_DEC,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
-      await triggerEvent(
-        Events.BIRTH_NEW_DEC,
-        request.payload,
-        request.headers.authorization
-      )
+      await triggerEvent(Events.BIRTH_NEW_DEC, request.payload, request.headers)
       break
-    case Events.BIRTH_NEW_VALIDATE:
+    case Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION:
       response = await createRegistrationHandler(request, h, event)
       await triggerEvent(
-        Events.BIRTH_NEW_VALIDATE,
+        Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
-    case Events.BIRTH_WAITING_VALIDATION:
+    case Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION:
       response = await markEventAsWaitingValidationHandler(request, h, event)
       await triggerEvent(
-        Events.BIRTH_WAITING_VALIDATION,
+        Events.BIRTH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
-    case Events.DEATH_WAITING_VALIDATION:
+    case Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION:
       response = await markEventAsWaitingValidationHandler(request, h, event)
       await triggerEvent(
-        Events.DEATH_WAITING_VALIDATION,
+        Events.DEATH_WAITING_EXTERNAL_RESOURCE_VALIDATION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
-    case Events.DEATH_NEW_VALIDATE:
-      response = await createRegistrationHandler(request, h, event)
+    case Events.BIRTH_REQUEST_CORRECTION:
+      response = await markEventAsRequestedForCorrectionHandler(request, h)
       await triggerEvent(
-        Events.DEATH_NEW_VALIDATE,
+        Events.BIRTH_REQUEST_CORRECTION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
-    case Events.BIRTH_NEW_WAITING_VALIDATION:
+    case Events.DEATH_REQUEST_CORRECTION:
+      response = await markEventAsRequestedForCorrectionHandler(request, h)
+      await triggerEvent(
+        Events.DEATH_REQUEST_CORRECTION,
+        request.payload,
+        request.headers
+      )
+      break
+    case Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION:
       response = await createRegistrationHandler(request, h, event)
       await triggerEvent(
-        Events.BIRTH_NEW_WAITING_VALIDATION,
+        Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
+      break
+    case Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
+      response = await createRegistrationHandler(request, h, event)
+      await triggerEvent(
+        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
+        request.payload,
+        request.headers
+      )
+      break
+    case Events.BIRTH_MARK_REINSTATED:
+    case Events.DEATH_MARK_REINSTATED:
+      response = await updateTaskHandler(request, h, event)
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.DEATH_IN_PROGRESS_DEC:
       response = await createRegistrationHandler(request, h, event)
       await triggerEvent(
         Events.DEATH_IN_PROGRESS_DEC,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_NEW_DEC:
       response = await createRegistrationHandler(request, h, event)
-      await triggerEvent(
-        Events.DEATH_NEW_DEC,
-        request.payload,
-        request.headers.authorization
-      )
+      await triggerEvent(Events.DEATH_NEW_DEC, request.payload, request.headers)
       break
-    case Events.DEATH_NEW_WAITING_VALIDATION:
+    case Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION:
       response = await createRegistrationHandler(request, h, event)
       await triggerEvent(
-        Events.DEATH_NEW_WAITING_VALIDATION,
+        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_MARK_VALID:
@@ -296,7 +329,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_MARK_VALID,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_MARK_VALID:
@@ -304,7 +337,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_MARK_VALID,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_MARK_REG:
@@ -312,7 +345,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_MARK_REG,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_MARK_REG:
@@ -320,7 +353,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_MARK_REG,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_MARK_CERT:
@@ -328,7 +361,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_MARK_CERT,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_MARK_CERT:
@@ -336,7 +369,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_MARK_CERT,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.BIRTH_MARK_VOID:
@@ -344,7 +377,7 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.BIRTH_MARK_VOID,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
       break
     case Events.DEATH_MARK_VOID:
@@ -352,16 +385,25 @@ export async function fhirWorkflowEventHandler(
       await triggerEvent(
         Events.DEATH_MARK_VOID,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
+      break
+    case Events.BIRTH_MARK_ARCHIVED:
+    case Events.DEATH_MARK_ARCHIVED:
+      response = await updateTaskHandler(request, h, event)
+      await triggerEvent(event, request.payload, request.headers)
       break
     case Events.EVENT_NOT_DUPLICATE:
       response = await forwardToHearth(request, h)
       await triggerEvent(
         Events.EVENT_NOT_DUPLICATE,
         request.payload,
-        request.headers.authorization
+        request.headers
       )
+      break
+    case Events.DOWNLOADED:
+      response = await markEventAsDownloadedHandler(request, h)
+      await triggerEvent(Events.DOWNLOADED, request.payload, request.headers)
       break
     default:
       // forward as-is to hearth
@@ -374,7 +416,7 @@ export async function fhirWorkflowEventHandler(
 export async function triggerEvent(
   event: Events,
   payload: string | object,
-  authHeader: string
+  headers: Record<string, string> = {}
 ) {
   try {
     await fetch(`${OPENHIM_URL}${event}`, {
@@ -382,7 +424,7 @@ export async function triggerEvent(
       body: JSON.stringify(payload),
       headers: {
         'Content-Type': 'application/json',
-        Authorization: authHeader
+        ...headers
       }
     })
   } catch (err) {

@@ -18,13 +18,12 @@ export function emptyFatherSectionTransformer(
 ) {
   if (!queryData[sectionId]) {
     transformedData[sectionId] = {
-      fathersDetailsExist: false,
-      permanentAddressSameAsMother: true,
-      addressSameAsMother: true
+      detailsExist: false,
+      primaryAddressSameAsOtherPrimary: true
     }
   } else {
     transformedData[sectionId] = {
-      fathersDetailsExist: true,
+      detailsExist: true,
       ...transformedData[sectionId]
     }
   }

@@ -11,23 +11,22 @@
  */
 import { Event } from '@client/forms'
 import {
-  getDraftApplicantFullName,
-  transformSearchQueryDataToDraft,
-  updateApplicationTaskHistory
+  getDraftInformantFullName,
+  transformSearchQueryDataToDraft
 } from '@client/utils/draftUtils'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { SUBMISSION_STATUS, IApplication } from '@client/applications'
+import { SUBMISSION_STATUS, IDeclaration } from '@client/declarations'
 import { IUserDetails } from './userUtils'
 
 describe('draftUtils tests', () => {
-  describe('getDraftApplicantFullName()', () => {
+  describe('getDraftInformantFullName()', () => {
     describe('Birth event', () => {
       it('Returns child english name properly', () => {
         expect(
-          getDraftApplicantFullName({
+          getDraftInformantFullName({
             id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
             data: {
               child: {
@@ -45,7 +44,7 @@ describe('draftUtils tests', () => {
       })
       it('Returns child bangla name properly', () => {
         expect(
-          getDraftApplicantFullName(
+          getDraftInformantFullName(
             {
               id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
               data: {
@@ -67,7 +66,7 @@ describe('draftUtils tests', () => {
     describe('Death event', () => {
       it('Returns deceased english name properly', () => {
         expect(
-          getDraftApplicantFullName({
+          getDraftInformantFullName({
             id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
             data: {
               deceased: {
@@ -84,7 +83,7 @@ describe('draftUtils tests', () => {
       })
       it('Returns child bangla name properly', () => {
         expect(
-          getDraftApplicantFullName(
+          getDraftInformantFullName(
             {
               id: '7b57d8f9-4d2d-4f12-8d0a-b042fe14f3d4',
               data: {
@@ -117,27 +116,6 @@ describe('draftUtils tests', () => {
             trackingId: 'BZX12Y',
             status: 'DECLARED'
           },
-          operationHistories: [
-            {
-              operatedOn: '2020-01-21T08:41:08.551Z',
-              operationType: 'DECLARED',
-              operatorOfficeName: 'Baniajan Union Parishad',
-              operatorRole: 'FIELD_AGENT',
-              operatorName: [
-                {
-                  familyName: 'Al Hasan',
-                  firstNames: 'Shakib',
-                  use: 'en'
-                },
-                {
-                  familyName: '',
-                  firstNames: '',
-                  use: 'bn'
-                }
-              ],
-              operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-            }
-          ],
           childName: [
             {
               firstNames: 'Muhammad',
@@ -152,9 +130,9 @@ describe('draftUtils tests', () => {
           ]
         }
 
-        const transformedDraftApplication =
+        const transformedDraftDeclaration =
           transformSearchQueryDataToDraft(queryData)
-        expect(transformedDraftApplication).toEqual({
+        expect(transformedDraftDeclaration).toEqual({
           id: '1',
           data: {
             registration: {
@@ -174,28 +152,7 @@ describe('draftUtils tests', () => {
           event: 'birth',
           trackingId: 'BZX12Y',
           submissionStatus: 'DECLARED',
-          compositionId: '1',
-          operationHistories: [
-            {
-              operatedOn: '2020-01-21T08:41:08.551Z',
-              operationType: 'DECLARED',
-              operatorOfficeName: 'Baniajan Union Parishad',
-              operatorRole: 'FIELD_AGENT',
-              operatorName: [
-                {
-                  familyName: 'Al Hasan',
-                  firstNames: 'Shakib',
-                  use: 'en'
-                },
-                {
-                  familyName: '',
-                  firstNames: '',
-                  use: 'bn'
-                }
-              ],
-              operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-            }
-          ]
+          compositionId: '1'
         })
       })
     })
@@ -209,27 +166,6 @@ describe('draftUtils tests', () => {
             trackingId: 'BZX12Y',
             status: 'DECLARED'
           },
-          operationHistories: [
-            {
-              operatedOn: '2020-01-21T08:41:08.551Z',
-              operationType: 'DECLARED',
-              operatorOfficeName: 'Baniajan Union Parishad',
-              operatorRole: 'FIELD_AGENT',
-              operatorName: [
-                {
-                  familyName: 'Al Hasan',
-                  firstNames: 'Shakib',
-                  use: 'en'
-                },
-                {
-                  familyName: '',
-                  firstNames: '',
-                  use: 'bn'
-                }
-              ],
-              operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-            }
-          ],
           deceasedName: [
             {
               firstNames: 'Muhammad',
@@ -244,9 +180,9 @@ describe('draftUtils tests', () => {
           ]
         }
 
-        const transformedDraftApplication =
+        const transformedDraftDeclaration =
           transformSearchQueryDataToDraft(queryData)
-        expect(transformedDraftApplication).toEqual({
+        expect(transformedDraftDeclaration).toEqual({
           id: '1',
           data: {
             registration: {
@@ -266,79 +202,8 @@ describe('draftUtils tests', () => {
           event: 'death',
           trackingId: 'BZX12Y',
           submissionStatus: 'DECLARED',
-          compositionId: '1',
-          operationHistories: [
-            {
-              operatedOn: '2020-01-21T08:41:08.551Z',
-              operationType: 'DECLARED',
-              operatorOfficeName: 'Baniajan Union Parishad',
-              operatorRole: 'FIELD_AGENT',
-              operatorName: [
-                {
-                  familyName: 'Al Hasan',
-                  firstNames: 'Shakib',
-                  use: 'en'
-                },
-                {
-                  familyName: '',
-                  firstNames: '',
-                  use: 'bn'
-                }
-              ],
-              operatorOfficeAlias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-            }
-          ]
+          compositionId: '1'
         })
-      })
-    })
-  })
-  describe('Task history', () => {
-    it('returns a structured operation history', () => {
-      const sampleDate = Date.now()
-      const application: IApplication = {
-        id: '',
-        data: {},
-        event: Event.BIRTH,
-        submissionStatus: SUBMISSION_STATUS.DECLARED,
-        modifiedOn: sampleDate
-      }
-      const userDetails: IUserDetails = {
-        role: 'FIELD_AGENT',
-        name: [
-          {
-            familyName: 'Al Hasan',
-            firstNames: 'Shakib',
-            use: 'en'
-          },
-          {
-            familyName: '',
-            firstNames: '',
-            use: 'bn'
-          }
-        ],
-        primaryOffice: {
-          id: '',
-          name: 'Baniajan Union Parishad',
-          alias: ['বানিয়াজান ইউনিয়ন পরিষদ']
-        },
-        language: 'en',
-        localRegistrar: {
-          name: []
-        }
-      }
-
-      const operationHistory = updateApplicationTaskHistory(
-        application,
-        userDetails
-      )
-
-      expect(operationHistory).toEqual({
-        operationType: application.submissionStatus,
-        operatedOn: new Date(sampleDate).toString(),
-        operatorRole: userDetails.role,
-        operatorName: userDetails.name,
-        operatorOfficeName: userDetails.primaryOffice!.name,
-        operatorOfficeAlias: userDetails.primaryOffice!.alias
       })
     })
   })

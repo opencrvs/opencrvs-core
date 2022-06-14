@@ -13,7 +13,6 @@ import * as React from 'react'
 import {
   CheckboxGroup,
   DateField,
-  PDFViewer,
   RadioGroup,
   Select,
   TextArea,
@@ -67,7 +66,6 @@ import {
   NUMBER,
   BIG_NUMBER,
   PARAGRAPH,
-  PDF_DOCUMENT_VIEWER,
   DYNAMIC_LIST,
   IDynamicListFormField,
   IListFormField,
@@ -113,11 +111,13 @@ import { SimpleDocumentUploader } from './DocumentUploadfield/SimpleDocumentUplo
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { connect } from 'react-redux'
-import { dynamicDispatch } from '@client/applications'
+import { dynamicDispatch } from '@client/declarations'
 import { LocationSearch } from '@opencrvs/components/lib/interface'
 import { REGEXP_NUMBER_INPUT_NON_NUMERIC } from '@client/utils/constants'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
+import { IUserDetails } from '@client/utils/userUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -130,7 +130,7 @@ const FormItem = styled.div<{
 }>`
   animation: ${fadeIn} 500ms;
   margin-bottom: ${({ ignoreBottomMargin }) =>
-    ignoreBottomMargin ? '0px' : '32px'};
+    ignoreBottomMargin ? '0px' : '40px'};
 
   ${({ hideFakeMarginTop }) =>
     !hideFakeMarginTop &&
@@ -144,11 +144,11 @@ const FormItem = styled.div<{
   }`}
 `
 const LinkFormField = styled(Link)`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const FieldGroupTitle = styled.div`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   margin-top: 16px;
 `
 
@@ -189,6 +189,9 @@ type GeneratedInputFieldProps = {
   error: string
   draftData?: IFormData
   disabled?: boolean
+  onUploadingStateChanged?: (isUploading: boolean) => void
+  requiredErrorMessage?: MessageDescriptor
+  setFieldTouched?: (name: string, isTouched?: boolean) => void
 } & IDispatchProps
 
 function GeneratedInputField({
@@ -204,7 +207,10 @@ function GeneratedInputField({
   nestedFields,
   draftData,
   disabled,
-  dynamicDispatch
+  dynamicDispatch,
+  onUploadingStateChanged,
+  setFieldTouched,
+  requiredErrorMessage
 }: GeneratedInputFieldProps) {
   const inputFieldProps = {
     id: fieldDefinition.name,
@@ -233,7 +239,6 @@ function GeneratedInputField({
     touched: Boolean(touched),
     placeholder: fieldDefinition.placeholder
   }
-
   if (fieldDefinition.type === SELECT_WITH_OPTIONS) {
     return (
       <InputField {...inputFieldProps}>
@@ -259,6 +264,7 @@ function GeneratedInputField({
   if (fieldDefinition.type === DOCUMENT_UPLOADER_WITH_OPTION) {
     return (
       <DocumentUploaderWithOption
+        {...inputProps}
         name={fieldDefinition.name}
         label={fieldDefinition.label}
         options={fieldDefinition.options}
@@ -266,22 +272,31 @@ function GeneratedInputField({
         files={value as IFileValue[]}
         extraValue={fieldDefinition.extraValue || ''}
         hideOnEmptyOption={fieldDefinition.hideOnEmptyOption}
-        onComplete={(files: IFileValue[]) =>
+        onComplete={(files: IFileValue[]) => {
           onSetFieldValue(fieldDefinition.name, files)
-        }
+          setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+        }}
+        onUploadingStateChanged={onUploadingStateChanged}
+        requiredErrorMessage={requiredErrorMessage}
       />
     )
   }
   if (fieldDefinition.type === SIMPLE_DOCUMENT_UPLOADER) {
     return (
       <SimpleDocumentUploader
+        {...inputProps}
         name={fieldDefinition.name}
         label={fieldDefinition.label}
         description={fieldDefinition.description}
         allowedDocType={fieldDefinition.allowedDocType}
         files={value as IAttachmentValue}
         error={error}
-        onComplete={(file) => onSetFieldValue(fieldDefinition.name, file)}
+        onComplete={(file) => {
+          onSetFieldValue(fieldDefinition.name, file)
+          setFieldTouched && setFieldTouched(fieldDefinition.name, true)
+        }}
+        onUploadingStateChanged={onUploadingStateChanged}
+        requiredErrorMessage={requiredErrorMessage}
       />
     )
   }
@@ -299,6 +314,7 @@ function GeneratedInputField({
           name={fieldDefinition.name}
           value={value as string}
           notice={fieldDefinition.notice}
+          flexDirection={fieldDefinition.flexDirection}
         />
       </InputField>
     )
@@ -476,16 +492,10 @@ function GeneratedInputField({
     )
   }
 
-  if (fieldDefinition.type === PDF_DOCUMENT_VIEWER) {
-    return (
-      <PDFViewer
-        id={fieldDefinition.name}
-        pdfSource={fieldDefinition.initialValue as string}
-      />
-    )
-  }
-
-  if (fieldDefinition.type === LOCATION_SEARCH_INPUT) {
+  if (
+    fieldDefinition.type === LOCATION_SEARCH_INPUT &&
+    fieldDefinition.locationList
+  ) {
     const selectedLocation = fieldDefinition.locationList.find(
       (location) => location.id === value
     )
@@ -537,7 +547,10 @@ function GeneratedInputField({
   )
 }
 
-const mapFieldsToValues = (fields: IFormField[]) =>
+const mapFieldsToValues = (
+  fields: IFormField[],
+  userDetails: IUserDetails | null
+) =>
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
 
@@ -557,6 +570,37 @@ const mapFieldsToValues = (fields: IFormField[]) =>
         nestedFields: nestedInitialValues
       }
     }
+
+    if (
+      field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
+      !field.initialValue &&
+      field.dynamicOptions.initialValue === 'agentDefault'
+    ) {
+      const catchmentAreas = userDetails?.catchmentArea
+      let district = ''
+      let state = ''
+
+      if (catchmentAreas) {
+        catchmentAreas.forEach((catchmentArea) => {
+          if (
+            catchmentArea.identifier?.find(({ value }) => value === 'DISTRICT')
+          ) {
+            district = catchmentArea.id
+          } else if (
+            catchmentArea.identifier?.find(({ value }) => value === 'STATE')
+          ) {
+            state = catchmentArea.id
+          }
+        })
+      }
+
+      if (field.name.includes('district') && !field.initialValue && district) {
+        fieldInitialValue = district as IFormFieldValue
+      }
+      if (field.name.includes('state') && !field.initialValue && state) {
+        fieldInitialValue = state as IFormFieldValue
+      }
+    }
     return { ...memo, [field.name]: fieldInitialValue }
   }, {})
 
@@ -570,10 +614,12 @@ interface IFormSectionProps {
   draftData?: IFormData
   onSetTouched?: (func: ISetTouchedFunction) => void
   requiredErrorMessage?: MessageDescriptor
+  onUploadingStateChanged?: (isUploading: boolean) => void
 }
 
 interface IStateProps {
   offlineCountryConfig: IOfflineData
+  userDetails: IUserDetails | null
 }
 
 interface IDispatchProps {
@@ -709,6 +755,7 @@ class FormSectionComponent extends React.Component<Props> {
       values,
       fields,
       setFieldValue,
+      setFieldTouched,
       touched,
       offlineCountryConfig,
       intl,
@@ -736,6 +783,7 @@ class FormSectionComponent extends React.Component<Props> {
      *
      * This might be because of setState not used with the function syntax
      */
+
     const fieldsWithValuesDefined = fields.filter(
       (field) => values[field.name] !== undefined
     )
@@ -864,9 +912,7 @@ class FormSectionComponent extends React.Component<Props> {
                   )
                 }
               : field
-
           if (
-            field.type === PDF_DOCUMENT_VIEWER ||
             field.type === FETCH_BUTTON ||
             field.type === FIELD_WITH_DYNAMIC_DEFINITIONS ||
             field.type === SELECT_WITH_DYNAMIC_OPTIONS
@@ -943,6 +989,7 @@ class FormSectionComponent extends React.Component<Props> {
                               name: nestedFieldName
                             })}
                             onSetFieldValue={setFieldValue}
+                            setFieldTouched={setFieldTouched}
                             resetDependentSelectValues={
                               this.resetDependentSelectValues
                             }
@@ -951,6 +998,9 @@ class FormSectionComponent extends React.Component<Props> {
                             error={nestedError}
                             draftData={draftData}
                             dynamicDispatch={dynamicDispatch}
+                            onUploadingStateChanged={
+                              this.props.onUploadingStateChanged
+                            }
                           />
                         )}
                       </FastField>
@@ -992,31 +1042,34 @@ class FormSectionComponent extends React.Component<Props> {
           } else {
             return (
               <FormItem
-                key={`${field.name}${language}${
-                  isFieldDisabled ? 'disabled' : ''
-                }`}
+                key={`${field.name}${language}`}
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
-                <FastField name={field.name}>
-                  {(formikFieldProps: FieldProps<any>) => (
-                    <GeneratedInputField
-                      fieldDefinition={internationaliseFieldObject(
-                        intl,
-                        withDynamicallyGeneratedFields
-                      )}
-                      onSetFieldValue={setFieldValue}
-                      resetDependentSelectValues={
-                        this.resetDependentSelectValues
-                      }
-                      {...formikFieldProps.field}
-                      touched={touched[field.name] || false}
-                      error={isFieldDisabled ? '' : error}
-                      draftData={draftData}
-                      dynamicDispatch={dynamicDispatch}
-                      disabled={isFieldDisabled}
-                    />
-                  )}
-                </FastField>
+                <Field name={field.name}>
+                  {(formikFieldProps: FieldProps<any>) => {
+                    return (
+                      <GeneratedInputField
+                        fieldDefinition={internationaliseFieldObject(
+                          intl,
+                          withDynamicallyGeneratedFields
+                        )}
+                        onSetFieldValue={setFieldValue}
+                        resetDependentSelectValues={
+                          this.resetDependentSelectValues
+                        }
+                        {...formikFieldProps.field}
+                        touched={touched[field.name] || false}
+                        error={isFieldDisabled ? '' : error}
+                        draftData={draftData}
+                        dynamicDispatch={dynamicDispatch}
+                        disabled={isFieldDisabled}
+                        onUploadingStateChanged={
+                          this.props.onUploadingStateChanged
+                        }
+                      />
+                    )
+                  }}
+                </Field>
               </FormItem>
             )
           }
@@ -1030,7 +1083,8 @@ const FormFieldGeneratorWithFormik = withFormik<
   IFormSectionProps & IStateProps & IDispatchProps,
   IFormSectionData
 >({
-  mapPropsToValues: (props) => mapFieldsToValues(props.fields),
+  mapPropsToValues: (props) =>
+    mapFieldsToValues(props.fields, props.userDetails),
   handleSubmit: (values) => {},
   validate: (values, props: IFormSectionProps & IStateProps) =>
     getValidationErrorsForForm(
@@ -1045,7 +1099,8 @@ const FormFieldGeneratorWithFormik = withFormik<
 export const FormFieldGenerator = connect(
   (state: IStoreState, ownProps: IFormSectionProps) => ({
     ...ownProps,
-    offlineCountryConfig: getOfflineData(state)
+    offlineCountryConfig: getOfflineData(state),
+    userDetails: getUserDetails(state)
   }),
   { dynamicDispatch }
 )(FormFieldGeneratorWithFormik)

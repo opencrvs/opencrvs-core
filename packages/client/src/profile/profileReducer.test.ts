@@ -15,9 +15,11 @@ import { createStore, AppStore } from '@client/store'
 import {
   mockUserResponse,
   getItem,
+  userDetails,
   mockRegistrarUserResponse
 } from '@client/tests/util'
 import { storage } from '@client/storage'
+import * as changeLanguageActions from '@client/i18n/actions'
 
 storage.removeItem = jest.fn()
 
@@ -62,6 +64,28 @@ describe('profileReducer tests', () => {
     }
     store.dispatch(action)
     expect(store.getState().profile.userDetailsFetched).toEqual(true)
+  })
+
+  describe('modify details', () => {
+    beforeEach(() => {
+      const action = {
+        type: actions.SET_USER_DETAILS,
+        payload: mockUserResponse
+      }
+      store.dispatch(action)
+    })
+
+    it('modifies the user details', () => {
+      const action = {
+        type: actions.MODIFY_USER_DETAILS,
+        payload: {
+          ...userDetails,
+          mobile: '2121'
+        }
+      }
+      store.dispatch(action)
+      expect(store.getState().profile.userDetails?.mobile).toBe('2121')
+    })
   })
 
   it('removes details, tike and logs out a user', async () => {

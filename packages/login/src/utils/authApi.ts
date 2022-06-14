@@ -17,6 +17,24 @@ export interface ICodeVerifyData {
   nonce: string
   code: string
 }
+export interface ICountryLogo {
+  fileName: string
+  file: string
+}
+export interface IApplicationConfig {
+  APPLICATION_NAME: string
+  COUNTRY: string
+  COUNTRY_LOGO: ICountryLogo
+  COUNTRY_LOGO_RENDER_WIDTH: number
+  COUNTRY_LOGO_RENDER_HEIGHT: number
+  DESKTOP_TIME_OUT_MILLISECONDS: number
+  SENTRY: string
+  LOGROCKET: string
+}
+
+export interface IApplicationConfigResponse {
+  config: IApplicationConfig
+}
 
 export interface IAuthenticationData {
   username: string
@@ -67,6 +85,13 @@ function request<T>(options: AxiosRequestConfig) {
   }
 
   return client(options).then(onSuccess).catch(onError)
+}
+
+const getApplicationConfig = () => {
+  return request<IApplicationConfigResponse>({
+    url: resolve(window.config.CONFIG_API_URL, '/loginConfig'),
+    method: 'GET'
+  })
 }
 
 const authenticate = (data: IAuthenticationData) => {
@@ -169,5 +194,6 @@ export const authApi = {
   verifyUser,
   verifySecurityAnswer,
   changePassword,
-  sendUserName
+  sendUserName,
+  getApplicationConfig
 }

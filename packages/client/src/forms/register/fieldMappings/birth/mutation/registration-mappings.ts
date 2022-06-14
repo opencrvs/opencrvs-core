@@ -12,8 +12,7 @@
 import {
   GQLAttachment,
   GQLPerson,
-  GQLRelatedPerson,
-  GQLRelationshipType
+  GQLRelatedPerson
 } from '@opencrvs/gateway/src/graphql/schema'
 import {
   ICertificate,
@@ -41,8 +40,7 @@ export function transformCertificateData(
   if (certificateData && certificateData.collector) {
     const collector: GQLRelatedPerson = {}
     if (certificateData.collector.type) {
-      collector.relationship = certificateData.collector
-        .type as GQLRelationshipType
+      collector.relationship = certificateData.collector.type as string
     }
     if (certificateData.collector.relationship) {
       collector.otherRelationship = certificateData.collector
@@ -88,11 +86,6 @@ export function setBirthRegistrationSectionTransformer(
   if (draftData[sectionId].registrationNumber) {
     transformedData[sectionId].registrationNumber =
       draftData[sectionId].registrationNumber
-  }
-
-  if (draftData[sectionId].presentAtBirthRegistration) {
-    transformedData.presentAtBirthRegistration =
-      draftData[sectionId].presentAtBirthRegistration
   }
 
   if (!transformedData[sectionId].status) {
@@ -179,3 +172,23 @@ export const changeHirerchyMutationTransformer =
 
     return transformedData
   }
+
+export const customFieldToQuestionnaireTransformer = (
+  transformedData: TransformedData,
+  draftData: IFormData,
+  sectionId: string,
+  field: IFormField
+) => {
+  const value: IFormSectionData = draftData[sectionId][
+    field.name
+  ] as IFormSectionData
+  if (!transformedData.questionnaire) {
+    transformedData.questionnaire = []
+  }
+  transformedData.questionnaire.push({
+    fieldId: field.customQuesstionMappingId,
+    value: String(value)
+  })
+
+  return transformedData
+}

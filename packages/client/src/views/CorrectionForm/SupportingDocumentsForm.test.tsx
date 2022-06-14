@@ -1,0 +1,84 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import { createStore } from '@client/store'
+import {
+  createRouterProps,
+  createTestComponent,
+  mockDeclarationData
+} from '@client/tests/util'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { CorrectionSection, Event } from '@client/forms'
+import { IDeclaration, storeDeclaration } from '@client/declarations'
+import { formatUrl } from '@client/navigation'
+import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
+import { CorrectionForm } from './CorrectionForm'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+
+let wrapper: ReactWrapper<{}, {}>
+
+const birthDeclaration: IDeclaration = {
+  id: '72c18939-70c1-40b4-9b80-b162c4871160',
+  data: mockDeclarationData,
+  event: Event.BIRTH
+}
+
+const { store, history } = createStore()
+
+describe('for an declaration', () => {
+  beforeEach(async () => {
+    store.dispatch(storeDeclaration(birthDeclaration))
+    wrapper = await createTestComponent(
+      <CorrectionForm
+        {...createRouterProps(
+          formatUrl(CERTIFICATE_CORRECTION, {
+            declarationId: birthDeclaration.id,
+            pageId: CorrectionSection.SupportingDocuments
+          }),
+          { isNavigatedInsideApp: false },
+          {
+            matchParams: {
+              declarationId: birthDeclaration.id,
+              pageId: CorrectionSection.SupportingDocuments
+            }
+          }
+        )}
+      />,
+      {
+        store,
+        history
+      }
+    )
+  })
+
+  it('should disable the continue button', () => {
+    expect(
+      wrapper.find('#confirm_form').hostNodes().props().disabled
+    ).toBeTruthy()
+  })
+
+  it('should enable the continue button if any radio button is selected', () => {
+    wrapper
+      .find('#supportDocumentRequiredForCorrection_true')
+      .hostNodes()
+      .simulate('change', { target: { checked: true } })
+    wrapper.update()
+    expect(
+      wrapper.find('#confirm_form').hostNodes().props().disabled
+    ).toBeFalsy()
+  })
+  it('should goto home if cross button is pressed', () => {
+    wrapper.find('#crcl-btn').hostNodes().simulate('click')
+    wrapper.update()
+    expect(history.location.pathname).toContain(WORKQUEUE_TABS.readyForReview)
+  })
+})

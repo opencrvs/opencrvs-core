@@ -42,7 +42,7 @@ const statusItems = [
   },
   {
     icon: <StatusOrange />,
-    label: 'Application'
+    label: 'Declaration'
   }
 ]
 

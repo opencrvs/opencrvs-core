@@ -1,4 +1,4 @@
-import { APPLICATION_STATUS } from '@metrics/features/registration/fhirUtils'
+import { DECLARATION_STATUS } from '@metrics/features/registration/fhirUtils'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -33,13 +33,23 @@ export interface IPointLocation {
   locationLevel2?: string
 }
 
-export interface IAuthHeader {
-  Authorization: string
-}
+export type IAuthHeader =
+  | {
+      Authorization: string
+      'x-correlation-id': string
+    }
+  | {
+      Authorization: string
+    }
 
 export interface IBirthRegistrationTags {
   regStatus: string
+  practitionerRole: string
+  eventLocationType: string
   gender: string | undefined
+  timeLabel: string | undefined
+  ageLabel: string | undefined
+  dateLabel: string | undefined
   officeLocation?: string
   locationLevel5?: string
   locationLevel4?: string
@@ -49,7 +59,12 @@ export interface IBirthRegistrationTags {
 
 export interface IDeathRegistrationTags {
   regStatus: string
+  practitionerRole: string
+  eventLocationType: string
   gender: string | undefined
+  timeLabel: string | undefined
+  ageLabel: string | undefined
+  dateLabel: string | undefined
   mannerOfDeath: string
   causeOfDeath: string
   officeLocation?: string
@@ -59,11 +74,11 @@ export interface IDeathRegistrationTags {
   locationLevel2?: string
 }
 
-export interface IInProgressApplicationFields {
+export interface IInProgressDeclarationFields {
   compositionId: string
 }
 
-export interface IInProgressApplicationTags {
+export interface IInProgressDeclarationTags {
   regStatus: string
   missingFieldSectionId: string
   missingFieldGroupId: string
@@ -127,10 +142,10 @@ export interface ITimeLoggedPoints {
   timestamp: number | undefined
 }
 
-export interface IInProgressApplicationPoints {
+export interface IInProgressDeclarationPoints {
   measurement: string
-  tags: IInProgressApplicationTags
-  fields: IInProgressApplicationFields
+  tags: IInProgressDeclarationTags
+  fields: IInProgressDeclarationFields
   timestamp: number | undefined
 }
 
@@ -150,8 +165,21 @@ export interface IBirthRegistrationPoints {
 
 export interface IPaymentPoints {
   measurement: string
-  tags: ILocationTags
+  tags: ILocationTags & {
+    eventType: 'BIRTH' | 'DEATH'
+    paymentType: 'certification' | 'correction'
+  }
   fields: IPaymentFields
+  timestamp: number | undefined
+}
+export interface ICorrectionPoint {
+  measurement: string
+  tags: ILocationTags & {
+    eventType: 'BIRTH' | 'DEATH'
+    // CLERICAL_ERROR, MATERIAL_ERROR, MATERIAL_OMISSION, JUDICIAL_ORDER, OTHER
+    reason: string
+  }
+  fields: { compositionId: string }
   timestamp: number | undefined
 }
 
@@ -160,16 +188,16 @@ export interface IPaymentFields {
   compositionId: string
 }
 
-export interface IApplicationsStartedPoints {
+export interface IDeclarationsStartedPoints {
   measurement: string
   tags: ILocationTags
-  fields: IApplicationsStartedFields
+  fields: IDeclarationsStartedFields
   timestamp: number | undefined
 }
 
-export interface IApplicationsStartedFields {
+export interface IDeclarationsStartedFields {
   role: string
-  status?: APPLICATION_STATUS | null
+  status?: DECLARATION_STATUS | null
   compositionId: string
 }
 
@@ -187,10 +215,10 @@ export interface IRejectedPoints {
 export type IPoints =
   | IDurationPoints
   | ITimeLoggedPoints
-  | IInProgressApplicationPoints
+  | IInProgressDeclarationPoints
   | IPaymentPoints
   | IBirthRegistrationPoints
   | IDeathRegistrationPoints
   | IPaymentPoints
-  | IApplicationsStartedPoints
+  | IDeclarationsStartedPoints
   | IRejectedPoints

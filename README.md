@@ -109,25 +109,49 @@ Open the url **[`http://localhost:3020/`](http://localhost:3020/)**
 
 Use one of the following authentication details for your user of choice. To learn about these user roles and to perform civil registration tasks, read our [documentation](http://documentation.opencrvs.org/)
 
+Ibombo District in Central Province is our fake country Farajaland's capital district.
+
+Ilanga District in Sulaka Province is meant to demonstrate a provincial district office in our fake country, Farajaland.
+
 ### Field Agent
 
-Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000**
+A Social Worker in the capital city:
+
+Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+
+A Local Leader in a provincial district:
+
+Username: **patrick.gondwe** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### Registration Agent
 
-Username: **felix.katongo** / Password: **test** / SMS code: **000000**
+Username: **felix.katongo** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+
+Username: **joshua.mutale** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### Registrar
 
-Username: **kennedy.mweene** / Password: **test** / SMS code: **000000**
+Username: **kennedy.mweene** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+
+Username: **derrick.bulaya** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### Local System Admin
 
-Username: **emmanuel.mayuka** / Password: **test** / SMS code: **000000**
+Username: **emmanuel.mayuka** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+
+Username: **alex.ngonga** / Password: **test** / SMS code: **000000** / Office: **Ilanga District, Sulaka Province**
 
 ### National System Admin
 
-Username: **jonathan.campbell** / Password: **test** / SMS code: **000000**
+Username: **jonathan.campbell** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+
+### National Registrar
+
+Username: **joseph.musonda** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+
+### Performance Manager
+
+Username: **edgar.kazembe** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
 ## Starting and stopping OpenCRVS
 
@@ -210,6 +234,15 @@ We innovatively extended [FHIR](https://www.hl7.org/fhir/) to support the civil 
 
 #### ElasticSearch
 
+ElasticSearch is used with Kibana for application and server health monitoring, along with optimisation.
+
+The Kibana login details that we use by default are:
+
+KIBANA_USERNAME: **kibana@opencrvs.org**
+KIBANA_PASSWORD: **test**
+
+These details should be configured in Github Actions for deployment to a server.
+
 De-duplication management to ensure data integrity is essential to any respectable civil registration system. A fast search engine lowers operational costs and improves the user experience for frontline staff.
 
 OpenCRVS uses [ElasticSearch](https://www.elastic.co/), an industry standard, NoSQL document orientated, real-time de-duplication & search engine. Lightning fast, intelligent civil registration record returns are possible, even with imprecise, “fuzzy” search parameters.
@@ -257,7 +290,7 @@ Each microservice in OpenCRVS has no knowledge of other services or business req
 
 Microservices:
 
-1. [auth](https://github.com/opencrvs/opencrvs-core/tree/master/packages/auth) - the authentication microservice for OpenCRVS, [JWT](https://jwt.io/) token generation and management in [Redis](https://www.redislabs.com/).
+- [auth](https://github.com/opencrvs/opencrvs-core/tree/master/packages/auth) - the authentication microservice for OpenCRVS, [JWT](https://jwt.io/) token generation and management in [Redis](https://www.redislabs.com/).
 
 ⋅⋅⋅Our client applications are protected by SMS [2-Factor Authentication](https://en.wikipedia.org/wiki/Multi-factor_authentication). Our apps and microservices utilise [OAuth best practices](https://tools.ietf.org/id/draft-ietf-oauth-jwt-bcp-02.html) for JWT tokens.
 
@@ -265,9 +298,11 @@ Microservices:
 <img src="https://static.wixstatic.com/media/93440e_297d9c18fc9e48e78b39e885bbfdaa13~mv2_d_1200_1204_s_2.png/v1/fill/w_70,h_70,al_c,q_80,usm_0.66_1.00_0.01/OAuth_svg.webp" width="70" height="70">
 </p>
 
-2. [commons](https://github.com/opencrvs/opencrvs-core/tree/master/packages/commons) - a shared library package that all microservoce pa
+- [commons](https://github.com/opencrvs/opencrvs-core/tree/master/packages/commons) - a shared library package that all microservices use in order to validate JWTs
 
-3. [gateway](https://github.com/opencrvs/opencrvs-core/tree/master/packages/gateway) - the [GraphQL](https://graphql.org/) and [Apollo](https://www.apollographql.com/) API gateway for the OpenCRVS client.
+- [config](https://github.com/opencrvs/opencrvs-core/tree/master/packages/config) - an application configuration microservice to serve country configuration settings in the upcoming Beta release scheduled for June 2022
+
+- [gateway](https://github.com/opencrvs/opencrvs-core/tree/master/packages/gateway) - the [GraphQL](https://graphql.org/) and [Apollo](https://www.apollographql.com/) API gateway for the OpenCRVS client.
 
 <br>
 <p align="left">
@@ -371,13 +406,13 @@ By contributing to the OpenCRVS code, you are conforming to the terms of the lic
 
 So you have contributed to core and want to make a new release as an OpenCRVS core repo admin?
 
-1. Update all packages with the new version number according to [semver](https://semver.org/). All packages will have the same version for simplicity as they are all designed to be used together. Update all dependencies to point to the newly created versions. E.g. `client` depend on `components`, so update the dependency: Do a find and replace for `1.0.0-alpha.2` and replace with `1.0.0-alpha.3`
+1. Update all packages with the new version number according to [semver](https://semver.org/). All packages will have the same version for simplicity as they are all designed to be used together. Update all dependencies to point to the newly created versions. E.g. `client` depend on `components`, so update the dependency: Do a find and replace for `1.0.0` and replace with `1.0.1`
 
 2. Run `yarn` to ensure there are no version errors.
 
 3. Run `yarn test` and ensure all passed.
 
-4. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.3.2`
+4. Run `git tag v<version_number>` e.g. `git tag v1.0.0`
 
 5. Run `git push origin v<version_number>`
 

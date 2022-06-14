@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { OPENCRVS_INDEX_NAME } from '@search/constants'
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { buildQuery, ICompositionBody } from '@search/elasticsearch/utils'
 import { logger } from '@search/logger'
-import { ApiResponse } from '@elastic/elasticsearch'
 
 export const indexComposition = async (
   compositionIdentifier: string,
@@ -21,7 +21,7 @@ export const indexComposition = async (
   let response: any
   try {
     response = await client.index({
-      index: 'ocrvs',
+      index: OPENCRVS_INDEX_NAME,
       type: 'compositions',
       id: compositionIdentifier,
       body,
@@ -38,7 +38,7 @@ export const updateComposition = async (id: string, body: ICompositionBody) => {
   let response: any
   try {
     response = await client.update({
-      index: 'ocrvs',
+      index: OPENCRVS_INDEX_NAME,
       type: 'compositions',
       id,
       body: {
@@ -53,12 +53,10 @@ export const updateComposition = async (id: string, body: ICompositionBody) => {
   return response
 }
 
-export const searchComposition = async (
-  body: ICompositionBody
-): Promise<ApiResponse<ISearchResponse<any>> | null> => {
+export const searchComposition = async (body: ICompositionBody) => {
   try {
-    const response = client.search({
-      index: 'ocrvs',
+    const response = client.search<ISearchResponse<any>>({
+      index: OPENCRVS_INDEX_NAME,
       type: 'compositions',
       body: {
         query: buildQuery(body)
@@ -71,12 +69,10 @@ export const searchComposition = async (
   }
 }
 
-export const searchByCompositionId = async (
-  compositionId: string
-): Promise<ApiResponse<ISearchResponse<any>> | null> => {
+export const searchByCompositionId = async (compositionId: string) => {
   try {
-    const response = await client.search({
-      index: 'ocrvs',
+    const response = await client.search<ISearchResponse<any>>({
+      index: OPENCRVS_INDEX_NAME,
       type: 'compositions',
       body: {
         query: {

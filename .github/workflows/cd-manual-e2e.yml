@@ -1,0 +1,106 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+name: Manual E2E - New Feature on Staging
+
+env:
+  CYPRESS_LOGIN_URL: https://login.farajaland-staging.opencrvs.org/
+  CYPRESS_CLIENT_URL: https://register.farajaland-staging.opencrvs.org/
+  CYPRESS_AUTH_URL: https://auth.farajaland-staging.opencrvs.org/
+  CYPRESS_GATEWAY_URL: https://gateway.farajaland-staging.opencrvs.org/
+  CYPRESS_COUNTRYCONFIG_URL: https://countryconfig.farajaland-staging.opencrvs.org/
+
+on:
+  workflow_dispatch:
+    inputs:
+      farajaland:
+        description: Farajaland branch name
+        default: develop
+        required: true
+      farajaland-image-tag:
+        description: Farajaland DockerHub image tag
+        required: false
+      core-image-tag:
+        description: Core DockerHub image tag
+        required: false
+
+jobs:
+  manual-deploy-staging-e2e:
+    environment: staging
+    runs-on: ubuntu-20.04
+    timeout-minutes: 120
+    strategy:
+      matrix:
+        node-version: [14.17.0]
+    steps:
+      - name: Checking out git repo
+        uses: actions/checkout@v2.3.4
+      - name: Checking out the country config repo
+        run: |
+          git clone -b ${{ github.event.inputs.farajaland }} https://github.com/opencrvs/opencrvs-farajaland.git
+          cd opencrvs-farajaland
+          git status
+          cd ../
+      - name: Get COUNTRY_CONFIG_VERSION
+        if: ${{ !github.event.inputs.farajaland-image-tag }}
+        run: |
+          cd opencrvs-farajaland
+          echo "COUNTRY_CONFIG_VERSION=$(git log -1 --pretty=format:%h)" >> $GITHUB_ENV
+          cd ../
+      - name: Set COUNTRY_CONFIG_VERSION from inputs
+        if: ${{ github.event.inputs.farajaland-image-tag }}
+        run: |
+          echo "COUNTRY_CONFIG_VERSION=${{ github.event.inputs.farajaland-image-tag }}" >> $GITHUB_ENV
+      - name: Login to DockerHub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Get CORE_VERSION
+        if: ${{ !github.event.inputs.core-image-tag }}
+        run: echo "CORE_VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
+      - name: Set CORE_VERSION from inputs
+        if: ${{ github.event.inputs.core-image-tag }}
+        run: echo "CORE_VERSION=${{ github.event.inputs.core-image-tag }}" >> $GITHUB_ENV
+
+      - name: Check if images exist on Dockerhub and build if they dont
+        if: ${{ !github.event.inputs.core-image-tag && !github.event.inputs.farajaland-image-tag }}
+        run: bash check-before-build.sh ${{ secrets.DOCKER_USERNAME }} ${{ secrets.DOCKER_PASSWORD }} ${{ env.CORE_VERSION }}
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
+      - name: Deploy to development
+        env:
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+          DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
+          DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
+          KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+          KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
+          MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
+          MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
+          ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
+        run: |
+          yarn deploy:staging farajaland-staging.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+      - name: Summarise deployment
+        run: echo "### Staging deployment\nCore version **$CORE_VERSION**\nFarajaland version **$COUNTRY_CONFIG_VERSION**" >> $GITHUB_STEP_SUMMARY
+      - name: Run Cypress tests
+        run: |
+          cd opencrvs-farajaland
+          rm -rf .git
+          yarn install
+          npm install -g cypress
+          cypress run --record --key e0fc7a26-f292-4e48-9716-2009137fe646 --headless --browser chrome

@@ -20,7 +20,7 @@ import {
   ICON_ALIGNMENT,
   PrimaryButton,
   TertiaryButton,
-  LinkButton
+  SecondaryButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import {
@@ -28,17 +28,18 @@ import {
   IEventTopBarProps,
   IEventTopBarMenuAction,
   ResponsiveModal,
-  Spinner
+  Spinner,
+  Warning
 } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import {
-  deleteApplication,
-  IApplication,
+  deleteDeclaration,
+  IDeclaration,
   IPayload,
-  modifyApplication,
+  modifyDeclaration,
   SUBMISSION_STATUS,
-  writeApplication
-} from '@client/applications'
+  writeDeclaration
+} from '@client/declarations'
 import {
   FormFieldGenerator,
   ITouchedNestedFields
@@ -51,10 +52,13 @@ import {
   IFormSection,
   IFormSectionData,
   IFormSectionGroup,
-  IFormData
+  IFormData,
+  CorrectionSection,
+  IFormFieldValue
 } from '@client/forms'
 import {
   goBack as goBackAction,
+  goToCertificateCorrection,
   goToHome,
   goToHomeTab,
   goToPageGroup as goToPageGroupAction
@@ -64,16 +68,27 @@ import { HOME } from '@client/navigation/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled, { keyframes } from '@client/styledComponents'
-import { Scope } from '@client/utils/authUtils'
+import {
+  Scope,
+  hasRegisterScope,
+  hasRegistrationClerkScope
+} from '@client/utils/authUtils'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import {
   getVisibleSectionGroupsBasedOnConditions,
   getVisibleGroupFields,
   hasFormError,
-  getSectionFields
+  getSectionFields,
+  getNextSectionIds,
+  VIEW_TYPE
 } from '@client/forms/utils'
 import { messages } from '@client/i18n/messages/views/register'
-import { buttonMessages, formMessages } from '@client/i18n/messages'
+import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import {
+  buttonMessages,
+  constantsMessages,
+  formMessages
+} from '@client/i18n/messages'
 import {
   PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_CLASSNAME,
@@ -81,21 +96,29 @@ import {
   PAGE_TRANSITIONS_EXIT_TIME,
   DECLARED,
   REJECTED,
-  VALIDATED
+  VALIDATED,
+  ACCUMULATED_FILE_SIZE
 } from '@client/utils/constants'
 import { TimeMounted } from '@client/components/TimeMounted'
-import { getValueFromApplicationDataByKey } from '@client/pdfRenderer/transformer/utils'
+import { getValueFromDeclarationDataByKey } from '@client/pdfRenderer/transformer/utils'
+import {
+  bytesToSize,
+  isCorrection,
+  isFileSizeExceeded
+} from '@client/views/CorrectionForm/utils'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const FormSectionTitle = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 16px;
   margin-bottom: 24px;
 `
 const FooterArea = styled.div`
-  padding-top: 6px;
+  height: 260px;
+  padding: 16px 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding-top: 0px;
+    height: 160px;
   }
 `
 
@@ -104,28 +127,29 @@ const Notice = styled.div`
   box-shadow: 0 0 12px 0 rgba(0, 0, 0, 0.11);
   padding: 25px;
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   margin: 30px -25px;
 `
 
-const StyledLinkButton = styled(LinkButton)`
-  margin-left: 32px;
+const BackReviewButton = styled(SecondaryButton)`
+  height: 48px;
+  margin-left: 16px;
 `
 const Required = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.error};
+    disabled ? theme.colors.disabled : theme.colors.negative};
   flex-grow: 0;
 `
 
 const Optional = styled.span<
   { disabled?: boolean } & React.LabelHTMLAttributes<HTMLLabelElement>
 >`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   color: ${({ disabled, theme }) =>
-    disabled ? theme.colors.disabled : theme.colors.placeholder};
+    disabled ? theme.colors.disabled : theme.colors.supportingCopy};
   flex-grow: 0;
 `
 const SpinnerWrapper = styled.div`
@@ -138,64 +162,13 @@ const SpinnerWrapper = styled.div`
 `
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.negative};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `
-const VIEW_TYPE = {
-  FORM: 'form',
-  REVIEW: 'review',
-  PREVIEW: 'preview',
-  HIDDEN: 'hidden'
-}
-
-function getNextSectionIds(
-  sections: IFormSection[],
-  fromSection: IFormSection,
-  fromSectionGroup: IFormSectionGroup,
-  application: IApplication
-): { [key: string]: string } | null {
-  const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
-    fromSection,
-    application.data[fromSection.id] || {},
-    application.data
-  )
-  const currentGroupIndex = visibleGroups.findIndex(
-    (group: IFormSectionGroup) => group.id === fromSectionGroup.id
-  )
-
-  if (currentGroupIndex === visibleGroups.length - 1) {
-    const visibleSections = sections.filter(
-      (section) =>
-        section.viewType !== VIEW_TYPE.HIDDEN &&
-        getVisibleSectionGroupsBasedOnConditions(
-          section,
-          application.data[fromSection.id] || {},
-          application.data
-        ).length > 0
-    )
-
-    const currentIndex = visibleSections.findIndex(
-      (section: IFormSection) => section.id === fromSection.id
-    )
-    if (currentIndex === visibleSections.length - 1) {
-      return null
-    }
-
-    return {
-      sectionId: visibleSections[currentIndex + 1].id,
-      groupId: visibleSections[currentIndex + 1].groups[0].id
-    }
-  }
-  return {
-    sectionId: fromSection.id,
-    groupId: visibleGroups[currentGroupIndex + 1].id
-  }
-}
-
 export interface IFormProps {
-  application: IApplication
+  declaration: IDeclaration
   registerForm: IForm
   pageRoute: string
   duplicate?: boolean
@@ -204,17 +177,18 @@ export interface IFormProps {
 export type RouteProps = RouteComponentProps<{
   pageId: string
   groupId: string
-  applicationId: string
+  declarationId: string
 }>
 
 type DispatchProps = {
   goToPageGroup: typeof goToPageGroupAction
   goBack: typeof goBackAction
+  goToCertificateCorrection: typeof goToCertificateCorrection
   goToHome: typeof goToHome
   goToHomeTab: typeof goToHomeTab
-  writeApplication: typeof writeApplication
-  modifyApplication: typeof modifyApplication
-  deleteApplication: typeof deleteApplication
+  writeDeclaration: typeof writeDeclaration
+  modifyDeclaration: typeof modifyDeclaration
+  deleteDeclaration: typeof deleteDeclaration
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
 }
 
@@ -238,6 +212,8 @@ type State = {
   rejectFormOpen: boolean
   hasError: boolean
   showConfirmationModal: boolean
+  isFileUploading: boolean
+  startTime: number
 }
 
 const fadeFromTop = keyframes`
@@ -265,7 +241,9 @@ class RegisterFormView extends React.Component<FullProps, State> {
       isDataAltered: false,
       rejectFormOpen: false,
       hasError: false,
-      showConfirmationModal: false
+      showConfirmationModal: false,
+      isFileUploading: false,
+      startTime: 0
     }
   }
   setAllFormFieldsTouched!: (touched: FormikTouched<FormikValues>) => void
@@ -273,8 +251,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
   showAllValidationErrors = () => {
     const touched = getSectionFields(
       this.props.activeSection,
-      this.props.application.data[this.props.activeSection.id],
-      this.props.application.data
+      this.props.declaration.data[this.props.activeSection.id],
+      this.props.declaration.data
     ).reduce((memo, field) => {
       let fieldTouched: boolean | ITouchedNestedFields = true
       if (field.nestedFields) {
@@ -302,6 +280,10 @@ class RegisterFormView extends React.Component<FullProps, State> {
     return this.props.scope && this.props.scope.includes('validate')
   }
 
+  componentDidMount() {
+    this.setState({ startTime: Date.now() })
+  }
+
   componentDidUpdate(prevProps: FullProps) {
     const oldHash = prevProps.location && prevProps.location.hash
     const newHash = this.props.location && this.props.location.hash
@@ -312,22 +294,53 @@ class RegisterFormView extends React.Component<FullProps, State> {
         hash: newHash + '-form-input'
       })
     }
+    const oldIsWritingDraft = prevProps.isWritingDraft
+    const newIsWritingDraft = this.props.isWritingDraft
+    if (oldIsWritingDraft && !newIsWritingDraft) {
+      const sectionValues =
+        this.props.declaration.data[this.props.activeSection.id] || {}
+      this.props.activeSectionGroup.fields.forEach((field) => {
+        const initialValue =
+          isUndefined(sectionValues[field.name]) ||
+          isNull(sectionValues[field.name])
+            ? getInitialValue(field, this.props.declaration.data || {})
+            : sectionValues[field.name]
+        sectionValues[field.name] = initialValue as IFormFieldValue
+      })
+      this.props.modifyDeclaration({
+        ...this.props.declaration,
+        data: {
+          ...this.props.declaration.data,
+          [this.props.activeSection.id]: {
+            ...this.props.declaration.data[this.props.activeSection.id],
+            ...sectionValues
+          }
+        }
+      })
+    }
   }
 
-  modifyApplication = (
+  onUploadingStateChanged = (isUploading: boolean) => {
+    this.setState({
+      ...this.state,
+      isFileUploading: isUploading
+    })
+  }
+
+  modifyDeclaration = (
     sectionData: IFormSectionData,
     activeSection: IFormSection,
-    application: IApplication
+    declaration: IDeclaration
   ) => {
-    if (application.review && !this.state.isDataAltered) {
+    if (declaration.review && !this.state.isDataAltered) {
       this.setState({ isDataAltered: true })
     }
-    this.props.modifyApplication({
-      ...application,
+    this.props.modifyDeclaration({
+      ...declaration,
       data: {
-        ...application.data,
+        ...declaration.data,
         [activeSection.id]: {
-          ...application.data[activeSection.id],
+          ...declaration.data[activeSection.id],
           ...sectionData
         }
       }
@@ -335,26 +348,31 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   logTime(timeMs: number) {
-    const application = this.props.application
-    if (!application.timeLoggedMS) {
-      application.timeLoggedMS = 0
+    const declaration = this.props.declaration
+    if (!declaration.timeLoggedMS) {
+      declaration.timeLoggedMS = 0
     }
-    application.timeLoggedMS += timeMs
-    this.props.modifyApplication(application)
+    declaration.timeLoggedMS += timeMs
+    this.props.modifyDeclaration(declaration)
   }
 
   confirmSubmission = (
-    application: IApplication,
+    declaration: IDeclaration,
     submissionStatus: string,
     action: string,
     payload?: IPayload,
     downloadStatus?: string
   ) => {
-    application.submissionStatus = submissionStatus
-    application.action = action
-    application.payload = payload
-    application.downloadStatus = downloadStatus
-    this.props.writeApplication(application)
+    const updatedDeclaration = {
+      ...declaration,
+      submissionStatus,
+      action,
+      payload,
+      downloadStatus,
+      timeLoggedMS:
+        (declaration.timeLoggedMS || 0) + Date.now() - this.state.startTime
+    }
+    this.props.writeDeclaration(updatedDeclaration)
     this.props.history.push(HOME)
   }
 
@@ -386,7 +404,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   getEvent() {
-    const eventType = this.props.application.event || 'BIRTH'
+    const eventType = this.props.declaration.event || 'BIRTH'
     switch (eventType.toLocaleLowerCase()) {
       case 'birth':
         return Event.BIRTH
@@ -398,41 +416,41 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onSaveAsDraftClicked = async () => {
-    const { application } = this.props
+    const { declaration } = this.props
     const isRegistrarOrRegistrationAgent =
       this.userHasRegisterScope() || this.userHasValidateScope()
     const isConfirmationModalApplicable =
-      application.registrationStatus === DECLARED ||
-      application.registrationStatus === VALIDATED ||
-      application.registrationStatus === REJECTED
+      declaration.registrationStatus === DECLARED ||
+      declaration.registrationStatus === VALIDATED ||
+      declaration.registrationStatus === REJECTED
     if (isRegistrarOrRegistrationAgent && isConfirmationModalApplicable) {
       this.toggleConfirmationModal()
     } else {
-      this.writeApplicationAndGoToHome()
+      this.writeDeclarationAndGoToHome()
     }
   }
 
-  writeApplicationAndGoToHome = () => {
-    this.props.writeApplication(this.props.application)
+  writeDeclarationAndGoToHome = () => {
+    this.props.writeDeclaration(this.props.declaration)
     this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
   }
 
-  onDeleteApplication = (application: IApplication) => {
-    this.props.goToHomeTab('progress')
+  onDeleteDeclaration = (declaration: IDeclaration) => {
+    this.props.goToHomeTab(WORKQUEUE_TABS.inProgress)
 
     setTimeout(
-      () => this.props.deleteApplication(application),
+      () => this.props.deleteDeclaration(declaration),
       PAGE_TRANSITIONS_ENTER_TIME + 200
     )
   }
 
-  onCloseApplication = () => {
+  onCloseDeclaration = () => {
     this.props.goToHomeTab(this.getRedirectionTabOnSaveOrExit())
   }
 
   continueButtonHandler = async (
     pageRoute: string,
-    applicationId: string,
+    declarationId: string,
     pageId: string,
     groupId: string,
     event: string
@@ -440,12 +458,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const { preventContinueIfError } = this.props.activeSectionGroup
     let groupHasError = false
     if (preventContinueIfError) {
-      if (!this.props.application.data[this.props.activeSection.id]) {
+      if (!this.props.declaration.data[this.props.activeSection.id]) {
         groupHasError = true
       } else {
         const activeSectionFields = this.props.activeSectionGroup.fields
         const activeSectionValues =
-          this.props.application.data[this.props.activeSection.id]
+          this.props.declaration.data[this.props.activeSection.id]
         groupHasError = hasFormError(activeSectionFields, activeSectionValues)
       }
       if (groupHasError) {
@@ -456,13 +474,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
 
     this.updateVisitedGroups()
 
-    this.props.writeApplication(this.props.application, () => {
-      this.props.goToPageGroup(pageRoute, applicationId, pageId, groupId, event)
+    this.props.writeDeclaration(this.props.declaration, () => {
+      this.props.goToPageGroup(pageRoute, declarationId, pageId, groupId, event)
     })
   }
 
   updateVisitedGroups = () => {
-    const visitedGroups = this.props.application.visitedGroupIds || []
+    const visitedGroups = this.props.declaration.visitedGroupIds || []
     if (
       visitedGroups.findIndex(
         (visitedGroup) =>
@@ -475,40 +493,67 @@ class RegisterFormView extends React.Component<FullProps, State> {
         groupId: this.props.activeSectionGroup.id
       })
     }
-    this.props.application.visitedGroupIds = visitedGroups
+    this.props.declaration.visitedGroupIds = visitedGroups
   }
 
   getRedirectionTabOnSaveOrExit = () => {
     const status =
-      this.props.application.submissionStatus ||
-      this.props.application.registrationStatus ||
+      this.props.declaration.submissionStatus ||
+      this.props.declaration.registrationStatus ||
       ''
     switch (status) {
       case 'DECLARED':
-        return 'review'
+        return WORKQUEUE_TABS.readyForReview
       case 'DRAFT':
-        return 'progress'
+        return WORKQUEUE_TABS.inProgress
       case 'IN_PROGRESS':
-        return 'progress/field-agents'
+        return WORKQUEUE_TABS.inProgressFieldAgent
       case 'REJECTED':
-        return 'updates'
+        return WORKQUEUE_TABS.requiresUpdate
       case 'VALIDATED':
-        return 'review'
+        return WORKQUEUE_TABS.readyForReview
       default:
-        return 'progress'
+        return WORKQUEUE_TABS.inProgress
+    }
+  }
+
+  getEventTopBarPropsForCorrection = () => {
+    const { declaration, intl } = this.props
+
+    const backButton = (
+      <TertiaryButton
+        align={ICON_ALIGNMENT.LEFT}
+        icon={() => <BackArrow />}
+        onClick={() => {
+          this.props.goToCertificateCorrection(
+            declaration.id,
+            CorrectionSection.Corrector
+          )
+        }}
+      />
+    )
+
+    return {
+      title: intl.formatMessage(correctionMessages.title),
+      pageIcon: backButton,
+      goHome: () => this.props.goToHomeTab(WORKQUEUE_TABS.readyForReview)
     }
   }
 
   getEventTopBarPropsForForm = (menuOption: IEventTopBarMenuAction) => {
-    const { intl, application, activeSectionGroup, goToHomeTab } = this.props
+    const { intl, declaration, activeSectionGroup, goToHomeTab } = this.props
+
+    if (isCorrection(declaration)) {
+      return this.getEventTopBarPropsForCorrection()
+    }
 
     let eventTopBarProps: IEventTopBarProps = {
       title: intl.formatMessage(messages.newVitalEventRegistration, {
-        event: application.event
+        event: declaration.event
       }),
       iconColor:
-        application.submissionStatus === SUBMISSION_STATUS.DRAFT
-          ? 'violet'
+        declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
+          ? 'purple'
           : 'orange'
     }
 
@@ -517,12 +562,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
         ...eventTopBarProps,
         exitAction: {
           handler: () => {
-            application.submissionStatus === SUBMISSION_STATUS.DRAFT &&
-            !application.review
-              ? this.onDeleteApplication(application)
+            declaration.submissionStatus === SUBMISSION_STATUS.DRAFT &&
+            !declaration.review
+              ? this.onDeleteDeclaration(declaration)
               : goToHomeTab(this.getRedirectionTabOnSaveOrExit())
           },
-          label: application.review
+          label: declaration.review
             ? intl.formatMessage(buttonMessages.saveExitButton)
             : intl.formatMessage(buttonMessages.exitButton)
         }
@@ -545,9 +590,8 @@ class RegisterFormView extends React.Component<FullProps, State> {
       intl,
       setAllFieldsDirty,
       fieldsToShowValidationErrors,
-      application,
+      declaration,
       registerForm,
-
       duplicate,
       activeSection,
       activeSectionGroup
@@ -557,23 +601,21 @@ class RegisterFormView extends React.Component<FullProps, State> {
       registerForm.sections,
       activeSection,
       activeSectionGroup,
-      application
+      declaration
     )
-
     const isErrorOccured = this.state.hasError
-    const debouncedModifyApplication = debounce(this.modifyApplication, 300)
-
+    const debouncedModifyDeclaration = debounce(this.modifyDeclaration, 300)
     const menuItemDeleteOrClose =
-      application.submissionStatus === SUBMISSION_STATUS.DRAFT
+      declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
         ? {
-            label: intl.formatMessage(buttonMessages.deleteApplication),
-            handler: () => this.onDeleteApplication(application)
+            label: intl.formatMessage(buttonMessages.deleteDeclaration),
+            handler: () => this.onDeleteDeclaration(declaration)
           }
         : {
-            label: intl.formatMessage(buttonMessages.closeApplication),
-            handler: () => this.onCloseApplication()
+            label: intl.formatMessage(buttonMessages.closeDeclaration),
+            handler: () => this.onCloseDeclaration()
           }
-
+    const isDocumentUploadPage = this.props.match.params.pageId === 'documents'
     return (
       <>
         <TimeMounted
@@ -598,12 +640,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
                     title={intl.formatMessage(
                       messages.newVitalEventRegistration,
                       {
-                        event: application.event
+                        event: declaration.event
                       }
                     )}
                     iconColor={
-                      application.submissionStatus === SUBMISSION_STATUS.DRAFT
-                        ? 'violet'
+                      declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
+                        ? 'purple'
                         : 'orange'
                     }
                     saveAction={{
@@ -614,40 +656,50 @@ class RegisterFormView extends React.Component<FullProps, State> {
                   />
                   <ReviewSection
                     pageRoute={this.props.pageRoute}
-                    draft={application}
+                    draft={declaration}
                     submitClickEvent={this.confirmSubmission}
-                    onChangeReviewForm={this.modifyApplication}
+                    onChangeReviewForm={this.modifyDeclaration}
                   />
                 </>
               )}
               {activeSection.viewType === VIEW_TYPE.REVIEW && (
                 <>
-                  <EventTopBar
-                    title={intl.formatMessage(
-                      messages.newVitalEventRegistration,
-                      {
-                        event: application.event
+                  {isCorrection(declaration) ? (
+                    <EventTopBar {...this.getEventTopBarPropsForCorrection()} />
+                  ) : (
+                    <EventTopBar
+                      title={intl.formatMessage(
+                        messages.newVitalEventRegistration,
+                        {
+                          event: declaration.event
+                        }
+                      )}
+                      iconColor={
+                        declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
+                          ? 'purple'
+                          : 'orange'
                       }
-                    )}
-                    iconColor={
-                      application.submissionStatus === SUBMISSION_STATUS.DRAFT
-                        ? 'violet'
-                        : 'orange'
-                    }
-                    saveAction={{
-                      handler: () =>
-                        this.props.goToHomeTab(
-                          this.getRedirectionTabOnSaveOrExit()
-                        ),
-                      label: intl.formatMessage(buttonMessages.exitButton)
-                    }}
-                  />
+                      saveAction={{
+                        handler: () =>
+                          this.props.goToHomeTab(
+                            this.getRedirectionTabOnSaveOrExit()
+                          ),
+                        label: intl.formatMessage(buttonMessages.exitButton)
+                      }}
+                    />
+                  )}
                   <ReviewSection
                     pageRoute={this.props.pageRoute}
-                    draft={application}
-                    rejectApplicationClickEvent={this.toggleRejectForm}
+                    draft={declaration}
+                    rejectDeclarationClickEvent={this.toggleRejectForm}
                     submitClickEvent={this.confirmSubmission}
-                    onChangeReviewForm={this.modifyApplication}
+                    onChangeReviewForm={this.modifyDeclaration}
+                    onContinue={() => {
+                      this.props.goToCertificateCorrection(
+                        this.props.declaration.id,
+                        CorrectionSection.SupportingDocuments
+                      )
+                    }}
                   />
                 </>
               )}
@@ -731,13 +783,24 @@ class RegisterFormView extends React.Component<FullProps, State> {
                             event.preventDefault()
                           }
                         >
+                          {isFileSizeExceeded(declaration) &&
+                            isDocumentUploadPage && (
+                              <Warning
+                                label={intl.formatMessage(
+                                  constantsMessages.totalFileSizeExceed,
+                                  {
+                                    fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
+                                  }
+                                )}
+                              />
+                            )}
                           <FormFieldGenerator
                             id={activeSectionGroup.id}
                             onChange={(values) => {
-                              debouncedModifyApplication(
+                              debouncedModifyDeclaration(
                                 values,
                                 activeSection,
-                                application
+                                declaration
                               )
                             }}
                             setAllFieldsDirty={setAllFieldsDirty}
@@ -745,10 +808,13 @@ class RegisterFormView extends React.Component<FullProps, State> {
                               fieldsToShowValidationErrors
                             }
                             fields={getVisibleGroupFields(activeSectionGroup)}
-                            draftData={application.data}
+                            draftData={declaration.data}
                             onSetTouched={(setTouchedFunc) => {
                               this.setAllFormFieldsTouched = setTouchedFunc
                             }}
+                            onUploadingStateChanged={
+                              this.onUploadingStateChanged
+                            }
                           />
                         </form>
                         {nextSectionGroup && (
@@ -758,43 +824,44 @@ class RegisterFormView extends React.Component<FullProps, State> {
                               onClick={() => {
                                 this.continueButtonHandler(
                                   this.props.pageRoute,
-                                  application.id,
+                                  declaration.id,
                                   nextSectionGroup.sectionId,
                                   nextSectionGroup.groupId,
-                                  application.event.toLowerCase()
+                                  declaration.event.toLowerCase()
                                 )
                               }}
+                              disabled={this.state.isFileUploading}
                             >
                               {intl.formatMessage(
                                 buttonMessages.continueButton
                               )}
                             </PrimaryButton>
-                            {application.review && (
-                              <StyledLinkButton
+                            {declaration.review && (
+                              <BackReviewButton
                                 id="back-to-review-button"
                                 className="item"
                                 onClick={() => {
                                   this.continueButtonHandler(
                                     this.props.pageRoute,
-                                    application.id,
-                                    application.submissionStatus &&
-                                      application.submissionStatus ===
+                                    declaration.id,
+                                    declaration.submissionStatus &&
+                                      declaration.submissionStatus ===
                                         SUBMISSION_STATUS.DRAFT
                                       ? 'preview'
                                       : 'review',
-                                    application.submissionStatus &&
-                                      application.submissionStatus ===
+                                    declaration.submissionStatus &&
+                                      declaration.submissionStatus ===
                                         SUBMISSION_STATUS.DRAFT
                                       ? 'preview-view-group'
                                       : 'review-view-group',
-                                    application.event.toLowerCase()
+                                    declaration.event.toLowerCase()
                                   )
                                 }}
                               >
                                 {intl.formatMessage(
                                   messages.backToReviewButton
                                 )}
-                              </StyledLinkButton>
+                              </BackReviewButton>
                             )}
                           </FooterArea>
                         )}
@@ -810,15 +877,15 @@ class RegisterFormView extends React.Component<FullProps, State> {
               onClose={this.toggleRejectForm}
               confirmRejectionEvent={this.confirmSubmission}
               duplicate={duplicate}
-              draftId={application.id}
+              draftId={declaration.id}
               event={this.getEvent()}
-              application={application}
+              declaration={declaration}
             />
           )}
           <ResponsiveModal
-            id="save_application_confirmation"
+            id="save_declaration_confirmation"
             title={intl.formatMessage(
-              messages.saveApplicationConfirmModalTitle
+              messages.saveDeclarationConfirmModalTitle
             )}
             show={this.state.showConfirmationModal}
             handleClose={this.toggleConfirmationModal}
@@ -835,14 +902,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
               <PrimaryButton
                 id="confirm_save"
                 key="confirm_save"
-                onClick={this.writeApplicationAndGoToHome}
+                onClick={this.writeDeclarationAndGoToHome}
               >
                 {intl.formatMessage(buttonMessages.save)}
               </PrimaryButton>
             ]}
           >
             {intl.formatMessage(
-              messages.saveApplicationConfirmModalDescription
+              messages.saveDeclarationConfirmModalDescription
             )}
           </ResponsiveModal>
         </StyledContainer>
@@ -855,7 +922,7 @@ function getInitialValue(field: IFormField, data: IFormData) {
   let fieldInitialValue = field.initialValue
   if (field.initialValueKey) {
     fieldInitialValue =
-      getValueFromApplicationDataByKey(data, field.initialValueKey) || ''
+      getValueFromDeclarationDataByKey(data, field.initialValueKey) || ''
   }
   return fieldInitialValue
 }
@@ -880,8 +947,7 @@ function firstVisibleSection(form: IForm) {
 }
 
 function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
-  const { match, registerForm, application } = props
-
+  const { match, registerForm, declaration } = props
   const sectionId = match.params.pageId || firstVisibleSection(registerForm).id
 
   const activeSection = registerForm.sections.find(
@@ -894,8 +960,8 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     match.params.groupId ||
     getVisibleSectionGroupsBasedOnConditions(
       activeSection,
-      application.data[activeSection.id] || {},
-      application.data
+      declaration.data[activeSection.id] || {},
+      declaration.data
     )[0].id
   const activeSectionGroup = activeSection.groups.find(
     (group) => group.id === groupId
@@ -906,13 +972,13 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     )
   }
 
-  if (!application) {
-    throw new Error(`Draft "${match.params.applicationId}" missing!`)
+  if (!declaration) {
+    throw new Error(`Draft "${match.params.declarationId}" missing!`)
   }
 
   const setAllFieldsDirty =
-    (application.visitedGroupIds &&
-      application.visitedGroupIds.findIndex(
+    (declaration.visitedGroupIds &&
+      declaration.visitedGroupIds.findIndex(
         (visitedGroup) =>
           visitedGroup.sectionId === activeSection.id &&
           visitedGroup.groupId === activeSectionGroup.id
@@ -921,8 +987,8 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
 
   const fields = replaceInitialValues(
     activeSectionGroup.fields,
-    application.data[activeSection.id] || {},
-    application.data
+    declaration.data[activeSection.id] || {},
+    declaration.data
   )
 
   let updatedFields: IFormField[] = []
@@ -941,7 +1007,7 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     },
     setAllFieldsDirty,
     fieldsToShowValidationErrors: updatedFields,
-    isWritingDraft: state.applicationsState.isWritingDraft,
+    isWritingDraft: state.declarationsState.isWritingDraft,
     scope: getScope(state)
   }
 }
@@ -952,11 +1018,12 @@ export const RegisterForm = connect<
   IFormProps & RouteProps,
   IStoreState
 >(mapStateToProps, {
-  writeApplication,
-  modifyApplication,
-  deleteApplication,
+  writeDeclaration,
+  modifyDeclaration,
+  deleteDeclaration,
   goToPageGroup: goToPageGroupAction,
   goBack: goBackAction,
+  goToCertificateCorrection,
   goToHome,
   goToHomeTab,
   toggleDraftSavedNotification

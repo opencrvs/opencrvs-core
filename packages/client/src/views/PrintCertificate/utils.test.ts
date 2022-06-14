@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  calculateDays,
+  calculateDaysFromToday,
   timeElapsed,
   getCountryTranslations
 } from '@client/views/PrintCertificate/utils'
@@ -20,17 +20,17 @@ describe('calculateDays, timeElapsed tests', () => {
     // @ts-ignore
     Date.now = jest.fn(() => new Date('2019-01-01'))
 
-    let days = calculateDays('1985-08-18')
+    let days = calculateDaysFromToday('1985-08-18')
 
     let time = timeElapsed(days)
     expect(time.value).toBe(33)
     expect(time.unit).toBe('Year')
-    days = calculateDays('2018-12-16')
+    days = calculateDaysFromToday('2018-12-16')
     time = timeElapsed(days)
     expect(time.value).toBe(16)
     expect(time.unit).toBe('Day')
 
-    days = calculateDays('2018-10-16')
+    days = calculateDaysFromToday('2018-10-16')
     time = timeElapsed(days)
     expect(time.value).toBe(2)
     expect(time.unit).toBe('Month')
@@ -51,6 +51,13 @@ describe('calculateDays, timeElapsed tests', () => {
         messages: {
           'countries.BGD': 'বাংলাদেশ'
         }
+      },
+      fr: {
+        lang: 'fr',
+        displayName: 'Français',
+        messages: {
+          'countries.BGD': 'Bangladesh'
+        }
       }
     }
     const countries = [
@@ -66,7 +73,8 @@ describe('calculateDays, timeElapsed tests', () => {
     const availableCountries = getCountryTranslations(languageState, countries)
     expect(availableCountries).toMatchObject([
       { countries: [{ value: 'BGD', name: 'Bangladesh' }], language: 'en' },
-      { countries: [{ value: 'BGD', name: 'বাংলাদেশ' }], language: 'bn' }
+      { countries: [{ value: 'BGD', name: 'বাংলাদেশ' }], language: 'bn' },
+      { countries: [{ value: 'BGD', name: 'Bangladesh' }], language: 'fr' }
     ])
   })
 })

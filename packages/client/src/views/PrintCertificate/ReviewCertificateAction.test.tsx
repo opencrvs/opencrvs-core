@@ -11,19 +11,18 @@
  */
 import * as React from 'react'
 import { createStore } from '@client/store'
-import { storeApplication, IApplication } from '@client/applications'
+import { storeDeclaration, IDeclaration } from '@client/declarations'
 import {
   createTestComponent,
-  mockApplicationData,
-  mockUserResponse,
-  mockDeathApplicationData,
+  mockDeclarationData,
+  mockDeathDeclarationData,
   flushPromises,
   loginAsFieldAgent,
   createRouterProps
 } from '@client/tests/util'
 import { ReviewCertificateAction } from './ReviewCertificateAction'
 import { ReactWrapper } from 'enzyme'
-import { Event } from '@client/forms'
+import { Event, IFormSectionData } from '@client/forms'
 import { cloneDeep } from 'lodash'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { push } from 'connected-react-router'
@@ -45,29 +44,129 @@ describe('when user wants to review death certificate', () => {
     const { store } = createStore(history)
 
     await loginAsFieldAgent(store)
-    await store.dispatch(
-      storeApplication({
-        id: 'mockDeath1234',
-        data: mockDeathApplicationData,
-        event: Event.DEATH
-      } as IApplication)
+    const deathDeclaration = {
+      id: 'mockDeath1234',
+      data: {
+        ...mockDeathDeclarationData,
+        history: [
+          {
+            date: '2022-03-21T08:16:24.467+00:00',
+            action: 'REGISTERED',
+            reinstated: false
+          }
+        ]
+      },
+      event: Event.DEATH
+    }
+    // @ts-ignore
+    store.dispatch(storeDeclaration(deathDeclaration))
+    component = await createTestComponent(
+      <ReviewCertificateAction
+        location={location}
+        history={history}
+        match={match}
+      />,
+      { store, history }
     )
-    component = (
-      await createTestComponent(
-        <ReviewCertificateAction
-          location={location}
-          history={history}
-          match={match}
-        />,
-        store
-      )
-    ).component
   })
 
   it('displays have the Continue and print Button', async () => {
     const confirmBtn = await waitForElement(component, '#confirm-print')
     const confirmBtnExist = !!confirmBtn.hostNodes().length
     expect(confirmBtnExist).toBe(true)
+  })
+})
+
+describe('back button behavior tests of review certificate action', () => {
+  let component: ReactWrapper
+
+  const mockBirthDeclarationData = cloneDeep(mockDeclarationData)
+  mockBirthDeclarationData.registration.certificates[0] = {
+    collector: {
+      type: 'PRINT_IN_ADVANCE'
+    }
+  }
+
+  it('takes user history back when navigated from inside app', async () => {
+    const { history, location, match } = createRouterProps(
+      '/previous-route',
+      { isNavigatedInsideApp: true },
+      {
+        matchParams: {
+          registrationId: 'asdhdqe2472487jsdfsdf',
+          eventType: Event.BIRTH
+        }
+      }
+    )
+    const { store } = createStore(history)
+
+    store.dispatch(push('/new-route', { isNavigatedInsideApp: true }))
+
+    await loginAsFieldAgent(store)
+    const birthDeclaration = {
+      id: 'asdhdqe2472487jsdfsdf',
+      data: {
+        ...mockBirthDeclarationData,
+        history: [
+          {
+            date: '2022-03-21T08:16:24.467+00:00',
+            action: 'REGISTERED',
+            reinstated: false
+          }
+        ]
+      },
+      event: Event.BIRTH
+    }
+    await store.dispatch(
+      // @ts-ignore
+      storeDeclaration(birthDeclaration)
+    )
+    component = await createTestComponent(
+      <ReviewCertificateAction
+        location={location}
+        history={history}
+        match={match}
+      />,
+      { store, history }
+    )
+
+    component.find('#action_page_back_button').hostNodes().simulate('click')
+    expect(history.location.pathname).toBe('/previous-route')
+  })
+
+  it('takes user to registration home when navigated from external link', async () => {
+    const { history, location, match } = createRouterProps(
+      '/previous-route',
+      { isNavigatedInsideApp: false },
+      {
+        matchParams: {
+          registrationId: 'asdhdqe2472487jsdfsdf',
+          eventType: Event.BIRTH
+        }
+      }
+    )
+    const { store } = createStore(history)
+
+    await loginAsFieldAgent(store)
+    await store.dispatch(
+      storeDeclaration({
+        id: 'asdhdqe2472487jsdfsdf',
+        data: mockBirthDeclarationData,
+        event: Event.BIRTH
+      } as IDeclaration)
+    )
+    component = await createTestComponent(
+      <ReviewCertificateAction
+        location={location}
+        history={history}
+        match={match}
+      />,
+      { store, history }
+    )
+
+    component.find('#action_page_back_button').hostNodes().simulate('click')
+    await flushPromises()
+    expect(history.location.pathname).toBe('/registration-home/print/')
   })
 })
 
@@ -87,31 +186,38 @@ describe('when user wants to review birth certificate', () => {
     )
     const { store } = createStore(history)
 
-    const mockBirthApplicationData = cloneDeep(mockApplicationData)
-    mockBirthApplicationData.registration.certificates[0] = {
+    const mockBirthDeclarationData = cloneDeep(mockDeclarationData)
+    mockBirthDeclarationData.registration.certificates[0] = {
       collector: {
         type: 'PRINT_IN_ADVANCE'
       }
     }
     await loginAsFieldAgent(store)
     await store.dispatch(
-      storeApplication({
+      storeDeclaration({
         id: 'asdhdqe2472487jsdfsdf',
-        data: mockBirthApplicationData,
+        data: {
+          ...mockBirthDeclarationData,
+          history: [
+            {
+              date: '2022-03-21T08:16:24.467+00:00',
+              action: 'REGISTERED',
+              reinstated: false
+            }
+          ] as unknown as IFormSectionData
+        },
         event: Event.BIRTH
-      } as IApplication)
+      })
     )
 
-    component = (
-      await createTestComponent(
-        <ReviewCertificateAction
-          location={location}
-          history={history}
-          match={match}
-        />,
-        store
-      )
-    ).component
+    component = await createTestComponent(
+      <ReviewCertificateAction
+        location={location}
+        history={history}
+        match={match}
+      />,
+      { store, history }
+    )
   })
 
   it('displays have the Continue and print Button', () => {
@@ -142,91 +248,5 @@ describe('when user wants to review birth certificate', () => {
       .length
 
     expect(modalIsClosed).toBe(false)
-  })
-})
-
-describe('back button behavior tests of review certificate action', () => {
-  let component: ReactWrapper
-
-  const mockBirthApplicationData = cloneDeep(mockApplicationData)
-  mockBirthApplicationData.registration.certificates[0] = {
-    collector: {
-      type: 'PRINT_IN_ADVANCE'
-    }
-  }
-
-  it('takes user history back when navigated from inside app', async () => {
-    const { history, location, match } = createRouterProps(
-      '/previous-route',
-      { isNavigatedInsideApp: true },
-      {
-        matchParams: {
-          registrationId: 'asdhdqe2472487jsdfsdf',
-          eventType: Event.BIRTH
-        }
-      }
-    )
-    const { store } = createStore(history)
-
-    store.dispatch(push('/new-route', { isNavigatedInsideApp: true }))
-
-    await loginAsFieldAgent(store)
-    await store.dispatch(
-      storeApplication({
-        id: 'asdhdqe2472487jsdfsdf',
-        data: mockBirthApplicationData,
-        event: Event.BIRTH
-      } as IApplication)
-    )
-    component = (
-      await createTestComponent(
-        <ReviewCertificateAction
-          location={location}
-          history={history}
-          match={match}
-        />,
-        store
-      )
-    ).component
-
-    component.find('#action_page_back_button').hostNodes().simulate('click')
-    expect(history.location.pathname).toBe('/previous-route')
-  })
-
-  it('takes user to registration home when navigated from external link', async () => {
-    const { history, location, match } = createRouterProps(
-      '/previous-route',
-      { isNavigatedInsideApp: false },
-      {
-        matchParams: {
-          registrationId: 'asdhdqe2472487jsdfsdf',
-          eventType: Event.BIRTH
-        }
-      }
-    )
-    const { store } = createStore(history)
-
-    await loginAsFieldAgent(store)
-    await store.dispatch(
-      storeApplication({
-        id: 'asdhdqe2472487jsdfsdf',
-        data: mockBirthApplicationData,
-        event: Event.BIRTH
-      } as IApplication)
-    )
-    component = (
-      await createTestComponent(
-        <ReviewCertificateAction
-          location={location}
-          history={history}
-          match={match}
-        />,
-        store
-      )
-    ).component
-
-    component.find('#action_page_back_button').hostNodes().simulate('click')
-    await flushPromises()
-    expect(history.location.pathname).toBe('/registration-home/print/')
   })
 })

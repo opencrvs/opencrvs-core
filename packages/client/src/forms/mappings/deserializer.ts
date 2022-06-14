@@ -46,7 +46,10 @@ import {
   ISelectFormFieldWithOptions,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   IRadioGroupWithNestedFieldsFormField,
-  SerializedFormField
+  SerializedFormField,
+  ITemplateDescriptor,
+  IFormFieldTemplateMapOperation,
+  IQueryTemplateDescriptor
 } from '@client/forms'
 import { countries } from '@client/forms/countries'
 
@@ -90,6 +93,12 @@ function isFactoryOperation(
 ): descriptor is ValidationFactoryOperation
 function isFactoryOperation(descriptor: any) {
   return Boolean((descriptor as ValidationFactoryOperation).parameters)
+}
+
+function hasTemplateOperator(
+  descriptor: ITemplateDescriptor
+): descriptor is IQueryTemplateDescriptor {
+  return Boolean((descriptor as IQueryTemplateDescriptor).operation)
 }
 
 function configurationError(
@@ -169,6 +178,18 @@ function fieldQueryDescriptorToQueryFunction(
   return transformer
 }
 
+function fieldTemplateDescriptorToQueryOperation(
+  descriptor: ITemplateDescriptor
+): IFormFieldTemplateMapOperation {
+  if (hasTemplateOperator(descriptor)) {
+    return [
+      descriptor.fieldName,
+      fieldQueryDescriptorToQueryFunction(descriptor)
+    ]
+  }
+  return [descriptor.fieldName]
+}
+
 function fieldMutationDescriptorToMutationFunction(
   descriptor: IMutationDescriptor
 ): IFormFieldMutationMapFunction {
@@ -196,7 +217,7 @@ function fieldMutationDescriptorToMutationFunction(
   return transformer
 }
 
-function fieldValidationDescriptorToValidationFunction(
+export function fieldValidationDescriptorToValidationFunction(
   descriptor: IValidatorDescriptor
 ): Validation {
   const validator: Validation | AnyFn<Validation> =
@@ -264,8 +285,8 @@ function deserializeQueryMap(queryMap: ISerializedQueryMap) {
   }, {})
 }
 
-function deserializeFormField(field: SerializedFormField) {
-  return {
+export function deserializeFormField(field: SerializedFormField): IFormField {
+  const baseFields = {
     ...field,
     validate: field.validate.map(fieldValidationDescriptorToValidationFunction),
     mapping: field.mapping && {
@@ -274,9 +295,59 @@ function deserializeFormField(field: SerializedFormField) {
         fieldQueryDescriptorToQueryFunction(field.mapping.query),
       mutation:
         field.mapping.mutation &&
-        fieldMutationDescriptorToMutationFunction(field.mapping.mutation)
+        fieldMutationDescriptorToMutationFunction(field.mapping.mutation),
+      template:
+        field.mapping.template &&
+        fieldTemplateDescriptorToQueryOperation(field.mapping.template)
     }
   }
+  if (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS) {
+    return {
+      ...baseFields,
+      dynamicDefinitions: deserializeDynamicDefinitions(
+        field.dynamicDefinitions
+      )
+    } as IFormFieldWithDynamicDefinitions
+  }
+
+  if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
+    const deserializedNestedFields = Object.keys(field.nestedFields).reduce(
+      (fields, key) => {
+        return {
+          ...fields,
+          [key]: field.nestedFields[key].map(deserializeFormField)
+        }
+      },
+      {}
+    )
+    return {
+      ...baseFields,
+      nestedFields: deserializedNestedFields
+    } as IRadioGroupWithNestedFieldsFormField
+  }
+
+  if (field.type === SELECT_WITH_OPTIONS) {
+    return {
+      ...baseFields,
+      options:
+        !Array.isArray(field.options) && field.options.resource
+          ? // Dummy implementation for now as there's only one resource
+            countries
+          : field.options
+    } as ISelectFormFieldWithOptions
+  }
+
+  if (field.type === FETCH_BUTTON) {
+    return {
+      ...baseFields,
+      queryMap: deserializeQueryMap(field.queryMap)
+    } as ILoaderButton
+  }
+
+  return baseFields as Exclude<
+    IFormField,
+    IFormFieldWithDynamicDefinitions | ILoaderButton
+  >
 }
 
 export function deserializeFormSection(
@@ -290,60 +361,21 @@ export function deserializeFormSection(
     mutation:
       section.mapping &&
       section.mapping.mutation &&
-      sectionMutationDescriptorToMutationFunction(section.mapping.mutation)
+      sectionMutationDescriptorToMutationFunction(section.mapping.mutation),
+    template:
+      section.mapping?.template &&
+      section.mapping.template.map(
+        ({ fieldName, ...query }) =>
+          [fieldName, sectionQueryDescriptorToQueryFunction(query)] as [
+            string,
+            IFormSectionQueryMapFunction
+          ]
+      )
   }
   const groups = section.groups.map((group) => ({
     ...group,
     fields: group.fields.map((field) => {
-      const baseFields = deserializeFormField(field)
-
-      if (field.type === FIELD_WITH_DYNAMIC_DEFINITIONS) {
-        return {
-          ...baseFields,
-          dynamicDefinitions: deserializeDynamicDefinitions(
-            field.dynamicDefinitions
-          )
-        } as IFormFieldWithDynamicDefinitions
-      }
-
-      if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS) {
-        const deserializedNestedFields = Object.keys(field.nestedFields).reduce(
-          (fields, key) => {
-            return {
-              ...fields,
-              [key]: field.nestedFields[key].map(deserializeFormField)
-            }
-          },
-          {}
-        )
-        return {
-          ...baseFields,
-          nestedFields: deserializedNestedFields
-        } as IRadioGroupWithNestedFieldsFormField
-      }
-
-      if (field.type === SELECT_WITH_OPTIONS) {
-        return {
-          ...baseFields,
-          options:
-            !Array.isArray(field.options) && field.options.resource
-              ? // Dummy implementation for now as there's only one resource
-                countries
-              : field.options
-        } as ISelectFormFieldWithOptions
-      }
-
-      if (field.type === FETCH_BUTTON) {
-        return {
-          ...baseFields,
-          queryMap: deserializeQueryMap(field.queryMap)
-        } as ILoaderButton
-      }
-
-      return baseFields as Exclude<
-        IFormField,
-        IFormFieldWithDynamicDefinitions | ILoaderButton
-      >
+      return deserializeFormField(field)
     })
   }))
 

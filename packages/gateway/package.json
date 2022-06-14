@@ -1,16 +1,16 @@
 {
   "name": "@opencrvs/gateway",
-  "version": "1.0.0-alpha.3.2",
+  "version": "1.0.0",
   "description": "OpenCRVS API Gateway with GraphQL",
   "license": "MPL-2.0",
   "scripts": {
+    "postinstall": "if [ \"$NODE_ENV\" != \"production\" ]; then npx crlf --set=LF ../../node_modules/graphql-schema-typescript/**/* || npx crlf --set=LF ./node_modules/graphql-schema-typescript/**/* || true; fi",
     "start": "yarn gen:schema && yarn gen:types && concurrently \"nodemon --exec ts-node -r tsconfig-paths/register src/index.ts\" \"yarn gen:types:watch\" \"yarn gen:schema:watch\"",
-    "start:prod": "node build/dist/src/index.js",
+    "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
     "build": "tsc && copyfiles 'src/**/*.graphql' build/dist",
-    "postbuild": "ef-tspm",
     "build:clean": "rm -rf build",
     "gen:schema": "node -e \"const importSchema = require('graphql-import').importSchema; console.log(importSchema('src/graphql/index.graphql'))\" > src/graphql/schema.graphql && yarn prettier --write src/graphql/schema.graphql",
     "gen:types": "graphql-schema-typescript generate-ts src/graphql/schema.graphql --output src/graphql/schema.d.ts && yarn prettier --write src/graphql/schema.d.ts",
@@ -21,12 +21,13 @@
     "precommit": "tslint --project ./tsconfig.json && lint-staged"
   },
   "dependencies": {
-    "@elastic/elasticsearch": "6",
+    "redis": "^3.1.1",
+    "@elastic/elasticsearch": "7.17.0",
     "@graphql-tools/graphql-file-loader": "^6.0.9",
     "@graphql-tools/load": "^6.0.9",
     "@graphql-tools/schema": "^6.0.9",
     "@hapi/hapi": "^20.0.1",
-    "@opencrvs/commons": "^1.0.0-alpha.3.2",
+    "@opencrvs/commons": "^1.0.0",
     "@sentry/node": "^5.10.2",
     "@types/archiver": "^3.0.0",
     "@types/flat": "^0.0.28",
@@ -40,6 +41,7 @@
     "country-data": "^0.0.31",
     "csv-stringify": "^5.3.4",
     "dotenv": "^6.1.0",
+    "file-type": "^16.5.3",
     "flat": "^5.0.0",
     "glob": "^7.1.2",
     "graphql": "^15.0.0",
@@ -48,6 +50,7 @@
     "hapi-auth-jwt2": "10.2.0",
     "hapi-boom-decorators": "^3.0.0",
     "hapi-pino": "^8.5.0",
+    "io-ts": "^1.2.1",
     "joi": "^17.3.0",
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
@@ -55,13 +58,12 @@
     "node-fetch": "^2.6.7",
     "pino": "^6.0.0",
     "ts-node": "^6.1.1",
-    "tsconfig-paths": "^3.8.0",
+    "tsconfig-paths": "^3.13.0",
     "uuid": "^3.2.1",
     "uuid-validate": "^0.0.3",
     "winston": "^3.0.0"
   },
   "devDependencies": {
-    "@ef-carbon/tspm": "^2.2.5",
     "@hapi/lab": "^24.0.0",
     "@types/bunyan": "^1.8.4",
     "@types/code": "^4.0.3",
@@ -104,7 +106,7 @@
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
+    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
     "moduleFileExtensions": [
       "ts",
       "tsx",

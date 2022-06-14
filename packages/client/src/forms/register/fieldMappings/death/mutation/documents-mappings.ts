@@ -18,58 +18,38 @@ import {
 import { fieldToAttachmentTransformer } from '@client/forms/mappings/mutation/field-mappings'
 
 export const deathDocumentForWhomFhirMapping = {
-  "Proof of Deceased's ID": 'DECEASED_ID_PROOF',
-  'Proof Deceased Permanent Address': 'DECEASED_PARMANENT_ADDRESS_PROOF',
-  'Proof of Death of Deceased': 'DECEASED_DEATH_PROOF',
-  'Proof of Date of Birth of Deceased': 'DECEASED_BIRTH_PROOF',
-  'Cuase of Death': 'CAUSE_OF_DEATH',
-  "Proof of Applicant's ID": 'APPLICANT_ID_PROOF',
-  "Proof of applicant's authority to apply":
-    'APPLICANT_ATHORITY_TO_APPLY_PROOF',
-  'Letter from ward councillor': 'WARD_COUNCILLOR_PROOF',
-  'Coroner Report': 'CORONERS_REPORT'
+  DECEASED_ID_PROOF: 'DECEASED_ID_PROOF',
+  DECEASED_DEATH_PROOF: 'DECEASED_DEATH_PROOF',
+  DECEASED_DEATH_CAUSE_PROOF: 'DECEASED_DEATH_CAUSE_PROOF',
+  INFORMANT_ID_PROOF: 'INFORMANT_ID_PROOF'
 }
 
 export const deathSectionMapping = {
   [DeathSection.Deceased]: [
-    deathDocumentForWhomFhirMapping['Cuase of Death'],
-    deathDocumentForWhomFhirMapping["Proof of Deceased's ID"],
-    deathDocumentForWhomFhirMapping['Proof Deceased Permanent Address'],
-    deathDocumentForWhomFhirMapping['Proof of Death of Deceased'],
-    deathDocumentForWhomFhirMapping['Proof of Date of Birth of Deceased'],
-    deathDocumentForWhomFhirMapping['Letter from ward councillor'],
-    deathDocumentForWhomFhirMapping['Coroner Report']
+    deathDocumentForWhomFhirMapping.DECEASED_ID_PROOF,
+    deathDocumentForWhomFhirMapping.DECEASED_DEATH_PROOF,
+    deathDocumentForWhomFhirMapping.DECEASED_DEATH_CAUSE_PROOF
   ],
-  [DeathSection.Applicants]: [
-    deathDocumentForWhomFhirMapping["Proof of Applicant's ID"],
-    deathDocumentForWhomFhirMapping["Proof of applicant's authority to apply"]
-  ]
+  [DeathSection.Informant]: [deathDocumentForWhomFhirMapping.INFORMANT_ID_PROOF]
 }
 
 export const deathSectionTitle = {
   [DeathSection.Deceased]: 'Deceased',
-  [DeathSection.Applicants]: 'Applicant'
+  [DeathSection.Informant]: 'Informant'
 }
 
 export const deathDocumentTypeFhirMapping = {
-  'Birth Registration': 'BIRTH_REGISTRATION',
-  'National ID (front)': 'NATIONAL_ID_FRONT',
-  'National ID (back)': 'NATIONAL_ID_BACK',
-  'Cuase of Death': 'CAUSE_OF_DEATH',
-  'Proof of Death of Deceased': 'DECEASED_DEATH_PROOF',
-  'Certified Post Mortem Report': 'POST_MORTEM_CERTIFICATE',
-  'Hospital Discharge Certificate': 'HOSPITAL_DISCHARGE_CERTIFICATE',
-  'Attested Letter of Death': 'ATTESTED_DEATH_LETTER',
-  'Attested Certificate of Death': 'ATTESTED_DEATH_CERTIFICATE',
-  'Certified Copy of Burial Receipt': 'BURIAL_RECEIPT',
-  'Certified Copy of Funeral Receipt': 'FUNERAL_RECEIPT',
-  Passport: 'PASSPORT',
-  'Police Brought In Dead Certificate': 'BROUGHT_IN_DEAD_CERTIFICATE',
-  'Coroner Report': 'CORONERS_REPORT',
-  'Signed Affidavit': 'SIGNED_AFFIDAVIT',
-  'Proof of Date of Birth of Deceased': 'DECEASED_BIRTH_PROOF_PAPER',
-  'Letter from ward councillor': 'LETTER_FROM_COUNCILLOR',
-  Other: 'OTHER'
+  HOSPITAL_CERTIFICATE_OF_DEATH: 'HOSPITAL_CERTIFICATE_OF_DEATH',
+  ATTESTED_LETTER_OF_DEATH: 'ATTESTED_LETTER_OF_DEATH',
+  BURIAL_RECEIPT: 'BURIAL_RECEIPT',
+  POLICE_CERTIFICATE_OF_DEATH: 'POLICE_CERTIFICATE_OF_DEATH',
+  MEDICALLY_CERTIFIED_CAUSE_OF_DEATH: 'MEDICALLY_CERTIFIED_CAUSE_OF_DEATH',
+  VERBAL_AUTOPSY_REPORT: 'VERBAL_AUTOPSY_REPORT',
+  CORONERS_REPORT: 'CORONERS_REPORT',
+  BIRTH_CERTIFICATE: 'BIRTH_CERTIFICATE',
+  NATIONAL_ID: 'NATIONAL_ID',
+  PASSPORT: 'PASSPORT',
+  OTHER: 'OTHER'
 }
 
 export function deathFieldToAttachmentTransformer(

@@ -13,11 +13,13 @@ import { defineMessages, MessageDescriptor } from 'react-intl'
 
 interface IButtonsMessages
   extends Record<string | number | symbol, MessageDescriptor> {
+  archive: MessageDescriptor
   back: MessageDescriptor
   apply: MessageDescriptor
   cancel: MessageDescriptor
   change: MessageDescriptor
   confirm: MessageDescriptor
+  configure: MessageDescriptor
   continueButton: MessageDescriptor
   createUser: MessageDescriptor
   deactivate: MessageDescriptor
@@ -37,13 +39,14 @@ interface IButtonsMessages
   print: MessageDescriptor
   register: MessageDescriptor
   reject: MessageDescriptor
-  rejectApplication: MessageDescriptor
+  rejectDeclaration: MessageDescriptor
+  replace: MessageDescriptor
   retry: MessageDescriptor
   review: MessageDescriptor
   save: MessageDescriptor
   saveExitButton: MessageDescriptor
-  deleteApplication: MessageDescriptor
-  closeApplication: MessageDescriptor
+  deleteDeclaration: MessageDescriptor
+  closeDeclaration: MessageDescriptor
   reactivate: MessageDescriptor
   search: MessageDescriptor
   select: MessageDescriptor
@@ -60,9 +63,17 @@ interface IButtonsMessages
   yes: MessageDescriptor
   approve: MessageDescriptor
   editRecord: MessageDescriptor
+  makeCorrection: MessageDescriptor
+  publish: MessageDescriptor
+  add: MessageDescriptor
 }
 
 const messagesToDefine: IButtonsMessages = {
+  archive: {
+    id: 'buttons.archive',
+    defaultMessage: 'Archive',
+    description: 'Archive button text'
+  },
   approve: {
     id: 'buttons.approve',
     defaultMessage: 'Approve',
@@ -92,6 +103,11 @@ const messagesToDefine: IButtonsMessages = {
     defaultMessage: 'Confirm',
     description: 'Confirm button text',
     id: 'buttons.confirm'
+  },
+  configure: {
+    defaultMessage: 'Configure',
+    description: 'Configure button text',
+    id: 'buttons.configure'
   },
   continueButton: {
     defaultMessage: 'Continue',
@@ -144,7 +160,7 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.forgottenPIN'
   },
   goToHomepage: {
-    defaultMessage: 'Go to Homepage',
+    defaultMessage: 'Back to home',
     description: 'Label for Go to Homepage button',
     id: 'buttons.goToHomePage'
   },
@@ -178,6 +194,11 @@ const messagesToDefine: IButtonsMessages = {
     description: 'Print button text',
     id: 'buttons.print'
   },
+  reinstate: {
+    defaultMessage: 'Reinstate',
+    description: 'Label for reinstate button',
+    id: 'buttons.reinstate'
+  },
   register: {
     defaultMessage: 'Register',
     description: 'Label for button on register confirmation modal',
@@ -188,14 +209,19 @@ const messagesToDefine: IButtonsMessages = {
     description: 'A label for reject link',
     id: 'buttons.reject'
   },
-  rejectApplication: {
-    defaultMessage: 'Reject Application',
-    description: 'Reject application button text',
-    id: 'buttons.rejectApplication'
+  rejectDeclaration: {
+    defaultMessage: 'Reject Declaration',
+    description: 'Reject declaration button text',
+    id: 'buttons.rejectDeclaration'
+  },
+  replace: {
+    defaultMessage: 'Change all',
+    description: 'Label for replacing the whole section in review form',
+    id: 'buttons.replace'
   },
   retry: {
     defaultMessage: 'Retry',
-    description: 'The title of retry button for failed application',
+    description: 'The title of retry button for failed declaration',
     id: 'buttons.retry'
   },
   review: {
@@ -213,15 +239,15 @@ const messagesToDefine: IButtonsMessages = {
     description: 'Save & Exit Button Text',
     id: 'buttons.saveAndExit'
   },
-  deleteApplication: {
-    defaultMessage: 'Delete Application',
-    description: 'Delete application button text',
-    id: 'buttons.deleteApplication'
+  deleteDeclaration: {
+    defaultMessage: 'Delete Declaration',
+    description: 'Delete declaration button text',
+    id: 'buttons.deleteDeclaration'
   },
-  closeApplication: {
-    defaultMessage: 'Close Application',
-    description: 'Close application button text',
-    id: 'buttons.closeApplication'
+  closeDeclaration: {
+    defaultMessage: 'Close Declaration',
+    description: 'Close declaration button text',
+    id: 'buttons.closeDeclaration'
   },
   reactivate: {
     defaultMessage: 'Reactivate',
@@ -275,7 +301,7 @@ const messagesToDefine: IButtonsMessages = {
   },
   update: {
     defaultMessage: 'Update',
-    description: 'The title of update button for draft application',
+    description: 'The title of update button for draft declaration',
     id: 'buttons.update'
   },
   upload: {
@@ -295,8 +321,28 @@ const messagesToDefine: IButtonsMessages = {
   },
   editRecord: {
     id: 'buttons.editRecord',
-    defaultMessage: 'Edit record',
-    description: 'Edit record button text on review certificate'
+    defaultMessage: 'Correct record',
+    description: 'Correct record button text on review certificate'
+  },
+  makeCorrection: {
+    id: 'buttons.makeCorrection',
+    defaultMessage: 'Make correction',
+    description: 'Make correction button text on correction summary'
+  },
+  view: {
+    id: 'buttons.view',
+    defaultMessage: 'View',
+    description: 'Label for link button view'
+  },
+  publish: {
+    id: 'buttons.publish',
+    defaultMessage: 'Publish',
+    description: 'Publish button text on form config'
+  },
+  add: {
+    id: 'buttons.add',
+    defaultMessage: 'Add',
+    description: 'Add button text on form config'
   }
 }
 

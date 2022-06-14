@@ -16,6 +16,7 @@ import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import { LoadingGrey } from '@opencrvs/components/lib/interface'
 import * as React from 'react'
 import styled from 'styled-components'
+import { Navigation } from '@client/components/interface/Navigation'
 
 const DynamicContainer = styled.div<{
   marginLeft?: number
@@ -37,7 +38,7 @@ const Content = styled(BodyContent)<{
   profilePageStyle?: IprofilePageStyle
 }>`
   padding: 0px 24px;
-  margin: 32px auto 0;
+  margin: 0 auto;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 0px 16px;
 
@@ -47,6 +48,10 @@ const Content = styled(BodyContent)<{
       margin: ${profilePageStyle.paddingTopMd}px auto ${0};
       padding: ${0}px ${profilePageStyle.horizontalPaddingMd}px
     `}
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 0;
   }
 `
 const SubPageContent = styled(Content)`
@@ -66,7 +71,14 @@ interface BasePage {
   marginRight?: number
   fixedWidth?: number
   mapPinClickHandler?: () => void
+  mapPerformanceClickHandler?: () => void
   profilePageStyle?: IprofilePageStyle
+  subMenuComponent?: React.ReactNode
+  /*
+  FIXME: This prop should be removed at some point.
+  It only toggle background between gray and white.
+  */
+  isCertificatesConfigPage?: boolean
 }
 
 interface DefaultPage extends BasePage {
@@ -100,14 +112,14 @@ const SubPageHeaderContainer = styled.div`
   width: 100%;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.dividerDark};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
 `
 const SubPageHeaderBody = styled.div`
   display: flex;
   align-items: center;
   max-height: 56px;
   padding: 16px;
-  ${({ theme }) => theme.fonts.bodyBoldStyle}
+  ${({ theme }) => theme.fonts.bold16}
   text-overflow: ellipsis;
   & > :first-child {
     margin-right: 8px;
@@ -132,7 +144,7 @@ const ToolbarContainer = styled.div`
   }
 `
 const HeaderMenuContainer = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   justify-content: space-between;
 `
 
@@ -141,6 +153,13 @@ const HeaderText = styled.span`
   overflow: hidden;
   text-overflow: ellipsis;
 `
+const BodyContainer = styled.div`
+  margin-left: 0px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 249px;
+  }
+`
+
 function SubPageHeader(props: HeaderProps) {
   return (
     <SubPageHeaderContainer id="sub-page-header">
@@ -208,21 +227,32 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
       </DynamicContainer>
     )
   } else {
-    pageHeader = <Header mapPinClickHandler={props.mapPinClickHandler} />
+    pageHeader = (
+      <Header
+        mapPinClickHandler={props.mapPinClickHandler}
+        mapPerformanceClickHandler={props.mapPerformanceClickHandler}
+      />
+    )
     pageContent = (
-      <DynamicContainer
-        marginLeft={props.marginLeft}
-        marginRight={props.marginRight}
-        fixedWidth={props.fixedWidth}
-      >
-        <Content>{props.children}</Content>
-      </DynamicContainer>
+      <>
+        <Navigation />
+        <BodyContainer>
+          <DynamicContainer
+            marginLeft={props.marginLeft}
+            marginRight={props.marginRight}
+            fixedWidth={props.fixedWidth}
+          >
+            <Content>{props.children}</Content>
+          </DynamicContainer>
+        </BodyContainer>
+      </>
     )
   }
 
   return (
-    <Container>
+    <Container isCertificatesConfigPage={props.isCertificatesConfigPage}>
       {pageHeader}
+      {props.subMenuComponent && props.subMenuComponent}
       {pageContent}
     </Container>
   )

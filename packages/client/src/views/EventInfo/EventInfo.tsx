@@ -37,15 +37,15 @@ import {
   goToHome
 } from '@client/navigation'
 import {
-  storeApplication,
-  IApplication,
-  createApplication
-} from '@client/applications'
+  storeDeclaration,
+  IDeclaration,
+  createDeclaration
+} from '@client/declarations'
 
 interface IDispatchProps {
   goBack: typeof goBack
   goToHome: typeof goToHome
-  storeApplication: typeof storeApplication
+  storeDeclaration: typeof storeDeclaration
   goToBirthInformant: typeof goToBirthInformant
   goToDeathInformant: typeof goToDeathInformant
 }
@@ -54,7 +54,7 @@ type IFullProps = RouteComponentProps<{ eventType: Event }> &
   IDispatchProps
 
 const Title = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.copy};
   margin-top: 16px;
   margin-bottom: 24px;
@@ -71,18 +71,18 @@ function EventInfoComponet(props: IFullProps) {
   let listItems: string[]
 
   function handleContinue() {
-    let application: IApplication
+    let declaration: IDeclaration
     switch (eventType) {
       case Event.BIRTH:
-        application = createApplication(Event.BIRTH)
-        props.storeApplication(application)
-        props.goToBirthInformant(application.id)
+        declaration = createDeclaration(Event.BIRTH)
+        props.storeDeclaration(declaration)
+        props.goToBirthInformant(declaration.id)
 
         break
       case Event.DEATH:
-        application = createApplication(Event.DEATH)
-        props.storeApplication(application)
-        props.goToDeathInformant(application.id)
+        declaration = createDeclaration(Event.DEATH)
+        props.storeDeclaration(declaration)
+        props.goToDeathInformant(declaration.id)
         break
       default:
         throw new Error(`Unknown eventType ${eventType}`)
@@ -135,7 +135,7 @@ function EventInfoComponet(props: IFullProps) {
 export const EventInfo = connect(null, {
   goBack,
   goToHome,
-  storeApplication,
+  storeDeclaration,
   goToBirthInformant,
   goToDeathInformant
 })(injectIntl(EventInfoComponet))

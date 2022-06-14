@@ -14,34 +14,28 @@ import * as React from 'react'
 import * as Sentry from '@sentry/browser'
 import styled from '@client/styledComponents'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { Button } from '@opencrvs/components/lib/buttons'
+import { PageWrapper } from '@opencrvs/components/lib/layout/PageWrapper'
+import { TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { Box } from '@opencrvs/components/lib/interface/Box'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
 
-const ErrorContainer = styled.div`
+const ErrorContainer = styled(Box)`
   display: flex;
+  width: 400px;
   flex-direction: column;
   align-items: center;
-  margin-top: 20px;
+  margin-top: -80px;
 `
 const ErrorTitle = styled.h1`
-  ${({ theme }) => theme.fonts.h2Style};
-  color: ${({ theme }) => theme.colors.secondary};
-  margin: 10px;
-`
-const ErrorMessage = styled.div`
-  ${({ theme }) => theme.fonts.h4Style};
-  color: ${({ theme }) => theme.colors.secondary};
-  margin: 5px 0;
+  ${({ theme }) => theme.fonts.h1};
+  color: ${({ theme }) => theme.colors.copy};
+  margin-bottom: 16px;
 `
 
-const GoToHomepage = styled(Button)`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
-  color: ${({ theme }) => theme.colors.secondary};
-  background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.subtitleStyle};
-  text-transform: capitalize;
-  cursor: pointer;
-  margin-top: 60px;
+const ErrorMessage = styled.div`
+  ${({ theme }) => theme.fonts.reg18};
+  color: ${({ theme }) => theme.colors.copy};
+  margin-bottom: 32px;
 `
 
 type IFullProps = React.PropsWithChildren<IntlShapeProps>
@@ -75,29 +69,26 @@ class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
       }
 
       return (
-        <ErrorContainer>
-          <ErrorTitle>
-            {this.state.authError &&
-              intl.formatMessage(errorMessages.errorCodeUnauthorized)}
-          </ErrorTitle>
-          <ErrorTitle>
-            {this.state.authError
-              ? intl.formatMessage(errorMessages.errorTitleUnauthorized)
-              : intl.formatMessage(errorMessages.errorTitle)}
-          </ErrorTitle>
-          <ErrorMessage>
-            {intl.formatMessage(errorMessages.unknownErrorTitle)}
-          </ErrorMessage>
-          <ErrorMessage>
-            {intl.formatMessage(errorMessages.unknownErrorDescription)}
-          </ErrorMessage>
-          <GoToHomepage
-            id="GoToHomepage"
-            onClick={() => (window.location.href = '/')}
-          >
-            {intl.formatMessage(buttonMessages.goToHomepage)}
-          </GoToHomepage>
-        </ErrorContainer>
+        <PageWrapper>
+          <ErrorContainer>
+            <ErrorTitle>
+              {this.state.authError &&
+                intl.formatMessage(errorMessages.errorCodeUnauthorized)}
+              {this.state.authError
+                ? intl.formatMessage(errorMessages.errorTitleUnauthorized)
+                : intl.formatMessage(errorMessages.errorTitle)}
+            </ErrorTitle>
+            <ErrorMessage>
+              {intl.formatMessage(errorMessages.unknownErrorDescription)}
+            </ErrorMessage>
+            <TertiaryButton
+              id="GoToHomepage"
+              onClick={() => (window.location.href = '/')}
+            >
+              {intl.formatMessage(buttonMessages.goToHomepage)}
+            </TertiaryButton>
+          </ErrorContainer>
+        </PageWrapper>
       )
     } else {
       // when there's not an error, render children untouched

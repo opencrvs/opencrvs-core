@@ -12,18 +12,24 @@
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from '@client/styledComponents'
-import { constantsMessages } from '@client/i18n/messages'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { Warning, Download } from '@opencrvs/components/lib/icons'
-import { TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { Download } from '@opencrvs/components/lib/icons'
+import { IconButton } from '@opencrvs/components/lib/buttons'
 import { connect } from 'react-redux'
 import {
-  downloadApplication,
-  makeApplicationReadyToDownload,
+  downloadDeclaration,
+  makeDeclarationReadyToDownload,
   DOWNLOAD_STATUS
-} from '@client/applications'
+} from '@client/declarations'
 import { Event, Action } from '@client/forms'
 import { withApollo, WithApolloClient } from 'react-apollo'
+import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
+import {
+  withOnlineStatus,
+  IOnlineStatusProps
+} from '@client/views/OfficeHome/LoadingIndicator'
+import ReactTooltip from 'react-tooltip'
+import { constantsMessages } from '@client/i18n/messages'
 
 interface IDownloadConfig {
   event: string
@@ -39,7 +45,7 @@ interface DownloadButtonProps extends IntlShapeProps {
 }
 
 interface IDispatchProps {
-  downloadApplication: typeof downloadApplication
+  downloadDeclaration: typeof downloadDeclaration
 }
 
 type HOCProps = IDispatchProps & WithApolloClient<{}>
@@ -48,44 +54,52 @@ const StatusIndicator = styled.div<{
   isLoading?: boolean
 }>`
   display: flex;
-  flex-grow: 1;
+  flex-grow: 0;
   align-items: center;
   max-width: 152px;
   justify-content: ${({ isLoading }) =>
     isLoading ? `space-between` : `flex-end`};
 `
-const DownloadAction = styled(TertiaryButton)<{
-  isFullHeight?: boolean
-}>`
-  ${({ isFullHeight }) => isFullHeight && `height: 100%;`}
+const DownloadAction = styled(IconButton)`
   border-radius: 50%;
   height: 40px;
+  width: 36px;
   & > div {
     padding: 0px 0px;
   }
 `
-
-function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
-  const { id, status, intl, className } = props
+const NoConnectionViewContainer = styled.div`
+  .no-connection {
+    ::after {
+      display: none;
+    }
+  }
+`
+function DownloadButtonComponent(
+  props: DownloadButtonProps & HOCProps & IOnlineStatusProps
+) {
+  const { id, status, intl, className, isOnline } = props
 
   function initiateDownload() {
     const { event, compositionId, action } = props.downloadConfigs
-    const downloadableApplication = makeApplicationReadyToDownload(
+    const downloadableDeclaration = makeDeclarationReadyToDownload(
       event.toLowerCase() as unknown as Event,
       compositionId,
       action
     )
 
-    props.downloadApplication(downloadableApplication, props.client)
+    props.downloadDeclaration(downloadableDeclaration, props.client)
   }
-
   if (
     status === DOWNLOAD_STATUS.READY_TO_DOWNLOAD ||
     status === DOWNLOAD_STATUS.DOWNLOADING
   ) {
     return (
-      <StatusIndicator isLoading={true} className={className}>
-        {intl.formatMessage(constantsMessages.downloading)}
+      <StatusIndicator
+        isLoading={true}
+        className={className}
+        id={`${id}-download-loading`}
+      >
         <Spinner id={`action-loading-${id}`} size={24} />
       </StatusIndicator>
     )
@@ -96,24 +110,38 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
     status === DOWNLOAD_STATUS.FAILED_NETWORK
   ) {
     return (
-      <StatusIndicator className={className}>
-        <Warning id={`action-error-${id}`} />
+      <StatusIndicator className={className} id={`${id}-download-failed`}>
         <DownloadAction
-          isFullHeight={false}
           id={`${id}-icon`}
           onClick={(e) => {
             initiateDownload()
             e.stopPropagation()
           }}
-          icon={() => <Download />}
+          icon={() => <Download isFailed={true} />}
         />
       </StatusIndicator>
     )
   }
 
+  if (!isOnline) {
+    return (
+      <NoConnectionViewContainer>
+        <div
+          data-tip
+          data-for={`${id}_noConnection`}
+          data-class="no-connection"
+        >
+          <ConnectionError id={`${id}_noConnection`} key={id} />
+        </div>
+        <ReactTooltip id={`${id}_noConnection`} place="top" effect="solid">
+          {intl.formatMessage(constantsMessages.noConnection)}
+        </ReactTooltip>
+      </NoConnectionViewContainer>
+    )
+  }
+
   return (
     <DownloadAction
-      isFullHeight={false}
       id={`${id}-icon`}
       onClick={(e) => {
         initiateDownload()
@@ -125,6 +153,6 @@ function DownloadButtonComponent(props: DownloadButtonProps & HOCProps) {
   )
 }
 
-export const DownloadButton = connect(null, { downloadApplication })(
-  injectIntl(withApollo(DownloadButtonComponent))
+export const DownloadButton = connect(null, { downloadDeclaration })(
+  injectIntl(withApollo(withOnlineStatus(DownloadButtonComponent)))
 )

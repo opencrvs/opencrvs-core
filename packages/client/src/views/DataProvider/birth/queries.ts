@@ -13,7 +13,7 @@ import gql from 'graphql-tag'
 import { Action } from '@client/forms'
 
 export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
-  query data($id: ID!) {
+  query fetchBirthRegistrationForReview($id: ID!) {
     fetchBirthRegistration(id: $id) {
       _fhirIDMap
       id
@@ -58,26 +58,6 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           }
         }
       }
-      primaryCaregiver {
-        parentDetailsType
-        primaryCaregiver {
-          name {
-            use
-            firstNames
-            familyName
-          }
-          telecom {
-            system
-            value
-            use
-          }
-        }
-        reasonsNotApplying {
-          primaryCaregiverType
-          reasonNotApplying
-          isDeceased
-        }
-      }
       mother {
         id
         name {
@@ -88,6 +68,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         birthDate
         maritalStatus
         occupation
+        detailsExist
+        reasonNotApplying
         dateOfMarriage
         educationalAttainment
         nationality
@@ -120,6 +102,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         birthDate
         maritalStatus
         occupation
+        detailsExist
+        reasonNotApplying
         dateOfMarriage
         educationalAttainment
         nationality
@@ -144,9 +128,12 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       }
       registration {
         id
+        informantType
+        otherInformantType
         contact
         contactRelationship
         contactPhoneNumber
+        duplicates
         attachments {
           data
           type
@@ -159,6 +146,14 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           }
           type
           timestamp
+          office {
+            name
+            alias
+            address {
+              district
+              state
+            }
+          }
         }
         type
         trackingId
@@ -168,6 +163,7 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
       weightAtBirth
       birthType
       eventLocation {
+        id
         type
         address {
           line
@@ -178,13 +174,93 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
           country
         }
       }
-      presentAtBirthRegistration
+      questionnaire {
+        fieldId
+        value
+      }
+      history {
+        date
+        action
+        reinstated
+        dhis2Notification
+        statusReason {
+          text
+        }
+        reason
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          id
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+        signature {
+          data
+          type
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
+        }
+      }
     }
   }
 `
 
 export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
-  query data($id: ID!) {
+  query fetchBirthRegistrationForCertificate($id: ID!) {
     fetchBirthRegistration(id: $id) {
       _fhirIDMap
       id
@@ -212,6 +288,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         educationalAttainment
         nationality
         occupation
+        detailsExist
+        reasonNotApplying
         identifier {
           id
           type
@@ -244,6 +322,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         educationalAttainment
         nationality
         occupation
+        detailsExist
+        reasonNotApplying
         identifier {
           id
           type
@@ -293,28 +373,10 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           }
         }
       }
-      primaryCaregiver {
-        parentDetailsType
-        primaryCaregiver {
-          name {
-            use
-            firstNames
-            familyName
-          }
-          telecom {
-            system
-            value
-            use
-          }
-        }
-        reasonsNotApplying {
-          primaryCaregiverType
-          reasonNotApplying
-          isDeceased
-        }
-      }
       registration {
         id
+        informantType
+        otherInformantType
         contact
         contactPhoneNumber
         status {
@@ -342,7 +404,12 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       attendantAtBirth
       weightAtBirth
       birthType
+      questionnaire {
+        fieldId
+        value
+      }
       eventLocation {
+        id
         type
         address {
           line
@@ -353,18 +420,100 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
           country
         }
       }
-      presentAtBirthRegistration
+      history {
+        date
+        action
+        reinstated
+        dhis2Notification
+        statusReason {
+          text
+        }
+        location {
+          id
+          name
+        }
+        office {
+          id
+          name
+        }
+        user {
+          id
+          type
+          role
+          name {
+            firstNames
+            familyName
+            use
+          }
+          avatar {
+            data
+            type
+          }
+        }
+        signature {
+          data
+          type
+        }
+        comments {
+          user {
+            id
+            username
+            avatar {
+              data
+              type
+            }
+          }
+          comment
+          createdAt
+        }
+        input {
+          valueCode
+          valueId
+          valueString
+        }
+        output {
+          valueCode
+          valueId
+          valueString
+        }
+        certificates {
+          hasShowedVerifiedDocument
+          collector {
+            relationship
+            otherRelationship
+            individual {
+              name {
+                use
+                firstNames
+                familyName
+              }
+              telecom {
+                system
+                value
+                use
+              }
+            }
+          }
+        }
+      }
     }
   }
 `
 export function getBirthQueryMappings(action: Action) {
   switch (action) {
-    case Action.LOAD_REVIEW_APPLICATION:
+    case Action.LOAD_REVIEW_DECLARATION:
       return {
         query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
         dataKey: 'fetchBirthRegistration'
       }
-    case Action.LOAD_CERTIFICATE_APPLICATION:
+    case Action.LOAD_CERTIFICATE_DECLARATION:
+      return {
+        query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
+        dataKey: 'fetchBirthRegistration'
+      }
+    case Action.LOAD_REQUESTED_CORRECTION_DECLARATION:
+      // TODO: Apply seperate query; currently using it
+      // because the actual query is yet to be developed
       return {
         query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
         dataKey: 'fetchBirthRegistration'

@@ -24,7 +24,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { storage } from '@client/storage'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
-import { Logout, BackArrow, Logo } from '@opencrvs/components/lib/icons'
+import { Logout, BackArrow } from '@opencrvs/components/lib/icons'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import {
   Button,
@@ -50,6 +50,8 @@ import { userQueries } from '@client/user/queries'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { getTheme } from '@opencrvs/components/lib/theme'
+import { AvatarLarge } from '@client/components/Avatar'
+import { getUserName } from '@client/utils/userUtils'
 
 interface IForgotPINProps {
   goBack: () => void
@@ -78,14 +80,12 @@ const Container = styled.div`
   align-items: center;
   width: 300px;
   position: relative;
-`
-const StyledLogo = styled(Logo)`
   margin-top: 104px;
-
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-top: 80px;
   }
 `
+
 const Name = styled.p`
   color: ${({ theme }) => theme.colors.white};
 `
@@ -98,7 +98,7 @@ const ActionWrapper = styled.div`
   flex-direction: column;
 `
 const ForgotPasswordLink = styled(Button)`
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme }) => theme.colors.white};
   text-transform: none;
   margin-top: 24px;
@@ -228,7 +228,10 @@ export function ForgotPIN(props: IForgotPINProps) {
         <Logout />
       </LogoutContainer>
       <Container>
-        <StyledLogo />
+        <AvatarLarge
+          name={getUserName(userDetails)}
+          avatar={userDetails?.avatar}
+        />
         {showName()}
         {verifyingPassword ? (
           <SpinnerContainer>

@@ -10,13 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import {
-  fetchLocationWiseEventEstimations,
-  getTotalNumberOfRegistrations
-} from '@metrics/features/metrics/metricsGenerator'
+import { fetchEventsGroupByMonthDates } from '@metrics/features/metrics/metricsGenerator'
 import {
   getMonthRangeFilterListFromTimeRage,
-  IMonthRangeFilter
+  IMonthRangeFilter,
+  fetchEstimateForTargetDaysByLocationId
 } from '@metrics/features/metrics/utils'
 import {
   TIME_FROM,
@@ -27,14 +25,13 @@ import {
 import { IAuthHeader } from '@metrics/features/registration/'
 
 interface IMonthWiseEstimation {
-  actualTotalRegistration: number
-  actual45DayRegistration: number
-  estimatedRegistration: number
-  estimated45DayPercentage: number
-  month: string
-  year: string
-  startOfMonth: string
-  endOfMonth: string
+  total: number
+  withinTarget: number
+  within1Year: number
+  within5Years: number
+  estimated: number
+  month: number
+  year: number
 }
 
 export async function monthWiseEventEstimationsHandler(
@@ -43,38 +40,73 @@ export async function monthWiseEventEstimationsHandler(
 ) {
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
-  const locationId = 'Location/' + request.query[LOCATION_ID]
+  const locationId = request.query[LOCATION_ID]
+    ? 'Location/' + request.query[LOCATION_ID]
+    : undefined
   const event = request.query[EVENT]
   const authHeader: IAuthHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
   const monthFilters: IMonthRangeFilter[] = getMonthRangeFilterListFromTimeRage(
     timeStart,
     timeEnd
   )
+  const registrationsGroupByMonthDates = await fetchEventsGroupByMonthDates(
+    timeStart,
+    timeEnd,
+    locationId,
+    event
+  )
   const estimations: IMonthWiseEstimation[] = []
   for (const monthFilter of monthFilters) {
-    const estimated45DayMetrics = await fetchLocationWiseEventEstimations(
-      monthFilter.startOfMonthTime,
-      monthFilter.endOfMonthTime,
-      locationId,
-      event,
-      authHeader
-    )
+    const estimatedTargetDayMetrics =
+      await fetchEstimateForTargetDaysByLocationId(
+        locationId,
+        event,
+        authHeader,
+        monthFilter.startOfMonthTime,
+        monthFilter.endOfMonthTime
+      )
+
+    const totalRegistrationWithinMonth = registrationsGroupByMonthDates
+      .filter(
+        (p) => p.dateLabel === `${monthFilter.year}-${monthFilter.monthIndex}`
+      )
+      .reduce((t, p) => t + p.total, 0)
+
+    const totalWithinTargetInMonth = registrationsGroupByMonthDates
+      .filter(
+        (p) =>
+          p.dateLabel === `${monthFilter.year}-${monthFilter.monthIndex}` &&
+          p.timeLabel === 'withinTarget'
+      )
+      .reduce((t, p) => t + p.total, 0)
+
+    const totalWithin1YearInMonth = registrationsGroupByMonthDates
+      .filter(
+        (p) =>
+          p.dateLabel === `${monthFilter.year}-${monthFilter.monthIndex}` &&
+          (p.timeLabel === 'withinTarget' ||
+            p.timeLabel === 'withinLate' ||
+            p.timeLabel === 'within1Year')
+      )
+      .reduce((t, p) => t + p.total, 0)
+    const totalWithin5YearsInMonth = registrationsGroupByMonthDates
+      .filter(
+        (p) =>
+          p.dateLabel === `${monthFilter.year}-${monthFilter.monthIndex}` &&
+          p.timeLabel !== 'after5Years'
+      )
+      .reduce((t, p) => t + p.total, 0)
 
     estimations.push({
-      startOfMonth: monthFilter.startOfMonthTime,
-      endOfMonth: monthFilter.endOfMonthTime,
-      actualTotalRegistration: await getTotalNumberOfRegistrations(
-        monthFilter.startOfMonthTime,
-        monthFilter.endOfMonthTime,
-        locationId,
-        event
-      ),
-      actual45DayRegistration: estimated45DayMetrics.actualRegistration,
-      estimatedRegistration: estimated45DayMetrics.estimatedRegistration,
-      estimated45DayPercentage: estimated45DayMetrics.estimatedPercentage,
-      month: monthFilter.month,
+      total: totalRegistrationWithinMonth,
+      withinTarget: totalWithinTargetInMonth,
+      within1Year: totalWithin1YearInMonth,
+      within5Years: totalWithin5YearsInMonth,
+      estimated: estimatedTargetDayMetrics.totalEstimation,
+      month: monthFilter.monthIndex,
       year: monthFilter.year
     })
   }

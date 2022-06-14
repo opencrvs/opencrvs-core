@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IApplication, ITaskHistory } from '@client/applications'
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import {
   BirthSection,
   DeathSection,
@@ -21,55 +21,70 @@ import {
   GQLDeathEventSearchSet,
   GQLEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { IUserDetails } from './userUtils'
 import { getEvent } from '@client/views/PrintCertificate/utils'
-import { BIRTH, DEATH } from './constants'
+import { includes } from 'lodash'
+import { EMPTY_STRING } from '@client/utils/constants'
 
-const getApplicantFullName = (
+const getInformantEngName = (sectionData: IFormSectionData): string => {
+  if (sectionData.firstNamesEng) {
+    return `${sectionData.firstNamesEng as string} ${
+      sectionData.familyNameEng as string
+    }`
+  } else {
+    return sectionData.familyNameEng as string
+  }
+}
+
+const getInformantOthreName = (sectionData: IFormSectionData): string => {
+  if (sectionData.firstNames) {
+    return `${sectionData.firstNames as string} ${
+      sectionData.familyName as string
+    }`
+  } else {
+    return sectionData.familyName as string
+  }
+}
+
+const getInformantFullName = (
   sectionData: IFormSectionData,
   language = 'en'
 ): string => {
-  let fullName = ''
+  let fullName: string
   if (!sectionData) {
-    return fullName
+    return EMPTY_STRING
   }
   if (language === 'en') {
-    if (sectionData.firstNamesEng) {
-      fullName = `${sectionData.firstNamesEng as string} ${
-        sectionData.familyNameEng as string
-      }`
-    } else {
-      fullName = sectionData.familyNameEng as string
-    }
+    fullName = getInformantEngName(sectionData)
   } else {
-    if (sectionData.firstNames) {
+    if (sectionData.firstNames && sectionData.familyName) {
       fullName = `${sectionData.firstNames as string} ${
         sectionData.familyName as string
       }`
     } else {
-      fullName = sectionData.familyName as string
+      fullName =
+        getInformantOthreName(sectionData) || getInformantEngName(sectionData)
     }
   }
   return fullName
 }
 
-export const getDraftApplicantFullName = (
-  draft: IApplication,
+export const getDraftInformantFullName = (
+  draft: IDeclaration,
   language?: string
 ) => {
   switch (draft.event) {
     case Event.BIRTH:
-      return getApplicantFullName(draft.data.child, language)
+      return getInformantFullName(draft.data.child, language)
     case Event.DEATH:
-      return getApplicantFullName(draft.data.deceased, language)
+      return getInformantFullName(draft.data.deceased, language)
   }
 }
 
 const transformBirthSearchQueryDataToDraft = (
   data: GQLBirthEventSearchSet,
-  application: IApplication
+  declaration: IDeclaration
 ) => {
-  application.data.child = {
+  declaration.data.child = {
     firstNamesEng:
       (data.childName &&
         data.childName
@@ -93,15 +108,16 @@ const transformBirthSearchQueryDataToDraft = (
         data.childName
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.familyName)[0]) ||
-      ''
+      '',
+    childBirthDate: data.dateOfBirth && data.dateOfBirth
   }
 }
 
 const transformDeathSearchQueryDataToDraft = (
   data: GQLDeathEventSearchSet,
-  application: IApplication
+  declaration: IDeclaration
 ) => {
-  application.data.deceased = {
+  declaration.data.deceased = {
     firstNamesEng:
       (data.deceasedName &&
         data.deceasedName
@@ -125,16 +141,17 @@ const transformDeathSearchQueryDataToDraft = (
         data.deceasedName
           .filter((name) => name && name.use !== 'en')
           .map((name) => name && name.familyName)[0]) ||
-      ''
+      '',
+    deathDate: data.dateOfDeath && data.dateOfDeath
   }
 }
 
 export const transformSearchQueryDataToDraft = (
   data: GQLEventSearchSet
-): IApplication => {
+): IDeclaration => {
   const eventType = getEvent(data.type)
 
-  const application: IApplication = {
+  const declaration: IDeclaration = {
     id: data.id,
     data: {
       registration: {
@@ -147,57 +164,42 @@ export const transformSearchQueryDataToDraft = (
   }
 
   // @ts-ignore
-  application.data.registration.contactPoint.nestedFields.registrationPhone =
+  declaration.data.registration.contactPoint.nestedFields.registrationPhone =
     data.registration && data.registration.contactNumber
-  application.trackingId = data.registration && data.registration.trackingId
-  application.submissionStatus = data.registration && data.registration.status
-  application.compositionId = data.id
-
-  application.operationHistories = data.operationHistories as ITaskHistory[]
+  declaration.trackingId = data.registration && data.registration.trackingId
+  declaration.submissionStatus = data.registration && data.registration.status
+  declaration.compositionId = data.id
+  declaration.createdAt =
+    data.registration?.createdAt && data.registration.createdAt
 
   switch (eventType) {
     case Event.BIRTH:
     default:
-      transformBirthSearchQueryDataToDraft(data, application)
+      transformBirthSearchQueryDataToDraft(data, declaration)
       break
     case Event.DEATH:
-      transformDeathSearchQueryDataToDraft(data, application)
+      transformDeathSearchQueryDataToDraft(data, declaration)
       break
   }
 
-  return application
+  return declaration
 }
 
-export const updateApplicationTaskHistory = (
-  application: IApplication,
-  userDetails: IUserDetails | null
-): ITaskHistory => {
-  return {
-    operationType: application.submissionStatus,
-    operatedOn:
-      (application.modifiedOn && new Date(application.modifiedOn).toString()) ||
-      '',
-    operatorRole: (userDetails && userDetails.role) || '',
-    operatorName: (userDetails && userDetails.name) || [],
-    operatorOfficeName:
-      (userDetails &&
-        userDetails.primaryOffice &&
-        userDetails.primaryOffice.name) ||
-      '',
-    operatorOfficeAlias:
-      (userDetails &&
-        userDetails.primaryOffice &&
-        userDetails.primaryOffice.alias) ||
-      []
-  }
-}
-
-export const getAttachmentSectionKey = (applicationEvent: Event): string => {
-  switch (applicationEvent) {
-    case DEATH:
+export const getAttachmentSectionKey = (declarationEvent: Event): string => {
+  switch (declarationEvent) {
+    case Event.DEATH:
       return DeathSection.DeathDocuments
-    case BIRTH:
+    case Event.BIRTH:
     default:
       return BirthSection.Documents
   }
+}
+
+export function isDeclarationInReadyToReviewStatus(
+  submissionStatus: string | undefined
+) {
+  return !includes(
+    [SUBMISSION_STATUS.DRAFT, SUBMISSION_STATUS.REJECTED, undefined],
+    submissionStatus
+  )
 }

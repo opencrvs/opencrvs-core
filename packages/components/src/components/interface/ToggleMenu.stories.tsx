@@ -20,15 +20,14 @@ interface IProps {
   menuHeader?: JSX.Element
   toggleButton: JSX.Element
   menuItems: IToggleMenuItem[]
-  hasFocusRing?: boolean
   hide?: boolean
   showSubmenu: boolean
 }
 const UserNameStyle = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
 `
 const UserRoleStyle = styled.div`
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
 `
 const header = (
   <>

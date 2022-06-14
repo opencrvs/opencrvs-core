@@ -32,7 +32,7 @@ import { getCroppedImage, IImage } from '@client/utils/imageUtils'
 import {
   withOnlineStatus,
   IOnlineStatusProps
-} from '@client/views/RegistrationHome/LoadingIndicator'
+} from '@client/views/OfficeHome/LoadingIndicator'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import { withTheme } from 'styled-components'
 
@@ -74,16 +74,19 @@ const DefaultImage = styled.div<{ width: number; height: number }>`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.loadingImage};
+  background-color: ${({ theme }) => theme.colors.grey100};
 `
 
 const Error = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 
 export const changeAvatarMutation = gql`
   mutation changeAvatar($userId: String!, $avatar: AvatarInput!) {
-    changeAvatar(userId: $userId, avatar: $avatar)
+    changeAvatar(userId: $userId, avatar: $avatar) {
+      type
+      data
+    }
   }
 `
 
@@ -156,7 +159,6 @@ function AvatarChangeModalComp({
   const [crop, setCrop] = React.useState<Point>(DEFAULT_CROP)
   const [zoom, setZoom] = React.useState<number>(1)
   const [croppedArea, setCroppedArea] = React.useState<Area>(DEFAULT_AREA)
-  const [avatar, setAvatar] = React.useState<IImage>()
 
   const cropSize = useCropSize(theme.grid.breakpoints.md)
 
@@ -165,7 +167,6 @@ function AvatarChangeModalComp({
     setCroppedArea(DEFAULT_AREA)
     setZoom(1)
     setError('')
-    setAvatar(undefined)
   }
 
   const handleCancel = () => {
@@ -183,10 +184,10 @@ function AvatarChangeModalComp({
         <TertiaryButton key="cancel" id="modal_cancel" onClick={handleCancel}>
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
-        <Mutation<{}, { userId: string; avatar: IImage }>
+        <Mutation<{ changeAvatar: IImage }, { userId: string; avatar: IImage }>
           mutation={changeAvatarMutation}
-          onCompleted={(_) => {
-            avatar && onAvatarChanged(avatar)
+          onCompleted={({ changeAvatar: avatar }) => {
+            onAvatarChanged(avatar)
             reset()
           }}
         >
@@ -195,15 +196,12 @@ function AvatarChangeModalComp({
               <PrimaryButton
                 key="apply"
                 id="apply_change"
-                disabled={
-                  !userDetails || !userDetails.userMgntUserID || !isOnline
-                }
+                disabled={!isOnline || !!error}
                 onClick={async () => {
                   const croppedImage = await getCroppedImage(
                     imgSrc,
                     croppedArea
                   )
-                  if (croppedImage) setAvatar(croppedImage)
                   if (
                     userDetails &&
                     userDetails.userMgntUserID &&

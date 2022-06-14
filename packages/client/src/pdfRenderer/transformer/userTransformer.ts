@@ -21,7 +21,7 @@ import { userMessages } from '@client/i18n/messages'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { IUserDetails } from '@client/utils/userUtils'
 
-function getUserName(userDetails: Pick<IUserDetails, 'name'>) {
+export function getUserName(userDetails: Pick<IUserDetails, 'name'>) {
   const nameObj =
     userDetails.name &&
     (userDetails.name.find((storedName: GQLHumanName | null) => {
@@ -43,7 +43,9 @@ export const userTransformers: IFunctionTransformer = {
     templateData: TemplateTransformerData,
     intl: IntlShape
   ) => {
-    return getUserName(templateData.userDetails.localRegistrar)
+    return templateData.userDetails.localRegistrar
+      ? getUserName(templateData.userDetails.localRegistrar)
+      : ''
   },
   /*
     LoggedInUserName provides the username of the loggedIn user.
@@ -75,7 +77,8 @@ export const userTransformers: IFunctionTransformer = {
     templateData: TemplateTransformerData,
     intl: IntlShape
   ) => {
-    return templateData.userDetails.localRegistrar.role
+    return templateData.userDetails.localRegistrar &&
+      templateData.userDetails.localRegistrar.role
       ? intl.formatMessage(
           userMessages[templateData.userDetails.localRegistrar.role]
         )
@@ -100,7 +103,8 @@ export const userTransformers: IFunctionTransformer = {
     templateData: TemplateTransformerData,
     intl: IntlShape
   ) => {
-    return templateData.userDetails.localRegistrar.signature
+    return templateData.userDetails.localRegistrar &&
+      templateData.userDetails.localRegistrar.signature
       ? templateData.userDetails.localRegistrar.signature.data || ''
       : ''
   },

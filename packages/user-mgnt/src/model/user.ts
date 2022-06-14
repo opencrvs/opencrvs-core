@@ -23,7 +23,10 @@ export enum AUDIT_REASON {
 
 export enum AUDIT_ACTION {
   DEACTIVATE,
-  REACTIVATE
+  REACTIVATE,
+  CERTIFICATE_CREATED,
+  CERTIFICATE_UPDATED,
+  CERTIFICATE_DELETED
 }
 
 export interface IUserName {
@@ -75,7 +78,7 @@ export interface IUser {
   catchmentAreaIds: string[]
   scope: string[]
   signature: ISignature
-  localRegistrar: ILocalRegistrar
+  localRegistrar?: ILocalRegistrar
   status: string
   device?: string
   securityQuestionAnswers?: ISecurityQuestionAnswer[]
@@ -121,7 +124,13 @@ const AuditHistory = new Schema(
     },
     action: {
       type: String,
-      enum: [AUDIT_ACTION.DEACTIVATE, AUDIT_ACTION.REACTIVATE],
+      enum: [
+        AUDIT_ACTION.DEACTIVATE,
+        AUDIT_ACTION.REACTIVATE,
+        AUDIT_ACTION.CERTIFICATE_CREATED,
+        AUDIT_ACTION.CERTIFICATE_UPDATED,
+        AUDIT_ACTION.CERTIFICATE_DELETED
+      ],
       default: AUDIT_ACTION.DEACTIVATE
     },
     reason: {
@@ -156,8 +165,8 @@ const userSchema = new Schema({
   name: { type: [UserNameSchema], required: true },
   username: { type: String, required: true },
   identifiers: [IdentifierSchema],
-  email: String,
-  mobile: String,
+  email: { type: String },
+  mobile: { type: String, unique: true },
   passwordHash: { type: String, required: true },
   salt: { type: String, required: true },
   role: String,

@@ -60,8 +60,7 @@ const taskBundle = {
             valueString: ''
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+260965656563'
           },
           {
@@ -112,9 +111,9 @@ const compositionResource = {
   status: 'preliminary',
   type: {
     coding: [
-      { system: 'http://opencrvs.org/doc-types', code: 'birth-application' }
+      { system: 'http://opencrvs.org/doc-types', code: 'birth-declaration' }
     ],
-    text: 'Birth Application'
+    text: 'Birth Declaration'
   },
   class: {
     coding: [
@@ -122,7 +121,7 @@ const compositionResource = {
     ],
     text: 'CRVS Document'
   },
-  title: 'Birth Application',
+  title: 'Birth Declaration',
   section: [
     {
       title: 'Supporting Documents',
@@ -217,7 +216,7 @@ const documentResource = {
     coding: [
       {
         system: 'http://opencrvs.org/specs/supporting-doc-type',
-        code: 'NATIONAL_ID_FRONT'
+        code: 'NATIONAL_ID'
       }
     ]
   },
@@ -267,8 +266,7 @@ const mosipBundle = {
             valueString: ''
           },
           {
-            url:
-              'http://opencrvs.org/specs/extension/contact-person-phone-number',
+            url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
             valueString: '+260965656563'
           },
           {
@@ -348,7 +346,7 @@ const mosipBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/specs/supporting-doc-type',
-              code: 'NATIONAL_ID_FRONT'
+              code: 'NATIONAL_ID'
             }
           ]
         },
@@ -383,7 +381,8 @@ describe('Webhook transformBirthBundle for national id integration', () => {
       })
 
       const authHeader = {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
+        'x-correlation-id': '1'
       }
 
       const transformedBundle = await transformBirthBundle(

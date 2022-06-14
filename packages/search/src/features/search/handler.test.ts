@@ -11,9 +11,12 @@
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { createServer } from '@search/index'
+import { createServer } from '@search/server'
 import { searchComposition } from '@search/features/search/service'
-import { mockSearchResult } from '@search/test/utils'
+import {
+  mockSearchResult,
+  mockAggregationSearchResult
+} from '@search/test/utils'
 import { client } from '@search/elasticsearch/client'
 import * as fetchMock from 'jest-fetch-mock'
 
@@ -138,11 +141,15 @@ describe('Verify handlers', () => {
     })
     describe('/statusWiseRegistrationCount', () => {
       it('Should return 200 for valid payload', async () => {
+        jest
+          .spyOn(client, 'search')
+          // @ts-ignore
+          .mockResolvedValueOnce(mockAggregationSearchResult)
         const res = await server.server.inject({
           method: 'POST',
           url: '/statusWiseRegistrationCount',
           payload: {
-            applicationLocationHirarchyId: '123',
+            declarationLocationHirarchyId: '123',
             status: ['REGISTED']
           },
           headers: {
@@ -152,20 +159,21 @@ describe('Verify handlers', () => {
         expect(res.statusCode).toBe(200)
       })
       it('Should return 500 for an error', async () => {
-        ;(searchComposition as jest.Mock).mockImplementation(() => {
+        jest.spyOn(client, 'search').mockImplementation(() => {
           throw new Error('error')
         })
         const res = await server.server.inject({
           method: 'POST',
           url: '/statusWiseRegistrationCount',
           payload: {
-            applicationLocationHirarchyId: '123',
+            declarationLocationHirarchyId: '123',
             status: ['REGISTED']
           },
           headers: {
             Authorization: `Bearer ${token}`
           }
         })
+
         expect(res.statusCode).toBe(500)
       })
     })

@@ -12,19 +12,12 @@
 interface Window {
   config: {
     AUTH_API_URL: string
+    CONFIG_API_URL: string
+    COUNTRY_CONFIG_URL: string
     COUNTRY: string
     LANGUAGES: string
     CLIENT_APP_URL: string
-    PHONE_NUMBER_PATTERN: {
-      pattern: RegExp
-      example: string
-      start?: string
-      num: string
-      mask: {
-        startForm: number
-        endBefore: number
-      }
-    }
+    PHONE_NUMBER_PATTERN: RegExp
     LOGROCKET: string
     SENTRY: string
   }

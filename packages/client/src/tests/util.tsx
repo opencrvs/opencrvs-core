@@ -10,15 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { App } from '@client/App'
-import { Event, ISerializedForm } from '@client/forms'
-import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { Event } from '@client/forms'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
 import { ThemeProvider } from '@client/styledComponents'
 import { getSchema } from '@client/tests/graphql-schema-mock'
-import { ICertificateCollectorDefinition } from '@client/views/PrintCertificate/VerifyCollector'
 import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { InMemoryCache } from 'apollo-cache-inmemory'
@@ -33,7 +32,6 @@ import {
 } from 'enzyme'
 import Adapter from 'enzyme-adapter-react-16'
 import { readFileSync } from 'fs'
-import { join } from 'path'
 import { graphql, print } from 'graphql'
 import * as jwt from 'jsonwebtoken'
 import * as React from 'react'
@@ -44,13 +42,11 @@ import { Provider } from 'react-redux'
 import { AnyAction, Store } from 'redux'
 import { waitForElement } from './wait-for-element'
 import { setUserDetails } from '@client/profile/profileActions'
-import {
-  createBrowserHistory,
-  createLocation,
-  createMemoryHistory
-} from 'history'
+import { createLocation, createMemoryHistory, History } from 'history'
 import { stringify } from 'query-string'
 import { match as Match } from 'react-router'
+import { ConnectedRouter } from 'connected-react-router'
+import { mockOfflineData } from './mock-offline-data'
 
 export const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -66,7 +62,8 @@ export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 export const inValidImageB64String =
   'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-
+export const natlSysAdminToken =
+  'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJzeXNhZG1pbiIsIm5hdGxzeXNhZG1pbiIsImRlbW8iXSwiaWF0IjoxNjQ5NjU3MTM4LCJleHAiOjE2NTAyNjE5MzgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpjb3VudHJ5Y29uZmlnLXVzZXIiLCJvcGVuY3J2czp3ZWJob29rcy11c2VyIiwib3BlbmNydnM6Y29uZmlnLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjIyZjgxYjQyY2Q1MzdiZjkxZGFhMTBiIn0.MojnxjSVja4VkS5ufVtpJHmiqQqngW3Zb6rHv4MqKwqSgHptjta1A-1xdpkfadxr0pVIYTh-rhKP93LPCTfThkA01oW8qgkUr0t_02cgJ5KLe1B3R5QFJ9i1IzLye9yOeakfpbtnk67cwJ2r4KTJMxj5BWucdPGK8ifZRBdDrt9HsTtcDOutgLmEp2VnxLvc2eAEmoBBp6mRZ8lOYIRei5UHfaROCk0vdwjLchiqQWH9GE8hxU3RIA1jpzshd3_TC4G0rvuIXnBGf9VQaH-gkNW7a44xLVHhdENxAsGTdyeSHRC83wbeoUZkuOFQpF8Iz-8SbLEQfmipdzeBAsBgWg'
 export const validateScopeToken = jwt.sign(
   { scope: ['validate'] },
   readFileSync('../auth/test/cert.key'),
@@ -115,7 +112,7 @@ export function getInitialState(): IStoreState {
 }
 
 export function waitForReady(app: ReactWrapper) {
-  return waitForElement(app, '#readyApplication')
+  return waitForElement(app, '#readyDeclaration')
 }
 
 export async function createTestApp(
@@ -197,10 +194,117 @@ export const selectOption = (
 
 const currentUserId = '123'
 
+export const graphQLEventLocationAddressMock = {
+  id: 'd3225149-d28a-4cc6-be41-4ba89d165ad3',
+  type: 'PRIVATE_HOME',
+  address: {
+    type: null,
+    line: ['', '', '', '', '', '', 'URBAN'],
+    district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+    state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+    city: null,
+    postalCode: null,
+    country: 'FAR',
+    __typename: 'Address'
+  },
+  __typename: 'Location'
+}
+
+export const graphQLPersonAddressMock = [
+  {
+    type: 'PRIMARY_ADDRESS',
+    line: ['', '', '', '', '', '', 'URBAN'],
+    district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+    state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+    city: null,
+    postalCode: null,
+    country: 'FAR',
+    __typename: 'Address'
+  },
+  {
+    type: 'SECONDARY_ADDRESS',
+    line: ['', '', '', '', '', '', 'URBAN'],
+    district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+    state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+    city: null,
+    postalCode: null,
+    country: 'FAR',
+    __typename: 'Address'
+  }
+]
+
+export const eventAddressData = {
+  country: 'FAR',
+  state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+  district: '852b103f-2fe0-4871-a323-51e51c6d9198',
+  ruralOrUrban: 'URBAN',
+  cityUrbanOption: 'my town',
+  addressLine3UrbanOption: 'my res area',
+  addressLine2UrbanOption: 'my street',
+  numberUrbanOption: 12,
+  postalCode: 'my postcode',
+  addressLine5: '',
+  internationalState: '',
+  internationalDistrict: '',
+  internationalCity: '',
+  internationalAddressLine1: '',
+  internationalAddressLine2: '',
+  internationalAddressLine3: '',
+  internationalPostcode: ''
+}
+
+export const primaryAddressData = {
+  primaryAddress: '',
+  countryPrimary: 'FAR',
+  statePrimary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+  districtPrimary: '852b103f-2fe0-4871-a323-51e51c6d9198',
+  ruralOrUrbanPrimary: 'RURAL',
+  cityUrbanOptionPrimary: '',
+  addressLine3UrbanOptionPrimary: '',
+  addressLine2UrbanOptionPrimary: '',
+  numberUrbanOptionPrimary: '',
+  postcodePrimary: '',
+  addressLine5Primary: 'my village'
+}
+
+export const secondaryAddressData = {
+  secondaryAddress: '',
+  countrySecondary: 'FAR',
+  stateSecondary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
+  districtSecondary: '852b103f-2fe0-4871-a323-51e51c6d9198',
+  ruralOrUrbanSecondary: 'URBAN',
+  cityUrbanOptionSecondary: 'my secondary town',
+  addressLine3UrbanOptionSecondary: 'my secondary res area',
+  addressLine2UrbanOptionSecondary: 'my secondary street',
+  numberUrbanOptionSecondary: 12,
+  postcodeSecondary: 'my secondary postcode',
+  addressLine5Secondary: ''
+}
+
+export const primaryInternationalAddressLines = {
+  internationalStatePrimary: 'ujggiu',
+  internationalDistrictPrimary: 'iuoug',
+  internationalCityPrimary: '',
+  internationalAddressLine1Primary: '',
+  internationalAddressLine2Primary: '',
+  internationalAddressLine3Primary: '',
+  internationalPostcodePrimary: ''
+}
+
+export const secondaryInternationalAddressLines = {
+  internationalStateSecondary: 'ugou',
+  internationalDistrictSecondary: 'iugoug',
+  internationalCitySecondary: '',
+  internationalAddressLine1Secondary: '',
+  internationalAddressLine2Secondary: '',
+  internationalAddressLine3Secondary: '',
+  internationalPostcodeSecondary: ''
+}
+
 // This object has more than 10 drafts to utilize pagination testing in draft tab
-export const currentUserApplications = {
+export const currentUserDeclarations = {
   userID: currentUserId,
-  applications: [
+  declarations: [
     {
       id: '72c18939-70c1-40b4-9b80-b162c4871160',
       data: {
@@ -217,17 +321,7 @@ export const currentUserApplications = {
           weightAtBirth: '',
           placeOfBirth: '',
           birthLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         mother: {
           iDType: 'NATIONAL_ID',
@@ -243,34 +337,13 @@ export const currentUserApplications = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddressSameAsPermanent: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -284,35 +357,14 @@ export const currentUserApplications = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          addressSameAsMother: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddressSameAsMother: true,
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          primaryAddressSameAsOtherPrimary: true,
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -342,17 +394,7 @@ export const currentUserApplications = {
           weightAtBirth: '',
           placeOfBirth: '',
           birthLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         mother: {
           iDType: '',
@@ -368,31 +410,10 @@ export const currentUserApplications = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddressSameAsPermanent: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         '': {}
       },
@@ -417,17 +438,7 @@ export const currentUserApplications = {
           weightAtBirth: '',
           placeOfBirth: '',
           birthLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         mother: {
           iDType: 'NATIONAL_ID',
@@ -443,34 +454,13 @@ export const currentUserApplications = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddressSameAsPermanent: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -483,36 +473,14 @@ export const currentUserApplications = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          educationalAttainment: '',
-          addressSameAsMother: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddressSameAsMother: true,
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          primaryAddressSameAsOtherPrimary: true,
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -542,17 +510,7 @@ export const currentUserApplications = {
           weightAtBirth: '',
           placeOfBirth: '',
           birthLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         mother: {
           iDType: 'NATIONAL_ID',
@@ -568,34 +526,13 @@ export const currentUserApplications = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddressSameAsPermanent: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -608,36 +545,14 @@ export const currentUserApplications = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          educationalAttainment: '',
-          addressSameAsMother: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddressSameAsMother: true,
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          primaryAddressSameAsOtherPrimary: true,
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -667,17 +582,7 @@ export const currentUserApplications = {
           weightAtBirth: '',
           placeOfBirth: '',
           birthLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         mother: {
           iDType: 'NATIONAL_ID',
@@ -693,34 +598,13 @@ export const currentUserApplications = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddressSameAsPermanent: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -733,36 +617,14 @@ export const currentUserApplications = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          educationalAttainment: '',
-          addressSameAsMother: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddressSameAsMother: true,
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          primaryAddressSameAsOtherPrimary: true,
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -791,17 +653,7 @@ export const currentUserApplications = {
           weightAtBirth: '',
           placeOfBirth: '',
           birthLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         mother: {
           iDType: 'NATIONAL_ID',
@@ -817,34 +669,13 @@ export const currentUserApplications = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddressSameAsPermanent: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -857,36 +688,14 @@ export const currentUserApplications = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          educationalAttainment: '',
-          addressSameAsMother: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddressSameAsMother: true,
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          primaryAddressSameAsOtherPrimary: true,
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -916,17 +725,7 @@ export const currentUserApplications = {
           weightAtBirth: '',
           placeOfBirth: '',
           birthLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         mother: {
           iDType: 'NATIONAL_ID',
@@ -942,34 +741,13 @@ export const currentUserApplications = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddressSameAsPermanent: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -982,36 +760,14 @@ export const currentUserApplications = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          educationalAttainment: '',
-          addressSameAsMother: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddressSameAsMother: true,
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          primaryAddressSameAsOtherPrimary: true,
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -1041,17 +797,7 @@ export const currentUserApplications = {
           weightAtBirth: '',
           placeOfBirth: '',
           birthLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         mother: {
           iDType: 'NATIONAL_ID',
@@ -1067,34 +813,13 @@ export const currentUserApplications = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddressSameAsPermanent: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -1107,36 +832,14 @@ export const currentUserApplications = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          educationalAttainment: '',
-          addressSameAsMother: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddressSameAsMother: true,
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          primaryAddressSameAsOtherPrimary: true,
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -1166,90 +869,36 @@ export const currentUserApplications = {
           gender: 'male',
           maritalStatus: 'MARRIED',
           birthDate: '1940-01-01',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddress: '',
-          currentAddressSameAsPermanent: true,
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         informant: {
           iDType: 'NATIONAL_ID',
           iDTypeOther: '',
-          applicantID: 1111111111111,
+          informantID: 1111111111111,
           fetchButton: '',
-          applicantFirstNames: 'স্যাম',
-          applicantFamilyName: 'পল',
-          applicantFirstNamesEng: 'Sam',
-          applicantFamilyNameEng: 'Paul',
+          informantFirstNames: 'স্যাম',
+          informantFamilyName: 'পল',
+          informantFirstNamesEng: 'Sam',
+          informantFamilyNameEng: 'Paul',
           nationality: 'BGD',
-          applicantBirthDate: '2000-01-01',
+          informantBirthDate: '2000-01-01',
           relationship: 'OTHER',
-          otherRelationship: 'Friend',
-          applicantPhone: '01711111111',
-          currentAddress: '',
-          country: 'BGD',
-          state: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddress: '',
-          applicantPermanentAddressSameAsCurrent: true,
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          informantPhone: '01711111111',
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         deathEvent: {
           deathDate: '2010-01-01',
           manner: 'NATURAL_CAUSES',
           deathPlace: '',
-          deathPlaceAddress: 'PERMANENT',
-          placeOfDeath: '',
+          placeOfDeath: 'PRIMARY_ADDRESS',
           deathLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         causeOfDeath: {
           causeOfDeathEstablished: false,
@@ -1280,17 +929,7 @@ export const currentUserApplications = {
           weightAtBirth: '',
           placeOfBirth: '',
           birthLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         mother: {
           iDType: 'NATIONAL_ID',
@@ -1306,34 +945,13 @@ export const currentUserApplications = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddressSameAsPermanent: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -1346,36 +964,14 @@ export const currentUserApplications = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          educationalAttainment: '',
-          addressSameAsMother: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddressSameAsMother: true,
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          primaryAddressSameAsOtherPrimary: true,
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -1405,17 +1001,7 @@ export const currentUserApplications = {
           weightAtBirth: '',
           placeOfBirth: '',
           birthLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         mother: {
           iDType: 'NATIONAL_ID',
@@ -1431,34 +1017,13 @@ export const currentUserApplications = {
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
           educationalAttainment: '',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddressSameAsPermanent: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         father: {
-          fathersDetailsExist: false,
+          detailsExist: false,
           iDType: '',
           iDTypeOther: '',
           iD: '',
@@ -1471,36 +1036,14 @@ export const currentUserApplications = {
           fatherBirthDate: '',
           maritalStatus: 'MARRIED',
           dateOfMarriage: '',
-          educationalAttainment: '',
-          addressSameAsMother: true,
-          currentAddress: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddressSameAsMother: true,
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          primaryAddressSameAsOtherPrimary: true,
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         registration: {
-          presentAtBirthRegistration: '',
+          informantType: '',
           whoseContactDetails: '',
           registrationPhone: '01711111111',
           phoneVerificationWarning: '',
@@ -1530,89 +1073,36 @@ export const currentUserApplications = {
           gender: 'male',
           maritalStatus: 'MARRIED',
           birthDate: '1940-01-01',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddress: '',
-          currentAddressSameAsPermanent: true,
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         informant: {
           iDType: 'NATIONAL_ID',
           iDTypeOther: '',
-          applicantID: 1111111111111,
+          informantID: 1111111111111,
           fetchButton: '',
-          applicantFirstNames: 'স্যাম',
-          applicantFamilyName: 'পল',
-          applicantFirstNamesEng: 'Sam',
-          applicantFamilyNameEng: 'Paul',
+          informantFirstNames: 'স্যাম',
+          informantFamilyName: 'পল',
+          informantFirstNamesEng: 'Sam',
+          informantFamilyNameEng: 'Paul',
           nationality: 'BGD',
-          applicantBirthDate: '2000-01-01',
+          informantBirthDate: '2000-01-01',
           relationship: 'SON',
-          applicantPhone: '01711111111',
-          currentAddress: '',
-          country: 'BGD',
-          state: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddress: '',
-          applicantPermanentAddressSameAsCurrent: true,
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          informantPhone: '01711111111',
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         deathEvent: {
           deathDate: '2010-01-01',
           manner: 'NATURAL_CAUSES',
           deathPlace: '',
-          deathPlaceAddress: 'PERMANENT',
-          placeOfDeath: '',
+          placeOfDeath: 'PRIMARY_ADDRESS',
           deathLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         causeOfDeath: {
           causeOfDeathEstablished: false,
@@ -1643,89 +1133,36 @@ export const currentUserApplications = {
           gender: 'male',
           maritalStatus: 'MARRIED',
           birthDate: '1940-01-01',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddress: '',
-          currentAddressSameAsPermanent: true,
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         informant: {
           iDType: 'NATIONAL_ID',
           iDTypeOther: '',
-          applicantID: 1111111111111,
+          informantID: 1111111111111,
           fetchButton: '',
-          applicantFirstNames: 'স্যাম',
-          applicantFamilyName: 'পল',
-          applicantFirstNamesEng: 'Sam',
-          applicantFamilyNameEng: 'Paul',
+          informantFirstNames: 'স্যাম',
+          informantFamilyName: 'পল',
+          informantFirstNamesEng: 'Sam',
+          informantFamilyNameEng: 'Paul',
           nationality: 'BGD',
-          applicantBirthDate: '2000-01-01',
+          informantBirthDate: '2000-01-01',
           relationship: 'SON',
-          applicantPhone: '01711111111',
-          currentAddress: '',
-          country: 'BGD',
-          state: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddress: '',
-          applicantPermanentAddressSameAsCurrent: true,
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          informantPhone: '01711111111',
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         deathEvent: {
           deathDate: '2010-01-01',
           manner: 'NATURAL_CAUSES',
           deathPlace: '',
-          deathPlaceAddress: 'PERMANENT',
-          placeOfDeath: '',
+          placeOfDeath: 'PRIMARY_ADDRESS',
           deathLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         causeOfDeath: {
           causeOfDeathEstablished: false,
@@ -1756,88 +1193,35 @@ export const currentUserApplications = {
           gender: 'male',
           maritalStatus: 'MARRIED',
           birthDate: '1940-01-01',
-          permanentAddress: '',
-          countryPermanent: 'BGD',
-          statePermanent: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          districtPermanent: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4Permanent: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: '',
-          currentAddress: '',
-          currentAddressSameAsPermanent: true,
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         informant: {
           iDType: 'NATIONAL_ID',
           iDTypeOther: '',
-          applicantID: 1111111111111,
+          informantID: 1111111111111,
           fetchButton: '',
-          applicantFirstNames: 'স্যাম',
-          applicantFamilyName: 'পল',
-          applicantFirstNamesEng: 'Sam',
-          applicantFamilyNameEng: 'Paul',
+          informantFirstNames: 'স্যাম',
+          informantFamilyName: 'পল',
+          informantFirstNamesEng: 'Sam',
+          informantFamilyNameEng: 'Paul',
           nationality: 'BGD',
-          applicantBirthDate: '2000-01-01',
+          informantBirthDate: '2000-01-01',
           relationship: 'SON',
-          currentAddress: '',
-          country: 'BGD',
-          state: '9a236522-0c3d-40eb-83ad-e8567518c763',
-          district: 'c879ce5c-545b-4042-98a6-77015b0e13df',
-          addressLine4: 'ee72f497-343f-4f0f-9062-d618fafc175c',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: '',
-          permanentAddress: '',
-          applicantPermanentAddressSameAsCurrent: true,
-          countryPermanent: 'BGD',
-          statePermanent: '',
-          districtPermanent: '',
-          addressLine4Permanent: '',
-          addressLine3Permanent: '',
-          addressLine3CityOptionPermanent: '',
-          addressLine2Permanent: '',
-          addressLine1CityOptionPermanent: '',
-          postCodeCityOptionPermanent: '',
-          addressLine1Permanent: '',
-          postCodePermanent: ''
+          ...primaryAddressData,
+          ...primaryInternationalAddressLines,
+          ...secondaryAddressData,
+          ...secondaryInternationalAddressLines
         },
         deathEvent: {
           deathDate: '2010-01-01',
           manner: 'NATURAL_CAUSES',
           deathPlace: '',
-          deathPlaceAddress: 'PERMANENT',
-          placeOfDeath: '',
+          placeOfDeath: 'PRIMARY_ADDRESS',
           deathLocation: '',
-          country: 'BGD',
-          state: '',
-          district: '',
-          addressLine4: '',
-          addressLine3: '',
-          addressLine3CityOption: '',
-          addressLine2: '',
-          addressLine1CityOption: '',
-          postCodeCityOption: '',
-          addressLine1: '',
-          postCode: ''
+          ...eventAddressData
         },
         causeOfDeath: {
           causeOfDeathEstablished: false,
@@ -2065,7 +1449,8 @@ export const mockUserResponse = {
             __typename: 'HumanName'
           }
         ]
-      }
+      },
+      role: 'LOCAL_REGISTRAR'
     }
   }
 }
@@ -2238,7 +1623,7 @@ export const mockRegistrarUserResponse = {
   }
 }
 
-export const mockApplicationData = {
+export const mockDeclarationData = {
   child: {
     firstNames: 'গায়ত্রী',
     familyName: 'স্পিভক',
@@ -2265,62 +1650,39 @@ export const mockApplicationData = {
     maritalStatus: 'MARRIED',
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
     nationality: 'BGD',
-    countryPermanent: 'BGD',
-    statePermanent: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
-    districtPermanent: 'bc4b9f99-0db3-4815-926d-89fd56889407',
-    addressLine4Permanent: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
-    addressLine3Permanent: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
-    addressLine2Permanent: '',
-    addressLine1Permanent: '193 Kalibari Road',
-    postCodePermanent: '2200',
-    country: 'BGD',
-    state: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
-    district: 'bc4b9f99-0db3-4815-926d-89fd56889407',
-    addressLine4: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
-    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
-    addressLine2: '',
-    addressLine1: '193 Kalibari Road',
-    postCode: '2200',
-    currentAddressSameAsPermanent: true
+    ...primaryAddressData,
+    ...primaryInternationalAddressLines,
+    ...secondaryAddressData,
+    ...secondaryInternationalAddressLines
   },
   father: {
-    fathersDetailsExist: true,
+    detailsExist: true,
     firstNames: 'গায়ত্রী',
     familyName: 'স্পিভক',
     firstNamesEng: 'Jeff',
     familyNameEng: 'Test',
-    iD: '43A8ZU817',
+    iD: '123456789',
     iDType: 'PASSPORT',
     fatherBirthDate: '1950-05-19',
     dateOfMarriage: '1972-09-19',
     maritalStatus: 'MARRIED',
     educationalAttainment: 'SECOND_STAGE_TERTIARY_ISCED_6',
     nationality: 'BGD',
-    countryPermanent: 'BGD',
-    statePermanent: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
-    districtPermanent: 'bc4b9f99-0db3-4815-926d-89fd56889407',
-    addressLine4Permanent: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
-    addressLine3Permanent: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
-    addressLine2Permanent: '',
-    addressLine1Permanent: '193 Kalibari Road',
-    postCodePermanent: '2200',
-    country: 'BGD',
-    state: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
-    district: 'bc4b9f99-0db3-4815-926d-89fd56889407',
-    addressLine4: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
-    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
-    addressLine2: '',
-    addressLine1: '193 Kalibari Road',
-    postCode: '2200',
-    permanentAddressSameAsMother: true,
-    addressSameAsMother: true
+    ...primaryAddressData,
+    ...primaryInternationalAddressLines,
+    ...secondaryAddressData,
+    ...secondaryInternationalAddressLines,
+    primaryAddressSameAsOtherPrimary: true
   },
   registration: {
     whoseContactDetails: {
       value: 'MOTHER',
       nestedFields: { registrationPhone: '01557394986' }
     },
-    presentAtBirthRegistration: 'BOTH_PARENTS',
+    informantType: {
+      value: 'MOTHER',
+      nestedFields: { otherInformantType: '' }
+    },
     registrationNumber: '201908122365BDSS0SE1',
     regStatus: {
       type: 'REGISTERED',
@@ -2333,7 +1695,7 @@ export const mockApplicationData = {
   }
 }
 
-export const mockDeathApplicationData = {
+export const mockDeathDeclarationData = {
   deceased: {
     iDType: 'NATIONAL_ID',
     iD: '1230000000000',
@@ -2345,56 +1707,26 @@ export const mockDeathApplicationData = {
     gender: 'male',
     maritalStatus: 'MARRIED',
     birthDate: '1987-02-16',
-    permanentAddress: '',
-    countryPermanent: 'BGD',
-    statePermanent: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
-    districtPermanent: 'bc4b9f99-0db3-4815-926d-89fd56889407',
-    addressLine4Permanent: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
-    addressLine3Permanent: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
-    addressLine2Permanent: '',
-    addressLine1Permanent: '193 Kalibari Road',
-    postCodePermanent: '2200',
-    currentAddress: '',
-    currentAddressSameAsPermanent: true,
-    country: 'BGD',
-    state: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
-    district: 'bc4b9f99-0db3-4815-926d-89fd56889407',
-    addressLine4: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
-    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
-    addressLine2: '',
-    addressLine1: '193 Kalibari Road',
-    postCode: '2200'
+    ...primaryAddressData,
+    ...primaryInternationalAddressLines,
+    ...secondaryAddressData,
+    ...secondaryInternationalAddressLines
   },
   informant: {
-    applicantIdType: 'NATIONAL_ID',
+    informantIdType: 'NATIONAL_ID',
     iDType: 'NATIONAL_ID',
-    applicantID: '1230000000000',
-    applicantFirstNames: '',
-    applicantFamilyName: 'ইসলাম',
-    applicantFirstNamesEng: 'Islam',
-    applicantFamilyNameEng: 'Islam',
+    informantID: '1230000000000',
+    informantFirstNames: '',
+    informantFamilyName: 'ইসলাম',
+    informantFirstNamesEng: 'Islam',
+    informantFamilyNameEng: 'Islam',
     nationality: 'BGD',
-    applicantBirthDate: '',
+    informantBirthDate: '',
     relationship: 'MOTHER',
-    currentAddress: '',
-    country: 'BGD',
-    state: '6d190887-c8a6-4818-a914-9cdbd36a1d70',
-    district: '22244d72-a10e-4edc-a5c4-4ffaed00f854',
-    addressLine4: '7b9c37e3-8d04-45f9-88be-1f0fe481018a',
-    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
-    addressLine2: '',
-    addressLine1: '193 Kalibari Road',
-    postCode: '2200',
-    permanentAddress: '',
-    applicantPermanentAddressSameAsCurrent: true,
-    countryPermanent: 'BGD',
-    statePermanent: '',
-    districtPermanent: '',
-    addressLine4Permanent: '',
-    addressLine3Permanent: '',
-    addressLine2Permanent: '',
-    addressLine1Permanent: '',
-    postCodePermanent: ''
+    ...primaryAddressData,
+    ...primaryInternationalAddressLines,
+    ...secondaryAddressData,
+    ...secondaryInternationalAddressLines
   },
   father: {
     fatherFirstNames: 'মোক্তার',
@@ -2416,17 +1748,9 @@ export const mockDeathApplicationData = {
   deathEvent: {
     deathDate: '1987-02-16',
     manner: 'ACCIDENT',
-    deathPlaceAddress: 'OTHER',
+    placeOfDeath: 'OTHER',
     deathLocation: '',
-    addressType: '',
-    country: 'BGD',
-    state: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
-    district: 'bc4b9f99-0db3-4815-926d-89fd56889407',
-    addressLine4: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
-    addressLine3: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
-    addressLine2: '',
-    addressLine1: '193 Kalibari Road',
-    postCode: '2200'
+    ...eventAddressData
   },
   causeOfDeath: {
     causeOfDeathEstablished: false,
@@ -2473,7 +1797,10 @@ export const mockBirthRegistrationSectionData = {
     value: 'MOTHER',
     nestedFields: { registrationPhone: '01557394986' }
   },
-  presentAtBirthRegistration: 'BOTH_PARENTS',
+  informantType: {
+    value: 'MOTHER',
+    nestedFields: { otherInformantType: '' }
+  },
   registrationPhone: '01557394986',
   trackingId: 'BDSS0SE',
   registrationNumber: '201908122365BDSS0SE1',
@@ -2505,7 +1832,10 @@ export const mockBirthRegistrationSectionData = {
 
 export const mockDeathRegistrationSectionData = {
   whoseContactDetails: 'MOTHER',
-  presentAtBirthRegistration: 'BOTH_PARENTS',
+  informantType: {
+    value: 'MOTHER',
+    nestedFields: { otherInformantType: '' }
+  },
   registrationPhone: '01557394986',
   trackingId: 'DDSS0SE',
   registrationNumber: '201908122365DDSS0SE1',
@@ -2534,363 +1864,77 @@ export const mockDeathRegistrationSectionData = {
   ]
 }
 
-export const mockOfflineData = {
-  forms: JSON.parse(
-    readFileSync(join(__dirname, './register.json')).toString()
-  ) as {
-    registerForm: { birth: ISerializedForm; death: ISerializedForm }
-    certificateCollectorDefinition: {
-      birth: ICertificateCollectorDefinition
-      death: ICertificateCollectorDefinition
-    }
-    userForm: ISerializedForm
+export const mockFetchCertificatesTemplatesDefinition = [
+  {
+    _id: '12313546',
+    event: 'birth',
+    status: 'ACTIVE',
+    svgCode:
+      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="209.884" y="549.336">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="210" y="445.552">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Died on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of death&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="211" y="384.004">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfDeath}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{informantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Death Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
+    svgDateCreated: 1640696680593,
+    svgDateUpdated: 1644326332088,
+    svgFilename: 'oCRVS_DefaultZambia_Death_v1.svg',
+    user: '61d42359f1a2c25ea01beb4b'
   },
-  facilities: {
-    '627fc0cc-e0e2-4c09-804d-38a9fa1807ee': {
-      id: '627fc0cc-e0e2-4c09-804d-38a9fa1807ee',
-      name: 'Shaheed Taj Uddin Ahmad Medical College',
-      alias: 'শহীদ তাজউদ্দিন আহমেদ মেডিকেল কলেজ হাসপাতাল',
-      physicalType: 'Building',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/3a5358d0-1bcd-4ea9-b0b7-7cfb7cbcbf0f'
-    },
-    'ae5b4462-d1b2-4b22-b289-a66f912dce73': {
-      id: 'ae5b4462-d1b2-4b22-b289-a66f912dce73',
-      name: 'Kaliganj Union Sub Center',
-      alias: 'কালীগঞ্জ ইউনিয়ন উপ-স্বাস্থ্য কেন্দ্র',
-      physicalType: 'Building',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
-    },
-    '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0': {
-      id: '6abbb7b8-d02e-41cf-8a3e-5039776c1eb0',
-      name: 'Kaliganj Upazila Health Complex',
-      alias: 'কালীগঞ্জ উপজেলা স্বাস্থ্য কমপ্লেক্স',
-      physicalType: 'Building',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
-    },
-    '0d8474da-0361-4d32-979e-af91f020309e': {
-      id: '0d8474da-0361-4d32-979e-af91f020309e',
-      name: 'Dholashadhukhan Cc',
-      alias: 'ধলাশাধুখান সিসি - কালিগঞ্জ',
-      physicalType: 'Building',
-      type: 'HEALTH_FACILITY',
-      partOf: 'Location/50c5a9c4-3cc1-4c8c-9a1b-a37ddaf85987'
-    }
-  },
-  offices: {
-    '0d8474da-0361-4d32-979e-af91f012340a': {
-      id: '0d8474da-0361-4d32-979e-af91f012340a',
-      name: 'Moktarpur Union Parishad',
-      alias: 'মোক্তারপুর ইউনিয়ন পরিষদ',
-      physicalType: 'Building',
-      type: 'CRVS_OFFICE',
-      partOf: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
-    }
-  },
-  locations: {
-    '65cf62cb-864c-45e3-9c0d-5c70f0074cb4': {
-      id: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
-      name: 'Barisal',
-      alias: 'বরিশাল',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '8cbc862a-b817-4c29-a490-4a8767ff023c': {
-      id: '8cbc862a-b817-4c29-a490-4a8767ff023c',
-      name: 'Chittagong',
-      alias: 'চট্টগ্রাম',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b': {
-      id: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
-      name: 'Dhaka',
-      alias: 'ঢাকা',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '7304b306-1b0d-4640-b668-5bf39bc78f48': {
-      id: '7304b306-1b0d-4640-b668-5bf39bc78f48',
-      name: 'Khulna',
-      alias: 'খুলনা',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '75fdf3dc-0dd2-4b65-9c59-3afe5f49fc3a': {
-      id: '75fdf3dc-0dd2-4b65-9c59-3afe5f49fc3a',
-      name: 'Rajshahi',
-      alias: 'রাজশাহী',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '2b55d13f-f700-4373-8255-c0febd4733b6': {
-      id: '2b55d13f-f700-4373-8255-c0febd4733b6',
-      name: 'Rangpur',
-      alias: 'রংপুর',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '59f7f044-84b8-4a6c-955d-271aa3e5af46': {
-      id: '59f7f044-84b8-4a6c-955d-271aa3e5af46',
-      name: 'Sylhet',
-      alias: 'সিলেট',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    '237f3404-d417-41fe-9130-3d049800a1e5': {
-      id: '237f3404-d417-41fe-9130-3d049800a1e5',
-      name: 'Mymensingh',
-      alias: 'ময়মনসিংহ',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DIVISION',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/0'
-    },
-    'bc4b9f99-0db3-4815-926d-89fd56889407': {
-      id: 'bc4b9f99-0db3-4815-926d-89fd56889407',
-      name: 'BARGUNA',
-      alias: 'বরগুনা',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    },
-    'dabffdf7-c174-4450-b306-5a3c2c0e2c0e': {
-      id: 'dabffdf7-c174-4450-b306-5a3c2c0e2c0e',
-      name: 'BARISAL',
-      alias: 'বরিশাল',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    },
-    'a5b61fc5-f0c9-4f54-a934-eba18f9110c2': {
-      id: 'a5b61fc5-f0c9-4f54-a934-eba18f9110c2',
-      name: 'BHOLA',
-      alias: 'ভোলা',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    },
-    '5ffa5780-5ddf-4549-a391-7ad3ba2334d4': {
-      id: '5ffa5780-5ddf-4549-a391-7ad3ba2334d4',
-      name: 'JHALOKATI',
-      alias: 'ঝালকাঠি',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    },
-    'c8dcf1fe-bf92-404b-81c0-31d6802a1a68': {
-      id: 'c8dcf1fe-bf92-404b-81c0-31d6802a1a68',
-      name: 'PATUAKHALI',
-      alias: 'পটুয়াখালী ',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    },
-    '9c86160a-f704-464a-8b7d-9eae2b4cf1f9': {
-      id: '9c86160a-f704-464a-8b7d-9eae2b4cf1f9',
-      name: 'PIROJPUR',
-      alias: 'পিরোজপুর ',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/65cf62cb-864c-45e3-9c0d-5c70f0074cb4'
-    },
-    '1846f07e-6f5c-4507-b5d6-126716b0856b': {
-      id: '1846f07e-6f5c-4507-b5d6-126716b0856b',
-      name: 'BANDARBAN',
-      alias: 'বান্দরবান',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    'cf141982-36a1-4308-9090-0445c311f5ae': {
-      id: 'cf141982-36a1-4308-9090-0445c311f5ae',
-      name: 'BRAHMANBARIA',
-      alias: 'ব্রাহ্মণবাড়িয়া',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    '478f518e-8d86-439d-8618-5cfa8d3bf5dd': {
-      id: '478f518e-8d86-439d-8618-5cfa8d3bf5dd',
-      name: 'CHANDPUR',
-      alias: 'চাঁদপুর',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    'db5faba3-8143-4924-a44a-8562ed5e0437': {
-      id: 'db5faba3-8143-4924-a44a-8562ed5e0437',
-      name: 'CHITTAGONG',
-      alias: 'চট্টগ্রাম',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    '5926982b-845c-4463-80aa-cbfb86762e0a': {
-      id: '5926982b-845c-4463-80aa-cbfb86762e0a',
-      name: 'COMILLA',
-      alias: 'কুমিল্লা',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    'a3455e64-164c-4bf4-b834-16640a85efd8': {
-      id: 'a3455e64-164c-4bf4-b834-16640a85efd8',
-      name: "COX'S BAZAR",
-      alias: 'কক্সবাজার ',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    '1dfc716a-c5f7-4d39-ad71-71d2a359210c': {
-      id: '1dfc716a-c5f7-4d39-ad71-71d2a359210c',
-      name: 'FENI',
-      alias: 'ফেনী',
-      physicalType: 'Jurisdiction',
-      jurisdictionType: 'DISTRICT',
-      type: 'ADMIN_STRUCTURE',
-      partOf: 'Location/8cbc862a-b817-4c29-a490-4a8767ff023c'
-    },
-    'bfe8306c-0910-48fe-8bf5-0db906cf3155': {
-      alias: 'বানিয়াজান',
-      id: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
-      jurisdictionType: 'UNION',
-      name: 'Baniajan',
-      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    },
-    'd3cef1d4-6187-4f0e-a024-61abd3fce9d4': {
-      alias: 'দুওজ',
-      id: 'd3cef1d4-6187-4f0e-a024-61abd3fce9d4',
-      jurisdictionType: 'UNION',
-      name: 'Duaz',
-      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    },
-    '473ed705-13e8-4ec1-9836-69bc269f7fad': {
-      alias: '',
-      id: '473ed705-13e8-4ec1-9836-69bc269f7fad',
-      jurisdictionType: 'STATE',
-      name: 'Lusaka',
-      partOf: 'Location/0',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    },
-    '81317429-1d89-42ac-8abc-7a92f268273c': {
-      alias: '',
-      id: '81317429-1d89-42ac-8abc-7a92f268273c',
-      jurisdictionType: 'DISTRICT',
-      name: 'Lusaka',
-      partOf: 'Location/473ed705-13e8-4ec1-9836-69bc269f7fad',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    }
-  },
-  pilotLocations: {
-    'bfe8306c-0910-48fe-8bf5-0db906cf3155': {
-      alias: 'বানিয়াজান',
-      id: 'bfe8306c-0910-48fe-8bf5-0db906cf3155',
-      jurisdictionType: 'UNION',
-      name: 'Baniajan',
-      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    },
-    'd3cef1d4-6187-4f0e-a024-61abd3fce9d4': {
-      alias: 'দুওজ',
-      id: 'd3cef1d4-6187-4f0e-a024-61abd3fce9d4',
-      jurisdictionType: 'UNION',
-      name: 'Duaz',
-      partOf: 'Location/8f1aae72-2f90-4585-b853-e8c37f4be764',
-      physicalType: 'Jurisdiction',
-      type: 'ADMIN_STRUCTURE'
-    }
-  },
-  languages: JSON.parse(
-    readFileSync(join(__dirname, './languages.json')).toString()
-  ).data,
-  templates: JSON.parse(
-    readFileSync(join(__dirname, './templates.json')).toString()
-  ),
-  assets: {
-    logo: `data:image;base64,${validImageB64String}`
+  {
+    _id: '25313546',
+    event: 'death',
+    status: 'ACTIVE',
+    svgCode:
+      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="549.336" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="445.552" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Was born on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of birth&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="50%" y="384.004" text-anchor="middle">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfBirth}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{informantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Birth Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
+    svgDateCreated: 1640696804785,
+    svgDateUpdated: 1643885502999,
+    svgFilename: 'oCRVS_DefaultZambia_Birth_v1.svg',
+    user: '61d42359f1a2c25ea01beb4b'
   }
+]
+
+export const mockConfigResponse = {
+  config: mockOfflineData.config,
+  certificates: mockFetchCertificatesTemplatesDefinition,
+  formConfig: mockOfflineData.formConfig
+}
+
+export const mockOfflineDataDispatch = {
+  languages: mockOfflineData.languages,
+  templates: mockOfflineData.templates,
+  locations: mockOfflineData.locations,
+  facilities: mockOfflineData.facilities,
+  pilotLocations: mockOfflineData.pilotLocations,
+  offices: mockOfflineData.offices,
+  assets: mockOfflineData.assets,
+  config: mockOfflineData.config,
+  formConfig: mockOfflineData.formConfig
 }
 
 export async function createTestStore() {
   const { store, history } = createStore()
-  await store.dispatch(
-    offlineDataReady({
-      languages: mockOfflineData.languages,
-      forms: mockOfflineData.forms,
-      templates: mockOfflineData.templates,
-      locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities,
-      pilotLocations: mockOfflineData.pilotLocations,
-      offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets
-    })
-  )
+  await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   return { store, history }
 }
 
 export async function createTestComponent(
   node: React.ReactElement<ITestView>,
-  store: AppStore,
-  graphqlMocks: any = null,
+  {
+    store,
+    history,
+    graphqlMocks,
+    apolloClient
+  }: {
+    store: AppStore
+    history: History
+    graphqlMocks?: MockedProvider['props']['mocks']
+    apolloClient?: ApolloClient<any>
+  },
   options?: MountRendererProps
 ) {
-  /*
-   * Would it work to replace this fn with createTestApp()
-   * call send return only the component that requires testing..
-   *
-   * Feels odd the whole boilerplate has to be recreated
-   */
+  await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
 
-  await store.dispatch(
-    offlineDataReady({
-      languages: mockOfflineData.languages,
-      forms: mockOfflineData.forms,
-      templates: mockOfflineData.templates,
-      locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities,
-      pilotLocations: mockOfflineData.pilotLocations,
-      offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets
-    })
-  )
+  const withGraphQL = (node: JSX.Element) => {
+    if (apolloClient) {
+      return <ApolloProvider client={apolloClient}>{node}</ApolloProvider>
+    }
 
-  function PropProxy(props: Record<string, any>) {
     return (
       <MockedProvider
         mocks={graphqlMocks}
@@ -2900,62 +1944,29 @@ export async function createTestComponent(
           query: { fetchPolicy: 'no-cache' }
         }}
       >
-        <Provider store={store}>
+        {node}
+      </MockedProvider>
+    )
+  }
+
+  function PropProxy(props: Record<string, any>) {
+    return withGraphQL(
+      <Provider store={store}>
+        <ConnectedRouter noInitialPop={true} history={history}>
           <I18nContainer>
             <ThemeProvider theme={getTheme(getDefaultLanguage())}>
               <node.type {...node.props} {...props} />
             </ThemeProvider>
           </I18nContainer>
-        </Provider>
-      </MockedProvider>
+        </ConnectedRouter>
+      </Provider>
     )
   }
 
-  const component = mount(<PropProxy {...node.props} />, options)
-  return { component: component.update(), store }
+  return mount(<PropProxy {...node.props} />, options)
 }
 
-export async function createTestComponentWithApolloClient(
-  node: React.ReactElement<ITestView>,
-  store: AppStore,
-  client: ApolloClient<{}>
-) {
-  /*
-   * Would it work to replace this fn with createTestApp()
-   * call send return only the component that requires testing..
-   *
-   * Feels odd the whole boilerplate has to be recreated
-   */
-
-  await store.dispatch(
-    offlineDataReady({
-      languages: mockOfflineData.languages,
-      forms: mockOfflineData.forms,
-      templates: mockOfflineData.templates,
-      locations: mockOfflineData.locations,
-      facilities: mockOfflineData.facilities,
-      pilotLocations: mockOfflineData.pilotLocations,
-      offices: mockOfflineData.offices,
-      assets: mockOfflineData.assets
-    })
-  )
-
-  const component = mount(
-    <ApolloProvider client={client}>
-      <Provider store={store}>
-        <I18nContainer>
-          <ThemeProvider theme={getTheme(getDefaultLanguage())}>
-            {node}
-          </ThemeProvider>
-        </I18nContainer>
-      </Provider>
-    </ApolloProvider>
-  )
-
-  return { component: component.update(), store }
-}
-
-export const mockDeathApplicationDataWithoutFirstNames = {
+export const mockDeathDeclarationDataWithoutFirstNames = {
   deceased: {
     iDType: 'NATIONAL_ID',
     iD: '1230000000000',
@@ -2967,17 +1978,16 @@ export const mockDeathApplicationDataWithoutFirstNames = {
     gender: 'male',
     maritalStatus: 'MARRIED',
     birthDate: '1987-02-16',
-    permanentAddress: '',
-    countryPermanent: 'BGD',
-    statePermanent: '6d190887-c8a6-4818-a914-9cdbd36a1d70',
-    districtPermanent: '22244d72-a10e-4edc-a5c4-4ffaed00f854',
-    addressLine4Permanent: '7b9c37e3-8d04-45f9-88be-1f0fe481018a',
-    addressLine3Permanent: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
-    addressLine2Permanent: '193 Kalibari Road',
-    addressLine1Permanent: '193 Kalibari Road',
-    postCodePermanent: '2200',
-    currentAddress: '',
-    currentAddressSameAsPermanent: true,
+    primaryAddress: '',
+    countryPrimary: 'BGD',
+    statePrimary: '6d190887-c8a6-4818-a914-9cdbd36a1d70',
+    districtPrimary: '22244d72-a10e-4edc-a5c4-4ffaed00f854',
+    addressLine4Primary: '7b9c37e3-8d04-45f9-88be-1f0fe481018a',
+    addressLine3Primary: '59c55c4c-fb7d-4334-b0ba-d1020ca5b549',
+    addressLine2Primary: '193 Kalibari Road',
+    addressLine1Primary: '193 Kalibari Road',
+    postCodePrimary: '2200',
+    secondaryAddress: '',
     country: 'BGD',
     state: '',
     district: '',
@@ -2988,17 +1998,17 @@ export const mockDeathApplicationDataWithoutFirstNames = {
     postCode: ''
   },
   informant: {
-    applicantIdType: 'NATIONAL_ID',
+    informantIdType: 'NATIONAL_ID',
     iDType: 'NATIONAL_ID',
-    applicantID: '1230000000000',
-    applicantFirstNames: '',
-    applicantFamilyName: 'ইসলাম',
-    applicantFirstNamesEng: 'Islam',
-    applicantFamilyNameEng: 'Islam',
+    informantID: '1230000000000',
+    informantFirstNames: '',
+    informantFamilyName: 'ইসলাম',
+    informantFirstNamesEng: 'Islam',
+    informantFamilyNameEng: 'Islam',
     nationality: 'BGD',
-    applicantBirthDate: '',
+    informantBirthDate: '',
     relationship: 'SPOUSE',
-    currentAddress: '',
+    secondaryAddress: '',
     country: 'BGD',
     state: '6d190887-c8a6-4818-a914-9cdbd36a1d70',
     district: '22244d72-a10e-4edc-a5c4-4ffaed00f854',
@@ -3007,22 +2017,21 @@ export const mockDeathApplicationDataWithoutFirstNames = {
     addressLine2: '',
     addressLine1: '193 Kalibari Road',
     postCode: '2200',
-    permanentAddress: '',
-    applicantPermanentAddressSameAsCurrent: true,
-    countryPermanent: 'BGD',
-    statePermanent: '',
-    districtPermanent: '',
-    addressLine4Permanent: '',
-    addressLine3Permanent: '',
-    addressLine2Permanent: '',
-    addressLine1Permanent: '',
-    postCodePermanent: ''
+    primaryAddress: '',
+    informantPrimaryAddressSameAsCurrent: true,
+    countryPrimary: 'BGD',
+    statePrimary: '',
+    districtPrimary: '',
+    addressLine4Primary: '',
+    addressLine3Primary: '',
+    addressLine2Primary: '',
+    addressLine1Primary: '',
+    postCodePrimary: ''
   },
   deathEvent: {
     deathDate: '1987-02-16',
     manner: 'ACCIDENT',
     deathPlace: '',
-    deathPlaceAddress: 'OTHER',
     placeOfDeath: 'OTHER',
     deathLocation: '',
     addressType: '',
@@ -3080,15 +2089,15 @@ export const getFileFromBase64String = (
 
 export async function goToSection(component: ReactWrapper, nth: number) {
   for (let i = 0; i < nth; i++) {
+    await waitForElement(component, '#next_section')
     component.find('#next_section').hostNodes().simulate('click')
-
     await flushPromises()
-    component.update()
+    await component.update()
   }
 }
 
 export async function goToEndOfForm(component: ReactWrapper) {
-  await goToSection(component, 5)
+  await goToSection(component, 6)
   await waitForElement(component, '#review_header')
 }
 
@@ -3181,7 +2190,11 @@ export function loginAsFieldAgent(store: AppStore) {
               ]
             }
           ],
-          primaryOffice: undefined,
+          primaryOffice: {
+            id: '0d8474da-0361-4d32-979e-af91f012340a',
+            name: 'Kaliganj Union Sub Center',
+            status: 'active'
+          },
           localRegistrar: {
             name: [
               {
@@ -3201,11 +2214,11 @@ export function loginAsFieldAgent(store: AppStore) {
 
 export function createRouterProps<T, Params>(
   path: string,
-  locationState: T,
+  locationState?: T,
   {
     search,
     matchParams = {} as Params
-  }: { search?: Record<string, string>; matchParams?: Params }
+  }: { search?: Record<string, string>; matchParams?: Params } = {}
 ) {
   const location = createLocation(path, locationState)
 
@@ -3229,3 +2242,5 @@ export function createRouterProps<T, Params>(
 
   return { location, history, match }
 }
+
+export { mockOfflineData } from './mock-offline-data'

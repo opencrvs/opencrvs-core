@@ -17,19 +17,12 @@ import {
 } from '@client/forms/register/fieldMappings/birth/mutation/documents-mappings'
 
 const fieldNameMapping = {
-  [birthDocumentForWhomFhirMapping.Mother]: 'uploadDocForMother',
-  [birthDocumentForWhomFhirMapping.Father]: 'uploadDocForFather',
-  [birthDocumentForWhomFhirMapping.Child]: 'uploadDocForChildDOB',
-  [birthDocumentForWhomFhirMapping.Parent]:
-    'uploadDocForParentPermanentAddress',
-  [birthDocumentForWhomFhirMapping.Applicant]: 'uploadDocForApplicant',
-  [birthDocumentForWhomFhirMapping.ChildAge]: 'uploadDocForChildAge',
-  [birthDocumentForWhomFhirMapping.AssignedResponsibilityProof]:
-    'uploadDocForProofOfAssignedResponsibility',
-  [birthDocumentForWhomFhirMapping.LegalGuardianProof]:
-    'uploadDocForProofOfLegarGuardian',
-  [birthDocumentForWhomFhirMapping.WardCouncillorProof]:
-    'uploadDocFromCounsilor'
+  [birthDocumentForWhomFhirMapping.MOTHER]: 'uploadDocForMother',
+  [birthDocumentForWhomFhirMapping.FATHER]: 'uploadDocForFather',
+  [birthDocumentForWhomFhirMapping.CHILD]: 'uploadDocForChildDOB',
+  [birthDocumentForWhomFhirMapping.INFORMANT_ID_PROOF]: 'uploadDocForInformant',
+  [birthDocumentForWhomFhirMapping.LEGAL_GUARDIAN_PROOF]:
+    'uploadDocForProofOfLegarGuardian'
 }
 
 export function birthAttachmentToFieldTransformer(

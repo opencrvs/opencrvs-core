@@ -20,14 +20,15 @@ sed -i "s/{{hostname}}/$1/g" /tmp/compose/infrastructure/openhim-console-config.
 # Set hostname in compose file
 sed -i "s/{{hostname}}/$1/g" /tmp/compose/docker-compose.deploy.yml
 
-# Set netdata user details in compose file
-USER_DETAILS=$(echo $2 | base64 -d | sed -e s/\\$/\\$\\$/g)
-sed -i "s#{{netdata_user}}#$USER_DETAILS#g" /tmp/compose/docker-compose.deploy.yml
+# Setup an encryption key for Kibana
+KIBANA_ENCRYPTION_KEY=`uuidgen`
+sed -i "s/{{KIBANA_ENCRYPTION_KEY}}/$KIBANA_ENCRYPTION_KEY/g" /tmp/compose/infrastructure/monitoring/kibana/kibana.yml
+sed -i -e "s%{{SMTP_HOST}}%$SMTP_HOST%" /tmp/compose/infrastructure/monitoring/elastalert/rules/alert.yaml
+sed -i -e "s%{{SMTP_PORT}}%$SMTP_PORT%" /tmp/compose/infrastructure/monitoring/elastalert/rules/alert.yaml
+sed -i -e "s%{{ALERT_EMAIL}}%$ALERT_EMAIL%" /tmp/compose/infrastructure/monitoring/elastalert/rules/alert.yaml
+sed -i -e "s%{{SMTP_USERNAME}}%$SMTP_USERNAME%" /tmp/compose/infrastructure/monitoring/elastalert/rules/auth.yaml
+sed -i -e "s%{{SMTP_PASSWORD}}%$SMTP_PASSWORD%" /tmp/compose/infrastructure/monitoring/elastalert/rules/auth.yaml
 
-# Setup API key for netdata streaming
-NETDATA_API_KEY=`uuidgen`
-sed -i "s/{{NETDATA_API_KEY}}/$NETDATA_API_KEY/g" /tmp/compose/infrastructure/netdata-master-stream.conf
-sed -i "s/{{NETDATA_API_KEY}}/$NETDATA_API_KEY/g" /tmp/compose/infrastructure/netdata-slave-stream.conf
 
 echo "DONE - `date --iso-8601=ns`"
 echo

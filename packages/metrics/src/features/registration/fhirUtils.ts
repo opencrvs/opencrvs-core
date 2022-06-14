@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IAuthHeader } from '@metrics/features/registration'
-import { fetchTaskHistory } from '@metrics/api'
+import {
+  fetchLocation,
+  fetchPractitionerRole,
+  fetchTaskHistory
+} from '@metrics/api'
 
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
@@ -54,19 +58,21 @@ function isTaskResource(resource: fhir.Resource): resource is fhir.Task {
   return resource.resourceType === 'Task'
 }
 
-export type APPLICATION_STATUS =
+export type DECLARATION_STATUS =
   | 'IN_PROGRESS'
   | 'DECLARED'
   | 'REGISTERED'
   | 'VALIDATED'
   | 'WAITING_VALIDATION'
   | 'REJECTED'
+  | 'REQUESTED_CORRECTION'
+  | 'CERTIFIED'
 
-export type APPLICATION_TYPE = 'BIRTH' | 'DEATH'
+export type DECLARATION_TYPE = 'BIRTH' | 'DEATH'
 
 function findPreviousTask(
   historyResponseBundle: fhir.Bundle,
-  allowedPreviousStates: APPLICATION_STATUS[]
+  allowedPreviousStates: DECLARATION_STATUS[]
 ) {
   const task =
     historyResponseBundle.entry &&
@@ -81,7 +87,7 @@ function findPreviousTask(
         }
 
         return resource.businessStatus.coding.some((coding) =>
-          allowedPreviousStates.includes(coding.code as APPLICATION_STATUS)
+          allowedPreviousStates.includes(coding.code as DECLARATION_STATUS)
         )
       })
 
@@ -111,11 +117,19 @@ export function getComposition(bundle: fhir.Bundle) {
 
 export async function getPreviousTask(
   task: Task,
-  allowedPreviousStates: APPLICATION_STATUS[],
+  allowedPreviousStates: DECLARATION_STATUS[],
   authHeader: IAuthHeader
 ) {
   const taskHistory = await fetchTaskHistory(task.id, authHeader)
   return findPreviousTask(taskHistory, allowedPreviousStates)
+}
+
+export function getPractitionerIdFromBundle(bundle: fhir.Bundle) {
+  const task = getTask(bundle)
+  if (!task) {
+    throw new Error('Task not found in bundle')
+  }
+  return getPractionerIdFromTask(task)
 }
 
 export function getPractionerIdFromTask(task: fhir.Task) {
@@ -126,7 +140,7 @@ export function getPractionerIdFromTask(task: fhir.Task) {
     ?.valueReference?.reference?.split('/')?.[1]
 }
 
-export function getApplicationStatus(task: Task): APPLICATION_STATUS | null {
+export function getDeclarationStatus(task: Task): DECLARATION_STATUS | null {
   if (!task.businessStatus || !task.businessStatus.coding) {
     return null
   }
@@ -137,7 +151,7 @@ export function getApplicationStatus(task: Task): APPLICATION_STATUS | null {
   if (!coding) {
     return null
   }
-  return coding.code as APPLICATION_STATUS
+  return coding.code as DECLARATION_STATUS
 }
 
 export function getTrackingId(task: Task) {
@@ -153,18 +167,14 @@ export function getTrackingId(task: Task) {
   return trackingIdentifier.value
 }
 
-export function getApplicationType(task: Task): APPLICATION_TYPE | null {
-  if (!task.code || !task.code.coding) {
-    return null
-  }
-
-  const coding = task.code.coding.find(
+export function getDeclarationType(task: Task): DECLARATION_TYPE {
+  const coding = task.code?.coding?.find(
     ({ system }) => system === 'http://opencrvs.org/specs/types'
   )
   if (!coding) {
-    return null
+    throw new Error('No declaration type found in task')
   }
-  return coding.code as APPLICATION_TYPE
+  return coding.code as DECLARATION_TYPE
 }
 
 export function getStartedByFieldAgent(taskHistory: fhir.Bundle): string {
@@ -213,7 +223,39 @@ export function getRegLastOffice(bundle: fhir.Bundle) {
     regLastOffice.valueReference.reference
   )
 }
+export async function getEncounterLocationType(
+  bundle: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
+  const encounter = getResourceByType<fhir.Encounter>(
+    bundle,
+    FHIR_RESOURCE_TYPE.ENCOUNTER
+  )
 
+  if (!encounter) {
+    throw new Error('Encounter not found!')
+  }
+
+  const locationId = encounter.location?.[0].location.reference
+  if (!locationId) {
+    throw new Error('Encounter location not found!')
+  }
+
+  const location = await fetchLocation(locationId, authHeader)
+  if (!location || !location.type) {
+    throw new Error(
+      `Encounter location not found from Hearth with id ${locationId}!`
+    )
+  }
+  const type = location.type.coding?.[0]?.code
+
+  if (!type) {
+    throw new Error(
+      `Encounter location was found from Hearth with id ${locationId}, but the location did not have a proper type code`
+    )
+  }
+  return type
+}
 export function getRegLastLocation(bundle: fhir.Bundle) {
   const task: fhir.Task = getResourceByType(
     bundle,
@@ -256,6 +298,7 @@ export function getResourceByType<T = fhir.Resource>(
 export enum FHIR_RESOURCE_TYPE {
   COMPOSITION = 'Composition',
   TASK = 'Task',
+  ENCOUNTER = 'Encounter',
   PAYMENT_RECONCILIATION = 'PaymentReconciliation'
 }
 
@@ -331,4 +374,34 @@ export function getObservationValueByCode(
     'UNKNOWN'
 
   return value
+}
+
+export async function fetchDeclarationsBeginnerRole(
+  fhirBundle: fhir.Bundle,
+  authHeader: IAuthHeader
+) {
+  let startedByRole = ''
+  const currentTask = getTask(fhirBundle)
+
+  if (currentTask) {
+    const bundle = await fetchTaskHistory(currentTask.id, authHeader)
+    const length = bundle.entry ? bundle.entry.length : 0
+    const task =
+      bundle.entry &&
+      bundle.entry
+        .map((entry) => entry.resource)
+        .filter((resource): resource is fhir.Task =>
+          Boolean(resource && isTaskResource(resource))
+        )
+
+    if (task && length > 0) {
+      const startedTask = task[length - 1] //the last task in the entries of history bundle
+      const practitionerId = getPractionerIdFromTask(startedTask)
+      if (!practitionerId) {
+        throw new Error('Practitioner id not found')
+      }
+      startedByRole = await fetchPractitionerRole(practitionerId, authHeader)
+    }
+  }
+  return startedByRole
 }

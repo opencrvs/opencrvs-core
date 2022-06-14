@@ -16,12 +16,15 @@ import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import styled, { withTheme } from 'styled-components'
+import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
+import { messages } from '@client/i18n/messages/views/performance'
 
 interface IProps extends WrappedComponentProps {
   theme: ITheme
   data?: ILineDataPoint[]
   loading?: boolean
   eventType?: Event
+  completenessRateTime?: CompletenessRateTime
 }
 
 interface IActiveState {
@@ -38,7 +41,7 @@ interface IState {
   maximizeXAxisInterval?: boolean
   legendLayout: string
   activeLabel: string
-  activeRegisteredIn45Day: IActiveState
+  activeRegisteredInTargetDays: IActiveState
   activeTotalRegistered: IActiveState
   activeTotalEstimate: IActiveState
 }
@@ -56,7 +59,7 @@ const LegendHeader = styled.div`
   padding-bottom: 8px;
   margin-bottom: 8px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
 `
 
 const LegendDetails = styled.div`
@@ -65,20 +68,20 @@ const LegendDetails = styled.div`
 `
 
 const LegendDataLabel = styled.span`
-  ${({ theme }) => theme.fonts.chartLegendStyle}
+  ${({ theme }) => theme.fonts.reg14}
 `
 const LegendDataValue = styled.span`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle}
+  ${({ theme }) => theme.fonts.h4}
 `
 
 const LegendData = styled.div`
   padding: 0 8px;
   width: 100%;
-  ${({ theme }) => theme.fonts.captionStyle};
+  ${({ theme }) => theme.fonts.reg12};
 `
 
 const TooltipContent = styled.div`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
 `
 
 const LoadingIndicator = styled.div<{
@@ -115,7 +118,7 @@ const LoaderBox = styled.span<{
 
 interface ILineDataPoint {
   label: string
-  registeredIn45Days: number
+  registeredInTargetDays: number
   totalRegistered: number
   totalEstimate: number
   registrationPercentage: string
@@ -190,28 +193,28 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
     const latestData = data && data[data.length - 1]
     return {
       activeLabel: (latestData && latestData.label) || '',
-      activeRegisteredIn45Day: {
-        value: (latestData && latestData.registeredIn45Days) || 0,
-        stroke: theme.colors.fountainBlue
+      activeRegisteredInTargetDays: {
+        value: (latestData && latestData.registeredInTargetDays) || 0,
+        stroke: theme.colors.teal
       },
       activeTotalRegistered: {
         value: (latestData && latestData.totalRegistered) || 0,
-        stroke: theme.colors.swansDown
+        stroke: theme.colors.tealLight
       },
       activeTotalEstimate: {
         value: (latestData && latestData.totalEstimate) || 0,
-        stroke: theme.colors.silverSand
+        stroke: theme.colors.grey300
       }
     }
   }
   customizedLegend = () => {
     const {
       activeLabel,
-      activeRegisteredIn45Day,
+      activeRegisteredInTargetDays,
       activeTotalRegistered,
       activeTotalEstimate
     } = this.state.activeLabel ? this.state : this.getLatestData()
-    const { intl, eventType } = this.props
+    const { intl, eventType, completenessRateTime } = this.props
     return (
       <CustomLegendContainer
         marginLeft={this.state.legendMarginLeft}
@@ -249,14 +252,29 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
         </LegendDetails>
         <LegendDetails>
           <div>
-            <LegendDot color={activeRegisteredIn45Day.stroke} />
+            <LegendDot color={activeRegisteredInTargetDays.stroke} />
           </div>
           <LegendData>
             <LegendDataLabel>
-              {intl.formatMessage(constantsMessages.registeredIn45d)}
+              {completenessRateTime === CompletenessRateTime.Within5Years
+                ? intl.formatMessage(messages.performanceWithin5YearsLabel)
+                : completenessRateTime === CompletenessRateTime.Within1Year
+                ? intl.formatMessage(messages.performanceWithin1YearLabel)
+                : intl.formatMessage(
+                    messages.performanceWithinTargetDaysLabel,
+                    {
+                      target:
+                        eventType === Event.BIRTH
+                          ? window.config.BIRTH.REGISTRATION_TARGET
+                          : window.config.DEATH.REGISTRATION_TARGET,
+                      withPrefix: false
+                    }
+                  )}
             </LegendDataLabel>
             <br />
-            <LegendDataValue>{activeRegisteredIn45Day.value}</LegendDataValue>
+            <LegendDataValue>
+              {activeRegisteredInTargetDays.value}
+            </LegendDataValue>
           </LegendData>
         </LegendDetails>
       </CustomLegendContainer>
@@ -280,17 +298,17 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
     if (data && data.activePayload) {
       this.setState({
         activeLabel: data.activeLabel || '',
-        activeRegisteredIn45Day: {
+        activeRegisteredInTargetDays: {
           value: data.activePayload[2].value || 0,
-          stroke: theme.colors.fountainBlue
+          stroke: theme.colors.teal
         },
         activeTotalRegistered: {
           value: data.activePayload[1].value || 0,
-          stroke: theme.colors.swansDown
+          stroke: theme.colors.tealLight
         },
         activeTotalEstimate: {
           value: data.activePayload[0].value || 0,
-          stroke: theme.colors.silverSand
+          stroke: theme.colors.grey200
         }
       })
     }
@@ -311,7 +329,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendHeader>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.silverSand} />
+                <LegendDot color={this.props.theme.colors.grey300} />
               </div>
               <LegendData>
                 <LoaderBox width={60} />
@@ -321,7 +339,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendDetails>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.silverSand} />
+                <LegendDot color={this.props.theme.colors.grey300} />
               </div>
               <LegendData>
                 <LegendDataLabel>
@@ -335,7 +353,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendDetails>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.silverSand} />
+                <LegendDot color={this.props.theme.colors.grey300} />
               </div>
               <LegendData>
                 <LegendDataLabel>
@@ -367,7 +385,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendHeader>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.silverSand} />
+                <LegendDot color={this.props.theme.colors.grey300} />
               </div>
               <LegendData>
                 <LoaderBox width={80} />
@@ -377,7 +395,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendDetails>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.silverSand} />
+                <LegendDot color={this.props.theme.colors.grey300} />
               </div>
               <LegendData>
                 <LegendDataLabel>
@@ -391,7 +409,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
             </LegendDetails>
             <LegendDetails>
               <div>
-                <LegendDot color={this.props.theme.colors.silverSand} />
+                <LegendDot color={this.props.theme.colors.grey300} />
               </div>
               <LegendData>
                 <LegendDataLabel>
@@ -427,7 +445,11 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
     return (
       <TriLineChart
         data={data}
-        dataKeys={['totalEstimate', 'totalRegistered', 'registeredIn45Days']}
+        dataKeys={[
+          'totalEstimate',
+          'totalRegistered',
+          'registeredInTargetDays'
+        ]}
         mouseMoveHandler={this.mouseMoveHandler}
         mouseLeaveHandler={this.mouseLeaveHandler}
         tooltipContent={this.customizedTooltip}

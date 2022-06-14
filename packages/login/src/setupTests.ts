@@ -11,7 +11,8 @@
  */
 ;(window as any).config = {
   AUTH_API_URL: 'http://localhost:4040/',
-  COUNTRY: 'bgd',
-  LANGUAGES: 'bn,en',
-  CLIENT_APP_URL: 'http://localhost:3000/'
+  COUNTRY: 'FAR',
+  LANGUAGES: 'en,fr',
+  CLIENT_APP_URL: 'http://localhost:3000/',
+  COUNTRY_CONFIG_URL: 'http://localhost:3040'
 }

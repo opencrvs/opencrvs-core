@@ -1,0 +1,588 @@
+{
+  "resourceType": "Bundle",
+  "type": "document",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:949fcc0a-6c7a-46f9-9124-61016d61fe59",
+      "resource": {
+        "identifier": {
+          "system": "urn:ietf:rfc:3986",
+          "value": "949fcc0a-6c7a-46f9-9124-61016d61fe59"
+        },
+        "resourceType": "Composition",
+        "status": "preliminary",
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/doc-types",
+              "code": "birth-declaration"
+            }
+          ],
+          "text": "Birth Declaration"
+        },
+        "class": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/doc-classes",
+              "code": "crvs-document"
+            }
+          ],
+          "text": "CRVS Document"
+        },
+        "title": "Birth Declaration",
+        "section": [
+          {
+            "title": "Birth encounter",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/specs/sections",
+                  "code": "birth-encounter"
+                }
+              ],
+              "text": "Birth encounter"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:0c3ea48f-46e9-4c91-9e98-54c193446f3c"
+              }
+            ]
+          },
+          {
+            "title": "Correction certificates",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/specs/sections",
+                  "code": "correction-certificates"
+                }
+              ],
+              "text": "Correction certificates"
+            },
+            "entry": []
+          },
+          {
+            "title": "Birth correction encounters",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/specs/sections",
+                  "code": "birth-correction-encounters"
+                }
+              ],
+              "text": "Birth correction encounters"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:fc2e8e6a-8602-4c77-86a0-0f309c50a9f8"
+              }
+            ]
+          },
+          {
+            "title": "Child details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "child-details"
+                }
+              ],
+              "text": "Child details"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:c4675156-fc99-436d-9b55-5453a5b9c4d5"
+              }
+            ]
+          },
+          {
+            "title": "Mother's details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "mother-details"
+                }
+              ],
+              "text": "Mother's details"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:e8c4e50b-b94a-4f68-aced-d20488009db5"
+              }
+            ]
+          }
+        ],
+        "subject": {},
+        "date": "2022-01-26T10:59:00.429Z",
+        "author": [],
+        "id": "c41a95b6-4439-4fc7-9d56-6d3a8ea0f80b"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:0c3ea48f-46e9-4c91-9e98-54c193446f3c",
+      "resource": {
+        "resourceType": "Encounter",
+        "status": "finished",
+        "id": "e96e7b0f-53a4-4171-8021-ccb83d229390",
+        "location": [
+          {
+            "location": {
+              "reference": "Location/63ee3076-4568-4cce-aa94-ad904b8ebfc8"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:40dbde40-325a-4dbf-8c83-cfbece3ff5d6",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "context": {
+          "reference": "urn:uuid:0c3ea48f-46e9-4c91-9e98-54c193446f3c"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "procedure",
+                "display": "Procedure"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "57722-1",
+              "display": "Birth plurality of Pregnancy"
+            }
+          ]
+        },
+        "id": "2ec4507a-8f60-4f3b-ab1d-201bd716fdd6",
+        "valueQuantity": {
+          "value": "SINGLE"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:2683d59d-4525-45a9-9be9-e28a463d1382",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "context": {
+          "reference": "urn:uuid:0c3ea48f-46e9-4c91-9e98-54c193446f3c"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "3141-9",
+              "display": "Body weight Measured"
+            }
+          ]
+        },
+        "id": "9c4b623d-923f-47ec-8647-8dbe6915e9c3",
+        "valueQuantity": {
+          "value": 1.6,
+          "unit": "kg",
+          "system": "http://unitsofmeasure.org",
+          "code": "kg"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6fef35e9-b1ef-420c-8d7f-282723c7ef58",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "context": {
+          "reference": "urn:uuid:0c3ea48f-46e9-4c91-9e98-54c193446f3c"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "procedure",
+                "display": "Procedure"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "73764-3",
+              "display": "Birth attendant title"
+            }
+          ]
+        },
+        "id": "e046da21-6e9a-48b9-93ab-df09057f1f73",
+        "valueString": "PHYSICIAN"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:407395c9-7d7f-4cf4-bcd4-38a588dbdeb6",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "context": {
+          "reference": "urn:uuid:0c3ea48f-46e9-4c91-9e98-54c193446f3c"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "procedure",
+                "display": "Procedure"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "present-at-birth-reg",
+              "display": "Present at birth registration"
+            }
+          ]
+        },
+        "id": "4d07eb85-cd4e-446f-86fe-f0128729465e",
+        "valueString": "MOTHER"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6bacf838-e333-49d2-bc1e-024e17fe8d7c",
+      "resource": {
+        "resourceType": "Task",
+        "status": "requested",
+        "code": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/types",
+              "code": "BIRTH"
+            }
+          ]
+        },
+        "focus": {
+          "reference": "urn:uuid:949fcc0a-6c7a-46f9-9124-61016d61fe59"
+        },
+        "id": "15d78710-8809-4a23-81db-45f917c15ac4",
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/draft-id",
+            "value": "c41a95b6-4439-4fc7-9d56-6d3a8ea0f80b"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/birth-tracking-id",
+            "value": "BYR7MLI"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/birth-registration-number",
+            "value": "2022BYR7MLI"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person",
+            "valueString": "MOTHER"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-relationship",
+            "valueString": ""
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person-phone-number",
+            "valueString": "+260965656868"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/timeLoggedMS",
+            "valueInteger": 6652
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/requestingIndividual",
+            "valueString": "MOTHER"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastLocation",
+            "valueReference": {
+              "reference": "Location/976c4871-c4d1-46f7-b50b-09f346e05d55"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastOffice",
+            "valueReference": {
+              "reference": "Location/fe68d322-4d98-4cdf-a320-2db9653f781d"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastUser",
+            "valueReference": {
+              "reference": "Practitioner/7ce43df4-0692-424d-98ce-4155c2f18757"
+            }
+          }
+        ],
+        "lastModified": "2022-02-01T08:59:58.544Z",
+        "input": [
+          {
+            "valueCode": "child",
+            "valueId": "name",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/action-type",
+                  "code": "update"
+                }
+              ]
+            },
+            "valueString": "Khaby Lame"
+          },
+          {
+            "valueCode": "mother",
+            "valueId": "name",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/action-type",
+                  "code": "update"
+                }
+              ]
+            },
+            "valueString": "First Name Last Name"
+          }
+        ],
+        "output": [
+          {
+            "valueCode": "child",
+            "valueId": "name",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/action-type",
+                  "code": "update"
+                }
+              ]
+            },
+            "valueString": "Khaby Lame Corrected"
+          },
+          {
+            "valueCode": "mother",
+            "valueId": "name",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/action-type",
+                  "code": "update"
+                }
+              ]
+            },
+            "valueString": "Mother Family Name"
+          }
+        ],
+        "reason": {
+          "text": "CLERICAL ERROR"
+        },
+        "note": [
+          {
+            "text": "Spelling mistakes",
+            "time": "Tue, 01 Feb 2022 08:59:58 GMT",
+            "authorString": ""
+          }
+        ],
+        "businessStatus": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/reg-status",
+              "code": "REQUESTED_CORRECTION"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:e975912c-9542-48ea-b849-d31ba542b0d2",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "masterIdentifier": {
+          "system": "urn:ietf:rfc:3986",
+          "value": "e975912c-9542-48ea-b849-d31ba542b0d2"
+        },
+        "status": "current",
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/certificate-type",
+              "code": "BIRTH"
+            }
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/hasShowedVerifiedDocument",
+            "valueString": true
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/attestedAndCopied",
+            "valueString": true
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/payment",
+            "valueReference": {
+              "reference": "urn:uuid:c0c3af1c-c9b8-4138-b7cb-773eb0b9af71"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:c0c3af1c-c9b8-4138-b7cb-773eb0b9af71",
+      "resource": {
+        "resourceType": "PaymentReconciliation",
+        "status": "active",
+        "detail": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "code": "payment"
+                }
+              ]
+            },
+            "amount": 50
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:fc2e8e6a-8602-4c77-86a0-0f309c50a9f8",
+      "resource": {
+        "resourceType": "Encounter",
+        "status": "finished",
+        "location": [
+          {
+            "location": {
+              "reference": "Location/63ee3076-4568-4cce-aa94-ad904b8ebfc8"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:c4675156-fc99-436d-9b55-5453a5b9c4d5",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "id": "cc57740e-8d6c-4147-9470-60f329f6854d",
+        "name": [
+          {
+            "use": "en",
+            "given": ["Khaby"],
+            "family": ["Lame Corrected"]
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2020-09-19",
+        "multipleBirthInteger": 3
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:e8c4e50b-b94a-4f68-aced-d20488009db5",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "id": "0e50f510-aa22-47f7-9f72-90b51057e336",
+        "identifier": [
+          {
+            "value": "123456789",
+            "type": "NATIONAL_ID"
+          }
+        ],
+        "name": [
+          {
+            "use": "en",
+            "given": ["Mother"],
+            "family": ["Family Name"]
+          }
+        ],
+        "maritalStatus": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/StructureDefinition/marital-status",
+              "code": "M"
+            }
+          ],
+          "text": "MARRIED"
+        },
+        "address": [
+          {
+            "type": "SECONDARY_ADDRESS",
+            "line": ["", "", "", "", "", ""],
+            "district": "1b49e1f7-7ca2-4417-8649-88b810289108",
+            "state": "ec34cfe2-b566-4140-af22-71ff17d832d6",
+            "country": "ZMB"
+          },
+          {
+            "type": "PRIMARY_ADDRESS",
+            "line": ["", "", "", "", "", "", "URBAN"],
+            "district": "1b49e1f7-7ca2-4417-8649-88b810289108",
+            "state": "ec34cfe2-b566-4140-af22-71ff17d832d6",
+            "country": "ZMB"
+          },
+          {
+            "type": "SECONDARY_ADDRESS",
+            "line": ["", "", "", "", "", "", "URBAN"],
+            "district": "1b49e1f7-7ca2-4417-8649-88b810289108",
+            "state": "ec34cfe2-b566-4140-af22-71ff17d832d6",
+            "country": "ZMB"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/patient-nationality",
+            "extension": [
+              {
+                "url": "code",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "urn:iso:std:iso:3166",
+                      "code": "ZMB"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "period",
+                "valuePeriod": {
+                  "start": "",
+                  "end": ""
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "meta": {
+    "lastUpdated": "2022-01-26T10:59:00.429Z"
+  }
+}

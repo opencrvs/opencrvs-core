@@ -11,14 +11,14 @@
  */
 import * as React from 'react'
 import {
-  createTestComponent,
   selectOption,
   flushPromises,
-  resizeWindow
+  resizeWindow,
+  createTestComponent
 } from '@client/tests/util'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { ReactWrapper } from 'enzyme'
-import { createApplication, storeApplication } from '@client/applications'
+import { createDeclaration, storeDeclaration } from '@client/declarations'
 import { createStore } from '@client/store'
 import {
   SELECT_WITH_OPTIONS,
@@ -46,18 +46,18 @@ describe('form component', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store } = createStore()
-    const draft = createApplication(Event.BIRTH)
-    store.dispatch(storeApplication(draft))
+    const { store, history } = createStore()
+    const draft = createDeclaration(Event.BIRTH)
+    store.dispatch(storeDeclaration(draft))
     const modifyDraft = jest.fn()
-    const testComponent = await createTestComponent(
+    component = await createTestComponent(
       <FormFieldGenerator
         id="mother"
         onChange={modifyDraft}
         setAllFieldsDirty={false}
         fields={[
           {
-            name: 'countryPermanent',
+            name: 'countryPrimary',
             type: SELECT_WITH_OPTIONS,
             label: formMessages.country,
             required: true,
@@ -66,7 +66,7 @@ describe('form component', () => {
             options: countries
           },
           {
-            name: 'statePermanent',
+            name: 'statePrimary',
             type: SELECT_WITH_DYNAMIC_OPTIONS,
             label: formMessages.state,
             required: true,
@@ -74,11 +74,11 @@ describe('form component', () => {
             validate: [],
             dynamicOptions: {
               resource: OFFLINE_LOCATIONS_KEY,
-              dependency: 'countryPermanent'
+              dependency: 'countryPrimary'
             }
           },
           {
-            name: 'districtPermanent',
+            name: 'districtPrimary',
             type: SELECT_WITH_DYNAMIC_OPTIONS,
             label: formMessages.district,
             required: true,
@@ -87,7 +87,7 @@ describe('form component', () => {
             validate: [],
             dynamicOptions: {
               resource: OFFLINE_LOCATIONS_KEY,
-              dependency: 'statePermanent'
+              dependency: 'statePrimary'
             }
           },
           {
@@ -108,22 +108,24 @@ describe('form component', () => {
           }
         ]}
       />,
-      store
+      {
+        store,
+        history
+      }
     )
-    component = testComponent.component
   })
   describe('when user is in the moth​​er section', () => {
     it('renders the page', async () => {
-      const label = await waitForElement(component, '#countryPermanent_label')
+      const label = await waitForElement(component, '#countryPrimary_label')
       expect(label.hostNodes()).toHaveLength(1)
     })
     it('changes the state select', async () => {
-      const select = selectOption(component, '#statePermanent', 'Barisal')
+      const select = selectOption(component, '#statePrimary', 'Barisal')
       expect(select.text()).toEqual('Barisal')
     })
     it('changes the district select', async () => {
-      selectOption(component, '#statePermanent', 'Barisal')
-      const select = selectOption(component, '#districtPermanent', 'BARGUNA')
+      selectOption(component, '#statePrimary', 'Barisal')
+      const select = selectOption(component, '#districtPrimary', 'BARGUNA')
       expect(select.text()).toEqual('BARGUNA')
     })
     describe('when resetDependentSelectValues is called', () => {
@@ -131,15 +133,15 @@ describe('form component', () => {
         const instance = component
           .find('FormSectionComponent')
           .instance() as any
-        instance.resetDependentSelectValues('statePermanent')
+        instance.resetDependentSelectValues('statePrimary')
       })
       it('resets dependent select fields', () => {
-        expect(component.find('#districtPermanent').hostNodes().text()).toEqual(
+        expect(component.find('#districtPrimary').hostNodes().text()).toEqual(
           'Select'
         )
       })
       it('doesnt reset non dependent select fields', () => {
-        expect(component.find('#countryPermanent').hostNodes().text()).toEqual(
+        expect(component.find('#countryPrimary').hostNodes().text()).toEqual(
           'Bangladesh'
         )
       })
@@ -152,8 +154,8 @@ describe('when field definition has location search input', () => {
   const modifyDraft = jest.fn()
 
   beforeEach(async () => {
-    const { store } = createStore()
-    const testComponent = await createTestComponent(
+    const { store, history } = createStore()
+    component = await createTestComponent(
       <FormFieldGenerator
         id="locationForm"
         setAllFieldsDirty={false}
@@ -172,10 +174,8 @@ describe('when field definition has location search input', () => {
           }
         ]}
       />,
-      store
+      { store, history }
     )
-
-    component = testComponent.component
   })
 
   it('renders location search input without crashing', async () => {
@@ -218,11 +218,11 @@ describe('when field definition has location search input', () => {
 describe('when user is in the register section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
-    const { store } = createStore()
-    const draft = createApplication(Event.BIRTH)
-    store.dispatch(storeApplication(draft))
+    const { store, history } = createStore()
+    const draft = createDeclaration(Event.BIRTH)
+    store.dispatch(storeDeclaration(draft))
     const modifyDraft = jest.fn()
-    const testComponent = await createTestComponent(
+    component = await createTestComponent(
       <FormFieldGenerator
         id="registration"
         onChange={modifyDraft}
@@ -233,7 +233,7 @@ describe('when user is in the register section', () => {
             type: TEL,
             label: {
               defaultMessage: 'Phone number',
-              id: 'form.field.label.application.phone',
+              id: 'form.field.label.declaration.phone',
               description: 'Input label for phone input'
             },
             required: true,
@@ -242,9 +242,11 @@ describe('when user is in the register section', () => {
           }
         ]}
       />,
-      store
+      {
+        store,
+        history
+      }
     )
-    component = testComponent.component
   })
   it('renders registration phone type as tel', () => {
     expect(
@@ -257,23 +259,23 @@ describe('when field definition has nested fields', () => {
   let component: ReactWrapper<{}, {}>
 
   beforeEach(async () => {
-    const { store } = createStore()
-    const draft = createApplication(Event.BIRTH)
-    store.dispatch(storeApplication(draft))
+    const { store, history } = createStore()
+    const draft = createDeclaration(Event.BIRTH)
+    store.dispatch(storeDeclaration(draft))
     const modifyDraft = jest.fn()
-    const testComponent = await createTestComponent(
+    component = await createTestComponent(
       <FormFieldGenerator
         id="registration"
         onChange={modifyDraft}
         setAllFieldsDirty={false}
         fields={[
           {
-            name: 'applicant',
+            name: 'informant',
             type: RADIO_GROUP_WITH_NESTED_FIELDS,
             label: {
-              defaultMessage: 'Applicant',
-              description: 'Form section name for Applicant',
-              id: 'form.section.applicant.name'
+              defaultMessage: 'Informant',
+              description: 'Form section name for Informant',
+              id: 'form.section.informant.name'
             },
             required: true,
             initialValue: '',
@@ -284,7 +286,7 @@ describe('when field definition has nested fields', () => {
                 label: {
                   defaultMessage: 'Father',
                   description: 'Label for option Father',
-                  id: 'form.field.label.applicantRelation.father'
+                  id: 'form.field.label.informantRelation.father'
                 }
               },
               {
@@ -292,14 +294,14 @@ describe('when field definition has nested fields', () => {
                 label: {
                   defaultMessage: 'Mother',
                   description: 'Label for option Mother',
-                  id: 'form.field.label.applicantRelation.mother'
+                  id: 'form.field.label.informantRelation.mother'
                 }
               }
             ],
             nestedFields: {
               FATHER: [
                 {
-                  name: 'applicantPhoneFather',
+                  name: 'informantPhoneFather',
                   type: TEL,
                   label: {
                     defaultMessage: 'Phone number',
@@ -313,7 +315,7 @@ describe('when field definition has nested fields', () => {
               ],
               MOTHER: [
                 {
-                  name: 'applicantPhoneMother',
+                  name: 'informantPhoneMother',
                   type: TEL,
                   label: {
                     defaultMessage: 'Phone number',
@@ -329,64 +331,65 @@ describe('when field definition has nested fields', () => {
           }
         ]}
       />,
-      store
+      {
+        store,
+        history
+      }
     )
-
-    component = testComponent.component
   })
 
   it('renders radio group with nested fields', () => {
-    expect(component.find('#applicant').length).toBeGreaterThanOrEqual(1)
+    expect(component.find('#informant').length).toBeGreaterThanOrEqual(1)
   })
 
   it('when clicking on a radio option renders nested fields', () => {
     component
-      .find('#applicant_MOTHER')
+      .find('#informant_MOTHER')
       .hostNodes()
       .simulate('change', { target: { checked: true } })
     component.update()
 
     expect(
       component.find(
-        'input[name="applicant.nestedFields.applicantPhoneMother"]'
+        'input[name="informant.nestedFields.informantPhoneMother"]'
       )
     ).toHaveLength(1)
   })
 
   it('changing radio button resets nested field values', () => {
     component
-      .find('#applicant_MOTHER')
+      .find('#informant_MOTHER')
       .hostNodes()
       .simulate('change', { target: { checked: true } })
 
     component
-      .find('input[name="applicant.nestedFields.applicantPhoneMother"]')
+      .find('input[name="informant.nestedFields.informantPhoneMother"]')
       .simulate('change', {
         target: {
-          name: 'applicant.nestedFields.applicantPhoneMother',
+          name: 'informant.nestedFields.informantPhoneMother',
           value: '01912345678'
         }
       })
 
     expect(
       component
-        .find('input[name="applicant.nestedFields.applicantPhoneMother"]')
+        .find('input[name="informant.nestedFields.informantPhoneMother"]')
         .props().value
     ).toEqual('01912345678')
 
     component
-      .find('#applicant_FATHER')
+      .find('#informant_FATHER')
       .hostNodes()
       .simulate('change', { target: { checked: true } })
 
     component
-      .find('#applicant_MOTHER')
+      .find('#informant_MOTHER')
       .hostNodes()
       .simulate('change', { target: { checked: true } })
 
     expect(
       component
-        .find('input[name="applicant.nestedFields.applicantPhoneMother"]')
+        .find('input[name="informant.nestedFields.informantPhoneMother"]')
         .props().value
     ).toEqual('')
   })
@@ -434,8 +437,8 @@ describe('when field definition has date field', () => {
 
   describe('in case of static date field', () => {
     beforeEach(async () => {
-      const { store } = createStore()
-      const testComponent = await createTestComponent(
+      const { store, history } = createStore()
+      component = await createTestComponent(
         <FormFieldGenerator
           id="locationForm"
           setAllFieldsDirty={false}
@@ -451,10 +454,8 @@ describe('when field definition has date field', () => {
             }
           ]}
         />,
-        store
+        { store, history }
       )
-
-      component = testComponent.component
     })
 
     it('shows validation errors for invalid date', async () => {
@@ -472,8 +473,8 @@ describe('when field definition has number field', () => {
   const modifyDraftMock = jest.fn()
 
   beforeEach(async () => {
-    const { store } = createStore()
-    const testComponent = await createTestComponent(
+    const { store, history } = createStore()
+    component = await createTestComponent(
       <FormFieldGenerator
         id="numberForm"
         setAllFieldsDirty={false}
@@ -489,10 +490,11 @@ describe('when field definition has number field', () => {
           }
         ]}
       />,
-      store
+      {
+        store,
+        history
+      }
     )
-
-    component = testComponent.component
   })
 
   it('field does not take input of non numeric characters', async () => {
@@ -521,15 +523,15 @@ describe('when field definition has select field on mobile device', () => {
 
   beforeEach(async () => {
     window.HTMLElement.prototype.scrollIntoView = scrollMock
-    const { store } = createStore()
-    const testComponent = await createTestComponent(
+    const { store, history } = createStore()
+    component = await createTestComponent(
       <FormFieldGenerator
         id="numberForm"
         setAllFieldsDirty={false}
         onChange={modifyDraftMock}
         fields={[
           {
-            name: 'countryPermanent',
+            name: 'countryPrimary',
             type: SELECT_WITH_OPTIONS,
             label: formMessages.country,
             required: true,
@@ -539,16 +541,16 @@ describe('when field definition has select field on mobile device', () => {
           }
         ]}
       />,
-      store,
-      null,
+      {
+        store,
+        history
+      },
       { attachTo: document.body }
     )
-
-    component = testComponent.component
   })
 
   it('triggers scroll up when focus so that soft keyboard does not block options', async () => {
-    const input = component.find('#countryPermanent').hostNodes()
+    const input = component.find('#countryPrimary').hostNodes()
 
     input.find('input').simulate('focus').update()
 

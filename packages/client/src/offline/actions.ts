@@ -14,10 +14,15 @@ import { ILanguageState } from '@client/i18n/reducer'
 import {
   ILocationDataResponse,
   IFacilitiesDataResponse,
-  IDefinitionsResponse,
-  IAssetResponse
+  IContentResponse,
+  IAssetResponse,
+  IApplicationConfigResponse,
+  IApplicationConfig,
+  ICertificateTemplateData
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { IQuestionConfig, IFormConfig } from '@client/forms'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {
@@ -25,15 +30,15 @@ type GetLocations = {
   payload: string
 }
 
-export const DEFINITIONS_LOADED = 'OFFLINE/DEFINITIONS_LOADED'
-export type DefinitionsLoadedAction = {
-  type: typeof DEFINITIONS_LOADED
-  payload: IDefinitionsResponse
+export const CONTENT_LOADED = 'OFFLINE/CONTENT_LOADED'
+export type ContentLoadedAction = {
+  type: typeof CONTENT_LOADED
+  payload: IContentResponse
 }
 
-export const DEFINITIONS_FAILED = 'OFFLINE/DEFINITIONS_FAILED'
-export type DefinitionsFailedAction = {
-  type: typeof DEFINITIONS_FAILED
+export const CONTENT_FAILED = 'OFFLINE/CONTENT_FAILED'
+export type ContentFailedAction = {
+  type: typeof CONTENT_FAILED
   payload: Error
 }
 
@@ -82,6 +87,24 @@ export type AssetsLoadedAction = {
 export const ASSETS_FAILED = 'OFFLINE/ASSETS_FAILED'
 export type AssetsFailedAction = {
   type: typeof ASSETS_FAILED
+  payload: Error
+}
+
+export const APPLICATION_CONFIG_LOADED = 'OFFLINE/APPLICATION_CONFIG_LOADED'
+export type ApplicationConfigLoadedAction = {
+  type: typeof APPLICATION_CONFIG_LOADED
+  payload: IApplicationConfigResponse
+}
+
+export const UPDATE_OFFLINE_CONFIG = 'OFFLINE/UPDATE_OFFLINE_CONFIG' as const
+export type ApplicationConfigUpdatedAction = {
+  type: typeof UPDATE_OFFLINE_CONFIG
+  payload: { config: IApplicationConfig }
+}
+
+export const APPLICATION_CONFIG_FAILED = 'OFFLINE/APPLICATION_CONFIG_FAILED'
+export type ApplicationConfigFailedAction = {
+  type: typeof APPLICATION_CONFIG_FAILED
   payload: Error
 }
 
@@ -164,15 +187,15 @@ export const getOfflineDataFailed = (): IGetOfflineDataFailedAction => ({
   type: GET_OFFLINE_DATA_FAILED
 })
 
-export const definitionsLoaded = (
-  payload: IDefinitionsResponse
-): DefinitionsLoadedAction => ({
-  type: DEFINITIONS_LOADED,
+export const contentLoaded = (
+  payload: IContentResponse
+): ContentLoadedAction => ({
+  type: CONTENT_LOADED,
   payload: payload
 })
 
-export const definitionsFailed = (error: Error): DefinitionsFailedAction => ({
-  type: DEFINITIONS_FAILED,
+export const contentFailed = (error: Error): ContentFailedAction => ({
+  type: CONTENT_FAILED,
   payload: error
 })
 
@@ -196,9 +219,82 @@ export const offlineDataUpdated = (state: IOfflineData) => ({
   payload: state
 })
 
+export const configLoaded = (
+  payload: IApplicationConfigResponse
+): ApplicationConfigLoadedAction => ({
+  type: APPLICATION_CONFIG_LOADED,
+  payload: payload
+})
+
+export const configFailed = (error: Error): ApplicationConfigFailedAction => ({
+  type: APPLICATION_CONFIG_FAILED,
+  payload: error
+})
+
+export const updateOfflineConfigData = (payload: {
+  config: IApplicationConfig
+}): ApplicationConfigUpdatedAction => ({
+  type: UPDATE_OFFLINE_CONFIG,
+  payload: payload
+})
+
 export const REFRESH_OFFLINE_DATA = 'OFFLINE/REFRESH_OFFLINE_DATA' as const
 export const refreshOfflineData = () => ({
   type: REFRESH_OFFLINE_DATA
+})
+
+export const UPDATE_OFFLINE_FORM_CONFIG = 'OFFLINE/UPDATE_FORM_CONFIG'
+export type UpdateOfflineFormConfigAction = {
+  type: typeof UPDATE_OFFLINE_FORM_CONFIG
+  payload: {
+    formDrafts: IFormDraft[]
+    questionConfig?: IQuestionConfig[]
+  }
+}
+
+export const UPDATE_OFFLINE_CERTIFICATE = 'OFFLINE/UPDATE_CERTIFICATE'
+export type UpdateOfflineCertificateAction = {
+  type: typeof UPDATE_OFFLINE_CERTIFICATE
+  payload: {
+    certificate: ICertificateTemplateData
+  }
+}
+
+export const updateOfflineFormConfig = (
+  formDrafts: IFormDraft[],
+  questionConfig?: IQuestionConfig[]
+): UpdateOfflineFormConfigAction => ({
+  type: UPDATE_OFFLINE_FORM_CONFIG,
+  payload: {
+    formDrafts,
+    questionConfig
+  }
+})
+
+export const updateOfflineCertificate = (
+  certificate: ICertificateTemplateData
+): UpdateOfflineCertificateAction => ({
+  type: UPDATE_OFFLINE_CERTIFICATE,
+  payload: {
+    certificate
+  }
+})
+
+export const OFFLINE_FORM_CONFIG_UPDATED = 'OFFLINE/FORM_CONFIG_UPDATED'
+export type OfflineFormConfigUpdatedAction = {
+  type: typeof OFFLINE_FORM_CONFIG_UPDATED
+  payload: {
+    formConfig: IFormConfig
+  }
+}
+
+export const offlineFormConfigUpdated = (
+  formConfig: IFormConfig
+): OfflineFormConfigUpdatedAction => ({
+  type: OFFLINE_FORM_CONFIG_UPDATED,
+  payload: {
+    formConfig
+  }
 })
 
 export type Action =
@@ -212,10 +308,16 @@ export type Action =
   | FacilitiesFailedAction
   | PilotLocationsLoadedAction
   | PilotLocationsFailedAction
-  | DefinitionsFailedAction
-  | DefinitionsLoadedAction
+  | ContentFailedAction
+  | ContentLoadedAction
   | AssetsLoadedAction
   | AssetsFailedAction
+  | ApplicationConfigLoadedAction
+  | ApplicationConfigFailedAction
+  | ApplicationConfigUpdatedAction
+  | UpdateOfflineFormConfigAction
+  | UpdateOfflineCertificateAction
+  | OfflineFormConfigUpdatedAction
   | IFilterLocationsAction
   | ReturnType<typeof offlineDataReady>
   | ReturnType<typeof offlineDataUpdated>

@@ -9,11 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ILocation, LocationType } from '@client/offline/reducer'
+import { ILocation, LocationType, IOfflineData } from '@client/offline/reducer'
 import { IUserDetails, IGQLLocation, IIdentifier } from './userUtils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface/LocationSearch/LocationSearch'
-import { IntlShape } from 'react-intl'
-import { locationMessages } from '@client/i18n/messages'
+import { IntlShape, MessageDescriptor } from 'react-intl'
+import { locationMessages, countryMessages } from '@client/i18n/messages'
+import { countries } from '@client/forms/countries'
 
 export function filterLocations(
   locations: { [key: string]: ILocation },
@@ -59,13 +60,38 @@ export function getLocation(userDetails: IUserDetails, locationKey: string) {
   return filteredArea[0] ? filteredArea[0].id : ''
 }
 
-export function generateLocationName(location: ILocation, intl: IntlShape) {
+export function generateLocationName(
+  location: ILocation | undefined,
+  intl: IntlShape
+) {
+  // when health institution in place of delivery is set null in birth registration form
+  if (!location) {
+    return ''
+  }
   let name = location.name
   location.jurisdictionType &&
     (name += ` ${
       intl.formatMessage(locationMessages[location.jurisdictionType]) || ''
     }`.trimEnd())
   return name
+}
+
+export function generateFullLocation(
+  districtId: string,
+  stateId: string,
+  countryCode: string,
+  resources: IOfflineData,
+  intl: IntlShape
+) {
+  const district = districtId && resources.locations[districtId]
+  const state = stateId && resources.locations[stateId]
+  const country =
+    countryCode && intl.formatMessage(countryMessages[countryCode])
+  let location = ''
+  if (district) location = district.name + ', '
+  if (state) location = location + state.name + ', '
+  location = location + country
+  return location
 }
 
 function generateSearchableLocations(
@@ -147,4 +173,28 @@ export function getJurisidictionType(
   }
 
   return relevantLocation.jurisdictionType as string
+}
+
+export type LocationName = string | MessageDescriptor
+
+export function getFullLocationNameOfFacility(
+  facilityLocation: ILocation,
+  offlineLocations: Record<string, ILocation>
+) {
+  let location: ILocation = facilityLocation
+  const names: LocationName[] = [location.name]
+  while (location.partOf) {
+    const parent = location.partOf.split('/')[1]
+    if (parent === '0') {
+      location.partOf = ''
+      names.push(
+        countries.find(({ value }) => value === window.config.COUNTRY)
+          ?.label as MessageDescriptor
+      )
+    } else {
+      location = offlineLocations[parent]
+      names.push(location.name)
+    }
+  }
+  return names
 }

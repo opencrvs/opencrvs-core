@@ -10,47 +10,54 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { StyledComponentBase } from 'styled-components'
+import styled from 'styled-components'
 import { Button, IButtonProps } from './Button'
 
-export const SecondaryButton = styled(Button)`
-  color: ${({ theme }) => theme.colors.secondary};
+export const SecondaryButton = ({
+  size = 'medium',
+  ...props
+}: IButtonProps) => {
+  return <StyledButton {...props} size={size} />
+}
+
+const StyledButton = styled(Button)`
+  padding: 0 8px;
+  color: ${({ theme }) => theme.colors.primary};
+  transition: background 0.4s ease;
+  border-radius: 4px;
   background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `2px solid ${theme.colors.secondary}`};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
-  border-radius: 2px;
-  ${({ theme }) => theme.fonts.buttonStyle};
-  height: 40px;
+  ${({ theme }) => theme.fonts.bold16};
 
-  & div {
-    padding-top: 2px;
-  }
-
-  &:hover {
-    opacity: 0.8;
+  &:hover:enabled {
+    border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
+    color: ${({ theme }) => theme.colors.indigoDark};
+    background: ${({ theme }) => theme.colors.grey100};
   }
 
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
     border: none;
   }
 
   &:not([data-focus-visible-added]) {
     outline: none;
-    color: ${({ theme }) => theme.colors.secondary};
+    color: ${({ theme }) => theme.colors.primary};
     background: ${({ theme }) => theme.colors.white};
-    border: ${({ theme }) => `2px solid ${theme.colors.secondary}`};
+    border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
   }
 
-  &:active {
-    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors.focus};
+  &:active:enabled {
+    border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
+    color: ${({ theme }) => theme.colors.indigoDark};
+    background: ${({ theme }) => theme.colors.grey100};
   }
 
   &:disabled {
-    border: ${({ theme }) => `2px solid ${theme.colors.disabled}`};
+    border: ${({ theme }) => `2px solid ${theme.colors.grey300}`};
     cursor: not-allowed;
-    color: ${({ theme }) => theme.colors.disabled};
+    color: ${({ theme }) => theme.colors.grey300};
   }
 `

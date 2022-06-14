@@ -45,7 +45,7 @@ describe('Test password update form', () => {
       })
     app.find('#continue-button').hostNodes().simulate('submit')
     expect(app.find('#GlobalError').hostNodes().text()).toEqual(
-      'উল্লেখিত পাসওয়ার্ড মিলে নি'
+      'Passwords do not match'
     )
   })
 
@@ -63,13 +63,13 @@ describe('Test password update form', () => {
         target: { value: '0crvsPassword' }
       })
     app.find('#continue-button').hostNodes().simulate('submit')
-    expect(app.text()).toContain('উল্লেখিত পাসওয়ার্ড মিলেছে')
+    expect(app.text()).toContain('Passwords match')
   })
 
   it('it shows passwords required error when Continue button is pressed', () => {
     app.find('#continue-button').hostNodes().simulate('submit')
     expect(app.find('#GlobalError').hostNodes().text()).toEqual(
-      'নতুন পাসওয়ার্ডটি সঠিক নয়'
+      'New password is not valid'
     )
   })
 })

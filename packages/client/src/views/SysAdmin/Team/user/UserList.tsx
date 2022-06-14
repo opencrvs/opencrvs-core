@@ -21,8 +21,7 @@ import {
   goToCreateNewUser,
   goToCreateNewUserWithLocationId,
   goToReviewUserDetails,
-  goToTeamSearch,
-  goToUserProfile
+  goToTeamSearch
 } from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -38,25 +37,20 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { UserStatus } from '@client/views/SysAdmin/Team/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { IAvatar, IUserDetails } from '@client/utils/userUtils'
+import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import {
   AddUser,
   VerticalThreeDots,
-  SearchRed
+  SearchRed,
+  NoWifi
 } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
 import {
-  ColumnContentAlignment,
-  ListTable,
   ToggleMenu,
   FloatingNotification,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
-import {
-  IColumn,
-  IDynamicValues
-} from '@opencrvs/components/lib/interface/GridTable/types'
 import { BodyContent } from '@opencrvs/components/lib/layout'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
@@ -66,16 +60,31 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { parse } from 'query-string'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import {
+  injectIntl,
+  useIntl,
+  WrappedComponentProps as IntlShapeProps
+} from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
-import { userDetails } from '@client/tests/util'
+import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
+import {
+  PaginationWrapper,
+  MobileWrapper,
+  DesktopWrapper
+} from '@opencrvs/components/lib/styleForPagination'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { useCallback } from 'react'
+import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
-const { useState, useEffect } = React
+const { useState } = React
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
@@ -93,19 +102,19 @@ const TableHeader = styled.div`
   padding: 8px 18px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
 `
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `
 const StatusBox = styled.div`
   padding: 4px 8px;
-  ${({ theme }) => theme.fonts.captionBold};
-  border-radius: 2px;
+  ${({ theme }) => theme.fonts.bold12};
+  border-radius: 100px;
   height: 30px;
   text-align: center;
   margin-left: 4px;
@@ -137,7 +146,7 @@ const AddUserIcon = styled(AddUser)`
 
 const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h2Style};
+  ${({ theme }) => theme.fonts.h1};
 `
 
 const HeaderContainer = styled.div`
@@ -156,31 +165,23 @@ const HeaderContainer = styled.div`
   }
 `
 
-const PhotoNameRoleContainer = styled.div`
-  display: flex;
-`
-
-const MarginPhotoRight = styled.span`
-  margin-right: 16px;
-`
-
 const LocationInfo = styled.div`
   padding: 8px 0px;
 `
 
 const LocationInfoKey = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
 `
 
 const LocationInfoValue = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const LocationInfoEmptyValue = styled.div`
-  color: ${({ theme }) => theme.colors.placeholder};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.supportingCopy};
+  ${({ theme }) => theme.fonts.reg16};
 `
 
 const ChangeButton = styled(LinkButton)`
@@ -189,30 +190,54 @@ const ChangeButton = styled(LinkButton)`
   }
 `
 
-const NameRoleTypeContainer = styled.div`
-  margin-right: auto;
-  display: flex;
-  flex-direction: column;
-`
-
-const StatusMenu = styled.div`
+const StatusMenuContainer = styled.div`
   display: flex;
   align-items: center;
 `
 
-const Name = styled(LinkButton)`
-  align-self: flex-start;
-  text-align: left;
+const Value = styled.span`
+  color: ${({ theme }) => theme.colors.grey500};
+  ${({ theme }) => theme.fonts.reg16}
 `
 
-const RoleType = styled.div`
-  ${({ theme }) => theme.fonts.chartLegendStyle}
-  color: ${({ theme }) => theme.colors.waitingForExternalValidation};
-  text-align: left;
+const Name = styled.span`
+  ${({ theme }) => theme.fonts.reg16}
 `
 
+const ListViewContainer = styled.div`
+  margin-top: 24px;
+`
+
+const NoRecord = styled.div<{ isFullPage?: boolean }>`
+  ${({ theme }) => theme.fonts.h3};
+  text-align: left;
+  margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
+  color: ${({ theme }) => theme.colors.copy};
+  margin-top: 20px;
+`
+
+const ConnectivityContainer = styled.div`
+  justify-content: center;
+  gap: 8px;
+  display: flex;
+  margin-top: 5vh;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-top: 12px;
+  }
+`
+const NoConnectivity = styled(NoWifi)`
+  width: 24px;
+`
+const Text = styled.div`
+  ${({ theme }) => theme.fonts.reg16};
+  text-align: center;
+`
 interface ISearchParams {
   locationId: string
+}
+
+type IOnlineStatusProps = {
+  isOnline: boolean
 }
 
 type BaseProps = {
@@ -223,10 +248,12 @@ type BaseProps = {
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToReviewUserDetails: typeof goToReviewUserDetails
   goToTeamSearch: typeof goToTeamSearch
-  goToUserProfile: typeof goToUserProfile
 }
 
-type IProps = BaseProps & IntlShapeProps & RouteComponentProps
+type IProps = BaseProps &
+  IntlShapeProps &
+  RouteComponentProps &
+  IOnlineStatusProps
 
 interface IStatusProps {
   status: string
@@ -238,18 +265,32 @@ interface ToggleUserActivation {
 }
 
 export const Status = (statusProps: IStatusProps) => {
-  const status =
-    statusProps.status.charAt(0).toUpperCase() + statusProps.status.slice(1)
-  switch (status.toLowerCase()) {
+  const status = statusProps.status
+  const intl = useIntl()
+  switch (status) {
     case UserStatus[UserStatus.ACTIVE].toLowerCase():
-      return <ActiveStatusBox>{status}</ActiveStatusBox>
+      return (
+        <ActiveStatusBox>{intl.formatMessage(messages.active)}</ActiveStatusBox>
+      )
     case UserStatus[UserStatus.DEACTIVATED].toLowerCase():
-      return <DeactivatedStatusBox>{status}</DeactivatedStatusBox>
+      return (
+        <DeactivatedStatusBox>
+          {intl.formatMessage(messages.deactivated)}
+        </DeactivatedStatusBox>
+      )
     case UserStatus[UserStatus.DISABLED].toLowerCase():
-      return <DisabledStatusBox>{status}</DisabledStatusBox>
+      return (
+        <DisabledStatusBox>
+          {intl.formatMessage(messages.disabled)}
+        </DisabledStatusBox>
+      )
     case UserStatus[UserStatus.PENDING].toLowerCase():
     default:
-      return <PendingStatusBox>{status}</PendingStatusBox>
+      return (
+        <PendingStatusBox>
+          {intl.formatMessage(messages.pending)}
+        </PendingStatusBox>
+      )
   }
 }
 
@@ -265,8 +306,8 @@ function UserListComponent(props: IProps) {
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToTeamSearch,
-    goToUserProfile,
     offlineOffices,
+    isOnline,
     location: { search }
   } = props
 
@@ -277,168 +318,88 @@ function UserListComponent(props: IProps) {
       selectedUser: null
     })
 
-  const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth)
-  useEffect(() => {
-    function recordWindowWidth() {
-      setViewportWidth(window.innerWidth)
-    }
-
-    window.addEventListener('resize', recordWindowWidth)
-
-    return () => window.removeEventListener('resize', recordWindowWidth)
-  }, [])
   const [currentPageNumber, setCurrentPageNumber] = useState<number>(1)
   const recordCount = DEFAULT_FIELD_AGENT_LIST_SIZE * currentPageNumber
   const searchedLocation: ILocation | undefined = offlineOffices.find(
     ({ id }) => locationId === id
   )
 
-  function toggleUserActivationModal(user?: GQLUser) {
-    if (user !== undefined) {
-      setToggleActivation({
-        ...toggleActivation,
-        modalVisible: true,
-        selectedUser: user
-      })
-    } else {
-      setToggleActivation({
-        ...toggleActivation,
-        modalVisible: false,
-        selectedUser: null
-      })
-    }
-  }
+  const toggleUserActivationModal = useCallback(
+    function toggleUserActivationModal(user?: GQLUser) {
+      if (user !== undefined) {
+        setToggleActivation({
+          ...toggleActivation,
+          modalVisible: true,
+          selectedUser: user
+        })
+      } else {
+        setToggleActivation({
+          ...toggleActivation,
+          modalVisible: false,
+          selectedUser: null
+        })
+      }
+    },
+    [toggleActivation]
+  )
 
-  async function resendSMS(userId: string) {
-    try {
-      const res = await userMutations.resendSMSInvite(userId, [
+  const resendSMS = useCallback(
+    async function resendSMS(userId: string) {
+      try {
+        const res = await userMutations.resendSMSInvite(userId, [
+          {
+            query: SEARCH_USERS,
+            variables: { primaryOfficeId: locationId, count: recordCount }
+          }
+        ])
+        if (res && res.data && res.data.resendSMSInvite) {
+          setShowResendSMSSuccess(true)
+        }
+      } catch (err) {
+        setShowResendSMSError(true)
+      }
+    },
+    [locationId, recordCount]
+  )
+
+  const getMenuItems = useCallback(
+    function getMenuItems(user: GQLUser) {
+      const menuItems = [
         {
-          query: SEARCH_USERS,
-          variables: { primaryOfficeId: locationId, count: recordCount }
+          label: intl.formatMessage(messages.editUserDetailsTitle),
+          handler: () => {
+            goToReviewUserDetails(user.id as string)
+          }
         }
-      ])
-      if (res && res.data && res.data.resendSMSInvite) {
-        setShowResendSMSSuccess(true)
+      ]
+
+      if (user.status !== 'deactivated' && user.status !== 'disabled') {
+        menuItems.push({
+          label: intl.formatMessage(messages.resendSMS),
+          handler: () => {
+            resendSMS(user.id as string)
+          }
+        })
       }
-    } catch (err) {
-      setShowResendSMSError(true)
-    }
-  }
 
-  function getMenuItems(user: GQLUser) {
-    const menuItems = [
-      {
-        label: intl.formatMessage(messages.editUserDetailsTitle),
-        handler: () => {
-          goToReviewUserDetails(user.id as string)
-        }
+      if (user.status === 'active') {
+        menuItems.push({
+          label: intl.formatMessage(messages.deactivate),
+          handler: () => toggleUserActivationModal(user)
+        })
       }
-    ]
 
-    if (user.status !== 'deactivated' && user.status !== 'disabled') {
-      menuItems.push({
-        label: intl.formatMessage(messages.resendSMS),
-        handler: () => {
-          resendSMS(user.id as string)
-        }
-      })
-    }
+      if (user.status === 'deactivated') {
+        menuItems.push({
+          label: intl.formatMessage(messages.reactivate),
+          handler: () => toggleUserActivationModal(user)
+        })
+      }
 
-    if (user.status === 'active') {
-      menuItems.push({
-        label: intl.formatMessage(messages.deactivate),
-        handler: () => toggleUserActivationModal(user)
-      })
-    }
-
-    if (user.status === 'deactivated') {
-      menuItems.push({
-        label: intl.formatMessage(messages.reactivate),
-        handler: () => toggleUserActivationModal(user)
-      })
-    }
-
-    return menuItems
-  }
-
-  function getRoleType(role: string, type: string) {
-    return (
-      <>
-        {role} &middot; {type}
-      </>
-    )
-  }
-
-  function getNameRoleType(
-    id: string,
-    name: string,
-    role: string,
-    type: string
-  ) {
-    return (
-      <NameRoleTypeContainer>
-        <Name
-          id={`name-role-type-link-${id}`}
-          onClick={() => goToUserProfile(id)}
-        >
-          {name}
-        </Name>
-        <RoleType>{getRoleType(role, type)}</RoleType>
-      </NameRoleTypeContainer>
-    )
-  }
-
-  function getPhotoNameRoleType(
-    id: string,
-    name: string,
-    role: string,
-    type: string,
-    avatar: IAvatar | undefined
-  ) {
-    return (
-      <PhotoNameRoleContainer>
-        <AvatarSmall name={name} avatar={avatar} />
-        <MarginPhotoRight />
-        <NameRoleTypeContainer>
-          <Name
-            id={`name-role-type-link-${id}`}
-            onClick={() => goToUserProfile(id)}
-          >
-            {name}
-          </Name>
-          <RoleType>{getRoleType(role, type)}</RoleType>
-        </NameRoleTypeContainer>
-      </PhotoNameRoleContainer>
-    )
-  }
-
-  function getPhotoNameType(
-    id: string,
-    name: string,
-    avatar: IAvatar | undefined
-  ) {
-    return (
-      <>
-        <AvatarSmall name={name} avatar={avatar} />
-        <MarginPhotoRight />
-        <LinkButton
-          id={`name-link-${id}`}
-          onClick={() => goToUserProfile(id || '')}
-        >
-          {name}
-        </LinkButton>
-      </>
-    )
-  }
-
-  function renderStatus(status?: string, underInvestigation?: boolean) {
-    return (
-      <>
-        {underInvestigation && <SearchRed />}
-        <Status status={status || 'pending'} />
-      </>
-    )
-  }
+      return menuItems
+    },
+    [goToReviewUserDetails, intl, resendSMS, toggleUserActivationModal]
+  )
 
   function getViewOnly(
     locationId: string,
@@ -465,80 +426,108 @@ function UserListComponent(props: IProps) {
     }
   }
 
-  function getStatusMenuType(
-    user: GQLUser,
-    index: number,
-    status?: string,
-    underInvestigation?: boolean
-  ) {
-    const statusDetails = renderStatus(status, underInvestigation)
-    return (
-      <StatusMenu>
-        {statusDetails}
-        <ToggleMenu
-          id={`user-item-${index}-menu`}
-          toggleButton={<VerticalThreeDots />}
-          menuItems={getMenuItems(user)}
-        />
-      </StatusMenu>
-    )
-  }
+  const StatusMenu = useCallback(
+    function StatusMenu({
+      userDetails,
+      locationId,
+      user,
+      index,
+      status,
+      underInvestigation
+    }: {
+      userDetails: IUserDetails | null
+      locationId: string
+      user: GQLUser
+      index: number
+      status?: string
+      underInvestigation?: boolean
+    }) {
+      const canEditUserDetails =
+        userDetails?.role === 'NATIONAL_SYSTEM_ADMIN' ||
+        (userDetails?.role === 'LOCAL_SYSTEM_ADMIN' &&
+          userDetails?.primaryOffice?.id === locationId)
+          ? true
+          : false
+      return (
+        // TODO use Pill Component from #2780
+        <StatusMenuContainer>
+          {underInvestigation && <SearchRed />}
+          <Status status={status || 'pending'} />
+          {canEditUserDetails && (
+            <ToggleMenu
+              id={`user-item-${index}-menu`}
+              toggleButton={<VerticalThreeDots />}
+              menuItems={getMenuItems(user)}
+            />
+          )}
+        </StatusMenuContainer>
+      )
+    },
+    [getMenuItems]
+  )
 
-  function generateUserContents(data: GQLQuery) {
-    if (!data || !data.searchUsers || !data.searchUsers.results) {
-      return []
-    }
+  const generateUserContents = useCallback(
+    function generateUserContents(
+      data: GQLQuery,
+      locationId: string,
+      userDetails: IUserDetails | null
+    ) {
+      if (!data || !data.searchUsers || !data.searchUsers.results) {
+        return []
+      }
 
-    return data.searchUsers.results.map(
-      (user: GQLUser | null, index: number) => {
-        if (user !== null) {
-          const name =
-            (user &&
-              user.name &&
-              ((createNamesMap(user.name as GQLHumanName[])[
-                intl.locale
-              ] as string) ||
-                (createNamesMap(user.name as GQLHumanName[])[
-                  LANG_EN
-                ] as string))) ||
-            ''
-          const role =
-            (user.role && intl.formatMessage(userMessages[user.role])) || '-'
-          const type =
-            (user.type && intl.formatMessage(userMessages[user.type])) || '-'
+      return data.searchUsers.results.map(
+        (user: GQLUser | null, index: number) => {
+          if (user !== null) {
+            const name =
+              (user &&
+                user.name &&
+                ((createNamesMap(user.name as GQLHumanName[])[
+                  intl.locale
+                ] as string) ||
+                  (createNamesMap(user.name as GQLHumanName[])[
+                    LANG_EN
+                  ] as string))) ||
+              ''
+            const role =
+              (user.role && intl.formatMessage(userMessages[user.role])) || '-'
 
-          const avatar = user.avatar
+            const avatar = user.avatar
 
+            return {
+              image: <AvatarSmall name={name} avatar={avatar} />,
+              label: <Name>{name}</Name>,
+              value: <Value>{role}</Value>,
+              actions: (
+                <StatusMenu
+                  userDetails={userDetails}
+                  locationId={locationId}
+                  user={user}
+                  index={index}
+                  status={user.status}
+                  underInvestigation={user.underInvestigation}
+                />
+              )
+            }
+          }
           return {
-            photoNameType: getPhotoNameType(user.id || '', name, avatar),
-            nameRoleType: getNameRoleType(user.id || '', name, role, type),
-            photoNameRoleType: getPhotoNameRoleType(
-              user.id || '',
-              name,
-              role,
-              type,
-              avatar
-            ),
-            roleType: getRoleType(role, type),
-            status: renderStatus(user.status, user.underInvestigation),
-            statusMenu: getStatusMenuType(
-              user,
-              index,
-              user.status,
-              user.underInvestigation
-            )
+            label: '',
+            value: <></>
           }
         }
-        return {}
-      }
-    )
-  }
+      )
+    },
+    [StatusMenu, intl]
+  )
 
-  function onClickAddUser() {
-    ;(searchedLocation &&
-      goToCreateNewUserWithLocationId(searchedLocation.id)) ||
-      goToCreateNewUser()
-  }
+  const onClickAddUser = useCallback(
+    function onClickAddUser() {
+      ;(searchedLocation &&
+        goToCreateNewUserWithLocationId(searchedLocation.id)) ||
+        goToCreateNewUser()
+    },
+    [goToCreateNewUser, goToCreateNewUserWithLocationId, searchedLocation]
+  )
 
   function onChangeLocation() {
     goToTeamSearch(
@@ -552,159 +541,132 @@ function UserListComponent(props: IProps) {
     )
   }
 
-  function renderUserList(
-    locationId: string,
-    userDetails: IUserDetails | null
-  ) {
-    let columns: IColumn[] = []
-    if (viewportWidth <= props.theme.grid.breakpoints.md) {
-      columns = columns.concat([
-        {
-          label: intl.formatMessage(constantsMessages.name),
-          width: 65,
-          key: 'nameRoleType'
-        },
-        {
-          label: intl.formatMessage(constantsMessages.status),
-          width: 35,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: 'statusMenu'
-        }
-      ])
-    } else if (viewportWidth <= props.theme.grid.breakpoints.lg) {
-      columns = columns.concat([
-        {
-          label: intl.formatMessage(constantsMessages.name),
-          width: 70,
-          key: 'photoNameRoleType'
-        },
-        {
-          label: intl.formatMessage(constantsMessages.status),
-          width: 30,
-          alignment: ColumnContentAlignment.RIGHT,
-          key: 'statusMenu'
-        }
-      ])
-    } else {
-      if (getViewOnly(locationId, userDetails, false)) {
-        columns = columns.concat([
-          {
-            label: intl.formatMessage(constantsMessages.name),
-            width: 35,
-            key: 'photoNameType'
-          },
-          {
-            label: intl.formatMessage(constantsMessages.labelRole),
-            width: 45,
-            key: 'roleType'
-          },
-          {
-            label: intl.formatMessage(constantsMessages.status),
-            width: 20,
-            alignment: ColumnContentAlignment.RIGHT,
-            key: 'statusMenu'
-          }
-        ])
-      } else {
-        columns = columns.concat([
-          {
-            label: intl.formatMessage(constantsMessages.name),
-            width: 35,
-            key: 'photoNameType'
-          },
-          {
-            label: intl.formatMessage(constantsMessages.labelRole),
-            width: 40,
-            key: 'roleType'
-          },
-          {
-            label: intl.formatMessage(constantsMessages.status),
-            width: 25,
-            alignment: ColumnContentAlignment.RIGHT,
-            key: 'statusMenu'
-          }
-        ])
-      }
-    }
-    return (
-      <Query
-        query={SEARCH_USERS}
-        variables={{
-          primaryOfficeId: locationId,
-          count: recordCount
-        }}
-        fetchPolicy={'cache-and-network'}
-      >
-        {({ data, loading, error }) => {
-          if (error) {
-            return (
-              <ErrorText id="user_loading_error">
-                {intl.formatMessage(errorMessages.userQueryError)}
-              </ErrorText>
+  const RenderUserList = useCallback(
+    function RenderUserList({
+      locationId,
+      userDetails
+    }: {
+      locationId: string
+      userDetails: IUserDetails | null
+    }) {
+      return (
+        <Query
+          query={SEARCH_USERS}
+          variables={{
+            primaryOfficeId: locationId,
+            count: DEFAULT_FIELD_AGENT_LIST_SIZE,
+            skip: (currentPageNumber - 1) * DEFAULT_FIELD_AGENT_LIST_SIZE
+          }}
+          fetchPolicy={'cache-and-network'}
+        >
+          {({ data, loading, error }) => {
+            if (error) {
+              return (
+                <ErrorText id="user_loading_error">
+                  {intl.formatMessage(errorMessages.userQueryError)}
+                </ErrorText>
+              )
+            }
+            const totalData =
+              (data && data.searchUsers && data.searchUsers.totalItems) || 0
+            const userContent = generateUserContents(
+              data,
+              locationId,
+              userDetails
             )
-          }
-          return (
-            <UserTable id="user_list">
-              <TableHeader>
-                {(data && data.searchUsers && data.searchUsers.totalItems) || 0}{' '}
-                users
-                {!getViewOnly(locationId, userDetails, false) && (
-                  <AddUserContainer id="add-user" onClick={onClickAddUser}>
-                    <AddUserIcon />
-                    {' New user'}
-                  </AddUserContainer>
+            return (
+              <UserTable id="user_list">
+                <TableHeader>
+                  {(data && data.searchUsers && data.searchUsers.totalItems) ||
+                    0}{' '}
+                  users
+                  {!getViewOnly(locationId, userDetails, false) && (
+                    <AddUserContainer id="add-user" onClick={onClickAddUser}>
+                      <AddUserIcon />
+                      {intl.formatMessage(messages.newUser)}
+                    </AddUserContainer>
+                  )}
+                </TableHeader>
+                <ListViewContainer>
+                  <ListViewSimplified>
+                    {userContent.length <= 0 ? (
+                      <NoRecord id="no-record">
+                        {intl.formatMessage(constantsMessages.noResults)}
+                      </NoRecord>
+                    ) : (
+                      userContent.map((content, index) => {
+                        return (
+                          <ListViewItemSimplified
+                            key={index}
+                            image={content.image}
+                            label={content.label}
+                            value={content.value}
+                            actions={content.actions}
+                          />
+                        )
+                      })
+                    )}
+                  </ListViewSimplified>
+                </ListViewContainer>
+                {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+                  <PaginationWrapper>
+                    <DesktopWrapper>
+                      <PaginationModified
+                        size={'small'}
+                        initialPage={currentPageNumber}
+                        totalPages={Math.ceil(
+                          totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                        )}
+                        onPageChange={(currentPage: number) =>
+                          setCurrentPageNumber(currentPage)
+                        }
+                      />
+                    </DesktopWrapper>
+                    <MobileWrapper>
+                      <PaginationModified
+                        size={'large'}
+                        initialPage={currentPageNumber}
+                        totalPages={Math.ceil(
+                          totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                        )}
+                        onPageChange={(currentPage: number) =>
+                          setCurrentPageNumber(currentPage)
+                        }
+                      />
+                    </MobileWrapper>
+                  </PaginationWrapper>
                 )}
-              </TableHeader>
-              <ListTable
-                isLoading={loading}
-                content={generateUserContents(data) as IDynamicValues[]}
-                columns={columns}
-                noResultText="No result to display"
-                onPageChange={(currentPage: number) => {
-                  setCurrentPageNumber(currentPage)
-                }}
-                pageSize={recordCount}
-                totalItems={
-                  data && data.searchUsers && data.searchUsers.totalItems
-                }
-                currentPage={currentPageNumber}
-                loadMoreText={intl.formatMessage(constantsMessages.showMore, {
-                  pageSize: DEFAULT_FIELD_AGENT_LIST_SIZE
-                })}
-                hideBoxShadow={true}
-                hideTableHeader={true}
-                disableScrollOnOverflow
-                rowStyle={{
-                  height: {
-                    lg: 56,
-                    md: 80
-                  },
-                  horizontalPadding: {
-                    lg: 8,
-                    md: 16
-                  }
-                }}
-              />
-              <UserAuditActionModal
-                show={toggleActivation.modalVisible}
-                user={toggleActivation.selectedUser}
-                onClose={() => toggleUserActivationModal()}
-                onConfirmRefetchQueries={[
-                  {
-                    query: SEARCH_USERS,
-                    variables: {
-                      primaryOfficeId: locationId,
-                      count: recordCount
+                <UserAuditActionModal
+                  show={toggleActivation.modalVisible}
+                  user={toggleActivation.selectedUser}
+                  onClose={() => toggleUserActivationModal()}
+                  onConfirmRefetchQueries={[
+                    {
+                      query: SEARCH_USERS,
+                      variables: {
+                        primaryOfficeId: locationId,
+                        count: recordCount
+                      }
                     }
-                  }
-                ]}
-              />
-            </UserTable>
-          )
-        }}
-      </Query>
-    )
-  }
+                  ]}
+                />
+              </UserTable>
+            )
+          }}
+        </Query>
+      )
+    },
+    [
+      currentPageNumber,
+      generateUserContents,
+      intl,
+      onClickAddUser,
+      recordCount,
+      toggleActivation.modalVisible,
+      toggleActivation.selectedUser,
+      toggleUserActivationModal
+    ]
+  )
 
   return (
     <SysAdminContentWrapper
@@ -713,29 +675,41 @@ function UserListComponent(props: IProps) {
         undefined
       }
     >
-      <HeaderContainer>
-        <Header id="header">
-          {(searchedLocation && searchedLocation.name) || ''}
-        </Header>
-        {!getViewOnly(locationId, userDetails, true) && (
-          <ChangeButton id="chng-loc" onClick={onChangeLocation}>
-            {intl.formatMessage(buttonMessages.change)}
-          </ChangeButton>
-        )}
-      </HeaderContainer>
-      <LocationInfo>
-        <LocationInfoKey>
-          {intl.formatMessage(constantsMessages.address)}
-        </LocationInfoKey>
-        {searchedLocation && searchedLocation.address ? (
-          <LocationInfoValue>{searchedLocation.address}</LocationInfoValue>
-        ) : (
-          <LocationInfoEmptyValue>
-            {intl.formatMessage(constantsMessages.notAvailable)}
-          </LocationInfoEmptyValue>
-        )}
-      </LocationInfo>
-      {renderUserList(locationId, userDetails)}
+      {isOnline ? (
+        <>
+          <HeaderContainer>
+            <Header id="header">
+              {(searchedLocation && searchedLocation.name) || ''}
+            </Header>
+            {!getViewOnly(locationId, userDetails, true) && (
+              <ChangeButton id="chng-loc" onClick={onChangeLocation}>
+                {intl.formatMessage(buttonMessages.change)}
+              </ChangeButton>
+            )}
+          </HeaderContainer>
+          <LocationInfo>
+            <LocationInfoKey>
+              {intl.formatMessage(constantsMessages.address)}
+            </LocationInfoKey>
+            {searchedLocation && searchedLocation.address ? (
+              <LocationInfoValue>{searchedLocation.address}</LocationInfoValue>
+            ) : (
+              <LocationInfoEmptyValue>
+                {intl.formatMessage(constantsMessages.notAvailable)}
+              </LocationInfoEmptyValue>
+            )}
+          </LocationInfo>
+          <RenderUserList locationId={locationId} userDetails={userDetails} />
+        </>
+      ) : (
+        <ConnectivityContainer>
+          <NoConnectivity />
+          <Text id="no-connection-text">
+            {intl.formatMessage(constantsMessages.noConnection)}
+          </Text>
+        </ConnectivityContainer>
+      )}
+
       {showResendSMSSuccess && (
         <FloatingNotification
           id="resend_invite_success"
@@ -769,7 +743,6 @@ export const UserList = connect(
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToReviewUserDetails,
-    goToTeamSearch,
-    goToUserProfile
+    goToTeamSearch
   }
-)(withTheme(injectIntl(UserListComponent)))
+)(withTheme(injectIntl(withOnlineStatus(UserListComponent))))

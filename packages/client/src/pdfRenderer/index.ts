@@ -14,19 +14,20 @@ import { commonVFS } from '@client/pdfRenderer/common_vfs'
 import { transformers } from '@client/pdfRenderer/transformer'
 import {
   IPDFTemplate,
+  ISVGTemplate,
   OptionalData
 } from '@client/pdfRenderer/transformer/types'
 import { IntlShape } from 'react-intl'
-import { IApplication } from '@client/applications'
+import { IDeclaration } from '@client/declarations'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IOfflineData } from '@client/offline/reducer'
 
 /*
-  Converts template definition into actual PDF using defined transformers, applicationData and userDetails
+  Converts template definition into actual PDF using defined transformers, declarationData and userDetails
 */
 export function createPDF(
   template: IPDFTemplate,
-  application: IApplication,
+  declaration: IDeclaration,
   userDetails: IUserDetails,
   offlineResource: IOfflineData,
   intl: IntlShape,
@@ -43,7 +44,7 @@ export function createPDF(
         )
       }
       let result = transformFunction(
-        { application, userDetails, resource: offlineResource },
+        { declaration, userDetails, resource: offlineResource },
         intl,
         transformerDef.parameters,
         optionalData
@@ -63,13 +64,55 @@ export function createPDF(
   return pdfMake.createPdf(
     JSON.parse(definitionString),
     undefined,
-    template.fonts[intl.locale]
+    template.fonts[intl.locale] || template.fonts[intl.defaultLocale]
   )
+}
+/*
+  Converts template definition into actual SVG using defined transformers, declarationData and userDetails
+*/
+
+export function createSVG(
+  template: ISVGTemplate,
+  declaration: IDeclaration,
+  userDetails: IUserDetails,
+  offlineResource: IOfflineData,
+  intl: IntlShape,
+  optionalData?: OptionalData
+): string {
+  pdfMake.vfs = { ...commonVFS, ...template.vfs }
+  let definitionString = JSON.stringify(template.definition)
+  if (template.transformers && template.transformers.length > 0) {
+    template.transformers.forEach((transformerDef) => {
+      const transformFunction = transformers[transformerDef.operation]
+      if (!transformFunction) {
+        throw new Error(
+          `No transform function found for given name: ${transformerDef.operation}`
+        )
+      }
+      let result = transformFunction(
+        { declaration, userDetails, resource: offlineResource },
+        intl,
+        transformerDef.parameters,
+        optionalData
+      )
+      if (
+        typeof transformerDef.valueIndex !== 'undefined' && // Checking type of the object as it can contain 0
+        typeof result === 'string'
+      ) {
+        result = (result as string).charAt(transformerDef.valueIndex) || ''
+      }
+      definitionString = definitionString.replace(
+        new RegExp(`{${transformerDef.field}}`, 'gi'),
+        result || ''
+      )
+    })
+  }
+  return JSON.parse(definitionString)
 }
 
 export function printPDF(
   template: IPDFTemplate,
-  application: IApplication,
+  declaration: IDeclaration,
   userDetails: IUserDetails,
   offlineResource: IOfflineData,
   intl: IntlShape,
@@ -77,7 +120,7 @@ export function printPDF(
 ) {
   createPDF(
     template,
-    application,
+    declaration,
     userDetails,
     offlineResource,
     intl,

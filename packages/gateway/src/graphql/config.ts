@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
+import { resolvers as certificateResolvers } from '@gateway/features/certificate/root-resolvers'
 import { resolvers as locationRootResolvers } from '@gateway/features/location/root-resolvers'
 import { resolvers as metricsRootResolvers } from '@gateway/features/metrics/root-resolvers'
 import { resolvers as notificationRootResolvers } from '@gateway/features/notification/root-resolvers'
@@ -20,6 +21,10 @@ import { roleTypeResolvers } from '@gateway/features/role/type-resolvers'
 import { resolvers as searchRootResolvers } from '@gateway/features/search/root-resolvers'
 import { searchTypeResolvers } from '@gateway/features/search/type-resolvers'
 import { resolvers as userRootResolvers } from '@gateway/features/user/root-resolvers'
+import { resolvers as correctionRootResolvers } from '@gateway/features/correction/root-resolvers'
+import { resolvers as applicationRootResolvers } from '@gateway/features/application/root-resolvers'
+import { resolvers as questionResolvers } from '@gateway/features/questions/root-resolvers'
+import { resolvers as formDraftResolvers } from '@gateway/features/formDraft/root-resolvers'
 import {
   IUserModelData,
   userTypeResolvers
@@ -36,7 +41,8 @@ import { AuthenticationError, Config, gql } from 'apollo-server-hapi'
 import { readFileSync } from 'fs'
 import { GraphQLSchema } from 'graphql'
 import { IResolvers } from 'graphql-tools'
-import { merge, isEqual } from 'lodash'
+import { merge, isEqual, uniqueId } from 'lodash'
+import { certificateTypeResolvers } from '@gateway/features/certificate/type-resolvers'
 
 const graphQLSchemaPath = `${__dirname}/schema.graphql`
 
@@ -52,12 +58,19 @@ const resolvers: StringIndexed<IResolvers> = merge(
   locationRootResolvers as IResolvers,
   userRootResolvers as IResolvers,
   userTypeResolvers as IResolvers,
+  certificateTypeResolvers as IResolvers,
   metricsRootResolvers as IResolvers,
   typeResolvers as IResolvers,
   searchRootResolvers as IResolvers,
   searchTypeResolvers as IResolvers,
   roleRootResolvers as IResolvers,
-  roleTypeResolvers as IResolvers
+  roleTypeResolvers as IResolvers,
+  certificateResolvers as IResolvers,
+  correctionRootResolvers as IResolvers,
+  questionResolvers as IResolvers,
+  formDraftResolvers as IResolvers,
+  applicationRootResolvers as IResolvers,
+  questionResolvers as IResolvers
 )
 
 export const getExecutableSchema = (): GraphQLSchema => {
@@ -101,7 +114,10 @@ export const getApolloConfig = (): Config => {
         throw new AuthenticationError(err)
       }
 
-      return { Authorization: request.headers.authorization }
+      return {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id'] || uniqueId()
+      }
     }
   }
 }

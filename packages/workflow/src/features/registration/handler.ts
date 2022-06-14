@@ -19,7 +19,11 @@ import {
   setTrackingId,
   markBundleAsWaitingValidation,
   invokeRegistrationValidation,
-  updatePatientIdentifierWithRN
+  updatePatientIdentifierWithRN,
+  touchBundle,
+  markBundleAsDeclarationUpdated,
+  markBundleAsRequestedForCorrection,
+  removeExtensionFromBundle
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import {
   getEventInformantName,
@@ -27,14 +31,18 @@ import {
   getPhoneNo,
   getSharedContactMsisdn,
   postToHearth,
-  generateEmptyBundle
+  generateEmptyBundle,
+  forwardToHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
-  getTaskEventType,
   sendEventNotification,
   sendRegisteredNotification,
   isEventNonNotifiable
 } from '@workflow/features/registration/utils'
+import {
+  taskHasInput,
+  getTaskEventType
+} from '@workflow/features/task/fhir/utils'
 import { logger } from '@workflow/logger'
 import { getToken } from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
@@ -46,6 +54,11 @@ import {
   BIRTH_REG_NUMBER_SYSTEM,
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
+import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import {
+  REINSTATED_EXTENSION_URL,
+  REQUEST_CORRECTION_EXTENSION_URL
+} from '@workflow/features/task/fhir/constants'
 
 interface IEventRegistrationCallbackPayload {
   trackingId: string
@@ -82,9 +95,9 @@ function getSectionFromResponse(
   reference: string
 ): fhir.BundleEntry[] {
   return (response.entry &&
-    response.entry.filter(o => {
+    response.entry.filter((o) => {
       const res = o.response as fhir.BundleEntryResponse
-      return Object.keys(res).some(k =>
+      return Object.keys(res).some((k) =>
         res[k].toLowerCase().includes(reference.toLowerCase())
       )
     })) as fhir.BundleEntry[]
@@ -130,9 +143,8 @@ export function populateCompositionWithID(
       ) {
         const entry = composition.section[payloadEncounterSectionIndex]
           .entry as fhir.Reference[]
-        entry[0].reference = responseEncounterSection[0].response.location.split(
-          '/'
-        )[3]
+        entry[0].reference =
+          responseEncounterSection[0].response.location.split('/')[3]
         composition.section[payloadEncounterSectionIndex].entry = entry
       }
       if (!composition.id) {
@@ -159,16 +171,18 @@ export async function createRegistrationHandler(
       getToken(request)
     )
     if (
-      event === Events.BIRTH_NEW_WAITING_VALIDATION ||
-      event === Events.DEATH_NEW_WAITING_VALIDATION
+      event ===
+        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION ||
+      event ===
+        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
     ) {
       payload = await markBundleAsWaitingValidation(
         payload as fhir.Bundle,
         getToken(request)
       )
     } else if (
-      event === Events.BIRTH_NEW_VALIDATE ||
-      event === Events.DEATH_NEW_VALIDATE
+      event === Events.BIRTH_REQUEST_FOR_REGISTRAR_VALIDATION ||
+      event === Events.DEATH_REQUEST_FOR_REGISTRAR_VALIDATION
     ) {
       payload = await markBundleAsValidated(
         payload as fhir.Bundle,
@@ -178,8 +192,10 @@ export async function createRegistrationHandler(
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
     if (
-      event === Events.BIRTH_NEW_WAITING_VALIDATION ||
-      event === Events.DEATH_NEW_WAITING_VALIDATION
+      event ===
+        Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION ||
+      event ===
+        Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
     ) {
       // validate registration with resource service and set resulting registration number now that bundle exists in Hearth
       // validate registration with resource service and set resulting registration number
@@ -214,7 +230,24 @@ export async function markEventAsValidatedHandler(
   event: Events
 ) {
   try {
-    const payload = await markBundleAsValidated(
+    let payload: fhir.Bundle & fhir.BundleEntry
+
+    const taskResource = getTaskResource(
+      request.payload as fhir.Bundle & fhir.BundleEntry
+    )
+
+    // In case the record was updated then there will be input output in payload
+    if (taskHasInput(taskResource)) {
+      payload = await markBundleAsDeclarationUpdated(
+        request.payload as fhir.Bundle & fhir.BundleEntry,
+        getToken(request)
+      )
+      await postToHearth(payload)
+      delete taskResource.input
+      delete taskResource.output
+    }
+
+    payload = await markBundleAsValidated(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
@@ -230,11 +263,8 @@ export async function markEventAsRegisteredCallbackHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const {
-    trackingId,
-    registrationNumber,
-    error
-  } = request.payload as IEventRegistrationCallbackPayload
+  const { trackingId, registrationNumber, error } =
+    request.payload as IEventRegistrationCallbackPayload
 
   if (error) {
     throw new Error(`Callback triggered with an error: ${error}`)
@@ -315,7 +345,7 @@ export async function markEventAsRegisteredCallbackHandler(
     // If an external system is being used, then its processing time will mean a wait is not required.
     if (!VALIDATING_EXTERNALLY) {
       // tslint:disable-next-line
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      await new Promise((resolve) => setTimeout(resolve, 2000))
     }
     // Trigger an event for the registration
     await triggerEvent(
@@ -323,7 +353,7 @@ export async function markEventAsRegisteredCallbackHandler(
         ? Events.BIRTH_MARK_REG
         : Events.DEATH_MARK_REG,
       { resourceType: 'Bundle', entry: [{ resource: task }] },
-      request.headers.authorization
+      request.headers
     )
   } catch (error) {
     logger.error(
@@ -341,7 +371,24 @@ export async function markEventAsWaitingValidationHandler(
   event: Events
 ) {
   try {
-    const payload = await markBundleAsWaitingValidation(
+    let payload: fhir.Bundle & fhir.BundleEntry
+
+    const taskResource = getTaskResource(
+      request.payload as fhir.Bundle & fhir.BundleEntry
+    )
+
+    // In case the record was updated then there will be input output in payload
+    if (taskHasInput(taskResource)) {
+      payload = await markBundleAsDeclarationUpdated(
+        request.payload as fhir.Bundle & fhir.BundleEntry,
+        getToken(request)
+      )
+      await postToHearth(payload)
+      delete taskResource.input
+      delete taskResource.output
+    }
+
+    payload = await markBundleAsWaitingValidation(
       request.payload as fhir.Bundle & fhir.BundleEntry,
       getToken(request)
     )
@@ -370,6 +417,45 @@ export async function markEventAsCertifiedHandler(
     return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsDownloadedHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    let payload = await touchBundle(
+      request.payload as fhir.Bundle,
+      getToken(request)
+    )
+    payload = removeExtensionFromBundle(payload, [
+      REINSTATED_EXTENSION_URL,
+      REQUEST_CORRECTION_EXTENSION_URL
+    ])
+    const newRequest = { ...request, payload } as Hapi.Request
+    return await forwardToHearth(newRequest, h)
+  } catch (error) {
+    logger.error(`Workflow/markBirthAsDownloadHandler: error: ${error}`)
+    throw new Error(error)
+  }
+}
+
+export async function markEventAsRequestedForCorrectionHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const payload = await markBundleAsRequestedForCorrection(
+      request.payload as fhir.Bundle,
+      getToken(request)
+    )
+    return await postToHearth(payload)
+  } catch (error) {
+    logger.error(
+      `Workflow/markEventAsRequestedForCorrectionHandler: error: ${error}`
+    )
     throw new Error(error)
   }
 }

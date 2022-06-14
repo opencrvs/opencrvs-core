@@ -12,6 +12,7 @@
 export const REDIS_HOST = process.env.REDIS_HOST || 'localhost'
 export const AUTH_HOST = process.env.AUTH_HOST || '0.0.0.0'
 export const AUTH_PORT = process.env.AUTH_PORT || 4040
+export const HOSTNAME = process.env.HOSTNAME || '*'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030/'
 
@@ -56,7 +57,8 @@ export const WEB_USER_JWT_AUDIENCES = [
   'opencrvs:search-user',
   'opencrvs:metrics-user',
   'opencrvs:countryconfig-user',
-  'opencrvs:webhooks-user'
+  'opencrvs:webhooks-user',
+  'opencrvs:config-user'
 ]
 export const NOTIFICATION_API_USER_AUDIENCE = 'opencrvs:notification-api-user'
 export const VALIDATOR_API_USER_AUDIENCE = 'opencrvs:validator-api-user'

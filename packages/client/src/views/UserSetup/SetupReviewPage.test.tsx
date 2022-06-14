@@ -16,7 +16,7 @@ import { createStore } from '@client/store'
 import { UserSetupReview } from './SetupReviewPage'
 import { activateUserMutation } from './queries'
 
-const { store } = createStore()
+const { store, history } = createStore()
 
 describe('SetupReviewPage page tests', () => {
   beforeEach(async () => {
@@ -40,10 +40,10 @@ describe('SetupReviewPage page tests', () => {
         }}
         goToStep={() => {}}
       />,
-      store
+      { store, history }
     )
 
-    expect(testComponent.component.find('#UserSetupData')).toBeDefined()
+    expect(testComponent.find('#UserSetupData')).toBeDefined()
   })
   it('render page without type', async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
@@ -59,12 +59,9 @@ describe('SetupReviewPage page tests', () => {
         }}
         goToStep={() => {}}
       />,
-      store
+      { store, history }
     )
-    const role = testComponent.component
-      .find('#RoleType_value')
-      .hostNodes()
-      .text()
+    const role = testComponent.find('#RoleType_value').hostNodes().text()
     expect(role).toEqual('Field Agent')
   })
   it('clicks question to change', async () => {
@@ -80,10 +77,10 @@ describe('SetupReviewPage page tests', () => {
         }}
         goToStep={() => {}}
       />,
-      store
+      { store, history }
     )
 
-    testComponent.component
+    testComponent
       .find('#Question_Action_BIRTH_TOWN')
       .hostNodes()
       .simulate('click')
@@ -117,11 +114,10 @@ describe('SetupReviewPage page tests', () => {
           ]
         }}
       />,
-      store,
-      mock
+      { store, history, graphqlMocks: mock }
     )
 
-    testComponent.component.find('button#Confirm').simulate('click')
+    testComponent.find('button#Confirm').simulate('click')
   })
 
   it('it shows error if error occurs', async () => {
@@ -152,19 +148,18 @@ describe('SetupReviewPage page tests', () => {
           ]
         }}
       />,
-      store,
-      graphqlErrorMock
+      { store, history, graphqlMocks: graphqlErrorMock }
     )
 
-    testComponent.component.find('button#Confirm').simulate('click')
+    testComponent.find('button#Confirm').simulate('click')
 
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.component.update()
-    expect(
-      testComponent.component.find('#GlobalError').hostNodes().text()
-    ).toBe('An error occurred. Please try again.')
+    testComponent.update()
+    expect(testComponent.find('#GlobalError').hostNodes().text()).toBe(
+      'An error occurred. Please try again.'
+    )
   })
 
   it('shows nothing for undefined fields of userDetails', async () => {
@@ -207,22 +202,19 @@ describe('SetupReviewPage page tests', () => {
           ]
         }}
       />,
-      store
+      { store, history }
     )
 
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.component.update()
+    testComponent.update()
 
-    expect(
-      testComponent.component.find('div#BengaliName').hostNodes().text()
-    ).toBe('Bengali nameChange')
-    expect(
-      testComponent.component.find('div#EnglishName').hostNodes().text()
-    ).toBe('English nameChange')
-    expect(
-      testComponent.component.find('div#UserPhone').hostNodes().text()
-    ).toBe('Phone numberChange')
+    expect(testComponent.find('div#EnglishName').hostNodes().text()).toBe(
+      'English nameChange'
+    )
+    expect(testComponent.find('div#UserPhone').hostNodes().text()).toBe(
+      'Phone numberChange'
+    )
   })
 })

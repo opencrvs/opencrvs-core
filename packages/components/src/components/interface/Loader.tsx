@@ -36,7 +36,7 @@ const LoadingContainer = styled.div<ILoader>`
   flex-direction: column;
 `
 const LoadingTextContainer = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   text-align: center;
 `
 

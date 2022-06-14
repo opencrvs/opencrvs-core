@@ -24,7 +24,7 @@ const StyledBanner = styled.div`
   border-radius: 1px;
   display: flex;
   align-items: center;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   background-color: ${({ theme }) => theme.colors.secondary};
   min-height: 109px;
   margin: 20px 0;
@@ -36,18 +36,18 @@ const StyledStatus = styled.div`
   border-radius: 16px;
   padding: 5px 10px 5px 7px;
   align-items: center;
-  background-color: ${({ theme }) => theme.colors.placeholder};
+  background-color: ${({ theme }) => theme.colors.placeholderCopy};
   height: 32px;
   margin-left: 10px;
 `
 const StyledText = styled.div`
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.h3Style};
+  ${({ theme }) => theme.fonts.h1};
   min-height: 42px;
 `
 
 const StyledNumber = styled.span`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   margin-left: 5px;
   color: ${({ theme }) => theme.colors.white};
 `
@@ -57,7 +57,7 @@ export const Banner = ({ text, count, status }: IBannerProps) => {
     <StyledBanner>
       <StyledText>{text}</StyledText>
       <StyledStatus>
-        {status === 'applications' ? (
+        {status === 'declarations' ? (
           <StatusOrange />
         ) : status === 'rejected' ? (
           <StatusRejected />

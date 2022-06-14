@@ -11,7 +11,8 @@
  */
 import {
   buildFHIRBundle,
-  updateFHIRTaskBundle
+  updateFHIRTaskBundle,
+  addOrUpdateExtension
 } from '@gateway/features/registration/fhir-builders'
 import {
   FHIR_SPECIFICATION_URL,
@@ -24,13 +25,14 @@ import {
   BODY_WEIGHT_CODE,
   BIRTH_ATTENDANT_CODE,
   BIRTH_REG_TYPE_CODE,
-  BIRTH_REG_PRESENT_CODE,
   NUMBER_BORN_ALIVE_CODE,
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE
 } from '@gateway/features/fhir/templates'
 import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import * as _ from 'lodash'
+import { mockTask } from '@gateway/utils/testUtils'
+import { findExtension } from '@gateway/features/fhir/utils'
 
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle(
@@ -47,7 +49,8 @@ test('should build a minimal FHIR registration document without error', async ()
         dateOfMarriage: '2014-01-28',
         nationality: ['BGD'],
         educationalAttainment: 'UPPER_SECONDARY_ISCED_3',
-        occupation: 'Mother Occupation'
+        occupation: 'Mother Occupation',
+        reasonNotApplying: ''
       },
       father: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb40',
@@ -91,7 +94,8 @@ test('should build a minimal FHIR registration document without error', async ()
         dateOfMarriage: '2014-01-28',
         nationality: ['BGD'],
         educationalAttainment: 'UPPER_SECONDARY_ISCED_3',
-        occupation: 'Father Occupation'
+        occupation: 'Father Occupation',
+        reasonNotApplying: ''
       },
       child: {
         _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb41',
@@ -142,7 +146,7 @@ test('should build a minimal FHIR registration document without error', async ()
             status: 'final',
             originalFileName: 'original.jpg',
             systemFileName: 'system.jpg',
-            type: 'NATIONAL_ID_FRONT',
+            type: 'NATIONAL_ID',
             createdAt: '2018-10-21'
           },
           {
@@ -195,7 +199,7 @@ test('should build a minimal FHIR registration document without error', async ()
           postalCode: 'sw11',
           line: [
             'addressLine1',
-            'addressLine1CityOption',
+            'addressLine1UrbanOption',
             'addressLine2',
             '123',
             '456',
@@ -207,7 +211,6 @@ test('should build a minimal FHIR registration document without error', async ()
       weightAtBirth: 3,
       attendantAtBirth: 'NURSE',
       birthRegistrationType: 'INFORMANT_ONLY',
-      presentAtBirthRegistration: 'INFORMANT_ONLY',
       childrenBornAliveToMother: 2,
       foetalDeathsToMother: 0,
       lastPreviousLiveBirth: '2014-01-28',
@@ -221,8 +224,6 @@ test('should build a minimal FHIR registration document without error', async ()
           attendantAtBirth: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3203',
           birthRegistrationType:
             '8f18a6ea-89d1-4b03-80b3-57509a7eebceds-djdwes',
-          presentAtBirthRegistration:
-            '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586',
           childrenBornAliveToMother:
             '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe',
           foetalDeathsToMother: '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324',
@@ -414,7 +415,7 @@ test('should build a minimal FHIR registration document without error', async ()
     coding: [
       {
         system: 'http://opencrvs.org/specs/supporting-doc-type',
-        code: 'NATIONAL_ID_FRONT'
+        code: 'NATIONAL_ID'
       }
     ]
   })
@@ -668,55 +669,41 @@ test('should build a minimal FHIR registration document without error', async ()
     }
   ])
   expect(fhir.entry[18].resource.id).toBe(
-    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh34586'
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe'
   )
-  expect(fhir.entry[18].resource.valueString).toBe('INFORMANT_ONLY')
+  expect(fhir.entry[18].resource.valueQuantity.value).toBe(2)
   expect(fhir.entry[18].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
   expect(fhir.entry[18].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
-      code: BIRTH_REG_PRESENT_CODE,
-      display: 'Present at birth registration'
+      code: NUMBER_BORN_ALIVE_CODE,
+      display: 'Number born alive to mother'
     }
   ])
   expect(fhir.entry[19].resource.id).toBe(
-    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dh3283kdsoe'
+    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324'
   )
-  expect(fhir.entry[19].resource.valueQuantity.value).toBe(2)
+  expect(fhir.entry[19].resource.valueQuantity.value).toBe(0)
   expect(fhir.entry[19].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
   expect(fhir.entry[19].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
-      code: NUMBER_BORN_ALIVE_CODE,
-      display: 'Number born alive to mother'
-    }
-  ])
-  expect(fhir.entry[20].resource.id).toBe(
-    '8f18a6ea-89d1-4b03-80b3-57509a7eebce-kdsa2324'
-  )
-  expect(fhir.entry[20].resource.valueQuantity.value).toBe(0)
-  expect(fhir.entry[20].resource.context.reference).toEqual(
-    fhir.entry[12].fullUrl
-  )
-  expect(fhir.entry[20].resource.code.coding).toEqual([
-    {
-      system: 'http://loinc.org',
       code: NUMBER_FOEATAL_DEATH_CODE,
       display: 'Number foetal deaths to mother'
     }
   ])
-  expect(fhir.entry[21].resource.id).toBe(
+  expect(fhir.entry[20].resource.id).toBe(
     '8f18a6ea-89d1-4b03-80b3-57509a7eebce-dsa23324lsdafk'
   )
-  expect(fhir.entry[21].resource.valueDateTime).toBe('2014-01-28')
-  expect(fhir.entry[21].resource.context.reference).toEqual(
+  expect(fhir.entry[20].resource.valueDateTime).toBe('2014-01-28')
+  expect(fhir.entry[20].resource.context.reference).toEqual(
     fhir.entry[12].fullUrl
   )
-  expect(fhir.entry[21].resource.code.coding).toEqual([
+  expect(fhir.entry[20].resource.code.coding).toEqual([
     {
       system: 'http://loinc.org',
       code: LAST_LIVE_BIRTH_CODE,
@@ -781,7 +768,7 @@ test('should update a task document as rejected', async () => {
   const rejectedText = 'Child name was misspelled'
   expect(fhir).toBeDefined()
   expect(fhir.entry[0].resource.reason.text).toEqual(rejectedReason)
-  expect(fhir.entry[0].resource.note[1].text).toEqual(rejectedText)
+  expect(fhir.entry[0].resource.statusReason.text).toEqual(rejectedText)
   expect(fhir.entry[0].resource.businessStatus.coding[0].code).toEqual(
     'REJECTED'
   )
@@ -824,7 +811,7 @@ test('creates task with contact other relationship', async () => {
             status: 'final',
             originalFileName: 'original.jpg',
             systemFileName: 'system.jpg',
-            type: 'NATIONAL_ID_FRONT',
+            type: 'NATIONAL_ID',
             createdAt: '2018-10-21'
           },
           {
@@ -899,43 +886,129 @@ test('creates task with contact other relationship', async () => {
   ).toBe(true)
 })
 
-test('build bundle for primaryCaregive', async () => {
-  const fhir: fhir.Bundle = await buildFHIRBundle(
+test('should build bundle for correction fhir builders', async () => {
+  const fhir = await buildFHIRBundle(
     {
-      primaryCaregiver: {
-        parentDetailsType: 'MOTHER_AND_FATHER',
-        primaryCaregiver: {
-          _fhirID: '8f18a6ea-89d1-4b03-xxxx-xxxxxxxxx',
-          name: [
+      child: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eeb41',
+        gender: 'male',
+        name: [],
+        birthDate: '2018-01-28',
+        maritalStatus: 'NOT_STATED',
+        deceased: false,
+        multipleBirth: 3,
+        dateOfMarriage: '',
+        nationality: ['BGD'],
+        educationalAttainment: 'NO_SCHOOLING'
+      },
+      registration: {
+        _fhirID: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
+        contact: 'MOTHER',
+        contactPhoneNumber: '01733333333',
+        paperFormID: '12345678',
+        draftId: '8f18a6ea-89d1-4b03-80b3-57509a7eebce',
+        trackingId: 'B123456',
+        registrationNumber: '201923324512345671',
+        correction: {
+          location: {
+            _fhirID: '63ee3076-4568-4cce-aa94-ad904b8ebfc8'
+          },
+          requester: 'MOTHER',
+          hasShowedVerifiedDocument: true,
+          attestedAndCopied: true,
+          noSupportingDocumentationRequired: false,
+          values: [
             {
-              use: 'en',
-              firstNames: 'Sahriar',
-              familyName: 'Toufiq'
+              section: 'child',
+              fieldName: 'name',
+              oldValue: 'Khaby Lame',
+              newValue: 'Khaby Lame Corrected'
             }
-          ]
-        },
-        reasonsNotApplying: [
-          {
-            primaryCaregiverType: 'MOTHER',
-            isDeceased: true
+          ],
+          reason: 'CLERICAL_ERROR',
+          note: 'Spelling mistake',
+          payments: {
+            amount: 10,
+            total: 10,
+            paymentId: '123',
+            type: 'MANUAL',
+            date: '2022-01-28T07:09:01.079Z',
+            data: 'data:image/png;base64,2324256'
           },
-          {
-            reasonNotApplying: 'Sick',
-            primaryCaregiverType: 'FATHER'
-          },
-          {
-            primaryCaregiverType: 'LEGAL_GUARDIAN',
-            reasonNotApplying: 'Not present'
-          }
-        ]
+          data: 'data:image/png;base64,2324234'
+        }
       }
     },
     'BIRTH' as EVENT_TYPE
   )
 
   expect(fhir).toBeDefined()
-  expect(fhir.entry.length).toBe(7)
-  expect(fhir.entry[2].resource.resourceType).toBe('Observation')
-  const observation = fhir.entry[2].resource as fhir.Observation
-  expect(observation.valueString).toBe('MOTHER_AND_FATHER')
+  // Task resource
+  expect(fhir.entry[2].resource.extension[2]).toEqual({
+    url: 'http://opencrvs.org/specs/extension/requestingIndividual',
+    valueString: 'MOTHER'
+  })
+  expect(fhir.entry[2].resource.input).toEqual([
+    {
+      valueCode: 'child',
+      valueId: 'name',
+      type: {
+        coding: [
+          {
+            code: 'update',
+            system: 'http://terminology.hl7.org/CodeSystem/action-type'
+          }
+        ]
+      },
+      valueString: 'Khaby Lame'
+    }
+  ])
+  expect(fhir.entry[2].resource.output).toEqual([
+    {
+      valueCode: 'child',
+      valueId: 'name',
+      type: {
+        coding: [
+          {
+            code: 'update',
+            system: 'http://terminology.hl7.org/CodeSystem/action-type'
+          }
+        ]
+      },
+      valueString: 'Khaby Lame Corrected'
+    }
+  ])
+})
+
+describe('addOrUpdateExtension()', () => {
+  it('should add the extension if it is not present', () => {
+    const bundle = addOrUpdateExtension(
+      { resource: mockTask },
+      { url: 'mock-url', valueString: 'mock-value' },
+      'downloaded'
+    )
+    const extension = bundle.entry[0].resource.extension as fhir.Extension[]
+    expect(findExtension('mock-url', extension)).toHaveProperty(
+      'valueString',
+      'mock-value'
+    )
+  })
+
+  it('should update the extension if it is already present', () => {
+    const mockTaskWithExtension = {
+      ...mockTask,
+      extension: [{ url: 'mock-url', valueString: 'not-mock-value' }]
+    }
+    const bundle = addOrUpdateExtension(
+      { resource: mockTaskWithExtension },
+      { url: 'mock-url', valueString: 'mock-value' },
+      'downloaded'
+    )
+    const extension = bundle.entry[0].resource.extension as fhir.Extension[]
+    expect(extension.length).toBe(1)
+    expect(findExtension('mock-url', extension)).toHaveProperty(
+      'valueString',
+      'mock-value'
+    )
+  })
 })

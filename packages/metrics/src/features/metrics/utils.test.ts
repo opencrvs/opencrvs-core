@@ -12,7 +12,7 @@
 import {
   calculateInterval,
   fetchEstimateByLocation,
-  fetchEstimateFor45DaysByLocationId,
+  fetchEstimateForTargetDaysByLocationId,
   getDistrictLocation,
   fillEmptyDataArrayByKey,
   EVENT_TYPE
@@ -129,6 +129,8 @@ const office = {
     reference: 'Location/7a18cb4c-38f3-449f-b3dc-508473d485f3'
   }
 }
+
+beforeEach(() => fetchLocation.mockReset())
 
 describe('verify metrics util', () => {
   describe('verify calculateInterval', () => {
@@ -248,6 +250,7 @@ describe('verify metrics util', () => {
     })
 
     it('Returns the district location', async () => {
+      fetchLocation.mockResolvedValueOnce(location)
       const result = await getDistrictLocation(
         'b2b3ca8b-a14f-41c6-b97f-7cb99a1299e5',
         { Authorization: 'bearer token' }
@@ -255,7 +258,6 @@ describe('verify metrics util', () => {
       expect(result.id).toEqual('0eaa73dd-2a21-4998-b1e6-b08430595201')
     })
     it('Throws error for invalid location', async () => {
-      fetchLocation.mockReset()
       fetchLocation
         .mockResolvedValueOnce({
           resourceType: 'Location',
@@ -315,12 +317,12 @@ describe('verify metrics util', () => {
       ).rejects.toThrowError('No district location found')
     })
   })
-  describe('verify fetchEstimateFor45DaysByLocationId', () => {
+  describe('verify fetchEstimateForTargetDaysByLocationId', () => {
     it('Returns estimate properly', async () => {
       // @ts-ignore
       jest.spyOn(api, 'fetchFHIR').mockReturnValue(location)
 
-      const result = await fetchEstimateFor45DaysByLocationId(
+      const result = await fetchEstimateForTargetDaysByLocationId(
         'Location/0eaa73dd-2a21-4998-b1e6-b08430595201',
         EVENT_TYPE.BIRTH,
         {

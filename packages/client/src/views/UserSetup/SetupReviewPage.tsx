@@ -42,7 +42,7 @@ import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { messages } from '@client/i18n/messages/views/userSetup'
 
 const Header = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.black};
 `
 const Instruction = styled.p`
@@ -53,7 +53,7 @@ const Action = styled.div`
 `
 
 const GlobalError = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 
 const ConfirmButton = styled(PrimaryButton)`
@@ -107,11 +107,6 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         userDetails.name &&
         (createNamesMap(userDetails.name as GQLHumanName[])['en'] as string)) ||
       ''
-    const bengaliName =
-      (userDetails &&
-        userDetails.name &&
-        (createNamesMap(userDetails.name as GQLHumanName[])['bn'] as string)) ||
-      ''
 
     const mobile = (userDetails && (userDetails.mobile as string)) || ''
 
@@ -154,15 +149,6 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         })
       })
     const items = [
-      {
-        id: 'BengaliName',
-        label: intl.formatMessage(messages.labelBanglaName),
-        value: bengaliName,
-        action: {
-          label: intl.formatMessage(buttonMessages.change),
-          disabled: true
-        }
-      },
       {
         id: 'EnglishName',
         label: intl.formatMessage(messages.labelEnglishName),

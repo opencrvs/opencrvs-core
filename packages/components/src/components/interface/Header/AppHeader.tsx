@@ -14,7 +14,12 @@ import { DesktopHeader, IDesktopHeaderProps } from './Desktop/DesktopHeader'
 import { grid } from '../../grid'
 import { MobileHeader, IMobileHeaderProps } from './Mobile/MobileHeader'
 
-type IProps = IMobileHeaderProps & IDesktopHeaderProps
+export interface IDomProps {
+  id?: string
+  className?: string
+}
+
+type IProps = IMobileHeaderProps & IDesktopHeaderProps & IDomProps
 
 interface IState {
   width: number

@@ -50,6 +50,7 @@ entryPoint = "http"
   main = "{{hostname}}"
   sans = [
     "register.{{hostname}}",
+    "config.{{hostname}}",
     "login.{{hostname}}",
     "auth.{{hostname}}",
     "gateway.{{hostname}}",
@@ -58,7 +59,7 @@ entryPoint = "http"
     "api.{{hostname}}",
     "openhim.{{hostname}}",
     "webhooks.{{hostname}}",
-    "monitor.{{hostname}}",
+    "kibana.{{hostname}}",
     "styleguide.{{hostname}}"
   ]
 

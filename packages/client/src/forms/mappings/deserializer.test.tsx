@@ -13,6 +13,8 @@ import { referenceApi } from '@client/utils/referenceApi'
 import traverse from 'traverse'
 import { IForm } from '@client/forms'
 import { deserializeForm } from './deserializer'
+import { formConfig } from '@client/tests/mock-offline-data'
+import { registerForms } from '@client/forms/configuration/default'
 
 function isGraphQLTag(item: any) {
   return typeof item === 'object' && item.kind && item.directives
@@ -32,16 +34,14 @@ function hasOperatorDescriptors(form: IForm) {
 
 describe('Form desearializer', () => {
   it('replaces all operator descriptors from the serialized form', async () => {
-    const definitions = await referenceApi.loadDefinitions()
-    const { birth, death } = definitions.forms.registerForm
+    const { birth, death } = registerForms
 
     expect(hasOperatorDescriptors(deserializeForm(birth))).toEqual([[], false])
     expect(hasOperatorDescriptors(deserializeForm(death))).toEqual([[], false])
   })
 
   it('throws errors when developer passes in invalid operations', async () => {
-    const definitions = await referenceApi.loadDefinitions()
-    const { birth } = definitions.forms.registerForm
+    const { birth } = registerForms
 
     birth.sections[0].groups[0].fields[0].mapping!.mutation!.operation =
       'non_existing_123' as any

@@ -41,10 +41,6 @@ const allNameFields = [
   'informantFamilyName',
   'informantFirstNamesLocal',
   'informantFamilyNameLocal',
-  'primaryCaregiverFirstNames',
-  'primaryCaregiverFamilyName',
-  'primaryCaregiverFirstNamesLocal',
-  'primaryCaregiverFamilyNameLocal',
   'deceasedFirstNames',
   'deceasedFamilyName',
   'deceasedFirstNamesLocal',
@@ -77,8 +73,8 @@ export function queryBuilder(
   eventLocationId: string,
   gender: string,
   nameCombinations: INameCombination[],
-  applicationLocationId: string,
-  applicationLocationHirarchyId: string,
+  declarationLocationId: string,
+  declarationLocationHirarchyId: string,
   createdBy: string,
   filters: IFilter
 ) {
@@ -151,11 +147,11 @@ export function queryBuilder(
     })
   }
 
-  if (applicationLocationId !== EMPTY_STRING) {
+  if (declarationLocationId !== EMPTY_STRING) {
     must.push({
       term: {
-        'applicationLocationId.keyword': {
-          value: applicationLocationId,
+        'declarationLocationId.keyword': {
+          value: declarationLocationId,
           // tslint:disable-next-line
           boost: 2.0
         }
@@ -163,11 +159,11 @@ export function queryBuilder(
     })
   }
 
-  if (applicationLocationHirarchyId !== EMPTY_STRING) {
+  if (declarationLocationHirarchyId !== EMPTY_STRING) {
     must.push({
       term: {
-        'applicationLocationHirarchyIds.keyword': {
-          value: applicationLocationHirarchyId,
+        'declarationLocationHirarchyIds.keyword': {
+          value: declarationLocationHirarchyId,
           // tslint:disable-next-line
           boost: 2.0
         }
@@ -234,4 +230,8 @@ function selectNameFields(fields: string): string[] {
     default:
       return allNameFields
   }
+}
+
+export function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }

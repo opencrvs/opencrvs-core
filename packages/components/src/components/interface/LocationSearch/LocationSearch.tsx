@@ -44,15 +44,15 @@ const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
   width: 100%;
   height: 40px;
   border-radius: 2px;
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   padding-left: 36px;
   border: 2px solid
     ${({ theme, error, touched }) =>
-      error && touched ? theme.colors.error : theme.colors.copy};
+      error && touched ? theme.colors.negative : theme.colors.copy};
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.focus};
+    box-shadow: 0 0 0px 3px ${({ theme }) => theme.colors.yellow};
   }
 `
 const DropDownWrapper = styled.ul`
@@ -81,11 +81,11 @@ const DropDownItem = styled.li`
     border-bottom: none;
   }
   &:hover {
-    background: ${({ theme }) => theme.colors.dropdownHover};
+    background: ${({ theme }) => theme.colors.grey100};
   }
 `
 const Label = styled.span`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 `
 export interface ISearchLocation {
@@ -101,7 +101,7 @@ interface IState {
   isFocused?: boolean
 }
 interface IProps {
-  locationList: ISearchLocation[]
+  locationList?: ISearchLocation[]
   selectedLocation?: ISearchLocation | undefined
   searchHandler?: (location: ISearchLocation) => void
   searchButtonHandler?: () => void
@@ -139,12 +139,13 @@ export class LocationSearch extends React.Component<IProps, IState> {
 
   search = (searchText: string) => {
     const searchResult = [] as ISearchLocation[]
-    if (searchText.length > 0) {
+    if (searchText.length > 0 && this.props.locationList) {
       for (const location of this.props.locationList) {
         if (searchResult.length === 10) {
           break
         }
         if (
+          location.searchableText &&
           location.searchableText
             .toLowerCase()
             .startsWith(searchText.toLowerCase())

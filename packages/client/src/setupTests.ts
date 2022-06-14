@@ -12,22 +12,31 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { GlobalWithFetchMock } from 'jest-fetch-mock'
 import { storage } from '@client/storage'
-import { IUserData } from './applications'
+import { IUserData } from './declarations'
 import { noop } from 'lodash'
 import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
 import { authApi } from './utils/authApi'
 import 'core-js/features/array/flat'
 import 'jsdom-worker'
-import { roleQueries } from './forms/user/fieldDefinitions/query/queries'
+import { roleQueries } from './forms/user/query/queries'
 import { userQueries } from './user/queries'
 import debounce from 'lodash/debounce'
-
+import { mockOfflineData } from './tests/mock-offline-data'
 import './tests/queryMock'
 
 if (process.env.CI) {
   jest.setTimeout(30000)
 }
+
+jest.mock('@client/forms/configuration/default', () => ({
+  ...jest.requireActual('@client/forms/configuration/default'),
+  registerForms: mockOfflineData.forms.registerForm
+}))
+
+jest.mock('@client/forms/user/fieldDefinitions/createUser', () => ({
+  createUserForm: mockOfflineData.forms.userForm
+}))
 
 /*
  * Initialize mocks
@@ -106,48 +115,42 @@ userQueries.searchUsers = jest.fn()
 const navigatorMock = {
   onLine: true
 }
-
 ;(window as any).navigator = navigatorMock
 ;(window as any).scrollTo = noop
 ;(window as any).config = {
   API_GATEWAY_URL: 'http://localhost:7070/',
-  AUTH_URL: 'http://localhost:4040',
-  BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
-  COUNTRY: 'bgd',
-  COUNTRY_LOGO_FILE: 'logo.png',
-  LANGUAGES: 'en,bn',
-  HIDE_EVENT_REGISTER_INFORMATION: false,
-  EXTERNAL_VALIDATION_WORKQUEUE: true,
-  FIELD_AGENT_AUDIT_LOCATIONS:
-    'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
-  APPLICATION_AUDIT_LOCATIONS: 'WARD,UNION',
+  CONFIG_API_URL: 'http://localhost:2021',
   LOGIN_URL: 'http://localhost:3020',
-  COUNTRY_CONFIG_URL: 'http://localhost:3040/bgd',
-  /**
-   * @deprecated HEALTH_FACILITY_FILTER is no longer used
-   */
-  HEALTH_FACILITY_FILTER: 'UPAZILA',
-  CERTIFICATE_PRINT_CHARGE_FREE_PERIOD: 45,
-  CERTIFICATE_PRINT_CHARGE_UP_LIMIT: 1825,
-  CERTIFICATE_PRINT_LOWEST_CHARGE: 25,
-  CERTIFICATE_PRINT_HIGHEST_CHARGE: 50,
+  AUTH_URL: 'http://localhost:4040',
+  COUNTRY_CONFIG_URL: 'http://localhost:3040',
+  APPLICATION_NAME: 'Farajaland CRVS',
+  BIRTH: {
+    REGISTRATION_TARGET: 45,
+    LATE_REGISTRATION_TARGET: 365,
+    FEE: {
+      ON_TIME: 0,
+      LATE: 0,
+      DELAYED: 0
+    }
+  },
+  COUNTRY: 'bgd',
+  CURRENCY: {
+    isoCode: 'ZMW',
+    languagesAndCountry: ['en-ZM']
+  },
+  DEATH: {
+    REGISTRATION_TARGET: 45,
+    FEE: {
+      ON_TIME: 0,
+      DELAYED: 0
+    }
+  },
+  LANGUAGES: 'en,bn,fr',
   SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
   LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
-  NID_NUMBER_PATTERN: {
-    pattern: /^[0-9]{9}$/,
-    example: '4837281940',
-    num: '9'
-  },
-  PHONE_NUMBER_PATTERN: {
-    pattern: /^01[1-9][0-9]{8}$/,
-    example: '01741234567',
-    start: '01',
-    num: '11',
-    mask: {
-      startForm: 5,
-      endBefore: 3
-    }
-  }
+  NID_NUMBER_PATTERN: /^[0-9]{9}$/,
+  PHONE_NUMBER_PATTERN: /^01[1-9][0-9]{8}$/,
+  ADDRESSES: 1
 }
 
 /*
@@ -156,7 +159,7 @@ const navigatorMock = {
 
 const {
   mockUserResponse,
-  mockOfflineData,
+  mockConfigResponse,
   userDetails,
   validToken,
   getItem
@@ -171,13 +174,12 @@ jest.mock(
       loadLocations: () => Promise.resolve(mockOfflineData.locations),
       loadFacilities: () => Promise.resolve(mockOfflineData.facilities),
       loadPilotLocations: () => Promise.resolve(mockOfflineData.pilotLocations),
-      loadDefinitions: () =>
+      loadContent: () =>
         Promise.resolve({
-          languages: mockOfflineData.languages,
-          forms: mockOfflineData.forms,
-          templates: mockOfflineData.templates
+          languages: mockOfflineData.languages
         }),
-      loadAssets: () => Promise.resolve(mockOfflineData.assets)
+      loadAssets: () => Promise.resolve(mockOfflineData.assets),
+      loadConfig: () => Promise.resolve(mockConfigResponse)
     }
   })
 )
@@ -224,7 +226,7 @@ beforeEach(() => {
     {
       userID: userDetails.userMgntUserID,
       userPIN: '$2a$10$xQBLcbPgGQNu9p6zVchWuu6pmCrQIjcb6k2W1PIVUxVTE/PumWM82',
-      applications: []
+      declarations: []
     }
   ]
 

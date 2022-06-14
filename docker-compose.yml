@@ -36,6 +36,9 @@ services:
       dockerfile: ./packages/gateway/Dockerfile
     restart: unless-stopped
     environment:
+      - REDIS_HOST=redis
+      - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
+      - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
       - FHIR_URL=http://openhim-core:5001/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
@@ -45,6 +48,7 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - NOTIFICATION_URL=http://notification:2020/
       - WORKFLOW_URL=http://workflow:5050/
+      - APPLICATION_CONFIG_URL=http://config:2021/
       - CHECK_INVALID_TOKEN=true
   # User facing services
   workflow:
@@ -60,6 +64,7 @@ services:
       - RESOURCE_SERVICE_URL=http://countryconfig:3040/
       - HEARTH_URL=http://hearth:3447/fhir
       - OPENHIM_URL=http://openhim-core:5001
+      - APPLICATION_CONFIG_URL=http://config:2021/
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
       - AUTH_URL=http://auth:4040
       - CHECK_INVALID_TOKEN=true
@@ -88,9 +93,11 @@ services:
       - INFLUX_DB=ocrvs
       - AUTH_URL=http://auth:4040
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
+      - CONFIG_API_URL=http://config:2021
       - FHIR_URL=http://openhim-core:5001/fhir
       - SEARCH_URL=http://search:9090/
       - CHECK_INVALID_TOKEN=true
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030
   # END User facing services
   auth:
     image: opencrvs/ocrvs-auth:${VERSION:-latest}
@@ -143,3 +150,18 @@ services:
       - HOST=0.0.0.0
       - CHECK_INVALID_TOKEN=true
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
+  config:
+    image: opencrvs/ocrvs-config:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./packages/config/Dockerfile
+    restart: unless-stopped
+    environment:
+      - AUTH_URL=http://auth:4040
+      - HOST=0.0.0.0
+      - PORT=2021
+      - MONGO_URL=mongodb://mongo1/application-config
+      - FHIR_URL=http://openhim-core:5001/fhir
+      - SEARCH_URL=http://search:9090/
+      - METRICS_URL=http://metrics:1050
+      - CHECK_INVALID_TOKEN=true

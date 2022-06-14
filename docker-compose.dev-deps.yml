@@ -28,35 +28,10 @@ services:
     volumes:
       - './data/elasticsearch:/usr/share/elasticsearch/data'
     environment:
+      - 'discovery.type=single-node'
       - 'cluster.routing.allocation.disk.threshold_enabled=false'
-      - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m -XX:UseSSE=2'
+      - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
       - bootstrap.system_call_filter=false
-      #- discovery.type=single-node
-      #- http.port=9200
-      #- http.cors.enabled=true
-      #- http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358
-      #- http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
-      #- http.cors.allow-credentials=true
-      #- bootstrap.memory_lock=true
-      #- "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-
-  # elasticsearch browser.  Uncomment during development, along with the environment variables for elastic above, to browse Elastic via a GUI at http://localhost:1358/
-  #dejavu:
-  #image: appbaseio/dejavu:3.2.3
-  #container_name: dejavu
-  #ports:
-  #  - "1358:1358"
-  #links:
-  #  - elasticsearch
-
-  # grafana browser.  Uncomment during development, to browse Influxdb via a GUI at http://localhost:4000/
-  # influx will be running on http://influxdb:8086
-  #grafana:
-  #image: grafana/grafana:5.1.0
-  #ports:
-  #  - "4000:3000"
-  #volumes:
-  #  - ./grafana:/var/lib/grafana
 
   influxdb:
     ports:
@@ -66,6 +41,8 @@ services:
 
   # Expose dev secrets as a plain volume - these will use docker secrets in staging and prod
   hearth:
+    environment:
+      - logger__level=warn
     volumes:
       - '.secrets/public-key.pem:/secrets/public-key.pem'
       - './infrastructure/hearth-plugins/checkDuplicateTask.js:/src/hearth/lib/plugins/checkDuplicateTask.js'
@@ -86,6 +63,7 @@ services:
       - '5000:5000'
       - '5001:5001'
     extra_hosts:
+      - 'webhooks:${LOCAL_IP-172.17.0.1}'
       - 'gateway:${LOCAL_IP-172.17.0.1}'
       - 'workflow:${LOCAL_IP-172.17.0.1}'
       - 'search:${LOCAL_IP-172.17.0.1}'

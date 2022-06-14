@@ -28,6 +28,9 @@ export const GET_USER_DETAILS_SUCCESS =
 export const GET_USER_DETAILS_FAILED =
   'PROFILE/GET_USER_DETAILS_FAILED' as const
 export const USER_DETAILS_AVAILABLE = 'PROFILE/USER_DETAILS_AVAILABLE' as const
+export const SEND_VERIFY_CODE = 'PROFILE/SEND_VERIFY_CODE' as const
+export const SEND_VERIFY_CODE_COMPLETED =
+  'PROFILE/SEND_VERIFY_CODE_COMPLETED' as const
 
 type RedirectToAuthenticationAction = {
   type: typeof REDIRECT_TO_AUTHENTICATION
@@ -35,7 +38,6 @@ type RedirectToAuthenticationAction = {
 
 type CheckAuthAction = {
   type: typeof CHECK_AUTH
-  payload: IURLParams
 }
 
 type SetUserDetailsAction = {
@@ -46,6 +48,22 @@ type SetUserDetailsAction = {
 type ModifyUserDetailsAction = {
   type: typeof MODIFY_USER_DETAILS
   payload: IUserDetails
+}
+type SendVerifyCode = {
+  type: typeof SEND_VERIFY_CODE
+  payload: {
+    phoneNumber: string
+  }
+}
+
+type SendVerifyCodeSuccessAction = {
+  type: typeof SEND_VERIFY_CODE_COMPLETED
+  payload: {
+    userId: string
+    nonce: string
+    mobile: string
+    status: string
+  }
 }
 
 export type IGetStorageUserDetailsSuccessAction = {
@@ -61,9 +79,8 @@ export type ISetInitialUserDetails = {
   type: typeof SET_INITIAL_USER_DETAILS
 }
 
-export const checkAuth = (payload: IURLParams): CheckAuthAction => ({
-  type: CHECK_AUTH,
-  payload
+export const checkAuth = (): CheckAuthAction => ({
+  type: CHECK_AUTH
 })
 
 export const setUserDetails = (
@@ -108,6 +125,27 @@ export const redirectToAuthentication = (): RedirectToAuthenticationAction => ({
   type: REDIRECT_TO_AUTHENTICATION
 })
 
+export const sendVerifyCode = (phoneNumber: string): SendVerifyCode => {
+  return {
+    type: SEND_VERIFY_CODE,
+    payload: {
+      phoneNumber
+    }
+  }
+}
+
+export const SendVerifyCodeSuccess = (payload: {
+  userId: string
+  nonce: string
+  mobile: string
+  status: string
+}): SendVerifyCodeSuccessAction => {
+  return {
+    type: SEND_VERIFY_CODE_COMPLETED,
+    payload
+  }
+}
+
 export type Action =
   | CheckAuthAction
   | SetUserDetailsAction
@@ -118,3 +156,5 @@ export type Action =
   | IGetStorageUserDetailsFailedAction
   | ModifyUserDetailsAction
   | UserDetailsAvailable
+  | SendVerifyCode
+  | SendVerifyCodeSuccessAction

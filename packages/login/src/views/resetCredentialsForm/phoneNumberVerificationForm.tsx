@@ -26,7 +26,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { Title } from './commons'
-import { messages } from './resetCredentialsForm'
+import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { convertToMSISDN } from '@login/utils/dataCleanse'
 
 const Actions = styled.div`
@@ -129,9 +129,6 @@ class PhoneNumberVerificationComponent extends React.Component<Props, State> {
                 messages.phoneNumberConfirmationFormBodyHeader
               )}
             </Title>
-            {intl.formatMessage(
-              messages.phoneNumberConfirmationFormBodySubheader
-            )}
 
             <Actions id="phone-number-verification">
               <InputField

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as moment from 'moment'
+import { differenceInDays } from 'date-fns'
 import {
   IBirthKeyFigures,
   IEstimation
@@ -26,16 +26,21 @@ import {
   JURISDICTION_TYPE_IDENTIFIER
 } from '@metrics/features/metrics/constants'
 import { IAuthHeader } from '@metrics/features/registration'
-import { fetchLocation, fetchFromResource, fetchFHIR } from '@metrics/api'
-import { EXPECTED_BIRTH_REGISTRATION_IN_DAYS } from '@metrics/constants'
+import {
+  fetchLocation,
+  fetchFromResource,
+  fetchFHIR,
+  fetchChildLocationsByParentId
+} from '@metrics/api'
+import { getApplicationConfig } from '@metrics/configApi'
 export const YEARLY_INTERVAL = '365d'
 export const MONTHLY_INTERVAL = '30d'
 export const WEEKLY_INTERVAL = '7d'
 
 export const LABEL_FOMRAT = {
-  [YEARLY_INTERVAL]: 'YYYY',
+  [YEARLY_INTERVAL]: 'yyyy',
   [MONTHLY_INTERVAL]: 'MMMM',
-  [WEEKLY_INTERVAL]: 'DD-MM-YYYY'
+  [WEEKLY_INTERVAL]: 'dd-MM-yyyy'
 }
 
 export interface IPoint {
@@ -51,7 +56,8 @@ export interface IMonthRangeFilter {
   startOfMonthTime: string
   endOfMonthTime: string
   month: string
-  year: string
+  year: number
+  monthIndex: number
 }
 
 export enum EVENT_TYPE {
@@ -61,33 +67,10 @@ export enum EVENT_TYPE {
 
 export type Location = fhir.Location & { id: string }
 
-export const ageIntervals = [
-  {
-    title: `${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}d`,
-    minAgeInDays: -1,
-    maxAgeInDays: Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS)
-  },
-  {
-    title: `${Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS) + 1}d - 1yr`,
-    minAgeInDays: Number(EXPECTED_BIRTH_REGISTRATION_IN_DAYS),
-    maxAgeInDays: 365
-  },
-  { title: '1yr', minAgeInDays: 366, maxAgeInDays: 730 },
-  { title: '2yr', minAgeInDays: 731, maxAgeInDays: 1095 },
-  { title: '3yr', minAgeInDays: 1096, maxAgeInDays: 1460 },
-  { title: '4yr', minAgeInDays: 1461, maxAgeInDays: 1825 },
-  { title: '5yr', minAgeInDays: 1826, maxAgeInDays: 2190 },
-  { title: '6yr', minAgeInDays: 2191, maxAgeInDays: 2555 },
-  { title: '7yr', minAgeInDays: 2556, maxAgeInDays: 2920 },
-  { title: '8yr', minAgeInDays: 2921, maxAgeInDays: 3285 },
-  { title: '9r', minAgeInDays: 3286, maxAgeInDays: 3650 },
-  { title: '10yr', minAgeInDays: 3651, maxAgeInDays: 4015 }
-]
-
 export const calculateInterval = (startTime: string, endTime: string) => {
   const timeStartInMil = parseInt(startTime.substr(0, 13), 10)
   const timeEndInMil = parseInt(endTime.substr(0, 13), 10)
-  const diffInDays = moment(timeEndInMil).diff(timeStartInMil, 'days')
+  const diffInDays = differenceInDays(timeEndInMil, timeStartInMil)
 
   if (diffInDays > 365) {
     return YEARLY_INTERVAL
@@ -147,7 +130,7 @@ export const fetchEstimateByLocation = async (
       maleEstimation: 0,
       femaleEstimation: 0,
       locationId: locationData.id,
-      estimationYear: toYear,
+      estimationYear: toYear, // TODO: Check if we actually need it
       locationLevel: getLocationLevelFromLocationData(locationData)
     }
   }
@@ -260,33 +243,62 @@ export const getLocationLevelFromLocationData = (locationData: Location) => {
   )
 }
 
-export const fetchEstimateFor45DaysByLocationId = async (
-  locationId: string,
+export const fetchEstimateForTargetDaysByLocationId = async (
+  locationId: string | undefined,
   event: EVENT_TYPE,
   authHeader: IAuthHeader,
   timeFrom: string,
   timeTo: string
 ): Promise<IEstimation> => {
-  const locationData: Location = await fetchFHIR(locationId, authHeader)
-  return await fetchEstimateByLocation(
-    locationData,
-    event,
-    authHeader,
-    timeFrom,
-    timeTo
-  )
+  if (locationId) {
+    const locationData: Location = await fetchFHIR(locationId, authHeader)
+    return await fetchEstimateByLocation(
+      locationData,
+      event,
+      authHeader,
+      timeFrom,
+      timeTo
+    )
+  } else {
+    const locationData = (await fetchChildLocationsByParentId(
+      'Location/0',
+      authHeader
+    )) as Location[]
+
+    const total = {
+      totalEstimation: 0,
+      maleEstimation: 0,
+      femaleEstimation: 0,
+      locationId: 'Location/0',
+      estimationYear: new Date(timeTo).getFullYear(), // TODO: Check if we actually need it
+      locationLevel: 'COUNTRY'
+    }
+
+    for (const location of locationData) {
+      const estimate = await fetchEstimateByLocation(
+        location,
+        event,
+        authHeader,
+        timeFrom,
+        timeTo
+      )
+      total.totalEstimation += estimate.totalEstimation || 0
+      total.maleEstimation += estimate.maleEstimation || 0
+      total.femaleEstimation += estimate.femaleEstimation || 0
+    }
+    return total
+  }
 }
 
 export const getDistrictLocation = async (
   locationId: string,
   authHeader: IAuthHeader
 ): Promise<Location> => {
-  let locationBundle: Location
-  let locationType: fhir.Identifier | undefined
   let lId = locationId
 
-  locationBundle = await fetchLocation(lId, authHeader)
-  locationType = getLocationType(locationBundle)
+  let locationBundle = await fetchLocation(lId, authHeader)
+
+  let locationType = getJurisdictionType(locationBundle)
   while (
     locationBundle &&
     (!locationType || locationType.value !== 'DISTRICT')
@@ -298,17 +310,17 @@ export const getDistrictLocation = async (
         locationBundle.partOf.reference.split('/')[1]) ||
       ''
     locationBundle = await fetchLocation(lId, authHeader)
-    locationType = getLocationType(locationBundle)
+    locationType = getJurisdictionType(locationBundle)
   }
 
   if (!locationBundle) {
     throw new Error('No district location found')
   }
 
-  return locationBundle
+  return locationBundle as Location
 }
 
-function getLocationType(locationBundle: fhir.Location) {
+export function getJurisdictionType(locationBundle: fhir.Location) {
   return (
     locationBundle &&
     locationBundle.identifier &&
@@ -319,6 +331,15 @@ function getLocationType(locationBundle: fhir.Location) {
   )
 }
 
+export function getLocationType(location: fhir.Location): string {
+  if (location.type?.coding?.[0]?.code) {
+    return location.type.coding[0].code
+  } else {
+    throw new Error(
+      `Location type could not be found for location, location id ${location.id}`
+    )
+  }
+}
 export function fillEmptyDataArrayByKey(
   dataArray: Array<any>,
   emptyDataArray: Array<any>,
@@ -376,8 +397,9 @@ export function getMonthRangeFilterListFromTimeRage(
     const filterDate = new Date(timeStart)
     filterDate.setMonth(filterDate.getMonth() + index)
     monthFilterList.push({
+      monthIndex: filterDate.getMonth(),
       month: filterDate.toLocaleString('en-us', { month: 'long' }),
-      year: String(filterDate.getFullYear()),
+      year: filterDate.getFullYear(),
       startOfMonthTime: new Date(
         filterDate.getFullYear(),
         filterDate.getMonth(),
@@ -392,4 +414,64 @@ export function getMonthRangeFilterListFromTimeRage(
   }
 
   return monthFilterList
+}
+
+export async function getRegistrationTargetDays(
+  event: string,
+  authorization: string
+) {
+  const applicationConfig = await getApplicationConfig(authorization)
+  const targetDays =
+    event === EVENT_TYPE.BIRTH
+      ? applicationConfig.BIRTH?.REGISTRATION_TARGET
+      : applicationConfig.DEATH?.REGISTRATION_TARGET
+  return targetDays
+}
+
+export async function getRegistrationLateTargetDays(
+  event: string,
+  authorization: string
+): Promise<number | null> {
+  const applicationConfig = await getApplicationConfig(authorization)
+  const targetDays =
+    event === EVENT_TYPE.BIRTH
+      ? applicationConfig.BIRTH?.LATE_REGISTRATION_TARGET
+      : null
+  return targetDays
+}
+
+export function getPercentage(value: number, total: number, decimalPoint = 2) {
+  return value === 0 || total === 0
+    ? 0
+    : Number(((value / total) * 100).toFixed(decimalPoint))
+}
+
+export function getPopulation(
+  location: fhir.Location,
+  populationYear: number
+): number {
+  const totalPopulationExtension = location.extension?.find(
+    (ext) => ext.url === OPENCRVS_SPECIFICATION_URL + TOTAL_POPULATION_SEC
+  )
+
+  if (!totalPopulationExtension) {
+    throw new Error(
+      `Total population extension not found for location, location ID: ${location.id}`
+    )
+  }
+  const populationDataArray: Record<string, number>[] =
+    totalPopulationExtension.valueString
+      ? JSON.parse(totalPopulationExtension.valueString)
+      : []
+  const populationYears = populationDataArray.map((data) =>
+    Number(Object.keys(data)[0])
+  )
+  const latestAvailableYear = Math.max(...populationYears)
+  const populationYearToConsider =
+    populationYear > latestAvailableYear ? latestAvailableYear : populationYear
+  const totalPopulation = populationDataArray.find((record) =>
+    record.hasOwnProperty(populationYearToConsider.toString())
+  )
+
+  return totalPopulation ? totalPopulation[populationYearToConsider] : 0
 }

@@ -48,8 +48,12 @@ echo
 echo -e "\033[32m:::::::::: PLEASE WAIT for @opencrvs/client ::::::::::\033[0m"
 echo
 sleep 10
-export LANGUAGES="en"
+
+export LANGUAGES="en,fr"
+export LOG_LEVEL="error"
+
 if [ $OS == "UBUNTU" ]; then
+  echo "YOU ARE RUNNING OPENCRVS ON UBUNTU"
   yarn dev:secrets:gen && concurrently "yarn run start" "yarn run compose:deps"
   else
   export LOCAL_IP=host-gateway

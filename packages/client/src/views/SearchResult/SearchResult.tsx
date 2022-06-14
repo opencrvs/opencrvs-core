@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { DOWNLOAD_STATUS, IApplication } from '@client/applications'
+import {
+  DOWNLOAD_STATUS,
+  IDeclaration,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { Header } from '@client/components/interface/Header/Header'
 import { Query } from '@client/components/Query'
@@ -25,11 +29,10 @@ import { messages as registrarHomeMessages } from '@client/i18n/messages/views/r
 import { messages as rejectMessages } from '@client/i18n/messages/views/reject'
 import { messages } from '@client/i18n/messages/views/search'
 import {
-  goToApplicationDetails,
+  goToDeclarationRecordAudit,
   goToEvents as goToEventsAction,
   goToPage as goToPageAction,
-  goToPrintCertificate as goToPrintCertificateAction,
-  goToReviewDuplicate as goToReviewDuplicateAction
+  goToPrintCertificate as goToPrintCertificateAction
 } from '@client/navigation'
 import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
@@ -46,21 +49,15 @@ import {
   TRACKING_ID_TEXT
 } from '@client/utils/constants'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { RowHistoryView } from '@opencrvs/client/src/views/RegistrationHome/RowHistoryView'
-import { Duplicate, Validate } from '@opencrvs/components/lib/icons'
+
 import {
   ColumnContentAlignment,
   GridTable,
   IAction,
-  ISearchInputProps,
-  Loader
+  COLUMNS
 } from '@opencrvs/components/lib/interface'
-import { HomeContent } from '@opencrvs/components/lib/layout'
-import {
-  GQLEventSearchResultSet,
-  GQLQuery
-} from '@opencrvs/gateway/src/graphql/schema.d'
-import moment from 'moment'
+
+import { SearchEventsQuery } from '@client/utils/gateway'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -68,16 +65,30 @@ import { RouteComponentProps } from 'react-router'
 import ReactTooltip from 'react-tooltip'
 import { convertToMSISDN } from '@client/forms/utils'
 import { formattedDuration } from '@client/utils/date-formatting'
+import { Navigation } from '@client/components/interface/Navigation'
+import {
+  IconWithName,
+  IconWithNameEvent,
+  NoNameContainer,
+  NameContainer
+} from '@client/views/OfficeHome/components'
+import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors.error};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  color: ${({ theme }) => theme.colors.negative};
+  ${({ theme }) => theme.fonts.reg16};
   text-align: center;
   margin-top: 100px;
 `
 
-const Container = styled.div`
-  margin: 20px 0px 0px 0px;
+const BodyContainer = styled.div`
+  margin-left: 0px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 250px;
+    padding: 0px 24px;
+  }
 `
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -93,15 +104,6 @@ export const ActionPageWrapper = styled.div`
   width: 100%;
   height: 100%;
   overflow-y: scroll;
-`
-const SearchResultText = styled.div`
-  left: 268px;
-  ${({ theme }) => theme.fonts.h4Style};
-  color: ${({ theme }) => theme.colors.copy};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 24px;
-    margin-top: 24px;
-  }
 `
 
 export function getRejectionReasonDisplayValue(reason: string) {
@@ -119,17 +121,29 @@ export function getRejectionReasonDisplayValue(reason: string) {
   }
 }
 
+export interface ISerachInputCustomProps {
+  searchValue?: string
+  error?: boolean
+  touched?: boolean
+  focusInput?: boolean
+  buttonLabel: string
+  onSearchTextChange?: (searchText: string) => void
+  onSubmit: (searchText: string) => any
+}
+
+export type ISearchInputProps = ISerachInputCustomProps &
+  React.InputHTMLAttributes<HTMLInputElement>
+
 interface IBaseSearchResultProps {
   theme: ITheme
   language: string
   scope: Scope | null
   goToEvents: typeof goToEventsAction
   userDetails: IUserDetails | null
-  outboxApplications: IApplication[]
+  outboxDeclarations: IDeclaration[]
   goToPage: typeof goToPageAction
-  goToReviewDuplicate: typeof goToReviewDuplicateAction
   goToPrintCertificate: typeof goToPrintCertificateAction
-  goToApplicationDetails: typeof goToApplicationDetails
+  goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
 }
 
 interface IMatchParams {
@@ -145,8 +159,9 @@ type ISearchResultProps = IntlShapeProps &
 
 interface ISearchResultState {
   width: number
-  currentPage: number
 }
+
+type QueryData = SearchEventsQuery['searchEvents']
 
 export class SearchResultView extends React.Component<
   ISearchResultProps,
@@ -157,7 +172,6 @@ export class SearchResultView extends React.Component<
   constructor(props: ISearchResultProps) {
     super(props)
     this.state = {
-      currentPage: 1,
       width: window.innerWidth
     }
   }
@@ -184,105 +198,41 @@ export class SearchResultView extends React.Component<
     if (this.state.width > this.props.theme.grid.breakpoints.lg) {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 10,
-          key: 'event'
-        },
-        {
+          width: 35,
           label: this.props.intl.formatMessage(constantsMessages.name),
-          width: 22,
-          key: 'name'
+          key: COLUMNS.ICON_WITH_NAME
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.status),
-          width: 15,
-          key: 'status'
+          label: this.props.intl.formatMessage(constantsMessages.event),
+          width: 20,
+          key: COLUMNS.EVENT
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.lastUpdated),
-          width: 15,
-          key: 'dateOfModification'
+          label: this.props.intl.formatMessage(constantsMessages.eventDate),
+          width: 20,
+          key: COLUMNS.DATE_OF_EVENT
         },
         {
-          label: this.props.intl.formatMessage(constantsMessages.startedAt),
-          width: 15,
-          key: 'startedAt'
-        },
-        {
-          width: 5,
-          key: 'icon',
-          isIconColumns: true
-        },
-        {
-          label: this.props.intl.formatMessage(
-            registrarHomeMessages.listItemAction
-          ),
-          width: 18,
-          key: 'actions',
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
+          width: 25,
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
         }
       ]
     } else {
       return [
         {
-          label: this.props.intl.formatMessage(constantsMessages.type),
-          width: 15,
-          key: 'event'
-        },
-        {
           label: this.props.intl.formatMessage(constantsMessages.name),
+          width: 70,
+          key: COLUMNS.ICON_WITH_NAME_EVENT
+        },
+        {
           width: 30,
-          key: 'name'
-        },
-        {
-          label: this.props.intl.formatMessage(constantsMessages.status),
-          width: 20,
-          key: 'status'
-        },
-        {
-          width: 15,
-          key: 'icon',
-          isIconColumns: true
-        },
-        {
-          width: 20,
-          key: 'actions',
-          isActionColumn: true,
-          alignment: ColumnContentAlignment.CENTER
+          alignment: ColumnContentAlignment.RIGHT,
+          key: COLUMNS.ACTIONS,
+          isActionColumn: true
         }
       ]
-    }
-  }
-
-  getDeclarationStatusLabel = (status: string) => {
-    switch (status) {
-      case 'IN_PROGRESS':
-        return this.props.intl.formatMessage(registrarHomeMessages.inProgress)
-      case 'DECLARED':
-        return this.props.intl.formatMessage(
-          registrarHomeMessages.readyForReview
-        )
-      case 'REGISTERED':
-        return this.props.intl.formatMessage(registrarHomeMessages.readyToPrint)
-      case 'VALIDATED':
-        return this.props.intl.formatMessage(
-          registrarHomeMessages.sentForApprovals
-        )
-      case 'WAITING_VALIDATION':
-        return this.props.intl.formatMessage(
-          registrarHomeMessages.waitingForExternalValidation
-        )
-      case 'REJECTED':
-        return this.props.intl.formatMessage(
-          registrarHomeMessages.sentForUpdates
-        )
-      case 'CERTIFIED':
-        return this.props.intl.formatMessage(registrarHomeMessages.certified)
-      default:
-        return this.props.intl.formatMessage(
-          registrarHomeMessages.readyForReview
-        )
     }
   }
 
@@ -302,7 +252,7 @@ export class SearchResultView extends React.Component<
     return this.userHasValidateScope() || this.userHasRegisterScope()
   }
 
-  transformSearchContent = (data: GQLEventSearchResultSet) => {
+  transformSearchContent = (data: QueryData) => {
     const { intl } = this.props
     if (!data || !data.results) {
       return []
@@ -310,24 +260,62 @@ export class SearchResultView extends React.Component<
 
     const transformedData = transformData(data, this.props.intl)
     return transformedData.map((reg, index) => {
-      const foundApplication = this.props.outboxApplications.find(
-        (application) => application.id === reg.id
+      const foundDeclaration = this.props.outboxDeclarations.find(
+        (declaration) => declaration.id === reg.id
       )
       const actions: IAction[] = []
       const downloadStatus =
-        (foundApplication && foundApplication.downloadStatus) || undefined
+        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
-      const applicationIsRegistered = reg.declarationStatus === 'REGISTERED'
-      const applicationIsCertified = reg.declarationStatus === 'CERTIFIED'
-      const applicationIsRejected = reg.declarationStatus === 'REJECTED'
-      const applicationIsValidated = reg.declarationStatus === 'VALIDATED'
-      const applicationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
+      const declarationIsArchived = reg.declarationStatus === 'ARCHIVED'
+      const declarationIsRequestedCorrection =
+        reg.declarationStatus === 'REQUESTED_CORRECTION'
+      const declarationIsRegistered = reg.declarationStatus === 'REGISTERED'
+      const declarationIsCertified = reg.declarationStatus === 'CERTIFIED'
+      const declarationIsRejected = reg.declarationStatus === 'REJECTED'
+      const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
+      const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
-      if (
-        downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED &&
-        ((!applicationIsValidated && this.userHasValidateOrRegistrarScope()) ||
-          (applicationIsValidated && this.userHasRegisterScope()))
-      ) {
+      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+        if (
+          (declarationIsRegistered || declarationIsCertified) &&
+          this.userHasCertifyScope()
+        ) {
+          actions.push({
+            label: this.props.intl.formatMessage(buttonMessages.print),
+            handler: (
+              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+            ) => {
+              e && e.stopPropagation()
+              this.props.goToPrintCertificate(reg.id, reg.event)
+            },
+            disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+          })
+        } else if (
+          (declarationIsValidated && this.userHasRegisterScope()) ||
+          (!declarationIsValidated &&
+            !declarationIsRegistered &&
+            !declarationIsCertified &&
+            !declarationIsArchived &&
+            this.userHasValidateOrRegistrarScope())
+        ) {
+          actions.push({
+            label:
+              declarationIsRejected || declarationIsInProgress
+                ? this.props.intl.formatMessage(constantsMessages.update)
+                : this.props.intl.formatMessage(constantsMessages.review),
+            handler: () =>
+              this.props.goToPage(
+                REVIEW_EVENT_PARENT_FORM_PAGE,
+                reg.id,
+                'review',
+                reg.event.toLowerCase()
+              ),
+            disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+          })
+        }
+      }
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         actions.push({
           actionComponent: (
             <DownloadButton
@@ -336,51 +324,20 @@ export class SearchResultView extends React.Component<
                 event: reg.event,
                 compositionId: reg.id,
                 action:
-                  ((applicationIsRegistered || applicationIsCertified) &&
-                    Action.LOAD_CERTIFICATE_APPLICATION) ||
-                  Action.LOAD_REVIEW_APPLICATION
+                  ((declarationIsRegistered || declarationIsCertified) &&
+                    Action.LOAD_CERTIFICATE_DECLARATION) ||
+                  (declarationIsRequestedCorrection &&
+                    Action.LOAD_REQUESTED_CORRECTION_DECLARATION) ||
+                  Action.LOAD_REVIEW_DECLARATION
               }}
               status={downloadStatus as DOWNLOAD_STATUS}
             />
           )
         })
-      } else if (
-        (applicationIsRegistered || applicationIsCertified) &&
-        this.userHasCertifyScope()
-      ) {
+      } else {
         actions.push({
-          label: this.props.intl.formatMessage(buttonMessages.print),
-          handler: () => this.props.goToPrintCertificate(reg.id, reg.event)
+          actionComponent: <Downloaded />
         })
-      } else if (
-        (applicationIsValidated && this.userHasRegisterScope()) ||
-        (!applicationIsValidated &&
-          !applicationIsRegistered &&
-          !applicationIsCertified &&
-          this.userHasValidateOrRegistrarScope())
-      ) {
-        actions.push({
-          label:
-            applicationIsRejected || applicationIsInProgress
-              ? this.props.intl.formatMessage(constantsMessages.update)
-              : this.props.intl.formatMessage(constantsMessages.review),
-          handler: () =>
-            !isDuplicate
-              ? this.props.goToPage(
-                  REVIEW_EVENT_PARENT_FORM_PAGE,
-                  reg.id,
-                  'review',
-                  reg.event.toLowerCase()
-                )
-              : this.props.goToReviewDuplicate(reg.id)
-        })
-      }
-
-      let icon: JSX.Element = <div />
-      if (isDuplicate && !applicationIsRegistered && !applicationIsCertified) {
-        icon = <Duplicate />
-      } else if (applicationIsValidated) {
-        icon = <Validate data-tip data-for="validateTooltip" />
       }
 
       const event =
@@ -389,46 +346,61 @@ export class SearchResultView extends React.Component<
             dynamicConstantsMessages[reg.event.toLowerCase()]
           )) ||
         ''
+      const dateOfEvent =
+        reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))
+      const isValidatedOnReview =
+        reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
+        this.userHasRegisterScope()
+          ? true
+          : false
+      const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
+      const NameComponent = reg.name ? (
+        <NameContainer
+          isBoldLink={true}
+          id={`name_${index}`}
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('search', reg.id)
+          }
+        >
+          {reg.name}
+        </NameContainer>
+      ) : (
+        <NoNameContainer
+          id={`name_${index}`}
+          onClick={() =>
+            this.props.goToDeclarationRecordAudit('search', reg.id)
+          }
+        >
+          {intl.formatMessage(constantsMessages.noNameProvided)}
+        </NoNameContainer>
+      )
       return {
         ...reg,
         event,
-        name: reg.name,
-        status: this.getDeclarationStatusLabel(reg.declarationStatus),
-        dateOfModification:
-          (reg.modifiedAt &&
-            formattedDuration(
-              moment(
-                moment(reg.modifiedAt, 'x').format('YYYY-MM-DD HH:mm:ss'),
-                'YYYY-MM-DD HH:mm:ss'
-              )
-            )) ||
-          '',
-        startedAt:
-          (reg.createdAt && formattedDuration(moment(reg.createdAt))) || '',
-        icon,
-        actions,
-        rowClickHandler: [
-          {
-            label: 'rowClickHandler',
-            handler: () =>
-              isDuplicate
-                ? this.props.goToReviewDuplicate(reg.id)
-                : this.props.goToApplicationDetails(reg.id)
-          }
-        ]
+        name: reg.name && reg.name.toLowerCase(),
+        iconWithName: (
+          <IconWithName
+            status={reg.declarationStatus}
+            name={NameComponent}
+            isValidatedOnReview={isValidatedOnReview}
+            isDuplicate={isDuplicate}
+            isArchived={isArchived}
+          />
+        ),
+        iconWithNameEvent: (
+          <IconWithNameEvent
+            status={reg.declarationStatus}
+            name={NameComponent}
+            event={event}
+            isDuplicate={isDuplicate}
+            isValidatedOnReview={isValidatedOnReview}
+            isArchived={isArchived}
+          />
+        ),
+        dateOfEvent,
+        actions
       }
     })
-  }
-
-  renderExpandedComponent = (itemId: string, data: GQLQuery) => {
-    const results = data && data.searchEvents && data.searchEvents.results
-    const eventDetails =
-      results && results.find((result) => result && result.id === itemId)
-    return <RowHistoryView eventDetails={eventDetails} />
-  }
-
-  onPageChange = (newPageNumber: number) => {
-    this.setState({ currentPage: newPageNumber })
   }
 
   render() {
@@ -442,13 +414,16 @@ export class SearchResultView extends React.Component<
           mobileSearchBar={true}
           enableMenuSelection={false}
         />
-        <Container>
-          <HomeContent>
+        <Navigation />
+        <BodyContainer>
+          <>
             {searchText && searchType && (
-              <Query
+              <Query<SearchEventsQuery>
                 query={SEARCH_EVENTS}
                 variables={{
-                  locationIds: userDetails
+                  locationIds: this.userHasRegisterScope()
+                    ? null
+                    : userDetails
                     ? [getUserLocation(userDetails).id]
                     : [],
                   sort: SEARCH_RESULT_SORT,
@@ -463,93 +438,60 @@ export class SearchResultView extends React.Component<
                 }}
                 fetchPolicy="no-cache"
               >
-                {({
-                  loading,
-                  error,
-                  data
-                }: {
-                  loading: boolean
-                  error?: Error
-                  data: GQLQuery
-                }) => {
-                  if (loading) {
-                    return (
-                      <Loader
-                        id="search_loader"
-                        marginPercent={35}
-                        loadingText={intl.formatMessage(messages.searchingFor, {
-                          param: searchText
-                        })}
-                      />
-                    )
-                  }
+                {({ loading, error, data }) => {
+                  const total = loading
+                    ? -1
+                    : data?.searchEvents?.results?.length || 0
 
-                  if (error || !data.searchEvents) {
-                    return (
-                      <ErrorText id="search-result-error-text">
-                        {intl.formatMessage(errorMessages.queryError)}
-                      </ErrorText>
-                    )
-                  }
-
-                  const total =
-                    (data.searchEvents &&
-                      data.searchEvents.results &&
-                      data.searchEvents.results.length) ||
-                    0
                   return (
-                    <>
-                      <SearchResultText>
-                        {intl.formatMessage(messages.searchResultFor, {
-                          total,
-                          param: searchText
-                        })}
-                      </SearchResultText>
-                      {total > 0 && (
-                        <>
-                          <ReactTooltip id="validateTooltip">
-                            <ToolTipContainer>
-                              {this.props.intl.formatMessage(
-                                registrarHomeMessages.validatedApplicationTooltipForRegistrar
+                    <WQContentWrapper
+                      title={intl.formatMessage(messages.searchResultFor, {
+                        total,
+                        param: searchText
+                      })}
+                      isMobileSize={
+                        this.state.width < this.props.theme.grid.breakpoints.lg
+                      }
+                    >
+                      {loading ? (
+                        <div id="search_loader">
+                          <LoadingIndicator loading={true} />
+                        </div>
+                      ) : error ? (
+                        <ErrorText id="search-result-error-text">
+                          {intl.formatMessage(errorMessages.queryError)}
+                        </ErrorText>
+                      ) : (
+                        data?.searchEvents &&
+                        total > 0 && (
+                          <>
+                            <ReactTooltip id="validateTooltip">
+                              <ToolTipContainer>
+                                {this.props.intl.formatMessage(
+                                  registrarHomeMessages.validatedDeclarationTooltipForRegistrar
+                                )}
+                              </ToolTipContainer>
+                            </ReactTooltip>
+                            <GridTable
+                              content={this.transformSearchContent(
+                                data.searchEvents
                               )}
-                            </ToolTipContainer>
-                          </ReactTooltip>
-                          <GridTable
-                            content={this.transformSearchContent(
-                              data.searchEvents
-                            )}
-                            columns={this.getColumns()}
-                            renderExpandedComponent={(itemId: string) =>
-                              this.renderExpandedComponent(itemId, data)
-                            }
-                            noResultText={intl.formatMessage(
-                              constantsMessages.noResults
-                            )}
-                            onPageChange={this.onPageChange}
-                            pageSize={this.pageSize}
-                            totalItems={
-                              (data &&
-                                data.searchEvents &&
-                                data.searchEvents.totalItems) ||
-                              0
-                            }
-                            currentPage={this.state.currentPage}
-                            expandable={this.getExpandable()}
-                            clickable={!this.getExpandable()}
-                            showPaginated={this.showPaginated}
-                            loadMoreText={intl.formatMessage(
-                              constantsMessages.loadMore
-                            )}
-                          />
-                        </>
+                              columns={this.getColumns()}
+                              noResultText={intl.formatMessage(
+                                constantsMessages.noResults
+                              )}
+                              hideLastBorder={true}
+                            />
+                          </>
+                        )
                       )}
-                    </>
+                    </WQContentWrapper>
                   )
                 }}
               </Query>
             )}
-          </HomeContent>
-        </Container>
+          </>
+        </BodyContainer>
       </>
     )
   }
@@ -559,13 +501,12 @@ export const SearchResult = connect(
     language: state.i18n.language,
     scope: getScope(state),
     userDetails: getUserDetails(state),
-    outboxApplications: state.applicationsState.applications
+    outboxDeclarations: state.declarationsState.declarations
   }),
   {
     goToEvents: goToEventsAction,
     goToPage: goToPageAction,
-    goToReviewDuplicate: goToReviewDuplicateAction,
     goToPrintCertificate: goToPrintCertificateAction,
-    goToApplicationDetails
+    goToDeclarationRecordAudit
   }
 )(injectIntl(withTheme(SearchResultView)))

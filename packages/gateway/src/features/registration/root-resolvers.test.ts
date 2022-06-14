@@ -13,10 +13,16 @@ import {
   resolvers,
   lookForDuplicate
 } from '@gateway/features/registration/root-resolvers'
+import {
+  DOWNLOADED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL
+} from '@gateway/features/fhir/constants'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import * as fetchAny from 'jest-fetch-mock'
-
+import { cloneDeep } from 'lodash'
+import { getStatusFromTask, findExtension } from '@gateway/features/fhir/utils'
+import { UserInputError } from 'apollo-server-hapi'
 const fetch = fetchAny as any
 
 const registerCertifyToken = jwt.sign(
@@ -59,6 +65,16 @@ const certifyToken = jwt.sign(
   }
 )
 
+const sysAdminToken = jwt.sign(
+  { scope: ['sysadmin'] },
+  readFileSync('../auth/test/cert.key'),
+  {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  }
+)
+
 const authHeaderRegCert = {
   Authorization: `Bearer ${registerCertifyToken}`
 }
@@ -75,18 +91,272 @@ const authHeaderNotRegCert = {
   Authorization: `Bearer ${declareToken}`
 }
 
+const authHeaderSysAdmin = {
+  Authorization: `Bearer ${sysAdminToken}`
+}
+
+const authHeaderNotSysAdmin = {
+  Authorization: `Bearer ${declareToken}`
+}
+
+const mockTaskBundle = {
+  resourceType: 'Bundle',
+  id: 'dc4e9b8b-82fa-4868-a6d2-2fb49f795ec1',
+  meta: { lastUpdated: '2018-11-29T10:43:30.286+00:00' },
+  type: 'searchset',
+  total: 1,
+  link: [
+    {
+      relation: 'self',
+      url: 'http://localhost:3447/fhir/Task?focus=Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    }
+  ],
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'BIRTH'
+            }
+          ]
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'MOTHER'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastUser',
+            valueReference: { reference: 'DUMMY' }
+          }
+        ],
+        lastModified: '2018-11-28T15:13:57.492Z',
+        note: [
+          {
+            text: '',
+            time: '2018-11-28T15:13:57.492Z',
+            authorString: 'DUMMY'
+          }
+        ],
+        focus: {
+          reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+            value: 'B1mW7jA'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'DECLARED'
+            }
+          ]
+        },
+        meta: {
+          lastUpdated: '2018-11-29T10:40:08.913+00:00',
+          versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
+        },
+        id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+      }
+    }
+  ]
+}
+
 beforeEach(() => {
   fetch.resetMocks()
 })
 
 describe('Registration root resolvers', () => {
-  describe('fetchBirthRegistration()', () => {
-    it('returns object of composition result', async () => {
+  describe('searchBirthRegistrations()', () => {
+    it('throws an error if the user does not have sysadmin scope', async () => {
+      return expect(
+        resolvers.Query.searchBirthRegistrations(
+          {},
+          {
+            fromDate: new Date('05 October 2011 14:48 UTC'),
+            toDate: new Date('05 October 2012 14:48 UTC')
+          },
+          authHeaderNotSysAdmin
+        )
+      ).rejects.toThrowError('User does not have a sysadmin scope')
+    })
+
+    it('returns an array of compositions', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
-          id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+          entry: [
+            {
+              resource: {
+                id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+                type: {
+                  coding: [
+                    {
+                      code: 'birth-declaration'
+                    }
+                  ]
+                }
+              }
+            }
+          ]
         })
       )
+
+      const compositions = await resolvers.Query.searchBirthRegistrations(
+        {},
+        {
+          fromDate: new Date('05 October 2011 14:48 UTC'),
+          toDate: new Date('05 October 2012 14:48 UTC')
+        },
+        authHeaderSysAdmin
+      )
+
+      expect(compositions[0].id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+  })
+
+  describe('searchDeathRegistrations()', () => {
+    it('throws an error if the user does not have sysadmin scope', async () => {
+      return expect(
+        resolvers.Query.searchDeathRegistrations(
+          {},
+          {
+            fromDate: new Date('05 October 2011 14:48 UTC'),
+            toDate: new Date('05 October 2012 14:48 UTC')
+          },
+          authHeaderNotSysAdmin
+        )
+      ).rejects.toThrowError('User does not have a sysadmin scope')
+    })
+
+    it('returns an array of compositions', async () => {
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          entry: [
+            {
+              resource: {
+                id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+                type: {
+                  coding: [
+                    {
+                      code: 'death-declaration'
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        })
+      )
+
+      const compositions = await resolvers.Query.searchDeathRegistrations(
+        {},
+        {
+          fromDate: new Date('05 October 2011 14:48 UTC'),
+          toDate: new Date('05 October 2012 14:48 UTC')
+        },
+        authHeaderSysAdmin
+      )
+
+      expect(compositions[0].id).toBe('0411ff3d-78a4-4348-8eb7-b023a0ee6dce')
+    })
+  })
+
+  describe('fetchBirthRegistration()', () => {
+    it('returns object of composition result', async () => {
+      const mockTaskOfComposition = JSON.stringify({
+        id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+        entry: [
+          {
+            fullUrl:
+              'http://localhost:3447/fhir/Task/10b082d6-e152-4391-b1ef-d88586b049b8/_history/80c56eba-9dc1-4d03-aebe-118a7390c8c0',
+            resource: {
+              resourceType: 'Task',
+              status: 'requested',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/types',
+                    code: 'BIRTH'
+                  }
+                ]
+              },
+              focus: {
+                reference: 'Composition/0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+              },
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/draft-id',
+                  value: '0b760582-9f9b-4793-a8e3-1022c91c4052'
+                },
+                {
+                  system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                  value: 'BIU2VLU'
+                }
+              ],
+              extension: [
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person',
+                  valueString: 'MOTHER'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+                  valueString: '+260725632525'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastUser',
+                  valueReference: {
+                    reference:
+                      'Practitioner/aa5fe4e2-9a89-4ab8-b4f1-2cd4471a7e2c'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastLocation',
+                  valueReference: {
+                    reference: 'Location/0fc529b4-4099-4b71-a26d-e367652b6921'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastOffice',
+                  valueReference: {
+                    reference: 'Location/497449a0-4f38-426f-b183-93bebfae9b8b'
+                  }
+                },
+                {
+                  url: DOWNLOADED_EXTENSION_URL,
+                  valueString: 'DECLARED'
+                }
+              ],
+              lastModified: '2022-02-16T13:07:22.445Z',
+              businessStatus: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/reg-status',
+                    code: 'DECLARED'
+                  }
+                ]
+              },
+              meta: {
+                lastUpdated: '2022-02-22T06:55:13.928+00:00',
+                versionId: '80c56eba-9dc1-4d03-aebe-118a7390c8c0'
+              },
+              id: '10b082d6-e152-4391-b1ef-d88586b049b8'
+            }
+          }
+        ]
+      })
+      const mockPost = JSON.stringify({
+        id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+      })
+      fetch.mockResponses([mockTaskOfComposition], [mockPost], [mockPost])
       const composition = await resolvers.Query.fetchBirthRegistration(
         {},
         { id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce' },
@@ -108,11 +378,91 @@ describe('Registration root resolvers', () => {
   })
   describe('fetchDeathRegistration()', () => {
     it('returns object of composition result', async () => {
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
-        })
-      )
+      const mockTaskOfComposition = JSON.stringify({
+        id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce',
+        entry: [
+          {
+            fullUrl:
+              'http://localhost:3447/fhir/Task/10b082d6-e152-4391-b1ef-d88586b049b8/_history/80c56eba-9dc1-4d03-aebe-118a7390c8c0',
+            resource: {
+              resourceType: 'Task',
+              status: 'requested',
+              code: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/types',
+                    code: 'BIRTH'
+                  }
+                ]
+              },
+              focus: {
+                reference: 'Composition/0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+              },
+              identifier: [
+                {
+                  system: 'http://opencrvs.org/specs/id/draft-id',
+                  value: '0b760582-9f9b-4793-a8e3-1022c91c4052'
+                },
+                {
+                  system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+                  value: 'BIU2VLU'
+                }
+              ],
+              extension: [
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person',
+                  valueString: 'MOTHER'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+                  valueString: '+260725632525'
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastUser',
+                  valueReference: {
+                    reference:
+                      'Practitioner/aa5fe4e2-9a89-4ab8-b4f1-2cd4471a7e2c'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastLocation',
+                  valueReference: {
+                    reference: 'Location/0fc529b4-4099-4b71-a26d-e367652b6921'
+                  }
+                },
+                {
+                  url: 'http://opencrvs.org/specs/extension/regLastOffice',
+                  valueReference: {
+                    reference: 'Location/497449a0-4f38-426f-b183-93bebfae9b8b'
+                  }
+                },
+                {
+                  url: DOWNLOADED_EXTENSION_URL,
+                  valueString: 'DECLARED'
+                }
+              ],
+              lastModified: '2022-02-16T13:07:22.445Z',
+              businessStatus: {
+                coding: [
+                  {
+                    system: 'http://opencrvs.org/specs/reg-status',
+                    code: 'DECLARED'
+                  }
+                ]
+              },
+              meta: {
+                lastUpdated: '2022-02-22T06:55:13.928+00:00',
+                versionId: '80c56eba-9dc1-4d03-aebe-118a7390c8c0'
+              },
+              id: '10b082d6-e152-4391-b1ef-d88586b049b8'
+            }
+          }
+        ]
+      })
+      const mockPost = JSON.stringify({
+        id: '0411ff3d-78a4-4348-8eb7-b023a0ee6dce'
+      })
+      fetch.mockResponses([mockTaskOfComposition], [mockPost], [mockPost])
       // @ts-ignore
       const composition = await resolvers.Query.fetchDeathRegistration(
         {},
@@ -405,7 +755,6 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
-        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -461,7 +810,6 @@ describe('Registration root resolvers', () => {
         }
       )
       fetch.mockResponses(
-        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -564,7 +912,6 @@ describe('Registration root resolvers', () => {
 
     it('throws an error when invalid composition is returned', async () => {
       fetch.mockResponses(
-        [JSON.stringify({})],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -607,81 +954,7 @@ describe('Registration root resolvers', () => {
   describe('markEventAsVoided()', () => {
     it('updates a task with rejected status, reason and comment', async () => {
       fetch.mockResponses(
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            id: 'dc4e9b8b-82fa-4868-a6d2-2fb49f795ec1',
-            meta: { lastUpdated: '2018-11-29T10:43:30.286+00:00' },
-            type: 'searchset',
-            total: 1,
-            link: [
-              {
-                relation: 'self',
-                url:
-                  'http://localhost:3447/fhir/Task?focus=Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
-              }
-            ],
-            entry: [
-              {
-                fullUrl:
-                  'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
-                resource: {
-                  resourceType: 'Task',
-                  status: 'requested',
-                  code: {
-                    coding: [
-                      {
-                        system: 'http://opencrvs.org/specs/types',
-                        code: 'BIRTH'
-                      }
-                    ]
-                  },
-                  extension: [
-                    {
-                      url: 'http://opencrvs.org/specs/extension/contact-person',
-                      valueString: 'MOTHER'
-                    },
-                    {
-                      url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueReference: { reference: 'DUMMY' }
-                    }
-                  ],
-                  lastModified: '2018-11-28T15:13:57.492Z',
-                  note: [
-                    {
-                      text: '',
-                      time: '2018-11-28T15:13:57.492Z',
-                      authorString: 'DUMMY'
-                    }
-                  ],
-                  focus: {
-                    reference:
-                      'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
-                  },
-                  identifier: [
-                    {
-                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-                      value: 'B1mW7jA'
-                    }
-                  ],
-                  businessStatus: {
-                    coding: [
-                      {
-                        system: 'http://opencrvs.org/specs/reg-status',
-                        code: 'REJECTED'
-                      }
-                    ]
-                  },
-                  meta: {
-                    lastUpdated: '2018-11-29T10:40:08.913+00:00',
-                    versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
-                  },
-                  id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
-                }
-              }
-            ]
-          })
-        ],
+        [JSON.stringify(mockTaskBundle)],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -706,7 +979,7 @@ describe('Registration root resolvers', () => {
       )
       const postData = JSON.parse(fetch.mock.calls[1][1].body)
       expect(postData.entry[0].resource.reason.text).toBe('Misspelling')
-      expect(postData.entry[0].resource.note[1].text).toBe(
+      expect(postData.entry[0].resource.statusReason.text).toBe(
         'Family name misspelled'
       )
       expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
@@ -720,6 +993,70 @@ describe('Registration root resolvers', () => {
         resolvers.Mutation.markEventAsVoided(
           {},
           { id, reason, comment },
+          authHeaderNotRegCert
+        )
+      ).rejects.toThrowError('User does not have a register or validate scope')
+    })
+  })
+
+  describe('markEventAsArchived()', () => {
+    it('updates a task with archived status', async () => {
+      fetch.mockResponses(
+        [JSON.stringify(mockTaskBundle)],
+        [JSON.stringify('ok'), { status: 200 }]
+      )
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      const result = await resolvers.Mutation.markEventAsArchived(
+        {},
+        { id },
+        authHeaderRegCert
+      )
+      const postData = JSON.parse(fetch.mock.calls[1][1].body)
+      expect(postData.entry[0].resource.businessStatus.coding[0].code).toBe(
+        'ARCHIVED'
+      )
+      expect(result).toBe('ba0412c6-5125-4447-bd32-fb5cf336ddbc')
+    })
+
+    it('throws error if user does not have register or validate scope', async () => {
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      await expect(
+        resolvers.Mutation.markEventAsArchived({}, { id }, authHeaderNotRegCert)
+      ).rejects.toThrowError('User does not have a register or validate scope')
+    })
+  })
+
+  describe('markEventAsReinstated()', () => {
+    it('updates a task with WAITING_VALIDATION status', async () => {
+      const archivedTaskBundle = cloneDeep(mockTaskBundle)
+      archivedTaskBundle.entry[0].resource.businessStatus.coding[0].code =
+        'ARCHIVED'
+      const taskHistoryBundle = cloneDeep(mockTaskBundle)
+      taskHistoryBundle.entry.push(mockTaskBundle.entry[0])
+      fetch.mockResponses(
+        [JSON.stringify(archivedTaskBundle)],
+        [JSON.stringify(taskHistoryBundle)],
+        [JSON.stringify({})]
+      )
+      await resolvers.Mutation.markEventAsReinstated(
+        {},
+        { id: archivedTaskBundle.id },
+        authHeaderRegCert
+      )
+      expect(fetch.mock.calls[0][0]).toContain(archivedTaskBundle.id)
+      const task = JSON.parse(fetch.mock.calls[2][1].body).entry[0].resource
+      expect(
+        findExtension(REINSTATED_EXTENSION_URL, task.extension)
+      ).not.toBeUndefined()
+      expect(getStatusFromTask(task)).toBe('DECLARED')
+    })
+
+    it('throws error if user does not have register or validate scope', async () => {
+      const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
+      await expect(
+        resolvers.Mutation.markEventAsReinstated(
+          {},
+          { id },
           authHeaderNotRegCert
         )
       ).rejects.toThrowError('User does not have a register or validate scope')
@@ -751,7 +1088,7 @@ describe('Registration root resolvers', () => {
           maritalStatus: 'MARRIED',
           address: [
             {
-              type: 'PERMANENT',
+              type: 'PRIMARY_ADDRESS',
               line: [
                 '',
                 '',
@@ -765,7 +1102,7 @@ describe('Registration root resolvers', () => {
               district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
             },
             {
-              type: 'CURRENT',
+              type: 'SECONDARY_ADDRESS',
               line: [
                 '',
                 '',
@@ -783,17 +1120,17 @@ describe('Registration root resolvers', () => {
         },
         registration: {
           contact: 'MOTHER',
+          informantType: 'MOTHER',
           contactPhoneNumber: '01712121212',
           _fhirID: '75e734d8-47cf-47b4-9416-fa4c747e1b71',
           trackingId: 'BZ1D4FY',
           status: [{ timestamp: '2019-07-23T07:51:31.906Z' }]
         },
-        presentAtBirthRegistration: 'MOTHER',
         _fhirIDMap: {
           composition: '20703e32-0e2f-4685-8371-e7448d18de82',
           encounter: '04cd7da2-89b6-4d68-b3c6-b158ce83b0e8',
           observation: {
-            presentAtBirthRegistration: 'c7879d8e-d094-42ed-804a-aeea8aaa7ef8'
+            birthType: 'c7879d8e-d094-42ed-804a-aeea8aaa7ef8'
           }
         }
       }
@@ -843,8 +1180,7 @@ describe('Registration root resolvers', () => {
             link: [
               {
                 relation: 'self',
-                url:
-                  'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+                url: 'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5'
               }
             ],
             entry: [
@@ -885,8 +1221,7 @@ describe('Registration root resolvers', () => {
                       }
                     },
                     {
-                      url:
-                        'http://opencrvs.org/specs/extension/regLastLocation',
+                      url: 'http://opencrvs.org/specs/extension/regLastLocation',
                       valueReference: {
                         reference:
                           'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
@@ -955,7 +1290,7 @@ describe('Registration root resolvers', () => {
       )
     })
 
-    it('throws error if no task entry found by given id', async () => {
+    it('throws error if no task entry found by given id', () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       fetch.mockResponseOnce(
         JSON.stringify({
@@ -969,14 +1304,13 @@ describe('Registration root resolvers', () => {
           link: [
             {
               relation: 'self',
-              url:
-                'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5s'
+              url: 'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5s'
             }
           ],
           entry: []
         })
       )
-      expect(
+      return expect(
         resolvers.Mutation.markBirthAsValidated(
           {},
           { id: compositionID },
@@ -1014,7 +1348,7 @@ describe('Registration root resolvers', () => {
           birthDate: '1940-01-01',
           address: [
             {
-              type: 'PERMANENT',
+              type: 'PRIMARY_ADDRESS',
               line: [
                 '',
                 '',
@@ -1028,7 +1362,7 @@ describe('Registration root resolvers', () => {
               district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
             },
             {
-              type: 'CURRENT',
+              type: 'SECONDARY_ADDRESS',
               line: [
                 '',
                 '',
@@ -1056,7 +1390,7 @@ describe('Registration root resolvers', () => {
             telecom: [{ system: 'phone', value: '01711111111' }],
             address: [
               {
-                type: 'CURRENT',
+                type: 'SECONDARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -1070,7 +1404,7 @@ describe('Registration root resolvers', () => {
                 district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
               },
               {
-                type: 'PERMANENT',
+                type: 'PRIMARY_ADDRESS',
                 line: [
                   '',
                   '',
@@ -1092,13 +1426,13 @@ describe('Registration root resolvers', () => {
         mannerOfDeath: 'NATURAL_CAUSES',
         eventLocation: {
           address: {
-            type: 'PERMANENT',
+            type: 'PRIMARY_ADDRESS',
             line: ['', '', '', '', '', 'f8816522-0a1a-49ca-aa4e-a886a9b056ec'],
             country: 'BGD',
             state: 'd2898740-42e4-4680-b5a7-2f0a12a15199',
             district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
           },
-          type: 'PERMANENT',
+          type: 'PRIMARY_ADDRESS',
           partOf: 'Location/f8816522-0a1a-49ca-aa4e-a886a9b056ec'
         },
         registration: {
@@ -1125,7 +1459,7 @@ describe('Registration root resolvers', () => {
                   birthDate: '1940-01-01',
                   address: [
                     {
-                      type: 'PERMANENT',
+                      type: 'PRIMARY_ADDRESS',
                       line: [
                         '',
                         '',
@@ -1139,7 +1473,7 @@ describe('Registration root resolvers', () => {
                       district: '68ba789b-0e6c-4528-a400-4422e142e3dd'
                     },
                     {
-                      type: 'CURRENT',
+                      type: 'SECONDARY_ADDRESS',
                       line: [
                         '',
                         '',
@@ -1199,8 +1533,7 @@ describe('Registration root resolvers', () => {
             link: [
               {
                 relation: 'self',
-                url:
-                  'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5'
+                url: 'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5'
               }
             ],
             entry: [
@@ -1233,8 +1566,7 @@ describe('Registration root resolvers', () => {
                       }
                     },
                     {
-                      url:
-                        'http://opencrvs.org/specs/extension/regLastLocation',
+                      url: 'http://opencrvs.org/specs/extension/regLastLocation',
                       valueReference: {
                         reference:
                           'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
@@ -1317,14 +1649,13 @@ describe('Registration root resolvers', () => {
           link: [
             {
               relation: 'self',
-              url:
-                'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5s'
+              url: 'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5s'
             }
           ],
           entry: []
         })
       )
-      expect(
+      return expect(
         resolvers.Mutation.markDeathAsValidated(
           {},
           { id: compositionID },
@@ -1438,106 +1769,6 @@ describe('Registration root resolvers', () => {
       }
       fetch.mockResponses(
         [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            id: '0a84365d-1925-40cf-a48b-17fcf3425040',
-            meta: {
-              lastUpdated: '2018-12-13T03:55:12.629+00:00'
-            },
-            type: 'searchset',
-            total: 1,
-            link: [
-              {
-                relation: 'self',
-                url:
-                  'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5'
-              }
-            ],
-            entry: [
-              {
-                fullUrl:
-                  'http://localhost:3447/fhir/Task/86f72aee-eb58-45c6-b9b2-93f6a344315e',
-                resource: {
-                  resourceType: 'Task',
-                  status: 'requested',
-                  code: {
-                    coding: [
-                      {
-                        system: 'http://opencrvs.org/specs/types',
-                        code: 'BIRTH'
-                      }
-                    ]
-                  },
-                  identifier: [
-                    {
-                      system: 'http://opencrvs.org/specs/id/paper-form-id',
-                      value: '23423'
-                    },
-                    {
-                      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
-                      value: 'BlAqHa7'
-                    }
-                  ],
-                  extension: [
-                    {
-                      url: 'http://opencrvs.org/specs/extension/contact-person',
-                      valueString: 'MOTHER'
-                    },
-                    {
-                      url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueReference: {
-                        reference:
-                          'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
-                      }
-                    },
-                    {
-                      url:
-                        'http://opencrvs.org/specs/extension/regLastLocation',
-                      valueReference: {
-                        reference:
-                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
-                      }
-                    },
-                    {
-                      url: 'http://opencrvs.org/specs/extension/regLastOffice',
-                      valueReference: {
-                        reference:
-                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
-                      }
-                    }
-                  ],
-                  lastModified: '2018-12-11T11:55:46.775Z',
-                  note: [
-                    {
-                      text: '',
-                      time: '2018-12-11T11:55:46.775Z',
-                      authorString:
-                        'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
-                    }
-                  ],
-                  focus: {
-                    reference:
-                      'Composition/cd168e0b-0817-4880-a67f-35de777460a5'
-                  },
-                  businessStatus: {
-                    coding: [
-                      {
-                        system: 'http://opencrvs.org/specs/reg-status',
-                        code: 'DECLARED'
-                      }
-                    ]
-                  },
-                  meta: {
-                    lastUpdated: '2018-12-11T12:29:48.862+00:00',
-                    versionId: '6086dbf7-3772-463a-a920-4694ccb70152'
-                  },
-                  id: '86f72aee-eb58-45c6-b9b2-93f6a344315e'
-                }
-              }
-            ]
-          })
-        ],
-        [
           // Response for when the status is updated
           JSON.stringify({
             resourceType: 'Bundle',
@@ -1564,6 +1795,7 @@ describe('Registration root resolvers', () => {
         expect.objectContaining({ method: 'POST' })
       )
     })
+
     it('throws error if no task entry found given id', async () => {
       const compositionID = 'cd168e0b-0817-4880-a67f-35de777460a5'
       fetch.mockResponseOnce(
@@ -1578,20 +1810,19 @@ describe('Registration root resolvers', () => {
           link: [
             {
               relation: 'self',
-              url:
-                'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5s'
+              url: 'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5s'
             }
           ],
           entry: []
         })
       )
-      expect(
+      return expect(
         resolvers.Mutation.markBirthAsRegistered(
           {},
           { id: compositionID },
           authHeaderRegCert
         )
-      ).rejects.toThrowError('Task does not exist')
+      ).rejects.toThrow()
     })
 
     it("throws an error when the user doesn't have register scope", async () => {
@@ -1697,98 +1928,6 @@ describe('Registration root resolvers', () => {
         id: '02ffb3a5-303f-4828-b63f-5847d4a4eff7'
       }
       fetch.mockResponses(
-        [
-          JSON.stringify({
-            resourceType: 'Bundle',
-            id: '0a84365d-1925-40cf-a48b-17fcf3425040',
-            meta: {
-              lastUpdated: '2018-12-13T03:55:12.629+00:00'
-            },
-            type: 'searchset',
-            total: 1,
-            link: [
-              {
-                relation: 'self',
-                url:
-                  'http://localhost:3447/fhir/Task?focus=Composition/cd168e0b-0817-4880-a67f-35de777460a5'
-              }
-            ],
-            entry: [
-              {
-                fullUrl:
-                  'http://localhost:3447/fhir/Task/86f72aee-eb58-45c6-b9b2-93f6a344315e',
-                resource: {
-                  resourceType: 'Task',
-                  status: 'requested',
-                  code: {
-                    coding: [
-                      {
-                        system: 'http://opencrvs.org/specs/types',
-                        code: 'DEATH'
-                      }
-                    ]
-                  },
-                  identifier: [
-                    {
-                      system: 'http://opencrvs.org/specs/id/death-tracking-id',
-                      value: 'DlAqHa7'
-                    }
-                  ],
-                  extension: [
-                    {
-                      url: 'http://opencrvs.org/specs/extension/regLastUser',
-                      valueReference: {
-                        reference:
-                          'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
-                      }
-                    },
-                    {
-                      url:
-                        'http://opencrvs.org/specs/extension/regLastLocation',
-                      valueReference: {
-                        reference:
-                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
-                      }
-                    },
-                    {
-                      url: 'http://opencrvs.org/specs/extension/regLastOffice',
-                      valueReference: {
-                        reference:
-                          'Location/71a2f856-3e6a-4bf7-97bd-145d4ab187fa'
-                      }
-                    }
-                  ],
-                  lastModified: '2018-12-11T11:55:46.775Z',
-                  note: [
-                    {
-                      text: '',
-                      time: '2018-12-11T11:55:46.775Z',
-                      authorString:
-                        'Practitioner/34562b20-718f-4272-9596-66cb89f2fe7b'
-                    }
-                  ],
-                  focus: {
-                    reference:
-                      'Composition/cd168e0b-0817-4880-a67f-35de777460a5'
-                  },
-                  businessStatus: {
-                    coding: [
-                      {
-                        system: 'http://opencrvs.org/specs/reg-status',
-                        code: 'DECLARED'
-                      }
-                    ]
-                  },
-                  meta: {
-                    lastUpdated: '2018-12-11T12:29:48.862+00:00',
-                    versionId: '6086dbf7-3772-463a-a920-4694ccb70152'
-                  },
-                  id: '86f72aee-eb58-45c6-b9b2-93f6a344315e'
-                }
-              }
-            ]
-          })
-        ],
         [
           JSON.stringify({
             resourceType: 'Bundle',
@@ -2288,7 +2427,7 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have required scope", async () => {
-      expect(
+      return expect(
         resolvers.Query.queryPersonByIdentifier(
           {},
           { identifier: '1234567898765' },
@@ -2359,7 +2498,7 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have required scope", async () => {
-      expect(
+      return expect(
         resolvers.Query.queryPersonByNidIdentifier(
           {},
           {
@@ -2408,7 +2547,7 @@ describe('Registration root resolvers', () => {
     })
 
     it("throws an error when the user doesn't have required scope", async () => {
-      expect(
+      return expect(
         resolvers.Query.fetchRegistrationCountByStatus(
           {},
           {
@@ -2418,6 +2557,50 @@ describe('Registration root resolvers', () => {
           authHeaderCertify
         )
       ).rejects.toThrowError('User does not have enough scope')
+    })
+  })
+
+  describe('AttachmentInput type only accepts image/* mime type', () => {
+    it('throws an error if a non-supported file is uploaded', async () => {
+      return expect(
+        resolvers.Mutation.createBirthRegistration(
+          {},
+          {
+            details: {
+              registration: {
+                attachments: [
+                  {
+                    data: 'data:text/csv;base64,VHlwZSxEYXRldGltZSxBY2NvdW50LEFtb3VudCxWYWx1ZSxSYXRlLEZlZSxTdWIgVHlwZQ0K',
+                    subject: 'CHILD',
+                    type: 'NOTIFICATION_OF_BIRTH',
+                    contentType: 'text/csv'
+                  }
+                ]
+              }
+            }
+          }
+        )
+      ).rejects.toThrow(UserInputError)
+    })
+
+    it('throws an error if file base64 headers are manipulated', async () => {
+      return expect(
+        resolvers.Mutation.createDeathRegistration(
+          {},
+          {
+            details: {
+              registration: {
+                attachments: [
+                  {
+                    data: 'data:image/png;base64,VHlwZSxEYXRldGltZSxBY2NvdW50LEFtb3VudCxWYWx1ZSxSYXRlLEZlZSxTdWIgVHlwZQ0K',
+                    contentType: 'text/csv'
+                  }
+                ]
+              }
+            }
+          }
+        )
+      ).rejects.toThrow(UserInputError)
     })
   })
 })

@@ -1,0 +1,599 @@
+{
+  "resourceType": "Bundle",
+  "type": "document",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:698f636c-7787-44fd-857b-4bf687f5a34a",
+      "resource": {
+        "identifier": {
+          "system": "urn:ietf:rfc:3986",
+          "value": "698f636c-7787-44fd-857b-4bf687f5a34a"
+        },
+        "resourceType": "Composition",
+        "status": "preliminary",
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/doc-types",
+              "code": "death-declaration"
+            }
+          ],
+          "text": "Death Declaration"
+        },
+        "class": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/doc-classes",
+              "code": "crvs-document"
+            }
+          ],
+          "text": "CRVS Document"
+        },
+        "title": "Death Declaration",
+        "section": [
+          {
+            "title": "Correction certificates",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/specs/sections",
+                  "code": "correction-certificates"
+                }
+              ],
+              "text": "Correction certificates"
+            },
+            "entry": []
+          },
+          {
+            "title": "Death correction encounters",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/specs/sections",
+                  "code": "death-correction-encounters"
+                }
+              ],
+              "text": "Death correction encounters"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:77202dea-2664-4e77-8b4a-c0fd36c36376"
+              }
+            ]
+          },
+          {
+            "title": "Deceased details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "deceased-details"
+                }
+              ],
+              "text": "Deceased details"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:dbd665e2-321d-4fa4-a497-2e7e2aedd01c"
+              }
+            ]
+          },
+          {
+            "title": "Informant's details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "informant-details"
+                }
+              ],
+              "text": "Informant's details"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:4eb6c2ae-1554-409b-8de9-a1ed306ba3bb"
+              }
+            ]
+          },
+          {
+            "title": "Mother's details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "mother-details"
+                }
+              ],
+              "text": "Mother's details"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:6233b8ba-0912-4482-830b-fc026db0e4cd"
+              }
+            ]
+          },
+          {
+            "title": "Father's details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "father-details"
+                }
+              ],
+              "text": "Father's details"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:b14f6e8a-3ee5-4038-9f62-d3763b95d5de"
+              }
+            ]
+          },
+          {
+            "title": "Death encounter",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/specs/sections",
+                  "code": "death-encounter"
+                }
+              ],
+              "text": "Death encounter"
+            },
+            "entry": [
+              {
+                "reference": "urn:uuid:9a9fe572-03fc-4168-b8a1-922cbcec2648"
+              }
+            ]
+          }
+        ],
+        "subject": {},
+        "date": "2022-02-02T07:14:03.201Z",
+        "author": [],
+        "id": "35acb304-ec54-46cb-b37f-831d970cb40d"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:923e7538-d359-425a-bc36-4e40d9969aef",
+      "resource": {
+        "resourceType": "Task",
+        "status": "requested",
+        "code": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/types",
+              "code": "DEATH"
+            }
+          ]
+        },
+        "focus": {
+          "reference": "urn:uuid:698f636c-7787-44fd-857b-4bf687f5a34a"
+        },
+        "id": "2be5b7ad-34d7-4f6e-a91f-604f8baa4e9b",
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/draft-id",
+            "value": "35acb304-ec54-46cb-b37f-831d970cb40d"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/death-tracking-id",
+            "value": "DKC52QB"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/death-registration-number",
+            "value": "2022DKC52QB"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person",
+            "valueString": "INFORMANT"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-relationship",
+            "valueString": ""
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person-phone-number",
+            "valueString": "+260965656868"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/timeLoggedMS",
+            "valueInteger": 30923
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/requestingIndividual",
+            "valueString": "MOTHER"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastLocation",
+            "valueReference": {
+              "reference": "Location/976c4871-c4d1-46f7-b50b-09f346e05d55"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastOffice",
+            "valueReference": {
+              "reference": "Location/fe68d322-4d98-4cdf-a320-2db9653f781d"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastUser",
+            "valueReference": {
+              "reference": "Practitioner/7ce43df4-0692-424d-98ce-4155c2f18757"
+            }
+          }
+        ],
+        "input": [
+          {
+            "valueCode": "informant",
+            "valueId": "name",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/action-type",
+                  "code": "update"
+                }
+              ]
+            },
+            "valueString": "Shirley the Medium"
+          }
+        ],
+        "output": [
+          {
+            "valueCode": "informant",
+            "valueId": "name",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/action-type",
+                  "code": "update"
+                }
+              ]
+            },
+            "valueString": "Shirley the Medium Corrected"
+          }
+        ],
+        "reason": {
+          "text": "CLERICAL ERROR"
+        },
+        "note": [
+          {
+            "text": "Spelling mistakes",
+            "time": "Wed, 02 Feb 2022 08:32:25 GMT",
+            "authorString": ""
+          }
+        ],
+        "businessStatus": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/reg-status",
+              "code": "REQUESTED_CORRECTION"
+            }
+          ]
+        },
+        "lastModified": "2022-02-02T08:32:25.825Z"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:0c9b3577-0d2d-4329-abfa-52aa247de2a7",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "masterIdentifier": {
+          "system": "urn:ietf:rfc:3986",
+          "value": "0c9b3577-0d2d-4329-abfa-52aa247de2a7"
+        },
+        "status": "current",
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/certificate-type",
+              "code": "DEATH"
+            }
+          ]
+        },
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/hasShowedVerifiedDocument",
+            "valueString": true
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/attestedAndCopied",
+            "valueString": true
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/payment",
+            "valueReference": {
+              "reference": "urn:uuid:85c4acb6-9a0c-4062-a242-785dad734be4"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:85c4acb6-9a0c-4062-a242-785dad734be4",
+      "resource": {
+        "resourceType": "PaymentReconciliation",
+        "status": "active",
+        "detail": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "code": "payment"
+                }
+              ]
+            },
+            "amount": 10
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:77202dea-2664-4e77-8b4a-c0fd36c36376",
+      "resource": {
+        "resourceType": "Encounter",
+        "status": "finished",
+        "location": [
+          {
+            "location": {
+              "reference": "Location/63ee3076-4568-4cce-aa94-ad904b8ebfc8"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:dbd665e2-321d-4fa4-a497-2e7e2aedd01c",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "id": "0e50f510-aa22-47f7-9f72-90b51057e336",
+        "identifier": [
+          {
+            "value": "123456789",
+            "type": "NATIONAL_ID"
+          },
+          {
+            "value": "1",
+            "type": "SOCIAL_SECURITY_NO"
+          }
+        ],
+        "name": [
+          {
+            "use": "en",
+            "given": ["Courage"],
+            "family": ["The Cowardly Dog"]
+          }
+        ],
+        "gender": "male",
+        "birthDate": "2021-02-14",
+        "maritalStatus": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/StructureDefinition/marital-status",
+              "code": "M"
+            }
+          ],
+          "text": "MARRIED"
+        },
+        "address": [
+          {
+            "type": "PRIMARY_ADDRESS",
+            "line": ["", "", "", "", "", "", "URBAN"],
+            "district": "1b49e1f7-7ca2-4417-8649-88b810289108",
+            "state": "ec34cfe2-b566-4140-af22-71ff17d832d6",
+            "country": "ZMB"
+          }
+        ],
+        "deceasedBoolean": true,
+        "deceasedDateTime": "2021-03-19",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/patient-nationality",
+            "extension": [
+              {
+                "url": "code",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "urn:iso:std:iso:3166",
+                      "code": "ZMB"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "period",
+                "valuePeriod": {
+                  "start": "",
+                  "end": ""
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:4eb6c2ae-1554-409b-8de9-a1ed306ba3bb",
+      "resource": {
+        "resourceType": "RelatedPerson",
+        "id": "c53aa5aa-afec-4352-bae6-b8ca60a200b1",
+        "relationship": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype",
+              "code": "SPOUSE"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "urn:uuid:fb743d70-cca3-4e99-93c1-36563d9174fb"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:fb743d70-cca3-4e99-93c1-36563d9174fb",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "id": "d5f5355e-acf6-480e-aa8c-099d588bacd8",
+        "identifier": [
+          {
+            "value": "123456789",
+            "type": "NATIONAL_ID"
+          }
+        ],
+        "name": [
+          {
+            "use": "en",
+            "given": ["Shirley", ""],
+            "family": ["the Medium Corrected"]
+          }
+        ],
+        "address": [
+          {
+            "type": "PRIMARY_ADDRESS",
+            "line": ["", "", "", "", "", "", "URBAN"],
+            "district": "1b49e1f7-7ca2-4417-8649-88b810289108",
+            "state": "ec34cfe2-b566-4140-af22-71ff17d832d6",
+            "country": "ZMB"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/patient-nationality",
+            "extension": [
+              {
+                "url": "code",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "urn:iso:std:iso:3166",
+                      "code": "ZMB"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "period",
+                "valuePeriod": {
+                  "start": "",
+                  "end": ""
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:6233b8ba-0912-4482-830b-fc026db0e4cd",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "id": "91c29d5a-9088-47e5-be17-4f2bd829b5d1",
+        "name": [
+          {
+            "use": "en",
+            "given": ["Muriel"],
+            "family": ["Bagge"]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:b14f6e8a-3ee5-4038-9f62-d3763b95d5de",
+      "resource": {
+        "resourceType": "Patient",
+        "active": true,
+        "id": "95f073a4-dedc-4f0c-929a-0df2936d2233",
+        "name": [
+          {
+            "use": "en",
+            "given": ["Eustace"],
+            "family": ["Bagge"]
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:9a9fe572-03fc-4168-b8a1-922cbcec2648",
+      "resource": {
+        "resourceType": "Encounter",
+        "status": "finished",
+        "location": [
+          {
+            "location": {
+              "reference": "urn:uuid:34093ad3-bc92-4fa8-b17b-6d7d4bc7d659"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:34093ad3-bc92-4fa8-b17b-6d7d4bc7d659",
+      "resource": {
+        "resourceType": "Location",
+        "mode": "instance",
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/location-type",
+              "code": "PRIMARY_ADDRESS"
+            }
+          ]
+        },
+        "address": {
+          "type": "PRIMARY_ADDRESS",
+          "line": ["", "", "", "", "", "", "URBAN"],
+          "district": "1b49e1f7-7ca2-4417-8649-88b810289108",
+          "state": "ec34cfe2-b566-4140-af22-71ff17d832d6",
+          "country": "ZMB"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:d472d46c-296b-43dd-968d-d57bcd53b900",
+      "resource": {
+        "resourceType": "Observation",
+        "status": "final",
+        "context": {
+          "reference": "urn:uuid:9a9fe572-03fc-4168-b8a1-922cbcec2648"
+        },
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "vital-signs",
+                "display": "Vital Signs"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "uncertified-manner-of-death",
+              "display": "Uncertified manner of death"
+            }
+          ]
+        },
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/ValueSet/icd-10",
+              "code": "ACCIDENT"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "meta": {
+    "lastUpdated": "2022-02-02T07:14:03.201Z"
+  }
+}

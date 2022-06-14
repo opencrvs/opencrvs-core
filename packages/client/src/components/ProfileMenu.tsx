@@ -30,14 +30,14 @@ import { buttonMessages, userMessages } from '@client/i18n/messages'
 
 const UserName = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
-  height: 27px;
+  ${({ theme }) => theme.fonts.h4};
+  margin-bottom: 4px;
 `
 
 const UserRole = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
-  height: 24px;
-  ${({ theme }) => theme.fonts.captionStyle};
+  color: ${({ theme }) => theme.colors.supportingCopy};
+  ${({ theme }) => theme.fonts.reg12};
+  margin-bottom: 4px;
 `
 
 interface IProps {
@@ -127,7 +127,6 @@ class ProfileMenuComponent extends React.Component<FullProps, IState> {
           }
           menuHeader={this.getMenuHeader(intl, language, userDetails)}
           menuItems={this.getMenuItems(intl)}
-          hasFocusRing={true}
         />
       </>
     )

@@ -50,12 +50,12 @@ describe('Test recvery code entry form', () => {
 
     describe('When recovery code is not resent', () => {
       it('loads valid header', () => {
-        expect(app.text()).toContain('৬-সংখ্যার পুনরুদ্ধার কোড লিখুন')
+        expect(app.text()).toContain('Enter the 6-digit recovery code')
       })
 
       it('loads valid subheader', () => {
         expect(app.text()).toContain(
-          'পুনরুদ্ধার কোডটি আপনার ফোন নম্বরটিতে প্রেরণ করা হয়েছে। কোডটি লিখুন। কোড পৌঁছায়নি?'
+          "The recovery code was sent to your phone number. Please enter the code. Didn't receive it?"
         )
       })
     })
@@ -70,7 +70,7 @@ describe('Test recvery code entry form', () => {
               status: 200
             })
             .then(() => {
-              expect(app.text()).toContain('যাচাই কোড পুনরায় পাঠানো হয়েছে')
+              expect(app.text()).toContain('Verification code resent')
               done()
             })
         })
@@ -86,7 +86,7 @@ describe('Test recvery code entry form', () => {
             })
             .then(() => {
               expect(app.text()).toContain(
-                `আপনাকে ${mobile} নম্বরে একটি কোড প্রেরণ করা হয়েছে।`
+                `We just resent you another code to ${mobile}`
               )
               done()
             })

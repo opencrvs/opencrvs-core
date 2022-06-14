@@ -17,7 +17,8 @@ import {
   GQLSignature
 } from '@opencrvs/gateway/src/graphql/schema'
 import { storage } from '@opencrvs/client/src/storage'
-import { getDefaultLanguage } from '@client/i18n/utils'
+import { createNamesMap } from './data-formatting'
+import { LANG_EN } from './constants'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
@@ -48,8 +49,7 @@ export interface IUserDetails {
   name?: Array<GQLHumanName | null>
   catchmentArea?: IGQLLocation[]
   primaryOffice?: IGQLLocation
-  language: string
-  localRegistrar: {
+  localRegistrar?: {
     name: Array<GQLHumanName | null>
     role?: string
     signature?: GQLSignature
@@ -71,9 +71,9 @@ export function getUserDetails(user: GQLUser): IUserDetails {
     localRegistrar,
     avatar
   } = user
-  const userDetails: IUserDetails = {
-    language: getDefaultLanguage(),
-    localRegistrar
+  const userDetails: IUserDetails = {}
+  if (localRegistrar) {
+    userDetails.localRegistrar = localRegistrar
   }
   if (userMgntUserID) {
     userDetails.userMgntUserID = userMgntUserID
@@ -163,5 +163,16 @@ export function getIndividualNameObj(
     individualNameArr.find((name: GQLHumanName | null) => {
       return name && name.use === language ? true : false
     }) || individualNameArr[0]
+  )
+}
+
+export function getUserName(userDetails: IUserDetails | null) {
+  return (
+    (userDetails &&
+      userDetails.name &&
+      createNamesMap(
+        userDetails.name.filter((name): name is GQLHumanName => !!name)
+      )[LANG_EN]) ||
+    ''
   )
 }

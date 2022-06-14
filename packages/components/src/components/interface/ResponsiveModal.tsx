@@ -14,17 +14,22 @@ import styled from 'styled-components'
 import { Cross } from '../icons'
 import { CircleButton } from '../buttons'
 
-const ModalContainer = styled.div`
+const ModalContainer = styled.div<{ fullscreen?: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  padding-top: ${({ fullscreen }) => (fullscreen ? 0 : 160)}px;
   z-index: 5;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    padding-top: 0px;
+  }
 `
+
 const ScreenBlocker = styled.div`
   position: absolute;
   z-index: -1;
@@ -32,7 +37,7 @@ const ScreenBlocker = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${({ theme }) => theme.colors.menuBackground};
+  background-color: ${({ theme }) => theme.colors.copy};
   opacity: 0.8;
 `
 const ModalContent = styled.div<{
@@ -40,12 +45,14 @@ const ModalContent = styled.div<{
   responsive?: boolean
   fullscreen?: boolean
 }>`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
   background-color: ${({ theme }) => theme.colors.white};
   width: ${({ width }) => (width ? width : 448)}px;
   height: ${({ fullscreen }) => (fullscreen ? '100vh' : 'auto')};
   display: flex;
+  border-radius: 4px;
+  border: 1px solid ${({ theme }) => theme.colors.grey300};
   flex-direction: column;
   flex-grow: ${({ fullscreen }) => (fullscreen ? 1 : 0)};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -55,27 +62,33 @@ const ModalContent = styled.div<{
       responsive && theme.grid.breakpoints.lg}px) {
     width: 100%;
     height: 100vh;
+    border-radius: unset;
   }
 `
-const Header = styled.div<{ responsive?: boolean; hideBoxShadow?: boolean }>`
+const Header = styled.div<{
+  responsive?: boolean
+  hideBoxShadow?: boolean
+  titleHeightAuto?: boolean
+}>`
   ${({ theme }) => theme.fonts.regularFont};
-  height: 64px;
+  height: ${({ titleHeightAuto }) => (titleHeightAuto ? 'auto' : '64px')};
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding: 0 8px 0px 24px;
+  padding: 24px 24px;
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.lg}px) {
-    ${({ theme, hideBoxShadow }) =>
-      !hideBoxShadow && theme.shadows.mistyShadow};
+    ${({ theme, hideBoxShadow }) => !hideBoxShadow && theme.shadows.light};
     margin-bottom: 16px;
+    padding-top: 8px 8px;
   }
 `
 const Title = styled.h1`
-  ${({ theme }) => theme.fonts.h4Style};
+  margin: 0px;
+  ${({ theme }) => theme.fonts.h2};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+    ${({ theme }) => theme.fonts.h4};
   }
 `
 const Body = styled.div<{
@@ -85,9 +98,10 @@ const Body = styled.div<{
   responsive?: boolean
   fullscreen?: boolean
 }>`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   height: ${({ height }) => (height ? height : 250)}px;
   height: ${({ autoHeight }) => autoHeight && `auto`};
+  color: ${({ theme }) => theme.colors.supportingCopy};
   overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'auto')};
   padding: 0 24px 16px;
   display: flex;
@@ -102,17 +116,17 @@ const Body = styled.div<{
   }
 
   ::-webkit-scrollbar-thumb {
-    background: ${({ theme }) => theme.colors.scrollBarGrey};
+    background: ${({ theme }) => theme.colors.grey400};
     border-radius: 10px;
   }
 `
 const Footer = styled.div<{ responsive?: boolean }>`
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bold14};
   padding: 16px 3px;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  border-top: 2px solid ${({ theme }) => theme.colors.dividerLight};
+  border-top: 1px solid ${({ theme }) => theme.colors.grey300};
   @media (max-width: ${({ theme, responsive }) =>
       responsive && theme.grid.breakpoints.md}px) {
     flex-direction: column-reverse;
@@ -121,7 +135,7 @@ const Footer = styled.div<{ responsive?: boolean }>`
 `
 
 const Action = styled.div`
-  margin: 0 12px;
+  margin: 0 8px;
   display: flex;
   align-items: center;
   & button {
@@ -135,6 +149,7 @@ interface IProps {
   responsive?: boolean
   width?: number
   contentHeight?: number
+  titleHeightAuto?: boolean
   autoHeight?: boolean
   contentScrollableY?: boolean
   fullscreen?: boolean
@@ -166,6 +181,7 @@ export class ResponsiveModal extends React.Component<IProps> {
       actions,
       width,
       contentHeight,
+      titleHeightAuto,
       fullscreen,
       autoHeight,
       contentScrollableY,
@@ -178,14 +194,18 @@ export class ResponsiveModal extends React.Component<IProps> {
     }
 
     return (
-      <ModalContainer id={id}>
+      <ModalContainer id={id} fullscreen={fullscreen}>
         <ScreenBlocker />
         <ModalContent
           width={width}
           responsive={responsive}
           fullscreen={fullscreen}
         >
-          <Header responsive={responsive} hideBoxShadow={hideHeaderBoxShadow}>
+          <Header
+            responsive={responsive}
+            hideBoxShadow={hideHeaderBoxShadow}
+            titleHeightAuto={titleHeightAuto}
+          >
             <Title>{title}</Title>
             <CircleButton id="close-btn" type="button" onClick={handleClose}>
               <Cross color="currentColor" />
@@ -199,11 +219,13 @@ export class ResponsiveModal extends React.Component<IProps> {
           >
             {this.props.children}
           </Body>
-          <Footer responsive={responsive}>
-            {actions.map((action, i) => (
-              <Action key={i}>{action}</Action>
-            ))}
-          </Footer>
+          {actions.length > 0 && (
+            <Footer responsive={responsive}>
+              {actions.map((action, i) => (
+                <Action key={i}>{action}</Action>
+              ))}
+            </Footer>
+          )}
         </ModalContent>
       </ModalContainer>
     )

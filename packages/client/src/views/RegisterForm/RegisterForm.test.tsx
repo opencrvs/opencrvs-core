@@ -13,9 +13,9 @@ import * as React from 'react'
 import {
   createTestComponent,
   selectOption,
-  mockApplicationData,
-  mockDeathApplicationData,
-  mockDeathApplicationDataWithoutFirstNames,
+  mockDeclarationData,
+  mockDeathDeclarationData,
+  mockDeathDeclarationDataWithoutFirstNames,
   getRegisterFormFromStore,
   getReviewFormFromStore,
   createTestStore,
@@ -24,13 +24,13 @@ import {
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import { ReactWrapper } from 'enzyme'
 import {
-  createApplication,
-  createReviewApplication,
-  storeApplication,
-  setInitialApplications,
+  createDeclaration,
+  createReviewDeclaration,
+  storeDeclaration,
+  setInitialDeclarations,
   SUBMISSION_STATUS,
-  modifyApplication
-} from '@client/applications'
+  modifyDeclaration
+} from '@client/declarations'
 import { v4 as uuid } from 'uuid'
 import { AppStore } from '@client/store'
 import {
@@ -51,7 +51,7 @@ import { FETCH_PERSON_NID } from '@opencrvs/client/src/forms/register/queries/pe
 
 import { formMessages as messages } from '@client/i18n/messages'
 import * as profileSelectors from '@client/profile/profileSelectors'
-import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
 import { DECLARED } from '@client/utils/constants'
@@ -71,10 +71,10 @@ describe('when user is in the register form for birth event', () => {
       store = storeContext.store
       history = storeContext.history
 
-      const draft = createApplication(Event.BIRTH)
-      store.dispatch(storeApplication(draft))
-      store.dispatch(setInitialApplications())
-      store.dispatch(storeApplication(draft))
+      const draft = createDeclaration(Event.BIRTH)
+      store.dispatch(storeDeclaration(draft))
+      store.dispatch(setInitialDeclarations())
+      store.dispatch(storeDeclaration(draft))
 
       const mock: any = jest.fn()
       const form = await getRegisterFormFromStore(store, Event.BIRTH)
@@ -85,11 +85,11 @@ describe('when user is in the register form for birth event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'mother',
               groupId: 'mother-view-group'
             },
@@ -98,9 +98,9 @@ describe('when user is in the register form for birth event', () => {
             url: ''
           }}
         />,
-        store
+        { store, history }
       )
-      component = testComponent.component
+      component = testComponent
     })
     it('renders the page', () => {
       expect(
@@ -110,7 +110,7 @@ describe('when user is in the register form for birth event', () => {
     it('changes the country select', async () => {
       const select = selectOption(
         component,
-        '#countryPermanent',
+        '#countryPrimary',
         'United States of America'
       )
       expect(select.text()).toEqual('United States of America')
@@ -122,7 +122,7 @@ describe('when user is in the register form for birth event', () => {
       )
       component.find('#save_draft').hostNodes().simulate('click')
       await flushPromises()
-      expect(history.location.pathname).toEqual('/field-agent-home/progress')
+      expect(history.location.pathname).toEqual('/registration-home/progress/')
     })
     it('takes registrar to declaration submitted page when save button is clicked', async () => {
       localStorage.getItem = jest.fn(
@@ -145,16 +145,16 @@ describe('when user is in the register form for death event', () => {
   let form: IForm
   let store: AppStore
   let history: History
-  let draft: ReturnType<typeof createApplication>
+  let draft: ReturnType<typeof createDeclaration>
 
   beforeEach(async () => {
     const testStore = await createTestStore()
     store = testStore.store
     history = testStore.history
     const mock: any = jest.fn()
-    draft = createApplication(Event.DEATH)
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(draft))
+    draft = createDeclaration(Event.DEATH)
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(draft))
     form = await getRegisterFormFromStore(store, Event.DEATH)
   })
   describe('when user is in optional cause of death section', () => {
@@ -171,32 +171,34 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={clonedForm}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
-              pageId: 'causeOfDeath',
-              groupId: 'causeOfDeath-causeOfDeathEstablished'
+              declarationId: draft.id,
+              pageId: 'deathEvent',
+              groupId: 'death-event-details'
             },
             isExact: true,
             path: '',
             url: ''
           }}
         />,
-        store
+        { store, history }
       )
-      component = testComponent.component
+      component = testComponent
     })
 
-    it('renders the optional label', () => {
+    it('renders the deathEvent details page', () => {
       expect(
-        component
-          .find('#form_section_id_causeOfDeath-causeOfDeathEstablished')
-          .hostNodes()
+        component.find('#form_section_id_death-event-details').hostNodes()
       ).toHaveLength(1)
     })
   })
+
+  /*
+
+// ID API Check not available in Farajaland form
 
   describe('when user is in deceased section', () => {
     beforeEach(async () => {
@@ -210,11 +212,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -223,14 +225,14 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        store
+        { store, history }
       )
-      component = testComponent.component
+      component = testComponent
       selectOption(component, '#iDType', 'Birth registration number')
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(0)
     })
   })
-
+*/
   describe('when user is in contact point page', () => {
     beforeEach(async () => {
       ;(debounce as jest.Mock).mockImplementation((fn) => fn)
@@ -243,22 +245,21 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: '', groupId: '' },
+            params: { declarationId: draft.id, pageId: '', groupId: '' },
             isExact: true,
             path: '',
             url: ''
           }}
         />,
-        store
+        { store, history }
       )
-      component = testComponent.component
+      component = testComponent
       component.find('#next_section').hostNodes().simulate('click')
-
-      await waitForElement(component, '#contactPoint_error')
-      expect(component.find('#contactPoint_error').hostNodes().text()).toBe(
+      await waitForElement(component, '#informantType_error')
+      expect(component.find('#informantType_error').hostNodes().text()).toBe(
         'Required for registration'
       )
     })
@@ -271,24 +272,28 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
-            params: { applicationId: draft.id, pageId: '', groupId: '' },
+            params: { declarationId: draft.id, pageId: '', groupId: '' },
             isExact: true,
             path: '',
             url: ''
           }}
         />,
-        store
+        { store, history }
       )
-      component = testComponent.component
-      component.find('#exit_top_bar').hostNodes().simulate('click')
+      component = testComponent
+      component.find('#crcl-btn').hostNodes().simulate('click')
 
       component.update()
 
       expect(history.location.pathname).toContain(REGISTRAR_HOME)
     })
+
+    /*
+
+    // ID API Check not available in Farajaland form
 
     it('renders loader button when idType is National ID', async () => {
       const testComponent = await createTestComponent(
@@ -298,11 +303,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -311,10 +316,10 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        store
+        { store, history }
       )
-      component = testComponent.component
-      selectOption(component, '#iDType', 'National ID number')
+      component = testComponent
+      selectOption(component, '#iD', 'National ID')
       expect(component.find('#fetchButton').hostNodes()).toHaveLength(1)
     })
 
@@ -360,11 +365,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -373,14 +378,13 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      component = testComponent.component
+      component = testComponent
       selectOption(component, '#iDType', 'Birth registration number')
 
       component.find('input#iD').simulate('change', {
@@ -408,7 +412,7 @@ describe('when user is in the register form for death event', () => {
           request: {
             query: FETCH_PERSON_NID,
             variables: {
-              nid: '1234567898',
+              nid: '123456789',
               dob: '1992-10-10',
               country: 'bgd'
             }
@@ -441,11 +445,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -454,18 +458,17 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      component = testComponent.component
+      component = testComponent
       selectOption(component, '#iDType', 'National ID number')
 
       component.find('input#iD').simulate('change', {
-        target: { id: 'iD', value: '1234567898' }
+        target: { id: 'iD', value: '123456789' }
       })
 
       component.find('input#birthDate-dd').simulate('change', {
@@ -496,7 +499,6 @@ describe('when user is in the register form for death event', () => {
         setTimeout(resolve, 200)
       })
       component.update()
-
       expect(component.find('#loader-button-success').hostNodes()).toHaveLength(
         1
       )
@@ -541,11 +543,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'informant',
               groupId: 'informant-view-group'
             },
@@ -554,30 +556,29 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      component = testComponent.component
+      component = testComponent
       selectOption(component, '#iDType', 'National ID number')
 
-      component.find('input#applicantID').simulate('change', {
-        target: { id: 'applicantID', value: '1234567898' }
+      component.find('input#informantID').simulate('change', {
+        target: { id: 'informantID', value: '1234567898' }
       })
 
-      component.find('input#applicantBirthDate-dd').simulate('change', {
-        target: { id: 'applicantBirthDate-dd', value: '10' }
+      component.find('input#informantBirthDate-dd').simulate('change', {
+        target: { id: 'informantBirthDate-dd', value: '10' }
       })
 
-      component.find('input#applicantBirthDate-mm').simulate('change', {
-        target: { id: 'applicantBirthDate-mm', value: '10' }
+      component.find('input#informantBirthDate-mm').simulate('change', {
+        target: { id: 'informantBirthDate-mm', value: '10' }
       })
 
-      component.find('input#applicantBirthDate-yyyy').simulate('change', {
-        target: { id: 'applicantBirthDate-yyyy', value: '1992' }
+      component.find('input#informantBirthDate-yyyy').simulate('change', {
+        target: { id: 'informantBirthDate-yyyy', value: '1992' }
       })
 
       component.update()
@@ -621,11 +622,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -634,14 +635,13 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      component = testComponent.component
+      component = testComponent
       selectOption(component, '#iDType', 'Birth registration number')
 
       const input = component.find('input#iD')
@@ -696,11 +696,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -709,11 +709,10 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock as any }
       )
 
-      component = testComponent.component
+      component = testComponent
       await waitForElement(component, '#iDType')
       selectOption(component, '#iDType', 'National ID number')
 
@@ -774,11 +773,11 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deceased',
               groupId: 'deceased-view-group'
             },
@@ -787,11 +786,10 @@ describe('when user is in the register form for death event', () => {
             url: ''
           }}
         />,
-        store,
-        graphqlMock
+        { store, history, graphqlMocks: graphqlMock }
       )
 
-      component = testComponent.component
+      component = testComponent
       await waitForElement(component, '#iDType')
       selectOption(component, '#iDType', 'National ID number')
 
@@ -840,28 +838,28 @@ describe('when user is in the register form for death event', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_DEATH_FORM_PAGE}
           match={{
             params: {
-              applicationId: draft.id,
+              declarationId: draft.id,
               pageId: 'deathEvent',
-              groupId: 'deathEvent-deathDate'
+              groupId: 'death-event-details'
             },
             isExact: true,
             path: '',
             url: ''
           }}
         />,
-        store
+        { store, history }
       )
-      expect(
-        testComponent.component.find('#deathDate_notice').hostNodes()
-      ).toHaveLength(1)
+      expect(testComponent.find('#deathDate_notice').hostNodes()).toHaveLength(
+        1
+      )
     })
+*/
   })
 })
-
 describe('when user is in the register form preview section', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
@@ -874,9 +872,24 @@ describe('when user is in the register form preview section', () => {
     store = storeContext.store
     history = storeContext.history
 
-    const draft = createApplication(Event.BIRTH)
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(draft))
+    const draft = createDeclaration(Event.BIRTH)
+    draft.data = {
+      child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
+      father: {
+        detailsExist: true
+      },
+      mother: {
+        detailsExist: true
+      },
+      documents: {
+        imageUploader: { title: 'dummy', description: 'dummy', data: '' }
+      },
+      registration: {
+        commentsOrNotes: ''
+      }
+    }
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(draft))
 
     const form = await getRegisterFormFromStore(store, Event.BIRTH)
     const testComponent = await createTestComponent(
@@ -884,11 +897,11 @@ describe('when user is in the register form preview section', () => {
       <RegisterForm
         history={history}
         registerForm={form}
-        application={draft}
+        declaration={draft}
         pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: draft.id,
+            declarationId: draft.id,
             pageId: 'preview',
             groupId: 'preview-view-group'
           },
@@ -897,9 +910,9 @@ describe('when user is in the register form preview section', () => {
           url: ''
         }}
       />,
-      store
+      { store, history }
     )
-    component = testComponent.component
+    component = testComponent
   })
 
   it('submit button will be enabled when even if form is not fully filled-up', () => {
@@ -917,14 +930,14 @@ describe('when user is in the register form preview section', () => {
   describe('User in the Preview section for submitting the Form', () => {
     beforeEach(async () => {
       // @ts-ignore
-      const nApplication = createReviewApplication(
+      const nDeclaration = createReviewDeclaration(
         uuid(),
-        mockApplicationData,
+        mockDeclarationData,
         Event.BIRTH
       )
-      nApplication.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-      store.dispatch(setInitialApplications())
-      store.dispatch(storeApplication(nApplication))
+      nDeclaration.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
+      store.dispatch(setInitialDeclarations())
+      store.dispatch(storeDeclaration(nDeclaration))
 
       const nform = getRegisterForm(store.getState())[Event.BIRTH]
       const nTestComponent = await createTestComponent(
@@ -932,11 +945,11 @@ describe('when user is in the register form preview section', () => {
         <RegisterForm
           history={history}
           registerForm={nform}
-          application={nApplication}
+          declaration={nDeclaration}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
           match={{
             params: {
-              applicationId: nApplication.id,
+              declarationId: nDeclaration.id,
               pageId: 'preview',
               groupId: 'preview-view-group'
             },
@@ -945,9 +958,9 @@ describe('when user is in the register form preview section', () => {
             url: ''
           }}
         />,
-        store
+        { store, history }
       )
-      component = nTestComponent.component
+      component = nTestComponent
     })
 
     it('should be able to submit the form', () => {
@@ -982,13 +995,13 @@ describe('when user is in the register form review section', () => {
   beforeEach(async () => {
     const { store, history } = await createTestStore()
     // @ts-ignore
-    const application = createReviewApplication(
+    const declaration = createReviewDeclaration(
       uuid(),
-      mockApplicationData,
+      mockDeclarationData,
       Event.BIRTH
     )
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(application))
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(declaration))
     const mock: any = jest.fn()
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
@@ -1001,11 +1014,11 @@ describe('when user is in the register form review section', () => {
         history={history}
         staticContext={mock}
         registerForm={form}
-        application={application}
+        declaration={declaration}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'review',
             groupId: 'review-view-group'
           },
@@ -1014,13 +1027,13 @@ describe('when user is in the register form review section', () => {
           url: ''
         }}
       />,
-      store
+      { store, history }
     )
-    component = testComponent.component
+    component = testComponent
   })
 
   it('clicking the reject button launches the reject form action page', async () => {
-    component.find('#rejectApplicationBtn').hostNodes().simulate('click')
+    component.find('#rejectDeclarationBtn').hostNodes().simulate('click')
 
     await waitForElement(component, '#reject-registration-form-container')
     expect(
@@ -1034,13 +1047,13 @@ describe('when user is in the register form from review edit', () => {
   beforeEach(async () => {
     const { store, history } = await createTestStore()
     // @ts-ignore
-    const application = createReviewApplication(
+    const declaration = createReviewDeclaration(
       uuid(),
-      mockApplicationData,
+      mockDeclarationData,
       Event.BIRTH
     )
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(application))
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(declaration))
     const mock: any = jest.fn()
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
@@ -1053,11 +1066,11 @@ describe('when user is in the register form from review edit', () => {
         history={history}
         staticContext={mock}
         registerForm={form}
-        application={application}
+        declaration={declaration}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'mother',
             groupId: 'mother-view-group'
           },
@@ -1066,23 +1079,23 @@ describe('when user is in the register form from review edit', () => {
           url: ''
         }}
       />,
-      store
+      { store, history }
     )
-    component = testComponent.component
+    component = testComponent
   })
 
-  it('should redirect to progress tab when close application button is clicked', async () => {
+  it('should redirect to progress tab when close declaration button is clicked', async () => {
     const menuButton = await waitForElement(
       component,
       '#eventToggleMenuToggleButton'
     )
     menuButton.hostNodes().simulate('click')
     component.update()
-    const closeApplicationButton = await waitForElement(
+    const closeDeclarationButton = await waitForElement(
       component,
       '#eventToggleMenuItem0'
     )
-    closeApplicationButton.hostNodes().simulate('click')
+    closeDeclarationButton.hostNodes().simulate('click')
     component.update()
     expect(window.location.href).toContain('/progress')
   })
@@ -1096,14 +1109,14 @@ describe('when user is in the register form from sent for review edit', () => {
     Date.now = jest.fn(() => 1582525224324)
     const { store, history } = await createTestStore()
     // @ts-ignore
-    const application = createReviewApplication(
+    const declaration = createReviewDeclaration(
       uuid(),
-      mockApplicationData,
+      mockDeclarationData,
       Event.BIRTH,
       DECLARED
     )
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(application))
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(declaration))
     const mock: any = jest.fn()
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
@@ -1116,11 +1129,11 @@ describe('when user is in the register form from sent for review edit', () => {
         history={history}
         staticContext={mock}
         registerForm={form}
-        application={application}
+        declaration={declaration}
         pageRoute={REVIEW_EVENT_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: application.id,
+            declarationId: declaration.id,
             pageId: 'mother',
             groupId: 'mother-view-group'
           },
@@ -1129,10 +1142,10 @@ describe('when user is in the register form from sent for review edit', () => {
           url: ''
         }}
       />,
-      store
+      { store, history }
     )
-    component = testComponent.component
-    testAppStore = testComponent.store
+    component = testComponent
+    testAppStore = store
   })
 
   it('clicking on save draft opens modal', async () => {
@@ -1141,7 +1154,7 @@ describe('when user is in the register form from sent for review edit', () => {
     component.update()
     const saveDraftConfirmationModal = await waitForElement(
       component,
-      '#save_application_confirmation'
+      '#save_declaration_confirmation'
     )
     expect(saveDraftConfirmationModal.hostNodes()).toHaveLength(1)
   })
@@ -1149,7 +1162,7 @@ describe('when user is in the register form from sent for review edit', () => {
   it('clicking save confirm saves the draft', async () => {
     const DRAFT_MODIFY_TIME = 1582525379383
     Date.now = jest.fn(() => DRAFT_MODIFY_TIME)
-    selectOption(component, '#iDType', 'National ID number')
+    selectOption(component, '#educationalAttainment', 'Tertiary')
 
     // Do some modifications
     component.find('input#iD').simulate('change', {
@@ -1160,7 +1173,7 @@ describe('when user is in the register form from sent for review edit', () => {
     component.update()
     const saveDraftConfirmationModal = await waitForElement(
       component,
-      '#save_application_confirmation'
+      '#save_declaration_confirmation'
     )
 
     saveDraftConfirmationModal
@@ -1170,7 +1183,7 @@ describe('when user is in the register form from sent for review edit', () => {
     component.update()
 
     const modifyTime =
-      testAppStore.getState().applicationsState.applications[0].modifiedOn
+      testAppStore.getState().declarationsState.declarations[0].modifiedOn
 
     expect(modifyTime).toBe(DRAFT_MODIFY_TIME)
   })
@@ -1190,20 +1203,20 @@ describe('When user is in Preview section death event', () => {
     store = testStore.store
     history = testStore.history
 
-    const draft = createApplication(Event.DEATH)
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(draft))
+    const draft = createDeclaration(Event.DEATH)
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(draft))
     jest.clearAllMocks()
     // @ts-ignore
-    deathDraft = createReviewApplication(
+    deathDraft = createReviewDeclaration(
       uuid(),
       // @ts-ignore
-      mockDeathApplicationData,
+      mockDeathDeclarationData,
       Event.DEATH
     )
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(deathDraft))
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(deathDraft))
 
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['declare'])
 
@@ -1215,11 +1228,11 @@ describe('When user is in Preview section death event', () => {
         history={history}
         staticContext={mock}
         registerForm={deathForm}
-        application={deathDraft}
+        declaration={deathDraft}
         pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: deathDraft.id,
+            declarationId: deathDraft.id,
             pageId: 'preview',
             groupId: 'preview-view-group'
           },
@@ -1228,23 +1241,23 @@ describe('When user is in Preview section death event', () => {
           url: ''
         }}
       />,
-      store
+      { store, history }
     )
-    component = nTestComponent.component
+    component = nTestComponent
   })
 
   it('Check if death location type is parsed properly', () => {
     expect(
-      draftToGqlTransformer(deathForm, mockDeathApplicationData as IFormData)
+      draftToGqlTransformer(deathForm, mockDeathDeclarationData as IFormData)
         .eventLocation.type
     ).toBe('OTHER')
   })
 
   it('Check if death location partOf is parsed properly', () => {
     expect(
-      draftToGqlTransformer(deathForm, mockDeathApplicationData as IFormData)
-        .eventLocation.partOf
-    ).toBe('Location/1dfc716a-c5f7-4d39-ad71-71d2a359210c')
+      draftToGqlTransformer(deathForm, mockDeathDeclarationData as IFormData)
+        .eventLocation.address.country
+    ).toEqual('FAR')
   })
 
   it('Should be able to submit the form', () => {
@@ -1259,70 +1272,45 @@ describe('When user is in Preview section death event', () => {
     expect(history.location.pathname).toBe(HOME)
   })
   it('Check if death location as hospital is parsed properly', () => {
-    const hospitalLocatioMockDeathApplicationData = clone(
-      mockDeathApplicationData
+    const hospitalLocatioMockDeathDeclarationData = clone(
+      mockDeathDeclarationData
     )
-    hospitalLocatioMockDeathApplicationData.deathEvent.deathPlaceAddress =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.placeOfDeath =
       'HEALTH_FACILITY'
-    hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
-
     expect(
       draftToGqlTransformer(
         deathForm,
-        hospitalLocatioMockDeathApplicationData as IFormData
-      ).eventLocation.type
+        hospitalLocatioMockDeathDeclarationData as IFormData
+      ).eventLocation.address
     ).toBe(undefined)
   })
 
   it('Check if death location as hospital _fhirID is parsed properly', () => {
-    const hospitalLocatioMockDeathApplicationData = clone(
-      mockDeathApplicationData
+    const hospitalLocatioMockDeathDeclarationData = clone(
+      mockDeathDeclarationData
     )
-    hospitalLocatioMockDeathApplicationData.deathEvent.deathPlaceAddress =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.placeOfDeath =
       'HEALTH_FACILITY'
-    hospitalLocatioMockDeathApplicationData.deathEvent.deathLocation =
+    hospitalLocatioMockDeathDeclarationData.deathEvent.deathLocation =
       '5e3736a0-090e-43b4-9012-f1cef399e123'
 
     expect(
       draftToGqlTransformer(
         deathForm,
-        hospitalLocatioMockDeathApplicationData as IFormData
+        hospitalLocatioMockDeathDeclarationData as IFormData
       ).eventLocation._fhirID
     ).toBe('5e3736a0-090e-43b4-9012-f1cef399e123')
   })
 
   it('Check if death location is deceased parmanent address', () => {
-    const mockDeathApplication = clone(mockDeathApplicationData)
-    mockDeathApplication.deathEvent.deathPlaceAddress = 'PERMANENT'
-
+    const mockDeathDeclaration = clone(mockDeathDeclarationData)
+    mockDeathDeclaration.deathEvent.placeOfDeath = 'PRIMARY_ADDRESS'
     expect(
-      draftToGqlTransformer(deathForm, mockDeathApplication as IFormData)
-        .eventLocation.address.type
-    ).toBe('PERMANENT')
-  })
-
-  it('Death location should be undefined if no decased address is found', () => {
-    const mockDeathApplication = cloneDeep(mockDeathApplicationData)
-    // @ts-ignore
-    mockDeathApplication.deceased = {
-      iDType: 'NATIONAL_ID',
-      iD: '1230000000000',
-      firstNames: 'মকবুল',
-      familyName: 'ইসলাম',
-      firstNamesEng: 'Mokbul',
-      familyNameEng: 'Islam',
-      nationality: 'BGD',
-      gender: 'male',
-      maritalStatus: 'MARRIED',
-      birthDate: '1987-02-16'
-    }
-    mockDeathApplication.deathEvent.deathPlaceAddress = 'CURRENT'
-
-    expect(
-      draftToGqlTransformer(deathForm, mockDeathApplication as IFormData)
-        .eventLocation
-    ).toBe(undefined)
+      draftToGqlTransformer(deathForm, mockDeathDeclaration as IFormData)
+        .eventLocation.type
+    ).toBe('PRIMARY_ADDRESS')
   })
 })
 
@@ -1340,9 +1328,9 @@ describe('When user is in Preview section death event in offline mode', () => {
     history = testStore.history
     store = testStore.store
 
-    const draft = createApplication(Event.DEATH)
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(draft))
+    const draft = createDeclaration(Event.DEATH)
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(draft))
 
     Object.defineProperty(window.navigator, 'onLine', {
       value: false,
@@ -1350,15 +1338,15 @@ describe('When user is in Preview section death event in offline mode', () => {
     })
     jest.clearAllMocks()
     // @ts-ignore
-    deathDraft = createReviewApplication(
+    deathDraft = createReviewDeclaration(
       uuid(),
       // @ts-ignore
-      mockDeathApplicationDataWithoutFirstNames,
+      mockDeathDeclarationDataWithoutFirstNames,
       Event.DEATH
     )
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
-    store.dispatch(setInitialApplications())
-    store.dispatch(storeApplication(deathDraft))
+    store.dispatch(setInitialDeclarations())
+    store.dispatch(storeDeclaration(deathDraft))
 
     deathForm = await getRegisterFormFromStore(store, Event.DEATH)
     const nTestComponent = await createTestComponent(
@@ -1368,11 +1356,11 @@ describe('When user is in Preview section death event in offline mode', () => {
         history={history}
         staticContext={mock}
         registerForm={deathForm}
-        application={deathDraft}
+        declaration={deathDraft}
         pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
         match={{
           params: {
-            applicationId: deathDraft.id,
+            declarationId: deathDraft.id,
             pageId: 'preview',
             groupId: 'preview-view-group'
           },
@@ -1381,9 +1369,9 @@ describe('When user is in Preview section death event in offline mode', () => {
           url: ''
         }}
       />,
-      store
+      { store, history }
     )
-    component = nTestComponent.component
+    component = nTestComponent
   })
 
   it('Should be able to submit the form', async () => {

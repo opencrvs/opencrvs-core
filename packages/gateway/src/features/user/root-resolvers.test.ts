@@ -10,6 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { resolvers } from '@gateway/features/user/root-resolvers'
+import { generateVerificationCode } from '@gateway/routes/verifyCode/handler'
 import * as fetchAny from 'jest-fetch-mock'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -198,7 +199,7 @@ describe('User root resolvers', () => {
         })
       )
 
-      expect(
+      return expect(
         resolvers.Query.searchUsers({}, {}, authHeaderFieldAgent)
       ).rejects.toThrow(
         'Search user is only allowed for sysadmin or registrar or registration agent'
@@ -333,10 +334,10 @@ describe('User root resolvers', () => {
         JSON.stringify([
           {
             practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-            totalNumberOfApplicationStarted: 12,
+            totalNumberOfDeclarationStarted: 12,
             totalNumberOfInProgressAppStarted: 5,
-            totalNumberOfRejectedApplications: 2,
-            averageTimeForDeclaredApplications: 360
+            totalNumberOfRejectedDeclarations: 2,
+            averageTimeForDeclaredDeclarations: 360
           }
         ])
       )
@@ -360,10 +361,10 @@ describe('User root resolvers', () => {
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
-          totalNumberOfApplicationStarted: 12,
+          totalNumberOfDeclarationStarted: 12,
           totalNumberOfInProgressAppStarted: 5,
-          totalNumberOfRejectedApplications: 2,
-          averageTimeForDeclaredApplications: 360
+          totalNumberOfRejectedDeclarations: 2,
+          averageTimeForDeclaredDeclarations: 360
         },
         {
           practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
@@ -372,10 +373,10 @@ describe('User root resolvers', () => {
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406444,
-          totalNumberOfApplicationStarted: 0,
+          totalNumberOfDeclarationStarted: 0,
           totalNumberOfInProgressAppStarted: 0,
-          totalNumberOfRejectedApplications: 0,
-          averageTimeForDeclaredApplications: 0
+          totalNumberOfRejectedDeclarations: 0,
+          averageTimeForDeclaredDeclarations: 0
         }
       ])
     })
@@ -390,10 +391,10 @@ describe('User root resolvers', () => {
         JSON.stringify([
           {
             practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-            totalNumberOfApplicationStarted: 12,
+            totalNumberOfDeclarationStarted: 12,
             totalNumberOfInProgressAppStarted: 5,
-            totalNumberOfRejectedApplications: 2,
-            averageTimeForDeclaredApplications: 360
+            totalNumberOfRejectedDeclarations: 2,
+            averageTimeForDeclaredDeclarations: 360
           }
         ])
       )
@@ -417,10 +418,10 @@ describe('User root resolvers', () => {
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
-          totalNumberOfApplicationStarted: 12,
+          totalNumberOfDeclarationStarted: 12,
           totalNumberOfInProgressAppStarted: 5,
-          totalNumberOfRejectedApplications: 2,
-          averageTimeForDeclaredApplications: 360
+          totalNumberOfRejectedDeclarations: 2,
+          averageTimeForDeclaredDeclarations: 360
         },
         {
           practitionerId: 'sseq1203-f0ff-4822-b5d9-cb90d0e7biwuw',
@@ -429,10 +430,10 @@ describe('User root resolvers', () => {
           status: 'pending',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406444,
-          totalNumberOfApplicationStarted: 0,
+          totalNumberOfDeclarationStarted: 0,
           totalNumberOfInProgressAppStarted: 0,
-          totalNumberOfRejectedApplications: 0,
-          averageTimeForDeclaredApplications: 0
+          totalNumberOfRejectedDeclarations: 0,
+          averageTimeForDeclaredDeclarations: 0
         }
       ])
     })
@@ -444,7 +445,7 @@ describe('User root resolvers', () => {
         })
       )
 
-      expect(
+      return expect(
         resolvers.Query.searchFieldAgents(
           {},
           {
@@ -469,10 +470,10 @@ describe('User root resolvers', () => {
         JSON.stringify([
           {
             practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
-            totalNumberOfApplicationStarted: 12,
+            totalNumberOfDeclarationStarted: 12,
             totalNumberOfInProgressAppStarted: 5,
-            totalNumberOfRejectedApplications: 2,
-            averageTimeForDeclaredApplications: 360
+            totalNumberOfRejectedDeclarations: 2,
+            averageTimeForDeclaredDeclarations: 360
           }
         ])
       )
@@ -497,10 +498,10 @@ describe('User root resolvers', () => {
           status: 'active',
           primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
           creationDate: 1559054406433,
-          totalNumberOfApplicationStarted: 12,
+          totalNumberOfDeclarationStarted: 12,
           totalNumberOfInProgressAppStarted: 5,
-          totalNumberOfRejectedApplications: 2,
-          averageTimeForDeclaredApplications: 360
+          totalNumberOfRejectedDeclarations: 2,
+          averageTimeForDeclaredDeclarations: 360
         }
       ])
     })
@@ -623,7 +624,7 @@ describe('User root resolvers', () => {
         })
       )
 
-      expect(
+      return expect(
         resolvers.Mutation.activateUser(
           {},
           {
@@ -689,7 +690,7 @@ describe('User root resolvers', () => {
     it('throws error if @user-mgnt/changeUserPassword sends anything but 200', async () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
 
-      expect(
+      return expect(
         resolvers.Mutation.changePassword(
           {},
           {
@@ -716,6 +717,102 @@ describe('User root resolvers', () => {
         )
       ).rejects.toThrowError(
         'Change password is not allowed. ba7022f0ff4822 is not the owner of the token'
+      )
+    })
+  })
+
+  describe('changePhone mutation', () => {
+    let authHeaderValidUser: { Authorization: string }
+    let authHeaderInValidUser: { Authorization: string }
+
+    beforeEach(() => {
+      fetch.resetMocks()
+      const validUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderValidUser = {
+        Authorization: `Bearer ${validUserToken}`
+      }
+      const inValidUserToken = jwt.sign(
+        { scope: ['register'] },
+        readFileSync('../auth/test/cert.key'),
+        {
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )
+      authHeaderInValidUser = {
+        Authorization: `Bearer ${inValidUserToken}`
+      }
+    })
+
+    it('changes phone number for loggedin user', async () => {
+      const nonce = '12345'
+      const mobile = '0711111111'
+      const code = await generateVerificationCode(nonce, mobile)
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
+
+      const response = await resolvers.Mutation.changePhone(
+        {},
+        {
+          userId: 'ba7022f0ff4822',
+          phoneNumber: mobile,
+          nonce: nonce,
+          verifyCode: code
+        },
+        authHeaderValidUser
+      )
+
+      expect(response).toEqual(true)
+    })
+    it('throws error if @user-mgnt/changeUserPhone sends anything but 201', async () => {
+      fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
+
+      const nonce = '12345'
+      const mobile = '0711111111'
+      const code = await generateVerificationCode(nonce, mobile)
+
+      return expect(
+        resolvers.Mutation.changePhone(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            phoneNumber: mobile,
+            nonce: nonce,
+            verifyCode: code
+          },
+          authHeaderValidUser
+        )
+      ).rejects.toThrowError(
+        "Something went wrong on user-mgnt service. Couldn't change user phone number"
+      )
+    })
+    it("throws error if any user tries to update some other user's phonenumber", async () => {
+      const nonce = '12345'
+      const mobile = '0711111111'
+      const code = await generateVerificationCode(nonce, mobile)
+
+      return expect(
+        resolvers.Mutation.changePhone(
+          {},
+          {
+            userId: 'ba7022f0ff4822',
+            phoneNumber: mobile,
+            nonce: nonce,
+            verifyCode: code
+          },
+          authHeaderInValidUser
+        )
+      ).rejects.toThrowError(
+        'Change phone is not allowed. ba7022f0ff4822 is not the owner of the token'
       )
     })
   })
@@ -756,31 +853,33 @@ describe('User root resolvers', () => {
     it('changes avatar for loggedin user', async () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 200 })
 
+      const avatar = {
+        type: 'image/jpeg',
+        data: 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gIoSUNDX1BST0ZJTEUAAQEAAAIYAAAAAAQwAABtbnRyUkdCIFhZWiAAAAAAAAAAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAAHRyWFlaAAABZAAAABRnWFlaAAABeAAAABRiWFlaAAABjAAAABRyVFJDAAABoAAAAChnVFJDAAABoAAAAChiVFJDAAABoAAAACh3dHB0AAAByAAAABRjcHJ0AAAB3AAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAFgAAAAcAHMAUgBHAEIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFhZWiAAAAAAAABvogAAOPUAAAOQWFlaIAAAAAAAAGKZAAC3hQAAGNpYWVogAAAAAAAAJKAAAA+EAAC2z3BhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABYWVogAAAAAAAA9tYAAQAAAADTLW1sdWMAAAAAAAAAAQAAAAxlblVTAAAAIAAAABwARwBvAG8AZwBsAGUAIABJAG4AYwAuACAAMgAwADEANv/bAEMAAwICAgICAwICAgMDAwMEBgQEBAQECAYGBQYJCAoKCQgJCQoMDwwKCw4LCQkNEQ0ODxAQERAKDBITEhATDxAQEP/bAEMBAwMDBAMECAQECBALCQsQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEP/AABEIAAEAAQMBIgACEQEDEQH/xAAVAAEBAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAVAQEBAAAAAAAAAAAAAAAAAAAFCP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhEDEQA/AJngKoCP/9k='
+      }
+
       const response = await resolvers.Mutation.changeAvatar(
         {},
         {
           userId: 'ba7022f0ff4822',
-          avatar: {
-            type: 'image/png;base64',
-            data: 'aGVsbG8gd29ybGQ='
-          }
+          avatar
         },
         authHeaderValidUser
       )
 
-      expect(response).toEqual(true)
+      expect(response).toEqual(avatar)
     })
     it('throws error if @user-mgnt/changeUserAvatar sends anything but 200', async () => {
       fetch.mockResponseOnce(JSON.stringify({}), { status: 401 })
 
-      expect(
+      return expect(
         resolvers.Mutation.changeAvatar(
           {},
           {
             userId: 'ba7022f0ff4822',
             avatar: {
               type: 'image/png;base64',
-              data: 'aGVsbG8gd29ybGQ='
+              data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAQSURBVHgBAQUA+v8AAAAA/wEEAQB5fl4xAAAAAElFTkSuQmCC'
             }
           },
           authHeaderValidUser
@@ -790,14 +889,14 @@ describe('User root resolvers', () => {
       )
     })
     it("throws error if any user tries to update some other user's avatar", async () => {
-      expect(
+      return expect(
         resolvers.Mutation.changeAvatar(
           {},
           {
             userId: 'ba7022f0ff4822',
             avatar: {
               type: 'image/png;base64',
-              data: 'aGVsbG8gd29ybGQ='
+              data: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAQSURBVHgBAQUA+v8AAAAA/wEEAQB5fl4xAAAAAElFTkSuQmCC'
             }
           },
           authHeaderInValidUser

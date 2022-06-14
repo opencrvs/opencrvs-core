@@ -17,16 +17,18 @@ import {
   generateDeathRegPoint,
   generateEventDurationPoint,
   generatePaymentPoint,
-  generateApplicationStartedPoint,
+  generateDeclarationStartedPoint,
   generateTimeLoggedPoint,
-  generateRejectedPoints
+  generateRejectedPoints,
+  generateCorrectionReasonPoint,
+  generateCertificationPoint
 } from '@metrics/features/registration/pointGenerator'
 import { internal } from '@hapi/boom'
 import { populateBundleFromPayload } from '@metrics/features/registration/utils'
 import { Events } from '@metrics/features/metrics/constants'
 import { IPoints } from '@metrics/features/registration'
 
-export async function waitingValidationHandler(
+export async function waitingExternalValidationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -34,7 +36,8 @@ export async function waitingValidationHandler(
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     points.push(
@@ -42,7 +45,8 @@ export async function waitingValidationHandler(
         request.payload as fhir.Bundle,
         ['IN_PROGRESS', 'DECLARED', 'VALIDATED'],
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       )
     )
@@ -54,7 +58,7 @@ export async function waitingValidationHandler(
   return h.response().code(200)
 }
 
-export async function newValidationHandler(
+export async function requestForRegistrarValidationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -62,16 +66,18 @@ export async function newValidationHandler(
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     points.push(
-      await generateApplicationStartedPoint(
+      await generateDeclarationStartedPoint(
         request.payload as fhir.Bundle,
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         },
-        Events.NEW_VALIDATE
+        Events.REQUEST_FOR_REGISTRAR_VALIDATION
       )
     )
     await writePoints(points)
@@ -82,7 +88,7 @@ export async function newValidationHandler(
   return h.response().code(200)
 }
 
-export async function newWaitingValidationHandler(
+export async function registrarRegistrationWaitingExternalValidationHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
@@ -90,16 +96,18 @@ export async function newWaitingValidationHandler(
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     points.push(
-      await generateApplicationStartedPoint(
+      await generateDeclarationStartedPoint(
         request.payload as fhir.Bundle,
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         },
-        Events.NEW_WAITING_VALIDATION
+        Events.REGISTRAR_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
       )
     )
     await writePoints(points)
@@ -118,14 +126,16 @@ export async function newDeclarationHandler(
   try {
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     points.push(
-      await generateApplicationStartedPoint(
+      await generateDeclarationStartedPoint(
         request.payload as fhir.Bundle,
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         },
         Events.NEW_DEC
       )
@@ -146,19 +156,22 @@ export async function inProgressHandler(
     const points = await generateInCompleteFieldPoints(
       request.payload as fhir.Bundle,
       {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       }
     )
     points.push(
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     points.push(
-      await generateApplicationStartedPoint(
+      await generateDeclarationStartedPoint(
         request.payload as fhir.Bundle,
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         },
         Events.IN_PROGRESS_DEC
       )
@@ -179,14 +192,16 @@ export async function markRejectedHandler(
     const points: IPoints[] = []
     points.push(
       await generateRejectedPoints(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     points.push(
       await generateTimeLoggedPoint(
         request.payload as fhir.Bundle,
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         },
         true
       )
@@ -196,7 +211,8 @@ export async function markRejectedHandler(
         request.payload as fhir.Bundle,
         ['IN_PROGRESS', 'DECLARED', 'VALIDATED'],
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         },
         true
       )
@@ -218,13 +234,15 @@ export async function newBirthRegistrationHandler(
     points.push(
       await generateBirthRegPoint(
         request.payload as fhir.Bundle,
-        'register-new-application',
+        'register-new-declaration',
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       ),
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     await writePoints(points)
@@ -250,14 +268,17 @@ export async function markBirthRegisteredHandler(
         bundle,
         ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       ),
-      generateBirthRegPoint(bundle, 'mark-existing-application-registered', {
-        Authorization: request.headers.authorization
+      generateBirthRegPoint(bundle, 'mark-existing-declaration-registered', {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       }),
       generateTimeLoggedPoint(bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     ])
 
@@ -277,13 +298,15 @@ export async function newDeathRegistrationHandler(
     points.push(
       await generateDeathRegPoint(
         request.payload as fhir.Bundle,
-        'register-new-application',
+        'register-new-declaration',
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       ),
       await generateTimeLoggedPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     )
     await writePoints(points)
@@ -308,14 +331,17 @@ export async function markDeathRegisteredHandler(
         bundle,
         ['IN_PROGRESS', 'DECLARED', 'VALIDATED', 'WAITING_VALIDATION'],
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       ),
-      generateDeathRegPoint(bundle, 'mark-existing-application-registered', {
-        Authorization: request.headers.authorization
+      generateDeathRegPoint(bundle, 'mark-existing-declaration-registered', {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       }),
       generateTimeLoggedPoint(bundle, {
-        Authorization: request.headers.authorization
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       })
     ])
 
@@ -333,14 +359,24 @@ export async function markCertifiedHandler(
 ) {
   try {
     const points = await Promise.all([
-      generatePaymentPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
+      generateCertificationPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
       }),
+      generatePaymentPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        },
+        'certification'
+      ),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED'],
         {
-          Authorization: request.headers.authorization
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
         }
       )
     ])
@@ -362,6 +398,44 @@ export async function markValidatedHandler(
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['IN_PROGRESS', 'DECLARED'],
+        {
+          Authorization: request.headers.authorization,
+          'x-correlation-id': request.headers['x-correlation-id']
+        }
+      ),
+      generateTimeLoggedPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization,
+        'x-correlation-id': request.headers['x-correlation-id']
+      })
+    ])
+
+    await writePoints(points)
+  } catch (err) {
+    return internal(err)
+  }
+
+  return h.response().code(200)
+}
+
+export async function requestCorrectionHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const points = await Promise.all([
+      generatePaymentPoint(
+        request.payload as fhir.Bundle,
+        {
+          Authorization: request.headers.authorization
+        },
+        'correction'
+      ),
+      generateCorrectionReasonPoint(request.payload as fhir.Bundle, {
+        Authorization: request.headers.authorization
+      }),
+      generateEventDurationPoint(
+        request.payload as fhir.Bundle,
+        ['REGISTERED', 'CERTIFIED'],
         {
           Authorization: request.headers.authorization
         }

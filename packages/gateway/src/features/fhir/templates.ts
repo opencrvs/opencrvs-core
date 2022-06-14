@@ -20,12 +20,15 @@ export const INFORMANT_CODE = 'informant-details'
 export const SPOUSE_CODE = 'spouse-details'
 export const ATTACHMENT_DOCS_CODE = 'supporting-documents'
 export const CERTIFICATE_DOCS_CODE = 'certificates'
+export const CORRECTION_CERTIFICATE_DOCS_CODE = 'correction-certificates'
+export const CORRECTION_CERTIFICATE_DOCS_TITLE = 'Correction certificates'
+export const CORRECTION_CERTIFICATE_DOCS_CONTEXT_KEY = 'correction-certificates'
 export const BIRTH_ENCOUNTER_CODE = 'birth-encounter'
 export const BODY_WEIGHT_CODE = '3141-9'
 export const BIRTH_TYPE_CODE = '57722-1'
 export const BIRTH_ATTENDANT_CODE = '73764-3'
 export const BIRTH_REG_TYPE_CODE = 'birth-reg-type'
-export const BIRTH_REG_PRESENT_CODE = 'present-at-birth-reg'
+export const INFORMANT_TYPE = 'informant-type'
 export const NUMBER_BORN_ALIVE_CODE = 'num-born-alive'
 export const NUMBER_FOEATAL_DEATH_CODE = 'num-foetal-death'
 export const MALE_DEPENDENTS_ON_DECEASED_CODE =
@@ -50,14 +53,13 @@ export const CERTIFICATE_CONTEXT_KEY = 'certificates'
 export const DEATH_ENCOUNTER_CODE = 'death-encounter'
 export const CAUSE_OF_DEATH_CODE = 'ICD10'
 export const CAUSE_OF_DEATH_METHOD_CODE = 'cause-of-death-method'
+export const CAUSE_OF_DEATH_ESTABLISHED_CODE = 'cause-of-death-established'
 export const MANNER_OF_DEATH_CODE = 'uncertified-manner-of-death'
-export const REASON_MOTHER_NOT_APPLYING = 'reason-mother-not-applying'
-export const REASON_FATHER_NOT_APPLYING = 'reason-father-not-applying'
-export const REASON_CAREGIVER_NOT_APPLYING = 'reason-caregiver-not-applying'
-export const PRIMARY_CAREGIVER = 'primary-caregiver'
-export const PRIMARY_CAREGIVER_CODE = 'primary-caregiver-details'
-export const PRIMARY_CAREGIVER_TITLE = "Primary caregiver's details"
+export const DEATH_DESCRIPTION_CODE =
+  'lay-reported-or-verbal-autopsy-description'
 export const PARENT_DETAILS = 'parent-details'
+export const BIRTH_CORRECTION_ENCOUNTER_CODE = 'birth-correction-encounters'
+export const DEATH_CORRECTION_ENCOUNTER_CODE = 'death-correction-encounters'
 
 export function createPersonSection(
   refUuid: string,
@@ -99,6 +101,10 @@ export function createEncounterSection(refUuid: string, sectionCode: string) {
     sectionTitle = 'Birth encounter'
   } else if (sectionCode === DEATH_ENCOUNTER_CODE) {
     sectionTitle = 'Death encounter'
+  } else if (sectionCode === BIRTH_CORRECTION_ENCOUNTER_CODE) {
+    sectionTitle = 'Birth correction encounters'
+  } else if (sectionCode === DEATH_CORRECTION_ENCOUNTER_CODE) {
+    sectionTitle = 'Death correction encounters'
   } else {
     throw new Error(`Unknown section code ${sectionCode}`)
   }
@@ -155,11 +161,11 @@ export function createCompositionTemplate(refUuid: string, context: any) {
   let declarationText
   let declarationCode
   if (context.event === EVENT_TYPE.BIRTH) {
-    declarationCode = 'birth-application'
-    declarationText = 'Birth Application'
+    declarationCode = 'birth-declaration'
+    declarationText = 'Birth Declaration'
   } else {
-    declarationCode = 'death-application'
-    declarationText = 'Death Application'
+    declarationCode = 'death-declaration'
+    declarationText = 'Death Declaration'
   }
 
   return {
@@ -222,16 +228,10 @@ export function updateTaskTemplate(
     }
 
     task.reason.text = reason || ''
-
-    const newNote: fhir.Annotation = {
-      text: comment ? comment : '',
-      time: new Date().toUTCString(),
-      authorString: ''
+    const statusReason: fhir.CodeableConcept = {
+      text: comment
     }
-    if (!task.note) {
-      task.note = []
-    }
-    task.note.push(newNote)
+    task.statusReason = statusReason
   }
   return task
 }
@@ -314,5 +314,14 @@ export function createTaskRefTemplate(refUuid: string, event: EVENT_TYPE) {
         ]
       }
     }
+  }
+}
+export function createQuestionnaireResponseTemplate(refUuid: string) {
+  return {
+    fullUrl: `urn:uuid:${refUuid}`,
+    resource: {
+      resourceType: 'QuestionnaireResponse',
+      status: 'completed'
+    } as fhir.QuestionnaireResponse
   }
 }

@@ -17,7 +17,7 @@ import { Action } from '@client/forms'
 
 describe('When calling getDeathQueryMappings', () => {
   it('Should return the Query for certification', () => {
-    const query = getDeathQueryMappings(Action.LOAD_CERTIFICATE_APPLICATION)
+    const query = getDeathQueryMappings(Action.LOAD_CERTIFICATE_DECLARATION)
     expect(query).not.toBe(null)
     if (query && query.query) {
       expect(query.query).toEqual(GET_DEATH_REGISTRATION_FOR_CERTIFICATION)

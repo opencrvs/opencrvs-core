@@ -28,10 +28,10 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
-import { messages } from './resetCredentialsForm'
+import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 
 const Header = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.black};
   margin: 0px;
 `
@@ -44,16 +44,16 @@ const Action = styled.div`
 `
 
 const GlobalError = styled.div`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 const PasswordMatch = styled.div`
   ${({ theme }) => theme.fonts.semiBoldFont};
-  color: ${({ theme }) => theme.colors.success};
+  color: ${({ theme }) => theme.colors.positive};
   margin-top: 8px;
 `
 const PasswordMismatch = styled.div`
   ${({ theme }) => theme.fonts.semiBoldFont};
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
   margin-top: 8px;
 `
 
@@ -168,7 +168,7 @@ class UpdatePasswordComponent extends React.Component<IFullProps, State> {
     }
   }
   render = () => {
-    const { intl } = this.props
+    const { intl, goToPhoneNumberVerificationForm } = this.props
     const forgottenItem = FORGOTTEN_ITEMS.PASSWORD
 
     return (

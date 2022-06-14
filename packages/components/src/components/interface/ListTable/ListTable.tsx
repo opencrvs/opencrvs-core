@@ -34,7 +34,7 @@ const Wrapper = styled.div<{
       : hideBoxShadow
       ? `padding: 24px 0;`
       : `padding: 24px;
-    ${theme.shadows.mistyShadow};`}
+    ${theme.shadows.light};`}
 `
 const TableTitleLoading = styled.span`
   background: ${({ theme }) => theme.colors.background};
@@ -50,34 +50,41 @@ const TableHeader = styled.div<{
 }>`
   ${({ fixedWidth, totalWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: ${totalWidth || 100}%;`}
-  border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
-  color: ${({ theme }) => theme.colors.copy};
+  background: ${({ theme }) => theme.colors.background};
   padding: 10px 0px;
   display: flex;
   align-items: flex-end;
 
   & span:first-child {
-    padding-left: 12px;
+    padding-left: 8px;
   }
 
   & span:last-child {
-    text-align: right;
-    padding-right: 12px;
+    padding-right: 8px;
   }
 `
 
 const TableHeaderText = styled.div<{
   isSorted?: boolean
 }>`
-  ${({ isSorted, theme }) =>
-    isSorted ? theme.fonts.bodyBoldStyle : theme.fonts.bodyStyle}
+  ${({ theme }) => theme.fonts.bold16};
+  color: ${({ theme }) => theme.colors.copy};
+  display: flex;
 `
 
 const TableBody = styled.div<{ footerColumns: boolean }>`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
+
   & div:last-of-type {
     ${({ footerColumns }) => (footerColumns ? 'border-bottom: none;' : '')};
+  }
+  & span:first-child {
+    padding-left: 8px;
+  }
+
+  & span:last-child {
+    padding-right: 8px;
   }
 `
 const RowWrapper = styled.div<{
@@ -85,12 +92,22 @@ const RowWrapper = styled.div<{
   highlight?: boolean
   height?: IBreakpoint
   horizontalPadding?: IBreakpoint
+  hideTableBottomBorder?: boolean
+  alignItemCenter?: boolean
 }>`
   width: 100%;
-  min-height: 48px;
+  /* min-height: 48px; */
+  padding-top: 10px;
+  padding-bottom: 10px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.disabled};
+
+  &:last-child {
+    ${({ hideTableBottomBorder }) =>
+      hideTableBottomBorder && `border-bottom: 0`};
+  }
+
   display: flex;
-  align-items: center;
+  ${({ alignItemCenter }) => alignItemCenter && `align-items: start`};
   ${({ height }) =>
     height ? `min-height:${height.lg}px;` : `min-height: 48px)`};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -98,7 +115,7 @@ const RowWrapper = styled.div<{
       height ? `min-height:${height.md}px` : `min-height: 48px)`};
   }
   ${({ highlight, theme }) =>
-    highlight && `:hover { background-color: ${theme.colors.dropdownHover};}`}
+    highlight && `:hover { background-color: ${theme.colors.grey100};}`}
 
   & span:first-child {
     ${({ horizontalPadding }) =>
@@ -140,7 +157,7 @@ const TableFooter = styled(RowWrapper)`
   border-bottom: none;
   & span {
     color: ${({ theme }) => theme.colors.copy};
-    ${({ theme }) => theme.fonts.bodyBoldStyle};
+    ${({ theme }) => theme.fonts.bold16};
   }
 `
 
@@ -150,6 +167,7 @@ const ContentWrapper = styled.span<{
   sortable?: boolean
   totalWidth?: number
 }>`
+  align-self: flex-start;
   width: ${({ width, totalWidth }) =>
     totalWidth && totalWidth > 100 ? (width * 100) / totalWidth : width}%;
   flex-shrink: 0;
@@ -167,21 +185,17 @@ const ValueWrapper = styled.span<{
   width: ${({ width, totalWidth }) =>
     totalWidth > 100 ? (width * 100) / totalWidth : width}%;
 
-  display: flex;
   justify-content: ${({ alignment }) =>
     alignment === ColumnContentAlignment.RIGHT ? 'flex-end' : 'flex-start'};
-  align-items: stretch;
-  flex-shrink: 0;
-  margin: auto 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   padding-right: 8px;
   ${({ color }) => color && `color: ${color};`}
 `
 const Error = styled.span`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 const ErrorText = styled.div<{ isFullPage?: boolean }>`
-  ${({ theme }) => theme.fonts.h5Style};
+  ${({ theme }) => theme.fonts.h3};
   text-align: left;
   margin-left: ${({ isFullPage }) => (isFullPage ? `40px` : `10px`)};
   color: ${({ theme }) => theme.colors.copy};
@@ -189,7 +203,7 @@ const ErrorText = styled.div<{ isFullPage?: boolean }>`
 const H3 = styled.div`
   padding-left: 12px;
   margin-bottom: 8px;
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   color: ${({ theme }) => theme.colors.copy};
 `
 export const LoadingGrey = styled.span<{
@@ -215,7 +229,7 @@ const TableScrollerHorizontal = styled.div<{
 
   &::-webkit-scrollbar-thumb {
     border-radius: 10px;
-    background: ${({ theme }) => theme.colors.lightScrollBarGrey};
+    background: ${({ theme }) => theme.colors.grey400};
   }
 `
 const TableScroller = styled.div<{
@@ -240,7 +254,7 @@ const TableScroller = styled.div<{
 `
 
 const TableHeaderWrapper = styled.div`
-  padding-right: 10px;
+  padding-right: 0;
 `
 const ToggleSortIcon = styled.div<{
   toggle?: boolean
@@ -286,6 +300,8 @@ interface IListTableProps {
   tableTitle?: string
   hideBoxShadow?: boolean
   hideTableHeader?: boolean
+  hideTableBottomBorder?: boolean
+  alignItemCenter?: boolean
   loadMoreText?: string
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean
@@ -373,6 +389,8 @@ export class ListTable extends React.Component<
       rowStyle,
       hideBoxShadow,
       hideTableHeader,
+      hideTableBottomBorder,
+      alignItemCenter,
       footerColumns,
       loadMoreText,
       highlightRowOnMouseOver,
@@ -416,7 +434,7 @@ export class ListTable extends React.Component<
                         }
                       >
                         <TableHeaderText isSorted={preference.isSorted}>
-                          {preference.label}
+                          <div>{preference.label}</div>
                           <ToggleSortIcon
                             toggle={
                               this.state.sortIconInverted &&
@@ -453,6 +471,8 @@ export class ListTable extends React.Component<
                           highlight={highlightRowOnMouseOver}
                           height={rowStyle?.height}
                           horizontalPadding={rowStyle?.horizontalPadding}
+                          hideTableBottomBorder={hideTableBottomBorder || false}
+                          alignItemCenter={alignItemCenter}
                         >
                           {columns.map((preference, indx) => {
                             return (

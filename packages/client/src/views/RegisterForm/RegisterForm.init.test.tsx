@@ -17,14 +17,14 @@ import {
 } from '@client/tests/util'
 import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import {
-  createApplication,
+  createDeclaration,
   IUserData,
   getCurrentUserID,
-  getApplicationsOfCurrentUser,
-  writeApplicationByUser,
-  deleteApplicationByUser,
-  IApplication
-} from '@client/applications'
+  getDeclarationsOfCurrentUser,
+  writeDeclarationByUser,
+  deleteDeclarationByUser,
+  IDeclaration
+} from '@client/declarations'
 import { DRAFT_BIRTH_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 
 import { Event } from '@opencrvs/client/src/forms'
@@ -32,22 +32,21 @@ import { storage } from '@client/storage'
 import { IUserDetails } from '@client/utils/userUtils'
 describe('when user logs in', () => {
   // Some mock data
-  const draft1 = createApplication(Event.BIRTH)
-  const draft2 = createApplication(Event.DEATH)
-  const draft3 = createApplication(Event.BIRTH)
+  const draft1 = createDeclaration(Event.BIRTH)
+  const draft2 = createDeclaration(Event.DEATH)
+  const draft3 = createDeclaration(Event.BIRTH)
 
   const currentUserData: IUserData = {
     userID: 'shakib75',
-    applications: [draft1, draft2]
+    declarations: [draft1, draft2]
   }
 
   const anotherUserData: IUserData = {
     userID: 'mortaza',
-    applications: [draft3]
+    declarations: [draft3]
   }
 
   const currentUserDetails: IUserDetails = {
-    language: 'en',
     userMgntUserID: 'shakib75',
     localRegistrar: { name: [] }
   }
@@ -90,8 +89,8 @@ describe('when user logs in', () => {
   })
 
   it('should read only the drafts of the currently logged-in user', async () => {
-    const details = await getApplicationsOfCurrentUser()
-    const currentUserDrafts = (JSON.parse(details) as IUserData).applications
+    const details = await getDeclarationsOfCurrentUser()
+    const currentUserDrafts = (JSON.parse(details) as IUserData).declarations
     expect(currentUserDrafts.length).toBe(2)
     expect(currentUserDrafts[0]).toEqual(draft1)
     expect(currentUserDrafts[1]).toEqual(draft2)
@@ -100,14 +99,14 @@ describe('when user logs in', () => {
     ).toBeFalsy()
   })
 
-  describe('Application in index db', () => {
-    let draft: IApplication
+  describe('Declaration in index db', () => {
+    let draft: IDeclaration
 
     beforeAll(async () => {
-      draft = createApplication(Event.DEATH)
+      draft = createDeclaration(Event.DEATH)
       jest.mock('lodash/debounce', () => jest.fn((fn) => fn))
       const { store } = await createTestStore()
-      await writeApplicationByUser(
+      await writeDeclarationByUser(
         store.getState,
         currentUserData.userID,
         draft
@@ -116,18 +115,18 @@ describe('when user logs in', () => {
 
     it("should save the draft inside the current user's array of drafts", async () => {
       // Now, let's check if the new draft is added
-      const details = await getApplicationsOfCurrentUser()
-      const currentUserDrafts = (JSON.parse(details) as IUserData).applications
+      const details = await getDeclarationsOfCurrentUser()
+      const currentUserDrafts = (JSON.parse(details) as IUserData).declarations
       expect(currentUserDrafts.length).toBe(3)
       expect(currentUserDrafts[0]).toBeTruthy()
     })
 
-    it("should delete the draft from the current user's array of applications", async () => {
-      await deleteApplicationByUser(currentUserData.userID, draft)
+    it("should delete the draft from the current user's array of declarations", async () => {
+      await deleteDeclarationByUser(currentUserData.userID, draft)
 
       // Now, let's check if the new draft is added
-      const details = await getApplicationsOfCurrentUser()
-      const currentUserDrafts = (JSON.parse(details) as IUserData).applications
+      const details = await getDeclarationsOfCurrentUser()
+      const currentUserDrafts = (JSON.parse(details) as IUserData).declarations
       expect(currentUserDrafts.length).toBe(2)
       expect(
         currentUserDrafts.find((cDraft) => cDraft.id === draft.id)
@@ -150,8 +149,8 @@ describe('when there is no user-data saved', () => {
           return ''
       }
     })
-    const str = await getApplicationsOfCurrentUser()
-    const drafts = (JSON.parse(str) as IUserData).applications
+    const str = await getDeclarationsOfCurrentUser()
+    const drafts = (JSON.parse(str) as IUserData).declarations
     expect(drafts.length).toBe(0)
   })
 })
@@ -161,7 +160,7 @@ describe('when user is in the register form before initial draft load', () => {
     const { store, history } = await createTestStore()
 
     const mock: any = jest.fn()
-    const draft = createApplication(Event.BIRTH)
+    const draft = createDeclaration(Event.BIRTH)
     const form = await getRegisterFormFromStore(store, Event.BIRTH)
 
     try {
@@ -172,16 +171,16 @@ describe('when user is in the register form before initial draft load', () => {
           history={history}
           staticContext={mock}
           registerForm={form}
-          application={draft}
+          declaration={draft}
           pageRoute={DRAFT_BIRTH_PARENT_FORM_PAGE}
           match={{
-            params: { applicationId: '', pageId: '', groupId: '' },
+            params: { declarationId: '', pageId: '', groupId: '' },
             isExact: true,
             path: '',
             url: ''
           }}
         />,
-        store
+        { store, history }
       )
     } catch (error) {
       expect(error).toBeInstanceOf(Error)

@@ -32,12 +32,19 @@ import {
   GQLUserInput
 } from '@gateway/graphql/schema'
 import { logger } from '@gateway/logger'
+import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
+import { UserInputError } from 'apollo-server-hapi'
 import fetch from 'node-fetch'
+import { validateAttachments } from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
   Query: {
     async getUser(_, { userId }, authHeader) {
       return await getUser({ userId }, authHeader)
+    },
+
+    async getUserByMobile(_, { mobile }, authHeader) {
+      return await getUser({ mobile }, authHeader)
     },
 
     async searchUsers(
@@ -164,7 +171,7 @@ export const resolvers: GQLResolver = {
       }
       // Loading metrics data by practitioner ids
       const metricsForPractitioners = await postMetrics(
-        '/applicationStartedMetricsByPractitioners',
+        '/declarationStartedMetricsByPractitioners',
         {
           timeStart,
           timeEnd,
@@ -188,16 +195,17 @@ export const resolvers: GQLResolver = {
             fullName: getFullName(user, language),
             type: user.type,
             status: user.status,
+            avatar: user.avatar,
             primaryOfficeId: user.primaryOfficeId,
             creationDate: user?.creationDate,
-            totalNumberOfApplicationStarted:
-              metricsData?.totalNumberOfApplicationStarted ?? 0,
+            totalNumberOfDeclarationStarted:
+              metricsData?.totalNumberOfDeclarationStarted ?? 0,
             totalNumberOfInProgressAppStarted:
               metricsData?.totalNumberOfInProgressAppStarted ?? 0,
-            totalNumberOfRejectedApplications:
-              metricsData?.totalNumberOfRejectedApplications ?? 0,
-            averageTimeForDeclaredApplications:
-              metricsData?.averageTimeForDeclaredApplications ?? 0
+            totalNumberOfRejectedDeclarations:
+              metricsData?.totalNumberOfRejectedDeclarations ?? 0,
+            averageTimeForDeclaredDeclarations:
+              metricsData?.averageTimeForDeclaredDeclarations ?? 0
           }
         })
 
@@ -234,6 +242,15 @@ export const resolvers: GQLResolver = {
           new Error('Create user is only allowed for sysadmin')
         )
       }
+
+      try {
+        if (user.signature) {
+          await validateAttachments([user.signature])
+        }
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
+
       const userPayload: IUserPayload = createOrUpdateUserPayload(user)
       const action = userPayload.id ? 'update' : 'create'
       const res = await fetch(`${USER_MANAGEMENT_URL}${action}User`, {
@@ -245,7 +262,11 @@ export const resolvers: GQLResolver = {
         }
       })
 
-      if (res.status !== 201) {
+      if (res.status === 403) {
+        return await Promise.reject(
+          new Error(`DUPLICATE_MOBILE-${userPayload.mobile}`)
+        )
+      } else if (res.status !== 201) {
         return await Promise.reject(
           new Error(
             `Something went wrong on user-mgnt service. Couldn't ${action} user`
@@ -309,7 +330,51 @@ export const resolvers: GQLResolver = {
       }
       return true
     },
+    async changePhone(
+      _,
+      { userId, phoneNumber, nonce, verifyCode },
+      authHeader
+    ) {
+      if (!isTokenOwner(authHeader, userId)) {
+        return await Promise.reject(
+          new Error(
+            `Change phone is not allowed. ${userId} is not the owner of the token`
+          )
+        )
+      }
+      try {
+        await checkVerificationCode(nonce, verifyCode)
+      } catch (err) {
+        logger.error(err)
+        return await Promise.reject(
+          new Error(`Change phone is not allowed. Error: ${err}`)
+        )
+      }
+      const res = await fetch(`${USER_MANAGEMENT_URL}changeUserPhone`, {
+        method: 'POST',
+        body: JSON.stringify({ userId, phoneNumber }),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 200) {
+        return await Promise.reject(
+          new Error(
+            "Something went wrong on user-mgnt service. Couldn't change user phone number"
+          )
+        )
+      }
+      return true
+    },
     async changeAvatar(_, { userId, avatar }, authHeader) {
+      try {
+        await validateAttachments([avatar])
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
+
       // Only token owner should be able to change their avatar
       if (!isTokenOwner(authHeader, userId)) {
         return await Promise.reject(
@@ -334,7 +399,7 @@ export const resolvers: GQLResolver = {
           )
         )
       }
-      return true
+      return avatar
     },
     async auditUser(_, { userId, action, reason, comment }, authHeader) {
       if (!hasScope(authHeader, 'sysadmin')) {

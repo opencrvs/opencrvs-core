@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { FormFieldGenerator } from '@client/components/form'
-import { roleQueries } from '@client/forms/user/fieldDefinitions/query/queries'
+import { roleQueries } from '@client/forms/user/query/queries'
 import { offlineDataReady } from '@client/offline/actions'
 import { AppStore, createStore } from '@client/store'
 import { userQueries, GET_USER } from '@client/user/queries'
@@ -18,14 +18,14 @@ import {
   createTestComponent,
   flushPromises,
   loginAsFieldAgent,
-  mockOfflineData
+  mockOfflineData,
+  mockOfflineDataDispatch
 } from '@client/tests/util'
 import { modifyUserFormData, processRoles } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import {
   mockCompleteFormData,
-  mockDataWithRegistarRoleSelected,
-  mockIncompleteFormData
+  mockDataWithRegistarRoleSelected
 } from '@client/views/SysAdmin/Team/utils'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
@@ -59,11 +59,6 @@ export const mockRoles = {
       {
         value: 'NATIONAL_SYSTEM_ADMIN',
         types: ['NATIONAL_SYSTEM_ADMIN'],
-        __typename: 'Role'
-      },
-      {
-        value: 'PERFORMANCE_OVERSIGHT',
-        types: ['CABINET_DIVISION', 'BBS'],
         __typename: 'Role'
       },
       {
@@ -230,23 +225,21 @@ describe('create new user tests', () => {
 
   describe('when user is in create new user form', () => {
     beforeEach(async () => {
-      testComponent = (
-        await createTestComponent(
-          <CreateNewUser
-            match={{
-              // @ts-ignore
-              params: {
-                locationId: '0d8474da-0361-4d32-979e-af91f012340a',
-                sectionId: mockOfflineData.forms.userForm.sections[0].id
-              },
-              isExact: true,
-              path: '/createUser',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      testComponent = await createTestComponent(
+        <CreateNewUser
+          match={{
+            // @ts-ignore
+            params: {
+              locationId: '0d8474da-0361-4d32-979e-af91f012340a',
+              sectionId: mockOfflineData.forms.userForm.sections[0].id
+            },
+            isExact: true,
+            path: '/createUser',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
 
       loginAsFieldAgent(store)
     })
@@ -293,23 +286,21 @@ describe('create new user tests', () => {
     beforeEach(async () => {
       store.dispatch(modifyUserFormData(mockCompleteFormData))
       store.dispatch(processRoles(mockCompleteFormData.registrationOffice))
-      testComponent = (
-        await createTestComponent(
-          // @ts-ignore
-          <CreateNewUser
-            match={{
-              params: {
-                sectionId: mockOfflineData.forms.userForm.sections[1].id,
-                groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
-              },
-              isExact: true,
-              path: '/createUser',
-              url: ''
-            }}
-          />,
-          store
-        )
-      ).component
+      testComponent = await createTestComponent(
+        // @ts-ignore
+        <CreateNewUser
+          match={{
+            params: {
+              sectionId: mockOfflineData.forms.userForm.sections[1].id,
+              groupId: mockOfflineData.forms.userForm.sections[1].groups[0].id
+            },
+            isExact: true,
+            path: '/createUser',
+            url: ''
+          }}
+        />,
+        { store, history }
+      )
     })
 
     it('renders review header', () => {
@@ -322,6 +313,7 @@ describe('create new user tests', () => {
       testComponent
         .find('#btn_change_familyNameEng')
         .hostNodes()
+        .first()
         .simulate('click')
       await flushPromises()
       expect(history.location.pathname).toBe('/createUser/user/user-view-group')
@@ -356,13 +348,13 @@ describe('edit user tests', () => {
             name: [
               {
                 use: 'bn',
-                firstNames: '',
+                firstNames: 'Jeff',
                 familyName: 'মায়ের পারিবারিক নাম ',
                 __typename: 'HumanName'
               },
               {
                 use: 'en',
-                firstNames: '',
+                firstNames: 'Jeff',
                 familyName: 'Shakib al Hasan',
                 __typename: 'HumanName'
               }
@@ -404,18 +396,7 @@ describe('edit user tests', () => {
   beforeEach(() => {
     ;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
     ;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
-    store.dispatch(
-      offlineDataReady({
-        languages: mockOfflineData.languages,
-        forms: mockOfflineData.forms,
-        templates: mockOfflineData.templates,
-        locations: mockOfflineData.locations,
-        facilities: mockOfflineData.facilities,
-        pilotLocations: mockOfflineData.pilotLocations,
-        offices: mockOfflineData.offices,
-        assets: mockOfflineData.assets
-      })
-    )
+    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   })
 
   describe('when user is in update form page', () => {
@@ -434,11 +415,10 @@ describe('edit user tests', () => {
             url: ''
           }}
         />,
-        store,
-        graphqlMocks
+        { store, history, graphqlMocks: graphqlMocks }
       )
 
-      component = testComponent.component
+      component = testComponent
     })
 
     it('clicking on continue button takes user review details page', async () => {
@@ -479,15 +459,14 @@ describe('edit user tests', () => {
             url: ''
           }}
         />,
-        store,
-        graphqlMocks
+        { store, history, graphqlMocks }
       )
 
       // wait for mocked data to load mockedProvider
       await new Promise((resolve) => {
         setTimeout(resolve, 100)
       })
-      component = testComponent.component
+      component = testComponent
       component.update()
     })
 
@@ -501,7 +480,7 @@ describe('edit user tests', () => {
         component,
         '#btn_change_type'
       )
-      changeButtonOfType.hostNodes().simulate('click')
+      changeButtonOfType.hostNodes().first().simulate('click')
       await flushPromises()
       expect(history.location.hash).toBe('#type')
     })

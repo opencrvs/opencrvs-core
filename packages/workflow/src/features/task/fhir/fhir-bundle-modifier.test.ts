@@ -42,6 +42,12 @@ describe('Verify handler', () => {
   })
 
   it('modifyTaskBundle returns correct bundle', async () => {
+    jest
+      .spyOn(
+        require('../../../utils/formDraftUtils'),
+        'checkFormDraftStatusToAddTestExtension'
+      )
+      .mockReturnValue('')
     fetch.mockResponses(
       [taskResouceMock, { status: 200 }],
       [userMock, { status: 200 }],
@@ -83,7 +89,7 @@ describe('Verify handler', () => {
     }
   })
 
-  it('Throws error if application is already rejected', () => {
+  it('Throws error if declaration is already rejected', () => {
     fetch.mockResponses(
       [
         JSON.stringify({

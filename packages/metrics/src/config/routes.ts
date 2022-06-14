@@ -17,21 +17,24 @@ import {
   markCertifiedHandler,
   markValidatedHandler,
   markRejectedHandler,
-  waitingValidationHandler,
+  waitingExternalValidationHandler,
   markDeathRegisteredHandler,
   newDeathRegistrationHandler,
   newDeclarationHandler,
-  newWaitingValidationHandler,
-  newValidationHandler
+  registrarRegistrationWaitingExternalValidationHandler,
+  requestForRegistrarValidationHandler,
+  requestCorrectionHandler
 } from '@metrics/features/registration/handler'
-import { metricsHandler } from '@metrics/features/metrics/handler'
-import { eventEstimationsHandler } from '@metrics/features/eventEstimations/handler'
+import {
+  metricsDeleteMeasurementHandler,
+  metricsHandler
+} from '@metrics/features/metrics/handler'
 import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
 import { locationWiseEventEstimationsHandler } from '@metrics/features/locationWiseEventEstimations/handler'
 import {
-  applicationsStartedHandler,
-  applicationStartedMetricsByPractitionersHandler
-} from '@metrics/features/applicationsStarted/handler'
+  declarationsStartedHandler,
+  declarationStartedMetricsByPractitionersHandler
+} from '@metrics/features/declarationsStarted/handler'
 import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
 import {
   exportHandler,
@@ -42,6 +45,15 @@ import {
   generateLegacyEventDurationHandler
 } from '@metrics/features/legacy/handler'
 import { getEventDurationHandler } from '@metrics/features/getEventDuration/handler'
+import { totalMetricsHandler } from '@metrics/features/totalMetrics/handler'
+import { totalPaymentsHandler } from '@metrics/features/payments/handler'
+import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
+import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
+import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
+
+const enum RouteScope {
+  NATLSYSADMIN = 'natlsysadmin'
+}
 
 export const getRoutes = () => {
   const routes = [
@@ -81,53 +93,53 @@ export const getRoutes = () => {
       }
     },
 
-    // New validation
+    // Request for registrar validation
     {
       method: 'POST',
-      path: '/events/birth/new-validation',
-      handler: newValidationHandler,
+      path: '/events/birth/request-for-registrar-validation',
+      handler: requestForRegistrarValidationHandler,
       config: {
         tags: ['api']
       }
     },
     {
       method: 'POST',
-      path: '/events/death/new-validation',
-      handler: newValidationHandler,
+      path: '/events/death/request-for-registrar-validation',
+      handler: requestForRegistrarValidationHandler,
       config: {
         tags: ['api']
       }
     },
 
-    // New registration
+    // Waiting external resource validation
     {
       method: 'POST',
-      path: '/events/birth/waiting-validation',
-      handler: waitingValidationHandler,
+      path: '/events/birth/waiting-external-resource-validation',
+      handler: waitingExternalValidationHandler,
       config: {
         tags: ['api']
       }
     },
     {
       method: 'POST',
-      path: '/events/death/waiting-validation',
-      handler: waitingValidationHandler,
+      path: '/events/death/waiting-external-resource-validation',
+      handler: waitingExternalValidationHandler,
       config: {
         tags: ['api']
       }
     },
     {
       method: 'POST',
-      path: '/events/birth/new-waiting-validation',
-      handler: newWaitingValidationHandler,
+      path: '/events/birth/registrar-registration-waiting-external-resource-validation',
+      handler: registrarRegistrationWaitingExternalValidationHandler,
       config: {
         tags: ['api']
       }
     },
     {
       method: 'POST',
-      path: '/events/death/new-waiting-validation',
-      handler: newWaitingValidationHandler,
+      path: '/events/death/registrar-registration-waiting-external-resource-validation',
+      handler: registrarRegistrationWaitingExternalValidationHandler,
       config: {
         tags: ['api']
       }
@@ -221,6 +233,24 @@ export const getRoutes = () => {
       }
     },
 
+    // Request correction
+    {
+      method: 'POST',
+      path: '/events/birth/request-correction',
+      handler: requestCorrectionHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+    {
+      method: 'POST',
+      path: '/events/death/request-correction',
+      handler: requestCorrectionHandler,
+      config: {
+        tags: ['api']
+      }
+    },
+
     // Metrics query API
     {
       method: 'GET',
@@ -239,11 +269,11 @@ export const getRoutes = () => {
       }
     },
 
-    // Area wise applications started query API
+    // Area wise declarations started query API
     {
       method: 'GET',
-      path: '/applicationsStarted',
-      handler: applicationsStartedHandler,
+      path: '/declarationsStarted',
+      handler: declarationsStartedHandler,
       config: {
         validate: {
           query: Joi.object({
@@ -256,17 +286,78 @@ export const getRoutes = () => {
       }
     },
 
-    // Area wise estimation query API
     {
       method: 'GET',
-      path: '/eventEstimations',
-      handler: eventEstimationsHandler,
+      path: '/totalMetrics',
+      handler: totalMetricsHandler,
       config: {
         validate: {
           query: Joi.object({
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
-            locationId: Joi.string().required()
+            locationId: Joi.string(),
+            event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'GET',
+      path: '/totalPayments',
+      handler: totalPaymentsHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string(),
+            event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'GET',
+      path: '/totalCertifications',
+      handler: totalCertificationsHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string()
+          })
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'GET',
+      path: '/totalCorrections',
+      handler: totalCorrectionsHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            timeStart: Joi.string().required(),
+            timeEnd: Joi.string().required(),
+            locationId: Joi.string(),
+            event: Joi.string().required()
+          })
+        },
+        tags: ['api']
+      }
+    },
+    {
+      method: 'GET',
+      path: '/locationStatistics',
+      handler: locationStatisticsHandler,
+      config: {
+        validate: {
+          query: Joi.object({
+            locationId: Joi.string(),
+            populationYear: Joi.string()
           })
         },
         tags: ['api']
@@ -282,7 +373,7 @@ export const getRoutes = () => {
           query: Joi.object({
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
-            locationId: Joi.string().required(),
+            locationId: Joi.string(),
             event: Joi.string().required()
           })
         },
@@ -299,14 +390,14 @@ export const getRoutes = () => {
           query: Joi.object({
             timeStart: Joi.string().required(),
             timeEnd: Joi.string().required(),
-            locationId: Joi.string().required(),
+            locationId: Joi.string(),
             event: Joi.string().required()
           })
         },
         tags: ['api']
       }
     },
-    // event duration query by application id
+    // event duration query by declaration id
     {
       method: 'GET',
       path: '/eventDuration',
@@ -320,7 +411,7 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
-    // Time logged query by application status API
+    // Time logged query by declaration status API
     {
       method: 'GET',
       path: '/timeLogged',
@@ -336,7 +427,7 @@ export const getRoutes = () => {
       }
     },
 
-    // Time logged query by application status API
+    // Time logged query by declaration status API
     {
       method: 'GET',
       path: '/timeLoggedMetricsByPractitioner',
@@ -357,8 +448,8 @@ export const getRoutes = () => {
 
     {
       method: 'POST',
-      path: '/applicationStartedMetricsByPractitioners',
-      handler: applicationStartedMetricsByPractitionersHandler,
+      path: '/declarationStartedMetricsByPractitioners',
+      handler: declarationStartedMetricsByPractitionersHandler,
       config: {
         validate: {
           payload: Joi.object({
@@ -446,6 +537,18 @@ export const getRoutes = () => {
         auth: false,
         tags: ['api'],
         description: 'Health check endpoint'
+      }
+    },
+    // delete all measurements ocrvs database from influx
+    {
+      method: 'DELETE',
+      path: '/influxMeasurement',
+      handler: metricsDeleteMeasurementHandler,
+      config: {
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        tags: ['api']
       }
     }
   ]

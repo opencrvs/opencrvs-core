@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { createServer } from '@metrics/index'
+import { createServer } from '@metrics/server'
 import * as influx from '@metrics/influxdb/client'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
@@ -40,8 +40,7 @@ describe('verify time logged handler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url:
-        '/timeLogged?compositionId=94429795-0a09-4de8-8e1e-27dab01877d2&status=REGISTERED',
+      url: '/timeLogged?compositionId=94429795-0a09-4de8-8e1e-27dab01877d2&status=REGISTERED',
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -55,8 +54,7 @@ describe('verify time logged handler', () => {
 
     const res = await server.server.inject({
       method: 'GET',
-      url:
-        '/timeLogged?compositionId=94429795-0a09-4de8-8e1e-27dab01877d2&status=REGISTERED',
+      url: '/timeLogged?compositionId=94429795-0a09-4de8-8e1e-27dab01877d2&status=REGISTERED',
       headers: {
         Authorization: `Bearer ${token}`
       }

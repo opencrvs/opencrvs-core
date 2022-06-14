@@ -9,12 +9,16 @@
 # graphic logo are (registered/a) trademark(s) of Plan International.
 enum RegStatus {
   IN_PROGRESS
+  ARCHIVED
   DECLARED
+  DECLARATION_UPDATED
   WAITING_VALIDATION
   VALIDATED
   REGISTERED
   CERTIFIED
   REJECTED
+  REQUESTED_CORRECTION
+  DOWNLOADED
 }
 
 enum BirthRegType {
@@ -30,14 +34,26 @@ enum RegistrationContactType {
   MOTHER
   FATHER
   OTHER
-  APPLICANT
+  INFORMANT
 }
 
-enum BirthRegPresence {
-  BOTH_PARENTS
+enum InformantType {
   INFORMANT
   MOTHER
   FATHER
+  GRANDFATHER
+  GRANDMOTHER
+  BROTHER
+  SISTER
+  OTHER_FAMILY_MEMBER
+  LEGAL_GUARDIAN
+  SPOUSE
+  SON
+  DAUGHTER
+  SON_IN_LAW
+  DAUGHTER_IN_LAW
+  GRANDSON
+  GRANDDAUGHTER
   OTHER
 }
 
@@ -61,42 +77,20 @@ enum AttendantType {
 }
 
 enum AttachmentType {
+  BIRTH_CERTIFICATE
+  NATIONAL_ID
   PASSPORT
-  NATIONAL_ID_FRONT
-  NATIONAL_ID_BACK
   NOTIFICATION_OF_BIRTH
-  IMMUNISATION_CERTIFICATE
-  PAPER_FORM
-  PASSPORT_PHOTO
-  BIRTH_REGISTRATION
-  SCHOOL_CERTIFICATE
-  PROOF_OF_DEATH
-  OTHER
-  POST_MORTEM_CERTIFICATE
-  HOSPITAL_DISCHARGE_CERTIFICATE
-  ATTESTED_DEATH_LETTER
-  ATTESTED_DEATH_CERTIFICATE
-  BURIAL_RECEIPT
-  FUNERAL_RECEIPT
-  DOCTOR_CERTIFICATE
-  EPI_CARD
-  EPI_STAFF_CERTIFICATE
-  BIRTH_PLACE_DATE_PROOF
-  DISCHARGE_CERTIFICATE
-  MEDICAL_INSTITUTION
-  BIRTH_ATTENDANT
-  TAX_RECEIPT
-  BROUGHT_IN_DEAD_CERTIFICATE
-  CORONERS_REPORT
-  SIGNED_AFFIDAVIT
-  DECEASED_BIRTH_PROOF_PAPER
-  ORIGINAL_BIRTH_RECORD
-  UNDER_FIVE_CARD
   PROOF_OF_LEGAL_GUARDIANSHIP
   PROOF_OF_ASSIGNED_RESPONSIBILITY
-  LETTER_FROM_COUNCILLOR
-  CAUSE_OF_DEATH
-  DECEASED_DEATH_PROOF
+  HOSPITAL_CERTIFICATE_OF_DEATH
+  ATTESTED_LETTER_OF_DEATH
+  BURIAL_RECEIPT
+  POLICE_CERTIFICATE_OF_DEATH
+  MEDICALLY_CERTIFIED_CAUSE_OF_DEATH
+  VERBAL_AUTOPSY_REPORT
+  CORONERS_REPORT
+  OTHER
 }
 
 enum AttachmentSubject {
@@ -107,16 +101,10 @@ enum AttachmentSubject {
   PARENT
   CHILD_AGE
   DECEASED_ID_PROOF
-  DECEASED_PARMANENT_ADDRESS_PROOF
   DECEASED_DEATH_PROOF
-  DECEASED_BIRTH_PROOF
-  APPLICANT_ID_PROOF
-  APPLICANT_ATHORITY_TO_APPLY_PROOF
+  DECEASED_DEATH_CAUSE_PROOF
+  INFORMANT_ID_PROOF
   LEGAL_GUARDIAN_PROOF
-  ASSIGNED_RESPONSIBILITY_PROOF
-  WARD_COUNCILLOR_PROOF
-  CAUSE_OF_DEATH
-  CORONERS_REPORT
 }
 
 enum RegistrationType {
@@ -129,7 +117,7 @@ enum MannerOfDeath {
   ACCIDENT
   SUICIDE
   HOMICIDE
-  UNDETERMINED
+  MANNER_UNDETERMINED
 }
 
 enum PaymentType {
@@ -143,6 +131,8 @@ enum PaymentOutcomeType {
 }
 
 enum CauseOfDeathMethodType {
+  PHYSICIAN
+  LAY_REPORTED
   VERBAL_AUTOPSY
   MEDICALLY_CERTIFIED
 }
@@ -154,6 +144,7 @@ input PaymentInput {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+  data: String
 }
 
 type Payment { # -> PaymentReconciliation
@@ -177,44 +168,11 @@ type MedicalPractitioner { # -> Encounter.participant
   lastVisitDate: Date # -> Encounter.participant.preriod.start
 }
 
-enum PrimaryCaregiverType {
-  MOTHER_AND_FATHER
-  MOTHER
-  FATHER
-  INFORMANT
-  LEGAL_GUARDIAN
-  OTHER
-}
-
 enum ParentDetailsType {
   MOTHER_AND_FATHER
   MOTHER_ONLY
   FATHER_ONLY
   NONE
-}
-
-input ReasonsNotApplyingInput {
-  primaryCaregiverType: PrimaryCaregiverType # -> Observation.valueString
-  reasonNotApplying: String # -> Observation.valueString
-  isDeceased: Boolean
-}
-
-input PrimaryCaregiverInput {
-  primaryCaregiver: PersonInput # -> Use for Observation.subject.reference
-  reasonsNotApplying: [ReasonsNotApplyingInput]
-  parentDetailsType: ParentDetailsType # -> Observation.valueString
-}
-
-type ReasonsNotApplying {
-  primaryCaregiverType: PrimaryCaregiverType
-  reasonNotApplying: String
-  isDeceased: Boolean
-}
-
-type PrimaryCaregiver {
-  primaryCaregiver: Person
-  reasonsNotApplying: [ReasonsNotApplying]
-  parentDetailsType: ParentDetailsType
 }
 
 input CommentInput {
@@ -228,6 +186,10 @@ type Comment { # Annotation
   user: User # -> .authorString
   comment: String # -> .text
   createdAt: Date # -> .time
+}
+
+type StatusReason {
+  text: String
 }
 
 input RegWorkflowInput {
@@ -252,9 +214,33 @@ type RegWorkflow { # Task
   timeLogged: Int # -> from metrics
 }
 
+type InputOutput {
+  valueCode: String
+  valueId: String
+  valueString: String
+}
+
+type History {
+  user: User
+  date: Date
+  action: RegStatus
+  statusReason: StatusReason
+  reason: String
+  reinstated: Boolean # -> extension(url='http://opencrvs.org/specs/extension/regReinstated')
+  location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
+  office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
+  dhis2Notification: Boolean # -> identitifier(system='http://opencrvs.org/specs/extension/dhis2_event_identifier')
+  comments: [Comment]
+  input: [InputOutput]
+  output: [InputOutput]
+  certificates: [Certificate]
+  signature: Signature
+}
+
 interface EventRegistration {
   id: ID! # long uuid
   registration: Registration
+  history: [History]
   createdAt: Date
 }
 
@@ -267,16 +253,14 @@ input BirthRegistrationInput {
   informant: RelatedPersonInput
   eventLocation: LocationInput
   birthType: BirthType # Not in BDRIS2
+  questionnaire: [QuestionnaireQuestionInput]
   weightAtBirth: Float # Not in BDRIS2
   attendantAtBirth: AttendantType # Not in BDRIS2
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType
-  presentAtBirthRegistration: BirthRegPresence # Informant in BDRIS2
-  otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int # Not in BDRIS2
   foetalDeathsToMother: Int # Not in BDRIS2
   lastPreviousLiveBirth: Date # Not in BDRIS2
-  primaryCaregiver: PrimaryCaregiverInput # Not in BDRIS2
   createdAt: Date
   updatedAt: Date
 }
@@ -291,18 +275,17 @@ type BirthRegistration implements EventRegistration { # -> Composition
   informant: RelatedPerson # -> .section(code='informant-details').entry.reference
   eventLocation: Location
   birthType: BirthType # -> Observation.valueInteger
+  questionnaire: [QuestionnaireQuestion]
   weightAtBirth: Float # -> Observation.valueQuantity (code=kg)
   attendantAtBirth: AttendantType # -> Observation.valueString
   otherAttendantAtBirth: String
   birthRegistrationType: BirthRegType # -> Observation.valueString
-  presentAtBirthRegistration: BirthRegPresence # -> Observation.valueString
-  otherPresentAtBirthRegistration: String
   childrenBornAliveToMother: Int # -> Observation.valueInteger
   foetalDeathsToMother: Int # -> Observation.valueInteger
   lastPreviousLiveBirth: Date # -> Observation.valueDateTime
-  primaryCaregiver: PrimaryCaregiver
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
+  history: [History]
 }
 
 input DeathRegistrationInput {
@@ -310,13 +293,16 @@ input DeathRegistrationInput {
   registration: RegistrationInput
   # Remember to mark person as deceased
   deceased: PersonInput
-  informant: RelatedPersonInput # -> Use for applicant ->.section(code='informant-details').entry.reference
-  mother: PersonInput # -> Use for applicant ->.section(code='mother-details').entry.reference
-  father: PersonInput # -> Use for applicant ->.section(code='father-details').entry.reference
-  spouse: PersonInput # -> Use for applicant ->.section(code='spouse-details').entry.reference
+  informant: RelatedPersonInput # -> Use for informant ->.section(code='informant-details').entry.reference
+  mother: PersonInput # -> Use for informant ->.section(code='mother-details').entry.reference
+  father: PersonInput # -> Use for informant ->.section(code='father-details').entry.reference
+  spouse: PersonInput # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: LocationInput
+  questionnaire: [QuestionnaireQuestionInput]
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
+  deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
+  causeOfDeathEstablished: String
   causeOfDeath: String # need to store ICD-10? More types of cause of death
   maleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
   femaleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
@@ -332,19 +318,43 @@ type DeathRegistration implements EventRegistration { # -> Composition
   registration: Registration
   # Remember to mark person as deceased
   deceased: Person # -> .section(code='deceased-details').entry.reference
-  informant: RelatedPerson # -> Use for applicant ->.section(code='informant-details').entry.reference
-  mother: Person # -> Use for applicant ->.section(code='mother-details').entry.reference
-  father: Person # -> Use for applicant ->.section(code='father-details').entry.reference
-  spouse: Person # -> Use for applicant ->.section(code='spouse-details').entry.reference
+  informant: RelatedPerson # -> Use for informant ->.section(code='informant-details').entry.reference
+  mother: Person # -> Use for informant ->.section(code='mother-details').entry.reference
+  father: Person # -> Use for informant ->.section(code='father-details').entry.reference
+  spouse: Person # -> Use for informant ->.section(code='spouse-details').entry.reference
   eventLocation: Location
+  questionnaire: [QuestionnaireQuestion]
   mannerOfDeath: MannerOfDeath # -> Observation.valueCodeableConcept
+  deathDescription: String
   causeOfDeathMethod: CauseOfDeathMethodType # -> Observation.valueCodeableConcept
+  causeOfDeathEstablished: String
   causeOfDeath: String # -> Observation.valueCodeableConcept
   maleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
   femaleDependentsOfDeceased: Float # -> Observation.valueCodeableConcept
   medicalPractitioner: MedicalPractitioner # -> Encounter.participant
   createdAt: Date # -> .date($first)
   updatedAt: Date # -> .date
+  history: [History]
+}
+
+input CorrectionValueInput {
+  section: String
+  fieldName: String
+  oldValue: String
+  newValue: String
+}
+
+input CorrectionInput {
+  requester: ID # -> Practitioner ID
+  hasShowedVerifiedDocument: Boolean
+  attestedAndCopied: Boolean
+  noSupportingDocumentationRequired: Boolean
+  payments: [PaymentInput]
+  values: [CorrectionValueInput]
+  location: LocationInput
+  data: String
+  reason: String
+  note: String
 }
 
 input RegistrationInput {
@@ -357,15 +367,18 @@ input RegistrationInput {
   paperFormID: String
   page: String
   book: String
-  contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
+  informantType: InformantType # -> Observation.valueString
+  otherInformantType: String
+  contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String
   status: [RegWorkflowInput]
   type: RegistrationType
   inCompleteFields: String
-  attachments: [AttachmentInput]
+  attachments: [AttachmentInput!]
   certificates: [CertificateInput]
   location: LocationInput
+  correction: CorrectionInput
 }
 
 type Registration { # -> Task
@@ -379,7 +392,9 @@ type Registration { # -> Task
   paperFormID: String # -> .identifier
   page: String # -> .identifier
   book: String # -> .identifier
-  contact: RegistrationContactType # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
+  informantType: InformantType # -> Observation.valueString
+  otherInformantType: String
+  contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString
   status: [RegWorkflow] # -> Task.*
@@ -404,11 +419,16 @@ type Certificate { # -> Document Reference
   data: String # -> .content.attachment.data base64
 }
 
+input QuestionnaireQuestionInput {
+  fieldId: String
+  value: String
+}
+
 input AttachmentInput {
   _fhirID: ID
   contentType: String
   # base64
-  data: String
+  data: String!
   # approved/validated/deleted
   status: String
   originalFileName: String
@@ -417,6 +437,11 @@ input AttachmentInput {
   description: String # -> use for other document type -> .description
   subject: AttachmentSubject
   createdAt: Date
+}
+
+type QuestionnaireQuestion {
+  fieldId: String
+  value: String
 }
 
 type Attachment { # -> DocumentReference
@@ -475,6 +500,11 @@ type CreatedIds {
   registrationNumber: String
 }
 
+type Reinstated {
+  taskEntryResourceID: ID!
+  registrationStatus: RegStatus
+}
+
 type Query {
   fetchBirthRegistration(id: ID!): BirthRegistration
   searchBirthRegistrations(fromDate: Date, toDate: Date): [BirthRegistration]
@@ -495,8 +525,9 @@ type Query {
   fetchRegistration(id: ID!): EventRegistration
   queryPersonByNidIdentifier(dob: String, nid: String, country: String): Person
   fetchRegistrationCountByStatus(
-    locationId: String!
     status: [String]!
+    locationId: String
+    event: String
   ): RegistrationCountResult
 }
 
@@ -512,10 +543,16 @@ type Mutation {
   markBirthAsValidated(id: ID!, details: BirthRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
   markBirthAsRegistered(
     id: ID!
-    details: BirthRegistrationInput
+    details: BirthRegistrationInput!
   ): BirthRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official - internally call update if details exists
   markBirthAsCertified(id: ID!, details: BirthRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced - internally call update if details exists
+  requestBirthRegistrationCorrection(
+    id: ID!
+    details: BirthRegistrationInput!
+  ): ID!
   markEventAsVoided(id: String!, reason: String!, comment: String): ID! # updated status to 'voided' - the registration was captured in error
+  markEventAsReinstated(id: String!): Reinstated # updates status to 'reinstated'
+  markEventAsArchived(id: String!): ID! # updates status to 'archived'
   notADuplicate(id: String!, duplicateId: String!): ID! # removes duplicates from composition
   # DEATH
   createDeathRegistration(details: DeathRegistrationInput!): CreatedIds!
@@ -528,7 +565,11 @@ type Mutation {
   markDeathAsValidated(id: ID!, details: DeathRegistrationInput): ID # updates status to 'validated' - registration agent has validated the declaration
   markDeathAsRegistered(
     id: ID!
-    details: DeathRegistrationInput
+    details: DeathRegistrationInput!
   ): DeathRegistration! # updates status to 'registered' - registration clerk has accepted the declaration, it is now official
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID! # updates status to 'certified' - a printed certificate has been produced
+  requestDeathRegistrationCorrection(
+    id: ID!
+    details: DeathRegistrationInput!
+  ): ID!
 }

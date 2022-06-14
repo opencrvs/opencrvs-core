@@ -20,14 +20,13 @@ const InputHeader = styled.div`
 `
 const ComponentWrapper = styled.span`
   display: flex;
-  max-width: 344px;
 `
 
 const Padding = styled.span`
   padding: 0 4px;
   display: inline-flex;
   align-items: center;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.secondary};
 `
 
@@ -35,14 +34,14 @@ const PostFixPadding = styled.span`
   padding: 0 8px;
   display: inline-flex;
   align-items: center;
-  ${({ theme }) => theme.fonts.bodyStyle};
-  color: ${({ theme }) => theme.colors.menuBackground};
+  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.copy};
 `
 
 const InputDescription = styled.p<{
   ignoreMediaQuery?: boolean
 }>`
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
 
   ${({ ignoreMediaQuery, theme }) => {
@@ -57,6 +56,7 @@ const InputDescription = styled.p<{
 export interface IInputFieldProps {
   id: string
   label?: string
+  className?: string
   helperText?: string
   tooltip?: string
   description?: string
@@ -116,7 +116,7 @@ export class InputField extends React.Component<IInputFieldProps, {}> {
     )
 
     return (
-      <div id={`${id}-form-input`}>
+      <div id={`${id}-form-input`} className={this.props.className}>
         {!hideInputHeader && (
           <InputHeader>
             {label && (

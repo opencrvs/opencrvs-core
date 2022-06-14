@@ -10,10 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as Hapi from '@hapi/hapi'
-import {
-  fetchLocationWiseEventEstimations,
-  getTotalNumberOfRegistrations
-} from '@metrics/features/metrics/metricsGenerator'
+import { fetchLocaitonWiseEventEstimationsGroupByTimeLabel } from '@metrics/features/metrics/metricsGenerator'
 import {
   TIME_FROM,
   TIME_TO,
@@ -24,10 +21,11 @@ import { IAuthHeader } from '@metrics/features/registration/'
 import { fetchChildLocationsByParentId } from '@metrics/api'
 
 interface ILocationWiseEstimation {
-  actualTotalRegistration: number
-  actual45DayRegistration: number
-  estimatedRegistration: number
-  estimated45DayPercentage: number
+  total: number
+  withinTarget: number
+  within1Year: number
+  within5Years: number
+  estimated: number
   locationId: string
   locationName: string
 }
@@ -38,13 +36,16 @@ export async function locationWiseEventEstimationsHandler(
 ) {
   const timeStart = request.query[TIME_FROM]
   const timeEnd = request.query[TIME_TO]
-  const locationId = 'Location/' + request.query[LOCATION_ID]
+  const locationId = request.query[LOCATION_ID]
+    ? 'Location/' + request.query[LOCATION_ID]
+    : undefined
   const event = request.query[EVENT]
   const authHeader: IAuthHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
   const childLocations = await fetchChildLocationsByParentId(
-    locationId,
+    locationId || 'Location/0',
     authHeader
   )
 
@@ -54,24 +55,32 @@ export async function locationWiseEventEstimationsHandler(
       continue
     }
 
-    const estimated45DayMetrics = await fetchLocationWiseEventEstimations(
-      timeStart,
-      timeEnd,
-      `Location/${childLocation.id}`,
-      event,
-      authHeader
-    )
-
-    estimations.push({
-      actualTotalRegistration: await getTotalNumberOfRegistrations(
+    const { results, estimated } =
+      await fetchLocaitonWiseEventEstimationsGroupByTimeLabel(
         timeStart,
         timeEnd,
         `Location/${childLocation.id}`,
-        event
-      ),
-      actual45DayRegistration: estimated45DayMetrics.actualRegistration,
-      estimatedRegistration: estimated45DayMetrics.estimatedRegistration,
-      estimated45DayPercentage: estimated45DayMetrics.estimatedPercentage,
+        event,
+        authHeader
+      )
+
+    estimations.push({
+      total: results.reduce((t, p) => t + p.total, 0),
+      withinTarget: results
+        .filter((p) => p.timeLabel === 'withinTarget')
+        .reduce((t, p) => t + p.total, 0),
+      within1Year: results
+        .filter(
+          (p) =>
+            p.timeLabel === 'withinTarget' ||
+            p.timeLabel === 'withinLate' ||
+            p.timeLabel === 'within1Year'
+        )
+        .reduce((t, p) => t + p.total, 0),
+      within5Years: results
+        .filter((p) => p.timeLabel !== 'after5Years')
+        .reduce((t, p) => t + p.total, 0),
+      estimated: estimated.totalEstimation,
       locationName: childLocation.name || '',
       locationId: childLocation.id
     })

@@ -26,28 +26,20 @@ import styled, {
   ThemeProvider
 } from '@client/styledComponents'
 import { createClient } from '@client/utils/apolloClient'
-import { ReviewDuplicates } from '@client/views/Duplicates/ReviewDuplicates'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
-import { FieldAgentHome } from '@client/views/FieldAgentHome/FieldAgentHome'
-import { Details } from '@client/views/Home/Details'
+import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { FieldAgentList } from '@client/views/Performance/FieldAgentList'
 import { CollectorForm } from '@client/views/PrintCertificate/collectorForm/CollectorForm'
 import { Payment } from '@client/views/PrintCertificate/Payment'
 import { ReviewCertificateAction } from '@client/views/PrintCertificate/ReviewCertificateAction'
 import { VerifyCollector } from '@client/views/PrintCertificate/VerifyCollector'
-import { ApplicationForm } from '@client/views/RegisterForm/ApplicationForm'
+import { DeclarationForm } from '@client/views/RegisterForm/DeclarationForm'
 import { ReviewForm } from '@client/views/RegisterForm/ReviewForm'
-import { RegistrationHome } from '@client/views/RegistrationHome/RegistrationHome'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
-import { SelectInformant } from '@client/views/SelectInformant/SelectInformant'
-import { SelectPrimaryApplicant } from '@client/views/SelectPrimaryApplicant/SelectPrimaryApplicant'
 import { SelectVitalEvent } from '@client/views/SelectVitalEvent/SelectVitalEvent'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
-import { OperationalReport } from '@client/views/SysAdmin/Performance/OperationalReport'
 import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
-import { RegistrationRates } from '@client/views/SysAdmin/Performance/RegistrationRates'
-import { Report } from '@client/views/SysAdmin/Performance/Report'
-import { ReportList } from '@client/views/SysAdmin/Performance/ReportList'
+import { CompletenessRates } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { WorkflowStatus } from '@client/views/SysAdmin/Performance/WorkflowStatus'
 import { TeamSearch } from '@client/views/SysAdmin/Team/TeamSearch'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
@@ -61,8 +53,15 @@ import { ApolloProvider } from 'react-apollo'
 import { Provider } from 'react-redux'
 import { Switch } from 'react-router'
 import { AppStore } from './store'
-import { ConfigHome } from './views/SysAdmin/Config/ConfigHome'
+import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
+import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
+import { RecordAudit } from './views/RecordAudit/RecordAudit'
+import { ChangePhonePage } from './views/Settings/ChangePhonePage'
+import { ApplicationConfig } from './views/SysAdmin/Config/Application'
+import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
+import { FormConfigHome, FormConfigWizard } from './views/SysAdmin/Config/Forms'
+import { Roles } from '@client/utils/authUtils'
 
 interface IAppProps {
   client?: ApolloClient<{}>
@@ -122,12 +121,7 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.HOME}
-                                            component={FieldAgentHome}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.FIELD_AGENT_HOME_TAB}
-                                            component={FieldAgentHome}
+                                            component={OfficeHome}
                                           />
                                           <ProtectedRoute
                                             exact
@@ -141,58 +135,51 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={
-                                              routes.SELECT_BIRTH_PRIMARY_APPLICANT
-                                            }
-                                            component={SelectPrimaryApplicant}
-                                          />
-                                          <ProtectedRoute
-                                            exact
                                             path={routes.SELECT_BIRTH_INFORMANT}
-                                            component={SelectInformant}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={routes.SELECT_DEATH_INFORMANT}
-                                            component={SelectInformant}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={
                                               routes.DRAFT_BIRTH_PARENT_FORM
                                             }
-                                            component={ApplicationForm}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={
                                               routes.DRAFT_BIRTH_PARENT_FORM_PAGE
                                             }
-                                            component={ApplicationForm}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={
                                               routes.DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP
                                             }
-                                            component={ApplicationForm}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={routes.DRAFT_DEATH_FORM}
-                                            component={ApplicationForm}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={routes.DRAFT_DEATH_FORM_PAGE}
-                                            component={ApplicationForm}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={
                                               routes.DRAFT_DEATH_FORM_PAGE_GROUP
                                             }
-                                            component={ApplicationForm}
+                                            component={DeclarationForm}
                                           />
                                           <ProtectedRoute
                                             exact
@@ -211,17 +198,44 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             exact
                                             path={routes.REGISTRAR_HOME}
-                                            component={RegistrationHome}
+                                            component={OfficeHome}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={routes.REGISTRAR_HOME_TAB}
-                                            component={RegistrationHome}
+                                            component={OfficeHome}
                                           />
                                           <ProtectedRoute
                                             exact
-                                            path={routes.CONFIG}
-                                            component={ConfigHome}
+                                            roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                            ]}
+                                            path={routes.CERTIFICATE_CONFIG}
+                                            component={CertificatesConfig}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            roles={[
+                                              Roles.NATIONAL_SYSTEM_ADMIN
+                                            ]}
+                                            path={routes.APPLICATION_CONFIG}
+                                            component={ApplicationConfig}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.FORM_CONFIG_WIZARD}
+                                            component={FormConfigWizard}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={routes.FORM_CONFIG_HOME}
+                                            component={FormConfigHome}
+                                          />
+                                          <ProtectedRoute
+                                            path={
+                                              routes.DECLARATION_RECORD_AUDIT
+                                            }
+                                            component={RecordAudit}
                                           />
                                           <ProtectedRoute
                                             path={routes.SEARCH}
@@ -230,10 +244,6 @@ export class App extends React.Component<IAppProps> {
                                           <ProtectedRoute
                                             path={routes.SEARCH_RESULT}
                                             component={SearchResult}
-                                          />
-                                          <ProtectedRoute
-                                            path={routes.REVIEW_DUPLICATES}
-                                            component={ReviewDuplicates}
                                           />
                                           <ProtectedRoute
                                             exact
@@ -246,6 +256,11 @@ export class App extends React.Component<IAppProps> {
                                             component={VerifyCollector}
                                           />
                                           <ProtectedRoute
+                                            exact
+                                            path={routes.VERIFY_CORRECTOR}
+                                            component={VerifyCorrector}
+                                          />
+                                          <ProtectedRoute
                                             path={routes.REVIEW_CERTIFICATE}
                                             component={ReviewCertificateAction}
                                           />
@@ -256,15 +271,36 @@ export class App extends React.Component<IAppProps> {
                                             component={Payment}
                                           />
                                           <ProtectedRoute
+                                            exact
+                                            path={routes.CERTIFICATE_CORRECTION}
+                                            component={CorrectionForm}
+                                          />
+                                          <ProtectedRoute
+                                            exact
+                                            path={
+                                              routes.CERTIFICATE_CORRECTION_REVIEW
+                                            }
+                                            component={CorrectionReviewForm}
+                                          />
+                                          <ProtectedRoute
+                                            exact
                                             path={routes.SETTINGS}
                                             component={SettingsPage}
                                           />
                                           <ProtectedRoute
-                                            path={routes.APPLICATION_DETAIL}
-                                            component={Details}
+                                            exact
+                                            path={routes.CHANGE_PHONE}
+                                            component={ChangePhonePage}
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.LOCAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.PERFORMANCE_MANAGEMENT
+                                            ]}
                                             path={routes.TEAM_SEARCH}
                                             component={TeamSearch}
                                           />
@@ -302,32 +338,23 @@ export class App extends React.Component<IAppProps> {
                                           />
                                           <ProtectedRoute
                                             exact
+                                            roles={[
+                                              Roles.REGISTRATION_AGENT,
+                                              Roles.LOCAL_REGISTRAR,
+                                              Roles.LOCAL_SYSTEM_ADMIN,
+                                              Roles.NATIONAL_SYSTEM_ADMIN,
+                                              Roles.PERFORMANCE_MANAGEMENT,
+                                              Roles.NATIONAL_REGISTRAR
+                                            ]}
                                             path={routes.PERFORMANCE_HOME}
                                             component={PerformanceHome}
                                           />
                                           <ProtectedRoute
                                             exact
                                             path={
-                                              routes.PERFORMANCE_REPORT_LIST
+                                              routes.EVENT_COMPLETENESS_RATES
                                             }
-                                            component={ReportList}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.PERFORMANCE_REPORT}
-                                            component={Report}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.OPERATIONAL_REPORT}
-                                            component={OperationalReport}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={
-                                              routes.EVENT_REGISTRATION_RATES
-                                            }
-                                            component={RegistrationRates}
+                                            component={CompletenessRates}
                                           />
                                           <ProtectedRoute
                                             exact

@@ -15,7 +15,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { setInitialApplications } from '@client/applications'
+import { setInitialDeclarations } from '@client/declarations'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import {
   getOfflineDataLoaded,
@@ -27,13 +27,12 @@ import {
   showConfigurationErrorNotification,
   hideConfigurationErrorNotification
 } from '@client/notification/actions'
-import { storage } from '@client/storage'
 import { changeLanguage } from '@client/i18n/actions'
 import { Ii18n } from '@client/type/i18n'
-import { USER_DETAILS } from '@client/utils/userUtils'
-import { getDefaultLanguage } from '@client/i18n/utils'
-import { getInitialApplicationsLoaded } from '@client/applications/selectors'
-import { isRegisterFormReady } from '@client/forms/register/application-selectors'
+import { getPreferredLanguage } from '@client/i18n/utils'
+import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
+import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
+import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -41,7 +40,6 @@ const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
   box-sizing: border-box;
-  padding-bottom: 80px;
   justify-content: space-between;
   display: flex;
   flex-direction: column;
@@ -87,20 +85,33 @@ const StyledSpinner = styled(Spinner)`
   position: absolute;
   margin-left: -24px;
   margin-top: -24px;
-  top: 50%;
+  top: calc(50% - 20px);
   left: 50%;
+  width: 40px;
+  height: 40px;
+`
+export const StyledText = styled.div`
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 251px;
+  height: 32px;
+  ${({ theme }) => theme.fonts.h3};
+  color: ${({ theme }) => theme.colors.grey600};
 `
 
 interface IPageProps {
   language?: string
-  initialApplicationsLoaded: boolean
+  initialDeclarationsLoaded: boolean
   offlineDataLoaded: boolean
   registerFormLoaded: boolean
+  formConfigLoaded: boolean
   loadingError: boolean
 }
 
 interface IDispatchProps {
-  setInitialApplications: () => void
+  setInitialDeclarations: () => void
   checkAuth: typeof checkAuth
   showConfigurationErrorNotification: () => void
   hideConfigurationErrorNotification: () => void
@@ -136,35 +147,39 @@ class Component extends React.Component<
   }
 
   async componentDidMount() {
-    const values = parse(this.props.location.search)
+    const language = await getPreferredLanguage()
 
-    this.props.checkAuth(values)
+    this.props.changeLanguage({ language })
 
-    const userDetails = JSON.parse(
-      (await storage.getItem(USER_DETAILS)) || '{}'
-    )
-
-    this.props.changeLanguage({
-      language: userDetails.language || getDefaultLanguage()
-    })
+    this.props.checkAuth()
   }
 
   render() {
     const {
-      initialApplicationsLoaded,
+      initialDeclarationsLoaded,
       offlineDataLoaded,
       registerFormLoaded,
+      formConfigLoaded,
       children
     } = this.props
 
-    if (offlineDataLoaded && initialApplicationsLoaded && registerFormLoaded) {
+    if (
+      offlineDataLoaded &&
+      initialDeclarationsLoaded &&
+      registerFormLoaded &&
+      formConfigLoaded
+    ) {
       return (
-        <div id="readyApplication">
+        <div id="readyDeclaration">
           <StyledPage {...this.props}>{children}</StyledPage>
         </div>
       )
     } else {
-      return <StyledSpinner id="appSpinner" />
+      return (
+        <>
+          <StyledSpinner id="appSpinner" />
+        </>
+      )
     }
   }
 }
@@ -172,15 +187,16 @@ class Component extends React.Component<
 const mapStateToProps = (store: IStoreState): IPageProps => {
   return {
     language: getLanguage(store),
-    initialApplicationsLoaded: getInitialApplicationsLoaded(store),
+    initialDeclarationsLoaded: getInitialDeclarationsLoaded(store),
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store),
-    registerFormLoaded: isRegisterFormReady(store)
+    registerFormLoaded: isRegisterFormReady(store),
+    formConfigLoaded: isFormConfigLoaded(store)
   }
 }
 
 const mapDispatchToProps = {
-  setInitialApplications,
+  setInitialDeclarations,
   checkAuth,
   showConfigurationErrorNotification,
   hideConfigurationErrorNotification,

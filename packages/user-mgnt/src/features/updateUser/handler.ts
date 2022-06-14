@@ -67,11 +67,15 @@ export default async function updateUser(
   }
   existingUser.type = user.type
   if (existingUser.primaryOfficeId !== user.primaryOfficeId) {
-    existingUser.primaryOfficeId = user.primaryOfficeId
-    user.catchmentAreaIds = await getCatchmentAreaIdsByPrimaryOfficeId(
-      user.primaryOfficeId,
-      token
-    )
+    if (request.auth.credentials?.scope?.includes('natlsysadmin')) {
+      existingUser.primaryOfficeId = user.primaryOfficeId
+      user.catchmentAreaIds = await getCatchmentAreaIdsByPrimaryOfficeId(
+        user.primaryOfficeId,
+        token
+      )
+    } else {
+      throw new Error('Location can be changed only by National System Admin')
+    }
   }
   // Updating practitioner and practitioner role in hearth
   const practitioner = createFhirPractitioner(user, false)
@@ -113,8 +117,11 @@ export default async function updateUser(
     await rollbackUpdateUser(
       token,
       existingPractitioner,
-      existingPractitionerRole
+      existingPractitionerRole.entry[0].resource
     )
+    if (err.code === 11000) {
+      return h.response().code(403)
+    }
     // return 400 if there is a validation error when saving to mongo
     return h.response().code(400)
   }

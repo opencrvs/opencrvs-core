@@ -18,7 +18,7 @@ import { Box } from './Box'
 const SubPageContainer = styled.div`
   width: 100%;
   height: calc(100vh - 80px);
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   display: flex;
@@ -37,19 +37,19 @@ const HeaderBlock = styled.div`
   margin-bottom: 1px;
   align-items: center;
 `
-const BackButton = styled(props => <CircleButton {...props} />)`
+const BackButton = styled((props) => <CircleButton {...props} />)`
   background: '#35495d00';
   margin-left: ${({ theme }) => theme.grid.margin}px;
 `
 const MenuTitle = styled.span`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   margin-left: 30px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 `
 const EmptyTitle = styled(MenuTitle)`
-  color: ${({ theme }) => theme.colors.error};
+  color: ${({ theme }) => theme.colors.negative};
 `
 const BodyContainer = styled(Box)`
   width: 100%;

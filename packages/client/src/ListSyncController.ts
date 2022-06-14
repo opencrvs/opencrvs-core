@@ -10,48 +10,63 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { client } from '@client/utils/apolloClient'
-import { REGISTRATION_HOME_QUERY } from '@client/views/RegistrationHome/queries'
+import {
+  REGISTRATION_HOME_QUERY,
+  FIELD_AGENT_HOME_QUERY
+} from '@client/views/OfficeHome/queries'
 
 export async function syncRegistrarWorkqueue(
   locationId: string,
   reviewStatuses: string[],
-  inProgressCount: number,
-  reviewCount: number,
-  rejectCount: number,
-  approvalCount: number,
-  externalValidationCount: number,
-  printCount: number,
+  pageSize: number,
+  isFieldAgent: boolean,
   inProgressSkip: number,
+  healthSystemSkip: number,
   reviewSkip: number,
   rejectSkip: number,
   approvalSkip: number,
   externalValidationSkip: number,
-  printSkip: number
+  printSkip: number,
+  userId?: string
 ) {
-  try {
-    const queryResult = await client.query({
-      query: REGISTRATION_HOME_QUERY,
-      variables: {
-        locationIds: [locationId],
-        count: 10,
-        inProgressCount,
-        reviewCount,
-        rejectCount,
-        approvalCount,
-        externalValidationCount,
-        printCount,
-        reviewStatuses: reviewStatuses,
-        inProgressSkip: inProgressSkip,
-        reviewSkip: reviewSkip,
-        rejectSkip: rejectSkip,
-        approvalSkip: approvalSkip,
-        externalValidationSkip: externalValidationSkip,
-        printSkip: printSkip
-      },
-      fetchPolicy: 'no-cache'
-    })
-    return queryResult.data
-  } catch (exception) {
-    return undefined
+  if (isFieldAgent && userId) {
+    try {
+      const queryResult = await client.query({
+        query: FIELD_AGENT_HOME_QUERY,
+        variables: {
+          userId: userId,
+          locationIds: [locationId],
+          pageSize,
+          reviewSkip: reviewSkip,
+          rejectSkip: rejectSkip
+        },
+        fetchPolicy: 'no-cache'
+      })
+      return queryResult.data
+    } catch (exception) {
+      return undefined
+    }
+  } else {
+    try {
+      const queryResult = await client.query({
+        query: REGISTRATION_HOME_QUERY,
+        variables: {
+          locationIds: [locationId],
+          pageSize,
+          reviewStatuses: reviewStatuses,
+          inProgressSkip: inProgressSkip,
+          healthSystemSkip: healthSystemSkip,
+          reviewSkip: reviewSkip,
+          rejectSkip: rejectSkip,
+          approvalSkip: approvalSkip,
+          externalValidationSkip: externalValidationSkip,
+          printSkip: printSkip
+        },
+        fetchPolicy: 'no-cache'
+      })
+      return queryResult.data
+    } catch (exception) {
+      return undefined
+    }
   }
 }

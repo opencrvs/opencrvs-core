@@ -17,99 +17,55 @@ beforeEach(() => {
   fetch.resetMocks()
 })
 
-describe('fetch birth registration metrics', () => {
-  it('returns an array of birth registraiton metrics', async () => {
+describe('get total metrics', () => {
+  it('returns estimated data for event', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
-        payments: [
+        estimated: {
+          totalEstimation: 263977,
+          maleEstimation: 127633,
+          femaleEstimation: 136838,
+          locationId: 'Location/0',
+          estimationYear: 2022,
+          locationLevel: 'COUNTRY'
+        },
+        results: [
           {
-            locationId: 'fake',
-            total: 0
-          }
-        ],
-        timeFrames: [
-          {
-            locationId: 'fake',
-            regWithin45d: 0,
-            regWithin45dTo1yr: 0,
-            regWithin1yrTo5yr: 0,
-            regOver5yr: 0,
-            total: 0
-          }
-        ],
-        genderBasisMetrics: [
-          {
-            locationId: 'fake',
-            maleUnder18: 0,
-            femaleUnder18: 0,
-            maleOver18: 0,
-            femaleOver18: 0,
-            total: 0
-          }
-        ],
-        estimated45DayMetrics: [
-          {
-            locationId: 'fake',
-            estimatedRegistration: 0,
-            registrationIn45Day: 0,
-            estimationPercentage: 0
+            total: 1,
+            gender: 'male',
+            eventLocationType: 'HEALTH_FACILITY',
+            timeLabel: 'withinTarget',
+            practitionerRole: 'LOCAL_REGISTRAR'
           }
         ]
       })
     )
 
-    const data = await resolvers.Query.fetchRegistrationMetrics(
+    const data = await resolvers.Query.getTotalMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',
         timeEnd: '2019-12-24T18:00:00.000Z',
-        locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9',
-        event: 'birth'
+        event: 'BIRTH'
       }
     )
 
     expect(data).toBeDefined()
-    expect(data.timeFrames).toBeInstanceOf(Object)
-    expect(data.timeFrames.details.length).toBe(1)
-    expect(data.genderBasisMetrics).toBeInstanceOf(Object)
-    expect(data.genderBasisMetrics.details.length).toBe(1)
-    expect(data.payments).toBeInstanceOf(Object)
-    expect(data.payments.details.length).toBe(1)
-    expect(data.genderBasisMetrics).toBeInstanceOf(Object)
-    expect(data.genderBasisMetrics.details.length).toBe(1)
-    expect(data.estimated45DayMetrics).toBeInstanceOf(Object)
-    expect(data.estimated45DayMetrics.details.length).toBe(1)
-  })
-
-  it('returns an empty array of birth registraiton metrics when error is thrown', async () => {
-    fetch.mockReject(new Error('error'))
-    await expect(
-      resolvers.Query.fetchRegistrationMetrics({}, {})
-    ).rejects.toThrowError('Metrics request failed: error')
+    expect(data).toBeInstanceOf(Object)
+    expect(data.results).toHaveLength(1)
   })
 })
-describe('get event estimation metrics', () => {
-  it('returns estimated data for both birth and death', async () => {
+describe('get declarations started metrics', () => {
+  it('returns declarations started', async () => {
     fetch.mockResponseOnce(
       JSON.stringify({
-        birth45DayMetrics: {
-          actualRegistration: 50,
-          estimatedRegistration: 356,
-          estimatedPercentage: 14,
-          malePercentage: 50,
-          femalePercentage: 50
-        },
-        death45DayMetrics: {
-          actualRegistration: 0,
-          estimatedRegistration: 150,
-          estimatedPercentage: 0,
-          malePercentage: 0,
-          femalePercentage: 0
-        }
+        fieldAgentDeclarations: 2,
+        hospitalDeclarations: 2,
+        officeDeclarations: 4
       })
     )
 
-    const data = await resolvers.Query.getEventEstimationMetrics(
+    const data = await resolvers.Query.getDeclarationsStartedMetrics(
       {},
       {
         timeStart: '2019-10-24T18:00:00.000Z',
@@ -119,33 +75,7 @@ describe('get event estimation metrics', () => {
     )
 
     expect(data).toBeDefined()
-    expect(data.birth45DayMetrics).toBeInstanceOf(Object)
-    expect(data.birth45DayMetrics.estimatedPercentage).toBe(14)
-    expect(data.death45DayMetrics).toBeInstanceOf(Object)
-    expect(data.death45DayMetrics.estimatedPercentage).toBe(0)
-  })
-})
-describe('get applications started metrics', () => {
-  it('returns applications started', async () => {
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        fieldAgentApplications: 2,
-        hospitalApplications: 2,
-        officeApplications: 4
-      })
-    )
-
-    const data = await resolvers.Query.getApplicationsStartedMetrics(
-      {},
-      {
-        timeStart: '2019-10-24T18:00:00.000Z',
-        timeEnd: '2019-12-24T18:00:00.000Z',
-        locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9'
-      }
-    )
-
-    expect(data).toBeDefined()
-    expect(data.fieldAgentApplications).toBe(2)
+    expect(data.fieldAgentDeclarations).toBe(2)
   })
 })
 describe('get month wise event estimation metrics', () => {
@@ -153,20 +83,22 @@ describe('get month wise event estimation metrics', () => {
     fetch.mockResponseOnce(
       JSON.stringify([
         {
-          actualTotalRegistration: 120,
-          actual45DayRegistration: 50,
-          estimatedRegistration: 356,
-          estimated45DayPercentage: 14,
-          month: 'January',
-          year: '2020'
+          total: 120,
+          withinTarget: 50,
+          within1Year: 100,
+          within5Years: 300,
+          estimated: 356,
+          month: 0,
+          year: 2020
         },
         {
-          actualTotalRegistration: 10,
-          actual45DayRegistration: 0,
-          estimatedRegistration: 356,
-          estimated45DayPercentage: 0,
-          month: 'February',
-          year: '2020'
+          total: 10,
+          withinTarget: 0,
+          within1Year: 17,
+          within5Years: 34,
+          estimated: 356,
+          month: 1,
+          year: 2020
         }
       ])
     )
@@ -177,13 +109,13 @@ describe('get month wise event estimation metrics', () => {
         timeStart: '2019-10-24T18:00:00.000Z',
         timeEnd: '2019-12-24T18:00:00.000Z',
         locationId: 'b809ac98-2a98-4970-9d64-c92086f887a9',
-        event: 'birth'
+        event: 'BIRTH'
       }
     )
 
     expect(data).toBeDefined()
-    expect(data.details.length).toBe(2)
-    expect(data.total.actualTotalRegistration).toBe(130)
+    expect(data.length).toBe(2)
+    expect(data[0].total).toBe(120)
   })
 })
 describe('get location wise event estimation metrics', () => {
@@ -191,18 +123,20 @@ describe('get location wise event estimation metrics', () => {
     fetch.mockResponseOnce(
       JSON.stringify([
         {
-          actualTotalRegistration: 120,
-          actual45DayRegistration: 50,
-          estimatedRegistration: 356,
-          estimated45DayPercentage: 14,
+          total: 120,
+          withinTarget: 50,
+          within1Year: 100,
+          within5Years: 300,
+          estimated: 356,
           locationName: 'Baniajan Union Parishod',
           locationId: '123'
         },
         {
-          actualTotalRegistration: 10,
-          actual45DayRegistration: 0,
-          estimatedRegistration: 356,
-          estimated45DayPercentage: 0,
+          total: 10,
+          withinTarget: 0,
+          within1Year: 100,
+          within5Years: 310,
+          estimated: 356,
           locationName: 'Atarpar Union Parishod',
           locationId: '123'
         }
@@ -220,9 +154,9 @@ describe('get location wise event estimation metrics', () => {
     )
 
     expect(data).toBeDefined()
-    expect(data.details.length).toBe(2)
-    expect(data.details[0].locationName).toEqual('Baniajan Union Parishod')
-    expect(data.total.actualTotalRegistration).toBe(130)
+    expect(data.length).toBe(2)
+    expect(data[0].locationName).toEqual('Baniajan Union Parishod')
+    expect(data[1].total).toBe(10)
   })
 })
 describe('get practitioner wise time logged metrics', () => {

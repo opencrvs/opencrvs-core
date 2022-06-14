@@ -17,11 +17,9 @@ import {
   checkForDuplicateStatusUpdate
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
 
-export async function modifyTaskBundle(
-  fhirBundle: fhir.Bundle,
-  token: string
-): Promise<fhir.Bundle> {
+export async function modifyTaskBundle(fhirBundle: fhir.Bundle, token: string) {
   if (
     !fhirBundle ||
     !fhirBundle.entry ||
@@ -33,10 +31,13 @@ export async function modifyTaskBundle(
   // Checking for duplicate status update
   await checkForDuplicateStatusUpdate(fhirBundle.entry[0].resource as fhir.Task)
 
-  const taskResource = getTaskResource(fhirBundle) as fhir.Task
+  const taskResource = getTaskResource(fhirBundle)
   const practitioner = await getLoggedInPractitionerResource(token)
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
+
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   /* setting lastRegLocation here */
   await setupLastRegLocation(taskResource, practitioner)

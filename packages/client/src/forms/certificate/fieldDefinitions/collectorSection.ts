@@ -27,11 +27,82 @@ import {
   identityNameMapper,
   identityTypeMapper
 } from '@client/forms/identity'
+import { fieldValidationDescriptorToValidationFunction } from '@client/forms/mappings/deserializer'
 import { conditionals } from '@client/forms/utils'
 import { formMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { validIDNumber } from '@client/utils/validate'
 import { RadioSize } from '@opencrvs/components/lib/forms'
+
+export interface INameField {
+  firstNamesField: string
+  familyNameField: string
+}
+export interface INameFields {
+  [language: string]: INameField
+}
+export interface IVerifyIDCertificateCollectorField {
+  identifierTypeField: string
+  identifierOtherTypeField: string
+  identifierField: string
+  nameFields: INameFields
+  birthDateField?: string
+  nationalityField: string
+}
+
+export interface IVerifyIDCertificateCollector {
+  [collector: string]: IVerifyIDCertificateCollectorField
+}
+
+export interface IVerifyIDCertificateCollectorDefinition {
+  [event: string]: IVerifyIDCertificateCollector
+}
+
+export const verifyIDOnBirthCertificateCollectorDefinition: IVerifyIDCertificateCollectorDefinition =
+  {
+    birth: {
+      mother: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'iD',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        birthDateField: 'motherBirthDate',
+        nationalityField: 'nationality'
+      },
+      father: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'iD',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        birthDateField: 'fatherBirthDate',
+        nationalityField: 'nationality'
+      }
+    },
+    death: {
+      informant: {
+        identifierTypeField: 'iDType',
+        identifierOtherTypeField: 'iDTypeOther',
+        identifierField: 'informantID',
+        nameFields: {
+          en: {
+            firstNamesField: 'firstNamesEng',
+            familyNameField: 'familyNameEng'
+          }
+        },
+        nationalityField: 'nationality'
+      }
+    }
+  }
 
 export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGroup =
   {
@@ -44,6 +115,7 @@ export const certCollectorGroupForBirthAppWithoutFatherDetails: IFormSectionGrou
         type: RADIO_GROUP,
         size: RadioSize.LARGE,
         label: certificateMessages.whoToCollect,
+        hideHeader: true,
         required: true,
         initialValue: '',
         validate: [],
@@ -70,6 +142,7 @@ export const certCollectorGroupForBirthAppWithoutMotherDetails: IFormSectionGrou
         type: RADIO_GROUP,
         size: RadioSize.LARGE,
         label: certificateMessages.whoToCollect,
+        hideHeader: true,
         required: true,
         initialValue: '',
         validate: [],
@@ -96,6 +169,7 @@ export const certCollectorGroupForBirthAppWithParentDetails: IFormSectionGroup =
         type: RADIO_GROUP,
         size: RadioSize.LARGE,
         label: certificateMessages.whoToCollect,
+        hideHeader: true,
         required: true,
         initialValue: '',
         validate: [],
@@ -123,6 +197,7 @@ export const certCollectorGroupForBirthAppWithoutParentDetails: IFormSectionGrou
         type: RADIO_GROUP,
         size: RadioSize.LARGE,
         label: certificateMessages.whoToCollect,
+        hideHeader: true,
         required: true,
         initialValue: '',
         validate: [],
@@ -150,19 +225,16 @@ export const collectBirthCertificateFormSection: IFormSection = {
       error: certificateMessages.certificateOtherCollectorInfoError,
       fields: [
         {
-          name: 'paragraph',
-          type: PARAGRAPH,
-          label: certificateMessages.otherCollectorFormParagraph,
-          initialValue: '',
-          validate: []
-        },
-        {
           name: 'iDType',
           type: SELECT_WITH_OPTIONS,
           label: formMessages.typeOfId,
           required: true,
           initialValue: '',
-          validate: [],
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
           placeholder: formMessages.select,
           options: identityOptions
         },
@@ -172,7 +244,11 @@ export const collectBirthCertificateFormSection: IFormSection = {
           label: formMessages.iDTypeOtherLabel,
           required: true,
           initialValue: '',
-          validate: [],
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
           conditionals: [conditionals.iDType]
         },
         {
@@ -202,7 +278,11 @@ export const collectBirthCertificateFormSection: IFormSection = {
           label: formMessages.iD,
           required: true,
           initialValue: '',
-          validate: [],
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
           conditionals: [conditionals.iDAvailable]
         },
         {
@@ -211,7 +291,11 @@ export const collectBirthCertificateFormSection: IFormSection = {
           label: formMessages.firstName,
           required: true,
           initialValue: '',
-          validate: []
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
         },
         {
           name: 'lastName',
@@ -219,15 +303,23 @@ export const collectBirthCertificateFormSection: IFormSection = {
           label: formMessages.lastName,
           required: true,
           initialValue: '',
-          validate: []
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
         },
         {
           name: 'relationship',
           type: TEXT,
-          label: formMessages.applicantsRelationWithChild,
+          label: formMessages.informantsRelationWithChild,
           required: true,
           initialValue: '',
-          validate: []
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
         }
       ]
     },
@@ -252,7 +344,14 @@ export const collectBirthCertificateFormSection: IFormSection = {
           description: certificateMessages.noLabel,
           initialValue: '',
           required: false,
-          validate: []
+          validate: [],
+          conditionals: [
+            {
+              action: 'hide',
+              expression:
+                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0]?.collector?.noAffidavitAgreement?.length !== 0'
+            }
+          ]
         },
         {
           name: 'noAffidavitAgreement',
@@ -265,6 +364,13 @@ export const collectBirthCertificateFormSection: IFormSection = {
             {
               value: 'AFFIDAVIT',
               label: certificateMessages.noSignedAffidavitAvailable
+            }
+          ],
+          conditionals: [
+            {
+              action: 'hide',
+              expression:
+                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0].collector.affidavitFile !== ""'
             }
           ]
         }
@@ -282,6 +388,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
     {
       id: 'certCollector',
       title: certificateMessages.whoToCollect,
+      conditionals: [conditionals.certCollectorOther],
       error: certificateMessages.certificateCollectorError,
       fields: [
         {
@@ -289,11 +396,16 @@ export const collectDeathCertificateFormSection: IFormSection = {
           type: RADIO_GROUP,
           size: RadioSize.LARGE,
           label: certificateMessages.whoToCollect,
+          hideHeader: true,
           required: true,
           initialValue: true,
-          validate: [],
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
           options: [
-            { value: 'INFORMANT', label: formMessages.applicantName },
+            { value: 'INFORMANT', label: formMessages.informantName },
             { value: 'OTHER', label: formMessages.someoneElse },
             {
               value: 'PRINT_IN_ADVANCE',
@@ -310,19 +422,16 @@ export const collectDeathCertificateFormSection: IFormSection = {
       error: certificateMessages.certificateOtherCollectorInfoError,
       fields: [
         {
-          name: 'paragraph',
-          type: PARAGRAPH,
-          label: certificateMessages.otherCollectorFormParagraph,
-          initialValue: '',
-          validate: []
-        },
-        {
           name: 'iDType',
           type: SELECT_WITH_OPTIONS,
           label: formMessages.typeOfId,
           required: true,
           initialValue: '',
-          validate: [],
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
           placeholder: formMessages.select,
           options: identityOptions
         },
@@ -332,7 +441,11 @@ export const collectDeathCertificateFormSection: IFormSection = {
           label: formMessages.iDTypeOtherLabel,
           required: true,
           initialValue: '',
-          validate: [],
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
           conditionals: [conditionals.iDType]
         },
         {
@@ -358,7 +471,11 @@ export const collectDeathCertificateFormSection: IFormSection = {
           label: formMessages.iD,
           required: true,
           initialValue: '',
-          validate: [],
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ],
           conditionals: [conditionals.iDAvailable]
         },
         {
@@ -367,7 +484,11 @@ export const collectDeathCertificateFormSection: IFormSection = {
           label: formMessages.firstName,
           required: true,
           initialValue: '',
-          validate: []
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
         },
         {
           name: 'lastName',
@@ -375,15 +496,23 @@ export const collectDeathCertificateFormSection: IFormSection = {
           label: formMessages.lastName,
           required: true,
           initialValue: '',
-          validate: []
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
         },
         {
           name: 'relationship',
           type: TEXT,
-          label: formMessages.applicantsRelationWithDeceased,
+          label: formMessages.informantsRelationWithDeceased,
           required: true,
           initialValue: '',
-          validate: []
+          validate: [
+            fieldValidationDescriptorToValidationFunction({
+              operation: 'requiredBasic'
+            })
+          ]
         }
       ]
     },

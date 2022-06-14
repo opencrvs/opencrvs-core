@@ -9,73 +9,67 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { PDFViewer } from '@opencrvs/components/lib/forms'
+import {
+  PrimaryButton,
+  SuccessButton,
+  DangerButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
 import { Check } from '@opencrvs/components/lib/icons'
+import { Content } from '@opencrvs/components/lib/interface/Content'
+
 import {
   ResponsiveModal,
   ActionPageLight
 } from '@opencrvs/components/lib/interface'
 import {
-  IPrintableApplication,
-  IApplicationsState,
-  modifyApplication,
-  writeApplication,
-  storeApplication,
+  IPrintableDeclaration,
+  modifyDeclaration,
+  writeDeclaration,
+  storeDeclaration,
   SUBMISSION_STATUS
-} from '@opencrvs/client/src/applications'
-import { Action, Event, IForm } from '@client/forms'
+} from '@opencrvs/client/src/declarations'
+import { Action, Event, CorrectionSection } from '@client/forms'
 import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
-  goToRegistrarHomeTab as goToRegistrarHomeTabAction,
-  goBack
+  goToHomeTab,
+  goBack,
+  goToCertificateCorrection
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { TAB_ID } from '@client/views/RegistrationHome/tabs/inProgress/inProgressTab'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
+import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import {
   previewCertificate,
   printCertificate
 } from '@client/views/PrintCertificate/PDFUtils'
-import { getEventRegisterForm } from '@client/forms/register/application-selectors'
-import { IOfflineData } from '@client/offline/reducer'
+import { getEventRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   getCountryTranslations,
-  IAvailableCountries,
   isCertificateForPrintInAdvance,
   getEventDate,
   isFreeOfCost,
-  calculatePrice
+  calculatePrice,
+  getRegisteredDate,
+  getRegistrarSignatureHandlebarName
 } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/forms/countries'
-
-export const ActionPageWrapper = styled.div`
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: ${({ theme }) => theme.colors.background};
-  z-index: 4;
-  width: 100%;
-  height: 100%;
-  overflow-y: scroll;
-`
+import { PDFViewer } from '@opencrvs/components/lib/forms'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { hasRegisterScope } from '@client/utils/authUtils'
 
 const CustomTertiaryButton = styled(TertiaryButton)`
   height: 48px;
   &:disabled {
     background: ${({ theme }) => theme.colors.white};
-    color: ${({ theme }) => theme.colors.scrollBarGrey};
+    color: ${({ theme }) => theme.colors.grey300};
   }
 `
 const ButtonWrapper = styled.div`
@@ -89,55 +83,32 @@ const ButtonWrapper = styled.div`
   }
 `
 const PdfWrapper = styled.div`
-  ${({ theme }) => theme.shadows.mistyShadow};
-  background: ${({ theme }) => theme.colors.blueDeepSeaLight};
   display: flex;
+  margin-top: 24px;
+  margin-bottom: 56px;
   height: 100%;
   align-items: center;
   justify-content: center;
-  margin-bottom: 32px;
-`
-
-const Info = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
-  margin-bottom: 30px;
-  color: ${({ theme }) => theme.colors.menuBackground};
-  width: 80%;
-`
-const Title = styled.h4`
-  ${({ theme }) => theme.fonts.h4Style};
-  margin: 0 0 20px 0;
 `
 
 type State = {
   certificatePdf: string | null
   showConfirmationModal: boolean
 }
-type IProps = {
-  event: Event
-  registrationId: string
-  draft: IPrintableApplication
-  userDetails: IUserDetails | null
-  countries: IAvailableCountries[]
-  registerForm: IForm
-  offlineCountryConfig: IOfflineData
-  goBack: typeof goBack
-  modifyApplication: typeof modifyApplication
-  writeApplication: typeof writeApplication
-  goToRegistrarHomeTabAction: typeof goToRegistrarHomeTabAction
-  storeApplication: typeof storeApplication
-}
 
 type IFullProps = IntlShapeProps &
   RouteComponentProps<{}, {}, { isNavigatedInsideApp: boolean }> &
-  IProps & { drafts: IApplicationsState }
+  ReturnType<typeof mapStatetoProps> &
+  typeof mapDispatchToProps
 
 class ReviewCertificateActionComponent extends React.Component<
   IFullProps,
   State
 > {
+  componentRef: React.RefObject<HTMLImageElement>
   constructor(props: IFullProps) {
     super(props)
+    this.componentRef = React.createRef()
     this.state = {
       certificatePdf: null,
       showConfirmationModal: false
@@ -150,9 +121,9 @@ class ReviewCertificateActionComponent extends React.Component<
         this.props.draft,
         this.props.userDetails,
         this.props.offlineCountryConfig,
-        (base64PDF: string) => {
+        (svg: string) => {
           this.setState({
-            certificatePdf: base64PDF
+            certificatePdf: svg
           })
         },
         this.props.countries
@@ -171,25 +142,43 @@ class ReviewCertificateActionComponent extends React.Component<
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
     draft.action = Action.COLLECT_CERTIFICATE
 
+    const registeredDate = getRegisteredDate(draft.data)
     const certificate = draft.data.registration.certificates[0]
     const eventDate = getEventDate(draft.data, draft.event)
     let submittableCertificate
     if (isCertificateForPrintInAdvance(draft)) {
-      if (isFreeOfCost(draft.event, eventDate)) {
-        submittableCertificate = {}
-      } else {
-        const paymentAmount = calculatePrice(draft.event, eventDate)
-        submittableCertificate = {
-          payments: {
-            type: 'MANUAL' as const,
-            total: Number(paymentAmount),
-            amount: Number(paymentAmount),
-            outcome: 'COMPLETED' as const,
-            date: Date.now()
-          }
+      const paymentAmount = calculatePrice(
+        draft.event,
+        eventDate,
+        registeredDate,
+        this.props.offlineCountryConfig
+      )
+      submittableCertificate = {
+        payments: {
+          type: 'MANUAL' as const,
+          total: Number(paymentAmount),
+          amount: Number(paymentAmount),
+          outcome: 'COMPLETED' as const,
+          date: Date.now()
         }
       }
     } else {
+      if (
+        isFreeOfCost(
+          draft.event,
+          eventDate,
+          registeredDate,
+          this.props.offlineCountryConfig
+        )
+      ) {
+        certificate.payments = {
+          type: 'MANUAL' as const,
+          total: 0,
+          amount: 0,
+          outcome: 'COMPLETED' as const,
+          date: Date.now()
+        }
+      }
       submittableCertificate = certificate
     }
     draft.data.registration = {
@@ -202,6 +191,7 @@ class ReviewCertificateActionComponent extends React.Component<
         }
       ]
     }
+
     printCertificate(
       this.props.intl,
       draft,
@@ -209,10 +199,10 @@ class ReviewCertificateActionComponent extends React.Component<
       this.props.offlineCountryConfig,
       this.props.countries
     )
-    this.props.modifyApplication(draft)
-    this.props.writeApplication(draft)
+    this.props.modifyDeclaration(draft)
+    this.props.writeDeclaration(draft)
     this.toggleModal()
-    this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
+    this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
   }
 
   getTitle = () => {
@@ -244,42 +234,55 @@ class ReviewCertificateActionComponent extends React.Component<
     if (navigatedFromInsideApp) {
       this.props.goBack()
     } else {
-      this.props.goToRegistrarHomeTabAction(TAB_ID.readyForPrint)
+      this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
     }
   }
 
   render = () => {
-    const { intl } = this.props
+    const { intl, scope } = this.props
 
     return (
       <ActionPageLight
         id="collector_form"
+        hideBackground
         title={intl.formatMessage(
           certificateMessages.certificateCollectionTitle
         )}
         goBack={this.goBack}
+        goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
       >
-        <Title>{this.getTitle()}</Title>
-        <Info>{intl.formatMessage(certificateMessages.reviewDescription)}</Info>
-
-        <PdfWrapper id="pdfwrapper">
-          <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
-        </PdfWrapper>
-
-        <ButtonWrapper>
-          <PrimaryButton
-            align={0}
-            id="confirm-print"
-            onClick={this.toggleModal}
-            icon={() => <Check />}
-          >
-            {intl.formatMessage(certificateMessages.confirmAndPrint)}
-          </PrimaryButton>
-
-          <CustomTertiaryButton disabled>
-            {intl.formatMessage(buttonMessages.editRecord)}
-          </CustomTertiaryButton>
-        </ButtonWrapper>
+        <Content
+          title={this.getTitle()}
+          subtitle={intl.formatMessage(certificateMessages.reviewDescription)}
+        >
+          <ButtonWrapper>
+            <SuccessButton
+              align={0}
+              id="confirm-print"
+              onClick={this.toggleModal}
+              icon={() => <Check />}
+            >
+              {intl.formatMessage(certificateMessages.confirmAndPrint)}
+            </SuccessButton>
+            {hasRegisterScope(scope) && (
+              <DangerButton
+                onClick={() =>
+                  this.props.goToCertificateCorrection(
+                    this.props.registrationId,
+                    CorrectionSection.Corrector
+                  )
+                }
+              >
+                {intl.formatMessage(buttonMessages.editRecord)}
+              </DangerButton>
+            )}
+          </ButtonWrapper>
+        </Content>
+        {this.state.certificatePdf && (
+          <PdfWrapper id="pdfwrapper">
+            <PDFViewer id="pdfholder" pdfSource={this.state.certificatePdf} />
+          </PdfWrapper>
+        )}
 
         <ResponsiveModal
           id="confirm-print-modal"
@@ -314,7 +317,7 @@ const getEvent = (eventType: string | undefined) => {
 }
 
 const getDraft = (
-  drafts: IPrintableApplication[],
+  drafts: IPrintableDeclaration[],
   registrationId: string,
   eventType: string
 ) =>
@@ -323,38 +326,59 @@ const getDraft = (
     id: '',
     data: {},
     event: getEvent(eventType)
-  } as IPrintableApplication)
+  } as IPrintableDeclaration)
 
 function mapStatetoProps(
   state: IStoreState,
   props: RouteComponentProps<{ registrationId: string; eventType: string }>
 ) {
   const { registrationId, eventType } = props.match.params
-  const applications = state.applicationsState
-    .applications as IPrintableApplication[]
+  const declarations = state.declarationsState
+    .declarations as IPrintableDeclaration[]
 
-  const draft = getDraft(applications, registrationId, eventType)
+  const draft = getDraft(declarations, registrationId, eventType)
   const event = getEvent(draft.event)
+  const offlineCountryConfig = getOfflineData(state)
+  const signatureKey = getRegistrarSignatureHandlebarName(
+    offlineCountryConfig,
+    event
+  )
 
   return {
     event,
     registrationId,
-    draft,
+    draft: {
+      ...draft,
+      data: {
+        ...draft.data,
+        template: {
+          ...draft.data.template,
+          [signatureKey]:
+            !draft.data.template?.[signatureKey] ||
+            isCertificateForPrintInAdvance(draft)
+              ? ''
+              : draft.data.template[signatureKey]
+        }
+      }
+    },
+    scope: getScope(state),
     countries: getCountryTranslations(state.i18n.languages, countries),
-    drafts: state.applicationsState,
     userDetails: getUserDetails(state),
-    offlineCountryConfig: getOfflineData(state),
+    offlineCountryConfig,
     registerForm: getEventRegisterForm(state, event)
   }
 }
+
 const mapDispatchToProps = {
-  modifyApplication,
-  writeApplication,
-  goToRegistrarHomeTabAction,
-  storeApplication,
-  goBack
+  modifyDeclaration,
+  writeDeclaration,
+  goToHomeTab,
+  storeDeclaration,
+  goBack,
+  goToCertificateCorrection
 }
+
 export const ReviewCertificateAction = connect(
   mapStatetoProps,
   mapDispatchToProps
-)(injectIntl<'intl', IFullProps>(ReviewCertificateActionComponent))
+)(injectIntl(ReviewCertificateActionComponent))

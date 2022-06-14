@@ -19,11 +19,11 @@ import {
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
 import {
-  IApplication,
+  IDeclaration,
   IPayload,
   SUBMISSION_STATUS,
   DOWNLOAD_STATUS
-} from '@client/applications'
+} from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { ResponsiveModal } from '@opencrvs/components/lib/interface'
@@ -33,20 +33,21 @@ import * as React from 'react'
 
 interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   id?: string
-  draftApplication?: boolean
-  completeApplication: boolean
-  applicationToBeValidated?: boolean
-  applicationToBeRegistered?: boolean
-  alreadyRejectedApplication: boolean
-  application: IApplication
-  submitApplicationAction: (
-    application: IApplication,
+  draftDeclaration?: boolean
+  completeDeclaration: boolean
+  totalFileSizeExceeded: boolean
+  declarationToBeValidated?: boolean
+  declarationToBeRegistered?: boolean
+  alreadyRejectedDeclaration: boolean
+  declaration: IDeclaration
+  submitDeclarationAction: (
+    declaration: IDeclaration,
     submissionStatus: string,
     action: string,
     payload?: IPayload,
     downloadStatus?: string
   ) => void
-  rejectApplicationAction?: () => void
+  rejectDeclarationAction?: () => void
 }
 
 const Container = styled.div`
@@ -71,30 +72,31 @@ const Content = styled.div`
 const UnderLayBackground = styled.div<{ background: string }>`
   background-color: ${({ background, theme }) =>
     background === 'success'
-      ? theme.colors.success
+      ? theme.colors.positive
       : background === 'error'
-      ? theme.colors.error
+      ? theme.colors.negative
       : theme.colors.primary};
   position: absolute;
+  border-radius: 4px;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0.16;
+  opacity: 0.1;
 `
 
 const Title = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle}
+  ${({ theme }) => theme.fonts.h4}
   margin-bottom: 8px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bodyBoldStyle}
+    ${({ theme }) => theme.fonts.bold16}
   }
 `
 const Description = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   margin-bottom: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    ${({ theme }) => theme.fonts.bodyStyle}
+    ${({ theme }) => theme.fonts.reg16}
   }
 `
 
@@ -113,20 +115,20 @@ const ActionContainer = styled.div`
 `
 
 enum ACTION {
-  APPLICATION_TO_BE_DECLARED = 'APPLICATION_TO_BE_DECLARED',
-  APPLICATION_TO_BE_VALIDATED = 'APPLICATION_TO_BE_VALIDATED',
-  APPLICATION_TO_BE_REGISTERED = 'APPLICATION_TO_BE_REGISTERED'
+  DECLARATION_TO_BE_DECLARED = 'DECLARATION_TO_BE_DECLARED',
+  DECLARATION_TO_BE_VALIDATED = 'DECLARATION_TO_BE_VALIDATED',
+  DECLARATION_TO_BE_REGISTERED = 'DECLARATION_TO_BE_REGISTERED'
 }
 
 const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
-  [String(ACTION.APPLICATION_TO_BE_DECLARED)]: {
+  [String(ACTION.DECLARATION_TO_BE_DECLARED)]: {
     draftStatus: {
       true: {
         completionStatus: {
           true: {
             title: {
               message: messages.reviewActionTitle,
-              payload: { completeApplication: true }
+              payload: { completeDeclaration: true }
             },
             description: {
               message: messages.reviewActionDescriptionComplete
@@ -134,18 +136,18 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
             modal: {
               title: {
                 message: messages.submitConfirmationTitle,
-                payload: { completeApplication: true }
+                payload: { completeDeclaration: true }
               },
               description: {
                 message: messages.submitConfirmationDesc,
-                payload: { completeApplication: true }
+                payload: { completeDeclaration: true }
               }
             }
           },
           false: {
             title: {
               message: messages.reviewActionTitle,
-              payload: { completeApplication: false }
+              payload: { completeDeclaration: false }
             },
             description: {
               message: messages.reviewActionDescriptionIncomplete
@@ -153,11 +155,11 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
             modal: {
               title: {
                 message: messages.submitConfirmationTitle,
-                payload: { completeApplication: false }
+                payload: { completeDeclaration: false }
               },
               description: {
                 message: messages.submitConfirmationDesc,
-                payload: { completeApplication: false }
+                payload: { completeDeclaration: false }
               }
             }
           }
@@ -165,7 +167,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
       }
     }
   },
-  [String(ACTION.APPLICATION_TO_BE_VALIDATED)]: {
+  [String(ACTION.DECLARATION_TO_BE_VALIDATED)]: {
     draftStatus: {
       true: {
         completionStatus: {
@@ -180,18 +182,18 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
             modal: {
               title: {
                 message: messages.validateConfirmationTitle,
-                payload: { completeApplication: true }
+                payload: { completeDeclaration: true }
               },
               description: {
                 message: messages.validateConfirmationDesc,
-                payload: { completeApplication: true }
+                payload: { completeDeclaration: true }
               }
             }
           },
           false: {
             title: {
               message: messages.reviewActionTitle,
-              payload: { completeApplication: false }
+              payload: { completeDeclaration: false }
             },
             description: {
               message: messages.approvalActionDescriptionIncomplete
@@ -212,18 +214,18 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
             modal: {
               title: {
                 message: messages.validateConfirmationTitle,
-                payload: { completeApplication: true }
+                payload: { completeDeclaration: true }
               },
               description: {
                 message: messages.validateConfirmationDesc,
-                payload: { completeApplication: true }
+                payload: { completeDeclaration: true }
               }
             }
           },
           false: {
             title: {
               message: messages.reviewActionTitle,
-              payload: { completeApplication: false }
+              payload: { completeDeclaration: false }
             },
             description: {
               message: messages.approvalActionDescriptionIncomplete
@@ -233,14 +235,14 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
       }
     }
   },
-  [String(ACTION.APPLICATION_TO_BE_REGISTERED)]: {
+  [String(ACTION.DECLARATION_TO_BE_REGISTERED)]: {
     draftStatus: {
       true: {
         completionStatus: {
           true: {
             title: {
               message: messages.reviewActionTitle,
-              payload: { completeApplication: true }
+              payload: { completeDeclaration: true }
             },
             description: {
               message: messages.registerActionDescriptionComplete
@@ -257,7 +259,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           false: {
             title: {
               message: messages.reviewActionTitle,
-              payload: { completeApplication: false }
+              payload: { completeDeclaration: false }
             },
             description: {
               message: messages.registerActionDescriptionIncomplete
@@ -286,7 +288,7 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
           false: {
             title: {
               message: messages.reviewActionTitle,
-              payload: { completeApplication: false }
+              payload: { completeDeclaration: false }
             },
             description: {
               message: messages.registerActionDescriptionIncomplete
@@ -314,32 +316,33 @@ class ReviewActionComponent extends React.Component<
   render() {
     const {
       id,
-      applicationToBeValidated,
-      applicationToBeRegistered,
-      alreadyRejectedApplication,
-      completeApplication,
-      application,
-      submitApplicationAction,
-      draftApplication,
-      rejectApplicationAction,
+      declarationToBeValidated,
+      declarationToBeRegistered,
+      alreadyRejectedDeclaration,
+      completeDeclaration,
+      totalFileSizeExceeded,
+      declaration,
+      submitDeclarationAction,
+      draftDeclaration,
+      rejectDeclarationAction,
       intl
     } = this.props
 
-    const background = !completeApplication
+    const background = !completeDeclaration
       ? 'error'
-      : draftApplication
+      : draftDeclaration
       ? 'success'
       : ''
-    const action = applicationToBeRegistered
-      ? ACTION.APPLICATION_TO_BE_REGISTERED
-      : applicationToBeValidated
-      ? ACTION.APPLICATION_TO_BE_VALIDATED
-      : ACTION.APPLICATION_TO_BE_DECLARED
+    const action = declarationToBeRegistered
+      ? ACTION.DECLARATION_TO_BE_REGISTERED
+      : declarationToBeValidated
+      ? ACTION.DECLARATION_TO_BE_VALIDATED
+      : ACTION.DECLARATION_TO_BE_DECLARED
 
     const actionContent =
-      (ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftApplication)] &&
-        ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftApplication)]
-          .completionStatus[String(completeApplication)]) ||
+      (ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftDeclaration)] &&
+        ACTION_TO_CONTENT_MAP[action].draftStatus[String(draftDeclaration)]
+          .completionStatus[String(completeDeclaration)]) ||
       null
     return !actionContent ? null : (
       <Container id={id}>
@@ -353,26 +356,26 @@ class ReviewActionComponent extends React.Component<
           </Title>
           <Description>
             {intl.formatMessage(actionContent.description.message, {
-              eventType: application.event
+              eventType: declaration.event
             })}
           </Description>
           <ActionContainer>
-            {applicationToBeRegistered ? (
+            {declarationToBeRegistered ? (
               <SuccessButton
-                id="registerApplicationBtn"
+                id="registerDeclarationBtn"
                 icon={() => <Check />}
                 onClick={this.toggleSubmitModalOpen}
-                disabled={!completeApplication}
+                disabled={!completeDeclaration || totalFileSizeExceeded}
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(buttonMessages.register)}
               </SuccessButton>
-            ) : applicationToBeValidated ? (
+            ) : declarationToBeValidated ? (
               <SuccessButton
-                id="validateApplicationBtn"
+                id="validateDeclarationBtn"
                 icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
-                disabled={!completeApplication}
+                disabled={!completeDeclaration || totalFileSizeExceeded}
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(buttonMessages.sendForApproval)}
@@ -382,23 +385,23 @@ class ReviewActionComponent extends React.Component<
                 id="submit_form"
                 icon={() => <Upload />}
                 onClick={this.toggleSubmitModalOpen}
-                disabled={false}
+                disabled={totalFileSizeExceeded}
                 align={ICON_ALIGNMENT.LEFT}
               >
                 {intl.formatMessage(
-                  completeApplication
+                  completeDeclaration
                     ? buttonMessages.sendForReview
                     : buttonMessages.sendIncomplete
                 )}
               </PrimaryButton>
             )}
 
-            {rejectApplicationAction && !alreadyRejectedApplication && (
+            {rejectDeclarationAction && !alreadyRejectedDeclaration && (
               <DangerButton
-                id="rejectApplicationBtn"
+                id="rejectDeclarationBtn"
                 align={ICON_ALIGNMENT.LEFT}
                 icon={() => <Cross color="currentColor" />}
-                onClick={rejectApplicationAction}
+                onClick={rejectDeclarationAction}
               >
                 {intl.formatMessage(buttonMessages.reject)}
               </DangerButton>
@@ -409,7 +412,7 @@ class ReviewActionComponent extends React.Component<
           <ResponsiveModal
             title={intl.formatMessage(actionContent.modal.title.message, {
               ...actionContent.modal.title.payload,
-              event: application.event
+              event: declaration.event
             })}
             responsive={false}
             autoHeight={true}
@@ -430,30 +433,30 @@ class ReviewActionComponent extends React.Component<
                 key="submit"
                 id="submit_confirm"
                 onClick={() =>
-                  draftApplication
-                    ? submitApplicationAction(
-                        application,
+                  draftDeclaration
+                    ? submitDeclarationAction(
+                        declaration,
                         SUBMISSION_STATUS.READY_TO_SUBMIT,
                         Action.SUBMIT_FOR_REVIEW,
                         undefined,
                         DOWNLOAD_STATUS.DOWNLOADED
                       )
-                    : applicationToBeRegistered
-                    ? submitApplicationAction(
-                        application,
+                    : declarationToBeRegistered
+                    ? submitDeclarationAction(
+                        declaration,
                         SUBMISSION_STATUS.READY_TO_REGISTER,
-                        Action.REGISTER_APPLICATION
+                        Action.REGISTER_DECLARATION
                       )
-                    : submitApplicationAction(
-                        application,
+                    : submitDeclarationAction(
+                        declaration,
                         SUBMISSION_STATUS.READY_TO_APPROVE,
-                        Action.APPROVE_APPLICATION
+                        Action.APPROVE_DECLARATION
                       )
                 }
               >
-                {applicationToBeRegistered
+                {declarationToBeRegistered
                   ? intl.formatMessage(buttonMessages.register)
-                  : applicationToBeValidated
+                  : declarationToBeValidated
                   ? intl.formatMessage(buttonMessages.send)
                   : intl.formatMessage(buttonMessages.send)}
               </PrimaryButton>
@@ -463,7 +466,7 @@ class ReviewActionComponent extends React.Component<
           >
             {intl.formatMessage(actionContent.modal.description.message, {
               ...actionContent.modal.description.payload,
-              event: application.event
+              event: declaration.event
             })}
           </ResponsiveModal>
         )}

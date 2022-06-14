@@ -9,35 +9,45 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { EXPECTED_BIRTH_REGISTRATION_IN_DAYS } from '@metrics/constants'
 import {
   FEMALE,
   MALE,
-  WITHIN_1_YEAR,
-  WITHIN_45_DAYS,
-  WITHIN_45_DAYS_TO_1_YEAR
+  WITHIN_1_YEAR
 } from '@metrics/features/metrics/constants'
 import {
-  ageIntervals,
   calculateInterval,
   fetchEstimateByLocation,
-  fetchEstimateFor45DaysByLocationId,
+  fetchEstimateForTargetDaysByLocationId,
   generateEmptyBirthKeyFigure,
   IPoint,
   LABEL_FOMRAT,
   Location,
   EVENT_TYPE,
-  fillEmptyDataArrayByKey
+  fillEmptyDataArrayByKey,
+  getRegistrationTargetDays
 } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
 import { query } from '@metrics/influxdb/client'
-import * as moment from 'moment'
-
+import { format } from 'date-fns'
 interface IGroupedByGender {
   total: number
   gender: string
 }
 
+interface IGroupByTimeLabel {
+  total: number
+  timeLabel: string
+}
+interface IGroupByEventDate {
+  total: number
+  dateLabel: string
+  timeLabel: string
+}
+
+interface IMetricsTotalGroup extends IGroupedByGender {
+  practitionerRole: string
+  timeLabel: string
+}
 export interface IBirthKeyFigures {
   label: string
   value: number
@@ -60,9 +70,9 @@ export interface IEstimation {
   estimationYear: number
 }
 
-export interface IRegistrationIn45DayEstimation {
+export interface IRegistrationInTargetDayEstimation {
   locationId: string
-  registrationIn45Day: number
+  registrationInTargetDay: number
   estimatedRegistration: number
   estimationYear: number
   estimationLocationLevel: string
@@ -90,23 +100,6 @@ interface IGenderBasisPoint {
   locationLevel3?: string
   locationLevel4?: string
   locationLevel5?: string
-}
-
-export async function regByAge(timeStart: string, timeEnd: string) {
-  const metricsData: any[] = []
-  for (const ageInterval of ageIntervals) {
-    const points = await query(
-      // tslint:disable-next-line
-      `SELECT COUNT(ageInDays) FROM birth_reg WHERE time > ${timeStart} AND time <= ${timeEnd} AND ageInDays > ${ageInterval.minAgeInDays} AND ageInDays <= ${ageInterval.maxAgeInDays}`
-    )
-
-    metricsData.push({
-      label: ageInterval.title,
-      value: (points && points.length > 0 && points[0].count) || 0
-    })
-  }
-
-  return metricsData
 }
 
 type Payment = {
@@ -149,29 +142,31 @@ const birthRegWithinTimeFramesQuery = (
   timeEnd: string,
   locationId: string,
   currentLocationLevel: string,
-  lowerLocationLevel: string
+  lowerLocationLevel: string,
+  birthRegistrationTargetInDays: number
 ): string => {
+  const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = birthRegistrationTargetInDays
   return `SELECT
-  SUM(within45Days) AS regWithin45d,
-  SUM(within45DTo1Yr) AS regWithin45dTo1yr,
+  SUM(withinTargetDays) AS regWithinTargetd,
+  SUM(withinTargetDTo1Yr) AS regWithinTargetdTo1yr,
   SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
   SUM(over5Yr) AS regOver5yr
  FROM (
-   SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
+   SELECT withinTargetDays, withinTargetDTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
    FROM (
-    SELECT COUNT(ageInDays) AS within45Days FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    SELECT COUNT(ageInDays) AS withinTargetDays FROM birth_registration WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND ageInDays > -1 AND ageInDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
-    SELECT COUNT(ageInDays) AS within45DTo1Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    SELECT COUNT(ageInDays) AS withinTargetDTo1Yr FROM birth_registration WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND ageInDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ageInDays <= 365 AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
-    SELECT COUNT(ageInDays) AS within1YrTo5Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    SELECT COUNT(ageInDays) AS within1YrTo5Yr FROM birth_registration WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND ageInDays > 366 AND ageInDays <= 1825 AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
-    SELECT COUNT(ageInDays) AS over5Yr FROM birth_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    SELECT COUNT(ageInDays) AS over5Yr FROM birth_registration WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND ageInDays > 1826 AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ) FILL(0)
@@ -184,29 +179,31 @@ const deathRegWithinTimeFramesQuery = (
   timeEnd: string,
   locationId: string,
   currentLocationLevel: string,
-  lowerLocationLevel: string
+  lowerLocationLevel: string,
+  deathRegistrationTargetInDays: number
 ): string => {
+  const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = deathRegistrationTargetInDays
   return `SELECT
-  SUM(within45Days) AS regWithin45d,
-  SUM(within45DTo1Yr) AS regWithin45dTo1yr,
+  SUM(withinTargetDays) AS regWithinTargetd,
+  SUM(withinTargetDTo1Yr) AS regWithinTargetdTo1yr,
   SUM(within1YrTo5Yr) AS regWithin1yrTo5yr,
   SUM(over5Yr) AS regOver5yr
  FROM (
-   SELECT within45Days, within45DTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
+   SELECT withinTargetDays, withinTargetDTo1Yr, within1YrTo5Yr, over5Yr, ${lowerLocationLevel}
    FROM (
-    SELECT COUNT(deathDays) AS within45Days FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    SELECT COUNT(deathDays) AS withinTargetDays FROM death_registration WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND deathDays > -1 AND deathDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
-    SELECT COUNT(deathDays) AS within45DTo1Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    SELECT COUNT(deathDays) AS withinTargetDTo1Yr FROM death_registration WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND deathDays > ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} AND deathDays <= 365 AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
-    SELECT COUNT(deathDays) AS within1YrTo5Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    SELECT COUNT(deathDays) AS within1YrTo5Yr FROM death_registration WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND deathDays > 366 AND deathDays <= 1825 AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ), (
-    SELECT COUNT(deathDays) AS over5Yr FROM death_reg WHERE time > '${timeStart}' AND time <= '${timeEnd}'
+    SELECT COUNT(deathDays) AS over5Yr FROM death_registration WHERE time > '${timeStart}' AND time <= '${timeEnd}'
   AND deathDays > 1826 AND ${currentLocationLevel}='${locationId}'
     GROUP BY ${lowerLocationLevel}
    ) FILL(0)
@@ -221,17 +218,19 @@ export async function fetchRegWithinTimeFrames(
   currentLocationLevel: string,
   lowerLocationLevel: string,
   event: string,
-  childLocationIds: Array<string>
+  childLocationIds: Array<string>,
+  registrationTargetInDays: number
 ) {
   let queryString = ''
-
+  //const registrationTargetInDays = await getRegistrationTargetDays(event)
   if (event === EVENT_TYPE.BIRTH) {
     queryString = birthRegWithinTimeFramesQuery(
       timeStart,
       timeEnd,
       locationId,
       currentLocationLevel,
-      lowerLocationLevel
+      lowerLocationLevel,
+      registrationTargetInDays
     )
   } else if (event === EVENT_TYPE.DEATH) {
     queryString = deathRegWithinTimeFramesQuery(
@@ -239,21 +238,26 @@ export async function fetchRegWithinTimeFrames(
       timeEnd,
       locationId,
       currentLocationLevel,
-      lowerLocationLevel
+      lowerLocationLevel,
+      registrationTargetInDays
     )
   }
 
   const timeFramePoints = await query(queryString)
 
   const dataFromInflux = timeFramePoints.map((point: any) => {
-    const { regWithin45d, regWithin45dTo1yr, regWithin1yrTo5yr, regOver5yr } =
-      point
+    const {
+      regWithinTargetd,
+      regWithinTargetdTo1yr,
+      regWithin1yrTo5yr,
+      regOver5yr
+    } = point
     const total =
-      regWithin45d + regWithin45dTo1yr + regWithin1yrTo5yr + regOver5yr
+      regWithinTargetd + regWithinTargetdTo1yr + regWithin1yrTo5yr + regOver5yr
     return {
       locationId: point[lowerLocationLevel],
-      regWithin45d,
-      regWithin45dTo1yr,
+      regWithinTargetd,
+      regWithinTargetdTo1yr,
       regWithin1yrTo5yr,
       regOver5yr,
       total
@@ -262,8 +266,8 @@ export async function fetchRegWithinTimeFrames(
 
   const placeholder = {
     total: 0,
-    regWithin45d: 0,
-    regWithin45dTo1yr: 0,
+    regWithinTargetd: 0,
+    regWithinTargetdTo1yr: 0,
     regWithin1yrTo5yr: 0,
     regOver5yr: 0
   }
@@ -288,7 +292,8 @@ export async function getCurrentAndLowerLocationLevels(
   locationId: string,
   event: EVENT_TYPE
 ): Promise<ICurrentAndLowerLocationLevels> {
-  const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const allPointsContainingLocationId = await query(
     `SELECT LAST(*) FROM ${measurement} WHERE time > '${timeStart}' AND time <= '${timeEnd}'
       AND ( officeLocation = '${locationId}'
@@ -333,12 +338,15 @@ export async function getCurrentAndLowerLocationLevels(
   }
 }
 
-export const regWithin45Days = async (timeStart: string, timeEnd: string) => {
+export const regWithinTargetDays = async (
+  timeStart: string,
+  timeEnd: string
+) => {
   const interval = calculateInterval(timeStart, timeEnd)
   const points = await query(
     `
       SELECT COUNT(ageInDays) AS count
-        FROM birth_reg
+        FROM birth_registration
       WHERE time >= ${timeStart} AND time <= ${timeEnd}
         GROUP BY time(${interval})
     `
@@ -355,7 +363,7 @@ export const regWithin45Days = async (timeStart: string, timeEnd: string) => {
   return (
     (points &&
       points.map((point: IPoint) => ({
-        label: moment(point.time).format(label),
+        label: format(new Date(point.time), label),
         value: point.count,
         totalEstimate: total.count
       }))) ||
@@ -369,7 +377,7 @@ export async function fetchKeyFigures(
   location: Location,
   authHeader: IAuthHeader
 ) {
-  const estimatedFigureFor45Days = await fetchEstimateByLocation(
+  const estimatedFigureForTargetDays = await fetchEstimateByLocation(
     location,
     EVENT_TYPE.BIRTH,
     authHeader,
@@ -378,12 +386,17 @@ export async function fetchKeyFigures(
   )
 
   const keyFigures: IBirthKeyFigures[] = []
-  const queryLocationId = `Location/${estimatedFigureFor45Days.locationId}`
+  const queryLocationId = `Location/${estimatedFigureForTargetDays.locationId}`
+
+  const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
+    EVENT_TYPE.BIRTH,
+    authHeader.Authorization
+  )
 
   /* Populating < 45D data */
-  const within45DaysData: IGroupedByGender[] = await query(
+  const withinTargetDaysData: IGroupedByGender[] = await query(
     `SELECT COUNT(ageInDays) AS total
-      FROM birth_reg
+      FROM birth_registration
     WHERE time >= ${timeStart}
       AND time <= ${timeEnd}
       AND ( locationLevel2 = '${queryLocationId}'
@@ -393,11 +406,15 @@ export async function fetchKeyFigures(
       AND ageInDays <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}
     GROUP BY gender`
   )
+  const WITHIN_TARGET_DAYS = `DAYS_0_TO_${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}`
+  const WITHIN_TARGET_DAYS_TO_1_YEAR = `DAYS_${
+    EXPECTED_BIRTH_REGISTRATION_IN_DAYS + 1
+  }_TO_365`
   keyFigures.push(
     populateBirthKeyFigurePoint(
-      WITHIN_45_DAYS,
-      within45DaysData,
-      estimatedFigureFor45Days.totalEstimation
+      WITHIN_TARGET_DAYS,
+      withinTargetDaysData,
+      estimatedFigureForTargetDays.totalEstimation
     )
   )
   /* Populating > 45D and < 365D data */
@@ -410,7 +427,7 @@ export async function fetchKeyFigures(
   )
   const within1YearData: IGroupedByGender[] = await query(
     `SELECT COUNT(ageInDays) AS total
-      FROM birth_reg
+      FROM birth_registration
     WHERE time >= ${timeStart}
       AND time <= ${timeEnd}
       AND ( locationLevel2 = '${queryLocationId}'
@@ -423,15 +440,15 @@ export async function fetchKeyFigures(
   )
   keyFigures.push(
     populateBirthKeyFigurePoint(
-      WITHIN_45_DAYS_TO_1_YEAR,
+      WITHIN_TARGET_DAYS_TO_1_YEAR,
       within1YearData,
       estimatedFigureFor1Year.totalEstimation
     )
   )
   /* Populating < 365D data */
   let fullData: IGroupedByGender[] = []
-  if (within45DaysData) {
-    fullData = fullData.concat(within45DaysData)
+  if (withinTargetDaysData) {
+    fullData = fullData.concat(withinTargetDaysData)
   }
   if (within1YearData) {
     fullData = fullData.concat(within1YearData)
@@ -506,7 +523,7 @@ const birthGenderBasisMetricsQuery = (
     SELECT under18, over18, gender, ${locationLevel} FROM (
       SELECT
         COUNT(ageInDays) AS under18
-      FROM birth_reg
+      FROM birth_registration
       WHERE ageInDays < 6574
        AND time > '${timeFrom}'
        AND time <= '${timeTo}'
@@ -515,7 +532,7 @@ const birthGenderBasisMetricsQuery = (
     ), (
       SELECT
         COUNT(ageInDays) AS over18
-      FROM birth_reg
+      FROM birth_registration
       WHERE ageInDays >= 6574
        AND time > '${timeFrom}'
        AND time <= '${timeTo}'
@@ -542,7 +559,7 @@ const deathGenderBasisMetricsQuery = (
     SELECT under18, over18, gender, ${locationLevel} FROM (
       SELECT
         COUNT(ageInYears) AS under18
-      FROM death_reg
+      FROM death_registration
       WHERE ageInYears < 18
        AND time > '${timeFrom}'
        AND time <= '${timeTo}'
@@ -551,7 +568,7 @@ const deathGenderBasisMetricsQuery = (
     ), (
       SELECT
         COUNT(ageInYears) AS over18
-      FROM death_reg
+      FROM death_registration
       WHERE ageInYears >= 18
        AND time > '${timeFrom}'
        AND time <= '${timeTo}'
@@ -615,7 +632,7 @@ export async function fetchGenderBasisMetrics(
   return genderBasisData
 }
 
-export async function fetchEstimated45DayMetrics(
+export async function fetchEstimatedTargetDayMetrics(
   timeFrom: string,
   timeTo: string,
   currLocation: string,
@@ -623,22 +640,26 @@ export async function fetchEstimated45DayMetrics(
   locationLevel: string,
   event: EVENT_TYPE,
   childLocationIds: Array<string>,
-  authHeader: IAuthHeader
+  authHeader: IAuthHeader,
+  registrationTargetInDays: number
 ) {
-  const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+  const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = registrationTargetInDays
+
   const points = await query(`SELECT
-                              COUNT(${column}) AS withIn45Day
+                              COUNT(${column}) AS withInTargetDay
                               FROM ${measurement}
                               WHERE ${column} <= ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS}
                               AND time > '${timeFrom}'
                               AND time <= '${timeTo}'
                               AND ${currLocationLevel}='${currLocation}'
                               GROUP BY ${locationLevel}`)
-  const dataFromInflux: IRegistrationIn45DayEstimation[] = []
+  const dataFromInflux: IRegistrationInTargetDayEstimation[] = []
   for (const point of points) {
-    const estimationOf45Day: IEstimation =
-      await fetchEstimateFor45DaysByLocationId(
+    const estimationOfTargetDay: IEstimation =
+      await fetchEstimateForTargetDaysByLocationId(
         point[locationLevel],
         event,
         authHeader,
@@ -647,26 +668,28 @@ export async function fetchEstimated45DayMetrics(
       )
     dataFromInflux.push({
       locationId: point[locationLevel],
-      registrationIn45Day: point.withIn45Day,
-      estimatedRegistration: estimationOf45Day.totalEstimation,
-      estimationYear: estimationOf45Day.estimationYear,
-      estimationLocationLevel: estimationOf45Day.locationLevel,
+      registrationInTargetDay: point.withInTargetDay,
+      estimatedRegistration: estimationOfTargetDay.totalEstimation,
+      estimationYear: estimationOfTargetDay.estimationYear,
+      estimationLocationLevel: estimationOfTargetDay.locationLevel,
       estimationPercentage:
-        point.withIn45Day === 0 || estimationOf45Day.totalEstimation === 0
+        point.withInTargetDay === 0 ||
+        estimationOfTargetDay.totalEstimation === 0
           ? 0
           : Number(
               (
-                (point.withIn45Day / estimationOf45Day.totalEstimation) *
+                (point.withInTargetDay /
+                  estimationOfTargetDay.totalEstimation) *
                 100
               ).toFixed(2)
             )
     })
   }
 
-  const emptyEstimationData: IRegistrationIn45DayEstimation[] = []
+  const emptyEstimationData: IRegistrationInTargetDayEstimation[] = []
   for (const id of childLocationIds) {
-    const estimationOf45Day: IEstimation =
-      await fetchEstimateFor45DaysByLocationId(
+    const estimationOfTargetDay: IEstimation =
+      await fetchEstimateForTargetDaysByLocationId(
         id,
         event,
         authHeader,
@@ -675,20 +698,20 @@ export async function fetchEstimated45DayMetrics(
       )
     emptyEstimationData.push({
       locationId: id,
-      registrationIn45Day: 0,
-      estimatedRegistration: estimationOf45Day.totalEstimation,
-      estimationYear: estimationOf45Day.estimationYear,
-      estimationLocationLevel: estimationOf45Day.locationLevel,
+      registrationInTargetDay: 0,
+      estimatedRegistration: estimationOfTargetDay.totalEstimation,
+      estimationYear: estimationOfTargetDay.estimationYear,
+      estimationLocationLevel: estimationOfTargetDay.locationLevel,
       estimationPercentage: 0
     })
   }
 
-  const estimated45DayData = fillEmptyDataArrayByKey(
+  const estimatedTargetDayData = fillEmptyDataArrayByKey(
     dataFromInflux,
     emptyEstimationData,
     'locationId'
   )
-  return estimated45DayData
+  return estimatedTargetDayData
 }
 
 type Registration = {
@@ -701,7 +724,8 @@ export async function getTotalNumberOfRegistrations(
   locationId: string,
   event: EVENT_TYPE
 ) {
-  const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
   const totalRegistrationPoint: Registration[] = await query(
     `SELECT COUNT(${column}) AS total
@@ -723,9 +747,14 @@ export async function fetchLocationWiseEventEstimations(
   event: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
-  const measurement = event === EVENT_TYPE.BIRTH ? 'birth_reg' : 'death_reg'
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
   const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
-  const registrationsIn45DaysPoints: IGroupedByGender[] = await query(
+  const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
+    event,
+    authHeader.Authorization
+  )
+  const registrationsInTargetDaysPoints: IGroupedByGender[] = await query(
     `SELECT COUNT(${column}) AS total
       FROM ${measurement}
     WHERE time > '${timeFrom}'
@@ -738,19 +767,19 @@ export async function fetchLocationWiseEventEstimations(
     GROUP BY gender`
   )
 
-  let totalRegistrationIn45Day: number = 0
-  let totalMaleRegistrationIn45Day: number = 0
-  let totalFemaleRegistrationIn45Day: number = 0
-  registrationsIn45DaysPoints.forEach((point) => {
-    totalRegistrationIn45Day += point.total
+  let totalRegistrationInTargetDay: number = 0
+  let totalMaleRegistrationInTargetDay: number = 0
+  let totalFemaleRegistrationInTargetDay: number = 0
+  registrationsInTargetDaysPoints.forEach((point) => {
+    totalRegistrationInTargetDay += point.total
     if (point.gender === 'male') {
-      totalMaleRegistrationIn45Day += point.total
+      totalMaleRegistrationInTargetDay += point.total
     } else if (point.gender === 'female') {
-      totalFemaleRegistrationIn45Day += point.total
+      totalFemaleRegistrationInTargetDay += point.total
     }
   })
-  const estimationOf45Day: IEstimation =
-    await fetchEstimateFor45DaysByLocationId(
+  const estimationOfTargetDay: IEstimation =
+    await fetchEstimateForTargetDaysByLocationId(
       locationId,
       event,
       authHeader,
@@ -759,39 +788,148 @@ export async function fetchLocationWiseEventEstimations(
     )
 
   return {
-    actualRegistration: totalRegistrationIn45Day,
-    estimatedRegistration: estimationOf45Day.totalEstimation,
+    actualRegistration: totalRegistrationInTargetDay,
+    estimatedRegistration: estimationOfTargetDay.totalEstimation,
     estimatedPercentage:
-      totalRegistrationIn45Day === 0 || estimationOf45Day.totalEstimation === 0
+      totalRegistrationInTargetDay === 0 ||
+      estimationOfTargetDay.totalEstimation === 0
         ? 0
         : Number(
             (
-              (totalRegistrationIn45Day / estimationOf45Day.totalEstimation) *
+              (totalRegistrationInTargetDay /
+                estimationOfTargetDay.totalEstimation) *
               100
             ).toFixed(2)
           ),
     malePercentage:
-      totalMaleRegistrationIn45Day === 0 ||
-      estimationOf45Day.maleEstimation === 0
+      totalMaleRegistrationInTargetDay === 0 ||
+      estimationOfTargetDay.maleEstimation === 0
         ? 0
         : Number(
             (
-              (totalMaleRegistrationIn45Day /
-                estimationOf45Day.maleEstimation) *
+              (totalMaleRegistrationInTargetDay /
+                estimationOfTargetDay.maleEstimation) *
               100
             ).toFixed(2)
           ),
     femalePercentage:
-      totalFemaleRegistrationIn45Day === 0 ||
-      estimationOf45Day.femaleEstimation === 0
+      totalFemaleRegistrationInTargetDay === 0 ||
+      estimationOfTargetDay.femaleEstimation === 0
         ? 0
         : Number(
             (
-              (totalFemaleRegistrationIn45Day /
-                estimationOf45Day.femaleEstimation) *
+              (totalFemaleRegistrationInTargetDay /
+                estimationOfTargetDay.femaleEstimation) *
               100
             ).toFixed(2)
           )
+  }
+}
+
+export async function fetchLocaitonWiseEventEstimationsGroupByTimeLabel(
+  timeFrom: string,
+  timeTo: string,
+  locationId: string,
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+
+  const registrations: IGroupByTimeLabel[] = await query(
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}
+    WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}'
+      AND ( locationLevel2 = '${locationId}'
+          OR locationLevel3 = '${locationId}'
+          OR locationLevel4 = '${locationId}'
+          OR locationLevel5 = '${locationId}' )
+    GROUP BY timeLabel`
+  )
+  const estimationOfTimeRange: IEstimation =
+    await fetchEstimateForTargetDaysByLocationId(
+      locationId,
+      event,
+      authHeader,
+      timeFrom,
+      timeTo
+    )
+
+  return {
+    estimated: estimationOfTimeRange,
+    results: registrations
+  }
+}
+export async function fetchEventsGroupByMonthDates(
+  timeFrom: string,
+  timeTo: string,
+  locationId: string | undefined,
+  event: EVENT_TYPE
+) {
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+
+  const registrationsInTargetDaysPoints: IGroupByEventDate[] = await query(
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}
+    WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}'
+      ${
+        locationId
+          ? `AND ( locationLevel2 = '${locationId}'
+      OR locationLevel3 = '${locationId}'
+      OR locationLevel4 = '${locationId}'
+      OR locationLevel5 = '${locationId}' )`
+          : ``
+      }
+    GROUP BY dateLabel, timeLabel`
+  )
+
+  return registrationsInTargetDaysPoints
+}
+export async function getTotalMetrics(
+  timeFrom: string,
+  timeTo: string,
+  locationId: string | undefined,
+  event: EVENT_TYPE,
+  authHeader: IAuthHeader
+) {
+  const measurement =
+    event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
+  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
+
+  const totalMetrics: IMetricsTotalGroup[] = await query(
+    `SELECT COUNT(${column}) AS total
+      FROM ${measurement}
+    WHERE time > '${timeFrom}'
+      AND time <= '${timeTo}'
+      ${
+        locationId
+          ? `AND ( locationLevel2 = '${locationId}'
+      OR locationLevel3 = '${locationId}'
+      OR locationLevel4 = '${locationId}'
+      OR locationLevel5 = '${locationId}'
+      OR officeLocation = '${locationId}')`
+          : ``
+      }
+    GROUP BY gender, timeLabel, eventLocationType, practitionerRole`
+  )
+
+  const estimationOfTimeRange: IEstimation =
+    await fetchEstimateForTargetDaysByLocationId(
+      locationId,
+      event,
+      authHeader,
+      timeFrom,
+      timeTo
+    )
+
+  return {
+    estimated: estimationOfTimeRange,
+    results: totalMetrics || []
   }
 }
 

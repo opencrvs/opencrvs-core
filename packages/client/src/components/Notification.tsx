@@ -13,11 +13,11 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { withRouter, RouteComponentProps } from 'react-router'
 import { messages } from '@client/i18n/messages/views/notifications'
+import { userMessages } from '@client/i18n/messages/user'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import {
-  Notification,
   NOTIFICATION_TYPE,
   FloatingNotification
 } from '@opencrvs/components/lib/interface'
@@ -28,7 +28,9 @@ import {
   hideSubmitFormSuccessToast,
   hideSubmitFormErrorToast,
   hideUserAuditSuccessToast,
-  hidePINUpdateSuccessToast
+  hidePINUpdateSuccessToast,
+  hideDownloadDeclarationFailedToast,
+  hideCreateUserErrorToast
 } from '@client/notification/actions'
 import { TOAST_MESSAGES } from '@client/user/userReducer'
 import { NotificationState } from '@client/notification/reducer'
@@ -42,6 +44,8 @@ type NotificationProps = {
   submitFormErrorToast: string | null
   userAuditSuccessToast: NotificationState['userAuditSuccessToast']
   showPINUpdateSuccess: boolean
+  downloadDeclarationFailedToast: NotificationState['downloadDeclarationFailedToast']
+  userCreateDuplicateMobileFailedToast: NotificationState['userCreateDuplicateMobileFailedToast']
 }
 
 type DispatchProps = {
@@ -52,6 +56,8 @@ type DispatchProps = {
   toggleDraftSavedNotification: typeof toggleDraftSavedNotification
   hideUserAuditSuccessToast: typeof hideUserAuditSuccessToast
   hidePINUpdateSuccessToast: typeof hidePINUpdateSuccessToast
+  hideDownloadDeclarationFailedToast: typeof hideDownloadDeclarationFailedToast
+  hideCreateUserErrorToast: typeof hideCreateUserErrorToast
 }
 
 class Component extends React.Component<
@@ -77,6 +83,10 @@ class Component extends React.Component<
     this.props.hideSubmitFormErrorToast()
   }
 
+  hideCreateUserFormErrorToast = () => {
+    this.props.hideCreateUserErrorToast()
+  }
+
   hideUserAuditSuccessToast = () => {
     this.props.hideUserAuditSuccessToast()
   }
@@ -91,23 +101,25 @@ class Component extends React.Component<
       submitFormSuccessToast,
       submitFormErrorToast,
       userAuditSuccessToast,
-      showPINUpdateSuccess
+      showPINUpdateSuccess,
+      downloadDeclarationFailedToast,
+      userCreateDuplicateMobileFailedToast
     } = this.props
 
     return (
       <div>
         {children}
         {backgroundSyncMessageVisible && (
-          <Notification
+          <FloatingNotification
             id="backgroundSyncShowNotification"
             show={backgroundSyncMessageVisible}
             callback={this.hideBackgroundSyncedNotification}
           >
             {intl.formatMessage(messages.declarationsSynced)}
-          </Notification>
+          </FloatingNotification>
         )}
         {configurationErrorVisible && (
-          <Notification
+          <FloatingNotification
             type={NOTIFICATION_TYPE.ERROR}
             id="configErrorShowNotification"
             show={configurationErrorVisible}
@@ -115,16 +127,16 @@ class Component extends React.Component<
           >
             OpenCRVS has been only partially configured - Awaiting facilities
             and locations
-          </Notification>
+          </FloatingNotification>
         )}
         {saveDraftClicked && (
-          <Notification
+          <FloatingNotification
             id="draftsSavedNotification"
             show={saveDraftClicked}
             callback={this.hideDraftsSavedNotification}
           >
             {intl.formatMessage(messages.draftsSaved)}
-          </Notification>
+          </FloatingNotification>
         )}
 
         {submitFormSuccessToast && (
@@ -173,6 +185,28 @@ class Component extends React.Component<
             {intl.formatMessage(messages.updatePINSuccess)}
           </FloatingNotification>
         )}
+        {downloadDeclarationFailedToast && (
+          <FloatingNotification
+            id="PINUpdateSuccessToast"
+            show={Boolean(downloadDeclarationFailedToast)}
+            type={NOTIFICATION_TYPE.ALTERNATE_ERROR}
+            callback={this.props.hideDownloadDeclarationFailedToast}
+          >
+            {intl.formatMessage(messages.downloadDeclarationFailed)}
+          </FloatingNotification>
+        )}
+        {userCreateDuplicateMobileFailedToast.visible && (
+          <FloatingNotification
+            id="createUserDuplicateMobileFailedToast"
+            show={Boolean(userCreateDuplicateMobileFailedToast.visible)}
+            type={NOTIFICATION_TYPE.ERROR}
+            callback={this.hideCreateUserFormErrorToast}
+          >
+            {intl.formatMessage(userMessages.duplicateUserMobileErrorMessege, {
+              number: userCreateDuplicateMobileFailedToast.mobile
+            })}
+          </FloatingNotification>
+        )}
         {/* More notification types can be added here */}
       </div>
     )
@@ -189,7 +223,11 @@ const mapStateToProps = (store: IStoreState) => {
     submitFormSuccessToast: store.notification.submitFormSuccessToast,
     submitFormErrorToast: store.notification.submitFormErrorToast,
     userAuditSuccessToast: store.notification.userAuditSuccessToast,
-    showPINUpdateSuccess: store.notification.showPINUpdateSuccess
+    showPINUpdateSuccess: store.notification.showPINUpdateSuccess,
+    downloadDeclarationFailedToast:
+      store.notification.downloadDeclarationFailedToast,
+    userCreateDuplicateMobileFailedToast:
+      store.notification.userCreateDuplicateMobileFailedToast
   }
 }
 
@@ -201,6 +239,8 @@ export const NotificationComponent = withRouter(
     hideSubmitFormErrorToast,
     toggleDraftSavedNotification,
     hideUserAuditSuccessToast,
-    hidePINUpdateSuccessToast
+    hidePINUpdateSuccessToast,
+    hideDownloadDeclarationFailedToast,
+    hideCreateUserErrorToast
   })(injectIntl(Component))
 )

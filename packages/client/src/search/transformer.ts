@@ -14,15 +14,16 @@ import {
   GQLDeathEventSearchSet,
   GQLEventSearchSet,
   GQLHumanName,
-  GQLRegStatus,
-  GQLEventSearchResultSet
+  GQLRegStatus
 } from '@opencrvs/gateway/src/graphql/schema'
 import { IntlShape } from 'react-intl'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
+import { SearchEventsQuery } from '@client/utils/gateway'
+import { LANG_EN } from '@client/utils/constants'
 
 export const transformData = (
-  data: GQLEventSearchResultSet,
+  data: SearchEventsQuery['searchEvents'],
   intl: IntlShape
 ) => {
   const { locale } = intl
@@ -50,20 +51,19 @@ export const transformData = (
       const status =
         assignedReg.registration &&
         (assignedReg.registration.status as GQLRegStatus)
+
       return {
         id: assignedReg.id,
         name:
           (createNamesMap(names)[locale] as string) ||
-          (createNamesMap(names)['default'] as string) ||
+          (createNamesMap(names)[LANG_EN] as string) ||
           '',
         dob:
-          (birthReg &&
-            birthReg.dateOfBirth &&
+          (birthReg?.dateOfBirth?.length &&
             formatLongDate(birthReg.dateOfBirth, locale)) ||
           '',
         dod:
-          (deathReg &&
-            deathReg.dateOfDeath &&
+          (deathReg?.dateOfDeath?.length &&
             formatLongDate(deathReg.dateOfDeath, locale)) ||
           '',
         dateOfEvent,
@@ -93,10 +93,7 @@ export const transformData = (
             assignedReg.registration &&
             assignedReg.registration.comment) ||
           '',
-        createdAt:
-          assignedReg.operationHistories &&
-          assignedReg.operationHistories[0] &&
-          assignedReg.operationHistories[0].operatedOn,
+        createdAt: assignedReg?.registration?.createdAt,
         modifiedAt:
           assignedReg.registration &&
           (assignedReg.registration.modifiedAt ||

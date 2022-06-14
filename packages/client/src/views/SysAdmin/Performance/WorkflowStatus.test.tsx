@@ -21,7 +21,6 @@ import { ReactWrapper } from 'enzyme'
 import { stringify, parse } from 'query-string'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
-import { OPERATIONAL_REPORT_SECTION } from './OperationalReport'
 import { GraphQLError } from 'graphql'
 import { match } from 'react-router'
 
@@ -50,7 +49,7 @@ describe('Workflow status tests', () => {
             skip: 0,
             locationId: locationId,
             status: ['REGISTERED'],
-            type: ['birth-application']
+            type: ['birth-declaration', 'birth-notification']
           }
         },
         result: {
@@ -78,7 +77,7 @@ describe('Workflow status tests', () => {
                     status: null,
                     contactNumber: null,
                     contactRelationship: null,
-                    dateOfApplication: null,
+                    dateOfDeclaration: null,
                     trackingId: 'B6N6YSF',
                     registrationNumber: '20207210411000121',
                     createdAt: '1590143054612',
@@ -125,7 +124,7 @@ describe('Workflow status tests', () => {
                     status: 'REGISTERED',
                     contactNumber: '+8801959595999',
                     contactRelationship: 'Uncle',
-                    dateOfApplication: '2020-05-20T14:40:03.088Z',
+                    dateOfDeclaration: '2020-05-20T14:40:03.088Z',
                     trackingId: 'BXOQWTT',
                     registrationNumber: '20207210411000119',
                     createdAt: '1589985603133',
@@ -171,13 +170,13 @@ describe('Workflow status tests', () => {
                     status: 'CERTIFIED',
                     contactNumber: '+8801656568682',
                     contactRelationship: 'MOTHER',
-                    dateOfApplication: '2020-05-22T06:18:04.895Z',
+                    dateOfDeclaration: '2020-05-22T06:18:04.895Z',
                     trackingId: 'BGEPVNQ',
                     registrationNumber: '20207210411000118',
                     createdAt: '1590128285130',
                     modifiedAt: null
                   },
-                  startedAt: '2020-05-17',
+                  startedAt: '2020-05-18',
                   startedBy: {
                     name: [
                       {
@@ -207,7 +206,6 @@ describe('Workflow status tests', () => {
     beforeEach(async () => {
       const path = '/performance/operations/workflowStatus'
       const location = createLocation(path, {
-        sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
         timeStart,
         timeEnd
       })
@@ -226,35 +224,28 @@ describe('Workflow status tests', () => {
       }
       const testComponent = await createTestComponent(
         <WorkflowStatus match={match} history={history} location={location} />,
-        store,
-        graphqlMocks
+        { store, history, graphqlMocks }
       )
 
-      component = testComponent.component
+      component = testComponent
 
-      await waitForElement(component, '#application-status-list')
       component.update()
+      await waitForElement(component, '#declaration-status-list')
     })
 
-    it('renders without crashing', async () => {
-      await waitForElement(component, '#workflow-status-header')
-    })
-
-    it('clicking on back takes back to operational dashboard', async () => {
+    it('clicking on back takes back to your previous url', async () => {
       const backButton = await waitForElement(
         component,
-        '#workflow-status-action-back'
+        '#header-go-back-button'
       )
       backButton.hostNodes().simulate('click')
-
-      expect(history.location.pathname).toContain('/performance/operations')
-      expect(history.location.pathname).not.toContain('workflowStatus')
+      expect(history.location.pathname).toBe('/')
     })
 
     it('renders data', async () => {
       const listTable = await waitForElement(
         component,
-        '#application-status-list'
+        '#declaration-status-list'
       )
 
       expect(listTable.find('div#row_1').hostNodes()).toHaveLength(1)
@@ -263,27 +254,27 @@ describe('Workflow status tests', () => {
     it('toggles sort order', async () => {
       const listTable = await waitForElement(
         component,
-        '#application-status-list'
+        '#declaration-status-list'
       )
 
       const toggleSortButton = await waitForElement(
         component,
-        'span#applicationStartedOn-label'
+        'span#declarationStartedOn-label'
       )
-      expect(listTable.find('div#row_0').hostNodes().childAt(7).text()).toMatch(
+      expect(listTable.find('div#row_0').hostNodes().childAt(5).text()).toMatch(
+        /May 18, 2020/
+      )
+
+      toggleSortButton.hostNodes().simulate('click')
+
+      expect(listTable.find('div#row_0').hostNodes().childAt(5).text()).toMatch(
         /May 17, 2020/
       )
 
       toggleSortButton.hostNodes().simulate('click')
 
-      expect(listTable.find('div#row_2').hostNodes().childAt(7).text()).toMatch(
-        /May 17, 2020/
-      )
-
-      toggleSortButton.hostNodes().simulate('click')
-
-      expect(listTable.find('div#row_0').hostNodes().childAt(7).text()).toMatch(
-        /May 17, 2020/
+      expect(listTable.find('div#row_0').hostNodes().childAt(5).text()).toMatch(
+        /May 18, 2020/
       )
     })
 
@@ -303,33 +294,6 @@ describe('Workflow status tests', () => {
       component.update()
       expect(parse(history.location.search).status).toBe('REGISTERED')
     })
-
-    it('changing location id from location picker updates the query params', async () => {
-      const locationIdBeforeChange = parse(history.location.search).locationId
-      const locationPickerElement = await waitForElement(
-        component,
-        '#location-range-picker-action'
-      )
-
-      locationPickerElement.hostNodes().simulate('click')
-
-      const locationSearchInput = await waitForElement(
-        component,
-        '#locationSearchInput'
-      )
-      locationSearchInput.hostNodes().simulate('change', {
-        target: { value: 'Duaz', id: 'locationSearchInput' }
-      })
-
-      const searchResultOption = await waitForElement(
-        component,
-        '#locationOptiond3cef1d4-6187-4f0e-a024-61abd3fce9d4'
-      )
-      searchResultOption.hostNodes().simulate('click')
-      const newLocationId = parse(history.location.search).locationId
-      expect(newLocationId).not.toBe(locationIdBeforeChange)
-      expect(newLocationId).toBe('d3cef1d4-6187-4f0e-a024-61abd3fce9d4')
-    })
   })
 
   describe('events with progress fetched with failure', () => {
@@ -342,7 +306,7 @@ describe('Workflow status tests', () => {
             skip: 0,
             parentLocationId: locationId,
             status: ['REGISTERED'],
-            type: ['birth-application']
+            type: ['birth-declaration', 'birth-notification']
           }
         },
         result: {
@@ -354,7 +318,6 @@ describe('Workflow status tests', () => {
     beforeEach(async () => {
       const path = '/performance/operations/workflowStatus'
       const location = createLocation(path, {
-        sectionId: OPERATIONAL_REPORT_SECTION.OPERATIONAL,
         timeStart,
         timeEnd
       })
@@ -373,11 +336,10 @@ describe('Workflow status tests', () => {
       }
       const testComponent = await createTestComponent(
         <WorkflowStatus match={match} history={history} location={location} />,
-        store,
-        graphqlMocksWithError
+        { store, history, graphqlMocks: graphqlMocksWithError }
       )
 
-      component = testComponent.component
+      component = testComponent
     })
 
     it('renders error notification toast', async () => {

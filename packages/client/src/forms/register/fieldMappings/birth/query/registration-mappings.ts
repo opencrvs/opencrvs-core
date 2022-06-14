@@ -10,18 +10,27 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  IFormData,
   Event,
-  TransformedData,
+  IFormData,
   IFormField,
-  IFormFieldQueryMapFunction
+  IFormFieldQueryMapFunction,
+  IQuestionnaireQuestion,
+  TransformedData
 } from '@client/forms'
+import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
+import { userMessages } from '@client/i18n/messages'
+import { IOfflineData } from '@client/offline/reducer'
+import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
+import format from '@client/utils/date-formatting'
+import { History, RegStatus } from '@client/utils/gateway'
+import { IUserDetails } from '@client/utils/userUtils'
 import {
-  GQLRegWorkflow,
-  GQLRegStatus
+  GQLRegStatus,
+  GQLRegWorkflow
 } from '@opencrvs/gateway/src/graphql/schema'
-import { get, cloneDeep } from 'lodash'
 import { callingCountries } from 'country-data'
+import { cloneDeep, get } from 'lodash'
+import { MessageDescriptor } from 'react-intl'
 
 export function transformStatusData(
   transformedData: IFormData,
@@ -88,11 +97,6 @@ export function getBirthRegistrationSectionTransformer(
       queryData[sectionId].registrationNumber
   }
 
-  if (queryData.presentAtBirthRegistration) {
-    transformedData[sectionId].presentAtBirthRegistration =
-      queryData.presentAtBirthRegistration
-  }
-
   if (queryData[sectionId].type && queryData[sectionId].type === 'BIRTH') {
     transformedData[sectionId].type = Event.BIRTH
   }
@@ -105,6 +109,37 @@ export function getBirthRegistrationSectionTransformer(
     )
   }
 }
+
+export function registrationNumberTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) {
+  if (queryData[sectionId].registrationNumber) {
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'registrationNumber'
+    ] = queryData[sectionId].registrationNumber
+  }
+}
+
+export const certificateDateTransformer =
+  (locale: string, dateFormat: string) =>
+  (
+    transformedData: IFormData,
+    _: any,
+    sectionId: string,
+    targetSectionId?: string,
+    targetFieldName?: string
+  ) => {
+    const prevLocale = window.__localeId__
+    window.__localeId__ = locale
+    transformedData[targetSectionId || sectionId][
+      targetFieldName || 'certificateDate'
+    ] = format(new Date(), dateFormat)
+    window.__localeId__ = prevLocale
+  }
 
 const convertToLocal = (
   mobileWithCountryCode: string,
@@ -176,3 +211,109 @@ export const changeHirerchyQueryTransformer =
 
     return transformedData
   }
+
+export function questionnaireToCustomFieldTransformer(
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  field: IFormField
+) {
+  if (queryData.questionnaire) {
+    const selectedQuestion: IQuestionnaireQuestion =
+      queryData.questionnaire.filter(
+        (question: IQuestionnaireQuestion) =>
+          question.fieldId === field.customQuesstionMappingId
+      )[0]
+    if (selectedQuestion) {
+      transformedData[sectionId][field.name] = selectedQuestion.value
+    }
+  }
+}
+
+export const registrarNameUserTransformer = (
+  transformedData: IFormData,
+  _: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData,
+  userDetails?: IUserDetails
+) => {
+  if (!_.history) {
+    return
+  }
+
+  const history = _.history.find(
+    (historyItem: History) => historyItem?.action === RegStatus.Registered
+  )
+  transformedData[targetSectionId || sectionId][targetFieldName || 'userName'] =
+    history?.user ? getUserName(history.user) : ''
+}
+
+export const roleUserTransformer = (
+  transformedData: IFormData,
+  _: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData,
+  userDetails?: IUserDetails
+) => {
+  if (!_.history) {
+    return
+  }
+
+  const history = _.history.find(
+    (historyItem: History) => historyItem?.action === RegStatus.Registered
+  )
+
+  transformedData[targetSectionId || sectionId][targetFieldName || 'role'] =
+    history?.user?.role
+      ? (userMessages[history.user.role] as MessageDescriptor &
+          Record<string, string>)
+      : ''
+}
+
+export const registrationLocationUserTransformer = (
+  transformedData: IFormData,
+  queryData: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string
+) => {
+  const statusData = queryData[REGISTRATION_SECTION].status as GQLRegWorkflow[]
+  const registrationStatus =
+    statusData &&
+    statusData.find((status) => {
+      return status.type && (status.type as GQLRegStatus) === 'REGISTERED'
+    })
+  const officeName = registrationStatus?.office?.name || ''
+  const officeAddressLevel3 =
+    registrationStatus?.office?.address?.district || ''
+  const officeAddressLevel4 = registrationStatus?.office?.address?.state || ''
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'registrationOffice'
+  ] = [officeName, officeAddressLevel3, officeAddressLevel4].join(', ')
+}
+
+export const registrarSignatureUserTransformer = (
+  transformedData: IFormData,
+  _: any,
+  sectionId: string,
+  targetSectionId?: string,
+  targetFieldName?: string,
+  __?: IOfflineData,
+  userDetails?: IUserDetails
+) => {
+  if (!_.history) {
+    return
+  }
+
+  const history = _.history.find(
+    (historyItem: History) => historyItem?.action === RegStatus.Registered
+  )
+
+  transformedData[targetSectionId || sectionId][
+    targetFieldName || 'registrationOffice'
+  ] = history?.signature?.data as string
+}

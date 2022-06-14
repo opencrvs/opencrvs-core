@@ -10,7 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IAuthHeader } from '@gateway/common-types'
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
+import {
+  EVENT_TYPE,
+  DOWNLOADED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL
+} from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
   getDeclarationIdsFromResponse,
@@ -18,19 +22,31 @@ import {
   getRegistrationIdsFromResponse,
   removeDuplicatesFromComposition,
   getRegistrationIds,
-  getDeclarationIds
+  getDeclarationIds,
+  getStatusFromTask,
+  findExtension
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
-  updateFHIRTaskBundle
+  updateFHIRTaskBundle,
+  addOrUpdateExtension,
+  ITaskBundle
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
+  GQLBirthRegistrationInput,
+  GQLDeathRegistrationInput,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
+import { updateTaskTemplate } from '@gateway/features/fhir/templates'
+import { UserInputError } from 'apollo-server-hapi'
+import {
+  validateBirthDeclarationAttachments,
+  validateDeathDeclarationAttachments
+} from '@gateway/utils/validators'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -50,7 +66,7 @@ export const resolvers: GQLResolver = {
       )
 
       return compositions.filter(({ type }) =>
-        type.coding?.some(({ code }) => code === 'birth-application')
+        type.coding?.some(({ code }) => code === 'birth-declaration')
       )
     },
     async searchDeathRegistrations(_, { fromDate, toDate }, authHeader) {
@@ -69,7 +85,7 @@ export const resolvers: GQLResolver = {
       )
 
       return compositions.filter(({ type }) =>
-        type.coding?.some(({ code }) => code === 'death-application')
+        type.coding?.some(({ code }) => code === 'death-declaration')
       )
     },
     async fetchBirthRegistration(_, { id }, authHeader) {
@@ -78,7 +94,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await fetchFHIR(`/Composition/${id}`, authHeader)
+        return await markRecordAsDownloaded(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -91,7 +107,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await fetchFHIR(`/Composition/${id}`, authHeader)
+        return await markRecordAsDownloaded(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -180,22 +196,26 @@ export const resolvers: GQLResolver = {
     },
     async fetchRegistrationCountByStatus(
       _,
-      { locationId, status },
+      { locationId, status, event },
       authHeader
     ) {
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare') ||
-        hasScope(authHeader, 'sysadmin')
+        hasScope(authHeader, 'sysadmin') ||
+        hasScope(authHeader, 'performance')
       ) {
         const payload: {
-          applicationLocationHirarchyId: string
+          declarationLocationHirarchyId?: string
           status: string[]
+          event?: string
         } = {
-          applicationLocationHirarchyId: locationId,
-          status: status as string[]
+          declarationLocationHirarchyId: locationId,
+          status: status as string[],
+          event
         }
+
         const results: GQLStatusWiseRegistrationCount[] = await fetch(
           `${SEARCH_URL}statusWiseRegistrationCount`,
           {
@@ -207,6 +227,7 @@ export const resolvers: GQLResolver = {
             }
           }
         ).then((data) => data.json())
+
         let total = 0
         if (results && results.length > 0) {
           total = results.reduce(
@@ -232,18 +253,22 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createBirthRegistration(_, { details }, authHeader) {
-      return await createEventRegistration(
-        details,
-        authHeader,
-        EVENT_TYPE.BIRTH
-      )
+      try {
+        await validateBirthDeclarationAttachments(details)
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
+
+      return createEventRegistration(details, authHeader, EVENT_TYPE.BIRTH)
     },
     async createDeathRegistration(_, { details }, authHeader) {
-      return await createEventRegistration(
-        details,
-        authHeader,
-        EVENT_TYPE.DEATH
-      )
+      try {
+        await validateDeathDeclarationAttachments(details)
+      } catch (error) {
+        throw new UserInputError(error.message)
+      }
+
+      return createEventRegistration(details, authHeader, EVENT_TYPE.DEATH)
     },
     async updateBirthRegistration(_, { details }, authHeader) {
       if (
@@ -332,6 +357,125 @@ export const resolvers: GQLResolver = {
         )
       }
     },
+    async markEventAsArchived(_, { id }, authHeader) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
+        const taskBundle = await fetchFHIR(
+          `/Task?focus=Composition/${id}`,
+          authHeader
+        )
+        const taskEntry = taskBundle.entry[0]
+        if (!taskEntry) {
+          throw new Error('Task does not exist')
+        }
+        const status = 'ARCHIVED'
+        const newTaskBundle = await updateFHIRTaskBundle(taskEntry, status)
+        const taskResource = newTaskBundle.entry[0].resource
+        if (
+          taskResource.extension &&
+          findExtension(DOWNLOADED_EXTENSION_URL, taskResource.extension)
+        ) {
+          taskResource.extension = taskResource.extension.filter(
+            (ext) => ext.url !== DOWNLOADED_EXTENSION_URL
+          )
+        }
+        await fetchFHIR(
+          '/Task',
+          authHeader,
+          'PUT',
+          JSON.stringify(newTaskBundle)
+        )
+        // return the taskId
+        return taskEntry.resource.id
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
+    },
+    async markEventAsReinstated(_, { id }, authHeader) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
+        const taskBundle: ITaskBundle = await fetchFHIR(
+          `/Task?focus=Composition/${id}`,
+          authHeader
+        )
+
+        const taskEntryData = taskBundle.entry[0]
+        if (!taskEntryData) {
+          throw new Error('Task does not exist')
+        }
+
+        const taskEntryResourceID = taskEntryData.resource.id
+
+        const taskHistoryBundle: fhir.Bundle = await fetchFHIR(
+          `/Task/${taskEntryResourceID}/_history`,
+          authHeader
+        )
+
+        const taskHistory =
+          taskHistoryBundle.entry &&
+          taskHistoryBundle.entry.map((taskEntry: fhir.BundleEntry) => {
+            const historicalTask = taskEntry.resource
+            // all these tasks will have the same id, make it more specific to keep apollo-client's cache happy
+            if (historicalTask && historicalTask.meta) {
+              historicalTask.id = `${historicalTask.id}/_history/${historicalTask.meta.versionId}`
+            }
+            return historicalTask as fhir.Task
+          })
+
+        const taskHistoryEntry = taskHistory && taskHistory.length > 1
+        if (!taskHistoryEntry) {
+          throw new Error('Task has no history')
+        }
+
+        const filteredTaskHistory = taskHistory?.filter((task) => {
+          return (
+            task.businessStatus?.coding &&
+            task.businessStatus?.coding[0].code !== 'ARCHIVED'
+          )
+        })
+        const regStatusCode =
+          filteredTaskHistory &&
+          filteredTaskHistory.length > 0 &&
+          getStatusFromTask(filteredTaskHistory[0])
+
+        if (!regStatusCode) {
+          return await Promise.reject(new Error('Task has no reg-status code'))
+        }
+
+        const newTaskBundle = addOrUpdateExtension(
+          taskEntryData,
+          {
+            url: REINSTATED_EXTENSION_URL,
+            valueString: regStatusCode
+          },
+          'reinstated'
+        )
+
+        newTaskBundle.entry[0].resource = updateTaskTemplate(
+          newTaskBundle.entry[0].resource,
+          regStatusCode
+        )
+
+        await fetchFHIR(
+          '/Task',
+          authHeader,
+          'PUT',
+          JSON.stringify(newTaskBundle)
+        )
+
+        return { taskEntryResourceID, registrationStatus: regStatusCode }
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
+        )
+      }
+    },
     async markBirthAsCertified(_, { details }, authHeader) {
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
@@ -397,15 +541,16 @@ export const resolvers: GQLResolver = {
 }
 
 async function createEventRegistration(
-  details: any,
+  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
   const doc = await buildFHIRBundle(details, event, authHeader)
-  const duplicateCompostion = await lookForDuplicate(
-    details && details.registration && details.registration.draftId,
-    authHeader
-  )
+  const draftId =
+    details && details.registration && details.registration.draftId
+
+  const duplicateCompostion =
+    draftId && (await lookForDuplicate(draftId, authHeader))
 
   if (duplicateCompostion) {
     if (hasScope(authHeader, 'register')) {
@@ -435,7 +580,7 @@ export async function lookForDuplicate(
   identifier: string,
   authHeader: IAuthHeader
 ) {
-  const taskBundle = await fetchFHIR(
+  const taskBundle = await fetchFHIR<fhir.Bundle>(
     `/Task?identifier=${identifier}`,
     authHeader
   )
@@ -485,30 +630,16 @@ async function markEventAsRegistered(
   id: string,
   authHeader: IAuthHeader,
   event: EVENT_TYPE,
-  details?: any
+  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput
 ) {
-  let doc
-  if (!details) {
-    const taskBundle = await fetchFHIR(
-      `/Task?focus=Composition/${id}`,
-      authHeader
-    )
-    if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
-      throw new Error('Task does not exist')
-    }
-    doc = {
-      resourceType: 'Bundle',
-      type: 'document',
-      entry: taskBundle.entry
-    }
-  } else {
-    doc = await buildFHIRBundle(details, event)
-  }
+  const doc = await buildFHIRBundle(details, event, authHeader)
 
   await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
 
   // return the full composition
-  return fetchFHIR(`/Composition/${id}`, authHeader)
+  const res = await fetchFHIR(`/Composition/${id}`, authHeader)
+
+  return res
 }
 
 async function markEventAsCertified(
@@ -521,4 +652,27 @@ async function markEventAsCertified(
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
   // return composition-id
   return getIDFromResponse(res)
+}
+
+async function markRecordAsDownloaded(id: string, authHeader: IAuthHeader) {
+  const taskBundle: ITaskBundle = await fetchFHIR(
+    `/Task?focus=Composition/${id}`,
+    authHeader
+  )
+  if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
+    throw new Error('Task does not exist')
+  }
+  const doc = addOrUpdateExtension(
+    taskBundle.entry[0],
+    {
+      url: DOWNLOADED_EXTENSION_URL,
+      valueString: getStatusFromTask(taskBundle.entry[0].resource)
+    },
+    'downloaded'
+  )
+
+  await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))
+
+  // return the full composition
+  return fetchFHIR(`/Composition/${id}`, authHeader)
 }

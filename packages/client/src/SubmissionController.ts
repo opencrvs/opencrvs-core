@@ -13,28 +13,26 @@ import ApolloClient, { ApolloError } from 'apollo-client'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
 import {
-  IApplication,
-  modifyApplication,
-  writeApplication,
+  IDeclaration,
+  modifyDeclaration,
+  writeDeclaration,
   SUBMISSION_STATUS,
   updateRegistrarWorkqueue,
-  deleteApplication
-} from '@client/applications'
+  deleteDeclaration
+} from '@client/declarations'
 import { Action } from '@client/forms'
-import { getRegisterForm } from '@client/forms/register/application-selectors'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { AppStore } from '@client/store'
 import { getMutationMapping } from '@client/views/DataProvider/MutationProvider'
-import { REGISTRATION_HOME_QUERY } from '@client/views/RegistrationHome/queries'
+import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 import { getOperationName } from 'apollo-utilities'
 import { client } from '@client/utils/apolloClient'
-import moment from 'moment'
 import { FetchResult, DocumentNode } from 'apollo-link'
-import {
-  getAttachmentSectionKey,
-  updateApplicationTaskHistory
-} from './utils/draftUtils'
+import { getAttachmentSectionKey } from './utils/draftUtils'
 import { getScope } from './profile/profileSelectors'
 import { RequestHandler } from 'mock-apollo-client'
+import differenceInMinutes from 'date-fns/differenceInMinutes'
+import { FIELD_AGENT_ROLES } from './utils/constants'
 
 const INTERVAL_TIME = 5000
 const HANGING_EXPIRE_MINUTES = 15
@@ -43,7 +41,10 @@ const ALLOWED_STATUS_FOR_RETRY = [
   SUBMISSION_STATUS.READY_TO_APPROVE.toString(),
   SUBMISSION_STATUS.READY_TO_REGISTER.toString(),
   SUBMISSION_STATUS.READY_TO_REJECT.toString(),
+  SUBMISSION_STATUS.READY_TO_ARCHIVE.toString(),
   SUBMISSION_STATUS.READY_TO_CERTIFY.toString(),
+  SUBMISSION_STATUS.READY_TO_REINSTATE.toString(),
+  SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION.toString(),
   SUBMISSION_STATUS.FAILED_NETWORK.toString()
 ]
 const INPROGRESS_STATUS = [
@@ -51,7 +52,10 @@ const INPROGRESS_STATUS = [
   SUBMISSION_STATUS.APPROVING.toString(),
   SUBMISSION_STATUS.REGISTERING.toString(),
   SUBMISSION_STATUS.REJECTING.toString(),
-  SUBMISSION_STATUS.CERTIFYING.toString()
+  SUBMISSION_STATUS.ARCHIVING.toString(),
+  SUBMISSION_STATUS.REINSTATING.toString(),
+  SUBMISSION_STATUS.CERTIFYING.toString(),
+  SUBMISSION_STATUS.REQUESTING_CORRECTION.toString()
 ]
 const changeStatus = {
   [SUBMISSION_STATUS.SUBMITTING.toString()]: SUBMISSION_STATUS.READY_TO_SUBMIT,
@@ -59,7 +63,12 @@ const changeStatus = {
   [SUBMISSION_STATUS.REGISTERING.toString()]:
     SUBMISSION_STATUS.READY_TO_REGISTER,
   [SUBMISSION_STATUS.REJECTING.toString()]: SUBMISSION_STATUS.READY_TO_REJECT,
-  [SUBMISSION_STATUS.CERTIFYING.toString()]: SUBMISSION_STATUS.READY_TO_CERTIFY
+  [SUBMISSION_STATUS.ARCHIVING.toString()]: SUBMISSION_STATUS.READY_TO_ARCHIVE,
+  [SUBMISSION_STATUS.REINSTATING.toString()]:
+    SUBMISSION_STATUS.READY_TO_REINSTATE,
+  [SUBMISSION_STATUS.CERTIFYING.toString()]: SUBMISSION_STATUS.READY_TO_CERTIFY,
+  [SUBMISSION_STATUS.REQUESTING_CORRECTION.toString()]:
+    SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
 }
 
 interface IActionList {
@@ -68,24 +77,37 @@ interface IActionList {
 
 const ACTION_LIST: IActionList = {
   [Action.SUBMIT_FOR_REVIEW]: Action.SUBMIT_FOR_REVIEW,
-  [Action.APPROVE_APPLICATION]: Action.APPROVE_APPLICATION,
-  [Action.REGISTER_APPLICATION]: Action.REGISTER_APPLICATION,
-  [Action.REJECT_APPLICATION]: Action.REJECT_APPLICATION,
-  [Action.COLLECT_CERTIFICATE]: Action.COLLECT_CERTIFICATE
+  [Action.APPROVE_DECLARATION]: Action.APPROVE_DECLARATION,
+  [Action.REGISTER_DECLARATION]: Action.REGISTER_DECLARATION,
+  [Action.REJECT_DECLARATION]: Action.REJECT_DECLARATION,
+  [Action.COLLECT_CERTIFICATE]: Action.COLLECT_CERTIFICATE,
+  [Action.REQUEST_CORRECTION_DECLARATION]:
+    Action.REQUEST_CORRECTION_DECLARATION,
+  [Action.REINSTATE_DECLARATION]: Action.REINSTATE_DECLARATION,
+  [Action.COLLECT_CERTIFICATE]: Action.COLLECT_CERTIFICATE,
+  [Action.ARCHIVE_DECLARATION]: Action.ARCHIVE_DECLARATION
 }
 const REQUEST_IN_PROGRESS_STATUS: IActionList = {
   [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTING,
-  [Action.APPROVE_APPLICATION]: SUBMISSION_STATUS.APPROVING,
-  [Action.REGISTER_APPLICATION]: SUBMISSION_STATUS.REGISTERING,
-  [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTING,
-  [Action.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFYING
+  [Action.APPROVE_DECLARATION]: SUBMISSION_STATUS.APPROVING,
+  [Action.REGISTER_DECLARATION]: SUBMISSION_STATUS.REGISTERING,
+  [Action.REJECT_DECLARATION]: SUBMISSION_STATUS.REJECTING,
+  [Action.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVING,
+  [Action.REINSTATE_DECLARATION]: SUBMISSION_STATUS.REINSTATING,
+  [Action.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFYING,
+  [Action.REQUEST_CORRECTION_DECLARATION]:
+    SUBMISSION_STATUS.REQUESTING_CORRECTION
 }
 const SUCCESS_SUBMISSION_STATUS: IActionList = {
   [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTED,
-  [Action.APPROVE_APPLICATION]: SUBMISSION_STATUS.APPROVED,
-  [Action.REGISTER_APPLICATION]: SUBMISSION_STATUS.REGISTERED,
-  [Action.REJECT_APPLICATION]: SUBMISSION_STATUS.REJECTED,
-  [Action.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFIED
+  [Action.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVED,
+  [Action.REINSTATE_DECLARATION]: SUBMISSION_STATUS.REINSTATED,
+  [Action.APPROVE_DECLARATION]: SUBMISSION_STATUS.APPROVED,
+  [Action.REGISTER_DECLARATION]: SUBMISSION_STATUS.REGISTERED,
+  [Action.REJECT_DECLARATION]: SUBMISSION_STATUS.REJECTED,
+  [Action.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFIED,
+  [Action.REQUEST_CORRECTION_DECLARATION]:
+    SUBMISSION_STATUS.REQUESTED_CORRECTION
 }
 
 export class SubmissionController {
@@ -107,31 +129,32 @@ export class SubmissionController {
     }, INTERVAL_TIME)
   }
 
-  private getApplications = () =>
-    this.store.getState().applicationsState.applications || []
+  private getDeclarations = () =>
+    this.store.getState().declarationsState.declarations || []
 
-  private getSubmitableApplications = () => {
-    return this.getApplications().filter(
-      (app: IApplication) =>
+  private getSubmitableDeclarations = () => {
+    return this.getDeclarations().filter(
+      (app: IDeclaration) =>
         app.submissionStatus &&
         ALLOWED_STATUS_FOR_RETRY.includes(app.submissionStatus)
     )
   }
-  public requeueHangingApplications = async () => {
-    const now = moment(Date.now())
-    this.getApplications()
-      .filter((app: IApplication) => {
+  public requeueHangingDeclarations = async () => {
+    const now = Date.now()
+    this.getDeclarations()
+      .filter((app: IDeclaration) => {
         return (
           app.submissionStatus &&
           INPROGRESS_STATUS.includes(app.submissionStatus) &&
-          now.diff(app.modifiedOn, 'minutes') > HANGING_EXPIRE_MINUTES
+          app.modifiedOn &&
+          differenceInMinutes(now, app.modifiedOn) > HANGING_EXPIRE_MINUTES
         )
       })
-      .forEach(async (app: IApplication) => {
+      .forEach(async (app: IDeclaration) => {
         if (app.submissionStatus) {
           app.submissionStatus = changeStatus[app.submissionStatus]
-          await this.store.dispatch(modifyApplication(app))
-          await this.store.dispatch(writeApplication(app))
+          await this.store.dispatch(modifyDeclaration(app))
+          await this.store.dispatch(writeDeclaration(app))
         }
       })
   }
@@ -149,13 +172,13 @@ export class SubmissionController {
 
     this.syncRunning = true
 
-    await this.requeueHangingApplications()
-    const applications = this.getSubmitableApplications()
+    await this.requeueHangingDeclarations()
+    const declarations = this.getSubmitableDeclarations()
     console.debug(
-      `[${this.syncCount}] Syncing ${applications.length} applications`
+      `[${this.syncCount}] Syncing ${declarations.length} declarations`
     )
-    for (const application of applications) {
-      await this.callMutation(application)
+    for (const declaration of declarations) {
+      await this.callMutation(declaration)
     }
 
     this.syncRunning = false
@@ -164,22 +187,22 @@ export class SubmissionController {
 
   /* eslint-enable no-console */
 
-  private callMutation = async (application: IApplication | undefined) => {
-    if (!application) {
+  private callMutation = async (declaration: IDeclaration | undefined) => {
+    if (!declaration) {
       return
     }
 
-    const applicationAction = ACTION_LIST[application.action || ''] || null
+    const declarationAction = ACTION_LIST[declaration.action || ''] || null
 
     const forms = getRegisterForm(this.store.getState())
 
     const result = getMutationMapping(
-      application.event,
+      declaration.event,
       // @ts-ignore
-      applicationAction,
-      application.payload,
-      forms[application.event],
-      application
+      declarationAction,
+      declaration.payload,
+      forms[declaration.event],
+      declaration
     )
     const { mutation, variables } = result || {
       mutation: null,
@@ -187,11 +210,11 @@ export class SubmissionController {
     }
 
     const requestInProgressStatus =
-      REQUEST_IN_PROGRESS_STATUS[application.action || ''] ||
+      REQUEST_IN_PROGRESS_STATUS[declaration.action || ''] ||
       SUBMISSION_STATUS.SUBMITTING
-    application.submissionStatus = requestInProgressStatus
-    await this.store.dispatch(modifyApplication(application))
-    await this.store.dispatch(writeApplication(application))
+    declaration.submissionStatus = requestInProgressStatus
+    await this.store.dispatch(modifyDeclaration(declaration))
+    await this.store.dispatch(writeDeclaration(declaration))
 
     if (mutation) {
       try {
@@ -201,21 +224,28 @@ export class SubmissionController {
           refetchQueries: [getOperationName(REGISTRATION_HOME_QUERY) || ''],
           awaitRefetchQueries: true
         })
-        await this.onSuccess(application, mutationResult)
+        await this.onSuccess(declaration, mutationResult)
       } catch (exception) {
-        await this.onError(application, exception)
+        await this.onError(declaration, exception)
       }
     }
   }
 
   private onSuccess = async (
-    application: IApplication,
+    declaration: IDeclaration,
     result: FetchResult<any, any, any>
   ) => {
     const submissionStatus =
-      SUCCESS_SUBMISSION_STATUS[application.action || ''] ||
+      SUCCESS_SUBMISSION_STATUS[declaration.action || ''] ||
       SUBMISSION_STATUS.SUBMITTED
-    application.submissionStatus = submissionStatus
+
+    declaration.submissionStatus = submissionStatus
+
+    if (declaration.action === Action.REINSTATE_DECLARATION) {
+      declaration.submissionStatus = ''
+      declaration.registrationStatus =
+        result.data.markEventAsReinstated.registrationStatus
+    }
     const response =
       (result && result.data && result.data.createBirthRegistration) ||
       (result && result.data && result.data.createDeathRegistration) ||
@@ -223,54 +253,37 @@ export class SubmissionController {
     if (response) {
       const { compositionId, trackingId } = response
       if (compositionId) {
-        application.compositionId = compositionId
+        declaration.compositionId = compositionId
       }
       if (trackingId) {
-        application.trackingId = trackingId
+        declaration.trackingId = trackingId
       }
     }
-    const scopes = getScope(this.store.getState()) || []
-    if (
-      application.submissionStatus === SUBMISSION_STATUS.SUBMITTED &&
-      scopes.includes('declare')
-    ) {
-      const taskHistory = updateApplicationTaskHistory(
-        application,
-        this.store.getState().profile.userDetails
-      )
-      if (!application.operationHistories) {
-        application.operationHistories = []
-      }
-      application.operationHistories.push(taskHistory)
-    }
-    await this.store.dispatch(updateRegistrarWorkqueue())
-    await this.store.dispatch(modifyApplication(application))
+    //It needs some times to elasticSearch to update index
+    const role = this.store.getState().offline.userDetails?.role
+    const isFieldAgent = role && FIELD_AGENT_ROLES.includes(role) ? true : false
+    const userId = this.store.getState().offline.userDetails?.practitionerId
+    await this.store.dispatch(
+      updateRegistrarWorkqueue(userId, 10, isFieldAgent)
+    )
+    await this.store.dispatch(modifyDeclaration(declaration))
 
     if (
-      application.submissionStatus === SUBMISSION_STATUS.SUBMITTED ||
-      application.submissionStatus === SUBMISSION_STATUS.APPROVED ||
-      application.submissionStatus === SUBMISSION_STATUS.REGISTERED ||
-      application.submissionStatus === SUBMISSION_STATUS.REJECTED
+      declaration.submissionStatus === SUBMISSION_STATUS.SUBMITTED ||
+      declaration.submissionStatus === SUBMISSION_STATUS.APPROVED ||
+      declaration.submissionStatus === SUBMISSION_STATUS.REGISTERED ||
+      declaration.submissionStatus === SUBMISSION_STATUS.REJECTED ||
+      declaration.submissionStatus === SUBMISSION_STATUS.ARCHIVED ||
+      declaration.submissionStatus === SUBMISSION_STATUS.REINSTATED ||
+      declaration.submissionStatus === SUBMISSION_STATUS.REQUESTED_CORRECTION
     ) {
-      if (scopes.includes('declare')) {
-        const attachmentSectionKey = getAttachmentSectionKey(application.event)
-        if (
-          application.data &&
-          application.data[attachmentSectionKey] &&
-          Object.keys(application.data[attachmentSectionKey]).length > 0
-        ) {
-          delete application.data[attachmentSectionKey]
-        }
-        this.store.dispatch(writeApplication(application))
-      } else {
-        this.store.dispatch(deleteApplication(application))
-      }
+      await this.store.dispatch(deleteDeclaration(declaration))
     } else {
-      await this.store.dispatch(writeApplication(application))
+      await this.store.dispatch(writeDeclaration(declaration))
     }
   }
 
-  private onError = async (application: IApplication, error: ApolloError) => {
+  private onError = async (declaration: IDeclaration, error: ApolloError) => {
     let status
     if (error.networkError) {
       status = SUBMISSION_STATUS.FAILED_NETWORK
@@ -279,8 +292,8 @@ export class SubmissionController {
       Sentry.captureException(error)
     }
 
-    application.submissionStatus = status
-    await this.store.dispatch(modifyApplication(application))
-    await this.store.dispatch(writeApplication(application))
+    declaration.submissionStatus = status
+    await this.store.dispatch(modifyDeclaration(declaration))
+    await this.store.dispatch(writeDeclaration(declaration))
   }
 }

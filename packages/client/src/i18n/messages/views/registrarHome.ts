@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 
-interface IregistrationHomeMessages
+interface IOfficeHomeMessages
   extends Record<string | number | symbol, MessageDescriptor> {
   certified: MessageDescriptor
   dataTableResults: MessageDescriptor
@@ -20,24 +20,31 @@ interface IregistrationHomeMessages
   inProgressOwnDrafts: MessageDescriptor
   hospitalDrafts: MessageDescriptor
   listItemAction: MessageDescriptor
-  listItemApplicationDate: MessageDescriptor
+  listItemDeclarationDate: MessageDescriptor
   listItemRegisteredDate: MessageDescriptor
   readyForReview: MessageDescriptor
   readyToPrint: MessageDescriptor
   registrationNumber: MessageDescriptor
+  requestedCorrection: MessageDescriptor
   sentForApprovals: MessageDescriptor
   sentForUpdates: MessageDescriptor
   sentForExternalValidation: MessageDescriptor
-  validatedApplicationTooltipForRegistrar: MessageDescriptor
-  validatedApplicationTooltipForRegistrationAgent: MessageDescriptor
+  validatedDeclarationTooltipForRegistrar: MessageDescriptor
+  validatedDeclarationTooltipForRegistrationAgent: MessageDescriptor
   waitingForExternalValidation: MessageDescriptor
+  archived: MessageDescriptor
 }
 
-const messagesToDefine: IregistrationHomeMessages = {
+const messagesToDefine: IOfficeHomeMessages = {
   certified: {
     defaultMessage: 'Certified',
     description: 'Label for registration status certified',
     id: 'regHome.certified'
+  },
+  archived: {
+    defaultMessage: 'Archived',
+    description: 'Label for registration status archived',
+    id: 'regHome.archived'
   },
   dataTableResults: {
     defaultMessage: 'Results',
@@ -55,12 +62,12 @@ const messagesToDefine: IregistrationHomeMessages = {
     id: 'regHome.inPro.selector.field.agents'
   },
   inProgressOwnDrafts: {
-    defaultMessage: 'Yours',
+    defaultMessage: 'My Drafts',
     description: 'The title of In progress own drafts',
     id: 'regHome.inPro.selector.own.drafts'
   },
   hospitalDrafts: {
-    defaultMessage: 'Hospitals',
+    defaultMessage: 'Health System',
     description: 'The title of In progress Hospitals',
     id: 'regHome.inPro.selector.hospital.drafts'
   },
@@ -69,13 +76,13 @@ const messagesToDefine: IregistrationHomeMessages = {
     description: 'Label for action in work queue list item',
     id: 'regHome.table.label.action'
   },
-  listItemApplicationDate: {
-    defaultMessage: 'Application sent',
-    description: 'Label for application date in work queue list item',
-    id: 'regHome.table.label.applicationDate'
+  listItemDeclarationDate: {
+    defaultMessage: 'Declaration sent',
+    description: 'Label for declaration date in work queue list item',
+    id: 'regHome.table.label.declarationDate'
   },
   listItemRegisteredDate: {
-    defaultMessage: 'Application registered',
+    defaultMessage: 'Declaration registered',
     description: 'Label for date of registration in work queue list item',
     id: 'regHome.table.label.registeredDate'
   },
@@ -94,13 +101,18 @@ const messagesToDefine: IregistrationHomeMessages = {
     description: 'The heading of registration no. column',
     id: 'regHome.registrationNumber'
   },
+  requestedCorrection: {
+    defaultMessage: 'Requested correction',
+    description: 'Label for registration status requested correction',
+    id: 'regHome.requestedCorrection'
+  },
   sentForApprovals: {
     defaultMessage: 'Sent for approval',
     description: 'The title of sent for approvals tab',
     id: 'regHome.sentForApprovals'
   },
   sentForExternalValidation: {
-    defaultMessage: 'Sent to BRIS',
+    defaultMessage: 'Sent for ext. validation',
     description: 'The label for external validation waiting duration column',
     id: 'regHome.sentForExternalValidation'
   },
@@ -109,22 +121,21 @@ const messagesToDefine: IregistrationHomeMessages = {
     description: 'The title of sent for updates tab',
     id: 'regHome.sentForUpdates'
   },
-  validatedApplicationTooltipForRegistrar: {
-    defaultMessage: 'Application has been validated by a registration agent',
-    description: 'Text to display for validated application as tooltip',
+  validatedDeclarationTooltipForRegistrar: {
+    defaultMessage: 'Declaration has been validated by a registration agent',
+    description: 'Text to display for validated declaration as tooltip',
     id: 'regHome.validated.registrar.tooltip'
   },
-  validatedApplicationTooltipForRegistrationAgent: {
-    defaultMessage: 'Application has been validated and waiting for approval',
-    description: 'Text to display for validated application as tooltip',
+  validatedDeclarationTooltipForRegistrationAgent: {
+    defaultMessage: 'Declaration has been validated and waiting for approval',
+    description: 'Text to display for validated declaration as tooltip',
     id: 'regHome.val.regAgent.tooltip'
   },
   waitingForExternalValidation: {
-    defaultMessage: 'Waiting for BRIS',
+    defaultMessage: 'Waiting for ext. validation',
     description: 'The title of waiting for external validation',
     id: 'regHome.waitingForExternalValidation'
   }
 }
 
-export const messages: IregistrationHomeMessages =
-  defineMessages(messagesToDefine)
+export const messages: IOfficeHomeMessages = defineMessages(messagesToDefine)

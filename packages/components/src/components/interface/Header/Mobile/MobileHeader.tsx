@@ -10,15 +10,16 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
+import { Hamburger } from '../../../icons/Hamburger'
 import styled from 'styled-components'
 import { CircleButton } from '../../../buttons'
+import { IDomProps } from '../AppHeader'
 
 interface IMenuAction {
   icon: () => React.ReactNode
   handler: () => void
 }
 export interface IMobileHeaderProps {
-  id?: string
   mobileLeft?: IMenuAction
   title: string
   mobileBody?: JSX.Element
@@ -29,20 +30,40 @@ const HeaderContainer = styled.div`
   padding: 8px 16px;
   display: flex;
   align-items: center;
-  ${({ theme }) => theme.gradients.gradientNightshade};
-  box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32);
+  background: ${({ theme }) => theme.colors.white};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   position: sticky;
   top: 0;
+  justify-content: space-between;
   z-index: 2;
 `
 
 const Title = styled.span`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
-  color: ${({ theme }) => theme.colors.white};
+  ${({ theme }) => theme.fonts.h4};
+  color: ${({ theme }) => theme.colors.grey800};
   align-self: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 const HeaderBody = styled.div`
+  margin: 0 16px;
+  width: 0;
+  flex: 1;
+  display: flex;
+  height: 40px;
+
+  form {
+    width: 100%;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+`
+
+const SearchBody = styled.div`
   margin: 0 16px;
   flex: 1;
   display: flex;
@@ -65,35 +86,37 @@ const EndComponentContainer = styled.div`
     padding: 0;
   }
 `
-class MobileHeader extends React.Component<IMobileHeaderProps> {
+class MobileHeader extends React.Component<IMobileHeaderProps & IDomProps> {
   render() {
     const { id, mobileLeft, mobileRight, title, mobileBody } = this.props
     return (
-      <HeaderContainer id={id}>
+      <HeaderContainer id={id} className={this.props.className}>
         {mobileLeft && (
           <EndComponentContainer>
             <CircleButton
               id="mobile_header_left"
               onClick={mobileLeft.handler}
-              dark={true}
-              color="#fff"
+              color="#4972BB"
             >
+              {!mobileBody && <Hamburger />}
               {mobileLeft.icon()}
             </CircleButton>
+            <>{!mobileBody && mobileLeft.icon()}</>
           </EndComponentContainer>
         )}
 
-        <HeaderBody>
-          {mobileBody || <Title id="header_title">{title}</Title>}
-        </HeaderBody>
+        {mobileBody ? (
+          <SearchBody>{mobileBody}</SearchBody>
+        ) : (
+          <HeaderBody>{<Title id="header_title">{title}</Title>}</HeaderBody>
+        )}
 
         {mobileRight && (
           <EndComponentContainer>
             <CircleButton
               id="mobile_header_right"
               onClick={mobileRight.handler}
-              dark={true}
-              color="#fff"
+              color="#4972BB"
             >
               {mobileRight.icon()}
             </CircleButton>

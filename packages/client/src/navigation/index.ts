@@ -10,38 +10,34 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { Event, UserSection } from '@client/forms'
 import {
-  APPLICATION_DETAIL,
+  Event,
+  UserSection,
+  CorrectionSection,
+  WizardSection
+} from '@client/forms'
+import {
   CERTIFICATE_COLLECTOR,
   CREATE_USER,
   CREATE_USER_ON_LOCATION,
   CREATE_USER_SECTION,
-  DRAFT_BIRTH_APPLICANT_FORM,
+  DRAFT_BIRTH_INFORMANT_FORM,
   DRAFT_BIRTH_PARENT_FORM,
   DRAFT_DEATH_FORM,
   EVENT_INFO,
-  EVENT_REGISTRATION_RATES,
-  FIELD_AGENT_HOME_TAB,
+  EVENT_COMPLETENESS_RATES,
   HOME,
-  OPERATIONAL_REPORT,
   PERFORMANCE_FIELD_AGENT_LIST,
   PERFORMANCE_HOME,
-  PERFORMANCE_REPORT,
-  PERFORMANCE_REPORT_LIST,
   PRINT_CERTIFICATE_PAYMENT,
   REGISTRAR_HOME_TAB,
   REVIEW_CERTIFICATE,
-  REVIEW_DUPLICATES,
   REVIEW_USER_DETAILS,
   REVIEW_USER_FORM,
   SEARCH,
   SEARCH_RESULT,
   SELECT_BIRTH_INFORMANT,
-  SELECT_BIRTH_MAIN_CONTACT_POINT,
-  SELECT_BIRTH_PRIMARY_APPLICANT,
   SELECT_DEATH_INFORMANT,
-  SELECT_DEATH_MAIN_CONTACT_POINT,
   SELECT_VITAL_EVENT,
   SETTINGS,
   SYS_ADMIN_HOME_TAB,
@@ -50,16 +46,40 @@ import {
   WORKFLOW_STATUS,
   TEAM_USER_LIST,
   USER_PROFILE,
-  CONFIG
+  CERTIFICATE_CONFIG,
+  CHANGE_PHONE,
+  APPLICATION_CONFIG,
+  CERTIFICATE_CORRECTION,
+  VERIFY_CORRECTOR,
+  DECLARATION_RECORD_AUDIT,
+  FORM_CONFIG_WIZARD,
+  FORM_CONFIG_HOME
 } from '@client/navigation/routes'
-import { getCurrentUserScope } from '@client/utils/authUtils'
-import { OPERATIONAL_REPORT_SECTION } from '@client/views/SysAdmin/Performance/OperationalReport'
-import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseApplicationCountView'
+import {
+  NATL_ADMIN_ROLES,
+  NATIONAL_REGISTRAR_ROLES,
+  PERFORMANCE_MANAGEMENT_ROLES,
+  REGISTRAR_ROLES,
+  SYS_ADMIN_ROLES
+} from '@client/utils/constants'
+import { IUserDetails } from '@client/utils/userUtils'
+import { IStatusMapping } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
+import {
+  getJurisdictionLocationIdFromUserDetails,
+  CompletenessRateTime
+} from '@client/views/SysAdmin/Performance/utils'
 import { ISearchLocation } from '@opencrvs/components/lib/interface'
-import { goBack as back, push, replace } from 'connected-react-router'
-import moment from 'moment'
+import {
+  goBack as back,
+  push,
+  replace,
+  goForward as forward
+} from 'connected-react-router'
 import { stringify } from 'query-string'
 import { Cmd, loop } from 'redux-loop'
+import { IRecordAuditTabs } from '@client/views/RecordAudit/RecordAudit'
+import subYears from 'date-fns/subYears'
+import { IWORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 export interface IDynamicValues {
   [key: string]: any
@@ -78,7 +98,7 @@ type GoToPageAction = {
   type: typeof GO_TO_PAGE
   payload: {
     pageRoute: string
-    applicationId: string
+    declarationId: string
     pageId: string
     groupId?: string
     event: string
@@ -87,21 +107,6 @@ type GoToPageAction = {
   }
 }
 
-export const GO_TO_REGISTRAR_HOME = 'navigation/GO_TO_REGISTRAR_HOME'
-type GoToRegistrarHome = {
-  type: typeof GO_TO_REGISTRAR_HOME
-  payload: {
-    tabId: string
-  }
-}
-
-export const GO_TO_FIELD_AGENT_HOME = 'navigation/GO_TO_FIELD_AGENT_HOME'
-type GoToFieldAgentHome = {
-  type: typeof GO_TO_FIELD_AGENT_HOME
-  payload: {
-    tabId: string
-  }
-}
 export const GO_TO_REVIEW_USER_DETAILS = 'navigation/GO_TO_REVIEW_USER_DETAILS'
 type GoToReviewUserDetails = {
   type: typeof GO_TO_REVIEW_USER_DETAILS
@@ -120,8 +125,6 @@ type GoToUserProfile = {
 
 export type Action =
   | GoToPageAction
-  | GoToRegistrarHome
-  | GoToFieldAgentHome
   | GoToSysAdminHome
   | GoToReviewUserDetails
   | GoToUserProfile
@@ -133,40 +136,24 @@ type GoToSysAdminHome = {
   }
 }
 
-export function goToBirthInformant(applicationId: string) {
+export function goToBirthInformant(declarationId: string) {
   return push(
     formatUrl(SELECT_BIRTH_INFORMANT, {
-      applicationId
+      declarationId
     })
   )
 }
 
-export function goToDeathInformant(applicationId: string) {
+export function goToDeathInformant(declarationId: string) {
   return push(
     formatUrl(SELECT_DEATH_INFORMANT, {
-      applicationId
-    })
-  )
-}
-
-export function goToBirthContactPoint(applicationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_MAIN_CONTACT_POINT, {
-      applicationId
+      declarationId
     })
   )
 }
 
 export function goToEventInfo(eventType: Event) {
   return push(formatUrl(EVENT_INFO, { eventType }))
-}
-
-export function goToDeathContactPoint(applicationId: string) {
-  return push(
-    formatUrl(SELECT_DEATH_MAIN_CONTACT_POINT, {
-      applicationId
-    })
-  )
 }
 
 export function goToEvents() {
@@ -177,19 +164,28 @@ export function goBack() {
   return back()
 }
 
+export function goForward() {
+  return forward()
+}
+
 export function goToHome() {
   return push(HOME)
 }
 
-export function goToConfig() {
-  return push(CONFIG)
+export function goToCertificateConfig() {
+  return push(CERTIFICATE_CONFIG)
 }
 
-export function goToHomeTab(tabId: string, selectorId = '') {
-  const path = getCurrentUserScope().includes('declare')
-    ? FIELD_AGENT_HOME_TAB
-    : REGISTRAR_HOME_TAB
-  return push(formatUrl(path, { tabId, selectorId }))
+export function goToFormConfigHome() {
+  return push(FORM_CONFIG_HOME)
+}
+
+export function goToApplicationConfig() {
+  return push(APPLICATION_CONFIG)
+}
+
+export function goToHomeTab(tabId: IWORKQUEUE_TABS, selectorId = '') {
+  return push(formatUrl(REGISTRAR_HOME_TAB, { tabId, selectorId }))
 }
 
 type searchedLocation = {
@@ -202,39 +198,14 @@ export function goToTeamSearch(searchedLocation?: searchedLocation) {
     : push(TEAM_SEARCH)
 }
 
-export function goToPerformanceHome(state?: searchedLocation) {
-  return state && state.selectedLocation
-    ? push(PERFORMANCE_HOME, { selectedLocation: state.selectedLocation })
-    : push(PERFORMANCE_HOME)
-}
-
-export function goToPerformanceReportList() {
-  return push(PERFORMANCE_REPORT_LIST)
-}
-
-export function goToPerformanceReport(
-  selectedLocation: ISearchLocation,
-  eventType: Event,
-  timeStart: Date,
-  timeEnd: Date
-) {
-  return push(PERFORMANCE_REPORT, {
-    selectedLocation,
-    timeRange: { start: timeStart, end: timeEnd },
-    eventType
-  })
-}
-
-export function goToOperationalReport(
-  locationId: string,
-  sectionId: OPERATIONAL_REPORT_SECTION = OPERATIONAL_REPORT_SECTION.OPERATIONAL,
-  timeStart: Date = moment().subtract(1, 'years').toDate(),
-  timeEnd: Date = moment().toDate()
+export function goToPerformanceHome(
+  timeStart: Date = subYears(new Date(Date.now()), 1),
+  timeEnd: Date = new Date(Date.now()),
+  locationId?: string
 ) {
   return push({
-    pathname: OPERATIONAL_REPORT,
+    pathname: PERFORMANCE_HOME,
     search: stringify({
-      sectionId,
       locationId,
       timeStart: timeStart.toISOString(),
       timeEnd: timeEnd.toISOString()
@@ -275,39 +246,25 @@ export function goToSearch() {
   return push(SEARCH)
 }
 
-export function goToApplicationDetails(
-  applicationId: string,
-  forceDetailsQuery?: boolean
+export function goToDeclarationRecordAudit(
+  tab: IRecordAuditTabs,
+  declarationId: string
 ) {
-  return push(formatUrl(APPLICATION_DETAIL, { applicationId }), {
-    forceDetailsQuery
-  })
+  return push(formatUrl(DECLARATION_RECORD_AUDIT, { tab, declarationId }))
 }
 
-export function goToBirthRegistrationAsParent(applicationId: string) {
+export function goToBirthRegistrationAsParent(declarationId: string) {
   return push(
     formatUrl(DRAFT_BIRTH_PARENT_FORM, {
-      applicationId: applicationId.toString()
+      declarationId: declarationId.toString()
     })
   )
 }
-export function goToApplicationContact(informant: string) {
+export function goToDeclarationContact(informant: string) {
   return push(
-    formatUrl(DRAFT_BIRTH_APPLICANT_FORM, {
+    formatUrl(DRAFT_BIRTH_INFORMANT_FORM, {
       informant: informant.toString()
     })
-  )
-}
-export function goToPrimaryApplicant(applicationId: string) {
-  return push(
-    formatUrl(SELECT_BIRTH_PRIMARY_APPLICANT, {
-      applicationId
-    })
-  )
-}
-export function goToReviewDuplicate(applicationId: string) {
-  return push(
-    formatUrl(REVIEW_DUPLICATES, { applicationId: applicationId.toString() })
   )
 }
 
@@ -321,6 +278,27 @@ export function goToPrintCertificate(
       registrationId: registrationId.toString(),
       eventType: event.toLowerCase().toString(),
       groupId: groupId || 'certCollector'
+    })
+  )
+}
+
+export function goToCertificateCorrection(
+  declarationId: string,
+  pageId: CorrectionSection
+) {
+  return push(
+    formatUrl(CERTIFICATE_CORRECTION, {
+      declarationId: declarationId.toString(),
+      pageId: pageId.toString()
+    })
+  )
+}
+
+export function goToVerifyCorrector(declarationId: string, corrector: string) {
+  return push(
+    formatUrl(VERIFY_CORRECTOR, {
+      declarationId: declarationId.toString(),
+      corrector: corrector.toLowerCase().toString()
     })
   )
 }
@@ -361,24 +339,19 @@ export function goToPrintCertificatePayment(
   )
 }
 
-export function goToDeathRegistration(applicationId: string) {
+export function goToDeathRegistration(declarationId: string) {
   return push(
-    formatUrl(DRAFT_DEATH_FORM, { applicationId: applicationId.toString() })
+    formatUrl(DRAFT_DEATH_FORM, { declarationId: declarationId.toString() })
   )
 }
 
-export function goToRegistrarHomeTab(tabId: string, selectorId?: string) {
-  return {
-    type: GO_TO_REGISTRAR_HOME,
-    payload: { tabId, selectorId }
-  }
-}
-
-export function goToFieldAgentHomeTab(tabId: string) {
-  return {
-    type: GO_TO_FIELD_AGENT_HOME,
-    payload: { tabId }
-  }
+export function goToFormConfigWizard(event: Event, section: WizardSection) {
+  return push(
+    formatUrl(FORM_CONFIG_WIZARD, {
+      event: event,
+      section: section
+    })
+  )
 }
 
 export function goToSysAdminHomeTab(tabId: string) {
@@ -391,6 +364,18 @@ export function goToSysAdminHomeTab(tabId: string) {
 export function goToSettings() {
   return push(SETTINGS)
 }
+export function goToPhoneSettings() {
+  return push(CHANGE_PHONE)
+}
+
+export function goToSettingsWithPhoneSuccessMsg(phonedNumberUpdated: boolean) {
+  return push({
+    pathname: SETTINGS,
+    state: {
+      phonedNumberUpdated
+    }
+  })
+}
 
 export function goToCreateNewUser() {
   return push(CREATE_USER)
@@ -400,29 +385,36 @@ export function goToCreateNewUserWithLocationId(locationId: string) {
   return push(formatUrl(CREATE_USER_ON_LOCATION, { locationId }))
 }
 
-export function goToRegistrationRates(
+export function goToCompletenessRates(
   eventType: Event,
-  title: string,
-  locationId: string,
+  locationId: string | undefined,
   timeStart: Date,
-  timeEnd: Date
+  timeEnd: Date,
+  time = CompletenessRateTime.WithinTarget
 ) {
   return push({
-    pathname: formatUrl(EVENT_REGISTRATION_RATES, { eventType }),
-    search: stringify({
-      locationId,
-      title,
-      timeStart: timeStart.toISOString(),
-      timeEnd: timeEnd.toISOString()
-    })
+    pathname: formatUrl(EVENT_COMPLETENESS_RATES, { eventType }),
+    search: stringify(
+      locationId
+        ? {
+            locationId,
+            timeStart: timeStart.toISOString(),
+            timeEnd: timeEnd.toISOString(),
+            time
+          }
+        : {
+            timeStart: timeStart.toISOString(),
+            timeEnd: timeEnd.toISOString(),
+            time
+          }
+    )
   })
 }
 
 export function goToFieldAgentList(
-  locationId: string,
   timeStart: string,
   timeEnd: string,
-  event?: string
+  locationId?: string
 ) {
   return push({
     pathname: PERFORMANCE_FIELD_AGENT_LIST,
@@ -435,7 +427,6 @@ export function goToFieldAgentList(
 }
 
 export function goToWorkflowStatus(
-  sectionId: string,
   locationId: string,
   timeStart: Date,
   timeEnd: Date,
@@ -450,7 +441,6 @@ export function goToWorkflowStatus(
       event
     }),
     state: {
-      sectionId,
       timeStart,
       timeEnd
     }
@@ -535,7 +525,7 @@ export function goToUserReviewForm(
 
 export function goToPageGroup(
   pageRoute: string,
-  applicationId: string,
+  declarationId: string,
   pageId: string,
   groupId: string,
   event: string,
@@ -545,7 +535,7 @@ export function goToPageGroup(
   return {
     type: GO_TO_PAGE,
     payload: {
-      applicationId,
+      declarationId,
       pageId,
       groupId,
       event,
@@ -558,7 +548,7 @@ export function goToPageGroup(
 
 export function goToPage(
   pageRoute: string,
-  applicationId: string,
+  declarationId: string,
   pageId: string,
   event: string,
   fieldNameHash?: string,
@@ -567,12 +557,55 @@ export function goToPage(
   return {
     type: GO_TO_PAGE,
     payload: {
-      applicationId,
+      declarationId,
       pageId,
       event,
       fieldNameHash,
       pageRoute,
       historyState
+    }
+  }
+}
+
+export function getDefaultPerformanceLocationId(userDetails: IUserDetails) {
+  const role = userDetails?.role
+  const primaryOfficeId = userDetails.primaryOffice?.id
+  if (role) {
+    if (REGISTRAR_ROLES.includes(role) || SYS_ADMIN_ROLES.includes(role)) {
+      return primaryOfficeId
+    } else if (
+      NATL_ADMIN_ROLES.includes(role) ||
+      NATIONAL_REGISTRAR_ROLES.includes(role) ||
+      PERFORMANCE_MANAGEMENT_ROLES.includes(role)
+    ) {
+      return // country wide
+    }
+  }
+  throw new Error(
+    `Performance view no default location selected for role: ${role}`
+  )
+}
+
+export function goToPerformanceView(userDetails: IUserDetails) {
+  return goToPerformanceHome(
+    undefined,
+    undefined,
+    getDefaultPerformanceLocationId(userDetails)
+  )
+}
+
+export function goToTeamView(userDetails: IUserDetails) {
+  if (userDetails && userDetails.role) {
+    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
+      return goToTeamSearch()
+    } else {
+      return goToTeamUserList({
+        id: (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
+        searchableText:
+          (userDetails.primaryOffice && userDetails.primaryOffice.name) || '',
+        displayLabel:
+          (userDetails.primaryOffice && userDetails.primaryOffice.name) || ''
+      })
     }
   }
 }
@@ -584,7 +617,7 @@ export function navigationReducer(state: INavigationState, action: any) {
     case GO_TO_PAGE:
       const {
         fieldNameHash,
-        applicationId,
+        declarationId,
         pageId,
         groupId,
         event,
@@ -596,37 +629,13 @@ export function navigationReducer(state: INavigationState, action: any) {
         Cmd.action(
           push(
             formatUrl(pageRoute, {
-              applicationId: applicationId.toString(),
+              declarationId: declarationId.toString(),
               pageId,
               groupId,
               event
             }) + (fieldNameHash ? `#${fieldNameHash}` : ''),
             historyState
           )
-        )
-      )
-    case GO_TO_REGISTRAR_HOME:
-      const {
-        tabId: RegistrarHomeTabId,
-        selectorId: RegistrarHomeSelectorId = ''
-      } = action.payload
-      return loop(
-        state,
-        Cmd.action(
-          push(
-            formatUrl(REGISTRAR_HOME_TAB, {
-              tabId: RegistrarHomeTabId,
-              selectorId: RegistrarHomeSelectorId
-            })
-          )
-        )
-      )
-    case GO_TO_FIELD_AGENT_HOME:
-      const { tabId: FieldAgentHomeTabId } = action.payload
-      return loop(
-        state,
-        Cmd.action(
-          push(formatUrl(FIELD_AGENT_HOME_TAB, { tabId: FieldAgentHomeTabId }))
         )
       )
     case GO_TO_SYS_ADMIN_HOME:

@@ -17,7 +17,8 @@ import { metricsHandler } from '@metrics/features/metrics/handler'
 import * as stringify from 'csv-stringify'
 import { fetchLocation } from '@metrics/api'
 import { EVENT } from '@metrics/features/metrics/constants'
-import { EXPECTED_BIRTH_REGISTRATION_IN_DAYS } from '@metrics/constants'
+//import { EXPECTED_BIRTH_REGISTRATION_IN_DAYS } from '@metrics/constants'
+import { getRegistrationTargetDays } from '@metrics/features/metrics/utils'
 
 async function getMeasurementNames() {
   const points = await query<Array<{ key: string }>>('SHOW SERIES')
@@ -50,6 +51,11 @@ export async function monthlyExportHandler(
   }
 
   const monthlyMetrics = await metricsHandler(request, h)
+
+  const EXPECTED_BIRTH_REGISTRATION_IN_DAYS = await getRegistrationTargetDays(
+    event,
+    auth.token
+  )
 
   const csvStreams = []
   // populating csv for gender based registration data
@@ -95,12 +101,15 @@ export async function monthlyExportHandler(
       stream.push({
         Location: loc.name,
         [`Within ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`]: `${
-          timeFrameData.regWithin45d
-        } (${getPercentage(timeFrameData.regWithin45d, timeFrameData.total)}%)`,
-        [`${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days - 1 year`]: `${
-          timeFrameData.regWithin45dTo1yr
+          timeFrameData.regWithinTargetd
         } (${getPercentage(
-          timeFrameData.regWithin45dTo1yr,
+          timeFrameData.regWithinTargetd,
+          timeFrameData.total
+        )}%)`,
+        [`${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days - 1 year`]: `${
+          timeFrameData.regWithinTargetdTo1yr
+        } (${getPercentage(
+          timeFrameData.regWithinTargetdTo1yr,
           timeFrameData.total
         )}%)`,
         '1 year to 5 years': `${
@@ -122,18 +131,19 @@ export async function monthlyExportHandler(
     ])
   }
   // populating csv for 45 days based estimated data
-  if (monthlyMetrics.estimated45DayMetrics) {
+  if (monthlyMetrics.estimatedTargetDayMetrics) {
     const stream = []
-    for (const estimated45DayData of monthlyMetrics.estimated45DayMetrics) {
-      const loc = await fetchLocation(estimated45DayData.locationId, {
+    for (const estimatedTargetDayData of monthlyMetrics.estimatedTargetDayMetrics) {
+      const loc = await fetchLocation(estimatedTargetDayData.locationId, {
         Authorization: `Bearer ${auth.token}`
       })
       stream.push({
         Location: loc.name,
         'Estimated no. of registrations':
-          estimated45DayData.estimatedRegistration,
-        [`Total registered in ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`]: estimated45DayData.registrationIn45Day,
-        'Percentage of estimate': `${estimated45DayData.estimationPercentage}%`
+          estimatedTargetDayData.estimatedRegistration,
+        [`Total registered in ${EXPECTED_BIRTH_REGISTRATION_IN_DAYS} days`]:
+          estimatedTargetDayData.registrationInTargetDay,
+        'Percentage of estimate': `${estimatedTargetDayData.estimationPercentage}%`
       })
     }
     csvStreams.push([

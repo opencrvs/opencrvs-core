@@ -20,8 +20,8 @@ import { createTestComponent, mockUserResponse } from '@client/tests/util'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { goToSearch } from '@client/navigation'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { Event } from '@client/components/DuplicateDetails'
-import { storeApplication } from '@client/applications'
+import { Event } from '@client/forms'
+import { storeDeclaration } from '@client/declarations'
 
 const registerScopeToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
@@ -51,10 +51,11 @@ queries.fetchUserDetails = mockFetchUserDetails
 
 describe('SearchResult tests', () => {
   let store: ReturnType<typeof createStore>['store']
+  let history: ReturnType<typeof createStore>['history']
   beforeEach(async () => {
-    store = createStore().store
+    ;({ store, history } = createStore())
     getItem.mockReturnValue(registerScopeToken)
-    await store.dispatch(checkAuth({ '?token': registerScopeToken }))
+    await store.dispatch(checkAuth())
   })
 
   it('sets loading state while waiting for data', async () => {
@@ -71,11 +72,11 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      store
+      { store, history }
     )
 
     // @ts-ignore
-    expect(testComponent.component.containsMatchingElement(Spinner)).toBe(true)
+    expect(testComponent.containsMatchingElement(Spinner)).toBe(true)
   })
 
   it('renders all items returned from graphql query', async () => {
@@ -85,7 +86,7 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            locationIds: null,
             sort: 'DESC',
             trackingId: '',
             registrationNumber: '',
@@ -309,16 +310,15 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock as any }
     )
 
     // wait for mocked data to load mockedProvider
     await new Promise((resolve) => {
       setTimeout(resolve, 100)
     })
-    testComponent.component.update()
-    const data = testComponent.component.find(GridTable).prop('content')
+    testComponent.update()
+    const data = testComponent.find(GridTable).prop('content')
     expect(data.length).toEqual(6)
   })
 
@@ -352,8 +352,7 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock as any }
     )
 
     // wait for mocked data to load mockedProvider
@@ -361,22 +360,17 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
+    testComponent.update()
     expect(
-      testComponent.component
-        .find('#search-result-error-text')
-        .hostNodes()
-        .text()
+      testComponent.find('#search-result-error-text').hostNodes().text()
     ).toBe('An error occurred while searching')
   })
   it('renders empty search page with a header in small devices', async () => {
-    const testSearchResultComponent = (
-      await createTestComponent(
-        // @ts-ignore
-        <SearchResult match={{ params: {} }} />,
-        store
-      )
-    ).component
+    const testSearchResultComponent = await createTestComponent(
+      // @ts-ignore
+      <SearchResult match={{ params: {} }} />,
+      { store, history }
+    )
 
     Object.defineProperty(window, 'innerWidth', {
       writable: true,
@@ -408,7 +402,7 @@ describe('SearchResult tests', () => {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            locationIds: null,
             sort: 'DESC',
             trackingId: 'DW0UTHR',
             registrationNumber: '',
@@ -473,8 +467,7 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock as any }
     )
 
     // wait for mocked data to load mockedProvider
@@ -482,223 +475,16 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
-    testComponent.component
-      .find('#ListItemAction-0-icon')
-      .hostNodes()
-      .simulate('click')
+    testComponent.update()
+    testComponent.find('#ListItemAction-0-icon').hostNodes().simulate('click')
 
     expect(
-      testComponent.component
-        .find('#action-loading-ListItemAction-0')
-        .hostNodes()
+      testComponent.find('#action-loading-ListItemAction-0').hostNodes()
     ).toHaveLength(1)
   })
 
-  it('renders review button in search page', async () => {
-    const application = {
-      id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
-      data: {},
-      event: Event.BIRTH,
-      downloadStatus: 'DOWNLOADED',
-      submissionStatus: 'DECLARED'
-    }
-
-    // @ts-ignore
-    store.dispatch(storeApplication(application))
-    const graphqlMock = [
-      {
-        request: {
-          operationName: null,
-          query: SEARCH_EVENTS,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            sort: 'DESC',
-            trackingId: 'DW0UTHR',
-            registrationNumber: '',
-            contactNumber: '',
-            name: ''
-          }
-        },
-        result: {
-          data: {
-            searchEvents: {
-              totalItems: 1,
-              results: [
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
-                  type: 'Death',
-                  __typename: 'X',
-                  registration: {
-                    __typename: 'X',
-                    status: 'DECLARED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    duplicates: [],
-                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
-                  },
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      __typename: 'X',
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan'
-                    },
-                    {
-                      __typename: 'X',
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
-                    }
-                  ],
-
-                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                  // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
-                  dateOfBirth: '',
-                  childName: []
-                }
-              ],
-              __typename: 'EventSearchResultSet'
-            }
-          }
-        }
-      }
-    ]
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <SearchResult
-        match={{
-          params: {
-            searchText: 'DW0UTHR',
-            searchType: 'tracking-id'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store,
-      graphqlMock
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-
-    const reviewButton = await waitForElement(
-      testComponent.component,
-      '#ListItemAction-0-Review'
-    )
-
-    expect(reviewButton.hostNodes()).toHaveLength(1)
-  })
-
-  it('renders update button in search page', async () => {
-    const application = {
-      id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
-      data: {},
-      event: Event.BIRTH,
-      downloadStatus: 'DOWNLOADED',
-      submissionStatus: 'REJECTED'
-    }
-
-    // @ts-ignore
-    store.dispatch(storeApplication(application))
-    const graphqlMock = [
-      {
-        request: {
-          operationName: null,
-          query: SEARCH_EVENTS,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            sort: 'DESC',
-            trackingId: 'DW0UTHR',
-            registrationNumber: '',
-            contactNumber: '',
-            name: ''
-          }
-        },
-        result: {
-          data: {
-            searchEvents: {
-              totalItems: 1,
-              results: [
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
-                  type: 'Death',
-                  __typename: 'X',
-                  registration: {
-                    __typename: 'X',
-                    status: 'REJECTED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    duplicates: [],
-                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
-                  },
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      __typename: 'X',
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan'
-                    },
-                    {
-                      __typename: 'X',
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
-                    }
-                  ],
-
-                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                  // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
-                  dateOfBirth: '',
-                  childName: []
-                }
-              ],
-              __typename: 'EventSearchResultSet'
-            }
-          }
-        }
-      }
-    ]
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <SearchResult
-        match={{
-          params: {
-            searchText: 'DW0UTHR',
-            searchType: 'tracking-id'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store,
-      graphqlMock
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-
-    const updateButton = await waitForElement(
-      testComponent.component,
-      '#ListItemAction-0-Update'
-    )
-
-    expect(updateButton.hostNodes()).toHaveLength(1)
-  })
-
   it('renders print button in search page', async () => {
-    const application = {
+    const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
       data: {},
       event: Event.BIRTH,
@@ -707,14 +493,14 @@ describe('SearchResult tests', () => {
     }
 
     // @ts-ignore
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
     const graphqlMock = [
       {
         request: {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            locationIds: null,
             sort: 'DESC',
             trackingId: 'DW0UTHR',
             registrationNumber: '',
@@ -784,8 +570,7 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock as any }
     )
 
     // wait for mocked data to load mockedProvider
@@ -793,10 +578,10 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
+    testComponent.update()
 
     const printButton = await waitForElement(
-      testComponent.component,
+      testComponent,
       '#ListItemAction-0-Print'
     )
 
@@ -809,115 +594,8 @@ describe('SearchResult tests', () => {
     expect(printButton.hostNodes()).toHaveLength(1)
   })
 
-  it('goes to duplicate page while click duplicate button in search page', async () => {
-    const application = {
-      id: 'bc09200d-0160-43b4-9e2b-5b9e90424e93',
-      data: {},
-      event: Event.BIRTH,
-      downloadStatus: 'DOWNLOADED',
-      submissionStatus: 'DECLARED'
-    }
-
-    // @ts-ignore
-    store.dispatch(storeApplication(application))
-    const graphqlMock = [
-      {
-        request: {
-          operationName: null,
-          query: SEARCH_EVENTS,
-          variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
-            sort: 'DESC',
-            trackingId: 'DW0UTHR',
-            registrationNumber: '',
-            contactNumber: '',
-            name: ''
-          }
-        },
-        result: {
-          data: {
-            searchEvents: {
-              totalItems: 1,
-              results: [
-                {
-                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e93',
-                  type: 'Death',
-                  __typename: 'X',
-                  registration: {
-                    __typename: 'X',
-                    status: 'DECLARED',
-                    trackingId: 'DW0UTHR',
-                    registrationNumber: null,
-                    duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
-                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
-                  },
-                  dateOfDeath: '2007-01-01',
-                  deceasedName: [
-                    {
-                      __typename: 'X',
-                      firstNames: 'Iliyas',
-                      familyName: 'Khan'
-                    },
-                    {
-                      __typename: 'X',
-                      firstNames: 'ইলিয়াস',
-                      familyName: 'খান'
-                    }
-                  ],
-
-                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
-                  // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
-                  dateOfBirth: '',
-                  childName: []
-                }
-              ],
-              __typename: 'EventSearchResultSet'
-            }
-          }
-        }
-      }
-    ]
-
-    const testComponent = await createTestComponent(
-      // @ts-ignore
-      <SearchResult
-        match={{
-          params: {
-            searchText: 'DW0UTHR',
-            searchType: 'tracking-id'
-          },
-          isExact: true,
-          path: '',
-          url: ''
-        }}
-      />,
-      store,
-      graphqlMock
-    )
-
-    // wait for mocked data to load mockedProvider
-    await new Promise((resolve) => {
-      setTimeout(resolve, 100)
-    })
-
-    testComponent.component.update()
-
-    const duplicateButton = await waitForElement(
-      testComponent.component,
-      '#ListItemAction-0-Review'
-    )
-
-    expect(duplicateButton.hostNodes()).toHaveLength(1)
-
-    duplicateButton.hostNodes().simulate('click')
-
-    expect(window.location.pathname).toContain(
-      'duplicates/bc09200d-0160-43b4-9e2b-5b9e90424e93'
-    )
-  })
-
-  it('renders review button in search page while application is validated', async () => {
-    const application = {
+  it('renders review button in search page while declaration is validated', async () => {
+    const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
       data: {},
       event: Event.BIRTH,
@@ -926,14 +604,14 @@ describe('SearchResult tests', () => {
     }
 
     // @ts-ignore
-    store.dispatch(storeApplication(application))
+    store.dispatch(storeDeclaration(declaration))
     const graphqlMock = [
       {
         request: {
           operationName: null,
           query: SEARCH_EVENTS,
           variables: {
-            locationIds: ['2a83cf14-b959-47f4-8097-f75a75d1867f'],
+            locationIds: null,
             sort: 'DESC',
             trackingId: 'DW0UTHR',
             registrationNumber: '',
@@ -998,8 +676,7 @@ describe('SearchResult tests', () => {
           url: ''
         }}
       />,
-      store,
-      graphqlMock
+      { store, history, graphqlMocks: graphqlMock as any }
     )
 
     // wait for mocked data to load mockedProvider
@@ -1007,13 +684,221 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
 
-    testComponent.component.update()
+    testComponent.update()
 
     const reviewButton = await waitForElement(
-      testComponent.component,
+      testComponent,
       '#ListItemAction-0-Review'
     )
 
     expect(reviewButton.hostNodes()).toHaveLength(1)
+  })
+})
+
+describe('SearchResult downloadButton tests', () => {
+  let store: ReturnType<typeof createStore>['store']
+  let history: ReturnType<typeof createStore>['history']
+  beforeEach(async () => {
+    ;({ store, history } = createStore())
+    getItem.mockReturnValue(registerScopeToken)
+    await store.dispatch(checkAuth())
+  })
+  it('renders review button in search page', async () => {
+    const declaration = {
+      id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
+      data: {},
+      event: Event.BIRTH,
+      downloadStatus: 'DOWNLOADED',
+      submissionStatus: 'DECLARED'
+    }
+
+    // @ts-ignore
+    store.dispatch(storeDeclaration(declaration))
+    const graphqlMock = [
+      {
+        request: {
+          operationName: null,
+          query: SEARCH_EVENTS,
+          variables: {
+            locationIds: null,
+            sort: 'DESC',
+            trackingId: 'DW0UTHR',
+            registrationNumber: '',
+            contactNumber: '',
+            name: ''
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 1,
+              results: [
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
+                  type: 'Death',
+                  __typename: 'X',
+                  registration: {
+                    __typename: 'X',
+                    status: 'DECLARED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    duplicates: [],
+                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
+                  },
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      __typename: 'X',
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan'
+                    },
+                    {
+                      __typename: 'X',
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান'
+                    }
+                  ],
+
+                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                  // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                  dateOfBirth: '',
+                  childName: []
+                }
+              ],
+              __typename: 'EventSearchResultSet'
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <SearchResult
+        match={{
+          params: {
+            searchText: 'DW0UTHR',
+            searchType: 'tracking-id'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      { store, history, graphqlMocks: graphqlMock as any }
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.update()
+
+    const reviewButton = await waitForElement(
+      testComponent,
+      '#ListItemAction-0-Review'
+    )
+
+    expect(reviewButton.hostNodes()).toHaveLength(1)
+  })
+  it('renders update button in search page', async () => {
+    const declaration = {
+      id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
+      data: {},
+      event: Event.BIRTH,
+      downloadStatus: 'DOWNLOADED',
+      submissionStatus: 'REJECTED'
+    }
+
+    // @ts-ignore
+    store.dispatch(storeDeclaration(declaration))
+    const graphqlMock = [
+      {
+        request: {
+          operationName: null,
+          query: SEARCH_EVENTS,
+          variables: {
+            locationIds: null,
+            sort: 'DESC',
+            trackingId: 'DW0UTHR',
+            registrationNumber: '',
+            contactNumber: '',
+            name: ''
+          }
+        },
+        result: {
+          data: {
+            searchEvents: {
+              totalItems: 1,
+              results: [
+                {
+                  id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
+                  type: 'Death',
+                  __typename: 'X',
+                  registration: {
+                    __typename: 'X',
+                    status: 'REJECTED',
+                    trackingId: 'DW0UTHR',
+                    registrationNumber: null,
+                    duplicates: [],
+                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
+                  },
+                  dateOfDeath: '2007-01-01',
+                  deceasedName: [
+                    {
+                      __typename: 'X',
+                      firstNames: 'Iliyas',
+                      familyName: 'Khan'
+                    },
+                    {
+                      __typename: 'X',
+                      firstNames: 'ইলিয়াস',
+                      familyName: 'খান'
+                    }
+                  ],
+
+                  // TODO: When fragmentMatching work is completed, remove unnecessary result objects
+                  // PR: https://github.com/opencrvs/opencrvs-core/pull/836/commits/6302fa8f015fe313cbce6197980f1300bf4eba32
+                  dateOfBirth: '',
+                  childName: []
+                }
+              ],
+              __typename: 'EventSearchResultSet'
+            }
+          }
+        }
+      }
+    ]
+
+    const testComponent = await createTestComponent(
+      // @ts-ignore
+      <SearchResult
+        match={{
+          params: {
+            searchText: 'DW0UTHR',
+            searchType: 'tracking-id'
+          },
+          isExact: true,
+          path: '',
+          url: ''
+        }}
+      />,
+      { store, history, graphqlMocks: graphqlMock as any }
+    )
+
+    // wait for mocked data to load mockedProvider
+    await new Promise((resolve) => {
+      setTimeout(resolve, 100)
+    })
+
+    testComponent.update()
+
+    const updateButton = await waitForElement(
+      testComponent,
+      '#ListItemAction-0-Update'
+    )
+
+    expect(updateButton.hostNodes()).toHaveLength(1)
   })
 })

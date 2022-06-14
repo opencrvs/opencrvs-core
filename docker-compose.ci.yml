@@ -51,3 +51,7 @@ services:
   webhooks:
     environment:
       - NODE_ENV=development
+
+  config:
+    environment:
+      - NODE_ENV=development

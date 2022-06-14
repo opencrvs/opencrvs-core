@@ -8,10 +8,11 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 version: '3.3'
-
+volumes:
+  metricbeat:
 services:
   mongo1:
-    image: mongo:3.6
+    image: mongo:4.4
     restart: unless-stopped
 
   redis:
@@ -19,18 +20,20 @@ services:
     restart: unless-stopped
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.0
     restart: unless-stopped
+    environment:
+      - discovery.type=single-node
 
   influxdb:
     image: influxdb:1.7.9
     restart: unless-stopped
 
   hearth:
-    image: jembi/hearth:v1.0.0-beta.3
+    image: opencrvs/hearth:1.1.0
     environment:
       - mongodb__url=mongodb://mongo1/hearth-dev
-      - logger__level=error
+      - logger__level=warn
       - authentication__type=disabled
       - idGenerator=uuidv4
       - server__fhirVersion=stu3
@@ -39,11 +42,12 @@ services:
     restart: unless-stopped
 
   openhim-core:
-    image: jembi/openhim-core:5
+    image: jembi/openhim-core:7
     environment:
       - mongo_url=mongodb://mongo1/openhim-dev
       - mongo_atnaUrl=mongodb://mongo1/openhim-dev
       - logger_level=error
+      - router_timeout=180000
     depends_on:
       - mongo1
     restart: unless-stopped

@@ -18,14 +18,15 @@ import { storage } from '@opencrvs/client/src/storage'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/pin'
 import * as ReactDOM from 'react-dom'
-import { getCurrentUserID, IUserData } from '@client/applications'
+import { getCurrentUserID, IUserData } from '@client/declarations'
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  ${({ theme }) => theme.gradients.gradientNightshade};
+  ${({ theme }) => theme.gradients.primary};
+  background: ${({ theme }) => theme.colors.backgroundPrimary};
   height: 100vh;
   width: 100%;
   position: absolute;
@@ -39,7 +40,7 @@ const StyledPIN = styled(PIN)`
 
 const TitleText = styled.span`
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.h4Style};
+  ${({ theme }) => theme.fonts.h2};
   text-align: center;
   margin-top: 24px;
   margin-bottom: 16px;
@@ -47,7 +48,7 @@ const TitleText = styled.span`
 
 const DescriptionText = styled.span`
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   text-align: center;
   max-width: 360px;
   margin-bottom: 40px;
@@ -58,8 +59,8 @@ const ErrorBox = styled.div`
   align-items: center;
   justify-content: center;
   color: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.fonts.bodyStyle};
-  background: ${({ theme }) => theme.colors.error};
+  ${({ theme }) => theme.fonts.reg16};
+  background: ${({ theme }) => theme.colors.negative};
   height: 40px;
   width: 360px;
   margin-top: -20px;
@@ -125,7 +126,7 @@ class CreatePinComponent extends React.Component<IProps> {
       allUserData.push({
         userID: currentUserID,
         userPIN: hash,
-        applications: []
+        declarations: []
       })
     }
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))

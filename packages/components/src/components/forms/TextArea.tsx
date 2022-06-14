@@ -18,27 +18,27 @@ interface ITextAreaProps {
 }
 
 const StyledTextArea = styled.textarea<ITextAreaProps>`
-  ${({ theme }) => theme.fonts.bigBodyStyle};
+  ${({ theme }) => theme.fonts.reg18};
   width: 100%;
   padding: 10px;
   min-height: 104px;
-  max-width: 344px;
-  border: 2px solid ${({ theme }) => theme.colors.menuBackground};
+  border-radius: 2px;
+  border: 2px solid ${({ theme }) => theme.colors.grey600};
   &:focus {
-    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.focus};
+    box-shadow: 0 0 0px 2px ${({ theme }) => theme.colors.yellow};
     outline: 0;
   }
   background-color: ${({ theme }) => theme.colors.background};
   color: ${({ theme }) => theme.colors.copy};
 
   &::-webkit-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
   &::-moz-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
   &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   ${({ ignoreMediaQuery, theme }) => {

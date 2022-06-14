@@ -22,6 +22,8 @@ import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
 import { ApiResponse } from '@elastic/elasticsearch'
 import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
 import { updateComposition } from '@search/elasticsearch/dbhelper'
+import { capitalize } from '@search/features/search/utils'
+import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
 export async function searchDeclaration(
   request: Hapi.Request,
@@ -45,10 +47,10 @@ export async function getAllDocumentsHandler(
     // By performing the search, requesting only the first 10 in DEFAULT_SIZE we can get the total count
     const allDocumentsCountCheck = await client.search(
       {
-        index: 'ocrvs',
+        index: OPENCRVS_INDEX_NAME,
         body: {
           query: { match_all: {} },
-          sort: [{ dateOfApplication: 'asc' }],
+          sort: [{ dateOfDeclaration: 'asc' }],
           size: DEFAULT_SIZE
         }
       },
@@ -56,7 +58,7 @@ export async function getAllDocumentsHandler(
         ignore: [404]
       }
     )
-    const count: number = allDocumentsCountCheck.body.hits.total
+    const count: number = allDocumentsCountCheck.body.hits.total.value
     if (count > 5000) {
       return internal(
         'Elastic contains over 5000 results.  It is risky to return all without pagination.'
@@ -65,10 +67,10 @@ export async function getAllDocumentsHandler(
     // If total count is less than 5000, then proceed.
     const allDocuments = await client.search(
       {
-        index: 'ocrvs',
+        index: OPENCRVS_INDEX_NAME,
         body: {
           query: { match_all: {} },
-          sort: [{ dateOfApplication: 'asc' }],
+          sort: [{ dateOfDeclaration: 'asc' }],
           size: count
         }
       },
@@ -83,8 +85,9 @@ export async function getAllDocumentsHandler(
 }
 
 interface ICountQueryParam {
-  applicationLocationHirarchyId: string
+  declarationLocationHirarchyId: string
   status: string[]
+  event?: string
 }
 
 export async function getStatusWiseRegistrationCountHandler(
@@ -93,18 +96,70 @@ export async function getStatusWiseRegistrationCountHandler(
 ) {
   try {
     const payload = request.payload as ICountQueryParam
-    const countResult: { status: string; count: number }[] = []
-    for (const regStatus of payload.status) {
-      const searchResult = await searchComposition({
-        applicationLocationHirarchyId: payload.applicationLocationHirarchyId,
-        status: [regStatus]
-      })
-      countResult.push({
-        status: regStatus,
-        count: searchResult?.body?.hits?.total || 0
+    const matchRules: Record<string, any>[] = [
+      {
+        match: {
+          event: capitalize(payload.event || EVENT.BIRTH)
+        }
+      },
+      {
+        terms: {
+          'type.keyword': payload.status
+        }
+      }
+    ]
+    if (payload.declarationLocationHirarchyId) {
+      matchRules.push({
+        match: {
+          declarationLocationHirarchyIds: payload.declarationLocationHirarchyId
+        }
       })
     }
-    return h.response(countResult).code(200)
+
+    const response = await client.search<{
+      aggregations?: {
+        statusCounts: {
+          buckets: Array<{
+            key: string
+            doc_count: number
+          }>
+        }
+      }
+    }>({
+      body: {
+        size: 0,
+        query: {
+          bool: {
+            must: matchRules
+          }
+        },
+        aggs: {
+          statusCounts: {
+            terms: {
+              field: 'type.keyword'
+            }
+          }
+        }
+      }
+    })
+
+    if (!response.body.aggregations) {
+      return payload.status.map((status) => ({
+        status,
+        count: 0
+      }))
+    }
+
+    const countResult = response.body.aggregations.statusCounts.buckets.map(
+      ({ key, doc_count }) => ({ status: key, count: doc_count })
+    )
+
+    const data = payload.status.map((status) => ({
+      status,
+      count: countResult.find(({ status: s }) => s === status)?.count || 0
+    }))
+
+    return h.response(data).code(200)
   } catch (err) {
     return internal(err)
   }
@@ -123,13 +178,13 @@ export async function populateHierarchicalLocationIdsHandler(
     // By performing the search, requesting only the first 10 in DEFAULT_SIZE we can get the total count
     const resultCountCheck = await client.search(
       {
-        index: 'ocrvs',
+        index: OPENCRVS_INDEX_NAME,
         body: {
           query: {
             bool: {
               must_not: {
                 exists: {
-                  field: 'applicationLocationHirarchyIds'
+                  field: 'declarationLocationHirarchyIds'
                 }
               }
             }
@@ -141,24 +196,24 @@ export async function populateHierarchicalLocationIdsHandler(
         ignore: [404]
       }
     )
-    const count: number = resultCountCheck.body.hits.total
+    const count: number = resultCountCheck.body.hits.total.value
     if (count > 5000) {
       return internal(
         'Elastic contains over 5000 results.  It is risky to return all without pagination.'
       )
     }
     // If total count is less than 5000, then proceed.
-    const allDocumentsWithoutHierarchicalLocations: ApiResponse<ISearchResponse<
-      ICompositionBody
-    >> = await client.search(
+    const allDocumentsWithoutHierarchicalLocations: ApiResponse<
+      ISearchResponse<ICompositionBody>
+    > = await client.search(
       {
-        index: 'ocrvs',
+        index: OPENCRVS_INDEX_NAME,
         body: {
           query: {
             bool: {
               must_not: {
                 exists: {
-                  field: 'applicationLocationHirarchyIds'
+                  field: 'declarationLocationHirarchyIds'
                 }
               }
             }
@@ -175,9 +230,9 @@ export async function populateHierarchicalLocationIdsHandler(
 
     for (const composition of compositions) {
       const body: ICompositionBody = composition._source
-      if (body && body.applicationLocationId) {
-        body.applicationLocationHirarchyIds = await getLocationHirarchyIDs(
-          body.applicationLocationId
+      if (body && body.declarationLocationId) {
+        body.declarationLocationHirarchyIds = await getLocationHirarchyIDs(
+          body.declarationLocationId
         )
         await updateComposition(composition._id, body)
         if (

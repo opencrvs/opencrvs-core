@@ -161,8 +161,8 @@ describe('Search type resolvers', () => {
       })
     })
     it('returns _source.operationHistories as operationHistories from birth event search set', () => {
-      const operationHistories = searchTypeResolvers.BirthEventSearchSet.registration(
-        {
+      const operationHistories =
+        searchTypeResolvers.BirthEventSearchSet.registration({
           _type: 'compositions',
           _id: '123',
           _source: {
@@ -198,8 +198,7 @@ describe('Search type resolvers', () => {
               }
             ]
           }
-        }
-      )
+        })
       expect(operationHistories).toEqual({
         operationHistories: [
           {
@@ -357,8 +356,8 @@ describe('Search type resolvers', () => {
       })
     })
     it('returns _source.operationHistories as operationHistories from death event search set', () => {
-      const operationHistories = searchTypeResolvers.DeathEventSearchSet.registration(
-        {
+      const operationHistories =
+        searchTypeResolvers.DeathEventSearchSet.registration({
           _type: 'compositions',
           _id: '123',
           _source: {
@@ -394,8 +393,7 @@ describe('Search type resolvers', () => {
               }
             ]
           }
-        }
-      )
+        })
       expect(operationHistories).toEqual({
         operationHistories: [
           {
@@ -445,8 +443,8 @@ describe('Search type resolvers', () => {
       expect(status).toEqual('DECLARED')
     })
     it('returns locationid from search set', () => {
-      const locationid = searchTypeResolvers.RegistrationSearchSet.registeredLocationId(
-        {
+      const locationid =
+        searchTypeResolvers.RegistrationSearchSet.registeredLocationId({
           event: 'Death',
           type: 'DECLARED',
           deceasedFirstNames: 'Anik',
@@ -454,14 +452,13 @@ describe('Search type resolvers', () => {
           deceasedFirstNamesLocal: 'অনিক',
           deceasedFamilyNameLocal: 'হক',
           deathDate: '01-01-2019',
-          applicationLocationId: '112345'
-        }
-      )
+          declarationLocationId: '112345'
+        })
       expect(locationid).toEqual('112345')
     })
     it('returns eventLocationId from search set', () => {
-      const eventLocationId = searchTypeResolvers.RegistrationSearchSet.eventLocationId(
-        {
+      const eventLocationId =
+        searchTypeResolvers.RegistrationSearchSet.eventLocationId({
           event: 'Death',
           type: 'DECLARED',
           deceasedFirstNames: 'Anik',
@@ -469,10 +466,9 @@ describe('Search type resolvers', () => {
           deceasedFirstNamesLocal: 'অনিক',
           deceasedFamilyNameLocal: 'হক',
           deathDate: '01-01-2019',
-          applicationLocationId: '112345',
+          declarationLocationId: '112345',
           eventLocationId: '12564-54687'
-        }
-      )
+        })
       expect(eventLocationId).toEqual('12564-54687')
     })
     it('returns duplicates from search set', () => {
@@ -484,37 +480,10 @@ describe('Search type resolvers', () => {
         deceasedFirstNamesLocal: 'অনিক',
         deceasedFamilyNameLocal: 'হক',
         deathDate: '01-01-2019',
-        applicationLocationId: '112345',
+        declarationLocationId: '112345',
         relatesTo: ['8a737727-a7db-4e77-865f-310dd7afb836']
       })
       expect(duplicates).toEqual(['8a737727-a7db-4e77-865f-310dd7afb836'])
-    })
-  })
-  describe('type resolvers for event operation history', () => {
-    it('returns operationHistories operator name as human name from birth event search set', () => {
-      const operatorName = searchTypeResolvers.OperationHistorySearchSet.operatorName(
-        {
-          operatedOn: '2019-12-12T15:21:51.355Z',
-          operatorFirstNames: 'Shakib',
-          operatorFamilyName: 'Al Hasan',
-          operatorOfficeName: 'Alokbali Union Parishad',
-          operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ'],
-          operationType: 'DECLARED',
-          operatorRole: 'FIELD_AGENT'
-        }
-      )
-      expect(operatorName).toEqual([
-        {
-          given: ['Shakib'],
-          family: ['Al Hasan'],
-          use: 'en'
-        },
-        {
-          given: null,
-          family: null,
-          use: 'bn'
-        }
-      ])
     })
   })
   describe('type resolvers for EventProgressSet', () => {
@@ -656,17 +625,18 @@ describe('Search type resolvers', () => {
           id: 'dummy_user_id'
         })
       )
-      const userModelData = await searchTypeResolvers.EventProgressSet.startedBy(
-        {
-          _source: {
-            createdBy: 'dummy_practioner_id'
+      const userModelData =
+        await searchTypeResolvers.EventProgressSet.startedBy(
+          {
+            _source: {
+              createdBy: 'dummy_practioner_id'
+            }
+          },
+          {},
+          {
+            Authorization: 'dummy_token'
           }
-        },
-        {},
-        {
-          Authorization: 'dummy_token'
-        }
-      )
+        )
       expect(userModelData).toEqual({
         id: 'dummy_user_id'
       })
@@ -688,15 +658,16 @@ describe('Search type resolvers', () => {
           }
         ])
       )
-      const progressReport = await searchTypeResolvers.EventProgressSet.progressReport(
-        {
-          _id: 'dummy_id'
-        },
-        {},
-        {
-          Authorization: 'dummy_token'
-        }
-      )
+      const progressReport =
+        await searchTypeResolvers.EventProgressSet.progressReport(
+          {
+            _id: 'dummy_id'
+          },
+          {},
+          {
+            Authorization: 'dummy_token'
+          }
+        )
       expect(progressReport).toEqual([
         {
           time: '123',
@@ -747,39 +718,41 @@ describe('Search type resolvers', () => {
       }
     ]
     it('return time in progress', () => {
-      const timeInProgress = searchTypeResolvers.EventProgressData.timeInProgress(
-        timeLoggedData
-      )
+      const timeInProgress =
+        searchTypeResolvers.EventProgressData.timeInProgress(timeLoggedData)
       expect(timeInProgress).toEqual(50)
     })
     it('return time in ready for review', () => {
-      const timeInReadyForReview = searchTypeResolvers.EventProgressData.timeInReadyForReview(
-        timeLoggedData
-      )
+      const timeInReadyForReview =
+        searchTypeResolvers.EventProgressData.timeInReadyForReview(
+          timeLoggedData
+        )
       expect(timeInReadyForReview).toEqual(100)
     })
     it('return time in requires updates', () => {
-      const timeInRequiresUpdates = searchTypeResolvers.EventProgressData.timeInRequiresUpdates(
-        timeLoggedData
-      )
+      const timeInRequiresUpdates =
+        searchTypeResolvers.EventProgressData.timeInRequiresUpdates(
+          timeLoggedData
+        )
       expect(timeInRequiresUpdates).toEqual(150)
     })
     it('return time in waiting for approval', () => {
-      const timeInWaitingForApproval = searchTypeResolvers.EventProgressData.timeInWaitingForApproval(
-        timeLoggedData
-      )
+      const timeInWaitingForApproval =
+        searchTypeResolvers.EventProgressData.timeInWaitingForApproval(
+          timeLoggedData
+        )
       expect(timeInWaitingForApproval).toEqual(200)
     })
     it('return time in waiting for BRIS', () => {
-      const timeInWaitingForBRIS = searchTypeResolvers.EventProgressData.timeInWaitingForBRIS(
-        timeLoggedData
-      )
+      const timeInWaitingForBRIS =
+        searchTypeResolvers.EventProgressData.timeInWaitingForBRIS(
+          timeLoggedData
+        )
       expect(timeInWaitingForBRIS).toEqual(250)
     })
     it('return time in ready to print', () => {
-      const timeInReadyToPrint = searchTypeResolvers.EventProgressData.timeInReadyToPrint(
-        timeLoggedData
-      )
+      const timeInReadyToPrint =
+        searchTypeResolvers.EventProgressData.timeInReadyToPrint(timeLoggedData)
       expect(timeInReadyToPrint).toEqual(300)
     })
   })

@@ -14,46 +14,40 @@ import * as React from 'react'
 
 export const TertiaryButton = styled(Button)`
   width: auto;
-  ${({ theme }) => theme.fonts.buttonStyle};
+  ${({ theme }) => theme.fonts.bold14};
   transition: background 0.4s ease;
   align-items: center;
   border: 0;
-  border-radius: 2px;
+  border-radius: 4px;
   text-transform: none !important;
-  cursor: pointer;
   height: 32px;
   & > div {
     padding: 0 8px;
     height: 32px;
   }
-  color: ${({ theme }) => theme.colors.tertiary};
+  color: ${({ theme }) => theme.colors.primary};
   &:hover {
-    opacity: 0.8;
-    background: ${({ theme }) => theme.colors.background};
+    background: ${({ theme }) => theme.colors.grey200};
   }
   &:not([data-focus-visible-added]):hover {
-    opacity: 0.8;
-    background: ${({ theme }) => theme.colors.background};
+    background: ${({ theme }) => theme.colors.grey200};
   }
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
   &:not([data-focus-visible-added]) {
     background: transparent;
     outline: none;
-    color: ${({ theme }) => theme.colors.tertiary};
+    color: ${({ theme }) => theme.colors.primary};
   }
   &:active:not([data-focus-visible-added]) {
-    outline: none;
-    background: ${({ theme }) => theme.colors.focus};
-    color: ${({ theme }) => theme.colors.copy};
-    opacity: 1;
+    background: ${({ theme }) => theme.colors.grey200};
   }
 
-  &:disabled {
-    background: ${({ theme }) => theme.colors.disabled};
+  &:disabled:hover {
+    background: ${({ theme }) => theme.colors.white};
   }
 `
 
@@ -69,7 +63,8 @@ const ButtonBase = styled.button`
   cursor: pointer;
   background: transparent;
   &:disabled {
-    background: ${({ theme }) => theme.colors.disabled};
+    background: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }) => theme.colors.disabled};
     path {
       stroke: ${({ theme }) => theme.colors.disabled};
     }
@@ -135,8 +130,7 @@ const LeftButtonIcon = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-right: 1px;
-  margin-left: -3px;
+  margin-right: 8px;
 `
 const RightButtonIcon = styled.div`
   position: relative !important;

@@ -25,15 +25,12 @@ export const influx = new Influx.InfluxDB({
   port: INFLUX_PORT,
   schema: [
     {
-      measurement: 'birth_reg',
+      measurement: 'certification',
       fields: {
-        compositionId: Influx.FieldType.STRING,
-        currentStatus: Influx.FieldType.STRING,
-        ageInDays: Influx.FieldType.INTEGER
+        compositionId: Influx.FieldType.STRING
       },
       tags: [
-        'regStatus',
-        'gender',
+        'eventType',
         'officeLocation',
         'locationLevel5',
         'locationLevel4',
@@ -42,7 +39,29 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
-      measurement: 'death_reg',
+      measurement: 'birth_registration',
+      fields: {
+        compositionId: Influx.FieldType.STRING,
+        currentStatus: Influx.FieldType.STRING,
+        ageInDays: Influx.FieldType.INTEGER
+      },
+      tags: [
+        'regStatus',
+        'gender',
+        'timeLabel',
+        'ageLabel',
+        'dateLabel',
+        'practitionerRole',
+        'eventLocationType',
+        'officeLocation',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
+    },
+    {
+      measurement: 'death_registration',
       fields: {
         compositionId: Influx.FieldType.STRING,
         currentStatus: Influx.FieldType.STRING,
@@ -52,6 +71,11 @@ export const influx = new Influx.InfluxDB({
       tags: [
         'regStatus',
         'gender',
+        'ageLabel',
+        'timeLabel',
+        'dateLabel',
+        'practitionerRole',
+        'eventLocationType',
         'mannerOfDeath',
         'causeOfDeath',
         'officeLocation',
@@ -79,7 +103,7 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
-      measurement: 'application_time_logged',
+      measurement: 'declaration_time_logged',
       fields: {
         timeSpentEditing: Influx.FieldType.INTEGER,
         compositionId: Influx.FieldType.STRING
@@ -97,7 +121,7 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
-      measurement: 'application_event_duration',
+      measurement: 'declaration_event_duration',
       fields: {
         durationInSeconds: Influx.FieldType.INTEGER,
         compositionId: Influx.FieldType.STRING,
@@ -107,13 +131,13 @@ export const influx = new Influx.InfluxDB({
       tags: ['currentStatus', 'previousStatus', 'eventType']
     },
     {
-      measurement: 'certification_payment',
+      measurement: 'correction',
       fields: {
-        total: Influx.FieldType.FLOAT,
         compositionId: Influx.FieldType.STRING
       },
       tags: [
         'eventType',
+        'reason',
         'officeLocation',
         'locationLevel5',
         'locationLevel4',
@@ -122,7 +146,23 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
-      measurement: 'applications_started',
+      measurement: 'payment',
+      fields: {
+        total: Influx.FieldType.FLOAT,
+        compositionId: Influx.FieldType.STRING
+      },
+      tags: [
+        'eventType',
+        'paymentType',
+        'officeLocation',
+        'locationLevel5',
+        'locationLevel4',
+        'locationLevel3',
+        'locationLevel2'
+      ]
+    },
+    {
+      measurement: 'declarations_started',
       fields: {
         role: Influx.FieldType.STRING,
         status: Influx.FieldType.STRING,
@@ -139,7 +179,7 @@ export const influx = new Influx.InfluxDB({
       ]
     },
     {
-      measurement: 'applications_rejected',
+      measurement: 'declarations_rejected',
       fields: {
         compositionId: Influx.FieldType.STRING
       },
@@ -163,11 +203,40 @@ export const writePoints = (points: IPoints[]) => {
   })
 }
 
-export const query = <T = any>(q: string): Promise<T> => {
+type InfluxQueryOptions = {
+  placeholders: Record<string, any>
+}
+
+export const query = <T = any>(
+  q: string,
+  options?: InfluxQueryOptions
+): Promise<T> => {
   try {
-    return influx.query(q)
+    return influx.query(q, options)
   } catch (err) {
     logger.error(`Error reading data from InfluxDB! ${err.stack}`)
+    throw err
+  }
+}
+
+export async function deleteMeasurements() {
+  try {
+    await Promise.all([
+      influx.dropMeasurement('birth_reg', INFLUX_DB),
+      influx.dropMeasurement('death_reg', INFLUX_DB),
+      influx.dropMeasurement('in_complete_fields', INFLUX_DB),
+      influx.dropMeasurement('declaration_time_logged', INFLUX_DB),
+      influx.dropMeasurement('declaration_event_duration', INFLUX_DB),
+      influx.dropMeasurement('certification_payment', INFLUX_DB),
+      influx.dropMeasurement('correction_payment', INFLUX_DB),
+      influx.dropMeasurement('declarations_started', INFLUX_DB),
+      influx.dropMeasurement('declarations_rejected', INFLUX_DB)
+    ])
+    return {
+      status: `Successfully deleted all the measurements form ${INFLUX_DB} database`
+    }
+  } catch (err) {
+    logger.error(`Error deleting ${INFLUX_DB} database from InfluxDB! ${err}`)
     throw err
   }
 }

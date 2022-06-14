@@ -13,10 +13,10 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 const Label = styled.span`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle}
+  ${({ theme }) => theme.fonts.h4}
 `
 const Value = styled.span`
-  ${({ theme }) => theme.fonts.bigBodyStyle}
+  ${({ theme }) => theme.fonts.reg18}
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -24,6 +24,9 @@ const Value = styled.span`
 const LabelValuePairContainer = styled.div`
   display: flex;
   flex-wrap: nowrap;
+  @media (max-width: 768px) {
+    display: grid;
+  }
 `
 interface IInfo {
   label: string

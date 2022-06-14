@@ -18,31 +18,22 @@ import {
 } from '@client/forms'
 
 export const birthDocumentForWhomFhirMapping = {
-  Child: 'CHILD',
-  Father: 'FATHER',
-  Mother: 'MOTHER',
-  Parent: 'PARENT',
-  Other: 'OTHER',
-  ChildAge: 'CHILD_AGE',
-  Applicant: 'APPLICANT_ID_PROOF',
-  AssignedResponsibilityProof: 'ASSIGNED_RESPONSIBILITY_PROOF',
-  LegalGuardianProof: 'LEGAL_GUARDIAN_PROOF',
-  WardCouncillorProof: 'WARD_COUNCILLOR_PROOF'
+  CHILD: 'CHILD',
+  FATHER: 'FATHER',
+  MOTHER: 'MOTHER',
+  PARENT: 'PARENT',
+  OTHER: 'OTHER',
+  INFORMANT_ID_PROOF: 'INFORMANT_ID_PROOF',
+  LEGAL_GUARDIAN_PROOF: 'LEGAL_GUARDIAN_PROOF'
 }
 
 export const birthSectionMapping = {
-  [BirthSection.Child]: [
-    birthDocumentForWhomFhirMapping.Child,
-    birthDocumentForWhomFhirMapping.ChildAge,
-    birthDocumentForWhomFhirMapping.WardCouncillorProof
-  ],
-  [BirthSection.Mother]: [birthDocumentForWhomFhirMapping.Mother],
-  [BirthSection.Father]: [birthDocumentForWhomFhirMapping.Father],
-  [BirthSection.Applicant]: [birthDocumentForWhomFhirMapping.Applicant],
-  [BirthSection.Parent]: [
-    birthDocumentForWhomFhirMapping.Parent,
-    birthDocumentForWhomFhirMapping.AssignedResponsibilityProof,
-    birthDocumentForWhomFhirMapping.LegalGuardianProof
+  [BirthSection.Child]: [birthDocumentForWhomFhirMapping.CHILD],
+  [BirthSection.Mother]: [birthDocumentForWhomFhirMapping.MOTHER],
+  [BirthSection.Father]: [birthDocumentForWhomFhirMapping.FATHER],
+  [BirthSection.Informant]: [
+    birthDocumentForWhomFhirMapping.INFORMANT_ID_PROOF,
+    birthDocumentForWhomFhirMapping.LEGAL_GUARDIAN_PROOF
   ]
 }
 
@@ -50,31 +41,17 @@ export const birthSectionTitle = {
   [BirthSection.Child]: 'Child',
   [BirthSection.Mother]: 'Mother',
   [BirthSection.Father]: 'Father',
-  [BirthSection.Applicant]: 'Applicant',
-  [BirthSection.Parent]: 'Parent'
+  [BirthSection.Informant]: 'Informant'
 }
 
 export const birthDocumentTypeFhirMapping = {
-  'Birth Registration': 'BIRTH_REGISTRATION',
-  'National ID (front)': 'NATIONAL_ID_FRONT',
-  'National ID (back)': 'NATIONAL_ID_BACK',
-  'Notification of birth': 'NOTIFICATION_OF_BIRTH',
-  Passport: 'PASSPORT',
-  'School Certificate': 'SCHOOL_CERTIFICATE',
-  Other: 'OTHER',
-  'EPI Card': 'EPI_CARD',
-  'EPI Staff Certificate': 'EPI_STAFF_CERTIFICATE',
-  'Doctor Certificate': 'DOCTOR_CERTIFICATE',
-  'Proof of Place and Date of Birth': 'BIRTH_PLACE_DATE_PROOF',
-  'Discharge Certificate': 'DISCHARGE_CERTIFICATE',
-  'Proof of birth from medical institution': 'MEDICAL_INSTITUTION',
-  'Proof of birth from birth attendant': 'BIRTH_ATTENDANT',
-  'Tax Payment Receipt': 'TAX_RECEIPT',
-  'Original Birth Record': 'ORIGINAL_BIRTH_RECORD',
-  'Under Five Card': 'UNDER_FIVE_CARD',
-  'Proof of legal guardianship': 'PROOF_OF_LEGAL_GUARDIANSHIP',
-  'Proof of assigned responsibility': 'PROOF_OF_ASSIGNED_RESPONSIBILITY',
-  'Letter from ward councillor': 'LETTER_FROM_COUNCILLOR'
+  BIRTH_CERTIFICATE: 'BIRTH_CERTIFICATE',
+  NATIONAL_ID: 'NATIONAL_ID',
+  PASSPORT: 'PASSPORT',
+  OTHER: 'OTHER',
+  NOTIFICATION_OF_BIRTH: 'NOTIFICATION_OF_BIRTH',
+  PROOF_OF_LEGAL_GUARDIANSHIP: 'PROOF_OF_LEGAL_GUARDIANSHIP',
+  PROOF_OF_ASSIGNED_RESPONSIBILITY: 'PROOF_OF_ASSIGNED_RESPONSIBILITY'
 }
 
 export function birthFieldToAttachmentTransformer(

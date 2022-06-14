@@ -9,12 +9,21 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as moment from 'moment'
 import {
   getTask,
   getComposition
 } from '@metrics/features/registration/fhirUtils'
 import { fetchFHIR } from '@metrics/api'
+import {
+  differenceInDays,
+  differenceInSeconds,
+  differenceInYears
+} from 'date-fns'
+import {
+  EVENT_TYPE,
+  getRegistrationTargetDays,
+  getRegistrationLateTargetDays
+} from '@metrics/features/metrics/utils'
 
 type YYYY_MM_DD = string
 type ISO_DATE = string
@@ -28,21 +37,21 @@ export function getAgeInYears(dateOfBirth: YYYY_MM_DD, fromDate: Date) {
 }
 
 export function getDurationInDays(from: ISO_DATE, to: ISO_DATE) {
-  const toDate = moment(to)
-  const fromDate = moment(from)
-  return toDate.diff(fromDate, 'days')
+  const toDate = new Date(to)
+  const fromDate = new Date(from)
+  return differenceInDays(toDate, fromDate)
 }
 
 export function getDurationInSeconds(from: ISO_DATE, to: ISO_DATE) {
-  const toDate = moment(to)
-  const fromDate = moment(from)
-  return toDate.diff(fromDate, 'seconds')
+  const toDate = new Date(to)
+  const fromDate = new Date(from)
+  return differenceInSeconds(toDate, fromDate)
 }
 
 export function getDurationInYears(from: ISO_DATE, to: ISO_DATE) {
-  const toDate = moment(to)
-  const fromDate = moment(from)
-  return toDate.diff(fromDate, 'years')
+  const toDate = new Date(to)
+  const fromDate = new Date(from)
+  return differenceInYears(toDate, fromDate)
 }
 
 /* Populates a bundle with necessary parts for processing metrics
@@ -125,4 +134,35 @@ export async function populateBundleFromPayload(
   }
 
   return bundle
+}
+
+export async function getTimeLabel(
+  timeInDays: number,
+  event: EVENT_TYPE,
+  authorization: string
+): Promise<string> {
+  const regTargetDays = await getRegistrationTargetDays(event, authorization)
+  const regLateTargetDays = await getRegistrationLateTargetDays(
+    event,
+    authorization
+  )
+  if (timeInDays <= regTargetDays) {
+    return 'withinTarget'
+  } else if (regLateTargetDays && timeInDays <= regLateTargetDays) {
+    return 'withinLate'
+  } else if (timeInDays <= 365) {
+    return 'within1Year'
+  } else if (timeInDays <= 1825) {
+    return 'within5Years'
+  } else {
+    return 'after5Years'
+  }
+}
+
+export function getAgeLabel(ageInDays: number) {
+  if (ageInDays < 6574) {
+    return 'under18'
+  } else {
+    return 'over18'
+  }
 }

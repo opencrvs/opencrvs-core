@@ -20,6 +20,7 @@ interface ICertificateMessages
   certificateReceiptHeader: MessageDescriptor
   certificateReceiptSubHeader: MessageDescriptor
   collectPayment: MessageDescriptor
+  correctorIDCheckDialogDescription: MessageDescriptor
   dateOfBirth: MessageDescriptor
   familyName: MessageDescriptor
   familyNameInEng: MessageDescriptor
@@ -46,8 +47,6 @@ interface ICertificateMessages
   paymentInstruction: MessageDescriptor
   paymentAmount: MessageDescriptor
   paymentMethod: MessageDescriptor
-  person1: MessageDescriptor
-  person2: MessageDescriptor
   preview: MessageDescriptor
   print: MessageDescriptor
   printCertificate: MessageDescriptor
@@ -68,7 +67,6 @@ interface ICertificateMessages
   modalBody: MessageDescriptor
   toastMessage: MessageDescriptor
   otherCollectorFormTitle: MessageDescriptor
-  otherCollectorFormParagraph: MessageDescriptor
   certificateCollectorError: MessageDescriptor
   certificateOtherCollectorInfoError: MessageDescriptor
   certificateOtherCollectorAffidavitFormTitle: MessageDescriptor
@@ -78,6 +76,8 @@ interface ICertificateMessages
   noAffidavitModalTitle: MessageDescriptor
   noAffidavitModalDescription: MessageDescriptor
   signedAffidavitFileLabel: MessageDescriptor
+  printedOnCollection: MessageDescriptor
+  collectorIDCheck: MessageDescriptor
 }
 
 const messagesToDefine: ICertificateMessages = {
@@ -86,7 +86,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.addAnotherSignature'
   },
   certificateCollectionTitle: {
-    defaultMessage: 'Certificate collection',
+    defaultMessage: 'Print certificate',
     description: 'The title of print certificate action',
     id: 'print.certificate.section.title'
   },
@@ -116,6 +116,13 @@ const messagesToDefine: ICertificateMessages = {
       'Please collect the payment, print the receipt and hand it over to the payee.',
     description: 'The label for collect payment paragraph',
     id: 'print.certificate.collectPayment'
+  },
+  correctorIDCheckDialogDescription: {
+    id: 'correction.corrector.description',
+    defaultMessage:
+      'Please be aware that if you proceed, you will be responsible for making a change to this record without the necessary proof of identification',
+    description:
+      'The description for the dialog when details of the corrector not verified'
   },
   dateOfBirth: {
     defaultMessage: 'Date of Birth',
@@ -168,23 +175,23 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.cert.coll.id.description'
   },
   idCheckDialogTitle: {
-    defaultMessage: 'Continue without proof of ID?',
+    defaultMessage: 'Print without proof of ID?',
     description:
       'The title for the dialog when details of the collector not verified',
     id: 'print.certificate.collector.idCheckDialog.title'
   },
   idCheckTitle: {
-    defaultMessage: 'Check proof of ID. Does it match the following details?',
+    defaultMessage: 'Check proof of ID',
     description: 'The title for id check component',
     id: 'print.certificate.collector.idCheck.title'
   },
   idCheckVerify: {
-    defaultMessage: 'Yes',
+    defaultMessage: 'ID verified',
     description: 'The label for id check component action when verify details',
     id: 'print.cert.coll.idCheck.actions.ver'
   },
   idCheckWithoutVerify: {
-    defaultMessage: 'No',
+    defaultMessage: 'No ID match',
     description:
       'The label for id check component action when does not verify details',
     id: 'print.cert.coll.idCheck.actions.noVer'
@@ -237,7 +244,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.other'
   },
   payment: {
-    defaultMessage: 'Payment is required',
+    defaultMessage: 'Collect payment',
     description: 'The title for payment section',
     id: 'print.certificate.payment'
   },
@@ -256,14 +263,6 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Payment method',
     description: 'The label for payment method select',
     id: 'print.certificate.paymentMethod'
-  },
-  person1: {
-    defaultMessage: 'UP Secretary Shakib al hasan',
-    id: 'print.certificate.signature.person1'
-  },
-  person2: {
-    defaultMessage: 'Local Registrar Mohammad Ashraful',
-    id: 'print.certificate.signature.person2'
   },
   preview: {
     defaultMessage: 'Certificate Preview',
@@ -327,29 +326,29 @@ const messagesToDefine: ICertificateMessages = {
     id: 'certificate.parent.details.label.typeOfID'
   },
   whoToCollect: {
-    defaultMessage: 'Who is collecting the certificate?',
+    defaultMessage: 'Certificate collector',
     description: 'The label for collector of certificate select',
     id: 'print.certificate.collector.whoToCollect'
   },
   confirmAndPrint: {
-    defaultMessage: 'Continue and print',
-    description: 'The text for Confirm & print button',
+    defaultMessage: 'Print',
+    description: 'The text for print button',
     id: 'print.certificate.button.confirmPrint'
   },
   reviewTitle: {
-    defaultMessage: 'Are all the details on the {event} certificate correct?',
+    defaultMessage: 'Review certificate',
     description: 'Certificate review title',
     id: 'print.certificate.review.title'
   },
   reviewDescription: {
     defaultMessage:
-      'Please confirm that the applicant has reviewed that the information on the certificate is correct and that it is ready to print.',
+      'Please confirm that the information on the certificate is correct and that it is ready to print.',
     description: 'Certificate review description',
     id: 'print.certificate.review.description'
   },
   modalTitle: {
     id: 'print.certificate.review.modal.title',
-    defaultMessage: 'Print Certificate?',
+    defaultMessage: 'Print certificate?',
     description: 'Print certificate modal title text'
   },
   modalBody: {
@@ -364,15 +363,9 @@ const messagesToDefine: ICertificateMessages = {
     description: 'Floating Toast message upon certificate ready to print'
   },
   otherCollectorFormTitle: {
-    defaultMessage: 'What is their ID and name?',
+    defaultMessage: 'Collector details',
     description: 'Title for other collector form',
     id: 'print.certificate.collector.other.title'
-  },
-  otherCollectorFormParagraph: {
-    defaultMessage:
-      'Because there are no details of this person on record, we need to capture their details:',
-    description: 'Paragraph for other collector form',
-    id: 'print.certificate.collector.other.paragraph'
   },
   certificateCollectorError: {
     defaultMessage: 'Please select who is collecting the certificate',
@@ -385,13 +378,13 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.certificate.collector.other.form.error'
   },
   certificateOtherCollectorAffidavitFormTitle: {
-    defaultMessage: 'Attach a signed affidavit',
+    defaultMessage: 'Upload signed affidavit',
     description: 'Form title for other collector affidavit form',
     id: 'print.cert.coll.other.aff.form.title'
   },
   certificateOtherCollectorAffidavitError: {
     defaultMessage:
-      'Attach a signed affidavit or click the checkbox if they do not have one.',
+      'Upload signed affidavit or click the checkbox if they do not have one.',
     description: 'Form level error for other collector affidavit form',
     id: 'print.cert.coll.other.aff.error'
   },
@@ -402,12 +395,12 @@ const messagesToDefine: ICertificateMessages = {
     id: 'print.cert.coll.other.aff.paragraph'
   },
   noSignedAffidavitAvailable: {
-    defaultMessage: "They don't have a signed affidavit",
+    defaultMessage: 'No signed affidavit available',
     description: 'Label for no affidavit checkbox',
     id: 'print.cert.coll.other.aff.check'
   },
   noAffidavitModalTitle: {
-    defaultMessage: 'Continue without signed affidavit?',
+    defaultMessage: 'Print without signed affidavit?',
     description:
       'Modal title for other coller form submission without signed affidavit',
     id: 'print.cert.coll.other.aff.title'
@@ -423,6 +416,17 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'Signed affidavit',
     description: 'File label for signed affidavit',
     id: 'print.cert.coll.other.aff.label'
+  },
+  printedOnCollection: {
+    defaultMessage: 'Printed on collection',
+    description: 'Table column header showing collector info in record audit',
+    id: 'record.certificate.collector'
+  },
+  collectorIDCheck: {
+    defaultMessage: 'ID Check',
+    description:
+      'Table column header showing collector ID verification info in record audit',
+    id: 'record.certificate.collector'
   }
 }
 
@@ -443,27 +447,31 @@ const dynamicMessagesToDefine = {
       'Service: <strong>Death registration after {service} of D.o.D.</strong><br/>Amount Due:',
     description: 'Amount due on certificate for death label'
   },
+  birthServiceBefore: {
+    id: 'certificate.receipt.birthService.before',
+    defaultMessage: 'Birth registration before {target} days of date of birth',
+    description: 'Amount due on certificate for birth label before target days'
+  },
   birthServiceAfter: {
     id: 'certificate.receipt.birthService.after',
-    defaultMessage: 'Birth registration after 5 years of date of birth',
+    defaultMessage: 'Birth registration after {target} days of date of birth',
     description: 'Amount due on certificate for birth label'
+  },
+  deathServiceBefore: {
+    id: 'certificate.receipt.deathService.before',
+    defaultMessage: 'Death registration before {target} days of date of birth',
+    description: 'Amount due on certificate for birth label before target days'
   },
   deathServiceAfter: {
     id: 'certificate.receipt.deathService.after',
-    defaultMessage: 'Death registration after 5 years of date of death',
+    defaultMessage: 'Death registration after {target} days of date of death',
     description: 'Amount due on certificate for death label'
   },
   birthServiceBetween: {
     id: 'certificate.receipt.birthService.between',
     defaultMessage:
-      'Birth registration between 45 days and 5 years of date of birth',
+      'Birth registration between {target} days and {latetarget} days of date of birth',
     description: 'Amount due on certificate for birth label'
-  },
-  deathServiceBetween: {
-    id: 'certificate.receipt.deathService.between',
-    defaultMessage:
-      'Death registration between 45 days and 5 years of date of death',
-    description: 'Amount due on certificate for death label'
   }
 }
 

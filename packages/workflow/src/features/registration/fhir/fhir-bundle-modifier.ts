@@ -12,12 +12,7 @@
 import {
   EVENT_TYPE,
   OPENCRVS_SPECIFICATION_URL,
-  REG_STATUS_CERTIFIED,
-  REG_STATUS_DECLARED,
-  REG_STATUS_IN_PROGRESS,
-  REG_STATUS_VALIDATED,
-  REG_STATUS_WAITING_VALIDATION,
-  REG_STATUS_REGISTERED
+  RegStatus
 } from '@workflow/features/registration/fhir/constants'
 import {
   getTaskResource,
@@ -26,14 +21,15 @@ import {
 } from '@workflow/features/registration/fhir/fhir-template'
 import {
   getFromFhir,
-  getRegStatusCode
+  getRegStatusCode,
+  fetchExistingRegStatusCode
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   generateBirthTrackingId,
   generateDeathTrackingId,
   getEventType,
   isEventNotification,
-  isInProgressApplication
+  isInProgressDeclaration
 } from '@workflow/features/registration/utils'
 import {
   getLoggedInPractitionerResource,
@@ -45,6 +41,15 @@ import { logger } from '@workflow/logger'
 import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils'
 import { RESOURCE_SERVICE_URL } from '@workflow/constants'
 import fetch from 'node-fetch'
+import { checkFormDraftStatusToAddTestExtension } from '@workflow/utils/formDraftUtils'
+import {
+  DOWNLOADED_EXTENSION_URL,
+  REINSTATED_EXTENSION_URL,
+  REQUEST_CORRECTION_EXTENSION_URL
+} from '@workflow/features/task/fhir/constants'
+export interface ITaskBundleEntry extends fhir.BundleEntry {
+  resource: fhir.Task
+}
 
 export async function modifyRegistrationBundle(
   fhirBundle: fhir.Bundle,
@@ -72,9 +77,9 @@ export async function modifyRegistrationBundle(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    isInProgressApplication(fhirBundle)
-      ? REG_STATUS_IN_PROGRESS
-      : REG_STATUS_DECLARED
+    isInProgressDeclaration(fhirBundle)
+      ? RegStatus.IN_PROGRESS
+      : RegStatus.DECLARED
   )
 
   const practitioner = await getLoggedInPractitionerResource(token)
@@ -86,6 +91,9 @@ export async function modifyRegistrationBundle(
     await setupLastRegLocation(taskResource, practitioner)
   }
 
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
   /* setting author and time on notes here */
   setupAuthorOnNotes(taskResource, practitioner)
 
@@ -96,19 +104,60 @@ export async function markBundleAsValidated(
   bundle: fhir.Bundle & fhir.BundleEntry,
   token: string
 ): Promise<fhir.Bundle & fhir.BundleEntry> {
-  const taskResource = getTaskResource(bundle) as fhir.Task
+  const taskResource = getTaskResource(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_VALIDATED
+    RegStatus.VALIDATED
   )
 
   await setupLastRegLocation(taskResource, practitioner)
 
   setupLastRegUser(taskResource, practitioner)
+
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
+  return bundle
+}
+
+export async function markBundleAsRequestedForCorrection(
+  bundle: fhir.Bundle & fhir.BundleEntry,
+  token: string
+): Promise<fhir.Bundle & fhir.BundleEntry> {
+  const taskResource = getTaskResource(bundle)
+  const practitioner = await getLoggedInPractitionerResource(token)
+  const regStatusCode = await fetchExistingRegStatusCode(taskResource.id)
+
+  if (!taskResource.extension) {
+    taskResource.extension = []
+  }
+  taskResource.extension.push({
+    url: REQUEST_CORRECTION_EXTENSION_URL,
+    valueString: regStatusCode?.code
+  })
+
+  await setupLastRegLocation(taskResource, practitioner)
+
+  setupLastRegUser(taskResource, practitioner)
+
+  /* setting registration workflow status here */
+  await setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    regStatusCode?.code
+  )
+
+  removeExtensionFromBundle(bundle, [
+    DOWNLOADED_EXTENSION_URL,
+    REINSTATED_EXTENSION_URL
+  ])
+
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
 }
@@ -135,7 +184,7 @@ export async function markBundleAsWaitingValidation(
   bundle: fhir.Bundle & fhir.BundleEntry,
   token: string
 ): Promise<fhir.Bundle & fhir.BundleEntry> {
-  const taskResource = getTaskResource(bundle) as fhir.Task
+  const taskResource = getTaskResource(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -143,7 +192,7 @@ export async function markBundleAsWaitingValidation(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_WAITING_VALIDATION
+    RegStatus.WAITING_VALIDATION
   )
 
   /* setting lastRegLocation here */
@@ -151,6 +200,36 @@ export async function markBundleAsWaitingValidation(
 
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
+
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
+  return bundle
+}
+
+export async function markBundleAsDeclarationUpdated(
+  bundle: fhir.Bundle & fhir.BundleEntry,
+  token: string
+): Promise<fhir.Bundle & fhir.BundleEntry> {
+  const taskResource = getTaskResource(bundle)
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  /* setting registration workflow status here */
+  await setupRegistrationWorkflow(
+    taskResource,
+    getTokenPayload(token),
+    RegStatus.DECLARATION_UPDATED
+  )
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
+
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
   return bundle
 }
@@ -180,7 +259,7 @@ export async function markEventAsRegistered(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_REGISTERED
+    RegStatus.REGISTERED
   )
 
   return taskResource
@@ -190,7 +269,7 @@ export async function markBundleAsCertified(
   bundle: fhir.Bundle,
   token: string
 ): Promise<fhir.Bundle> {
-  const taskResource = getTaskResource(bundle) as fhir.Task
+  const taskResource = getTaskResource(bundle)
 
   const practitioner = await getLoggedInPractitionerResource(token)
 
@@ -198,7 +277,7 @@ export async function markBundleAsCertified(
   await setupRegistrationWorkflow(
     taskResource,
     getTokenPayload(token),
-    REG_STATUS_CERTIFIED
+    RegStatus.CERTIFIED
   )
 
   /* setting lastRegLocation here */
@@ -207,7 +286,52 @@ export async function markBundleAsCertified(
   /* setting lastRegUser here */
   setupLastRegUser(taskResource, practitioner)
 
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
   return bundle
+}
+
+export async function touchBundle(
+  bundle: fhir.Bundle,
+  token: string
+): Promise<fhir.Bundle> {
+  const taskResource = getTaskResource(bundle) as fhir.Task
+
+  const practitioner = await getLoggedInPractitionerResource(token)
+
+  /* setting lastRegLocation here */
+  await setupLastRegLocation(taskResource, practitioner)
+
+  /* setting lastRegUser here */
+  setupLastRegUser(taskResource, practitioner)
+
+  /* check if the status of any event draft is not published and setting configuration extension*/
+  await checkFormDraftStatusToAddTestExtension(taskResource, token)
+
+  return bundle
+}
+
+export function removeExtensionFromBundle(
+  fhirBundle: fhir.Bundle,
+  urls: string[]
+): fhir.Bundle {
+  if (
+    fhirBundle &&
+    fhirBundle.entry &&
+    fhirBundle.entry[0] &&
+    fhirBundle.entry[0].resource
+  ) {
+    let extensions: fhir.Extension[] =
+      (fhirBundle.entry[0].resource as fhir.Element).extension || []
+
+    extensions = extensions.filter(
+      (ext: fhir.Extension) => !urls.includes(ext.url)
+    )
+    ;(fhirBundle.entry[0].resource as fhir.Element).extension = extensions
+  }
+
+  return fhirBundle
 }
 
 export function setTrackingId(fhirBundle: fhir.Bundle): fhir.Bundle {
@@ -391,6 +515,28 @@ export function setupLastRegUser(
   return taskResource
 }
 
+export function setupTestExtension(taskResource: fhir.Task): fhir.Task {
+  if (!taskResource.extension) {
+    taskResource.extension = []
+  }
+  const testExtension = taskResource.extension.find((extension) => {
+    return (
+      extension.url === `${OPENCRVS_SPECIFICATION_URL}extension/configuration`
+    )
+  })
+  if (testExtension && testExtension.valueReference) {
+    testExtension.valueReference.reference = 'IN_CONFIGURATION'
+  } else {
+    taskResource.extension.push({
+      url: `${OPENCRVS_SPECIFICATION_URL}extension/configuration`,
+      valueReference: { reference: 'IN_CONFIGURATION' }
+    })
+  }
+  taskResource.lastModified =
+    taskResource.lastModified || new Date().toISOString()
+  return taskResource
+}
+
 export function setupAuthorOnNotes(
   taskResource: fhir.Task,
   practitioner: fhir.Practitioner
@@ -420,23 +566,16 @@ export async function checkForDuplicateStatusUpdate(taskResource: fhir.Task) {
     !taskResource ||
     !taskResource.id ||
     !regStatusCode ||
-    regStatusCode.code === REG_STATUS_CERTIFIED
+    regStatusCode.code === RegStatus.CERTIFIED
   ) {
     return
   }
-  const existingTaskResource: fhir.Task = await getFromFhir(
-    `/Task/${taskResource.id}`
+  const existingRegStatusCode = await fetchExistingRegStatusCode(
+    taskResource.id
   )
-  const existingRegStatusCode =
-    existingTaskResource &&
-    existingTaskResource.businessStatus &&
-    existingTaskResource.businessStatus.coding &&
-    existingTaskResource.businessStatus.coding.find((code) => {
-      return code.system === `${OPENCRVS_SPECIFICATION_URL}reg-status`
-    })
   if (existingRegStatusCode && existingRegStatusCode.code === regStatusCode) {
-    logger.error(`Application is already in ${regStatusCode} state`)
-    throw new Error(`Application is already in ${regStatusCode} state`)
+    logger.error(`Declaration is already in ${regStatusCode} state`)
+    throw new Error(`Declaration is already in ${regStatusCode} state`)
   }
 }
 

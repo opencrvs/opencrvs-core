@@ -18,18 +18,18 @@ import { SetupConfirmationPage } from '@client/views/UserSetup/SetupConfirmation
 const getItem = window.localStorage.getItem as jest.Mock
 
 describe('Setup confirmation page tests', () => {
-  const { store } = createStore()
+  const { store, history } = createStore()
   beforeAll(async () => {
     getItem.mockReturnValue(validToken)
-    await store.dispatch(checkAuth({ '?token': validToken }))
+    await store.dispatch(checkAuth())
   })
   it('renders page successfully', async () => {
     const testComponent = await createTestComponent(
       // @ts-ignore
       <SetupConfirmationPage />,
-      store
+      { store, history }
     )
-    const app = testComponent.component
+    const app = testComponent
     expect(app.find('#user-setup-complete-page').hostNodes()).toHaveLength(1)
   })
 })

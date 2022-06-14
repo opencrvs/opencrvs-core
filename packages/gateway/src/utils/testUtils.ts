@@ -178,9 +178,22 @@ export const mockDocumentReference = {
   ]
 }
 
+export const mockUser = {
+  type: 'CHAIRMAN',
+  role: 'LOCAL_REGISTRAR',
+  name: [
+    {
+      firstNames: 'Kennedy',
+      familyName: 'Mweene',
+      use: 'en'
+    }
+  ]
+}
+
 export const mockTask = {
   resourceType: 'Task',
   status: 'requested',
+  intent: '',
   identifier: [
     {
       system: 'http://opencrvs.org/specs/id/birth-tracking-id',
@@ -217,7 +230,7 @@ export const mockTask = {
   lastModified: '2016-10-31T09:45:05+10:00',
   note: [
     {
-      authorString: '<username>',
+      authorString: 'Practitioner/12121212',
       text: 'Comment',
       time: '2016-10-31T09:45:05+10:00'
     }
@@ -248,6 +261,92 @@ export const mockTask = {
   ],
   meta: {
     versionId: '123'
+  }
+}
+
+export const mockTaskDownloaded = {
+  resourceType: 'Task',
+  status: 'requested',
+  intent: '',
+  identifier: [
+    {
+      system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+      value: '123'
+    },
+    {
+      system: 'http://opencrvs.org/specs/id/birth-registration-number',
+      value: '123'
+    },
+    { system: 'http://opencrvs.org/specs/id/paper-form-id', value: '123' },
+    { system: 'http://opencrvs.org/specs/id/paper-form-page', value: '123' },
+    { system: 'http://opencrvs.org/specs/id/paper-form-book', value: '123' }
+  ],
+  businessStatus: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/reg-status',
+        code: 'DECLARED'
+      }
+    ]
+  },
+  code: {
+    coding: [
+      {
+        system: 'http://opencrvs.org/specs/types',
+        code: 'BIRTH'
+      }
+    ]
+  },
+  focus: {
+    reference: 'Composition/123' // the composition encompassing this registration
+  },
+  authoredOn: '2016-10-31T08:25:05+10:00',
+  lastModified: '2016-10-31T09:45:05+10:00',
+  statusReason: {
+    text: 'Rejected reason'
+  },
+  note: [
+    {
+      authorString: 'Practitioner/12121212',
+      text: 'Comment',
+      time: '2016-10-31T09:45:05+10:00'
+    }
+  ],
+  extension: [
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastUser',
+      valueReference: { reference: 'Practitioner/123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastLocation',
+      valueReference: { reference: 'Location/123' }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regLastOffice',
+      valueReference: {
+        reference: 'Location/43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+      }
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person',
+      valueString: 'MOTHER'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
+      valueString: '01733333333'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regDownloaded',
+      valueString: 'DECLARED'
+    },
+    {
+      url: 'http://opencrvs.org/specs/extension/regReinstated',
+      valueString: '01733333333'
+    }
+  ],
+  meta: {
+    versionId: '123',
+    lastUpdated: '2016-10-31T09:45:05+10:00'
   }
 }
 
@@ -705,10 +804,10 @@ export const mockFhirBundle = {
           coding: [
             {
               system: 'http://opencrvs.org/doc-types',
-              code: 'birth-application'
+              code: 'birth-declaration'
             }
           ],
-          text: 'Birth Application'
+          text: 'Birth Declaration'
         },
         class: {
           coding: [
@@ -1073,31 +1172,6 @@ export const mockObservations = {
       }
     ]
   },
-  presentAtBirthRegistration: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'present-at-birth-reg',
-                display: 'Present at birth registration'
-              }
-            ]
-          },
-          effectiveDateTime: '2016-03-28', // same as registration date
-          valueString: 'BOTH_PARENTS'
-        }
-      }
-    ]
-  },
   childrenBornAliveToMother: {
     entry: [
       {
@@ -1340,122 +1414,6 @@ export const mockObservations = {
         }
       }
     ]
-  },
-  parentDetailsType: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'parent-details',
-                display: 'Parent details'
-              }
-            ]
-          },
-          valueString: 'MOTHER_AND_FATHER'
-        }
-      }
-    ]
-  },
-  reasonMotherNotApplying: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'reason-mother-not-applying'
-              }
-            ]
-          },
-          valueString: 'Sick'
-        }
-      }
-    ]
-  },
-  reasonFatherNotApplying: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'reason-father-not-applying'
-              }
-            ]
-          },
-          valueString: 'DECEASED'
-        }
-      }
-    ]
-  },
-  reasonCaregiverNotApplying: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'reason-caregiver-not-applying'
-              }
-            ]
-          },
-          valueString: 'Not in town'
-        }
-      }
-    ]
-  },
-  primaryCaregiverType: {
-    entry: [
-      {
-        fullUrl: 'urn:uuid:<uuid>',
-        resource: {
-          resourceType: 'Observation',
-          status: 'final',
-          context: {
-            reference: 'Encounter/123' // the birth encounter
-          },
-          code: {
-            coding: [
-              {
-                system: 'http://opencrvs.org/specs/obs-type',
-                code: 'primary-caregiver'
-              }
-            ]
-          },
-          valueString: 'OTHER'
-        }
-      }
-    ]
   }
 }
 
@@ -1591,24 +1549,3 @@ export const mockTaskForError = {
     versionId: '123'
   }
 }
-
-export const mockObservationBundle = {
-  resourceType: 'Bundle',
-  type: 'searchset',
-  entry: [
-    mockObservations.reasonMotherNotApplying.entry[0],
-    mockObservations.reasonFatherNotApplying.entry[0],
-    mockObservations.reasonCaregiverNotApplying.entry[0],
-    mockObservations.primaryCaregiverType.entry[0]
-  ]
-}
-
-export const reasonsNotApplyingMock = [
-  {
-    primaryCaregiverType: 'MOTHER',
-    reasonNotApplying: 'Sick',
-    isDeceased: false
-  },
-  { primaryCaregiverType: 'FATHER', reasonNotApplying: '', isDeceased: true },
-  { primaryCaregiverType: 'OTHER', reasonNotApplying: 'Not in town' }
-]

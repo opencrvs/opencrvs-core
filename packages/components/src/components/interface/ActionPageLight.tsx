@@ -11,74 +11,52 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { BackArrowDeepBlue } from '../icons'
-import { Button, CircleButton } from '../buttons'
+import { BackArrowDeepBlue, Cross } from '../icons'
+import { CircleButton } from '../buttons'
+import { IPageHeaderProps, PageHeader } from './Header/PageHeader'
 const ActionContainer = styled.div`
   width: 100%;
 `
-const HeaderContainer = styled.div`
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.shadows.mistyShadow};
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  position: relative;
-`
-const BodyContent = styled.div`
-  width: 100%;
-  height: 64px;
-  margin: 0 24px;
-  padding: 24px 0px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`
 const BackButtonContainer = styled.div`
-  margin-right: 8px;
+  margin-right: 16px;
   cursor: pointer;
-`
-const BackButton = styled(Button)`
-  justify-content: center;
-  height: auto;
 `
 
 const BackButtonText = styled.span`
-  ${({ theme }) => theme.fonts.bodyBoldStyle};
+  ${({ theme }) => theme.fonts.bold16};
   text-transform: capitalize;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: none;
   }
 `
-const MenuTitle = styled.div`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
-`
 
-const Container = styled.div`
-  ${({ theme }) => theme.fonts.bodyStyle};
-  ${({ theme }) => theme.shadows.mistyShadow};
+const Container = styled.div<{ hideBackground: boolean | undefined }>`
+  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme, hideBackground }) => (hideBackground ? '' : theme.shadows.light)};
   color: ${({ theme }) => theme.colors.copy};
   padding: 24px 32px 32px;
-  margin: 32px auto 0;
+  margin: 0 auto;
   max-width: 940px;
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme, hideBackground }) =>
+    hideBackground ? '' : theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 40px 54px;
     padding: 24px 32px;
     min-height: 100vh;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
     margin: 0;
-    padding: 24px 32px;
+    padding: 0;
     min-height: 100vh;
   }
 `
 interface IProps {
   title?: string
+  hideBackground?: boolean
   backLabel?: string
   icon?: () => React.ReactNode
   id?: string
+  goHome?: () => void
 }
 
 export class ActionPageLight extends React.Component<
@@ -86,23 +64,49 @@ export class ActionPageLight extends React.Component<
     goBack: () => void
   }
 > {
+  getHeaderLeft = () => {
+    const { icon, goBack, backLabel } = this.props
+    return [
+      <BackButtonContainer
+        id="action_page_back_button"
+        onClick={goBack}
+        key="action_page_back_button"
+      >
+        <CircleButton>{(icon && icon()) || <BackArrowDeepBlue />}</CircleButton>
+        <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
+      </BackButtonContainer>
+    ]
+  }
+  getHeaderRight = () => {
+    const { goHome } = this.props
+    return [
+      (goHome && (
+        <CircleButton id="crcl-btn" onClick={goHome} key="crcl-btn">
+          <Cross color="currentColor" />
+        </CircleButton>
+      )) || <></>
+    ]
+  }
+
   render() {
-    const { id, title, icon, goBack, backLabel } = this.props
+    const { id, title, hideBackground } = this.props
+
+    const pageHeaderProps: IPageHeaderProps = {
+      id: 'pageHeader',
+      mobileTitle: title,
+      mobileLeft: this.getHeaderLeft(),
+      mobileRight: this.getHeaderRight(),
+      desktopTitle: title,
+      desktopLeft: this.getHeaderLeft(),
+      desktopRight: this.getHeaderRight()
+    }
 
     return (
       <ActionContainer id={id}>
-        <HeaderContainer>
-          <BodyContent>
-            <BackButtonContainer id="action_page_back_button" onClick={goBack}>
-              <CircleButton>
-                {(icon && icon()) || <BackArrowDeepBlue />}
-              </CircleButton>
-              <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
-            </BackButtonContainer>
-            {title && <MenuTitle>{title}</MenuTitle>}
-          </BodyContent>
-        </HeaderContainer>
-        <Container>{this.props.children}</Container>
+        <PageHeader {...pageHeaderProps} />
+        <Container hideBackground={hideBackground}>
+          {this.props.children}
+        </Container>
       </ActionContainer>
     )
   }

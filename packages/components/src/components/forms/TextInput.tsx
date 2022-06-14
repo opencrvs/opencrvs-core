@@ -32,13 +32,13 @@ const StyledInput = styled.input<ITextInputProps>`
     inputFieldWidth ? `width: ${inputFieldWidth}` : `width: 100%`};
   padding: 8px 10px;
   height: 40px;
+  border-radius: 2px;
   transition: border-color 500ms ease-out;
   box-sizing: border-box;
   outline: none;
-  ${({ theme }) => theme.fonts.bodyStyle};
+  ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
-  background: ${({ isDisabled, theme }) =>
-    isDisabled ? theme.colors.lightGrey : theme.colors.background};
+  background: ${({ theme }) => theme.colors.white};
 
   ${({ hideBorder, error, touched, isDisabled, theme }) =>
     hideBorder
@@ -46,38 +46,38 @@ const StyledInput = styled.input<ITextInputProps>`
       border:none;
       ${
         error && touched
-          ? `box-shadow: 0 0 0px 2px ${theme.colors.error};`
+          ? `box-shadow: 0 0 0px 2px ${theme.colors.negative};`
           : 'box-shadow: none;'
       }
       &:focus {
         box-shadow: 0 0 0px 2px ${
-          error && touched ? theme.colors.error : theme.colors.focus
+          error && touched ? theme.colors.negative : theme.colors.yellow
         };
       }
         `
       : `
       border: 2px solid ${
         error && touched
-          ? theme.colors.error
+          ? theme.colors.negative
           : isDisabled
           ? theme.colors.greyGrey
           : theme.colors.copy
       };
       &:focus {
-        box-shadow: 0 0 0px 3px ${theme.colors.focus};
+        box-shadow: 0 0 0px 3px ${theme.colors.yellow};
       }
       `}
 
   &::-webkit-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   &::-moz-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   &:-ms-input-placeholder {
-    color: ${({ theme }) => theme.colors.placeholder};
+    color: ${({ theme }) => theme.colors.placeholderCopy};
   }
 
   &::-webkit-outer-spin-button,
@@ -97,10 +97,10 @@ const StyledInput = styled.input<ITextInputProps>`
     return !ignoreMediaQuery && !inputFieldWidth
       ? isSmallSized
         ? `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 234px;
+        width: 344px;
       }`
         : `@media (min-width: ${theme.grid.breakpoints.md}px) {
-        width: 535px;
+        width: 344px;
       }`
       : ''
   }}

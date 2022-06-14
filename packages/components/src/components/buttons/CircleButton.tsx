@@ -10,36 +10,44 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import styled from 'styled-components'
+import React from 'react'
 
-export const CircleButton = styled.button<{ dark?: boolean }>`
-  color: ${({ color = '#4C68C1' }) => color};
-  margin: 0;
+type IButtonSize = 'small' | 'medium' | 'large'
+
+const dimensionMap = {
+  small: '24px',
+  medium: '32px',
+  large: '40px'
+}
+
+const Button = styled.button<ICircleButtonProps & { size: IButtonSize }>`
+  color: ${({ theme }) => theme.colors.primary};
+  transition: background 0.4s ease;
   border: none;
   background: none;
-  height: 40px;
-  width: 40px;
+  height: ${({ size }) => dimensionMap[size]};
+  width: ${({ size }) => dimensionMap[size]};
   display: flex;
   justify-content: center;
   align-items: center;
-  transition: background-color 0.3s ease;
   border-radius: 100%;
   &:hover:not([disabled]) {
     ${({ theme, dark }) =>
       dark
-        ? theme.gradients.gradientSkyDark
-        : 'background-color: ' + theme.colors.dropdownHover};
+        ? theme.colors.indigoDark
+        : 'background-color: ' + theme.colors.grey200};
   }
   &:not([data-focus-visible-added]):not([disabled]):hover {
     ${({ theme, dark }) =>
       dark
-        ? theme.gradients.gradientSkyDark
-        : 'background-color: ' + theme.colors.dropdownHover};
+        ? theme.colors.indigoDark
+        : 'background-color: ' + theme.colors.grey200};
   }
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   &:focus {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.yellow};
     color: ${({ theme }) => theme.colors.copy};
   }
   &:not([data-focus-visible-added]):not([disabled]) {
@@ -49,10 +57,9 @@ export const CircleButton = styled.button<{ dark?: boolean }>`
   }
   &:active:not([data-focus-visible-added]):not([disabled]) {
     outline: none;
-    background: ${({ theme }) => theme.colors.focus};
+    background: ${({ theme }) => theme.colors.grey200};
     color: ${({ theme }) => theme.colors.copy};
   }
-  padding: 0 8px;
   &:disabled {
     cursor: default;
     path {
@@ -60,3 +67,20 @@ export const CircleButton = styled.button<{ dark?: boolean }>`
     }
   }
 `
+interface ICircleButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  size?: IButtonSize
+  dark?: boolean
+}
+
+export function CircleButton({
+  size = 'large',
+  children,
+  ...props
+}: ICircleButtonProps) {
+  return (
+    <Button size={size} {...props}>
+      {children}
+    </Button>
+  )
+}

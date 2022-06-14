@@ -39,10 +39,12 @@ interface IValidationMessages
   required: MessageDescriptor
   requiredForNewUser: MessageDescriptor
   requiredSymbol: MessageDescriptor
+  requiredBasic: MessageDescriptor
   validBirthRegistrationNumber: MessageDescriptor
   validDeathRegistrationNumber: MessageDescriptor
   validNationalId: MessageDescriptor
   validNationalIDLengths: MessageDescriptor
+  duplicateNationalID: MessageDescriptor
   validPassportNumber: MessageDescriptor
   phoneNumberNotValid: MessageDescriptor
   validDrivingLicenseNumber: MessageDescriptor
@@ -193,6 +195,11 @@ const messagesToDefine: IValidationMessages = {
       'The error message that appears when an out of range value is used',
     id: 'validations.range'
   },
+  requiredBasic: {
+    defaultMessage: 'Required',
+    description: 'The error message that appears on required fields',
+    id: 'validations.requiredBasic'
+  },
   required: {
     defaultMessage: 'Required',
     description: 'The error message that appears on required fields',
@@ -226,7 +233,7 @@ const messagesToDefine: IValidationMessages = {
   },
   validNationalId: {
     defaultMessage:
-      'The National ID can only be numeric and must be {min} or {max} digits long',
+      'The National ID can only be numeric and must be 9 digits long',
     description:
       'The error message that appears when an invalid value is used as nid',
     id: 'validations.validNationalId'
@@ -235,6 +242,11 @@ const messagesToDefine: IValidationMessages = {
     defaultMessage: '10 or 17',
     description: 'Nid valid lengths',
     id: 'validations.validNationalIDLengths'
+  },
+  duplicateNationalID: {
+    defaultMessage: 'National ID must be unique',
+    description: 'Unique Nid validation',
+    id: 'validations.duplicateNationalID'
   },
   validPassportNumber: {
     defaultMessage:

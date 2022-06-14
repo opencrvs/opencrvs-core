@@ -39,7 +39,12 @@ import {
   IFormSectionGroup,
   IRadioGroupFormField,
   RADIO_GROUP_WITH_NESTED_FIELDS,
-  DOCUMENT_UPLOADER_WITH_OPTION
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  IFormFieldValue,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  IRadioGroupWithNestedFieldsFormField,
+  IInformant,
+  IContactPoint
 } from '@client/forms'
 import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
@@ -59,11 +64,24 @@ import {
   isAValidDateFormat,
   isDateNotInFuture
 } from '@client/utils/validate'
-import moment from 'moment'
 import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/forms'
 import { IDynamicValues } from '@client/navigation'
 import { generateLocations } from '@client/utils/locationUtils'
 import { callingCountries } from 'country-data'
+import { IDeclaration } from '@client/declarations'
+import differenceInDays from 'date-fns/differenceInDays'
+
+export const VIEW_TYPE = {
+  FORM: 'form',
+  REVIEW: 'review',
+  PREVIEW: 'preview',
+  HIDDEN: 'hidden'
+}
+
+const REGISTRATION_TARGET_DAYS =
+  window.config &&
+  window.config.BIRTH &&
+  window.config.BIRTH.REGISTRATION_TARGET
 
 interface IRange {
   start: number
@@ -240,6 +258,50 @@ export const getFieldValidation = (
   return validate
 }
 
+export function getNextSectionIds(
+  sections: IFormSection[],
+  fromSection: IFormSection,
+  fromSectionGroup: IFormSectionGroup,
+  declaration: IDeclaration
+): { [key: string]: string } | null {
+  const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
+    fromSection,
+    declaration.data[fromSection.id] || {},
+    declaration.data
+  )
+  const currentGroupIndex = visibleGroups.findIndex(
+    (group: IFormSectionGroup) => group.id === fromSectionGroup.id
+  )
+
+  if (currentGroupIndex === visibleGroups.length - 1) {
+    const visibleSections = sections.filter(
+      (section) =>
+        section.viewType !== VIEW_TYPE.HIDDEN &&
+        getVisibleSectionGroupsBasedOnConditions(
+          section,
+          declaration.data[fromSection.id] || {},
+          declaration.data
+        ).length > 0
+    )
+
+    const currentIndex = visibleSections.findIndex(
+      (section: IFormSection) => section.id === fromSection.id
+    )
+    if (currentIndex === visibleSections.length - 1) {
+      return null
+    }
+
+    return {
+      sectionId: visibleSections[currentIndex + 1].id,
+      groupId: visibleSections[currentIndex + 1].groups[0].id
+    }
+  }
+  return {
+    sectionId: fromSection.id,
+    groupId: visibleGroups[currentGroupIndex + 1].id
+  }
+}
+
 export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
@@ -249,6 +311,11 @@ export const getFieldOptions = (
   offlineCountryConfig: IOfflineData
 ) => {
   const locations = offlineCountryConfig[OFFLINE_LOCATIONS_KEY]
+  if (!field.dynamicOptions.dependency) {
+    throw new Error(
+      `Dependency is undefined, the value should have an entry in the dynamic options object.`
+    )
+  }
   const dependencyVal = values[field.dynamicOptions.dependency] as string
   if (field.dynamicOptions.jurisdictionType) {
     return generateOptions(
@@ -337,14 +404,19 @@ export const getFieldOptionsByValueMapper = (
 }
 
 export const diffDoB = (doB: string) => {
-  if (!isAValidDateFormat(doB) || !isDateNotInFuture(doB)) return 'within45days'
-  const todaysDate = moment(Date.now())
-  const birthDate = moment(doB)
-  const diffInDays = todaysDate.diff(birthDate, 'days')
+  if (!isAValidDateFormat(doB) || !isDateNotInFuture(doB))
+    return 'withinTargetdays'
+  const todaysDate = new Date()
+  const birthDate = new Date(doB)
+  const diffInDays = differenceInDays(todaysDate, birthDate)
 
   const ranges: IRange[] = [
-    { start: 0, end: 45, value: 'within45days' },
-    { start: 46, end: 5 * 365, value: 'between46daysTo5yrs' },
+    { start: 0, end: REGISTRATION_TARGET_DAYS, value: 'withinTargetdays' },
+    {
+      start: REGISTRATION_TARGET_DAYS + 1,
+      end: 5 * 365,
+      value: 'between46daysTo5yrs'
+    },
     { start: 5 * 365 + 1, value: 'after5yrs' }
   ]
   const valueWithinRange = ranges.find((range) =>
@@ -419,6 +491,33 @@ export function getQueryData(
   return queryData
 }
 
+function getSelectedInformantAndContactType(draftData?: IFormData) {
+  // IFormFieldValue is a union with primitives - usually a top-level string in this function like this section.fieldValue
+  // informantType is a special case where both the nested field and the selected parent are required
+  // this means an object was required for the fieldValue
+  // TypeScript throws an error as the IFormFieldValue type cannot access the object prop of what it things could be a string
+  // creating selectedInformantType to be a value which will be used in the conditional
+  let selectedInformantType = ''
+  let selectedContactType = ''
+  if (
+    draftData &&
+    draftData.registration &&
+    draftData.registration.informantType
+  ) {
+    const informantType = draftData.registration.informantType as IInformant
+    selectedInformantType = informantType.value
+  }
+  if (
+    draftData &&
+    draftData.registration &&
+    draftData.registration.contactPoint
+  ) {
+    const contactPoint = draftData.registration.contactPoint as IContactPoint
+    selectedContactType = contactPoint.value
+  }
+  return { selectedInformantType, selectedContactType }
+}
+
 export const getConditionalActionsForField = (
   field: IFormField,
   /*
@@ -428,6 +527,21 @@ export const getConditionalActionsForField = (
   offlineCountryConfig?: IOfflineData,
   draftData?: IFormData
 ): string[] => {
+  // set some constants that are used in conditionals
+  const selectedInformantAndContactType =
+    getSelectedInformantAndContactType(draftData)
+  // eslint-disable-next-line no-unused-vars
+  const mothersDetailsExistBasedOnContactAndInformant =
+    selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||
+    selectedInformantAndContactType.selectedContactType === 'MOTHER'
+      ? true
+      : false
+  // eslint-disable-next-line no-unused-vars
+  const fathersDetailsExistBasedOnContactAndInformant =
+    selectedInformantAndContactType.selectedInformantType === 'FATHER' ||
+    selectedInformantAndContactType.selectedContactType === 'FATHER'
+      ? true
+      : false
   if (!field.conditionals) {
     return []
   }
@@ -444,6 +558,22 @@ export const getVisibleSectionGroupsBasedOnConditions = (
   values: IFormSectionData,
   draftData?: IFormData
 ): IFormSectionGroup[] => {
+  // set some constants that are used in conditionals
+  const selectedInformantAndContactType =
+    getSelectedInformantAndContactType(draftData)
+  // eslint-disable-next-line no-unused-vars
+  const mothersDetailsExistBasedOnContactAndInformant =
+    selectedInformantAndContactType.selectedInformantType === 'MOTHER' ||
+    selectedInformantAndContactType.selectedContactType === 'MOTHER'
+      ? true
+      : false
+  // eslint-disable-next-line no-unused-vars
+  const fathersDetailsExistBasedOnContactAndInformant =
+    selectedInformantAndContactType.selectedInformantType === 'FATHER' ||
+    selectedInformantAndContactType.selectedContactType === 'FATHER'
+      ? true
+      : false
+  // handling all possible group visibility conditionals
   return section.groups.filter((group) => {
     if (!group.conditionals) {
       return true
@@ -536,50 +666,113 @@ export const convertToMSISDN = (phone: string) => {
     : `${countryCallingCode}${phone}`
 }
 
+export const isRadioGroupWithNestedField = (
+  field: IFormField
+): field is IRadioGroupWithNestedFieldsFormField => {
+  return field.type === RADIO_GROUP_WITH_NESTED_FIELDS
+}
+
+export const isDynamicField = (
+  field: IFormField
+): field is IDynamicFormField => {
+  return field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
+}
+
+export const isDateField = (
+  field: IFormField,
+  sectionData: IFormSectionData
+): field is IDateFormField => {
+  if (isDynamicField(field)) {
+    return getFieldType(field, sectionData) === DATE
+  }
+
+  return field.type === DATE
+}
+
+export const stringifyFieldValue = (
+  field: IFormField,
+  fieldValue: IFormFieldValue,
+  sectionData: IFormSectionData
+): string => {
+  if (!fieldValue) {
+    return ''
+  }
+
+  if (isDateField(field, sectionData)) {
+    return fieldValue.toString()
+  }
+
+  return fieldValue.toString()
+}
+
+export const getSelectedRadioOptionWithNestedFields = (
+  field: IRadioGroupWithNestedFieldsFormField,
+  sectionData: IFormSectionData
+): string | undefined => {
+  return (sectionData[field.name] as IFormSectionData).value as string
+}
+
+export function getSelectedOption(
+  value: string,
+  options: ISelectOption[]
+): ISelectOption | null {
+  const selectedOption = options.find((x: ISelectOption) => x.value === value)
+  if (selectedOption) {
+    return selectedOption
+  }
+
+  return null
+}
+
 export const conditionals: IConditionals = {
+  informantType: {
+    action: 'hide',
+    expression:
+      '(!draftData || !draftData.registration || draftData.registration.informantType !== "OTHER" || draftData.registration.informantType === "BOTH_PARENTS" )'
+  },
+  isRegistrarRoleSelected: {
+    action: 'hide',
+    expression: 'values.role!=="LOCAL_REGISTRAR"'
+  },
+  isOfficePreSelected: {
+    action: 'hide',
+    expression: 'values.skippedOfficeSelction && values.registrationOffice'
+  },
   iDType: {
     action: 'hide',
     expression: "!values.iDType || (values.iDType !== 'OTHER')"
   },
   fathersDetailsExist: {
     action: 'hide',
-    expression: '!values.fathersDetailsExist'
+    expression: '!values.detailsExist'
   },
-  permanentAddressSameAsMother: {
+  primaryAddressSameAsOtherPrimary: {
     action: 'hide',
-    expression: 'values.permanentAddressSameAsMother'
+    expression: 'values.primaryAddressSameAsOtherPrimary'
   },
-  addressSameAsMother: {
+  countryPrimary: {
     action: 'hide',
-    expression: 'values.addressSameAsMother'
+    expression: '!values.countryPrimary'
   },
-  currentAddressSameAsPermanent: {
+  isDefaultCountryPrimary: {
     action: 'hide',
-    expression: 'values.currentAddressSameAsPermanent'
+    expression: 'isDefaultCountry(values.countryPrimary)'
   },
-  countryPermanent: {
+  statePrimary: {
     action: 'hide',
-    expression: '!values.countryPermanent'
+    expression: '!values.statePrimary'
   },
-  isDefaultCountryPermanent: {
+  districtPrimary: {
     action: 'hide',
-    expression: 'isDefaultCountry(values.countryPermanent)'
+    expression: '!values.districtPrimary'
   },
-  statePermanent: {
+  addressLine4Primary: {
     action: 'hide',
-    expression: '!values.statePermanent'
+    expression: '!values.addressLine4Primary'
   },
-  districtPermanent: {
+  addressLine3Primary: {
     action: 'hide',
-    expression: '!values.districtPermanent'
-  },
-  addressLine4Permanent: {
-    action: 'hide',
-    expression: '!values.addressLine4Permanent'
-  },
-  addressLine3Permanent: {
-    action: 'hide',
-    expression: '!values.addressLine3Permanent'
+    expression: '!values.addressLine3Primary'
   },
   country: {
     action: 'hide',
@@ -640,9 +833,9 @@ export const conditionals: IConditionals = {
     expression:
       '(values.placeOfBirth!="HOSPITAL" && values.placeOfBirth!="OTHER_HEALTH_INSTITUTION")'
   },
-  deathPlaceAddressTypeHeathInstitue: {
+  placeOfDeathTypeHeathInstitue: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress!="HEALTH_FACILITY"'
+    expression: 'values.placeOfDeath!="HEALTH_FACILITY"'
   },
   otherBirthEventLocation: {
     action: 'hide',
@@ -659,35 +852,35 @@ export const conditionals: IConditionals = {
     expression:
       '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4))'
   },
-  isNotCityLocationPermanent: {
+  isNotCityLocationPrimary: {
     action: 'hide',
     expression:
-      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))'
+      '(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Primary))'
   },
-  isCityLocationPermanent: {
+  isCityLocationPrimary: {
     action: 'hide',
     expression:
-      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Permanent))'
+      '!(offlineCountryConfig && offlineCountryConfig.locations && isCityLocation(offlineCountryConfig.locations,values.addressLine4Primary))'
   },
   iDAvailable: {
     action: 'hide',
     expression: '!values.iDType || values.iDType === "NO_ID"'
   },
-  applicantPermanentAddressSameAsCurrent: {
+  informantPrimaryAddressSameAsCurrent: {
     action: 'hide',
-    expression: 'values.applicantPermanentAddressSameAsCurrent'
+    expression: 'values.informantPrimaryAddressSameAsCurrent'
   },
   deathPlaceOther: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress !== "OTHER"'
+    expression: 'values.placeOfDeath !== "OTHER"'
   },
   deathPlaceAtPrivateHome: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress !== "PRIVATE_HOME"'
+    expression: 'values.placeOfDeath !== "PRIVATE_HOME"'
   },
   deathPlaceAtOtherLocation: {
     action: 'hide',
-    expression: 'values.deathPlaceAddress !== "OTHER"'
+    expression: 'values.placeOfDeath !== "OTHER"'
   },
   causeOfDeathEstablished: {
     action: 'hide',
@@ -702,19 +895,15 @@ export const conditionals: IConditionals = {
     expression:
       '(!values.iDType || (values.iDType !== "BIRTH_REGISTRATION_NUMBER" && values.iDType !== "NATIONAL_ID"))'
   },
-  otherRelationship: {
-    action: 'hide',
-    expression: 'values.applicantsRelationToDeceased !== "OTHER"'
-  },
   fatherContactDetailsRequired: {
     action: 'hide',
     expression:
       '(draftData && draftData.registration && draftData.registration.whoseContactDetails === "FATHER")'
   },
-  withIn45Days: {
+  withInTargetDays: {
     action: 'hide',
     expression:
-      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "within45days") || !draftData.child || !draftData.child.childBirthDate'
+      '(draftData && draftData.child && draftData.child.childBirthDate && diffDoB(draftData.child.childBirthDate) === "withinTargetdays") || !draftData.child || !draftData.child.childBirthDate'
   },
   between46daysTo5yrs: {
     action: 'hide',
@@ -730,10 +919,6 @@ export const conditionals: IConditionals = {
     action: 'hide',
     expression:
       '(values.uploadDocForDeceased && !!values.uploadDocForDeceased.find(a => ["National ID (front)", "National ID (Back)"].indexOf(a.optionValues[1]) > -1))'
-  },
-  isRegistrarRoleSelected: {
-    action: 'hide',
-    expression: 'values.role!=="LOCAL_REGISTRAR"'
   },
   certCollectorOther: {
     action: 'hide',

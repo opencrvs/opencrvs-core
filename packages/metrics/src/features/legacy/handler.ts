@@ -18,16 +18,15 @@ import {
 } from '@metrics/api'
 import {
   IAuthHeader,
-  IApplicationsStartedFields,
-  IApplicationsStartedPoints,
+  IDeclarationsStartedFields,
+  IDeclarationsStartedPoints,
   IPointLocation,
   IDurationPoints,
   IDurationFields,
   IDurationTags
 } from '@metrics/features/registration'
 import { writePoints, query } from '@metrics/influxdb/client'
-import * as moment from 'moment'
-
+import { differenceInSeconds } from 'date-fns'
 interface ISearchResult {
   _index: string
   _type: string
@@ -71,9 +70,9 @@ interface ISearchResult {
     fatherDoB: string
     contactNumber: string
     type: string
-    dateOfApplication: string
+    dateOfDeclaration: string
     trackingId: string
-    applicationLocationId: string
+    declarationLocationId: string
     compositionType: string
     createdBy: string
     updatedBy: string
@@ -87,10 +86,11 @@ export async function generateLegacyMetricsHandler(
 ) {
   let result: any
   const authHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
   try {
-    await query('DROP MEASUREMENT applications_started')
+    await query('DROP MEASUREMENT declarations_started')
   } catch (err) {
     throw new Error('Could not clear influx')
   }
@@ -99,18 +99,16 @@ export async function generateLegacyMetricsHandler(
   } catch (err) {
     throw new Error('Could not resolve values from search')
   }
-  const totalPoints: IApplicationsStartedPoints[] = []
-  if (result.body.hits.total !== result.body.hits.hits.length) {
+  const totalPoints: IDeclarationsStartedPoints[] = []
+  if (result.body.hits.total.value !== result.body.hits.hits.length) {
     throw new Error(
       'Not all results returned in search results.  Need to implement Elastic pagination for more than 10,000 records'
     )
   }
   const searchResults: ISearchResult[] = result.body.hits.hits
   for (const searchResult of searchResults) {
-    const points: IApplicationsStartedPoints = await generateApplicationStartedPoint(
-      searchResult,
-      authHeader
-    )
+    const points: IDeclarationsStartedPoints =
+      await generateDeclarationStartedPoint(searchResult, authHeader)
     totalPoints.push(points)
   }
   await writePoints(totalPoints)
@@ -118,13 +116,13 @@ export async function generateLegacyMetricsHandler(
 }
 
 const generatePointLocationsFromID = async (
-  applicationLocationId: string,
+  declarationLocationId: string,
   authHeader: IAuthHeader
 ): Promise<IPointLocation> => {
   const locations: IPointLocation = {}
 
   const officeUnion = await fetchParentLocationByLocationID(
-    applicationLocationId,
+    declarationLocationId,
     authHeader
   )
 
@@ -146,7 +144,7 @@ const generatePointLocationsFromID = async (
   return locations
 }
 
-export async function generateApplicationStartedPoint(
+export async function generateDeclarationStartedPoint(
   searchResult: ISearchResult,
   authHeader: IAuthHeader
 ): Promise<any> {
@@ -159,7 +157,7 @@ export async function generateApplicationStartedPoint(
     role = 'REGISTRAR'
   }
 
-  const fields: IApplicationsStartedFields = {
+  const fields: IDeclarationsStartedFields = {
     role,
     compositionId: searchResult._id
   }
@@ -167,13 +165,13 @@ export async function generateApplicationStartedPoint(
   const tags = {
     eventType: searchResult._source.event.toUpperCase(),
     ...(await generatePointLocationsFromID(
-      `Location/${searchResult._source.applicationLocationId}`,
+      `Location/${searchResult._source.declarationLocationId}`,
       authHeader
     ))
   }
 
   return {
-    measurement: 'applications_started',
+    measurement: 'declarations_started',
     tags,
     fields,
     timestamp: `${parseInt(searchResult._source.createdAt, 10) * 1000000}`
@@ -186,10 +184,11 @@ export async function generateLegacyEventDurationHandler(
 ) {
   let result: any
   const authHeader = {
-    Authorization: request.headers.authorization
+    Authorization: request.headers.authorization,
+    'x-correlation-id': request.headers['x-correlation-id']
   }
   try {
-    await query('DROP MEASUREMENT application_event_duration')
+    await query('DROP MEASUREMENT declaration_event_duration')
   } catch (err) {
     throw new Error('Could not clear influx')
   }
@@ -199,7 +198,7 @@ export async function generateLegacyEventDurationHandler(
     throw new Error('Could not resolve values from search')
   }
   let totalPoints: IDurationPoints[] = []
-  if (result.body.hits.total !== result.body.hits.hits.length) {
+  if (result.body.hits.total.value !== result.body.hits.hits.length) {
     throw new Error(
       'Not all results returned in search results.  Need to implement Elastic pagination for more than 10,000 records'
     )
@@ -229,9 +228,9 @@ async function generateEventDurationPoint(
         .map((history, index) => {
           const previousHistory = searchResult._source.operationHistories[index]
           const fields: IDurationFields = {
-            durationInSeconds: moment(new Date(history.operatedOn)).diff(
-              moment(new Date(previousHistory.operatedOn)),
-              'seconds'
+            durationInSeconds: differenceInSeconds(
+              new Date(history.operatedOn),
+              new Date(previousHistory.operatedOn)
             ),
             compositionId: searchResult._id,
             currentTaskId: taskId,
@@ -245,11 +244,12 @@ async function generateEventDurationPoint(
           }
 
           return {
-            measurement: 'application_event_duration',
+            measurement: 'declaration_event_duration',
             tags,
             fields,
-            timestamp: `${parseInt(searchResult._source.createdAt, 10) *
-              1000000}`
+            timestamp: `${
+              parseInt(searchResult._source.createdAt, 10) * 1000000
+            }`
           }
         })) ||
     []

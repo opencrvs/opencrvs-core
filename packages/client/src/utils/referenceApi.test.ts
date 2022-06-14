@@ -57,6 +57,138 @@ export const mockFetchPilotLocations = {
   }
 }
 
+export const mockCertificatesTemplatesDefinitionData = {
+  birth: {
+    svgCode: '<svg></svg>'
+  },
+  death: {
+    svgCode: '<svg></svg/>'
+  }
+}
+
+export const mockFetchCertificatesTemplatesDefinition = [
+  {
+    event: 'birth',
+    status: 'ACTIVE',
+    svgCode: '<svg></svg>',
+    svgDateCreated: 1640696680593,
+    svgDateUpdated: 1644326332088,
+    svgFilename: 'oCRVS_DefaultZambia_Death_v1.svg',
+    user: '61d42359f1a2c25ea01beb4b'
+  },
+  {
+    event: 'death',
+    status: 'ACTIVE',
+    svgCode: '<svg></svg>',
+    svgDateCreated: 1640696804785,
+    svgDateUpdated: 1643885502999,
+    svgFilename: 'oCRVS_DefaultZambia_Birth_v1.svg',
+    user: '61d42359f1a2c25ea01beb4b'
+  }
+]
+
+export const mockCertificateTemplate = {
+  data: {
+    getActiveCertificatesSVG: [
+      {
+        event: 'birth',
+        status: 'ACTIVE',
+        svgCode: '<svg><svg/>',
+        svgDateCreated: '1640696680593',
+        svgDateUpdated: '1643292458812',
+        svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
+        user: 'jonathan.campbell',
+        __typename: 'CertificateSVG',
+        id: '61cb0b68ab0cc2e187089786'
+      },
+      {
+        event: 'death',
+        status: 'ACTIVE',
+        svgCode: '<svg><svg/>',
+        svgDateCreated: '1640696804785',
+        svgDateUpdated: '1643292520393',
+        svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Death_v1.svg',
+        user: 'jonathan.campbell',
+        __typename: 'CertificateSVG',
+        id: '61cb0be4ab0cc2e187089787'
+      }
+    ]
+  }
+}
+
+export const mockFetchConfig = {
+  config: {
+    API_GATEWAY_URL: 'http://localhost:7070/',
+    CONFIG_API_URL: 'http://localhost:2021',
+    LOGIN_URL: 'http://localhost:3020',
+    AUTH_URL: 'http://localhost:4040',
+    RESOURCES_URL: 'http://localhost:3040',
+    APPLICATION_NAME: 'Farajaland CRVS',
+    UI_POLLING_INTERVAL: 5000,
+    FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
+    DECLARATION_AUDIT_LOCATIONS: 'DISTRICT',
+    INFORMANT_MINIMUM_AGE: 16,
+    HIDE_EVENT_REGISTER_INFORMATION: false,
+    EXTERNAL_VALIDATION_WORKQUEUE: false,
+    PHONE_NUMBER_PATTERN: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
+    SENTRY: 'https://f892d643aab642108f44e2d1795706bc@sentry.io/1774604',
+    LOGROCKET: 'opencrvs-foundation/opencrvs-zambia',
+    NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
+    COUNTRY: 'zmb',
+    CURRENCY: {
+      isoCode: 'ZMW',
+      languagesAndCountry: ['en-ZM']
+    },
+    LANGUAGES: 'en',
+    ADDRESSES: 1
+  },
+  certificates: [
+    {
+      _id: '620bdfb896974e7de5a91624',
+      svgCode: '<svg></svg>',
+      svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
+      user: 'jonathan.campbell',
+      event: 'birth',
+      status: 'ACTIVE',
+      svgDateUpdated: 1643292458812,
+      svgDateCreated: 1640696680593
+    },
+    {
+      _id: '620bdfb896974e7de5a91625',
+      svgCode: '<svg></svg>',
+      svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Death_v1.svg',
+      user: 'jonathan.campbell',
+      event: 'death',
+      status: 'ACTIVE',
+      svgDateUpdated: 1643292520393,
+      svgDateCreated: 1640696804785
+    }
+  ]
+}
+
+const certificates = [
+  {
+    id: '620bdfb896974e7de5a91624',
+    svgCode: '<svg></svg>',
+    svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Birth_v1.svg',
+    user: 'jonathan.campbell',
+    event: 'birth',
+    status: 'ACTIVE',
+    svgDateUpdated: 1643292458812,
+    svgDateCreated: 1640696680593
+  },
+  {
+    id: '620bdfb896974e7de5a91625',
+    svgCode: '<svg></svg>',
+    svgFilename: 'oCRVS_DefaultZambia_SingleCharacterSet_Death_v1.svg',
+    user: 'jonathan.campbell',
+    event: 'death',
+    status: 'ACTIVE',
+    svgDateUpdated: 1643292520393,
+    svgDateCreated: 1640696804785
+  }
+]
+
 describe('referenceApi', () => {
   beforeEach(() => {
     fetch.resetMocks()
@@ -81,5 +213,14 @@ describe('referenceApi', () => {
 
     const data = await referenceApi.loadPilotLocations()
     expect(data).toEqual(mockFetchPilotLocations.data)
+  })
+
+  it('retrieves the config from the server', async () => {
+    fetch.mockResponseOnce(JSON.stringify(mockFetchConfig))
+    const data = await referenceApi.loadConfig()
+    expect(data).toEqual({
+      ...mockFetchConfig,
+      certificates
+    })
   })
 })

@@ -12,14 +12,14 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { TertiaryButton, CircleButton } from '../buttons'
-import { ApplicationIcon, Cross, VerticalThreeDots } from '../icons'
+import { DeclarationIcon, Cross, VerticalThreeDots } from '../icons'
 import { ToggleMenu } from '.'
 
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;
-  height: 64px;
+  height: 56px;
   background: ${({ theme }) => theme.colors.white};
-  ${({ theme }) => theme.shadows.mistyShadow};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -29,14 +29,21 @@ const TopBar = styled.div`
   z-index: 1;
 `
 const TopBarTitle = styled.h4`
-  ${({ theme }) => theme.fonts.bigBodyBoldStyle};
+  ${({ theme }) => theme.fonts.h4};
   padding-left: 16px;
   color: ${({ theme }) => theme.colors.copy};
 `
+
 const Item = styled.span`
   display: flex;
   align-items: center;
 `
+const TopBarActionsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`
+
 export interface IEventTopBarProps {
   id?: string
   title: string
@@ -46,7 +53,9 @@ export interface IEventTopBarProps {
   exitAction?: IEventTopBarMenuAction
   menuItems?: IToggleMenuItem[]
   iconColor?: string
+  topBarActions?: React.ReactNode[]
 }
+
 export interface IEventTopBarMenuAction {
   handler: () => void
   label: string
@@ -64,16 +73,20 @@ export const EventTopBar = (props: IEventTopBarProps) => {
     saveAction,
     exitAction,
     menuItems,
-    iconColor,
+    iconColor = 'purple',
+    topBarActions,
     pageIcon
   } = props
   return (
     <TopBar>
       <Item>
-        {pageIcon || <ApplicationIcon color={iconColor} />}{' '}
+        {pageIcon || <DeclarationIcon color={iconColor} />}
         <TopBarTitle>{title}</TopBarTitle>
       </Item>
       <Item>
+        {topBarActions && (
+          <TopBarActionsContainer>{topBarActions}</TopBarActionsContainer>
+        )}
         {goHome && (
           <CircleButton id="crcl-btn" onClick={goHome}>
             <Cross color="currentColor" />
@@ -86,11 +99,10 @@ export const EventTopBar = (props: IEventTopBarProps) => {
         )}
 
         {exitAction && (
-          <TertiaryButton onClick={exitAction.handler} id="exit_top_bar">
-            {exitAction.label}
-          </TertiaryButton>
+          <CircleButton id="crcl-btn" onClick={exitAction.handler}>
+            <Cross color="currentColor" />
+          </CircleButton>
         )}
-
         {menuItems && (
           <ToggleMenu
             id="eventToggleMenu"
