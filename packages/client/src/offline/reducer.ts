@@ -24,7 +24,8 @@ import { storage } from '@client/storage'
 import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
-import { Event, IFormConfig, IQuestionConfig } from '@client/forms'
+import { IFormConfig, IQuestionConfig } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { isOfflineDataLoaded } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
@@ -363,11 +364,11 @@ function reducer(
       merge(window.config, config)
       let newOfflineData
       const birthCertificateTemplate = certificates.find(
-        ({ event, status }) => event === Event.BIRTH && status === 'ACTIVE'
+        ({ event, status }) => event === Event.Birth && status === 'ACTIVE'
       )
 
       const deathCertificateTemplate = certificates.find(
-        ({ event, status }) => event === Event.DEATH && status === 'ACTIVE'
+        ({ event, status }) => event === Event.Death && status === 'ACTIVE'
       )
 
       if (birthCertificateTemplate && deathCertificateTemplate) {
