@@ -139,7 +139,7 @@ export class LocationSearch extends React.Component<IProps, IState> {
 
   search = (searchText: string) => {
     const searchResult = [] as ISearchLocation[]
-    if (searchText.length > 0 && this.props.locationList) {
+    if (searchText && this.props.locationList) {
       for (const location of this.props.locationList) {
         if (searchResult.length === 10) {
           break
