@@ -241,6 +241,7 @@ class UserReviewFormComponent extends React.Component<
       userFormSection,
       formData,
       goToTeamUserList,
+      userDetails,
       offlineCountryConfiguration
     } = this.props
     let title: string
@@ -285,14 +286,21 @@ class UserReviewFormComponent extends React.Component<
       <ActionPageLight
         title={title}
         goBack={this.props.goBack}
-        goHome={() =>
-          locationDetails &&
-          goToTeamUserList({
-            id: locationDetails.id,
-            searchableText: locationDetails.name,
-            displayLabel: locationDetails.name
-          })
-        }
+        goHome={() => {
+          if (locationDetails) {
+            goToTeamUserList({
+              id: locationDetails.id,
+              searchableText: locationDetails.name,
+              displayLabel: locationDetails.name
+            })
+          } else if (userDetails?.primaryOffice?.id) {
+            goToTeamUserList({
+              id: userDetails.primaryOffice.id,
+              searchableText: '',
+              displayLabel: ''
+            })
+          }
+        }}
       >
         {!this.props.userId && (
           <FormTitle id={`${section.id}_title`}>
