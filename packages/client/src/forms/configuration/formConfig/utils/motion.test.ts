@@ -18,6 +18,7 @@ const mockConfigFieldOne: IConfigField = {
   fieldId: 'one',
   enabled: '',
   custom: false,
+  required: false,
   precedingFieldId: FieldPosition.TOP,
   foregoingFieldId: 'two',
   identifiers: { sectionIndex: 0, groupIndex: 0, fieldIndex: 0 }
@@ -27,6 +28,7 @@ const mockConfigFieldTwo: IConfigField = {
   fieldId: 'two',
   enabled: '',
   custom: false,
+  required: false,
   precedingFieldId: 'one',
   foregoingFieldId: 'three',
   identifiers: { sectionIndex: 0, groupIndex: 0, fieldIndex: 0 }
@@ -36,6 +38,7 @@ const mockConfigFieldThree: IConfigField = {
   fieldId: 'three',
   enabled: '',
   custom: false,
+  required: false,
   precedingFieldId: 'two',
   foregoingFieldId: FieldPosition.BOTTOM,
   identifiers: { sectionIndex: 0, groupIndex: 0, fieldIndex: 0 }
