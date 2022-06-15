@@ -132,7 +132,7 @@ class FloatingNotificationComp extends React.Component<FullProps> {
 
   // Issue 3203: The notification will be disappeared automatically
   closeNotification() {
-    if (this.props.callback) {
+    if (this.props && this.props.callback) {
       this.props.callback()
     }
   }
