@@ -9,8 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ApolloError } from 'apollo-server-errors'
 
-export * from './Avatar'
-export * from './AvatarSmall'
-export * from './AvatarLarge'
-export * from './AvatarVerySmall'
+export class UnassignError extends ApolloError {
+  constructor(message: string) {
+    super(message, 'UNASSIGNED')
+
+    Object.defineProperty(this, 'name', { value: 'UnassignError' })
+  }
+}

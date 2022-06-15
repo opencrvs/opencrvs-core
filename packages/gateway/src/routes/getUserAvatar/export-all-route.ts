@@ -10,7 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-export * from './Avatar'
-export * from './AvatarSmall'
-export * from './AvatarLarge'
-export * from './AvatarVerySmall'
+import { getUserAvatarHandler } from '@gateway/routes/getUserAvatar/handler'
+
+// curl -H 'Content-Type: application/json' -d '{"username": "test.user", "password": "test"}' http://localhost:4040/sendVerifyCode
+export default {
+  method: 'GET',
+  path: '/files/avatar/{userId}.jpg',
+  handler: getUserAvatarHandler,
+  config: {
+    tags: ['api'],
+    auth: false,
+    description: 'Get the user avatar as buffer',
+    notes: 'Pass the usreId as url param'
+  }
+}

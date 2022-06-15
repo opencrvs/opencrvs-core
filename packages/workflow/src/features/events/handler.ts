@@ -23,7 +23,7 @@ import {
   markEventAsRequestedForCorrectionHandler,
   markEventAsValidatedHandler,
   markEventAsWaitingValidationHandler,
-  markEventAsDownloadedHandler
+  markDownloadedEventAsAssignedOrUnassignedHandler
 } from '@workflow/features/registration/handler'
 import {
   getEventType,
@@ -33,7 +33,8 @@ import {
 import {
   hasReinstatedExtension,
   isRejectedTask,
-  isArchiveTask
+  isArchiveTask,
+  hasAssignedExtension
 } from '@workflow/features/task/fhir/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
@@ -71,6 +72,8 @@ export enum Events {
   DEATH_REQUEST_CORRECTION = '/events/death/request-correction',
   EVENT_NOT_DUPLICATE = '/events/not-duplicate',
   DOWNLOADED = '/events/downloaded',
+  DOWNLOADED_ASSIGNED_EVENT = '/events/assigned',
+  UNASSIGNED_EVENT = '/events/unassigned',
   UNKNOWN = 'unknown'
 }
 
@@ -155,8 +158,17 @@ function detectEvent(request: Hapi.Request): Events {
         }
       }
       if (firstEntry.resourceType === 'Task' && firstEntry.id) {
+        const taskResource = getTaskResource(fhirBundle)
         if (fhirBundle?.signature?.type[0]?.code === 'downloaded') {
-          return Events.DOWNLOADED
+          if (hasAssignedExtension(taskResource)) {
+            return Events.DOWNLOADED_ASSIGNED_EVENT
+          } else {
+            return Events.DOWNLOADED
+          }
+        }
+
+        if (fhirBundle?.signature?.type[0]?.code === 'unassigned') {
+          return Events.UNASSIGNED_EVENT
         }
 
         const eventType = getEventType(fhirBundle)
@@ -402,8 +414,32 @@ export async function fhirWorkflowEventHandler(
       )
       break
     case Events.DOWNLOADED:
-      response = await markEventAsDownloadedHandler(request, h)
-      await triggerEvent(Events.DOWNLOADED, request.payload, request.headers)
+      response = await markDownloadedEventAsAssignedOrUnassignedHandler(
+        request,
+        h
+      )
+      break
+    case Events.DOWNLOADED_ASSIGNED_EVENT:
+      response = await markDownloadedEventAsAssignedOrUnassignedHandler(
+        request,
+        h
+      )
+      await triggerEvent(
+        Events.DOWNLOADED_ASSIGNED_EVENT,
+        request.payload,
+        request.headers
+      )
+      break
+    case Events.UNASSIGNED_EVENT:
+      response = await markDownloadedEventAsAssignedOrUnassignedHandler(
+        request,
+        h
+      )
+      await triggerEvent(
+        Events.UNASSIGNED_EVENT,
+        request.payload,
+        request.headers
+      )
       break
     default:
       // forward as-is to hearth

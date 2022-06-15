@@ -71,6 +71,7 @@ export interface GQLMutation {
   markDeathAsRegistered: GQLDeathRegistration
   markDeathAsCertified: string
   requestDeathRegistrationCorrection: string
+  markEventAsUnassigned: string
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -1150,6 +1151,7 @@ export interface GQLRegistrationSearchSet {
   duplicates?: Array<string | null>
   createdAt?: string
   modifiedAt?: string
+  assignment?: GQLAssignmentData
 }
 
 export interface GQLBirthEventSearchSet extends GQLEventSearchSet {
@@ -1294,6 +1296,13 @@ export interface GQLPayment {
   date?: GQLDate
 }
 
+export interface GQLAssignmentData {
+  userId?: string
+  firstName?: string
+  lastName?: string
+  officeName?: string
+}
+
 export interface GQLCommentInput {
   user?: GQLUserInput
   comment?: string
@@ -1420,6 +1429,7 @@ export interface GQLResolver {
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   Payment?: GQLPaymentTypeResolver
+  AssignmentData?: GQLAssignmentDataTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
@@ -2045,6 +2055,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   markDeathAsRegistered?: MutationToMarkDeathAsRegisteredResolver<TParent>
   markDeathAsCertified?: MutationToMarkDeathAsCertifiedResolver<TParent>
   requestDeathRegistrationCorrection?: MutationToRequestDeathRegistrationCorrectionResolver<TParent>
+  markEventAsUnassigned?: MutationToMarkEventAsUnassignedResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -2366,6 +2377,21 @@ export interface MutationToRequestDeathRegistrationCorrectionResolver<
   (
     parent: TParent,
     args: MutationToRequestDeathRegistrationCorrectionArgs,
+    context: any,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToMarkEventAsUnassignedArgs {
+  id: string
+}
+export interface MutationToMarkEventAsUnassignedResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: MutationToMarkEventAsUnassignedArgs,
     context: any,
     info: GraphQLResolveInfo
   ): TResult
@@ -5162,6 +5188,7 @@ export interface GQLRegistrationSearchSetTypeResolver<TParent = any> {
   duplicates?: RegistrationSearchSetToDuplicatesResolver<TParent>
   createdAt?: RegistrationSearchSetToCreatedAtResolver<TParent>
   modifiedAt?: RegistrationSearchSetToModifiedAtResolver<TParent>
+  assignment?: RegistrationSearchSetToAssignmentResolver<TParent>
 }
 
 export interface RegistrationSearchSetToStatusResolver<
@@ -5249,6 +5276,13 @@ export interface RegistrationSearchSetToCreatedAtResolver<
 }
 
 export interface RegistrationSearchSetToModifiedAtResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationSearchSetToAssignmentResolver<
   TParent = any,
   TResult = any
 > {
@@ -5471,5 +5505,37 @@ export interface PaymentToOutcomeResolver<TParent = any, TResult = any> {
 }
 
 export interface PaymentToDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface GQLAssignmentDataTypeResolver<TParent = any> {
+  userId?: AssignmentDataToUserIdResolver<TParent>
+  firstName?: AssignmentDataToFirstNameResolver<TParent>
+  lastName?: AssignmentDataToLastNameResolver<TParent>
+  officeName?: AssignmentDataToOfficeNameResolver<TParent>
+}
+
+export interface AssignmentDataToUserIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AssignmentDataToFirstNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AssignmentDataToLastNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AssignmentDataToOfficeNameResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
