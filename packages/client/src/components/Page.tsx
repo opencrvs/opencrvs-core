@@ -18,6 +18,7 @@ import { IStoreState } from '@opencrvs/client/src/store'
 import { setInitialDeclarations } from '@client/declarations'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import {
+  getOfflineData,
   getOfflineDataLoaded,
   getOfflineLoadingError
 } from '@client/offline/selectors'
@@ -33,6 +34,7 @@ import { getPreferredLanguage } from '@client/i18n/utils'
 import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
 import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -108,6 +110,7 @@ interface IPageProps {
   registerFormLoaded: boolean
   formConfigLoaded: boolean
   loadingError: boolean
+  offlineData: IOfflineData | undefined
 }
 
 interface IDispatchProps {
@@ -126,6 +129,10 @@ class Component extends React.Component<
   ) {
     const { hash } = this.props.location
     const hashChanged = hash && hash !== prevProps.location.hash
+    const appName = this.props.offlineData
+      ? this.props.offlineData.config.APPLICATION_NAME
+      : ''
+    if (appName) document.title = appName
     if (hashChanged) {
       // Push onto callback queue so it runs after the DOM is updated,
       // this is required when navigating from a different page so that
@@ -191,7 +198,8 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store),
     registerFormLoaded: isRegisterFormReady(store),
-    formConfigLoaded: isFormConfigLoaded(store)
+    formConfigLoaded: isFormConfigLoaded(store),
+    offlineData: getOfflineDataLoaded(store) ? getOfflineData(store) : undefined
   }
 }
 
