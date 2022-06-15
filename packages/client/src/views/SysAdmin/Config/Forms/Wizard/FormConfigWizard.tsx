@@ -99,7 +99,7 @@ const CanvasWrapper = styled.div`
 
 type IRouteProps = {
   event: Event
-  section: string
+  section: WizardSection
 }
 
 function isValidEvent(event: string): event is Event {
@@ -156,9 +156,8 @@ function useHiddenFields([selectedField, setSelectedField]: ReturnType<
   return [showHiddenFields, setShowHiddenFields] as const
 }
 
-export function FormConfigWizard() {
+function FormConfigWizardView() {
   const dispatch = useDispatch()
-  const hasNatlSysAdminScope = useHasNatlSysAdminScope()
   const intl = useIntl()
   const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
   const [selectedField, setSelectedField] = useSelectedField()
@@ -184,13 +183,6 @@ export function FormConfigWizard() {
       throw new Error(`No starting field found in section`)
     }
     firstFieldIdentifiers = getIdentifiersFromFieldId(firstField.fieldId)
-  }
-  if (
-    !hasNatlSysAdminScope ||
-    !isValidEvent(event) ||
-    !isValidSection(section)
-  ) {
-    return <Redirect to={HOME} />
   }
 
   return (
@@ -280,4 +272,17 @@ export function FormConfigWizard() {
       </WizardContainer>
     </Container>
   )
+}
+
+export function FormConfigWizard() {
+  const { event, section } = useParams<{ event: string; section: string }>()
+  const hasNatlSysAdminScope = useHasNatlSysAdminScope()
+  if (
+    !hasNatlSysAdminScope ||
+    !isValidEvent(event) ||
+    !isValidSection(section)
+  ) {
+    return <Redirect to={HOME} />
+  }
+  return <FormConfigWizardView />
 }
