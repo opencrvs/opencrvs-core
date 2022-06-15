@@ -96,8 +96,17 @@ export default class PanViewer extends React.Component<IProps> {
   }
   componentDidMount() {
     document.addEventListener('keypress', (e) => {
-      const commentsInput = document.getElementById('additional_comments')
-      if (!(e.target === commentsInput)) {
+      const commentsInput = document.querySelectorAll('textarea')
+
+      let isInArray = false
+      if (commentsInput) {
+        commentsInput.forEach((a) => {
+          if (a === e.target) {
+            isInArray = true
+          }
+        })
+      }
+      if (!isInArray) {
         if (e.keyCode === 43 || e.keyCode === 61) {
           this.zoomIn()
         } else if (e.keyCode === 45) {
