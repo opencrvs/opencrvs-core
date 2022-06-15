@@ -11,25 +11,9 @@
  */
 import User from '@user-mgnt/model/user'
 import { createServer } from '@user-mgnt/server'
-import * as jwt from 'jsonwebtoken'
-import { readFileSync } from 'fs'
 import mockingoose from 'mockingoose'
+import * as fetchAny from 'jest-fetch-mock'
 
-let server: any
-
-beforeEach(async () => {
-  server = await createServer()
-})
-
-const token = jwt.sign(
-  { scope: ['declare'] },
-  readFileSync('../auth/test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:user-mgnt-user'
-  }
-)
 const dummyUser = {
   _id: '5d027bc403b93b17526323f6',
   name: [
@@ -49,6 +33,10 @@ const dummyUser = {
   scope: ['register'],
   role: 'Field Agent',
   status: 'active',
+  avatar: {
+    type: 'image/jpg',
+    data: 'data:image/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
+  },
   practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de',
   primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
   catchmentAreaIds: [
@@ -75,50 +63,42 @@ const dummyUser = {
   auditHistory: []
 }
 
-describe('getUser tests', () => {
+let server: any
+const fetch = fetchAny as fetchAny.FetchMock
+
+beforeEach(async () => {
+  server = await createServer()
+})
+
+describe('getUserAvatar tests', () => {
   beforeEach(() => {
     mockingoose.resetAll()
   })
-  it('Successfully returns user with user id', async () => {
+  it('Successfully returns user avatar with user id', async () => {
     mockingoose(User).toReturn(dummyUser, 'findOne')
-
     const res = await server.server.inject({
-      method: 'POST',
-      url: '/getUser',
-      payload: { userId: '5d027bc403b93b17526323f6' },
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      method: 'GET',
+      url: '/users/5d027bc403b93b17526323f6/avatar'
     })
-
-    const parsedResult = JSON.parse(JSON.stringify(res.result))
-    expect(parsedResult).toEqual(dummyUser)
+    const parsedResult = res.result
+    expect(parsedResult).toBeDefined()
   })
-  it('Successfully returns user with practitioner id', async () => {
+  it('returns 200 for if has no avatar for userId', async () => {
+    delete dummyUser.avatar
     mockingoose(User).toReturn(dummyUser, 'findOne')
-
+    fetch.mockResponse(JSON.stringify({ data: 'buffer' }))
     const res = await server.server.inject({
-      method: 'POST',
-      url: '/getUser',
-      payload: { practitionerId: 'dcba7022-f0ff-4822-b5d9-cb90d0e7b8de' },
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
+      method: 'GET',
+      url: '/users/5d027bc403b93b17526323f6/avatar'
     })
-
-    const parsedResult = JSON.parse(JSON.stringify(res.result))
-    expect(parsedResult).toEqual(dummyUser)
+    expect(res.statusCode).toEqual(200)
   })
-  it('returns 401 for an invalid userid', async () => {
-    const res = await server.server.inject({
-      method: 'POST',
-      url: '/getUser',
-      payload: { userId: 'XXX' },
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
 
-    expect(res.result.statusCode).toEqual(401)
+  it('returns 400 for if has no user for userId', async () => {
+    const res = await server.server.inject({
+      method: 'GET',
+      url: '/users/123/avatar'
+    })
+    expect(res.statusCode).toEqual(400)
   })
 })

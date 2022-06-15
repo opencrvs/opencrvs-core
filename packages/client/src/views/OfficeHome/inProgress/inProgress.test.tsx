@@ -809,7 +809,7 @@ describe('In Progress tab', () => {
           { store, history }
         )
         expect(
-          testComponent.find('#ListItemAction-0-download-failed').hostNodes()
+          testComponent.find('#ListItemAction-0-icon-failed').hostNodes()
         ).toHaveLength(1)
       })
     })

@@ -1127,7 +1127,7 @@ describe('markEventAsRegisteredCallbackHandler', () => {
   })
 })
 
-describe('markEventAsDownloadedHandler', () => {
+describe('markEventAsDownloadedAndAssignedHandler', () => {
   let server: any
 
   beforeEach(async () => {
@@ -3123,5 +3123,58 @@ describe('populateCompositionWithID', () => {
       ],
       meta: { lastUpdated: '2020-03-09T10:20:43.664Z' }
     })
+  })
+})
+
+describe('markDownloadedEventAsAssignedOrUnassignedHandler', () => {
+  let server: any
+
+  beforeEach(async () => {
+    fetch.resetMocks()
+    server = await createServer()
+    fetch.mockResponses(
+      [userMock, { status: 200 }],
+      [fieldAgentPractitionerMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [fieldAgentPractitionerRoleMock, { status: 200 }],
+      [districtMock, { status: 200 }],
+      [upazilaMock, { status: 200 }],
+      [unionMock, { status: 200 }],
+      [officeMock, { status: 200 }],
+      [hearthResponseMock, { status: 200 }]
+    )
+  })
+
+  it('returns OK with full fhir bundle as payload', async () => {
+    const token = jwt.sign(
+      { scope: ['validate'] },
+      readFileSync('../auth/test/cert.key'),
+      {
+        algorithm: 'RS256',
+        issuer: 'opencrvs:auth-service',
+        audience: 'opencrvs:workflow-user'
+      }
+    )
+    const bundleWithDownloadSignature: any = cloneDeep(testFhirTaskBundle)
+    bundleWithDownloadSignature.signature = {
+      type: [
+        {
+          code: 'downloaded'
+        }
+      ]
+    }
+    const res = await server.server.inject({
+      method: 'POST',
+      url: '/fhir',
+      payload: bundleWithDownloadSignature,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+    expect(res.statusCode).toBe(200)
   })
 })
