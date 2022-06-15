@@ -647,7 +647,7 @@ const draftActionMessagesToDefine: IActionMessage = {
   [ActionStatus.COMPLETED]: {
     id: 'config.form.draft.success',
     defaultMessage:
-      '{event} draft v{version} has been moved to drafts successfully',
+      '{event} draft v{version} has been moved to drafts successfully. Redirecting...',
     description: 'Edit draft success notification label'
   }
 }

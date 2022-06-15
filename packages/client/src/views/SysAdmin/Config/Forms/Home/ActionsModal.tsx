@@ -37,8 +37,13 @@ import {
   DeleteFormDraftMutationVariables,
   ChangeFormDraftStatusMutationVariables
 } from '@client/utils/gateway'
-import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+import {
+  ActionStatus,
+  REDIRECT_DELAY
+} from '@client/views/SysAdmin/Config/Forms/utils'
 import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
+import { goToFormConfigWizard } from '@client/navigation'
+import { BirthSection, DeathSection } from '@client/forms'
 
 export enum Actions {
   PUBLISH = 'PUBLISH',
@@ -111,10 +116,20 @@ function ActionButton() {
           dispatch(updateFormConfig(formDraft))
           setAction({ status: ActionStatus.COMPLETED })
 
-          /* uncommenting this causes issues with webpack compilation */
-          // if (action === Actions.EDIT) {
-          //   dispatch(goToFormConfigWizard(event, event === Event.Birth ? BirthSection.Registration : DeathSection.Registration))
-          // }
+          if (action === Actions.EDIT) {
+            setTimeout(
+              () =>
+                dispatch(
+                  goToFormConfigWizard(
+                    event,
+                    event === Event.Birth
+                      ? BirthSection.Child
+                      : DeathSection.Deceased
+                  )
+                ),
+              REDIRECT_DELAY
+            )
+          }
         }
       }}
       onError={() => setAction({ status: ActionStatus.ERROR })}
