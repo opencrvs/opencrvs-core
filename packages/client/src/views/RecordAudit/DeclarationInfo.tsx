@@ -21,6 +21,10 @@ import styled from 'styled-components'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import format from '@client/utils/date-formatting'
 import { REGISTERED, CERTIFIED } from '@client/utils/constants'
+import {
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages/constants'
 
 const MobileDiv = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -86,11 +90,15 @@ export const GetDeclarationInfo = ({
   const finalStatus = removeUnderscore(getCaptitalizedWord(declaration?.status))
   const displayStatus =
     finalStatus === 'Declared' || finalStatus === 'Submitted'
-      ? 'In Review'
+      ? intl.formatMessage(constantsMessages.inReviewStatus)
       : finalStatus === 'In progress'
-      ? 'Incomplete'
+      ? intl.formatMessage(constantsMessages.incompleteStatus)
       : finalStatus === 'Rejected'
-      ? 'Requires updates'
+      ? intl.formatMessage(constantsMessages.requiresUpdatesStatus)
+      : finalStatus === 'Registered'
+      ? intl.formatMessage(constantsMessages.registeredStatus)
+      : finalStatus === 'Archived'
+      ? intl.formatMessage(dynamicConstantsMessages.archived_declaration)
       : finalStatus
 
   if (declaration?.informantContact && informant) {
@@ -117,6 +125,7 @@ export const GetDeclarationInfo = ({
     }
     info = {
       ...info,
+      type: intl.formatMessage(constantsMessages.birth),
       dateOfBirth: declaration?.dateOfBirth,
       placeOfBirth: declaration?.placeOfBirth,
       informant: removeUnderscore(informant)
@@ -134,6 +143,7 @@ export const GetDeclarationInfo = ({
     }
     info = {
       ...info,
+      type: intl.formatMessage(constantsMessages.death),
       dateOfDeath: declaration?.dateOfDeath,
       placeOfDeath: declaration?.placeOfDeath,
       informant: removeUnderscore(informant)

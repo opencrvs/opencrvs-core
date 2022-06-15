@@ -789,7 +789,9 @@ function createQuestionnaireBuilder() {
       context: any
     ) => {
       const questionnaire = selectOrCreateQuestionnaireResource(
-        BIRTH_ENCOUNTER_CODE,
+        context.event === EVENT_TYPE.BIRTH
+          ? BIRTH_ENCOUNTER_CODE
+          : DEATH_ENCOUNTER_CODE,
         fhirBundle,
         context
       )
@@ -1938,15 +1940,16 @@ export const builders: IFieldBuilders = {
         INFORMANT_TITLE,
         fhirBundle
       )
-
-      relatedPersonResource.relationship = {
-        coding: [
-          {
-            system:
-              'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-            code: fieldValue
-          }
-        ]
+      if (fieldValue !== 'OTHER') {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: fieldValue
+            }
+          ]
+        }
       }
       if (context.event === EVENT_TYPE.BIRTH) {
         if (fieldValue === 'MOTHER') {

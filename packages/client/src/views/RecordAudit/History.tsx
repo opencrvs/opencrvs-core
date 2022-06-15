@@ -144,6 +144,10 @@ export const GetHistory = ({
   toggleActionDetails: (actionItem: IActionDetailsData) => void
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const isFieldAgent =
+    userDetails?.role && FIELD_AGENT_ROLES.includes(userDetails.role)
+      ? true
+      : false
   const DEFAULT_HISTORY_RECORD_PAGE_SIZE = 10
   const onPageChange = (currentPageNumber: number) =>
     setCurrentPageNumber(currentPageNumber)
@@ -224,6 +228,8 @@ export const GetHistory = ({
     location:
       item.dhis2Notification && !item.user?.role ? (
         <HealthSystemLocation>{item.office?.name}</HealthSystemLocation>
+      ) : isFieldAgent ? (
+        <>{item.office?.name}</>
       ) : (
         <GetLink
           status={item.office?.name}
@@ -241,24 +247,32 @@ export const GetHistory = ({
 
   const columns = [
     {
-      label: 'Action',
+      label: intl.formatMessage(constantsMessages.action),
       width: 22,
       key: 'action'
     },
     {
-      label: 'Date',
+      label: intl.formatMessage(constantsMessages.date),
       width: 22,
       key: 'date'
     },
     {
-      label: 'By',
+      label: intl.formatMessage(constantsMessages.by),
       width: 22,
       key: 'user',
       isIconColumn: true,
       ICON_ALIGNMENT: ColumnContentAlignment.LEFT
     },
-    { label: 'Type', width: 15, key: 'type' },
-    { label: 'Location', width: 20, key: 'location' }
+    {
+      label: intl.formatMessage(constantsMessages.type),
+      width: 15,
+      key: 'type'
+    },
+    {
+      label: intl.formatMessage(constantsMessages.location),
+      width: 20,
+      key: 'location'
+    }
   ]
   return (
     <>

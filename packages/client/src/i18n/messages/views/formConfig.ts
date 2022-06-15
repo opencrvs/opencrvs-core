@@ -17,6 +17,9 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 
 interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
+  requiredForRegistrationTooltip: MessageDescriptor
+  contentKeyTooltip: MessageDescriptor
+  certHandelbarsTooltip: MessageDescriptor
   showHiddenFields: MessageDescriptor
   defaultComment: MessageDescriptor
   hidden: MessageDescriptor
@@ -126,6 +129,23 @@ const navigationMessagesToDefine: INavigationMessages = {
 }
 
 const messagesToDefine: IFormConfigMessages = {
+  requiredForRegistrationTooltip: {
+    id: 'config.form.tooltip.requiredForRegistration',
+    defaultMessage:
+      'Select if this field is mandatory to complete registration',
+    description: 'Default tooltip message for required for registration'
+  },
+  contentKeyTooltip: {
+    id: 'config.form.tooltip.contentKey',
+    defaultMessage: 'Use these keys to update copy for this field',
+    description: 'Default tooltip message for content key'
+  },
+  certHandelbarsTooltip: {
+    id: 'config.form.tooltip.certHandelbars',
+    defaultMessage:
+      'Use this handlebar in your certificate SVG to show this data field',
+    description: 'Default tooltip message for certificate handelbars'
+  },
   defaultComment: {
     id: 'config.form.draft.defaultComment',
     defaultMessage: 'Default Configuration',
@@ -435,7 +455,7 @@ const messagesToDefine: IFormConfigMessages = {
   },
   formConfigMobileModalTitle: {
     id: 'config.form.mobile.modal.title',
-    defaultMessage: 'Configuration on mobile unavailble',
+    defaultMessage: 'Configuration on mobile unavailable',
     description: 'Modal title for mobile form configuration'
   },
   formConfigMobileModalDesc: {

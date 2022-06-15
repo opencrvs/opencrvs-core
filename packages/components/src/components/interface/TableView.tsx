@@ -182,6 +182,7 @@ const ContentWrapper = styled.span<{
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
   color: ${({ theme }) => theme.colors.tertiary};
+  padding: 0 4px;
 `
 const ValueWrapper = styled.span<{
   width: number
@@ -195,7 +196,7 @@ const ValueWrapper = styled.span<{
   justify-content: ${({ alignment }) =>
     alignment === ColumnContentAlignment.RIGHT ? 'flex-end' : 'flex-start'};
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
-  padding-right: 8px;
+  padding: 0 4px;
   align-self: center;
   ${({ color }) => color && `color: ${color};`}
 `

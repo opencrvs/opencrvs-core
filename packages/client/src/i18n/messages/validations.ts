@@ -39,6 +39,7 @@ interface IValidationMessages
   required: MessageDescriptor
   requiredForNewUser: MessageDescriptor
   requiredSymbol: MessageDescriptor
+  requiredBasic: MessageDescriptor
   validBirthRegistrationNumber: MessageDescriptor
   validDeathRegistrationNumber: MessageDescriptor
   validNationalId: MessageDescriptor
@@ -193,6 +194,11 @@ const messagesToDefine: IValidationMessages = {
     description:
       'The error message that appears when an out of range value is used',
     id: 'validations.range'
+  },
+  requiredBasic: {
+    defaultMessage: 'Required',
+    description: 'The error message that appears on required fields',
+    id: 'validations.requiredBasic'
   },
   required: {
     defaultMessage: 'Required',

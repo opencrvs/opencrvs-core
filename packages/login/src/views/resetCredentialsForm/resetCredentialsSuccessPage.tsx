@@ -12,7 +12,7 @@
 import { goToHome, FORGOTTEN_ITEMS } from '@login/login/actions'
 import { storage } from '@login/storage'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { LightLogo } from '@opencrvs/components/lib/icons'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 import {
   Container,
   LogoContainer,
@@ -24,6 +24,8 @@ import { connect } from 'react-redux'
 import styled from 'styled-components'
 import { messages } from '@login/i18n/messages/views/resetCredentialsForm'
 import { RouteComponentProps } from 'react-router'
+import { selectCountryLogo } from '@login/login/selectors'
+import { IStoreState } from '@login/store'
 
 const TitleHolder = styled.div`
   ${({ theme }) => theme.fonts.h1};
@@ -43,19 +45,19 @@ export class ResetCredentialsSuccessView extends React.Component<
     {},
     { forgottenItem: FORGOTTEN_ITEMS }
   > &
-    IntlShapeProps
+    IntlShapeProps & { logo: string | undefined }
 > {
   async componentDidMount() {
     await storage.removeItem('USER_DETAILS')
   }
   render() {
-    const { intl, goToHome } = this.props
+    const { intl, goToHome, logo } = this.props
     const { forgottenItem } = this.props.location.state
     return (
       <Page>
         <Container id="reset-credentials-success-page">
           <LogoContainer>
-            <LightLogo />
+            <CountryLogo src={logo} />
           </LogoContainer>
           <TitleHolder>
             {intl.formatMessage(messages.successPageTitle, { forgottenItem })}
@@ -74,6 +76,13 @@ export class ResetCredentialsSuccessView extends React.Component<
   }
 }
 
-export const ResetCredentialsSuccessPage = connect(null, {
-  goToHome
-})(injectIntl(ResetCredentialsSuccessView))
+export const ResetCredentialsSuccessPage = connect(
+  (state: IStoreState) => {
+    return {
+      logo: selectCountryLogo(state)
+    }
+  },
+  {
+    goToHome
+  }
+)(injectIntl(ResetCredentialsSuccessView))

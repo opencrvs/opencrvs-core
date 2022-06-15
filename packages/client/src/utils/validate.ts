@@ -87,6 +87,9 @@ export const isAValidDateFormat = (value: string): boolean => {
   return givenDate.toISOString().slice(0, 10) === valueISOString
 }
 
+export const requiredBasic: Validation = (value: IFormFieldValue) =>
+  value ? undefined : { message: messages.requiredBasic }
+
 export const requiredSymbol: Validation = (value: IFormFieldValue) =>
   value ? undefined : { message: messages.requiredSymbol }
 

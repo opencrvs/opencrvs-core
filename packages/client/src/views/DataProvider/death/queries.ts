@@ -199,6 +199,10 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
             type
           }
         }
+        signature {
+          data
+          type
+        }
         comments {
           user {
             id
@@ -427,6 +431,10 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             data
             type
           }
+        }
+        signature {
+          data
+          type
         }
         comments {
           user {

@@ -1545,7 +1545,7 @@
                 {
                   "id": "informantNameInEnglish",
                   "label": {
-                    "defaultMessage": "Informant's English name",
+                    "defaultMessage": "Informant's fullname",
                     "description": "Label for informant's name in english",
                     "id": "form.preview.group.label.informant.english.name"
                   },
@@ -1795,7 +1795,7 @@
                   "previewGroup": "motherNameInEnglish",
                   "type": "TEXT",
                   "label": {
-                    "defaultMessage": "First Name",
+                    "defaultMessage": "First name(s)",
                     "description": "Label for form field: First names in english",
                     "id": "form.field.label.motherFirstNamesEng"
                   },
@@ -2612,7 +2612,7 @@
                 {
                   "id": "fatherNameInEnglish",
                   "label": {
-                    "defaultMessage": "Father's English name",
+                    "defaultMessage": "Father's fullname",
                     "description": "Group label for father's name in english",
                     "id": "form.preview.group.label.father.english.name"
                   },
@@ -5093,11 +5093,11 @@
                 "name": "firstNamesEng",
                 "type": "TEXT",
                 "label": {
-                  "defaultMessage": "English first name",
+                  "defaultMessage": "First name",
                   "description": "English first name",
                   "id": "form.field.label.firstNameEN"
                 },
-                "required": false,
+                "required": true,
                 "initialValue": "",
                 "validate": [
                   {
@@ -5125,7 +5125,7 @@
                 "name": "familyNameEng",
                 "type": "TEXT",
                 "label": {
-                  "defaultMessage": "English last name",
+                  "defaultMessage": "Last name",
                   "description": "English last name",
                   "id": "form.field.label.lastNameEN"
                 },
@@ -5359,7 +5359,7 @@
             "conditionals": [
               {
                 "action": "hide",
-                "expression": "values.role!==\"LOCAL_REGISTRAR\""
+                "expression": "values.role!==\"LOCAL_REGISTRAR\" && values.role!==\"NATIONAL_REGISTRAR\""
               }
             ],
             "fields": [
@@ -5484,11 +5484,11 @@
                 "name": "firstNamesEng",
                 "type": "TEXT",
                 "label": {
-                  "defaultMessage": "English first name",
+                  "defaultMessage": "First name",
                   "description": "English first name",
                   "id": "form.field.label.firstNameEN"
                 },
-                "required": false,
+                "required": true,
                 "initialValue": "",
                 "validate": [
                   {
@@ -5516,7 +5516,7 @@
                 "name": "familyNameEng",
                 "type": "TEXT",
                 "label": {
-                  "defaultMessage": "English last name",
+                  "defaultMessage": "Last name",
                   "description": "English last name",
                   "id": "form.field.label.lastNameEN"
                 },

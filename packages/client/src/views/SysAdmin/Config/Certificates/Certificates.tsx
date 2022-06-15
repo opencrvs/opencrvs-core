@@ -78,12 +78,6 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
-const ListTitleDiv = styled.div`
-  width: 645px;
-  height: 46px;
-  ${({ theme }) => theme.fonts.reg16};
-`
-
 const BlueTitle = styled.span`
   color: ${({ theme }) => theme.colors.tertiary};
 `
@@ -481,12 +475,12 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
           {this.state.selectedSubMenuItem ===
             this.SUB_MENU_ID.certificatesConfig && (
             <Content title={CertificateSection.title} titleColor={'copy'}>
-              <ListTitleDiv>
+              <>
                 {intl.formatMessage(messages.listDetails)}
                 <BlueTitle>
                   {intl.formatMessage(messages.listDetailsQsn)}
                 </BlueTitle>
-              </ListTitleDiv>
+              </>
               <ListViewContainer>
                 <ListViewSimplified>
                   {CertificateSection.items.map((item) => {

@@ -21,7 +21,10 @@ import {
   SIMPLE_DOCUMENT_UPLOADER
 } from '@client/forms'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
-import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
+import {
+  getVisibleSectionGroupsBasedOnConditions,
+  getConditionalActionsForField
+} from '@client/forms/utils'
 import {
   buttonMessages as messages,
   userMessages,
@@ -30,6 +33,7 @@ import {
 import {
   goBack,
   goToCreateUserSection,
+  goToTeamUserList,
   goToUserReviewForm
 } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
@@ -51,7 +55,10 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
-import { ActionPageLight, IDataProps } from '@opencrvs/components/lib/interface'
+import {
+  ActionPageLight,
+  ISearchLocation
+} from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -83,6 +90,7 @@ interface IDispatchProps {
   userFormSection: IFormSection
   offlineCountryConfiguration: IOfflineData
   goBack: typeof goBack
+  goToTeamUserList: typeof goToTeamUserList
   modify: (values: IFormSectionData) => void
   userDetails: IUserDetails | null
 }
@@ -135,6 +143,7 @@ class UserReviewFormComponent extends React.Component<
         if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
         } else if (field && sections.length > 0) {
+          if (field.name === 'username' && !this.getValue(field)) return
           const label =
             field.type === SIMPLE_DOCUMENT_UPLOADER ? (
               <DocumentUploaderContainer>
@@ -158,38 +167,43 @@ class UserReviewFormComponent extends React.Component<
             ) : (
               intl.formatMessage(field.label)
             )
-
-          sections[sections.length - 1].items.push({
-            label: <Label>{label}</Label>,
-            value: <Value id={`value_${idx}`}>{this.getValue(field)}</Value>,
-            actions:
-              !(
-                field.name === 'registrationOffice' &&
-                this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
-              ) && !field.readonly ? (
-                <LinkButton
-                  id={`btn_change_${field.name}`}
-                  onClick={() => {
-                    this.props.userId
-                      ? this.props.goToUserReviewForm(
-                          this.props.userId,
-                          userFormSection.id,
-                          group.id,
-                          field.name
-                        )
-                      : this.props.goToCreateUserSection(
-                          userFormSection.id,
-                          group.id,
-                          field.name
-                        )
-                  }}
-                >
-                  {intl.formatMessage(messages.change)}
-                </LinkButton>
-              ) : (
-                <></>
-              )
-          })
+          if (
+            !getConditionalActionsForField(field, this.props.formData).includes(
+              'hide'
+            )
+          ) {
+            sections[sections.length - 1].items.push({
+              label: <Label>{label}</Label>,
+              value: <Value id={`value_${idx}`}>{this.getValue(field)}</Value>,
+              actions:
+                !(
+                  field.name === 'registrationOffice' &&
+                  this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
+                ) && !field.readonly ? (
+                  <LinkButton
+                    id={`btn_change_${field.name}`}
+                    onClick={() => {
+                      this.props.userId
+                        ? this.props.goToUserReviewForm(
+                            this.props.userId,
+                            userFormSection.id,
+                            group.id,
+                            field.name
+                          )
+                        : this.props.goToCreateUserSection(
+                            userFormSection.id,
+                            group.id,
+                            field.name
+                          )
+                    }}
+                  >
+                    {intl.formatMessage(messages.change)}
+                  </LinkButton>
+                ) : (
+                  <></>
+                )
+            })
+          }
         }
       })
     })
@@ -220,17 +234,31 @@ class UserReviewFormComponent extends React.Component<
   }
 
   render() {
-    const { intl, section, userId, userFormSection } = this.props
+    const {
+      intl,
+      section,
+      userId,
+      userFormSection,
+      formData,
+      goToTeamUserList,
+      userDetails,
+      offlineCountryConfiguration
+    } = this.props
     let title: string
     let actionComponent: JSX.Element
-
+    const locationId = formData['registrationOffice']
+    const locationDetails =
+      offlineCountryConfiguration['locations'][`${locationId}`] ||
+      offlineCountryConfiguration['facilities'][`${locationId}`] ||
+      offlineCountryConfiguration['offices'][`${locationId}`]
     if (userId) {
       title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
       actionComponent = (
         <SuccessButton
           id="submit-edit-user-form"
           disabled={
-            this.props.formData.role === 'LOCAL_REGISTRAR' &&
+            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
+              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}
@@ -246,7 +274,8 @@ class UserReviewFormComponent extends React.Component<
         <PrimaryButton
           id="submit_user_form"
           disabled={
-            this.props.formData.role === 'LOCAL_REGISTRAR' &&
+            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
+              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}
@@ -256,7 +285,25 @@ class UserReviewFormComponent extends React.Component<
       )
     }
     return (
-      <ActionPageLight title={title} goBack={this.props.goBack}>
+      <ActionPageLight
+        title={title}
+        goBack={this.props.goBack}
+        goHome={() => {
+          if (locationDetails) {
+            goToTeamUserList({
+              id: locationDetails.id,
+              searchableText: locationDetails.name,
+              displayLabel: locationDetails.name
+            })
+          } else if (userDetails?.primaryOffice?.id) {
+            goToTeamUserList({
+              id: userDetails.primaryOffice.id,
+              searchableText: '',
+              displayLabel: ''
+            })
+          }
+        }}
+      >
         {!this.props.userId && (
           <FormTitle id={`${section.id}_title`}>
             {intl.formatMessage(section.name)}
@@ -300,6 +347,8 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
       fieldName?: string
     ) => dispatch(goToUserReviewForm(userId, sec, group, fieldName)),
     goBack: () => dispatch(goBack()),
+    goToTeamUserList: (selectedLocation: ISearchLocation) =>
+      dispatch(goToTeamUserList(selectedLocation)),
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
     submitForm: (userFormSection: IFormSection) => {
       const variables = draftToGqlTransformer(

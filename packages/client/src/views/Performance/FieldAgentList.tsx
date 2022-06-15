@@ -54,6 +54,7 @@ import {
   MobileWrapper,
   DesktopWrapper
 } from '@opencrvs/components/lib/styleForPagination'
+import { userMessages } from '@client/i18n/messages'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -62,7 +63,7 @@ const DEFAULT_FIELD_AGENT_LIST_SIZE = 25
 const { useState } = React
 interface SortMap {
   totalDeclarations: SORT_ORDER
-  name: SORT_ORDER
+  rawName: SORT_ORDER
   startMonth: SORT_ORDER
   avgCompleteDeclarationTime: SORT_ORDER
   type: SORT_ORDER
@@ -72,7 +73,7 @@ interface SortMap {
 }
 const INITIAL_SORT_MAP = {
   totalDeclarations: SORT_ORDER.DESCENDING,
-  name: SORT_ORDER.ASCENDING,
+  rawName: SORT_ORDER.ASCENDING,
   startMonth: SORT_ORDER.ASCENDING,
   avgCompleteDeclarationTime: SORT_ORDER.ASCENDING,
   type: SORT_ORDER.ASCENDING,
@@ -107,7 +108,7 @@ export enum EVENT_OPTIONS {
 
 enum STATUS_OPTIONS {
   ACTIVE = 'active',
-  DEACTIVE = 'deactive',
+  DEACTIVE = 'deactivated',
   PENDING = 'pending'
 }
 
@@ -227,9 +228,10 @@ function FieldAgentListComponent(props: IProps) {
         }),
         width: 20,
         isSortable: true,
-        sortFunction: () => toggleSort('name'),
-        icon: columnToBeSort === 'name' ? <SortArrow active={true} /> : <></>,
-        isSorted: columnToBeSort === 'name' ? true : false
+        sortFunction: () => toggleSort('rawName'),
+        icon:
+          columnToBeSort === 'rawName' ? <SortArrow active={true} /> : <></>,
+        isSorted: columnToBeSort === 'rawName' ? true : false
       },
       {
         key: 'type',
@@ -326,6 +328,10 @@ function FieldAgentListComponent(props: IProps) {
     ]
   }
 
+  function getFieldAgentTypeLabel(type: string) {
+    return userMessages[type] ? intl.formatMessage(userMessages[type]) : type
+  }
+
   function getContent(data?: GQLSearchFieldAgentResult) {
     const content =
       data &&
@@ -348,7 +354,8 @@ function FieldAgentListComponent(props: IProps) {
           offices.find(({ id }) => id === row.primaryOfficeId)
         return {
           name: getNameWithAvatar(row.fullName || '', row.avatar),
-          type: row.type,
+          rawName: row.fullName || '',
+          type: (row.type && getFieldAgentTypeLabel(row.type)) || '',
           officeName: (office && office.displayLabel) || '',
           startMonth: row.creationDate,
           totalDeclarations: String(row.totalNumberOfDeclarationStarted),
@@ -371,7 +378,7 @@ function FieldAgentListComponent(props: IProps) {
       (content &&
         orderBy(
           content,
-          columnToBeSort === 'name'
+          columnToBeSort === 'rawName'
             ? [(content) => content[columnToBeSort]!.toString().toLowerCase()]
             : [columnToBeSort],
           [sortOrder[columnToBeSort]]
