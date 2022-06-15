@@ -131,13 +131,6 @@ function useSelectedField() {
     selectedFieldId && section !== 'settings'
       ? sectionFieldsMap[section][selectedFieldId]
       : null
-  /*
-   * We need to clear the selected field if section changes
-   * as the changed section won't have the previously selected field
-   */
-  if (selectedFieldId && !selectedFieldId.includes(section)) {
-    setSelectedFieldId(null)
-  }
 
   return [selectedField, setSelectedFieldId] as const
 }
