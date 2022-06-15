@@ -11,7 +11,6 @@
  */
 import {
   IDefaultQuestionConfig,
-  IFieldIdentifiers,
   ICustomQuestionConfig
 } from '@client/forms/questionConfig'
 import { IConnection, IConfigField, getConfigFieldIdentifiers } from '.'
@@ -31,7 +30,9 @@ import { FieldEnabled } from '@client/forms/configuration'
 import { Event } from '@client/utils/gateway'
 import { MessageDescriptor } from 'react-intl'
 
-export type IDefaultConfigField = IDefaultQuestionConfig & IConnection
+export type IDefaultConfigField = IDefaultQuestionConfig & {
+  required: boolean
+} & IConnection
 
 export type IDefaultConfigFieldWithPreviewGroup = IDefaultConfigField & {
   previewGroup: string
@@ -55,32 +56,23 @@ export function isDefaultConfigFieldWithPreviewGroup(
   return 'previewGroup' in configField
 }
 
-export function defaultFieldToQuestionConfig(
-  fieldId: string,
-  { precedingFieldId, foregoingFieldId }: IConnection,
-  identifiers: IFieldIdentifiers,
+export function defaultFieldToConfigField(
+  question: IDefaultQuestionConfig,
+  foregoingFieldId: string,
   defaultForm: ISerializedForm
 ): IDefaultConfigField | IDefaultConfigFieldWithPreviewGroup {
-  const { sectionIndex, groupIndex, fieldIndex } = identifiers
-  const { enabled, previewGroup, required } = getField(identifiers, defaultForm)
+  const { previewGroup, required } = getField(question.identifiers, defaultForm)
   const configField = {
-    fieldId,
-    enabled: enabled ?? '',
     required: required ?? false,
-    precedingFieldId,
-    foregoingFieldId,
-    identifiers: {
-      sectionIndex,
-      groupIndex,
-      fieldIndex
-    }
+    ...question,
+    foregoingFieldId
   }
   if (previewGroup && isPlaceHolderPreviewGroup(previewGroup)) {
     return {
       ...configField,
       previewGroup,
       previewGroupLabel: getPreviewGroupLabel(
-        getGroup(identifiers, defaultForm),
+        getGroup(question.identifiers, defaultForm),
         previewGroup
       )
     }

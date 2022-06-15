@@ -45,7 +45,7 @@ import {
 import { ICustomConfigField } from './customConfig'
 import {
   IDefaultConfigField,
-  defaultFieldToQuestionConfig,
+  defaultFieldToConfigField,
   isDefaultConfigField,
   hasDefaultFieldChanged,
   isDefaultConfigFieldWithPreviewGroup,
@@ -338,12 +338,7 @@ export function generateConfigFields(
           foregoingFieldId
         }
       }
-      return defaultFieldToQuestionConfig(
-        question.fieldId,
-        { precedingFieldId: question.precedingFieldId, foregoingFieldId },
-        question.identifiers,
-        defaultForm
-      )
+      return defaultFieldToConfigField(question, foregoingFieldId, defaultForm)
     })
     .map((configField) => ({
       ...configField,
