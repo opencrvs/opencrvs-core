@@ -16,7 +16,8 @@ import {
   IDefaultQuestionConfig,
   getFieldIdentifiers,
   getCustomizedDefaultField,
-  getGroupIdentifiers
+  getGroupIdentifiers,
+  IFieldIdentifiers
 } from '@client/forms/questionConfig'
 import { createCustomField } from '@client/forms/configuration/customUtils'
 import { getEventDraft } from '@client/forms/configuration/formDrafts/utils'
@@ -54,13 +55,48 @@ function isConfigurable(status: DraftStatus | null) {
   return status === DraftStatus.Published || status === DraftStatus.InPreview
 }
 
+type MergedIdentifier = Omit<IFieldIdentifiers, 'fieldIndex'> & {
+  fieldIndices: number[]
+}
+
+function mergeIdentifiers(
+  mergedIdentifiers: MergedIdentifier[],
+  { identifiers: questionIdentifiers }: IDefaultQuestionConfig
+) {
+  let currentFieldIdentifier = mergedIdentifiers.find(
+    ({ sectionIndex, groupIndex }) =>
+      sectionIndex === questionIdentifiers.sectionIndex &&
+      groupIndex === questionIdentifiers.groupIndex
+  ) ?? {
+    sectionIndex: questionIdentifiers.sectionIndex,
+    groupIndex: questionIdentifiers.groupIndex,
+    fieldIndices: []
+  }
+  currentFieldIdentifier = {
+    ...currentFieldIdentifier,
+    fieldIndices: [
+      ...currentFieldIdentifier.fieldIndices,
+      questionIdentifiers.fieldIndex
+    ]
+  }
+  return [
+    ...mergedIdentifiers.filter(
+      ({ sectionIndex, groupIndex }) =>
+        sectionIndex !== questionIdentifiers.sectionIndex &&
+        groupIndex !== questionIdentifiers.groupIndex
+    ),
+    currentFieldIdentifier
+  ]
+}
+
 function filterOutDefaultFields(
   serializedForm: ISerializedForm,
   defaultQuestionConfigs: IDefaultQuestionConfig[]
 ): ISerializedForm {
   const filteredForm: ISerializedForm = { ...serializedForm }
-  defaultQuestionConfigs.forEach(
-    ({ identifiers: { sectionIndex, groupIndex, fieldIndex } }) => {
+  defaultQuestionConfigs
+    .reduce(mergeIdentifiers, [])
+    .forEach(({ sectionIndex, groupIndex, fieldIndices }) => {
       filteredForm.sections = filteredForm.sections.map((section, idx) => {
         if (idx !== sectionIndex) {
           return section
@@ -73,13 +109,14 @@ function filterOutDefaultFields(
             }
             return {
               ...group,
-              fields: group.fields.filter((_, idx) => idx !== fieldIndex)
+              fields: group.fields.filter((_, idx) =>
+                fieldIndices.every((index) => idx !== index)
+              )
             }
           })
         }
       })
-    }
-  )
+    })
   return filteredForm
 }
 
