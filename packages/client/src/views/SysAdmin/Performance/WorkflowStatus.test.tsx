@@ -45,11 +45,11 @@ describe('Workflow status tests', () => {
         request: {
           query: FETCH_EVENTS_WITH_PROGRESS,
           variables: {
-            count: 25,
+            count: 10,
             skip: 0,
             locationId: locationId,
             status: ['REGISTERED'],
-            type: ['birth-declaration']
+            type: ['birth-declaration', 'birth-notification']
           }
         },
         result: {
@@ -306,7 +306,7 @@ describe('Workflow status tests', () => {
             skip: 0,
             parentLocationId: locationId,
             status: ['REGISTERED'],
-            type: ['birth-declaration']
+            type: ['birth-declaration', 'birth-notification']
           }
         },
         result: {

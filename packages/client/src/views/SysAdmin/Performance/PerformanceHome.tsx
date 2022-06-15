@@ -443,6 +443,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 <>
                   <Query
                     query={PERFORMANCE_METRICS}
+                    fetchPolicy="no-cache"
                     onCompleted={() => this.markFinished('PERFORMANCE_METRICS')}
                     onError={() => this.markFinished('PERFORMANCE_METRICS')}
                     variables={

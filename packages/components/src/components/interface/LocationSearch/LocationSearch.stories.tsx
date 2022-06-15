@@ -32,10 +32,12 @@ interface IProps {
   filteredList: ISearchLocation[]
   selectedText: string | null
   selectedItem: ISearchLocation | null
+  buttonLabel: string
 }
 const Template: Story<IProps> = (args) => <LocationSearch {...args} />
 export const LocationSearchView = Template.bind({})
 LocationSearchView.args = {
+  buttonLabel: 'Search',
   locationList: [
     {
       id: '123',
