@@ -85,7 +85,7 @@ class TeamSearchComponent extends React.Component<Props, State> {
 
   searchButtonHandler = () => {
     this.state.selectedLocation &&
-      this.props.goToTeamUserList(this.state.selectedLocation)
+      this.props.goToTeamUserList(this.state.selectedLocation.id)
   }
 
   render() {

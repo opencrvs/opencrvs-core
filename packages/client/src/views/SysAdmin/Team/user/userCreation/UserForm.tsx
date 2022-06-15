@@ -156,13 +156,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               : intl.formatMessage(section.title)
           }
           goBack={this.handleBackAction}
-          goHome={() =>
-            goToTeamUserList({
-              id: String(formData.registrationOffice),
-              searchableText: '',
-              displayLabel: ''
-            })
-          }
+          goHome={() => goToTeamUserList(String(formData.registrationOffice))}
         >
           <FormTitle id="form-title">
             {userId

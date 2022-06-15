@@ -17,11 +17,13 @@ import {
   userMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/sysAdmin'
+import { messages as headerMessages } from '@client/i18n/messages/views/header'
 import {
   goToCreateNewUser,
   goToCreateNewUserWithLocationId,
   goToReviewUserDetails,
-  goToTeamSearch
+  goToTeamSearch,
+  goToTeamUserList
 } from '@client/navigation'
 import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
@@ -81,36 +83,47 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { useCallback } from 'react'
-import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import {
+  withOnlineStatus,
+  LoadingIndicator
+} from '@client/views/OfficeHome/LoadingIndicator'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
+import { LocationPicker } from '@client/components/LocationPicker'
+import { ApolloError } from 'apollo-client'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const { useState } = React
 
 const UserTable = styled(BodyContent)`
   padding: 0px;
-  margin: 32px auto 0;
+  margin: 8px auto 0;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0px;
   }
 `
 
-const TableHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 8px 18px;
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bold16};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.silverSand};
-`
 const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors};
-  ${({ theme }) => theme.fonts.reg16};
+  ${({ theme }) => theme.fonts.bold16};
   text-align: center;
-  margin-top: 100px;
+  height: 328px;
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-top: 12px;
+    height: calc(100vh - 104px);
+  }
 `
+
+const Loading = styled.div`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    height: calc(100vh - 104px);
+  }
+`
+
 const StatusBox = styled.div`
   padding: 4px 8px;
   ${({ theme }) => theme.fonts.bold12};
@@ -131,37 +144,17 @@ const PendingStatusBox = styled(StatusBox)`
 const DisabledStatusBox = styled(StatusBox)`
   background: rgba(206, 206, 206, 0.3);
 `
-const AddUserContainer = styled.div`
-  display: flex;
-  cursor: pointer;
-  color: ${({ theme }) => theme.colors.primary};
 
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
 const AddUserIcon = styled(AddUser)`
-  padding: 4px;
+  cursor: pointer;
 `
 
 const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.h1};
-`
-
-const HeaderContainer = styled.div`
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  margin-top: -32px;
-
-  & > :first-child {
-    margin-right: 24px;
-  }
-
-  & > :nth-child(2) {
-    position: relative;
-    bottom: 2px;
+  ${({ theme }) => theme.fonts.h2};
+  margin: 8px 0;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
   }
 `
 
@@ -169,25 +162,14 @@ const LocationInfo = styled.div`
   padding: 8px 0px;
 `
 
-const LocationInfoKey = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.bold16};
-`
-
 const LocationInfoValue = styled.div`
-  color: ${({ theme }) => theme.colors.copy};
-  ${({ theme }) => theme.fonts.reg16};
+  color: ${({ theme }) => theme.colors.supportingCopy};
+  ${({ theme }) => theme.fonts.reg18};
 `
 
 const LocationInfoEmptyValue = styled.div`
   color: ${({ theme }) => theme.colors.supportingCopy};
   ${({ theme }) => theme.fonts.reg16};
-`
-
-const ChangeButton = styled(LinkButton)`
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
 `
 
 const StatusMenuContainer = styled.div`
@@ -204,10 +186,6 @@ const Name = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
-const ListViewContainer = styled.div`
-  margin-top: 24px;
-`
-
 const NoRecord = styled.div<{ isFullPage?: boolean }>`
   ${({ theme }) => theme.fonts.h3};
   text-align: left;
@@ -217,12 +195,13 @@ const NoRecord = styled.div<{ isFullPage?: boolean }>`
 `
 
 const ConnectivityContainer = styled.div`
-  justify-content: center;
-  gap: 8px;
+  height: 328px;
+  margin-top: 16px;
   display: flex;
-  margin-top: 5vh;
+  gap: 12px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     margin-top: 12px;
+    height: calc(100vh - 104px);
   }
 `
 const NoConnectivity = styled(NoWifi)`
@@ -232,6 +211,10 @@ const Text = styled.div`
   ${({ theme }) => theme.fonts.reg16};
   text-align: center;
 `
+const LinkButtonModified = styled(LinkButton)`
+  height: 24px;
+`
+
 interface ISearchParams {
   locationId: string
 }
@@ -248,6 +231,7 @@ type BaseProps = {
   goToCreateNewUserWithLocationId: typeof goToCreateNewUserWithLocationId
   goToReviewUserDetails: typeof goToReviewUserDetails
   goToTeamSearch: typeof goToTeamSearch
+  goToTeamUserList: typeof goToTeamUserList
 }
 
 type IProps = BaseProps &
@@ -298,7 +282,6 @@ function UserListComponent(props: IProps) {
   const [showResendSMSSuccess, setShowResendSMSSuccess] =
     useState<boolean>(false)
   const [showResendSMSError, setShowResendSMSError] = useState<boolean>(false)
-
   const {
     intl,
     userDetails,
@@ -310,6 +293,11 @@ function UserListComponent(props: IProps) {
     isOnline,
     location: { search }
   } = props
+  const isNatlSysAdmin = userDetails?.role
+    ? NATL_ADMIN_ROLES.includes(userDetails.role)
+      ? true
+      : false
+    : false
 
   const { locationId } = parse(search) as unknown as ISearchParams
   const [toggleActivation, setToggleActivation] =
@@ -541,15 +529,129 @@ function UserListComponent(props: IProps) {
     )
   }
 
+  const LocationButton = (
+    locationId: string,
+    userDetails: IUserDetails | null,
+    onlyNational: boolean
+  ) => {
+    const buttons: React.ReactElement[] = []
+    if (!getViewOnly(locationId, userDetails, onlyNational)) {
+      buttons.push(
+        <LocationPicker
+          selectedLocationId={locationId}
+          onChangeLocation={(locationId) => {
+            props.goToTeamUserList(locationId)
+          }}
+          requiredJurisdictionTypes={'CRVS_OFFICE'}
+        />
+      )
+      buttons.push(<AddUserIcon id="add-user" onClick={onClickAddUser} />)
+    }
+    return buttons
+  }
+
   const RenderUserList = useCallback(
     function RenderUserList({
+      data,
       locationId,
       userDetails
     }: {
+      data: any
       locationId: string
       userDetails: IUserDetails | null
     }) {
+      const totalData =
+        (data && data.searchUsers && data.searchUsers.totalItems) || 0
+      const userContent = generateUserContents(data, locationId, userDetails)
+
       return (
+        <>
+          <UserTable id="user_list">
+            <ListViewSimplified>
+              {userContent.length <= 0 ? (
+                <NoRecord id="no-record">
+                  {intl.formatMessage(constantsMessages.noResults)}
+                </NoRecord>
+              ) : (
+                userContent.map((content, index) => {
+                  return (
+                    <ListViewItemSimplified
+                      key={index}
+                      image={content.image}
+                      label={content.label}
+                      value={content.value}
+                      actions={content.actions}
+                    />
+                  )
+                })
+              )}
+            </ListViewSimplified>
+            {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
+              <PaginationWrapper>
+                <DesktopWrapper>
+                  <PaginationModified
+                    size={'small'}
+                    initialPage={currentPageNumber}
+                    totalPages={Math.ceil(
+                      totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                    )}
+                    onPageChange={(currentPage: number) =>
+                      setCurrentPageNumber(currentPage)
+                    }
+                  />
+                </DesktopWrapper>
+                <MobileWrapper>
+                  <PaginationModified
+                    size={'large'}
+                    initialPage={currentPageNumber}
+                    totalPages={Math.ceil(
+                      totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                    )}
+                    onPageChange={(currentPage: number) =>
+                      setCurrentPageNumber(currentPage)
+                    }
+                  />
+                </MobileWrapper>
+              </PaginationWrapper>
+            )}
+            <UserAuditActionModal
+              show={toggleActivation.modalVisible}
+              user={toggleActivation.selectedUser}
+              onClose={() => toggleUserActivationModal()}
+              onConfirmRefetchQueries={[
+                {
+                  query: SEARCH_USERS,
+                  variables: {
+                    primaryOfficeId: locationId,
+                    count: recordCount
+                  }
+                }
+              ]}
+            />
+          </UserTable>
+        </>
+      )
+    },
+    [
+      currentPageNumber,
+      generateUserContents,
+      intl,
+      recordCount,
+      toggleActivation.modalVisible,
+      toggleActivation.selectedUser,
+      toggleUserActivationModal
+    ]
+  )
+
+  return (
+    <SysAdminContentWrapper
+      changeTeamLocation={
+        (!getViewOnly(locationId, userDetails, true) && onChangeLocation) ||
+        undefined
+      }
+      isCertificatesConfigPage={true}
+    >
+      {isOnline ? (
         <Query
           query={SEARCH_USERS}
           variables={{
@@ -560,154 +662,72 @@ function UserListComponent(props: IProps) {
           fetchPolicy={'cache-and-network'}
         >
           {({ data, loading, error }) => {
-            if (error) {
-              return (
-                <ErrorText id="user_loading_error">
-                  {intl.formatMessage(errorMessages.userQueryError)}
-                </ErrorText>
-              )
-            }
-            const totalData =
-              (data && data.searchUsers && data.searchUsers.totalItems) || 0
-            const userContent = generateUserContents(
-              data,
-              locationId,
-              userDetails
-            )
-            const totalUser =
-              (data && data.searchUsers && data.searchUsers.totalItems) || 0
             return (
-              <UserTable id="user_list">
-                <TableHeader>
-                  {intl.formatMessage(messages.totalUsers, { totalUser })}
-                  {!getViewOnly(locationId, userDetails, false) && (
-                    <AddUserContainer id="add-user" onClick={onClickAddUser}>
-                      <AddUserIcon />
-                      {intl.formatMessage(messages.newUser)}
-                    </AddUserContainer>
-                  )}
-                </TableHeader>
-                <ListViewContainer>
-                  <ListViewSimplified>
-                    {userContent.length <= 0 ? (
-                      <NoRecord id="no-record">
-                        {intl.formatMessage(constantsMessages.noResults)}
-                      </NoRecord>
-                    ) : (
-                      userContent.map((content, index) => {
-                        return (
-                          <ListViewItemSimplified
-                            key={index}
-                            image={content.image}
-                            label={content.label}
-                            value={content.value}
-                            actions={content.actions}
-                          />
-                        )
-                      })
-                    )}
-                  </ListViewSimplified>
-                </ListViewContainer>
-                {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
-                  <PaginationWrapper>
-                    <DesktopWrapper>
-                      <PaginationModified
-                        size={'small'}
-                        initialPage={currentPageNumber}
-                        totalPages={Math.ceil(
-                          totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                        )}
-                        onPageChange={(currentPage: number) =>
-                          setCurrentPageNumber(currentPage)
-                        }
-                      />
-                    </DesktopWrapper>
-                    <MobileWrapper>
-                      <PaginationModified
-                        size={'large'}
-                        initialPage={currentPageNumber}
-                        totalPages={Math.ceil(
-                          totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                        )}
-                        onPageChange={(currentPage: number) =>
-                          setCurrentPageNumber(currentPage)
-                        }
-                      />
-                    </MobileWrapper>
-                  </PaginationWrapper>
+              <Content
+                title={
+                  !loading && !error
+                    ? searchedLocation?.name || ''
+                    : intl.formatMessage(headerMessages.teamTitle)
+                }
+                size={ContentSize.LARGE}
+                topActionButtons={LocationButton(
+                  locationId,
+                  userDetails,
+                  isNatlSysAdmin
                 )}
-                <UserAuditActionModal
-                  show={toggleActivation.modalVisible}
-                  user={toggleActivation.selectedUser}
-                  onClose={() => toggleUserActivationModal()}
-                  onConfirmRefetchQueries={[
-                    {
-                      query: SEARCH_USERS,
-                      variables: {
-                        primaryOfficeId: locationId,
-                        count: recordCount
-                      }
-                    }
-                  ]}
-                />
-              </UserTable>
+              >
+                {error ? (
+                  <ErrorText id="user_loading_error">
+                    <>{intl.formatMessage(errorMessages.userQueryError)}</>
+                    <LinkButtonModified
+                      onClick={() => window.location.reload()}
+                    >
+                      {intl.formatMessage(constantsMessages.refresh)}
+                    </LinkButtonModified>
+                  </ErrorText>
+                ) : loading ? (
+                  <Loading>
+                    <LoadingIndicator loading={true} />
+                  </Loading>
+                ) : (
+                  <>
+                    <Header id="header">
+                      {(searchedLocation && searchedLocation.name) || ''}
+                    </Header>
+                    <LocationInfo>
+                      {searchedLocation && searchedLocation.address ? (
+                        <LocationInfoValue>
+                          {searchedLocation.address}
+                        </LocationInfoValue>
+                      ) : (
+                        <LocationInfoEmptyValue>
+                          {intl.formatMessage(constantsMessages.notAvailable)}
+                        </LocationInfoEmptyValue>
+                      )}
+                    </LocationInfo>
+                    <RenderUserList
+                      data={data}
+                      locationId={locationId}
+                      userDetails={userDetails}
+                    />
+                  </>
+                )}
+              </Content>
             )
           }}
         </Query>
-      )
-    },
-    [
-      currentPageNumber,
-      generateUserContents,
-      intl,
-      onClickAddUser,
-      recordCount,
-      toggleActivation.modalVisible,
-      toggleActivation.selectedUser,
-      toggleUserActivationModal
-    ]
-  )
-
-  return (
-    <SysAdminContentWrapper
-      mapPinClickHandler={
-        (!getViewOnly(locationId, userDetails, true) && onChangeLocation) ||
-        undefined
-      }
-    >
-      {isOnline ? (
-        <>
-          <HeaderContainer>
-            <Header id="header">
-              {(searchedLocation && searchedLocation.name) || ''}
-            </Header>
-            {!getViewOnly(locationId, userDetails, true) && (
-              <ChangeButton id="chng-loc" onClick={onChangeLocation}>
-                {intl.formatMessage(buttonMessages.change)}
-              </ChangeButton>
-            )}
-          </HeaderContainer>
-          <LocationInfo>
-            <LocationInfoKey>
-              {intl.formatMessage(constantsMessages.address)}
-            </LocationInfoKey>
-            {searchedLocation && searchedLocation.address ? (
-              <LocationInfoValue>{searchedLocation.address}</LocationInfoValue>
-            ) : (
-              <LocationInfoEmptyValue>
-                {intl.formatMessage(constantsMessages.notAvailable)}
-              </LocationInfoEmptyValue>
-            )}
-          </LocationInfo>
-          <RenderUserList locationId={locationId} userDetails={userDetails} />
-        </>
       ) : (
-        <ConnectivityContainer>
-          <NoConnectivity />
-          <Text id="no-connection-text">
-            {intl.formatMessage(constantsMessages.noConnection)}
-          </Text>
-        </ConnectivityContainer>
+        <Content
+          title={intl.formatMessage(headerMessages.teamTitle)}
+          size={ContentSize.LARGE}
+        >
+          <ConnectivityContainer>
+            <NoConnectivity />
+            <Text id="no-connection-text">
+              {intl.formatMessage(constantsMessages.noConnection)}
+            </Text>
+          </ConnectivityContainer>
+        </Content>
       )}
 
       {showResendSMSSuccess && (
@@ -743,6 +763,7 @@ export const UserList = connect(
     goToCreateNewUser,
     goToCreateNewUserWithLocationId,
     goToReviewUserDetails,
-    goToTeamSearch
+    goToTeamSearch,
+    goToTeamUserList
   }
 )(withTheme(injectIntl(withOnlineStatus(UserListComponent))))
