@@ -278,7 +278,6 @@ export function FormConfigWizard() {
               {isSelectedFieldValid(selectedField, section) ? (
                 isCustomConfigField(selectedField) ? (
                   <CustomFieldTools
-                    key={selectedField.fieldId}
                     event={event}
                     section={section}
                     selectedField={selectedField}
