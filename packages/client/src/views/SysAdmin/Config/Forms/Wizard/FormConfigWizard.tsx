@@ -11,7 +11,6 @@
  */
 import { CustomFieldTools } from '@client/components/formConfig/formTools/CustomFieldTools'
 import {
-  IConfigField,
   isDefaultConfigField,
   isCustomConfigField
 } from '@client/forms/configuration/formConfig/utils'
@@ -115,16 +114,9 @@ function isValidSection(section: string): section is WizardSection {
   ].includes(section)
 }
 
-function isSelectedFieldValid(
-  selectedField: IConfigField | null,
-  section: string
-): selectedField is IConfigField {
-  return !!selectedField?.fieldId.includes(section)
-}
-
 function useHasNatlSysAdminScope() {
   const scope = useSelector(getScope)
-  return scope?.includes(AuthScope.NATLSYSADMIN)
+  return scope?.includes(AuthScope.NATLSYSADMIN) ?? false
 }
 
 function useSelectedField() {
@@ -132,48 +124,43 @@ function useSelectedField() {
   const [selectedFieldId, setSelectedFieldId] = React.useState<string | null>(
     null
   )
-  const fields = useSelector((store: IStoreState) =>
-    selectConfigFields(store, event, section)
+  const sectionFieldsMap = useSelector((store: IStoreState) =>
+    selectConfigFields(store, event)
   )
-  /* fields can be undefined if section is 'settings'*/
   const selectedField =
-    selectedFieldId && fields ? fields[selectedFieldId] : null
+    selectedFieldId && section !== 'settings'
+      ? sectionFieldsMap[section][selectedFieldId]
+      : null
   /*
    * We need to clear the selected field if section changes
    * as the changed section won't have the previously selected field
    */
-  React.useEffect(() => {
-    if (selectedFieldId && !selectedFieldId.includes(section)) {
-      setSelectedFieldId(null)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [section])
+  if (selectedFieldId && !selectedFieldId.includes(section)) {
+    setSelectedFieldId(null)
+  }
 
-  return { selectedField, setSelectedField: setSelectedFieldId }
+  return [selectedField, setSelectedFieldId] as const
 }
 
-function useHiddenFields({
-  selectedField,
-  setSelectedField
-}: ReturnType<typeof useSelectedField>) {
+function useHiddenFields([selectedField, setSelectedField]: ReturnType<
+  typeof useSelectedField
+>) {
   const [showHiddenFields, setShowHiddenFields] = React.useState(true)
 
   /*
    * We need to clear the selected field if the selected field is made
    * hidden and we have the showHiddenFields set to false
    */
-  React.useEffect(() => {
-    if (
-      !showHiddenFields &&
-      selectedField &&
-      isDefaultConfigField(selectedField) &&
-      selectedField.enabled === FieldEnabled.DISABLED
-    ) {
-      setSelectedField(null)
-    }
-  }, [showHiddenFields, selectedField, setSelectedField])
+  if (
+    !showHiddenFields &&
+    selectedField &&
+    isDefaultConfigField(selectedField) &&
+    selectedField.enabled === FieldEnabled.DISABLED
+  ) {
+    setSelectedField(null)
+  }
 
-  return { showHiddenFields, setShowHiddenFields }
+  return [showHiddenFields, setShowHiddenFields] as const
 }
 
 export function FormConfigWizard() {
@@ -181,11 +168,11 @@ export function FormConfigWizard() {
   const hasNatlSysAdminScope = useHasNatlSysAdminScope()
   const intl = useIntl()
   const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
-  const { selectedField, setSelectedField } = useSelectedField()
-  const { showHiddenFields, setShowHiddenFields } = useHiddenFields({
+  const [selectedField, setSelectedField] = useSelectedField()
+  const [showHiddenFields, setShowHiddenFields] = useHiddenFields([
     selectedField,
     setSelectedField
-  })
+  ])
   const { event, section } = useParams<IRouteProps>()
   const { version } = useSelector((store: IStoreState) =>
     selectFormDraft(store, event)
@@ -268,14 +255,7 @@ export function FormConfigWizard() {
               </CanvasContainer>
             </CanvasWrapper>
             <ToolsContainer>
-              {/*
-               *  The useEffect hook for clearing the selectedFieldId takes
-               *  effect after the render for when the section changes so
-               *  for that particular render where the section has changed
-               *  but the selectedFieldId is still from the previous section,
-               *  we need to make sure that the selectedField is valid
-               */}
-              {isSelectedFieldValid(selectedField, section) ? (
+              {selectedField ? (
                 isCustomConfigField(selectedField) ? (
                   <CustomFieldTools
                     event={event}

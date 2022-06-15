@@ -22,7 +22,8 @@ import {
   IRadioGroupFormField,
   IRadioGroupWithNestedFieldsFormField,
   ISelectFormFieldWithOptions,
-  IDocumentUploaderWithOptionsFormField
+  IDocumentUploaderWithOptionsFormField,
+  SerializedFormField
 } from '@client/forms'
 import {
   IQuestionConfig,
@@ -50,6 +51,7 @@ import {
   isDefaultConfigFieldWithPreviewGroup,
   IDefaultConfigFieldWithPreviewGroup
 } from './defaultConfig'
+import { getField } from '@client/forms/configuration/defaultUtils'
 
 export * from './previewGroup'
 export * from './motion'
@@ -83,21 +85,18 @@ export function getFieldDefinition(
   configField: IDefaultConfigField | ICustomConfigField,
   defaultForm: ISerializedForm
 ) {
-  let formField: IFormField
+  let serializedField: SerializedFormField
   if (isDefaultConfigField(configField)) {
-    const { sectionIndex, groupIndex, fieldIndex } = configField.identifiers
-    formField = deserializeFormField({
-      ...defaultForm.sections[sectionIndex].groups[groupIndex].fields[
-        fieldIndex
-      ],
+    serializedField = {
+      ...getField(configField.identifiers, defaultForm),
       required: configField.required
-    })
+    }
+    /* We need to build the field regardless of the conditionals */
+    delete serializedField.conditionals
   } else {
-    formField = deserializeFormField(createCustomField(configField))
+    serializedField = createCustomField(configField)
   }
-  /* We need to build the field regardless of the conditionals */
-  delete formField.conditionals
-  return formField
+  return deserializeFormField(serializedField)
 }
 
 function hasOptions(
