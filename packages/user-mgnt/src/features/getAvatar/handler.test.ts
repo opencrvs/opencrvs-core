@@ -94,11 +94,11 @@ describe('getUserAvatar tests', () => {
     expect(res.statusCode).toEqual(200)
   })
 
-  it('returns 401 for if has no user for userId', async () => {
+  it('returns 400 for if has no user for userId', async () => {
     const res = await server.server.inject({
       method: 'GET',
       url: '/users/123/avatar'
     })
-    expect(res.statusCode).toEqual(401)
+    expect(res.statusCode).toEqual(400)
   })
 })
