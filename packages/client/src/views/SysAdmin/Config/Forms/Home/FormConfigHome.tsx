@@ -42,7 +42,7 @@ const StyledWarning = styled(Warning)`
   max-width: 778px;
 `
 
-function UnbuplishedWarning() {
+export function UnbuplishedWarning() {
   const intl = useIntl()
   const { status: birthStatus } = useSelector((store: IStoreState) =>
     selectFormDraft(store, Event.BIRTH)

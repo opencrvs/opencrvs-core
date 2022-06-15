@@ -226,8 +226,7 @@ const messagesToDefine: IFormConfigMessages = {
   },
   publishedWarning: {
     id: 'config.form.published.warning',
-    defaultMessage:
-      'Nothing is currently published. Awaiting to be published: {events}',
+    defaultMessage: 'Warning! Form configuration unpublished for: {events}',
     description: 'Warning for unpublished events'
   },
   contentKey: {
