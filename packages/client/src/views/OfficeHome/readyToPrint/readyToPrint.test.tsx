@@ -730,7 +730,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#ListItemAction-0-icon-failed'
+        '#ListItemAction-1-icon-failed'
       )
       expect(errorIcon.hostNodes()).toHaveLength(1)
     })
