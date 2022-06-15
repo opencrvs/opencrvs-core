@@ -21,7 +21,10 @@ import styled from 'styled-components'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
 import format from '@client/utils/date-formatting'
 import { REGISTERED, CERTIFIED } from '@client/utils/constants'
-import { constantsMessages } from '@client/i18n/messages/constants'
+import {
+  constantsMessages,
+  dynamicConstantsMessages
+} from '@client/i18n/messages/constants'
 
 const MobileDiv = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -94,6 +97,8 @@ export const GetDeclarationInfo = ({
       ? intl.formatMessage(constantsMessages.requiresUpdatesStatus)
       : finalStatus === 'Registered'
       ? intl.formatMessage(constantsMessages.registeredStatus)
+      : finalStatus === 'Archived'
+      ? intl.formatMessage(dynamicConstantsMessages.archived_declaration)
       : finalStatus
 
   if (declaration?.informantContact && informant) {

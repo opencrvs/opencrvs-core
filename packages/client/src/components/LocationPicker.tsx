@@ -20,7 +20,7 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
-import { constantsMessages } from '@client/i18n/messages'
+import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { CircleButton } from '@opencrvs/components/lib/buttons'
 import { colors } from '@opencrvs/components/lib/colors'
 import {
@@ -179,6 +179,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
             </ModalHeader>
             <ModalBody>
               <StyledLocationSearch
+                buttonLabel={intl.formatMessage(buttonMessages.search)}
                 selectedLocation={selectedSearchedLocation}
                 locationList={searchableLocations}
                 searchHandler={({ id }) => {
