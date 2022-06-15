@@ -95,13 +95,16 @@ export default class PanViewer extends React.Component<IProps> {
     )
   }
   componentDidMount() {
-    document.addEventListener('keypress', e => {
-      if (e.keyCode === 43 || e.keyCode === 61) {
-        this.zoomIn()
-      } else if (e.keyCode === 45) {
-        this.zoomOut()
-      } else if (e.keyCode === 114 || e.keyCode === 82) {
-        this.rotateLeft()
+    document.addEventListener('keypress', (e) => {
+      const commentsInput = document.getElementById('additional_comments')
+      if (!(e.target === commentsInput)) {
+        if (e.keyCode === 43 || e.keyCode === 61) {
+          this.zoomIn()
+        } else if (e.keyCode === 45) {
+          this.zoomOut()
+        } else if (e.keyCode === 114 || e.keyCode === 82) {
+          this.rotateLeft()
+        }
       }
     })
   }
