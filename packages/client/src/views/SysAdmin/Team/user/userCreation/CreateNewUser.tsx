@@ -38,6 +38,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { gqlToDraftTransformer } from '@client/transformer'
+import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
 
 interface IMatchParams {
   userId?: string
@@ -82,16 +83,17 @@ const Container = styled.div`
 class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
   async componentDidMount() {
     const { userId, client } = this.props
+    if (
+      this.props.match.path.includes(CREATE_USER_ON_LOCATION.split('/:')[0])
+    ) {
+      this.props.clearUserFormData()
+    }
     if (userId) {
       this.props.fetchAndStoreUserData(client, GET_USER, { userId })
     }
     if (this.props.match.params.locationId) {
       this.props.processRoles(this.props.match.params.locationId)
     }
-  }
-
-  componentWillUnmount() {
-    this.props.clearUserFormData()
   }
 
   renderLoadingPage = () => {
