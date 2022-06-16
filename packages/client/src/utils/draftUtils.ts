@@ -28,6 +28,7 @@ import {
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
+import { History } from '@client/utils/gateway'
 
 const getInformantEngName = (sectionData: IFormSectionData): string => {
   if (sectionData.firstNamesEng) {
@@ -212,7 +213,7 @@ export function getRegisteringOfficeId(
   declaration?: IPrintableDeclaration
 ): string | null {
   const registeringHistory = (
-    declaration?.data?.history as unknown as Record<string, any>[]
+    declaration?.data?.history as unknown as History[]
   ).find((h) => h.action === 'REGISTERED')
 
   return registeringHistory?.office?.id || null
