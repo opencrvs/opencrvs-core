@@ -80,7 +80,7 @@ function CompletenessDataTableComponent(props: ITableProps) {
           (item) => ({
             location: item.locationName,
             totalRegistered: String(item.total),
-            registeredWithinTargetd: item[props.completenessRateTime],
+            registeredWithinTargetd: String(item[props.completenessRateTime]),
             estimated: String(item.estimated),
             completenessRate: `${Number(
               (item[props.completenessRateTime] / item.estimated) * 100
@@ -96,8 +96,8 @@ function CompletenessDataTableComponent(props: ITableProps) {
             'MMMM yyyy'
           ),
           totalRegistered: item.total,
-          registeredWithinTargetd: item[props.completenessRateTime],
-          estimated: item.estimated,
+          registeredWithinTargetd: String(item[props.completenessRateTime]),
+          estimated: String(item.estimated),
           completenessRate: `${Number(
             (item[props.completenessRateTime] / item.estimated) * 100
           ).toFixed(2)}%`
