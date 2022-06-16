@@ -143,16 +143,16 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     precedingFieldId: 'birth.father.father-view-group.educationalAttainment',
     configurations: [
       {
+        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
+        label: formMessageDescriptors.primaryAddress,
+        conditionalCase: `(${fathersDetailsDontExist} && ${fathersDetailsExistBasedOnContactAndInformant})`
+      },
+      {
         config: AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
         label: formMessageDescriptors.primaryAddressSameAsOtherPrimary,
         xComparisonSection: BirthSection.Father,
         yComparisonSection: BirthSection.Mother,
         conditionalCase: `(${fathersDetailsDontExist} || ${mothersDetailsDontExistOnOtherPage})`
-      },
-      {
-        config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
-        label: formMessageDescriptors.primaryAddress,
-        conditionalCase: `(${fathersDetailsDontExist} && ${fathersDetailsExistBasedOnContactAndInformant})`
       },
       {
         config: AddressCases.PRIMARY_ADDRESS,
@@ -383,6 +383,7 @@ export const getXAddressSameAsY = (
     label,
     required: true,
     initialValue: true,
+    previewGroup: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
     validate: [],
     options: [
       {
