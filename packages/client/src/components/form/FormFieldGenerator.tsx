@@ -589,10 +589,6 @@ const mapFieldsToValues = (
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
 
-    if (field.type === TEXT && field.dynamicOptions) {
-      fieldInitialValue = field.initialValue as IFormFieldValue
-    }
-
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
       const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
 
