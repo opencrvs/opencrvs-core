@@ -744,11 +744,10 @@ class FormSectionComponent extends React.Component<Props> {
         (field.type === SELECT_WITH_DYNAMIC_OPTIONS || field.type === TEXT) &&
         field?.dynamicOptions?.dependency === fieldName
     )
-    if (fieldsToReset.length) {
-      fieldsToReset.forEach((fieldToReset) => {
-        this.props.setFieldValue(fieldToReset.name, '')
-      })
-    }
+
+    fieldsToReset.forEach((fieldToReset) => {
+      this.props.setFieldValue(fieldToReset.name, '')
+    })
   }
 
   resetNestedInputValues = (parentField: Ii18nFormField) => {

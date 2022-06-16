@@ -3030,6 +3030,9 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'district'
+      },
       conditionals: [
         {
           action: 'hide',
@@ -3083,6 +3086,9 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'district'
+      },
       conditionals: [
         {
           action: 'hide',
@@ -3136,6 +3142,9 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'district'
+      },
       conditionals: [
         {
           action: 'hide',
@@ -3189,6 +3198,9 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'district'
+      },
       conditionals: [
         {
           action: 'hide',
@@ -3242,6 +3254,9 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'district'
+      },
       conditionals: [
         {
           action: 'hide',
@@ -3295,6 +3310,9 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'district'
+      },
       conditionals: [
         {
           action: 'hide',
@@ -3348,6 +3366,9 @@ export function getPlaceOfEventAddressFields(
       required: true,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'country'
+      },
       conditionals: [
         {
           action: 'hide',
@@ -3400,6 +3421,9 @@ export function getPlaceOfEventAddressFields(
       required: true,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'country'
+      },
       conditionals: [
         {
           action: 'hide',
@@ -3452,6 +3476,9 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'country'
+      },
       conditionals: [
         {
           action: 'hide',
@@ -3489,6 +3516,9 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'country'
+      },
       conditionals: [
         {
           action: 'hide',
@@ -3526,6 +3556,9 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'country'
+      },
       conditionals: [
         {
           action: 'hide',
@@ -3563,6 +3596,9 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'country'
+      },
       conditionals: [
         {
           action: 'hide',
@@ -3600,6 +3636,9 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dynamicOptions: {
+        dependency: 'country'
+      },
       conditionals: [
         {
           action: 'hide',
