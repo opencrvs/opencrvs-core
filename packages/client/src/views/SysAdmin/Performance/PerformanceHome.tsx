@@ -427,10 +427,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
         id="performanceHome"
         isCertificatesConfigPage={true}
         mapPerformanceClickHandler={this.togglePerformanceStatus}
-        profilePageStyle={{
-          paddingTopMd: 0,
-          horizontalPaddingMd: 0
-        }}
+        hideBackground={true}
       >
         <Layout>
           <LayoutLeft>

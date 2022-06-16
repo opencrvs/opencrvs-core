@@ -471,7 +471,10 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     }
     return (
       <>
-        <SysAdminContentWrapper isCertificatesConfigPage={true}>
+        <SysAdminContentWrapper
+          isCertificatesConfigPage={true}
+          hideBackground={true}
+        >
           {this.state.selectedSubMenuItem ===
             this.SUB_MENU_ID.certificatesConfig && (
             <Content title={CertificateSection.title} titleColor={'copy'}>

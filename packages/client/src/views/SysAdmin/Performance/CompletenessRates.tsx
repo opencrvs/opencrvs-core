@@ -255,10 +255,7 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
     <SysAdminContentWrapper
       id="reg-rates"
       isCertificatesConfigPage={true}
-      profilePageStyle={{
-        paddingTopMd: 0,
-        horizontalPaddingMd: 0
-      }}
+      hideBackground={true}
     >
       <Content
         title={intl.formatMessage(navigationMessages.completenessRates)}

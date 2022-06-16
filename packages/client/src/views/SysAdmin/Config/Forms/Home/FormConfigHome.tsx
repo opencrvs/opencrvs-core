@@ -86,7 +86,7 @@ export function FormConfigHome() {
   )
 
   return (
-    <SysAdminContentWrapper isCertificatesConfigPage>
+    <SysAdminContentWrapper isCertificatesConfigPage hideBackground={true}>
       <UnbuplishedWarning />
       <Content
         title={intl.formatMessage(messages.title)}
