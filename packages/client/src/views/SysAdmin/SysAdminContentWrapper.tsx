@@ -70,7 +70,7 @@ interface BasePage {
   marginLeft?: number
   marginRight?: number
   fixedWidth?: number
-  mapPinClickHandler?: () => void
+  changeTeamLocation?: () => void
   mapPerformanceClickHandler?: () => void
   profilePageStyle?: IprofilePageStyle
   subMenuComponent?: React.ReactNode
@@ -229,7 +229,7 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
   } else {
     pageHeader = (
       <Header
-        mapPinClickHandler={props.mapPinClickHandler}
+        changeTeamLocation={props.changeTeamLocation}
         mapPerformanceClickHandler={props.mapPerformanceClickHandler}
       />
     )

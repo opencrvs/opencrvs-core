@@ -44,6 +44,7 @@ interface ISysAdminMessages
   pending: MessageDescriptor
   disabled: MessageDescriptor
   deactivated: MessageDescriptor
+  totalUsers: MessageDescriptor
 }
 
 const messagesToDefine: ISysAdminMessages = {
@@ -204,6 +205,11 @@ const messagesToDefine: ISysAdminMessages = {
     defaultMessage: 'Deactivated',
     description: 'Pill label for deactivated user',
     id: 'system.user.deactivated'
+  },
+  totalUsers: {
+    id: 'system.user.total',
+    defaultMessage: '{totalUser} users',
+    description: 'User list table header text'
   }
 }
 

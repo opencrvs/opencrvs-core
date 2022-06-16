@@ -28,6 +28,7 @@ const ModalContainer = styled.div<{ fullscreen?: boolean }>`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding-top: 0px;
   }
+  cursor: initial;
 `
 
 const ScreenBlocker = styled.div`
@@ -106,6 +107,8 @@ const Body = styled.div<{
   padding: 0 24px 16px;
   display: flex;
   flex-direction: column;
+  text-align: left;
+  white-space: normal;
   flex-grow: ${({ fullscreen }) => (fullscreen ? 1 : 0)};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-grow: 1;
@@ -154,8 +157,9 @@ interface IProps {
   contentScrollableY?: boolean
   fullscreen?: boolean
   actions: JSX.Element[]
-  handleClose?: () => void
+  handleClose?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   hideHeaderBoxShadow?: boolean
+  preventClickOnParent?: boolean
 }
 
 export class ResponsiveModal extends React.Component<IProps> {
@@ -185,7 +189,8 @@ export class ResponsiveModal extends React.Component<IProps> {
       fullscreen,
       autoHeight,
       contentScrollableY,
-      hideHeaderBoxShadow
+      hideHeaderBoxShadow,
+      preventClickOnParent
     } = this.props
 
     this.toggleScroll()
@@ -194,7 +199,15 @@ export class ResponsiveModal extends React.Component<IProps> {
     }
 
     return (
-      <ModalContainer id={id} fullscreen={fullscreen}>
+      <ModalContainer
+        id={id}
+        fullscreen={fullscreen}
+        onClick={(e) => {
+          if (preventClickOnParent) {
+            e.stopPropagation()
+          }
+        }}
+      >
         <ScreenBlocker />
         <ModalContent
           width={width}

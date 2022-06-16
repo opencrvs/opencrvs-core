@@ -234,12 +234,7 @@ export const GetHistory = ({
         <GetLink
           status={item.office?.name}
           onClick={() => {
-            goToTeamUserList &&
-              goToTeamUserList({
-                id: item.office.id,
-                searchableText: item.office.name,
-                displayLabel: item.office.name
-              } as ISearchLocation)
+            goToTeamUserList && goToTeamUserList(item.office.id)
           }}
         />
       )

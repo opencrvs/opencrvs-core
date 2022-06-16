@@ -158,6 +158,7 @@ interface IConstantsMessages
   action: MessageDescriptor
   date: MessageDescriptor
   totalFileSizeExceed: MessageDescriptor
+  refresh: MessageDescriptor
 }
 const messagesToDefine: IConstantsMessages = {
   countryName: {
@@ -899,6 +900,11 @@ const messagesToDefine: IConstantsMessages = {
       'Total size of documents exceeds {fileSize}. Please reduce file size of your uploads',
     description: 'Accumulated File size exceed message',
     id: 'constants.totalFileSizeExceed'
+  },
+  refresh: {
+    defaultMessage: 'Refresh',
+    description: 'label for refresh',
+    id: 'constants.refresh'
   }
 }
 

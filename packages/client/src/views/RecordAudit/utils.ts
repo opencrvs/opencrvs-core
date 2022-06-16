@@ -28,7 +28,8 @@ import {
   GQLEventSearchSet,
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
-  GQLHumanName
+  GQLHumanName,
+  GQLAssignmentData
 } from '@opencrvs/gateway/src/graphql/schema'
 import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
@@ -54,6 +55,7 @@ export interface IDeclarationData {
   informant?: string
   informantContact?: string
   brnDrn?: string
+  assignment?: GQLAssignmentData
 }
 
 export interface IGQLDeclaration {
@@ -389,6 +391,8 @@ export const getWQDeclarationData = (
     id: workqueueDeclaration?.id,
     name,
     type: (workqueueDeclaration?.type && workqueueDeclaration.type) || '',
+    status: workqueueDeclaration?.registration?.status || '',
+    assignment: workqueueDeclaration?.registration?.assignment,
     trackingId: trackingId,
     dateOfBirth: '',
     placeOfBirth: '',

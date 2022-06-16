@@ -66,4 +66,5 @@ export interface IDynamicValues {
     | Date
     | null
     | undefined
+    | Record<string, unknown>
 }

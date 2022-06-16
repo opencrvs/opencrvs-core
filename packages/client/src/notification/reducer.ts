@@ -12,6 +12,7 @@
 import { LoopReducer, Loop } from 'redux-loop'
 import * as actions from '@client/notification/actions'
 import { AUDIT_ACTION } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
+import { ShowUnassignedPayload } from '@client/notification/actions'
 
 type UserAuditSuccessToastState =
   | {
@@ -39,6 +40,7 @@ export type NotificationState = {
   userAuditSuccessToast: UserAuditSuccessToastState
   showPINUpdateSuccess: boolean
   downloadDeclarationFailedToast: boolean
+  unassignedModal: ShowUnassignedPayload | null
   userCreateDuplicateMobileFailedToast: userCreateDuplicateMobileFailedToastState
 }
 
@@ -53,6 +55,7 @@ export const initialState: NotificationState = {
   userAuditSuccessToast: { visible: false },
   showPINUpdateSuccess: false,
   downloadDeclarationFailedToast: false,
+  unassignedModal: null,
   userCreateDuplicateMobileFailedToast: {
     visible: false,
     mobile: null
@@ -174,6 +177,17 @@ export const notificationReducer: LoopReducer<
       return {
         ...state,
         showPINUpdateSuccess: false
+      }
+    case actions.SHOW_UNASSIGNED:
+      console.log(action.payload)
+      return {
+        ...state,
+        unassignedModal: action.payload
+      }
+    case actions.HIDE_UNASSIGNED:
+      return {
+        ...state,
+        unassignedModal: null
       }
     default:
       return state

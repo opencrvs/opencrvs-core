@@ -13,4 +13,5 @@ import { OPENCRVS_SPECIFICATION_URL } from '@workflow/features/registration/fhir
 
 export const REINSTATED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regReinstated`
 export const DOWNLOADED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regDownloaded`
+export const ASSIGNED_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`
 export const REQUEST_CORRECTION_EXTENSION_URL = `${OPENCRVS_SPECIFICATION_URL}extension/requestCorrection`
