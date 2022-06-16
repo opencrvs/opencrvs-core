@@ -35,7 +35,10 @@ import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
 import { IStoreState } from '@client/store'
 import { AvatarVerySmall } from '@client/components/Avatar'
-import { ROLE_LOCAL_REGISTRAR } from '@client/utils/constants'
+import {
+  ROLE_LOCAL_REGISTRAR,
+  FIELD_AGENT_ROLES
+} from '@client/utils/constants'
 import { Dispatch } from 'redux'
 import ApolloClient from 'apollo-client'
 import { useIntl, IntlShape, MessageDescriptor } from 'react-intl'
@@ -245,8 +248,9 @@ function DownloadButtonComponent(
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
-        assignment?.userId != userId ||
-        status === DOWNLOAD_STATUS.DOWNLOADED
+        (assignment?.userId != userId ||
+          status === DOWNLOAD_STATUS.DOWNLOADED) &&
+        !FIELD_AGENT_ROLES.includes(userRole as string)
       ) {
         setAssignModal(
           getAssignModalOptions(
