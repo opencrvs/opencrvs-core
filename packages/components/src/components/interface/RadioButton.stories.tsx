@@ -33,11 +33,24 @@ interface IRadioButton {
 
 const Template: Story<IRadioButton> = (args) => <RadioButton {...args} />
 
-export const RadioButtonView = Template.bind({})
-RadioButtonView.args = {
+export const RadioButtonSmallView = Template.bind({})
+RadioButtonSmallView.args = {
   name: 'radio-button',
-  label: 'Father',
+  label:
+    'Small radio onSmall radio onSmall radio onSmall radio onSmall radio onSmall radio onSmall radio onSmall radio onSmall radio onSmall radio ',
   value: 'Father',
+  id: 'Father',
+  selected: 'Father',
+  onChange: () => alert('checked')
+}
+
+export const RadioButtonLargeView = Template.bind({})
+RadioButtonLargeView.args = {
+  name: 'radio-button',
+  label:
+    'Small radio onSmall radio onSmall radio onSmall radio onSmall radio onSmall radio onSmall radio onSmall radio onSmall radio onSmall radio ',
+  value: 'Father',
+  size: 'large',
   id: 'Father',
   selected: 'Father',
   onChange: () => alert('checked')

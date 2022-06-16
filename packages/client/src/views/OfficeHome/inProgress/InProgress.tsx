@@ -209,47 +209,37 @@ export class InProgressComponent extends React.Component<
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
-      const downloadStatus =
-        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+      const downloadStatus = foundDeclaration?.downloadStatus
 
-      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-          actions.push({
-            label: intl.formatMessage(buttonMessages.update),
-            handler: () => {},
-            disabled: true
-          })
-        }
+      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
         actions.push({
-          actionComponent: (
-            <DownloadButton
-              downloadConfigs={{
-                event: event as string,
-                compositionId: reg.id,
-                action: Action.LOAD_REVIEW_DECLARATION
-              }}
-              key={`DownloadButton-${index}`}
-              status={downloadStatus as DOWNLOAD_STATUS}
-            />
-          )
-        })
-      } else {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-          actions.push({
-            label: intl.formatMessage(buttonMessages.update),
-            handler: () =>
+          label: intl.formatMessage(buttonMessages.update),
+          handler: () => {
+            if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
               this.props.goToPage(
                 pageRoute,
                 regId,
                 'review',
                 (event && event.toLowerCase()) || ''
               )
-          })
-        }
-        actions.push({
-          actionComponent: <Downloaded />
+            }
+          },
+          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
         })
       }
+      actions.push({
+        actionComponent: (
+          <DownloadButton
+            downloadConfigs={{
+              event: event as string,
+              compositionId: reg.id,
+              action: Action.LOAD_REVIEW_DECLARATION
+            }}
+            key={`DownloadButton-${index}`}
+            status={downloadStatus}
+          />
+        )
+      })
       const NameComponent = name ? (
         <NameContainer
           id={`name_${index}`}

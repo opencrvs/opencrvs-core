@@ -26,6 +26,12 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
       duplicates
       createdAt
       modifiedAt
+      assignment {
+        userId
+        firstName
+        lastName
+        officeName
+      }
     }
     ... on BirthEventSearchSet {
       dateOfBirth

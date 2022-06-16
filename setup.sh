@@ -374,13 +374,7 @@ TMUX_STARTED=1
 tmux set -p @mytitle "opencrvs-core-working"
 tmux send-keys -t opencrvs "bash setup-scripts/summary.sh" C-m
 tmux split-window -h -p 30
-
-if [ $OS == "UBUNTU" ]; then
-  tmux send-keys -t opencrvs "LANGUAGES=en,fr && yarn start" C-m
-  else
-  tmux send-keys -t opencrvs "LANGUAGES=en,fr && LOCAL_IP=host-gateway && yarn start" C-m
-fi
-
+tmux send-keys -t opencrvs "LANGUAGES=en && yarn start" C-m
 tmux set -p @mytitle "opencrvs-core"
 tmux split-window -v
 tmux set -p @mytitle "opencrvs-farajaland"

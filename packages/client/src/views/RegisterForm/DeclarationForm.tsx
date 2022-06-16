@@ -12,17 +12,27 @@
 import * as React from 'react'
 import {
   RegisterForm,
-  IFormProps,
   RouteProps
 } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
-  DRAFT_DEATH_FORM_PAGE_GROUP
+  DRAFT_DEATH_FORM_PAGE_GROUP,
+  HOME
 } from '@opencrvs/client/src/navigation/routes'
 import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { connect } from 'react-redux'
+import { IForm } from '@client/forms'
 import { Event } from '@client/utils/gateway'
+import { IDeclaration } from '@client/declarations'
+import { Redirect } from 'react-router'
+
+interface IFormProps {
+  declaration?: IDeclaration
+  registerForm: IForm
+  pageRoute: string
+  duplicate?: boolean
+}
 
 const pageRoute: { [key in Event]: string } = {
   birth: DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
@@ -33,7 +43,11 @@ export class DeclarationFormView extends React.Component<
   IFormProps & RouteProps
 > {
   render() {
-    return <RegisterForm {...this.props} />
+    const { declaration, ...rest } = this.props
+    if (!declaration) {
+      return <Redirect to={HOME} />
+    }
+    return <RegisterForm declaration={declaration} {...rest} />
   }
 }
 
@@ -43,16 +57,7 @@ function mapStatetoProps(state: IStoreState, props: RouteProps) {
     ({ id }) => id === match.params.declarationId
   )
 
-  if (!declaration) {
-    throw new Error(`Draft "${match.params.declarationId}" missing!`)
-  }
-
-  const event = declaration.event
-
-  if (!event) {
-    throw new Error(`Event is not specified in Draft`)
-  }
-
+  const event = declaration?.event || Event.Birth
   const registerForm = getRegisterForm(state)[event]
 
   return {

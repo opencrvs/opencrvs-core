@@ -786,6 +786,84 @@ export const mockDeathComposition = {
   id: '123'
 }
 
+export const mockTaskBundle = {
+  resourceType: 'Bundle',
+  id: 'dc4e9b8b-82fa-4868-a6d2-2fb49f795ec1',
+  meta: { lastUpdated: '2018-11-29T10:43:30.286+00:00' },
+  type: 'searchset',
+  total: 1,
+  link: [
+    {
+      relation: 'self',
+      url: 'http://localhost:3447/fhir/Task?focus=Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+    }
+  ],
+  entry: [
+    {
+      fullUrl:
+        'http://localhost:3447/fhir/Task/ba0412c6-5125-4447-bd32-fb5cf336ddbc',
+      resource: {
+        resourceType: 'Task',
+        status: 'requested',
+        code: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/types',
+              code: 'BIRTH'
+            }
+          ]
+        },
+        extension: [
+          {
+            url: 'http://opencrvs.org/specs/extension/contact-person',
+            valueString: 'MOTHER'
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regLastUser',
+            valueReference: { reference: 'DUMMY' }
+          },
+          {
+            url: 'http://opencrvs.org/specs/extension/regAssigned',
+            valueReference: {
+              reference: 'Practitioner/2d11389d-f58e-4d47-a562-b934f1b85936'
+            }
+          }
+        ],
+        lastModified: '2018-11-28T15:13:57.492Z',
+        note: [
+          {
+            text: '',
+            time: '2018-11-28T15:13:57.492Z',
+            authorString: 'DUMMY'
+          }
+        ],
+        focus: {
+          reference: 'Composition/df3fb104-4c2c-486f-97b3-edbeabcd4422'
+        },
+        identifier: [
+          {
+            system: 'http://opencrvs.org/specs/id/birth-tracking-id',
+            value: 'B1mW7jA'
+          }
+        ],
+        businessStatus: {
+          coding: [
+            {
+              system: 'http://opencrvs.org/specs/reg-status',
+              code: 'DECLARED'
+            }
+          ]
+        },
+        meta: {
+          lastUpdated: '2018-11-29T10:40:08.913+00:00',
+          versionId: 'aa8c1c4a-4680-497f-81f7-fde357fdb77d'
+        },
+        id: 'ba0412c6-5125-4447-bd32-fb5cf336ddbc'
+      }
+    }
+  ]
+}
+
 export const mockFhirBundle = {
   resourceType: 'Bundle',
   type: 'document',
@@ -1548,4 +1626,49 @@ export const mockTaskForError = {
   meta: {
     versionId: '123'
   }
+}
+
+export const mockUserDetails = {
+  _id: '5d027bc403b93b17526323f6',
+  name: [
+    {
+      use: 'en',
+      given: ['Sakib Al'],
+      family: 'Hasan'
+    }
+  ],
+  username: 'sakibal.hasan',
+  mobile: '+8801711111111',
+  email: 'test@test.org',
+  identifiers: [],
+  passwordHash:
+    'b8be6cae5215c93784b1b9e2c06384910f754b1d66c077f1f8fdc98fbd92e6c17a0fdc790b30225986cadb9553e87a47b1d2eb7bd986f96f0da7873e1b2ddf9c',
+  salt: '12345',
+  scope: ['register'],
+  role: 'Field Agent',
+  status: 'active',
+  practitionerId: '2d11389d-f58e-4d47-a562-b934f1b85936',
+  primaryOfficeId: '79776844-b606-40e9-8358-7d82147f702a',
+  catchmentAreaIds: [
+    'b21ce04e-7ccd-4d65-929f-453bc193a736',
+    '95754572-ab6f-407b-b51a-1636cb3d0683',
+    '7719942b-16a7-474a-8af1-cd0c94c730d2',
+    '43ac3486-7df1-4bd9-9b5e-728054ccd6ba'
+  ],
+  securityQuestionAnswers: [
+    {
+      questionKey: 'BIRTH_TOWN',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'MOTHER_NICK_NAME',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    },
+    {
+      questionKey: 'FAVORITE_MOVIE',
+      answerHash: '$2a$10$uHhZhgHqgOdt7CZdkKCysO/sVyYHwbEhB5q5TPE.fN9O1kiz0OxVG'
+    }
+  ],
+  creationDate: 1559054406433,
+  auditHistory: []
 }

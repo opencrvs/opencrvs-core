@@ -209,11 +209,11 @@ export function goToPerformanceHome(
   })
 }
 
-export function goToTeamUserList(selectedLocation: ISearchLocation) {
+export function goToTeamUserList(id: string) {
   return push({
     pathname: TEAM_USER_LIST,
     search: stringify({
-      locationId: selectedLocation.id
+      locationId: id
     })
   })
 }
@@ -595,13 +595,9 @@ export function goToTeamView(userDetails: IUserDetails) {
     if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
       return goToTeamSearch()
     } else {
-      return goToTeamUserList({
-        id: (userDetails.primaryOffice && userDetails.primaryOffice.id) || '',
-        searchableText:
-          (userDetails.primaryOffice && userDetails.primaryOffice.name) || '',
-        displayLabel:
-          (userDetails.primaryOffice && userDetails.primaryOffice.name) || ''
-      })
+      return goToTeamUserList(
+        (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
+      )
     }
   }
 }

@@ -455,7 +455,7 @@ const messagesToDefine: IFormConfigMessages = {
   },
   formConfigMobileModalTitle: {
     id: 'config.form.mobile.modal.title',
-    defaultMessage: 'Configuration on mobile unavailble',
+    defaultMessage: 'Configuration on mobile unavailable',
     description: 'Modal title for mobile form configuration'
   },
   formConfigMobileModalDesc: {
