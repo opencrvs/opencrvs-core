@@ -27,23 +27,27 @@ interface IMenuAction {
 interface IProps {
   desktopRightMenu?: IRightMenu[]
   id?: string
-  mobileLeft?: IMenuAction
+  mobileLeft?: IMenuAction[]
   title: string
   mobileBody?: JSX.Element
-  mobileRight?: IMenuAction
+  mobileRight?: IMenuAction[]
 }
 
 const Template: Story<IProps> = (args) => <AppHeader {...args} />
 export const AppHeaderView = Template.bind({})
 AppHeaderView.args = {
   id: 'register_app_header',
-  mobileLeft: {
-    icon: () => <Hamburger />,
-    handler: () => alert('left menu clicked')
-  },
+  mobileLeft: [
+    {
+      icon: () => <Hamburger />,
+      handler: () => alert('left menu clicked')
+    }
+  ],
   title: 'Mobile header',
-  mobileRight: {
-    icon: () => <SearchDark />,
-    handler: () => alert('right menu clicked')
-  }
+  mobileRight: [
+    {
+      icon: () => <SearchDark />,
+      handler: () => alert('right menu clicked')
+    }
+  ]
 }

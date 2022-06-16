@@ -30,7 +30,8 @@ import {
   IDeclaration,
   IPayload,
   SUBMISSION_STATUS,
-  writeDeclaration
+  writeDeclaration,
+  DOWNLOAD_STATUS
 } from '@client/declarations'
 import { ReviewAction } from '@client/components/form/ReviewActionComponent'
 import {
@@ -265,7 +266,7 @@ interface IProps {
     submissionStatus: string,
     action: string,
     payload?: IPayload,
-    downloadStatus?: string
+    downloadStatus?: DOWNLOAD_STATUS
   ) => void
   scope: Scope | null
   offlineCountryConfiguration: IOfflineData

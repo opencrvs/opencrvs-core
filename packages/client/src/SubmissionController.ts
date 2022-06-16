@@ -32,6 +32,8 @@ import { getAttachmentSectionKey } from './utils/draftUtils'
 import { getScope } from './profile/profileSelectors'
 import { RequestHandler } from 'mock-apollo-client'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
+import { GraphQLError } from 'graphql'
+import { showUnassigned } from '@client/notification/actions'
 import { FIELD_AGENT_ROLES } from './utils/constants'
 
 const INTERVAL_TIME = 5000
@@ -287,6 +289,13 @@ export class SubmissionController {
     let status
     if (error.networkError) {
       status = SUBMISSION_STATUS.FAILED_NETWORK
+    } else if (error.graphQLErrors?.[0].extensions.code === 'UNASSIGNED') {
+      this.store.dispatch(
+        showUnassigned({
+          trackingId: declaration.data.registration.trackingId as string
+        })
+      )
+      this.store.dispatch(deleteDeclaration(declaration))
     } else {
       status = SUBMISSION_STATUS.FAILED
       Sentry.captureException(error)

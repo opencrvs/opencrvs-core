@@ -332,9 +332,9 @@ export function getPreviewGroups(
         {
           id: 'secondaryAddress',
           label: {
-            defaultMessage: 'Current address',
-            description: 'Tag definition for crrent address',
-            id: 'form.preview.tag.current.address'
+            defaultMessage: 'Secondary address',
+            description: 'Preview group label for secodary address',
+            id: 'form.field.previewGroups.secondaryAddress'
           },
           fieldToRedirect: 'countrySecondary'
         }

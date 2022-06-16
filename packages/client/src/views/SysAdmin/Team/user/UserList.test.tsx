@@ -14,7 +14,9 @@ import {
   mockLocalSysAdminUserResponse,
   createTestComponent,
   flushPromises,
-  mockOfflineDataDispatch
+  mockOfflineDataDispatch,
+  userDetails,
+  mockUserResponse
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { SEARCH_USERS } from '@client/user/queries'
@@ -26,6 +28,56 @@ import { UserList } from './UserList'
 import { userMutations } from '@client/user/mutations'
 import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
+
+describe('user list without admin scope', () => {
+  let store: AppStore
+  let history: History<any>
+
+  it('no add user button', async () => {
+    Date.now = jest.fn(() => 1487076708000)
+    ;({ store, history } = await createStore())
+    const action = {
+      type: actions.SET_USER_DETAILS,
+      payload: mockUserResponse
+    }
+    await store.dispatch(action)
+    await store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+
+    const userListMock = [
+      {
+        request: {
+          query: SEARCH_USERS,
+          variables: {
+            primaryOfficeId: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
+            count: 10
+          }
+        },
+        result: {
+          data: {
+            searchUsers: {
+              totalItems: 0,
+              results: []
+            }
+          }
+        }
+      }
+    ]
+
+    const component = await createTestComponent(
+      <UserList
+        // @ts-ignore
+        location={{
+          search: stringify({
+            locationId: '0d8474da-0361-4d32-979e-af91f012340a'
+          })
+        }}
+      />,
+      { store, history, graphqlMocks: userListMock }
+    )
+    component.update()
+    expect(component.find('#add-user').length).toBe(0)
+  })
+})
 
 describe('User list tests', () => {
   let store: AppStore
@@ -44,82 +96,6 @@ describe('User list tests', () => {
   })
 
   describe('Header test', () => {
-    it('renders header with user count', async () => {
-      const userListMock = [
-        {
-          request: {
-            query: SEARCH_USERS,
-            variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10,
-              skip: 0
-            }
-          },
-          result: {
-            data: {
-              searchUsers: {
-                totalItems: 0,
-                results: []
-              }
-            }
-          }
-        }
-      ]
-      const testComponent = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-            })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
-
-      // wait for mocked data to load mockedProvider
-      await new Promise((resolve) => {
-        setTimeout(resolve, 200)
-      })
-
-      testComponent.update()
-      const app = testComponent
-      expect(app.find('#user_list').hostNodes().html()).toContain('0 users')
-    })
-    it('load user list in view only mode', async () => {
-      const userListMock = [
-        {
-          request: {
-            query: SEARCH_USERS,
-            variables: {
-              primaryOfficeId: '65cf62cb-864c-45e3-9c0d-5c70f0074cb4',
-              count: 10
-            }
-          },
-          result: {
-            data: {
-              searchUsers: {
-                totalItems: 0,
-                results: []
-              }
-            }
-          }
-        }
-      ]
-      const component = await createTestComponent(
-        <UserList
-          // @ts-ignore
-          location={{
-            search: stringify({
-              locationId: '0d8474da-0361-4d32-979e-af91f012340a'
-            })
-          }}
-        />,
-        { store, history, graphqlMocks: userListMock }
-      )
-      component.update()
-      expect(component.find('#add-user').length).toBe(0)
-    })
     it('add user button redirects to user form', async () => {
       const userListMock = [
         {
@@ -153,7 +129,6 @@ describe('User list tests', () => {
         { store, history, graphqlMocks: userListMock }
       )
       component.update()
-
       const addUser = await waitForElement(component, '#add-user')
       addUser.hostNodes().simulate('click')
 
