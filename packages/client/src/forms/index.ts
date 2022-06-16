@@ -546,7 +546,7 @@ export interface IInformativeRadioGroupFormField extends IFormFieldBase {
 export interface ITextFormField extends IFormFieldBase {
   type: typeof TEXT
   maxLength?: number
-  dynamicOptions?: IDynamicOptions
+  dependency?: string
 }
 
 export interface ITelFormField extends IFormFieldBase {

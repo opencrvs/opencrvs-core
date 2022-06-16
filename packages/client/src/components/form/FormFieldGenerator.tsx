@@ -741,8 +741,9 @@ class FormSectionComponent extends React.Component<Props> {
     const fields = this.props.fields
     const fieldsToReset = fields.filter(
       (field) =>
-        (field.type === SELECT_WITH_DYNAMIC_OPTIONS || field.type === TEXT) &&
-        field?.dynamicOptions?.dependency === fieldName
+        (field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
+          field.dynamicOptions.dependency === fieldName) ||
+        (field.type === TEXT && field.dependency === fieldName)
     )
 
     fieldsToReset.forEach((fieldToReset) => {
