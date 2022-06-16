@@ -17,7 +17,7 @@ import {
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
-import { Redirect, useParams, useLocation } from 'react-router'
+import { Redirect, useParams } from 'react-router'
 import { HOME } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
@@ -172,7 +172,6 @@ function FormConfigWizardView() {
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
-  const location = useLocation()
 
   let firstFieldIdentifiers
   if (section !== 'settings') {
@@ -194,7 +193,7 @@ function FormConfigWizardView() {
         })}
         pageIcon={<></>}
         topBarActions={
-          !location.pathname.includes('settings')
+          section !== 'settings'
             ? [
                 <TertiaryButton
                   id="settings"
