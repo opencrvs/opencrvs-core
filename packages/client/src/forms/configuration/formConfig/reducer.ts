@@ -99,9 +99,7 @@ function getReadyState(formConfig: IFormConfig) {
       configFields: generateConfigFields(
         Event.Birth,
         defaultBirthForm,
-        questionConfig.filter((question) =>
-          question.fieldId.includes(Event.Birth)
-        )
+        questionConfig
       )
     },
     death: {
@@ -111,9 +109,7 @@ function getReadyState(formConfig: IFormConfig) {
       configFields: generateConfigFields(
         Event.Death,
         defaultDeathForm,
-        questionConfig.filter((question) =>
-          question.fieldId.includes(Event.Death)
-        )
+        questionConfig
       )
     }
   }
