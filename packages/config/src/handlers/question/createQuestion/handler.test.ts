@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { createServer } from '@config/server'
-import Question, { IQuestion } from '@config/models/question'
+import Question, { IQuestion, FieldType } from '@config/models/question'
 import * as mockingoose from 'mockingoose'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
@@ -25,7 +25,7 @@ const token = jwt.sign(
   }
 )
 
-const mockQuestion = {
+const mockQuestion: IQuestion = {
   fieldId: 'birth.myField',
   label: [
     {
@@ -79,12 +79,11 @@ const mockQuestion = {
   ],
   maxLength: 32,
   fieldName: 'myField',
-  fieldType: 'TEXT',
-  preceedingFieldId: 'myPreviousFieldId',
+  fieldType: FieldType.TEXT,
+  precedingFieldId: 'myPreviousFieldId',
   required: true,
-  custom: true,
-  initialValue: 'myValue'
-} as IQuestion
+  custom: true
+}
 
 describe('createQuestion handler', () => {
   let server: any

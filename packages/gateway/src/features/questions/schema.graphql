@@ -49,7 +49,7 @@ input QuestionInput {
   maxLength: Int
   fieldName: String
   fieldType: CustomFieldType
-  preceedingFieldId: String
+  precedingFieldId: String!
   required: Boolean
   enabled: String
   custom: Boolean

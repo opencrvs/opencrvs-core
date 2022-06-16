@@ -49,8 +49,8 @@ export const reviewReducer: LoopReducer<IReviewFormState, Action> = (
     case offlineActions.APPLICATION_CONFIG_LOADED:
       const { formConfig } = action.payload
 
-      const birth = getConfiguredOrDefaultForm(formConfig, Event.Birth, false)
-      const death = getConfiguredOrDefaultForm(formConfig, Event.Death, false)
+      const birth = getConfiguredOrDefaultForm(formConfig, Event.Birth)
+      const death = getConfiguredOrDefaultForm(formConfig, Event.Death)
 
       const review = {
         id: ReviewSection.Review,

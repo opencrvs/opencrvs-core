@@ -9,11 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormConfig, QuestionConfigFieldType } from '@client/forms'
+import { IFormConfig } from '@client/forms'
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { DraftStatus, Event } from '@client/utils/gateway'
+import { CustomFieldType, DraftStatus, Event } from '@client/utils/gateway'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -94,8 +94,8 @@ export const formConfig: IFormConfig = {
       ],
       maxLength: 32,
       fieldName: 'vaccination',
-      fieldType: QuestionConfigFieldType.TEXT,
-      preceedingFieldId: 'birth.child.child-view-group.attendantAtBirth',
+      fieldType: CustomFieldType.Text,
+      precedingFieldId: 'birth.child.child-view-group.attendantAtBirth',
       required: false,
       enabled: '',
       custom: true

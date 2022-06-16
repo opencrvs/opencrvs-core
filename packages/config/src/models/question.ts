@@ -43,7 +43,7 @@ export interface IQuestion {
   fieldName?: string
   fieldType?: FieldType
   // must be the fieldId for the field vertically above this one in the form or the string "TOP"
-  preceedingFieldId?: string
+  precedingFieldId: string
   required?: boolean
   // enabled should be a string "DISABLED" or "" or undefined because existing default fields will be ""
   // wanted to use disabled, but this prop is already in use in IFormField
@@ -104,7 +104,7 @@ const questionSchema = new Schema({
     enum: validFieldType,
     default: FieldType.TEXT
   },
-  preceedingFieldId: { type: String },
+  precedingFieldId: { type: String, required: true },
   required: { type: Boolean },
   enabled: { type: String },
   custom: { type: Boolean, default: false }

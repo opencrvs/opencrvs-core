@@ -41,11 +41,6 @@ const graphqlMocks: MockedResponse[] = [
         questions: [
           {
             fieldId: 'birth.child.child-view-group.vaccination',
-            fieldName: 'vaccination',
-            preceedingFieldId: 'birth.child.child-view-group.attendantAtBirth',
-            required: false,
-            enabled: '',
-            custom: true,
             label: [
               {
                 lang: 'en',
@@ -67,16 +62,6 @@ const graphqlMocks: MockedResponse[] = [
                 }
               }
             ],
-            tooltip: [
-              {
-                lang: 'en',
-                descriptor: {
-                  defaultMessage: 'Enter the Vaccine name',
-                  description: 'Tooltip for form field: vaccination question',
-                  id: 'form.field.label.vaccinationTooltip'
-                }
-              }
-            ],
             description: [
               {
                 lang: 'en',
@@ -87,7 +72,34 @@ const graphqlMocks: MockedResponse[] = [
                 }
               }
             ],
-            fieldType: 'TEXT'
+            tooltip: [
+              {
+                lang: 'en',
+                descriptor: {
+                  defaultMessage: 'Enter the Vaccine name',
+                  description: 'Tooltip for form field: vaccination question',
+                  id: 'form.field.label.vaccinationTooltip'
+                }
+              }
+            ],
+            errorMessage: [
+              {
+                lang: 'en',
+                descriptor: {
+                  defaultMessage: 'Please enter the valid vaccine name',
+                  description:
+                    'Error Message for form field: vaccination question',
+                  id: 'form.field.label.vaccinationErrorMessage'
+                }
+              }
+            ],
+            maxLength: 32,
+            fieldName: 'vaccination',
+            fieldType: 'TEXT',
+            precedingFieldId: 'birth.child.child-view-group.attendantAtBirth',
+            required: false,
+            enabled: '',
+            custom: true
           }
         ]
       }

@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ICustomConfigField, IConfigField } from './utils'
-import { IQuestionConfig } from '@client/forms'
+import { ICustomConfigField, IConfigField, IDefaultConfigField } from './utils'
+import { IQuestionConfig } from '@client/forms/questionConfig'
 import { Event } from '@client/utils/gateway'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 
@@ -90,7 +90,7 @@ export type ModifyConfigFieldAction = {
   type: typeof MODIFY_CONFIG_FIELD
   payload: {
     fieldId: string
-    modifiedProps: Partial<IConfigField>
+    modifiedProps: Partial<IDefaultConfigField | ICustomConfigField>
   }
 }
 

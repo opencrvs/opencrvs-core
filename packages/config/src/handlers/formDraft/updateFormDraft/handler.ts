@@ -13,7 +13,11 @@
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
-import FormDraft, { validEvent, DraftStatus } from '@config/models/formDraft'
+import FormDraft, {
+  validEvent,
+  DraftStatus,
+  IFormDraft
+} from '@config/models/formDraft'
 import { Event } from '@config/models/certificate'
 import { clearHearthElasticInfluxData } from '@config/services/formDraftService'
 
@@ -48,10 +52,30 @@ export async function modifyDraftStatusHandler(
     event
   })
 
+  /* When the default form configuration is published */
   if (!draft) {
-    return h
-      .response(`Could not find any form draft for ${event} event`)
-      .code(400)
+    if (newStatus !== DraftStatus.PUBLISHED) {
+      return h
+        .response(`Could not find any form draft for ${event} event`)
+        .code(400)
+    }
+
+    try {
+      const formDraft: IFormDraft = {
+        event: event,
+        status: newStatus,
+        comment: 'Default configuration',
+        history: [],
+        version: 1,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+      }
+      await FormDraft.create(formDraft)
+
+      return h.response(formDraft).code(201)
+    } catch (e) {
+      return h.response('Could not create draft').code(400)
+    }
   }
 
   const currentStatus = draft.status

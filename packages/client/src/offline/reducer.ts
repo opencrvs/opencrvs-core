@@ -24,8 +24,12 @@ import { storage } from '@client/storage'
 import { IApplicationConfig, referenceApi } from '@client/utils/referenceApi'
 import { ILanguage } from '@client/i18n/reducer'
 import { filterLocations } from '@client/utils/locationUtils'
-import { IFormConfig, IQuestionConfig } from '@client/forms'
+import { IFormConfig } from '@client/forms'
 import { Event } from '@client/utils/gateway'
+import {
+  IQuestionConfig,
+  isDefaultQuestionConfig
+} from '@client/forms/questionConfig'
 import { isOfflineDataLoaded } from './selectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
@@ -105,6 +109,9 @@ function getAvailableContent(formConfig: IFormConfig, languages: ILanguage[]) {
 function extractMessages(questions: IQuestionConfig[], language: string) {
   const messages: { [key: string]: string } = {}
   questions.forEach((question) => {
+    if (isDefaultQuestionConfig(question)) {
+      return
+    }
     const labelMessage = find(question.label, {
       lang: language
     })
