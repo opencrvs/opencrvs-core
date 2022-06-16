@@ -60,3 +60,4 @@ export const SENTRY_DSN =
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
 export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
+export const DEFAULT_TIMEOUT = 600000

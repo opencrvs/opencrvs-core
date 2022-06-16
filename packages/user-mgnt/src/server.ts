@@ -16,7 +16,8 @@ import {
   PORT,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
-  AUTH_URL
+  AUTH_URL,
+  DEFAULT_TIMEOUT
 } from '@user-mgnt/constants'
 import getPlugins from '@user-mgnt/config/plugins'
 import * as database from '@user-mgnt/database'
@@ -32,7 +33,7 @@ export async function createServer() {
     port: PORT,
     routes: {
       cors: { origin: ['*'] },
-      payload: { maxBytes: 52428800 }
+      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
     }
   })
 

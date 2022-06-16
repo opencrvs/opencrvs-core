@@ -66,3 +66,4 @@ export const AGE_VERIFICATION_USER_AUDIENCE = 'opencrvs:age-verification-user'
 export const NATIONAL_ID_USER_AUDIENCE = 'opencrvs:nationalId-api-user'
 export const JWT_ISSUER = 'opencrvs:auth-service'
 export const INVALID_TOKEN_NAMESPACE = 'invalidToken'
+export const DEFAULT_TIMEOUT = 600000
