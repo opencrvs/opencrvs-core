@@ -80,9 +80,11 @@ import {
 import {
   OPENCRVS_SPECIFICATION_URL,
   FHIR_SPECIFICATION_URL,
-  EVENT_TYPE
+  EVENT_TYPE,
+  ASSIGNED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
+import { getTokenPayload, getUser } from '@gateway/features/user/utils'
 
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
@@ -789,7 +791,9 @@ function createQuestionnaireBuilder() {
       context: any
     ) => {
       const questionnaire = selectOrCreateQuestionnaireResource(
-        BIRTH_ENCOUNTER_CODE,
+        context.event === EVENT_TYPE.BIRTH
+          ? BIRTH_ENCOUNTER_CODE
+          : DEATH_ENCOUNTER_CODE,
         fhirBundle,
         context
       )
@@ -1938,15 +1942,16 @@ export const builders: IFieldBuilders = {
         INFORMANT_TITLE,
         fhirBundle
       )
-
-      relatedPersonResource.relationship = {
-        coding: [
-          {
-            system:
-              'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
-            code: fieldValue
-          }
-        ]
+      if (fieldValue !== 'OTHER') {
+        relatedPersonResource.relationship = {
+          coding: [
+            {
+              system:
+                'http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype',
+              code: fieldValue
+            }
+          ]
+        }
       }
       if (context.event === EVENT_TYPE.BIRTH) {
         if (fieldValue === 'MOTHER') {
@@ -3568,7 +3573,7 @@ export async function updateFHIRTaskBundle(
 
 export function addOrUpdateExtension(
   taskEntry: ITaskBundleEntry,
-  extension: fhir.Extension,
+  extensions: fhir.Extension[],
   code: 'downloaded' | 'reinstated'
 ) {
   const task = taskEntry.resource
@@ -3577,12 +3582,14 @@ export function addOrUpdateExtension(
     task.extension = []
   }
 
-  const previousExtension = findExtension(extension.url, task.extension)
+  for (const extension of extensions) {
+    const previousExtension = findExtension(extension.url, task.extension)
 
-  if (!previousExtension) {
-    task.extension.push(extension)
-  } else {
-    previousExtension.valueString = extension.valueString
+    if (!previousExtension) {
+      task.extension.push(extension)
+    } else {
+      previousExtension.valueString = extension.valueString
+    }
   }
 
   taskEntry.request = {
@@ -3604,6 +3611,45 @@ export function addOrUpdateExtension(
     }
   }
   return fhirBundle
+}
+
+export async function checkUserAssignment(
+  id: string,
+  authHeader: IAuthHeader
+): Promise<boolean> {
+  if (!authHeader || !authHeader.Authorization) {
+    return false
+  }
+  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+  const userId = tokenPayload.sub
+  const taskBundle: ITaskBundle = await fetchFHIR(
+    `/Task?focus=Composition/${id}`,
+    authHeader
+  )
+  const taskEntryData = taskBundle.entry[0]
+  if (
+    !taskEntryData ||
+    !taskEntryData.resource ||
+    !taskEntryData.resource.extension
+  ) {
+    return false
+  }
+  const assignedExtensionData = findExtension(
+    ASSIGNED_EXTENSION_URL,
+    taskEntryData.resource.extension
+  )
+  if (!assignedExtensionData) {
+    return false
+  }
+  const practitionerId =
+    assignedExtensionData?.valueReference?.reference?.split('/')[1]
+
+  const userDetails = await getUser({ userId }, authHeader)
+
+  if (practitionerId === userDetails.practitionerId) {
+    return true
+  }
+  return false
 }
 
 export interface ITemplatedComposition extends fhir.Composition {

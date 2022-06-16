@@ -11,7 +11,7 @@
  */
 import { ApolloLink, Observable, Operation, NextLink } from 'apollo-link'
 import { DefinitionNode, OperationDefinitionNode } from 'graphql'
-const DEFAULT_TIMEOUT = 30000
+const DEFAULT_TIMEOUT = 600000
 const REQUEST_TIMEOUT_ERROR_CODE = 408
 
 /**

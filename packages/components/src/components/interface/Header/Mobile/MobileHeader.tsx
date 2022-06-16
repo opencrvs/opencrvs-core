@@ -20,10 +20,10 @@ interface IMenuAction {
   handler: () => void
 }
 export interface IMobileHeaderProps {
-  mobileLeft?: IMenuAction
+  mobileLeft?: IMenuAction[]
   title: string
   mobileBody?: JSX.Element
-  mobileRight?: IMenuAction
+  mobileRight?: IMenuAction[]
 }
 
 const HeaderContainer = styled.div`
@@ -91,19 +91,20 @@ class MobileHeader extends React.Component<IMobileHeaderProps & IDomProps> {
     const { id, mobileLeft, mobileRight, title, mobileBody } = this.props
     return (
       <HeaderContainer id={id} className={this.props.className}>
-        {mobileLeft && (
-          <EndComponentContainer>
-            <CircleButton
-              id="mobile_header_left"
-              onClick={mobileLeft.handler}
-              color="#4972BB"
-            >
-              {!mobileBody && <Hamburger />}
-              {mobileLeft.icon()}
-            </CircleButton>
-            <>{!mobileBody && mobileLeft.icon()}</>
-          </EndComponentContainer>
-        )}
+        {mobileLeft &&
+          mobileLeft.map(({ handler, icon }) => (
+            <EndComponentContainer>
+              <CircleButton
+                id="mobile_header_left"
+                onClick={handler}
+                color="#4972BB"
+              >
+                {!mobileBody && <Hamburger />}
+                {icon()}
+              </CircleButton>
+              <>{!mobileBody && icon()}</>
+            </EndComponentContainer>
+          ))}
 
         {mobileBody ? (
           <SearchBody>{mobileBody}</SearchBody>
@@ -111,17 +112,18 @@ class MobileHeader extends React.Component<IMobileHeaderProps & IDomProps> {
           <HeaderBody>{<Title id="header_title">{title}</Title>}</HeaderBody>
         )}
 
-        {mobileRight && (
-          <EndComponentContainer>
-            <CircleButton
-              id="mobile_header_right"
-              onClick={mobileRight.handler}
-              color="#4972BB"
-            >
-              {mobileRight.icon()}
-            </CircleButton>
-          </EndComponentContainer>
-        )}
+        {mobileRight &&
+          mobileRight.map(({ handler, icon }) => (
+            <EndComponentContainer>
+              <CircleButton
+                id="mobile_header_right"
+                onClick={handler}
+                color="#4972BB"
+              >
+                {icon()}
+              </CircleButton>
+            </EndComponentContainer>
+          ))}
       </HeaderContainer>
     )
   }

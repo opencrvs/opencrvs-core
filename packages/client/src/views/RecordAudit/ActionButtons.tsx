@@ -75,7 +75,8 @@ export const ShowDownloadButton = ({
     const downLoadConfig = {
       event: type as string,
       compositionId: id,
-      action: Action.LOAD_REVIEW_DECLARATION
+      action: Action.LOAD_REVIEW_DECLARATION,
+      assignment: declaration?.assignment
     }
     return (
       <DownloadButton
@@ -210,7 +211,14 @@ export const ShowPrintButton = ({
       SUBMISSION_STATUS.REGISTERED,
       SUBMISSION_STATUS.CERTIFIED
     ],
-    LOCAL_REGISTRAR: [SUBMISSION_STATUS.REGISTERED, SUBMISSION_STATUS.CERTIFIED]
+    LOCAL_REGISTRAR: [
+      SUBMISSION_STATUS.REGISTERED,
+      SUBMISSION_STATUS.CERTIFIED
+    ],
+    NATIONAL_REGISTRAR: [
+      SUBMISSION_STATUS.REGISTERED,
+      SUBMISSION_STATUS.CERTIFIED
+    ]
   }
 
   if (
@@ -270,12 +278,14 @@ export const ShowReviewButton = ({
     FIELD_AGENT: [],
     REGISTRATION_AGENT: [EVENT_STATUS.DECLARED],
     DISTRICT_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED],
-    LOCAL_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED]
+    LOCAL_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED],
+    NATIONAL_REGISTRAR: [EVENT_STATUS.VALIDATED, EVENT_STATUS.DECLARED]
   }
 
   if (
     role &&
     type &&
+    role in reviewButtonRoleStatusMap &&
     reviewButtonRoleStatusMap[role].includes(declaration?.status as string) &&
     showActionButton
   ) {

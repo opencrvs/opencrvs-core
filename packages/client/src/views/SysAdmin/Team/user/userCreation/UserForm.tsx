@@ -27,6 +27,7 @@ import {
 import {
   goBack,
   goToCreateUserSection,
+  goToTeamUserList,
   goToUserReviewForm
 } from '@client/navigation'
 import { IStoreState } from '@client/store'
@@ -70,6 +71,7 @@ type IState = {
 
 type IDispatchProps = {
   goBack: typeof goBack
+  goToTeamUserList: typeof goToTeamUserList
   modifyUserFormData: typeof modifyUserFormData
   goToCreateUserSection: typeof goToCreateUserSection
   goToUserReviewForm: typeof goToUserReviewForm
@@ -142,7 +144,8 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   render = () => {
-    const { section, intl, activeGroup, userId } = this.props
+    const { section, intl, activeGroup, userId, formData, goToTeamUserList } =
+      this.props
 
     return (
       <>
@@ -153,6 +156,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
               : intl.formatMessage(section.title)
           }
           goBack={this.handleBackAction}
+          goHome={() => goToTeamUserList(String(formData.registrationOffice))}
         >
           <FormTitle id="form-title">
             {userId
@@ -201,5 +205,6 @@ export const UserForm = connect(mapStateToProps, {
   goToCreateUserSection,
   goToUserReviewForm,
   goBack,
+  goToTeamUserList,
   clearUserFormData
 })(injectIntl(UserFormComponent))

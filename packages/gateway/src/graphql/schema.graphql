@@ -184,6 +184,7 @@ type Mutation {
     id: ID!
     details: DeathRegistrationInput!
   ): ID!
+  markEventAsUnassigned(id: String!): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -768,6 +769,7 @@ type History {
   input: [InputOutput]
   output: [InputOutput]
   certificates: [Certificate]
+  signature: Signature
 }
 
 enum MannerOfDeath {
@@ -1242,16 +1244,10 @@ enum AttachmentSubject {
   PARENT
   CHILD_AGE
   DECEASED_ID_PROOF
-  DECEASED_PARMANENT_ADDRESS_PROOF
   DECEASED_DEATH_PROOF
-  DECEASED_BIRTH_PROOF
+  DECEASED_DEATH_CAUSE_PROOF
   INFORMANT_ID_PROOF
-  INFORMANT_ATHORITY_TO_APPLY_PROOF
   LEGAL_GUARDIAN_PROOF
-  ASSIGNED_RESPONSIBILITY_PROOF
-  WARD_COUNCILLOR_PROOF
-  CAUSE_OF_DEATH
-  CORONERS_REPORT
 }
 
 type RegistrationSearchSet {
@@ -1268,6 +1264,7 @@ type RegistrationSearchSet {
   duplicates: [ID]
   createdAt: String
   modifiedAt: String
+  assignment: AssignmentData
 }
 
 type BirthEventSearchSet implements EventSearchSet {
@@ -1410,6 +1407,13 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+}
+
+type AssignmentData {
+  userId: String
+  firstName: String
+  lastName: String
+  officeName: String
 }
 
 input CommentInput {

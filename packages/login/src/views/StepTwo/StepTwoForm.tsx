@@ -50,6 +50,7 @@ export interface IProps {
   resentSMS: boolean
   submitting: boolean
   stepOneDetails: { mobile: string }
+  applicationName: string | undefined
 }
 export interface IDispatchProps {
   submitAction: (values: IVerifyCodeNumbers) => void
@@ -92,6 +93,11 @@ const CodeInput = injectIntl(
 )
 
 export class StepTwoForm extends React.Component<FullProps> {
+  componentDidUpdate() {
+    const appName = this.props.applicationName
+    if (appName) document.title = appName
+  }
+
   render() {
     const {
       intl,
@@ -165,7 +171,7 @@ export class StepTwoForm extends React.Component<FullProps> {
               disabled={submitting}
               type="submit"
             >
-              {intl.formatMessage(messages.submit)}
+              {intl.formatMessage(messages.verify)}
             </PrimaryButton>{' '}
             <br />
             <StyledButtonWrapper>

@@ -52,7 +52,8 @@ import { connect } from 'react-redux'
 import {
   buttonMessages,
   constantsMessages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IOfflineData } from '@client/offline/reducer'
@@ -207,53 +208,48 @@ export class InProgressComponent extends React.Component<
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
-      const downloadStatus =
-        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+      const downloadStatus = foundDeclaration?.downloadStatus
 
-      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-          actions.push({
-            label: intl.formatMessage(buttonMessages.update),
-            handler: () => {},
-            disabled: true
-          })
-        }
+      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
         actions.push({
-          actionComponent: (
-            <DownloadButton
-              downloadConfigs={{
-                event: event as string,
-                compositionId: reg.id,
-                action: Action.LOAD_REVIEW_DECLARATION
-              }}
-              key={`DownloadButton-${index}`}
-              status={downloadStatus as DOWNLOAD_STATUS}
-            />
-          )
-        })
-      } else {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-          actions.push({
-            label: intl.formatMessage(buttonMessages.update),
-            handler: () =>
+          label: intl.formatMessage(buttonMessages.update),
+          handler: () => {
+            if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
               this.props.goToPage(
                 pageRoute,
                 regId,
                 'review',
                 (event && event.toLowerCase()) || ''
               )
-          })
-        }
-        actions.push({
-          actionComponent: <Downloaded />
+            }
+          },
+          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
         })
       }
+      actions.push({
+        actionComponent: (
+          <DownloadButton
+            downloadConfigs={{
+              event: event as string,
+              compositionId: reg.id,
+              action: Action.LOAD_REVIEW_DECLARATION
+            }}
+            key={`DownloadButton-${index}`}
+            status={downloadStatus}
+          />
+        )
+      })
       const NameComponent = name ? (
         <NameContainer
           id={`name_${index}`}
           isBoldLink={true}
           onClick={() =>
-            this.props.goToDeclarationRecordAudit('inProgressTab', regId)
+            this.props.goToDeclarationRecordAudit(
+              this.props.selectorId === SELECTOR_ID.hospitalDrafts
+                ? 'notificationTab'
+                : 'inProgressTab',
+              regId
+            )
           }
         >
           {name}
@@ -635,10 +631,11 @@ export class InProgressComponent extends React.Component<
 
     const noResultMessage =
       !selectorId || selectorId === SELECTOR_ID.ownDrafts
-        ? 'in progress'
+        ? intl.formatMessage(wqMessages.noRecordsDraft)
         : selectorId === SELECTOR_ID.fieldAgentDrafts
-        ? 'from field agents'
-        : 'from health system'
+        ? intl.formatMessage(wqMessages.noRecordsFieldAgents)
+        : intl.formatMessage(wqMessages.noRecordsHealthSystem)
+
     return (
       <WQContentWrapper
         title={intl.formatMessage(navigationMessages.progress)}
@@ -664,9 +661,7 @@ export class InProgressComponent extends React.Component<
             ? false
             : this.props.error
         }
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: noResultMessage
-        })}
+        noResultText={noResultMessage}
         noContent={noContent}
       >
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (

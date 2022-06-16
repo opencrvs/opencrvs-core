@@ -29,7 +29,9 @@ import {
   storeDeclaration,
   IDeclaration,
   SUBMISSION_STATUS,
-  DOWNLOAD_STATUS
+  DOWNLOAD_STATUS,
+  IWorkqueue,
+  getCurrentUserWorkqueuSuccess
 } from '@client/declarations'
 import { Event } from '@client/forms'
 import { formatUrl } from '@client/navigation'
@@ -68,6 +70,22 @@ declaration.data.history = [
     output: []
   }
 ]
+
+const workqueue: IWorkqueue = {
+  data: {
+    inProgressTab: {},
+    notificationTab: {},
+    reviewTab: {
+      results: [{ id: declaration.id, registration: {} }],
+      totalItems: 1
+    },
+    rejectTab: {},
+    approvalTab: {},
+    printTab: {},
+    externalValidationTab: {}
+  },
+  initialSyncDone: true
+}
 
 describe('Record audit summary for a draft birth declaration', () => {
   let component: ReactWrapper<{}, {}>
@@ -254,6 +272,7 @@ describe('Record audit for a draft declaration', () => {
     declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
 
     store.dispatch(storeDeclaration(declaration))
+    store.dispatch(getCurrentUserWorkqueuSuccess(JSON.stringify(workqueue)))
 
     component = await createTestComponent(
       <RecordAudit
@@ -440,6 +459,7 @@ describe('Record audit for a reinstate declaration', () => {
     declaration.submissionStatus = SUBMISSION_STATUS.ARCHIVED
     declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
     store.dispatch(storeDeclaration(declaration))
+    store.dispatch(getCurrentUserWorkqueuSuccess(JSON.stringify(workqueue)))
 
     component = await createTestComponent(
       <RecordAudit

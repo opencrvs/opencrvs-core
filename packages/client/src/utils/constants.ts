@@ -62,6 +62,7 @@ export const SYS_ADMIN_ROLES = ['LOCAL_SYSTEM_ADMIN']
 export const PERFORMANCE_MANAGEMENT_ROLES = ['PERFORMANCE_MANAGEMENT']
 export const NATL_ADMIN_ROLES = ['NATIONAL_SYSTEM_ADMIN']
 export const NATIONAL_REGISTRAR_ROLES = ['NATIONAL_REGISTRAR']
+
 export const REGISTRAR_ROLES = [
   ROLE_LOCAL_REGISTRAR,
   'DISTRICT_REGISTRAR',
@@ -93,7 +94,6 @@ export const MONTHS_IN_YEAR = 12
 
 export const LOADER_MIN_DISPLAY_TIME =
   process.env.NODE_ENV !== 'test' ? 3 * 1000 : 0 // 3 seconds except test environment
-export const LOADING_SCREEN_TEXT = 'Loading your workspace'
 
 export const DECLARED_DECLARATION_SEARCH_QUERY_COUNT =
   process.env.DECLARED_DECLARATION_SEARCH_QUERY_COUNT || 100

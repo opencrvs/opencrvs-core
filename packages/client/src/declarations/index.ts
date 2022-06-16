@@ -16,11 +16,16 @@ import {
   IFormData,
   IFormFieldValue,
   IContactPoint,
-  Sort
+  Sort,
+  FieldValueMap
 } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import { Action as NavigationAction, GO_TO_PAGE } from '@client/navigation'
+import {
+  Action as NavigationAction,
+  GO_TO_PAGE,
+  IDynamicValues
+} from '@client/navigation'
 import {
   UserDetailsAvailable,
   USER_DETAILS_AVAILABLE
@@ -55,6 +60,9 @@ import {
   showDownloadDeclarationFailedToast,
   ShowDownloadDeclarationFailedToast
 } from '@client/notification/actions'
+import differenceInMinutes from 'date-fns/differenceInMinutes'
+import { Roles } from '@client/utils/authUtils'
+import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
@@ -77,6 +85,9 @@ const ENQUEUE_DOWNLOAD_DECLARATION = 'DECLARATION/ENQUEUE_DOWNLOAD_DECLARATION'
 const DOWNLOAD_DECLARATION_SUCCESS = 'DECLARATION/DOWNLOAD_DECLARATION_SUCCESS'
 const DOWNLOAD_DECLARATION_FAIL = 'DECLARATION/DOWNLOAD_DECLARATION_FAIL'
 const CLEAR_CORRECTION_CHANGE = 'CLEAR_CORRECTION_CHANGE'
+const ENQUEUE_UNASSIGN_DECLARATION = 'DECLARATION/ENQUEUE_UNASSIGN'
+const UNASSIGN_DECLARATION = 'DECLARATION/UNASSIGN'
+const UNASSIGN_DECLARATION_SUCCESS = 'DECLARATION/UNASSIGN_SUCCESS'
 
 export enum SUBMISSION_STATUS {
   DRAFT = 'DRAFT',
@@ -116,7 +127,9 @@ export enum DOWNLOAD_STATUS {
   DOWNLOADING = 'DOWNLOADING',
   DOWNLOADED = 'DOWNLOADED',
   FAILED = 'FAILED',
-  FAILED_NETWORK = 'FAILED_NETWORK'
+  FAILED_NETWORK = 'FAILED_NETWORK',
+  READY_TO_UNASSIGN = 'READY_TO_UNASSIGN',
+  UNASSIGNING = 'UNASSIGNING'
 }
 
 export const processingStates = [
@@ -170,7 +183,7 @@ export interface IDeclaration {
   event: Event
   registrationStatus?: string
   submissionStatus?: string
-  downloadStatus?: string
+  downloadStatus?: DOWNLOAD_STATUS
   downloadRetryAttempt?: number
   action?: string
   trackingId?: string
@@ -384,7 +397,8 @@ interface UpdateRegistrarWorkqueueAction {
   type: typeof UPDATE_REGISTRAR_WORKQUEUE
   payload: {
     pageSize: number
-
+    userId?: string
+    isFieldAgent: boolean
     inProgressSkip: number
     healthSystemSkip: number
     reviewSkip: number
@@ -392,6 +406,30 @@ interface UpdateRegistrarWorkqueueAction {
     approvalSkip: number
     externalValidationSkip: number
     printSkip: number
+  }
+}
+
+interface IUnassignDeclaration {
+  type: typeof UNASSIGN_DECLARATION
+  payload: {
+    id: string
+    client: ApolloClient<{}>
+  }
+}
+
+interface IEnqueueUnassignDeclaration {
+  type: typeof ENQUEUE_UNASSIGN_DECLARATION
+  payload: {
+    id: string
+    client: ApolloClient<{}>
+  }
+}
+
+interface IUnassignDeclarationSuccess {
+  type: typeof UNASSIGN_DECLARATION_SUCCESS
+  payload: {
+    id: string
+    client: ApolloClient<{}>
   }
 }
 
@@ -417,6 +455,9 @@ export type Action =
   | UpdateRegistrarWorkQueueSuccessAction
   | UpdateRegistrarWorkQueueFailAction
   | ShowDownloadDeclarationFailedToast
+  | IEnqueueUnassignDeclaration
+  | IUnassignDeclaration
+  | IUnassignDeclarationSuccess
 
 export interface IUserData {
   userID: string
@@ -584,6 +625,14 @@ export function writeDeclaration(
 ): IWriteDeclarationAction {
   return { type: WRITE_DECLARATION, payload: { declaration, callback } }
 }
+async function getCurrentUserRole(): Promise<string> {
+  const userDetails = await storage.getItem('USER_DETAILS')
+
+  if (!userDetails) {
+    return ''
+  }
+  return (JSON.parse(userDetails) as IUserDetails).role || ''
+}
 
 export async function getCurrentUserID(): Promise<string> {
   const userDetails = await storage.getItem('USER_DETAILS')
@@ -703,6 +752,7 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
     return JSON.stringify({ declarations: [] })
   }
 
+  const currentUserRole = await getCurrentUserRole()
   const currentUserID = await getCurrentUserID()
 
   const allUserData = JSON.parse(storageTable) as IUserData[]
@@ -720,8 +770,35 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
   const currentUserData = allUserData.find(
     (uData) => uData.userID === currentUserID
   )
-  const currentUserDeclarations: IDeclaration[] =
+  let currentUserDeclarations: IDeclaration[] =
     (currentUserData && currentUserData.declarations) || []
+
+  if (Roles.FIELD_AGENT.includes(currentUserRole) && currentUserData) {
+    currentUserDeclarations = currentUserData.declarations.filter((d) => {
+      if (d.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
+        const history = d.originalData?.history as unknown as IDynamicValues
+
+        const downloadedTime = (
+          history.filter((h: IDynamicValues) => {
+            return h.action === DOWNLOAD_STATUS.DOWNLOADED
+          }) as IDynamicValues[]
+        ).sort((fe, se) => {
+          return new Date(se.date).getTime() - new Date(fe.date).getTime()
+        })
+
+        return (
+          differenceInMinutes(new Date(), new Date(downloadedTime[0].date)) <
+          1440 // 24 hours, used munites for better accuracy
+        )
+      }
+      return true
+    })
+
+    // Storing the declarations again by excluding the 24 hours old downloaded declaration
+    currentUserData.declarations = currentUserDeclarations
+    await storage.setItem('USER_DATA', JSON.stringify(allUserData))
+  }
+
   const payload: IUserData = {
     userID: currentUserID,
     declarations: currentUserDeclarations
@@ -915,9 +992,9 @@ function mergeWorkQueueData(
       )
       if (declarationIndex >= 0) {
         const isDownloadFailed =
-          currentApplications[declarationIndex].downloadStatus ===
+          currentApplications[declarationIndex].submissionStatus ===
             SUBMISSION_STATUS.FAILED_NETWORK ||
-          currentApplications[declarationIndex].downloadStatus ===
+          currentApplications[declarationIndex].submissionStatus ===
             SUBMISSION_STATUS.FAILED
 
         if (!isDownloadFailed) {
@@ -1067,9 +1144,16 @@ export async function deleteDeclarationByUser(
 }
 
 export function downloadDeclaration(
-  declaration: IDeclaration,
+  event: Event,
+  compositionId: string,
+  action: string,
   client: ApolloClient<{}>
 ): IDownloadDeclaration {
+  const declaration = makeDeclarationReadyToDownload(
+    event,
+    compositionId,
+    action
+  )
   return {
     type: ENQUEUE_DOWNLOAD_DECLARATION,
     payload: {
@@ -1090,7 +1174,7 @@ export function updateRegistrarWorkqueue(
   approvalSkip = 0,
   externalValidationSkip = 0,
   printSkip = 0
-) {
+): UpdateRegistrarWorkqueueAction {
   return {
     type: UPDATE_REGISTRAR_WORKQUEUE,
     payload: {
@@ -1206,6 +1290,45 @@ function downloadDeclarationFail(
   }
 }
 
+export function executeUnassignDeclaration(
+  id: string,
+  client: ApolloClient<{}>
+): IUnassignDeclaration {
+  return {
+    type: UNASSIGN_DECLARATION,
+    payload: {
+      id,
+      client
+    }
+  }
+}
+
+export function unassignDeclaration(
+  id: string,
+  client: ApolloClient<{}>
+): IEnqueueUnassignDeclaration {
+  return {
+    type: ENQUEUE_UNASSIGN_DECLARATION,
+    payload: {
+      id,
+      client
+    }
+  }
+}
+
+function unassignDeclarationSuccess([id, client]: [
+  string,
+  ApolloClient<{}>
+]): IUnassignDeclarationSuccess {
+  return {
+    type: UNASSIGN_DECLARATION_SUCCESS,
+    payload: {
+      id,
+      client
+    }
+  }
+}
+
 export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
   state: IDeclarationsState = initialState,
   action: Action
@@ -1270,7 +1393,15 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       const currentDeclarationIndex = newDeclarations.findIndex(
         (declaration) => declaration.id === action.payload.declaration.id
       )
-      newDeclarations[currentDeclarationIndex] = action.payload.declaration
+      const modifiedDeclaration = { ...action.payload.declaration }
+
+      if (modifiedDeclaration.data?.informant?.relationship) {
+        modifiedDeclaration.data.informant.relationship = (
+          modifiedDeclaration.data.registration.informantType as FieldValueMap
+        )?.value
+      }
+
+      newDeclarations[currentDeclarationIndex] = modifiedDeclaration
 
       return {
         ...state,
@@ -1668,7 +1799,91 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         return loop(state, Cmd.action(writeDeclaration(modifiedDeclaration)))
       }
       return state
+    case ENQUEUE_UNASSIGN_DECLARATION:
+      const queueIndex = state.declarations.findIndex(
+        ({ id }) => id === action.payload.id
+      )
+      const isQueueBusy = state.declarations.some((declaration) =>
+        [
+          DOWNLOAD_STATUS.READY_TO_UNASSIGN,
+          DOWNLOAD_STATUS.UNASSIGNING
+        ].includes(declaration.downloadStatus as DOWNLOAD_STATUS)
+      )
+      const updatedDeclarationsQueue = state.declarations
+      if (queueIndex === -1) {
+        // Not found locally, unassigning others declaration
+        updatedDeclarationsQueue.push({
+          id: action.payload.id,
+          downloadStatus: DOWNLOAD_STATUS.READY_TO_UNASSIGN
+        } as IDeclaration)
+      } else {
+        updatedDeclarationsQueue[queueIndex].downloadStatus =
+          DOWNLOAD_STATUS.READY_TO_UNASSIGN
+      }
 
+      return loop(
+        {
+          ...state,
+          declarations: updatedDeclarationsQueue
+        },
+        isQueueBusy
+          ? Cmd.none
+          : Cmd.action(executeUnassignDeclaration(action.payload.id, client))
+      )
+    case UNASSIGN_DECLARATION:
+      const unassignIndex = state.declarations.findIndex(
+        ({ id }) => id === action.payload.id
+      )
+      const updatedDeclarationsUnassign = state.declarations
+      updatedDeclarationsUnassign[unassignIndex].downloadStatus =
+        DOWNLOAD_STATUS.UNASSIGNING
+      return loop(
+        {
+          ...state,
+          declarations: updatedDeclarationsUnassign
+        },
+        Cmd.run(
+          async () => {
+            await action.payload.client.mutate({
+              mutation: MARK_EVENT_UNASSIGNED,
+              variables: { id: action.payload.id }
+            })
+            return [action.payload.id, action.payload.client]
+          },
+          {
+            successActionCreator: unassignDeclarationSuccess
+          }
+        )
+      )
+    case UNASSIGN_DECLARATION_SUCCESS:
+      const declarationNextToUnassign = state.declarations.find(
+        (declaration) =>
+          declaration.downloadStatus === DOWNLOAD_STATUS.READY_TO_UNASSIGN
+      )
+      return loop(
+        state,
+        Cmd.list<
+          | IDeleteDeclarationAction
+          | UpdateRegistrarWorkqueueAction
+          | IUnassignDeclaration
+        >(
+          [
+            Cmd.action(
+              deleteDeclaration({ id: action.payload.id } as IDeclaration)
+            ),
+            Cmd.action(updateRegistrarWorkqueue()),
+            declarationNextToUnassign
+              ? Cmd.action(
+                  executeUnassignDeclaration(
+                    declarationNextToUnassign.id,
+                    action.payload.client
+                  )
+                )
+              : Cmd.none
+          ],
+          { sequence: true }
+        )
+      )
     default:
       return state
   }

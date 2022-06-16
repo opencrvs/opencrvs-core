@@ -33,8 +33,14 @@ export const correctionFeesPayment: IFormSectionGroup = {
       initialValue: '',
       validate: [],
       options: [
-        { value: 'REQUIRED', label: messages.idCheckVerify },
-        { value: 'NOT_REQUIRED', label: messages.idCheckWithoutVerify }
+        {
+          value: 'REQUIRED',
+          label: messages.correctionSummaryFeesRequiredPositive
+        },
+        {
+          value: 'NOT_REQUIRED',
+          label: messages.correctionSummaryFeesRequiredNegative
+        }
       ],
       nestedFields: {
         REQUIRED: [
@@ -42,7 +48,7 @@ export const correctionFeesPayment: IFormSectionGroup = {
             name: 'totalFees',
             type: 'NUMBER',
             label: {
-              defaultMessage: 'Total',
+              defaultMessage: '',
               id: 'form.field.label.totalFees',
               description: 'Label for input Reason for Change'
             },

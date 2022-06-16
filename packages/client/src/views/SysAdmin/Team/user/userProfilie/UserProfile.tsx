@@ -383,9 +383,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                         <LinkButtonWithoutSpacing
                           id="office-link"
                           onClick={() =>
-                            this.props.goToTeamUserList(
-                              user.primaryOffice as ISearchLocation
-                            )
+                            this.props.goToTeamUserList(user.primaryOffice!.id)
                           }
                         >
                           {user.primaryOffice &&

@@ -114,7 +114,7 @@ export function CertificationRatesReport(props: ICertificationRateProps) {
                 value={
                   <PerformanceValue>
                     <PercentageDisplay
-                      total={dataItem.total}
+                      total={Math.min(dataItem.total, props.totalRegistrations)}
                       ofNumber={props.totalRegistrations}
                     />
                   </PerformanceValue>

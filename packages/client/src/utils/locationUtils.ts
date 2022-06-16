@@ -183,10 +183,11 @@ export function getFullLocationNameOfFacility(
 ) {
   let location: ILocation = facilityLocation
   const names: LocationName[] = [location.name]
-  while (location.partOf) {
+  let continueLoop = true
+  while (location.partOf && continueLoop) {
     const parent = location.partOf.split('/')[1]
     if (parent === '0') {
-      location.partOf = ''
+      continueLoop = false
       names.push(
         countries.find(({ value }) => value === window.config.COUNTRY)
           ?.label as MessageDescriptor

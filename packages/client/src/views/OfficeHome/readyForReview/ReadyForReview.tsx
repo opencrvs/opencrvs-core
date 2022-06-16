@@ -30,7 +30,8 @@ import { connect } from 'react-redux'
 import ReactTooltip from 'react-tooltip'
 import {
   constantsMessages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/registrarHome'
 import {
@@ -53,8 +54,9 @@ import {
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
+import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -131,13 +133,12 @@ class ReadyForReviewComponent extends React.Component<
       return []
     }
     const transformedData = transformData(data, this.props.intl)
-    const items = transformedData.map((reg, index) => {
+    const items: IDynamicValues[] = transformedData.map((reg, index) => {
       const actions = [] as IAction[]
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
-      const downloadStatus =
-        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+      const downloadStatus = foundDeclaration?.downloadStatus
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
@@ -148,19 +149,6 @@ class ReadyForReviewComponent extends React.Component<
             disabled: true
           })
         }
-        actions.push({
-          actionComponent: (
-            <DownloadButton
-              downloadConfigs={{
-                event: reg.event,
-                compositionId: reg.id,
-                action: Action.LOAD_REVIEW_DECLARATION
-              }}
-              key={`DownloadButton-${index}`}
-              status={downloadStatus as DOWNLOAD_STATUS}
-            />
-          )
-        })
       } else {
         if (this.state.width > this.props.theme.grid.breakpoints.lg) {
           actions.push({
@@ -178,10 +166,22 @@ class ReadyForReviewComponent extends React.Component<
             }
           })
         }
-        actions.push({
-          actionComponent: <Downloaded />
-        })
       }
+      actions.push({
+        actionComponent: (
+          <DownloadButton
+            downloadConfigs={{
+              event: reg.event,
+              compositionId: reg.id,
+              action: Action.LOAD_REVIEW_DECLARATION,
+              assignment: reg.assignment
+            }}
+            key={`DownloadButton-${index}`}
+            status={downloadStatus as DOWNLOAD_STATUS}
+          />
+        )
+      })
+
       const event =
         (reg.event &&
           intl.formatMessage(
@@ -339,9 +339,7 @@ class ReadyForReviewComponent extends React.Component<
         onPageChange={onPageChange}
         loading={this.props.loading}
         error={this.props.error}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'are ready for review'
-        })}
+        noResultText={intl.formatMessage(wqMessages.noRecordsReadyForReview)}
         noContent={this.transformDeclaredContent(data).length <= 0}
       >
         <ReactTooltip id="validateTooltip">

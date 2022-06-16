@@ -13,7 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { LightLogo } from '@opencrvs/components/lib/icons'
+import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import {
@@ -25,6 +25,9 @@ import { storage } from '@client/storage'
 import { USER_DETAILS } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { buttonMessages } from '@client/i18n/messages'
+import { IStoreState } from '@client/store'
+import { getOfflineData } from '@client/offline/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 const TitleHolder = styled.div`
   ${({ theme }) => theme.fonts.h1};
@@ -38,21 +41,26 @@ const LoginButton = styled(PrimaryButton)`
   box-shadow: 0 0 13px 0 rgba(0, 0, 0, 0.27);
 `
 
+interface IStateData {
+  offlineCountryConfig: IOfflineData
+}
+
 export class SetupConfirmationView extends React.Component<
   {
     redirectToAuthentication: typeof redirectToAuthentication
-  } & IntlShapeProps
+  } & IStateData &
+    IntlShapeProps
 > {
   async componentDidMount() {
     await storage.removeItem(USER_DETAILS)
   }
   render() {
-    const { intl } = this.props
+    const { intl, offlineCountryConfig } = this.props
     return (
       <Page>
         <Container id="user-setup-complete-page">
           <LogoContainer>
-            <LightLogo />
+            <CountryLogo src={offlineCountryConfig.config.COUNTRY_LOGO.file} />
           </LogoContainer>
           <TitleHolder>
             {intl.formatMessage(messages.setupCompleteTitle)}
@@ -72,6 +80,13 @@ export class SetupConfirmationView extends React.Component<
   }
 }
 
-export const SetupConfirmationPage = connect(null, {
-  redirectToAuthentication
-})(injectIntl(SetupConfirmationView))
+export const SetupConfirmationPage = connect(
+  (state: IStoreState) => {
+    return {
+      offlineCountryConfig: getOfflineData(state)
+    }
+  },
+  {
+    redirectToAuthentication
+  }
+)(injectIntl(SetupConfirmationView))

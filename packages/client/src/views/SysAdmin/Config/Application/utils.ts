@@ -195,7 +195,10 @@ export const isApplyButtonDisabled = (
   } else if (changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET) {
     return !Boolean(state.birthRegistrationTarget)
   } else if (changeModalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET) {
-    return !Boolean(state.birthLateRegistrationTarget)
+    return (
+      Number(state.birthLateRegistrationTarget) <
+      Number(state.birthRegistrationTarget) + 2
+    )
   } else if (changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET) {
     return !Boolean(state.deathRegistrationTarget)
   } else if (changeModalName === BirthActionId.BIRTH_ON_TIME_FEE) {

@@ -200,7 +200,6 @@ interface IFormMessages
   iDTypePassport: MessageDescriptor
   iDTypeRefugeeNumber: MessageDescriptor
   informantAttestation: MessageDescriptor
-  lastNameBn: MessageDescriptor
   lastNameEn: MessageDescriptor
   manner: MessageDescriptor
   mannerAccident: MessageDescriptor
@@ -1351,11 +1350,6 @@ export const formMessageDescriptors: IFormMessages = {
     description: 'Attested document of the informant',
     id: 'form.section.documents.list.informantAttestation'
   },
-  lastNameBn: {
-    defaultMessage: 'Bengali last name',
-    description: 'Bengali last name',
-    id: 'form.field.label.lastNameBN'
-  },
   lastNameEn: {
     defaultMessage: 'English last name',
     description: 'English last name',
@@ -1452,22 +1446,22 @@ export const formMessageDescriptors: IFormMessages = {
     id: 'form.field.label.motherEducationAttainment'
   },
   motherFamilyName: {
-    defaultMessage: 'নামের শেষাংশ বাংলায়',
+    defaultMessage: 'Last name',
     description: 'Label for form field: Family name',
     id: 'form.field.label.motherFamilyName'
   },
   motherFamilyNameEng: {
-    defaultMessage: 'Last Name(s) in English',
+    defaultMessage: 'Last name',
     description: 'Label for form field: Family name in english',
     id: 'form.field.label.motherFamilyNameEng'
   },
   motherFirstNames: {
-    defaultMessage: 'নামের প্রথমাংশ বাংলায়',
+    defaultMessage: 'First name(s)',
     description: 'Label for form field: First names',
     id: 'form.field.label.motherFirstNames'
   },
   motherFirstNamesEng: {
-    defaultMessage: 'First Name(s) in English',
+    defaultMessage: 'First name(s)',
     description: 'Label for form field: First names in english',
     id: 'form.field.label.motherFirstNamesEng'
   },

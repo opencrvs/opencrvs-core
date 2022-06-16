@@ -315,11 +315,7 @@ export class SearchResultView extends React.Component<
           })
         }
       }
-      if (
-        downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED &&
-        ((!declarationIsValidated && this.userHasValidateOrRegistrarScope()) ||
-          (declarationIsValidated && this.userHasRegisterScope()))
-      ) {
+      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
         actions.push({
           actionComponent: (
             <DownloadButton
@@ -327,6 +323,7 @@ export class SearchResultView extends React.Component<
               downloadConfigs={{
                 event: reg.event,
                 compositionId: reg.id,
+                assignment: reg.assignment,
                 action:
                   ((declarationIsRegistered || declarationIsCertified) &&
                     Action.LOAD_CERTIFICATE_DECLARATION) ||

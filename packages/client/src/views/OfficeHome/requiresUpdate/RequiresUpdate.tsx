@@ -31,7 +31,8 @@ import { withTheme } from 'styled-components'
 import {
   buttonMessages,
   constantsMessages,
-  dynamicConstantsMessages
+  dynamicConstantsMessages,
+  wqMessages
 } from '@client/i18n/messages'
 import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
 import { Action } from '@client/forms'
@@ -182,8 +183,7 @@ class RequiresUpdateComponent extends React.Component<
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
-      const downloadStatus =
-        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+      const downloadStatus = foundDeclaration?.downloadStatus
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
@@ -197,19 +197,6 @@ class RequiresUpdateComponent extends React.Component<
             disabled: true
           })
         }
-        actions.push({
-          actionComponent: (
-            <DownloadButton
-              downloadConfigs={{
-                event: reg.event,
-                compositionId: reg.id,
-                action: Action.LOAD_REVIEW_DECLARATION
-              }}
-              key={`DownloadButton-${index}`}
-              status={downloadStatus as DOWNLOAD_STATUS}
-            />
-          )
-        })
       } else {
         if (
           this.state.width > this.props.theme.grid.breakpoints.lg &&
@@ -230,10 +217,21 @@ class RequiresUpdateComponent extends React.Component<
             }
           })
         }
-        actions.push({
-          actionComponent: <Downloaded />
-        })
       }
+      actions.push({
+        actionComponent: (
+          <DownloadButton
+            downloadConfigs={{
+              event: reg.event,
+              compositionId: reg.id,
+              action: Action.LOAD_REVIEW_DECLARATION,
+              assignment: reg.assignment
+            }}
+            key={`DownloadButton-${index}`}
+            status={downloadStatus as DOWNLOAD_STATUS}
+          />
+        )
+      })
       const event =
         (reg.event &&
           intl.formatMessage(
@@ -329,9 +327,7 @@ class RequiresUpdateComponent extends React.Component<
         onPageChange={onPageChange}
         loading={this.props.loading}
         error={this.props.error}
-        noResultText={intl.formatMessage(constantsMessages.noRecords, {
-          tab: 'sent for updates'
-        })}
+        noResultText={intl.formatMessage(wqMessages.noRecordsRequireUpdates)}
         noContent={this.transformRejectedContent(data).length <= 0}
       >
         <GridTable

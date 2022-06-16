@@ -115,7 +115,7 @@ Ilanga District in Sulaka Province is meant to demonstrate a provincial district
 
 ### Field Agent
 
-A Social Worker in the captial city:
+A Social Worker in the capital city:
 
 Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
@@ -406,13 +406,13 @@ By contributing to the OpenCRVS code, you are conforming to the terms of the lic
 
 So you have contributed to core and want to make a new release as an OpenCRVS core repo admin?
 
-1. Update all packages with the new version number according to [semver](https://semver.org/). All packages will have the same version for simplicity as they are all designed to be used together. Update all dependencies to point to the newly created versions. E.g. `client` depend on `components`, so update the dependency: Do a find and replace for `1.0.0-alpha.2` and replace with `1.0.0-alpha.3`
+1. Update all packages with the new version number according to [semver](https://semver.org/). All packages will have the same version for simplicity as they are all designed to be used together. Update all dependencies to point to the newly created versions. E.g. `client` depend on `components`, so update the dependency: Do a find and replace for `1.0.0` and replace with `1.0.1`
 
 2. Run `yarn` to ensure there are no version errors.
 
 3. Run `yarn test` and ensure all passed.
 
-4. Run `git tag v<version_number>` e.g. `git tag v1.0.0-alpha.3.2`
+4. Run `git tag v<version_number>` e.g. `git tag v1.0.0`
 
 5. Run `git push origin v<version_number>`
 

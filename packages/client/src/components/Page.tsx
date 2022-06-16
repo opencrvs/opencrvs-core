@@ -18,6 +18,7 @@ import { IStoreState } from '@opencrvs/client/src/store'
 import { setInitialDeclarations } from '@client/declarations'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import {
+  getOfflineData,
   getOfflineDataLoaded,
   getOfflineLoadingError
 } from '@client/offline/selectors'
@@ -32,8 +33,8 @@ import { Ii18n } from '@client/type/i18n'
 import { getPreferredLanguage } from '@client/i18n/utils'
 import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
-import { LOADING_SCREEN_TEXT } from '@client/utils/constants'
 import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
+import { IOfflineData } from '@client/offline/reducer'
 
 const languageFromProps = ({ language }: IPageProps) => language
 
@@ -86,7 +87,7 @@ const StyledSpinner = styled(Spinner)`
   position: absolute;
   margin-left: -24px;
   margin-top: -24px;
-  top: 38%;
+  top: calc(50% - 20px);
   left: 50%;
   width: 40px;
   height: 40px;
@@ -109,6 +110,7 @@ interface IPageProps {
   registerFormLoaded: boolean
   formConfigLoaded: boolean
   loadingError: boolean
+  offlineData: IOfflineData | undefined
 }
 
 interface IDispatchProps {
@@ -127,6 +129,10 @@ class Component extends React.Component<
   ) {
     const { hash } = this.props.location
     const hashChanged = hash && hash !== prevProps.location.hash
+    const appName = this.props.offlineData
+      ? this.props.offlineData.config.APPLICATION_NAME
+      : ''
+    if (appName) document.title = appName
     if (hashChanged) {
       // Push onto callback queue so it runs after the DOM is updated,
       // this is required when navigating from a different page so that
@@ -179,7 +185,6 @@ class Component extends React.Component<
       return (
         <>
           <StyledSpinner id="appSpinner" />
-          <StyledText>{LOADING_SCREEN_TEXT}</StyledText>
         </>
       )
     }
@@ -193,7 +198,8 @@ const mapStateToProps = (store: IStoreState): IPageProps => {
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store),
     registerFormLoaded: isRegisterFormReady(store),
-    formConfigLoaded: isFormConfigLoaded(store)
+    formConfigLoaded: isFormConfigLoaded(store),
+    offlineData: getOfflineDataLoaded(store) ? getOfflineData(store) : undefined
   }
 }
 

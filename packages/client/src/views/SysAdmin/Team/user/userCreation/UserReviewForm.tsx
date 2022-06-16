@@ -21,7 +21,10 @@ import {
   SIMPLE_DOCUMENT_UPLOADER
 } from '@client/forms'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
-import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
+import {
+  getVisibleSectionGroupsBasedOnConditions,
+  getConditionalActionsForField
+} from '@client/forms/utils'
 import {
   buttonMessages as messages,
   userMessages,
@@ -30,6 +33,7 @@ import {
 import {
   goBack,
   goToCreateUserSection,
+  goToTeamUserList,
   goToUserReviewForm
 } from '@client/navigation'
 import { IOfflineData } from '@client/offline/reducer'
@@ -51,7 +55,10 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
-import { ActionPageLight, IDataProps } from '@opencrvs/components/lib/interface'
+import {
+  ActionPageLight,
+  ISearchLocation
+} from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -64,7 +71,8 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
   ListViewSimplified,
-  ListViewItemSimplified
+  ListViewItemSimplified,
+  IListViewItemSimplifiedProps
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import styled from 'styled-components'
 
@@ -82,13 +90,14 @@ interface IDispatchProps {
   userFormSection: IFormSection
   offlineCountryConfiguration: IOfflineData
   goBack: typeof goBack
+  goToTeamUserList: typeof goToTeamUserList
   modify: (values: IFormSectionData) => void
   userDetails: IUserDetails | null
 }
 
 interface ISectionData {
   title: string
-  items: IDataProps[]
+  items: IListViewItemSimplifiedProps[]
 }
 
 type IFullProps = IUserReviewFormProps &
@@ -107,10 +116,19 @@ const Title = styled.div`
 `
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};
+  width: 100%;
 `
+
+const DocumentUploaderContainer = styled.div`
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding-right: 8px;
+  }
+`
+
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
+
 class UserReviewFormComponent extends React.Component<
   IFullProps & IDispatchProps
 > {
@@ -121,25 +139,50 @@ class UserReviewFormComponent extends React.Component<
       userFormSection,
       this.props.formData
     ).forEach((group) => {
-      group.fields.forEach((field: IFormField) => {
+      group.fields.forEach((field: IFormField, idx) => {
         if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
         } else if (field && sections.length > 0) {
-          sections[sections.length - 1].items.push({
-            label:
-              field.type === SIMPLE_DOCUMENT_UPLOADER
-                ? ''
-                : intl.formatMessage(field.label),
-            value: this.getValue(field),
-            action:
-              !(
-                field.name === 'registrationOffice' &&
-                this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
-              ) && !field.readonly
-                ? {
-                    id: `btn_change_${field.name}`,
-                    label: intl.formatMessage(messages.change),
-                    handler: () => {
+          if (field.name === 'username' && !this.getValue(field)) return
+          const label =
+            field.type === SIMPLE_DOCUMENT_UPLOADER ? (
+              <DocumentUploaderContainer>
+                <SimpleDocumentUploader
+                  label={intl.formatMessage(field.label)}
+                  disableDeleteInPreview={true}
+                  name={field.name}
+                  onComplete={(file) => {
+                    this.props.modify({
+                      ...this.props.formData,
+                      [field.name]: file
+                    })
+                  }}
+                  files={
+                    this.props.formData[
+                      field.name
+                    ] as unknown as IAttachmentValue
+                  }
+                />
+              </DocumentUploaderContainer>
+            ) : (
+              intl.formatMessage(field.label)
+            )
+          if (
+            !getConditionalActionsForField(field, this.props.formData).includes(
+              'hide'
+            )
+          ) {
+            sections[sections.length - 1].items.push({
+              label: <Label>{label}</Label>,
+              value: <Value id={`value_${idx}`}>{this.getValue(field)}</Value>,
+              actions:
+                !(
+                  field.name === 'registrationOffice' &&
+                  this.props.userDetails?.role !== 'NATIONAL_SYSTEM_ADMIN'
+                ) && !field.readonly ? (
+                  <LinkButton
+                    id={`btn_change_${field.name}`}
+                    onClick={() => {
                       this.props.userId
                         ? this.props.goToUserReviewForm(
                             this.props.userId,
@@ -152,10 +195,15 @@ class UserReviewFormComponent extends React.Component<
                             group.id,
                             field.name
                           )
-                    }
-                  }
-                : undefined
-          })
+                    }}
+                  >
+                    {intl.formatMessage(messages.change)}
+                  </LinkButton>
+                ) : (
+                  <></>
+                )
+            })
+          }
         }
       })
     })
@@ -165,22 +213,6 @@ class UserReviewFormComponent extends React.Component<
 
   getValue = (field: IFormField) => {
     const { intl, formData } = this.props
-
-    if (field.type === SIMPLE_DOCUMENT_UPLOADER) {
-      const files = formData[field.name] as unknown as IAttachmentValue
-
-      return (
-        <SimpleDocumentUploader
-          label={intl.formatMessage(field.label)}
-          disableDeleteInPreview={true}
-          name={field.name}
-          onComplete={(file) => {
-            this.props.modify({ ...this.props.formData, [field.name]: file })
-          }}
-          files={files}
-        />
-      )
-    }
 
     if (field.type === LOCATION_SEARCH_INPUT) {
       const offlineLocations =
@@ -202,17 +234,31 @@ class UserReviewFormComponent extends React.Component<
   }
 
   render() {
-    const { intl, section, userId, userFormSection } = this.props
+    const {
+      intl,
+      section,
+      userId,
+      userFormSection,
+      formData,
+      goToTeamUserList,
+      userDetails,
+      offlineCountryConfiguration
+    } = this.props
     let title: string
     let actionComponent: JSX.Element
-
+    const locationId = formData['registrationOffice']
+    const locationDetails =
+      offlineCountryConfiguration['locations'][`${locationId}`] ||
+      offlineCountryConfiguration['facilities'][`${locationId}`] ||
+      offlineCountryConfiguration['offices'][`${locationId}`]
     if (userId) {
       title = intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
       actionComponent = (
         <SuccessButton
           id="submit-edit-user-form"
           disabled={
-            this.props.formData.role === 'LOCAL_REGISTRAR' &&
+            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
+              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}
@@ -228,7 +274,8 @@ class UserReviewFormComponent extends React.Component<
         <PrimaryButton
           id="submit_user_form"
           disabled={
-            this.props.formData.role === 'LOCAL_REGISTRAR' &&
+            (this.props.formData.role === 'LOCAL_REGISTRAR' ||
+              this.props.formData.role === 'NATIONAL_REGISTRAR') &&
             !this.props.formData.signature
           }
           onClick={() => this.props.submitForm(userFormSection)}
@@ -238,7 +285,16 @@ class UserReviewFormComponent extends React.Component<
       )
     }
     return (
-      <ActionPageLight title={title} goBack={this.props.goBack}>
+      <ActionPageLight
+        title={title}
+        goBack={this.props.goBack}
+        goHome={() =>
+          locationDetails
+            ? goToTeamUserList(locationDetails.id)
+            : userDetails?.primaryOffice?.id &&
+              goToTeamUserList(userDetails.primaryOffice.id)
+        }
+      >
         {!this.props.userId && (
           <FormTitle id={`${section.id}_title`}>
             {intl.formatMessage(section.name)}
@@ -254,21 +310,9 @@ class UserReviewFormComponent extends React.Component<
                     return (
                       <ListViewItemSimplified
                         key={index}
-                        label={<Label>{item.label}</Label>}
-                        value={
-                          <Value id={item.label.split(' ')[0]}>
-                            {item.value}
-                          </Value>
-                        }
-                        actions={
-                          <LinkButton
-                            id={item.action?.id}
-                            disabled={item.action?.disabled}
-                            onClick={item.action?.handler}
-                          >
-                            {item.action?.label}
-                          </LinkButton>
-                        }
+                        label={item.label}
+                        value={item.value}
+                        actions={item.actions}
                       />
                     )
                   })}
@@ -294,6 +338,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
       fieldName?: string
     ) => dispatch(goToUserReviewForm(userId, sec, group, fieldName)),
     goBack: () => dispatch(goBack()),
+    goToTeamUserList,
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
     submitForm: (userFormSection: IFormSection) => {
       const variables = draftToGqlTransformer(
