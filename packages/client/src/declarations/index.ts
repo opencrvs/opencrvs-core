@@ -1828,7 +1828,12 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         },
         isQueueBusy
           ? Cmd.none
-          : Cmd.action(executeUnassignDeclaration(action.payload.id, client))
+          : Cmd.action(
+              executeUnassignDeclaration(
+                action.payload.id,
+                action.payload.client
+              )
+            )
       )
     case UNASSIGN_DECLARATION:
       const unassignIndex = state.declarations.findIndex(
