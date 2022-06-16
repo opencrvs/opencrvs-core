@@ -440,12 +440,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onDeleteDeclaration = (declaration: IDeclaration) => {
-    this.props.goToHomeTab(WORKQUEUE_TABS.inProgress)
-
-    setTimeout(
-      () => this.props.deleteDeclaration(declaration),
-      PAGE_TRANSITIONS_ENTER_TIME + 200
-    )
+    this.props.deleteDeclaration(declaration)
   }
 
   onCloseDeclaration = () => {
