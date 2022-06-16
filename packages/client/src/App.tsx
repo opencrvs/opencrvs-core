@@ -19,7 +19,6 @@ import { SessionExpireConfirmation } from '@client/components/SessionExpireConfi
 import { StyledErrorBoundary } from '@client/components/StyledErrorBoundary'
 import TransitionWrapper from '@client/components/TransitionWrapper'
 import { I18nContainer } from '@client/i18n/components/I18nContainer'
-import { getDefaultLanguage } from '@client/i18n/utils'
 import * as routes from '@client/navigation/routes'
 import styled, {
   createGlobalStyle,
@@ -94,7 +93,7 @@ export class App extends React.Component<IAppProps> {
         >
           <Provider store={this.props.store}>
             <I18nContainer>
-              <ThemeProvider theme={getTheme(getDefaultLanguage())}>
+              <ThemeProvider theme={getTheme()}>
                 <StyledErrorBoundary>
                   <ConnectedRouter history={this.props.history}>
                     <ScrollToTop>

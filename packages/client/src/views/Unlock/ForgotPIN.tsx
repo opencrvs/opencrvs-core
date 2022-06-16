@@ -48,7 +48,6 @@ import {
 } from '@client/i18n/messages'
 import { userQueries } from '@client/user/queries'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { getDefaultLanguage } from '@client/i18n/utils'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { AvatarLarge } from '@client/components/Avatar'
 import { getUserName } from '@client/utils/userUtils'
@@ -237,7 +236,7 @@ export function ForgotPIN(props: IForgotPINProps) {
           <SpinnerContainer>
             <Spinner
               id="verifying_password_spinner"
-              baseColor={getTheme(getDefaultLanguage()).colors.white}
+              baseColor={getTheme().colors.white}
             />
           </SpinnerContainer>
         ) : (

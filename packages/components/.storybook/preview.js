@@ -11,7 +11,13 @@
  */
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
 import { getTheme } from '../src/components/theme'
+import WebFont from 'webfontloader'
 
+WebFont.load({
+  google: {
+    families: ['Noto+Sans:600', 'Noto+Sans:400']
+  }
+})
 const language = process.env.REACT_APP_LANGUAGE
   ? process.env.REACT_APP_LANGUAGE
   : 'en'
@@ -37,17 +43,10 @@ body,
 
   @font-face {
     /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
-    src: url('/fonts/notosans-semibold-webfont-en.ttf') format('truetype');
-  }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.regularFont};
-    src: url('/fonts/notosans-regular-webfont-en.ttf') format('truetype');
+    font-family: "Noto Sans";
   }
   *:not(i) {
-    font-family: ${({ theme }) => theme.fonts.regularFont};
+    font-family: "Noto Sans";
   }
 }
 body,

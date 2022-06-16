@@ -15,9 +15,6 @@ import { RouteComponentProps } from 'react-router'
 import { IPage } from '@login/common/Page'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { getTheme } from '@opencrvs/components/lib/theme'
-import { getDefaultLanguage } from '@login/i18n/utils'
-import zambiaBackground from './background-zmb.jpg'
-const languageFromProps = ({ language }: IPage) => language
 
 const StyledPage = styled.div<IPage>`
   ${({ theme }) => theme.gradients.primary};
@@ -43,28 +40,12 @@ const StyledPage = styled.div<IPage>`
 
   @font-face {
     /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
-    src: url('/fonts/notosans-semibold-webfont-en.ttf') format('truetype');
+    font-family: 'Noto Sans';
   }
 
   @font-face {
     /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.regularFont};
-    src: url('/fonts/notosans-regular-webfont-en.ttf') format('truetype');
-  }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
-    src: url('/fonts/notosans-semibold-webfont-${languageFromProps}.ttf')
-      format('truetype');
-  }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.regularFont};
-    src: url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
-      format('truetype');
+    font-family: 'Noto Sans';
   }
 `
 
@@ -77,7 +58,7 @@ export class DarkPage extends React.Component<IPage & RouteComponentProps<{}>> {
           {submitting ? (
             <Spinner
               id="login-submitting-spinner"
-              baseColor={getTheme(getDefaultLanguage()).colors.white}
+              baseColor={getTheme().colors.white}
             />
           ) : (
             children

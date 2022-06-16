@@ -13,7 +13,6 @@ import { App } from '@client/App'
 import { Event } from '@client/forms'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
-import { getDefaultLanguage } from '@client/i18n/utils'
 import { offlineDataReady, setOfflineData } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
 import { ThemeProvider } from '@client/styledComponents'
@@ -1954,7 +1953,7 @@ export async function createTestComponent(
       <Provider store={store}>
         <ConnectedRouter noInitialPop={true} history={history}>
           <I18nContainer>
-            <ThemeProvider theme={getTheme(getDefaultLanguage())}>
+            <ThemeProvider theme={getTheme()}>
               <node.type {...node.props} {...props} />
             </ThemeProvider>
           </I18nContainer>
