@@ -47,6 +47,7 @@ import {
   IOnlineStatusProps
 } from '@client/views/OfficeHome/LoadingIndicator'
 import ReactTooltip from 'react-tooltip'
+import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -54,6 +55,7 @@ interface IDownloadConfig {
   compositionId: string
   action: Action
   assignment?: GQLAssignmentData
+  refetchQueries?: RefetchQueryDescription
 }
 
 interface DownloadButtonProps {
@@ -254,7 +256,7 @@ function DownloadButtonComponent(
                 download()
                 hideModal()
               },
-              onUnassign: async () => {
+              onUnassign: () => {
                 unassign()
                 hideModal()
               },
@@ -346,7 +348,10 @@ const mapStateToProps = (state: IStoreState): IConnectProps => ({
   userId: state.profile.userDetails?.userMgntUserID
 })
 
-const mapDispatchToProps = (dispatch: Dispatch): IDispatchProps => ({
+const mapDispatchToProps = (
+  dispatch: Dispatch,
+  ownProps: DownloadButtonProps
+): IDispatchProps => ({
   downloadDeclaration: (
     event: Event,
     compositionId: string,
@@ -354,7 +359,9 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchProps => ({
     client: ApolloClient<any>
   ) => dispatch(downloadDeclaration(event, compositionId, action, client)),
   unassignDeclaration: (id: string, client: ApolloClient<any>) =>
-    dispatch(unassignDeclaration(id, client))
+    dispatch(
+      unassignDeclaration(id, client, ownProps.downloadConfigs.refetchQueries)
+    )
 })
 
 export const DownloadButton = connect(
