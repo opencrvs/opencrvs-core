@@ -17,7 +17,7 @@ import { ISerializedFormSectionGroup } from '@client/forms'
 import { PlaceholderPreviewGroups } from '@client/forms/configuration/default'
 
 export type IPreviewGroupConfigField = {
-  fieldId: string //event.sectionid.groupId.previewGroupId
+  fieldId: string //[event].[sectionId].previewGroup.[previewGroupId]
   previewGroup: string
   previewGroupLabel: MessageDescriptor
   configFields: IDefaultConfigField[]
@@ -65,7 +65,7 @@ export function getPreviewGroupLabel(
   group: ISerializedFormSectionGroup,
   previewGroupId: string
 ) {
-  const previewGroup = group.previewGroups!.find(
+  const previewGroup = group.previewGroups?.find(
     ({ id }) => id === previewGroupId
   )
   if (!previewGroup) {
