@@ -32,3 +32,7 @@ export const getsubmitting = (store: IStoreState): LoginState['submitting'] =>
 export function selectCountryLogo(store: IStoreState) {
   return getKey(store, 'config').COUNTRY_LOGO?.file
 }
+
+export function selectApplicationName(store: IStoreState) {
+  return getKey(store, 'config').APPLICATION_NAME
+}

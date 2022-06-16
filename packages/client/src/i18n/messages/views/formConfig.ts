@@ -215,13 +215,13 @@ const messagesToDefine: IFormConfigMessages = {
   previewDescription: {
     id: 'config.form.preview.description',
     defaultMessage:
-      'These versions are available to review and test. Log in using the test users acounts for a  Field Agent, Registration Agent or Registrar to test your declaration form.',
+      'These versions are available to review and test. Log in using the test users accounts for a  Field Agent, Registration Agent or Registrar to test your declaration form.',
     description: 'Description for preview tab'
   },
   publishedDescription: {
     id: 'config.form.published.description',
     defaultMessage:
-      'Your pulished declaration forms will appear here. Once your configuration is published you will no longer be able to make changes.',
+      'Your published declaration forms will appear here. Once your configuration is published you will no longer be able to make changes.',
     description: 'Description for published tab'
   },
   publishedWarning: {

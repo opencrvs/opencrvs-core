@@ -22,7 +22,11 @@ import {
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { Event, CorrectionSection } from '@client/forms'
-import { IDeclaration, storeDeclaration } from '@client/declarations'
+import {
+  IDeclaration,
+  storeDeclaration,
+  DOWNLOAD_STATUS
+} from '@client/declarations'
 import { CorrectionForm } from './CorrectionForm'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
@@ -86,7 +90,7 @@ const deathDeclaration: IDeclaration = {
   review: true,
   event: Event.DEATH,
   registrationStatus: 'REGISTERED',
-  downloadStatus: 'DOWNLOADED',
+  downloadStatus: DOWNLOAD_STATUS.DOWNLOADED,
   modifiedOn: 1644490181166,
   visitedGroupIds: [
     {
@@ -145,7 +149,7 @@ const birthDeclaration: IDeclaration = {
   review: true,
   event: Event.BIRTH,
   registrationStatus: 'REGISTERED',
-  downloadStatus: 'DOWNLOADED',
+  downloadStatus: DOWNLOAD_STATUS.DOWNLOADED,
   modifiedOn: 1644407705186,
   visitedGroupIds: [
     {

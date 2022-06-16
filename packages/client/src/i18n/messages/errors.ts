@@ -32,6 +32,7 @@ interface IErrorMessages
   waitingForConnection: MessageDescriptor
   pageLoadFailed: MessageDescriptor
   passwordSubmissionError: MessageDescriptor
+  userListError: MessageDescriptor
 }
 
 const messagesToDefine: IErrorMessages = {
@@ -133,6 +134,11 @@ const messagesToDefine: IErrorMessages = {
     defaultMessage: 'The password you entered was incorrect',
     description: 'Error message when password verification fails',
     id: 'error.passwordSubmissionError'
+  },
+  userListError: {
+    defaultMessage: 'Failed to load users',
+    description: 'Error message when user list loads fails',
+    id: 'error.userListError'
   }
 }
 

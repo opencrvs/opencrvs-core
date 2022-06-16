@@ -74,6 +74,7 @@ const dummyUser = {
   creationDate: 1559054406433,
   auditHistory: []
 }
+
 describe('getUser tests', () => {
   beforeEach(() => {
     mockingoose.resetAll()

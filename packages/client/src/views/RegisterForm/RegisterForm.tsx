@@ -38,7 +38,8 @@ import {
   IPayload,
   modifyDeclaration,
   SUBMISSION_STATUS,
-  writeDeclaration
+  writeDeclaration,
+  DOWNLOAD_STATUS
 } from '@client/declarations'
 import {
   FormFieldGenerator,
@@ -364,7 +365,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
     submissionStatus: string,
     action: string,
     payload?: IPayload,
-    downloadStatus?: string
+    downloadStatus?: DOWNLOAD_STATUS
   ) => {
     const updatedDeclaration = {
       ...declaration,

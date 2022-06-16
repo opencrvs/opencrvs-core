@@ -55,6 +55,8 @@ export const createClient = (store: Store<IStoreState, AnyAction>) => {
         error.graphQLErrors[0].extensions.code === 'UNAUTHENTICATED')
     ) {
       store.dispatch(showSessionExpireConfirmation())
+    } else if (error.graphQLErrors?.[0]?.extensions?.code === 'UNASSIGNED') {
+      return error.forward(error.operation)
     } else {
       Sentry.captureException(error)
     }

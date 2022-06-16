@@ -184,6 +184,7 @@ type Mutation {
     id: ID!
     details: DeathRegistrationInput!
   ): ID!
+  markEventAsUnassigned(id: String!): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -1263,6 +1264,7 @@ type RegistrationSearchSet {
   duplicates: [ID]
   createdAt: String
   modifiedAt: String
+  assignment: AssignmentData
 }
 
 type BirthEventSearchSet implements EventSearchSet {
@@ -1405,6 +1407,13 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+}
+
+type AssignmentData {
+  userId: String
+  firstName: String
+  lastName: String
+  officeName: String
 }
 
 input CommentInput {

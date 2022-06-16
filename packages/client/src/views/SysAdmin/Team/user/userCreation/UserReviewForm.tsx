@@ -288,21 +288,12 @@ class UserReviewFormComponent extends React.Component<
       <ActionPageLight
         title={title}
         goBack={this.props.goBack}
-        goHome={() => {
-          if (locationDetails) {
-            goToTeamUserList({
-              id: locationDetails.id,
-              searchableText: locationDetails.name,
-              displayLabel: locationDetails.name
-            })
-          } else if (userDetails?.primaryOffice?.id) {
-            goToTeamUserList({
-              id: userDetails.primaryOffice.id,
-              searchableText: '',
-              displayLabel: ''
-            })
-          }
-        }}
+        goHome={() =>
+          locationDetails
+            ? goToTeamUserList(locationDetails.id)
+            : userDetails?.primaryOffice?.id &&
+              goToTeamUserList(userDetails.primaryOffice.id)
+        }
       >
         {!this.props.userId && (
           <FormTitle id={`${section.id}_title`}>
@@ -347,8 +338,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
       fieldName?: string
     ) => dispatch(goToUserReviewForm(userId, sec, group, fieldName)),
     goBack: () => dispatch(goBack()),
-    goToTeamUserList: (selectedLocation: ISearchLocation) =>
-      dispatch(goToTeamUserList(selectedLocation)),
+    goToTeamUserList,
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
     submitForm: (userFormSection: IFormSection) => {
       const variables = draftToGqlTransformer(
