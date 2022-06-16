@@ -79,7 +79,8 @@ import {
   RADIO_GROUP_WITH_NESTED_FIELDS,
   Ii18nRadioGroupWithNestedFieldsFormField,
   LOCATION_SEARCH_INPUT,
-  Ii18nTextareaFormField
+  Ii18nTextareaFormField,
+  TEXT
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -584,6 +585,10 @@ const mapFieldsToValues = (
   fields.reduce((memo, field) => {
     let fieldInitialValue = field.initialValue as IFormFieldValue
 
+    if (field.type === TEXT && field.dynamicOptions) {
+      fieldInitialValue = field.initialValue as IFormFieldValue
+    }
+
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
       const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
 
@@ -734,13 +739,15 @@ class FormSectionComponent extends React.Component<Props> {
 
   resetDependentSelectValues = (fieldName: string) => {
     const fields = this.props.fields
-    const fieldToReset = fields.find(
+    const fieldsToReset = fields.filter(
       (field) =>
-        field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-        field.dynamicOptions.dependency === fieldName
+        (field.type === SELECT_WITH_DYNAMIC_OPTIONS || field.type === TEXT) &&
+        field?.dynamicOptions?.dependency === fieldName
     )
-    if (fieldToReset) {
-      this.props.setFieldValue(fieldToReset.name, '')
+    if (fieldsToReset.length) {
+      fieldsToReset.forEach((fieldToReset) => {
+        this.props.setFieldValue(fieldToReset.name, '')
+      })
     }
   }
 
