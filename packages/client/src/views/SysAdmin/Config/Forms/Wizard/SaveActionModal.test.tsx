@@ -12,11 +12,8 @@
 import React from 'react'
 import { MockedResponse } from 'react-apollo/test-links'
 import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
-import {
-  DraftStatus,
-  IFormDraft
-} from '@client/forms/configuration/formDrafts/utils'
-import { Event } from '@client/forms'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import { SaveActionContext, SaveActionModal } from './SaveActionModal'
 import { AppStore, createStore } from '@client/store'
 import { History } from 'history'
@@ -26,8 +23,8 @@ import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import routeData from 'react-router'
 
 const draft: IFormDraft = {
-  event: Event.BIRTH,
-  status: DraftStatus.DRAFT,
+  event: Event.Birth,
+  status: DraftStatus.Draft,
   version: 1,
   history: [],
   updatedAt: Date.now(),
@@ -39,16 +36,11 @@ const graphqlMocks: MockedResponse[] = [
     request: {
       query: CREATE_FORM_DRAFT,
       variables: {
-        event: Event.BIRTH,
+        event: Event.Birth,
         comment: 'No comment',
         questions: [
           {
             fieldId: 'birth.child.child-view-group.vaccination',
-            fieldName: 'vaccination',
-            preceedingFieldId: 'birth.child.child-view-group.attendantAtBirth',
-            required: false,
-            enabled: '',
-            custom: true,
             label: [
               {
                 lang: 'en',
@@ -70,16 +62,6 @@ const graphqlMocks: MockedResponse[] = [
                 }
               }
             ],
-            tooltip: [
-              {
-                lang: 'en',
-                descriptor: {
-                  defaultMessage: 'Enter the Vaccine name',
-                  description: 'Tooltip for form field: vaccination question',
-                  id: 'form.field.label.vaccinationTooltip'
-                }
-              }
-            ],
             description: [
               {
                 lang: 'en',
@@ -90,7 +72,34 @@ const graphqlMocks: MockedResponse[] = [
                 }
               }
             ],
-            fieldType: 'TEXT'
+            tooltip: [
+              {
+                lang: 'en',
+                descriptor: {
+                  defaultMessage: 'Enter the Vaccine name',
+                  description: 'Tooltip for form field: vaccination question',
+                  id: 'form.field.label.vaccinationTooltip'
+                }
+              }
+            ],
+            errorMessage: [
+              {
+                lang: 'en',
+                descriptor: {
+                  defaultMessage: 'Please enter the valid vaccine name',
+                  description:
+                    'Error Message for form field: vaccination question',
+                  id: 'form.field.label.vaccinationErrorMessage'
+                }
+              }
+            ],
+            maxLength: 32,
+            fieldName: 'vaccination',
+            fieldType: 'TEXT',
+            precedingFieldId: 'birth.child.child-view-group.attendantAtBirth',
+            required: false,
+            enabled: '',
+            custom: true
           }
         ]
       }
@@ -119,7 +128,7 @@ describe('SaveActionModal', () => {
   let history: History
 
   beforeEach(async () => {
-    jest.spyOn(routeData, 'useParams').mockReturnValue({ event: Event.BIRTH })
+    jest.spyOn(routeData, 'useParams').mockReturnValue({ event: Event.Birth })
     ;({ store, history } = createStore())
     component = await createTestComponent(<WrappedSaveActionModal />, {
       store,

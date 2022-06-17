@@ -16,7 +16,7 @@ import {
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
 import { formatTimeDuration } from '@client/DateUtils'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import {
   constantsMessages,
   dynamicConstantsMessages,

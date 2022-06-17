@@ -13,7 +13,7 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
 import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   OptionalData,
@@ -147,7 +147,7 @@ function getPDFTemplateWithSVG(
   intl: IntlShape
 ): IPDFTemplate {
   let svgTemplate
-  if (declaration.event === Event.BIRTH) {
+  if (declaration.event === Event.Birth) {
     svgTemplate = offlineResource.templates.certificates!.birth.definition
   } else {
     svgTemplate = offlineResource.templates.certificates!.death.definition

@@ -19,7 +19,7 @@ import {
   GET_DEATH_REGISTRATION_FOR_REVIEW
 } from '@client/views/DataProvider/death/queries'
 import { createReviewDeclaration } from '@opencrvs/client/src/declarations'
-import { Event } from '@opencrvs/client/src/forms'
+import { Event } from '@client/utils/gateway'
 import { v4 as uuid } from 'uuid'
 
 export const birthDeclarationForReview = {

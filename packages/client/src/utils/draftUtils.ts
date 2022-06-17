@@ -10,12 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
-import {
-  BirthSection,
-  DeathSection,
-  Event,
-  IFormSectionData
-} from '@client/forms'
+import { BirthSection, DeathSection, IFormSectionData } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
@@ -73,9 +69,9 @@ export const getDraftInformantFullName = (
   language?: string
 ) => {
   switch (draft.event) {
-    case Event.BIRTH:
+    case Event.Birth:
       return getInformantFullName(draft.data.child, language)
-    case Event.DEATH:
+    case Event.Death:
       return getInformantFullName(draft.data.deceased, language)
   }
 }
@@ -173,11 +169,11 @@ export const transformSearchQueryDataToDraft = (
     data.registration?.createdAt && data.registration.createdAt
 
   switch (eventType) {
-    case Event.BIRTH:
+    case Event.Birth:
     default:
       transformBirthSearchQueryDataToDraft(data, declaration)
       break
-    case Event.DEATH:
+    case Event.Death:
       transformDeathSearchQueryDataToDraft(data, declaration)
       break
   }
@@ -187,9 +183,9 @@ export const transformSearchQueryDataToDraft = (
 
 export const getAttachmentSectionKey = (declarationEvent: Event): string => {
   switch (declarationEvent) {
-    case Event.DEATH:
+    case Event.Death:
       return DeathSection.DeathDocuments
-    case Event.BIRTH:
+    case Event.Birth:
     default:
       return BirthSection.Documents
   }

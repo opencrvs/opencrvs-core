@@ -10,13 +10,13 @@
 
 input MesssageDescriptorInput {
   id: String!
-  description: String!
+  description: String
   defaultMessage: String!
 }
 
 type MesssageDescriptor {
   id: String!
-  description: String!
+  description: String
   defaultMessage: String!
 }
 
@@ -30,26 +30,16 @@ input MesssageInput {
   descriptor: MesssageDescriptorInput!
 }
 
-type Question {
-  _id: ID!
-  fieldId: String!
-  label: [Messsage!]
-  placeholder: [Messsage!]
-  description: [Messsage!]
-  tooltip: [Messsage!]
-  errorMessage: [Messsage!]
-  maxLength: Int
-  fieldName: String
-  fieldType: String
-  preceedingFieldId: String
-  required: Boolean
-  enabled: String
-  custom: Boolean
-  initialValue: String
+enum CustomFieldType {
+  TEXT
+  TEL
+  TEXTAREA
+  NUMBER
+  SUBSECTION
+  PARAGRAPH
 }
 
 input QuestionInput {
-  id: ID
   fieldId: String!
   label: [MesssageInput!]
   placeholder: [MesssageInput!]
@@ -58,18 +48,9 @@ input QuestionInput {
   errorMessage: [MesssageInput!]
   maxLength: Int
   fieldName: String
-  fieldType: String
-  preceedingFieldId: String
+  fieldType: CustomFieldType
+  precedingFieldId: String!
   required: Boolean
   enabled: String
   custom: Boolean
-  initialValue: String
-}
-
-type Query {
-  getQuestions: [Question]
-}
-
-type Mutation {
-  createOrUpdateQuestion(question: QuestionInput!): Question
 }

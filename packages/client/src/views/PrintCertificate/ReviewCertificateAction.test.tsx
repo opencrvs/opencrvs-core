@@ -22,7 +22,8 @@ import {
 } from '@client/tests/util'
 import { ReviewCertificateAction } from './ReviewCertificateAction'
 import { ReactWrapper } from 'enzyme'
-import { Event, IFormSectionData } from '@client/forms'
+import { IFormSectionData } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { cloneDeep } from 'lodash'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { push } from 'connected-react-router'
@@ -37,7 +38,7 @@ describe('when user wants to review death certificate', () => {
       {
         matchParams: {
           registrationId: 'mockDeath1234',
-          eventType: Event.DEATH
+          eventType: Event.Death
         }
       }
     )
@@ -56,7 +57,7 @@ describe('when user wants to review death certificate', () => {
           }
         ]
       },
-      event: Event.DEATH
+      event: Event.Death
     }
     // @ts-ignore
     store.dispatch(storeDeclaration(deathDeclaration))
@@ -94,7 +95,7 @@ describe('back button behavior tests of review certificate action', () => {
       {
         matchParams: {
           registrationId: 'asdhdqe2472487jsdfsdf',
-          eventType: Event.BIRTH
+          eventType: Event.Birth
         }
       }
     )
@@ -115,7 +116,7 @@ describe('back button behavior tests of review certificate action', () => {
           }
         ]
       },
-      event: Event.BIRTH
+      event: Event.Birth
     }
     await store.dispatch(
       // @ts-ignore
@@ -141,7 +142,7 @@ describe('back button behavior tests of review certificate action', () => {
       {
         matchParams: {
           registrationId: 'asdhdqe2472487jsdfsdf',
-          eventType: Event.BIRTH
+          eventType: Event.Birth
         }
       }
     )
@@ -152,7 +153,7 @@ describe('back button behavior tests of review certificate action', () => {
       storeDeclaration({
         id: 'asdhdqe2472487jsdfsdf',
         data: mockBirthDeclarationData,
-        event: Event.BIRTH
+        event: Event.Birth
       } as IDeclaration)
     )
     component = await createTestComponent(
@@ -180,7 +181,7 @@ describe('when user wants to review birth certificate', () => {
       {
         matchParams: {
           registrationId: 'asdhdqe2472487jsdfsdf',
-          eventType: Event.BIRTH
+          eventType: Event.Birth
         }
       }
     )
@@ -206,7 +207,7 @@ describe('when user wants to review birth certificate', () => {
             }
           ] as unknown as IFormSectionData
         },
-        event: Event.BIRTH
+        event: Event.Birth
       })
     )
 

@@ -10,19 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  Event,
   IFormData,
+  TransformedData,
   IFormField,
   IFormFieldQueryMapFunction,
-  IQuestionnaireQuestion,
-  TransformedData
+  IQuestionnaireQuestion
 } from '@client/forms'
 import { REGISTRATION_SECTION } from '@client/forms/mappings/query'
 import { userMessages } from '@client/i18n/messages'
 import { IOfflineData } from '@client/offline/reducer'
 import { getUserName } from '@client/pdfRenderer/transformer/userTransformer'
 import format from '@client/utils/date-formatting'
-import { History, RegStatus } from '@client/utils/gateway'
+import { Event, History, RegStatus } from '@client/utils/gateway'
 import { IUserDetails } from '@client/utils/userUtils'
 import {
   GQLRegStatus,
@@ -98,7 +97,7 @@ export function getBirthRegistrationSectionTransformer(
   }
 
   if (queryData[sectionId].type && queryData[sectionId].type === 'BIRTH') {
-    transformedData[sectionId].type = Event.BIRTH
+    transformedData[sectionId].type = Event.Birth
   }
 
   if (queryData[sectionId].status) {

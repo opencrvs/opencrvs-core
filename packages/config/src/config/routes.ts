@@ -37,10 +37,14 @@ import {
 } from '@config/handlers/formDraft/createFormDraft/handler'
 import {
   modifyDraftStatusHandler,
-  requestSchema as modifyFormDraftStatus
+  requestSchema as modifyFormDraftReqSchema
 } from '@config/handlers/formDraft/updateFormDraft/handler'
 
-import getFormDrafts from '@config/handlers/formDraft/getFormDraft/handler'
+import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
+import {
+  deleteFormDraftHandler,
+  requestSchema as deleteFormDraftReqSchema
+} from '@config/handlers/formDraft/deleteFormDraft/handler'
 
 export const enum RouteScope {
   DECLARE = 'declare',
@@ -204,7 +208,7 @@ export default function getRoutes() {
     },
     {
       method: 'PUT',
-      path: '/formDraftStatus',
+      path: '/formDraft',
       handler: modifyDraftStatusHandler,
       config: {
         tags: ['api'],
@@ -213,17 +217,32 @@ export default function getRoutes() {
           scope: [RouteScope.NATLSYSADMIN]
         },
         validate: {
-          payload: modifyFormDraftStatus
+          payload: modifyFormDraftReqSchema
         }
       }
     },
     {
-      method: 'PUT',
-      path: '/draftQuestions',
+      method: 'DELETE',
+      path: '/formDraft',
+      handler: deleteFormDraftHandler,
+      config: {
+        tags: ['api'],
+        description: 'Delete form draft',
+        auth: {
+          scope: [RouteScope.NATLSYSADMIN]
+        },
+        validate: {
+          payload: deleteFormDraftReqSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/formDraft',
       handler: createFormDraftHandler,
       config: {
         tags: ['api'],
-        description: 'Update form draft & questions',
+        description: 'Create form draft & update questions',
         auth: {
           scope: [RouteScope.NATLSYSADMIN]
         },

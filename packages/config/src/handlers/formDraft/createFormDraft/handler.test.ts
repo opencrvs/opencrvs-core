@@ -78,7 +78,7 @@ const mockQuestion = [
     maxLength: 32,
     fieldName: 'myField',
     fieldType: 'TEXT',
-    preceedingFieldId: 'myPreviousFieldId',
+    precedingFieldId: 'myPreviousFieldId',
     required: true,
     enabled: true,
     custom: true,
@@ -100,8 +100,8 @@ describe('createFormDraftHandler test', () => {
     mockingoose(Question).toReturn(deathMockFormDraft, 'create')
 
     const res = await server.server.inject({
-      method: 'PUT',
-      url: '/draftQuestions',
+      method: 'POST',
+      url: '/formDraft',
       payload: {
         event: 'birth',
         comment: 'Modified question',
@@ -122,8 +122,8 @@ describe('createFormDraftHandler test', () => {
     mockingoose(Question).toReturn(mockQuestion, 'findOneAndRemove')
 
     const res = await server.server.inject({
-      method: 'PUT',
-      url: '/draftQuestions',
+      method: 'POST',
+      url: '/formDraft',
       payload: {
         event: 'birth',
         comment: 'Modified question',
@@ -144,8 +144,8 @@ describe('createFormDraftHandler test', () => {
     mockingoose(Question).toReturn(mockQuestion, 'findOneAndRemove')
 
     const res = await server.server.inject({
-      method: 'PUT',
-      url: '/draftQuestions',
+      method: 'POST',
+      url: '/formDraft',
       payload: {
         event: 'birth',
         comment: 'Modified question',
@@ -164,17 +164,17 @@ describe('createFormDraftHandler test', () => {
     mockingoose(Question).toReturn(mockQuestion, 'updateOne')
     mockingoose(FormDraft).toReturn(birthMockFormDraft, 'updateOne')
     const res = await server.server.inject({
-      method: 'PUT',
-      url: '/draftQuestions',
+      method: 'POST',
+      url: '/formDraft',
       payload: {
         questions: [
           {
             fieldId: 'birth.covid.fieldId',
-            fieldName: 'Does take covid vaccine?'
+            precedingFieldId: 'birth.some.field'
           },
           {
             fieldId: 'birth.myField',
-            fieldName: 'myNewField'
+            precedingFieldId: 'birth.some.other.field'
           }
         ],
         event: 'birth',
@@ -194,8 +194,8 @@ describe('createFormDraftHandler test', () => {
     mockingoose(Question).toReturn(mockQuestion, 'updateOne')
     mockingoose(Question).toReturn(new Error('boom'), 'deleteMany')
     const res = await server.server.inject({
-      method: 'PUT',
-      url: '/draftQuestions',
+      method: 'POST',
+      url: '/formDraft',
       payload: {
         event: 'birth',
         questions: [
@@ -218,8 +218,8 @@ describe('createFormDraftHandler test', () => {
     mockingoose(FormDraft).toReturn(new Error('boom'), 'updateOne')
     mockingoose(Question).toReturn(mockQuestion, 'findOne')
     const res = await server.server.inject({
-      method: 'PUT',
-      url: '/draftQuestions',
+      method: 'POST',
+      url: '/formDraft',
       payload: {
         event: 'death',
         comment: 'Modified question',

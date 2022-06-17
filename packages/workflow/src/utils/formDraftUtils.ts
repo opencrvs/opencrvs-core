@@ -17,8 +17,7 @@ import { setupTestExtension } from '@workflow/features/registration/fhir/fhir-bu
 export enum DraftStatus {
   DRAFT = 'DRAFT',
   IN_PREVIEW = 'IN_PREVIEW',
-  PUBLISHED = 'PUBLISHED',
-  DELETED = 'DELETED'
+  PUBLISHED = 'PUBLISHED'
 }
 
 export interface IDraft {

@@ -11,7 +11,6 @@
  */
 import { ValidationInitializer } from '@client/utils/validate'
 import { MessageDescriptor } from 'react-intl'
-import { Message } from 'typescript-react-intl'
 import {
   ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
@@ -36,6 +35,7 @@ import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { IQuestionConfig } from './questionConfig'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -64,11 +64,6 @@ export const DYNAMIC_LIST = 'DYNAMIC_LIST'
 export const FETCH_BUTTON = 'FETCH_BUTTON'
 export const LOCATION_SEARCH_INPUT = 'LOCATION_SEARCH_INPUT'
 
-export enum Event {
-  BIRTH = 'birth',
-  DEATH = 'death'
-}
-
 export enum Sort {
   ASC = 'asc',
   DESC = 'desc'
@@ -86,42 +81,6 @@ export enum Action {
   ARCHIVE_DECLARATION = 'archive',
   LOAD_REQUESTED_CORRECTION_DECLARATION = 'load declaration data for which is requested correction',
   REQUEST_CORRECTION_DECLARATION = 'request correction'
-}
-
-export enum QuestionConfigFieldType {
-  TEXT = 'TEXT',
-  TEXTAREA = 'TEXTAREA',
-  NUMBER = 'NUMBER',
-  TEL = 'TEL',
-  PARAGRAPH = 'PARAGRAPH',
-  SUBSECTION = 'SUBSECTION'
-}
-
-export interface IIdentifiers {
-  event: string
-  sectionId: string
-  groupId: string
-  fieldName: string
-}
-export interface IMessage {
-  lang: string
-  descriptor: Message
-}
-export interface IQuestionConfig {
-  fieldId: string
-  label?: IMessage[]
-  placeholder?: IMessage[]
-  description?: IMessage[]
-  tooltip?: IMessage[]
-  errorMessage?: IMessage[]
-  maxLength?: number
-  fieldName?: string
-  fieldType?: QuestionConfigFieldType
-  preceedingFieldId?: string
-  required?: boolean
-  enabled: string
-  custom?: boolean
-  initialValue?: string
 }
 
 export interface IFormConfig {

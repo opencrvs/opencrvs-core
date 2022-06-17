@@ -19,7 +19,7 @@ import * as Joi from 'joi'
 import { merge, pick } from 'lodash'
 import { getActiveCertificatesHandler } from '@config/handlers/certificate/certificateHandler'
 import getQuestionsHandler from '@config/handlers/question/getQuestions/handler'
-import getFormDrafts from '@config/handlers/formDraft/getFormDraft/handler'
+import getFormDrafts from '@config/handlers/formDraft/getFormDrafts/handler'
 
 export default async function configHandler(
   request: Hapi.Request,

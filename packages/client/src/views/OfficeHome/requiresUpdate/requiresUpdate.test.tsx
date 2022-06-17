@@ -14,7 +14,8 @@ import {
   makeDeclarationReadyToDownload,
   storeDeclaration
 } from '@client/declarations'
-import { Action, Event } from '@client/forms'
+import { Action } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
@@ -33,7 +34,6 @@ import { GridTable } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { Store } from 'redux'
 import { RequiresUpdate } from './RequiresUpdate'
 import {
   GQLBirthEventSearchSet,
@@ -605,7 +605,7 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     it('shows error when download is failed', async () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
-        Event.DEATH,
+        Event.Death,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
         Action.LOAD_REVIEW_DECLARATION
       )

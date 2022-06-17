@@ -1,5 +1,5 @@
 import { ICertificateCorrectorDefinition } from '@client/views/CorrectionForm/VerifyCorrector'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -69,4 +69,4 @@ const verifyDeathCorrector: ICertificateCorrectorDefinition = {
 }
 
 export const getVerifyCorrectorDefinition = (event: Event) =>
-  event === Event.BIRTH ? verifyBirthCorrector : verifyDeathCorrector
+  event === Event.Birth ? verifyBirthCorrector : verifyDeathCorrector
