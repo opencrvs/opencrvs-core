@@ -46,7 +46,7 @@ const Container = styled.div<{ hideBackground: boolean | undefined }>`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
     margin: 0;
-    padding: 0;
+    ${({ hideBackground }) => hideBackground && `padding 0;`}
     min-height: 100vh;
   }
 `

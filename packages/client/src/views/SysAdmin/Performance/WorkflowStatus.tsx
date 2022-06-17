@@ -673,7 +673,11 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
   }
 
   return (
-    <SysAdminContentWrapper id="workflow-status" isCertificatesConfigPage>
+    <SysAdminContentWrapper
+      id="workflow-status"
+      isCertificatesConfigPage
+      hideBackground={true}
+    >
       <Content
         title={intl.formatMessage(messages.registrationByStatus)}
         size={ContentSize.LARGE}
