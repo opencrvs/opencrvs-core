@@ -842,6 +842,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -911,6 +912,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -980,6 +982,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1049,6 +1052,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1118,6 +1122,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1187,6 +1192,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1256,6 +1262,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: true,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1309,6 +1316,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: true,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1362,6 +1370,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1415,6 +1424,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1468,6 +1478,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1521,6 +1532,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1574,6 +1586,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1909,6 +1922,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtSecondary',
       conditionals: [
         {
           action: 'hide',
@@ -1978,6 +1992,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtSecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2047,6 +2062,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtSecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2116,6 +2132,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtSecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2185,6 +2202,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtSecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2254,6 +2272,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtSecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2323,6 +2342,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: true,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2376,6 +2396,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: true,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2429,6 +2450,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2482,6 +2504,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2535,6 +2558,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2588,6 +2612,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2641,6 +2666,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2952,6 +2978,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3005,6 +3032,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3058,6 +3086,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3111,6 +3140,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3164,6 +3194,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3217,6 +3248,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3270,6 +3302,7 @@ export function getPlaceOfEventAddressFields(
       required: true,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
@@ -3322,6 +3355,7 @@ export function getPlaceOfEventAddressFields(
       required: true,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
@@ -3374,6 +3408,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
@@ -3411,6 +3446,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
@@ -3448,6 +3484,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
@@ -3485,6 +3522,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
@@ -3522,6 +3560,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
