@@ -37,16 +37,6 @@ const StyledPage = styled.div<IPage>`
   *:after {
     box-sizing: border-box;
   }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: 'Noto Sans';
-  }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: 'Noto Sans';
-  }
 `
 
 export class DarkPage extends React.Component<IPage & RouteComponentProps<{}>> {

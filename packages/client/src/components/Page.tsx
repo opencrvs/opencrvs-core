@@ -52,16 +52,6 @@ const StyledPage = styled.div<IPageProps>`
   *:after {
     box-sizing: border-box;
   }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: 'Noto Sans';
-  }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: 'Noto Sans';
-  }
 `
 
 const StyledSpinner = styled(Spinner)`
