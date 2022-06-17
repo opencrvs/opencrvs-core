@@ -35,3 +35,4 @@ export const REDIS_HOST = process.env.REDIS_HOST || 'localhost'
 export const REDIS_PORT = parseInt(process.env.REDIS_PORT || '6379', 10)
 export const QUEUE_NAME = 'NOTIFY_URL'
 export const OPENCRVS_SPECIFICATION_URL = 'http://opencrvs.org/specs/'
+export const DEFAULT_TIMEOUT = 600000

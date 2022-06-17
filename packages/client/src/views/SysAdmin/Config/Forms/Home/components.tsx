@@ -14,7 +14,7 @@ import styled from '@client/styledComponents'
 import { useIntl } from 'react-intl'
 import { constantsMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/formConfig'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 
 const Label = styled.span`
   ${({ theme }) => theme.fonts.bold16};

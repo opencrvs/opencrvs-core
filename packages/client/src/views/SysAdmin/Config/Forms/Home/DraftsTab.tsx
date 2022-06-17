@@ -17,7 +17,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
-import { Event, BirthSection, DeathSection } from '@client/forms'
+import { BirthSection, DeathSection } from '@client/forms'
 import { useIntl } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
 import {
@@ -28,10 +28,8 @@ import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ToggleMenu, Pill } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { goToFormConfigWizard } from '@client/navigation'
-import {
-  DraftStatus,
-  IFormDraft
-} from '@client/forms/configuration/formDrafts/utils'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import { Value, DraftVersion } from './components'
 import {
   ActionStatus,
@@ -41,7 +39,7 @@ import { ActionContext, Actions } from './ActionsModal'
 import { FormConfigMobileViewModal } from './FormConfigMobileViewModal'
 import { isMobileDevice } from '@client/utils/commonUtils'
 
-function ActionButton({ event, status, version }: IFormDraft) {
+function ActionButton({ event, version }: IFormDraft) {
   const intl = useIntl()
   const dispatch = useDispatch()
   const [showMobileModal, setMobileModal] = React.useState(false)
@@ -56,7 +54,7 @@ function ActionButton({ event, status, version }: IFormDraft) {
             dispatch(
               goToFormConfigWizard(
                 event,
-                event === Event.BIRTH
+                event === Event.Birth
                   ? BirthSection.Child
                   : DeathSection.Deceased
               )
@@ -65,7 +63,7 @@ function ActionButton({ event, status, version }: IFormDraft) {
         }}
       >
         {intl.formatMessage(
-          isDefaultDraft({ version }) || status === DraftStatus.DELETED
+          isDefaultDraft({ version })
             ? buttonMessages.configure
             : buttonMessages.edit
         )}
@@ -121,9 +119,7 @@ function EventDrafts({ event }: { event: Event }) {
   const actions = (
     <>
       <ActionButton {...formDraft} />
-      {!isDefaultDraft(formDraft) && status !== DraftStatus.DELETED && (
-        <OptionsMenu event={event} />
-      )}
+      {!isDefaultDraft(formDraft) && <OptionsMenu event={event} />}
     </>
   )
 
@@ -140,19 +136,19 @@ function EventDrafts({ event }: { event: Event }) {
           </Value>
         }
         actions={
-          status === DraftStatus.DRAFT || status === DraftStatus.DELETED ? (
+          status === DraftStatus.Draft ? (
             actions
-          ) : status === DraftStatus.PREVIEW ? (
+          ) : status === DraftStatus.InPreview ? (
             <Pill
               label={intl.formatMessage(
-                draftStatusMessages[DraftStatus.PREVIEW]
+                draftStatusMessages[DraftStatus.InPreview]
               )}
               type="active"
             />
           ) : (
             <Pill
               label={intl.formatMessage(
-                draftStatusMessages[DraftStatus.PUBLISHED]
+                draftStatusMessages[DraftStatus.Published]
               )}
               type="active"
             />
@@ -175,8 +171,8 @@ function EventDrafts({ event }: { event: Event }) {
 export function DraftsTab() {
   return (
     <ListViewSimplified>
-      <EventDrafts event={Event.BIRTH} />
-      <EventDrafts event={Event.DEATH} />
+      <EventDrafts event={Event.Birth} />
+      <EventDrafts event={Event.Death} />
     </ListViewSimplified>
   )
 }

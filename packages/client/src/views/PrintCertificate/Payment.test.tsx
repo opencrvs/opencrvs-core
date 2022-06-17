@@ -19,7 +19,7 @@ import {
   mockUserResponse
 } from '@client/tests/util'
 import { storeDeclaration } from '@client/declarations'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { Payment } from './Payment'
 import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
 import { queries } from '@client/profile/queries'
@@ -44,7 +44,7 @@ describe('verify collector tests', () => {
         }
       ]
     },
-    event: Event.BIRTH
+    event: Event.Birth
   }
 
   const deathDeclaration = {
@@ -59,7 +59,7 @@ describe('verify collector tests', () => {
         }
       ]
     },
-    event: Event.DEATH
+    event: Event.Death
   }
 
   describe('in case of birth declaration', () => {
@@ -78,7 +78,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth1234',
-              eventType: Event.BIRTH
+              eventType: Event.Birth
             },
             isExact: true,
             path: '',
@@ -112,7 +112,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth1234',
-              eventType: Event.BIRTH
+              eventType: Event.Birth
             },
             isExact: true,
             path: '',
@@ -136,7 +136,7 @@ describe('verify collector tests', () => {
             match={{
               params: {
                 registrationId: 'mockBirth',
-                eventType: Event.BIRTH
+                eventType: Event.Birth
               },
               isExact: true,
               path: '',
@@ -163,7 +163,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockDeath1234',
-              eventType: Event.DEATH
+              eventType: Event.Death
             },
             isExact: true,
             path: '',

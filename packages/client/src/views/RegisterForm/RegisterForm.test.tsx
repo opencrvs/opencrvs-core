@@ -42,13 +42,11 @@ import {
   REGISTRAR_HOME
 } from '@opencrvs/client/src/navigation/routes'
 
-import { Event, IFormData } from '@opencrvs/client/src/forms'
+import { IFormData } from '@opencrvs/client/src/forms'
+import { Event } from '@client/utils/gateway'
 import { draftToGqlTransformer } from '@client/transformer'
 import { IForm } from '@client/forms'
 import { clone, cloneDeep } from 'lodash'
-import { FETCH_REGISTRATION } from '@opencrvs/client/src/forms/register/queries/registration'
-import { FETCH_PERSON_NID } from '@opencrvs/client/src/forms/register/queries/person'
-
 import { formMessages as messages } from '@client/i18n/messages'
 import * as profileSelectors from '@client/profile/profileSelectors'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -71,13 +69,13 @@ describe('when user is in the register form for birth event', () => {
       store = storeContext.store
       history = storeContext.history
 
-      const draft = createDeclaration(Event.BIRTH)
+      const draft = createDeclaration(Event.Birth)
       store.dispatch(storeDeclaration(draft))
       store.dispatch(setInitialDeclarations())
       store.dispatch(storeDeclaration(draft))
 
       const mock: any = jest.fn()
-      const form = await getRegisterFormFromStore(store, Event.BIRTH)
+      const form = await getRegisterFormFromStore(store, Event.Birth)
       const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
@@ -152,10 +150,10 @@ describe('when user is in the register form for death event', () => {
     store = testStore.store
     history = testStore.history
     const mock: any = jest.fn()
-    draft = createDeclaration(Event.DEATH)
+    draft = createDeclaration(Event.Death)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
-    form = await getRegisterFormFromStore(store, Event.DEATH)
+    form = await getRegisterFormFromStore(store, Event.Death)
   })
   describe('when user is in optional cause of death section', () => {
     beforeEach(async () => {
@@ -872,7 +870,7 @@ describe('when user is in the register form preview section', () => {
     store = storeContext.store
     history = storeContext.history
 
-    const draft = createDeclaration(Event.BIRTH)
+    const draft = createDeclaration(Event.Birth)
     draft.data = {
       child: { firstNamesEng: 'John', familyNameEng: 'Doe' },
       father: {
@@ -891,7 +889,7 @@ describe('when user is in the register form preview section', () => {
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
 
-    const form = await getRegisterFormFromStore(store, Event.BIRTH)
+    const form = await getRegisterFormFromStore(store, Event.Birth)
     const testComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
@@ -933,13 +931,13 @@ describe('when user is in the register form preview section', () => {
       const nDeclaration = createReviewDeclaration(
         uuid(),
         mockDeclarationData,
-        Event.BIRTH
+        Event.Birth
       )
       nDeclaration.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
       store.dispatch(setInitialDeclarations())
       store.dispatch(storeDeclaration(nDeclaration))
 
-      const nform = getRegisterForm(store.getState())[Event.BIRTH]
+      const nform = getRegisterForm(store.getState())[Event.Birth]
       const nTestComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
@@ -998,14 +996,14 @@ describe('when user is in the register form review section', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       mockDeclarationData,
-      Event.BIRTH
+      Event.Birth
     )
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
     const mock: any = jest.fn()
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
-    const form = await getReviewFormFromStore(store, Event.BIRTH)
+    const form = await getReviewFormFromStore(store, Event.Birth)
 
     const testComponent = await createTestComponent(
       // @ts-ignore
@@ -1050,14 +1048,14 @@ describe('when user is in the register form from review edit', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       mockDeclarationData,
-      Event.BIRTH
+      Event.Birth
     )
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
     const mock: any = jest.fn()
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
-    const form = await getReviewFormFromStore(store, Event.BIRTH)
+    const form = await getReviewFormFromStore(store, Event.Birth)
 
     const testComponent = await createTestComponent(
       // @ts-ignore
@@ -1112,7 +1110,7 @@ describe('when user is in the register form from sent for review edit', () => {
     const declaration = createReviewDeclaration(
       uuid(),
       mockDeclarationData,
-      Event.BIRTH,
+      Event.Birth,
       DECLARED
     )
     store.dispatch(setInitialDeclarations())
@@ -1120,7 +1118,7 @@ describe('when user is in the register form from sent for review edit', () => {
     const mock: any = jest.fn()
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
-    const form = await getReviewFormFromStore(store, Event.BIRTH)
+    const form = await getReviewFormFromStore(store, Event.Birth)
 
     const testComponent = await createTestComponent(
       // @ts-ignore
@@ -1203,7 +1201,7 @@ describe('When user is in Preview section death event', () => {
     store = testStore.store
     history = testStore.history
 
-    const draft = createDeclaration(Event.DEATH)
+    const draft = createDeclaration(Event.Death)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
     jest.clearAllMocks()
@@ -1212,7 +1210,7 @@ describe('When user is in Preview section death event', () => {
       uuid(),
       // @ts-ignore
       mockDeathDeclarationData,
-      Event.DEATH
+      Event.Death
     )
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     store.dispatch(setInitialDeclarations())
@@ -1220,7 +1218,7 @@ describe('When user is in Preview section death event', () => {
 
     jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['declare'])
 
-    deathForm = await getRegisterFormFromStore(store, Event.DEATH)
+    deathForm = await getRegisterFormFromStore(store, Event.Death)
     const nTestComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm
@@ -1328,7 +1326,7 @@ describe('When user is in Preview section death event in offline mode', () => {
     history = testStore.history
     store = testStore.store
 
-    const draft = createDeclaration(Event.DEATH)
+    const draft = createDeclaration(Event.Death)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
 
@@ -1342,13 +1340,13 @@ describe('When user is in Preview section death event in offline mode', () => {
       uuid(),
       // @ts-ignore
       mockDeathDeclarationDataWithoutFirstNames,
-      Event.DEATH
+      Event.Death
     )
     deathDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(deathDraft))
 
-    deathForm = await getRegisterFormFromStore(store, Event.DEATH)
+    deathForm = await getRegisterFormFromStore(store, Event.Death)
     const nTestComponent = await createTestComponent(
       // @ts-ignore
       <RegisterForm

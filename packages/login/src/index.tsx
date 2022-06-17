@@ -18,6 +18,13 @@ import registerServiceWorker from '@login/registerServiceWorker'
 import { storage } from '@login/storage'
 import { createStore } from './store'
 import 'focus-visible/dist/focus-visible.js'
+import WebFont from 'webfontloader'
+
+WebFont.load({
+  google: {
+    families: ['Noto+Sans:600', 'Noto+Sans:400']
+  }
+})
 storage.configStorage('OpenCRVS')
 
 if (

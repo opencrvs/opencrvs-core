@@ -11,7 +11,7 @@
  */
 
 import { IStoreState } from '@client/store'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { ISectionFieldMap, IConfigFieldMap } from './utils'
 
 export function isFormConfigLoaded(store: IStoreState) {
@@ -24,11 +24,6 @@ export function selectFormConfigState(store: IStoreState) {
     throw new Error('Offline data not loaded yet')
   }
   return store.formConfig
-}
-
-export function selectConfigRegisterForm(store: IStoreState, event: Event) {
-  const formConfigState = selectFormConfigState(store)
-  return formConfigState[event].registerForm
 }
 
 export function selectConfigFields(
@@ -49,16 +44,6 @@ export function selectConfigFields(
     [event]: { configFields }
   } = selectFormConfigState(store)
   return section ? configFields[section] : configFields
-}
-
-export function selectConfigField(
-  store: IStoreState,
-  event: Event,
-  section: string,
-  fieldId: string | null
-) {
-  const configFields = selectConfigFields(store, event, section)
-  return fieldId && configFields ? configFields[fieldId] : null
 }
 
 export function selectFormDraft(store: IStoreState, event: Event) {

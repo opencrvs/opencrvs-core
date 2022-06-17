@@ -13,10 +13,6 @@ import * as React from 'react'
 import styled, { ThemeProvider } from 'styled-components'
 import { getTheme } from '../theme'
 
-const language = process.env.REACT_APP_LANGUAGE
-  ? process.env.REACT_APP_LANGUAGE
-  : 'en'
-
 const Wrapper = styled.div`
   * {
     box-sizing: border-box;
@@ -33,7 +29,7 @@ export class ThemeWrapper extends React.Component {
   render() {
     return (
       <Wrapper>
-        <ThemeProvider theme={getTheme(language)}>
+        <ThemeProvider theme={getTheme()}>
           {this.props.children as any}
         </ThemeProvider>
       </Wrapper>

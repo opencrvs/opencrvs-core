@@ -10,19 +10,20 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  IMessage,
   NUMBER,
   TEL,
   TEXT,
   TEXTAREA,
   BirthSection,
   DeathSection,
-  Event,
   IFormField
 } from '@client/forms'
+import { IMessage } from '@client/forms/questionConfig'
+import { Event } from '@client/utils/gateway'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import {
   getCertificateHandlebar,
+  getConfigFieldIdentifiers,
   ICustomConfigField
 } from '@client/forms/configuration/formConfig/utils'
 import { buttonMessages } from '@client/i18n/messages'
@@ -48,7 +49,6 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
 import { connect } from 'react-redux'
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
-import { getConfigFieldIdentifiers } from '@client/forms/configuration/formConfig/motionUtils'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
 import { Title, Label, RequiredToggleAction, ToolTip } from './components'
 import { messages } from '@client/i18n/messages/views/formConfig'
@@ -164,7 +164,6 @@ interface ICustomFieldState {
   isFieldDuplicate: boolean
   selectedLanguage: string
   handleBars: string
-  hideField: string
   maxLength: number
   fieldForms: IFieldForms
 }
@@ -211,7 +210,6 @@ class CustomFieldToolsComp extends React.Component<
         getCertificateHandlebar(formField) ||
         camelCase(fieldForms[defaultLanguage].label),
       selectedLanguage: defaultLanguage,
-      hideField: selectedField.enabled,
       maxLength: selectedField.maxLength ?? DEFAULT_MAX_LENGTH,
       fieldForms
     }
@@ -348,7 +346,6 @@ class CustomFieldToolsComp extends React.Component<
       description: optionalContent.description,
       errorMessage: optionalContent.errorMessage,
       fieldName: handleBars,
-      enabled: this.state.hideField,
       fieldId: newFieldID,
       /* We can't let maxlength be 0 as it doesn't make any sense */
       maxLength: this.state.maxLength || DEFAULT_MAX_LENGTH,

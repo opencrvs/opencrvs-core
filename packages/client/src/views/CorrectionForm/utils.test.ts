@@ -11,13 +11,13 @@
  */
 
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { isCorrection } from './utils'
 
 let declaration: IDeclaration = {
   id: '72c18939-70c1-40b4-9b80-b162c4871160',
   data: {},
-  event: Event.BIRTH
+  event: Event.Birth
 }
 
 describe('isCorrection()', () => {

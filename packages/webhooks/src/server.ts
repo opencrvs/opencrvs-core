@@ -16,7 +16,8 @@ import {
   PORT,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
-  AUTH_URL
+  AUTH_URL,
+  DEFAULT_TIMEOUT
 } from '@webhooks/constants'
 import getPlugins from '@webhooks/config/plugins'
 import * as database from '@webhooks/database'
@@ -33,7 +34,7 @@ export async function createServer() {
     port: PORT,
     routes: {
       cors: { origin: ['*'] },
-      payload: { maxBytes: 52428800 }
+      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
     }
   })
 

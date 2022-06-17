@@ -17,7 +17,7 @@ import {
   MessageDescriptor,
   injectIntl
 } from 'react-intl'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
 import { messages } from '@client/i18n/messages/views/eventInfo'
@@ -73,14 +73,14 @@ function EventInfoComponet(props: IFullProps) {
   function handleContinue() {
     let declaration: IDeclaration
     switch (eventType) {
-      case Event.BIRTH:
-        declaration = createDeclaration(Event.BIRTH)
+      case Event.Birth:
+        declaration = createDeclaration(Event.Birth)
         props.storeDeclaration(declaration)
         props.goToBirthInformant(declaration.id)
 
         break
-      case Event.DEATH:
-        declaration = createDeclaration(Event.DEATH)
+      case Event.Death:
+        declaration = createDeclaration(Event.Death)
         props.storeDeclaration(declaration)
         props.goToDeathInformant(declaration.id)
         break
@@ -89,13 +89,13 @@ function EventInfoComponet(props: IFullProps) {
     }
   }
   switch (eventType) {
-    case Event.BIRTH:
+    case Event.Birth:
       topBarTitle = constantsMessages.newBirthRegistration
       listItems = messages.birthBulletListItems.map((message) =>
         intl.formatMessage(message.index)
       )
       break
-    case Event.DEATH:
+    case Event.Death:
       topBarTitle = constantsMessages.newDeathRegistration
       listItems = messages.deathBulletListItems.map((message) =>
         intl.formatMessage(message.index)

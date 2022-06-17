@@ -163,7 +163,8 @@ export const mockFetchConfig = {
       svgDateUpdated: 1643292520393,
       svgDateCreated: 1640696804785
     }
-  ]
+  ],
+  formConfig: { questionConfig: [] }
 }
 
 const certificates = [

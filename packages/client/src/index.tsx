@@ -23,6 +23,14 @@ import * as LogRocket from 'logrocket'
 import { SubmissionController } from '@client/SubmissionController'
 import * as pdfjs from 'pdfjs-dist/build/pdf'
 import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry'
+import WebFont from 'webfontloader'
+
+WebFont.load({
+  google: {
+    families: ['Noto+Sans:600', 'Noto+Sans:400']
+  }
+})
+
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker
 
 storage.configStorage('OpenCRVS')

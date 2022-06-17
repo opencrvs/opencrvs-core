@@ -16,6 +16,7 @@ interface Window {
     COUNTRY_CONFIG_URL: string
     COUNTRY: string
     LANGUAGES: string
+    AVAILABLE_LANGUAGES_SELECT: string
     CLIENT_APP_URL: string
     PHONE_NUMBER_PATTERN: RegExp
     LOGROCKET: string

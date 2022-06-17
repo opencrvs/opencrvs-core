@@ -9,22 +9,22 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 
 export const HOME = '/'
 export const SELECT_VITAL_EVENT = '/events'
 
 export const EVENT_INFO = '/events/:eventType/info'
-export const SELECT_BIRTH_INFORMANT = `/drafts/:declarationId/events/${Event.BIRTH}/registration/informantType`
-export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:declarationId/events/${Event.BIRTH}`
-export const DRAFT_BIRTH_PARENT_FORM_PAGE = `/drafts/:declarationId/events/${Event.BIRTH}/:pageId`
-export const DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.BIRTH}/:pageId/group/:groupId`
-export const DRAFT_BIRTH_INFORMANT_FORM = `/events/${Event.BIRTH}/contact`
-export const DRAFT_BIRTH_PARENT_FORM_TAB = `/drafts/:declarationId/events/${Event.BIRTH}/parent/:tabId`
-export const SELECT_DEATH_INFORMANT = `/drafts/:declarationId/events/${Event.DEATH}/registration/informantType`
-export const DRAFT_DEATH_FORM = `/drafts/:declarationId/events/${Event.DEATH}`
-export const DRAFT_DEATH_FORM_PAGE = `/drafts/:declarationId/events/${Event.DEATH}/:pageId`
-export const DRAFT_DEATH_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.DEATH}/:pageId/group/:groupId`
+export const SELECT_BIRTH_INFORMANT = `/drafts/:declarationId/events/${Event.Birth}/registration/informantType`
+export const DRAFT_BIRTH_PARENT_FORM = `/drafts/:declarationId/events/${Event.Birth}`
+export const DRAFT_BIRTH_PARENT_FORM_PAGE = `/drafts/:declarationId/events/${Event.Birth}/:pageId`
+export const DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Birth}/:pageId/group/:groupId`
+export const DRAFT_BIRTH_INFORMANT_FORM = `/events/${Event.Birth}/contact`
+export const DRAFT_BIRTH_PARENT_FORM_TAB = `/drafts/:declarationId/events/${Event.Birth}/parent/:tabId`
+export const SELECT_DEATH_INFORMANT = `/drafts/:declarationId/events/${Event.Death}/registration/informantType`
+export const DRAFT_DEATH_FORM = `/drafts/:declarationId/events/${Event.Death}`
+export const DRAFT_DEATH_FORM_PAGE = `/drafts/:declarationId/events/${Event.Death}/:pageId`
+export const DRAFT_DEATH_FORM_PAGE_GROUP = `/drafts/:declarationId/events/${Event.Death}/:pageId/group/:groupId`
 
 export const REVIEW_EVENT_PARENT_FORM_PAGE =
   '/reviews/:declarationId/events/:event/parent/:pageId'

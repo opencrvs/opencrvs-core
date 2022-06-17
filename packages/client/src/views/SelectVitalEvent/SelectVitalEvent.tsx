@@ -17,7 +17,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import {
   goBack,
   goToHome,
@@ -98,13 +98,13 @@ class SelectVitalEventView extends React.Component<
       if (window.config.HIDE_EVENT_REGISTER_INFORMATION) {
         let declaration: IDeclaration
         switch (this.state.goTo as Event) {
-          case Event.BIRTH:
-            declaration = createDeclaration(Event.BIRTH)
+          case Event.Birth:
+            declaration = createDeclaration(Event.Birth)
             this.props.storeDeclaration(declaration)
             this.props.goToBirthInformant(declaration.id)
             break
-          case Event.DEATH:
-            declaration = createDeclaration(Event.DEATH)
+          case Event.Death:
+            declaration = createDeclaration(Event.Death)
             this.props.storeDeclaration(declaration)
             this.props.goToDeathInformant(declaration.id)
             break

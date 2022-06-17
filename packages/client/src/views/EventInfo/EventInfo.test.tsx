@@ -13,7 +13,7 @@ import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
 import { createTestStore, createTestComponent } from '@client/tests/util'
 import { EventInfo } from '@client/views/EventInfo/EventInfo'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
 import { AppStore } from '@client/store'
@@ -29,7 +29,7 @@ describe('EventInfo tests', () => {
 
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <EventInfo match={{ params: { eventType: Event.BIRTH } }} />,
+        <EventInfo match={{ params: { eventType: Event.Birth } }} />,
         { store, history }
       )
       component = testComponent
@@ -55,7 +55,7 @@ describe('EventInfo tests', () => {
 
       const testComponent = await createTestComponent(
         // @ts-ignore
-        <EventInfo match={{ params: { eventType: Event.DEATH } }} />,
+        <EventInfo match={{ params: { eventType: Event.Death } }} />,
         { store, history }
       )
       component = testComponent

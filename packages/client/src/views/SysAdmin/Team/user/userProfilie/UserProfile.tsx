@@ -367,10 +367,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                       />
                     </HeaderMenuHolder>
                   }
-                  profilePageStyle={{
-                    paddingTopMd: 24,
-                    horizontalPaddingMd: 24
-                  }}
+                  hideBackground={true}
                 >
                   <ContentWrapper>
                     <UserAvatar name={user.name} avatar={user.avatar} />

@@ -19,7 +19,8 @@ import {
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { CorrectorForm } from './CorrectorForm'
-import { Event, CorrectionSection } from '@client/forms'
+import { CorrectionSection } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { IDeclaration, storeDeclaration } from '@client/declarations'
 import { CorrectionForm } from './CorrectionForm'
 import { formatUrl } from '@client/navigation'
@@ -31,13 +32,13 @@ let wrapper: ReactWrapper<{}, {}>
 const birthDeclaration: IDeclaration = {
   id: '72c18939-70c1-40b4-9b80-b162c4871160',
   data: mockDeclarationData,
-  event: Event.BIRTH
+  event: Event.Birth
 }
 
 const deathDeclaration: IDeclaration = {
   id: '72c18939-70c1-40b4-9b80-b162c4871161',
   data: mockDeathDeclarationData,
-  event: Event.DEATH
+  event: Event.Death
 }
 
 const { store, history } = createStore()
