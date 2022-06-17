@@ -19,7 +19,8 @@ import {
   AUTH_URL,
   PORT,
   HOST,
-  HOSTNAME
+  HOSTNAME,
+  DEFAULT_TIMEOUT
 } from '@gateway/constants'
 import { readFileSync } from 'fs'
 import { validateFunc } from '@opencrvs/commons'
@@ -44,7 +45,7 @@ export async function createServer() {
     port: PORT,
     routes: {
       cors: { origin: whitelist },
-      payload: { maxBytes: 52428800 }
+      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
     }
   })
   const plugins = getPlugins()
