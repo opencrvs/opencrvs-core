@@ -79,7 +79,8 @@ import {
   RADIO_GROUP_WITH_NESTED_FIELDS,
   Ii18nRadioGroupWithNestedFieldsFormField,
   LOCATION_SEARCH_INPUT,
-  Ii18nTextareaFormField
+  Ii18nTextareaFormField,
+  TEXT
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -738,14 +739,17 @@ class FormSectionComponent extends React.Component<Props> {
 
   resetDependentSelectValues = (fieldName: string) => {
     const fields = this.props.fields
-    const fieldToReset = fields.find(
+    const fieldsToReset = fields.filter(
       (field) =>
-        field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-        field.dynamicOptions.dependency === fieldName
+        (field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
+          field.dynamicOptions.dependency === fieldName) ||
+        (field.type === TEXT && field.dependency === fieldName)
     )
-    if (fieldToReset) {
+
+    fieldsToReset.forEach((fieldToReset) => {
       this.props.setFieldValue(fieldToReset.name, '')
-    }
+      this.resetDependentSelectValues(fieldToReset.name)
+    })
   }
 
   resetNestedInputValues = (parentField: Ii18nFormField) => {

@@ -17,13 +17,12 @@ import {
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
-import { Event } from '@client/forms'
+import { Event, DraftStatus } from '@client/utils/gateway'
 import { useIntl } from 'react-intl'
 import {
   messages,
   draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
 import { Value, DraftVersion } from './components'
 import { Pill } from '@opencrvs/components/lib/interface'
 import { isDefaultDraft } from '@client/views/SysAdmin/Config/Forms/utils'
@@ -35,7 +34,7 @@ function EventDrafts({ event }: { event: Event }) {
   )
   const { updatedAt, comment, status, version } = formDraft
 
-  if (status !== DraftStatus.PUBLISHED) {
+  if (status !== DraftStatus.Published) {
     return <></>
   }
 
@@ -56,7 +55,7 @@ function EventDrafts({ event }: { event: Event }) {
         actions={
           <Pill
             label={intl.formatMessage(
-              draftStatusMessages[DraftStatus.PUBLISHED]
+              draftStatusMessages[DraftStatus.Published]
             )}
             type="active"
           />
@@ -69,8 +68,8 @@ function EventDrafts({ event }: { event: Event }) {
 export function PublishedTab() {
   return (
     <ListViewSimplified>
-      <EventDrafts event={Event.BIRTH} />
-      <EventDrafts event={Event.DEATH} />
+      <EventDrafts event={Event.Birth} />
+      <EventDrafts event={Event.Death} />
     </ListViewSimplified>
   )
 }

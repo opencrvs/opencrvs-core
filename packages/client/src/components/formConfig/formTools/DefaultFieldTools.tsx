@@ -20,13 +20,16 @@ import { useIntl } from 'react-intl'
 import {
   getContentKeys,
   getCertificateHandlebar,
-  IDefaultConfigField
+  IDefaultConfigField,
+  IPreviewGroupConfigField,
+  getFirstFieldOfPreviewGroup,
+  isDefaultConfigField,
+  getFieldDefinition
 } from '@client/forms/configuration/formConfig/utils'
 import { useDispatch } from 'react-redux'
 import { fieldTypeLabel } from '@client/forms'
-import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
+import { FieldEnabled } from '@client/forms/configuration'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
-import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
 import {
   Title,
   Label,
@@ -34,6 +37,7 @@ import {
   RequiredToggleAction,
   ToolTip
 } from './components'
+import { useDefaultForm } from '@client/views/SysAdmin/Config/Forms/hooks'
 
 const Container = styled.div`
   display: flex;
@@ -87,18 +91,21 @@ function HideToggleAction({ fieldId, enabled }: IDefaultConfigField) {
 export function DefaultFieldTools({
   configField
 }: {
-  configField: IDefaultConfigField
+  configField: IDefaultConfigField | IPreviewGroupConfigField
 }) {
   const intl = useIntl()
-  const formField = useFieldDefinition(configField)
+  const defaultForm = useDefaultForm()
+  const formField = isDefaultConfigField(configField)
+    ? getFieldDefinition(configField, defaultForm)
+    : getFieldDefinition(getFirstFieldOfPreviewGroup(configField), defaultForm)
   const handleBar = getCertificateHandlebar(formField)
-  const contentKeys = getContentKeys(formField)
+  const contentKeys = getContentKeys(configField, defaultForm)
   const fieldType = fieldTypeLabel(formField.type)
 
   return (
     <Container>
       <Title>{intl.formatMessage(fieldType)}</Title>
-      {formField.customisable && (
+      {isDefaultConfigField(configField) && formField.customisable && (
         <ListViewSimplified bottomBorder>
           <ListViewItemSimplified
             label={<Label>{intl.formatMessage(messages.hideField)}</Label>}

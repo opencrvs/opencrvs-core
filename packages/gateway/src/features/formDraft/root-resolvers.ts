@@ -12,7 +12,7 @@
 import fetch from 'node-fetch'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 import { hasScope } from '@gateway/features/user/utils'
-import { GQLFormDraftStatusModify, GQLResolver } from '@gateway/graphql/schema'
+import { GQLResolver } from '@gateway/graphql/schema'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -30,7 +30,7 @@ export const resolvers: GQLResolver = {
 
   Mutation: {
     async createFormDraft(_, { formDraft }, authHeader) {
-      // Only natlsysadmin should be able to create or update a question
+      // Only natlsysadmin should be able to create a formDraft
       if (!hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(
           new Error(
@@ -38,8 +38,8 @@ export const resolvers: GQLResolver = {
           )
         )
       }
-      const res = await fetch(`${APPLICATION_CONFIG_URL}draftQuestions`, {
-        method: 'PUT',
+      const res = await fetch(`${APPLICATION_CONFIG_URL}formDraft`, {
+        method: 'POST',
         body: JSON.stringify(formDraft),
         headers: {
           'Content-Type': 'application/json',
@@ -58,18 +58,18 @@ export const resolvers: GQLResolver = {
     },
 
     async modifyDraftStatus(_, { formDraft }, authHeader) {
-      // Only natlsysadmin should be able to create or update a question
+      // Only natlsysadmin should be able to modify a formDraft
       if (!hasScope(authHeader, 'natlsysadmin')) {
         return await Promise.reject(
-          new Error('Update form draft status is only allowed for natlsysadmin')
+          new Error(
+            'Modifying form draft status is only allowed for natlsysadmin'
+          )
         )
       }
 
-      const formDraftStatusPayload: IModifyDraftStatusPayload =
-        modifyFormDraftStatusPayload(formDraft)
-      const res = await fetch(`${APPLICATION_CONFIG_URL}formDraftStatus`, {
+      const res = await fetch(`${APPLICATION_CONFIG_URL}formDraft`, {
         method: 'PUT',
-        body: JSON.stringify(formDraftStatusPayload),
+        body: JSON.stringify(formDraft),
         headers: {
           'Content-Type': 'application/json',
           ...authHeader
@@ -84,33 +84,32 @@ export const resolvers: GQLResolver = {
         )
       }
       return await res.json()
+    },
+
+    async deleteFormDraft(_, { formDraft }, authHeader) {
+      // Only natlsysadmin should be able to delete a formDraft
+      if (!hasScope(authHeader, 'natlsysadmin')) {
+        return await Promise.reject(
+          new Error('Deleting form draft is only allowed for natlsysadmin')
+        )
+      }
+      const res = await fetch(`${APPLICATION_CONFIG_URL}formDraft`, {
+        method: 'DELETE',
+        body: JSON.stringify(formDraft),
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeader
+        }
+      })
+
+      if (res.status !== 204) {
+        return await Promise.reject(
+          new Error(
+            `Something went wrong on config service. Couldn't delete form draft`
+          )
+        )
+      }
+      return formDraft.event
     }
   }
-}
-
-function modifyFormDraftStatusPayload(
-  formDraft: GQLFormDraftStatusModify
-): IModifyDraftStatusPayload {
-  const formDraftStatusPayload: IModifyDraftStatusPayload = {
-    event: formDraft.event as Event,
-    status: formDraft.status as DraftStatus
-  }
-
-  return formDraftStatusPayload
-}
-enum Event {
-  BIRTH = 'birth',
-  DEATH = 'death'
-}
-
-enum DraftStatus {
-  DRAFT = 'DRAFT',
-  IN_PREVIEW = 'IN_PREVIEW',
-  PUBLISHED = 'PUBLISHED',
-  DELETED = 'DELETED'
-}
-
-interface IModifyDraftStatusPayload {
-  event: Event
-  status: DraftStatus
 }

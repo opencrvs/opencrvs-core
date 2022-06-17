@@ -22,7 +22,8 @@ import {
 } from '@client/utils/referenceApi'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
-import { IQuestionConfig, IFormConfig } from '@client/forms'
+import { IFormConfig } from '@client/forms'
+import { IQuestionConfig } from '@client/forms/questionConfig'
 
 export const GET_LOCATIONS = 'OFFLINE/GET_LOCATIONS'
 type GetLocations = {

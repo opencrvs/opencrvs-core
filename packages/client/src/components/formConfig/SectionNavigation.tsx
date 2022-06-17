@@ -16,7 +16,8 @@ import {
   NavigationSubItem,
   LabelContainer
 } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
-import { Event, BirthSection, DeathSection, WizardSection } from '@client/forms'
+import { BirthSection, DeathSection, WizardSection } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { useIntl } from 'react-intl'
 import {
   messages,
@@ -68,7 +69,7 @@ export function SectionNavigation() {
   const intl = useIntl()
   const dispatch = useDispatch()
   const { event, section } = useParams<IRouteProps>()
-  const tabs = event === Event.BIRTH ? BirthSection : DeathSection
+  const tabs = event === Event.Birth ? BirthSection : DeathSection
 
   return (
     <>

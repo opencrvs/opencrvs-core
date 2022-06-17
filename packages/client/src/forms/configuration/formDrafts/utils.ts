@@ -10,13 +10,25 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { find } from 'lodash'
-import { Event } from '@client/forms'
+import { DraftStatus, Event } from '@client/utils/gateway'
 
-export enum DraftStatus {
-  DRAFT = 'DRAFT',
-  PREVIEW = 'IN_PREVIEW',
-  PUBLISHED = 'PUBLISHED',
-  DELETED = 'DELETED'
+export const DEFAULT_FORM_DRAFT = {
+  birth: {
+    version: 0,
+    status: DraftStatus.Draft,
+    event: Event.Birth,
+    history: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  },
+  death: {
+    version: 0,
+    status: DraftStatus.Draft,
+    event: Event.Death,
+    history: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  }
 }
 
 export interface IDraftHistory {
