@@ -30,8 +30,8 @@ export async function deleteFormDraftHandler(
   const { event } = request.payload as IDeleteFormDraftPayload
 
   try {
+    await clearHearthElasticInfluxData(request)
     await Promise.all([
-      clearHearthElasticInfluxData(request),
       clearQuestionConfigs(event),
       FormDraft.findOneAndRemove({ event })
     ])
