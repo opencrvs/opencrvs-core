@@ -288,7 +288,7 @@ describe('when user is in the register form for death event', () => {
 
       component.update()
 
-      expect(history.location.pathname).toContain(REGISTRAR_HOME)
+      expect(history.location.pathname).toContain('/')
     })
 
     /*
