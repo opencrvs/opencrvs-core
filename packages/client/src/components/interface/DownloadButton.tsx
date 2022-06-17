@@ -38,7 +38,8 @@ import { IStoreState } from '@client/store'
 import { AvatarVerySmall } from '@client/components/Avatar'
 import {
   ROLE_LOCAL_REGISTRAR,
-  FIELD_AGENT_ROLES
+  FIELD_AGENT_ROLES,
+  ROLE_REGISTRATION_AGENT
 } from '@client/utils/constants'
 import { Dispatch } from 'redux'
 import ApolloClient from 'apollo-client'
@@ -61,6 +62,7 @@ interface IDownloadConfig {
   action: Action
   assignment?: GQLAssignmentData
   refetchQueries?: RefetchQueryDescription
+  declarationStatus?: string
 }
 
 interface DownloadButtonProps {
@@ -252,7 +254,8 @@ function DownloadButtonComponent(
       if (
         (assignment?.userId != userId ||
           status === DOWNLOAD_STATUS.DOWNLOADED) &&
-        downloadConfigs.action !== Action.LOAD_REVIEW_DECLARATION &&
+        (downloadConfigs.declarationStatus !== 'VALIDATED' ||
+          userRole !== ROLE_REGISTRATION_AGENT) &&
         !FIELD_AGENT_ROLES.includes(String(userRole))
       ) {
         setAssignModal(
