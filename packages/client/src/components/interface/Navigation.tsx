@@ -324,7 +324,7 @@ export const NavigationView = (props: IFullProps) => {
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
       avatar={() => userInfo && userInfo.avatar}
-      warning={<UnbuplishedWarning />}
+      warning={UnbuplishedWarning(true)}
     >
       {userDetails?.role === 'FIELD_AGENT' ? (
         <>
