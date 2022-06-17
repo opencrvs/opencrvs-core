@@ -40,6 +40,13 @@ body,
       height: 100%;
     }
   }
+  @font-face {
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
+    font-family: "Noto Sans";
+  }
+  *:not(i) {
+    font-family: "Noto Sans";
+  }
 }
 body,
 h1, h2, h3, h4, h5, h6,
