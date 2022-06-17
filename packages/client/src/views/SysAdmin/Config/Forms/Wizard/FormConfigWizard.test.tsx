@@ -19,9 +19,10 @@ import {
 } from '@client/tests/util'
 import { FormConfigWizard } from './FormConfigWizard'
 import routeData from 'react-router'
-import { Event, BirthSection } from '@client/forms'
+import { BirthSection } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { checkAuth } from '@client/profile/profileActions'
-import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
+import { FieldEnabled } from '@client/forms/configuration'
 
 let component: ReactWrapper<{}, {}>
 
@@ -29,7 +30,7 @@ describe('FormConfigWizard', () => {
   beforeEach(async () => {
     jest
       .spyOn(routeData, 'useParams')
-      .mockReturnValue({ event: Event.BIRTH, section: BirthSection.Child })
+      .mockReturnValue({ event: Event.Birth, section: BirthSection.Child })
 
     const { store, history } = createStore()
     getItem.mockReturnValue(natlSysAdminToken)

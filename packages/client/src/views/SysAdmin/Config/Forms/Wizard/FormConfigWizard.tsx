@@ -11,13 +11,13 @@
  */
 import { CustomFieldTools } from '@client/components/formConfig/formTools/CustomFieldTools'
 import {
-  IConfigField,
-  isDefaultField
+  isDefaultConfigField,
+  isCustomConfigField
 } from '@client/forms/configuration/formConfig/utils'
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
-import { Redirect, useParams, useLocation } from 'react-router'
+import { Redirect, useParams } from 'react-router'
 import { HOME } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
@@ -26,7 +26,8 @@ import { SettingsBlue } from '@opencrvs/components/lib/icons'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
 import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
 import { FormTools } from '@client/components/formConfig/formTools/FormTools'
-import { Event, BirthSection, DeathSection, WizardSection } from '@client/forms'
+import { BirthSection, DeathSection, WizardSection } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { Canvas } from '@client/components/formConfig/Canvas'
 import { DefaultFieldTools } from '@client/components/formConfig/formTools/DefaultFieldTools'
@@ -40,15 +41,11 @@ import { SaveActionModal, SaveActionContext } from './SaveActionModal'
 import { SaveActionNotification } from './SaveActionNotification'
 import { FormConfigSettings } from './FormConfigSettings'
 import {
-  selectConfigField,
   selectFormDraft,
   selectConfigFields
 } from '@client/forms/configuration/formConfig/selectors'
-import { FieldEnabled } from '@client/forms/configuration/defaultUtils'
-import {
-  FieldPosition,
-  getIdentifiersFromFieldId
-} from '@client/forms/configuration'
+import { FieldPosition, FieldEnabled } from '@client/forms/configuration'
+import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
 
 const Container = styled.div`
   display: flex;
@@ -102,7 +99,7 @@ const CanvasWrapper = styled.div`
 
 type IRouteProps = {
   event: Event
-  section: string
+  section: WizardSection
 }
 
 function isValidEvent(event: string): event is Event {
@@ -117,16 +114,9 @@ function isValidSection(section: string): section is WizardSection {
   ].includes(section)
 }
 
-function isSelectedFieldValid(
-  selectedField: IConfigField | null,
-  section: string
-): selectedField is IConfigField {
-  return !!selectedField?.fieldId.includes(section)
-}
-
 function useHasNatlSysAdminScope() {
   const scope = useSelector(getScope)
-  return scope?.includes(AuthScope.NATLSYSADMIN)
+  return scope?.includes(AuthScope.NATLSYSADMIN) ?? false
 }
 
 function useSelectedField() {
@@ -134,53 +124,47 @@ function useSelectedField() {
   const [selectedFieldId, setSelectedFieldId] = React.useState<string | null>(
     null
   )
-  const selectedField = useSelector((store: IStoreState) =>
-    selectConfigField(store, event, section, selectedFieldId)
+  const sectionFieldsMap = useSelector((store: IStoreState) =>
+    selectConfigFields(store, event)
   )
+  const selectedField =
+    selectedFieldId && section !== 'settings'
+      ? sectionFieldsMap[section][selectedFieldId]
+      : null
 
-  /*
-   * We need to clear the selected field if section changes
-   * as the changed section won't have the previously selected field
-   */
-  React.useEffect(() => {
-    if (selectedFieldId && !selectedFieldId.includes(section)) {
-      setSelectedFieldId(null)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [section])
-
-  return { selectedField, setSelectedField: setSelectedFieldId }
+  return [selectedField, setSelectedFieldId] as const
 }
 
-function useHiddenFields({
-  selectedField,
-  setSelectedField
-}: ReturnType<typeof useSelectedField>) {
+function useHiddenFields([selectedField, setSelectedField]: ReturnType<
+  typeof useSelectedField
+>) {
   const [showHiddenFields, setShowHiddenFields] = React.useState(true)
 
   /*
    * We need to clear the selected field if the selected field is made
    * hidden and we have the showHiddenFields set to false
    */
-  React.useEffect(() => {
-    if (!showHiddenFields && selectedField?.enabled === FieldEnabled.DISABLED) {
-      setSelectedField(null)
-    }
-  }, [showHiddenFields, selectedField?.enabled, setSelectedField])
+  if (
+    !showHiddenFields &&
+    selectedField &&
+    isDefaultConfigField(selectedField) &&
+    selectedField.enabled === FieldEnabled.DISABLED
+  ) {
+    setSelectedField(null)
+  }
 
-  return { showHiddenFields, setShowHiddenFields }
+  return [showHiddenFields, setShowHiddenFields] as const
 }
 
-export function FormConfigWizard() {
+function FormConfigWizardView() {
   const dispatch = useDispatch()
-  const hasNatlSysAdminScope = useHasNatlSysAdminScope()
   const intl = useIntl()
   const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.IDLE)
-  const { selectedField, setSelectedField } = useSelectedField()
-  const { showHiddenFields, setShowHiddenFields } = useHiddenFields({
+  const [selectedField, setSelectedField] = useSelectedField()
+  const [showHiddenFields, setShowHiddenFields] = useHiddenFields([
     selectedField,
     setSelectedField
-  })
+  ])
   const { event, section } = useParams<IRouteProps>()
   const { version } = useSelector((store: IStoreState) =>
     selectFormDraft(store, event)
@@ -188,24 +172,16 @@ export function FormConfigWizard() {
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
-  const location = useLocation()
 
   let firstFieldIdentifiers
   if (section !== 'settings') {
     const firstField = Object.values(fieldsMap).find(
-      (formField) => formField.preceedingFieldId === FieldPosition.TOP
+      (formField) => formField.precedingFieldId === FieldPosition.TOP
     )
     if (!firstField) {
       throw new Error(`No starting field found in section`)
     }
     firstFieldIdentifiers = getIdentifiersFromFieldId(firstField.fieldId)
-  }
-  if (
-    !hasNatlSysAdminScope ||
-    !isValidEvent(event) ||
-    !isValidSection(section)
-  ) {
-    return <Redirect to={HOME} />
   }
 
   return (
@@ -217,7 +193,7 @@ export function FormConfigWizard() {
         })}
         pageIcon={<></>}
         topBarActions={
-          !location.pathname.includes('settings')
+          section !== 'settings'
             ? [
                 <TertiaryButton
                   id="settings"
@@ -263,17 +239,8 @@ export function FormConfigWizard() {
               </CanvasContainer>
             </CanvasWrapper>
             <ToolsContainer>
-              {/*
-               *  The useEffect hook for clearing the selectedFieldId takes
-               *  effect after the render for when the section changes so
-               *  for that particular render where the section has changed
-               *  but the selectedFieldId is still from the previous section,
-               *  we need to make sure that the selectedField is valid
-               */}
-              {isSelectedFieldValid(selectedField, section) ? (
-                isDefaultField(selectedField) ? (
-                  <DefaultFieldTools configField={selectedField} />
-                ) : (
+              {selectedField ? (
+                isCustomConfigField(selectedField) ? (
                   <CustomFieldTools
                     event={event}
                     section={section}
@@ -281,6 +248,8 @@ export function FormConfigWizard() {
                     setSelectedField={setSelectedField}
                     groupId={firstFieldIdentifiers.groupId}
                   />
+                ) : (
+                  <DefaultFieldTools configField={selectedField} />
                 )
               ) : (
                 <FormTools
@@ -302,4 +271,17 @@ export function FormConfigWizard() {
       </WizardContainer>
     </Container>
   )
+}
+
+export function FormConfigWizard() {
+  const { event, section } = useParams<{ event: string; section: string }>()
+  const hasNatlSysAdminScope = useHasNatlSysAdminScope()
+  if (
+    !hasNatlSysAdminScope ||
+    !isValidEvent(event) ||
+    !isValidSection(section)
+  ) {
+    return <Redirect to={HOME} />
+  }
+  return <FormConfigWizardView />
 }

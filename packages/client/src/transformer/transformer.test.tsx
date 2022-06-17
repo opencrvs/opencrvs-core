@@ -33,7 +33,8 @@ import {
 } from '@client/transformer'
 import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import { getOfflineDataSuccess } from '@client/offline/actions'
-import { Event, IForm } from '@opencrvs/client/src/forms'
+import { IForm } from '@opencrvs/client/src/forms'
+import { Event } from '@client/utils/gateway'
 import { clone } from 'lodash'
 import * as fetchAny from 'jest-fetch-mock'
 import { birthDraftData } from '@client/tests/mock-drafts'
@@ -70,11 +71,11 @@ describe('when draft data is transformed to graphql', () => {
     customDraft = {
       id: uuid(),
       data: birthDraftData,
-      event: Event.BIRTH,
+      event: Event.Birth,
       submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
     }
     store.dispatch(storeDeclaration(customDraft))
-    form = getRegisterForm(store.getState())[Event.BIRTH]
+    form = getRegisterForm(store.getState())[Event.Birth]
     history.replace(
       DRAFT_BIRTH_PARENT_FORM.replace(
         ':declarationId',

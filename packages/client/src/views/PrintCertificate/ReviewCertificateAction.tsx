@@ -29,7 +29,8 @@ import {
   storeDeclaration,
   SUBMISSION_STATUS
 } from '@opencrvs/client/src/declarations'
-import { Action, Event, CorrectionSection } from '@client/forms'
+import { Action, CorrectionSection } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
@@ -209,11 +210,11 @@ class ReviewCertificateActionComponent extends React.Component<
     const { intl, event } = this.props
     let eventName = intl.formatMessage(constantsMessages.birth).toLowerCase()
     switch (event) {
-      case Event.BIRTH:
+      case Event.Birth:
         return intl.formatMessage(certificateMessages.reviewTitle, {
           event: eventName
         })
-      case Event.DEATH:
+      case Event.Death:
         eventName = intl.formatMessage(constantsMessages.death).toLowerCase()
         return intl.formatMessage(certificateMessages.reviewTitle, {
           event: eventName
@@ -310,9 +311,9 @@ const getEvent = (eventType: string | undefined) => {
   switch (eventType && eventType.toLowerCase()) {
     case 'birth':
     default:
-      return Event.BIRTH
+      return Event.Birth
     case 'death':
-      return Event.DEATH
+      return Event.Death
   }
 }
 

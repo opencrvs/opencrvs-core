@@ -25,24 +25,25 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { useDispatch } from 'react-redux'
 import { Mutation } from 'react-apollo'
-import { GQLMutation } from '@opencrvs/gateway/src/graphql/schema'
-import { CHANGE_FORM_DRAFT_STATUS } from '@client/views/SysAdmin/Config/Forms/mutations'
+import {
+  CHANGE_FORM_DRAFT_STATUS,
+  DELETE_FORM_DRAFT
+} from '@client/views/SysAdmin/Config/Forms/mutations'
+import { DEFAULT_FORM_DRAFT } from '@client/forms/configuration/formDrafts/utils'
 import {
   DraftStatus,
-  IFormDraft
-} from '@client/forms/configuration/formDrafts/utils'
-import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
+  Event,
+  Mutation as GQLMutation,
+  DeleteFormDraftMutationVariables,
+  ChangeFormDraftStatusMutationVariables
+} from '@client/utils/gateway'
+import {
+  ActionStatus,
+  REDIRECT_DELAY
+} from '@client/views/SysAdmin/Config/Forms/utils'
 import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
-
-/*
- * There seems to be an issue with webpack
- * if Event is imported form '@client/forms'
- * similar to https://github.com/webpack/webpack/issues/12724
- */
-enum Event {
-  BIRTH = 'birth',
-  DEATH = 'death'
-}
+import { goToFormConfigWizard } from '@client/navigation'
+import { BirthSection, DeathSection } from '@client/forms'
 
 export enum Actions {
   PUBLISH = 'PUBLISH',
@@ -53,7 +54,7 @@ export enum Actions {
 
 export const defaultActionState = {
   action: Actions.EDIT,
-  event: Event.BIRTH,
+  event: Event.Birth,
   status: ActionStatus.IDLE
 }
 
@@ -68,11 +69,13 @@ export type ActionState = {
   status: ActionStatus
 }
 
-const STATUS_CHANGE_MAP: Record<Actions, DraftStatus> = {
-  [Actions.PUBLISH]: DraftStatus.PUBLISHED,
-  [Actions.PREVIEW]: DraftStatus.PREVIEW,
-  [Actions.EDIT]: DraftStatus.DRAFT,
-  [Actions.DELETE]: DraftStatus.DELETED
+const STATUS_CHANGE_MAP: Record<
+  Exclude<Actions, Actions.DELETE>,
+  DraftStatus
+> = {
+  [Actions.PUBLISH]: DraftStatus.Published,
+  [Actions.PREVIEW]: DraftStatus.InPreview,
+  [Actions.EDIT]: DraftStatus.Draft
 }
 
 const ACTION_BUTTON_MESSAGE: Record<Actions, MessageDescriptor> = {
@@ -100,23 +103,33 @@ function ActionButton() {
   return (
     <Mutation<
       GQLMutation,
-      {
-        status: DraftStatus
-        event: Event
-      }
+      DeleteFormDraftMutationVariables | ChangeFormDraftStatusMutationVariables
     >
-      mutation={CHANGE_FORM_DRAFT_STATUS}
+      mutation={
+        action === Actions.DELETE ? DELETE_FORM_DRAFT : CHANGE_FORM_DRAFT_STATUS
+      }
       onCompleted={({ modifyDraftStatus: formDraft }) => {
-        if (formDraft) {
-          action === Actions.DELETE
-            ? dispatch(updateFormConfig(formDraft as IFormDraft, []))
-            : dispatch(updateFormConfig(formDraft as IFormDraft))
+        if (action === Actions.DELETE) {
+          dispatch(updateFormConfig(DEFAULT_FORM_DRAFT[event], []))
+          setAction({ status: ActionStatus.COMPLETED })
+        } else if (formDraft) {
+          dispatch(updateFormConfig(formDraft))
           setAction({ status: ActionStatus.COMPLETED })
 
-          /* uncommenting this causes issues with webpack compilation */
-          // if (action === Actions.EDIT) {
-          //   dispatch(goToFormConfigWizard(event, event === Event.BIRTH ? BirthSection.Registration : DeathSection.Registration))
-          // }
+          if (action === Actions.EDIT) {
+            setTimeout(
+              () =>
+                dispatch(
+                  goToFormConfigWizard(
+                    event,
+                    event === Event.Birth
+                      ? BirthSection.Child
+                      : DeathSection.Deceased
+                  )
+                ),
+              REDIRECT_DELAY
+            )
+          }
         }
       }}
       onError={() => setAction({ status: ActionStatus.ERROR })}
@@ -126,10 +139,13 @@ function ActionButton() {
           id: 'status-change-btn',
           onClick: () => {
             changeStatus({
-              variables: {
-                status: STATUS_CHANGE_MAP[action],
-                event: event
-              }
+              variables:
+                action === Actions.DELETE
+                  ? { event }
+                  : {
+                      status: STATUS_CHANGE_MAP[action],
+                      event: event
+                    }
             })
             setAction({ status: ActionStatus.PROCESSING })
           }

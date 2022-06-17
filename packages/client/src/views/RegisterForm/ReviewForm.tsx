@@ -31,7 +31,8 @@ import { Dispatch } from 'redux'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@opencrvs/client/src/utils/authUtils'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { IFormData, Event, Action } from '@client/forms'
+import { IFormData, Action } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import {
   QueryProvider,
   QueryContext
@@ -149,11 +150,11 @@ export class ReviewFormView extends React.Component<IProps> {
 function getEvent(eventType: string) {
   switch (eventType && eventType.toLocaleLowerCase()) {
     case 'birth':
-      return Event.BIRTH
+      return Event.Birth
     case 'death':
-      return Event.DEATH
+      return Event.Death
     default:
-      return Event.BIRTH
+      return Event.Birth
   }
 }
 

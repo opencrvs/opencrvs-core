@@ -25,7 +25,7 @@ import {
 } from 'react-intl'
 import styled from 'styled-components'
 import { checkExternalValidationStatus } from '@client/views/SysAdmin/Team/utils'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 
 type Props = WrappedComponentProps & BaseProps
 

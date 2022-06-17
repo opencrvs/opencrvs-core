@@ -29,7 +29,8 @@ import {
   DOWNLOAD_STATUS,
   unassignDeclaration
 } from '@client/declarations'
-import { Event, Action } from '@client/forms'
+import { Action } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { withApollo, WithApolloClient } from 'react-apollo'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'

@@ -20,11 +20,8 @@ import {
 } from '@client/forms/index'
 import { formMessageDescriptors } from '@client/i18n/messages'
 import { MessageDescriptor } from 'react-intl'
-import {
-  getDefaultField,
-  IDefaultField
-} from '@client/forms/configuration/defaultUtils'
 import { cloneDeep } from 'lodash'
+import { getFieldIdentifiers } from '@client/forms/questionConfig'
 
 export enum AddressCases {
   // the below are UPPER_CASE because they map to GQLAddress type enums
@@ -63,7 +60,7 @@ const primaryAddressSameAsOtherPrimaryAddress =
   'values.primaryAddressSameAsOtherPrimary'
 
 // secondary addresses are not enabled
-const secondaryAddressesDisabled = '!window.config.ADDRESSES==2'
+const secondaryAddressesDisabled = 'window.config.ADDRESSES!=2'
 
 export enum AddressSubsections {
   PRIMARY_ADDRESS_SUBSECTION = 'primaryAddress',
@@ -71,7 +68,7 @@ export enum AddressSubsections {
 }
 
 export interface IAddressConfiguration {
-  preceedingFieldId: string
+  precedingFieldId: string
   configurations: AllowedAddressConfigurations[]
 }
 
@@ -90,15 +87,15 @@ export type AllowedAddressConfigurations = {
 
 export const defaultAddressConfiguration: IAddressConfiguration[] = [
   {
-    preceedingFieldId: 'birth.child.child-view-group.birthLocation',
+    precedingFieldId: 'birth.child.child-view-group.birthLocation',
     configurations: [{ config: EventLocationAddressCases.PLACE_OF_BIRTH }]
   },
   {
-    preceedingFieldId: 'death.deathEvent.death-event-details.deathLocation',
+    precedingFieldId: 'death.deathEvent.death-event-details.deathLocation',
     configurations: [{ config: EventLocationAddressCases.PLACE_OF_DEATH }]
   },
   {
-    preceedingFieldId: 'birth.informant.informant-view-group.familyNameEng',
+    precedingFieldId: 'birth.informant.informant-view-group.familyNameEng',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
@@ -118,7 +115,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     ]
   },
   {
-    preceedingFieldId: 'birth.mother.mother-view-group.educationalAttainment',
+    precedingFieldId: 'birth.mother.mother-view-group.educationalAttainment',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
@@ -133,17 +130,17 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
       {
         config: AddressSubsections.SECONDARY_ADDRESS_SUBSECTION,
         label: formMessageDescriptors.secondaryAddress,
-        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant} && ${secondaryAddressesDisabled}) || (${secondaryAddressesDisabled})`
+        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant}) || (${secondaryAddressesDisabled})`
       },
       {
         config: AddressCases.SECONDARY_ADDRESS,
         informant: false,
-        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant} && ${secondaryAddressesDisabled}) || (${secondaryAddressesDisabled})`
+        conditionalCase: `(${mothersDetailsDontExist} && ${mothersDetailsExistBasedOnContactAndInformant}) || (${secondaryAddressesDisabled})`
       }
     ]
   },
   {
-    preceedingFieldId: 'birth.father.father-view-group.educationalAttainment',
+    precedingFieldId: 'birth.father.father-view-group.educationalAttainment',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
@@ -175,7 +172,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     ]
   },
   {
-    preceedingFieldId: 'death.deceased.deceased-view-group.maritalStatus',
+    precedingFieldId: 'death.deceased.deceased-view-group.maritalStatus',
     configurations: [
       {
         config: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
@@ -195,7 +192,7 @@ export const defaultAddressConfiguration: IAddressConfiguration[] = [
     ]
   },
   {
-    preceedingFieldId: 'death.informant.informant-view-group.familyNameEng',
+    precedingFieldId: 'death.informant.informant-view-group.familyNameEng',
     configurations: [
       {
         config: AddressCopyConfigCases.PRIMARY_ADDRESS_SAME_AS_OTHER_PRIMARY,
@@ -386,6 +383,7 @@ export const getXAddressSameAsY = (
     label,
     required: true,
     initialValue: true,
+    previewGroup: AddressSubsections.PRIMARY_ADDRESS_SUBSECTION,
     validate: [],
     options: [
       {
@@ -445,69 +443,37 @@ export const getXAddressSameAsY = (
   return [copyAddressField]
 }
 
-const shouldAddAddressFields = (
-  configuration: AllowedAddressConfigurations
-) => {
-  if (
-    (configuration.config === AddressSubsections.SECONDARY_ADDRESS_SUBSECTION ||
-      configuration.config === AddressCases.SECONDARY_ADDRESS) &&
-    window.config.ADDRESSES === 2
-  ) {
-    return true
-  } else if (
-    (configuration.config === AddressSubsections.SECONDARY_ADDRESS_SUBSECTION ||
-      configuration.config === AddressCases.SECONDARY_ADDRESS) &&
-    window.config.ADDRESSES === 1
-  ) {
-    return false
-  } else {
-    return true
-  }
-}
-
 export function populateRegisterFormsWithAddresses(
   defaultEventForm: ISerializedForm,
   event: string
 ) {
   const newForm = cloneDeep(defaultEventForm)
+
   defaultAddressConfiguration.forEach(
-    (addressConfiguration: IAddressConfiguration) => {
-      if (addressConfiguration.preceedingFieldId.includes(event)) {
-        const preceedingDefaultField: IDefaultField | undefined =
-          getDefaultField(newForm, addressConfiguration.preceedingFieldId)
+    ({ precedingFieldId, configurations }: IAddressConfiguration) => {
+      if (precedingFieldId.includes(event)) {
+        const { sectionIndex, groupIndex, fieldIndex } = getFieldIdentifiers(
+          precedingFieldId,
+          newForm
+        )
 
         let addressFields: SerializedFormField[] = []
         let previewGroups: IPreviewGroup[] = []
-        if (preceedingDefaultField) {
-          addressConfiguration.configurations.forEach((configuration) => {
-            if (shouldAddAddressFields(configuration)) {
-              const tmpAddressFields: SerializedFormField[] =
-                addressFields.concat(getAddressFields(configuration))
-              addressFields = tmpAddressFields
-              const tmpPreviewGroups: IPreviewGroup[] = previewGroups.concat(
-                getPreviewGroups(configuration)
-              )
-              previewGroups = tmpPreviewGroups
-            }
-          })
-        }
-        if (preceedingDefaultField && addressFields.length) {
-          newForm.sections[preceedingDefaultField?.selectedSectionIndex].groups[
-            preceedingDefaultField?.selectedGroupIndex
-          ].fields.splice(preceedingDefaultField.index + 1, 0, ...addressFields)
-        }
+        configurations.forEach((configuration) => {
+          addressFields = addressFields.concat(getAddressFields(configuration))
+          previewGroups = previewGroups.concat(getPreviewGroups(configuration))
+        })
+        newForm.sections[sectionIndex].groups[groupIndex].fields.splice(
+          fieldIndex + 1,
+          0,
+          ...addressFields
+        )
 
-        if (preceedingDefaultField && previewGroups.length) {
-          const group =
-            newForm.sections[preceedingDefaultField?.selectedSectionIndex]
-              .groups[preceedingDefaultField?.selectedGroupIndex]
-          if (group.previewGroups) {
-            const newPreviewGroups: IPreviewGroup[] =
-              group.previewGroups.concat(previewGroups)
-            group.previewGroups = newPreviewGroups
-          } else {
-            group.previewGroups = previewGroups
-          }
+        const group = newForm.sections[sectionIndex].groups[groupIndex]
+        if (group.previewGroups) {
+          group.previewGroups = group.previewGroups.concat(previewGroups)
+        } else {
+          group.previewGroups = previewGroups
         }
       }
     }
@@ -842,6 +808,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -911,6 +878,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -980,6 +948,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1049,6 +1018,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1118,6 +1088,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1187,6 +1158,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1256,6 +1228,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: true,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1309,6 +1282,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: true,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1362,6 +1336,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1415,6 +1390,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1468,6 +1444,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1521,6 +1498,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1574,6 +1552,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countryPrimary',
       conditionals: [
         {
           action: 'hide',
@@ -1909,6 +1888,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtSecondary',
       conditionals: [
         {
           action: 'hide',
@@ -1978,6 +1958,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtSecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2047,6 +2028,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtSecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2116,6 +2098,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtSecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2185,6 +2168,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtSecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2254,6 +2238,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'districtSecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2323,6 +2308,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: true,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2376,6 +2362,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: true,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2429,6 +2416,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2482,6 +2470,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2535,6 +2524,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2588,6 +2578,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2641,6 +2632,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'countrySecondary',
       conditionals: [
         {
           action: 'hide',
@@ -2952,6 +2944,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3005,6 +2998,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3058,6 +3052,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3111,6 +3106,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3164,6 +3160,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3217,6 +3214,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'district',
       conditionals: [
         {
           action: 'hide',
@@ -3270,6 +3268,7 @@ export function getPlaceOfEventAddressFields(
       required: true,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
@@ -3322,6 +3321,7 @@ export function getPlaceOfEventAddressFields(
       required: true,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
@@ -3374,6 +3374,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
@@ -3411,6 +3412,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
@@ -3448,6 +3450,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
@@ -3485,6 +3488,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',
@@ -3522,6 +3526,7 @@ export function getPlaceOfEventAddressFields(
       required: false,
       initialValue: '',
       validate: [],
+      dependency: 'country',
       conditionals: [
         {
           action: 'hide',

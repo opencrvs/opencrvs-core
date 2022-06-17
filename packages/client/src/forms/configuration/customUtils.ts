@@ -9,69 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
-import {
-  ISerializedForm,
-  IQuestionConfig,
-  SerializedFormField,
-  QuestionConfigFieldType,
-  IMessage
-} from '@client/forms/index'
+import { SerializedFormField } from '@client/forms/index'
+import { IMessage, ICustomQuestionConfig } from '@client/forms/questionConfig'
 import { find } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
-import { IDefaultField } from '@client/forms/configuration/defaultUtils'
-import {
-  getGroup,
-  getIdentifiersFromFieldId,
-  getSection,
-  IGroup,
-  ISection
-} from '@client/forms/configuration'
 import { getDefaultLanguage } from '@client/i18n/utils'
 
 // THIS FILE CONTAINS FUNCTIONS TO CONFIGURE CUSTOM FORM CONFIGURATIONS
-
-interface ICustomQuestionConfiguration {
-  question: IQuestionConfig
-  field: SerializedFormField
-}
-export interface ISortedCustomGroup {
-  preceedingDefaultField?: IDefaultField
-  positionTop?: boolean
-  questions: ICustomQuestionConfiguration[]
-  sectionIndex: number
-  groupIndex: number
-}
-
-export function createCustomGroup(
-  form: ISerializedForm,
-  customQuestionConfigurations: ISortedCustomGroup[],
-  question: IQuestionConfig,
-  preceedingDefaultField: IDefaultField | null,
-  positionTop?: boolean
-) {
-  const customQuestionIdentifiers = getIdentifiersFromFieldId(question.fieldId)
-  const section: ISection = getSection(
-    form.sections,
-    customQuestionIdentifiers.sectionId
-  )
-  const group: IGroup = getGroup(
-    section.section.groups,
-    customQuestionIdentifiers.groupId
-  )
-  const newCustomGroup: ISortedCustomGroup = {
-    sectionIndex: section.index,
-    groupIndex: group.index,
-    questions: [{ question, field: createCustomField(question) }]
-  }
-  if (preceedingDefaultField) {
-    newCustomGroup.preceedingDefaultField = preceedingDefaultField
-  }
-  if (positionTop) {
-    newCustomGroup.positionTop = positionTop
-  }
-  customQuestionConfigurations.push(newCustomGroup)
-}
 
 function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
   const language = getDefaultLanguage()
@@ -81,21 +25,29 @@ function getDefaultLanguageMessage(messages: IMessage[] | undefined) {
   return defaultMessage?.descriptor
 }
 
-export function createCustomField(
-  question: IQuestionConfig
-): SerializedFormField {
+export function createCustomField({
+  fieldName,
+  fieldId,
+  custom,
+  fieldType,
+  label,
+  description,
+  tooltip,
+  placeholder,
+  required,
+  maxLength
+}: ICustomQuestionConfig): SerializedFormField {
   const baseField: SerializedFormField = {
-    name: question.fieldName as string,
-    customQuesstionMappingId: question.fieldId,
-    custom: true,
-    type: question.fieldType as QuestionConfigFieldType,
-    label: getDefaultLanguageMessage(question.label) as MessageDescriptor,
+    name: fieldName,
+    customQuesstionMappingId: fieldId,
+    custom,
+    required,
+    type: fieldType,
+    label: getDefaultLanguageMessage(label) as MessageDescriptor,
     initialValue: '',
     validate: [],
-    description: getDefaultLanguageMessage(
-      question.description
-    ) as MessageDescriptor,
-    tooltip: getDefaultLanguageMessage(question.tooltip) as MessageDescriptor,
+    description: getDefaultLanguageMessage(description),
+    tooltip: getDefaultLanguageMessage(tooltip),
     mapping: {
       mutation: {
         operation: 'customFieldToQuestionnaireTransformer'
@@ -112,8 +64,7 @@ export function createCustomField(
     baseField.type === 'TEXTAREA' ||
     baseField.type === 'TEL'
   ) {
-    baseField.required = question.required
-    baseField.placeholder = getDefaultLanguageMessage(question.placeholder)
+    baseField.placeholder = getDefaultLanguageMessage(placeholder)
   }
   if (baseField.type === 'TEL') {
     baseField.validate = [
@@ -123,17 +74,7 @@ export function createCustomField(
     ]
   }
   if (baseField.type === 'TEXT' || baseField.type === 'TEXTAREA') {
-    baseField.maxLength = question.maxLength as number
+    baseField.maxLength = maxLength
   }
   return baseField
-}
-
-export function getCustomFields(
-  customQuestionConfig: ICustomQuestionConfiguration[]
-) {
-  const fields: SerializedFormField[] = []
-  customQuestionConfig.forEach((config) => {
-    fields.push(config.field)
-  })
-  return fields
 }

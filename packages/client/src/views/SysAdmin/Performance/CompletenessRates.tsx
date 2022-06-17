@@ -17,7 +17,7 @@ import {
 } from '@client/components/interface/ToastNotification'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { Query } from '@client/components/Query'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/performance'
 import { goToCompletenessRates } from '@client/navigation'
 

@@ -15,7 +15,7 @@ import {
   IUserData,
   updateRegistrarWorkqueueSuccessActionCreator
 } from '@client/declarations'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'

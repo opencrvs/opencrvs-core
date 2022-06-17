@@ -19,7 +19,8 @@ import {
   DOWNLOAD_STATUS,
   modifyDeclaration
 } from '@client/declarations'
-import { Event, Action } from '@client/forms'
+import { Action } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
 import {
   REGISTRAR_HOME_TAB,
@@ -85,12 +86,12 @@ describe('In Progress tab', () => {
     const localDrafts = [
       {
         id: '1',
-        event: Event.BIRTH,
+        event: Event.Birth,
         data: {}
       },
       {
         id: '2',
-        event: Event.BIRTH,
+        event: Event.Birth,
         data: {}
       }
     ]
@@ -153,12 +154,12 @@ describe('In Progress tab', () => {
     const localDrafts = [
       {
         id: '1',
-        event: Event.BIRTH,
+        event: Event.Birth,
         data: {}
       },
       {
         id: '2',
-        event: Event.BIRTH,
+        event: Event.Birth,
         data: {}
       }
     ]
@@ -216,13 +217,13 @@ describe('In Progress tab', () => {
               familyNameEng: 'Hoque'
             }
           },
-          event: Event.BIRTH,
+          event: Event.Birth,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           modifiedOn: TIME_STAMP
         },
         {
           id: 'e6605607-92e0-4625-87d8-c168205bdde7',
-          event: Event.BIRTH,
+          event: Event.Birth,
           modifiedOn: TIME_STAMP,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
@@ -246,7 +247,7 @@ describe('In Progress tab', () => {
               familyNameEng: 'Hoque'
             }
           },
-          event: Event.DEATH,
+          event: Event.Death,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           modifiedOn: TIME_STAMP
         },
@@ -259,7 +260,7 @@ describe('In Progress tab', () => {
               familyNameEng: 'Hoque'
             }
           },
-          event: Event.DEATH,
+          event: Event.Death,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           modifiedOn: TIME_STAMP
         }
@@ -304,7 +305,7 @@ describe('In Progress tab', () => {
       jest.clearAllMocks()
       const drafts: IDeclaration[] = []
       for (let i = 0; i < 12; i++) {
-        drafts.push(createDeclaration(Event.BIRTH))
+        drafts.push(createDeclaration(Event.Birth))
       }
       const testComponent = await createTestComponent(
         <InProgress
@@ -347,7 +348,7 @@ describe('In Progress tab', () => {
       const drafts: IDeclaration[] = [
         {
           id: 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8',
-          event: Event.BIRTH,
+          event: Event.Birth,
           modifiedOn: TIME_STAMP,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
@@ -369,7 +370,7 @@ describe('In Progress tab', () => {
         },
         {
           id: 'bd22s7c5-ad87-4117-91c1-35eaf2ese32bw',
-          event: Event.BIRTH,
+          event: Event.Birth,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           modifiedOn: TIME_STAMP,
           data: {
@@ -380,7 +381,7 @@ describe('In Progress tab', () => {
         },
         {
           id: 'cc66d69c-7f0a-4047-9283-f066571830f1',
-          event: Event.DEATH,
+          event: Event.Death,
           modifiedOn: TIME_STAMP,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
@@ -392,7 +393,7 @@ describe('In Progress tab', () => {
         },
         {
           id: 'cc66d69c-7f0a-4047-9283-f066571830f2',
-          event: Event.DEATH,
+          event: Event.Death,
           modifiedOn: TIME_STAMP,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
@@ -403,7 +404,7 @@ describe('In Progress tab', () => {
         },
         {
           id: 'cc66d69c-7f0a-4047-9283-f066571830f4',
-          event: Event.DEATH,
+          event: Event.Death,
           modifiedOn: TIME_STAMP + 1,
           submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT],
           data: {
@@ -460,7 +461,7 @@ describe('In Progress tab', () => {
     it('renders all items returned from graphql query in inProgress tab', async () => {
       const TIME_STAMP = '1562912635549'
       const drafts: IDeclaration[] = []
-      drafts.push(createDeclaration(Event.BIRTH))
+      drafts.push(createDeclaration(Event.Birth))
       const testComponent = await createTestComponent(
         <InProgress
           drafts={drafts}
@@ -551,7 +552,7 @@ describe('In Progress tab', () => {
     it('Should render pagination in progress tab if data is more than 10', async () => {
       jest.clearAllMocks()
       const drafts: IDeclaration[] = []
-      drafts.push(createDeclaration(Event.BIRTH))
+      drafts.push(createDeclaration(Event.Birth))
       const testComponent = await createTestComponent(
         <InProgress
           drafts={drafts}
@@ -592,7 +593,7 @@ describe('In Progress tab', () => {
       jest.clearAllMocks()
       const TIME_STAMP = '1562912635549'
       const drafts: IDeclaration[] = []
-      drafts.push(createDeclaration(Event.BIRTH))
+      drafts.push(createDeclaration(Event.Birth))
       // @ts-ignore
       const testComponent = await createTestComponent(
         <InProgress
@@ -729,7 +730,7 @@ describe('In Progress tab', () => {
       }
       it('renders download button when not downloaded', async () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
-          Event.BIRTH,
+          Event.Birth,
           declarationId,
           Action.LOAD_REVIEW_DECLARATION
         )
@@ -746,7 +747,7 @@ describe('In Progress tab', () => {
       })
       it('renders loading indicator when declaration is being downloaded', async () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
-          Event.BIRTH,
+          Event.Birth,
           declarationId,
           Action.LOAD_REVIEW_DECLARATION
         )
@@ -763,7 +764,7 @@ describe('In Progress tab', () => {
       })
       it('renders update button when download succeeds', async () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
-          Event.BIRTH,
+          Event.Birth,
           declarationId,
           Action.LOAD_REVIEW_DECLARATION
         )
@@ -798,7 +799,7 @@ describe('In Progress tab', () => {
       })
       it('renders error when download fails', async () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
-          Event.BIRTH,
+          Event.Birth,
           declarationId,
           Action.LOAD_REVIEW_DECLARATION
         )
@@ -819,7 +820,7 @@ describe('In Progress tab', () => {
     it('Should render all items returned from graphQL', async () => {
       const TIME_STAMP = '1562912635549'
       const drafts: IDeclaration[] = []
-      drafts.push(createDeclaration(Event.BIRTH))
+      drafts.push(createDeclaration(Event.Birth))
       const testComponent = await createTestComponent(
         <InProgress
           drafts={drafts}
@@ -907,7 +908,7 @@ describe('Tablet tests', () => {
     jest.clearAllMocks()
     const TIME_STAMP = '1562912635549'
     const drafts: IDeclaration[] = []
-    drafts.push(createDeclaration(Event.BIRTH))
+    drafts.push(createDeclaration(Event.Birth))
     const declarationId = 'e302f7c5-ad87-4117-91c1-35eaf2ea7be8'
 
     // @ts-ignore

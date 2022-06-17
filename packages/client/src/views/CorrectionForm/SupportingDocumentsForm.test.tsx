@@ -17,7 +17,8 @@ import {
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { CorrectionSection, Event } from '@client/forms'
+import { CorrectionSection } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { IDeclaration, storeDeclaration } from '@client/declarations'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
@@ -29,7 +30,7 @@ let wrapper: ReactWrapper<{}, {}>
 const birthDeclaration: IDeclaration = {
   id: '72c18939-70c1-40b4-9b80-b162c4871160',
   data: mockDeclarationData,
-  event: Event.BIRTH
+  event: Event.Birth
 }
 
 const { store, history } = createStore()

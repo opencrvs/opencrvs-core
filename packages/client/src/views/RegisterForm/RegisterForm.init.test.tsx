@@ -27,14 +27,14 @@ import {
 } from '@client/declarations'
 import { DRAFT_BIRTH_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
 
-import { Event } from '@opencrvs/client/src/forms'
+import { Event } from '@client/utils/gateway'
 import { storage } from '@client/storage'
 import { IUserDetails } from '@client/utils/userUtils'
 describe('when user logs in', () => {
   // Some mock data
-  const draft1 = createDeclaration(Event.BIRTH)
-  const draft2 = createDeclaration(Event.DEATH)
-  const draft3 = createDeclaration(Event.BIRTH)
+  const draft1 = createDeclaration(Event.Birth)
+  const draft2 = createDeclaration(Event.Death)
+  const draft3 = createDeclaration(Event.Birth)
 
   const currentUserData: IUserData = {
     userID: 'shakib75',
@@ -103,7 +103,7 @@ describe('when user logs in', () => {
     let draft: IDeclaration
 
     beforeAll(async () => {
-      draft = createDeclaration(Event.DEATH)
+      draft = createDeclaration(Event.Death)
       jest.mock('lodash/debounce', () => jest.fn((fn) => fn))
       const { store } = await createTestStore()
       await writeDeclarationByUser(
@@ -160,8 +160,8 @@ describe('when user is in the register form before initial draft load', () => {
     const { store, history } = await createTestStore()
 
     const mock: any = jest.fn()
-    const draft = createDeclaration(Event.BIRTH)
-    const form = await getRegisterFormFromStore(store, Event.BIRTH)
+    const draft = createDeclaration(Event.Birth)
+    const form = await getRegisterFormFromStore(store, Event.Birth)
 
     try {
       await createTestComponent(
