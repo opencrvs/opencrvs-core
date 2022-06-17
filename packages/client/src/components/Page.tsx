@@ -13,7 +13,6 @@ import * as React from 'react'
 import styled from '@client/styledComponents'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
-import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { setInitialDeclarations } from '@client/declarations'
 import { Spinner } from '@opencrvs/components/lib/interface'
@@ -36,8 +35,6 @@ import { isRegisterFormReady } from '@client/forms/register/declaration-selector
 import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 
-const languageFromProps = ({ language }: IPageProps) => language
-
 const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};
   min-height: 100vh;
@@ -54,32 +51,6 @@ const StyledPage = styled.div<IPageProps>`
   *:before,
   *:after {
     box-sizing: border-box;
-  }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
-    src: url('/fonts/notosans-semibold-webfont-en.ttf') format('truetype');
-  }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.regularFont};
-    src: url('/fonts/notosans-regular-webfont-en.ttf') format('truetype');
-  }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
-    src: url('/fonts/notosans-semibold-webfont-${languageFromProps}.ttf')
-      format('truetype');
-  }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.regularFont};
-    src: url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
-      format('truetype');
   }
 `
 
@@ -104,7 +75,6 @@ export const StyledText = styled.div`
 `
 
 interface IPageProps {
-  language?: string
   initialDeclarationsLoaded: boolean
   offlineDataLoaded: boolean
   registerFormLoaded: boolean
@@ -193,7 +163,6 @@ class Component extends React.Component<
 
 const mapStateToProps = (store: IStoreState): IPageProps => {
   return {
-    language: getLanguage(store),
     initialDeclarationsLoaded: getInitialDeclarationsLoaded(store),
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store),

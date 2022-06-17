@@ -114,7 +114,6 @@ const SmallWidthInput = styled(TextInput)`
 `
 const ErrorMessage = styled.div`
   position: relative;
-  ${({ theme }) => theme.fonts.semiBoldFont};
   color: ${({ theme }) => theme.colors.negative};
   margin-left: 6px;
 `

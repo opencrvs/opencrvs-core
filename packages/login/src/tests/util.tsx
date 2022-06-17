@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { mount, configure, ReactWrapper } from 'enzyme'
+import { mount, configure } from 'enzyme'
 import { Provider } from 'react-redux'
 import Adapter from 'enzyme-adapter-react-16'
 import { Router } from 'react-router'
@@ -21,7 +21,6 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 import { App } from '@login/App'
 import { IStoreState, createStore } from '@login/store'
 import { IntlContainer } from '@login/i18n/components/I18nContainer'
-import { getDefaultLanguage } from '@login/i18n/utils'
 
 configure({ adapter: new Adapter() })
 
@@ -44,7 +43,7 @@ export function createTestComponent(
   return mount(
     <Provider store={store}>
       <IntlContainer>
-        <ThemeProvider theme={getTheme(getDefaultLanguage())}>
+        <ThemeProvider theme={getTheme()}>
           <Router history={history}>{node}</Router>
         </ThemeProvider>
       </IntlContainer>

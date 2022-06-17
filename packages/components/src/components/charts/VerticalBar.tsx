@@ -97,7 +97,7 @@ export const VerticalBar = withTheme(
             >
               <Label
                 fill={theme.colors.secondary}
-                fontFamily={theme.fonts.regularFont}
+                fontFamily={theme.fonts.fontFamily}
                 offset={20}
                 value={xAxisLabel}
                 position="bottom"
@@ -106,7 +106,7 @@ export const VerticalBar = withTheme(
             <YAxis width={30} tickLine={false} axisLine={false} tick={false}>
               <Label
                 fill={theme.colors.secondary}
-                fontFamily={theme.fonts.regularFont}
+                fontFamily={theme.fonts.fontFamily}
                 transform="rotate(-90)"
                 dy={-40}
                 offset={20}

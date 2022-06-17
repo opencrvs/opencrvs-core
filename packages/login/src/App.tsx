@@ -56,7 +56,7 @@ export class App extends React.Component<IAppProps> {
         <GlobalStyle />
         <Provider store={this.props.store}>
           <IntlContainer>
-            <ThemeProvider theme={getTheme(getDefaultLanguage())}>
+            <ThemeProvider theme={getTheme()}>
               <ConnectedRouter history={this.props.history}>
                 <Page>
                   <Switch>

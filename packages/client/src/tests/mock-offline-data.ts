@@ -651,6 +651,7 @@ export const mockOfflineData = {
     COUNTRY_LOGO_RENDER_WIDTH: 104,
     COUNTRY_LOGO_RENDER_HEIGHT: 104,
     DESKTOP_TIME_OUT_MILLISECONDS: 900000,
+    AVAILABLE_LANGUAGES_SELECT: 'en:English,fr:Français,bn:বাংলা',
     DEATH: {
       REGISTRATION_TARGET: 45,
       FEE: {

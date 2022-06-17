@@ -40,7 +40,8 @@
     "redux-form": "^8.2.3",
     "redux-loop": "^5.0.0",
     "redux-sentry-middleware": "^0.0.15",
-    "styled-components": "^5.2.0"
+    "styled-components": "^5.2.0",
+    "webfontloader": "^1.6.28"
   },
   "scripts": {
     "postinstall": "patch-package",
@@ -80,6 +81,7 @@
     "@types/react-dom": "^16.9.1",
     "@types/redux-form": "^8.2.0",
     "@types/redux-mock-store": "^1.0.0",
+    "@types/webfontloader": "^1.6.34",
     "enzyme": "^3.4.4",
     "enzyme-adapter-react-16": "^1.2.0",
     "eslint-config-react-app": "^6.0.0",
