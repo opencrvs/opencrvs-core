@@ -233,7 +233,8 @@ export class InProgressComponent extends React.Component<
             downloadConfigs={{
               event: event as string,
               compositionId: reg.id,
-              action: Action.LOAD_REVIEW_DECLARATION
+              action: Action.LOAD_REVIEW_DECLARATION,
+              assignment: reg?.registration?.assignment
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus}
