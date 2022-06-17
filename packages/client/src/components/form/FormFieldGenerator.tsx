@@ -748,6 +748,7 @@ class FormSectionComponent extends React.Component<Props> {
 
     fieldsToReset.forEach((fieldToReset) => {
       this.props.setFieldValue(fieldToReset.name, '')
+      this.resetDependentSelectValues(fieldToReset.name)
     })
   }
 
