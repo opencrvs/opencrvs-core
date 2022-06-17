@@ -271,7 +271,7 @@ function DownloadButtonComponent(
             status === DOWNLOAD_STATUS.DOWNLOADED
           )
         )
-      } else {
+      } else if (status !== DOWNLOAD_STATUS.DOWNLOADED) {
         download()
       }
       e.stopPropagation()
