@@ -47,6 +47,7 @@ import {
   IOnlineStatusProps
 } from '@client/views/OfficeHome/LoadingIndicator'
 import ReactTooltip from 'react-tooltip'
+import { Roles } from '@client/utils/authUtils'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -64,7 +65,7 @@ interface DownloadButtonProps {
 }
 
 interface IConnectProps {
-  userRole?: string
+  userRole?: Roles
   userId?: string
 }
 interface IDispatchProps {
@@ -111,7 +112,7 @@ function getAssignModalOptions(
     onUnassign: () => void
     onCancel: () => void
   },
-  userRole?: string,
+  userRole?: Roles,
   isDownloadedBySelf?: boolean
 ): AssignModalOptions {
   const assignAction: IModalAction = {
@@ -243,8 +244,9 @@ function DownloadButtonComponent(
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
-        assignment?.userId != userId ||
-        status === DOWNLOAD_STATUS.DOWNLOADED
+        (assignment?.userId != userId ||
+          status === DOWNLOAD_STATUS.DOWNLOADED) &&
+        downloadConfigs.action !== Action.LOAD_REVIEW_DECLARATION
       ) {
         setAssignModal(
           getAssignModalOptions(
@@ -269,7 +271,16 @@ function DownloadButtonComponent(
       }
       e.stopPropagation()
     },
-    [assignment, userRole, download, userId, status, unassign, hideModal]
+    [
+      assignment,
+      userRole,
+      download,
+      userId,
+      status,
+      unassign,
+      hideModal,
+      downloadConfigs
+    ]
   )
 
   if (status && LOADING_STATUSES.includes(status)) {
@@ -342,7 +353,7 @@ function DownloadButtonComponent(
 }
 
 const mapStateToProps = (state: IStoreState): IConnectProps => ({
-  userRole: state.profile.userDetails?.role,
+  userRole: state.profile.userDetails?.role as Roles | undefined,
   userId: state.profile.userDetails?.userMgntUserID
 })
 
