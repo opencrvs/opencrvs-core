@@ -73,7 +73,8 @@ export const ShowDownloadButton = ({
       event: type as string,
       compositionId: id,
       action: Action.LOAD_REVIEW_DECLARATION,
-      assignment: declaration?.assignment
+      assignment: declaration?.assignment,
+      declarationStatus: declaration.status
     }
     return (
       <DownloadButton

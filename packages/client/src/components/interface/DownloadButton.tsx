@@ -38,7 +38,8 @@ import { IStoreState } from '@client/store'
 import { AvatarVerySmall } from '@client/components/Avatar'
 import {
   ROLE_LOCAL_REGISTRAR,
-  FIELD_AGENT_ROLES
+  FIELD_AGENT_ROLES,
+  ROLE_REGISTRATION_AGENT
 } from '@client/utils/constants'
 import { Dispatch } from 'redux'
 import ApolloClient from 'apollo-client'
@@ -51,6 +52,7 @@ import {
   IOnlineStatusProps
 } from '@client/views/OfficeHome/LoadingIndicator'
 import ReactTooltip from 'react-tooltip'
+import { Roles } from '@client/utils/authUtils'
 import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 
 const { useState, useCallback, useMemo } = React
@@ -60,6 +62,7 @@ interface IDownloadConfig {
   action: Action
   assignment?: GQLAssignmentData
   refetchQueries?: RefetchQueryDescription
+  declarationStatus?: string
 }
 
 interface DownloadButtonProps {
@@ -70,7 +73,7 @@ interface DownloadButtonProps {
 }
 
 interface IConnectProps {
-  userRole?: string
+  userRole?: Roles
   userId?: string
 }
 interface IDispatchProps {
@@ -117,7 +120,7 @@ function getAssignModalOptions(
     onUnassign: () => void
     onCancel: () => void
   },
-  userRole?: string,
+  userRole?: Roles,
   isDownloadedBySelf?: boolean
 ): AssignModalOptions {
   const assignAction: IModalAction = {
@@ -251,7 +254,9 @@ function DownloadButtonComponent(
       if (
         (assignment?.userId != userId ||
           status === DOWNLOAD_STATUS.DOWNLOADED) &&
-        !FIELD_AGENT_ROLES.includes(userRole as string)
+        (downloadConfigs.declarationStatus !== 'VALIDATED' ||
+          userRole !== ROLE_REGISTRATION_AGENT) &&
+        !FIELD_AGENT_ROLES.includes(String(userRole))
       ) {
         setAssignModal(
           getAssignModalOptions(
@@ -276,7 +281,16 @@ function DownloadButtonComponent(
       }
       e.stopPropagation()
     },
-    [assignment, userRole, download, userId, status, unassign, hideModal]
+    [
+      assignment,
+      userRole,
+      download,
+      userId,
+      status,
+      unassign,
+      hideModal,
+      downloadConfigs
+    ]
   )
 
   if (status && LOADING_STATUSES.includes(status)) {
@@ -349,7 +363,7 @@ function DownloadButtonComponent(
 }
 
 const mapStateToProps = (state: IStoreState): IConnectProps => ({
-  userRole: state.profile.userDetails?.role,
+  userRole: state.profile.userDetails?.role as Roles | undefined,
   userId: state.profile.userDetails?.userMgntUserID
 })
 
