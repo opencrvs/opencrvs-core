@@ -210,7 +210,7 @@ export function getRegisteringOfficeId(
 ): string | null {
   const registeringHistory = (
     declaration?.data?.history as unknown as History[]
-  ).find((h) => h.action === 'REGISTERED')
+  )?.find((h) => h.action === 'REGISTERED')
 
   return registeringHistory?.office?.id || null
 }
