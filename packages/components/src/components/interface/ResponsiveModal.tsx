@@ -98,8 +98,9 @@ const Body = styled.div<{
   fullscreen?: boolean
 }>`
   ${({ theme }) => theme.fonts.reg16};
-  height: ${({ height }) => (height ? height : 250)}px;
-  height: ${({ autoHeight }) => autoHeight && `auto`};
+  height: ${({ height, autoHeight }) =>
+    height ? `${height}px` : autoHeight ? `auto` : `250px`};
+  max-height: ${({ fullscreen }) => !fullscreen && `calc(100vh - 180px)`};
   color: ${({ theme }) => theme.colors.supportingCopy};
   overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'auto')};
   padding: 0 24px 16px;
