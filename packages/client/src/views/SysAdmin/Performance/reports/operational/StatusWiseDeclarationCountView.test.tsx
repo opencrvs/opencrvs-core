@@ -18,7 +18,7 @@ import {
 import { queries } from '@client/profile/queries'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { StatusWiseDeclarationCountView } from '@client/views/SysAdmin/Performance/reports/operational/StatusWiseDeclarationCountView'
-import { AppStore, createStore } from '@client/store'
+import { AppStore } from '@client/store'
 import * as React from 'react'
 import { GQLRegistrationCountResult } from '@opencrvs/gateway/src/graphql/schema'
 import { ReactWrapper } from 'enzyme'
@@ -26,7 +26,7 @@ import * as locationUtils from '@client/utils/locationUtils'
 import * as performanceUtils from '@client/views/SysAdmin/Performance/utils'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { StatusMapping } from '@client/views/SysAdmin/Performance/WorkflowStatus'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { History } from 'history'
 import { offlineDataReady } from '@client/offline/actions'
 
@@ -71,7 +71,7 @@ describe('Status wise registration count', () => {
       }
       component = await createTestComponent(
         <StatusWiseDeclarationCountView
-          selectedEvent={Event.BIRTH}
+          selectedEvent={Event.Birth}
           data={data}
           isAccessibleOffice={true}
           statusMapping={StatusMapping}

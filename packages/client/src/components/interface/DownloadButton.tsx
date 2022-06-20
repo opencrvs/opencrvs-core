@@ -29,13 +29,18 @@ import {
   DOWNLOAD_STATUS,
   unassignDeclaration
 } from '@client/declarations'
-import { Event, Action } from '@client/forms'
+import { Action } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { withApollo, WithApolloClient } from 'react-apollo'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
 import { IStoreState } from '@client/store'
 import { AvatarVerySmall } from '@client/components/Avatar'
-import { ROLE_LOCAL_REGISTRAR } from '@client/utils/constants'
+import {
+  ROLE_LOCAL_REGISTRAR,
+  FIELD_AGENT_ROLES,
+  ROLE_REGISTRATION_AGENT
+} from '@client/utils/constants'
 import { Dispatch } from 'redux'
 import ApolloClient from 'apollo-client'
 import { useIntl, IntlShape, MessageDescriptor } from 'react-intl'
@@ -47,6 +52,8 @@ import {
   IOnlineStatusProps
 } from '@client/views/OfficeHome/LoadingIndicator'
 import ReactTooltip from 'react-tooltip'
+import { Roles } from '@client/utils/authUtils'
+import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 
 const { useState, useCallback, useMemo } = React
 interface IDownloadConfig {
@@ -54,6 +61,8 @@ interface IDownloadConfig {
   compositionId: string
   action: Action
   assignment?: GQLAssignmentData
+  refetchQueries?: RefetchQueryDescription
+  declarationStatus?: string
 }
 
 interface DownloadButtonProps {
@@ -64,7 +73,7 @@ interface DownloadButtonProps {
 }
 
 interface IConnectProps {
-  userRole?: string
+  userRole?: Roles
   userId?: string
 }
 interface IDispatchProps {
@@ -111,7 +120,7 @@ function getAssignModalOptions(
     onUnassign: () => void
     onCancel: () => void
   },
-  userRole?: string,
+  userRole?: Roles,
   isDownloadedBySelf?: boolean
 ): AssignModalOptions {
   const assignAction: IModalAction = {
@@ -243,8 +252,11 @@ function DownloadButtonComponent(
   const onClickDownload = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       if (
-        assignment?.userId != userId ||
-        status === DOWNLOAD_STATUS.DOWNLOADED
+        (assignment?.userId != userId ||
+          status === DOWNLOAD_STATUS.DOWNLOADED) &&
+        (downloadConfigs.declarationStatus !== 'VALIDATED' ||
+          userRole !== ROLE_REGISTRATION_AGENT) &&
+        !FIELD_AGENT_ROLES.includes(String(userRole))
       ) {
         setAssignModal(
           getAssignModalOptions(
@@ -254,7 +266,7 @@ function DownloadButtonComponent(
                 download()
                 hideModal()
               },
-              onUnassign: async () => {
+              onUnassign: () => {
                 unassign()
                 hideModal()
               },
@@ -264,12 +276,21 @@ function DownloadButtonComponent(
             status === DOWNLOAD_STATUS.DOWNLOADED
           )
         )
-      } else {
+      } else if (status !== DOWNLOAD_STATUS.DOWNLOADED) {
         download()
       }
       e.stopPropagation()
     },
-    [assignment, userRole, download, userId, status, unassign, hideModal]
+    [
+      assignment,
+      userRole,
+      download,
+      userId,
+      status,
+      unassign,
+      hideModal,
+      downloadConfigs
+    ]
   )
 
   if (status && LOADING_STATUSES.includes(status)) {
@@ -342,11 +363,14 @@ function DownloadButtonComponent(
 }
 
 const mapStateToProps = (state: IStoreState): IConnectProps => ({
-  userRole: state.profile.userDetails?.role,
+  userRole: state.profile.userDetails?.role as Roles | undefined,
   userId: state.profile.userDetails?.userMgntUserID
 })
 
-const mapDispatchToProps = (dispatch: Dispatch): IDispatchProps => ({
+const mapDispatchToProps = (
+  dispatch: Dispatch,
+  ownProps: DownloadButtonProps
+): IDispatchProps => ({
   downloadDeclaration: (
     event: Event,
     compositionId: string,
@@ -354,7 +378,9 @@ const mapDispatchToProps = (dispatch: Dispatch): IDispatchProps => ({
     client: ApolloClient<any>
   ) => dispatch(downloadDeclaration(event, compositionId, action, client)),
   unassignDeclaration: (id: string, client: ApolloClient<any>) =>
-    dispatch(unassignDeclaration(id, client))
+    dispatch(
+      unassignDeclaration(id, client, ownProps.downloadConfigs.refetchQueries)
+    )
 })
 
 export const DownloadButton = connect(

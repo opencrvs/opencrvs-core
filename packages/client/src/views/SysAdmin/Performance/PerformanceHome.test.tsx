@@ -23,7 +23,7 @@ import * as React from 'react'
 import { PerformanceHome } from './PerformanceHome'
 import { parse } from 'query-string'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 
 describe('Performance home test', () => {
   describe('Performance home without location in props', () => {
@@ -41,7 +41,7 @@ describe('Performance home test', () => {
           {...createRouterProps('/', undefined, {
             search: {
               locationId: LOCATION_DHAKA_DIVISION.id,
-              event: Event.BIRTH,
+              event: Event.Birth,
               timeEnd: new Date(1487076708000).toISOString(),
               timeStart: new Date(1455454308000).toISOString()
             }

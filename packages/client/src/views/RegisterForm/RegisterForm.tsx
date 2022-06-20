@@ -48,7 +48,6 @@ import {
 } from '@client/components/form'
 import { RejectRegistrationForm } from '@client/components/review/RejectRegistrationForm'
 import {
-  Event,
   IForm,
   IFormField,
   IFormSection,
@@ -59,6 +58,7 @@ import {
   IFormFieldValue,
   SELECT_WITH_DYNAMIC_OPTIONS
 } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import {
   goBack as goBackAction,
   goToCertificateCorrection,
@@ -411,11 +411,11 @@ class RegisterFormView extends React.Component<FullProps, State> {
     const eventType = this.props.declaration.event || 'BIRTH'
     switch (eventType.toLocaleLowerCase()) {
       case 'birth':
-        return Event.BIRTH
+        return Event.Birth
       case 'death':
-        return Event.DEATH
+        return Event.Death
       default:
-        return Event.BIRTH
+        return Event.Birth
     }
   }
 
@@ -440,12 +440,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onDeleteDeclaration = (declaration: IDeclaration) => {
-    this.props.goToHomeTab(WORKQUEUE_TABS.inProgress)
-
-    setTimeout(
-      () => this.props.deleteDeclaration(declaration),
-      PAGE_TRANSITIONS_ENTER_TIME + 200
-    )
+    this.props.deleteDeclaration(declaration)
   }
 
   onCloseDeclaration = () => {

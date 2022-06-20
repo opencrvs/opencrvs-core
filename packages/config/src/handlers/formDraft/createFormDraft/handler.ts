@@ -9,11 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import Question, {
-  IQuestion,
-  IQuestionModel,
-  validFieldType
-} from '@config/models/question'
+import Question, { IQuestion, IQuestionModel } from '@config/models/question'
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@config/config/logger'
 import * as Joi from 'joi'
@@ -24,7 +20,7 @@ import FormDraft, {
   validEvent,
   DraftStatus
 } from '@config/models/formDraft'
-import { messageSchema } from '@config/handlers/question/createQuestion/handler'
+import { requestSchema as questionReqeustSchema } from '@config/handlers/question/createQuestion/handler'
 import { find, partition, isEmpty } from 'lodash'
 import { Event } from '@config/models/certificate'
 
@@ -160,29 +156,11 @@ export async function createFormDraftHandler(
   return h.response(oldDraft).code(201)
 }
 
-export const questionReqSchema = Joi.object({
-  id: Joi.string(),
-  fieldId: Joi.string(),
-  label: messageSchema,
-  placeholder: messageSchema,
-  description: messageSchema,
-  tooltip: messageSchema,
-  errorMessage: messageSchema,
-  maxLength: Joi.number(),
-  fieldName: Joi.string(),
-  fieldType: Joi.string().valid(...validFieldType),
-  preceedingFieldId: Joi.string(),
-  required: Joi.boolean(),
-  enabled: Joi.string().allow(''),
-  custom: Joi.boolean(),
-  initialValue: Joi.string()
-})
-
 export const requestSchema = Joi.object({
   id: Joi.string(),
   event: Joi.string()
     .valid(...validEvent)
     .required(),
-  questions: Joi.array().items(questionReqSchema).required(),
+  questions: Joi.array().items(questionReqeustSchema).required(),
   comment: Joi.string().required()
 })

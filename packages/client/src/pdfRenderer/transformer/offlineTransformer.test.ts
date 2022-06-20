@@ -16,7 +16,7 @@ import {
 } from '@client/tests/util'
 import { offlineTransformers } from '@client/pdfRenderer/transformer/offlineTransformer'
 import { createIntl } from 'react-intl'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { TemplateTransformerData } from './types'
 
 describe('PDF template offline data related field transformer tests', () => {
@@ -24,7 +24,7 @@ describe('PDF template offline data related field transformer tests', () => {
     declaration: {
       id: 'sample',
       data: mockDeclarationData,
-      event: Event.BIRTH
+      event: Event.Birth
     },
     userDetails,
     resource: mockOfflineData

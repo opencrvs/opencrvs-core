@@ -57,3 +57,4 @@ export const mockFetchConfig = {
   LANGUAGES: 'en',
   ADDRESSES: 1
 }
+export const DEFAULT_TIMEOUT = 600000

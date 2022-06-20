@@ -16,11 +16,8 @@ import { createTestComponent } from '@client/tests/util'
 import { DraftsTab } from './DraftsTab'
 import { History } from 'history'
 import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
-import {
-  IFormDraft,
-  DraftStatus
-} from '@client/forms/configuration/formDrafts/utils'
-import { Event } from '@client/forms'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import {
   ActionState,
   defaultActionState,
@@ -32,12 +29,12 @@ let component: ReactWrapper<{}, {}>
 
 const draftHistory = [
   {
-    status: DraftStatus.DRAFT,
+    status: DraftStatus.Draft,
     version: 1,
     updatedAt: Date.now()
   },
   {
-    status: DraftStatus.DRAFT,
+    status: DraftStatus.Draft,
     version: 0,
     updatedAt: Date.now()
   }
@@ -76,30 +73,6 @@ describe('DraftsTab', () => {
     expect(component.exists('DraftsTab')).toBeTruthy()
   })
 
-  describe('when Draft status is DELETED', () => {
-    const deletedDraft: IFormDraft = {
-      event: Event.BIRTH,
-      status: DraftStatus.DELETED,
-      version: 1,
-      history: draftHistory,
-      updatedAt: Date.now(),
-      createdAt: Date.now()
-    }
-
-    beforeEach(() => {
-      store.dispatch(updateFormConfig(deletedDraft))
-      component.update()
-    })
-
-    it('show not show options menu', () => {
-      expect(component.exists('OptionsMenu')).toBeFalsy()
-    })
-
-    it('should not show status Pill', () => {
-      expect(component.exists('Pill')).toBeFalsy()
-    })
-  })
-
   describe('when Draft status is DRAFT', () => {
     it('should not show options menu', () => {
       expect(component.exists('OptionsMenu')).toBeFalsy()
@@ -112,8 +85,8 @@ describe('DraftsTab', () => {
     describe('if not default draft', () => {
       beforeEach(() => {
         const newDraft: IFormDraft = {
-          event: Event.BIRTH,
-          status: DraftStatus.DRAFT,
+          event: Event.Birth,
+          status: DraftStatus.Draft,
           version: 1,
           history: draftHistory,
           updatedAt: Date.now(),
@@ -161,8 +134,8 @@ describe('DraftsTab', () => {
 
   describe('when DraftStatus status is IN_PREVIEW', () => {
     const inPreviewDraft: IFormDraft = {
-      event: Event.BIRTH,
-      status: DraftStatus.PREVIEW,
+      event: Event.Birth,
+      status: DraftStatus.InPreview,
       version: 1,
       history: draftHistory,
       updatedAt: Date.now(),
@@ -181,8 +154,8 @@ describe('DraftsTab', () => {
 
   describe('when DraftStatus status is PUBLISHED', () => {
     const publishedDraft: IFormDraft = {
-      event: Event.BIRTH,
-      status: DraftStatus.PUBLISHED,
+      event: Event.Birth,
+      status: DraftStatus.Published,
       version: 1,
       history: draftHistory,
       updatedAt: Date.now(),

@@ -14,7 +14,10 @@ import styled from '@client/styledComponents'
 import { useDispatch } from 'react-redux'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
-import { IConfigField } from '@client/forms/configuration/formConfig/utils'
+import {
+  IDefaultConfigField,
+  ICustomConfigField
+} from '@client/forms/configuration/formConfig/utils'
 import { Tooltip } from '@opencrvs/components/lib/icons'
 import ReactTooltip from 'react-tooltip'
 
@@ -51,7 +54,10 @@ const TooltipContainer = styled.div`
   }
 `
 
-export function RequiredToggleAction({ fieldId, required }: IConfigField) {
+export function RequiredToggleAction({
+  fieldId,
+  required
+}: IDefaultConfigField | ICustomConfigField) {
   const dispatch = useDispatch()
 
   return (

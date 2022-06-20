@@ -38,7 +38,6 @@ import {
   BirthSection,
   CHECKBOX_GROUP,
   DATE,
-  Event,
   FETCH_BUTTON,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   ICheckboxGroupFormField,
@@ -69,6 +68,7 @@ import {
   LOCATION_SEARCH_INPUT,
   IAttachmentValue
 } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import {
   getBirthSection,
   getRegisterForm
@@ -506,12 +506,12 @@ const getErrorsOnFieldsBySection = (
 }
 
 const SECTION_MAPPING = {
-  [Event.BIRTH]: birthSectionMapping,
-  [Event.DEATH]: deathSectionMapping
+  [Event.Birth]: birthSectionMapping,
+  [Event.Death]: deathSectionMapping
 }
 const SECTION_TITLE = {
-  [Event.BIRTH]: birthSectionTitle,
-  [Event.DEATH]: deathSectionTitle
+  [Event.Birth]: birthSectionTitle,
+  [Event.Death]: deathSectionTitle
 }
 
 class ReviewSectionComp extends React.Component<FullProps, State> {
@@ -1394,7 +1394,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       draft: { data, event }
     } = this.props
     return (
-      event === Event.BIRTH &&
+      event === Event.Birth &&
       ((section.id === BirthSection.Mother && !!data.mother?.detailsExist) ||
         (section.id === BirthSection.Father && !!data.father?.detailsExist))
     )

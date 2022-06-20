@@ -650,6 +650,7 @@ function UserListComponent(props: IProps) {
         undefined
       }
       isCertificatesConfigPage={true}
+      hideBackground={true}
     >
       {isOnline ? (
         <Query

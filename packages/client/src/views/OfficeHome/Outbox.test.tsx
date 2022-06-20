@@ -12,7 +12,7 @@
 import * as React from 'react'
 import OutBox from '@client/views/OfficeHome/Outbox'
 import { IDeclaration } from '@client/declarations'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { createTestComponent } from '@client/tests/util'
 import { createStore } from '@client/store'
 
@@ -56,7 +56,7 @@ describe('OutBox tests', () => {
       },
       documents: {}
     },
-    event: Event.BIRTH,
+    event: Event.Birth,
     submissionStatus: 'READY_TO_SUBMIT',
     savedOn: 1562834811371,
     modifiedOn: 1562834888006,
@@ -105,7 +105,7 @@ describe('OutBox tests', () => {
       },
       documents: {}
     },
-    event: Event.DEATH,
+    event: Event.Death,
     submissionStatus: 'READY_TO_SUBMIT',
     savedOn: 1562846186040,
     modifiedOn: 1562846292423,

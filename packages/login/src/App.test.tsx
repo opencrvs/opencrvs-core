@@ -27,6 +27,7 @@ describe('Login app step one', () => {
       CONFIG_API_URL: 'http://localhost:2021/',
       COUNTRY: 'far',
       LANGUAGES: 'en,fr',
+      AVAILABLE_LANGUAGES_SELECT: 'en:English,fr:Français,bn:বাংলা',
       CLIENT_APP_URL: 'http://localhost:3000/',
       COUNTRY_CONFIG_URL: 'http://localhost:3040',
       PHONE_NUMBER_PATTERN: /^0(7|9)[0-9]{1}[0-9]{7}$/,

@@ -15,7 +15,7 @@ import { AppStore, createStore } from '@client/store'
 import { ReactWrapper } from 'enzyme'
 import { createTestComponent } from '@client/tests/util'
 import { CompletenessDataTable } from '@client/views/SysAdmin/Performance/reports/completenessRates/CompletenessDataTable'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 import { History } from 'history'
@@ -58,7 +58,7 @@ describe('CompletenessDataTable tests for over time option', () => {
         completenessRateTime={CompletenessRateTime.Within1Year}
         loading={false}
         base={{ baseType: COMPLETENESS_RATE_REPORT_BASE.TIME }}
-        eventType={Event.BIRTH}
+        eventType={Event.Birth}
         data={mockData}
       />,
       { store, history }
@@ -125,7 +125,7 @@ describe('CompletenessDataTable tests for by location option', () => {
           baseType: COMPLETENESS_RATE_REPORT_BASE.LOCATION,
           locationJurisdictionType: 'UNION'
         }}
-        eventType={Event.BIRTH}
+        eventType={Event.Birth}
         data={mockData}
       />,
       { store, history }

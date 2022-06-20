@@ -53,7 +53,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { REGISTRAR_HOME } from '@client/navigation/routes'
+import { UnbuplishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -324,6 +324,7 @@ export const NavigationView = (props: IFullProps) => {
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
       avatar={() => userInfo && userInfo.avatar}
+      warning={UnbuplishedWarning(true)}
     >
       {userDetails?.role === 'FIELD_AGENT' ? (
         <>

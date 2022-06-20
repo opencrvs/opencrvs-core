@@ -19,14 +19,13 @@ import {
   messages,
   draftTabsMessages
 } from '@client/i18n/messages/views/formConfig'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import { DraftsTab } from './DraftsTab'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'
 import { PreviewTab } from './PreviewTab'
 import { PublishedTab } from './PublishedTab'
 import styled from '@client/styledComponents'
 import { Warning } from '@opencrvs/components/lib/interface'
-import { Event } from '@client/forms'
 import { constantsMessages } from '@client/i18n/messages'
 import {
   ActionState,
@@ -42,26 +41,27 @@ const StyledWarning = styled(Warning)`
   max-width: 778px;
 `
 
-function UnbuplishedWarning() {
+export function UnbuplishedWarning(hideIcon?: boolean) {
   const intl = useIntl()
   const { status: birthStatus } = useSelector((store: IStoreState) =>
-    selectFormDraft(store, Event.BIRTH)
+    selectFormDraft(store, Event.Birth)
   )
   const { status: deathStatus } = useSelector((store: IStoreState) =>
-    selectFormDraft(store, Event.DEATH)
+    selectFormDraft(store, Event.Death)
   )
   const events: string[] = []
-  if (birthStatus !== DraftStatus.PUBLISHED) {
-    events.push(intl.formatMessage(constantsMessages[Event.BIRTH]))
+  if (birthStatus !== DraftStatus.Published) {
+    events.push(intl.formatMessage(constantsMessages[Event.Birth]))
   }
-  if (deathStatus !== DraftStatus.PUBLISHED) {
-    events.push(intl.formatMessage(constantsMessages[Event.DEATH]))
+  if (deathStatus !== DraftStatus.Published) {
+    events.push(intl.formatMessage(constantsMessages[Event.Death]))
   }
 
   return (
     <>
       {events.length > 0 && (
         <StyledWarning
+          hideIcon={hideIcon}
           label={intl.formatMessage(messages.publishedWarning, {
             events: events.join(', ')
           })}
@@ -74,7 +74,7 @@ function UnbuplishedWarning() {
 export function FormConfigHome() {
   const intl = useIntl()
   const [selectedTab, setSelectedTab] = React.useState<string>(
-    DraftStatus.DRAFT
+    DraftStatus.Draft
   )
   /* This reducer is for ActionsModal and Notifications */
   const [actionState, setAction] = React.useReducer(
@@ -86,14 +86,14 @@ export function FormConfigHome() {
   )
 
   return (
-    <SysAdminContentWrapper isCertificatesConfigPage>
-      <UnbuplishedWarning />
+    <SysAdminContentWrapper isCertificatesConfigPage hideBackground={true}>
+      {UnbuplishedWarning()}
       <Content
         title={intl.formatMessage(messages.title)}
         subtitle={
-          selectedTab === DraftStatus.PREVIEW
+          selectedTab === DraftStatus.InPreview
             ? intl.formatMessage(messages.previewDescription)
-            : selectedTab === DraftStatus.PUBLISHED
+            : selectedTab === DraftStatus.Published
             ? intl.formatMessage(messages.publishedDescription)
             : undefined
         }
@@ -101,19 +101,19 @@ export function FormConfigHome() {
           <FormTabs
             sections={[
               {
-                id: DraftStatus.DRAFT,
-                title: intl.formatMessage(draftTabsMessages[DraftStatus.DRAFT])
+                id: DraftStatus.Draft,
+                title: intl.formatMessage(draftTabsMessages[DraftStatus.Draft])
               },
               {
-                id: DraftStatus.PREVIEW,
+                id: DraftStatus.InPreview,
                 title: intl.formatMessage(
-                  draftTabsMessages[DraftStatus.PREVIEW]
+                  draftTabsMessages[DraftStatus.InPreview]
                 )
               },
               {
-                id: DraftStatus.PUBLISHED,
+                id: DraftStatus.Published,
                 title: intl.formatMessage(
-                  draftTabsMessages[DraftStatus.PUBLISHED]
+                  draftTabsMessages[DraftStatus.Published]
                 )
               }
             ]}
@@ -123,11 +123,11 @@ export function FormConfigHome() {
         }
       >
         <ActionContext.Provider value={{ actionState, setAction }}>
-          {selectedTab === DraftStatus.DRAFT ? (
+          {selectedTab === DraftStatus.Draft ? (
             <DraftsTab />
-          ) : selectedTab === DraftStatus.PREVIEW ? (
+          ) : selectedTab === DraftStatus.InPreview ? (
             <PreviewTab />
-          ) : selectedTab === DraftStatus.PUBLISHED ? (
+          ) : selectedTab === DraftStatus.Published ? (
             <PublishedTab />
           ) : (
             <></>

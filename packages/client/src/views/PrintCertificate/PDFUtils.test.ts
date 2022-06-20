@@ -20,7 +20,7 @@ import {
   mockOfflineData
 } from '@client/tests/util'
 import { createIntl } from 'react-intl'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { omit, cloneDeep } from 'lodash'
 
 const intl = createIntl({
@@ -35,7 +35,7 @@ describe('PDFUtils related tests', () => {
         {
           id: 'asdhdqe2472487jsdfsdf',
           data: mockDeclarationData,
-          event: Event.BIRTH
+          event: Event.Birth
         },
         userDetails,
         mockOfflineData
@@ -49,7 +49,7 @@ describe('PDFUtils related tests', () => {
         {
           id: 'asdhdqe2472487jsdfsdf',
           data: mockDeathDeclarationData,
-          event: Event.DEATH
+          event: Event.Death
         },
         userDetails,
         mockOfflineData
@@ -64,7 +64,7 @@ describe('PDFUtils related tests', () => {
         {
           id: 'asdhdqe2472487jsdfsdf',
           data: deathDeclaration,
-          event: Event.DEATH
+          event: Event.Death
         },
         null,
         mockOfflineData
@@ -80,7 +80,7 @@ describe('PDFUtils related tests', () => {
         {
           id: 'asdhdqe2472487jsdfsdf',
           data: mockDeathDeclarationData,
-          event: Event.DEATH
+          event: Event.Death
         },
         userDetails,
         faultyOfflineData
@@ -95,7 +95,7 @@ describe('PDFUtils related tests', () => {
         {
           id: 'asdhdqe2472487jsdfsdf',
           data: deathDeclaration,
-          event: Event.DEATH
+          event: Event.Death
         },
         null,
         mockOfflineData,

@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+
 import { Header } from '@client/components/interface/Header/Header'
 import { CircleButton } from '@opencrvs/components/lib/buttons'
 import { BackArrowDeepBlue } from '@opencrvs/components/lib/icons'
@@ -29,29 +30,20 @@ const DynamicContainer = styled.div<{
     fixedWidth ? `width: ${fixedWidth}px;` : `width: 100%`}
 `
 
-interface IprofilePageStyle {
-  paddingTopMd: number
-  horizontalPaddingMd: number
-}
-
 const Content = styled(BodyContent)<{
-  profilePageStyle?: IprofilePageStyle
+  hideBackground?: boolean
 }>`
   padding: 0px 24px;
   margin: 0 auto;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 0px 16px;
 
-    ${({ profilePageStyle }) =>
-      profilePageStyle &&
+    ${({ hideBackground }) =>
+      hideBackground &&
       `
-      margin: ${profilePageStyle.paddingTopMd}px auto ${0};
-      padding: ${0}px ${profilePageStyle.horizontalPaddingMd}px
+      margin: 0;
+      padding: 0;
     `}
-  }
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 0;
   }
 `
 const SubPageContent = styled(Content)`
@@ -72,7 +64,7 @@ interface BasePage {
   fixedWidth?: number
   changeTeamLocation?: () => void
   mapPerformanceClickHandler?: () => void
-  profilePageStyle?: IprofilePageStyle
+  hideBackground?: boolean
   subMenuComponent?: React.ReactNode
   /*
   FIXME: This prop should be removed at some point.
@@ -203,7 +195,11 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
       />
     )
 
-    pageContent = <SubPageContent>{props.children}</SubPageContent>
+    pageContent = (
+      <SubPageContent hideBackground={props.hideBackground}>
+        {props.children}
+      </SubPageContent>
+    )
   } else if (isSubPageCentered(props)) {
     pageHeader = (
       <SubPageHeader
@@ -221,7 +217,7 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
         marginRight={props.marginRight}
         fixedWidth={props.fixedWidth}
       >
-        <Content profilePageStyle={props.profilePageStyle}>
+        <Content hideBackground={props.hideBackground}>
           {props.children}
         </Content>
       </DynamicContainer>
@@ -242,7 +238,9 @@ export function SysAdminContentWrapper(props: SysAdminPage) {
             marginRight={props.marginRight}
             fixedWidth={props.fixedWidth}
           >
-            <Content>{props.children}</Content>
+            <Content hideBackground={props.hideBackground}>
+              {props.children}
+            </Content>
           </DynamicContainer>
         </BodyContainer>
       </>

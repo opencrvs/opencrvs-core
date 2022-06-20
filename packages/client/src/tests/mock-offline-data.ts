@@ -9,29 +9,27 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IFormConfig, QuestionConfigFieldType, Event } from '@client/forms'
+import { IFormConfig } from '@client/forms'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import {
-  DraftStatus,
-  IFormDraft
-} from '@client/forms/configuration/formDrafts/utils'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { CustomFieldType, DraftStatus, Event } from '@client/utils/gateway'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 
 const formDrafts: IFormDraft[] = [
   {
-    event: Event.BIRTH,
-    status: DraftStatus.DRAFT,
+    event: Event.Birth,
+    status: DraftStatus.Draft,
     version: 0,
     history: [],
     updatedAt: 1649395100098,
     createdAt: 1649395100098
   },
   {
-    event: Event.DEATH,
-    status: DraftStatus.DRAFT,
+    event: Event.Death,
+    status: DraftStatus.Draft,
     version: 0,
     history: [],
     updatedAt: 1649395100098,
@@ -96,8 +94,8 @@ export const formConfig: IFormConfig = {
       ],
       maxLength: 32,
       fieldName: 'vaccination',
-      fieldType: QuestionConfigFieldType.TEXT,
-      preceedingFieldId: 'birth.child.child-view-group.attendantAtBirth',
+      fieldType: CustomFieldType.Text,
+      precedingFieldId: 'birth.child.child-view-group.attendantAtBirth',
       required: false,
       enabled: '',
       custom: true
@@ -653,6 +651,7 @@ export const mockOfflineData = {
     COUNTRY_LOGO_RENDER_WIDTH: 104,
     COUNTRY_LOGO_RENDER_HEIGHT: 104,
     DESKTOP_TIME_OUT_MILLISECONDS: 900000,
+    AVAILABLE_LANGUAGES_SELECT: 'en:English,fr:Français,bn:বাংলা',
     DEATH: {
       REGISTRATION_TARGET: 45,
       FEE: {
