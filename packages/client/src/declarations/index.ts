@@ -1128,10 +1128,18 @@ export async function writeRegistrarWorkqueueByUser(
 
 export async function deleteDeclarationByUser(
   userId: string,
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  state: IDeclarationsState
 ): Promise<string> {
   const uID = userId || (await getCurrentUserID())
   const { allUserData, currentUserData } = await getUserData(uID)
+
+  allUserData.map((userData) => {
+    if (userData.userID === state.userID) {
+      userData.declarations = state.declarations
+    }
+    return userData
+  })
 
   const deletedDeclarationId = currentUserData
     ? currentUserData.declarations.findIndex((app) => app.id === declaration.id)
@@ -1142,7 +1150,6 @@ export async function deleteDeclarationByUser(
       currentUserData.declarations.splice(deletedDeclarationId, 1)
     storage.setItem('USER_DATA', JSON.stringify(allUserData))
   }
-
   return JSON.stringify(currentUserData)
 }
 
@@ -1392,7 +1399,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         Cmd.run(deleteDeclarationByUser, {
           successActionCreator: getStorageDeclarationsSuccess,
           failActionCreator: getStorageDeclarationsFailed,
-          args: [state.userID, action.payload.declaration]
+          args: [state.userID, action.payload.declaration, state]
         })
       )
     case MODIFY_DECLARATION:
