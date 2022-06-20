@@ -455,16 +455,23 @@ function RecordAuditBody({
       ? true
       : false
 
-  const hasDuplicates = !!(duplicates && duplicates.length > 0)
+  const hasDuplicates = !!(
+    duplicates &&
+    duplicates.length > 0 &&
+    declaration.status !== SUBMISSION_STATUS.CERTIFIED &&
+    declaration.status !== SUBMISSION_STATUS.REGISTERED
+  )
 
   return (
     <>
       <MobileHeader {...mobileProps} key={'record-audit-mobile-header'} />
-      <StyledDuplicateWarning
-        duplicateIds={duplicates?.filter(
-          (duplicate): duplicate is string => !!duplicate
-        )}
-      />
+      {hasDuplicates && (
+        <StyledDuplicateWarning
+          duplicateIds={duplicates?.filter(
+            (duplicate): duplicate is string => !!duplicate
+          )}
+        />
+      )}
       <Content
         title={
           declaration.name || intl.formatMessage(recordAuditMessages.noName)
