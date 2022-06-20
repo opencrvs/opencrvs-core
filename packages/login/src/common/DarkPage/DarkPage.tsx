@@ -17,7 +17,6 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import { getTheme } from '@opencrvs/components/lib/theme'
 
 const StyledPage = styled.div<IPage>`
-  ${({ theme }) => theme.gradients.primary};
   background: ${({ theme }) => theme.colors.backgroundPrimary};
   min-height: 100vh;
   display: flex;

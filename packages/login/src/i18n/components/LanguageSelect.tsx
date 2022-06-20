@@ -30,10 +30,10 @@ type IDispatchProps = {
 type IProps = IStateProps & IDispatchProps & { children: React.ReactNode }
 
 const SelectContainer = styled.div`
-  position: fixed;
-  top: 24px;
-  right: 36px;
-  z-index: 1;
+  display: flex;
+  justify-content: end;
+  padding: 24px 24px 8px;
+  background: ${({ theme }) => theme.colors.backgroundPrimary};
 `
 
 function LanguageSelectComponent({
