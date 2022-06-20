@@ -350,7 +350,7 @@ export class OfficeHomeView extends React.Component<
             }}
           />
         )}
-        <Navigation />
+        <Navigation loadWorkqueueStatuses={false} />
         <BodyContainer>
           {tabId === WORKQUEUE_TABS.inProgress && (
             <InProgress

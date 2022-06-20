@@ -15,7 +15,8 @@ import {
   storeDeclaration,
   modifyDeclaration
 } from '@client/declarations'
-import { Action, Event } from '@client/forms'
+import { Action } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { createStore } from '@client/store'
@@ -29,7 +30,7 @@ import { waitForElement, waitFor } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
 import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 import { OfficeHome, EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
-import { Validate, DeclarationIcon } from '@opencrvs/components/lib/icons'
+import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { GridTable } from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import { ReactWrapper } from 'enzyme'
@@ -482,6 +483,10 @@ describe('OfficeHome sent for review tab related tests', () => {
 
       testComponent.update()
 
+      expect(testComponent.find('#assignment').hostNodes()).toHaveLength(1)
+
+      testComponent.find('#assign').hostNodes().simulate('click')
+
       expect(
         testComponent.find('#action-loading-ListItemAction-0').hostNodes()
       ).toHaveLength(1)
@@ -508,7 +513,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     it('shows error when download is failed', async () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
-        Event.DEATH,
+        Event.Death,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
         Action.LOAD_REVIEW_DECLARATION
       )
@@ -519,7 +524,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#ListItemAction-1-download-failed'
+        '#ListItemAction-1-icon-failed'
       )
 
       expect(errorIcon.hostNodes()).toHaveLength(1)
@@ -665,7 +670,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     it('shows review button when download is complete', async () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
-        Event.DEATH,
+        Event.Death,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
         Action.LOAD_REVIEW_DECLARATION
       )
@@ -689,7 +694,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     it('shows error when download is failed', async () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
-        Event.DEATH,
+        Event.Death,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
         Action.LOAD_REVIEW_DECLARATION
       )

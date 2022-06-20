@@ -11,7 +11,12 @@
  */
 
 import * as Hapi from '@hapi/hapi'
-import { AUTH_HOST, AUTH_PORT, HOSTNAME } from '@auth/constants'
+import {
+  AUTH_HOST,
+  AUTH_PORT,
+  DEFAULT_TIMEOUT,
+  HOSTNAME
+} from '@auth/constants'
 import authenticateHandler, {
   requestSchema as reqAuthSchema,
   responseSchema as resAuthSchema
@@ -79,7 +84,7 @@ export async function createServer() {
     port: AUTH_PORT,
     routes: {
       cors: { origin: whitelist },
-      payload: { maxBytes: 52428800 }
+      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
     }
   })
 

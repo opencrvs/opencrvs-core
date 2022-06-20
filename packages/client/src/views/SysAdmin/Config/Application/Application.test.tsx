@@ -474,14 +474,14 @@ describe('application birth late registration target test', () => {
       .find('#applicationBirthLateRegTarget')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationBirthLateRegTarget', value: 30 }
+        target: { id: 'applicationBirthLateRegTarget', value: 45 }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
     expect(
       testComponent.find('#Late-registration_value').hostNodes().first().text()
-    ).toContain('30')
+    ).toContain('45')
   })
 
   it('should show success notification if appliction config change', async () => {
@@ -712,7 +712,11 @@ describe('application death registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#Late-registration_value').hostNodes().first().text()
+      testComponent
+        .find('#Within-legally-specified-time_value')
+        .hostNodes()
+        .first()
+        .text()
     ).toContain('10')
   })
 

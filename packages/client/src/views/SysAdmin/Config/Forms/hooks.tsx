@@ -9,35 +9,31 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { selectConfigRegisterForm } from '@client/forms/configuration/formConfig/selectors'
-import { useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
+import React from 'react'
 import {
-  IConfigField,
-  getDefaultConfigFieldIdentifiers,
-  isDefaultField
+  getFieldDefinition,
+  IDefaultConfigField,
+  ICustomConfigField
 } from '@client/forms/configuration/formConfig/utils'
 import { IFormField } from '@client/forms'
-import { deserializeFormField } from '@client/forms/mappings/deserializer'
-import { createCustomField } from '@client/forms/configuration/customUtils'
-import { getConfigFieldIdentifiers } from '@client/forms/configuration/formConfig/motionUtils'
+import { useParams } from 'react-router'
+import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
+import { registerForms } from '@client/forms/configuration/default'
+import { Event } from '@client/utils/gateway'
 
-export function useFieldDefinition(configField: IConfigField): IFormField {
-  const { event } = getConfigFieldIdentifiers(configField.fieldId)
-  const registerForm = useSelector((store: IStoreState) =>
-    selectConfigRegisterForm(store, event)
+export function useDefaultForm() {
+  const { event } = useParams<{ event: Event }>()
+  return React.useMemo(
+    () => populateRegisterFormsWithAddresses(registerForms[event], event),
+    [event]
   )
-  if (!isDefaultField(configField)) {
-    return deserializeFormField(createCustomField(configField))
-  }
-  const { sectionIndex, groupIndex, fieldIndex } =
-    getDefaultConfigFieldIdentifiers(configField)
-  /* Remove conditionals as we need to always build the field*/
-  const { conditionals, ...formField } =
-    registerForm.sections[sectionIndex].groups[groupIndex].fields[fieldIndex]
+}
 
-  return {
-    ...formField,
-    required: configField.required
-  }
+export function useFieldDefinition(
+  configField: IDefaultConfigField | ICustomConfigField
+): IFormField {
+  const defaultForm = useDefaultForm()
+  return React.useMemo(() => {
+    return getFieldDefinition(configField, defaultForm)
+  }, [configField, defaultForm])
 }

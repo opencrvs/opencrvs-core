@@ -13,7 +13,8 @@ import { IAuthHeader } from '@gateway/common-types'
 import {
   EVENT_TYPE,
   DOWNLOADED_EXTENSION_URL,
-  REINSTATED_EXTENSION_URL
+  REINSTATED_EXTENSION_URL,
+  ASSIGNED_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import {
   fetchFHIR,
@@ -30,18 +31,21 @@ import {
   buildFHIRBundle,
   updateFHIRTaskBundle,
   addOrUpdateExtension,
-  ITaskBundle
+  ITaskBundle,
+  checkUserAssignment
 } from '@gateway/features/registration/fhir-builders'
 import { hasScope } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
+  GQLRegStatus,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
 import fetch from 'node-fetch'
 import { COUNTRY_CONFIG_URL, FHIR_URL, SEARCH_URL } from '@gateway/constants'
 import { updateTaskTemplate } from '@gateway/features/fhir/templates'
+import { UnassignError } from '@gateway/utils/unassignError'
 import { UserInputError } from 'apollo-server-hapi'
 import {
   validateBirthDeclarationAttachments,
@@ -94,7 +98,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await markRecordAsDownloaded(id, authHeader)
+        return await markRecordAsDownloadedAndAssigned(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -107,7 +111,7 @@ export const resolvers: GQLResolver = {
         hasScope(authHeader, 'validate') ||
         hasScope(authHeader, 'declare')
       ) {
-        return await markRecordAsDownloaded(id, authHeader)
+        return await markRecordAsDownloadedAndAssigned(id, authHeader)
       } else {
         return await Promise.reject(
           new Error('User does not have a register or validate scope')
@@ -287,20 +291,45 @@ export const resolvers: GQLResolver = {
       }
     },
     async markBirthAsValidated(_, { id, details }, authHeader) {
-      if (hasScope(authHeader, 'validate')) {
-        await markEventAsValidated(id, authHeader, EVENT_TYPE.BIRTH, details)
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
+      if (!hasScope(authHeader, 'validate')) {
+        return await Promise.reject(
+          new Error('User does not have a validate scope')
+        )
       } else {
-        await Promise.reject(new Error('User does not have a validate scope'))
+        return await markEventAsValidated(
+          id,
+          authHeader,
+          EVENT_TYPE.BIRTH,
+          details
+        )
       }
     },
     async markDeathAsValidated(_, { id, details }, authHeader) {
-      if (hasScope(authHeader, 'validate')) {
-        await markEventAsValidated(id, authHeader, EVENT_TYPE.DEATH, details)
-      } else {
-        await Promise.reject(new Error('User does not have a validate scope'))
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
       }
+      if (!hasScope(authHeader, 'validate')) {
+        return await Promise.reject(
+          new Error('User does not have a validate scope')
+        )
+      }
+      return await markEventAsValidated(
+        id,
+        authHeader,
+        EVENT_TYPE.DEATH,
+        details
+      )
     },
     async markBirthAsRegistered(_, { id, details }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
       if (hasScope(authHeader, 'register')) {
         return markEventAsRegistered(id, authHeader, EVENT_TYPE.BIRTH, details)
       } else {
@@ -310,6 +339,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markDeathAsRegistered(_, { id, details }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
       if (hasScope(authHeader, 'register')) {
         return await markEventAsRegistered(
           id,
@@ -324,6 +357,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsVoided(_, { id, reason, comment }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
@@ -358,6 +395,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsArchived(_, { id }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
@@ -373,12 +414,17 @@ export const resolvers: GQLResolver = {
         const status = 'ARCHIVED'
         const newTaskBundle = await updateFHIRTaskBundle(taskEntry, status)
         const taskResource = newTaskBundle.entry[0].resource
+        // remove downloaded and assigned extension while archiving
         if (
           taskResource.extension &&
-          findExtension(DOWNLOADED_EXTENSION_URL, taskResource.extension)
+          (findExtension(DOWNLOADED_EXTENSION_URL, taskResource.extension) ||
+            findExtension(ASSIGNED_EXTENSION_URL, taskResource.extension))
         ) {
           taskResource.extension = taskResource.extension.filter(
-            (ext) => ext.url !== DOWNLOADED_EXTENSION_URL
+            (ext) =>
+              ![DOWNLOADED_EXTENSION_URL, ASSIGNED_EXTENSION_URL].includes(
+                ext.url
+              )
           )
         }
         await fetchFHIR(
@@ -396,6 +442,10 @@ export const resolvers: GQLResolver = {
       }
     },
     async markEventAsReinstated(_, { id }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
       if (
         hasScope(authHeader, 'register') ||
         hasScope(authHeader, 'validate')
@@ -450,10 +500,12 @@ export const resolvers: GQLResolver = {
 
         const newTaskBundle = addOrUpdateExtension(
           taskEntryData,
-          {
-            url: REINSTATED_EXTENSION_URL,
-            valueString: regStatusCode
-          },
+          [
+            {
+              url: REINSTATED_EXTENSION_URL,
+              valueString: regStatusCode
+            }
+          ],
           'reinstated'
         )
 
@@ -476,14 +528,22 @@ export const resolvers: GQLResolver = {
         )
       }
     },
-    async markBirthAsCertified(_, { details }, authHeader) {
+    async markBirthAsCertified(_, { id, details }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.BIRTH)
       } else {
         return Promise.reject(new Error('User does not have a certify scope'))
       }
     },
-    async markDeathAsCertified(_, { details }, authHeader) {
+    async markDeathAsCertified(_, { id, details }, authHeader) {
+      const hasAssignedToThisUser = await checkUserAssignment(id, authHeader)
+      if (!hasAssignedToThisUser) {
+        throw new UnassignError('User has been unassigned')
+      }
       if (hasScope(authHeader, 'certify')) {
         return await markEventAsCertified(details, authHeader, EVENT_TYPE.DEATH)
       } else {
@@ -534,6 +594,56 @@ export const resolvers: GQLResolver = {
       } else {
         return await Promise.reject(
           new Error('User does not have a register scope')
+        )
+      }
+    },
+    async markEventAsUnassigned(_, { id }, authHeader) {
+      if (
+        hasScope(authHeader, 'register') ||
+        hasScope(authHeader, 'validate')
+      ) {
+        const taskBundle = (await fetchFHIR(
+          `/Task?focus=Composition/${id}`,
+          authHeader
+        )) as ITaskBundle
+        const taskEntry = taskBundle.entry[0]
+        if (!taskEntry) {
+          throw new Error('Task does not exist')
+        }
+        const taskResource = taskBundle.entry[0].resource
+        // remove assigned extension when unassigned
+        if (
+          taskResource.extension &&
+          findExtension(ASSIGNED_EXTENSION_URL, taskResource.extension)
+        ) {
+          taskResource.extension = taskResource.extension.filter(
+            (ext) => ext.url !== ASSIGNED_EXTENSION_URL
+          )
+        }
+        taskEntry.request = {
+          method: 'PUT',
+          url: `Task/${taskEntry.resource.id}`
+        } as fhir.BundleEntryRequest
+
+        const fhirBundle: ITaskBundle = {
+          resourceType: 'Bundle',
+          type: 'document',
+          entry: [taskEntry],
+          signature: {
+            type: [
+              {
+                code: 'unassigned'
+              }
+            ],
+            when: Date().toString()
+          }
+        }
+        await fetchFHIR('', authHeader, 'POST', JSON.stringify(fhirBundle))
+        // return the taskId
+        return taskEntry.resource.id
+      } else {
+        return await Promise.reject(
+          new Error('User does not have a register or validate scope')
         )
       }
     }
@@ -654,7 +764,10 @@ async function markEventAsCertified(
   return getIDFromResponse(res)
 }
 
-async function markRecordAsDownloaded(id: string, authHeader: IAuthHeader) {
+async function markRecordAsDownloadedAndAssigned(
+  id: string,
+  authHeader: IAuthHeader
+) {
   const taskBundle: ITaskBundle = await fetchFHIR(
     `/Task?focus=Composition/${id}`,
     authHeader
@@ -662,12 +775,38 @@ async function markRecordAsDownloaded(id: string, authHeader: IAuthHeader) {
   if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
     throw new Error('Task does not exist')
   }
+
+  let extensions: fhir.Extension[]
+  const businessStatus = getStatusFromTask(
+    taskBundle.entry[0].resource
+  ) as GQLRegStatus
+
+  if (
+    (hasScope(authHeader, 'register') || hasScope(authHeader, 'validate')) &&
+    businessStatus !== GQLRegStatus.VALIDATED
+  ) {
+    extensions = [
+      {
+        url: ASSIGNED_EXTENSION_URL,
+        valueString: getStatusFromTask(taskBundle.entry[0].resource)
+      },
+      {
+        url: DOWNLOADED_EXTENSION_URL,
+        valueString: getStatusFromTask(taskBundle.entry[0].resource)
+      }
+    ]
+  } else {
+    extensions = [
+      {
+        url: DOWNLOADED_EXTENSION_URL,
+        valueString: getStatusFromTask(taskBundle.entry[0].resource)
+      }
+    ]
+  }
+
   const doc = addOrUpdateExtension(
     taskBundle.entry[0],
-    {
-      url: DOWNLOADED_EXTENSION_URL,
-      valueString: getStatusFromTask(taskBundle.entry[0].resource)
-    },
+    extensions,
     'downloaded'
   )
 

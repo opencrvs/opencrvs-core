@@ -29,9 +29,11 @@ import {
   storeDeclaration,
   IDeclaration,
   SUBMISSION_STATUS,
-  DOWNLOAD_STATUS
+  DOWNLOAD_STATUS,
+  IWorkqueue,
+  getCurrentUserWorkqueuSuccess
 } from '@client/declarations'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
 import { DECLARATION_RECORD_AUDIT } from '@client/navigation/routes'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
@@ -40,7 +42,7 @@ import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 const declaration: IDeclaration = createDeclaration(
-  Event.BIRTH,
+  Event.Birth,
   mockDeclarationData
 )
 declaration.data.registration = {
@@ -68,6 +70,22 @@ declaration.data.history = [
     output: []
   }
 ]
+
+const workqueue: IWorkqueue = {
+  data: {
+    inProgressTab: {},
+    notificationTab: {},
+    reviewTab: {
+      results: [{ id: declaration.id, registration: {} }],
+      totalItems: 1
+    },
+    rejectTab: {},
+    approvalTab: {},
+    printTab: {},
+    externalValidationTab: {}
+  },
+  initialSyncDone: true
+}
 
 describe('Record audit summary for a draft birth declaration', () => {
   let component: ReactWrapper<{}, {}>
@@ -113,7 +131,7 @@ describe('Record audit summary for a draft death declaration', () => {
   beforeEach(async () => {
     const { store, history } = createStore()
     const deathDeclaration = createDeclaration(
-      Event.DEATH,
+      Event.Death,
       mockDeathDeclarationData
     )
 
@@ -254,6 +272,7 @@ describe('Record audit for a draft declaration', () => {
     declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
 
     store.dispatch(storeDeclaration(declaration))
+    store.dispatch(getCurrentUserWorkqueuSuccess(JSON.stringify(workqueue)))
 
     component = await createTestComponent(
       <RecordAudit
@@ -440,6 +459,7 @@ describe('Record audit for a reinstate declaration', () => {
     declaration.submissionStatus = SUBMISSION_STATUS.ARCHIVED
     declaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
     store.dispatch(storeDeclaration(declaration))
+    store.dispatch(getCurrentUserWorkqueuSuccess(JSON.stringify(workqueue)))
 
     component = await createTestComponent(
       <RecordAudit

@@ -11,12 +11,15 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 import { DeathSection, BirthSection } from '@client/forms'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus } from '@client/utils/gateway'
 import { Actions } from '@client/views/SysAdmin/Config/Forms/Home/ActionsModal'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 
 interface IFormConfigMessages
   extends Record<string | number | symbol, MessageDescriptor> {
+  requiredForRegistrationTooltip: MessageDescriptor
+  contentKeyTooltip: MessageDescriptor
+  certHandelbarsTooltip: MessageDescriptor
   showHiddenFields: MessageDescriptor
   defaultComment: MessageDescriptor
   hidden: MessageDescriptor
@@ -126,6 +129,23 @@ const navigationMessagesToDefine: INavigationMessages = {
 }
 
 const messagesToDefine: IFormConfigMessages = {
+  requiredForRegistrationTooltip: {
+    id: 'config.form.tooltip.requiredForRegistration',
+    defaultMessage:
+      'Select if this field is mandatory to complete registration',
+    description: 'Default tooltip message for required for registration'
+  },
+  contentKeyTooltip: {
+    id: 'config.form.tooltip.contentKey',
+    defaultMessage: 'Use these keys to update copy for this field',
+    description: 'Default tooltip message for content key'
+  },
+  certHandelbarsTooltip: {
+    id: 'config.form.tooltip.certHandelbars',
+    defaultMessage:
+      'Use this handlebar in your certificate SVG to show this data field',
+    description: 'Default tooltip message for certificate handelbars'
+  },
   defaultComment: {
     id: 'config.form.draft.defaultComment',
     defaultMessage: 'Default Configuration',
@@ -195,19 +215,18 @@ const messagesToDefine: IFormConfigMessages = {
   previewDescription: {
     id: 'config.form.preview.description',
     defaultMessage:
-      'These versions are available to review and test. Log in using the test users acounts for a  Field Agent, Registration Agent or Registrar to test your declaration form.',
+      'These versions are available to review and test. Log in using the test users accounts for a  Field Agent, Registration Agent or Registrar to test your declaration form.',
     description: 'Description for preview tab'
   },
   publishedDescription: {
     id: 'config.form.published.description',
     defaultMessage:
-      'Your pulished declaration forms will appear here. Once your configuration is published you will no longer be able to make changes.',
+      'Your published declaration forms will appear here. Once your configuration is published you will no longer be able to make changes.',
     description: 'Description for published tab'
   },
   publishedWarning: {
     id: 'config.form.published.warning',
-    defaultMessage:
-      'Nothing is currently published. Awaiting to be published: {events}',
+    defaultMessage: 'Warning! Form configuration unpublished for: {events}',
     description: 'Warning for unpublished events'
   },
   contentKey: {
@@ -435,7 +454,7 @@ const messagesToDefine: IFormConfigMessages = {
   },
   formConfigMobileModalTitle: {
     id: 'config.form.mobile.modal.title',
-    defaultMessage: 'Configuration on mobile unavailble',
+    defaultMessage: 'Configuration on mobile unavailable',
     description: 'Modal title for mobile form configuration'
   },
   formConfigMobileModalDesc: {
@@ -450,12 +469,12 @@ const draftStatusMessagesToDefine: Record<
   Exclude<DraftStatus, 'DRAFT' | 'DELETED'>,
   MessageDescriptor
 > = {
-  [DraftStatus.PREVIEW]: {
+  [DraftStatus.InPreview]: {
     id: 'config.form.status.preview',
     defaultMessage: 'In Preview',
     description: 'Label for in preview tab of form config page'
   },
-  [DraftStatus.PUBLISHED]: {
+  [DraftStatus.Published]: {
     id: 'config.form.status.published',
     defaultMessage: 'Published',
     description: 'Label for published tab of form config page'
@@ -466,17 +485,17 @@ const draftTabsMessagesToDefine: Record<
   Exclude<DraftStatus, 'DELETED'>,
   MessageDescriptor
 > = {
-  [DraftStatus.DRAFT]: {
+  [DraftStatus.Draft]: {
     id: 'config.form.tab.drafts',
     defaultMessage: 'Drafts',
     description: 'Label for drafts tab of form config page'
   },
-  [DraftStatus.PREVIEW]: {
+  [DraftStatus.InPreview]: {
     id: 'config.form.tab.inPreview',
     defaultMessage: 'In Preview',
     description: 'Label for in preview tab of form config page'
   },
-  [DraftStatus.PUBLISHED]: {
+  [DraftStatus.Published]: {
     id: 'config.form.tab.published',
     defaultMessage: 'Published',
     description: 'Label for published tab of form config page'
@@ -627,7 +646,7 @@ const draftActionMessagesToDefine: IActionMessage = {
   [ActionStatus.COMPLETED]: {
     id: 'config.form.draft.success',
     defaultMessage:
-      '{event} draft v{version} has been moved to drafts successfully',
+      '{event} draft v{version} has been moved to drafts successfully. Redirecting...',
     description: 'Edit draft success notification label'
   }
 }

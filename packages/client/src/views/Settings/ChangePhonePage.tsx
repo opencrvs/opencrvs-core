@@ -109,8 +109,6 @@ const Message = styled.div`
 
 const InvalidPhoneNumber = styled.div`
   /* stylelint-disable-next-line opencrvs/no-font-styles */
-  font-family: ${({ theme }) => theme.fonts.semiBoldFont};
-  ${({ theme }) => theme.fonts.semiBoldFont};
   color: ${({ theme }) => theme.colors.negative};
   margin-top: 8px;
 `

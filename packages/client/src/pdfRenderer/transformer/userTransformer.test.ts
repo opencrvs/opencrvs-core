@@ -20,14 +20,14 @@ import { createIntl } from 'react-intl'
 import { omit } from 'lodash'
 import { IUserDetails } from '@client/utils/userUtils'
 import { TemplateTransformerData } from './types'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 
 describe("PDF template's logged-in user field related transformer tests", () => {
   const intl = createIntl({
     locale: 'en'
   })
   const data: TemplateTransformerData = {
-    declaration: { id: '123', event: Event.BIRTH, data: mockDeclarationData },
+    declaration: { id: '123', event: Event.Birth, data: mockDeclarationData },
     userDetails,
     resource: mockOfflineData
   }

@@ -29,7 +29,8 @@ import {
   storeDeclaration,
   SUBMISSION_STATUS
 } from '@opencrvs/client/src/declarations'
-import { Action, Event, CorrectionSection } from '@client/forms'
+import { Action, CorrectionSection } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
@@ -56,7 +57,8 @@ import {
   getEventDate,
   isFreeOfCost,
   calculatePrice,
-  getRegisteredDate
+  getRegisteredDate,
+  getRegistrarSignatureHandlebarName
 } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/forms/countries'
@@ -146,6 +148,22 @@ class ReviewCertificateActionComponent extends React.Component<
     const eventDate = getEventDate(draft.data, draft.event)
     let submittableCertificate
     if (isCertificateForPrintInAdvance(draft)) {
+      const paymentAmount = calculatePrice(
+        draft.event,
+        eventDate,
+        registeredDate,
+        this.props.offlineCountryConfig
+      )
+      submittableCertificate = {
+        payments: {
+          type: 'MANUAL' as const,
+          total: Number(paymentAmount),
+          amount: Number(paymentAmount),
+          outcome: 'COMPLETED' as const,
+          date: Date.now()
+        }
+      }
+    } else {
       if (
         isFreeOfCost(
           draft.event,
@@ -154,25 +172,14 @@ class ReviewCertificateActionComponent extends React.Component<
           this.props.offlineCountryConfig
         )
       ) {
-        submittableCertificate = {}
-      } else {
-        const paymentAmount = calculatePrice(
-          draft.event,
-          eventDate,
-          registeredDate,
-          this.props.offlineCountryConfig
-        )
-        submittableCertificate = {
-          payments: {
-            type: 'MANUAL' as const,
-            total: Number(paymentAmount),
-            amount: Number(paymentAmount),
-            outcome: 'COMPLETED' as const,
-            date: Date.now()
-          }
+        certificate.payments = {
+          type: 'MANUAL' as const,
+          total: 0,
+          amount: 0,
+          outcome: 'COMPLETED' as const,
+          date: Date.now()
         }
       }
-    } else {
       submittableCertificate = certificate
     }
     draft.data.registration = {
@@ -203,11 +210,11 @@ class ReviewCertificateActionComponent extends React.Component<
     const { intl, event } = this.props
     let eventName = intl.formatMessage(constantsMessages.birth).toLowerCase()
     switch (event) {
-      case Event.BIRTH:
+      case Event.Birth:
         return intl.formatMessage(certificateMessages.reviewTitle, {
           event: eventName
         })
-      case Event.DEATH:
+      case Event.Death:
         eventName = intl.formatMessage(constantsMessages.death).toLowerCase()
         return intl.formatMessage(certificateMessages.reviewTitle, {
           event: eventName
@@ -243,6 +250,7 @@ class ReviewCertificateActionComponent extends React.Component<
           certificateMessages.certificateCollectionTitle
         )}
         goBack={this.goBack}
+        goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
       >
         <Content
           title={this.getTitle()}
@@ -303,9 +311,9 @@ const getEvent = (eventType: string | undefined) => {
   switch (eventType && eventType.toLowerCase()) {
     case 'birth':
     default:
-      return Event.BIRTH
+      return Event.Birth
     case 'death':
-      return Event.DEATH
+      return Event.Death
   }
 }
 
@@ -331,15 +339,33 @@ function mapStatetoProps(
 
   const draft = getDraft(declarations, registrationId, eventType)
   const event = getEvent(draft.event)
+  const offlineCountryConfig = getOfflineData(state)
+  const signatureKey = getRegistrarSignatureHandlebarName(
+    offlineCountryConfig,
+    event
+  )
 
   return {
     event,
     registrationId,
-    draft,
+    draft: {
+      ...draft,
+      data: {
+        ...draft.data,
+        template: {
+          ...draft.data.template,
+          [signatureKey]:
+            !draft.data.template?.[signatureKey] ||
+            isCertificateForPrintInAdvance(draft)
+              ? ''
+              : draft.data.template[signatureKey]
+        }
+      }
+    },
     scope: getScope(state),
     countries: getCountryTranslations(state.i18n.languages, countries),
     userDetails: getUserDetails(state),
-    offlineCountryConfig: getOfflineData(state),
+    offlineCountryConfig,
     registerForm: getEventRegisterForm(state, event)
   }
 }

@@ -11,10 +11,11 @@
  */
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
   goBack,
+  goToHomeTab,
   goToPrintCertificatePayment,
   goToReviewCertificate
 } from '@client/navigation'
@@ -34,6 +35,7 @@ import {
   IVerifyIDCertificateCollectorField,
   verifyIDOnBirthCertificateCollectorDefinition
 } from '@client/forms/certificate/fieldDefinitions/collectorSection'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 interface IMatchParams {
   registrationId: string
@@ -47,6 +49,7 @@ interface IStateProps {
 }
 interface IDispatchProps {
   goBack: typeof goBack
+  goToHomeTab: typeof goToHomeTab
   modifyDeclaration: typeof modifyDeclaration
   goToReviewCertificate: typeof goToReviewCertificate
   goToPrintCertificatePayment: typeof goToPrintCertificatePayment
@@ -147,6 +150,7 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
         goBack={this.props.goBack}
         hideBackground
         title={intl.formatMessage(messages.certificateCollectionTitle)}
+        goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
       >
         <IDVerifier
           id="idVerifier"
@@ -186,6 +190,7 @@ const mapStateToProps = (
 
 export const VerifyCollector = connect(mapStateToProps, {
   goBack,
+  goToHomeTab,
   modifyDeclaration,
   goToReviewCertificate,
   goToPrintCertificatePayment

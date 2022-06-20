@@ -13,11 +13,11 @@ import * as React from 'react'
 import styled from '@client/styledComponents'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { connect } from 'react-redux'
-import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { setInitialDeclarations } from '@client/declarations'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import {
+  getOfflineData,
   getOfflineDataLoaded,
   getOfflineLoadingError
 } from '@client/offline/selectors'
@@ -32,10 +32,8 @@ import { Ii18n } from '@client/type/i18n'
 import { getPreferredLanguage } from '@client/i18n/utils'
 import { getInitialDeclarationsLoaded } from '@client/declarations/selectors'
 import { isRegisterFormReady } from '@client/forms/register/declaration-selectors'
-import { LOADING_SCREEN_TEXT } from '@client/utils/constants'
 import { isFormConfigLoaded } from '@client/forms/configuration/formConfig/selectors'
-
-const languageFromProps = ({ language }: IPageProps) => language
+import { IOfflineData } from '@client/offline/reducer'
 
 const StyledPage = styled.div<IPageProps>`
   background: ${({ theme }) => theme.colors.background};
@@ -54,39 +52,13 @@ const StyledPage = styled.div<IPageProps>`
   *:after {
     box-sizing: border-box;
   }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
-    src: url('/fonts/notosans-semibold-webfont-en.ttf') format('truetype');
-  }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.regularFont};
-    src: url('/fonts/notosans-regular-webfont-en.ttf') format('truetype');
-  }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.semiBoldFont};
-    src: url('/fonts/notosans-semibold-webfont-${languageFromProps}.ttf')
-      format('truetype');
-  }
-
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${({ theme }) => theme.fonts.regularFont};
-    src: url('/fonts/notosans-regular-webfont-${languageFromProps}.ttf')
-      format('truetype');
-  }
 `
 
 const StyledSpinner = styled(Spinner)`
   position: absolute;
   margin-left: -24px;
   margin-top: -24px;
-  top: 38%;
+  top: calc(50% - 20px);
   left: 50%;
   width: 40px;
   height: 40px;
@@ -103,12 +75,12 @@ export const StyledText = styled.div`
 `
 
 interface IPageProps {
-  language?: string
   initialDeclarationsLoaded: boolean
   offlineDataLoaded: boolean
   registerFormLoaded: boolean
   formConfigLoaded: boolean
   loadingError: boolean
+  offlineData: IOfflineData | undefined
 }
 
 interface IDispatchProps {
@@ -127,6 +99,10 @@ class Component extends React.Component<
   ) {
     const { hash } = this.props.location
     const hashChanged = hash && hash !== prevProps.location.hash
+    const appName = this.props.offlineData
+      ? this.props.offlineData.config.APPLICATION_NAME
+      : ''
+    if (appName) document.title = appName
     if (hashChanged) {
       // Push onto callback queue so it runs after the DOM is updated,
       // this is required when navigating from a different page so that
@@ -179,7 +155,6 @@ class Component extends React.Component<
       return (
         <>
           <StyledSpinner id="appSpinner" />
-          <StyledText>{LOADING_SCREEN_TEXT}</StyledText>
         </>
       )
     }
@@ -188,12 +163,12 @@ class Component extends React.Component<
 
 const mapStateToProps = (store: IStoreState): IPageProps => {
   return {
-    language: getLanguage(store),
     initialDeclarationsLoaded: getInitialDeclarationsLoaded(store),
     offlineDataLoaded: getOfflineDataLoaded(store),
     loadingError: getOfflineLoadingError(store),
     registerFormLoaded: isRegisterFormReady(store),
-    formConfigLoaded: isFormConfigLoaded(store)
+    formConfigLoaded: isFormConfigLoaded(store),
+    offlineData: getOfflineDataLoaded(store) ? getOfflineData(store) : undefined
   }
 }
 

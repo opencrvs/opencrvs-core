@@ -10,8 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export interface IFonts {
-  regularFont: string
-  semiBoldFont: string
+  fontFamily: string
 
   h1: string
   h2: string
@@ -29,62 +28,32 @@ export interface IFonts {
   reg12: string
 }
 
-// TODO: we need a way to load fonts for other languages without recompiling
-const languageFonts = {
-  bn: {
-    semiBoldFontFamily: 'noto_sans_bengali_semi_bold',
-    regularFontFamily: 'noto_sans_bengali_regular'
-  },
-  en: {
-    semiBoldFontFamily: 'noto_sans_semi_bold',
-    regularFontFamily: 'noto_sans_regular'
-  },
-  fr: {
-    semiBoldFontFamily: 'noto_sans_semi_bold',
-    regularFontFamily: 'noto_sans_regular'
-  },
-  default: {
-    semiBoldFontFamily: 'noto_sans_semi_bold',
-    regularFontFamily: 'noto_sans_regular'
-  }
-}
-
-export const fonts = (language: string): IFonts => {
-  const regularFont =
-    languageFonts[language].regularFontFamily ||
-    languageFonts.default.regularFontFamily
-
-  const semiBoldFont =
-    languageFonts[language].semiBoldFontFamily ||
-    languageFonts.default.semiBoldFontFamily
-
+export const fonts = (): IFonts => {
+  const fontFamily = 'Noto Sans'
   return {
-    // Fonts
-
-    regularFont,
-    semiBoldFont,
+    fontFamily,
 
     // Headings
 
-    h1: `font-family: ${semiBoldFont};
+    h1: `font-family: ${fontFamily};
     font-size: 36px;
     font-weight: 600;
     line-height: 54px;
     `,
 
-    h2: `font-family: ${semiBoldFont};
+    h2: `font-family: ${fontFamily};
     font-size: 24px;
     font-weight: 600;
     line-height: 36px;
     `,
 
-    h3: `font-family: ${semiBoldFont};
+    h3: `font-family: ${fontFamily};
     font-size: 21px;
     font-weight: 600;
     line-height: 32px;
     `,
 
-    h4: `font-family: ${semiBoldFont};
+    h4: `font-family: ${fontFamily};
       font-size: 18px;
       font-weight: 600;
       line-height: 27px;
@@ -92,50 +61,50 @@ export const fonts = (language: string): IFonts => {
 
     // Bold Body Styles
 
-    bold18: `font-family: ${semiBoldFont};
+    bold18: `font-family: ${fontFamily};
     font-size: 18px;
-    font-weight: normal;
+    font-weight: 600;
     line-height: 27px;
     `,
 
-    bold16: `font-family: ${semiBoldFont};
+    bold16: `font-family: ${fontFamily};
       font-size: 16px;
-      font-weight: normal;
+      font-weight: 600;
       line-height: 24px;
       `,
 
-    bold14: `font-family: ${semiBoldFont};
+    bold14: `font-family: ${fontFamily};
       font-size: 14px;
-      font-weight: normal;
+      font-weight: 600;
       line-height: 21px;
       `,
 
-    bold12: `font-family: ${semiBoldFont};
+    bold12: `font-family: ${fontFamily};
       font-size: 12px;
-      font-weight: normal;
+      font-weight: 600;
       line-height: 18px;
       `,
 
     // Regular Body Styles
 
-    reg18: `font-family: ${regularFont};
+    reg18: `font-family: ${fontFamily};
       font-size: 18px;
-      font-weight: normal;
+      font-weight: 400;
       line-height: 27px;`,
 
-    reg16: `font-family: ${regularFont};
+    reg16: `font-family: ${fontFamily};
       font-size: 16px;
-      font-weight: normal;
+      font-weight: 400;
       line-height: 24px;`,
 
-    reg14: `font-family: ${regularFont};
+    reg14: `font-family: ${fontFamily};
       font-size: 14px;
-      font-weight: normal;
+      font-weight: 400;
       line-height: 21px;`,
 
-    reg12: `font-family: ${regularFont};
+    reg12: `font-family: ${fontFamily};
       font-size: 12px;
-      font-weight: normal;
+      font-weight: 400;
       line-height: 18px;
       `
   }

@@ -142,7 +142,7 @@ describe('modifyDraftStatusHandler test', () => {
 
     const res = await server.server.inject({
       method: 'PUT',
-      url: '/formDraftStatus',
+      url: '/formDraft',
       payload: {
         event: 'birth',
         status: 'IN_PREVIEW'
@@ -160,7 +160,7 @@ describe('modifyDraftStatusHandler test', () => {
 
     const res = await server.server.inject({
       method: 'PUT',
-      url: '/formDraftStatus',
+      url: '/formDraft',
       payload: {
         event: 'birth',
         status: 'PUBLISHED'
@@ -177,7 +177,7 @@ describe('modifyDraftStatusHandler test', () => {
     mockingoose(FormDraft).toReturn(new Error('boom'), 'updateOne')
     const res = await server.server.inject({
       method: 'PUT',
-      url: '/formDraftStatus',
+      url: '/formDraft',
       payload: {
         event: 'death',
         status: 'IN_PREVIEW'
@@ -218,7 +218,7 @@ describe('modifyDraftStatusHandler test', () => {
 
     const res = await server.server.inject({
       method: 'PUT',
-      url: '/formDraftStatus',
+      url: '/formDraft',
       payload: {
         event: 'death',
         status: 'DRAFT'
@@ -256,7 +256,7 @@ describe('modifyDraftStatusHandler test', () => {
 
     const res = await server.server.inject({
       method: 'PUT',
-      url: '/formDraftStatus',
+      url: '/formDraft',
       payload: {
         event: 'death',
         status: 'DELETED'

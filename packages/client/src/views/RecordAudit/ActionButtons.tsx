@@ -68,14 +68,13 @@ export const ShowDownloadButton = ({
     draft?.submissionStatus === SUBMISSION_STATUS.DECLARED
   )
     return <></>
-  if (
-    draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
-    downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
-  ) {
+  if (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT) {
     const downLoadConfig = {
       event: type as string,
       compositionId: id,
-      action: Action.LOAD_REVIEW_DECLARATION
+      action: Action.LOAD_REVIEW_DECLARATION,
+      assignment: declaration?.assignment,
+      declarationStatus: declaration.status
     }
     return (
       <DownloadButton

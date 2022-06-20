@@ -24,13 +24,13 @@ import {
   SELECT_WITH_OPTIONS,
   SELECT_WITH_DYNAMIC_OPTIONS,
   TEL,
-  Event,
   BIG_NUMBER,
   RADIO_GROUP_WITH_NESTED_FIELDS,
   LOCATION_SEARCH_INPUT,
   DATE,
   NUMBER
 } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { countries } from '@client/forms/countries'
 import { OFFLINE_LOCATIONS_KEY, LocationType } from '@client/offline/reducer'
 
@@ -47,7 +47,7 @@ describe('form component', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createDeclaration(Event.BIRTH)
+    const draft = createDeclaration(Event.Birth)
     store.dispatch(storeDeclaration(draft))
     const modifyDraft = jest.fn()
     component = await createTestComponent(
@@ -219,7 +219,7 @@ describe('when user is in the register section', () => {
   let component: ReactWrapper<{}, {}>
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createDeclaration(Event.BIRTH)
+    const draft = createDeclaration(Event.Birth)
     store.dispatch(storeDeclaration(draft))
     const modifyDraft = jest.fn()
     component = await createTestComponent(
@@ -260,7 +260,7 @@ describe('when field definition has nested fields', () => {
 
   beforeEach(async () => {
     const { store, history } = createStore()
-    const draft = createDeclaration(Event.BIRTH)
+    const draft = createDeclaration(Event.Birth)
     store.dispatch(storeDeclaration(draft))
     const modifyDraft = jest.fn()
     component = await createTestComponent(

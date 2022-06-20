@@ -10,19 +10,20 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  IMessage,
   NUMBER,
   TEL,
   TEXT,
   TEXTAREA,
   BirthSection,
   DeathSection,
-  Event,
   IFormField
 } from '@client/forms'
+import { IMessage } from '@client/forms/questionConfig'
+import { Event } from '@client/utils/gateway'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import {
   getCertificateHandlebar,
+  getConfigFieldIdentifiers,
   ICustomConfigField
 } from '@client/forms/configuration/formConfig/utils'
 import { buttonMessages } from '@client/i18n/messages'
@@ -48,9 +49,11 @@ import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'
 import { connect } from 'react-redux'
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
-import { getConfigFieldIdentifiers } from '@client/forms/configuration/formConfig/motionUtils'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
-import { Title, Label, RequiredToggleAction, StyledTooltip } from './components'
+import { Title, Label, RequiredToggleAction, ToolTip } from './components'
+import { messages } from '@client/i18n/messages/views/formConfig'
+
+const DEFAULT_MAX_LENGTH = 250
 
 const CInputField = styled(InputField)`
   label {
@@ -161,8 +164,7 @@ interface ICustomFieldState {
   isFieldDuplicate: boolean
   selectedLanguage: string
   handleBars: string
-  hideField: string
-  maxLength: number | undefined
+  maxLength: number
   fieldForms: IFieldForms
 }
 
@@ -176,17 +178,23 @@ class CustomFieldToolsComp extends React.Component<
 > {
   constructor(props: IFullProps) {
     super(props)
-    this.initialize()
+    this.state = this.getInitialState()
   }
 
-  initialize() {
+  componentDidUpdate({ selectedField: { fieldId } }: IFullProps) {
+    if (fieldId !== this.props.selectedField.fieldId) {
+      this.setState(this.getInitialState())
+    }
+  }
+
+  getInitialState() {
     const defaultLanguage = getDefaultLanguage()
     const languages = this.getLanguages()
     const { selectedField, formField } = this.props
 
     const fieldForms: { [key: string]: ICustomField } = {}
 
-    Object.keys(languages).map((lang) => {
+    Object.keys(languages).forEach((lang) => {
       const label = this.getIntlMessage(selectedField.label, lang)
       fieldForms[lang] = {
         label,
@@ -196,14 +204,13 @@ class CustomFieldToolsComp extends React.Component<
         errorMessage: this.getIntlMessage(selectedField.errorMessage, lang)
       }
     })
-    this.state = {
+    return {
       isFieldDuplicate: false,
       handleBars:
         getCertificateHandlebar(formField) ||
         camelCase(fieldForms[defaultLanguage].label),
       selectedLanguage: defaultLanguage,
-      hideField: selectedField.enabled,
-      maxLength: selectedField.maxLength,
+      maxLength: selectedField.maxLength ?? DEFAULT_MAX_LENGTH,
       fieldForms
     }
   }
@@ -286,8 +293,8 @@ class CustomFieldToolsComp extends React.Component<
     }
   }
 
-  prepareModifiedFormField(defaultLanguage: string): ICustomConfigField {
-    const { selectedField, formField } = this.props
+  prepareModifiedFormField(): ICustomConfigField {
+    const { selectedField } = this.props
     const { fieldForms, handleBars } = this.state
     const languages = this.getLanguages()
     const newFieldID = this.generateNewFieldID()
@@ -339,11 +346,11 @@ class CustomFieldToolsComp extends React.Component<
       description: optionalContent.description,
       errorMessage: optionalContent.errorMessage,
       fieldName: handleBars,
-      enabled: this.state.hideField,
       fieldId: newFieldID,
+      /* We can't let maxlength be 0 as it doesn't make any sense */
+      maxLength: this.state.maxLength || DEFAULT_MAX_LENGTH,
       label
     }
-    modifiedField.maxLength = this.state.maxLength
     return modifiedField
   }
 
@@ -419,7 +426,12 @@ class CustomFieldToolsComp extends React.Component<
             label={
               <Label>
                 {intl.formatMessage(customFieldFormMessages.requiredFieldLabel)}
-                <StyledTooltip />
+                <ToolTip
+                  label={intl.formatMessage(
+                    messages.requiredForRegistrationTooltip
+                  )}
+                  id={'required-field-label'}
+                />
               </Label>
             }
             actions={<RequiredToggleAction {...selectedField} />}
@@ -536,8 +548,8 @@ class CustomFieldToolsComp extends React.Component<
                 </CInputField>
               </FieldContainer>
 
+              {/*errorMessage is not implemented yet*/}
               {/*
-              errorMessage is not implemented yet
               <FieldContainer hide={language !== this.state.selectedLanguage}>
                 <CInputField
                   required={false}
@@ -559,31 +571,27 @@ class CustomFieldToolsComp extends React.Component<
                 </CInputField>
               </FieldContainer>
             */}
-
-              <FieldContainer hide={language !== this.state.selectedLanguage}>
-                <CInputField
-                  required={true}
-                  id={`custom-form-max-length-${language}`}
-                  label={intl.formatMessage(
-                    customFieldFormMessages.maxLengthLabel
-                  )}
-                  touched={false}
-                >
-                  <CTextInput
-                    type="number"
-                    maxLength={this.state.maxLength || 250}
-                    value={this.state.maxLength || 250}
-                    onChange={(event: any) =>
-                      this.setState({
-                        maxLength: event.target.value
-                      })
-                    }
-                  />
-                </CInputField>
-              </FieldContainer>
             </React.Fragment>
           )
         })}
+        <FieldContainer>
+          <CInputField
+            required={false}
+            id="custom-form-max-length"
+            label={intl.formatMessage(customFieldFormMessages.maxLengthLabel)}
+            touched={false}
+          >
+            <CTextInput
+              type="number"
+              defaultValue={this.state.maxLength}
+              onChange={(event) =>
+                this.setState({
+                  maxLength: +event.target.value
+                })
+              }
+            />
+          </CInputField>
+        </FieldContainer>
         <ListContainer>
           <ListRow>
             <ListColumn>
@@ -595,8 +603,7 @@ class CustomFieldToolsComp extends React.Component<
                     })
                     return
                   }
-                  const modifiedField =
-                    this.prepareModifiedFormField(defaultLanguage)
+                  const modifiedField = this.prepareModifiedFormField()
                   modifyConfigField(selectedField.fieldId, modifiedField)
                   debouncedNullifySelectedField()
                 }}

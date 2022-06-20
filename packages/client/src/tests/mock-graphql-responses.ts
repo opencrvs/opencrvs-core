@@ -19,7 +19,7 @@ import {
   GET_DEATH_REGISTRATION_FOR_REVIEW
 } from '@client/views/DataProvider/death/queries'
 import { createReviewDeclaration } from '@opencrvs/client/src/declarations'
-import { Event } from '@opencrvs/client/src/forms'
+import { Event } from '@client/utils/gateway'
 import { v4 as uuid } from 'uuid'
 
 export const birthDeclarationForReview = {
@@ -692,6 +692,7 @@ export const lateBirthCertificationResponse = [
                 avatar: null,
                 __typename: 'User'
               },
+              signature: null,
               comments: [],
               input: [],
               output: [],
@@ -727,6 +728,10 @@ export const lateBirthCertificationResponse = [
                 ],
                 avatar: null,
                 __typename: 'User'
+              },
+              signature: {
+                data: 'data:image/png;base64,iVBORw0KGgoAAAAN',
+                type: 'image/png'
               },
               comments: [],
               input: [],
@@ -764,6 +769,7 @@ export const lateBirthCertificationResponse = [
                 avatar: null,
                 __typename: 'User'
               },
+              signature: null,
               comments: [],
               input: [],
               output: [],
@@ -909,6 +915,7 @@ export const lateBirthCertificationResponseNoMotherOrFather = [
                 avatar: null,
                 __typename: 'User'
               },
+              signature: null,
               comments: [],
               input: [],
               output: [],
@@ -944,6 +951,10 @@ export const lateBirthCertificationResponseNoMotherOrFather = [
                 ],
                 avatar: null,
                 __typename: 'User'
+              },
+              signature: {
+                data: 'data:image/png;base64,iVBORw0KGgoAAA',
+                type: 'image/png'
               },
               comments: [],
               input: [],
@@ -981,6 +992,7 @@ export const lateBirthCertificationResponseNoMotherOrFather = [
                 avatar: null,
                 __typename: 'User'
               },
+              signature: null,
               comments: [],
               input: [],
               output: [],
@@ -1241,6 +1253,7 @@ export const lateBirthCertificationResponseWithFather = [
                 avatar: null,
                 __typename: 'User'
               },
+              signature: null,
               comments: [],
               input: [],
               output: [],
@@ -1276,6 +1289,10 @@ export const lateBirthCertificationResponseWithFather = [
                 ],
                 avatar: null,
                 __typename: 'User'
+              },
+              signature: {
+                data: 'data:image/png;base64,iVBORw0KGgoAAA',
+                type: 'image/png'
               },
               comments: [],
               input: [],
@@ -1313,6 +1330,7 @@ export const lateBirthCertificationResponseWithFather = [
                 avatar: null,
                 __typename: 'User'
               },
+              signature: null,
               comments: [],
               input: [],
               output: [],
@@ -1512,6 +1530,7 @@ export const onTimeBirthCertificationResponse = [
                 avatar: null,
                 __typename: 'User'
               },
+              signature: null,
               comments: [],
               input: [],
               output: [],
@@ -1848,6 +1867,7 @@ export const deathCertificationResponse = [
                 avatar: null,
                 __typename: 'User'
               },
+              signature: null,
               comments: [],
               input: [],
               output: [],

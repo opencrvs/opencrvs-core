@@ -35,6 +35,7 @@ interface INotificationsMessages
   userFormUpdateSuccess: MessageDescriptor
   waitingToRetry: MessageDescriptor
   downloadDeclarationFailed: MessageDescriptor
+  unassigned: MessageDescriptor
 }
 
 const messagesToDefine: INotificationsMessages = {
@@ -164,6 +165,11 @@ const messagesToDefine: INotificationsMessages = {
     defaultMessage: 'Failed to download declaration. Please try again',
     description: 'Label for declaration downloading failed',
     id: 'regHome.workqueue.downloadDeclarationFailed'
+  },
+  unassigned: {
+    defaultMessage: 'You were unassigned from {trackingId}',
+    id: 'misc.notif.unassign',
+    description: 'Label for unassigned toast notification'
   }
 }
 

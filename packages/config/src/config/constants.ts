@@ -30,3 +30,4 @@ export const CERT_PUBLIC_KEY_PATH =
 // Check if the token has been invalided in the auth service before it has expired
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
+export const DEFAULT_TIMEOUT = 600000

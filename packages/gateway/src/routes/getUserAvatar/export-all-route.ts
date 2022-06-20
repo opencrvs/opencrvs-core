@@ -9,15 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { Logo } from '.'
 
+import { getUserAvatarHandler } from '@gateway/routes/getUserAvatar/handler'
+
+// curl -H 'Content-Type: application/json' -d '{"username": "test.user", "password": "test"}' http://localhost:4040/sendVerifyCode
 export default {
-  title: 'Components/icons/Logo',
-  component: Logo
-} as Meta
-
-const Template: Story<{}> = () => <Logo />
-
-export const LogoView = Template.bind({})
+  method: 'GET',
+  path: '/files/avatar/{userId}.jpg',
+  handler: getUserAvatarHandler,
+  config: {
+    tags: ['api'],
+    auth: false,
+    description: 'Get the user avatar as buffer',
+    notes: 'Pass the usreId as url param'
+  }
+}

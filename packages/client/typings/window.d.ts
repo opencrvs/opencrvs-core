@@ -44,6 +44,7 @@ interface Window {
       }
     }
     LANGUAGES: string
+    AVAILABLE_LANGUAGES_SELECT: string
     LOGIN_URL: string
     AUTH_URL: string
     COUNTRY_CONFIG_URL: string

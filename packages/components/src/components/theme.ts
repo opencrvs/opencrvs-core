@@ -22,10 +22,10 @@ export interface ITheme {
   fonts: IFonts
   grid: IGrid
 }
-export const getTheme = (language: string): ITheme => ({
+export const getTheme = (): ITheme => ({
   colors,
   gradients,
   shadows,
-  fonts: fonts(language),
+  fonts: fonts(),
   grid
 })

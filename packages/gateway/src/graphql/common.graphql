@@ -24,6 +24,13 @@ type HumanName { # -> HumanName
   familyName: String # -> .family
 }
 
+# Although the recommended way is use ALL_CAPS but keeping it lowercase
+# makes it a lot more easier to use in client
+enum Event {
+  birth
+  death
+}
+
 enum Relationship {
   GUARDIAN
   NON_LEGAL_GUARDIAN

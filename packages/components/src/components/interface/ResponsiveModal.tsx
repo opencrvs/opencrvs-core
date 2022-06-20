@@ -20,14 +20,14 @@ const ModalContainer = styled.div<{ fullscreen?: boolean }>`
   left: 0;
   right: 0;
   bottom: 0;
-  padding-top: ${({ fullscreen }) => (fullscreen ? 0 : 160)}px;
   z-index: 5;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding-top: 0px;
   }
+  cursor: initial;
 `
 
 const ScreenBlocker = styled.div`
@@ -70,7 +70,6 @@ const Header = styled.div<{
   hideBoxShadow?: boolean
   titleHeightAuto?: boolean
 }>`
-  ${({ theme }) => theme.fonts.regularFont};
   height: ${({ titleHeightAuto }) => (titleHeightAuto ? 'auto' : '64px')};
   display: flex;
   flex-direction: row;
@@ -99,13 +98,16 @@ const Body = styled.div<{
   fullscreen?: boolean
 }>`
   ${({ theme }) => theme.fonts.reg16};
-  height: ${({ height }) => (height ? height : 250)}px;
-  height: ${({ autoHeight }) => autoHeight && `auto`};
+  height: ${({ height, autoHeight }) =>
+    height ? `${height}px` : autoHeight ? `auto` : `250px`};
+  max-height: ${({ fullscreen }) => !fullscreen && `calc(100vh - 180px)`};
   color: ${({ theme }) => theme.colors.supportingCopy};
   overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'auto')};
   padding: 0 24px 16px;
   display: flex;
   flex-direction: column;
+  text-align: left;
+  white-space: normal;
   flex-grow: ${({ fullscreen }) => (fullscreen ? 1 : 0)};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-grow: 1;
@@ -154,8 +156,9 @@ interface IProps {
   contentScrollableY?: boolean
   fullscreen?: boolean
   actions: JSX.Element[]
-  handleClose?: () => void
+  handleClose?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   hideHeaderBoxShadow?: boolean
+  preventClickOnParent?: boolean
 }
 
 export class ResponsiveModal extends React.Component<IProps> {
@@ -185,7 +188,8 @@ export class ResponsiveModal extends React.Component<IProps> {
       fullscreen,
       autoHeight,
       contentScrollableY,
-      hideHeaderBoxShadow
+      hideHeaderBoxShadow,
+      preventClickOnParent
     } = this.props
 
     this.toggleScroll()
@@ -194,7 +198,15 @@ export class ResponsiveModal extends React.Component<IProps> {
     }
 
     return (
-      <ModalContainer id={id} fullscreen={fullscreen}>
+      <ModalContainer
+        id={id}
+        fullscreen={fullscreen}
+        onClick={(e) => {
+          if (preventClickOnParent) {
+            e.stopPropagation()
+          }
+        }}
+      >
         <ScreenBlocker />
         <ModalContent
           width={width}

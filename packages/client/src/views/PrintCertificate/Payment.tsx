@@ -15,11 +15,12 @@ import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
 import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/certificate'
 import {
   goBack as goBackAction,
+  goToHomeTab,
   goToReviewCertificate as goToReviewCertificateAction
 } from '@client/navigation'
 import { getUserDetails } from '@client/profile/profileSelectors'
@@ -40,6 +41,7 @@ import {
 } from './utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const Action = styled.div`
   margin-top: 32px;
@@ -78,6 +80,7 @@ interface IProps {
   modifyDeclaration: typeof modifyDeclaration
   goToReviewCertificate: typeof goToReviewCertificateAction
   goBack: typeof goBackAction
+  goToHomeTab: typeof goToHomeTab
   userDetails: IUserDetails | null
   offlineCountryConfig: IOfflineData
 }
@@ -168,6 +171,7 @@ class PaymentComponent extends React.Component<IFullProps> {
           title={'Print certificate'}
           goBack={goBack}
           hideBackground
+          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
           <Content
             title={intl.formatMessage(messages.payment)}
@@ -210,9 +214,9 @@ const getEvent = (eventType: string | undefined) => {
   switch (eventType && eventType.toLowerCase()) {
     case 'birth':
     default:
-      return Event.BIRTH
+      return Event.Birth
     case 'death':
-      return Event.DEATH
+      return Event.Death
   }
 }
 
@@ -242,6 +246,7 @@ function mapStatetoProps(
 
 export const Payment = connect(mapStatetoProps, {
   goBack: goBackAction,
+  goToHomeTab,
   modifyDeclaration,
   goToReviewCertificate: goToReviewCertificateAction
 })(injectIntl(withTheme(PaymentComponent)))

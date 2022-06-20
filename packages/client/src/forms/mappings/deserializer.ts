@@ -217,7 +217,7 @@ function fieldMutationDescriptorToMutationFunction(
   return transformer
 }
 
-function fieldValidationDescriptorToValidationFunction(
+export function fieldValidationDescriptorToValidationFunction(
   descriptor: IValidatorDescriptor
 ): Validation {
   const validator: Validation | AnyFn<Validation> =

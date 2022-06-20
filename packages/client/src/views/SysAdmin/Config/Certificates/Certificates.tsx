@@ -39,11 +39,11 @@ import {
   ERROR_TYPES,
   validateCertificateTemplate
 } from '@client/utils/imageUtils'
-import { mapValues } from 'lodash'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { Event, IAttachmentValue, IFormFieldValue, IForm } from '@client/forms'
+import { IAttachmentValue, IFormFieldValue, IForm } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import {
   getDummyCertificateTemplateData,
@@ -78,21 +78,8 @@ const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
-const ListTitleDiv = styled.div`
-  width: 645px;
-  height: 46px;
-  ${({ theme }) => theme.fonts.reg16};
-`
-
 const BlueTitle = styled.span`
   color: ${({ theme }) => theme.colors.tertiary};
-`
-
-const ErrorText = styled.div`
-  color: ${({ theme }) => theme.colors};
-  ${({ theme }) => theme.fonts.reg16};
-  text-align: center;
-  margin-top: 100px;
 `
 
 export type Scope = string[]
@@ -160,9 +147,9 @@ export const printDummyCertificate = async (
   const data = getDummyDeclarationData(event, registerForm)
   let certEvent: Event
   if (event === 'death') {
-    certEvent = Event.DEATH
+    certEvent = Event.Death
   } else {
-    certEvent = Event.BIRTH
+    certEvent = Event.Birth
   }
   const updatedOfflineData: IOfflineData = {
     ...offlineData,
@@ -425,7 +412,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   toggleButton={<VerticalThreeDots />}
                   menuItems={this.getMenuItems(
                     intl,
-                    Event.BIRTH,
+                    Event.Birth,
                     offlineResources.templates.certificates.birth.definition,
                     offlineResources.templates.certificates.birth.fileName
                   )}
@@ -457,7 +444,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   toggleButton={<VerticalThreeDots />}
                   menuItems={this.getMenuItems(
                     intl,
-                    Event.DEATH,
+                    Event.Death,
                     offlineResources.templates.certificates.death.definition,
                     offlineResources.templates.certificates.death.fileName
                   )}
@@ -477,16 +464,19 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     }
     return (
       <>
-        <SysAdminContentWrapper isCertificatesConfigPage={true}>
+        <SysAdminContentWrapper
+          isCertificatesConfigPage={true}
+          hideBackground={true}
+        >
           {this.state.selectedSubMenuItem ===
             this.SUB_MENU_ID.certificatesConfig && (
             <Content title={CertificateSection.title} titleColor={'copy'}>
-              <ListTitleDiv>
+              <>
                 {intl.formatMessage(messages.listDetails)}
                 <BlueTitle>
                   {intl.formatMessage(messages.listDetailsQsn)}
                 </BlueTitle>
-              </ListTitleDiv>
+              </>
               <ListViewContainer>
                 <ListViewSimplified>
                   {CertificateSection.items.map((item) => {
@@ -553,9 +543,9 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 key="continue"
                 onClick={() => {
                   this.togglePrompt()
-                  if (eventName === Event.BIRTH)
+                  if (eventName === Event.Birth)
                     this.birthCertificatefileUploader.current!.click()
-                  else if (eventName === Event.DEATH)
+                  else if (eventName === Event.Death)
                     this.deathCertificatefileUploader.current!.click()
                 }}
               >
@@ -570,7 +560,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               previewImage={this.state.previewImage}
               disableDelete={true}
               title={
-                eventName === Event.BIRTH
+                eventName === Event.Birth
                   ? intl.formatMessage(messages.birthTemplate)
                   : intl.formatMessage(messages.deathTemplate)
               }

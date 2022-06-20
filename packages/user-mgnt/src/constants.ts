@@ -27,5 +27,7 @@ export const QA_ENV = process.env.QA_ENV || false
 // Check if the token has been invalided in the auth service before it has expired
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
-
+export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
 export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:5001/fhir'
+
+export const DEFAULT_TIMEOUT = 600000

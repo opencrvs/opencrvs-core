@@ -80,7 +80,7 @@ const mockQuestion = {
   maxLength: 32,
   fieldName: 'myField',
   fieldType: 'TEXT',
-  preceedingFieldId: 'myPreviousFieldId',
+  precedingFieldId: 'myPreviousFieldId',
   required: true,
   custom: true,
   initialValue: 'myValue'

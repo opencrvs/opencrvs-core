@@ -14,7 +14,8 @@ import {
   makeDeclarationReadyToDownload,
   storeDeclaration
 } from '@client/declarations'
-import { Action, Event } from '@client/forms'
+import { Action } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
 import { storage } from '@client/storage'
@@ -31,7 +32,6 @@ import { GridTable } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
-import { Store } from 'redux'
 import { ReadyToPrint } from './ReadyToPrint'
 import {
   GQLBirthEventSearchSet,
@@ -373,8 +373,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
   })
 
   describe('When a row is clicked', () => {
-    let expandedRow: any
-
     it('renders expanded area for ready to print', async () => {
       const testComponent = await createTestComponent(
         // @ts-ignore
@@ -690,6 +688,9 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
       testComponent.update()
 
+      expect(testComponent.find('#assignment').hostNodes()).toHaveLength(1)
+
+      testComponent.find('#assign').hostNodes().simulate('click')
       expect(
         testComponent.find('#action-loading-ListItemAction-0').hostNodes()
       ).toHaveLength(1)
@@ -716,7 +717,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
     it('shows error when download is failed', async () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
-        Event.DEATH,
+        Event.Death,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
         Action.LOAD_CERTIFICATE_DECLARATION
       )
@@ -727,7 +728,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
 
       const errorIcon = await waitForElement(
         testComponent,
-        '#ListItemAction-1-download-failed'
+        '#ListItemAction-1-icon-failed'
       )
       expect(errorIcon.hostNodes()).toHaveLength(1)
     })

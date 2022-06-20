@@ -408,7 +408,13 @@ function RecordAuditBody({
     if (draft?.submissionStatus === SUBMISSION_STATUS.DRAFT) {
       actions.push(<Uploaded />)
     } else {
-      actions.push(<Downloaded />)
+      actions.push(
+        ShowDownloadButton({
+          declaration,
+          draft,
+          userDetails
+        })
+      )
     }
     desktopActionsView.push(actions[actions.length - 1])
   }
@@ -572,7 +578,11 @@ function getBodyContent({
   goBack,
   ...actionProps
 }: IFullProps) {
-  if (tab === 'search') {
+  if (
+    tab === 'search' ||
+    (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
+      !workqueueDeclaration)
+  ) {
     return (
       <>
         <Query

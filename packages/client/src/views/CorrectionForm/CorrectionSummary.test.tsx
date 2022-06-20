@@ -21,8 +21,13 @@ import {
 } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
-import { Event, CorrectionSection } from '@client/forms'
-import { IDeclaration, storeDeclaration } from '@client/declarations'
+import { CorrectionSection } from '@client/forms'
+import { Event } from '@client/utils/gateway'
+import {
+  IDeclaration,
+  storeDeclaration,
+  DOWNLOAD_STATUS
+} from '@client/declarations'
 import { CorrectionForm } from './CorrectionForm'
 import { formatUrl } from '@client/navigation'
 import { CERTIFICATE_CORRECTION } from '@client/navigation/routes'
@@ -84,9 +89,9 @@ const deathDeclaration: IDeclaration = {
   },
   originalData: mockDeathDeclarationData,
   review: true,
-  event: Event.DEATH,
+  event: Event.Death,
   registrationStatus: 'REGISTERED',
-  downloadStatus: 'DOWNLOADED',
+  downloadStatus: DOWNLOAD_STATUS.DOWNLOADED,
   modifiedOn: 1644490181166,
   visitedGroupIds: [
     {
@@ -143,9 +148,9 @@ const birthDeclaration: IDeclaration = {
   },
   originalData: mockDeclarationData,
   review: true,
-  event: Event.BIRTH,
+  event: Event.Birth,
   registrationStatus: 'REGISTERED',
-  downloadStatus: 'DOWNLOADED',
+  downloadStatus: DOWNLOAD_STATUS.DOWNLOADED,
   modifiedOn: 1644407705186,
   visitedGroupIds: [
     {
@@ -167,7 +172,7 @@ describe('Correction summary', () => {
     beforeEach(async () => {
       store.dispatch(storeDeclaration(birthDeclaration))
       store.dispatch(getOfflineDataSuccess(JSON.stringify(mockOfflineData)))
-      const form = await getRegisterFormFromStore(store, Event.BIRTH)
+      const form = await getRegisterFormFromStore(store, Event.Birth)
       wrapper = await createTestComponent(
         <CorrectionForm
           {...createRouterProps(

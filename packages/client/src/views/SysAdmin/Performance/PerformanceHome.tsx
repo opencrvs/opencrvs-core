@@ -36,7 +36,7 @@ import {
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import subYears from 'date-fns/subYears'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
@@ -265,7 +265,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
       timeStart:
         (timeStart && new Date(timeStart)) || subYears(new Date(Date.now()), 1),
       timeEnd: (timeEnd && new Date(timeEnd)) || new Date(Date.now()),
-      event: event || Event.BIRTH,
+      event: event || Event.Birth,
       toggleStatus: false,
       queriesLoading: ['PERFORMANCE_METRICS', 'GET_TOTAL_PAYMENTS'],
       officeSelected: this.isOfficeSelected(selectedLocation),
@@ -341,11 +341,11 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
           options={[
             {
               label: intl.formatMessage(messages.eventOptionForBirths),
-              value: Event.BIRTH
+              value: Event.Birth
             },
             {
               label: intl.formatMessage(messages.eventOptionForDeaths),
-              value: Event.DEATH
+              value: Event.Death
             }
           ]}
         />
@@ -427,10 +427,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
         id="performanceHome"
         isCertificatesConfigPage={true}
         mapPerformanceClickHandler={this.togglePerformanceStatus}
-        profilePageStyle={{
-          paddingTopMd: 0,
-          horizontalPaddingMd: 0
-        }}
+        hideBackground={true}
       >
         <Layout>
           <LayoutLeft>
@@ -443,6 +440,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                 <>
                   <Query
                     query={PERFORMANCE_METRICS}
+                    fetchPolicy="no-cache"
                     onCompleted={() => this.markFinished('PERFORMANCE_METRICS')}
                     onError={() => this.markFinished('PERFORMANCE_METRICS')}
                     variables={
@@ -629,18 +627,14 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
               officeSelected: this.state.officeSelected
             }}
             fetchPolicy="no-cache"
+            key={Number(isOnline)} // To re-render when online
           >
             {({ loading, data, error }) => {
-              if (error) {
-                return (
-                  <>
-                    <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
-                  </>
-                )
-              }
-              if (!data) return <></>
               return (
                 <>
+                  {error && (
+                    <ToastNotification type={NOTIFICATION_TYPE.ERROR} />
+                  )}
                   <ResponsiveModal
                     title={intl.formatMessage(constantsMessages.status)}
                     show={toggleStatus}
@@ -652,15 +646,17 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                         <Spinner id="modal-data-loading" />
                       ) : (
                         <>
-                          <StatusWiseDeclarationCountView
-                            selectedEvent={this.state.event}
-                            isAccessibleOffice={this.state.isAccessibleOffice}
-                            statusMapping={StatusMapping}
-                            data={data.fetchRegistrationCountByStatus}
-                            onClickStatusDetails={this.onClickStatusDetails}
-                          />
+                          {isOnline && (
+                            <StatusWiseDeclarationCountView
+                              selectedEvent={this.state.event}
+                              isAccessibleOffice={this.state.isAccessibleOffice}
+                              statusMapping={StatusMapping}
+                              data={data.fetchRegistrationCountByStatus}
+                              onClickStatusDetails={this.onClickStatusDetails}
+                            />
+                          )}
 
-                          {!officeSelected && (
+                          {!officeSelected && isOnline && (
                             <>
                               <Devider />
 

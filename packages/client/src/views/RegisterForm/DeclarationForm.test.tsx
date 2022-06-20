@@ -33,7 +33,7 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
 import { storage } from '@client/storage'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { waitForElement } from '@client/tests/wait-for-element'
 
 describe('when user has starts a new declaration', () => {
@@ -66,7 +66,7 @@ describe('when user has starts a new declaration', () => {
       history = testApp.history
       store = testApp.store
 
-      draft = createDeclaration(Event.BIRTH)
+      draft = createDeclaration(Event.Birth)
       await store.dispatch(storeDeclaration(draft))
     })
 
@@ -101,7 +101,7 @@ describe('when user has starts a new declaration', () => {
             }
           }
         }
-        draft = createDeclaration(Event.BIRTH, data)
+        draft = createDeclaration(Event.Birth, data)
         store.dispatch(storeDeclaration(draft))
         history.replace(
           SELECT_BIRTH_INFORMANT.replace(':declarationId', draft.id.toString())
@@ -171,7 +171,7 @@ describe('when user has starts a new declaration', () => {
             }
           }
         }
-        draft = createDeclaration(Event.BIRTH, data)
+        draft = createDeclaration(Event.Birth, data)
 
         /*
          * Needs to be done before storeDeclaration(draft)

@@ -28,7 +28,6 @@ import {
 import { FormFieldGenerator } from '@client/components/form'
 import {
   Action,
-  Event,
   IForm,
   IFormData,
   IFormField,
@@ -36,6 +35,7 @@ import {
   IFormSectionData,
   IFormSectionGroup
 } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
 import {
   getValidationErrorsForForm,
@@ -45,6 +45,7 @@ import { buttonMessages, errorMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
   goBack,
+  goToHomeTab,
   goToPrintCertificate,
   goToPrintCertificatePayment,
   goToReviewCertificate,
@@ -68,7 +69,7 @@ import {
 import { StyledSpinner } from '@client/views/OfficeHome/OfficeHome'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
-import { flatten, cloneDeep, get, isEqual } from 'lodash'
+import { flatten, cloneDeep } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -85,6 +86,7 @@ import {
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
 const ErrorWrapper = styled.div`
   margin-top: -3px;
@@ -102,6 +104,7 @@ interface IBaseProps {
   offlineCountryConfiguration: IOfflineData
   theme: ITheme
   goBack: typeof goBack
+  goToHomeTab: typeof goToHomeTab
   storeDeclaration: typeof storeDeclaration
   writeDeclaration: typeof writeDeclaration
   modifyDeclaration: typeof modifyDeclaration
@@ -408,6 +411,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
           hideBackground
           title={intl.formatMessage(formSection.title)}
           goBack={goBack}
+          goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
           <Content
             title={
@@ -501,10 +505,10 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
 
 const getCollectCertificateForm = (event: Event, state: IStoreState) => {
   switch (event) {
-    case Event.BIRTH:
+    case Event.Birth:
     default:
       return state.printCertificateForm.collectBirthCertificateForm
-    case Event.DEATH:
+    case Event.Death:
       return state.printCertificateForm.collectDeathCertificateForm
   }
 }
@@ -526,7 +530,7 @@ const mapStateToProps = (
 
   const formSection = getCollectCertificateForm(event, state)
   const clonedFormSection = cloneDeep(formSection)
-  if (event === Event.BIRTH && groupId === 'certCollector') {
+  if (event === Event.Birth && groupId === 'certCollector') {
     const declarationData = declaration && declaration.data
     let motherDataExist: boolean | undefined
     let fatherDataExist: boolean | undefined
@@ -601,6 +605,7 @@ const mapStateToProps = (
 
 export const CollectorForm = connect(mapStateToProps, {
   goBack,
+  goToHomeTab,
   storeDeclaration,
   writeDeclaration,
   modifyDeclaration,

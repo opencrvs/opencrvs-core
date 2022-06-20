@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Event, IFormData, ISelectOption } from '@client/forms'
+import { IFormData, ISelectOption } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { dynamicMessages } from '@client/i18n/messages/views/certificate'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { ILanguageState } from '@client/i18n/reducer'
@@ -90,8 +91,8 @@ function getDayRanges(offlineData: IOfflineData): IDayRange {
 
   return {
     rangeData: {
-      [Event.BIRTH]: birthRanges,
-      [Event.DEATH]: deathRanges
+      [Event.Birth]: birthRanges,
+      [Event.Death]: deathRanges
     }
   }
 }
@@ -163,7 +164,7 @@ export function getServiceMessage(
 ) {
   const days = calculateDays(eventDate, registeredDate)
 
-  if (event === Event.BIRTH) {
+  if (event === Event.Birth) {
     if (days <= offlineData.config.BIRTH.REGISTRATION_TARGET) {
       return intl.formatMessage(dynamicMessages[`${event}ServiceBefore`], {
         target: offlineData.config.BIRTH.REGISTRATION_TARGET
@@ -178,8 +179,7 @@ export function getServiceMessage(
       })
     } else {
       return intl.formatMessage(dynamicMessages[`${event}ServiceAfter`], {
-        target: offlineData.config.BIRTH.REGISTRATION_TARGET,
-        latetarget: offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
+        target: offlineData.config.BIRTH.LATE_REGISTRATION_TARGET
       })
     }
   } else {
@@ -208,9 +208,9 @@ export function isFreeOfCost(
 
 export function getEventDate(data: IFormData, event: Event) {
   switch (event) {
-    case Event.BIRTH:
+    case Event.Birth:
       return data.child.childBirthDate as string
-    case Event.DEATH:
+    case Event.Death:
       return data.deathEvent.deathDate as string
   }
 }
@@ -227,9 +227,9 @@ export function getEvent(eventType: string | undefined) {
   switch (eventType && eventType.toLowerCase()) {
     case 'birth':
     default:
-      return Event.BIRTH
+      return Event.Birth
     case 'death':
-      return Event.DEATH
+      return Event.Death
   }
 }
 
@@ -246,4 +246,22 @@ export function isCertificateForPrintInAdvance(
     return true
   }
   return false
+}
+
+export function getRegistrarSignatureHandlebarName(
+  offlineCountryConfig: IOfflineData,
+  event: Event
+) {
+  const svgCode = offlineCountryConfig.templates.certificates![event].definition
+  const html = document.createElement('html')
+  html.innerHTML = svgCode
+  const certificateImages = html.querySelectorAll('image')
+  const signatureImage = Array.from(certificateImages).find(
+    (image) => image.getAttribute('data-content') === 'signature'
+  )
+  const handlebarText =
+    signatureImage?.getAttribute('href') ||
+    signatureImage?.getAttribute('xlink:href') ||
+    ''
+  return handlebarText?.match(/^{{(\w+)}}$/)?.[1] || ''
 }

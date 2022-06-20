@@ -36,7 +36,6 @@ import {
 
 import { IVerifyCodeNumbers } from '@login/login/actions'
 import { Ii18nReduxFormFieldProps } from '@login/utils/fieldUtils'
-
 import { PrimaryButton } from '@opencrvs/components/lib/buttons/PrimaryButton'
 import { ceil } from 'lodash'
 import { messages } from '@login/i18n/messages/views/stepTwoForm'
@@ -44,12 +43,18 @@ import { messages } from '@login/i18n/messages/views/stepTwoForm'
 const StyledMobile2FA = styled(Mobile2FA)`
   transform: scale(0.8);
 `
+const StyledH2 = styled.h2`
+  ${({ theme }) => theme.fonts.h2};
+  /* stylelint-disable-next-line opencrvs/no-font-styles */
+  font-weight: 400;
+`
 export interface IProps {
   formId: string
   submissionError: boolean
   resentSMS: boolean
   submitting: boolean
   stepOneDetails: { mobile: string }
+  applicationName: string | undefined
 }
 export interface IDispatchProps {
   submitAction: (values: IVerifyCodeNumbers) => void
@@ -92,6 +97,11 @@ const CodeInput = injectIntl(
 )
 
 export class StepTwoForm extends React.Component<FullProps> {
+  componentDidUpdate() {
+    const appName = this.props.applicationName
+    if (appName) document.title = appName
+  }
+
   render() {
     const {
       intl,
@@ -125,7 +135,9 @@ export class StepTwoForm extends React.Component<FullProps> {
           </LogoContainer>
           {resentSMS ? (
             <React.Fragment>
-              <h2>{intl.formatMessage(messages.stepTwoResendTitle)}</h2>
+              <StyledH2>
+                {intl.formatMessage(messages.stepTwoResendTitle)}
+              </StyledH2>
               <p>
                 {intl.formatMessage(messages.resentSMS, {
                   number: mobileNumber
@@ -134,7 +146,7 @@ export class StepTwoForm extends React.Component<FullProps> {
             </React.Fragment>
           ) : (
             <React.Fragment>
-              <h2>{intl.formatMessage(messages.stepTwoTitle)}</h2>
+              <StyledH2>{intl.formatMessage(messages.stepTwoTitle)}</StyledH2>
               <p>
                 {intl.formatMessage(messages.stepTwoInstruction, {
                   number: mobileNumber
@@ -165,7 +177,7 @@ export class StepTwoForm extends React.Component<FullProps> {
               disabled={submitting}
               type="submit"
             >
-              {intl.formatMessage(messages.submit)}
+              {intl.formatMessage(messages.verify)}
             </PrimaryButton>{' '}
             <br />
             <StyledButtonWrapper>

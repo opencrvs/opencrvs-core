@@ -20,6 +20,7 @@ export interface ILeftNavigationProps {
   avatar?: () => void
   name?: string | null
   role?: string | null
+  warning?: JSX.Element | null
 }
 const LeftNavigationContainer = styled.div<{
   navigationWidth?: number
@@ -75,7 +76,7 @@ const ApplicationName = styled.div`
 const Version = styled.div`
   color: ${({ theme }) => theme.colors.grey400};
   ${({ theme }) => theme.fonts.reg14};
-  height: 40px;
+  height: auto;
   position: absolute;
   bottom: 0px;
   padding: 24px 24px;
@@ -105,7 +106,8 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
       </UserInfo>
       {props.children && props.children}
       <Version>
-        <span>OpenCRVS v1.0.0-alpha.3.1</span>
+        {props.warning}
+        <span>OpenCRVS v1.0.0</span>
         <span>{process.env.REACT_APP_VERSION || 'Development'}</span>
       </Version>
     </LeftNavigationContainer>

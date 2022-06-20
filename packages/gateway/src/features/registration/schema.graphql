@@ -234,6 +234,7 @@ type History {
   input: [InputOutput]
   output: [InputOutput]
   certificates: [Certificate]
+  signature: Signature
 }
 
 interface EventRegistration {
@@ -571,4 +572,5 @@ type Mutation {
     id: ID!
     details: DeathRegistrationInput!
   ): ID!
+  markEventAsUnassigned(id: String!): ID! # remove assigned extension from task'
 }

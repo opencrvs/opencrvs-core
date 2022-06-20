@@ -16,11 +16,15 @@ import * as React from 'react'
 import { queries } from '@client/profile/queries'
 import { SEARCH_EVENTS } from '@client/search/queries'
 import { createStore } from '@client/store'
-import { createTestComponent, mockUserResponse } from '@client/tests/util'
+import {
+  createTestComponent,
+  mockUserResponse,
+  flushPromises
+} from '@client/tests/util'
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { goToSearch } from '@client/navigation'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { storeDeclaration } from '@client/declarations'
 
 const registerScopeToken =
@@ -395,7 +399,7 @@ describe('SearchResult tests', () => {
     expect(window.location.pathname).toBe('/search-result/tracking-id/DW0UTHR')
   })
 
-  it('renders download button and loaders in search page', async () => {
+  it('renders download button and modals in search page', async () => {
     const graphqlMock = [
       {
         request: {
@@ -478,16 +482,14 @@ describe('SearchResult tests', () => {
     testComponent.update()
     testComponent.find('#ListItemAction-0-icon').hostNodes().simulate('click')
 
-    expect(
-      testComponent.find('#action-loading-ListItemAction-0').hostNodes()
-    ).toHaveLength(1)
+    expect(testComponent.find('#assignment').hostNodes()).toHaveLength(1)
   })
 
   it('renders print button in search page', async () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
       data: {},
-      event: Event.BIRTH,
+      event: Event.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'REGISTERED'
     }
@@ -598,7 +600,7 @@ describe('SearchResult tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
       data: {},
-      event: Event.BIRTH,
+      event: Event.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'VALIDATED'
     }
@@ -707,7 +709,7 @@ describe('SearchResult downloadButton tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
       data: {},
-      event: Event.BIRTH,
+      event: Event.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'DECLARED'
     }
@@ -806,7 +808,7 @@ describe('SearchResult downloadButton tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
       data: {},
-      event: Event.BIRTH,
+      event: Event.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'REJECTED'
     }

@@ -17,7 +17,8 @@ import {
   CHECK_INVALID_TOKEN,
   CERT_PUBLIC_KEY_PATH,
   AUTH_URL,
-  HOSTNAME
+  HOSTNAME,
+  DEFAULT_TIMEOUT
 } from '@config/config/constants'
 import getRoutes from '@config/config/routes'
 import getPlugins from '@config/config/plugins'
@@ -39,7 +40,7 @@ export async function createServer() {
     port: PORT,
     routes: {
       cors: { origin: whitelist },
-      payload: { maxBytes: 52428800 }
+      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
     }
   })
 

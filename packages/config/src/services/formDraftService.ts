@@ -18,7 +18,7 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   SEARCH_URL
 } from '@config/config/constants'
-import { IModifyDraftStatus } from '@config/handlers/formDraft/updateFormDraft/handler'
+import { IModifyFormDraftPayload } from '@config/handlers/formDraft/updateFormDraft/handler'
 import { fetchFHIR, deleteFHIR } from '@config/services/fhirService'
 import { every } from 'lodash'
 
@@ -35,7 +35,7 @@ export enum HearthCollectionsName {
 
 export async function clearHearthElasticInfluxData(request: Hapi.Request) {
   const token = request.headers.authorization.replace('Bearer ', '')
-  const formDraft = request.payload as IModifyDraftStatus
+  const formDraft = request.payload as IModifyFormDraftPayload
   const taskBundle = await fetchFHIR(`/${HearthCollectionsName.Task}`, {
     Authorization: `Bearer ${token}`
   })

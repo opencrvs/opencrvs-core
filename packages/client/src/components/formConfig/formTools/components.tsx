@@ -14,8 +14,12 @@ import styled from '@client/styledComponents'
 import { useDispatch } from 'react-redux'
 import { modifyConfigField } from '@client/forms/configuration/formConfig/actions'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
-import { IConfigField } from '@client/forms/configuration/formConfig/utils'
+import {
+  IDefaultConfigField,
+  ICustomConfigField
+} from '@client/forms/configuration/formConfig/utils'
 import { Tooltip } from '@opencrvs/components/lib/icons'
+import ReactTooltip from 'react-tooltip'
 
 export const Title = styled.h3`
   margin: 0;
@@ -39,7 +43,21 @@ export const StyledTooltip = styled(Tooltip)`
   width: 16px;
 `
 
-export function RequiredToggleAction({ fieldId, required }: IConfigField) {
+const TooltipContainer = styled.div`
+  .tooltip {
+    opacity: 1 !important;
+    width: 248px;
+    text-align: center;
+    ::after {
+      display: none;
+    }
+  }
+`
+
+export function RequiredToggleAction({
+  fieldId,
+  required
+}: IDefaultConfigField | ICustomConfigField) {
   const dispatch = useDispatch()
 
   return (
@@ -53,5 +71,16 @@ export function RequiredToggleAction({ fieldId, required }: IConfigField) {
         )
       }
     />
+  )
+}
+
+export const ToolTip = ({ label, id }: { label: string; id: string }) => {
+  return (
+    <TooltipContainer>
+      <StyledTooltip data-tip data-for={id} />
+      <ReactTooltip id={id} place="top" effect="solid" className="tooltip">
+        {label}
+      </ReactTooltip>
+    </TooltipContainer>
   )
 }

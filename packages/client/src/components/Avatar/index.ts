@@ -13,3 +13,4 @@
 export * from './Avatar'
 export * from './AvatarSmall'
 export * from './AvatarLarge'
+export * from './AvatarVerySmall'

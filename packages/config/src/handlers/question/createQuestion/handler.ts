@@ -48,11 +48,10 @@ export const requestSchema = Joi.object({
   maxLength: Joi.number(),
   fieldName: Joi.string(),
   fieldType: Joi.string().valid(...validFieldType),
-  preceedingFieldId: Joi.string(),
+  precedingFieldId: Joi.string().required(),
   required: Joi.boolean(),
   enabled: Joi.string().allow(''),
-  custom: Joi.boolean(),
-  initialValue: Joi.string()
+  custom: Joi.boolean()
 })
 
 export const responseSchema = Joi.object({})
