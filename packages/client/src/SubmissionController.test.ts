@@ -20,8 +20,7 @@ import {
   REGISTER_BIRTH_DECLARATION,
   REJECT_BIRTH_DECLARATION,
   COLLECT_BIRTH_CERTIFICATE,
-  ARCHIVE_BIRTH_DECLARATION,
-  REINSTATE_BIRTH_DECLARATION
+  ARCHIVE_BIRTH_DECLARATION
 } from '@client/views/DataProvider/birth/mutations'
 import {
   ARCHIVE_DEATH_DECLARATION,
@@ -601,106 +600,6 @@ describe('Submission Controller', () => {
     expect(
       store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
     ).toBe(SUBMISSION_STATUS.ARCHIVED)
-  })
-
-  it('syncs all ready to reinstate birth declarations', async () => {
-    const store = {
-      getState: () => ({
-        declarationsState: {
-          declarations: [
-            {
-              event: 'birth',
-              submissionStatus: SUBMISSION_STATUS.READY_TO_REINSTATE,
-              action: Action.REINSTATE_DECLARATION
-            }
-          ]
-        },
-        offline: { userDetails: { role: 'FIELD_AGENT' } },
-        registerForm: {
-          registerForm: {}
-        },
-        profile: {
-          tokenPayload: {
-            scope: []
-          }
-        }
-      }),
-      dispatch: jest.fn()
-    }
-
-    // @ts-ignore
-    const subCon = new SubmissionController(store)
-
-    subCon.client = createMockClient()
-    const mutationHandler = jest.fn().mockResolvedValue({
-      data: {
-        data: {
-          markEventAsReinstated: {
-            taskEntryResourceID: '12321fsfasf',
-            registrationStatus: 'DECLARED'
-          }
-        }
-      }
-    })
-    subCon.client.setRequestHandler(
-      REINSTATE_BIRTH_DECLARATION,
-      mutationHandler
-    )
-
-    await subCon.sync()
-
-    expect(mutationHandler).toHaveBeenCalledTimes(1)
-    expect(store.dispatch).toHaveBeenCalledTimes(4)
-  })
-
-  it('syncs all ready to reinstate death declarations', async () => {
-    const store = {
-      getState: () => ({
-        declarationsState: {
-          declarations: [
-            {
-              event: 'death',
-              submissionStatus: SUBMISSION_STATUS.READY_TO_REINSTATE,
-              action: Action.REINSTATE_DECLARATION
-            }
-          ]
-        },
-        offline: { userDetails: { role: 'FIELD_AGENT' } },
-        registerForm: {
-          registerForm: {}
-        },
-        profile: {
-          tokenPayload: {
-            scope: []
-          }
-        }
-      }),
-      dispatch: jest.fn()
-    }
-
-    // @ts-ignore
-    const subCon = new SubmissionController(store)
-    const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
-    subCon.client = createMockClient()
-    const mutationHandler = jest.fn().mockResolvedValue({
-      data: {
-        data: {
-          markEventAsReinstated: {
-            taskEntryResourceID: id,
-            registrationStatus: 'DECLARED'
-          }
-        }
-      }
-    })
-    subCon.client.setRequestHandler(
-      REINSTATE_BIRTH_DECLARATION,
-      mutationHandler
-    )
-
-    await subCon.sync()
-
-    expect(mutationHandler).toHaveBeenCalledTimes(1)
-    expect(store.dispatch).toHaveBeenCalledTimes(4)
   })
 
   it('syncs all ready to archive death declarations', async () => {

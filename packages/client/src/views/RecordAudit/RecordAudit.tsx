@@ -28,8 +28,8 @@ import {
   BackArrow,
   Duplicate
 } from '@opencrvs/components/lib/icons'
-import { connect } from 'react-redux'
-import { RouteComponentProps, Redirect } from 'react-router'
+import { connect, useDispatch, useSelector } from 'react-redux'
+import { RouteComponentProps, Redirect, useParams } from 'react-router'
 import {
   goToHomeTab,
   goToPage,
@@ -41,15 +41,16 @@ import {
 import {
   injectIntl,
   IntlShape,
-  WrappedComponentProps as IntlShapeProps
+  WrappedComponentProps as IntlShapeProps,
+  useIntl
 } from 'react-intl'
 import {
   archiveDeclaration,
-  reinstateDeclaration,
   clearCorrectionChange,
   IDeclaration,
   SUBMISSION_STATUS,
-  DOWNLOAD_STATUS
+  DOWNLOAD_STATUS,
+  modifyDeclaration
 } from '@client/declarations'
 import { IStoreState } from '@client/store'
 import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
@@ -109,7 +110,18 @@ import { ActionDetailsModal } from './ActionDetailsModal'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
 import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { Mutation } from 'react-apollo'
+import {
+  MarkEventAsReinstatedMutation,
+  MarkEventAsReinstatedMutationVariables,
+  Event
+} from '@client/utils/gateway'
+import {
+  REINSTATE_BIRTH_DECLARATION,
+  REINSTATE_DEATH_DECLARATION
+} from './mutations'
+import { selectDeclaration } from '@client/declarations/selectors'
+import { OperationVariables } from 'apollo-client'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -175,7 +187,6 @@ interface IStateProps {
 
 interface IDispatchProps {
   archiveDeclaration: typeof archiveDeclaration
-  reinstateDeclaration: typeof reinstateDeclaration
   clearCorrectionChange: typeof clearCorrectionChange
   goToCertificateCorrection: typeof goToCertificateCorrection
   goToPage: typeof goToPage
@@ -211,9 +222,74 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
 
 const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
 
+function ReinstateButton({
+  toggleDisplayDialog,
+  refetch
+}: {
+  toggleDisplayDialog: () => void
+  refetch: ((variables?: OperationVariables) => void) | undefined
+}) {
+  const { declarationId } = useParams<{ declarationId: string }>()
+  const intl = useIntl()
+  const dispatch = useDispatch()
+  const declaration = useSelector((store: IStoreState) =>
+    selectDeclaration(store, declarationId)
+  )
+
+  if (!declaration) {
+    return <Redirect to={HOME} />
+  }
+
+  /* TODO: handle error */
+  return (
+    <Mutation<
+      MarkEventAsReinstatedMutation,
+      MarkEventAsReinstatedMutationVariables
+    >
+      mutation={
+        declaration.event === Event.Birth
+          ? REINSTATE_BIRTH_DECLARATION
+          : REINSTATE_DEATH_DECLARATION
+      }
+      onCompleted={() => {
+        if (refetch) {
+          refetch({ id: declaration.id })
+        }
+        dispatch(
+          modifyDeclaration({
+            ...declaration,
+            submissionStatus: ''
+          })
+        )
+      }}
+    >
+      {(reinstateDeclaration) => (
+        <PrimaryButton
+          id="reinstate_confirm"
+          key="reinstate_confirm"
+          size="medium"
+          onClick={() => {
+            reinstateDeclaration({ variables: { id: declaration.id } })
+            dispatch(
+              modifyDeclaration({
+                ...declaration,
+                submissionStatus: SUBMISSION_STATUS.REINSTATING
+              })
+            )
+            toggleDisplayDialog()
+          }}
+        >
+          {intl.formatMessage(
+            recordAuditMessages.reinstateDeclarationDialogConfirm
+          )}
+        </PrimaryButton>
+      )}
+    </Mutation>
+  )
+}
+
 function RecordAuditBody({
   archiveDeclaration,
-  reinstateDeclaration,
   clearCorrectionChange,
   declaration,
   draft,
@@ -226,6 +302,7 @@ function RecordAuditBody({
   scope,
   userDetails,
   registerForm,
+  refetch,
   goToUserProfile,
   goToTeamUserList,
   goBack,
@@ -240,6 +317,7 @@ function RecordAuditBody({
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
   tab: IRecordAuditTabs
+  refetch?: (variables?: OperationVariables) => void
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
@@ -524,19 +602,10 @@ function RecordAuditBody({
             {intl.formatMessage(buttonMessages.cancel)}
           </TertiaryButton>,
           declaration.status && ARCHIVED.includes(declaration.status) ? (
-            <PrimaryButton
-              id="continue"
-              key="continue"
-              size={'medium'}
-              onClick={() => {
-                reinstateDeclaration(declaration.id)
-                toggleDisplayDialog()
-              }}
-            >
-              {intl.formatMessage(
-                recordAuditMessages.reinstateDeclarationDialogConfirm
-              )}
-            </PrimaryButton>
+            <ReinstateButton
+              toggleDisplayDialog={toggleDisplayDialog}
+              refetch={refetch}
+            />
           ) : (
             <DangerButton
               id="archive_confirm"
@@ -592,7 +661,7 @@ function getBodyContent({
           }}
           fetchPolicy="no-cache"
         >
-          {({ loading, error, data }) => {
+          {({ loading, error, data, refetch }) => {
             if (loading) {
               return <Loader id="search_loader" marginPercent={35} />
             } else if (error) {
@@ -628,6 +697,7 @@ function getBodyContent({
                 duplicates={getPotentialDuplicateIds(data.fetchRegistration)}
                 intl={intl}
                 scope={scope}
+                refetch={refetch}
                 userDetails={userDetails}
                 goBack={goBack}
               />
@@ -723,7 +793,6 @@ export const RecordAudit = connect<
   IStoreState
 >(mapStateToProps, {
   archiveDeclaration,
-  reinstateDeclaration,
   clearCorrectionChange,
   goToCertificateCorrection,
   goToPage,
