@@ -20,11 +20,10 @@ const ModalContainer = styled.div<{ fullscreen?: boolean }>`
   left: 0;
   right: 0;
   bottom: 0;
-  padding-top: ${({ fullscreen }) => (fullscreen ? 0 : 160)}px;
   z-index: 5;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding-top: 0px;
   }
@@ -99,8 +98,9 @@ const Body = styled.div<{
   fullscreen?: boolean
 }>`
   ${({ theme }) => theme.fonts.reg16};
-  height: ${({ height }) => (height ? height : 250)}px;
-  height: ${({ autoHeight }) => autoHeight && `auto`};
+  height: ${({ height, autoHeight }) =>
+    height ? `${height}px` : autoHeight ? `auto` : `250px`};
+  max-height: ${({ fullscreen }) => !fullscreen && `calc(100vh - 180px)`};
   color: ${({ theme }) => theme.colors.supportingCopy};
   overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'auto')};
   padding: 0 24px 16px;
