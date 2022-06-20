@@ -189,7 +189,7 @@ function AvatarChangeModalComp({
     <ResponsiveModal
       id="ChangeAvatarModal"
       width={1080}
-      contentHeight={720}
+      autoHeight
       show={showChangeAvatar}
       title={intl.formatMessage(messages.changeAvatar)}
       actions={[
