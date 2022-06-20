@@ -70,7 +70,6 @@ const Header = styled.div<{
   hideBoxShadow?: boolean
   titleHeightAuto?: boolean
 }>`
-  ${({ theme }) => theme.fonts.regularFont};
   height: ${({ titleHeightAuto }) => (titleHeightAuto ? 'auto' : '64px')};
   display: flex;
   flex-direction: row;

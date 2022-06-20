@@ -11,7 +11,7 @@
  */
 import { defineMessages, MessageDescriptor } from 'react-intl'
 import { DeathSection, BirthSection } from '@client/forms'
-import { DraftStatus } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus } from '@client/utils/gateway'
 import { Actions } from '@client/views/SysAdmin/Config/Forms/Home/ActionsModal'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 
@@ -226,8 +226,7 @@ const messagesToDefine: IFormConfigMessages = {
   },
   publishedWarning: {
     id: 'config.form.published.warning',
-    defaultMessage:
-      'Nothing is currently published. Awaiting to be published: {events}',
+    defaultMessage: 'Warning! Form configuration unpublished for: {events}',
     description: 'Warning for unpublished events'
   },
   contentKey: {
@@ -470,12 +469,12 @@ const draftStatusMessagesToDefine: Record<
   Exclude<DraftStatus, 'DRAFT' | 'DELETED'>,
   MessageDescriptor
 > = {
-  [DraftStatus.PREVIEW]: {
+  [DraftStatus.InPreview]: {
     id: 'config.form.status.preview',
     defaultMessage: 'In Preview',
     description: 'Label for in preview tab of form config page'
   },
-  [DraftStatus.PUBLISHED]: {
+  [DraftStatus.Published]: {
     id: 'config.form.status.published',
     defaultMessage: 'Published',
     description: 'Label for published tab of form config page'
@@ -486,17 +485,17 @@ const draftTabsMessagesToDefine: Record<
   Exclude<DraftStatus, 'DELETED'>,
   MessageDescriptor
 > = {
-  [DraftStatus.DRAFT]: {
+  [DraftStatus.Draft]: {
     id: 'config.form.tab.drafts',
     defaultMessage: 'Drafts',
     description: 'Label for drafts tab of form config page'
   },
-  [DraftStatus.PREVIEW]: {
+  [DraftStatus.InPreview]: {
     id: 'config.form.tab.inPreview',
     defaultMessage: 'In Preview',
     description: 'Label for in preview tab of form config page'
   },
-  [DraftStatus.PUBLISHED]: {
+  [DraftStatus.Published]: {
     id: 'config.form.tab.published',
     defaultMessage: 'Published',
     description: 'Label for published tab of form config page'
@@ -647,7 +646,7 @@ const draftActionMessagesToDefine: IActionMessage = {
   [ActionStatus.COMPLETED]: {
     id: 'config.form.draft.success',
     defaultMessage:
-      '{event} draft v{version} has been moved to drafts successfully',
+      '{event} draft v{version} has been moved to drafts successfully. Redirecting...',
     description: 'Edit draft success notification label'
   }
 }

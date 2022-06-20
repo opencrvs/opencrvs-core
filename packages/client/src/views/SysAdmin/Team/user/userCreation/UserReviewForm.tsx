@@ -338,7 +338,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
       fieldName?: string
     ) => dispatch(goToUserReviewForm(userId, sec, group, fieldName)),
     goBack: () => dispatch(goBack()),
-    goToTeamUserList,
+    goToTeamUserList: (id: string) => dispatch(goToTeamUserList(id)),
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
     submitForm: (userFormSection: IFormSection) => {
       const variables = draftToGqlTransformer(

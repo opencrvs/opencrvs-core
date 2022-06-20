@@ -11,7 +11,6 @@
  */
 import {
   Action as DeclarationAction,
-  Event,
   IForm,
   IFormData,
   IFormFieldValue,
@@ -19,6 +18,7 @@ import {
   Sort,
   FieldValueMap
 } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
 import {
@@ -64,6 +64,7 @@ import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { Roles } from '@client/utils/authUtils'
 import { MARK_EVENT_UNASSIGNED } from '@client/views/DataProvider/birth/mutations'
 import { getPotentialDuplicateIds } from '@client/transformer/index'
+import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 
 const ARCHIVE_DECLARATION = 'DECLARATION/ARCHIVE'
 const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
@@ -414,6 +415,7 @@ interface IUnassignDeclaration {
   payload: {
     id: string
     client: ApolloClient<{}>
+    refetchQueries?: RefetchQueryDescription
   }
 }
 
@@ -422,6 +424,7 @@ interface IEnqueueUnassignDeclaration {
   payload: {
     id: string
     client: ApolloClient<{}>
+    refetchQueries?: RefetchQueryDescription
   }
 }
 
@@ -1292,26 +1295,30 @@ function downloadDeclarationFail(
 
 export function executeUnassignDeclaration(
   id: string,
-  client: ApolloClient<{}>
+  client: ApolloClient<{}>,
+  refetchQueries?: RefetchQueryDescription
 ): IUnassignDeclaration {
   return {
     type: UNASSIGN_DECLARATION,
     payload: {
       id,
-      client
+      client,
+      refetchQueries
     }
   }
 }
 
 export function unassignDeclaration(
   id: string,
-  client: ApolloClient<{}>
+  client: ApolloClient<{}>,
+  refetchQueries?: RefetchQueryDescription
 ): IEnqueueUnassignDeclaration {
   return {
     type: ENQUEUE_UNASSIGN_DECLARATION,
     payload: {
       id,
-      client
+      client,
+      refetchQueries
     }
   }
 }
@@ -1828,7 +1835,13 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         },
         isQueueBusy
           ? Cmd.none
-          : Cmd.action(executeUnassignDeclaration(action.payload.id, client))
+          : Cmd.action(
+              executeUnassignDeclaration(
+                action.payload.id,
+                action.payload.client,
+                action.payload.refetchQueries
+              )
+            )
       )
     case UNASSIGN_DECLARATION:
       const unassignIndex = state.declarations.findIndex(
@@ -1846,7 +1859,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           async () => {
             await action.payload.client.mutate({
               mutation: MARK_EVENT_UNASSIGNED,
-              variables: { id: action.payload.id }
+              variables: { id: action.payload.id },
+              refetchQueries: action.payload.refetchQueries
             })
             return [action.payload.id, action.payload.client]
           },

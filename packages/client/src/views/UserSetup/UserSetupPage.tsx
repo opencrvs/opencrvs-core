@@ -30,7 +30,6 @@ import { IOfflineData } from '@client/offline/reducer'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 
 export const Page = styled.div`
-  ${({ theme }) => theme.fonts.regularFont};
   color: ${({ theme }) => theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
   min-height: 100vh;

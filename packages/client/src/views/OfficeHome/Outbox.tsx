@@ -26,7 +26,6 @@ import { messages } from '@client/i18n/messages/views/notifications'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import styled from '@client/styledComponents'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
-import { getDefaultLanguage } from '@client/i18n/utils'
 const Container = styled(BodyContent)`
   padding-top: 32px;
 `
@@ -240,7 +239,7 @@ class Outbox extends React.Component<IFullProps, IState> {
               ),
               width: 35,
               key: 'submissionStatus',
-              color: getTheme(getDefaultLanguage()).colors.supportingCopy
+              color: getTheme().colors.supportingCopy
             },
             {
               label: '',

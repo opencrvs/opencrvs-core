@@ -51,8 +51,7 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
+
 interface IBasePrintTabProps {
   theme: ITheme
   goToPrintCertificate: typeof goToPrintCertificate
@@ -211,7 +210,8 @@ class ReadyToPrintComponent extends React.Component<
             downloadConfigs={{
               event: reg.event,
               compositionId: reg.id,
-              action: Action.LOAD_REVIEW_DECLARATION
+              action: Action.LOAD_REVIEW_DECLARATION,
+              assignment: reg.assignment
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus}

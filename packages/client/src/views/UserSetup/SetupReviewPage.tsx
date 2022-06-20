@@ -45,9 +45,6 @@ const Header = styled.h4`
   ${({ theme }) => theme.fonts.h2};
   color: ${({ theme }) => theme.colors.black};
 `
-const Instruction = styled.p`
-  color: ${({ theme }) => theme.colors.copy};
-`
 const Action = styled.div`
   margin-top: 32px;
 `
@@ -204,7 +201,6 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         }}
       >
         <Header>{intl.formatMessage(messages.userSetupReviewHeader)}</Header>
-        <Instruction>{intl.formatMessage(messages.instruction)}</Instruction>
         <GlobalError id="GlobalError">
           {this.state.submitError && (
             <WarningMessage>

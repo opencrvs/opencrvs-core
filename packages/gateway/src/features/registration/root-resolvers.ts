@@ -38,6 +38,7 @@ import { hasScope } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
+  GQLRegStatus,
   GQLResolver,
   GQLStatusWiseRegistrationCount
 } from '@gateway/graphql/schema'
@@ -776,8 +777,14 @@ async function markRecordAsDownloadedAndAssigned(
   }
 
   let extensions: fhir.Extension[]
+  const businessStatus = getStatusFromTask(
+    taskBundle.entry[0].resource
+  ) as GQLRegStatus
 
-  if (hasScope(authHeader, 'register') || hasScope(authHeader, 'validate')) {
+  if (
+    (hasScope(authHeader, 'register') || hasScope(authHeader, 'validate')) &&
+    businessStatus !== GQLRegStatus.VALIDATED
+  ) {
     extensions = [
       {
         url: ASSIGNED_EXTENSION_URL,

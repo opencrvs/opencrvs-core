@@ -59,7 +59,8 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { Action, Event } from '@client/forms'
+import { Action } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -232,7 +233,8 @@ export class InProgressComponent extends React.Component<
             downloadConfigs={{
               event: event as string,
               compositionId: reg.id,
-              action: Action.LOAD_REVIEW_DECLARATION
+              action: Action.LOAD_REVIEW_DECLARATION,
+              assignment: reg?.registration?.assignment
             }}
             key={`DownloadButton-${index}`}
             status={downloadStatus}
@@ -365,7 +367,7 @@ export class InProgressComponent extends React.Component<
           )) ||
         ''
       const eventTime =
-        draft.event === Event.BIRTH
+        draft.event === Event.Birth
           ? draft.data.child?.childBirthDate || ''
           : draft.data.deathEvent?.deathDate || ''
       const dateOfEvent = (eventTime && new Date(eventTime as string)) || ''

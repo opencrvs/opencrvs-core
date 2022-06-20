@@ -21,11 +21,8 @@ import {
   ActionsModal
 } from './ActionsModal'
 import { PreviewTab } from './PreviewTab'
-import {
-  IFormDraft,
-  DraftStatus
-} from '@client/forms/configuration/formDrafts/utils'
-import { Event } from '@client/forms'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import { updateFormConfig } from '@client/forms/configuration/formConfig/actions'
 
 let component: ReactWrapper<{}, {}>
@@ -47,8 +44,8 @@ function WrappedPreviewTab() {
 }
 
 const inPreviewDraft: IFormDraft = {
-  event: Event.BIRTH,
-  status: DraftStatus.PREVIEW,
+  event: Event.Birth,
+  status: DraftStatus.InPreview,
   version: 1,
   history: [],
   updatedAt: Date.now(),

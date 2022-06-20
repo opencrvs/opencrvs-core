@@ -38,7 +38,7 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
 
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { v4 as uuid } from 'uuid'
 // eslint-disable-next-line no-restricted-imports
 import * as ReactApollo from 'react-apollo'
@@ -77,7 +77,7 @@ describe('when user is previewing the form data', () => {
       customDraft = {
         id: uuid(),
         data,
-        event: Event.BIRTH,
+        event: Event.Birth,
         submissionStatus: SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
       }
       store.dispatch(storeDeclaration(customDraft))
@@ -195,7 +195,7 @@ describe('when user is previewing the form data', () => {
       await store.dispatch(checkAuth())
       const data = birthReviewDraftData
 
-      customDraft = { id: uuid(), data, review: true, event: Event.BIRTH }
+      customDraft = { id: uuid(), data, review: true, event: Event.Birth }
       store.dispatch(storeDeclaration(customDraft))
       history.replace(
         REVIEW_EVENT_PARENT_FORM_PAGE.replace(
@@ -326,7 +326,7 @@ describe('when user is previewing the form data', () => {
       await store.dispatch(checkAuth())
       const data = deathReviewDraftData
 
-      customDraft = { id: uuid(), data, review: true, event: Event.DEATH }
+      customDraft = { id: uuid(), data, review: true, event: Event.Death }
       store.dispatch(storeDeclaration(customDraft))
       history.replace(
         REVIEW_EVENT_PARENT_FORM_PAGE.replace(
@@ -379,7 +379,7 @@ describe('when user is previewing the form data', () => {
         ...mockDeclarationData
       }
 
-      const customDraft = createReviewDeclaration(uuid(), data, Event.BIRTH)
+      const customDraft = createReviewDeclaration(uuid(), data, Event.Birth)
       customDraft.submissionStatus = SUBMISSION_STATUS[SUBMISSION_STATUS.DRAFT]
 
       store.dispatch(storeDeclaration(customDraft))

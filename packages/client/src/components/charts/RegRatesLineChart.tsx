@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
 import { TriLineChart } from '@opencrvs/components/lib/charts'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -264,7 +264,7 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
                     messages.performanceWithinTargetDaysLabel,
                     {
                       target:
-                        eventType === Event.BIRTH
+                        eventType === Event.Birth
                           ? window.config.BIRTH.REGISTRATION_TARGET
                           : window.config.DEATH.REGISTRATION_TARGET,
                       withPrefix: false

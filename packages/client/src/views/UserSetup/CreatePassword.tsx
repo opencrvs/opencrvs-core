@@ -44,12 +44,10 @@ const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
 `
 const PasswordMatch = styled.div`
-  ${({ theme }) => theme.fonts.semiBoldFont};
   color: ${({ theme }) => theme.colors.positive};
   margin-top: 8px;
 `
 const PasswordMismatch = styled.div`
-  ${({ theme }) => theme.fonts.semiBoldFont};
   color: ${({ theme }) => theme.colors.negative};
   margin-top: 8px;
 `

@@ -43,3 +43,4 @@ function getAvailableLanguages() {
 export function getDefaultLanguage() {
   return getAvailableLanguages()[0]
 }
+export const DEFAULT_TIMEOUT = 600000

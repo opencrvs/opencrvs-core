@@ -19,7 +19,7 @@ import {
 } from '@client/tests/util'
 import { VerifyCorrector } from './VerifyCorrector'
 import { storeDeclaration } from '@client/declarations'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
@@ -29,13 +29,13 @@ describe('verify corrector tests', () => {
   const birthDeclaration = {
     id: 'mockBirth1234',
     data: mockDeclarationData,
-    event: Event.BIRTH
+    event: Event.Birth
   }
 
   const deathDeclaration = {
     id: 'mockDeath1234',
     data: mockDeathDeclarationData,
-    event: Event.DEATH
+    event: Event.Death
   }
 
   describe('in case of birth declaration', () => {

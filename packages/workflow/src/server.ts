@@ -16,7 +16,8 @@ import {
   PORT,
   CERT_PUBLIC_KEY_PATH,
   CHECK_INVALID_TOKEN,
-  AUTH_URL
+  AUTH_URL,
+  DEFAULT_TIMEOUT
 } from '@workflow/constants'
 import getPlugins from '@workflow/config/plugins'
 import { getRoutes } from '@workflow/config/routes'
@@ -31,7 +32,7 @@ export async function createServer() {
     port: PORT,
     routes: {
       cors: { origin: ['*'] },
-      payload: { maxBytes: 52428800 }
+      payload: { maxBytes: 52428800, timeout: DEFAULT_TIMEOUT }
     }
   })
 

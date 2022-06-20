@@ -80,12 +80,10 @@ const ValidationRulesSectionLg = styled.div`
   }
 `
 const PasswordMatch = styled.div`
-  ${({ theme }) => theme.fonts.semiBoldFont};
   color: ${({ theme }) => theme.colors.positive};
   margin-top: 8px;
 `
 const PasswordMismatch = styled.div`
-  ${({ theme }) => theme.fonts.semiBoldFont};
   color: ${({ theme }) => theme.colors.negative};
   margin-top: 8px;
 `

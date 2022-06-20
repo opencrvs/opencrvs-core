@@ -24,7 +24,7 @@ import {
 import { SearchResult } from '@client/views/SearchResult/SearchResult'
 import { goToSearch } from '@client/navigation'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { storeDeclaration } from '@client/declarations'
 
 const registerScopeToken =
@@ -489,7 +489,7 @@ describe('SearchResult tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
       data: {},
-      event: Event.BIRTH,
+      event: Event.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'REGISTERED'
     }
@@ -600,7 +600,7 @@ describe('SearchResult tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
       data: {},
-      event: Event.BIRTH,
+      event: Event.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'VALIDATED'
     }
@@ -709,7 +709,7 @@ describe('SearchResult downloadButton tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e91',
       data: {},
-      event: Event.BIRTH,
+      event: Event.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'DECLARED'
     }
@@ -808,7 +808,7 @@ describe('SearchResult downloadButton tests', () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
       data: {},
-      event: Event.BIRTH,
+      event: Event.Birth,
       downloadStatus: 'DOWNLOADED',
       submissionStatus: 'REJECTED'
     }
