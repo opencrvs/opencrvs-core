@@ -172,6 +172,10 @@ function FormConfigWizardView() {
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
+  const canvasRef = React.useRef<HTMLDivElement>(null)
+
+  const scrollToLastCard = () =>
+    canvasRef.current?.lastElementChild?.scrollIntoView({ behavior: 'smooth' })
 
   let firstFieldIdentifiers
   if (section !== 'settings') {
@@ -235,6 +239,7 @@ function FormConfigWizardView() {
                   selectedField={selectedField}
                   setSelectedField={setSelectedField}
                   showHiddenFields={showHiddenFields}
+                  ref={canvasRef}
                 />
               </CanvasContainer>
             </CanvasWrapper>
@@ -257,6 +262,7 @@ function FormConfigWizardView() {
                   setShowHiddenFields={setShowHiddenFields}
                   setSelectedField={setSelectedField}
                   groupId={firstFieldIdentifiers.groupId}
+                  onCustomFieldCreated={scrollToLastCard}
                 />
               )}
             </ToolsContainer>

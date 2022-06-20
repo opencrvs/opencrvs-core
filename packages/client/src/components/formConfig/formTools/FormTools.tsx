@@ -59,6 +59,7 @@ type IRouteProps = {
 type IFormToolsProps = {
   groupId: string
   showHiddenFields: boolean
+  onCustomFieldCreated: () => void
   setShowHiddenFields: React.Dispatch<React.SetStateAction<boolean>>
   setSelectedField: React.Dispatch<React.SetStateAction<string | null>>
 }
@@ -66,6 +67,7 @@ type IFormToolsProps = {
 export const FormTools = ({
   showHiddenFields,
   groupId,
+  onCustomFieldCreated,
   setShowHiddenFields,
   setSelectedField
 }: IFormToolsProps) => {
@@ -88,9 +90,7 @@ export const FormTools = ({
     )
     dispatch(addCustomField(event, section, customConfigField))
     flushSync(() => setSelectedField(customConfigField.fieldId))
-    document
-      .getElementById(`${customConfigField.fieldName}-form-input`)
-      ?.scrollIntoView({ behavior: 'smooth' })
+    onCustomFieldCreated()
   }
 
   return (
