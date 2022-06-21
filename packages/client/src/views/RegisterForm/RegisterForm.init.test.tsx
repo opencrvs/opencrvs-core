@@ -122,7 +122,12 @@ describe('when user logs in', () => {
     })
 
     it("should delete the draft from the current user's array of declarations", async () => {
-      await deleteDeclarationByUser(currentUserData.userID, draft)
+      const { store } = await createTestStore()
+      await deleteDeclarationByUser(
+        currentUserData.userID,
+        draft,
+        store.getState().declarationsState
+      )
 
       // Now, let's check if the new draft is added
       const details = await getDeclarationsOfCurrentUser()

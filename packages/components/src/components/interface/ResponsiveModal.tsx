@@ -14,17 +14,16 @@ import styled from 'styled-components'
 import { Cross } from '../icons'
 import { CircleButton } from '../buttons'
 
-const ModalContainer = styled.div<{ fullscreen?: boolean }>`
+const ModalContainer = styled.div`
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  padding-top: ${({ fullscreen }) => (fullscreen ? 0 : 160)}px;
   z-index: 5;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding-top: 0px;
   }
@@ -44,18 +43,15 @@ const ScreenBlocker = styled.div`
 const ModalContent = styled.div<{
   width?: number
   responsive?: boolean
-  fullscreen?: boolean
 }>`
   ${({ theme }) => theme.fonts.reg16};
   color: ${({ theme }) => theme.colors.copy};
   background-color: ${({ theme }) => theme.colors.white};
   width: ${({ width }) => (width ? width : 448)}px;
-  height: ${({ fullscreen }) => (fullscreen ? '100vh' : 'auto')};
   display: flex;
   border-radius: 4px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   flex-direction: column;
-  flex-grow: ${({ fullscreen }) => (fullscreen ? 1 : 0)};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     flex-grow: 1;
   }
@@ -96,11 +92,11 @@ const Body = styled.div<{
   autoHeight?: boolean
   scrollableY?: boolean
   responsive?: boolean
-  fullscreen?: boolean
 }>`
   ${({ theme }) => theme.fonts.reg16};
-  height: ${({ height }) => (height ? height : 250)}px;
-  height: ${({ autoHeight }) => autoHeight && `auto`};
+  height: ${({ height, autoHeight }) =>
+    height ? `${height}px` : autoHeight ? `auto` : `250px`};
+  max-height: calc(100vh - 180px);
   color: ${({ theme }) => theme.colors.supportingCopy};
   overflow-y: ${({ scrollableY }) => (scrollableY ? 'visible' : 'auto')};
   padding: 0 24px 16px;
@@ -108,7 +104,6 @@ const Body = styled.div<{
   flex-direction: column;
   text-align: left;
   white-space: normal;
-  flex-grow: ${({ fullscreen }) => (fullscreen ? 1 : 0)};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     flex-grow: 1;
   }
@@ -154,7 +149,6 @@ interface IProps {
   titleHeightAuto?: boolean
   autoHeight?: boolean
   contentScrollableY?: boolean
-  fullscreen?: boolean
   actions: JSX.Element[]
   handleClose?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   hideHeaderBoxShadow?: boolean
@@ -185,7 +179,6 @@ export class ResponsiveModal extends React.Component<IProps> {
       width,
       contentHeight,
       titleHeightAuto,
-      fullscreen,
       autoHeight,
       contentScrollableY,
       hideHeaderBoxShadow,
@@ -200,7 +193,6 @@ export class ResponsiveModal extends React.Component<IProps> {
     return (
       <ModalContainer
         id={id}
-        fullscreen={fullscreen}
         onClick={(e) => {
           if (preventClickOnParent) {
             e.stopPropagation()
@@ -208,11 +200,7 @@ export class ResponsiveModal extends React.Component<IProps> {
         }}
       >
         <ScreenBlocker />
-        <ModalContent
-          width={width}
-          responsive={responsive}
-          fullscreen={fullscreen}
-        >
+        <ModalContent width={width} responsive={responsive}>
           <Header
             responsive={responsive}
             hideBoxShadow={hideHeaderBoxShadow}
@@ -226,7 +214,6 @@ export class ResponsiveModal extends React.Component<IProps> {
           <Body
             height={contentHeight}
             scrollableY={contentScrollableY}
-            fullscreen={fullscreen}
             autoHeight={autoHeight}
           >
             {this.props.children}
