@@ -26,7 +26,8 @@ import {
   generateConfigFields,
   IConfigFieldMap,
   ISectionFieldMap,
-  getConfigFieldIdentifiers
+  getConfigFieldIdentifiers,
+  prepareNewCustomFieldConfig
 } from './utils'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default'
@@ -134,9 +135,16 @@ export const formConfigReducer: LoopReducer<IFormConfigState, Actions> = (
     }
 
     case actions.ADD_CUSTOM_FIELD: {
-      const { event, section, customField } = action.payload
-      const fields = {
-        ...state[event].configFields[section],
+      const { event, section, fieldType } = action.payload
+      let fields = state[event].configFields[section]
+      const customField = prepareNewCustomFieldConfig(
+        fields,
+        event,
+        section,
+        fieldType
+      )
+      fields = {
+        ...fields,
         [customField.fieldId]: customField
       }
 

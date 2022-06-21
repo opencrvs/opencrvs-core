@@ -32,7 +32,6 @@ import { messages } from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
-import { Box } from '@opencrvs/components/lib/interface'
 import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormConfigElementCard'
 import React from 'react'
 import { useIntl } from 'react-intl'
@@ -40,8 +39,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router'
 import ConfigPlaceholder from './ConfigPlaceholder'
 
-const CanvasBox = styled(Box)`
+const CanvasBox = styled.div`
   display: flex;
+  padding: 16px;
+  background: ${({ theme }) => theme.colors.white};
   flex-direction: column;
   gap: 8px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -57,6 +58,7 @@ type ICanvasProps = {
   showHiddenFields: boolean
   selectedField: IConfigField | null
   setSelectedField: React.Dispatch<React.SetStateAction<string | null>>
+  ref: React.RefObject<HTMLDivElement>
 }
 
 function generateConfigFields(formFieldMap: IConfigFieldMap) {
@@ -104,58 +106,58 @@ function FormField({
   )
 }
 
-export function Canvas({
-  showHiddenFields,
-  selectedField,
-  setSelectedField
-}: ICanvasProps) {
-  const dispatch = useDispatch()
-  const intl = useIntl()
-  const fields = useConfigFields()
+export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
+  function Canvas({ showHiddenFields, selectedField, setSelectedField }, ref) {
+    const dispatch = useDispatch()
+    const intl = useIntl()
+    const fields = useConfigFields()
 
-  return (
-    <CanvasBox>
-      {(showHiddenFields
-        ? fields
-        : fields.filter((configField) =>
-            isDefaultConfigField(configField)
-              ? configField.enabled !== FieldEnabled.DISABLED
-              : true
+    return (
+      <CanvasBox ref={ref}>
+        {(showHiddenFields
+          ? fields
+          : fields.filter((configField) =>
+              isDefaultConfigField(configField)
+                ? configField.enabled !== FieldEnabled.DISABLED
+                : true
+            )
+        ).map((configField) => {
+          const { fieldId, precedingFieldId, foregoingFieldId } = configField
+          const isCustom = isCustomConfigField(configField)
+          const isSelected = selectedField?.fieldId === fieldId
+          const isHidden =
+            isDefaultConfigField(configField) &&
+            configField.enabled === FieldEnabled.DISABLED
+
+          return (
+            <FormConfigElementCard
+              id={fieldId}
+              key={fieldId}
+              selected={isSelected}
+              onClick={() => setSelectedField(fieldId)}
+              movable={isCustom && isSelected}
+              status={
+                isHidden ? intl.formatMessage(messages.hidden) : undefined
+              }
+              removable={isCustom}
+              isUpDisabled={precedingFieldId === FieldPosition.TOP}
+              isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}
+              onMoveUp={() => dispatch(shiftConfigFieldUp(fieldId))}
+              onMoveDown={() => dispatch(shiftConfigFieldDown(fieldId))}
+              onRemove={() => {
+                selectedField &&
+                  dispatch(removeCustomField(selectedField.fieldId))
+              }}
+            >
+              {isPreviewGroupConfigField(configField) ? (
+                <ConfigPlaceholder label={configField.previewGroupLabel} />
+              ) : (
+                <FormField configField={configField} />
+              )}
+            </FormConfigElementCard>
           )
-      ).map((configField) => {
-        const { fieldId, precedingFieldId, foregoingFieldId } = configField
-        const isCustom = isCustomConfigField(configField)
-        const isSelected = selectedField?.fieldId === fieldId
-        const isHidden =
-          isDefaultConfigField(configField) &&
-          configField.enabled === FieldEnabled.DISABLED
-
-        return (
-          <FormConfigElementCard
-            id={fieldId}
-            key={fieldId}
-            selected={isSelected}
-            onClick={() => setSelectedField(fieldId)}
-            movable={isCustom && isSelected}
-            status={isHidden ? intl.formatMessage(messages.hidden) : undefined}
-            removable={isCustom}
-            isUpDisabled={precedingFieldId === FieldPosition.TOP}
-            isDownDisabled={foregoingFieldId === FieldPosition.BOTTOM}
-            onMoveUp={() => dispatch(shiftConfigFieldUp(fieldId))}
-            onMoveDown={() => dispatch(shiftConfigFieldDown(fieldId))}
-            onRemove={() => {
-              selectedField &&
-                dispatch(removeCustomField(selectedField.fieldId))
-            }}
-          >
-            {isPreviewGroupConfigField(configField) ? (
-              <ConfigPlaceholder label={configField.previewGroupLabel} />
-            ) : (
-              <FormField configField={configField} />
-            )}
-          </FormConfigElementCard>
-        )
-      })}
-    </CanvasBox>
-  )
-}
+        })}
+      </CanvasBox>
+    )
+  }
+)

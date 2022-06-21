@@ -21,10 +21,7 @@ import {
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import React from 'react'
 import { useIntl, MessageDescriptor } from 'react-intl'
-import { prepareNewCustomFieldConfig } from '@client/forms/configuration/formConfig/utils'
-import { useSelector, useDispatch } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
+import { useDispatch } from 'react-redux'
 import { useParams } from 'react-router'
 import { addCustomField } from '@client/forms/configuration/formConfig/actions'
 import { flushSync } from 'react-dom'
@@ -57,40 +54,25 @@ type IRouteProps = {
 }
 
 type IFormToolsProps = {
-  groupId: string
   showHiddenFields: boolean
+  onCustomFieldAdded: () => void
   setShowHiddenFields: React.Dispatch<React.SetStateAction<boolean>>
-  setSelectedField: React.Dispatch<React.SetStateAction<string | null>>
 }
 
 export const FormTools = ({
   showHiddenFields,
-  groupId,
-  setShowHiddenFields,
-  setSelectedField
+  onCustomFieldAdded,
+  setShowHiddenFields
 }: IFormToolsProps) => {
   const intl = useIntl()
   const dispatch = useDispatch()
   const { event, section } = useParams<IRouteProps>()
-  const fieldsMap = useSelector((store: IStoreState) =>
-    selectConfigFields(store, event, section)
-  )
 
   const toggleShowHiddenFields = () => setShowHiddenFields((prev) => !prev)
 
-  const createCustomField = (fieldType: CustomFieldType) => {
-    const customConfigField = prepareNewCustomFieldConfig(
-      fieldsMap,
-      event,
-      section,
-      groupId,
-      fieldType
-    )
-    dispatch(addCustomField(event, section, customConfigField))
-    flushSync(() => setSelectedField(customConfigField.fieldId))
-    document
-      .getElementById(`${customConfigField.fieldName}-form-input`)
-      ?.scrollIntoView({ behavior: 'smooth' })
+  const handleAddCustomField = (fieldType: CustomFieldType) => {
+    flushSync(() => dispatch(addCustomField(event, section, fieldType)))
+    onCustomFieldAdded()
   }
 
   return (
@@ -117,7 +99,7 @@ export const FormTools = ({
             actions={
               <LinkButton
                 id={`add-${fieldType}-btn`}
-                onClick={() => createCustomField(fieldType)}
+                onClick={() => handleAddCustomField(fieldType)}
                 size="small"
                 /* TODO */
                 disabled={

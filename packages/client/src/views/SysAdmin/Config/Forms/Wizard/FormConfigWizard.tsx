@@ -45,7 +45,6 @@ import {
   selectConfigFields
 } from '@client/forms/configuration/formConfig/selectors'
 import { FieldPosition, FieldEnabled } from '@client/forms/configuration'
-import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
 
 const Container = styled.div`
   display: flex;
@@ -156,6 +155,17 @@ function useHiddenFields([selectedField, setSelectedField]: ReturnType<
   return [showHiddenFields, setShowHiddenFields] as const
 }
 
+function useFieldsMapRef(event: Event, section: WizardSection) {
+  const fieldsMap = useSelector((store: IStoreState) =>
+    selectConfigFields(store, event, section)
+  )
+  const fieldsMapRef = React.useRef(fieldsMap)
+
+  fieldsMapRef.current = fieldsMap
+
+  return fieldsMapRef
+}
+
 function FormConfigWizardView() {
   const dispatch = useDispatch()
   const intl = useIntl()
@@ -169,20 +179,25 @@ function FormConfigWizardView() {
   const { version } = useSelector((store: IStoreState) =>
     selectFormDraft(store, event)
   )
-  const fieldsMap = useSelector((store: IStoreState) =>
-    selectConfigFields(store, event, section)
-  )
+  /*
+   * The ref is needed to ensure that we are always getting
+   * the latest fields, even after adding a custom field,
+   * before selecting the last field from them
+   */
+  const fieldsMapRef = useFieldsMapRef(event, section)
+  const canvasRef = React.useRef<HTMLDivElement>(null)
 
-  let firstFieldIdentifiers
-  if (section !== 'settings') {
-    const firstField = Object.values(fieldsMap).find(
-      (formField) => formField.precedingFieldId === FieldPosition.TOP
+  const selectLastField = () => {
+    const lastField = Object.values(fieldsMapRef.current).find(
+      ({ foregoingFieldId }) => foregoingFieldId === FieldPosition.BOTTOM
     )
-    if (!firstField) {
-      throw new Error(`No starting field found in section`)
+    if (lastField) {
+      setSelectedField(lastField.fieldId)
     }
-    firstFieldIdentifiers = getIdentifiersFromFieldId(firstField.fieldId)
   }
+
+  const scrollToLastField = () =>
+    canvasRef.current?.lastElementChild?.scrollIntoView({ behavior: 'smooth' })
 
   return (
     <Container>
@@ -220,7 +235,7 @@ function FormConfigWizardView() {
         <NavigationContainer>
           <SectionNavigation />
         </NavigationContainer>
-        {section !== 'settings' && firstFieldIdentifiers !== undefined ? (
+        {section !== 'settings' ? (
           <>
             <CanvasWrapper
               onClick={(e) => {
@@ -235,6 +250,7 @@ function FormConfigWizardView() {
                   selectedField={selectedField}
                   setSelectedField={setSelectedField}
                   showHiddenFields={showHiddenFields}
+                  ref={canvasRef}
                 />
               </CanvasContainer>
             </CanvasWrapper>
@@ -246,7 +262,6 @@ function FormConfigWizardView() {
                     section={section}
                     selectedField={selectedField}
                     setSelectedField={setSelectedField}
-                    groupId={firstFieldIdentifiers.groupId}
                   />
                 ) : (
                   <DefaultFieldTools configField={selectedField} />
@@ -255,8 +270,10 @@ function FormConfigWizardView() {
                 <FormTools
                   showHiddenFields={showHiddenFields}
                   setShowHiddenFields={setShowHiddenFields}
-                  setSelectedField={setSelectedField}
-                  groupId={firstFieldIdentifiers.groupId}
+                  onCustomFieldAdded={() => {
+                    scrollToLastField()
+                    selectLastField()
+                  }}
                 />
               )}
             </ToolsContainer>

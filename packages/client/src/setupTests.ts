@@ -116,6 +116,7 @@ const navigatorMock = {
   onLine: true
 }
 ;(window as any).navigator = navigatorMock
+window.HTMLElement.prototype.scrollIntoView = jest.fn()
 ;(window as any).scrollTo = noop
 ;(window as any).config = {
   API_GATEWAY_URL: 'http://localhost:7070/',

@@ -17,6 +17,10 @@ import { ISerializedFormSectionGroup } from '@client/forms'
 import { PlaceholderPreviewGroups } from '@client/forms/configuration/default'
 
 export type IPreviewGroupConfigField = {
+  /*
+   * TODO: Make the previewGroupId's unique so that the fieldId
+   * for previewGroups can be similar to default and custom fields
+   */
   fieldId: string //[event].[sectionId].previewGroup.[previewGroupId]
   previewGroup: string
   previewGroupLabel: MessageDescriptor
