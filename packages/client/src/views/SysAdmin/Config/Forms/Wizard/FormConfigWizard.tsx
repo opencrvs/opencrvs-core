@@ -66,14 +66,16 @@ const WizardContainer = styled.div`
 `
 
 const NavigationContainer = styled.div`
-  width: 250px;
+  width: 25vw;
+  max-width: 250px;
   flex-shrink: 0;
   border-right: 1px solid ${({ theme }) => theme.colors.grey300};
   background-color: ${({ theme }) => theme.colors.white};
 `
 
 const ToolsContainer = styled.div`
-  width: 348px;
+  width: 25vw;
+  max-width: 348px;
   flex-shrink: 0;
   padding-left: 24px;
   padding-right: 24px;

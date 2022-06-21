@@ -98,7 +98,7 @@ function FormField({
     <FormFieldGenerator
       id={fieldId}
       onChange={() => {}}
-      fields={[formField]}
+      fields={[{ ...formField, ignoreMediaQuery: true }]}
       setAllFieldsDirty={false}
     />
   )
