@@ -19,6 +19,7 @@ interface ISearchMessages
   informantContact: MessageDescriptor
   searchingFor: MessageDescriptor
   searchResultFor: MessageDescriptor
+  noResultFor: MessageDescriptor
   totalResultText: MessageDescriptor
   locationNotFound: MessageDescriptor
 }
@@ -54,9 +55,13 @@ const messagesToDefine: ISearchMessages = {
   },
   searchResultFor: {
     id: 'search.searchResultFor',
-    defaultMessage:
-      '{total, plural, =0 {No results for “{param}”} other {Search results for “{param}”}}',
+    defaultMessage: 'Search results for ”{param}”',
     description: 'The search result text'
+  },
+  noResultFor: {
+    id: 'search.noResultFor',
+    defaultMessage: 'No results for ”{param}”',
+    description: 'The no result text'
   },
   totalResultText: {
     id: 'search.totalResultText',
