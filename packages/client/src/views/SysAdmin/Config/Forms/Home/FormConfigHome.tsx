@@ -41,7 +41,7 @@ const StyledWarning = styled(Warning)`
   max-width: 778px;
 `
 
-export function UnbuplishedWarning(hideIcon?: boolean) {
+export function UnbuplishedWarning({ hideIcon }: { hideIcon?: boolean }) {
   const intl = useIntl()
   const { status: birthStatus } = useSelector((store: IStoreState) =>
     selectFormDraft(store, Event.Birth)
@@ -87,7 +87,7 @@ export function FormConfigHome() {
 
   return (
     <SysAdminContentWrapper isCertificatesConfigPage hideBackground={true}>
-      {UnbuplishedWarning()}
+      {<UnbuplishedWarning />}
       <Content
         title={intl.formatMessage(messages.title)}
         subtitle={

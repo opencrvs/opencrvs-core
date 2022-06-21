@@ -36,10 +36,8 @@ import {
   goToApplicationConfig
 } from '@client/navigation'
 import { redirectToAuthentication } from '@client/profile/profileActions'
-import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { EVENT_STATUS } from '@client/views/OfficeHome/OfficeHome'
 import { Activity, Users } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
@@ -47,7 +45,7 @@ import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
 import { Expandable } from '@opencrvs/components/lib/icons/Expandable'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
-import { Query } from '@client/components/Query'
+import { isMobileDevice } from '@client/utils/commonUtils'
 import { RouteComponentProps, withRouter } from 'react-router'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
@@ -324,7 +322,7 @@ export const NavigationView = (props: IFullProps) => {
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
       avatar={() => userInfo && userInfo.avatar}
-      warning={UnbuplishedWarning(true)}
+      warning={isMobileDevice() ? <></> : <UnbuplishedWarning hideIcon />}
     >
       {userDetails?.role === 'FIELD_AGENT' ? (
         <>
