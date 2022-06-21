@@ -10,12 +10,19 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import { ICustomQuestionConfig } from '@client/forms/questionConfig'
+import {
+  ICustomQuestionConfig,
+  getIdentifiersFromFieldId
+} from '@client/forms/questionConfig'
 import { IConnection, IConfigField, IConfigFieldMap } from '.'
 import { camelCase, keys } from 'lodash'
 import { FieldPosition } from '@client/forms/configuration'
 import { CustomFieldType, Event } from '@client/utils/gateway'
 import { getDefaultLanguage } from '@client/i18n/utils'
+import {
+  isPreviewGroupConfigField,
+  getLastFieldOfPreviewGroup
+} from './previewGroup'
 
 const CUSTOM_FIELD_LABEL = 'Custom Field'
 
@@ -52,13 +59,27 @@ function getLastConfigField(fieldsMap: IConfigFieldMap) {
   )
 }
 
+function getGroupId(fieldsMap: IConfigFieldMap) {
+  const lastConfigField = Object.values(fieldsMap).find(
+    ({ foregoingFieldId }) => foregoingFieldId === FieldPosition.BOTTOM
+  )
+  if (!lastConfigField) {
+    throw new Error(`No field found in section`)
+  }
+  const { fieldId } = isPreviewGroupConfigField(lastConfigField)
+    ? getLastFieldOfPreviewGroup(lastConfigField)
+    : lastConfigField
+  const { groupId } = getIdentifiersFromFieldId(fieldId)
+  return groupId
+}
+
 export function prepareNewCustomFieldConfig(
   fieldsMap: IConfigFieldMap,
   event: Event,
   section: string,
-  groupId: string,
   fieldType: CustomFieldType
 ): ICustomConfigField {
+  const groupId = getGroupId(fieldsMap)
   const customFieldNumber = determineNextFieldIdNumber(
     fieldsMap,
     event,

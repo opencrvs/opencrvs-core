@@ -156,6 +156,17 @@ function useHiddenFields([selectedField, setSelectedField]: ReturnType<
   return [showHiddenFields, setShowHiddenFields] as const
 }
 
+function useFieldsMap(event: Event, section: WizardSection) {
+  const fieldsMap = useSelector((store: IStoreState) =>
+    selectConfigFields(store, event, section)
+  )
+  const fieldsMapRef = React.useRef(fieldsMap)
+
+  fieldsMapRef.current = React.useMemo(() => fieldsMap, [fieldsMap])
+
+  return [fieldsMapRef.current, fieldsMapRef] as const
+}
+
 function FormConfigWizardView() {
   const dispatch = useDispatch()
   const intl = useIntl()
@@ -169,12 +180,24 @@ function FormConfigWizardView() {
   const { version } = useSelector((store: IStoreState) =>
     selectFormDraft(store, event)
   )
-  const fieldsMap = useSelector((store: IStoreState) =>
-    selectConfigFields(store, event, section)
-  )
+  /*
+   * The ref is needed to ensure that we are always getting
+   * the latest fields, even after adding a custom field,
+   * before selecting the last field from them
+   */
+  const [fieldsMap, fieldsMapRef] = useFieldsMap(event, section)
   const canvasRef = React.useRef<HTMLDivElement>(null)
 
-  const scrollToLastCard = () =>
+  const selectLastField = () => {
+    const lastField = Object.values(fieldsMapRef.current).find(
+      ({ foregoingFieldId }) => foregoingFieldId === FieldPosition.BOTTOM
+    )
+    if (lastField) {
+      setSelectedField(lastField.fieldId)
+    }
+  }
+
+  const scrollToLastField = () =>
     canvasRef.current?.lastElementChild?.scrollIntoView({ behavior: 'smooth' })
 
   let firstFieldIdentifiers
@@ -260,9 +283,10 @@ function FormConfigWizardView() {
                 <FormTools
                   showHiddenFields={showHiddenFields}
                   setShowHiddenFields={setShowHiddenFields}
-                  setSelectedField={setSelectedField}
-                  groupId={firstFieldIdentifiers.groupId}
-                  onCustomFieldCreated={scrollToLastCard}
+                  onCustomFieldAdded={() => {
+                    scrollToLastField()
+                    selectLastField()
+                  }}
                 />
               )}
             </ToolsContainer>

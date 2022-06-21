@@ -11,7 +11,7 @@
  */
 import { ICustomConfigField, IConfigField, IDefaultConfigField } from './utils'
 import { IQuestionConfig } from '@client/forms/questionConfig'
-import { Event } from '@client/utils/gateway'
+import { Event, CustomFieldType } from '@client/utils/gateway'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 
 export const ADD_CUSTOM_FIELD = 'FORM/ADD_CUSTOM_FIELD'
@@ -20,19 +20,19 @@ export type AddCustomFieldAction = {
   payload: {
     event: Event
     section: string
-    customField: ICustomConfigField
+    fieldType: CustomFieldType
   }
 }
 export const addCustomField = (
   event: Event,
   section: string,
-  customField: ICustomConfigField
+  fieldType: CustomFieldType
 ): AddCustomFieldAction => ({
   type: ADD_CUSTOM_FIELD,
   payload: {
     event,
     section,
-    customField
+    fieldType
   }
 })
 
