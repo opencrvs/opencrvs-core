@@ -45,9 +45,12 @@ export async function checkFormDraftStatusToAddTestExtension(
   token: string
 ) {
   const formDraft: IDraft[] = await getFormDraft(token)
-  const isPublished = Object.values(formDraft).every(
-    (draft) => draft.status === DraftStatus.PUBLISHED
-  )
+  // Array.prototype.every returns true for an empty array
+  const isPublished =
+    formDraft.length > 0 &&
+    Object.values(formDraft).every(
+      (draft) => draft.status === DraftStatus.PUBLISHED
+    )
 
   if (!isPublished) {
     setupTestExtension(taskResource)
