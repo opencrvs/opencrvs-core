@@ -73,26 +73,6 @@ export function executeHandlebarsTemplate(
   const output = template(formattedTemplateData)
   return output
 }
-export function printMoneyReceipt(
-  intl: IntlShape,
-  declaration: IDeclaration,
-  userDetails: IUserDetails | null,
-  offlineResource: IOfflineData
-) {
-  if (!userDetails) {
-    throw new Error('No user details found')
-  }
-  if (!offlineResource.templates || !offlineResource.templates.receipt) {
-    throw new Error('Money reciept template is misssing in offline data')
-  }
-  printPDF(
-    offlineResource.templates.receipt,
-    declaration,
-    userDetails,
-    offlineResource,
-    intl
-  )
-}
 
 export async function previewCertificate(
   intl: IntlShape,
