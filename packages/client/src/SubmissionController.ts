@@ -268,6 +268,7 @@ export class SubmissionController {
       declaration.submissionStatus === SUBMISSION_STATUS.REGISTERED ||
       declaration.submissionStatus === SUBMISSION_STATUS.REJECTED ||
       declaration.submissionStatus === SUBMISSION_STATUS.ARCHIVED ||
+      declaration.submissionStatus === SUBMISSION_STATUS.CERTIFIED ||
       declaration.submissionStatus === SUBMISSION_STATUS.REINSTATED ||
       declaration.submissionStatus === SUBMISSION_STATUS.REQUESTED_CORRECTION
     ) {
