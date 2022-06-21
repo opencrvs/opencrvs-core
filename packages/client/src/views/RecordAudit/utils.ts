@@ -66,6 +66,7 @@ export interface IGQLDeclaration {
     trackingId: string
     type: string
     status: { type: string }[]
+    assignment?: GQLAssignmentData
   }
 }
 
@@ -416,6 +417,7 @@ export const getGQLDeclaration = (
     type: data?.registration?.type,
     status: data?.registration?.status[0].type,
     trackingId: data?.registration?.trackingId,
+    assignment: data?.registration?.assignment,
     dateOfBirth: '',
     placeOfBirth: '',
     informant: ''

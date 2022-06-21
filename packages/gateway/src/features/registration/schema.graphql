@@ -394,6 +394,7 @@ type Registration { # -> Task
   book: String # -> .identifier
   informantType: InformantType # -> Observation.valueString
   otherInformantType: String
+  assignment: AssignmentData # -> extension(url='http://opencrvs.org/specs/extension/regAssigned')
   contact: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person').valueString
   contactRelationship: String # -> extension(url='http://opencrvs.org/specs/extension/contact-relationship').valueString
   contactPhoneNumber: String # -> extension(url='http://opencrvs.org/specs/extension/contact-person-phone-number').valueString

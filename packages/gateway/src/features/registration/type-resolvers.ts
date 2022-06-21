@@ -61,6 +61,7 @@ import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
 import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
+import { getUser } from '../user/utils'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
@@ -479,7 +480,36 @@ export const typeResolvers: GQLResolver = {
       )
     },
     certificates: async (task, _, authHeader) =>
-      await getCertificatesFromTask(task, _, authHeader)
+      await getCertificatesFromTask(task, _, authHeader),
+    assignment: async (task, _, authHeader) => {
+      const assignmentExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
+        task.extension
+      )
+      const regLastOfficeExtension = findExtension(
+        `${OPENCRVS_SPECIFICATION_URL}extension/regLastOffice`,
+        task.extension
+      )
+
+      if (assignmentExtension) {
+        const practitionerId =
+          assignmentExtension.valueReference?.reference?.split('/')?.[1]
+
+        if (practitionerId) {
+          const user = await getUser({ practitionerId }, authHeader)
+
+          if (user) {
+            return {
+              userId: user._id,
+              firstName: user.name[0].given.join(' '),
+              lastName: user.name[0].family,
+              officeName: regLastOfficeExtension?.valueString || ''
+            }
+          }
+        }
+      }
+      return null
+    }
   },
   RegWorkflow: {
     type: (task: fhir.Task) => {

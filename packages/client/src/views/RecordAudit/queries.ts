@@ -22,6 +22,12 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           type
         }
         duplicates
+        assignment {
+          userId
+          firstName
+          lastName
+          officeName
+        }
       }
       ... on BirthRegistration {
         child {
