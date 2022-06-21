@@ -155,13 +155,13 @@ function useHiddenFields([selectedField, setSelectedField]: ReturnType<
   return [showHiddenFields, setShowHiddenFields] as const
 }
 
-function useFieldsMap(event: Event, section: WizardSection) {
+function useFieldsMapRef(event: Event, section: WizardSection) {
   const fieldsMap = useSelector((store: IStoreState) =>
     selectConfigFields(store, event, section)
   )
   const fieldsMapRef = React.useRef(fieldsMap)
 
-  fieldsMapRef.current = React.useMemo(() => fieldsMap, [fieldsMap])
+  fieldsMapRef.current = fieldsMap
 
   return fieldsMapRef
 }
@@ -184,7 +184,7 @@ function FormConfigWizardView() {
    * the latest fields, even after adding a custom field,
    * before selecting the last field from them
    */
-  const fieldsMapRef = useFieldsMap(event, section)
+  const fieldsMapRef = useFieldsMapRef(event, section)
   const canvasRef = React.useRef<HTMLDivElement>(null)
 
   const selectLastField = () => {
