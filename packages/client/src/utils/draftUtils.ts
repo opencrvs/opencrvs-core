@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
+import {
+  IDeclaration,
+  SUBMISSION_STATUS,
+  IPrintableDeclaration
+} from '@client/declarations'
 import { BirthSection, DeathSection, IFormSectionData } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -20,6 +24,7 @@ import {
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
+import { History } from '@client/utils/gateway'
 
 const getInformantEngName = (sectionData: IFormSectionData): string => {
   if (sectionData.firstNamesEng) {
@@ -198,4 +203,14 @@ export function isDeclarationInReadyToReviewStatus(
     [SUBMISSION_STATUS.DRAFT, SUBMISSION_STATUS.REJECTED, undefined],
     submissionStatus
   )
+}
+
+export function getRegisteringOfficeId(
+  declaration?: IPrintableDeclaration
+): string | null {
+  const registeringHistory = (
+    declaration?.data?.history as unknown as History[]
+  )?.find((h) => h.action === 'REGISTERED')
+
+  return registeringHistory?.office?.id || null
 }

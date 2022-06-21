@@ -68,6 +68,7 @@ export interface IRadioOption {
   label: string
   value: string | boolean
   conditionals?: IConditionals[]
+  disabled?: boolean
 }
 
 export interface IRadioGroupProps {
@@ -110,6 +111,7 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
                     {...props}
                     size={'large'}
                     name={name}
+                    disabled={option.disabled}
                     label={option.label}
                     value={option.value}
                     id={`${name}_${option.value}`}
@@ -135,6 +137,7 @@ export class RadioGroup extends React.Component<IRadioGroupProps> {
                     {...props}
                     size={'small'}
                     name={name}
+                    disabled={option.disabled}
                     label={option.label}
                     value={option.value}
                     id={`${name}_${option.value}`}
