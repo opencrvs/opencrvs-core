@@ -73,7 +73,6 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 const ErrorText = styled.div`
@@ -464,12 +463,15 @@ export class SearchResultView extends React.Component<
                   return (
                     <WQContentWrapper
                       title={intl.formatMessage(messages.searchResultFor, {
-                        total,
                         param: searchText
                       })}
                       isMobileSize={
                         this.state.width < this.props.theme.grid.breakpoints.lg
                       }
+                      noResultText={intl.formatMessage(messages.noResultFor, {
+                        param: searchText
+                      })}
+                      noContent={total < 1 && !loading}
                     >
                       {loading ? (
                         <div id="search_loader">
