@@ -13,44 +13,35 @@ services:
   gateway:
     environment:
       - NODE_ENV=production
-      - QA_ENV=true
 
   workflow:
     environment:
       - NODE_ENV=production
-      - QA_ENV=true
 
   search:
     environment:
       - NODE_ENV=production
-      - QA_ENV=true
 
   metrics:
     environment:
       - NODE_ENV=production
-      - QA_ENV=true
 
   auth:
     environment:
       - NODE_ENV=production
-      - QA_ENV=true
 
   user-mgnt:
     environment:
       - NODE_ENV=production
-      - QA_ENV=true
 
   notification:
     environment:
       - NODE_ENV=production
-      - QA_ENV=true
 
   webhooks:
     environment:
       - NODE_ENV=production
-      - QA_ENV=true
 
   config:
     environment:
       - NODE_ENV=production
-      - QA_ENV=true
