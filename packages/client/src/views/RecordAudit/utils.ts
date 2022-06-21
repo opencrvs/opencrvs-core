@@ -443,11 +443,11 @@ export const getStatusLabel = (
   userDetails: IUserDetails
 ) => {
   if (status in DECLARATION_STATUS_LABEL)
-    return (reinstated
-      ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'])
-      : '') +
-      status ===
-      'DECLARED'
+    return reinstated
+      ? intl.formatMessage(DECLARATION_STATUS_LABEL['REINSTATED'], {
+          status: intl.formatMessage(DECLARATION_STATUS_LABEL[status])
+        })
+      : status === 'DECLARED'
       ? findMessage(status, userDetails.role ? userDetails.role : '', intl)
       : intl.formatMessage(DECLARATION_STATUS_LABEL[status])
   return ''

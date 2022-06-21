@@ -77,7 +77,6 @@ export enum Action {
   REJECT_DECLARATION = 'reject',
   LOAD_REVIEW_DECLARATION = 'load declaration data for review',
   LOAD_CERTIFICATE_DECLARATION = 'load declaration data for certificate collection',
-  REINSTATE_DECLARATION = 'reinstate',
   ARCHIVE_DECLARATION = 'archive',
   LOAD_REQUESTED_CORRECTION_DECLARATION = 'load declaration data for which is requested correction',
   REQUEST_CORRECTION_DECLARATION = 'request correction'

@@ -27,7 +27,6 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { ITheme } from '@client/styledComponents'
 import { IUserDetails } from '@client/utils/userUtils'
-import { printMoneyReceipt } from '@client/views/PrintCertificate/PDFUtils'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
@@ -146,25 +145,6 @@ class PaymentComponent extends React.Component<IFullProps> {
       offlineCountryConfig
     )
 
-    const RecieptPrint = (
-      <TertiaryButton
-        id="print-receipt"
-        icon={() => <Print />}
-        align={0}
-        disabled={true}
-        onClick={() =>
-          printMoneyReceipt(
-            this.props.intl,
-            this.props.declaration,
-            this.props.userDetails,
-            this.props.offlineCountryConfig
-          )
-        }
-      >
-        {intl.formatMessage(messages.printReceipt)}
-      </TertiaryButton>
-    )
-
     return (
       <>
         <ActionPageLight
@@ -173,10 +153,7 @@ class PaymentComponent extends React.Component<IFullProps> {
           hideBackground
           goHome={() => this.props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)}
         >
-          <Content
-            title={intl.formatMessage(messages.payment)}
-            topActionButtons={[RecieptPrint]}
-          >
+          <Content title={intl.formatMessage(messages.payment)}>
             <LabelValue
               id="service"
               label={intl.formatMessage(messages.receiptService)}
