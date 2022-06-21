@@ -138,7 +138,6 @@ type IProps = {
   event: Event
   selectedField: ICustomConfigField
   section: BirthSection | DeathSection
-  groupId: string
   setSelectedField: React.Dispatch<React.SetStateAction<string | null>>
 }
 
@@ -248,11 +247,11 @@ class CustomFieldToolsComp extends React.Component<
   }
 
   generateNewFieldID() {
-    const { event, sectionId } = getConfigFieldIdentifiers(
+    const { event, sectionId, groupId } = getConfigFieldIdentifiers(
       this.props.selectedField.fieldId
     )
 
-    return `${event}.${sectionId}.${this.props.groupId}.${this.state.handleBars}`
+    return `${event}.${sectionId}.${groupId}.${this.state.handleBars}`
   }
 
   doesContentExist(

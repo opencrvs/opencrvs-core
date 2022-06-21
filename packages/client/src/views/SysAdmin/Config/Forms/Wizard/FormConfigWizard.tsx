@@ -45,7 +45,6 @@ import {
   selectConfigFields
 } from '@client/forms/configuration/formConfig/selectors'
 import { FieldPosition, FieldEnabled } from '@client/forms/configuration'
-import { getIdentifiersFromFieldId } from '@client/forms/questionConfig'
 
 const Container = styled.div`
   display: flex;
@@ -164,7 +163,7 @@ function useFieldsMap(event: Event, section: WizardSection) {
 
   fieldsMapRef.current = React.useMemo(() => fieldsMap, [fieldsMap])
 
-  return [fieldsMapRef.current, fieldsMapRef] as const
+  return fieldsMapRef
 }
 
 function FormConfigWizardView() {
@@ -185,7 +184,7 @@ function FormConfigWizardView() {
    * the latest fields, even after adding a custom field,
    * before selecting the last field from them
    */
-  const [fieldsMap, fieldsMapRef] = useFieldsMap(event, section)
+  const fieldsMapRef = useFieldsMap(event, section)
   const canvasRef = React.useRef<HTMLDivElement>(null)
 
   const selectLastField = () => {
@@ -199,17 +198,6 @@ function FormConfigWizardView() {
 
   const scrollToLastField = () =>
     canvasRef.current?.lastElementChild?.scrollIntoView({ behavior: 'smooth' })
-
-  let firstFieldIdentifiers
-  if (section !== 'settings') {
-    const firstField = Object.values(fieldsMap).find(
-      (formField) => formField.precedingFieldId === FieldPosition.TOP
-    )
-    if (!firstField) {
-      throw new Error(`No starting field found in section`)
-    }
-    firstFieldIdentifiers = getIdentifiersFromFieldId(firstField.fieldId)
-  }
 
   return (
     <Container>
@@ -247,7 +235,7 @@ function FormConfigWizardView() {
         <NavigationContainer>
           <SectionNavigation />
         </NavigationContainer>
-        {section !== 'settings' && firstFieldIdentifiers !== undefined ? (
+        {section !== 'settings' ? (
           <>
             <CanvasWrapper
               onClick={(e) => {
@@ -274,7 +262,6 @@ function FormConfigWizardView() {
                     section={section}
                     selectedField={selectedField}
                     setSelectedField={setSelectedField}
-                    groupId={firstFieldIdentifiers.groupId}
                   />
                 ) : (
                   <DefaultFieldTools configField={selectedField} />
