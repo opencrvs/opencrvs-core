@@ -726,9 +726,8 @@ export async function getTotalNumberOfRegistrations(
 ) {
   const measurement =
     event === EVENT_TYPE.BIRTH ? 'birth_registration' : 'death_registration'
-  const column = event === EVENT_TYPE.BIRTH ? 'ageInDays' : 'deathDays'
   const totalRegistrationPoint: Registration[] = await query(
-    `SELECT COUNT(${column}) AS total
+    `SELECT COUNT(DISTINCT(compositionId)) AS total
       FROM ${measurement}
     WHERE time > '${timeFrom}'
       AND time <= '${timeTo}'
