@@ -61,7 +61,7 @@ import fetch from 'node-fetch'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import * as validateUUID from 'uuid-validate'
 import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
-import { getUser } from '../user/utils'
+import { getUser } from '@gateway/features/user/utils'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
