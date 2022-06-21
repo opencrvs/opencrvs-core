@@ -781,9 +781,13 @@ async function markRecordAsDownloadedAndAssigned(
     taskBundle.entry[0].resource
   ) as GQLRegStatus
 
+  const isFieldAgentValidatedDeclaration =
+    hasScope(authHeader, 'validate') &&
+    businessStatus === GQLRegStatus.VALIDATED
+
   if (
-    (hasScope(authHeader, 'register') || hasScope(authHeader, 'validate')) &&
-    businessStatus !== GQLRegStatus.VALIDATED
+    hasScope(authHeader, 'register') ||
+    (hasScope(authHeader, 'validate') && !isFieldAgentValidatedDeclaration)
   ) {
     extensions = [
       {
