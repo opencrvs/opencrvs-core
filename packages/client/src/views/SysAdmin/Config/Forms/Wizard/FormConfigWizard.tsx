@@ -21,7 +21,7 @@ import { Redirect, useParams } from 'react-router'
 import { HOME } from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import { PrimaryButton, CircleButton } from '@opencrvs/components/lib/buttons'
 import { SettingsBlue } from '@opencrvs/components/lib/icons'
 import { EventTopBar } from '@opencrvs/components/lib/interface'
 import { SectionNavigation } from '@client/components/formConfig/SectionNavigation'
@@ -195,14 +195,15 @@ function FormConfigWizardView() {
         topBarActions={
           section !== 'settings'
             ? [
-                <TertiaryButton
+                <CircleButton
                   id="settings"
                   key="settings"
-                  icon={() => <SettingsBlue />}
                   onClick={() =>
                     dispatch(goToFormConfigWizard(event, 'settings'))
                   }
-                ></TertiaryButton>,
+                >
+                  <SettingsBlue />
+                </CircleButton>,
                 <PrimaryButton
                   key="save"
                   size="small"
