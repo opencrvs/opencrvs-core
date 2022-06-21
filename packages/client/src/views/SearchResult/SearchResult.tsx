@@ -73,7 +73,6 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 
 const ErrorText = styled.div`
@@ -276,6 +275,8 @@ export class SearchResultView extends React.Component<
       const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
       const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
+      const { intl, match, userDetails } = this.props
+      const { searchText, searchType } = match.params
       if (this.state.width > this.props.theme.grid.breakpoints.lg) {
         if (
           (declarationIsRegistered || declarationIsCertified) &&
@@ -315,31 +316,47 @@ export class SearchResultView extends React.Component<
           })
         }
       }
-      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        actions.push({
-          actionComponent: (
-            <DownloadButton
-              key={reg.id}
-              downloadConfigs={{
-                event: reg.event,
-                compositionId: reg.id,
-                action:
-                  ((declarationIsRegistered || declarationIsCertified) &&
-                    Action.LOAD_CERTIFICATE_DECLARATION) ||
-                  (declarationIsRequestedCorrection &&
-                    Action.LOAD_REQUESTED_CORRECTION_DECLARATION) ||
-                  Action.LOAD_REVIEW_DECLARATION
-              }}
-              status={downloadStatus as DOWNLOAD_STATUS}
-            />
-          )
-        })
-      } else {
-        actions.push({
-          actionComponent: <Downloaded />
-        })
-      }
-
+      actions.push({
+        actionComponent: (
+          <DownloadButton
+            key={reg.id}
+            downloadConfigs={{
+              event: reg.event,
+              compositionId: reg.id,
+              assignment: reg.assignment,
+              refetchQueries: [
+                {
+                  query: SEARCH_EVENTS,
+                  variables: {
+                    locationIds: this.userHasRegisterScope()
+                      ? null
+                      : userDetails
+                      ? [getUserLocation(userDetails).id]
+                      : [],
+                    sort: SEARCH_RESULT_SORT,
+                    trackingId:
+                      searchType === TRACKING_ID_TEXT ? searchText : '',
+                    registrationNumber:
+                      searchType === BRN_DRN_TEXT ? searchText : '',
+                    contactNumber:
+                      searchType === PHONE_TEXT
+                        ? convertToMSISDN(searchText)
+                        : '',
+                    name: searchType === NAME_TEXT ? searchText : ''
+                  }
+                }
+              ],
+              action:
+                ((declarationIsRegistered || declarationIsCertified) &&
+                  Action.LOAD_CERTIFICATE_DECLARATION) ||
+                (declarationIsRequestedCorrection &&
+                  Action.LOAD_REQUESTED_CORRECTION_DECLARATION) ||
+                Action.LOAD_REVIEW_DECLARATION
+            }}
+            status={downloadStatus as DOWNLOAD_STATUS}
+          />
+        )
+      })
       const event =
         (reg.event &&
           intl.formatMessage(
@@ -436,7 +453,7 @@ export class SearchResultView extends React.Component<
                       : '',
                   name: searchType === NAME_TEXT ? searchText : ''
                 }}
-                fetchPolicy="no-cache"
+                fetchPolicy="cache-and-network"
               >
                 {({ loading, error, data }) => {
                   const total = loading
@@ -446,12 +463,15 @@ export class SearchResultView extends React.Component<
                   return (
                     <WQContentWrapper
                       title={intl.formatMessage(messages.searchResultFor, {
-                        total,
                         param: searchText
                       })}
                       isMobileSize={
                         this.state.width < this.props.theme.grid.breakpoints.lg
                       }
+                      noResultText={intl.formatMessage(messages.noResultFor, {
+                        param: searchText
+                      })}
+                      noContent={total < 1 && !loading}
                     >
                       {loading ? (
                         <div id="search_loader">

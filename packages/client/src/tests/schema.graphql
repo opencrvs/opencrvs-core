@@ -192,6 +192,7 @@ type Mutation {
     details: DeathRegistrationInput!
   ): DeathRegistration!
   markDeathAsCertified(id: ID!, details: DeathRegistrationInput!): ID!
+  markEventAsUnassigned(id: String!): ID!
   requestDeathRegistrationCorrection(
     id: ID!
     details: DeathRegistrationInput!
@@ -460,6 +461,13 @@ type EventProgressResultSet {
   totalItems: Int
 }
 
+type AssignmentData {
+  userId: String
+  firstName: String
+  lastName: String
+  officeName: String
+}
+
 type Role {
   id: ID!
   title: String
@@ -490,7 +498,7 @@ type Question {
   maxLength: Int
   fieldName: String
   fieldType: String
-  preceedingFieldId: String
+  precedingFieldId: String
   required: Boolean
   enabled: String
   custom: Boolean
@@ -672,7 +680,7 @@ input QuestionInput {
   maxLength: Int
   fieldName: String
   fieldType: String
-  preceedingFieldId: String
+  precedingFieldId: String
   required: Boolean
   enabled: String
   custom: Boolean
@@ -1267,6 +1275,7 @@ type RegistrationSearchSet {
   duplicates: [ID]
   createdAt: String
   modifiedAt: String
+  assignment: AssignmentData
 }
 
 type BirthEventSearchSet implements EventSearchSet {

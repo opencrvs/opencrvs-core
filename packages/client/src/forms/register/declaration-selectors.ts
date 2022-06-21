@@ -14,10 +14,10 @@ import { IStoreState } from '@opencrvs/client/src/store'
 import {
   Section,
   IFormSection,
-  Event,
   DeathSection,
   BirthSection
 } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 
 const getPartialState = (state: IStoreState): IRegisterFormState =>
   state.registerForm
@@ -70,9 +70,9 @@ export const getRegisterFormSection = (
 }
 
 export const getBirthSection = (state: IStoreState, section: BirthSection) => {
-  return getRegisterFormSection(state, section, Event.BIRTH)
+  return getRegisterFormSection(state, section, Event.Birth)
 }
 
 export const getDeathSection = (state: IStoreState, section: DeathSection) => {
-  return getRegisterFormSection(state, section, Event.DEATH)
+  return getRegisterFormSection(state, section, Event.Death)
 }

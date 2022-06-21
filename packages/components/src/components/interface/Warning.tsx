@@ -31,10 +31,13 @@ const Conatiner = styled.div`
 export function Warning({
   label,
   ...props
-}: { label: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
+}: {
+  label: React.ReactNode
+  hideIcon?: boolean
+} & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <Conatiner {...props}>
-      <Alert color="invert" />
+      {!props.hideIcon && <Alert color="invert" />}
       <p>{label}</p>
     </Conatiner>
   )

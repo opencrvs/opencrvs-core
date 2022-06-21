@@ -16,21 +16,21 @@ import {
   ConditionOperation
 } from '@client/pdfRenderer/transformer/types'
 import {
-  Event,
   IFormData,
   IFormSectionData,
   IFormFieldValue
 } from '@opencrvs/client/src/forms'
+import { Event } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { MessageDescriptor } from 'react-intl'
 
 const eventMessageDescriptor = {
-  [Event.BIRTH]: {
+  [Event.Birth]: {
     defaultMessage: 'Birth',
     description: 'A label from the birth event',
     id: 'constants.birth'
   },
-  [Event.DEATH]: {
+  [Event.Death]: {
     defaultMessage: 'Death',
     description: 'A label from the death event',
     id: 'constants.death'

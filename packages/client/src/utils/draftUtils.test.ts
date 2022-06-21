@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import {
   getDraftInformantFullName,
   transformSearchQueryDataToDraft
@@ -18,8 +18,6 @@ import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet
 } from '@opencrvs/gateway/src/graphql/schema'
-import { SUBMISSION_STATUS, IDeclaration } from '@client/declarations'
-import { IUserDetails } from './userUtils'
 
 describe('draftUtils tests', () => {
   describe('getDraftInformantFullName()', () => {
@@ -36,7 +34,7 @@ describe('draftUtils tests', () => {
                 familyNameEng: 'Hoque'
               }
             },
-            event: Event.BIRTH,
+            event: Event.Birth,
             savedOn: 1558037863335,
             modifiedOn: 1558037867987
           })
@@ -54,7 +52,7 @@ describe('draftUtils tests', () => {
                   familyNameEng: 'Hoque'
                 }
               },
-              event: Event.BIRTH,
+              event: Event.Birth,
               savedOn: 1558037863335,
               modifiedOn: 1558037867987
             },
@@ -75,7 +73,7 @@ describe('draftUtils tests', () => {
                 familyNameEng: 'Hoque'
               }
             },
-            event: Event.DEATH,
+            event: Event.Death,
             savedOn: 1558037863335,
             modifiedOn: 1558037867987
           })
@@ -94,7 +92,7 @@ describe('draftUtils tests', () => {
                   familyNameEng: 'Hoque'
                 }
               },
-              event: Event.DEATH,
+              event: Event.Death,
               savedOn: 1558037863335,
               modifiedOn: 1558037867987
             },

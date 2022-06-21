@@ -18,7 +18,7 @@ import {
 } from '@client/tests/util'
 import { VerifyCollector } from './VerifyCollector'
 import { storeDeclaration } from '@client/declarations'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { ReactWrapper } from 'enzyme'
 
 describe('verify collector tests', () => {
@@ -36,7 +36,7 @@ describe('verify collector tests', () => {
         }
       ]
     },
-    event: Event.BIRTH
+    event: Event.Birth
   }
 
   const deathDeclaration = {
@@ -51,7 +51,7 @@ describe('verify collector tests', () => {
         }
       ]
     },
-    event: Event.DEATH
+    event: Event.Death
   }
 
   describe('in case of birth declaration', () => {
@@ -68,7 +68,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth1234',
-              eventType: Event.BIRTH,
+              eventType: Event.Birth,
               collector: 'mother'
             },
             isExact: true,
@@ -90,7 +90,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockBirth1234',
-              eventType: Event.BIRTH,
+              eventType: Event.Birth,
               collector: 'mother'
             },
             isExact: true,
@@ -129,7 +129,7 @@ describe('verify collector tests', () => {
             match={{
               params: {
                 registrationId: 'mockDeath1234',
-                eventType: Event.DEATH,
+                eventType: Event.Death,
                 collector: 'informant'
               },
               isExact: true,
@@ -169,7 +169,7 @@ describe('verify collector tests', () => {
               match={{
                 params: {
                   registrationId: 'mockBirth1234',
-                  eventType: Event.DEATH,
+                  eventType: Event.Death,
                   collector: 'father'
                 },
                 isExact: true,
@@ -252,7 +252,7 @@ describe('verify collector tests', () => {
           match={{
             params: {
               registrationId: 'mockDeath1234',
-              eventType: Event.DEATH,
+              eventType: Event.Death,
               collector: 'informant'
             },
             isExact: true,

@@ -8,7 +8,7 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "outDir": "build/dist",
-    "lib": ["esnext.asynciterable", "es6", "es2017"],
+    "lib": ["esnext.asynciterable", "es6", "es2017", "dom"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,

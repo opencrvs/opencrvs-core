@@ -21,11 +21,12 @@ export enum FieldType {
 }
 
 export const validFieldType = Object.values(FieldType)
+
 export interface IMessage {
   lang: string
   descriptor: {
     id: string
-    description: string
+    description?: string
     defaultMessage: string
   }
 }
@@ -42,13 +43,12 @@ export interface IQuestion {
   fieldName?: string
   fieldType?: FieldType
   // must be the fieldId for the field vertically above this one in the form or the string "TOP"
-  preceedingFieldId?: string
+  precedingFieldId: string
   required?: boolean
   // enabled should be a string "DISABLED" or "" or undefined because existing default fields will be ""
   // wanted to use disabled, but this prop is already in use in IFormField
   enabled?: string
   custom?: boolean
-  initialValue?: string
 }
 
 export interface IQuestionModel extends IQuestion, Document {}
@@ -57,15 +57,15 @@ export const messageDescriptor = new Schema(
   {
     id: { type: String, required: true },
     description: { type: String },
-    defaultMessage: { type: String }
+    defaultMessage: { type: String, required: true }
   },
   { _id: false }
 )
 
 export const message = new Schema(
   {
-    lang: { type: String },
-    descriptor: { type: messageDescriptor }
+    lang: { type: String, required: true },
+    descriptor: { type: messageDescriptor, required: true }
   },
   { _id: false }
 )
@@ -104,11 +104,10 @@ const questionSchema = new Schema({
     enum: validFieldType,
     default: FieldType.TEXT
   },
-  preceedingFieldId: { type: String },
+  precedingFieldId: { type: String, required: true },
   required: { type: Boolean },
   enabled: { type: String },
-  custom: { type: Boolean, default: false },
-  initialValue: { type: String }
+  custom: { type: Boolean, default: false }
 })
 
 export default model<IQuestionModel>('Question', questionSchema)

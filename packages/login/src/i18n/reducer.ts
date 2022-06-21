@@ -38,11 +38,24 @@ interface ISupportedLanguages {
   language: string
 }
 
-const supportedLanguages: ISupportedLanguages[] = [
-  { code: 'en', language: 'English' },
-  { code: 'fr', language: 'Français' },
-  { code: 'bn', language: 'বাংলা' }
-]
+function extractLanguageSelectConfig(
+  languageSelectConfig: string
+): ISupportedLanguages[] {
+  const languageSelectConfigs = languageSelectConfig.split(',')
+  const supportedLanguages: ISupportedLanguages[] = []
+  languageSelectConfigs.forEach((languageSelectConfig) => {
+    const languageSelectValueAndLabel = languageSelectConfig.split(':')
+    supportedLanguages.push({
+      code: languageSelectValueAndLabel[0],
+      language: languageSelectValueAndLabel[1]
+    })
+  })
+  return supportedLanguages
+}
+
+const supportedLanguages: ISupportedLanguages[] = extractLanguageSelectConfig(
+  window.config.AVAILABLE_LANGUAGES_SELECT
+)
 
 export const initLanguages = () => {
   const initLanguages: ILanguageState = {}

@@ -39,6 +39,12 @@ export const SEARCH_EVENTS = gql`
           registrationNumber
           registeredLocationId
           duplicates
+          assignment {
+            userId
+            firstName
+            lastName
+            officeName
+          }
           createdAt
           modifiedAt
         }

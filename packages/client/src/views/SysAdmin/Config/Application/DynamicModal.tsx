@@ -55,15 +55,6 @@ import {
 const Message = styled.div`
   margin-bottom: 16px;
 `
-const Text = styled.div<{
-  align?: 'right' | 'left'
-}>`
-  margin-left: ${({ align }) => (align === 'left' ? '0px' : '8px')};
-  margin-right: ${({ align }) => (align === 'left' ? '8px' : '0px')};
-  margin-top: 36px;
-  color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.reg16};
-`
 const ApplyButton = styled(PrimaryButton)`
   height: 40px;
   & div {
@@ -96,17 +87,22 @@ export const Field = styled.div`
     margin-bottom: 0px;
   }
 `
-export const HalfWidthInput = styled(TextInput)<{
-  topMargin?: boolean
-}>`
-  margin-top: ${({ topMargin }) => (topMargin ? '30px' : '0px')};
+
+export const InputContainer = styled.div`
+  display: flex;
+  margin-top: 30px;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+`
+
+export const HalfWidthInput = styled(TextInput)`
   width: 300px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
   }
 `
 const SmallWidthInput = styled(TextInput)`
-  margin-top: 30px;
   width: 78px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
@@ -114,7 +110,6 @@ const SmallWidthInput = styled(TextInput)`
 `
 const ErrorMessage = styled.div`
   position: relative;
-  ${({ theme }) => theme.fonts.semiBoldFont};
   color: ${({ theme }) => theme.colors.negative};
   margin-left: 6px;
 `
@@ -813,16 +808,18 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 touched={true}
                 required={false}
               >
-                <SmallWidthInput
-                  id="applicationBirthRegTarget"
-                  type="text"
-                  error={false}
-                  value={this.state.birthRegistrationTarget}
-                  onChange={this.setBirthRegistrationTarget}
-                />
-                <Text>
-                  {intl.formatMessage(messages.eventTargetInputLabel)}
-                </Text>
+                <InputContainer>
+                  <SmallWidthInput
+                    id="applicationBirthRegTarget"
+                    type="text"
+                    error={false}
+                    value={this.state.birthRegistrationTarget}
+                    onChange={this.setBirthRegistrationTarget}
+                  />
+                  <span>
+                    {intl.formatMessage(messages.eventTargetInputLabel)}
+                  </span>
+                </InputContainer>
               </InputField>
             </Field>
           </Content>
@@ -835,16 +832,18 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 touched={true}
                 required={false}
               >
-                <SmallWidthInput
-                  id="applicationBirthLateRegTarget"
-                  type="text"
-                  error={false}
-                  value={this.state.birthLateRegistrationTarget}
-                  onChange={this.setBirthLateRegistrationTarget}
-                />
-                <Text>
-                  {intl.formatMessage(messages.eventTargetInputLabel)}
-                </Text>
+                <InputContainer>
+                  <SmallWidthInput
+                    id="applicationBirthLateRegTarget"
+                    type="text"
+                    error={false}
+                    value={this.state.birthLateRegistrationTarget}
+                    onChange={this.setBirthLateRegistrationTarget}
+                  />
+                  <span>
+                    {intl.formatMessage(messages.eventTargetInputLabel)}
+                  </span>
+                </InputContainer>
               </InputField>
             </Field>
           </Content>
@@ -857,16 +856,18 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 touched={true}
                 required={false}
               >
-                <SmallWidthInput
-                  id="applicationDeathRegTarget"
-                  type="text"
-                  error={false}
-                  value={this.state.deathRegistrationTarget}
-                  onChange={this.setDeathRegistrationTarget}
-                />
-                <Text>
-                  {intl.formatMessage(messages.eventTargetInputLabel)}
-                </Text>
+                <InputContainer>
+                  <SmallWidthInput
+                    id="applicationDeathRegTarget"
+                    type="text"
+                    error={false}
+                    value={this.state.deathRegistrationTarget}
+                    onChange={this.setDeathRegistrationTarget}
+                  />
+                  <span>
+                    {intl.formatMessage(messages.eventTargetInputLabel)}
+                  </span>
+                </InputContainer>
               </InputField>
             </Field>
           </Content>
@@ -879,17 +880,16 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 touched={true}
                 required={false}
               >
-                <Text align="left">
-                  {getCurrency(offlineCountryConfiguration)}
-                </Text>
-                <HalfWidthInput
-                  id="applicationBirthOnTimeFee"
-                  type="text"
-                  topMargin={true}
-                  error={false}
-                  value={this.state.birthOnTimeFee}
-                  onChange={this.setBirthOnTimeFee}
-                />
+                <InputContainer>
+                  <span>{getCurrency(offlineCountryConfiguration)}</span>
+                  <HalfWidthInput
+                    id="applicationBirthOnTimeFee"
+                    type="text"
+                    error={false}
+                    value={this.state.birthOnTimeFee}
+                    onChange={this.setBirthOnTimeFee}
+                  />
+                </InputContainer>
               </InputField>
             </Field>
           </Content>
@@ -902,17 +902,16 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 touched={true}
                 required={false}
               >
-                <Text align="left">
-                  {getCurrency(offlineCountryConfiguration)}
-                </Text>
-                <HalfWidthInput
-                  id="applicationBirthLateFee"
-                  type="text"
-                  topMargin={true}
-                  error={false}
-                  value={this.state.birthLateFee}
-                  onChange={this.setBirthLateFee}
-                />
+                <InputContainer>
+                  <span>{getCurrency(offlineCountryConfiguration)}</span>
+                  <HalfWidthInput
+                    id="applicationBirthLateFee"
+                    type="text"
+                    error={false}
+                    value={this.state.birthLateFee}
+                    onChange={this.setBirthLateFee}
+                  />
+                </InputContainer>
               </InputField>
             </Field>
           </Content>
@@ -925,18 +924,16 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 touched={true}
                 required={false}
               >
-                <Text align="left">
-                  {getCurrency(offlineCountryConfiguration)}
-                </Text>
-
-                <HalfWidthInput
-                  id="applicationBirthDelayedFee"
-                  type="text"
-                  topMargin={true}
-                  error={false}
-                  value={this.state.birthDelayedFee}
-                  onChange={this.setBirthDelayedFee}
-                />
+                <InputContainer>
+                  <span>{getCurrency(offlineCountryConfiguration)}</span>
+                  <HalfWidthInput
+                    id="applicationBirthDelayedFee"
+                    type="text"
+                    error={false}
+                    value={this.state.birthDelayedFee}
+                    onChange={this.setBirthDelayedFee}
+                  />
+                </InputContainer>
               </InputField>
             </Field>
           </Content>
@@ -949,18 +946,16 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 touched={true}
                 required={false}
               >
-                <Text align="left">
-                  {getCurrency(offlineCountryConfiguration)}
-                </Text>
-
-                <HalfWidthInput
-                  id="applicationDeathOnTimeFee"
-                  type="text"
-                  topMargin={true}
-                  error={false}
-                  value={this.state.deathOnTimeFee}
-                  onChange={this.setDeathOnTimeFee}
-                />
+                <InputContainer>
+                  <span>{getCurrency(offlineCountryConfiguration)}</span>
+                  <HalfWidthInput
+                    id="applicationDeathOnTimeFee"
+                    type="text"
+                    error={false}
+                    value={this.state.deathOnTimeFee}
+                    onChange={this.setDeathOnTimeFee}
+                  />
+                </InputContainer>
               </InputField>
             </Field>
           </Content>
@@ -973,18 +968,16 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 touched={true}
                 required={false}
               >
-                <Text align="left">
-                  {getCurrency(offlineCountryConfiguration)}
-                </Text>
-
-                <HalfWidthInput
-                  id="applicationDeathDelayedFee"
-                  type="text"
-                  topMargin={true}
-                  error={false}
-                  value={this.state.deathDelayedFee}
-                  onChange={this.setDeathDelayedFee}
-                />
+                <InputContainer>
+                  <span>{getCurrency(offlineCountryConfiguration)}</span>
+                  <HalfWidthInput
+                    id="applicationDeathDelayedFee"
+                    type="text"
+                    error={false}
+                    value={this.state.deathDelayedFee}
+                    onChange={this.setDeathDelayedFee}
+                  />
+                </InputContainer>
               </InputField>
             </Field>
           </Content>

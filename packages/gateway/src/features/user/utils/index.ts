@@ -38,7 +38,7 @@ export const convertToLocal = (
 export async function getUser(
   body: { [key: string]: string | undefined },
   authHeader: IAuthHeader
-) {
+): Promise<IUserModelData> {
   const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
     method: 'POST',
     body: JSON.stringify(body),

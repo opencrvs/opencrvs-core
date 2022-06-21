@@ -576,7 +576,10 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
     const { intl, offlineCountryConfiguration } = this.props
 
     return (
-      <SysAdminContentWrapper isCertificatesConfigPage={true}>
+      <SysAdminContentWrapper
+        isCertificatesConfigPage={true}
+        hideBackground={true}
+      >
         <Content
           title={intl.formatMessage(messages.applicationSettings)}
           titleColor={'copy'}

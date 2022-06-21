@@ -120,10 +120,10 @@ function UserAuditActionModalComponent(
       hasFormError(props.form.fields, formValues, undefined, { formValues })
     ) {
       if (user && user.status === 'active') {
-        const auditAction = 'deactivating' as string
+        const auditAction = 'deactivating'
         setFormError(intl.formatMessage(messages.formError, { auditAction }))
       } else if (user && user.status === 'deactivated') {
-        const auditAction = 'reactivating' as string
+        const auditAction = 'reactivating'
         setFormError(intl.formatMessage(messages.formError, { auditAction }))
       }
     } else {
@@ -217,7 +217,8 @@ function UserAuditActionModalComponent(
       title={modalTitle}
       hideHeaderBoxShadow
       show={show}
-      fullscreen
+      width={920}
+      contentHeight={504}
       handleClose={onClose}
       responsive
       actions={actions}

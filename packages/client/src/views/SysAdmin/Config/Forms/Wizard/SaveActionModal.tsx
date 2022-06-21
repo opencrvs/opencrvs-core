@@ -19,13 +19,12 @@ import {
 } from '@client/views/SysAdmin/Config/Forms/utils'
 import { CREATE_FORM_DRAFT } from '@client/views/SysAdmin/Config/Forms/mutations'
 import { selectConfigFields } from '@client/forms/configuration/formConfig/selectors'
-import { Event } from '@client/forms'
-import { Mutation } from 'react-apollo'
 import {
-  GQLMutation,
-  GQLFormDraftInput
-} from '@opencrvs/gateway/src/graphql/schema'
-import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+  Event,
+  Mutation as GQLMutation,
+  CreateFormDraftMutationVariables
+} from '@client/utils/gateway'
+import { Mutation } from 'react-apollo'
 import {
   SecondaryButton,
   PrimaryButton
@@ -40,6 +39,7 @@ import { updateFormConfig } from '@client/forms/configuration/formConfig/actions
 import { generateModifiedQuestionConfigs } from '@client/forms/configuration/formConfig/utils'
 import { populateRegisterFormsWithAddresses } from '@client/forms/configuration/administrative/addresses'
 import { registerForms } from '@client/forms/configuration/default'
+import { questionsTransformer } from '@client/forms/questionConfig'
 
 export const SaveActionContext = React.createContext({
   status: ActionStatus.IDLE,
@@ -66,12 +66,12 @@ function SaveActionButton({ comment }: { comment: string }) {
   const dispatch = useDispatch()
 
   return (
-    <Mutation<GQLMutation, GQLFormDraftInput>
+    <Mutation<GQLMutation, CreateFormDraftMutationVariables>
       mutation={CREATE_FORM_DRAFT}
       onError={() => setStatus(ActionStatus.ERROR)}
       onCompleted={({ createFormDraft: formDraft }) => {
         if (formDraft) {
-          dispatch(updateFormConfig(formDraft as IFormDraft, questions))
+          dispatch(updateFormConfig(formDraft, questionsTransformer(questions)))
           setStatus(ActionStatus.COMPLETED)
           setTimeout(() => dispatch(goToFormConfigHome()), REDIRECT_DELAY)
         }
@@ -85,9 +85,9 @@ function SaveActionButton({ comment }: { comment: string }) {
             setStatus(ActionStatus.PROCESSING)
             createFormDraft({
               variables: {
-                event,
+                event: event as any,
                 comment,
-                questions
+                questions: questions as any
               }
             })
           }}

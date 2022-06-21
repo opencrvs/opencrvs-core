@@ -28,13 +28,12 @@ import {
   goToHomeTab
 } from '@client/navigation'
 import {
-  Event,
   IFormSection,
   IFormSectionData,
   IRadioGroupWithNestedFieldsFormField,
   ReviewSection
 } from '@client/forms'
-import { get, isEqual } from 'lodash'
+import { Event } from '@client/utils/gateway'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from '@client/components/form'
@@ -68,7 +67,7 @@ function getGroupWithVisibleFields(
   const event = declaration.event
   const group = section.groups[0]
   const field = group.fields[0] as IRadioGroupWithNestedFieldsFormField
-  if (event === Event.BIRTH) {
+  if (event === Event.Birth) {
     const declarationData = declaration.data
 
     const motherDataExists =
@@ -187,7 +186,7 @@ function CorrectorFormComponent(props: IFullProps) {
         <Content
           title={group.title && intl.formatMessage(group.title)}
           subtitle={
-            declaration.event === Event.BIRTH
+            declaration.event === Event.Birth
               ? intl.formatMessage(messages.birthCorrectionNote)
               : undefined
           }

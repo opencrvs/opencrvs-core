@@ -79,7 +79,8 @@ import {
   RADIO_GROUP_WITH_NESTED_FIELDS,
   Ii18nRadioGroupWithNestedFieldsFormField,
   LOCATION_SEARCH_INPUT,
-  Ii18nTextareaFormField
+  Ii18nTextareaFormField,
+  TEXT
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -94,7 +95,8 @@ import {
   WrappedComponentProps as IntlShapeProps,
   injectIntl,
   FormattedMessage,
-  MessageDescriptor
+  MessageDescriptor,
+  useIntl
 } from 'react-intl'
 import {
   withFormik,
@@ -118,6 +120,7 @@ import { isMobileDevice } from '@client/utils/commonUtils'
 import { generateLocations } from '@client/utils/locationUtils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { buttonMessages } from '@client/i18n/messages/buttons'
 
 const fadeIn = keyframes`
   from { opacity: 0; }
@@ -229,6 +232,7 @@ function GeneratedInputField({
     mode: fieldDefinition.mode
   }
 
+  const intl = useIntl()
   const inputProps = {
     id: fieldDefinition.name,
     onChange,
@@ -503,6 +507,7 @@ function GeneratedInputField({
     return (
       <InputField {...inputFieldProps}>
         <LocationSearchFormField
+          buttonLabel={intl.formatMessage(buttonMessages.search)}
           {...inputProps}
           selectedLocation={selectedLocation}
           locationList={fieldDefinition.locationList}
@@ -547,6 +552,36 @@ function GeneratedInputField({
   )
 }
 
+export function getInitialValueForSelectDynamicValue(
+  field: IFormField,
+  userDetails: IUserDetails | null
+) {
+  let fieldInitialValue = field.initialValue as IFormFieldValue
+  const catchmentAreas = userDetails?.catchmentArea
+  let district = ''
+  let state = ''
+
+  if (catchmentAreas) {
+    catchmentAreas.forEach((catchmentArea) => {
+      if (catchmentArea.identifier?.find(({ value }) => value === 'DISTRICT')) {
+        district = catchmentArea.id
+      } else if (
+        catchmentArea.identifier?.find(({ value }) => value === 'STATE')
+      ) {
+        state = catchmentArea.id
+      }
+    })
+  }
+
+  if (field.name.includes('district') && !field.initialValue && district) {
+    fieldInitialValue = district as IFormFieldValue
+  }
+  if (field.name.includes('state') && !field.initialValue && state) {
+    fieldInitialValue = state as IFormFieldValue
+  }
+  return fieldInitialValue
+}
+
 const mapFieldsToValues = (
   fields: IFormField[],
   userDetails: IUserDetails | null
@@ -576,30 +611,10 @@ const mapFieldsToValues = (
       !field.initialValue &&
       field.dynamicOptions.initialValue === 'agentDefault'
     ) {
-      const catchmentAreas = userDetails?.catchmentArea
-      let district = ''
-      let state = ''
-
-      if (catchmentAreas) {
-        catchmentAreas.forEach((catchmentArea) => {
-          if (
-            catchmentArea.identifier?.find(({ value }) => value === 'DISTRICT')
-          ) {
-            district = catchmentArea.id
-          } else if (
-            catchmentArea.identifier?.find(({ value }) => value === 'STATE')
-          ) {
-            state = catchmentArea.id
-          }
-        })
-      }
-
-      if (field.name.includes('district') && !field.initialValue && district) {
-        fieldInitialValue = district as IFormFieldValue
-      }
-      if (field.name.includes('state') && !field.initialValue && state) {
-        fieldInitialValue = state as IFormFieldValue
-      }
+      fieldInitialValue = getInitialValueForSelectDynamicValue(
+        field,
+        userDetails
+      )
     }
     return { ...memo, [field.name]: fieldInitialValue }
   }, {})
@@ -724,14 +739,17 @@ class FormSectionComponent extends React.Component<Props> {
 
   resetDependentSelectValues = (fieldName: string) => {
     const fields = this.props.fields
-    const fieldToReset = fields.find(
+    const fieldsToReset = fields.filter(
       (field) =>
-        field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
-        field.dynamicOptions.dependency === fieldName
+        (field.type === SELECT_WITH_DYNAMIC_OPTIONS &&
+          field.dynamicOptions.dependency === fieldName) ||
+        (field.type === TEXT && field.dependency === fieldName)
     )
-    if (fieldToReset) {
+
+    fieldsToReset.forEach((fieldToReset) => {
       this.props.setFieldValue(fieldToReset.name, '')
-    }
+      this.resetDependentSelectValues(fieldToReset.name)
+    })
   }
 
   resetNestedInputValues = (parentField: Ii18nFormField) => {

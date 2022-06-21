@@ -11,7 +11,7 @@
  */
 import { IReviewFormState } from '@client/forms/register/reviewReducer'
 import { IStoreState } from '@client/store'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 
 const getPartialState = (store: IStoreState): IReviewFormState =>
   store.reviewForm

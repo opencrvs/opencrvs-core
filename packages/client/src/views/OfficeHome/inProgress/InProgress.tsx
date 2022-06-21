@@ -59,7 +59,8 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { Action, Event } from '@client/forms'
+import { Action } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -208,47 +209,38 @@ export class InProgressComponent extends React.Component<
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
-      const downloadStatus =
-        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+      const downloadStatus = foundDeclaration?.downloadStatus
 
-      if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-          actions.push({
-            label: intl.formatMessage(buttonMessages.update),
-            handler: () => {},
-            disabled: true
-          })
-        }
+      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
         actions.push({
-          actionComponent: (
-            <DownloadButton
-              downloadConfigs={{
-                event: event as string,
-                compositionId: reg.id,
-                action: Action.LOAD_REVIEW_DECLARATION
-              }}
-              key={`DownloadButton-${index}`}
-              status={downloadStatus as DOWNLOAD_STATUS}
-            />
-          )
-        })
-      } else {
-        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-          actions.push({
-            label: intl.formatMessage(buttonMessages.update),
-            handler: () =>
+          label: intl.formatMessage(buttonMessages.update),
+          handler: () => {
+            if (downloadStatus === DOWNLOAD_STATUS.DOWNLOADED) {
               this.props.goToPage(
                 pageRoute,
                 regId,
                 'review',
                 (event && event.toLowerCase()) || ''
               )
-          })
-        }
-        actions.push({
-          actionComponent: <Downloaded />
+            }
+          },
+          disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
         })
       }
+      actions.push({
+        actionComponent: (
+          <DownloadButton
+            downloadConfigs={{
+              event: event as string,
+              compositionId: reg.id,
+              action: Action.LOAD_REVIEW_DECLARATION,
+              assignment: reg?.registration?.assignment
+            }}
+            key={`DownloadButton-${index}`}
+            status={downloadStatus}
+          />
+        )
+      })
       const NameComponent = name ? (
         <NameContainer
           id={`name_${index}`}
@@ -375,7 +367,7 @@ export class InProgressComponent extends React.Component<
           )) ||
         ''
       const eventTime =
-        draft.event === Event.BIRTH
+        draft.event === Event.Birth
           ? draft.data.child?.childBirthDate || ''
           : draft.data.deathEvent?.deathDate || ''
       const dateOfEvent = (eventTime && new Date(eventTime as string)) || ''

@@ -18,7 +18,7 @@ import {
   filterProcessingDeclarations,
   filterProcessingDeclarationsFromQuery
 } from '.'
-import { Event } from '@client/forms'
+import { Event } from '@client/utils/gateway'
 import { AppStore, createStore } from '@client/store'
 import { mockDeclarationData, flushPromises } from '@client/tests/util'
 import { IUserDetails } from '@client/utils/userUtils'
@@ -243,13 +243,13 @@ describe('Utilty functions', () => {
       {
         id: '1',
         data: {},
-        event: Event.BIRTH,
+        event: Event.Birth,
         compositionId: '1'
       },
       {
         id: '2',
         data: {},
-        event: Event.DEATH,
+        event: Event.Death,
         compositionId: '2'
       }
     ]
@@ -270,7 +270,7 @@ describe('Utilty functions', () => {
 
 describe('archiveDeclaration tests', () => {
   let store: AppStore
-  const declaration = createDeclaration(Event.BIRTH, mockDeclarationData)
+  const declaration = createDeclaration(Event.Birth, mockDeclarationData)
   let indexedDB: { USER_DATA: string; USER_DETAILS: string }
 
   beforeEach(() => {

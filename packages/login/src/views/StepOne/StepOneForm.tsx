@@ -37,7 +37,10 @@ import {
 } from '@login/utils/authUtils'
 import { goToForgottenItemForm } from '@login/login/actions'
 import { useSelector } from 'react-redux'
-import { selectCountryLogo } from '@login/login/selectors'
+import {
+  selectApplicationName,
+  selectCountryLogo
+} from '@login/login/selectors'
 
 export const Container = styled.div`
   position: relative;
@@ -211,6 +214,11 @@ export function StepOneForm({
   /* This might need to be converted into a state */
   const isOffline: boolean = navigator.onLine ? false : true
   const logo = useSelector(selectCountryLogo)
+  const appName = useSelector(selectApplicationName)
+
+  React.useEffect(() => {
+    if (appName) document.title = appName
+  }, [appName])
 
   return (
     <Container id="login-step-one-box">

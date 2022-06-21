@@ -45,7 +45,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
     submissionStatus: string,
     action: string,
     payload?: IPayload,
-    downloadStatus?: string
+    downloadStatus?: DOWNLOAD_STATUS
   ) => void
   rejectDeclarationAction?: () => void
 }

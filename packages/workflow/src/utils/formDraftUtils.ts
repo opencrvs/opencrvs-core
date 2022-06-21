@@ -17,8 +17,7 @@ import { setupTestExtension } from '@workflow/features/registration/fhir/fhir-bu
 export enum DraftStatus {
   DRAFT = 'DRAFT',
   IN_PREVIEW = 'IN_PREVIEW',
-  PUBLISHED = 'PUBLISHED',
-  DELETED = 'DELETED'
+  PUBLISHED = 'PUBLISHED'
 }
 
 export interface IDraft {
@@ -46,9 +45,12 @@ export async function checkFormDraftStatusToAddTestExtension(
   token: string
 ) {
   const formDraft: IDraft[] = await getFormDraft(token)
-  const isPublished = Object.values(formDraft).every(
-    (draft) => draft.status === DraftStatus.PUBLISHED
-  )
+  // Array.prototype.every returns true for an empty array
+  const isPublished =
+    formDraft.length > 0 &&
+    Object.values(formDraft).every(
+      (draft) => draft.status === DraftStatus.PUBLISHED
+    )
 
   if (!isPublished) {
     setupTestExtension(taskResource)

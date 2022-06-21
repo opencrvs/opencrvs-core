@@ -12,11 +12,8 @@
 import React from 'react'
 import { MockedResponse } from 'react-apollo/test-links'
 import { CHANGE_FORM_DRAFT_STATUS } from '@client/views/SysAdmin/Config/Forms/mutations'
-import {
-  DraftStatus,
-  IFormDraft
-} from '@client/forms/configuration/formDrafts/utils'
-import { Event } from '@client/forms'
+import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
+import { DraftStatus, Event } from '@client/utils/gateway'
 import {
   ActionState,
   ActionContext,
@@ -30,8 +27,8 @@ import { ReactWrapper } from 'enzyme'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 
 const inPreviewDraft: IFormDraft = {
-  event: Event.BIRTH,
-  status: DraftStatus.PREVIEW,
+  event: Event.Birth,
+  status: DraftStatus.InPreview,
   version: 1,
   history: [],
   updatedAt: Date.now(),
@@ -43,8 +40,8 @@ const graphqlMocks: MockedResponse[] = [
     request: {
       query: CHANGE_FORM_DRAFT_STATUS,
       variables: {
-        status: DraftStatus.PREVIEW,
-        event: Event.BIRTH
+        status: DraftStatus.InPreview,
+        event: Event.Birth
       }
     },
     result: {
@@ -63,7 +60,7 @@ function WrappedActionsModal() {
     }),
     {
       action: Actions.PREVIEW,
-      event: Event.BIRTH,
+      event: Event.Birth,
       status: ActionStatus.MODAL
     }
   )
@@ -100,7 +97,7 @@ describe('ActionsModal', () => {
     component.find('#status-change-btn').hostNodes().simulate('click')
     await flushPromises()
     expect(store.getState().formConfig.birth?.formDraft.status).toBe(
-      DraftStatus.PREVIEW
+      DraftStatus.InPreview
     )
   })
 })

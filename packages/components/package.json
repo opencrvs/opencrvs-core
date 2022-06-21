@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/components",
-  "version": "1.0.0-alpha.3.2",
+  "version": "1.0.0",
   "description": "OpenCRVS UI Component library",
   "license": "MPL-2.0",
   "private": true,
@@ -22,7 +22,8 @@
     "ts-jest": "26.4.4",
     "tslint": "^5.7.0",
     "tslint-config-prettier": "^1.10.0",
-    "tslint-react": "^3.2.0"
+    "tslint-react": "^3.2.0",
+    "webfontloader": "^1.6.28"
   },
   "scripts": {
     "precommit": "lint-staged",
@@ -60,6 +61,7 @@
     "@types/react-tooltip": "^4.2.4",
     "@types/recharts": "^1.1.1",
     "@types/styled-components": "^5.1.3",
+    "@types/webfontloader": "^1.6.34",
     "concurrently": "^3.5.1",
     "dotenv": "^6.1.0",
     "lint-staged": "^7.1.0",

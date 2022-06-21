@@ -367,10 +367,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                       />
                     </HeaderMenuHolder>
                   }
-                  profilePageStyle={{
-                    paddingTopMd: 24,
-                    horizontalPaddingMd: 24
-                  }}
+                  hideBackground={true}
                 >
                   <ContentWrapper>
                     <UserAvatar name={user.name} avatar={user.avatar} />
@@ -383,9 +380,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                         <LinkButtonWithoutSpacing
                           id="office-link"
                           onClick={() =>
-                            this.props.goToTeamUserList(
-                              user.primaryOffice as ISearchLocation
-                            )
+                            this.props.goToTeamUserList(user.primaryOffice!.id)
                           }
                         >
                           {user.primaryOffice &&

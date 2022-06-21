@@ -141,7 +141,6 @@ type Query {
   ): [Role]
   getCertificateSVG(status: String, event: String): CertificateSVG
   getActiveCertificatesSVG: [CertificateSVG]
-  getQuestions: [Question]
   getFormDraft: [FormDraft!]
 }
 
@@ -184,6 +183,7 @@ type Mutation {
     id: ID!
     details: DeathRegistrationInput!
   ): ID!
+  markEventAsUnassigned(id: String!): ID!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -215,9 +215,9 @@ type Mutation {
   updateApplicationConfig(
     applicationConfig: ApplicationConfigurationInput
   ): ApplicationConfiguration
-  createOrUpdateQuestion(question: QuestionInput!): Question
   createFormDraft(formDraft: FormDraftInput!): FormDraft
-  modifyDraftStatus(formDraft: FormDraftStatusModify!): FormDraft
+  modifyDraftStatus(formDraft: FormDraftStatusModifyInput!): FormDraft
+  deleteFormDraft(formDraft: DeleteFormDraftInput!): String
 }
 
 type Dummy {
@@ -478,31 +478,13 @@ type CertificateSVG {
   status: String!
 }
 
-type Question {
-  _id: ID!
-  fieldId: String!
-  label: [Messsage!]
-  placeholder: [Messsage!]
-  description: [Messsage!]
-  tooltip: [Messsage!]
-  errorMessage: [Messsage!]
-  maxLength: Int
-  fieldName: String
-  fieldType: String
-  preceedingFieldId: String
-  required: Boolean
-  enabled: String
-  custom: Boolean
-  initialValue: String
-}
-
 type FormDraft {
-  _id: ID
-  event: String!
-  status: String!
-  comment: String
+  _id: ID!
+  event: Event!
+  status: DraftStatus!
+  comment: String!
   version: Int!
-  history: [DraftHistory!]
+  history: [DraftHistory!]!
   updatedAt: Date!
   createdAt: Date!
 }
@@ -660,33 +642,19 @@ input ApplicationConfigurationInput {
   ADDRESSES: Int
 }
 
-input QuestionInput {
-  id: ID
-  fieldId: String!
-  label: [MesssageInput!]
-  placeholder: [MesssageInput!]
-  description: [MesssageInput!]
-  tooltip: [MesssageInput!]
-  errorMessage: [MesssageInput!]
-  maxLength: Int
-  fieldName: String
-  fieldType: String
-  preceedingFieldId: String
-  required: Boolean
-  enabled: String
-  custom: Boolean
-  initialValue: String
-}
-
 input FormDraftInput {
   questions: [QuestionInput!]!
-  event: String!
+  event: Event!
   comment: String!
 }
 
-input FormDraftStatusModify {
-  event: String!
-  status: String!
+input FormDraftStatusModifyInput {
+  event: Event!
+  status: DraftStatus!
+}
+
+input DeleteFormDraftInput {
+  event: Event!
 }
 
 scalar Map
@@ -959,17 +927,23 @@ type EventProgressSet {
   progressReport: EventProgressData
 }
 
-type Messsage {
-  lang: String!
-  descriptor: MesssageDescriptor!
+enum Event {
+  birth
+  death
+}
+
+enum DraftStatus {
+  DRAFT
+  IN_PREVIEW
+  PUBLISHED
 }
 
 type DraftHistory {
-  _id: ID
-  version: Int
-  status: String
-  comment: String
-  updatedAt: Date
+  _id: ID!
+  version: Int!
+  status: DraftStatus!
+  comment: String!
+  updatedAt: Date!
 }
 
 input PersonInput {
@@ -1125,9 +1099,20 @@ input DeathInput {
   FEE: DeathFeeInput
 }
 
-input MesssageInput {
-  lang: String!
-  descriptor: MesssageDescriptorInput!
+input QuestionInput {
+  fieldId: String!
+  label: [MesssageInput!]
+  placeholder: [MesssageInput!]
+  description: [MesssageInput!]
+  tooltip: [MesssageInput!]
+  errorMessage: [MesssageInput!]
+  maxLength: Int
+  fieldName: String
+  fieldType: CustomFieldType
+  precedingFieldId: String!
+  required: Boolean
+  enabled: String
+  custom: Boolean
 }
 
 enum InformantType {
@@ -1263,6 +1248,7 @@ type RegistrationSearchSet {
   duplicates: [ID]
   createdAt: String
   modifiedAt: String
+  assignment: AssignmentData
 }
 
 type BirthEventSearchSet implements EventSearchSet {
@@ -1288,12 +1274,6 @@ type EventProgressData {
   timeInWaitingForApproval: Int
   timeInWaitingForBRIS: Int
   timeInReadyToPrint: Int
-}
-
-type MesssageDescriptor {
-  id: String!
-  description: String!
-  defaultMessage: String!
 }
 
 input IdentityInput {
@@ -1392,10 +1372,18 @@ input DeathFeeInput {
   DELAYED: Float
 }
 
-input MesssageDescriptorInput {
-  id: String!
-  description: String
-  defaultMessage: String!
+input MesssageInput {
+  lang: String!
+  descriptor: MesssageDescriptorInput!
+}
+
+enum CustomFieldType {
+  TEXT
+  TEL
+  TEXTAREA
+  NUMBER
+  SUBSECTION
+  PARAGRAPH
 }
 
 type Payment {
@@ -1405,6 +1393,13 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
+}
+
+type AssignmentData {
+  userId: String
+  firstName: String
+  lastName: String
+  officeName: String
 }
 
 input CommentInput {
@@ -1428,6 +1423,12 @@ input CorrectionValueInput {
   fieldName: String
   oldValue: String
   newValue: String
+}
+
+input MesssageDescriptorInput {
+  id: String!
+  description: String
+  defaultMessage: String!
 }
 
 enum PaymentType {
