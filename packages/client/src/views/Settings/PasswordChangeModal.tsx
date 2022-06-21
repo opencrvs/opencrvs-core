@@ -80,10 +80,12 @@ const ValidationRulesSectionLg = styled.div`
   }
 `
 const PasswordMatch = styled.div`
+  ${({ theme }) => theme.fonts.bold16};
   color: ${({ theme }) => theme.colors.positive};
   margin-top: 8px;
 `
 const PasswordMismatch = styled.div`
+  ${({ theme }) => theme.fonts.bold16};
   color: ${({ theme }) => theme.colors.negative};
   margin-top: 8px;
 `
@@ -232,7 +234,7 @@ class PasswordChangeModalComp extends React.Component<IFullProps, State> {
         id="ChangePasswordModal"
         title={intl.formatMessage(messages.changePassword)}
         show={showPasswordChange}
-        fullscreen
+        contentHeight={420}
         actions={[
           <Mutation
             mutation={changePasswordMutation}
