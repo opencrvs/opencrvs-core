@@ -87,6 +87,8 @@ import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { getRegisteringOfficeId } from '@client/utils/draftUtils'
 
 const ErrorWrapper = styled.div`
   margin-top: -3px;
@@ -529,6 +531,9 @@ const mapStateToProps = (
   ) as IPrintableDeclaration | undefined
 
   const formSection = getCollectCertificateForm(event, state)
+  const userDetails = getUserDetails(state)
+  const userOfficeId = userDetails?.primaryOffice?.id
+  const registeringOfficeId = getRegisteringOfficeId(declaration)
   const clonedFormSection = cloneDeep(formSection)
   if (event === Event.Birth && groupId === 'certCollector') {
     const declarationData = declaration && declaration.data
@@ -577,6 +582,21 @@ const mapStateToProps = (
     clonedFormSection.groups.find((group) => group.id === groupId) ||
     clonedFormSection.groups[0]
 
+  /**
+   * As the field defintions are hard-coded in core, finding
+   * by field name, option values are supposed to be fine
+   */
+  const collectorField = formGroup.fields.find(({ name }) => name === 'type')
+  if (collectorField && collectorField.type === 'RADIO_GROUP') {
+    const isDifferentOffice =
+      userOfficeId &&
+      registeringOfficeId &&
+      userOfficeId !== registeringOfficeId
+    collectorField.options = collectorField.options.map((opt) => ({
+      ...opt,
+      disabled: opt.value === 'PRINT_IN_ADVANCE' && isDifferentOffice
+    }))
+  }
   const fields = replaceInitialValues(
     formGroup.fields,
     (declaration &&

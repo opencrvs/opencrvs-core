@@ -80,14 +80,7 @@ export const REJECT_BIRTH_DECLARATION = gql`
     markEventAsVoided(id: $id, reason: $reason, comment: $comment)
   }
 `
-export const REINSTATE_BIRTH_DECLARATION = gql`
-  mutation markEventAsReinstated($id: String!) {
-    markEventAsReinstated(id: $id) {
-      taskEntryResourceID
-      registrationStatus
-    }
-  }
-`
+
 export const ARCHIVE_BIRTH_DECLARATION = gql`
   mutation markEventAsArchived($id: String!) {
     markEventAsArchived(id: $id)
@@ -155,14 +148,6 @@ export function getBirthMutationMappings(
           ...payload
         },
         dataKey: 'markEventAsVoided'
-      }
-    case Action.REINSTATE_DECLARATION:
-      return {
-        mutation: REINSTATE_BIRTH_DECLARATION,
-        variables: {
-          ...payload
-        },
-        dataKey: 'markDeclarationAsReinstate'
       }
     case Action.ARCHIVE_DECLARATION:
       return {

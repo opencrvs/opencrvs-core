@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  printMoneyReceipt,
-  previewCertificate
-} from '@client/views/PrintCertificate/PDFUtils'
+import { previewCertificate } from '@client/views/PrintCertificate/PDFUtils'
 import {
   mockDeclarationData,
   userDetails,
@@ -28,65 +25,6 @@ const intl = createIntl({
 })
 
 describe('PDFUtils related tests', () => {
-  it('Print from money receipt template for birth event', () => {
-    expect(() =>
-      printMoneyReceipt(
-        intl,
-        {
-          id: 'asdhdqe2472487jsdfsdf',
-          data: mockDeclarationData,
-          event: Event.Birth
-        },
-        userDetails,
-        mockOfflineData
-      )
-    ).not.toThrowError()
-  })
-  it('Print from money receipt template for death event', () => {
-    expect(() =>
-      printMoneyReceipt(
-        intl,
-        {
-          id: 'asdhdqe2472487jsdfsdf',
-          data: mockDeathDeclarationData,
-          event: Event.Death
-        },
-        userDetails,
-        mockOfflineData
-      )
-    ).not.toThrowError()
-  })
-  it('Print money reciept function will throws exception if invalid userDetails found', () => {
-    const deathDeclaration = omit(mockDeathDeclarationData, 'deathEvent')
-    expect(() =>
-      printMoneyReceipt(
-        intl,
-        {
-          id: 'asdhdqe2472487jsdfsdf',
-          data: deathDeclaration,
-          event: Event.Death
-        },
-        null,
-        mockOfflineData
-      )
-    ).toThrowError('No user details found')
-  })
-  it('Print money reciept function will throws exception if receipt template is not present', () => {
-    const faultyOfflineData = cloneDeep(mockOfflineData)
-    faultyOfflineData.templates.receipt = null
-    expect(() =>
-      printMoneyReceipt(
-        intl,
-        {
-          id: 'asdhdqe2472487jsdfsdf',
-          data: mockDeathDeclarationData,
-          event: Event.Death
-        },
-        userDetails,
-        faultyOfflineData
-      )
-    ).toThrowError('Money reciept template is misssing in offline data')
-  })
   it('Throws exception if invalid userDetails found for previewCertificate', () => {
     const deathDeclaration = omit(mockDeathDeclarationData, 'deathEvent')
     expect(

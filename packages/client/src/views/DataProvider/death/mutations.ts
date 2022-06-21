@@ -80,14 +80,7 @@ export const REJECT_DEATH_DECLARATION = gql`
     markEventAsVoided(id: $id, reason: $reason, comment: $comment)
   }
 `
-export const REINSTATE_DEATH_DECLARATION = gql`
-  mutation markEventAsReinstated($id: String!) {
-    markEventAsReinstated(id: $id) {
-      taskEntryResourceID
-      registrationStatus
-    }
-  }
-`
+
 export const ARCHIVE_DEATH_DECLARATION = gql`
   mutation markEventAsArchived($id: String!) {
     markEventAsArchived(id: $id)
@@ -149,14 +142,6 @@ export function getDeathMutationMappings(
           ...payload
         },
         dataKey: 'markEventAsVoided'
-      }
-    case Action.REINSTATE_DECLARATION:
-      return {
-        mutation: REINSTATE_DEATH_DECLARATION,
-        variables: {
-          ...payload
-        },
-        dataKey: 'markDeclarationAsReinstate'
       }
     case Action.ARCHIVE_DECLARATION:
       return {
