@@ -85,9 +85,9 @@ function SaveActionButton({ comment }: { comment: string }) {
             setStatus(ActionStatus.PROCESSING)
             createFormDraft({
               variables: {
-                event: event as any,
+                event: event,
                 comment,
-                questions: questions as any
+                questions: questions
               }
             })
           }}

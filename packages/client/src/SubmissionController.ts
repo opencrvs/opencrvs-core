@@ -85,7 +85,6 @@ const ACTION_LIST: IActionList = {
   [Action.COLLECT_CERTIFICATE]: Action.COLLECT_CERTIFICATE,
   [Action.REQUEST_CORRECTION_DECLARATION]:
     Action.REQUEST_CORRECTION_DECLARATION,
-  [Action.REINSTATE_DECLARATION]: Action.REINSTATE_DECLARATION,
   [Action.COLLECT_CERTIFICATE]: Action.COLLECT_CERTIFICATE,
   [Action.ARCHIVE_DECLARATION]: Action.ARCHIVE_DECLARATION
 }
@@ -95,7 +94,6 @@ const REQUEST_IN_PROGRESS_STATUS: IActionList = {
   [Action.REGISTER_DECLARATION]: SUBMISSION_STATUS.REGISTERING,
   [Action.REJECT_DECLARATION]: SUBMISSION_STATUS.REJECTING,
   [Action.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVING,
-  [Action.REINSTATE_DECLARATION]: SUBMISSION_STATUS.REINSTATING,
   [Action.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFYING,
   [Action.REQUEST_CORRECTION_DECLARATION]:
     SUBMISSION_STATUS.REQUESTING_CORRECTION
@@ -103,7 +101,6 @@ const REQUEST_IN_PROGRESS_STATUS: IActionList = {
 const SUCCESS_SUBMISSION_STATUS: IActionList = {
   [Action.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTED,
   [Action.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVED,
-  [Action.REINSTATE_DECLARATION]: SUBMISSION_STATUS.REINSTATED,
   [Action.APPROVE_DECLARATION]: SUBMISSION_STATUS.APPROVED,
   [Action.REGISTER_DECLARATION]: SUBMISSION_STATUS.REGISTERED,
   [Action.REJECT_DECLARATION]: SUBMISSION_STATUS.REJECTED,
@@ -243,11 +240,6 @@ export class SubmissionController {
 
     declaration.submissionStatus = submissionStatus
 
-    if (declaration.action === Action.REINSTATE_DECLARATION) {
-      declaration.submissionStatus = ''
-      declaration.registrationStatus =
-        result.data.markEventAsReinstated.registrationStatus
-    }
     const response =
       (result && result.data && result.data.createBirthRegistration) ||
       (result && result.data && result.data.createDeathRegistration) ||
