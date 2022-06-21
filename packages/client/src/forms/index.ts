@@ -451,6 +451,7 @@ export interface IFormFieldBase {
   ignoreBottomMargin?: boolean
   customisable?: boolean
   customQuesstionMappingId?: string
+  ignoreMediaQuery?: boolean
 }
 
 export interface ISelectFormFieldWithOptions extends IFormFieldBase {
@@ -991,6 +992,7 @@ export interface Ii18nFormFieldBase {
   hidden?: boolean
   nestedFields?: { [key: string]: Ii18nFormField[] }
   ignoreBottomMargin?: boolean
+  ignoreMediaQuery?: boolean
 }
 
 export interface Ii18nSelectFormField extends Ii18nFormFieldBase {

@@ -229,7 +229,8 @@ function GeneratedInputField({
     hideInputHeader: fieldDefinition.hideHeader,
     error,
     touched,
-    mode: fieldDefinition.mode
+    mode: fieldDefinition.mode,
+    ignoreMediaQuery: fieldDefinition.ignoreMediaQuery
   }
 
   const intl = useIntl()
