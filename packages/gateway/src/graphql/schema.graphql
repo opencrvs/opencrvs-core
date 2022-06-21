@@ -670,6 +670,7 @@ type Registration {
   book: String
   informantType: InformantType
   otherInformantType: String
+  assignment: AssignmentData
   contact: String
   contactRelationship: String
   contactPhoneNumber: String
@@ -1135,6 +1136,13 @@ enum InformantType {
   OTHER
 }
 
+type AssignmentData {
+  userId: String
+  firstName: String
+  lastName: String
+  officeName: String
+}
+
 type RegWorkflow {
   id: ID!
   type: RegStatus
@@ -1393,13 +1401,6 @@ type Payment {
   amount: Float
   outcome: PaymentOutcomeType
   date: Date
-}
-
-type AssignmentData {
-  userId: String
-  firstName: String
-  lastName: String
-  officeName: String
 }
 
 input CommentInput {

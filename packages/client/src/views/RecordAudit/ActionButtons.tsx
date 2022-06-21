@@ -36,6 +36,8 @@ import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IDeclarationData } from './utils'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
+import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 
 export type CMethodParams = {
   declaration: IDeclarationData
@@ -62,19 +64,26 @@ export const ShowDownloadButton = ({
   if (declaration === null || id === null || type === null) return <></>
 
   const downloadStatus = draft?.downloadStatus || undefined
-
+  let refetchQueries: RefetchQueryDescription = []
   if (
     userDetails?.role === 'FIELD_AGENT' &&
     draft?.submissionStatus === SUBMISSION_STATUS.DECLARED
   )
     return <></>
+
+  if (declaration.status === 'IN_PROGRESS') {
+    refetchQueries = [
+      { query: FETCH_DECLARATION_SHORT_INFO, variables: { id: declaration.id } }
+    ]
+  }
   if (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT) {
     const downLoadConfig = {
       event: type as string,
       compositionId: id,
       action: Action.LOAD_REVIEW_DECLARATION,
       assignment: declaration?.assignment,
-      declarationStatus: declaration.status
+      declarationStatus: declaration.status,
+      refetchQueries
     }
     return (
       <DownloadButton

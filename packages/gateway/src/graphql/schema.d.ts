@@ -546,6 +546,7 @@ export interface GQLRegistration {
   book?: string
   informantType?: GQLInformantType
   otherInformantType?: string
+  assignment?: GQLAssignmentData
   contact?: string
   contactRelationship?: string
   contactPhoneNumber?: string
@@ -1022,6 +1023,13 @@ export const enum GQLInformantType {
   OTHER = 'OTHER'
 }
 
+export interface GQLAssignmentData {
+  userId?: string
+  firstName?: string
+  lastName?: string
+  officeName?: string
+}
+
 export interface GQLRegWorkflow {
   id: string
   type?: GQLRegStatus
@@ -1282,13 +1290,6 @@ export interface GQLPayment {
   date?: GQLDate
 }
 
-export interface GQLAssignmentData {
-  userId?: string
-  firstName?: string
-  lastName?: string
-  officeName?: string
-}
-
 export interface GQLCommentInput {
   user?: GQLUserInput
   comment?: string
@@ -1406,6 +1407,7 @@ export interface GQLResolver {
   CountryLogo?: GQLCountryLogoTypeResolver
   Currency?: GQLCurrencyTypeResolver
   Death?: GQLDeathTypeResolver
+  AssignmentData?: GQLAssignmentDataTypeResolver
   RegWorkflow?: GQLRegWorkflowTypeResolver
   Certificate?: GQLCertificateTypeResolver
   StatusReason?: GQLStatusReasonTypeResolver
@@ -1418,7 +1420,6 @@ export interface GQLResolver {
   BirthFee?: GQLBirthFeeTypeResolver
   DeathFee?: GQLDeathFeeTypeResolver
   Payment?: GQLPaymentTypeResolver
-  AssignmentData?: GQLAssignmentDataTypeResolver
 }
 export interface GQLQueryTypeResolver<TParent = any> {
   listNotifications?: QueryToListNotificationsResolver<TParent>
@@ -4007,6 +4008,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   book?: RegistrationToBookResolver<TParent>
   informantType?: RegistrationToInformantTypeResolver<TParent>
   otherInformantType?: RegistrationToOtherInformantTypeResolver<TParent>
+  assignment?: RegistrationToAssignmentResolver<TParent>
   contact?: RegistrationToContactResolver<TParent>
   contactRelationship?: RegistrationToContactRelationshipResolver<TParent>
   contactPhoneNumber?: RegistrationToContactPhoneNumberResolver<TParent>
@@ -4067,6 +4069,13 @@ export interface RegistrationToInformantTypeResolver<
 }
 
 export interface RegistrationToOtherInformantTypeResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToAssignmentResolver<
   TParent = any,
   TResult = any
 > {
@@ -4938,6 +4947,38 @@ export interface DeathToFEEResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
+export interface GQLAssignmentDataTypeResolver<TParent = any> {
+  userId?: AssignmentDataToUserIdResolver<TParent>
+  firstName?: AssignmentDataToFirstNameResolver<TParent>
+  lastName?: AssignmentDataToLastNameResolver<TParent>
+  officeName?: AssignmentDataToOfficeNameResolver<TParent>
+}
+
+export interface AssignmentDataToUserIdResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AssignmentDataToFirstNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AssignmentDataToLastNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface AssignmentDataToOfficeNameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
 export interface GQLRegWorkflowTypeResolver<TParent = any> {
   id?: RegWorkflowToIdResolver<TParent>
   type?: RegWorkflowToTypeResolver<TParent>
@@ -5371,37 +5412,5 @@ export interface PaymentToOutcomeResolver<TParent = any, TResult = any> {
 }
 
 export interface PaymentToDateResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface GQLAssignmentDataTypeResolver<TParent = any> {
-  userId?: AssignmentDataToUserIdResolver<TParent>
-  firstName?: AssignmentDataToFirstNameResolver<TParent>
-  lastName?: AssignmentDataToLastNameResolver<TParent>
-  officeName?: AssignmentDataToOfficeNameResolver<TParent>
-}
-
-export interface AssignmentDataToUserIdResolver<TParent = any, TResult = any> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface AssignmentDataToFirstNameResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface AssignmentDataToLastNameResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface AssignmentDataToOfficeNameResolver<
-  TParent = any,
-  TResult = any
-> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
