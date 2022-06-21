@@ -72,7 +72,6 @@ const STORE_DECLARATION = 'DECLARATION/STORE_DECLARATION'
 const MODIFY_DECLARATION = 'DECLARATION/MODIFY_DRAFT'
 const WRITE_DECLARATION = 'DECLARATION/WRITE_DRAFT'
 const DELETE_DECLARATION = 'DECLARATION/DELETE_DRAFT'
-const REINSTATE_DECLARATION = 'DECLARATION/REINSTATE_DECLARATION'
 const GET_DECLARATIONS_SUCCESS = 'DECLARATION/GET_DRAFTS_SUCCESS'
 const GET_DECLARATIONS_FAILED = 'DECLARATION/GET_DRAFTS_FAILED'
 const GET_WORKQUEUE_SUCCESS = 'DECLARATION/GET_WORKQUEUE_SUCCESS'
@@ -330,12 +329,6 @@ interface IDeleteDeclarationAction {
     declaration: IDeclaration | IPrintableDeclaration
   } & OnSuccessDeleteDeclarationOptions
 }
-interface IReinstateDeclarationAction {
-  type: typeof REINSTATE_DECLARATION
-  payload: {
-    declarationId: string
-  }
-}
 
 interface IGetStorageDeclarationsSuccessAction {
   type: typeof GET_DECLARATIONS_SUCCESS
@@ -445,7 +438,6 @@ export type Action =
   | IWriteDeclarationAction
   | NavigationAction
   | IDeleteDeclarationAction
-  | IReinstateDeclarationAction
   | IGetStorageDeclarationsSuccessAction
   | IGetStorageDeclarationsFailedAction
   | IGetWorkqueueOfCurrentUserSuccessAction
@@ -607,12 +599,6 @@ export function archiveDeclaration(
   declarationId: string
 ): IArchiveDeclarationAction {
   return { type: ARCHIVE_DECLARATION, payload: { declarationId } }
-}
-
-export function reinstateDeclaration(
-  declarationId: string
-): IReinstateDeclarationAction {
-  return { type: REINSTATE_DECLARATION, payload: { declarationId } }
 }
 
 export function deleteDeclaration(
@@ -1364,25 +1350,6 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         }
       }
       return loop(state, Cmd.action(modifyDeclaration(modifiedDeclaration)))
-    }
-    case REINSTATE_DECLARATION: {
-      if (action.payload) {
-        const declaration = state.declarations.find(
-          ({ id }) => id === action.payload.declarationId
-        )
-
-        if (!declaration) {
-          return state
-        }
-        const modifiedDeclaration: IDeclaration = {
-          ...declaration,
-          submissionStatus: SUBMISSION_STATUS.READY_TO_REINSTATE,
-          action: DeclarationAction.REINSTATE_DECLARATION,
-          payload: { id: declaration.id }
-        }
-        return loop(state, Cmd.action(writeDeclaration(modifiedDeclaration)))
-      }
-      return state
     }
     case STORE_DECLARATION:
       return {
