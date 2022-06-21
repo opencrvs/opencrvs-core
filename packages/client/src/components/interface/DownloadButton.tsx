@@ -149,7 +149,10 @@ function getAssignModalOptions(
       actions: [cancelAction, unassignAction]
     }
   } else if (assignment) {
-    if (userRole === ROLE_LOCAL_REGISTRAR) {
+    if (
+      userRole === Roles.LOCAL_REGISTRAR ||
+      userRole === Roles.NATIONAL_REGISTRAR
+    ) {
       return {
         title: conflictsMessages.unassignTitle,
         content: conflictsMessages.regUnassignDesc,
