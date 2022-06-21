@@ -10,52 +10,16 @@
 version: '3.3'
 
 services:
-  gateway:
-    environment:
-      - NODE_ENV=production
-      - QA_ENV=true
-
-  workflow:
-    environment:
-      - NODE_ENV=production
-      - QA_ENV=true
-
-  search:
-    environment:
-      - NODE_ENV=production
-      - QA_ENV=true
-
-  metrics:
-    environment:
-      - NODE_ENV=production
-      - QA_ENV=true
-
-  auth:
-    environment:
-      - NODE_ENV=production
-      - QA_ENV=true
-
   user-mgnt:
     environment:
-      - NODE_ENV=production
-      - QA_ENV=true
       - MONGO_URL=mongodb://user-mgnt:${USER_MGNT_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/user-mgnt?replicaSet=rs0
-
-  notification:
-    environment:
-      - NODE_ENV=production
-      - QA_ENV=true
 
   webhooks:
     environment:
       - MONGO_URL=mongodb://webhooks:${WEBHOOKS_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/webhooks?replicaSet=rs0
-      - NODE_ENV=production
-      - QA_ENV=true
 
   config:
     environment:
-      - NODE_ENV=production
-      - QA_ENV=true
       - MONGO_URL=mongodb://config:${CONFIG_MONGODB_PASSWORD}@mongo1,mongo2,mongo3/application-config?replicaSet=rs0
 
   hearth:

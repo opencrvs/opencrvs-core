@@ -115,7 +115,7 @@ Ilanga District in Sulaka Province is meant to demonstrate a provincial district
 
 ### Field Agent
 
-A Social Worker in the capital city:
+A Social Worker in an urban district:
 
 Username: **kalusha.bwalya** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
 
@@ -143,15 +143,21 @@ Username: **alex.ngonga** / Password: **test** / SMS code: **000000** / Office: 
 
 ### National System Admin
 
-Username: **jonathan.campbell** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+Based in the country HQ Office:
+
+Username: **jonathan.campbell** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Isamba District, Central Province**
 
 ### National Registrar
 
-Username: **joseph.musonda** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+Based in the country HQ Office:
+
+Username: **joseph.musonda** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Isamba District, Central Province**
 
 ### Performance Manager
 
-Username: **edgar.kazembe** / Password: **test** / SMS code: **000000** / Office: **Ibombo District, Central Province**
+Based in the country HQ Office:
+
+Username: **edgar.kazembe** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Isamba District, Central Province**
 
 ## Starting and stopping OpenCRVS
 
