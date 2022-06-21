@@ -72,7 +72,6 @@ const STORE_DECLARATION = 'DECLARATION/STORE_DECLARATION'
 const MODIFY_DECLARATION = 'DECLARATION/MODIFY_DRAFT'
 const WRITE_DECLARATION = 'DECLARATION/WRITE_DRAFT'
 const DELETE_DECLARATION = 'DECLARATION/DELETE_DRAFT'
-const REINSTATE_DECLARATION = 'DECLARATION/REINSTATE_DECLARATION'
 const GET_DECLARATIONS_SUCCESS = 'DECLARATION/GET_DRAFTS_SUCCESS'
 const GET_DECLARATIONS_FAILED = 'DECLARATION/GET_DRAFTS_FAILED'
 const GET_WORKQUEUE_SUCCESS = 'DECLARATION/GET_WORKQUEUE_SUCCESS'
@@ -330,12 +329,6 @@ interface IDeleteDeclarationAction {
     declaration: IDeclaration | IPrintableDeclaration
   } & OnSuccessDeleteDeclarationOptions
 }
-interface IReinstateDeclarationAction {
-  type: typeof REINSTATE_DECLARATION
-  payload: {
-    declarationId: string
-  }
-}
 
 interface IGetStorageDeclarationsSuccessAction {
   type: typeof GET_DECLARATIONS_SUCCESS
@@ -445,7 +438,6 @@ export type Action =
   | IWriteDeclarationAction
   | NavigationAction
   | IDeleteDeclarationAction
-  | IReinstateDeclarationAction
   | IGetStorageDeclarationsSuccessAction
   | IGetStorageDeclarationsFailedAction
   | IGetWorkqueueOfCurrentUserSuccessAction
@@ -607,12 +599,6 @@ export function archiveDeclaration(
   declarationId: string
 ): IArchiveDeclarationAction {
   return { type: ARCHIVE_DECLARATION, payload: { declarationId } }
-}
-
-export function reinstateDeclaration(
-  declarationId: string
-): IReinstateDeclarationAction {
-  return { type: REINSTATE_DECLARATION, payload: { declarationId } }
 }
 
 export function deleteDeclaration(
@@ -1128,10 +1114,18 @@ export async function writeRegistrarWorkqueueByUser(
 
 export async function deleteDeclarationByUser(
   userId: string,
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  state: IDeclarationsState
 ): Promise<string> {
   const uID = userId || (await getCurrentUserID())
   const { allUserData, currentUserData } = await getUserData(uID)
+
+  allUserData.map((userData) => {
+    if (userData.userID === state.userID) {
+      userData.declarations = state.declarations
+    }
+    return userData
+  })
 
   const deletedDeclarationId = currentUserData
     ? currentUserData.declarations.findIndex((app) => app.id === declaration.id)
@@ -1142,7 +1136,6 @@ export async function deleteDeclarationByUser(
       currentUserData.declarations.splice(deletedDeclarationId, 1)
     storage.setItem('USER_DATA', JSON.stringify(allUserData))
   }
-
   return JSON.stringify(currentUserData)
 }
 
@@ -1358,25 +1351,6 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       }
       return loop(state, Cmd.action(modifyDeclaration(modifiedDeclaration)))
     }
-    case REINSTATE_DECLARATION: {
-      if (action.payload) {
-        const declaration = state.declarations.find(
-          ({ id }) => id === action.payload.declarationId
-        )
-
-        if (!declaration) {
-          return state
-        }
-        const modifiedDeclaration: IDeclaration = {
-          ...declaration,
-          submissionStatus: SUBMISSION_STATUS.READY_TO_REINSTATE,
-          action: DeclarationAction.REINSTATE_DECLARATION,
-          payload: { id: declaration.id }
-        }
-        return loop(state, Cmd.action(writeDeclaration(modifiedDeclaration)))
-      }
-      return state
-    }
     case STORE_DECLARATION:
       return {
         ...state,
@@ -1392,7 +1366,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         Cmd.run(deleteDeclarationByUser, {
           successActionCreator: getStorageDeclarationsSuccess,
           failActionCreator: getStorageDeclarationsFailed,
-          args: [state.userID, action.payload.declaration]
+          args: [state.userID, action.payload.declaration, state]
         })
       )
     case MODIFY_DECLARATION:
