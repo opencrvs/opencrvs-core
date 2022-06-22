@@ -537,7 +537,14 @@ export const collectDeathCertificateFormSection: IFormSection = {
           description: certificateMessages.noLabel,
           initialValue: '',
           required: false,
-          validate: []
+          validate: [],
+          conditionals: [
+            {
+              action: 'hide',
+              expression:
+                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0]?.collector?.noAffidavitAgreement?.length !== 0'
+            }
+          ]
         },
         {
           name: 'noAffidavitAgreement',
@@ -550,6 +557,13 @@ export const collectDeathCertificateFormSection: IFormSection = {
             {
               value: 'AFFIDAVIT',
               label: certificateMessages.noSignedAffidavitAvailable
+            }
+          ],
+          conditionals: [
+            {
+              action: 'hide',
+              expression:
+                'draftData?.registration?.certificates?.length && draftData?.registration?.certificates[0].collector.affidavitFile !== ""'
             }
           ]
         }
