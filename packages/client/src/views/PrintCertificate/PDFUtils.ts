@@ -35,17 +35,15 @@ function isMessageDescriptor(
 }
 
 export function formatAllNonStringValues(
-  templateData: Record<string, string | MessageDescriptor | Array<string>>,
-  intl: IntlShape
+  templateData: Record<string, string | MessageDescriptor | Array<string>>
 ): Record<string, string> {
   for (const key of Object.keys(templateData)) {
     if (
       typeof templateData[key] === 'object' &&
       isMessageDescriptor(templateData[key] as Record<string, unknown>)
     ) {
-      templateData[key] = intl.formatMessage(
-        templateData[key] as MessageDescriptor
-      )
+      templateData[key] = (templateData[key] as MessageDescriptor)
+        .defaultMessage as string
     } else if (Array.isArray(templateData[key])) {
       // For address field, country label is a MessageDescriptor
       // but state, province is string
@@ -55,7 +53,7 @@ export function formatAllNonStringValues(
         .filter(Boolean)
         .map((item) =>
           isMessageDescriptor(item as Record<string, unknown>)
-            ? intl.formatMessage(item as MessageDescriptor)
+            ? (item as MessageDescriptor).defaultMessage
             : item
         )
         .join(', ')
@@ -65,11 +63,10 @@ export function formatAllNonStringValues(
 }
 export function executeHandlebarsTemplate(
   templateString: string,
-  data: Record<string, any> = {},
-  intl: IntlShape
+  data: Record<string, any> = {}
 ): string {
   const template = Handlebars.compile(templateString)
-  const formattedTemplateData = formatAllNonStringValues(data, intl)
+  const formattedTemplateData = formatAllNonStringValues(data)
   const output = template(formattedTemplateData)
   return output
 }
@@ -88,7 +85,7 @@ export async function previewCertificate(
   }
 
   await createPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration, pageSize, intl),
+    getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
     declaration,
     userDetails,
     offlineResource,
@@ -111,7 +108,7 @@ export function printCertificate(
     throw new Error('No user details found')
   }
   printPDF(
-    getPDFTemplateWithSVG(offlineResource, declaration, pageSize, intl),
+    getPDFTemplateWithSVG(offlineResource, declaration, pageSize),
     declaration,
     userDetails,
     offlineResource,
@@ -123,8 +120,7 @@ export function printCertificate(
 function getPDFTemplateWithSVG(
   offlineResource: IOfflineData,
   declaration: IDeclaration,
-  pageSize: PageSize,
-  intl: IntlShape
+  pageSize: PageSize
 ): IPDFTemplate {
   let svgTemplate
   if (declaration.event === Event.Birth) {
@@ -134,8 +130,7 @@ function getPDFTemplateWithSVG(
   }
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,
-    declaration.data.template,
-    intl
+    declaration.data.template
   )
   const pdfTemplate: IPDFTemplate = certificateBaseTemplate
   pdfTemplate.definition.pageSize = pageSize
