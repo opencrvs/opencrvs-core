@@ -380,6 +380,17 @@ export const resolvers: GQLResolver = {
           reason,
           comment
         )
+        const taskResource = newTaskBundle.entry[0].resource
+        // remove assigned extension when reject
+        if (
+          taskResource.extension &&
+          findExtension(ASSIGNED_EXTENSION_URL, taskResource.extension)
+        ) {
+          taskResource.extension = taskResource.extension.filter(
+            (ext) => ext.url !== ASSIGNED_EXTENSION_URL
+          )
+        }
+
         await fetchFHIR(
           '/Task',
           authHeader,
@@ -717,13 +728,25 @@ async function markEventAsValidated(
 ) {
   let doc
   if (!details) {
-    const taskBundle = await fetchFHIR(
+    const taskBundle = (await fetchFHIR(
       `/Task?focus=Composition/${id}`,
       authHeader
-    )
+    )) as ITaskBundle
     if (!taskBundle || !taskBundle.entry || !taskBundle.entry[0]) {
       throw new Error('Task does not exist')
     }
+
+    const taskResource = taskBundle.entry[0].resource
+    // remove assigned extension when reject
+    if (
+      taskResource.extension &&
+      findExtension(ASSIGNED_EXTENSION_URL, taskResource.extension)
+    ) {
+      taskResource.extension = taskResource.extension.filter(
+        (ext) => ext.url !== ASSIGNED_EXTENSION_URL
+      )
+    }
+
     doc = {
       resourceType: 'Bundle',
       type: 'document',

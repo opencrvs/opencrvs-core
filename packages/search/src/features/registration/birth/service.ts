@@ -23,7 +23,10 @@ import {
   ICompositionBody,
   NAME_EN,
   IOperationHistory,
-  REJECTED_STATUS
+  REJECTED_STATUS,
+  VALIDATED_STATUS,
+  REGISTERED_STATUS,
+  CERTIFIED_STATUS
 } from '@search/elasticsearch/utils'
 import {
   addDuplicatesToComposition,
@@ -126,6 +129,16 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     regLastUserIdentifier.valueReference.reference.split('/')[1]
   body.registrationNumber =
     registrationNumberIdentifier && registrationNumberIdentifier.value
+  if (
+    [
+      REJECTED_STATUS,
+      VALIDATED_STATUS,
+      REGISTERED_STATUS,
+      CERTIFIED_STATUS
+    ].includes(body.type ?? '')
+  ) {
+    body.assignment = null
+  }
   await createStatusHistory(body, task, authHeader)
   await updateComposition(compositionId, body)
 }
@@ -411,7 +424,7 @@ async function updateCompositionWithDuplicates(
   if (composition && composition.id) {
     const body: ICompositionBody = {}
     body.relatesTo = duplicateCompositionIds
-    updateComposition(composition.id, body)
+    await updateComposition(composition.id, body)
   }
   const compositionFromFhir = (await getCompositionById(
     composition.id as string

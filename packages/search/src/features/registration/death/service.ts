@@ -14,6 +14,7 @@ import {
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import {
+  CERTIFIED_STATUS,
   createStatusHistory,
   EVENT,
   getCreatedBy,
@@ -22,7 +23,9 @@ import {
   IDeathCompositionBody,
   IOperationHistory,
   NAME_EN,
-  REJECTED_STATUS
+  REGISTERED_STATUS,
+  REJECTED_STATUS,
+  VALIDATED_STATUS
 } from '@search/elasticsearch/utils'
 import {
   findEntry,
@@ -115,7 +118,16 @@ async function updateEvent(task: fhir.Task, authHeader: string) {
     regLastUserIdentifier.valueReference.reference.split('/')[1]
   body.registrationNumber =
     registrationNumberIdentifier && registrationNumberIdentifier.value
-
+  if (
+    [
+      REJECTED_STATUS,
+      VALIDATED_STATUS,
+      REGISTERED_STATUS,
+      CERTIFIED_STATUS
+    ].includes(body.type ?? '')
+  ) {
+    body.assignment = null
+  }
   await createStatusHistory(body, task, authHeader)
   await updateComposition(compositionId, body)
 }
