@@ -247,7 +247,7 @@ docker_stack_deploy() {
     docker stack deploy --prune -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml '$environment_compose' '$replicas_compose' --with-registry-auth opencrvs'
 }
 
-FILES_TO_ROTATE=""
+FILES_TO_ROTATE="/tmp/compose/docker-compose.deploy.yml"
 
 if [ "$REPLICAS" = "3" ]; then
   REPLICAS_COMPOSE="-c docker-compose.replicas-3.yml"
