@@ -216,9 +216,9 @@ class SentForReviewComponent extends React.Component<
           )) ||
         ''
       const sentForApproval =
-        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
-          ? new Date(reg.modifiedAt)
-          : new Date(Number(reg.modifiedAt))) || ''
+        (reg.createdAt && Number.isNaN(Number(reg.createdAt))
+          ? new Date(reg.createdAt)
+          : new Date(Number(reg.createdAt))) || ''
       const dateOfEvent =
         reg.dateOfEvent &&
         reg.dateOfEvent.length > 0 &&
