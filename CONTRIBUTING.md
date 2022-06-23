@@ -1,8 +1,6 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-**Table of Contents**
-
 - [How to Contribute to OpenCRVS](#how-to-contribute-to-opencrvs)
   - [Internal Dev Process - for the core team (Plan, Jembi and DSI)](#internal-dev-process---for-the-core-team-plan-jembi-and-dsi)
     - [Sprint work process](#sprint-work-process)
