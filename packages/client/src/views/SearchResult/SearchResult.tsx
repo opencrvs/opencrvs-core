@@ -274,7 +274,11 @@ export class SearchResultView extends React.Component<
       const declarationIsRejected = reg.declarationStatus === 'REJECTED'
       const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
       const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
-      const isDuplicate = reg.duplicates && reg.duplicates.length > 0
+      const isDuplicate =
+        reg.duplicates &&
+        reg.duplicates.length > 0 &&
+        reg.declarationStatus !== SUBMISSION_STATUS.CERTIFIED &&
+        reg.declarationStatus !== SUBMISSION_STATUS.REGISTERED
       const { intl, match, userDetails } = this.props
       const { searchText, searchType } = match.params
       if (this.state.width > this.props.theme.grid.breakpoints.lg) {
