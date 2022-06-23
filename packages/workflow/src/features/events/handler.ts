@@ -38,7 +38,11 @@ import {
 } from '@workflow/features/task/fhir/utils'
 import updateTaskHandler from '@workflow/features/task/handler'
 import { logger } from '@workflow/logger'
-import { hasRegisterScope, hasValidateScope } from '@workflow/utils/authUtils'
+import {
+  hasDeclareScope,
+  hasRegisterScope,
+  hasValidateScope
+} from '@workflow/utils/authUtils'
 import * as Hapi from '@hapi/hapi'
 import fetch from 'node-fetch'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
@@ -160,7 +164,7 @@ function detectEvent(request: Hapi.Request): Events {
       if (firstEntry.resourceType === 'Task' && firstEntry.id) {
         const taskResource = getTaskResource(fhirBundle)
         if (fhirBundle?.signature?.type[0]?.code === 'downloaded') {
-          if (hasAssignedExtension(taskResource)) {
+          if (hasAssignedExtension(taskResource) && !hasDeclareScope(request)) {
             return Events.DOWNLOADED_ASSIGNED_EVENT
           } else {
             return Events.DOWNLOADED

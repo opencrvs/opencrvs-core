@@ -64,3 +64,7 @@ export function hasRegisterScope(request: Hapi.Request): boolean {
 export function hasValidateScope(request: Hapi.Request): boolean {
   return hasScope(request, USER_SCOPE.VALIDATE)
 }
+
+export function hasDeclareScope(request: Hapi.Request): boolean {
+  return hasScope(request, USER_SCOPE.DECLARE)
+}
