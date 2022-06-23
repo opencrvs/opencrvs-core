@@ -3,7 +3,7 @@
 <h3 align="center">OpenCRVS</h3>
 <p align="center"> A digital public good for civil registration
 <br>
-<a href="https://github.com/opencrvs/opencrvs-core/issues">Report an issue</a>  ·  <a href="https://community.opencrvs.org">Join our community</a>  ·  <a href="https://www.opencrvs.org">www.opencrvs.org</a></p>
+<a href="https://github.com/opencrvs/opencrvs-core/issues">Report an issue</a>  ·  <a href="https://community.opencrvs.org">Join our community</a>  ·  <a href="https://documentation.opencrvs.org">Read our documentation</a>  ·  <a href="https://www.opencrvs.org">www.opencrvs.org</a></p>
 
 [![codecov](https://codecov.io/gh/opencrvs/opencrvs-core/branch/master/graph/badge.svg)](https://codecov.io/gh/opencrvs/opencrvs-core)[![License: MPL 2.0](https://img.shields.io/badge/License-MPL%202.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
