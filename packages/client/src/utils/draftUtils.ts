@@ -15,7 +15,7 @@ import {
   IPrintableDeclaration
 } from '@client/declarations'
 import { BirthSection, DeathSection, IFormSectionData } from '@client/forms'
-import { Event } from '@client/utils/gateway'
+import { Event, History } from '@client/utils/gateway'
 import {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
@@ -24,7 +24,6 @@ import {
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { History } from '@client/utils/gateway'
 
 const getInformantEngName = (sectionData: IFormSectionData): string => {
   if (sectionData.firstNamesEng) {
