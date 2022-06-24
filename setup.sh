@@ -334,7 +334,6 @@ if [ -d "data" ] ; then sudo rm -r data ; fi
 openssl genrsa -out .secrets/private-key.pem 2048 && openssl rsa -pubout -in .secrets/private-key.pem -out .secrets/public-key.pem
 mkdir -p data/elasticsearch
 chmod 775 data/elasticsearch
-sudo chown -R 1000:root data/elasticsearch
 
 mkdir -p data/mongo
 chmod 775 data/mongo

@@ -25,9 +25,6 @@ export interface IApplicationConfig {
   APPLICATION_NAME: string
   COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
-  COUNTRY_LOGO_RENDER_WIDTH: number
-  COUNTRY_LOGO_RENDER_HEIGHT: number
-  DESKTOP_TIME_OUT_MILLISECONDS: number
   SENTRY: string
   LOGROCKET: string
 }

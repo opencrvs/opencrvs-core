@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [This package is not regularly maintained or supported. It is included for reference.](#this-package-is-not-regularly-maintained-or-supported-it-is-included-for-reference)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## This package is not regularly maintained or supported. It is included for reference.
 
 You can run a PWA on an Android device and connect to OpenCRVS running on your local network. This is the best way to work and debug service workers and do actual device testing.

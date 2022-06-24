@@ -35,7 +35,6 @@ export const validImageB64String =
 
 let mockConfig = {
   APPLICATION_NAME: 'Farajaland CRVS',
-  BACKGROUND_SYNC_BROADCAST_CHANNEL: 'backgroundSynBroadCastChannel',
   BIRTH: {
     REGISTRATION_TARGET: 45,
     LATE_REGISTRATION_TARGET: 365,
@@ -45,7 +44,6 @@ let mockConfig = {
       DELAYED: 0
     }
   },
-  COUNTRY: 'bgd',
   COUNTRY_LOGO: {
     fileName: 'logo.png',
     file: `data:image;base64,${validImageB64String}`
@@ -61,21 +59,16 @@ let mockConfig = {
       DELAYED: 0
     }
   },
-  DESKTOP_TIME_OUT_MILLISECONDS: 900000, // 15 mins
   HEALTH_FACILITY_FILTER: 'UPAZILA',
-  LANGUAGES: 'en,bn',
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
   API_GATEWAY_URL: 'http://localhost:7070/',
   PERFORMANCE_URL: 'http://localhost:3001',
   RESOURCES_URL: 'http://localhost:3040',
-  UI_POLLING_INTERVAL: 5000,
   FIELD_AGENT_AUDIT_LOCATIONS:
     'WARD,UNION,CITY_CORPORATION,MUNICIPALITY,UPAZILA',
   DECLARATION_AUDIT_LOCATIONS: 'WARD,UNION,MUNICIPALITY',
   EXTERNAL_VALIDATION_WORKQUEUE: true, // this flag will decide whether to show external validation workqueue on registrar home
-  SENTRY: 'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551',
-  LOGROCKET: 'opencrvs-foundation/opencrvs-bangladesh',
   ADDRESSES: 1
 } as unknown as IApplicationConfigurationModel
 
