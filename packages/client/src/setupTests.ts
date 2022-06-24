@@ -180,7 +180,6 @@ jest.mock(
         Promise.resolve({
           languages: mockOfflineData.languages
         }),
-      loadAssets: () => Promise.resolve(mockOfflineData.assets),
       loadConfig: () => Promise.resolve(mockConfigResponse)
     }
   })
