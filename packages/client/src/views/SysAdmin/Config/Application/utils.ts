@@ -24,6 +24,8 @@ import { IBirth, ICurrency, IDeath, IFullProps, IState } from './DynamicModal'
 import { configApplicationMutations } from './mutations'
 import { IOfflineData } from '@client/offline/reducer'
 import { IFormConfigSettingsProps } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
+import { updateOfflineConfigData } from '@client/offline/actions'
+import { Dispatch } from 'redux'
 
 interface ICurrencyOptions {
   [key: string]: string
@@ -223,24 +225,25 @@ export const isApplyButtonDisabled = (
 
 export async function callUpdateApplicationNameMutation(
   applicationName: string,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
+  offlineCountryConfiguration: IOfflineData,
+  dispatch: Dispatch,
+  setIsValueUpdating: (value: boolean) => void
 ) {
   try {
-    updatingValue(true)
+    setIsValueUpdating(true)
     const res = await configApplicationMutations.mutateApplicationConfig({
       APPLICATION_NAME: applicationName
     })
     if (res && res.data) {
-      updatingValue(false)
+      setIsValueUpdating(false)
       const APPLICATION_NAME = res.data.updateApplicationConfig.APPLICATION_NAME
       const offlineConfig = {
         config: {
-          ...props.offlineCountryConfiguration.config,
+          ...offlineCountryConfiguration.config,
           APPLICATION_NAME
         }
       }
-      props.updateConfig(offlineConfig)
+      dispatch(updateOfflineConfigData(offlineConfig))
     }
   } catch (err) {
     throw err
@@ -250,12 +253,12 @@ export async function callUpdateApplicationNameMutation(
 export async function callUpdateGovtLogoMutation(
   govtLogo: string,
   logoFileName: string,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
+  offlineCountryConfiguration: IOfflineData,
+  dispatch: Dispatch,
+  setIsValueUpdating: (value: boolean) => void
 ) {
   try {
-    updatingValue(true)
-
+    setIsValueUpdating(true)
     const COUNTRY_LOGO = {
       file: govtLogo,
       fileName: logoFileName
@@ -264,21 +267,21 @@ export async function callUpdateGovtLogoMutation(
       COUNTRY_LOGO
     })
     if (res && res.data) {
-      updatingValue(false)
+      setIsValueUpdating(false)
       const COUNTRY_LOGO_FILE =
         res.data.updateApplicationConfig.COUNTRY_LOGO.file
       const COUNTRY_LOGO_FILE_NAME =
         res.data.updateApplicationConfig.COUNTRY_LOGO.fileName
       const updatedOfflineConfig = {
         config: {
-          ...props.offlineCountryConfiguration.config,
+          ...offlineCountryConfiguration.config,
           COUNTRY_LOGO: {
             file: COUNTRY_LOGO_FILE,
             fileName: COUNTRY_LOGO_FILE_NAME
           }
         }
       }
-      props.updateConfig(updatedOfflineConfig)
+      dispatch(updateOfflineConfigData(updatedOfflineConfig))
     }
   } catch (err) {
     throw err
@@ -287,24 +290,26 @@ export async function callUpdateGovtLogoMutation(
 
 export async function callUpdateApplicationCurrencyMutation(
   currency: ICurrency,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
+  offlineCountryConfiguration: IOfflineData,
+  dispatch: Dispatch,
+  setIsValueUpdating: (value: boolean) => void
 ) {
+  setIsValueUpdating(true)
   try {
     const res = await configApplicationMutations.mutateApplicationConfig({
       CURRENCY: currency
     })
     if (res && res.data) {
-      updatingValue(false)
+      setIsValueUpdating(false)
       const CURRENCY = res.data.updateApplicationConfig.CURRENCY
       omit(CURRENCY, ['__typename'])
       const offlineConfig = {
         config: {
-          ...props.offlineCountryConfiguration.config,
+          ...offlineCountryConfiguration.config,
           CURRENCY
         }
       }
-      props.updateConfig(offlineConfig)
+      dispatch(updateOfflineConfigData(offlineConfig))
     }
   } catch (err) {
     throw err
@@ -313,24 +318,26 @@ export async function callUpdateApplicationCurrencyMutation(
 
 export async function callUpdateApplicationBirthMutation(
   birth: IBirth,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
+  offlineCountryConfiguration: IOfflineData,
+  dispatch: Dispatch,
+  setIsValueUpdating: (value: boolean) => void
 ) {
   try {
+    setIsValueUpdating(true)
     const res = await configApplicationMutations.mutateApplicationConfig({
       BIRTH: birth
     })
     if (res && res.data) {
-      updatingValue(false)
+      setIsValueUpdating(false)
       const BIRTH = res.data.updateApplicationConfig.BIRTH
       omit(BIRTH, ['__typename'])
       const offlineConfig = {
         config: {
-          ...props.offlineCountryConfiguration.config,
+          ...offlineCountryConfiguration.config,
           BIRTH
         }
       }
-      props.updateConfig(offlineConfig)
+      dispatch(updateOfflineConfigData(offlineConfig))
     }
   } catch (err) {
     throw err
@@ -339,24 +346,26 @@ export async function callUpdateApplicationBirthMutation(
 
 export async function callUpdateApplicationDeathMutation(
   death: IDeath,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
+  offlineCountryConfiguration: IOfflineData,
+  dispatch: Dispatch,
+  setIsValueUpdating: (value: boolean) => void
 ) {
   try {
+    setIsValueUpdating(true)
     const res = await configApplicationMutations.mutateApplicationConfig({
       DEATH: death
     })
     if (res && res.data) {
-      updatingValue(false)
+      setIsValueUpdating(false)
       const DEATH = res.data.updateApplicationConfig.DEATH
       omit(DEATH, ['__typename'])
       const offlineConfig = {
         config: {
-          ...props.offlineCountryConfiguration.config,
+          ...offlineCountryConfiguration.config,
           DEATH
         }
       }
-      props.updateConfig(offlineConfig)
+      dispatch(updateOfflineConfigData(offlineConfig))
     }
   } catch (err) {
     throw err
@@ -365,25 +374,26 @@ export async function callUpdateApplicationDeathMutation(
 
 export async function callUpdateNIDPatternMutation(
   nidPattern: string,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
+  offlineCountryConfiguration: IOfflineData,
+  dispatch: Dispatch,
+  setIsValueUpdating: (value: boolean) => void
 ) {
   try {
-    updatingValue(true)
+    setIsValueUpdating(true)
     const res = await configApplicationMutations.mutateApplicationConfig({
       NID_NUMBER_PATTERN: nidPattern
     })
     if (res && res.data) {
-      updatingValue(false)
+      setIsValueUpdating(false)
       const NID_NUMBER_PATTERN =
         res.data.updateApplicationConfig.NID_NUMBER_PATTERN
       const offlineConfig = {
         config: {
-          ...props.offlineCountryConfiguration.config,
+          ...offlineCountryConfiguration.config,
           NID_NUMBER_PATTERN
         }
       }
-      props.updateConfig(offlineConfig)
+      dispatch(updateOfflineConfigData(offlineConfig))
     }
   } catch (err) {
     throw err
@@ -392,25 +402,26 @@ export async function callUpdateNIDPatternMutation(
 
 export async function callUpdatePhoneNumberPatternMutation(
   phoneNumberPattern: string,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
+  offlineCountryConfiguration: IOfflineData,
+  dispatch: Dispatch,
+  setIsValueUpdating: (value: boolean) => void
 ) {
   try {
-    updatingValue(true)
+    setIsValueUpdating(true)
     const res = await configApplicationMutations.mutateApplicationConfig({
       PHONE_NUMBER_PATTERN: phoneNumberPattern
     })
     if (res && res.data) {
-      updatingValue(false)
+      setIsValueUpdating(false)
       const PHONE_NUMBER_PATTERN =
         res.data.updateApplicationConfig.PHONE_NUMBER_PATTERN
       const offlineConfig = {
         config: {
-          ...props.offlineCountryConfiguration.config,
+          ...offlineCountryConfiguration.config,
           PHONE_NUMBER_PATTERN
         }
       }
-      props.updateConfig(offlineConfig)
+      dispatch(updateOfflineConfigData(offlineConfig))
     }
   } catch (err) {
     throw err

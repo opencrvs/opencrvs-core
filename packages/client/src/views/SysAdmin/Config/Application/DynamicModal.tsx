@@ -17,8 +17,8 @@ import {
 import { buttonMessages } from '@client/i18n/messages'
 import { messages } from '@client/i18n/messages/views/config'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 import styled from '@client/styledComponents'
 import { InputField, TextInput, Select } from '@opencrvs/components/lib/forms'
 import {
@@ -28,7 +28,6 @@ import {
 } from '@client/views/SysAdmin/Config/Application'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
-import { updateOfflineConfigData } from '@client/offline/actions'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import ContentComponent from './NIDPhoneNumContent'
@@ -167,7 +166,6 @@ export type IState = {
   phoneNumberPattern: string
   phoneNumberExample: string
   testPhoneNumber: boolean
-  updatingValue: boolean
   errorOccured: boolean
   errorMessages: string
   govtLogo: string
@@ -183,198 +181,214 @@ interface IProps {
     notificationStatus: NOTIFICATION_TYPE,
     messages: string
   ) => void
-  offlineCountryConfiguration: IOfflineData
 }
 
-type DispatchProps = {
-  updateConfig: typeof updateOfflineConfigData
-}
+export type IFullProps = IProps
 
-export type IFullProps = IProps & IntlShapeProps & DispatchProps
-class DynamicModalComponent extends React.Component<IFullProps, IState> {
-  constructor(props: IFullProps) {
-    super(props)
-    const { offlineCountryConfiguration } = this.props
-    this.state = {
-      applicationName: offlineCountryConfiguration.config.APPLICATION_NAME,
-      currency: `${offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${this.props.offlineCountryConfiguration.config.CURRENCY.isoCode}`,
-      birthRegistrationTarget:
-        offlineCountryConfiguration.config.BIRTH.REGISTRATION_TARGET.toString(),
-      birthLateRegistrationTarget:
-        offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET.toString(),
-      deathRegistrationTarget:
-        offlineCountryConfiguration.config.DEATH.REGISTRATION_TARGET.toString(),
-      birthOnTimeFee:
-        offlineCountryConfiguration.config.BIRTH.FEE.ON_TIME.toLocaleString(),
-      birthLateFee:
-        offlineCountryConfiguration.config.BIRTH.FEE.LATE.toLocaleString(),
-      birthDelayedFee:
-        offlineCountryConfiguration.config.BIRTH.FEE.DELAYED.toLocaleString(),
-      deathOnTimeFee:
-        offlineCountryConfiguration.config.DEATH.FEE.ON_TIME.toLocaleString(),
-      deathDelayedFee:
-        offlineCountryConfiguration.config.DEATH.FEE.DELAYED.toLocaleString(),
-      nidPattern:
-        props.offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString(),
-      nidExample: EMPTY_STRING,
-      testNid: false,
-      phoneNumberPattern:
-        props.offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.toString(),
-      phoneNumberExample: EMPTY_STRING,
-      testPhoneNumber: false,
-      updatingValue: false,
-      errorOccured: false,
-      errorMessages: EMPTY_STRING,
-      govtLogo: EMPTY_STRING,
-      logoFile: { name: EMPTY_STRING, type: EMPTY_STRING, data: EMPTY_STRING },
-      isFileUploading: false,
-      logoFileName: EMPTY_STRING
-    }
+function DynamicModalComponent(props: IProps) {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+  const offlineCountryConfiguration = useSelector((store: IStoreState) =>
+    getOfflineData(store)
+  )
+  const [applicationName, setApplicationName] = React.useState(
+    offlineCountryConfiguration.config.APPLICATION_NAME
+  )
+  const [currency, setCurrency] = React.useState(
+    `${offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${offlineCountryConfiguration.config.CURRENCY.isoCode}`
+  )
+  const [birthRegistrationTarget, setBirthRegistrationTarget] = React.useState(
+    String(offlineCountryConfiguration.config.BIRTH.REGISTRATION_TARGET)
+  )
+  const [birthLateRegistrationTarget, setBirthLateRegistrationTarget] =
+    React.useState(
+      String(offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET)
+    )
+  const [deathRegistrationTarget, setDeathRegistrationTarget] = React.useState(
+    String(offlineCountryConfiguration.config.DEATH.REGISTRATION_TARGET)
+  )
+  const [birthOnTimeFee, setBirthOnTimeFee] = React.useState(
+    offlineCountryConfiguration.config.BIRTH.FEE.ON_TIME.toLocaleString()
+  )
+  const [birthLateFee, setBirthLateFee] = React.useState(
+    offlineCountryConfiguration.config.BIRTH.FEE.LATE.toLocaleString()
+  )
+  const [birthDelayedFee, setBirthDelayedFee] = React.useState(
+    offlineCountryConfiguration.config.BIRTH.FEE.DELAYED.toLocaleString()
+  )
+  const [deathOnTimeFee, setDeathOnTimeFee] = React.useState(
+    offlineCountryConfiguration.config.DEATH.FEE.ON_TIME.toLocaleString()
+  )
+  const [deathDelayedFee, setDeathDelayedFee] = React.useState(
+    offlineCountryConfiguration.config.DEATH.FEE.DELAYED.toLocaleString()
+  )
+  const [nidPattern, setNidPattern] = React.useState(
+    String(offlineCountryConfiguration.config.NID_NUMBER_PATTERN)
+  )
+  const [nidExample, setNidExample] = React.useState(EMPTY_STRING)
+  const [testNid, setTestNid] = React.useState(false)
+  const [phoneNumberPattern, setPhoneNumberPattern] = React.useState(
+    String(offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN)
+  )
+  const [phoneNumberExample, setPhoneNumberExample] =
+    React.useState(EMPTY_STRING)
+  const [testPhoneNumber, setTestPhoneNumber] = React.useState(false)
+  const [errorOccured, setErrorOccured] = React.useState(false)
+  const [errorMessages, setErrorMessages] = React.useState(EMPTY_STRING)
+  const [govtLogo, setGovtLogo] = React.useState(EMPTY_STRING)
+  const [logoFile, setLogoFile] = React.useState<{
+    name?: string
+    type: string
+    data: string
+  }>({
+    name: EMPTY_STRING,
+    type: EMPTY_STRING,
+    data: EMPTY_STRING
+  })
+  const [isFileUploading, setIsFileUploading] = React.useState(false)
+  const [logoFileName, setLogoFileName] = React.useState(EMPTY_STRING)
+  const [isValueUpdating, setIsValueUpdating] = React.useState(false)
+  const showChangeModal = !!!props.changeModalName ? false : true
+
+  const state: IState = {
+    applicationName,
+    currency,
+    birthRegistrationTarget,
+    birthLateRegistrationTarget,
+    deathRegistrationTarget,
+    birthOnTimeFee,
+    birthLateFee,
+    birthDelayedFee,
+    deathOnTimeFee,
+    deathDelayedFee,
+    nidPattern,
+    nidExample,
+    testNid,
+    phoneNumberPattern,
+    phoneNumberExample,
+    testPhoneNumber,
+    errorOccured,
+    errorMessages,
+    govtLogo,
+    logoFile,
+    logoFileName,
+    isFileUploading
   }
 
-  showChangeModal: boolean = !!!this.props.changeModalName ? false : true
-
-  setApplicationName = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    this.setState(() => ({
-      applicationName: value
-    }))
-  }
-
-  setBirthRegistrationTarget = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.toString()
-    if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
-      this.setState(() => ({
-        birthRegistrationTarget: value,
-        birthLateRegistrationTarget:
-          Number(value) > Number(this.state.birthLateRegistrationTarget)
-            ? String(Number(value) + 2)
-            : this.state.birthLateRegistrationTarget
-      }))
-    }
-  }
-
-  setDeathRegistrationTarget = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.toString()
-    if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
-      this.setState(() => ({
-        deathRegistrationTarget: value
-      }))
-    }
-  }
-
-  setBirthOnTimeFee = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.toString()
-    this.setState(() => ({
-      birthOnTimeFee: getFormattedFee(value)
-    }))
-  }
-
-  setBirthLateFee = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.toString()
-    this.setState(() => ({
-      birthLateFee: getFormattedFee(value)
-    }))
-  }
-
-  setBirthDelayedFee = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.toString()
-    this.setState(() => ({
-      birthDelayedFee: getFormattedFee(value)
-    }))
-  }
-
-  setDeathOnTimeFee = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.toString()
-    this.setState(() => ({
-      deathOnTimeFee: getFormattedFee(value)
-    }))
-  }
-
-  setDeathDelayedFee = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value.toString()
-    this.setState(() => ({
-      deathDelayedFee: getFormattedFee(value)
-    }))
-  }
-
-  setBirthLateRegistrationTarget = (
+  const handleApplicationName = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const value = event.target.value.toString()
+    const value = event.target.value
+    setApplicationName(value)
+  }
+
+  const handleBirthRegistrationTarget = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = String(event.target.value)
     if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
-      this.setState(() => ({
-        birthLateRegistrationTarget: value
-      }))
+      setBirthRegistrationTarget(value)
+      setBirthLateRegistrationTarget(
+        Number(value) > Number(birthLateRegistrationTarget)
+          ? String(Number(value) + 2)
+          : birthLateRegistrationTarget
+      )
     }
   }
 
-  setGovtLogo = (data: string) => {
-    this.setState(() => ({
-      govtLogo: data
-    }))
+  const handleDeathRegistrationTarget = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = String(event.target.value)
+    if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
+      setDeathRegistrationTarget(value)
+    }
   }
 
-  setNIDPattern = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBirthOnTimeFee = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = String(event.target.value)
+    setBirthOnTimeFee(getFormattedFee(value))
+  }
+
+  const handleBirthLateFee = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = String(event.target.value)
+    setBirthLateFee(getFormattedFee(value))
+  }
+
+  const handleBirthDelayedFee = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = String(event.target.value)
+    setBirthDelayedFee(getFormattedFee(value))
+  }
+
+  const handleDeathOnTimeFee = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = String(event.target.value)
+    setDeathOnTimeFee(getFormattedFee(value))
+  }
+
+  const handleDeathDelayedFee = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = String(event.target.value)
+    setDeathDelayedFee(getFormattedFee(value))
+  }
+
+  const handleBirthLateRegistrationTarget = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = String(event.target.value)
+    if ((!value.includes('.') && /^\d+$/.test(value)) || !value) {
+      setBirthLateRegistrationTarget(value)
+    }
+  }
+
+  const handleGovtLogo = (data: string) => {
+    setGovtLogo(data)
+  }
+
+  const handleNIDPattern = (event: React.ChangeEvent<HTMLInputElement>) => {
     const pattern = event.target.value
-    this.setState(() => ({
-      nidPattern: pattern
-    }))
+    setNidPattern(pattern)
   }
 
-  setNIDExample = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNIDExample = (event: React.ChangeEvent<HTMLInputElement>) => {
     const example = event.target.value
-    this.setState(() => ({
-      nidExample: example
-    }))
+    setNidExample(example)
   }
 
-  setPhoneNumberPattern = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhoneNumberPattern = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const pattern = event.target.value
-    this.setState(() => ({
-      phoneNumberPattern: pattern
-    }))
+    setPhoneNumberPattern(pattern)
   }
 
-  setPhoneNumberExample = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhoneNumberExample = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const example = event.target.value
-    this.setState(() => ({
-      phoneNumberExample: example
-    }))
+    setPhoneNumberExample(example)
   }
 
-  setLogoFile(data: IAttachmentValue) {
-    this.setState(() => ({
-      logoFile: data
-    }))
+  const handleLogoFile = (data: IAttachmentValue) => {
+    setLogoFile(data)
   }
 
-  setLogoFileName = (attachment: IAttachmentValue) => {
-    this.setState(() => ({
-      logoFileName: attachment.name ? attachment.name : EMPTY_STRING
-    }))
+  const handleLogoFileName = (attachment: IAttachmentValue) => {
+    setLogoFileName(attachment.name ?? EMPTY_STRING)
   }
 
-  onUploadingStateChanged = (isUploading: boolean) => {
-    this.setState(() => ({
-      isFileUploading: isUploading
-    }))
+  const onUploadingStateChanged = (isUploading: boolean) => {
+    setIsFileUploading(isUploading)
   }
 
-  setUpdatingValue = (value: boolean) => {
-    this.setState({
-      updatingValue: value
-    })
+  const setError = (errorMessage: string) => {
+    setErrorOccured(true)
+    setErrorMessages(errorMessage)
   }
 
-  setError = (errorMessage: string) => {
-    this.setState({
-      errorOccured: true,
-      errorMessages: errorMessage
-    })
-  }
-
-  async mutationHandler(
+  async function mutationHandler(
     modalName: string,
     value: IApplicationConfig,
     valueChanged: (
@@ -389,22 +403,19 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
       try {
         await callUpdateApplicationNameMutation(
           value.APPLICATION_NAME,
-          this.props,
-          this.setUpdatingValue
+          offlineCountryConfiguration,
+          dispatch,
+          setIsValueUpdating
         )
         valueChanged(
           NOTIFICATION_TYPE.SUCCESS,
-          this.props.intl.formatMessage(
-            messages.applicationNameChangeNotification
-          )
+          intl.formatMessage(messages.applicationNameChangeNotification)
         )
       } catch {
-        this.setError(
-          this.props.intl.formatMessage(messages.applicationConfigChangeError)
-        )
+        setError(intl.formatMessage(messages.applicationConfigChangeError))
         valueChanged(
           NOTIFICATION_TYPE.ERROR,
-          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+          intl.formatMessage(messages.applicationConfigChangeError)
         )
       }
     } else if (
@@ -414,20 +425,19 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
       try {
         await callUpdateNIDPatternMutation(
           value.NID_NUMBER_PATTERN,
-          this.props,
-          this.setUpdatingValue
+          offlineCountryConfiguration,
+          dispatch,
+          setIsValueUpdating
         )
         valueChanged(
           NOTIFICATION_TYPE.SUCCESS,
-          this.props.intl.formatMessage(messages.nidPatternChangeNotification)
+          intl.formatMessage(messages.nidPatternChangeNotification)
         )
       } catch {
-        this.setError(
-          this.props.intl.formatMessage(messages.applicationConfigChangeError)
-        )
+        setError(intl.formatMessage(messages.applicationConfigChangeError))
         valueChanged(
           NOTIFICATION_TYPE.ERROR,
-          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+          intl.formatMessage(messages.applicationConfigChangeError)
         )
       }
     } else if (
@@ -437,20 +447,19 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
       try {
         await callUpdatePhoneNumberPatternMutation(
           value.PHONE_NUMBER_PATTERN,
-          this.props,
-          this.setUpdatingValue
+          offlineCountryConfiguration,
+          dispatch,
+          setIsValueUpdating
         )
         valueChanged(
           NOTIFICATION_TYPE.SUCCESS,
-          this.props.intl.formatMessage(messages.phoneNumberChangeNotification)
+          intl.formatMessage(messages.phoneNumberChangeNotification)
         )
       } catch {
-        this.setError(
-          this.props.intl.formatMessage(messages.applicationConfigChangeError)
-        )
+        setError(intl.formatMessage(messages.applicationConfigChangeError))
         valueChanged(
           NOTIFICATION_TYPE.ERROR,
-          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+          intl.formatMessage(messages.applicationConfigChangeError)
         )
       }
     }
@@ -459,43 +468,36 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
       value.COUNTRY_LOGO?.file &&
       value.COUNTRY_LOGO?.fileName
     ) {
-      if (
-        this.isWithinFileLength(value.COUNTRY_LOGO.file as string) === false
-      ) {
-        this.setError(
-          this.props.intl.formatMessage(messages.govtLogoFileLimitError)
-        )
-        this.setState({
-          govtLogo: EMPTY_STRING,
-          logoFile: {
-            name: EMPTY_STRING,
-            type: EMPTY_STRING,
-            data: EMPTY_STRING
-          }
+      if (isWithinFileLength(value.COUNTRY_LOGO.file as string) === false) {
+        setError(intl.formatMessage(messages.govtLogoFileLimitError))
+        setGovtLogo(EMPTY_STRING)
+        handleLogoFile({
+          name: EMPTY_STRING,
+          type: EMPTY_STRING,
+          data: EMPTY_STRING
         })
         valueChanged(
           NOTIFICATION_TYPE.ERROR,
-          this.props.intl.formatMessage(messages.govtLogoFileLimitError)
+          intl.formatMessage(messages.govtLogoFileLimitError)
         )
       } else {
         try {
           await callUpdateGovtLogoMutation(
             value.COUNTRY_LOGO.file,
             value.COUNTRY_LOGO.fileName,
-            this.props,
-            this.setUpdatingValue
+            offlineCountryConfiguration,
+            dispatch,
+            setIsValueUpdating
           )
           valueChanged(
             NOTIFICATION_TYPE.SUCCESS,
-            this.props.intl.formatMessage(messages.govtLogoChangeNotification)
+            intl.formatMessage(messages.govtLogoChangeNotification)
           )
         } catch {
-          this.setError(
-            this.props.intl.formatMessage(messages.govtLogoChangeError)
-          )
+          setError(intl.formatMessage(messages.govtLogoChangeError))
           valueChanged(
             NOTIFICATION_TYPE.ERROR,
-            this.props.intl.formatMessage(messages.govtLogoChangeError)
+            intl.formatMessage(messages.govtLogoChangeError)
           )
         }
       }
@@ -503,22 +505,19 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
       try {
         await callUpdateApplicationCurrencyMutation(
           value.CURRENCY,
-          this.props,
-          this.setUpdatingValue
+          offlineCountryConfiguration,
+          dispatch,
+          setIsValueUpdating
         )
         valueChanged(
           NOTIFICATION_TYPE.SUCCESS,
-          this.props.intl.formatMessage(
-            messages.applicationCurrencyChangeNotification
-          )
+          intl.formatMessage(messages.applicationCurrencyChangeNotification)
         )
       } catch {
-        this.setError(
-          this.props.intl.formatMessage(messages.applicationConfigChangeError)
-        )
+        setError(intl.formatMessage(messages.applicationConfigChangeError))
         valueChanged(
           NOTIFICATION_TYPE.ERROR,
-          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+          intl.formatMessage(messages.applicationConfigChangeError)
         )
       }
     } else if (
@@ -534,40 +533,39 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
       try {
         await callUpdateApplicationBirthMutation(
           value.BIRTH,
-          this.props,
-          this.setUpdatingValue
+          offlineCountryConfiguration,
+          dispatch,
+          setIsValueUpdating
         )
         const notificationText =
           modalName === BirthActionId.BIRTH_REGISTRATION_TARGET
-            ? this.props.intl.formatMessage(
+            ? intl.formatMessage(
                 messages.applicationBirthRegTargetChangeNotification
               )
             : modalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET
-            ? this.props.intl.formatMessage(
+            ? intl.formatMessage(
                 messages.applicationBirthLateRegTargetChangeNotification
               )
             : modalName === BirthActionId.BIRTH_ON_TIME_FEE
-            ? this.props.intl.formatMessage(
+            ? intl.formatMessage(
                 messages.applicationBirthOnTimeFeeChangeNotification
               )
             : modalName === BirthActionId.BIRTH_LATE_FEE
-            ? this.props.intl.formatMessage(
+            ? intl.formatMessage(
                 messages.applicationBirthLateFeeChangeNotification
               )
             : modalName === BirthActionId.BIRTH_DELAYED_FEE
-            ? this.props.intl.formatMessage(
+            ? intl.formatMessage(
                 messages.applicationBirthDelayedFeeChangeNotification
               )
             : EMPTY_STRING
 
         valueChanged(NOTIFICATION_TYPE.SUCCESS, notificationText)
       } catch {
-        this.setError(
-          this.props.intl.formatMessage(messages.applicationConfigChangeError)
-        )
+        setError(intl.formatMessage(messages.applicationConfigChangeError))
         valueChanged(
           NOTIFICATION_TYPE.ERROR,
-          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+          intl.formatMessage(messages.applicationConfigChangeError)
         )
       }
     } else if (
@@ -579,38 +577,37 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
       try {
         await callUpdateApplicationDeathMutation(
           value.DEATH,
-          this.props,
-          this.setUpdatingValue
+          offlineCountryConfiguration,
+          dispatch,
+          setIsValueUpdating
         )
         const notificationText =
           modalName === DeathActionId.DEATH_REGISTRATION_TARGET
-            ? this.props.intl.formatMessage(
+            ? intl.formatMessage(
                 messages.applicationDeathRegTargetChangeNotification
               )
             : modalName === DeathActionId.DEATH_ON_TIME_FEE
-            ? this.props.intl.formatMessage(
+            ? intl.formatMessage(
                 messages.applicationDeathOnTimeFeeChangeNotification
               )
             : modalName === DeathActionId.DEATH_DELAYED_FEE
-            ? this.props.intl.formatMessage(
+            ? intl.formatMessage(
                 messages.applicationDeathDelayedFeeChangeNotification
               )
             : EMPTY_STRING
 
         valueChanged(NOTIFICATION_TYPE.SUCCESS, notificationText)
       } catch {
-        this.setError(
-          this.props.intl.formatMessage(messages.applicationConfigChangeError)
-        )
+        setError(intl.formatMessage(messages.applicationConfigChangeError))
         valueChanged(
           NOTIFICATION_TYPE.ERROR,
-          this.props.intl.formatMessage(messages.applicationConfigChangeError)
+          intl.formatMessage(messages.applicationConfigChangeError)
         )
       }
     }
   }
 
-  isWithinFileLength(base64data: string) {
+  const isWithinFileLength = (base64data: string) => {
     const baseStr = base64data.substring(22)
     const decoded = window.atob(baseStr)
     if (decoded.length >= 2000000) {
@@ -619,380 +616,346 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
     return true
   }
 
-  render() {
-    const {
-      intl,
-      changeModalName,
-      toggleConfigModal,
-      valueChanged,
-      offlineCountryConfiguration
-    } = this.props
-    return (
-      <ResponsiveModal
-        id={`${changeModalName}Modal`}
-        title={getTitle(intl, changeModalName)}
-        autoHeight={true}
-        titleHeightAuto={true}
-        show={this.showChangeModal}
-        contentScrollableY={
-          changeModalName === GeneralActionId.CURRENCY ? true : false
-        }
-        actions={[
-          <CancelButton
-            key="cancel"
-            id="modal_cancel"
-            onClick={toggleConfigModal}
-          >
-            {intl.formatMessage(buttonMessages.cancel)}
-          </CancelButton>,
-          <ApplyButton
-            key="apply"
-            id="apply_change"
-            disabled={isApplyButtonDisabled(this.state, changeModalName)}
-            onClick={() => {
-              this.mutationHandler(
-                changeModalName,
-                {
-                  APPLICATION_NAME: this.state.applicationName,
-                  CURRENCY: getCurrencyObject(this.state.currency),
-                  BIRTH: {
-                    REGISTRATION_TARGET: parseInt(
-                      this.state.birthRegistrationTarget
-                    ),
-                    LATE_REGISTRATION_TARGET: parseInt(
-                      this.state.birthLateRegistrationTarget
-                    ),
-                    FEE: {
-                      ON_TIME: parseFloat(
-                        this.state.birthOnTimeFee.replace(/,/g, '')
-                      ),
-                      LATE: parseFloat(
-                        this.state.birthLateFee.replace(/,/g, '')
-                      ),
-                      DELAYED: parseFloat(
-                        this.state.birthDelayedFee.replace(/,/g, '')
-                      )
-                    }
-                  },
-                  DEATH: {
-                    REGISTRATION_TARGET: parseInt(
-                      this.state.deathRegistrationTarget
-                    ),
-                    FEE: {
-                      ON_TIME: parseFloat(
-                        this.state.deathOnTimeFee.replace(/,/g, '')
-                      ),
-                      DELAYED: parseFloat(
-                        this.state.deathDelayedFee.replace(/,/g, '')
-                      )
-                    }
-                  },
-                  NID_NUMBER_PATTERN: this.state.nidPattern,
-                  PHONE_NUMBER_PATTERN: this.state.phoneNumberPattern,
-                  COUNTRY_LOGO: {
-                    file: this.state.govtLogo,
-                    fileName: this.state.logoFileName
+  return (
+    <ResponsiveModal
+      id={`${props.changeModalName}Modal`}
+      title={getTitle(intl, props.changeModalName)}
+      autoHeight={true}
+      titleHeightAuto={true}
+      show={showChangeModal}
+      contentScrollableY={
+        props.changeModalName === GeneralActionId.CURRENCY ? true : false
+      }
+      actions={[
+        <CancelButton
+          key="cancel"
+          id="modal_cancel"
+          onClick={props.toggleConfigModal}
+        >
+          {intl.formatMessage(buttonMessages.cancel)}
+        </CancelButton>,
+        <ApplyButton
+          key="apply"
+          id="apply_change"
+          disabled={isApplyButtonDisabled(state, props.changeModalName)}
+          onClick={() => {
+            mutationHandler(
+              props.changeModalName,
+              {
+                APPLICATION_NAME: applicationName,
+                CURRENCY: getCurrencyObject(currency),
+                BIRTH: {
+                  REGISTRATION_TARGET: parseInt(birthRegistrationTarget),
+                  LATE_REGISTRATION_TARGET: parseInt(
+                    birthLateRegistrationTarget
+                  ),
+                  FEE: {
+                    ON_TIME: parseFloat(birthOnTimeFee.replace(/,/g, '')),
+                    LATE: parseFloat(birthLateFee.replace(/,/g, '')),
+                    DELAYED: parseFloat(birthDelayedFee.replace(/,/g, ''))
                   }
                 },
-                valueChanged
-              )
-            }}
-          >
-            {intl.formatMessage(buttonMessages.apply)}
-          </ApplyButton>
-        ]}
-        handleClose={toggleConfigModal}
-      >
-        <Message>{getMessage(intl, changeModalName)}</Message>
-        {this.state.errorOccured && (
-          <ErrorContent>
-            <Alert color="invert" />
-            <ErrorMessage>
-              <div>{this.state.errorMessages}</div>
-            </ErrorMessage>
-          </ErrorContent>
-        )}
-        {changeModalName === GeneralActionId.APPLICATION_NAME && (
-          <Content>
-            <Field>
-              <InputField id="applicationName" touched={true} required={false}>
-                <HalfWidthInput
-                  id="applicationName"
+                DEATH: {
+                  REGISTRATION_TARGET: parseInt(deathRegistrationTarget),
+                  FEE: {
+                    ON_TIME: parseFloat(deathOnTimeFee.replace(/,/g, '')),
+                    DELAYED: parseFloat(deathDelayedFee.replace(/,/g, ''))
+                  }
+                },
+                NID_NUMBER_PATTERN: nidPattern,
+                PHONE_NUMBER_PATTERN: phoneNumberPattern,
+                COUNTRY_LOGO: {
+                  file: govtLogo,
+                  fileName: logoFileName
+                }
+              },
+              props.valueChanged
+            )
+          }}
+        >
+          {intl.formatMessage(buttonMessages.apply)}
+        </ApplyButton>
+      ]}
+      handleClose={props.toggleConfigModal}
+    >
+      <Message>{getMessage(intl, props.changeModalName)}</Message>
+      {errorOccured && (
+        <ErrorContent>
+          <Alert color="invert" />
+          <ErrorMessage>
+            <div>{errorMessages}</div>
+          </ErrorMessage>
+        </ErrorContent>
+      )}
+      {props.changeModalName === GeneralActionId.APPLICATION_NAME && (
+        <Content>
+          <Field>
+            <InputField id="applicationName" touched={true} required={false}>
+              <HalfWidthInput
+                id="applicationName"
+                type="text"
+                error={false}
+                value={applicationName}
+                onChange={handleApplicationName}
+              />
+            </InputField>
+          </Field>
+        </Content>
+      )}
+      {props.changeModalName === GeneralActionId.NID_PATTERN && (
+        <ContentComponent
+          intl={intl}
+          changeModalName={props.changeModalName}
+          pattern={nidPattern}
+          example={nidExample}
+          setPattern={handleNIDPattern}
+          setExample={handleNIDExample}
+          patternErrorMessage={intl.formatMessage(
+            messages.nidPatternChangeError
+          )}
+        />
+      )}
+      {props.changeModalName === GeneralActionId.PHONE_NUMBER && (
+        <ContentComponent
+          intl={intl}
+          changeModalName={props.changeModalName}
+          pattern={phoneNumberPattern}
+          example={phoneNumberExample}
+          setPattern={handlePhoneNumberPattern}
+          setExample={handlePhoneNumberExample}
+          patternErrorMessage={intl.formatMessage(
+            messages.phoneNumberChangeError
+          )}
+        />
+      )}
+      {props.changeModalName === GeneralActionId.GOVT_LOGO && (
+        <Content>
+          <Field id="govtLogoFile">
+            <SimpleDocumentUploader
+              label={logoFile.name ? logoFile.name : ''}
+              disableDeleteInPreview={false}
+              name={intl.formatMessage(messages.govermentLogoLabel)}
+              allowedDocType={['image/png', 'image/svg']}
+              onComplete={(file) => {
+                setErrorOccured(false)
+                setErrorMessages(EMPTY_STRING)
+                handleGovtLogo((file as IAttachmentValue).data as string)
+                handleLogoFile(file as IAttachmentValue)
+                handleLogoFileName(file as IAttachmentValue)
+              }}
+              files={logoFile}
+              onUploadingStateChanged={onUploadingStateChanged}
+              error={errorMessages}
+            />
+          </Field>
+        </Content>
+      )}
+      {props.changeModalName === GeneralActionId.CURRENCY && (
+        <Content>
+          <Field>
+            <InputField
+              id="applicationCurrency"
+              touched={true}
+              required={false}
+            >
+              <Select
+                id="selectCurrency"
+                isDisabled={false}
+                onChange={(val: string) => {
+                  setCurrency(val)
+                }}
+                value={currency}
+                options={getCurrencySelectOptions()}
+              />
+            </InputField>
+          </Field>
+        </Content>
+      )}
+      {props.changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET && (
+        <Content>
+          <Field>
+            <InputField
+              id="applicationBirthRegTarget"
+              touched={true}
+              required={false}
+            >
+              <InputContainer>
+                <SmallWidthInput
+                  id="applicationBirthRegTarget"
                   type="text"
                   error={false}
-                  value={this.state.applicationName}
-                  onChange={this.setApplicationName}
+                  value={birthRegistrationTarget}
+                  onChange={handleBirthRegistrationTarget}
                 />
-              </InputField>
-            </Field>
-          </Content>
-        )}
-        {changeModalName === GeneralActionId.NID_PATTERN && (
-          <ContentComponent
-            intl={intl}
-            changeModalName={changeModalName}
-            pattern={this.state.nidPattern}
-            example={this.state.nidExample}
-            setPattern={this.setNIDPattern}
-            setExample={this.setNIDExample}
-            patternErrorMessage={intl.formatMessage(
-              messages.nidPatternChangeError
-            )}
-          />
-        )}
-        {changeModalName === GeneralActionId.PHONE_NUMBER && (
-          <ContentComponent
-            intl={intl}
-            changeModalName={changeModalName}
-            pattern={this.state.phoneNumberPattern}
-            example={this.state.phoneNumberExample}
-            setPattern={this.setPhoneNumberPattern}
-            setExample={this.setPhoneNumberExample}
-            patternErrorMessage={intl.formatMessage(
-              messages.phoneNumberChangeError
-            )}
-          />
-        )}
-        {changeModalName === GeneralActionId.GOVT_LOGO && (
-          <Content>
-            <Field id="govtLogoFile">
-              <SimpleDocumentUploader
-                label={this.state.logoFile.name ? this.state.logoFile.name : ''}
-                disableDeleteInPreview={false}
-                name={intl.formatMessage(messages.govermentLogoLabel)}
-                allowedDocType={['image/png', 'image/svg']}
-                onComplete={(file) => {
-                  this.setState({
-                    errorOccured: false,
-                    errorMessages: EMPTY_STRING
-                  })
-                  this.setGovtLogo((file as IAttachmentValue).data as string)
-                  this.setLogoFile(file as IAttachmentValue)
-                  this.setLogoFileName(file as IAttachmentValue)
-                }}
-                files={this.state.logoFile}
-                onUploadingStateChanged={this.onUploadingStateChanged}
-                error={this.state.errorMessages}
-              />
-            </Field>
-          </Content>
-        )}
-        {changeModalName === GeneralActionId.CURRENCY && (
-          <Content>
-            <Field>
-              <InputField
-                id="applicationCurrency"
-                touched={true}
-                required={false}
-              >
-                <Select
-                  id="selectCurrency"
-                  isDisabled={false}
-                  onChange={(val: string) => {
-                    this.setState({
-                      currency: val
-                    })
-                  }}
-                  value={this.state.currency}
-                  options={getCurrencySelectOptions()}
+                <span>
+                  {intl.formatMessage(messages.eventTargetInputLabel)}
+                </span>
+              </InputContainer>
+            </InputField>
+          </Field>
+        </Content>
+      )}
+      {props.changeModalName ===
+        BirthActionId.BIRTH_LATE_REGISTRATION_TARGET && (
+        <Content>
+          <Field>
+            <InputField
+              id="applicationBirthLateRegTarget"
+              touched={true}
+              required={false}
+            >
+              <InputContainer>
+                <SmallWidthInput
+                  id="applicationBirthLateRegTarget"
+                  type="text"
+                  error={false}
+                  value={birthLateRegistrationTarget}
+                  onChange={handleBirthLateRegistrationTarget}
                 />
-              </InputField>
-            </Field>
-          </Content>
-        )}
-        {changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET && (
-          <Content>
-            <Field>
-              <InputField
-                id="applicationBirthRegTarget"
-                touched={true}
-                required={false}
-              >
-                <InputContainer>
-                  <SmallWidthInput
-                    id="applicationBirthRegTarget"
-                    type="text"
-                    error={false}
-                    value={this.state.birthRegistrationTarget}
-                    onChange={this.setBirthRegistrationTarget}
-                  />
-                  <span>
-                    {intl.formatMessage(messages.eventTargetInputLabel)}
-                  </span>
-                </InputContainer>
-              </InputField>
-            </Field>
-          </Content>
-        )}
-        {changeModalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET && (
-          <Content>
-            <Field>
-              <InputField
-                id="applicationBirthLateRegTarget"
-                touched={true}
-                required={false}
-              >
-                <InputContainer>
-                  <SmallWidthInput
-                    id="applicationBirthLateRegTarget"
-                    type="text"
-                    error={false}
-                    value={this.state.birthLateRegistrationTarget}
-                    onChange={this.setBirthLateRegistrationTarget}
-                  />
-                  <span>
-                    {intl.formatMessage(messages.eventTargetInputLabel)}
-                  </span>
-                </InputContainer>
-              </InputField>
-            </Field>
-          </Content>
-        )}
-        {changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET && (
-          <Content>
-            <Field>
-              <InputField
-                id="applicationDeathRegTarget"
-                touched={true}
-                required={false}
-              >
-                <InputContainer>
-                  <SmallWidthInput
-                    id="applicationDeathRegTarget"
-                    type="text"
-                    error={false}
-                    value={this.state.deathRegistrationTarget}
-                    onChange={this.setDeathRegistrationTarget}
-                  />
-                  <span>
-                    {intl.formatMessage(messages.eventTargetInputLabel)}
-                  </span>
-                </InputContainer>
-              </InputField>
-            </Field>
-          </Content>
-        )}
-        {changeModalName === BirthActionId.BIRTH_ON_TIME_FEE && (
-          <Content>
-            <Field>
-              <InputField
-                id="applicationBirthOnTimeFee"
-                touched={true}
-                required={false}
-              >
-                <InputContainer>
-                  <span>{getCurrency(offlineCountryConfiguration)}</span>
-                  <HalfWidthInput
-                    id="applicationBirthOnTimeFee"
-                    type="text"
-                    error={false}
-                    value={this.state.birthOnTimeFee}
-                    onChange={this.setBirthOnTimeFee}
-                  />
-                </InputContainer>
-              </InputField>
-            </Field>
-          </Content>
-        )}
-        {changeModalName === BirthActionId.BIRTH_LATE_FEE && (
-          <Content>
-            <Field>
-              <InputField
-                id="applicationBirthLateFee"
-                touched={true}
-                required={false}
-              >
-                <InputContainer>
-                  <span>{getCurrency(offlineCountryConfiguration)}</span>
-                  <HalfWidthInput
-                    id="applicationBirthLateFee"
-                    type="text"
-                    error={false}
-                    value={this.state.birthLateFee}
-                    onChange={this.setBirthLateFee}
-                  />
-                </InputContainer>
-              </InputField>
-            </Field>
-          </Content>
-        )}
-        {changeModalName === BirthActionId.BIRTH_DELAYED_FEE && (
-          <Content>
-            <Field>
-              <InputField
-                id="applicationBirthDelayedFee"
-                touched={true}
-                required={false}
-              >
-                <InputContainer>
-                  <span>{getCurrency(offlineCountryConfiguration)}</span>
-                  <HalfWidthInput
-                    id="applicationBirthDelayedFee"
-                    type="text"
-                    error={false}
-                    value={this.state.birthDelayedFee}
-                    onChange={this.setBirthDelayedFee}
-                  />
-                </InputContainer>
-              </InputField>
-            </Field>
-          </Content>
-        )}
-        {changeModalName === DeathActionId.DEATH_ON_TIME_FEE && (
-          <Content>
-            <Field>
-              <InputField
-                id="applicationDeathOnTimeFee"
-                touched={true}
-                required={false}
-              >
-                <InputContainer>
-                  <span>{getCurrency(offlineCountryConfiguration)}</span>
-                  <HalfWidthInput
-                    id="applicationDeathOnTimeFee"
-                    type="text"
-                    error={false}
-                    value={this.state.deathOnTimeFee}
-                    onChange={this.setDeathOnTimeFee}
-                  />
-                </InputContainer>
-              </InputField>
-            </Field>
-          </Content>
-        )}
-        {changeModalName === DeathActionId.DEATH_DELAYED_FEE && (
-          <Content>
-            <Field>
-              <InputField
-                id="applicationDeathDelayedFee"
-                touched={true}
-                required={false}
-              >
-                <InputContainer>
-                  <span>{getCurrency(offlineCountryConfiguration)}</span>
-                  <HalfWidthInput
-                    id="applicationDeathDelayedFee"
-                    type="text"
-                    error={false}
-                    value={this.state.deathDelayedFee}
-                    onChange={this.setDeathDelayedFee}
-                  />
-                </InputContainer>
-              </InputField>
-            </Field>
-          </Content>
-        )}
-      </ResponsiveModal>
-    )
-  }
+                <span>
+                  {intl.formatMessage(messages.eventTargetInputLabel)}
+                </span>
+              </InputContainer>
+            </InputField>
+          </Field>
+        </Content>
+      )}
+      {props.changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET && (
+        <Content>
+          <Field>
+            <InputField
+              id="applicationDeathRegTarget"
+              touched={true}
+              required={false}
+            >
+              <InputContainer>
+                <SmallWidthInput
+                  id="applicationDeathRegTarget"
+                  type="text"
+                  error={false}
+                  value={deathRegistrationTarget}
+                  onChange={handleDeathRegistrationTarget}
+                />
+                <span>
+                  {intl.formatMessage(messages.eventTargetInputLabel)}
+                </span>
+              </InputContainer>
+            </InputField>
+          </Field>
+        </Content>
+      )}
+      {props.changeModalName === BirthActionId.BIRTH_ON_TIME_FEE && (
+        <Content>
+          <Field>
+            <InputField
+              id="applicationBirthOnTimeFee"
+              touched={true}
+              required={false}
+            >
+              <InputContainer>
+                <span>{getCurrency(offlineCountryConfiguration)}</span>
+                <HalfWidthInput
+                  id="applicationBirthOnTimeFee"
+                  type="text"
+                  error={false}
+                  value={birthOnTimeFee}
+                  onChange={handleBirthOnTimeFee}
+                />
+              </InputContainer>
+            </InputField>
+          </Field>
+        </Content>
+      )}
+      {props.changeModalName === BirthActionId.BIRTH_LATE_FEE && (
+        <Content>
+          <Field>
+            <InputField
+              id="applicationBirthLateFee"
+              touched={true}
+              required={false}
+            >
+              <InputContainer>
+                <span>{getCurrency(offlineCountryConfiguration)}</span>
+                <HalfWidthInput
+                  id="applicationBirthLateFee"
+                  type="text"
+                  error={false}
+                  value={birthLateFee}
+                  onChange={handleBirthLateFee}
+                />
+              </InputContainer>
+            </InputField>
+          </Field>
+        </Content>
+      )}
+      {props.changeModalName === BirthActionId.BIRTH_DELAYED_FEE && (
+        <Content>
+          <Field>
+            <InputField
+              id="applicationBirthDelayedFee"
+              touched={true}
+              required={false}
+            >
+              <InputContainer>
+                <span>{getCurrency(offlineCountryConfiguration)}</span>
+                <HalfWidthInput
+                  id="applicationBirthDelayedFee"
+                  type="text"
+                  error={false}
+                  value={birthDelayedFee}
+                  onChange={handleBirthDelayedFee}
+                />
+              </InputContainer>
+            </InputField>
+          </Field>
+        </Content>
+      )}
+      {props.changeModalName === DeathActionId.DEATH_ON_TIME_FEE && (
+        <Content>
+          <Field>
+            <InputField
+              id="applicationDeathOnTimeFee"
+              touched={true}
+              required={false}
+            >
+              <InputContainer>
+                <span>{getCurrency(offlineCountryConfiguration)}</span>
+                <HalfWidthInput
+                  id="applicationDeathOnTimeFee"
+                  type="text"
+                  error={false}
+                  value={deathOnTimeFee}
+                  onChange={handleDeathOnTimeFee}
+                />
+              </InputContainer>
+            </InputField>
+          </Field>
+        </Content>
+      )}
+      {props.changeModalName === DeathActionId.DEATH_DELAYED_FEE && (
+        <Content>
+          <Field>
+            <InputField
+              id="applicationDeathDelayedFee"
+              touched={true}
+              required={false}
+            >
+              <InputContainer>
+                <span>{getCurrency(offlineCountryConfiguration)}</span>
+                <HalfWidthInput
+                  id="applicationDeathDelayedFee"
+                  type="text"
+                  error={false}
+                  value={deathDelayedFee}
+                  onChange={handleDeathDelayedFee}
+                />
+              </InputContainer>
+            </InputField>
+          </Field>
+        </Content>
+      )}
+    </ResponsiveModal>
+  )
 }
 
-function mapStateToProps(state: IStoreState) {
-  return {
-    offlineCountryConfiguration: getOfflineData(state)
-  }
-}
-
-export const DynamicModal = connect(mapStateToProps, {
-  updateConfig: updateOfflineConfigData
-})(injectIntl(DynamicModalComponent))
+export const DynamicModal = DynamicModalComponent
