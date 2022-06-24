@@ -2154,7 +2154,7 @@ export const formMessageDescriptors: IFormMessages = {
   },
   tooltipNationalID: {
     defaultMessage:
-      'If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.',
+      'The National ID can only be numeric and must be 9 digits long',
     description: 'Tooltip for form field: iD number',
     id: 'form.field.tooltip.tooltipNationalID'
   },
@@ -2275,7 +2275,7 @@ export const formMessageDescriptors: IFormMessages = {
   },
   helperTextNID: {
     defaultMessage:
-      'If the National ID number is 13 digits long, you must add the year of birth at the beginning. Like this: YYYY0000000000000. If the National ID number is 10 digits long ID, please use an older ID.',
+      'The National ID can only be numeric and must be 9 digits long',
     description: 'Helper text for nid input field',
     id: 'form.field.helpertext.nid'
   },
