@@ -23,6 +23,7 @@ import { getCurrentUserID, IUserData } from '@client/declarations'
 import * as LogRocket from 'logrocket'
 import { refreshToken } from '@client/utils/authUtils'
 import {
+  DESKTOP_TIME_OUT_MILLISECONDS,
   LOADER_MIN_DISPLAY_TIME,
   REFRESH_TOKEN_CHECK_MILLIS
 } from '@client/utils/constants'
@@ -250,10 +251,7 @@ class ProtectedPageComponent extends React.Component<Props, IProtectPageState> {
       )
     }
     return (
-      <IdleTimer
-        onIdle={this.onIdle}
-        timeout={window.config.DESKTOP_TIME_OUT_MILLISECONDS}
-      >
+      <IdleTimer onIdle={this.onIdle} timeout={DESKTOP_TIME_OUT_MILLISECONDS}>
         {this.conditionalRenderUponSecuredState()}
       </IdleTimer>
     )

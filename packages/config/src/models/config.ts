@@ -37,23 +37,14 @@ interface ICountryLogo {
 }
 export interface IApplicationConfigurationModel extends Document {
   APPLICATION_NAME: string
-  BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   BIRTH: IBirth
-  COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
-  COUNTRY_LOGO_RENDER_WIDTH: number
-  COUNTRY_LOGO_RENDER_HEIGHT: number
   CURRENCY: ICurrency
   DEATH: IDeath
-  DESKTOP_TIME_OUT_MILLISECONDS: number
-  UI_POLLING_INTERVAL: number
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
-  INFORMANT_MINIMUM_AGE: number
   HIDE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
-  SENTRY: string
-  LOGROCKET: string
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: string
   ADDRESSES: number
@@ -89,20 +80,10 @@ const currencySchema = new Schema<ICurrency>({
 
 const systemSchema = new Schema({
   APPLICATION_NAME: { type: String, required: false, default: 'OpenCRVS' },
-  BACKGROUND_SYNC_BROADCAST_CHANNEL: { type: String, required: false },
   BIRTH: { type: birthSchema, required: false },
-  COUNTRY: { type: String, required: false },
   COUNTRY_LOGO: { type: countryLogoSchema, required: false },
-  COUNTRY_LOGO_RENDER_WIDTH: { type: Number, required: false, default: 104 },
-  COUNTRY_LOGO_RENDER_HEIGHT: { type: Number, required: false, default: 104 },
   CURRENCY: { type: currencySchema, required: false },
   DEATH: { type: deathSchema, required: false },
-  DESKTOP_TIME_OUT_MILLISECONDS: {
-    type: Number,
-    required: false,
-    default: 900000
-  },
-  UI_POLLING_INTERVAL: { type: Number, required: false, default: 5000 },
   FIELD_AGENT_AUDIT_LOCATIONS: {
     type: String,
     required: false,
@@ -113,7 +94,6 @@ const systemSchema = new Schema({
     required: false,
     default: 'DISTRICT'
   },
-  INFORMANT_MINIMUM_AGE: { type: Number, required: false, default: 16 },
   HIDE_EVENT_REGISTER_INFORMATION: {
     type: Boolean,
     required: false,
@@ -126,8 +106,6 @@ const systemSchema = new Schema({
   },
   PHONE_NUMBER_PATTERN: { type: String, required: false },
   NID_NUMBER_PATTERN: { type: String, required: false },
-  SENTRY: { type: String, required: false },
-  LOGROCKET: { type: String, required: false },
   ADDRESSES: {
     type: Number,
     required: false,

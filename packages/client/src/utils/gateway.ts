@@ -85,50 +85,30 @@ export enum AddressType {
 export type ApplicationConfiguration = {
   __typename?: 'ApplicationConfiguration'
   ADDRESSES?: Maybe<Scalars['Int']>
-  APPLICATION_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
   APPLICATION_NAME?: Maybe<Scalars['String']>
-  BACKGROUND_SYNC_BROADCAST_CHANNEL?: Maybe<Scalars['String']>
   BIRTH?: Maybe<Birth>
-  COUNTRY?: Maybe<Scalars['String']>
   COUNTRY_LOGO?: Maybe<CountryLogo>
-  COUNTRY_LOGO_RENDER_HEIGHT?: Maybe<Scalars['Int']>
-  COUNTRY_LOGO_RENDER_WIDTH?: Maybe<Scalars['Int']>
   CURRENCY?: Maybe<Currency>
   DEATH?: Maybe<Death>
-  DESKTOP_TIME_OUT_MILLISECONDS?: Maybe<Scalars['Int']>
   EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
-  INFORMANT_MINIMUM_AGE?: Maybe<Scalars['Int']>
-  LOGROCKET?: Maybe<Scalars['String']>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
-  SENTRY?: Maybe<Scalars['String']>
-  UI_POLLING_INTERVAL?: Maybe<Scalars['Int']>
 }
 
 export type ApplicationConfigurationInput = {
   ADDRESSES?: InputMaybe<Scalars['Int']>
-  APPLICATION_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
   APPLICATION_NAME?: InputMaybe<Scalars['String']>
-  BACKGROUND_SYNC_BROADCAST_CHANNEL?: InputMaybe<Scalars['String']>
   BIRTH?: InputMaybe<BirthInput>
-  COUNTRY?: InputMaybe<Scalars['String']>
   COUNTRY_LOGO?: InputMaybe<CountryLogoInput>
-  COUNTRY_LOGO_RENDER_HEIGHT?: InputMaybe<Scalars['Int']>
-  COUNTRY_LOGO_RENDER_WIDTH?: InputMaybe<Scalars['Int']>
   CURRENCY?: InputMaybe<CurrencyInput>
   DEATH?: InputMaybe<DeathInput>
-  DESKTOP_TIME_OUT_MILLISECONDS?: InputMaybe<Scalars['Int']>
   EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
-  INFORMANT_MINIMUM_AGE?: InputMaybe<Scalars['Int']>
-  LOGROCKET?: InputMaybe<Scalars['String']>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
-  SENTRY?: InputMaybe<Scalars['String']>
-  UI_POLLING_INTERVAL?: InputMaybe<Scalars['Int']>
 }
 
 export type Attachment = {
