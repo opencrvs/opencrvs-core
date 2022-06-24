@@ -105,10 +105,10 @@ function getInformant(draft: IDeclarationWithContactPoint): string {
   return informantType
 }
 
-class LocalInProgressDataDetailsComponent extends React.Component<
-  IProps & IntlShapeProps
-> {
-  transformer = (draft?: IDeclarationWithContactPoint) => {
+const LocalInProgressDataDetailsComponent = (
+  props: IProps & IntlShapeProps
+) => {
+  const transformer = (draft?: IDeclarationWithContactPoint) => {
     if (!draft) {
       return {}
     }
@@ -129,43 +129,39 @@ class LocalInProgressDataDetailsComponent extends React.Component<
     }
   }
 
-  render() {
-    const { intl, draft } = this.props
-    const transformedData = this.transformer(draft)
-    const timestamp =
-      (transformedData.draftStartedOn &&
-        format(
-          new Date(transformedData.draftStartedOn),
-          CERTIFICATE_DATE_FORMAT
-        )) ||
-      ''
+  const { intl, draft } = props
+  const transformedData = transformer(draft)
+  const timestamp =
+    (transformedData.draftStartedOn &&
+      format(
+        new Date(transformedData.draftStartedOn),
+        CERTIFICATE_DATE_FORMAT
+      )) ||
+    ''
 
-    return (
-      <ExpansionContent>
-        <HistoryWrapper>
-          <ExpansionContainer>
-            <StatusIcon>
-              <StatusProgress />
-            </StatusIcon>
-            <ExpansionContentContainer>
-              <LabelValue
-                label={intl.formatMessage(
-                  constantsMessages.declarationStartedOn
-                )}
-                value={timestamp}
-              />
-              <ExpansionContainer>
-                <label>{intl.formatMessage(messages.informantContact)}:</label>
-                <BoldSpan>
-                  {[transformedData.informantContactNumber || '']}
-                </BoldSpan>
-              </ExpansionContainer>
-            </ExpansionContentContainer>
-          </ExpansionContainer>
-        </HistoryWrapper>
-      </ExpansionContent>
-    )
-  }
+  return (
+    <ExpansionContent>
+      <HistoryWrapper>
+        <ExpansionContainer>
+          <StatusIcon>
+            <StatusProgress />
+          </StatusIcon>
+          <ExpansionContentContainer>
+            <LabelValue
+              label={intl.formatMessage(constantsMessages.declarationStartedOn)}
+              value={timestamp}
+            />
+            <ExpansionContainer>
+              <label>{intl.formatMessage(messages.informantContact)}:</label>
+              <BoldSpan>
+                {[transformedData.informantContactNumber || '']}
+              </BoldSpan>
+            </ExpansionContainer>
+          </ExpansionContentContainer>
+        </ExpansionContainer>
+      </HistoryWrapper>
+    </ExpansionContent>
+  )
 }
 
 function mapStateToProps(state: IStoreState, props: { eventId: string }) {

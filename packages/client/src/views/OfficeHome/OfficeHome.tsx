@@ -65,6 +65,7 @@ import {
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { PERFORMANCE_HOME } from '@client/navigation/routes'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { useState, useEffect, useCallback, useRef } from 'react'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -132,18 +133,6 @@ interface IBaseOfficeHomeStateProps {
   userDetails: IUserDetails | null
 }
 
-interface IOfficeHomeState {
-  draftCurrentPage: number
-  healthSystemCurrentPage: number
-  progressCurrentPage: number
-  reviewCurrentPage: number
-  approvalCurrentPage: number
-  printCurrentPage: number
-  externalValidationCurrentPage: number
-  requireUpdateCurrentPage: number
-  showCertificateToast: boolean
-}
-
 type IOfficeHomeProps = IntlShapeProps &
   IDispatchProps &
   IBaseOfficeHomeStateProps
@@ -157,159 +146,149 @@ export const EVENT_STATUS = {
   WAITING_VALIDATION: 'WAITING_VALIDATION'
 }
 
-export class OfficeHomeView extends React.Component<
-  IOfficeHomeProps,
-  IOfficeHomeState
-> {
-  pageSize = 10
-  showPaginated = false
-  interval: any = undefined
-  role = this.props.userDetails && this.props.userDetails.role
-  isFieldAgent = this.role
-    ? FIELD_AGENT_ROLES.includes(this.role)
+export const OfficeHomeView = (props: IOfficeHomeProps) => {
+  const pageSize = 10
+  const showPaginated = false
+  const interval: any = useRef(undefined)
+  const role = props.userDetails && props.userDetails.role
+  const { intl, updateRegistrarWorkqueue, userDetails } = props
+  const isFieldAgent = role
+    ? FIELD_AGENT_ROLES.includes(role)
       ? true
       : false
     : false
-
-  constructor(props: IOfficeHomeProps) {
-    super(props)
-    this.state = {
-      draftCurrentPage: 1,
-      healthSystemCurrentPage: 1,
-      progressCurrentPage: 1,
-      reviewCurrentPage: 1,
-      approvalCurrentPage: 1,
-      printCurrentPage: 1,
-      requireUpdateCurrentPage: 1,
-      externalValidationCurrentPage: 1,
-      showCertificateToast: Boolean(
-        this.props.declarations.filter(
-          (item) => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
-        ).length
-      )
-    }
-  }
-
-  updateWorkqueue() {
-    this.props.updateRegistrarWorkqueue(
-      this.props.userDetails?.practitionerId,
-      this.pageSize,
-      this.isFieldAgent,
-      Math.max(this.state.progressCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.healthSystemCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.reviewCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.requireUpdateCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.approvalCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.externalValidationCurrentPage - 1, 0) * this.pageSize,
-      Math.max(this.state.printCurrentPage - 1, 0) * this.pageSize
+  const [draftCurrentPage, setDraftCurrentPage] = useState<number>(1)
+  const [healthSystemCurrentPage, setHealthSystemCurrentPage] =
+    useState<number>(1)
+  const [progressCurrentPage, setProgressCurrentPage] = useState<number>(1)
+  const [reviewCurrentPage, setReviewCurrentPage] = useState<number>(1)
+  const [approvalCurrentPage, setApprovalCurrentPage] = useState<number>(1)
+  const [printCurrentPage, setPrintCurrentPage] = useState<number>(1)
+  const [requireUpdateCurrentPage, setRequireUpdateCurrentPage] =
+    useState<number>(1)
+  const [externalValidationCurrentPage, setExternalValidationCurrentPage] =
+    useState<number>(1)
+  const [showCertificateToast, setShowCertificateToast] = useState<boolean>(
+    Boolean(
+      props.declarations.filter(
+        (item) => item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY
+      ).length
     )
-  }
+  )
 
-  syncWorkqueue() {
-    setTimeout(() => this.updateWorkqueue(), PAGE_TRANSITIONS_ENTER_TIME)
-    this.interval = setInterval(() => {
-      this.updateWorkqueue()
-    }, 300000)
-  }
+  const syncWorkqueue = useCallback(
+    (
+      healthSystemCurrentPage,
+      progressCurrentPage,
+      reviewCurrentPage,
+      approvalCurrentPage,
+      printCurrentPage,
+      requireUpdateCurrentPage,
+      externalValidationCurrentPage
+    ) => {
+      const updateWorkqueue = () => {
+        updateRegistrarWorkqueue(
+          userDetails?.practitionerId,
+          pageSize,
+          isFieldAgent,
+          Math.max(progressCurrentPage - 1, 0) * pageSize,
+          Math.max(healthSystemCurrentPage - 1, 0) * pageSize,
+          Math.max(reviewCurrentPage - 1, 0) * pageSize,
+          Math.max(requireUpdateCurrentPage - 1, 0) * pageSize,
+          Math.max(approvalCurrentPage - 1, 0) * pageSize,
+          Math.max(externalValidationCurrentPage - 1, 0) * pageSize,
+          Math.max(printCurrentPage - 1, 0) * pageSize
+        )
+      }
 
-  componentDidMount() {
-    this.syncWorkqueue()
-  }
+      setTimeout(() => updateWorkqueue(), PAGE_TRANSITIONS_ENTER_TIME)
 
-  componentWillUnmount() {
-    clearInterval(this.interval)
-  }
+      interval.current = setInterval(() => {
+        updateWorkqueue()
+      }, 300000)
+    },
+    [updateRegistrarWorkqueue, userDetails, isFieldAgent, pageSize]
+  )
 
-  componentDidUpdate(prevProps: IOfficeHomeProps) {
-    if (prevProps.tabId !== this.props.tabId) {
-      this.setState({
-        draftCurrentPage: 1,
-        healthSystemCurrentPage: 1,
-        progressCurrentPage: 1,
-        reviewCurrentPage: 1,
-        approvalCurrentPage: 1,
-        printCurrentPage: 1,
-        requireUpdateCurrentPage: 1,
-        externalValidationCurrentPage: 1
-      })
-      this.syncWorkqueue()
+  useEffect(() => {
+    syncWorkqueue(
+      healthSystemCurrentPage,
+      progressCurrentPage,
+      reviewCurrentPage,
+      approvalCurrentPage,
+      printCurrentPage,
+      requireUpdateCurrentPage,
+      externalValidationCurrentPage
+    )
+
+    return () => {
+      clearInterval(interval.current)
     }
-  }
-  userHasRegisterScope() {
-    return this.props.scope && this.props.scope.includes('register')
-  }
+  }, [
+    draftCurrentPage,
+    healthSystemCurrentPage,
+    progressCurrentPage,
+    reviewCurrentPage,
+    approvalCurrentPage,
+    printCurrentPage,
+    requireUpdateCurrentPage,
+    externalValidationCurrentPage,
+    syncWorkqueue
+  ])
 
-  userHasValidateScope() {
-    return this.props.scope && this.props.scope.includes('validate')
-  }
+  useEffect(() => {
+    setDraftCurrentPage(1)
+    setHealthSystemCurrentPage(1)
+    setProgressCurrentPage(1)
+    setReviewCurrentPage(1)
+    setApprovalCurrentPage(1)
+    setPrintCurrentPage(1)
+    setRequireUpdateCurrentPage(1)
+    setExternalValidationCurrentPage(1)
+    syncWorkqueue(1, 1, 1, 1, 1, 1, 1)
+  }, [props.tabId, syncWorkqueue])
 
-  subtractDeclarationsWithStatus(count: number, status: string[]) {
-    const outboxCount = this.props.storedDeclarations.filter(
-      (app) => app.submissionStatus && status.includes(app.submissionStatus)
-    ).length
-    return count - outboxCount
-  }
-
-  onPageChange = (newPageNumber: number) => {
-    switch (this.props.tabId) {
+  function onPageChange(newPageNumber: number) {
+    switch (props.tabId) {
       case WORKQUEUE_TABS.inProgress:
         if (
-          this.props.selectorId &&
-          this.props.selectorId === SELECTOR_ID.fieldAgentDrafts
+          props.selectorId &&
+          props.selectorId === SELECTOR_ID.fieldAgentDrafts
         ) {
-          this.setState({ progressCurrentPage: newPageNumber }, () => {
-            this.syncWorkqueue()
-          })
+          setProgressCurrentPage(newPageNumber)
         } else if (
-          this.props.selectorId &&
-          this.props.selectorId === SELECTOR_ID.hospitalDrafts
+          props.selectorId &&
+          props.selectorId === SELECTOR_ID.hospitalDrafts
         ) {
-          this.setState({ healthSystemCurrentPage: newPageNumber }, () => {
-            this.syncWorkqueue()
-          })
+          setHealthSystemCurrentPage(newPageNumber)
         } else {
-          this.setState({ draftCurrentPage: newPageNumber }, () => {
-            this.syncWorkqueue()
-          })
+          setDraftCurrentPage(newPageNumber)
         }
-
         break
       case WORKQUEUE_TABS.readyForReview:
-        this.setState({ reviewCurrentPage: newPageNumber }, () => {
-          this.syncWorkqueue()
-        })
+        setReviewCurrentPage(newPageNumber)
         break
       case WORKQUEUE_TABS.requiresUpdate:
-        this.setState({ requireUpdateCurrentPage: newPageNumber }, () => {
-          this.syncWorkqueue()
-        })
+        setRequireUpdateCurrentPage(newPageNumber)
         break
       case WORKQUEUE_TABS.sentForApproval:
-        this.setState({ approvalCurrentPage: newPageNumber }, () => {
-          this.syncWorkqueue()
-        })
+        setApprovalCurrentPage(newPageNumber)
         break
       case WORKQUEUE_TABS.readyToPrint:
-        this.setState({ printCurrentPage: newPageNumber }, () => {
-          this.syncWorkqueue()
-        })
+        setPrintCurrentPage(newPageNumber)
         break
       case WORKQUEUE_TABS.externalValidation:
-        this.setState({ externalValidationCurrentPage: newPageNumber }, () => {
-          this.syncWorkqueue()
-        })
+        setExternalValidationCurrentPage(newPageNumber)
         break
       case WORKQUEUE_TABS.sentForReview:
-        this.setState({ reviewCurrentPage: newPageNumber }, () => {
-          this.syncWorkqueue()
-        })
+        setReviewCurrentPage(newPageNumber)
         break
       default:
-        throw new Error(`Unknown tab id when changing page ${this.props.tabId}`)
+        throw new Error(`Unknown tab id when changing page ${props.tabId}`)
     }
   }
 
-  getData = (
+  const getData = (
     draftCurrentPage: number,
     healthSystemCurrentPage: number,
     progressCurrentPage: number,
@@ -326,7 +305,7 @@ export class OfficeHomeView extends React.Component<
       selectorId,
       storedDeclarations,
       declarationsReadyToSend
-    } = this.props
+    } = props
     const { loading, error, data } = workqueue
     const filteredData = filterProcessingDeclarationsFromQuery(
       data,
@@ -335,17 +314,17 @@ export class OfficeHomeView extends React.Component<
 
     return (
       <>
-        {this.role &&
-          (NATL_ADMIN_ROLES.includes(this.role) ||
-            PERFORMANCE_MANAGEMENT_ROLES.includes(this.role)) && (
+        {role &&
+          (NATL_ADMIN_ROLES.includes(role) ||
+            PERFORMANCE_MANAGEMENT_ROLES.includes(role)) && (
             <Redirect to={PERFORMANCE_HOME} />
           )}
-        {this.role && SYS_ADMIN_ROLES.includes(this.role) && (
+        {role && SYS_ADMIN_ROLES.includes(role) && (
           <Redirect
             to={{
               pathname: PERFORMANCE_HOME,
               search: `?locationId=${getDefaultPerformanceLocationId(
-                this.props.userDetails as IUserDetails
+                props.userDetails as IUserDetails
               )}`
             }}
           />
@@ -356,7 +335,7 @@ export class OfficeHomeView extends React.Component<
             <InProgress
               drafts={drafts}
               selectorId={selectorId}
-              isFieldAgent={this.isFieldAgent}
+              isFieldAgent={isFieldAgent}
               queryData={{
                 inProgressData: filteredData.inProgressTab,
                 notificationData: filteredData.notificationTab
@@ -366,13 +345,13 @@ export class OfficeHomeView extends React.Component<
                 fieldAgentId: progressCurrentPage,
                 healthSystemId: healthSystemCurrentPage
               }}
-              pageSize={this.pageSize}
-              onPageChange={this.onPageChange}
+              pageSize={pageSize}
+              onPageChange={onPageChange}
               loading={loading}
               error={error}
             />
           )}
-          {!this.isFieldAgent ? (
+          {!isFieldAgent ? (
             <>
               {tabId === WORKQUEUE_TABS.readyForReview && (
                 <ReadyForReview
@@ -380,8 +359,8 @@ export class OfficeHomeView extends React.Component<
                     data: filteredData.reviewTab
                   }}
                   paginationId={reviewCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
+                  pageSize={pageSize}
+                  onPageChange={onPageChange}
                   loading={loading}
                   error={error}
                 />
@@ -392,8 +371,8 @@ export class OfficeHomeView extends React.Component<
                     data: filteredData.rejectTab
                   }}
                   paginationId={requireUpdateCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
+                  pageSize={pageSize}
+                  onPageChange={onPageChange}
                   loading={loading}
                   error={error}
                 />
@@ -406,8 +385,8 @@ export class OfficeHomeView extends React.Component<
                       data: filteredData.externalValidationTab
                     }}
                     paginationId={externalValidationCurrentPage}
-                    pageSize={this.pageSize}
-                    onPageChange={this.onPageChange}
+                    pageSize={pageSize}
+                    onPageChange={onPageChange}
                     loading={loading}
                     error={error}
                   />
@@ -418,8 +397,8 @@ export class OfficeHomeView extends React.Component<
                     data: filteredData.approvalTab
                   }}
                   paginationId={approvalCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
+                  pageSize={pageSize}
+                  onPageChange={onPageChange}
                   loading={loading}
                   error={error}
                 />
@@ -430,8 +409,8 @@ export class OfficeHomeView extends React.Component<
                     data: filteredData.printTab
                   }}
                   paginationId={printCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
+                  pageSize={pageSize}
+                  onPageChange={onPageChange}
                   loading={loading}
                   error={error}
                 />
@@ -445,8 +424,8 @@ export class OfficeHomeView extends React.Component<
                     data: filteredData.reviewTab
                   }}
                   paginationId={reviewCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
+                  pageSize={pageSize}
+                  onPageChange={onPageChange}
                   loading={loading}
                   error={error}
                 />
@@ -457,8 +436,8 @@ export class OfficeHomeView extends React.Component<
                     data: filteredData.rejectTab
                   }}
                   paginationId={requireUpdateCurrentPage}
-                  pageSize={this.pageSize}
-                  onPageChange={this.onPageChange}
+                  pageSize={pageSize}
+                  onPageChange={onPageChange}
                   loading={loading}
                   error={error}
                 />
@@ -470,59 +449,41 @@ export class OfficeHomeView extends React.Component<
     )
   }
 
-  render() {
-    const { intl } = this.props
-    const {
-      draftCurrentPage,
-      healthSystemCurrentPage,
-      progressCurrentPage,
-      reviewCurrentPage,
-      approvalCurrentPage,
-      printCurrentPage,
-      externalValidationCurrentPage,
-      requireUpdateCurrentPage
-    } = this.state
+  return (
+    <>
+      <Header title={intl.formatMessage(navigationMessages[props.tabId])} />
+      {getData(
+        draftCurrentPage,
+        healthSystemCurrentPage,
+        progressCurrentPage,
+        reviewCurrentPage,
+        approvalCurrentPage,
+        printCurrentPage,
+        externalValidationCurrentPage,
+        requireUpdateCurrentPage
+      )}
 
-    return (
-      <>
-        <Header
-          title={intl.formatMessage(navigationMessages[this.props.tabId])}
+      <FABContainer>
+        <FloatingActionButton
+          id="new_event_declaration"
+          onClick={props.goToEvents}
+          icon={() => <PlusTransparentWhite />}
         />
-        {this.getData(
-          draftCurrentPage,
-          healthSystemCurrentPage,
-          progressCurrentPage,
-          reviewCurrentPage,
-          approvalCurrentPage,
-          printCurrentPage,
-          externalValidationCurrentPage,
-          requireUpdateCurrentPage
-        )}
+      </FABContainer>
+      <NotificationToast showPaginated={showPaginated} />
 
-        <FABContainer>
-          <FloatingActionButton
-            id="new_event_declaration"
-            onClick={this.props.goToEvents}
-            icon={() => <PlusTransparentWhite />}
-          />
-        </FABContainer>
-        <NotificationToast showPaginated={this.showPaginated} />
-
-        {this.state.showCertificateToast && (
-          <FloatingNotification
-            id="print-cert-notification"
-            type={NOTIFICATION_TYPE.SUCCESS}
-            show={this.state.showCertificateToast}
-            callback={() => {
-              this.setState({ showCertificateToast: false })
-            }}
-          >
-            {intl.formatMessage(certificateMessage.toastMessage)}
-          </FloatingNotification>
-        )}
-      </>
-    )
-  }
+      {showCertificateToast && (
+        <FloatingNotification
+          id="print-cert-notification"
+          type={NOTIFICATION_TYPE.SUCCESS}
+          show={showCertificateToast}
+          callback={() => setShowCertificateToast(false)}
+        >
+          {intl.formatMessage(certificateMessage.toastMessage)}
+        </FloatingNotification>
+      )}
+    </>
+  )
 }
 
 function mapStateToProps(

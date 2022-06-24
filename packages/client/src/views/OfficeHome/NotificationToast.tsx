@@ -48,51 +48,43 @@ interface IProps {
   showPaginated?: boolean
 }
 type IFullProps = IProps & IntlShapeProps
-class NotificationToast extends React.Component<IFullProps> {
-  render() {
-    const outboxData = this.props.declaration.filter(
-      (item) =>
-        item.submissionStatus === SUBMISSION_STATUS.READY_TO_ARCHIVE ||
-        item.submissionStatus === SUBMISSION_STATUS.READY_TO_REINSTATE ||
-        item.submissionStatus === SUBMISSION_STATUS.READY_TO_SUBMIT ||
-        item.submissionStatus === SUBMISSION_STATUS.READY_TO_APPROVE ||
-        item.submissionStatus === SUBMISSION_STATUS.READY_TO_REGISTER ||
-        item.submissionStatus === SUBMISSION_STATUS.READY_TO_REJECT ||
-        item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY ||
-        item.submissionStatus === SUBMISSION_STATUS.ARCHIVING ||
-        item.submissionStatus === SUBMISSION_STATUS.REINSTATING ||
-        item.submissionStatus ===
-          SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION ||
-        item.submissionStatus === SUBMISSION_STATUS.SUBMITTING ||
-        item.submissionStatus === SUBMISSION_STATUS.APPROVING ||
-        item.submissionStatus === SUBMISSION_STATUS.REGISTERING ||
-        item.submissionStatus === SUBMISSION_STATUS.REJECTING ||
-        item.submissionStatus === SUBMISSION_STATUS.CERTIFYING ||
-        item.submissionStatus === SUBMISSION_STATUS.REQUESTING_CORRECTION ||
-        item.submissionStatus === SUBMISSION_STATUS.FAILED_NETWORK
-    )
 
-    return outboxData.length > 0 ? (
-      <ExpandableNotificationContainer>
-        <ExpandableNotification
-          outboxText={this.props.intl.formatMessage(messages.outboxText, {
-            num: outboxData.length
-          })}
-          processingText={this.props.intl.formatMessage(
-            messages.processingText,
-            {
-              num: outboxData.length
-            }
-          )}
-        >
-          <Outbox
-            declaration={outboxData}
-            showPaginated={this.props.showPaginated}
-          />
-        </ExpandableNotification>
-      </ExpandableNotificationContainer>
-    ) : null
-  }
+const NotificationToast = (props: IFullProps) => {
+  const outboxData = props.declaration.filter(
+    (item) =>
+      item.submissionStatus === SUBMISSION_STATUS.READY_TO_ARCHIVE ||
+      item.submissionStatus === SUBMISSION_STATUS.READY_TO_REINSTATE ||
+      item.submissionStatus === SUBMISSION_STATUS.READY_TO_SUBMIT ||
+      item.submissionStatus === SUBMISSION_STATUS.READY_TO_APPROVE ||
+      item.submissionStatus === SUBMISSION_STATUS.READY_TO_REGISTER ||
+      item.submissionStatus === SUBMISSION_STATUS.READY_TO_REJECT ||
+      item.submissionStatus === SUBMISSION_STATUS.READY_TO_CERTIFY ||
+      item.submissionStatus === SUBMISSION_STATUS.ARCHIVING ||
+      item.submissionStatus === SUBMISSION_STATUS.REINSTATING ||
+      item.submissionStatus === SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION ||
+      item.submissionStatus === SUBMISSION_STATUS.SUBMITTING ||
+      item.submissionStatus === SUBMISSION_STATUS.APPROVING ||
+      item.submissionStatus === SUBMISSION_STATUS.REGISTERING ||
+      item.submissionStatus === SUBMISSION_STATUS.REJECTING ||
+      item.submissionStatus === SUBMISSION_STATUS.CERTIFYING ||
+      item.submissionStatus === SUBMISSION_STATUS.REQUESTING_CORRECTION ||
+      item.submissionStatus === SUBMISSION_STATUS.FAILED_NETWORK
+  )
+
+  return outboxData.length > 0 ? (
+    <ExpandableNotificationContainer>
+      <ExpandableNotification
+        outboxText={props.intl.formatMessage(messages.outboxText, {
+          num: outboxData.length
+        })}
+        processingText={props.intl.formatMessage(messages.processingText, {
+          num: outboxData.length
+        })}
+      >
+        <Outbox declaration={outboxData} showPaginated={props.showPaginated} />
+      </ExpandableNotification>
+    </ExpandableNotificationContainer>
+  ) : null
 }
 
 function mapStatetoProps(state: IStoreState) {

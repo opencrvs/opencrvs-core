@@ -72,35 +72,33 @@ type IBaseLoadingProps = {
 
 type IProps = IBaseLoadingProps & IntlShapeProps & IOnlineStatusProps
 
-export class LoadingIndicatorComp extends React.Component<IProps> {
-  render() {
-    const { loading, noDeclaration, hasError, intl } = this.props
+export const LoadingIndicatorComp = (props: IProps) => {
+  const { loading, noDeclaration, hasError, intl } = props
 
-    return (
-      <Wrapper>
-        {this.props.isOnline && loading && (
-          <LoadingContainer>
-            <Spinner id="Spinner" size={24} baseColor="#4C68C1" />
-          </LoadingContainer>
+  return (
+    <Wrapper>
+      {props.isOnline && loading && (
+        <LoadingContainer>
+          <Spinner id="Spinner" size={24} baseColor="#4C68C1" />
+        </LoadingContainer>
+      )}
+      <MobileViewContainer noDeclaration={noDeclaration}>
+        {props.isOnline && hasError && (
+          <ErrorText id="search-result-error-text-count">
+            {intl.formatMessage(errorMessages.queryError)}
+          </ErrorText>
         )}
-        <MobileViewContainer noDeclaration={noDeclaration}>
-          {this.props.isOnline && hasError && (
-            <ErrorText id="search-result-error-text-count">
-              {intl.formatMessage(errorMessages.queryError)}
-            </ErrorText>
-          )}
-          {!this.props.isOnline && (
-            <ConnectivityContainer>
-              <NoConnectivity />
-              <Text id="wait-connection-text">
-                {intl.formatMessage(errorMessages.waitingForConnection)}
-              </Text>
-            </ConnectivityContainer>
-          )}
-        </MobileViewContainer>
-      </Wrapper>
-    )
-  }
+        {!props.isOnline && (
+          <ConnectivityContainer>
+            <NoConnectivity />
+            <Text id="wait-connection-text">
+              {intl.formatMessage(errorMessages.waitingForConnection)}
+            </Text>
+          </ConnectivityContainer>
+        )}
+      </MobileViewContainer>
+    </Wrapper>
+  )
 }
 
 export function withOnlineStatus<T>(

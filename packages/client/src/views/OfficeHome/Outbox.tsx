@@ -30,17 +30,15 @@ const Container = styled(BodyContent)`
   padding-top: 32px;
 `
 
-interface IState {
-  sentForReviewPageNo: number
-}
 interface IProps {
   declaration: IDeclaration[]
   showPaginated?: boolean
 }
 type IFullProps = IProps & IntlShapeProps
-class Outbox extends React.Component<IFullProps, IState> {
-  submissionStatusMap = (status: string, index: number) => {
-    const { formatMessage } = this.props.intl
+
+const Outbox = (props: IFullProps) => {
+  const submissionStatusMap = (status: string, index: number) => {
+    const { formatMessage } = props.intl
     const {
       statusWaitingToBeArchived,
       statusWaitingToBeReinstated,
@@ -146,9 +144,9 @@ class Outbox extends React.Component<IFullProps, IState> {
     }
   }
 
-  transformDeclarationsReadyToSend = () => {
-    const { intl } = this.props
-    const alldeclarations = this.props.declaration || []
+  const transformDeclarationsReadyToSend = () => {
+    const { intl } = props
+    const alldeclarations = props.declaration || []
     return alldeclarations.map((declaration, index) => {
       let name
       if (declaration.event && declaration.event.toString() === 'birth') {
@@ -190,7 +188,7 @@ class Outbox extends React.Component<IFullProps, IState> {
           ''
       }
 
-      const { statusText, icon } = this.submissionStatusMap(
+      const { statusText, icon } = submissionStatusMap(
         declaration.submissionStatus || '',
         index
       )
@@ -210,50 +208,42 @@ class Outbox extends React.Component<IFullProps, IState> {
     })
   }
 
-  onPageChange = (pageNumber: number) => {
-    this.setState({ sentForReviewPageNo: pageNumber })
-  }
+  const { intl, declaration } = props
 
-  render() {
-    const { intl, declaration } = this.props
-
-    return (
-      <Container>
-        <GridTable
-          hideTableHeader={true}
-          content={this.transformDeclarationsReadyToSend()}
-          columns={[
-            {
-              label: this.props.intl.formatMessage(constantsMessages.type),
-              width: 15,
-              key: 'event'
-            },
-            {
-              width: 45,
-              label: this.props.intl.formatMessage(constantsMessages.name),
-              key: 'name'
-            },
-            {
-              label: this.props.intl.formatMessage(
-                messages.statusWaitingToRegister
-              ),
-              width: 35,
-              key: 'submissionStatus',
-              color: getTheme().colors.supportingCopy
-            },
-            {
-              label: '',
-              width: 5,
-              alignment: ColumnContentAlignment.CENTER,
-              key: 'statusIndicator'
-            }
-          ]}
-          noResultText={intl.formatMessage(constantsMessages.noResults)}
-          hideLastBorder={true}
-        />
-      </Container>
-    )
-  }
+  return (
+    <Container>
+      <GridTable
+        hideTableHeader={true}
+        content={transformDeclarationsReadyToSend()}
+        columns={[
+          {
+            label: props.intl.formatMessage(constantsMessages.type),
+            width: 15,
+            key: 'event'
+          },
+          {
+            width: 45,
+            label: props.intl.formatMessage(constantsMessages.name),
+            key: 'name'
+          },
+          {
+            label: props.intl.formatMessage(messages.statusWaitingToRegister),
+            width: 35,
+            key: 'submissionStatus',
+            color: getTheme().colors.supportingCopy
+          },
+          {
+            label: '',
+            width: 5,
+            alignment: ColumnContentAlignment.CENTER,
+            key: 'statusIndicator'
+          }
+        ]}
+        noResultText={intl.formatMessage(constantsMessages.noResults)}
+        hideLastBorder={true}
+      />
+    </Container>
+  )
 }
 
 export default injectIntl(Outbox)
