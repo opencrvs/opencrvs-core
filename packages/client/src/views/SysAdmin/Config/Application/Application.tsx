@@ -13,14 +13,8 @@ import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import * as React from 'react'
-import {
-  injectIntl,
-  IntlShape,
-  WrappedComponentProps as IntlShapeProps
-} from 'react-intl'
-import { connect } from 'react-redux'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { IUserDetails } from '@client/utils/userUtils'
+import { IntlShape, useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import {
   FloatingNotification,
@@ -61,18 +55,6 @@ const ListGroupTitle = styled.div`
   display: flex;
   align-items: center;
 `
-
-type Props = IntlShapeProps & {
-  userDetails: IUserDetails | null
-  offlineCountryConfiguration: IOfflineData
-}
-interface State {
-  activeTabId: string
-  changeModalName: string
-  showNotification: boolean
-  notificationStatus: NOTIFICATION_TYPE
-  notificationMessages: string
-}
 
 export enum TabId {
   GENERAL = 'general',
@@ -516,41 +498,44 @@ function DeathTabContent({
   )
 }
 
-class ApplicationConfigComponent extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      activeTabId: TabId.GENERAL,
-      changeModalName: EMPTY_STRING,
-      showNotification: false,
-      notificationStatus: NOTIFICATION_TYPE.IN_PROGRESS,
-      notificationMessages: EMPTY_STRING
-    }
-  }
+function ApplicationConfigComponent() {
+  const intl = useIntl()
+  const offlineCountryConfiguration = useSelector((store: IStoreState) =>
+    getOfflineData(store)
+  )
+  const [activeTabId, setActiveTabId] = React.useState(TabId.GENERAL)
+  const [changeModalName, setModalName] = React.useState(EMPTY_STRING)
+  const [showNotification, setShowNotification] = React.useState(false)
+  const [notificationStatus, setNotificationStatus] = React.useState(
+    NOTIFICATION_TYPE.IN_PROGRESS
+  )
+  const [notificationMessages, setNotificationMessages] =
+    React.useState(EMPTY_STRING)
 
-  changeValue = (notificationStatus: NOTIFICATION_TYPE, messages: string) => {
+  const changeValue = (
+    notificationStatus: NOTIFICATION_TYPE,
+    messages: string
+  ) => {
     if (notificationStatus !== NOTIFICATION_TYPE.ERROR) {
-      this.toggleConfigModal()
-      this.setState({
-        showNotification: true,
-        notificationStatus: notificationStatus,
-        notificationMessages: messages
-      })
+      toggleConfigModal()
+      setShowNotification(true)
+      setNotificationStatus(notificationStatus)
+      setNotificationMessages(messages)
     }
   }
 
-  changeTab(id: string) {
-    this.setState({ activeTabId: id })
+  const changeTab = (id: TabId) => {
+    setActiveTabId(id)
   }
 
-  toggleConfigModal = () => {
-    if (this.state.changeModalName) {
-      this.setState({ changeModalName: '' })
+  const toggleConfigModal = () => {
+    if (changeModalName) {
+      setModalName('')
     }
-    return !!!this.state.changeModalName ? false : true
+    return !!!changeModalName ? false : true
   }
 
-  getTabs = (intl: IntlShape) => {
+  const getTabs = (intl: IntlShape) => {
     const tabs = {
       sections: [
         {
@@ -566,89 +551,64 @@ class ApplicationConfigComponent extends React.Component<Props, State> {
           title: intl.formatMessage(messages.deathTabTitle)
         }
       ],
-      activeTabId: this.state.activeTabId,
-      onTabClick: (id: string) => this.changeTab(id)
+      activeTabId: activeTabId,
+      onTabClick: (id: string) => changeTab(id as TabId)
     }
     return <FormTabs {...tabs} />
   }
 
-  render() {
-    const { intl, offlineCountryConfiguration } = this.props
-
-    return (
-      <SysAdminContentWrapper
-        isCertificatesConfigPage={true}
-        hideBackground={true}
+  return (
+    <SysAdminContentWrapper
+      isCertificatesConfigPage={true}
+      hideBackground={true}
+    >
+      <Content
+        title={intl.formatMessage(messages.applicationSettings)}
+        titleColor={'copy'}
+        tabBarContent={getTabs(intl)}
       >
-        <Content
-          title={intl.formatMessage(messages.applicationSettings)}
-          titleColor={'copy'}
-          tabBarContent={this.getTabs(intl)}
-        >
-          {this.state.activeTabId && this.state.activeTabId === TabId.GENERAL && (
-            <GeneralTabContent
-              offlineCountryConfiguration={offlineCountryConfiguration}
-              intl={intl}
-              callBack={(modalName: string) =>
-                this.setState({
-                  changeModalName: modalName
-                })
-              }
-            />
-          )}
-          {this.state.activeTabId && this.state.activeTabId === TabId.BIRTH && (
-            <BirthTabContent
-              offlineCountryConfiguration={offlineCountryConfiguration}
-              intl={intl}
-              callBack={(modalName: string) =>
-                this.setState({
-                  changeModalName: modalName
-                })
-              }
-            />
-          )}
-          {this.state.activeTabId && this.state.activeTabId === TabId.DEATH && (
-            <DeathTabContent
-              offlineCountryConfiguration={offlineCountryConfiguration}
-              intl={intl}
-              callBack={(modalName: string) =>
-                this.setState({
-                  changeModalName: modalName
-                })
-              }
-            />
-          )}
-        </Content>
-        {this.state.changeModalName && (
-          <DynamicModal
-            toggleConfigModal={this.toggleConfigModal}
-            changeModalName={this.state.changeModalName}
-            showNotification={this.state.showNotification}
-            valueChanged={this.changeValue}
+        {activeTabId && activeTabId === TabId.GENERAL && (
+          <GeneralTabContent
+            offlineCountryConfiguration={offlineCountryConfiguration}
+            intl={intl}
+            callBack={(modalName: string) => setModalName(modalName)}
           />
         )}
-        <FloatingNotification
-          id="print-cert-notification"
-          type={this.state.notificationStatus}
-          show={this.state.showNotification}
-          callback={() => {
-            this.setState({ showNotification: false })
-          }}
-        >
-          {this.state.notificationMessages}
-        </FloatingNotification>
-      </SysAdminContentWrapper>
-    )
-  }
+        {activeTabId && activeTabId === TabId.BIRTH && (
+          <BirthTabContent
+            offlineCountryConfiguration={offlineCountryConfiguration}
+            intl={intl}
+            callBack={(modalName: string) => setModalName(modalName)}
+          />
+        )}
+        {activeTabId && activeTabId === TabId.DEATH && (
+          <DeathTabContent
+            offlineCountryConfiguration={offlineCountryConfiguration}
+            intl={intl}
+            callBack={(modalName: string) => setModalName(modalName)}
+          />
+        )}
+      </Content>
+      {changeModalName && (
+        <DynamicModal
+          toggleConfigModal={toggleConfigModal}
+          changeModalName={changeModalName}
+          showNotification={showNotification}
+          valueChanged={changeValue}
+        />
+      )}
+      <FloatingNotification
+        id="print-cert-notification"
+        type={notificationStatus}
+        show={showNotification}
+        callback={() => {
+          setShowNotification(false)
+        }}
+      >
+        {notificationMessages}
+      </FloatingNotification>
+    </SysAdminContentWrapper>
+  )
 }
 
-function mapStateToProps(state: IStoreState) {
-  return {
-    userDetails: getUserDetails(state),
-    offlineCountryConfiguration: getOfflineData(state)
-  }
-}
-
-export const ApplicationConfig = connect(mapStateToProps)(
-  injectIntl(ApplicationConfigComponent)
-)
+export const ApplicationConfig = ApplicationConfigComponent
