@@ -20,8 +20,8 @@ import {
 } from '@client/views/SysAdmin/Config/Application'
 import { messages } from '@client/i18n/messages/views/config'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { IBirth, ICurrency, IDeath, IFullProps, IState } from './DynamicModal'
-import { configApplicationMutations } from './mutations'
+import { IActionType, IApplicationConfig, IState } from './DynamicModal'
+import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 import { IOfflineData } from '@client/offline/reducer'
 import { IFormConfigSettingsProps } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
 import { updateOfflineConfigData } from '@client/offline/actions'
@@ -141,7 +141,7 @@ export const getFormattedFee = (value: string) => {
 export const getTitle = (intl: IntlShape, changeModalName: string) => {
   if (changeModalName === GeneralActionId.APPLICATION_NAME)
     return intl.formatMessage(messages.applicationNameLabel)
-  if (changeModalName === GeneralActionId.GOVT_LOGO)
+  if (changeModalName === GeneralActionId.COUNTRY_LOGO)
     return intl.formatMessage(messages.govermentLogoLabel)
   else if (changeModalName === GeneralActionId.CURRENCY)
     return intl.formatMessage(messages.currencyLabel)
@@ -151,9 +151,9 @@ export const getTitle = (intl: IntlShape, changeModalName: string) => {
     return intl.formatMessage(messages.birthDelayedDialogTitle)
   else if (changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET)
     return intl.formatMessage(messages.deathLegallySpecifiedDialogTitle)
-  else if (changeModalName === GeneralActionId.NID_PATTERN)
+  else if (changeModalName === GeneralActionId.NID_NUMBER_PATTERN)
     return intl.formatMessage(messages.nidPatternTitle)
-  else if (changeModalName === GeneralActionId.PHONE_NUMBER)
+  else if (changeModalName === GeneralActionId.PHONE_NUMBER_PATTERN)
     return intl.formatMessage(messages.phoneNumberPatternTitle)
   else if (
     changeModalName === BirthActionId.BIRTH_ON_TIME_FEE ||
@@ -173,13 +173,13 @@ export const getTitle = (intl: IntlShape, changeModalName: string) => {
 export const getMessage = (intl: IntlShape, changeModalName: string) => {
   if (changeModalName === GeneralActionId.APPLICATION_NAME)
     return intl.formatMessage(messages.applicationNameChangeMessage)
-  else if (changeModalName === GeneralActionId.GOVT_LOGO)
+  else if (changeModalName === GeneralActionId.COUNTRY_LOGO)
     return intl.formatMessage(messages.govtLogoChangeMessage)
   else if (changeModalName === GeneralActionId.CURRENCY)
     return intl.formatMessage(messages.applicationCurrencyChangeMessage)
-  else if (changeModalName === GeneralActionId.NID_PATTERN)
+  else if (changeModalName === GeneralActionId.NID_NUMBER_PATTERN)
     return intl.formatMessage(messages.nidPatternChangeMessage)
-  else if (changeModalName === GeneralActionId.PHONE_NUMBER)
+  else if (changeModalName === GeneralActionId.PHONE_NUMBER_PATTERN)
     return intl.formatMessage(messages.phoneNumberChangeMessage)
   else return EMPTY_STRING
 }
@@ -190,7 +190,7 @@ export const isApplyButtonDisabled = (
 ) => {
   if (changeModalName === GeneralActionId.APPLICATION_NAME) {
     return !Boolean(state.applicationName)
-  } else if (changeModalName === GeneralActionId.GOVT_LOGO) {
+  } else if (changeModalName === GeneralActionId.COUNTRY_LOGO) {
     return !Boolean(state.govtLogo)
   } else if (changeModalName === GeneralActionId.CURRENCY) {
     return !Boolean(state.currency)
@@ -213,9 +213,9 @@ export const isApplyButtonDisabled = (
     return !Boolean(state.deathOnTimeFee)
   } else if (changeModalName === DeathActionId.DEATH_DELAYED_FEE) {
     return !Boolean(state.deathDelayedFee)
-  } else if (changeModalName === GeneralActionId.NID_PATTERN) {
+  } else if (changeModalName === GeneralActionId.NID_NUMBER_PATTERN) {
     return !isValidRegEx(state.nidPattern) || !Boolean(state.nidPattern)
-  } else if (changeModalName === GeneralActionId.PHONE_NUMBER) {
+  } else if (changeModalName === GeneralActionId.PHONE_NUMBER_PATTERN) {
     return (
       !isValidRegEx(state.phoneNumberPattern) ||
       !Boolean(state.phoneNumberPattern)
@@ -223,202 +223,40 @@ export const isApplyButtonDisabled = (
   } else return true
 }
 
-export async function callUpdateApplicationNameMutation(
-  applicationName: string,
+export async function callApplicationConfigMutation(
+  configProperty: IActionType,
+  appConfig: IApplicationConfig,
   offlineCountryConfiguration: IOfflineData,
   dispatch: Dispatch,
   setIsValueUpdating: (value: boolean) => void
 ) {
   try {
     setIsValueUpdating(true)
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      APPLICATION_NAME: applicationName
-    })
-    if (res && res.data) {
-      setIsValueUpdating(false)
-      const APPLICATION_NAME = res.data.updateApplicationConfig.APPLICATION_NAME
-      const offlineConfig = {
-        config: {
-          ...offlineCountryConfiguration.config,
-          APPLICATION_NAME
-        }
-      }
-      dispatch(updateOfflineConfigData(offlineConfig))
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateGovtLogoMutation(
-  govtLogo: string,
-  logoFileName: string,
-  offlineCountryConfiguration: IOfflineData,
-  dispatch: Dispatch,
-  setIsValueUpdating: (value: boolean) => void
-) {
-  try {
-    setIsValueUpdating(true)
-    const COUNTRY_LOGO = {
-      file: govtLogo,
-      fileName: logoFileName
-    }
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      COUNTRY_LOGO
-    })
-    if (res && res.data) {
-      setIsValueUpdating(false)
-      const COUNTRY_LOGO_FILE =
-        res.data.updateApplicationConfig.COUNTRY_LOGO.file
-      const COUNTRY_LOGO_FILE_NAME =
-        res.data.updateApplicationConfig.COUNTRY_LOGO.fileName
-      const updatedOfflineConfig = {
-        config: {
-          ...offlineCountryConfiguration.config,
-          COUNTRY_LOGO: {
-            file: COUNTRY_LOGO_FILE,
-            fileName: COUNTRY_LOGO_FILE_NAME
+    const res = await configApplicationMutations.mutateApplicationConfig(
+      configProperty in GeneralActionId
+        ? {
+            [configProperty as GeneralActionId]:
+              appConfig[configProperty as GeneralActionId]
           }
-        }
-      }
-      dispatch(updateOfflineConfigData(updatedOfflineConfig))
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateApplicationCurrencyMutation(
-  currency: ICurrency,
-  offlineCountryConfiguration: IOfflineData,
-  dispatch: Dispatch,
-  setIsValueUpdating: (value: boolean) => void
-) {
-  setIsValueUpdating(true)
-  try {
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      CURRENCY: currency
-    })
+        : configProperty in BirthActionId
+        ? { BIRTH: appConfig.BIRTH }
+        : { DEATH: appConfig.DEATH }
+    )
     if (res && res.data) {
+      const updatedConfigs = res.data.updateApplicationConfig
       setIsValueUpdating(false)
-      const CURRENCY = res.data.updateApplicationConfig.CURRENCY
-      omit(CURRENCY, ['__typename'])
       const offlineConfig = {
         config: {
           ...offlineCountryConfiguration.config,
-          CURRENCY
-        }
-      }
-      dispatch(updateOfflineConfigData(offlineConfig))
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateApplicationBirthMutation(
-  birth: IBirth,
-  offlineCountryConfiguration: IOfflineData,
-  dispatch: Dispatch,
-  setIsValueUpdating: (value: boolean) => void
-) {
-  try {
-    setIsValueUpdating(true)
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      BIRTH: birth
-    })
-    if (res && res.data) {
-      setIsValueUpdating(false)
-      const BIRTH = res.data.updateApplicationConfig.BIRTH
-      omit(BIRTH, ['__typename'])
-      const offlineConfig = {
-        config: {
-          ...offlineCountryConfiguration.config,
-          BIRTH
-        }
-      }
-      dispatch(updateOfflineConfigData(offlineConfig))
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateApplicationDeathMutation(
-  death: IDeath,
-  offlineCountryConfiguration: IOfflineData,
-  dispatch: Dispatch,
-  setIsValueUpdating: (value: boolean) => void
-) {
-  try {
-    setIsValueUpdating(true)
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      DEATH: death
-    })
-    if (res && res.data) {
-      setIsValueUpdating(false)
-      const DEATH = res.data.updateApplicationConfig.DEATH
-      omit(DEATH, ['__typename'])
-      const offlineConfig = {
-        config: {
-          ...offlineCountryConfiguration.config,
-          DEATH
-        }
-      }
-      dispatch(updateOfflineConfigData(offlineConfig))
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateNIDPatternMutation(
-  nidPattern: string,
-  offlineCountryConfiguration: IOfflineData,
-  dispatch: Dispatch,
-  setIsValueUpdating: (value: boolean) => void
-) {
-  try {
-    setIsValueUpdating(true)
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      NID_NUMBER_PATTERN: nidPattern
-    })
-    if (res && res.data) {
-      setIsValueUpdating(false)
-      const NID_NUMBER_PATTERN =
-        res.data.updateApplicationConfig.NID_NUMBER_PATTERN
-      const offlineConfig = {
-        config: {
-          ...offlineCountryConfiguration.config,
-          NID_NUMBER_PATTERN
-        }
-      }
-      dispatch(updateOfflineConfigData(offlineConfig))
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdatePhoneNumberPatternMutation(
-  phoneNumberPattern: string,
-  offlineCountryConfiguration: IOfflineData,
-  dispatch: Dispatch,
-  setIsValueUpdating: (value: boolean) => void
-) {
-  try {
-    setIsValueUpdating(true)
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      PHONE_NUMBER_PATTERN: phoneNumberPattern
-    })
-    if (res && res.data) {
-      setIsValueUpdating(false)
-      const PHONE_NUMBER_PATTERN =
-        res.data.updateApplicationConfig.PHONE_NUMBER_PATTERN
-      const offlineConfig = {
-        config: {
-          ...offlineCountryConfiguration.config,
-          PHONE_NUMBER_PATTERN
+          ...(configProperty in GeneralActionId && {
+            [configProperty]: updatedConfigs[configProperty]
+          }),
+          ...(configProperty in BirthActionId && {
+            BIRTH: updatedConfigs.BIRTH
+          }),
+          ...(configProperty in DeathActionId && {
+            DEATH: updatedConfigs.DEATH
+          })
         }
       }
       dispatch(updateOfflineConfigData(offlineConfig))

@@ -31,7 +31,6 @@ import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import ContentComponent from './NIDPhoneNumContent'
-import { IOfflineData } from '@client/offline/reducer'
 import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 import { IAttachmentValue } from '@client/forms'
 import {
@@ -40,15 +39,9 @@ import {
   getTitle,
   getMessage,
   isApplyButtonDisabled,
-  callUpdateNIDPatternMutation,
-  callUpdateApplicationNameMutation,
-  callUpdateApplicationCurrencyMutation,
-  callUpdateApplicationBirthMutation,
-  callUpdateApplicationDeathMutation,
+  callApplicationConfigMutation,
   getFormattedFee,
-  getCurrency,
-  callUpdatePhoneNumberPatternMutation,
-  callUpdateGovtLogoMutation
+  getCurrency
 } from '@client/views/SysAdmin/Config/Application/utils'
 
 const Message = styled.div`
@@ -116,38 +109,44 @@ export type ICurrency = {
   isoCode: string | undefined
   languagesAndCountry: string[]
 }
+export type ICountryLogo = {
+  fileName: string
+  file: string
+}
 
 export type IBirth = {
-  REGISTRATION_TARGET?: number
-  LATE_REGISTRATION_TARGET?: number
-  FEE?: {
-    ON_TIME?: number
-    LATE?: number
-    DELAYED?: number
+  REGISTRATION_TARGET: number
+  LATE_REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    LATE: number
+    DELAYED: number
   }
 }
 export type IDeath = {
-  REGISTRATION_TARGET?: number
-  FEE?: {
-    ON_TIME?: number
-    DELAYED?: number
+  REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    DELAYED: number
   }
 }
 
 export type IApplicationConfig = {
-  APPLICATION_NAME?: string
-  NID_NUMBER_PATTERN?: string
-  PHONE_NUMBER_PATTERN?: string
-  COUNTRY_LOGO?: {
-    fileName: string
-    file: string
-  }
-  CURRENCY?: ICurrency
-  BIRTH?: IBirth
-  DEATH?: IDeath
+  APPLICATION_NAME: string
+  NID_NUMBER_PATTERN: string
+  PHONE_NUMBER_PATTERN: string
+  COUNTRY_LOGO: ICountryLogo
+  CURRENCY: ICurrency
+  BIRTH: IBirth
+  DEATH: IDeath
   HIDE_EVENT_REGISTER_INFORMATION?: boolean
   ADDRESSES?: number
 }
+
+export type IActionType =
+  | keyof typeof GeneralActionId
+  | keyof typeof BirthActionId
+  | keyof typeof DeathActionId
 
 export type IState = {
   applicationName: string
@@ -389,86 +388,19 @@ function DynamicModalComponent(props: IProps) {
   }
 
   async function mutationHandler(
-    modalName: string,
-    value: IApplicationConfig,
+    modalName: IActionType,
+    appConfig: IApplicationConfig,
     valueChanged: (
       notificationStatus: NOTIFICATION_TYPE,
       messages: string
     ) => void
   ) {
     if (
-      modalName === GeneralActionId.APPLICATION_NAME &&
-      value.APPLICATION_NAME
+      modalName === GeneralActionId.COUNTRY_LOGO &&
+      appConfig.COUNTRY_LOGO?.file &&
+      appConfig.COUNTRY_LOGO?.fileName
     ) {
-      try {
-        await callUpdateApplicationNameMutation(
-          value.APPLICATION_NAME,
-          offlineCountryConfiguration,
-          dispatch,
-          setIsValueUpdating
-        )
-        valueChanged(
-          NOTIFICATION_TYPE.SUCCESS,
-          intl.formatMessage(messages.applicationNameChangeNotification)
-        )
-      } catch {
-        setError(intl.formatMessage(messages.applicationConfigChangeError))
-        valueChanged(
-          NOTIFICATION_TYPE.ERROR,
-          intl.formatMessage(messages.applicationConfigChangeError)
-        )
-      }
-    } else if (
-      modalName === GeneralActionId.NID_PATTERN &&
-      value.NID_NUMBER_PATTERN
-    ) {
-      try {
-        await callUpdateNIDPatternMutation(
-          value.NID_NUMBER_PATTERN,
-          offlineCountryConfiguration,
-          dispatch,
-          setIsValueUpdating
-        )
-        valueChanged(
-          NOTIFICATION_TYPE.SUCCESS,
-          intl.formatMessage(messages.nidPatternChangeNotification)
-        )
-      } catch {
-        setError(intl.formatMessage(messages.applicationConfigChangeError))
-        valueChanged(
-          NOTIFICATION_TYPE.ERROR,
-          intl.formatMessage(messages.applicationConfigChangeError)
-        )
-      }
-    } else if (
-      modalName === GeneralActionId.PHONE_NUMBER &&
-      value.PHONE_NUMBER_PATTERN
-    ) {
-      try {
-        await callUpdatePhoneNumberPatternMutation(
-          value.PHONE_NUMBER_PATTERN,
-          offlineCountryConfiguration,
-          dispatch,
-          setIsValueUpdating
-        )
-        valueChanged(
-          NOTIFICATION_TYPE.SUCCESS,
-          intl.formatMessage(messages.phoneNumberChangeNotification)
-        )
-      } catch {
-        setError(intl.formatMessage(messages.applicationConfigChangeError))
-        valueChanged(
-          NOTIFICATION_TYPE.ERROR,
-          intl.formatMessage(messages.applicationConfigChangeError)
-        )
-      }
-    }
-    if (
-      modalName === GeneralActionId.GOVT_LOGO &&
-      value.COUNTRY_LOGO?.file &&
-      value.COUNTRY_LOGO?.fileName
-    ) {
-      if (isWithinFileLength(value.COUNTRY_LOGO.file as string) === false) {
+      if (isWithinFileLength(appConfig.COUNTRY_LOGO.file as string) === false) {
         setError(intl.formatMessage(messages.govtLogoFileLimitError))
         setGovtLogo(EMPTY_STRING)
         handleLogoFile({
@@ -480,65 +412,30 @@ function DynamicModalComponent(props: IProps) {
           NOTIFICATION_TYPE.ERROR,
           intl.formatMessage(messages.govtLogoFileLimitError)
         )
-      } else {
-        try {
-          await callUpdateGovtLogoMutation(
-            value.COUNTRY_LOGO.file,
-            value.COUNTRY_LOGO.fileName,
-            offlineCountryConfiguration,
-            dispatch,
-            setIsValueUpdating
-          )
-          valueChanged(
-            NOTIFICATION_TYPE.SUCCESS,
-            intl.formatMessage(messages.govtLogoChangeNotification)
-          )
-        } catch {
-          setError(intl.formatMessage(messages.govtLogoChangeError))
-          valueChanged(
-            NOTIFICATION_TYPE.ERROR,
-            intl.formatMessage(messages.govtLogoChangeError)
-          )
-        }
       }
-    } else if (modalName === GeneralActionId.CURRENCY && value.CURRENCY) {
+    }
+
+    if (!errorOccured) {
       try {
-        await callUpdateApplicationCurrencyMutation(
-          value.CURRENCY,
-          offlineCountryConfiguration,
-          dispatch,
-          setIsValueUpdating
-        )
-        valueChanged(
-          NOTIFICATION_TYPE.SUCCESS,
-          intl.formatMessage(messages.applicationCurrencyChangeNotification)
-        )
-      } catch {
-        setError(intl.formatMessage(messages.applicationConfigChangeError))
-        valueChanged(
-          NOTIFICATION_TYPE.ERROR,
-          intl.formatMessage(messages.applicationConfigChangeError)
-        )
-      }
-    } else if (
-      (modalName === BirthActionId.BIRTH_REGISTRATION_TARGET ||
-        modalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET ||
-        modalName === BirthActionId.BIRTH_ON_TIME_FEE ||
-        modalName === BirthActionId.BIRTH_LATE_FEE ||
-        modalName === BirthActionId.BIRTH_DELAYED_FEE) &&
-      (value.BIRTH?.REGISTRATION_TARGET ||
-        value.BIRTH?.LATE_REGISTRATION_TARGET ||
-        value.BIRTH?.FEE)
-    ) {
-      try {
-        await callUpdateApplicationBirthMutation(
-          value.BIRTH,
+        await callApplicationConfigMutation(
+          modalName,
+          appConfig,
           offlineCountryConfiguration,
           dispatch,
           setIsValueUpdating
         )
         const notificationText =
-          modalName === BirthActionId.BIRTH_REGISTRATION_TARGET
+          modalName === GeneralActionId.APPLICATION_NAME
+            ? intl.formatMessage(messages.applicationNameChangeNotification)
+            : modalName === GeneralActionId.NID_NUMBER_PATTERN
+            ? intl.formatMessage(messages.nidPatternChangeNotification)
+            : modalName === GeneralActionId.PHONE_NUMBER_PATTERN
+            ? intl.formatMessage(messages.phoneNumberChangeNotification)
+            : modalName === GeneralActionId.COUNTRY_LOGO
+            ? intl.formatMessage(messages.govtLogoChangeNotification)
+            : modalName === GeneralActionId.CURRENCY
+            ? intl.formatMessage(messages.applicationCurrencyChangeNotification)
+            : modalName === BirthActionId.BIRTH_REGISTRATION_TARGET
             ? intl.formatMessage(
                 messages.applicationBirthRegTargetChangeNotification
               )
@@ -558,31 +455,7 @@ function DynamicModalComponent(props: IProps) {
             ? intl.formatMessage(
                 messages.applicationBirthDelayedFeeChangeNotification
               )
-            : EMPTY_STRING
-
-        valueChanged(NOTIFICATION_TYPE.SUCCESS, notificationText)
-      } catch {
-        setError(intl.formatMessage(messages.applicationConfigChangeError))
-        valueChanged(
-          NOTIFICATION_TYPE.ERROR,
-          intl.formatMessage(messages.applicationConfigChangeError)
-        )
-      }
-    } else if (
-      (modalName === DeathActionId.DEATH_REGISTRATION_TARGET ||
-        modalName === DeathActionId.DEATH_ON_TIME_FEE ||
-        modalName === DeathActionId.DEATH_DELAYED_FEE) &&
-      (value.DEATH?.REGISTRATION_TARGET || value.DEATH?.FEE)
-    ) {
-      try {
-        await callUpdateApplicationDeathMutation(
-          value.DEATH,
-          offlineCountryConfiguration,
-          dispatch,
-          setIsValueUpdating
-        )
-        const notificationText =
-          modalName === DeathActionId.DEATH_REGISTRATION_TARGET
+            : modalName === DeathActionId.DEATH_REGISTRATION_TARGET
             ? intl.formatMessage(
                 messages.applicationDeathRegTargetChangeNotification
               )
@@ -595,13 +468,14 @@ function DynamicModalComponent(props: IProps) {
                 messages.applicationDeathDelayedFeeChangeNotification
               )
             : EMPTY_STRING
-
         valueChanged(NOTIFICATION_TYPE.SUCCESS, notificationText)
       } catch {
         setError(intl.formatMessage(messages.applicationConfigChangeError))
         valueChanged(
           NOTIFICATION_TYPE.ERROR,
-          intl.formatMessage(messages.applicationConfigChangeError)
+          modalName === GeneralActionId.COUNTRY_LOGO
+            ? intl.formatMessage(messages.govtLogoChangeError)
+            : intl.formatMessage(messages.applicationConfigChangeError)
         )
       }
     }
@@ -640,7 +514,7 @@ function DynamicModalComponent(props: IProps) {
           disabled={isApplyButtonDisabled(state, props.changeModalName)}
           onClick={() => {
             mutationHandler(
-              props.changeModalName,
+              props.changeModalName as IActionType,
               {
                 APPLICATION_NAME: applicationName,
                 CURRENCY: getCurrencyObject(currency),
@@ -702,7 +576,7 @@ function DynamicModalComponent(props: IProps) {
           </Field>
         </Content>
       )}
-      {props.changeModalName === GeneralActionId.NID_PATTERN && (
+      {props.changeModalName === GeneralActionId.NID_NUMBER_PATTERN && (
         <ContentComponent
           intl={intl}
           changeModalName={props.changeModalName}
@@ -715,7 +589,7 @@ function DynamicModalComponent(props: IProps) {
           )}
         />
       )}
-      {props.changeModalName === GeneralActionId.PHONE_NUMBER && (
+      {props.changeModalName === GeneralActionId.PHONE_NUMBER_PATTERN && (
         <ContentComponent
           intl={intl}
           changeModalName={props.changeModalName}
@@ -728,7 +602,7 @@ function DynamicModalComponent(props: IProps) {
           )}
         />
       )}
-      {props.changeModalName === GeneralActionId.GOVT_LOGO && (
+      {props.changeModalName === GeneralActionId.COUNTRY_LOGO && (
         <Content>
           <Field id="govtLogoFile">
             <SimpleDocumentUploader

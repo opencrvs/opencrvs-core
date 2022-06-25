@@ -63,27 +63,27 @@ export enum TabId {
 }
 
 export enum GeneralActionId {
-  APPLICATION_NAME = 'changeAppName',
-  GOVT_LOGO = 'changeGovtLogo',
-  NID_PATTERN = 'changeNidPattern',
-  CURRENCY = 'changeCurrency',
-  PHONE_NUMBER = 'changePhnNum'
+  APPLICATION_NAME = 'APPLICATION_NAME',
+  COUNTRY_LOGO = 'COUNTRY_LOGO',
+  NID_NUMBER_PATTERN = 'NID_NUMBER_PATTERN',
+  CURRENCY = 'CURRENCY',
+  PHONE_NUMBER_PATTERN = 'PHONE_NUMBER_PATTERN'
 }
 
 export enum BirthActionId {
-  BIRTH_REGISTRATION_TARGET = 'changeBirthRegTarget',
-  BIRTH_LATE_REGISTRATION_TARGET = 'changeBirthLateRegTarget',
+  BIRTH_REGISTRATION_TARGET = 'BIRTH_REGISTRATION_TARGET',
+  BIRTH_LATE_REGISTRATION_TARGET = 'BIRTH_LATE_REGISTRATION_TARGET',
   BIRTH_PERIOD_BETWEEN_LATE_DELAYED_TARGET = 'birthPeriodBetweenLateDelayedTarget',
-  BIRTH_ON_TIME_FEE = 'changeBirthOnTimeFee',
-  BIRTH_LATE_FEE = 'changeBirthLateFee',
-  BIRTH_DELAYED_FEE = 'changeBirthDelayedFee'
+  BIRTH_ON_TIME_FEE = 'BIRTH_ON_TIME_FEE',
+  BIRTH_LATE_FEE = 'BIRTH_LATE_FEE',
+  BIRTH_DELAYED_FEE = 'BIRTH_DELAYED_FEE'
 }
 
 export enum DeathActionId {
-  DEATH_REGISTRATION_TARGET = 'changeDeathRegTarget',
-  DEATH_REGISTRATION_DELAYED_TARGET = 'birthRegistrationDelayedTarget',
-  DEATH_ON_TIME_FEE = 'changeDeathOnTimeFee',
-  DEATH_DELAYED_FEE = 'changeDeathDelayedFee'
+  DEATH_REGISTRATION_TARGET = 'DEATH_REGISTRATION_TARGET',
+  DEATH_REGISTRATION_DELAYED_TARGET = 'DEATH_REGISTRATION_DELAYED_TARGET',
+  DEATH_ON_TIME_FEE = 'DEATH_ON_TIME_FEE',
+  DEATH_DELAYED_FEE = 'DEATH_DELAYED_FEE'
 }
 
 interface IItem {
@@ -135,10 +135,10 @@ function GeneralTabContent({
         />
       ),
       action: {
-        id: GeneralActionId.GOVT_LOGO,
+        id: GeneralActionId.COUNTRY_LOGO,
         label: intl.formatMessage(buttonMessages.change),
         handler: () => {
-          callBack(GeneralActionId.GOVT_LOGO)
+          callBack(GeneralActionId.COUNTRY_LOGO)
         }
       }
     },
@@ -158,10 +158,10 @@ function GeneralTabContent({
       label: intl.formatMessage(messages.phoneNumberLabel),
       value: offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN.toString(),
       action: {
-        id: GeneralActionId.PHONE_NUMBER,
+        id: GeneralActionId.PHONE_NUMBER_PATTERN,
         label: intl.formatMessage(buttonMessages.change),
         handler: () => {
-          callBack(GeneralActionId.PHONE_NUMBER)
+          callBack(GeneralActionId.PHONE_NUMBER_PATTERN)
         }
       }
     },
@@ -170,10 +170,10 @@ function GeneralTabContent({
       label: intl.formatMessage(messages.nidPatternTitle),
       value: offlineCountryConfiguration.config.NID_NUMBER_PATTERN.toString(),
       action: {
-        id: GeneralActionId.NID_PATTERN,
+        id: GeneralActionId.NID_NUMBER_PATTERN,
         label: intl.formatMessage(buttonMessages.change),
         handler: () => {
-          callBack(GeneralActionId.NID_PATTERN)
+          callBack(GeneralActionId.NID_NUMBER_PATTERN)
         }
       }
     }

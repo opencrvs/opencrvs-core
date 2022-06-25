@@ -11,7 +11,12 @@
  */
 import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
-import { IApplicationConfig } from './DynamicModal'
+import {
+  IBirth,
+  ICountryLogo,
+  ICurrency,
+  IDeath
+} from '@client/views/SysAdmin/Config/Application/DynamicModal'
 
 const applicationConfigMutation = gql`
   mutation updateApplicationConfig(
@@ -50,7 +55,16 @@ const applicationConfigMutation = gql`
     }
   }
 `
-async function mutateApplicationConfig(applicationConfig: IApplicationConfig) {
+async function mutateApplicationConfig(applicationConfig: {
+  [key: string]:
+    | IBirth
+    | IDeath
+    | ICurrency
+    | ICountryLogo
+    | string
+    | boolean
+    | number
+}) {
   return (
     client &&
     client.mutate({
