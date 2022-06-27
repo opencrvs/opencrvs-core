@@ -82,7 +82,7 @@ function mergeIdentifiers(
   return [
     ...mergedIdentifiers.filter(
       ({ sectionIndex, groupIndex }) =>
-        sectionIndex !== questionIdentifiers.sectionIndex &&
+        sectionIndex !== questionIdentifiers.sectionIndex ||
         groupIndex !== questionIdentifiers.groupIndex
     ),
     currentFieldIdentifier
