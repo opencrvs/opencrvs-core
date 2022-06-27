@@ -317,7 +317,7 @@ export function generateConfigFields(
   defaultForm: ISerializedForm,
   questions: IQuestionConfig[]
 ) {
-  questions = questions.filter((question) => question.fieldId.includes(event))
+  questions = questions.filter((question) => question.fieldId.startsWith(event))
   /*
    * We get a list of all the fields, configured & default,
    * transformed into questionConfigs

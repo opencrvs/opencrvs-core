@@ -82,7 +82,7 @@ function mergeIdentifiers(
   return [
     ...mergedIdentifiers.filter(
       ({ sectionIndex, groupIndex }) =>
-        sectionIndex !== questionIdentifiers.sectionIndex &&
+        sectionIndex !== questionIdentifiers.sectionIndex ||
         groupIndex !== questionIdentifiers.groupIndex
     ),
     currentFieldIdentifier
@@ -292,7 +292,7 @@ export function getConfiguredOrDefaultForm(
     ? getConfiguredForm(
         formWithAddresses,
         formConfig.questionConfig.filter(({ fieldId }) =>
-          fieldId.includes(event)
+          fieldId.startsWith(event)
         )
       )
     : formWithAddresses
