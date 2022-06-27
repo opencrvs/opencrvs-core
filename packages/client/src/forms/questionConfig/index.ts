@@ -180,7 +180,7 @@ export function getConfiguredQuestions(
       ...orderedQuestions,
       ...orderByPosition([
         ...customizedQuestions.filter(({ fieldId }) =>
-          fieldId.includes(section)
+          fieldId.startsWith(`${event}.${section}`)
         ),
         ...nonCustomizedQuestions
       ])
