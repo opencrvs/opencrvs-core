@@ -11,7 +11,7 @@
  */
 
 import { countries as countryList, lookup } from 'country-data'
-import { orderBy, uniqBy, omit } from 'lodash'
+import { orderBy, uniqBy } from 'lodash'
 import { IntlShape } from 'react-intl'
 import {
   BirthActionId,
@@ -23,7 +23,7 @@ import { EMPTY_STRING } from '@client/utils/constants'
 import { IActionType, IApplicationConfig, IState } from './DynamicModal'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 import { IOfflineData } from '@client/offline/reducer'
-import { IFormConfigSettingsProps } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
+import { ConfigActionType } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { Dispatch } from 'redux'
 
@@ -223,8 +223,17 @@ export const isApplyButtonDisabled = (
   } else return true
 }
 
+const isGeneralOrConfigAction = (
+  configProperty: IActionType | ConfigActionType
+): configProperty is GeneralActionId | ConfigActionType => {
+  return (
+    Object.keys(GeneralActionId).includes(configProperty) ||
+    Object.keys(ConfigActionType).includes(configProperty)
+  )
+}
+
 export async function callApplicationConfigMutation(
-  configProperty: IActionType,
+  configProperty: IActionType | ConfigActionType,
   appConfig: IApplicationConfig,
   offlineCountryConfiguration: IOfflineData,
   dispatch: Dispatch,
@@ -233,10 +242,9 @@ export async function callApplicationConfigMutation(
   try {
     setIsValueUpdating(true)
     const res = await configApplicationMutations.mutateApplicationConfig(
-      configProperty in GeneralActionId
+      isGeneralOrConfigAction(configProperty)
         ? {
-            [configProperty as GeneralActionId]:
-              appConfig[configProperty as GeneralActionId]
+            [configProperty]: appConfig[configProperty]
           }
         : configProperty in BirthActionId
         ? { BIRTH: appConfig.BIRTH }
@@ -260,53 +268,6 @@ export async function callApplicationConfigMutation(
         }
       }
       dispatch(updateOfflineConfigData(offlineConfig))
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateHideEventRegisterInformationMutation(
-  hideEventEegisterInformation: boolean,
-  props: IFormConfigSettingsProps
-) {
-  try {
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      HIDE_EVENT_REGISTER_INFORMATION: hideEventEegisterInformation
-    })
-    if (res && res.data) {
-      const HIDE_EVENT_REGISTER_INFORMATION =
-        res.data.updateApplicationConfig.HIDE_EVENT_REGISTER_INFORMATION
-      const offlineConfig = {
-        config: {
-          ...props.applicationConfig.config,
-          HIDE_EVENT_REGISTER_INFORMATION
-        }
-      }
-      props.updateConfig(offlineConfig)
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateAddressesMutation(
-  numOfAddresses: number,
-  props: IFormConfigSettingsProps
-) {
-  try {
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      ADDRESSES: numOfAddresses
-    })
-    if (res && res.data) {
-      const ADDRESSES = res.data.updateApplicationConfig.ADDRESSES
-      const offlineConfig = {
-        config: {
-          ...props.applicationConfig.config,
-          ADDRESSES
-        }
-      }
-      props.updateConfig(offlineConfig)
     }
   } catch (err) {
     throw err

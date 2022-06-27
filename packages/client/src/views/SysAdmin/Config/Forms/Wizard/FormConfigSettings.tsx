@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import * as React from 'react'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { connect } from 'react-redux'
+import { useIntl } from 'react-intl'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   FloatingNotification,
   NOTIFICATION_TYPE,
@@ -36,13 +35,10 @@ import {
   ListViewSimplified,
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
-import { updateOfflineConfigData } from '@client/offline/actions'
-import {
-  callUpdateAddressesMutation,
-  callUpdateHideEventRegisterInformationMutation
-} from '@client/views/SysAdmin/Config/Application/utils'
+import { callApplicationConfigMutation } from '@client/views/SysAdmin/Config/Application/utils'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { messages as configMessages } from '@client/i18n/messages/views/config'
+import { IApplicationConfig } from '@client/views/SysAdmin/Config/Application/DynamicModal'
 
 const Label = styled.span`
   ${({ theme }) => theme.fonts.reg16};
@@ -78,272 +74,246 @@ const DescriptionMessage = styled.div`
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
-type DispatchProps = {
-  updateConfig: typeof updateOfflineConfigData
+export enum ConfigActionType {
+  HIDE_EVENT_REGISTER_INFORMATION = 'HIDE_EVENT_REGISTER_INFORMATION',
+  ADDRESSES = 'ADDRESSES'
 }
 
-export type IFormConfigSettingsProps = IntlShapeProps & {
-  applicationConfig: IOfflineData
-} & DispatchProps
-interface State {
-  modalName: string
-  introductionPage: boolean
-  numberOfAddresses: number
-  showModal: boolean
-  errorOccured: boolean
-  showNotification: boolean
-  notificationMessages: string
-}
-
-enum ConfigModals {
-  INTRODUCTION_PAGE = 'changeIntroductionPage',
-  ADDRESSES = 'changeAddresses'
-}
-
-class FormConfigSettingsComponent extends React.Component<
-  IFormConfigSettingsProps,
-  State
-> {
-  constructor(props: IFormConfigSettingsProps) {
-    super(props)
-    this.state = {
-      modalName: EMPTY_STRING,
-      introductionPage:
-        this.props.applicationConfig.config.HIDE_EVENT_REGISTER_INFORMATION,
-      numberOfAddresses: this.props.applicationConfig.config.ADDRESSES,
-      showModal: false,
-      errorOccured: false,
-      showNotification: false,
-      notificationMessages: EMPTY_STRING
-    }
+function FormConfigSettingsComponent() {
+  const intl = useIntl()
+  const dispatch = useDispatch()
+  const offlineCountryConfiguration = useSelector((store: IStoreState) =>
+    getOfflineData(store)
+  )
+  const [modalName, setModalName] = React.useState<
+    ConfigActionType | typeof EMPTY_STRING
+  >(EMPTY_STRING)
+  const [introductionPage, setIntroductionPage] = React.useState(
+    offlineCountryConfiguration.config.HIDE_EVENT_REGISTER_INFORMATION
+  )
+  const [numberOfAddresses, setNumberOfAddresses] = React.useState(
+    offlineCountryConfiguration.config.ADDRESSES
+  )
+  const [showModal, setShowModal] = React.useState(false)
+  const [errorOccured, setErrorOccured] = React.useState(false)
+  const [showNotification, setShowNotification] = React.useState(false)
+  const [notificationMessages, setNotificationMessages] =
+    React.useState(EMPTY_STRING)
+  const [isValueUpdating, setIsValueUpdating] = React.useState(false)
+  const appConfigs: IApplicationConfig = {
+    APPLICATION_NAME: offlineCountryConfiguration.config.APPLICATION_NAME,
+    NID_NUMBER_PATTERN: String(
+      offlineCountryConfiguration.config.NID_NUMBER_PATTERN
+    ),
+    PHONE_NUMBER_PATTERN: String(
+      offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN
+    ),
+    COUNTRY_LOGO: offlineCountryConfiguration.config.COUNTRY_LOGO,
+    CURRENCY: offlineCountryConfiguration.config.CURRENCY,
+    BIRTH: offlineCountryConfiguration.config.BIRTH,
+    DEATH: offlineCountryConfiguration.config.DEATH,
+    HIDE_EVENT_REGISTER_INFORMATION: introductionPage,
+    ADDRESSES: numberOfAddresses
   }
 
-  changeValue = async () => {
-    if (this.state.modalName === ConfigModals.INTRODUCTION_PAGE) {
+  const changeValue = async () => {
+    if (
+      modalName === ConfigActionType.ADDRESSES ||
+      modalName === ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION
+    ) {
       try {
-        await callUpdateHideEventRegisterInformationMutation(
-          this.state.introductionPage,
-          this.props
+        await callApplicationConfigMutation(
+          modalName,
+          modalName === ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION
+            ? {
+                ...appConfigs,
+                [ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION]:
+                  introductionPage
+              }
+            : {
+                ...appConfigs,
+                [ConfigActionType.ADDRESSES]: numberOfAddresses
+              },
+          offlineCountryConfiguration,
+          dispatch,
+          setIsValueUpdating
         )
-        this.toggleConfigModal()
-        this.setState({
-          showNotification: true,
-          notificationMessages: this.props.intl.formatMessage(
-            messages.introductionPageSuccessNotification,
-            {
-              action: this.state.introductionPage
-                ? this.props.intl.formatMessage(messages.disable)
-                : this.props.intl.formatMessage(messages.enable)
-            }
-          )
-        })
-      } catch {
-        this.setState({
-          errorOccured: true
-        })
-      }
-    } else if (this.state.modalName === ConfigModals.ADDRESSES) {
-      try {
-        await callUpdateAddressesMutation(
-          this.state.numberOfAddresses,
-          this.props
+        toggleConfigModal()
+        setShowNotification(true)
+        setNotificationMessages(
+          modalName === ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION
+            ? intl.formatMessage(messages.introductionPageSuccessNotification, {
+                action: introductionPage
+                  ? intl.formatMessage(messages.disable)
+                  : intl.formatMessage(messages.enable)
+              })
+            : intl.formatMessage(messages.noOfAddressesSuccessNotification)
         )
-        this.toggleConfigModal()
-        this.setState({
-          showNotification: true,
-          notificationMessages: this.props.intl.formatMessage(
-            messages.noOfAddressesSuccessNotification
-          )
-        })
       } catch {
-        this.setState({
-          errorOccured: true
-        })
+        setErrorOccured(true)
       }
     }
   }
 
-  toggleOnChange = () => {
-    this.setState({ introductionPage: !this.state.introductionPage })
+  const toggleOnChange = () => {
+    setIntroductionPage(!introductionPage)
   }
 
-  setNumberOfAddresses = (noOfAddresses: string) => {
-    this.setState({ numberOfAddresses: parseInt(noOfAddresses) })
+  const handleNumberOfAddresses = (noOfAddresses: string) => {
+    setNumberOfAddresses(parseInt(noOfAddresses))
   }
 
-  toggleConfigModal = () => {
-    this.setState({ showModal: !this.state.showModal })
+  const toggleConfigModal = () => {
+    setShowModal(!showModal)
   }
 
-  render() {
-    const { intl } = this.props
-    const { showModal, modalName, introductionPage, numberOfAddresses } =
-      this.state
+  return (
+    <Containter>
+      <Content
+        title={intl.formatMessage(messages.settingsTitle)}
+        titleColor={'copy'}
+        subtitle={intl.formatMessage(messages.globalSettingsDescription)}
+      >
+        <ListViewSimplified>
+          <ListViewItemSimplified
+            label={intl.formatMessage(messages.introductionSettings)}
+            value={[
+              <span id="Introduction-page_value">
+                {introductionPage
+                  ? intl.formatMessage(messages.disable)
+                  : intl.formatMessage(messages.enable)}
+              </span>
+            ]}
+            actions={[
+              <LinkButton
+                id={'introductionPageSettings'}
+                onClick={() => {
+                  setModalName(ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION)
+                  toggleConfigModal()
+                }}
+              >
+                {intl.formatMessage(buttonMessages.change)}
+              </LinkButton>
+            ]}
+          />
+          <ListViewItemSimplified
+            label={intl.formatMessage(messages.addressesSettings)}
+            value={<span id="numberOfAddresses">{numberOfAddresses}</span>}
+            actions={[
+              <LinkButton
+                id={'addressesSettings'}
+                onClick={() => {
+                  setModalName(ConfigActionType.ADDRESSES)
+                  toggleConfigModal()
+                }}
+              >
+                {intl.formatMessage(buttonMessages.change)}
+              </LinkButton>
+            ]}
+          />
+        </ListViewSimplified>
+      </Content>
+      <ResponsiveModal
+        id={`${modalName}Modal`}
+        show={showModal}
+        title={
+          modalName === ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION
+            ? intl.formatMessage(messages.introductionPageSettingsDialogTitle)
+            : modalName === ConfigActionType.ADDRESSES
+            ? intl.formatMessage(messages.addressesSettingsDialogTitle)
+            : EMPTY_STRING
+        }
+        autoHeight={true}
+        handleClose={toggleConfigModal}
+        actions={[
+          <TertiaryButton id="cancel" key="cancel" onClick={toggleConfigModal}>
+            {intl.formatMessage(buttonMessages.cancel)}
+          </TertiaryButton>,
+          <PrimaryButton
+            id="apply"
+            key="apply"
+            onClick={() => {
+              changeValue()
+            }}
+          >
+            {intl.formatMessage(buttonMessages.apply)}
+          </PrimaryButton>
+        ]}
+      >
+        {modalName === ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION ? (
+          <DescriptionMessage>
+            {intl.formatMessage(messages.introductionPageSettingsDialogDesc)}
+          </DescriptionMessage>
+        ) : modalName === ConfigActionType.ADDRESSES ? (
+          intl.formatMessage(messages.addressesSettingsDialogDesc)
+        ) : (
+          EMPTY_STRING
+        )}
 
-    return (
-      <Containter>
-        <Content
-          title={intl.formatMessage(messages.settingsTitle)}
-          titleColor={'copy'}
-          subtitle={intl.formatMessage(messages.globalSettingsDescription)}
-        >
+        {modalName === ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION ? (
           <ListViewSimplified>
             <ListViewItemSimplified
-              label={intl.formatMessage(messages.introductionSettings)}
-              value={[
-                <span id="Introduction-page_value">
-                  {introductionPage
-                    ? intl.formatMessage(messages.disable)
-                    : intl.formatMessage(messages.enable)}
-                </span>
-              ]}
-              actions={[
-                <LinkButton
-                  id={'introductionPageSettings'}
-                  onClick={() => {
-                    this.setState({
-                      modalName: ConfigModals.INTRODUCTION_PAGE
-                    })
-                    this.toggleConfigModal()
-                  }}
-                >
-                  {this.props.intl.formatMessage(buttonMessages.change)}
-                </LinkButton>
-              ]}
-            />
-            <ListViewItemSimplified
-              label={intl.formatMessage(messages.addressesSettings)}
-              value={<span id="numberOfAddresses">{numberOfAddresses}</span>}
-              actions={[
-                <LinkButton
-                  id={'addressesSettings'}
-                  onClick={() => {
-                    this.setState({
-                      modalName: ConfigModals.ADDRESSES
-                    })
-                    this.toggleConfigModal()
-                  }}
-                >
-                  {this.props.intl.formatMessage(buttonMessages.change)}
-                </LinkButton>
-              ]}
+              label={
+                <Label>
+                  {intl.formatMessage(messages.showIntroductionPage)}
+                </Label>
+              }
+              actions={
+                <CenteredToggle
+                  id="introductionPage"
+                  defaultChecked={!introductionPage}
+                  onChange={toggleOnChange}
+                />
+              }
             />
           </ListViewSimplified>
-        </Content>
-        <ResponsiveModal
-          id={`${modalName}Modal`}
-          show={showModal}
-          title={
-            modalName === ConfigModals.INTRODUCTION_PAGE
-              ? intl.formatMessage(messages.introductionPageSettingsDialogTitle)
-              : modalName === ConfigModals.ADDRESSES
-              ? intl.formatMessage(messages.addressesSettingsDialogTitle)
-              : EMPTY_STRING
-          }
-          autoHeight={true}
-          handleClose={this.toggleConfigModal}
-          actions={[
-            <TertiaryButton
-              id="cancel"
-              key="cancel"
-              onClick={this.toggleConfigModal}
-            >
-              {intl.formatMessage(buttonMessages.cancel)}
-            </TertiaryButton>,
-            <PrimaryButton
-              id="apply"
-              key="apply"
-              onClick={() => {
-                this.changeValue()
-              }}
-            >
-              {intl.formatMessage(buttonMessages.apply)}
-            </PrimaryButton>
-          ]}
-        >
-          {modalName === ConfigModals.INTRODUCTION_PAGE ? (
-            <DescriptionMessage>
-              {intl.formatMessage(messages.introductionPageSettingsDialogDesc)}
-            </DescriptionMessage>
-          ) : modalName === ConfigModals.ADDRESSES ? (
-            intl.formatMessage(messages.addressesSettingsDialogDesc)
-          ) : (
-            EMPTY_STRING
-          )}
-
-          {modalName === ConfigModals.INTRODUCTION_PAGE ? (
-            <ListViewSimplified>
-              <ListViewItemSimplified
-                label={
-                  <Label>
-                    {intl.formatMessage(messages.showIntroductionPage)}
-                  </Label>
+        ) : modalName === ConfigActionType.ADDRESSES ? (
+          <RadioGroupWrapper id="numberOfAddress">
+            <RadioGroup
+              onChange={(val: string) => handleNumberOfAddresses(val)}
+              options={[
+                {
+                  label: '1',
+                  value: '1'
+                },
+                {
+                  label: '2',
+                  value: '2'
                 }
-                actions={
-                  <CenteredToggle
-                    id="introductionPage"
-                    defaultChecked={!introductionPage}
-                    onChange={this.toggleOnChange}
-                  />
-                }
-              />
-            </ListViewSimplified>
-          ) : modalName === ConfigModals.ADDRESSES ? (
-            <RadioGroupWrapper id="numberOfAddress">
-              <RadioGroup
-                onChange={(val: string) => this.setNumberOfAddresses(val)}
-                options={[
-                  {
-                    label: '1',
-                    value: '1'
-                  },
-                  {
-                    label: '2',
-                    value: '2'
-                  }
-                ]}
-                name={'numberOfAddresses'}
-                value={numberOfAddresses.toString() as string}
-              />
-            </RadioGroupWrapper>
-          ) : (
-            <></>
-          )}
+              ]}
+              name={'numberOfAddresses'}
+              value={numberOfAddresses.toString() as string}
+            />
+          </RadioGroupWrapper>
+        ) : (
+          <></>
+        )}
 
-          {this.state.errorOccured && (
-            <ErrorContent>
-              <Alert color="invert" />
-              <ErrorMessage>
-                <div>
-                  {intl.formatMessage(
-                    configMessages.applicationConfigChangeError
-                  )}
-                </div>
-              </ErrorMessage>
-            </ErrorContent>
-          )}
-        </ResponsiveModal>
-        <FloatingNotification
-          id="form-settings-notification"
-          type={NOTIFICATION_TYPE.SUCCESS}
-          show={this.state.showNotification}
-          callback={() => {
-            this.setState({ showNotification: false })
-          }}
-        >
-          {this.state.notificationMessages}
-        </FloatingNotification>
-      </Containter>
-    )
-  }
+        {errorOccured && (
+          <ErrorContent>
+            <Alert color="invert" />
+            <ErrorMessage>
+              <div>
+                {intl.formatMessage(
+                  configMessages.applicationConfigChangeError
+                )}
+              </div>
+            </ErrorMessage>
+          </ErrorContent>
+        )}
+      </ResponsiveModal>
+      <FloatingNotification
+        id="form-settings-notification"
+        type={NOTIFICATION_TYPE.SUCCESS}
+        show={showNotification}
+        callback={() => {
+          setShowNotification(false)
+        }}
+      >
+        {notificationMessages}
+      </FloatingNotification>
+    </Containter>
+  )
 }
 
-function mapStateToProps(state: IStoreState) {
-  return {
-    applicationConfig: getOfflineData(state)
-  }
-}
-
-export const FormConfigSettings = connect(mapStateToProps, {
-  updateConfig: updateOfflineConfigData
-})(injectIntl(FormConfigSettingsComponent))
+export const FormConfigSettings = FormConfigSettingsComponent

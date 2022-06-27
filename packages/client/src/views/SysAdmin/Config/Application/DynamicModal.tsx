@@ -139,8 +139,8 @@ export type IApplicationConfig = {
   CURRENCY: ICurrency
   BIRTH: IBirth
   DEATH: IDeath
-  HIDE_EVENT_REGISTER_INFORMATION?: boolean
-  ADDRESSES?: number
+  HIDE_EVENT_REGISTER_INFORMATION: boolean
+  ADDRESSES: number
 }
 
 export type IActionType =
@@ -541,7 +541,11 @@ function DynamicModalComponent(props: IProps) {
                 COUNTRY_LOGO: {
                   file: govtLogo,
                   fileName: logoFileName
-                }
+                },
+                HIDE_EVENT_REGISTER_INFORMATION:
+                  offlineCountryConfiguration.config
+                    .HIDE_EVENT_REGISTER_INFORMATION,
+                ADDRESSES: offlineCountryConfiguration.config.ADDRESSES
               },
               props.valueChanged
             )
