@@ -1933,7 +1933,7 @@ export interface QueryToFetchTimeLoggedMetricsByPractitionerResolver<
 
 export interface QueryToSearchEventsArgs {
   userId?: string
-  locationIds?: Array<string | null>
+  locationIds?: Array<string>
   status?: Array<string | null>
   type?: Array<string | null>
   trackingId?: string
