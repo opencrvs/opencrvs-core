@@ -52,6 +52,7 @@ interface IBaseProps {
   onPageChange: (newPageNumber: number) => void
   loading?: boolean
   error?: boolean
+  viewPortWidth: number
 }
 
 interface IDispatchProps {
@@ -66,8 +67,14 @@ function InExternalValidationComponent(props: IProps) {
   const [sortOrder, setSortOrder] = React.useState<SORT_ORDER>(
     SORT_ORDER.ASCENDING
   )
-  const [viewportWidth, setViewportWidth] = useState<number>(window.innerWidth)
-  const { intl, queryData, paginationId, pageSize, onPageChange } = props
+  const {
+    intl,
+    queryData,
+    paginationId,
+    pageSize,
+    onPageChange,
+    viewPortWidth
+  } = props
   const { data } = queryData
   const totalPages = props.queryData.data.totalItems
     ? Math.ceil(props.queryData.data.totalItems / pageSize)
@@ -77,16 +84,6 @@ function InExternalValidationComponent(props: IProps) {
     props.queryData.data.totalItems > pageSize
       ? true
       : false
-
-  useEffect(() => {
-    function recordWindowWidth() {
-      setViewportWidth(window.innerWidth)
-    }
-
-    window.addEventListener('resize', recordWindowWidth)
-
-    return () => window.removeEventListener('resize', recordWindowWidth)
-  }, [])
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -180,7 +177,7 @@ function InExternalValidationComponent(props: IProps) {
   }
 
   const columns =
-    viewportWidth > props.theme.grid.breakpoints.lg
+    viewPortWidth > props.theme.grid.breakpoints.lg
       ? [
           {
             width: 30,
@@ -222,7 +219,7 @@ function InExternalValidationComponent(props: IProps) {
   return (
     <WQContentWrapper
       title={intl.formatMessage(navigationMessages.waitingValidation)}
-      isMobileSize={viewportWidth < props.theme.grid.breakpoints.lg}
+      isMobileSize={viewPortWidth < props.theme.grid.breakpoints.lg}
       isShowPagination={isShowPagination}
       paginationId={paginationId}
       totalPages={totalPages}

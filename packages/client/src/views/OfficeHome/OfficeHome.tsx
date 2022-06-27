@@ -164,6 +164,7 @@ export const OfficeHomeView = (props: IOfficeHomeProps) => {
   const [reviewCurrentPage, setReviewCurrentPage] = useState<number>(1)
   const [approvalCurrentPage, setApprovalCurrentPage] = useState<number>(1)
   const [printCurrentPage, setPrintCurrentPage] = useState<number>(1)
+  const [viewPortWidth, setViewPortWidth] = useState<number>(window.innerWidth)
   const [requireUpdateCurrentPage, setRequireUpdateCurrentPage] =
     useState<number>(1)
   const [externalValidationCurrentPage, setExternalValidationCurrentPage] =
@@ -209,6 +210,16 @@ export const OfficeHomeView = (props: IOfficeHomeProps) => {
     },
     [updateRegistrarWorkqueue, userDetails, isFieldAgent, pageSize]
   )
+
+  useEffect(() => {
+    function recordWindowWidth() {
+      setViewPortWidth(window.innerWidth)
+    }
+
+    window.addEventListener('resize', recordWindowWidth)
+
+    return () => window.removeEventListener('resize', recordWindowWidth)
+  }, [])
 
   useEffect(() => {
     syncWorkqueue(
@@ -349,6 +360,7 @@ export const OfficeHomeView = (props: IOfficeHomeProps) => {
               onPageChange={onPageChange}
               loading={loading}
               error={error}
+              viewPortWidth={viewPortWidth}
             />
           )}
           {!isFieldAgent ? (
@@ -363,6 +375,7 @@ export const OfficeHomeView = (props: IOfficeHomeProps) => {
                   onPageChange={onPageChange}
                   loading={loading}
                   error={error}
+                  viewPortWidth={viewPortWidth}
                 />
               )}
               {tabId === WORKQUEUE_TABS.requiresUpdate && (
@@ -375,6 +388,7 @@ export const OfficeHomeView = (props: IOfficeHomeProps) => {
                   onPageChange={onPageChange}
                   loading={loading}
                   error={error}
+                  viewPortWidth={viewPortWidth}
                 />
               )}
 
@@ -389,6 +403,7 @@ export const OfficeHomeView = (props: IOfficeHomeProps) => {
                     onPageChange={onPageChange}
                     loading={loading}
                     error={error}
+                    viewPortWidth={viewPortWidth}
                   />
                 )}
               {tabId === WORKQUEUE_TABS.sentForApproval && (
@@ -401,6 +416,7 @@ export const OfficeHomeView = (props: IOfficeHomeProps) => {
                   onPageChange={onPageChange}
                   loading={loading}
                   error={error}
+                  viewPortWidth={viewPortWidth}
                 />
               )}
               {tabId === WORKQUEUE_TABS.readyToPrint && (
@@ -413,6 +429,7 @@ export const OfficeHomeView = (props: IOfficeHomeProps) => {
                   onPageChange={onPageChange}
                   loading={loading}
                   error={error}
+                  viewPortWidth={viewPortWidth}
                 />
               )}
             </>
@@ -428,6 +445,7 @@ export const OfficeHomeView = (props: IOfficeHomeProps) => {
                   onPageChange={onPageChange}
                   loading={loading}
                   error={error}
+                  viewPortWidth={viewPortWidth}
                 />
               )}
               {tabId === WORKQUEUE_TABS.requiresUpdate && (
@@ -440,6 +458,7 @@ export const OfficeHomeView = (props: IOfficeHomeProps) => {
                   onPageChange={onPageChange}
                   loading={loading}
                   error={error}
+                  viewPortWidth={viewPortWidth}
                 />
               )}
             </>
