@@ -777,7 +777,7 @@ export async function getDeclarationsOfCurrentUser(): Promise<string> {
 
         return (
           differenceInMinutes(new Date(), new Date(downloadedTime[0].date)) <
-          1440 // 24 hours, used munites for better accuracy
+          1500 // 25 hours, used munites for better accuracy
         )
       }
       return true

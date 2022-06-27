@@ -24,6 +24,7 @@ import { SubmissionController } from '@client/SubmissionController'
 import * as pdfjs from 'pdfjs-dist/build/pdf'
 import * as pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry'
 import WebFont from 'webfontloader'
+import { BACKGROUND_SYNC_BROADCAST_CHANNEL } from './utils/constants'
 
 WebFont.load({
   google: {
@@ -84,9 +85,7 @@ function onBackGroundSync() {
   if (typeof BroadcastChannel === 'undefined') {
     return
   }
-  const channel = new BroadcastChannel(
-    window.config.BACKGROUND_SYNC_BROADCAST_CHANNEL
-  )
+  const channel = new BroadcastChannel(BACKGROUND_SYNC_BROADCAST_CHANNEL)
   channel.onmessage = (e) => {
     const action = actions.showBackgroundSyncedNotification()
     store.dispatch(action)

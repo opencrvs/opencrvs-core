@@ -472,23 +472,13 @@ export interface GQLCertificateSVGInput {
 
 export interface GQLApplicationConfiguration {
   APPLICATION_NAME?: string
-  BACKGROUND_SYNC_BROADCAST_CHANNEL?: string
   BIRTH?: GQLBirth
-  COUNTRY?: string
   COUNTRY_LOGO?: GQLCountryLogo
   CURRENCY?: GQLCurrency
-  COUNTRY_LOGO_RENDER_WIDTH?: number
-  COUNTRY_LOGO_RENDER_HEIGHT?: number
-  DESKTOP_TIME_OUT_MILLISECONDS?: number
   DEATH?: GQLDeath
-  UI_POLLING_INTERVAL?: number
   FIELD_AGENT_AUDIT_LOCATIONS?: string
-  APPLICATION_AUDIT_LOCATIONS?: string
-  INFORMANT_MINIMUM_AGE?: number
   HIDE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
-  SENTRY?: string
-  LOGROCKET?: string
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
@@ -496,23 +486,13 @@ export interface GQLApplicationConfiguration {
 
 export interface GQLApplicationConfigurationInput {
   APPLICATION_NAME?: string
-  BACKGROUND_SYNC_BROADCAST_CHANNEL?: string
   BIRTH?: GQLBirthInput
-  COUNTRY?: string
   COUNTRY_LOGO?: GQLCountryLogoInput
   CURRENCY?: GQLCurrencyInput
-  COUNTRY_LOGO_RENDER_WIDTH?: number
-  COUNTRY_LOGO_RENDER_HEIGHT?: number
-  DESKTOP_TIME_OUT_MILLISECONDS?: number
   DEATH?: GQLDeathInput
-  UI_POLLING_INTERVAL?: number
   FIELD_AGENT_AUDIT_LOCATIONS?: string
-  APPLICATION_AUDIT_LOCATIONS?: string
-  INFORMANT_MINIMUM_AGE?: number
   HIDE_EVENT_REGISTER_INFORMATION?: boolean
   EXTERNAL_VALIDATION_WORKQUEUE?: boolean
-  SENTRY?: string
-  LOGROCKET?: string
   PHONE_NUMBER_PATTERN?: string
   NID_NUMBER_PATTERN?: string
   ADDRESSES?: number
@@ -3828,23 +3808,13 @@ export interface AvatarToDataResolver<TParent = any, TResult = any> {
 
 export interface GQLApplicationConfigurationTypeResolver<TParent = any> {
   APPLICATION_NAME?: ApplicationConfigurationToAPPLICATION_NAMEResolver<TParent>
-  BACKGROUND_SYNC_BROADCAST_CHANNEL?: ApplicationConfigurationToBACKGROUND_SYNC_BROADCAST_CHANNELResolver<TParent>
   BIRTH?: ApplicationConfigurationToBIRTHResolver<TParent>
-  COUNTRY?: ApplicationConfigurationToCOUNTRYResolver<TParent>
   COUNTRY_LOGO?: ApplicationConfigurationToCOUNTRY_LOGOResolver<TParent>
   CURRENCY?: ApplicationConfigurationToCURRENCYResolver<TParent>
-  COUNTRY_LOGO_RENDER_WIDTH?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_WIDTHResolver<TParent>
-  COUNTRY_LOGO_RENDER_HEIGHT?: ApplicationConfigurationToCOUNTRY_LOGO_RENDER_HEIGHTResolver<TParent>
-  DESKTOP_TIME_OUT_MILLISECONDS?: ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver<TParent>
   DEATH?: ApplicationConfigurationToDEATHResolver<TParent>
-  UI_POLLING_INTERVAL?: ApplicationConfigurationToUI_POLLING_INTERVALResolver<TParent>
   FIELD_AGENT_AUDIT_LOCATIONS?: ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<TParent>
-  APPLICATION_AUDIT_LOCATIONS?: ApplicationConfigurationToAPPLICATION_AUDIT_LOCATIONSResolver<TParent>
-  INFORMANT_MINIMUM_AGE?: ApplicationConfigurationToINFORMANT_MINIMUM_AGEResolver<TParent>
   HIDE_EVENT_REGISTER_INFORMATION?: ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolver<TParent>
   EXTERNAL_VALIDATION_WORKQUEUE?: ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<TParent>
-  SENTRY?: ApplicationConfigurationToSENTRYResolver<TParent>
-  LOGROCKET?: ApplicationConfigurationToLOGROCKETResolver<TParent>
   PHONE_NUMBER_PATTERN?: ApplicationConfigurationToPHONE_NUMBER_PATTERNResolver<TParent>
   NID_NUMBER_PATTERN?: ApplicationConfigurationToNID_NUMBER_PATTERNResolver<TParent>
   ADDRESSES?: ApplicationConfigurationToADDRESSESResolver<TParent>
@@ -3857,21 +3827,7 @@ export interface ApplicationConfigurationToAPPLICATION_NAMEResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface ApplicationConfigurationToBACKGROUND_SYNC_BROADCAST_CHANNELResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface ApplicationConfigurationToBIRTHResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToCOUNTRYResolver<
   TParent = any,
   TResult = any
 > {
@@ -3892,27 +3848,6 @@ export interface ApplicationConfigurationToCURRENCYResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface ApplicationConfigurationToCOUNTRY_LOGO_RENDER_WIDTHResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToCOUNTRY_LOGO_RENDER_HEIGHTResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToDESKTOP_TIME_OUT_MILLISECONDSResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface ApplicationConfigurationToDEATHResolver<
   TParent = any,
   TResult = any
@@ -3920,28 +3855,7 @@ export interface ApplicationConfigurationToDEATHResolver<
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 
-export interface ApplicationConfigurationToUI_POLLING_INTERVALResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
 export interface ApplicationConfigurationToFIELD_AGENT_AUDIT_LOCATIONSResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToAPPLICATION_AUDIT_LOCATIONSResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToINFORMANT_MINIMUM_AGEResolver<
   TParent = any,
   TResult = any
 > {
@@ -3956,20 +3870,6 @@ export interface ApplicationConfigurationToHIDE_EVENT_REGISTER_INFORMATIONResolv
 }
 
 export interface ApplicationConfigurationToEXTERNAL_VALIDATION_WORKQUEUEResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToSENTRYResolver<
-  TParent = any,
-  TResult = any
-> {
-  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
-}
-
-export interface ApplicationConfigurationToLOGROCKETResolver<
   TParent = any,
   TResult = any
 > {

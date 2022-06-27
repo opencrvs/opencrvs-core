@@ -1,3 +1,16 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+**Table of Contents** _generated with [DocToc](https://github.com/thlorenz/doctoc)_
+
+- [Data types](#data-types)
+- [Properties of default.ts](#properties-of-registerjson)
+- [registerForm](#registerform)
+- [birth](#birth)
+- [death](#death)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ### Data types
 
 We are using some data types and they maintain a hierarchical relation between themselves. These types are currently defined in `/packages/client/src/forms/index.ts`
@@ -71,9 +84,9 @@ We are using some data types and they maintain a hierarchical relation between t
   - **`labelAs:`** An optional propoerty, Just incase we want to change the label as well.
   - **`conditionals:`** Optional property. Same as any other condition, but this condition applies should the element be displayed on the new location or not. It satisfied it will be displayed to the new location other wise it not change it's location.
 
-### Properties of register.json
+### Properties of default.ts
 
-Going through all properties of register.json below
+Going through all properties of default.ts below
 
 ### registerForm
 
@@ -189,7 +202,7 @@ This object holds sections for birth declaration forms. All sections are contain
 
 * #### `Address fields`
 
-  The following fields are standard address fields. We have separate inputs for address lines. They maintain a cascading appearance by their own conditional properties. Sometimes we have a configurable primary and secondary address.
+  The following fields are standard address fields configured in the file **administrative/addresses.ts**. We have separate inputs for address lines. They maintain a cascading appearance by their own conditional properties. Sometimes we have a configurable primary and secondary address.
 
   With the exception of state, district, postcodes and city, address lines map into an address lines array in a FHIR Location at the following indexes:
 

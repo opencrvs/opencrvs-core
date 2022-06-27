@@ -38,6 +38,7 @@ import { IDeclarationData } from './utils'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
+import { Roles } from '@client/utils/authUtils'
 
 export type CMethodParams = {
   declaration: IDeclarationData
@@ -71,7 +72,11 @@ export const ShowDownloadButton = ({
   )
     return <></>
 
-  if (declaration.status === 'IN_PROGRESS') {
+  if (
+    declaration.assignment &&
+    (userDetails?.role === Roles.LOCAL_REGISTRAR ||
+      userDetails?.role === Roles.NATIONAL_REGISTRAR)
+  ) {
     refetchQueries = [
       { query: FETCH_DECLARATION_SHORT_INFO, variables: { id: declaration.id } }
     ]
