@@ -292,7 +292,7 @@ export function getConfiguredOrDefaultForm(
     ? getConfiguredForm(
         formWithAddresses,
         formConfig.questionConfig.filter(({ fieldId }) =>
-          fieldId.includes(event)
+          fieldId.startsWith(event)
         )
       )
     : formWithAddresses
