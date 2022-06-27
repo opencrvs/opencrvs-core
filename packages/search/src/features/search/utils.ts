@@ -73,7 +73,7 @@ export function queryBuilder(
   eventLocationId: string,
   gender: string,
   nameCombinations: INameCombination[],
-  declarationLocationId: string,
+  declarationLocationId: string | string[],
   declarationLocationHirarchyId: string,
   createdBy: string,
   filters: IFilter
@@ -147,13 +147,23 @@ export function queryBuilder(
     })
   }
 
-  if (declarationLocationId !== EMPTY_STRING) {
+  if (Array.isArray(declarationLocationId)) {
+    declarationLocationId.forEach((id) => {
+      should.push({
+        term: {
+          'declarationLocationId.keyword': {
+            value: id,
+            boost: 2
+          }
+        }
+      })
+    })
+  } else if (declarationLocationId !== EMPTY_STRING) {
     must.push({
       term: {
         'declarationLocationId.keyword': {
           value: declarationLocationId,
-          // tslint:disable-next-line
-          boost: 2.0
+          boost: 2
         }
       }
     })

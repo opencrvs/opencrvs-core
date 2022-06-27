@@ -111,7 +111,7 @@ type Query {
   ): TimeLoggedMetricsResultSet
   searchEvents(
     userId: String
-    locationIds: [String]
+    locationIds: [String!]
     status: [String]
     type: [String]
     trackingId: String
