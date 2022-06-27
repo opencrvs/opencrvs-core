@@ -23,7 +23,11 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
+import {
+  LinkButton,
+  PrimaryButton,
+  TertiaryButton
+} from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import { buttonMessages } from '@client/i18n/messages/buttons'
@@ -76,10 +80,6 @@ const Label = styled.span`
 `
 const Value = styled.span`
   ${({ theme }) => theme.fonts.reg16}
-`
-
-const BlueTitle = styled.span`
-  color: ${({ theme }) => theme.colors.tertiary};
 `
 
 export type Scope = string[]
@@ -469,9 +469,18 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             <Content title={CertificateSection.title} titleColor={'copy'}>
               <>
                 {intl.formatMessage(messages.listDetails)}
-                <BlueTitle>
+                <LinkButton
+                  id="certificate-instructions-link"
+                  onClick={() => {
+                    window.open(
+                      'https://documentation.opencrvs.org/setup/4.-functional-configuration/4.4-configure-a-certificate-template',
+                      '_blank',
+                      'noopener,noreferrer'
+                    )
+                  }}
+                >
                   {intl.formatMessage(messages.listDetailsQsn)}
-                </BlueTitle>
+                </LinkButton>
               </>
               <ListViewContainer>
                 <ListViewSimplified>
