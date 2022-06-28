@@ -87,7 +87,7 @@ export const GridTableRowDesktop = (props: IGridTableRow) => {
         return (
           <StyledBox key={index} hideLastBorder={props.hideLastBorder}>
             <RowWrapper
-              id={'row_' + index}
+              id={`row-${index}`}
               clickable={clickable}
               onClick={() =>
                 clickable &&

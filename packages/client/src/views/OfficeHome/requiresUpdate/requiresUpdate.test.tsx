@@ -164,7 +164,6 @@ describe('OfficeHome sent for update tab related tests', () => {
     const TIME_STAMP = '1544188309380'
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <RequiresUpdate
         queryData={{
           data: {
@@ -229,6 +228,12 @@ describe('OfficeHome sent for update tab related tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -249,7 +254,6 @@ describe('OfficeHome sent for update tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <RequiresUpdate
         queryData={{
           data: {
@@ -257,6 +261,12 @@ describe('OfficeHome sent for update tab related tests', () => {
             results: []
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -350,7 +360,6 @@ describe('OfficeHome sent for update tab related tests', () => {
     ]
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <RequiresUpdate
         queryData={{
           data: {
@@ -438,6 +447,12 @@ describe('OfficeHome sent for update tab related tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+        viewPortWidth={1024}
       />,
       { store, history, graphqlMocks: graphqlMock }
     )
@@ -562,6 +577,7 @@ describe('OfficeHome sent for update tab related tests', () => {
         { store, history, apolloClient: client }
       )
       testComponent = createdTestComponent
+      testComponent.update()
       getItem.mockReturnValue(registerScopeToken)
       await store.dispatch(checkAuth())
     })
@@ -642,7 +658,6 @@ describe('Tablet tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <RequiresUpdate
         queryData={{
           data: {
@@ -707,6 +722,12 @@ describe('Tablet tests', () => {
             ]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )

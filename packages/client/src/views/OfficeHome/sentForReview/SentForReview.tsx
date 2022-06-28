@@ -265,11 +265,11 @@ const SentForReviewComponent = (props: IApprovalTabProps) => {
   // Review tab for field agent
   const { intl, queryData, paginationId, pageSize, onPageChange } = props
   const { data } = queryData
-  const totalPages = props.queryData.data.totalItems
+  const totalPages = props.queryData?.data?.totalItems
     ? Math.ceil(props.queryData.data.totalItems / pageSize)
     : 0
   const isShowPagination =
-    props.queryData.data.totalItems &&
+    props.queryData?.data?.totalItems &&
     props.queryData.data.totalItems > pageSize
       ? true
       : false

@@ -53,7 +53,7 @@ export const GridTableRowMobile = (props: IGridTableRow) => {
         return (
           <StyledBox key={index} id="styledBox">
             <RowWrapper
-              id={'row_' + index}
+              id={`row-${index}`}
               clickable={clickable}
               onClick={() =>
                 clickable &&

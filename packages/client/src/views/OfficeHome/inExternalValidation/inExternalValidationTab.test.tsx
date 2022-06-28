@@ -81,9 +81,14 @@ describe('Registrar home external validation tab tests', () => {
     testStore.dispatch(checkAuth())
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <InExternalValidationTab
         queryData={{ data: { totalItems: 1, results: [birthEventSearchSet] } }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+        viewPortWidth={1024}
       />,
       { store: testStore, history: testHistory }
     )

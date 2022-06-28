@@ -300,7 +300,6 @@ describe('RegistrarHome ready to print tab related tests', () => {
     }
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <ReadyToPrint
         queryData={{
           data: {
@@ -308,6 +307,12 @@ describe('RegistrarHome ready to print tab related tests', () => {
             results: [birthEventSearchSet, deathEventSearchSet]
           }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -328,11 +333,16 @@ describe('RegistrarHome ready to print tab related tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <ReadyToPrint
         queryData={{
           data: { totalItems: 0, results: [] }
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -355,6 +365,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -375,17 +386,22 @@ describe('RegistrarHome ready to print tab related tests', () => {
   describe('When a row is clicked', () => {
     it('renders expanded area for ready to print', async () => {
       const testComponent = await createTestComponent(
-        // @ts-ignore
         <ReadyToPrint
           queryData={{
             data: mockPrintTabData
           }}
+          paginationId={1}
+          pageSize={10}
+          onPageChange={() => {}}
+          loading={false}
+          error={false}
+          viewPortWidth={1024}
         />,
         { store, history }
       )
 
       // wait for mocked data to load mockedProvider
-      // after sorting (by default name) row's order will be changed
+      // after sorting (by default last column) row's order will be changed
       await waitForElement(testComponent, '#name_0')
 
       testComponent.update()
@@ -676,6 +692,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
         { store, history, apolloClient: client }
       )
       testComponent = createdTestComponent
+      testComponent.update()
     })
 
     it('downloads declaration after clicking download button', async () => {
@@ -752,11 +769,16 @@ describe('Tablet tests', () => {
     Date.now = jest.fn(() => 1554055200000)
 
     const testComponent = await createTestComponent(
-      // @ts-ignore
       <ReadyToPrint
         queryData={{
           data: mockPrintTabData
         }}
+        paginationId={1}
+        pageSize={10}
+        onPageChange={() => {}}
+        loading={false}
+        error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )

@@ -249,11 +249,11 @@ const ReadyToPrintComponent = (props: IPrintTabProps) => {
 
   const { intl, queryData, paginationId, onPageChange, pageSize } = props
   const { data } = queryData
-  const totalPages = props.queryData.data.totalItems
+  const totalPages = props.queryData?.data?.totalItems
     ? Math.ceil(props.queryData.data.totalItems / pageSize)
     : 0
   const isShowPagination =
-    props.queryData.data.totalItems &&
+    props.queryData?.data?.totalItems &&
     props.queryData.data.totalItems > pageSize
       ? true
       : false

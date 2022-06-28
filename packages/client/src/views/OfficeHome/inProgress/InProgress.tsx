@@ -544,11 +544,11 @@ export const InProgressComponent = (props: IRegistrarHomeProps) => {
         ? true
         : false
       : props.selectorId === SELECTOR_ID.fieldAgentDrafts
-      ? props.queryData.inProgressData.totalItems &&
+      ? props.queryData?.inProgressData?.totalItems &&
         props.queryData.inProgressData.totalItems > props.pageSize
         ? true
         : false
-      : props.queryData.notificationData.totalItems &&
+      : props.queryData?.notificationData?.totalItems &&
         props.queryData.notificationData.totalItems > props.pageSize
       ? true
       : false
@@ -565,9 +565,9 @@ export const InProgressComponent = (props: IRegistrarHomeProps) => {
     !selectorId || selectorId === SELECTOR_ID.ownDrafts
       ? Math.ceil(props.drafts.length / props.pageSize)
       : selectorId === SELECTOR_ID.fieldAgentDrafts
-      ? props.queryData.inProgressData.totalItems &&
+      ? props.queryData?.inProgressData?.totalItems &&
         Math.ceil(props.queryData.inProgressData.totalItems / props.pageSize)
-      : props.queryData.notificationData.totalItems &&
+      : props.queryData?.notificationData?.totalItems &&
         Math.ceil(props.queryData.notificationData.totalItems / props.pageSize)
 
   const noContent =

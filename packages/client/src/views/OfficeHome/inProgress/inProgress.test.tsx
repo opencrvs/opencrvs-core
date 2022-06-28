@@ -113,6 +113,7 @@ describe('In Progress tab', () => {
         onPageChange={(pageId: number) => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -180,6 +181,7 @@ describe('In Progress tab', () => {
         }}
         pageSize={10}
         onPageChange={(pageId: number) => {}}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -282,6 +284,7 @@ describe('In Progress tab', () => {
           }}
           pageSize={10}
           onPageChange={(pageId: number) => {}}
+          viewPortWidth={1024}
         />,
         { store, history }
       )
@@ -323,6 +326,7 @@ describe('In Progress tab', () => {
           }}
           pageSize={10}
           onPageChange={(pageId: number) => {}}
+          viewPortWidth={1024}
         />,
         { store, history }
       )
@@ -430,6 +434,7 @@ describe('In Progress tab', () => {
           }}
           pageSize={10}
           onPageChange={(pageId: number) => {}}
+          viewPortWidth={1024}
         />,
         { store, history }
       )
@@ -532,6 +537,7 @@ describe('In Progress tab', () => {
           }}
           pageSize={10}
           onPageChange={(pageId: number) => {}}
+          viewPortWidth={1024}
         />,
         { store, history }
       )
@@ -569,6 +575,7 @@ describe('In Progress tab', () => {
           }}
           pageSize={10}
           onPageChange={(pageId: number) => {}}
+          viewPortWidth={1024}
         />,
         { store, history }
       )
@@ -670,6 +677,7 @@ describe('In Progress tab', () => {
           }}
           pageSize={10}
           onPageChange={(pageId: number) => {}}
+          viewPortWidth={1024}
         />,
         { store, history }
       )
@@ -726,7 +734,8 @@ describe('In Progress tab', () => {
           healthSystemId: 1
         },
         pageSize: 10,
-        onPageChange: (pageId: number) => {}
+        onPageChange: (pageId: number) => {},
+        viewPortWidth: 1024
       }
       it('renders download button when not downloaded', async () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
@@ -871,6 +880,7 @@ describe('In Progress tab', () => {
           }}
           pageSize={10}
           onPageChange={(pageId: number) => {}}
+          viewPortWidth={1024}
         />,
         { store, history }
       )
@@ -947,6 +957,7 @@ describe('Tablet tests', () => {
         }}
         pageSize={10}
         onPageChange={(pageId: number) => {}}
+        viewPortWidth={1024}
       />,
       { store, history }
     )

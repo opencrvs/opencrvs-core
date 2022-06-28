@@ -241,6 +241,7 @@ describe('OfficeHome sent for review tab related tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -274,6 +275,7 @@ describe('OfficeHome sent for review tab related tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -311,6 +313,7 @@ describe('OfficeHome sent for review tab related tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -414,6 +417,7 @@ describe('OfficeHome sent for review tab related tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -599,6 +603,7 @@ describe('OfficeHome sent for review tab related tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -801,6 +806,7 @@ describe('Tablet tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )

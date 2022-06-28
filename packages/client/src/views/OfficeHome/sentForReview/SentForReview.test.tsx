@@ -219,6 +219,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -252,6 +253,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -278,6 +280,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -309,6 +312,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -413,6 +417,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
@@ -520,6 +525,7 @@ describe('Tablet tests', () => {
         onPageChange={() => {}}
         loading={false}
         error={false}
+        viewPortWidth={1024}
       />,
       { store, history }
     )
