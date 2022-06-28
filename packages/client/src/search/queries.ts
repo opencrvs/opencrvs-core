@@ -18,7 +18,7 @@ export const SEARCH_EVENTS = gql`
     $contactNumber: String
     $registrationNumber: String
     $name: String
-    $locationIds: [String]
+    $locationIds: [String!]
   ) {
     searchEvents(
       sort: $sort
@@ -72,7 +72,7 @@ export const SEARCH_DECLARATIONS_USER_WISE = gql`
   query searchDeclarationsUserWise(
     $status: [String]
     $userId: String
-    $locationIds: [String]
+    $locationIds: [String!]
     $sort: String
     $count: Int
     $skip: Int
@@ -122,7 +122,7 @@ export const COUNT_USER_WISE_DECLARATIONS = gql`
   query countUserWiseDeclarations(
     $status: [String]
     $userId: String
-    $locationIds: [String]
+    $locationIds: [String!]
   ) {
     searchEvents(status: $status, userId: $userId, locationIds: $locationIds) {
       totalItems

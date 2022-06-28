@@ -135,19 +135,19 @@ Username: **alex.ngonga** / Password: **test** / SMS code: **000000** / Office: 
 
 Based in the country HQ Office:
 
-Username: **jonathan.campbell** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Isamba District, Central Province**
+Username: **jonathan.campbell** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
 
 ### National Registrar
 
 Based in the country HQ Office:
 
-Username: **joseph.musonda** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Isamba District, Central Province**
+Username: **joseph.musonda** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
 
 ### Performance Manager
 
 Based in the country HQ Office:
 
-Username: **edgar.kazembe** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Isamba District, Central Province**
+Username: **edgar.kazembe** / Password: **test** / SMS code: **000000** / Office: **HQ Office, Itambo District, Central Province**
 
 ## Starting and stopping OpenCRVS
 

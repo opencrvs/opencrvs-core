@@ -60,7 +60,8 @@ import {
   ResponsiveModal,
   Loader,
   PageHeader,
-  IPageHeaderProps
+  IPageHeaderProps,
+  ErrorToastNotification
 } from '@opencrvs/components/lib/interface'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
@@ -122,6 +123,7 @@ import {
 } from './mutations'
 import { selectDeclaration } from '@client/declarations/selectors'
 import { OperationVariables } from 'apollo-client'
+import { errorMessages } from '@client/i18n/messages/errors'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -672,7 +674,14 @@ function getBodyContent({
             if (loading) {
               return <Loader id="search_loader" marginPercent={35} />
             } else if (error) {
-              return <Redirect to={HOME} />
+              return (
+                <ErrorToastNotification
+                  retryButtonText={intl.formatMessage(buttonMessages.retry)}
+                  retryButtonHandler={() => refetch()}
+                >
+                  {intl.formatMessage(errorMessages.pleaseTryAgainError)}
+                </ErrorToastNotification>
+              )
             }
 
             let declaration
