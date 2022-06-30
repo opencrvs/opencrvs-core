@@ -20,6 +20,6 @@ THEN
 
 (Link to Figma)
 
-### Dev-tasks
+### Dev tasks
 
 - [ ] Task 1
