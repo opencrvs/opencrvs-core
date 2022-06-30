@@ -1,8 +1,6 @@
 ---
 name: User story
-about:
-  For describing a small piece of functionality so users can accomplish a specific
-  goal.
+about: For describing a small piece of functionality so users can accomplish a specific goal
 title: ''
 labels: ''
 assignees: ''
@@ -21,10 +19,6 @@ THEN
 ### Design
 
 (Link to Figma)
-
-### Copy
-
-(Link to Notion)
 
 ### Dev-tasks
 
