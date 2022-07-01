@@ -530,32 +530,24 @@ function ApplicationConfigComponent() {
 
   const toggleConfigModal = () => {
     if (changeModalName) {
-      setModalName('')
+      setModalName(EMPTY_STRING)
     }
-    return !!!changeModalName ? false : true
   }
 
-  const getTabs = (intl: IntlShape) => {
-    const tabs = {
-      sections: [
-        {
-          id: 'general',
-          title: intl.formatMessage(messages.generalTabTitle)
-        },
-        {
-          id: 'birth',
-          title: intl.formatMessage(messages.birthTabTitle)
-        },
-        {
-          id: 'death',
-          title: intl.formatMessage(messages.deathTabTitle)
-        }
-      ],
-      activeTabId: activeTabId,
-      onTabClick: (id: string) => changeTab(id as TabId)
+  const tabSections = [
+    {
+      id: TabId.GENERAL,
+      title: intl.formatMessage(messages.generalTabTitle)
+    },
+    {
+      id: TabId.BIRTH,
+      title: intl.formatMessage(messages.birthTabTitle)
+    },
+    {
+      id: TabId.DEATH,
+      title: intl.formatMessage(messages.deathTabTitle)
     }
-    return <FormTabs {...tabs} />
-  }
+  ]
 
   return (
     <SysAdminContentWrapper
@@ -565,23 +557,29 @@ function ApplicationConfigComponent() {
       <Content
         title={intl.formatMessage(messages.applicationSettings)}
         titleColor={'copy'}
-        tabBarContent={getTabs(intl)}
+        tabBarContent={
+          <FormTabs
+            sections={tabSections}
+            activeTabId={activeTabId}
+            onTabClick={(id: TabId) => changeTab(id)}
+          />
+        }
       >
-        {activeTabId && activeTabId === TabId.GENERAL && (
+        {activeTabId === TabId.GENERAL && (
           <GeneralTabContent
             offlineCountryConfiguration={offlineCountryConfiguration}
             intl={intl}
             callBack={(modalName: string) => setModalName(modalName)}
           />
         )}
-        {activeTabId && activeTabId === TabId.BIRTH && (
+        {activeTabId === TabId.BIRTH && (
           <BirthTabContent
             offlineCountryConfiguration={offlineCountryConfiguration}
             intl={intl}
             callBack={(modalName: string) => setModalName(modalName)}
           />
         )}
-        {activeTabId && activeTabId === TabId.DEATH && (
+        {activeTabId === TabId.DEATH && (
           <DeathTabContent
             offlineCountryConfiguration={offlineCountryConfiguration}
             intl={intl}

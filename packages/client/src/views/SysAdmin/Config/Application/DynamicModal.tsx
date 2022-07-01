@@ -161,10 +161,8 @@ export type IState = {
   deathDelayedFee: string
   nidPattern: string
   nidExample: string
-  testNid: boolean
   phoneNumberPattern: string
   phoneNumberExample: string
-  testPhoneNumber: boolean
   errorOccured: boolean
   errorMessages: string
   govtLogo: string
@@ -225,13 +223,11 @@ function DynamicModalComponent(props: IProps) {
     String(offlineCountryConfiguration.config.NID_NUMBER_PATTERN)
   )
   const [nidExample, setNidExample] = React.useState(EMPTY_STRING)
-  const [testNid, setTestNid] = React.useState(false)
   const [phoneNumberPattern, setPhoneNumberPattern] = React.useState(
     String(offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN)
   )
   const [phoneNumberExample, setPhoneNumberExample] =
     React.useState(EMPTY_STRING)
-  const [testPhoneNumber, setTestPhoneNumber] = React.useState(false)
   const [errorOccured, setErrorOccured] = React.useState(false)
   const [errorMessages, setErrorMessages] = React.useState(EMPTY_STRING)
   const [govtLogo, setGovtLogo] = React.useState(EMPTY_STRING)
@@ -247,8 +243,7 @@ function DynamicModalComponent(props: IProps) {
   const [isFileUploading, setIsFileUploading] = React.useState(false)
   const [logoFileName, setLogoFileName] = React.useState(EMPTY_STRING)
   const [isValueUpdating, setIsValueUpdating] = React.useState(false)
-  const showChangeModal = !!!props.changeModalName ? false : true
-
+  const showChangeModal = Boolean(props.changeModalName)
   const state: IState = {
     applicationName,
     currency,
@@ -262,10 +257,8 @@ function DynamicModalComponent(props: IProps) {
     deathDelayedFee,
     nidPattern,
     nidExample,
-    testNid,
     phoneNumberPattern,
     phoneNumberExample,
-    testPhoneNumber,
     errorOccured,
     errorMessages,
     govtLogo,
