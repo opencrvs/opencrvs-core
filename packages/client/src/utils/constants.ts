@@ -100,3 +100,7 @@ export const DECLARED_DECLARATION_SEARCH_QUERY_COUNT =
 
 export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
 export const ACCUMULATED_FILE_SIZE = 20480000
+
+export const DESKTOP_TIME_OUT_MILLISECONDS = 900000
+export const INFORMANT_MINIMUM_AGE = 16
+export const BACKGROUND_SYNC_BROADCAST_CHANNEL = 'backgroundSynBroadCastChannel'

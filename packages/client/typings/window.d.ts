@@ -23,7 +23,6 @@ interface Window {
       }
     }
     CONFIG_API_URL: string
-    BACKGROUND_SYNC_BROADCAST_CHANNEL: string
     COUNTRY: string
     COUNTRY_LOGO: {
       fileName: string
@@ -33,9 +32,6 @@ interface Window {
       isoCode: string
       languagesAndCountry: string[]
     }
-    COUNTRY_LOGO_RENDER_WIDTH: number // in px
-    COUNTRY_LOGO_RENDER_HEIGHT: number // in px
-    DESKTOP_TIME_OUT_MILLISECONDS: number
     DEATH: {
       REGISTRATION_TARGET: number
       FEE: {
@@ -49,12 +45,9 @@ interface Window {
     AUTH_URL: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean
-    UI_POLLING_INTERVAL: number
-    INFORMANT_MINIMUM_AGE: number
     HIDE_EVENT_REGISTER_INFORMATION: boolean
     EXTERNAL_VALIDATION_WORKQUEUE: boolean
     FIELD_AGENT_AUDIT_LOCATIONS: string
-    APPLICATION_AUDIT_LOCATIONS: string
     PHONE_NUMBER_PATTERN: RegExp
     NID_NUMBER_PATTERN: RegExp
     DECLARATION_AUDIT_LOCATIONS: string

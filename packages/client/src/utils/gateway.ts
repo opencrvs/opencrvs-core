@@ -85,50 +85,38 @@ export enum AddressType {
 export type ApplicationConfiguration = {
   __typename?: 'ApplicationConfiguration'
   ADDRESSES?: Maybe<Scalars['Int']>
-  APPLICATION_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
   APPLICATION_NAME?: Maybe<Scalars['String']>
-  BACKGROUND_SYNC_BROADCAST_CHANNEL?: Maybe<Scalars['String']>
   BIRTH?: Maybe<Birth>
-  COUNTRY?: Maybe<Scalars['String']>
   COUNTRY_LOGO?: Maybe<CountryLogo>
-  COUNTRY_LOGO_RENDER_HEIGHT?: Maybe<Scalars['Int']>
-  COUNTRY_LOGO_RENDER_WIDTH?: Maybe<Scalars['Int']>
   CURRENCY?: Maybe<Currency>
   DEATH?: Maybe<Death>
-  DESKTOP_TIME_OUT_MILLISECONDS?: Maybe<Scalars['Int']>
   EXTERNAL_VALIDATION_WORKQUEUE?: Maybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: Maybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: Maybe<Scalars['Boolean']>
-  INFORMANT_MINIMUM_AGE?: Maybe<Scalars['Int']>
-  LOGROCKET?: Maybe<Scalars['String']>
   NID_NUMBER_PATTERN?: Maybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: Maybe<Scalars['String']>
-  SENTRY?: Maybe<Scalars['String']>
-  UI_POLLING_INTERVAL?: Maybe<Scalars['Int']>
 }
 
 export type ApplicationConfigurationInput = {
   ADDRESSES?: InputMaybe<Scalars['Int']>
-  APPLICATION_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
   APPLICATION_NAME?: InputMaybe<Scalars['String']>
-  BACKGROUND_SYNC_BROADCAST_CHANNEL?: InputMaybe<Scalars['String']>
   BIRTH?: InputMaybe<BirthInput>
-  COUNTRY?: InputMaybe<Scalars['String']>
   COUNTRY_LOGO?: InputMaybe<CountryLogoInput>
-  COUNTRY_LOGO_RENDER_HEIGHT?: InputMaybe<Scalars['Int']>
-  COUNTRY_LOGO_RENDER_WIDTH?: InputMaybe<Scalars['Int']>
   CURRENCY?: InputMaybe<CurrencyInput>
   DEATH?: InputMaybe<DeathInput>
-  DESKTOP_TIME_OUT_MILLISECONDS?: InputMaybe<Scalars['Int']>
   EXTERNAL_VALIDATION_WORKQUEUE?: InputMaybe<Scalars['Boolean']>
   FIELD_AGENT_AUDIT_LOCATIONS?: InputMaybe<Scalars['String']>
   HIDE_EVENT_REGISTER_INFORMATION?: InputMaybe<Scalars['Boolean']>
-  INFORMANT_MINIMUM_AGE?: InputMaybe<Scalars['Int']>
-  LOGROCKET?: InputMaybe<Scalars['String']>
   NID_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
   PHONE_NUMBER_PATTERN?: InputMaybe<Scalars['String']>
-  SENTRY?: InputMaybe<Scalars['String']>
-  UI_POLLING_INTERVAL?: InputMaybe<Scalars['Int']>
+}
+
+export type AssignmentData = {
+  __typename?: 'AssignmentData'
+  firstName?: Maybe<Scalars['String']>
+  lastName?: Maybe<Scalars['String']>
+  officeName?: Maybe<Scalars['String']>
+  userId?: Maybe<Scalars['String']>
 }
 
 export type Attachment = {
@@ -706,6 +694,7 @@ export type History = {
   output?: Maybe<Array<Maybe<InputOutput>>>
   reason?: Maybe<Scalars['String']>
   reinstated?: Maybe<Scalars['Boolean']>
+  signature?: Maybe<Signature>
   statusReason?: Maybe<StatusReason>
   user?: Maybe<User>
 }
@@ -935,6 +924,7 @@ export type Mutation = {
   markDeathAsVerified?: Maybe<DeathRegistration>
   markEventAsArchived: Scalars['ID']
   markEventAsReinstated?: Maybe<Reinstated>
+  markEventAsUnassigned: Scalars['ID']
   markEventAsVoided: Scalars['ID']
   modifyDraftStatus?: Maybe<FormDraft>
   notADuplicate: Scalars['ID']
@@ -1051,6 +1041,10 @@ export type MutationMarkEventAsArchivedArgs = {
 }
 
 export type MutationMarkEventAsReinstatedArgs = {
+  id: Scalars['String']
+}
+
+export type MutationMarkEventAsUnassignedArgs = {
   id: Scalars['String']
 }
 
@@ -1413,7 +1407,7 @@ export type QuerySearchDeathRegistrationsArgs = {
 export type QuerySearchEventsArgs = {
   contactNumber?: InputMaybe<Scalars['String']>
   count?: InputMaybe<Scalars['Int']>
-  locationIds?: InputMaybe<Array<InputMaybe<Scalars['String']>>>
+  locationIds?: InputMaybe<Array<Scalars['String']>>
   name?: InputMaybe<Scalars['String']>
   registrationNumber?: InputMaybe<Scalars['String']>
   skip?: InputMaybe<Scalars['Int']>
@@ -1522,6 +1516,7 @@ export type RegWorkflowInput = {
 export type Registration = {
   __typename?: 'Registration'
   _fhirID?: Maybe<Scalars['ID']>
+  assignment?: Maybe<AssignmentData>
   attachments?: Maybe<Array<Maybe<Attachment>>>
   book?: Maybe<Scalars['String']>
   certificates?: Maybe<Array<Maybe<Certificate>>>
@@ -1572,6 +1567,7 @@ export type RegistrationInput = {
 
 export type RegistrationSearchSet = {
   __typename?: 'RegistrationSearchSet'
+  assignment?: Maybe<AssignmentData>
   comment?: Maybe<Scalars['String']>
   contactNumber?: Maybe<Scalars['String']>
   contactRelationship?: Maybe<Scalars['String']>
@@ -1969,9 +1965,7 @@ export type SearchEventsQueryVariables = Exact<{
   contactNumber?: InputMaybe<Scalars['String']>
   registrationNumber?: InputMaybe<Scalars['String']>
   name?: InputMaybe<Scalars['String']>
-  locationIds?: InputMaybe<
-    Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
-  >
+  locationIds?: InputMaybe<Array<Scalars['String']> | Scalars['String']>
 }>
 
 export type SearchEventsQuery = {
@@ -2001,6 +1995,13 @@ export type SearchEventsQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | {
@@ -2024,6 +2025,13 @@ export type SearchEventsQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | null
@@ -2036,9 +2044,7 @@ export type SearchDeclarationsUserWiseQueryVariables = Exact<{
     Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
   >
   userId?: InputMaybe<Scalars['String']>
-  locationIds?: InputMaybe<
-    Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
-  >
+  locationIds?: InputMaybe<Array<Scalars['String']> | Scalars['String']>
   sort?: InputMaybe<Scalars['String']>
   count?: InputMaybe<Scalars['Int']>
   skip?: InputMaybe<Scalars['Int']>
@@ -2102,9 +2108,7 @@ export type CountUserWiseDeclarationsQueryVariables = Exact<{
     Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
   >
   userId?: InputMaybe<Scalars['String']>
-  locationIds?: InputMaybe<
-    Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
-  >
+  locationIds?: InputMaybe<Array<Scalars['String']> | Scalars['String']>
 }>
 
 export type CountUserWiseDeclarationsQuery = {
@@ -2346,19 +2350,6 @@ export type MarkEventAsVoidedMutation = {
   markEventAsVoided: string
 }
 
-export type MarkEventAsReinstatedMutationVariables = Exact<{
-  id: Scalars['String']
-}>
-
-export type MarkEventAsReinstatedMutation = {
-  __typename?: 'Mutation'
-  markEventAsReinstated?: {
-    __typename?: 'Reinstated'
-    taskEntryResourceID: string
-    registrationStatus?: RegStatus | null
-  } | null
-}
-
 export type MarkEventAsArchivedMutationVariables = Exact<{
   id: Scalars['String']
 }>
@@ -2376,6 +2367,15 @@ export type MarkBirthAsCertifiedMutationVariables = Exact<{
 export type MarkBirthAsCertifiedMutation = {
   __typename?: 'Mutation'
   markBirthAsCertified: string
+}
+
+export type SubmitMutationMutationVariables = Exact<{
+  id: Scalars['String']
+}>
+
+export type SubmitMutationMutation = {
+  __typename?: 'Mutation'
+  markEventAsUnassigned: string
 }
 
 export type FetchBirthRegistrationForReviewQueryVariables = Exact<{
@@ -2608,6 +2608,11 @@ export type FetchBirthRegistrationForReviewQuery = {
           use?: string | null
         } | null> | null
         avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
+      } | null
+      signature?: {
+        __typename?: 'Signature'
+        data?: string | null
+        type?: string | null
       } | null
       comments?: Array<{
         __typename?: 'Comment'
@@ -2884,6 +2889,11 @@ export type FetchBirthRegistrationForCertificateQuery = {
           use?: string | null
         } | null> | null
         avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
+      } | null
+      signature?: {
+        __typename?: 'Signature'
+        data?: string | null
+        type?: string | null
       } | null
       comments?: Array<{
         __typename?: 'Comment'
@@ -3241,6 +3251,11 @@ export type FetchDeathRegistrationForReviewQuery = {
         } | null> | null
         avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
       } | null
+      signature?: {
+        __typename?: 'Signature'
+        data?: string | null
+        type?: string | null
+      } | null
       comments?: Array<{
         __typename?: 'Comment'
         comment?: string | null
@@ -3506,6 +3521,11 @@ export type FetchDeathRegistrationForCertificationQuery = {
         } | null> | null
         avatar?: { __typename?: 'Avatar'; data: string; type: string } | null
       } | null
+      signature?: {
+        __typename?: 'Signature'
+        data?: string | null
+        type?: string | null
+      } | null
       comments?: Array<{
         __typename?: 'Comment'
         comment?: string | null
@@ -3580,6 +3600,13 @@ type EventSearchFields_BirthEventSearchSet_Fragment = {
     duplicates?: Array<string | null> | null
     createdAt?: string | null
     modifiedAt?: string | null
+    assignment?: {
+      __typename?: 'AssignmentData'
+      userId?: string | null
+      firstName?: string | null
+      lastName?: string | null
+      officeName?: string | null
+    } | null
   } | null
 }
 
@@ -3606,6 +3633,13 @@ type EventSearchFields_DeathEventSearchSet_Fragment = {
     duplicates?: Array<string | null> | null
     createdAt?: string | null
     modifiedAt?: string | null
+    assignment?: {
+      __typename?: 'AssignmentData'
+      userId?: string | null
+      firstName?: string | null
+      lastName?: string | null
+      officeName?: string | null
+    } | null
   } | null
 }
 
@@ -3614,9 +3648,7 @@ export type EventSearchFieldsFragment =
   | EventSearchFields_DeathEventSearchSet_Fragment
 
 export type RegistrationHomeQueryVariables = Exact<{
-  locationIds?: InputMaybe<
-    Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
-  >
+  locationIds?: InputMaybe<Array<Scalars['String']> | Scalars['String']>
   pageSize?: InputMaybe<Scalars['Int']>
   inProgressSkip?: InputMaybe<Scalars['Int']>
   healthSystemSkip?: InputMaybe<Scalars['Int']>
@@ -3659,6 +3691,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | {
@@ -3684,6 +3723,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | null
@@ -3716,6 +3762,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | {
@@ -3741,6 +3794,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | null
@@ -3773,6 +3833,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | {
@@ -3798,6 +3865,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | null
@@ -3830,6 +3904,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | {
@@ -3855,6 +3936,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | null
@@ -3887,6 +3975,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | {
@@ -3912,6 +4007,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | null
@@ -3944,6 +4046,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | {
@@ -3969,6 +4078,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | null
@@ -4001,6 +4117,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | {
@@ -4026,6 +4149,13 @@ export type RegistrationHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | null
@@ -4035,9 +4165,7 @@ export type RegistrationHomeQuery = {
 
 export type FieldAgentHomeQueryVariables = Exact<{
   userId?: InputMaybe<Scalars['String']>
-  locationIds?: InputMaybe<
-    Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
-  >
+  locationIds?: InputMaybe<Array<Scalars['String']> | Scalars['String']>
   pageSize?: InputMaybe<Scalars['Int']>
   reviewSkip?: InputMaybe<Scalars['Int']>
   rejectSkip?: InputMaybe<Scalars['Int']>
@@ -4072,6 +4200,13 @@ export type FieldAgentHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | {
@@ -4097,6 +4232,13 @@ export type FieldAgentHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | null
@@ -4129,6 +4271,13 @@ export type FieldAgentHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | {
@@ -4154,6 +4303,13 @@ export type FieldAgentHomeQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | null
@@ -4169,9 +4325,7 @@ export type SearchEventsForWorkqueueQueryVariables = Exact<{
   status?: InputMaybe<
     Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
   >
-  locationIds?: InputMaybe<
-    Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
-  >
+  locationIds?: InputMaybe<Array<Scalars['String']> | Scalars['String']>
   count?: InputMaybe<Scalars['Int']>
   skip?: InputMaybe<Scalars['Int']>
 }>
@@ -4205,6 +4359,13 @@ export type SearchEventsForWorkqueueQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | {
@@ -4230,6 +4391,13 @@ export type SearchEventsForWorkqueueQuery = {
             duplicates?: Array<string | null> | null
             createdAt?: string | null
             modifiedAt?: string | null
+            assignment?: {
+              __typename?: 'AssignmentData'
+              userId?: string | null
+              firstName?: string | null
+              lastName?: string | null
+              officeName?: string | null
+            } | null
           } | null
         }
       | null
@@ -4380,6 +4548,19 @@ export type FetchRegistrationByCompositionQuery = {
     | null
 }
 
+export type MarkEventAsReinstatedMutationVariables = Exact<{
+  id: Scalars['String']
+}>
+
+export type MarkEventAsReinstatedMutation = {
+  __typename?: 'Mutation'
+  markEventAsReinstated?: {
+    __typename?: 'Reinstated'
+    taskEntryResourceID: string
+    registrationStatus?: RegStatus | null
+  } | null
+}
+
 export type FetchDeclarationShortInfoQueryVariables = Exact<{
   id: Scalars['ID']
 }>
@@ -4408,6 +4589,13 @@ export type FetchDeclarationShortInfoQuery = {
             __typename?: 'RegWorkflow'
             type?: RegStatus | null
           } | null> | null
+          assignment?: {
+            __typename?: 'AssignmentData'
+            userId?: string | null
+            firstName?: string | null
+            lastName?: string | null
+            officeName?: string | null
+          } | null
         } | null
       }
     | {
@@ -4431,6 +4619,13 @@ export type FetchDeclarationShortInfoQuery = {
             __typename?: 'RegWorkflow'
             type?: RegStatus | null
           } | null> | null
+          assignment?: {
+            __typename?: 'AssignmentData'
+            userId?: string | null
+            firstName?: string | null
+            lastName?: string | null
+            officeName?: string | null
+          } | null
         } | null
       }
     | null
@@ -4641,6 +4836,8 @@ export type UpdateApplicationConfigMutation = {
     APPLICATION_NAME?: string | null
     NID_NUMBER_PATTERN?: string | null
     PHONE_NUMBER_PATTERN?: string | null
+    HIDE_EVENT_REGISTER_INFORMATION?: boolean | null
+    ADDRESSES?: number | null
     COUNTRY_LOGO?: {
       __typename?: 'CountryLogo'
       fileName?: string | null
@@ -4787,7 +4984,6 @@ export type GetLocationStatisticsQueryVariables = Exact<{
   status: Array<InputMaybe<Scalars['String']>> | InputMaybe<Scalars['String']>
   event?: InputMaybe<Scalars['String']>
   officeSelected: Scalars['Boolean']
-  showStatusCount: Scalars['Boolean']
 }>
 
 export type GetLocationStatisticsQuery = {

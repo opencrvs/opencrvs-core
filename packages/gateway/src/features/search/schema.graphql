@@ -87,7 +87,7 @@ type EventProgressSet {
 type Query {
   searchEvents(
     userId: String
-    locationIds: [String]
+    locationIds: [String!]
     status: [String]
     type: [String]
     trackingId: String

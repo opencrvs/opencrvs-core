@@ -52,7 +52,6 @@ interface ICurrency {
 
 export interface IApplicationConfig {
   APPLICATION_NAME: string
-  BACKGROUND_SYNC_BROADCAST_CHANNEL: string
   BIRTH: {
     REGISTRATION_TARGET: number
     LATE_REGISTRATION_TARGET: number
@@ -62,12 +61,8 @@ export interface IApplicationConfig {
       DELAYED: number
     }
   }
-  COUNTRY: string
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
-  COUNTRY_LOGO_RENDER_WIDTH: number
-  COUNTRY_LOGO_RENDER_HEIGHT: number
-  DESKTOP_TIME_OUT_MILLISECONDS: number
   DEATH: {
     REGISTRATION_TARGET: number
     FEE: {
@@ -75,15 +70,10 @@ export interface IApplicationConfig {
       DELAYED: number
     }
   }
-  LANGUAGES: string
-  UI_POLLING_INTERVAL: number
   FIELD_AGENT_AUDIT_LOCATIONS: string
   DECLARATION_AUDIT_LOCATIONS: string
-  INFORMANT_MINIMUM_AGE: number
   HIDE_EVENT_REGISTER_INFORMATION: boolean
   EXTERNAL_VALIDATION_WORKQUEUE: boolean
-  SENTRY: string
-  LOGROCKET: string
   PHONE_NUMBER_PATTERN: RegExp
   NID_NUMBER_PATTERN: RegExp
   ADDRESSES: number
@@ -194,37 +184,10 @@ async function loadPilotLocations(): Promise<ILocationDataResponse> {
   return response.data
 }
 
-const toDataURL = (url: string) =>
-  fetch(url)
-    .then((response) => response.blob())
-    .then(
-      (blob) =>
-        new Promise((resolve, reject) => {
-          const reader = new FileReader()
-          reader.onloadend = () => resolve(reader.result)
-          reader.onerror = reject
-          reader.readAsDataURL(blob)
-        })
-    )
-    .catch((error) => {
-      throw error
-    })
-
-async function loadAssets(): Promise<IAssetResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/assets/${window.config.COUNTRY_LOGO.fileName}`
-
-  return toDataURL(url).then((dataUrl) => {
-    return {
-      logo: `${dataUrl}`
-    }
-  })
-}
-
 export const referenceApi = {
   loadLocations,
   loadFacilities,
   loadPilotLocations,
   loadContent,
-  loadAssets,
   loadConfig
 }

@@ -72,13 +72,7 @@ export async function getLoginConfigHandler(
   }
   const refineConfigResponse = pick(loginConfig, [
     'APPLICATION_NAME',
-    'COUNTRY',
-    'COUNTRY_LOGO',
-    'COUNTRY_LOGO_RENDER_WIDTH',
-    'COUNTRY_LOGO_RENDER_HEIGHT',
-    'DESKTOP_TIME_OUT_MILLISECONDS',
-    'SENTRY',
-    'LOGROCKET'
+    'COUNTRY_LOGO'
   ])
   return { config: refineConfigResponse }
 }
@@ -111,7 +105,6 @@ export async function updateApplicationConfigHandler(
 
 export const updateApplicationConfig = Joi.object({
   APPLICATION_NAME: Joi.string(),
-  BACKGROUND_SYNC_BROADCAST_CHANNEL: Joi.string(),
   BIRTH: Joi.object().keys({
     REGISTRATION_TARGET: Joi.number(),
     LATE_REGISTRATION_TARGET: Joi.number(),
@@ -121,13 +114,10 @@ export const updateApplicationConfig = Joi.object({
       DELAYED: Joi.number()
     }
   }),
-  COUNTRY: Joi.string(),
   COUNTRY_LOGO: Joi.object().keys({
     fileName: Joi.string(),
     file: Joi.string()
   }),
-  COUNTRY_LOGO_RENDER_WIDTH: Joi.number(),
-  COUNTRY_LOGO_RENDER_HEIGHT: Joi.number(),
   CURRENCY: Joi.object().keys({
     isoCode: Joi.string(),
     languagesAndCountry: Joi.array().items(Joi.string())
@@ -139,16 +129,9 @@ export const updateApplicationConfig = Joi.object({
       DELAYED: Joi.number()
     }
   }),
-  DESKTOP_TIME_OUT_MILLISECONDS: Joi.number(),
-  LANGUAGES: Joi.string(),
-  UI_POLLING_INTERVAL: Joi.number(),
   FIELD_AGENT_AUDIT_LOCATIONS: Joi.string(),
-  APPLICATION_AUDIT_LOCATIONS: Joi.string(),
-  INFORMANT_MINIMUM_AGE: Joi.number(),
   HIDE_EVENT_REGISTER_INFORMATION: Joi.boolean(),
   EXTERNAL_VALIDATION_WORKQUEUE: Joi.boolean(),
-  SENTRY: Joi.string(),
-  LOGROCKET: Joi.string(),
   PHONE_NUMBER_PATTERN: Joi.string(),
   BIRTH_REGISTRATION_TARGET: Joi.number(),
   DEATH_REGISTRATION_TARGET: Joi.number(),

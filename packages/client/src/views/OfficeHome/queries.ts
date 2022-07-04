@@ -55,7 +55,7 @@ const EVENT_SEARCH_RESULT_FIELDS = gql`
 export const REGISTRATION_HOME_QUERY = gql`
   ${EVENT_SEARCH_RESULT_FIELDS}
   query registrationHome(
-    $locationIds: [String]
+    $locationIds: [String!]
     $pageSize: Int
     $inProgressSkip: Int
     $healthSystemSkip: Int
@@ -154,7 +154,7 @@ export const FIELD_AGENT_HOME_QUERY = gql`
   ${EVENT_SEARCH_RESULT_FIELDS}
   query fieldAgentHome(
     $userId: String
-    $locationIds: [String]
+    $locationIds: [String!]
     $pageSize: Int
     $reviewSkip: Int
     $rejectSkip: Int
@@ -202,7 +202,7 @@ export const SEARCH_EVENTS = gql`
     $contactNumber: String
     $registrationNumber: String
     $status: [String]
-    $locationIds: [String]
+    $locationIds: [String!]
     $count: Int
     $skip: Int
   ) {

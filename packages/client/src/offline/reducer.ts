@@ -213,16 +213,6 @@ const PILOT_LOCATIONS_CMD = Cmd.run(() => referenceApi.loadPilotLocations(), {
   failActionCreator: actions.pilotLocationsFailed
 })
 
-/*
- * TODO: This API is not used anymore so this can be
- * removed but will require quite a bit of refactoring
- * in the tests
- */
-const ASSETS_CMD = Cmd.run(() => referenceApi.loadAssets(), {
-  successActionCreator: actions.assetsLoaded,
-  failActionCreator: actions.assetsFailed
-})
-
 const CONFIG_CMD = Cmd.run(() => referenceApi.loadConfig(), {
   successActionCreator: actions.configLoaded,
   failActionCreator: actions.configFailed
@@ -248,8 +238,7 @@ function getDataLoadingCommands() {
     LOCATIONS_CMD,
     PILOT_LOCATIONS_CMD,
     CONFIG_CMD,
-    CONTENT_CMD,
-    ASSETS_CMD
+    CONTENT_CMD
   ])
 }
 

@@ -16,6 +16,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
     fetchRegistration(id: $id) {
       id
       registration {
+        id
         type
         trackingId
         status {
@@ -31,6 +32,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
       }
       ... on BirthRegistration {
         child {
+          id
           name {
             use
             firstNames
@@ -40,6 +42,7 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
       }
       ... on DeathRegistration {
         deceased {
+          id
           name {
             use
             firstNames
