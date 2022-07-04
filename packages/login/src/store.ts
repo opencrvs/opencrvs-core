@@ -31,7 +31,6 @@ import {
   routerMiddleware,
   RouterState
 } from 'connected-react-router'
-import { reducer as formReducer, FormStateMap, FormAction } from 'redux-form'
 import { loginReducer, LoginState } from '@login/login/reducer'
 import { intlReducer, IntlState } from '@login/i18n/reducer'
 import * as Sentry from '@sentry/browser'
@@ -40,15 +39,10 @@ import createSentryMiddleware from 'redux-sentry-middleware'
 export interface IStoreState {
   login: LoginState
   router: RouterState
-  form: FormStateMap
   i18n: IntlState
 }
 
 // @ts-ignore
-const formRed: LoopReducer<FormStateMap, FormAction> = (
-  state: FormStateMap,
-  action: FormAction
-) => formReducer(state as FormStateMap, action)
 
 const enhancedCreateStore = createReduxStore as StoreCreator
 
@@ -60,7 +54,6 @@ export const createStore = () => {
   const reducers = combineReducers<IStoreState>({
     login: loginReducer,
     router: connectRouter(history) as any, // @todo
-    form: formRed,
     i18n: intlReducer
   })
 
