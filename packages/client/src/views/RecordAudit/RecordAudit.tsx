@@ -730,7 +730,10 @@ function getBodyContent({
 
     let declaration =
       draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
-        ? getDraftDeclarationData(draft, resources, intl, trackingId)
+        ? {
+            ...getDraftDeclarationData(draft, resources, intl, trackingId),
+            assignment: workqueueDeclaration?.registration?.assignment
+          }
         : getWQDeclarationData(
             workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
             language,
