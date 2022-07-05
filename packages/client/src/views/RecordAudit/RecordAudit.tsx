@@ -656,11 +656,7 @@ function getBodyContent({
   goBack,
   ...actionProps
 }: IFullProps) {
-  if (
-    tab === 'search' ||
-    (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
-      !workqueueDeclaration)
-  ) {
+  if (tab === 'search') {
     return (
       <>
         <Query
@@ -769,7 +765,7 @@ const RecordAuditComp = (props: IFullProps) => {
   return (
     <>
       <DesktopHeader />
-      <Navigation deselectAllTabs={true} />
+      <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
       <BodyContainer>{getBodyContent(props)}</BodyContainer>
       <NotificationToast />
     </>
