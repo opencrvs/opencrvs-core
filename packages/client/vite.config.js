@@ -9,26 +9,29 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-const path = require('path')
-const { ESLINT_MODES } = require('@craco/craco')
+
+import { defineConfig } from 'vite'
+import reactRefresh from '@vitejs/plugin-react-refresh'
+import VitePluginHtmlEnv from 'vite-plugin-html-env'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 process.env.VITE_APP_COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 
-module.exports = {
-  eslint: {
-    mode: ESLINT_MODES.file
+// https://vitejs.dev/config/
+export default defineConfig({
+  // This changes the out put dir from dist to build
+  // comment this out if that isn't relevant for your project
+  build: {
+    outDir: 'build',
+    commonjsOptions: {
+      transformMixedEsModules: true
+    }
   },
-  webpack: {
+  resolve: {
     alias: {
-      '@client': path.resolve(__dirname, 'src/')
+      crypto: 'crypto-js'
     }
   },
-  jest: {
-    configure: {
-      moduleNameMapper: {
-        '^@client(.*)$': '<rootDir>/src/$1'
-      }
-    }
-  }
-}
+  plugins: [tsconfigPaths(), VitePluginHtmlEnv(), reactRefresh()]
+})
