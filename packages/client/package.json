@@ -79,7 +79,7 @@
     "precommit": "lint-staged",
     "start": "vite --port=3000",
     "preview": "vite preview",
-    "build": "VITE_APP_VERSION=$VERSION craco --max_old_space_size=8000 build && yarn gen:sw",
+    "build": "VITE_APP_VERSION=$VERSION NODE_OPTIONS=--max_old_space_size=8000 vite build && yarn gen:sw",
     "gen:sw": "workbox injectManifest --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-register -t ocrvs-client",
     "docker:run": "docker run -it --rm -p 5000:80 --name ocrvs-client ocrvs-client",

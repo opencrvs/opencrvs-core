@@ -49,7 +49,7 @@
     "precommit": "lint-staged",
     "start": "vite --port=3020",
     "preview": "vite preview",
-    "build": "craco --max_old_space_size=8000 build && yarn gen:sw",
+    "build": "NODE_OPTIONS=--max_old_space_size=8000 vite build && yarn gen:sw",
     "gen:sw": "workbox generateSW --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
     "docker:run": "docker run -it --rm -p 5000:80 --name ocrvs-login ocrvs-login",
