@@ -137,7 +137,9 @@ class SimpleDocumentUploaderComponent extends React.Component<
                 type:
                   allowedDocType.join() === 'image/png'
                     ? 'png'
-                    : allowedDocType.join()
+                    : allowedDocType
+                        .map((docTypeStr) => docTypeStr.split('/').pop())
+                        .join()
               })
             })
         })
