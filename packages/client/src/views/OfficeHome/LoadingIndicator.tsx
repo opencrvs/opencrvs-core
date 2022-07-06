@@ -30,7 +30,6 @@ const ConnectivityContainer = styled.div`
 `
 const NoConnectivity = styled(ConnectionError)`
   width: 24px;
-  margin: auto;
   margin-right: 8px;
 `
 const Wrapper = styled.div`
