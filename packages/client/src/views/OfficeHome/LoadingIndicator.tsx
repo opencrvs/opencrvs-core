@@ -11,10 +11,10 @@
  */
 import * as React from 'react'
 import { Spinner } from '@opencrvs/components/lib/interface'
-import { NoWifi } from '@opencrvs/components/lib/icons'
+import { ConnectionError } from '@opencrvs/components/lib/icons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import styled from 'styled-components'
-import { errorMessages } from '@client/i18n/messages'
+import { errorMessages, constantsMessages } from '@client/i18n/messages'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -26,11 +26,12 @@ const ErrorText = styled.div`
 const ConnectivityContainer = styled.div`
   width: 100%;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
 `
-const NoConnectivity = styled(NoWifi)`
+const NoConnectivity = styled(ConnectionError)`
   width: 24px;
   margin: auto;
+  margin-right: 8px;
 `
 const Wrapper = styled.div`
   display: flex;
@@ -52,15 +53,14 @@ const LoadingContainer = styled.div`
 const Text = styled.div`
   ${({ theme }) => theme.fonts.reg16};
   text-align: center;
-  margin: auto;
 `
 
 const MobileViewContainer = styled.div<{ noDeclaration?: boolean }>`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    position: fixed;
+    position: ${({ noDeclaration }) => (noDeclaration ? `fixed` : `relative`)};
     left: 0;
     right: 0;
-    ${({ noDeclaration }) => (noDeclaration ? `top:55%;` : `top:50%;`)}
+    ${({ noDeclaration }) => (noDeclaration ? `top:55%;` : ``)}
   }
 `
 
@@ -93,7 +93,7 @@ export class LoadingIndicatorComp extends React.Component<IProps> {
             <ConnectivityContainer>
               <NoConnectivity />
               <Text id="wait-connection-text">
-                {intl.formatMessage(errorMessages.waitingForConnection)}
+                {intl.formatMessage(constantsMessages.noConnection)}
               </Text>
             </ConnectivityContainer>
           )}
