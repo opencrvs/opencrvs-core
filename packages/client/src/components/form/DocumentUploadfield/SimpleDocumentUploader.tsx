@@ -136,7 +136,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
               error: this.props.intl.formatMessage(messages.fileUploadError, {
                 type: allowedDocType
                   .map((docTypeStr) => docTypeStr.split('/').pop())
-                  .join()
+                  .join(', ')
               })
             })
         })
