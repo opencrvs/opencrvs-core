@@ -24,6 +24,7 @@
     "tslint": "^5.7.0",
     "tslint-config-prettier": "^1.10.0",
     "tslint-react": "^3.2.0",
+    "vite": "^2.3.2",
     "webfontloader": "^1.6.28"
   },
   "scripts": {
@@ -48,8 +49,8 @@
     "@storybook/addon-actions": "^6.5.0",
     "@storybook/addon-essentials": "^6.5.0",
     "@storybook/addon-links": "^6.5.0",
+    "@storybook/builder-vite": "^0.1.39",
     "@storybook/node-logger": "^6.5.0",
-    "@storybook/preset-create-react-app": "^3.2.0",
     "@storybook/react": "^6.5.0",
     "@types/jest": "^26.0.14",
     "@types/lodash": "^4.14.126",
