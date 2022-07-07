@@ -361,7 +361,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         event
       )
       if (res && res.createOrUpdateCertificateSVG) {
-        this.setState({ imageUploading: false })
+        this.setState({ imageUploading: false, imageLoadingError: '' })
         this.props.updateOfflineCertificate(
           res.createOrUpdateCertificateSVG as ICertificateTemplateData
         )
