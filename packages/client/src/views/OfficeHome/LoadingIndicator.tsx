@@ -55,11 +55,14 @@ const Text = styled.div`
 `
 
 const MobileViewContainer = styled.div<{ noDeclaration?: boolean }>`
+  padding-top: 16px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     position: ${({ noDeclaration }) => (noDeclaration ? `fixed` : `relative`)};
     left: 0;
     right: 0;
-    ${({ noDeclaration }) => (noDeclaration ? `top:55%;` : ``)}
+    padding-top: 0;
+    padding-bottom: 16px;
+    ${({ noDeclaration }) => (noDeclaration ? `top:55%; padding: 0;` : ``)}
   }
 `
 
