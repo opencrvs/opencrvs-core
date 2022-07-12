@@ -12,3 +12,6 @@
 export * from './Name'
 export * from './Role'
 export * from './Language'
+export * from './Password'
+export * from './PIN'
+export * from './PhoneNumber'

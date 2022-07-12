@@ -61,7 +61,14 @@ import {
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { useEffect } from 'react'
-import { Name, Role, Language } from '@client/views/Settings/items'
+import {
+  Name,
+  Role,
+  Language,
+  Password,
+  PIN,
+  PhoneNumber
+} from '@client/views/Settings/items'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -128,8 +135,6 @@ interface IState {
 function SettingsView(props: IProps) {
   const [showSuccessNotification, setShowSuccessNotification] =
     React.useState<boolean>(false)
-  const [showPasswordChange, setShowPasswordChange] =
-    React.useState<boolean>(false)
   const [showChangeAvatar, setShowChangeAvatar] = React.useState<boolean>(false)
   const [imageUploading, setImageUploading] = React.useState<boolean>(false)
   const [showAvatarNotification, setShowAvatarNotification] =
@@ -142,24 +147,6 @@ function SettingsView(props: IProps) {
   const [notificationSubject, setNotificationSubject] =
     React.useState<NOTIFICATION_SUBJECT | null>(null)
 
-  const changePhoneNumber = React.useCallback(() => {
-    toggleSuccessNotification(NOTIFICATION_SUBJECT.PHONE)
-  }, [])
-  useEffect(() => {
-    if (props.history && props.history.location.state) {
-      let phonedNumberUpdated = false
-      const historyState = props.history.location.state
-      phonedNumberUpdated = historyState.phonedNumberUpdated
-      if (phonedNumberUpdated) {
-        changePhoneNumber()
-        props.history.replace({
-          pathname: SETTINGS,
-          state: { phonedNumberUpdated: false }
-        })
-      }
-    }
-  }, [props.history, changePhoneNumber])
-
   const toggleSuccessNotification = (
     subject: NOTIFICATION_SUBJECT | null = null
   ) => {
@@ -169,15 +156,6 @@ function SettingsView(props: IProps) {
 
   const toggleAvatarChangeModal = () => {
     setShowChangeAvatar((prevValue) => !prevValue)
-  }
-
-  const togglePasswordChangeModal = () => {
-    setShowPasswordChange((prevValue) => !prevValue)
-  }
-
-  const changePassword = () => {
-    togglePasswordChangeModal()
-    toggleSuccessNotification(NOTIFICATION_SUBJECT.PASSWORD)
   }
 
   const handleConfirmAvatarChange = () => {
@@ -214,41 +192,6 @@ function SettingsView(props: IProps) {
     englishName = `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
   }
 
-  const mobile = (userDetails && userDetails.mobile) || ''
-
-  const role =
-    userDetails && userDetails.role
-      ? intl.formatMessage(messages[userDetails.role])
-      : ''
-  const items = [
-    {
-      label: intl.formatMessage(constantsMessages.labelPhone),
-      value: mobile,
-      action: {
-        label: intl.formatMessage(buttonMessages.change),
-        disabled: isOnline ? false : true,
-        handler: goToPhoneSettingAction
-      }
-    },
-    {
-      label: intl.formatMessage(constantsMessages.labelPassword),
-      value: '********',
-      action: {
-        id: 'BtnChangePassword',
-        label: intl.formatMessage(buttonMessages.change),
-        handler: togglePasswordChangeModal
-      }
-    },
-    {
-      label: intl.formatMessage(constantsMessages.labelPin),
-      value: '****',
-      action: {
-        label: intl.formatMessage(buttonMessages.change),
-        disabled: true
-      }
-    }
-  ]
-
   return (
     <>
       <Header title={intl.formatMessage(messages.settingsTitle)} />
@@ -260,26 +203,11 @@ function SettingsView(props: IProps) {
         >
           <ListViewSimplified>
             <Name />
-            {items.map((item) => {
-              return (
-                <ListViewItemSimplified
-                  key={item.label}
-                  label={<LabelContainer>{item.label}</LabelContainer>}
-                  value={<ValueContainer>{item.value}</ValueContainer>}
-                  actions={
-                    <DynamicHeightLinkButton
-                      id={item.action.id}
-                      onClick={item.action.handler}
-                      disabled={item.action.disabled}
-                    >
-                      {item.action.label}
-                    </DynamicHeightLinkButton>
-                  }
-                />
-              )
-            })}
-            <Language />
+            <PhoneNumber />
             <Role />
+            <Language />
+            <Password />
+            <PIN />
             {/* For Profile Image */}
             <TopAlignedListViewItemSimplified
               label={
@@ -321,11 +249,6 @@ function SettingsView(props: IProps) {
         onConfirmAvatarChange={handleConfirmAvatarChange}
         onAvatarChanged={changeAvatar}
       />
-      <PasswordChangeModal
-        togglePasswordChangeModal={togglePasswordChangeModal}
-        showPasswordChange={showPasswordChange}
-        passwordChanged={changePassword}
-      />
       <FloatingNotification
         type={
           imageUploading
@@ -337,16 +260,6 @@ function SettingsView(props: IProps) {
           imageUploading ? undefined : () => toggleSuccessNotification()
         }
       >
-        {/* Success notification message for Password Change */}
-        {notificationSubject === NOTIFICATION_SUBJECT.PASSWORD && (
-          <FormattedMessage {...messages.passwordUpdated} />
-        )}
-
-        {/* Success notification message for Phone Change */}
-        {notificationSubject === NOTIFICATION_SUBJECT.PHONE && (
-          <FormattedMessage {...messages.phoneNumberUpdated} />
-        )}
-
         {/* Success notification message for Avatar Change */}
         {notificationSubject === NOTIFICATION_SUBJECT.AVATAR && (
           <FormattedMessage
