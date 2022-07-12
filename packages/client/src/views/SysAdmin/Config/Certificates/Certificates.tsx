@@ -289,7 +289,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     const userMgntUserID =
       this.props.userDetails && this.props.userDetails.userMgntUserID
     this.setState({
-      imageUploading: true
+      imageUploading: true,
+      imageLoadingError: ''
     })
     this.toggleNotification()
 
@@ -361,7 +362,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         event
       )
       if (res && res.createOrUpdateCertificateSVG) {
-        this.setState({ imageUploading: false, imageLoadingError: '' })
+        this.setState({ imageUploading: false })
         this.props.updateOfflineCertificate(
           res.createOrUpdateCertificateSVG as ICertificateTemplateData
         )
