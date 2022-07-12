@@ -5,6 +5,10 @@
     "module": "ESNext",
     "target": "es6",
     "lib": ["es6", "dom", "es2017"],
+    "types": [
+      "vite/client",
+      "node"
+    ],
     "sourceMap": true,
     "allowJs": false,
     "declaration": true,
