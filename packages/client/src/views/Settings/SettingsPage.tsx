@@ -61,6 +61,7 @@ import {
   withOnlineStatus
 } from '@client/views/OfficeHome/LoadingIndicator'
 import { useEffect } from 'react'
+import { Name, Role, Language } from '@client/views/Settings/items'
 
 const BodyContainer = styled.div`
   margin-left: 0px;
@@ -80,12 +81,6 @@ const ValueContainer = styled.span`
   ${({ theme }) => theme.fonts.reg16}
 `
 
-const Message = styled.div`
-  margin-bottom: 16px;
-`
-const Label = styled.label`
-  margin-bottom: 8px;
-`
 type IProps = IntlShapeProps &
   RouteComponentProps<
     {},
@@ -130,18 +125,9 @@ interface IState {
   showAvatarNotification: boolean
 }
 
-interface ILanguageOptions {
-  [key: string]: string
-}
-
 function SettingsView(props: IProps) {
-  const [showLanguageSettings, setShowLanguageSettings] =
-    React.useState<boolean>(false)
   const [showSuccessNotification, setShowSuccessNotification] =
     React.useState<boolean>(false)
-  const [selectedLanguage, setSelectedLanguage] = React.useState<string>(
-    props.language
-  )
   const [showPasswordChange, setShowPasswordChange] =
     React.useState<boolean>(false)
   const [showChangeAvatar, setShowChangeAvatar] = React.useState<boolean>(false)
@@ -174,10 +160,6 @@ function SettingsView(props: IProps) {
     }
   }, [props.history, changePhoneNumber])
 
-  const toggleLanguageSettingsModal = () => {
-    setShowLanguageSettings((prevValue) => !prevValue)
-  }
-
   const toggleSuccessNotification = (
     subject: NOTIFICATION_SUBJECT | null = null
   ) => {
@@ -189,21 +171,8 @@ function SettingsView(props: IProps) {
     setShowChangeAvatar((prevValue) => !prevValue)
   }
 
-  const cancelLanguageSettings = () => {
-    setSelectedLanguage(props.language)
-    setShowLanguageSettings((prevValue) => !prevValue)
-  }
-
   const togglePasswordChangeModal = () => {
     setShowPasswordChange((prevValue) => !prevValue)
-  }
-
-  const changeLanguage = () => {
-    if (props.userDetails) {
-      props.changeLanguage({ language: selectedLanguage })
-      toggleLanguageSettingsModal()
-      toggleSuccessNotification(NOTIFICATION_SUBJECT.LANGUAGE)
-    }
   }
 
   const changePassword = () => {
@@ -234,16 +203,6 @@ function SettingsView(props: IProps) {
 
   const { userDetails, intl, languages, goToPhoneSettingAction, isOnline } =
     props
-  const langChoice = [] as ILanguageOptions[]
-  const availableLangs = getAvailableLanguages()
-  availableLangs.forEach((lang: string) => {
-    if (languages[lang]) {
-      langChoice.push({
-        value: lang,
-        label: languages[lang].displayName
-      })
-    }
-  })
 
   let englishName = ''
   if (userDetails && userDetails.name) {
@@ -263,37 +222,12 @@ function SettingsView(props: IProps) {
       : ''
   const items = [
     {
-      label: intl.formatMessage(messages.labelEnglishName),
-      value: englishName,
-      action: {
-        label: intl.formatMessage(buttonMessages.change),
-        disabled: true
-      }
-    },
-    {
       label: intl.formatMessage(constantsMessages.labelPhone),
       value: mobile,
       action: {
         label: intl.formatMessage(buttonMessages.change),
         disabled: isOnline ? false : true,
         handler: goToPhoneSettingAction
-      }
-    },
-    {
-      label: intl.formatMessage(constantsMessages.labelRole),
-      value: role,
-      action: {
-        label: intl.formatMessage(buttonMessages.change),
-        disabled: true
-      }
-    },
-    {
-      label: intl.formatMessage(messages.systemLanguage),
-      value: languages[props.language].displayName,
-      action: {
-        id: 'BtnChangeLanguage',
-        label: intl.formatMessage(buttonMessages.change),
-        handler: toggleLanguageSettingsModal
       }
     },
     {
@@ -325,6 +259,7 @@ function SettingsView(props: IProps) {
           showTitleOnMobile={true}
         >
           <ListViewSimplified>
+            <Name />
             {items.map((item) => {
               return (
                 <ListViewItemSimplified
@@ -343,6 +278,8 @@ function SettingsView(props: IProps) {
                 />
               )
             })}
+            <Language />
+            <Role />
             {/* For Profile Image */}
             <TopAlignedListViewItemSimplified
               label={
@@ -372,38 +309,6 @@ function SettingsView(props: IProps) {
           </ListViewSimplified>
         </Content>
       </BodyContainer>
-      <ResponsiveModal
-        id="ChangeLanguageModal"
-        title={intl.formatMessage(messages.changeLanguageTitle)}
-        show={showLanguageSettings}
-        actions={[
-          <TertiaryButton
-            key="cancel"
-            id="modal_cancel"
-            onClick={cancelLanguageSettings}
-          >
-            {intl.formatMessage(buttonMessages.cancel)}
-          </TertiaryButton>,
-          <PrimaryButton key="apply" id="apply_change" onClick={changeLanguage}>
-            {intl.formatMessage(buttonMessages.apply)}
-          </PrimaryButton>
-        ]}
-        handleClose={cancelLanguageSettings}
-        contentHeight={175}
-        contentScrollableY={true}
-      >
-        <Message>{intl.formatMessage(messages.changeLanguageMessege)}</Message>
-        <Label>{intl.formatMessage(constantsMessages.labelLanguage)}</Label>
-        <Select
-          id="SelectLanguage"
-          onChange={(val: string) => {
-            setSelectedLanguage(val)
-          }}
-          value={selectedLanguage}
-          options={langChoice}
-          placeholder=""
-        />
-      </ResponsiveModal>
       <AvatarChangeModal
         cancelAvatarChangeModal={toggleAvatarChangeModal}
         showChangeAvatar={showChangeAvatar}
@@ -432,15 +337,6 @@ function SettingsView(props: IProps) {
           imageUploading ? undefined : () => toggleSuccessNotification()
         }
       >
-        {/* Success notification message for Language Change */}
-        {notificationSubject === NOTIFICATION_SUBJECT.LANGUAGE && (
-          <FormattedMessage
-            {...messages.changeLanguageSuccessMessage}
-            values={{
-              language: languages[selectedLanguage].displayName
-            }}
-          />
-        )}
         {/* Success notification message for Password Change */}
         {notificationSubject === NOTIFICATION_SUBJECT.PASSWORD && (
           <FormattedMessage {...messages.passwordUpdated} />
