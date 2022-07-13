@@ -113,7 +113,10 @@ export function Language() {
           <ValueContainer>{languages[language].displayName}</ValueContainer>
         }
         actions={
-          <DynamicHeightLinkButton onClick={toggleLanguageSettingsModal}>
+          <DynamicHeightLinkButton
+            id="BtnChangeLanguage"
+            onClick={toggleLanguageSettingsModal}
+          >
             {intl.formatMessage(buttonMessages.change)}
           </DynamicHeightLinkButton>
         }

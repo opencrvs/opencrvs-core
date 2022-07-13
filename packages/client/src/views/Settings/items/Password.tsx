@@ -58,7 +58,10 @@ export function Password() {
         }
         value={<ValueContainer>********</ValueContainer>}
         actions={
-          <DynamicHeightLinkButton onClick={togglePasswordChangeModal}>
+          <DynamicHeightLinkButton
+            id="BtnChangePassword"
+            onClick={togglePasswordChangeModal}
+          >
             {intl.formatMessage(buttonMessages.change)}
           </DynamicHeightLinkButton>
         }
