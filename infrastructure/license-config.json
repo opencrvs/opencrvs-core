@@ -28,6 +28,7 @@
     "infrastructure/configure-file-monitoring.sh",
     "packages/client/index.html",
     "packages/login/index.html",
+    "packages/components/.storybook/preview.jsx",
     "grafana"
   ],
   "license": "infrastructure/license-header.txt",
