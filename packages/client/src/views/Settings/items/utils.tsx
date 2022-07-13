@@ -11,6 +11,7 @@
  */
 import styled from '@client/styledComponents'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
 
 export const LabelContainer = styled.span`
   ${({ theme }) => theme.fonts.bold16}
@@ -28,4 +29,8 @@ export const Message = styled.div`
 `
 export const Label = styled.label`
   margin-bottom: 8px;
+`
+export const TopAlignedListViewItemSimplified = styled(ListViewItemSimplified)`
+  align-items: start;
+  padding: 16px 0;
 `
