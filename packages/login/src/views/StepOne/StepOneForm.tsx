@@ -202,16 +202,16 @@ const Password = injectIntl((props: Props) => {
   )
 })
 
-function usePersistentLogo() {
+function usePersistentCountryLogo() {
   const [offlineLogo, setOfflineLogo] = React.useState(
-    localStorage.getItem('country-logo')
+    localStorage.getItem('country-logo') ?? ''
   )
   const logo = useSelector(selectCountryLogo)
   if (logo && logo !== offlineLogo) {
     setOfflineLogo(logo)
     localStorage.setItem('country-logo', logo)
   }
-  return offlineLogo ?? ''
+  return offlineLogo
 }
 
 export function StepOneForm({
@@ -225,7 +225,7 @@ export function StepOneForm({
 }: FullProps) {
   /* This might need to be converted into a state */
   const isOffline: boolean = navigator.onLine ? false : true
-  const logo = usePersistentLogo()
+  const logo = usePersistentCountryLogo()
   const appName = useSelector(selectApplicationName)
 
   React.useEffect(() => {
