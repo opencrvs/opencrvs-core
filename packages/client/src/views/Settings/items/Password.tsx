@@ -30,23 +30,22 @@ import { PasswordChangeModal } from '@client/views/Settings/PasswordChangeModal'
 
 export function Password() {
   const intl = useIntl()
-  const [showPasswordChange, setShowPasswordChange] =
-    React.useState<boolean>(false)
+  const [showModal, setShowModal] = React.useState(false)
   const [showSuccessNotification, setShowSuccessNotification] =
-    React.useState<boolean>(false)
+    React.useState(false)
 
-  const togglePasswordChangeModal = React.useCallback(() => {
-    setShowPasswordChange((prevValue) => !prevValue)
-  }, [])
+  const togglePasswordChangeModal = () => {
+    setShowModal((prevValue) => !prevValue)
+  }
 
-  const toggleSuccessNotification = React.useCallback(() => {
+  const toggleSuccessNotification = () => {
     setShowSuccessNotification((prevValue) => !prevValue)
-  }, [])
+  }
 
-  const changePassword = React.useCallback(() => {
+  const changePassword = () => {
     togglePasswordChangeModal()
     toggleSuccessNotification()
-  }, [togglePasswordChangeModal, toggleSuccessNotification])
+  }
 
   return (
     <>
@@ -68,7 +67,7 @@ export function Password() {
       />
       <PasswordChangeModal
         togglePasswordChangeModal={togglePasswordChangeModal}
-        showPasswordChange={showPasswordChange}
+        showPasswordChange={showModal}
         passwordChanged={changePassword}
       />
       <FloatingNotification

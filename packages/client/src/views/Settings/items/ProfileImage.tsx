@@ -33,44 +33,39 @@ import { getDefaultLanguage } from '@client/i18n/utils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { modifyUserDetails } from '@client/profile/profileActions'
+import { createNamesMap } from '@client/utils/data-formatting'
 
 export function ProfileImage() {
   const intl = useIntl()
-  const [showChangeAvatar, setShowChangeAvatar] = React.useState<boolean>(false)
-  const [imageUploading, setImageUploading] = React.useState<boolean>(false)
+  const [showChangeAvatar, setShowChangeAvatar] = React.useState(false)
+  const [imageUploading, setImageUploading] = React.useState(false)
   const [image, setImage] = React.useState<IImage>({
     type: '',
     data: ''
   })
-  const [imageLoadingError, setImageLoadingError] = React.useState<string>('')
-  const toggleAvatarChangeModal = React.useCallback(() => {
+  const [imageLoadingError, setImageLoadingError] = React.useState('')
+  const toggleAvatarChangeModal = () => {
     setShowChangeAvatar((prevValue) => !prevValue)
-  }, [])
+  }
   const [showSuccessNotification, setShowSuccessNotification] =
     React.useState<boolean>(false)
 
-  const toggleSuccessNotification = React.useCallback(() => {
+  const toggleSuccessNotification = () => {
     setShowSuccessNotification((prevValue) => !prevValue)
-  }, [])
+  }
 
-  const handleConfirmAvatarChange = React.useCallback(() => {
+  const handleConfirmAvatarChange = () => {
     setImageUploading(true)
     toggleAvatarChangeModal()
     toggleSuccessNotification()
-  }, [toggleSuccessNotification, toggleAvatarChangeModal])
+  }
 
   const englishName = useSelector<IStoreState, string>((state) => {
     const { userDetails } = state.profile
-    const nameObj = userDetails?.name?.find(
-      (storedName: GQLHumanName | null) => {
-        const name = storedName as GQLHumanName
-        return name.use === getDefaultLanguage()
-      }
-    ) as GQLHumanName
-
-    return nameObj
-      ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-      : ''
+    const name = createNamesMap(userDetails?.name as GQLHumanName[])[
+      getDefaultLanguage()
+    ]
+    return name || ''
   })
 
   const userDetails = useSelector<IStoreState, IUserDetails | null>(

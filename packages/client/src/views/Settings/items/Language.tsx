@@ -30,14 +30,12 @@ import {
   Label
 } from '@client/views/Settings/items/utils'
 import { useSelector, useDispatch } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { ILanguageState } from '@client/i18n/reducer'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Select } from '@opencrvs/components/lib/forms'
 import { getAvailableLanguages } from '@client/i18n/utils'
-import { IUserDetails } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { changeLanguage as changeLanguageActionCreator } from '@client/i18n/actions'
+import { getLanguage, getLanguages } from '@client/i18n/selectors'
 
 interface ILanguageOptions {
   [key: string]: string
@@ -48,44 +46,34 @@ export function Language() {
   const [showSuccessNotification, setShowSuccessNotification] =
     React.useState<boolean>(false)
   const intl = useIntl()
-  const languages = useSelector<IStoreState, ILanguageState>(
-    (state) => state.i18n.languages
-  )
-  const language = useSelector<IStoreState, string>(
-    (state) => state.i18n.language
-  )
+  const languages = useSelector(getLanguages)
+  const language = useSelector(getLanguage)
   const [selectedLanguage, setSelectedLanguage] =
     React.useState<string>(language)
-  const toggleLanguageSettingsModal = React.useCallback(() => {
-    setShowLanguageSettings((prevValue) => !prevValue)
-  }, [])
+  const toggleLanguageModal = () => {
+    setShowModal((prevValue) => !prevValue)
+  }
 
-  const cancelLanguageSettings = React.useCallback(() => {
+  const cancelLanguageSettings = () => {
     setSelectedLanguage(language)
-    setShowLanguageSettings((prevValue) => !prevValue)
-  }, [language])
+    toggleLanguageModal()
+  }
 
-  const toggleSuccessNotification = React.useCallback(() => {
+  const toggleSuccessNotification = () => {
     setShowSuccessNotification((prevValue) => !prevValue)
-  }, [])
+  }
 
   const userDetails = useSelector(getUserDetails)
 
   const dispatch = useDispatch()
 
-  const changeLanguage = React.useCallback(() => {
+  const changeLanguage = () => {
     if (userDetails) {
       dispatch(changeLanguageActionCreator({ language: selectedLanguage }))
-      toggleLanguageSettingsModal()
+      toggleLanguageModal()
       toggleSuccessNotification()
     }
-  }, [
-    userDetails,
-    dispatch,
-    toggleLanguageSettingsModal,
-    toggleSuccessNotification,
-    selectedLanguage
-  ])
+  }
 
   const langChoice = [] as ILanguageOptions[]
   const availableLangs = getAvailableLanguages()
@@ -112,7 +100,7 @@ export function Language() {
         actions={
           <DynamicHeightLinkButton
             id="BtnChangeLanguage"
-            onClick={toggleLanguageSettingsModal}
+            onClick={toggleLanguageModal}
           >
             {intl.formatMessage(buttonMessages.change)}
           </DynamicHeightLinkButton>
@@ -121,7 +109,7 @@ export function Language() {
       <ResponsiveModal
         id="ChangeLanguageModal"
         title={intl.formatMessage(userMessages.changeLanguageTitle)}
-        show={showLanguageSettings}
+        show={showModal}
         actions={[
           <TertiaryButton
             key="cancel"

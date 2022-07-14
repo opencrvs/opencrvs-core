@@ -39,16 +39,14 @@ export function PhoneNumberCommponent({ isOnline }: { isOnline: boolean }) {
     (state) => state.profile.userDetails?.mobile || ''
   )
   const dispatch = useDispatch()
-  const onClickChange = React.useCallback(
-    () => dispatch(goToPhoneSettings()),
-    [dispatch]
-  )
+  const onClickChange = () => dispatch(goToPhoneSettings())
+
   const history = useHistory()
   const [showSuccessNotification, setShowSuccessNotification] =
-    React.useState<boolean>(false)
-  const toggleSuccessNotification = React.useCallback(() => {
+    React.useState(false)
+  const toggleSuccessNotification = () => {
     setShowSuccessNotification((prevValue) => !prevValue)
-  }, [])
+  }
 
   React.useEffect(() => {
     if (history && history.location.state) {
@@ -63,7 +61,7 @@ export function PhoneNumberCommponent({ isOnline }: { isOnline: boolean }) {
         })
       }
     }
-  }, [history, toggleSuccessNotification])
+  }, [history])
 
   return (
     <>

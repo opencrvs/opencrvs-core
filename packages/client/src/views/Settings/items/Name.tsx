@@ -22,21 +22,16 @@ import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getDefaultLanguage } from '@client/i18n/utils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
+import { createNamesMap } from '@client/utils/data-formatting'
 
 export function Name() {
   const intl = useIntl()
   const englishName = useSelector<IStoreState, string>((state) => {
     const { userDetails } = state.profile
-    const nameObj = userDetails?.name?.find(
-      (storedName: GQLHumanName | null) => {
-        const name = storedName as GQLHumanName
-        return name.use === getDefaultLanguage()
-      }
-    ) as GQLHumanName
-
-    return nameObj
-      ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
-      : ''
+    const name = createNamesMap(userDetails?.name as GQLHumanName[])[
+      getDefaultLanguage()
+    ]
+    return name || ''
   })
 
   return (
