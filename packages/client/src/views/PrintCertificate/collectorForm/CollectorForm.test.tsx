@@ -14,7 +14,8 @@ import {
   createTestComponent,
   selectOption,
   getFileFromBase64String,
-  validImageB64String
+  validImageB64String,
+  inValidImageB64String
 } from '@client/tests/util'
 import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from '@client/views/DataProvider/birth/queries'
 import { GET_DEATH_REGISTRATION_FOR_CERTIFICATION } from '@client/views/DataProvider/death/queries'
@@ -284,6 +285,24 @@ describe('Certificate collector test for a birth registration without father det
         expect(component.find('#form_error').hostNodes().text()).toBe(
           'Upload signed affidavit or click the checkbox if they do not have one.'
         )
+      })
+
+      it('shows form level error when invalid type of file is uploaded as affidavit file', async () => {
+        component
+          .find('#image_file_uploader_field')
+          .hostNodes()
+          .simulate('change', {
+            target: {
+              files: [
+                getFileFromBase64String(
+                  inValidImageB64String,
+                  'index.svg',
+                  'image/svg'
+                )
+              ]
+            }
+          })
+        waitFor(() => component.find('#field_error').hostNodes().length > 0)
       })
 
       it('continue to payment section when the mandatory fields are filled and birth event is between 45 days and 5 years', async () => {
