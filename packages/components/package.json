@@ -24,7 +24,7 @@
     "tslint": "^5.7.0",
     "tslint-config-prettier": "^1.10.0",
     "tslint-react": "^3.2.0",
-    "vite": "^2.3.2",
+    "vite": "^3.0.0",
     "webfontloader": "^1.6.28"
   },
   "scripts": {
