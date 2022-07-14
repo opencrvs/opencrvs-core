@@ -11,7 +11,7 @@
  */
 
 import { defineConfig } from 'vite'
-import reactRefresh from '@vitejs/plugin-react-refresh'
+import react from '@vitejs/plugin-react'
 import VitePluginHtmlEnv from 'vite-plugin-html-env'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
@@ -28,5 +28,5 @@ export default defineConfig({
       transformMixedEsModules: true
     }
   },
-  plugins: [tsconfigPaths(), VitePluginHtmlEnv(), reactRefresh()]
+  plugins: [react(), tsconfigPaths(), VitePluginHtmlEnv()]
 })
