@@ -44,8 +44,7 @@ interface ILanguageOptions {
 }
 
 export function Language() {
-  const [showLanguageSettings, setShowLanguageSettings] =
-    React.useState<boolean>(false)
+  const [showModal, setShowModal] = React.useState(false)
   const [showSuccessNotification, setShowSuccessNotification] =
     React.useState<boolean>(false)
   const intl = useIntl()
@@ -70,9 +69,7 @@ export function Language() {
     setShowSuccessNotification((prevValue) => !prevValue)
   }, [])
 
-  const userDetails = useSelector<IStoreState, IUserDetails | null>(
-    getUserDetails
-  )
+  const userDetails = useSelector(getUserDetails)
 
   const dispatch = useDispatch()
 
