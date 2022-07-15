@@ -20,7 +20,7 @@ import {
   LabelContainer,
   ValueContainer,
   DynamicHeightLinkButton
-} from '@client/views/Settings/items/utils'
+} from '@client/views/Settings/items/components'
 import {
   constantsMessages,
   buttonMessages,

@@ -15,7 +15,7 @@ import {
   LabelContainer,
   ValueContainer,
   DynamicHeightLinkButton
-} from '@client/views/Settings/items/utils'
+} from '@client/views/Settings/items/components'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import {

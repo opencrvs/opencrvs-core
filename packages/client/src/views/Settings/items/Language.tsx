@@ -28,7 +28,7 @@ import {
   DynamicHeightLinkButton,
   Message,
   Label
-} from '@client/views/Settings/items/utils'
+} from '@client/views/Settings/items/components'
 import { useSelector, useDispatch } from 'react-redux'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Select } from '@opencrvs/components/lib/forms'

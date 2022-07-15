@@ -17,7 +17,7 @@ import {
   LabelContainer,
   ValueContainer,
   DynamicHeightLinkButton
-} from '@client/views/Settings/items/utils'
+} from '@client/views/Settings/items/components'
 
 export function PIN() {
   const intl = useIntl()

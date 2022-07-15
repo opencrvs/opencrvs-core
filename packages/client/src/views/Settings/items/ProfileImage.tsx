@@ -15,7 +15,7 @@ import {
   LabelContainer,
   ValueContainer,
   DynamicHeightLinkButton
-} from '@client/views/Settings/items/utils'
+} from '@client/views/Settings/items/components'
 import { useIntl, FormattedMessage } from 'react-intl'
 import { Avatar } from '@client/components/Avatar'
 import { userMessages, buttonMessages } from '@client/i18n/messages'
