@@ -28,12 +28,9 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { getDefaultLanguage } from '@client/i18n/utils'
-import { IUserDetails } from '@client/utils/userUtils'
+import { IUserDetails, getUserName } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { modifyUserDetails } from '@client/profile/profileActions'
-import { createNamesMap } from '@client/utils/data-formatting'
 
 export function ProfileImage() {
   const intl = useIntl()
@@ -62,10 +59,7 @@ export function ProfileImage() {
 
   const englishName = useSelector<IStoreState, string>((state) => {
     const { userDetails } = state.profile
-    const name = createNamesMap(userDetails?.name as GQLHumanName[])[
-      getDefaultLanguage()
-    ]
-    return name || ''
+    return getUserName(userDetails)
   })
 
   const userDetails = useSelector<IStoreState, IUserDetails | null>(
