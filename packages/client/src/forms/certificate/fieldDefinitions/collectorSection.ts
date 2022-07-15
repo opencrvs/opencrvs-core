@@ -538,6 +538,7 @@ export const collectDeathCertificateFormSection: IFormSection = {
           description: certificateMessages.noLabel,
           initialValue: '',
           required: false,
+          allowedDocType: ['image/png', 'image/jpeg'],
           validate: [],
           conditionals: [
             {
