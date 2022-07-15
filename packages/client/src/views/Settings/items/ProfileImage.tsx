@@ -28,7 +28,7 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { IUserDetails, getUserName } from '@client/utils/userUtils'
+import { IUserDetails, useUserName } from '@client/utils/userUtils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { modifyUserDetails } from '@client/profile/profileActions'
 
@@ -57,10 +57,7 @@ export function ProfileImage() {
     toggleSuccessNotification()
   }
 
-  const englishName = useSelector<IStoreState, string>((state) => {
-    const { userDetails } = state.profile
-    return getUserName(userDetails)
-  })
+  const englishName = useUserName()
 
   const userDetails = useSelector<IStoreState, IUserDetails | null>(
     getUserDetails

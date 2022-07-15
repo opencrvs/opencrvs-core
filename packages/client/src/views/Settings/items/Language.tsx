@@ -75,16 +75,20 @@ export function Language() {
     }
   }
 
-  const langChoice = [] as ILanguageOptions[]
   const availableLangs = getAvailableLanguages()
-  availableLangs.forEach((lang: string) => {
-    if (languages[lang]) {
-      langChoice.push({
-        value: lang,
-        label: languages[lang].displayName
-      })
-    }
-  })
+  const langChoice = availableLangs.reduce<ILanguageOptions[]>(
+    (choices, lang) =>
+      languages[lang]
+        ? [
+            ...choices,
+            {
+              value: lang,
+              label: languages[lang].displayName
+            }
+          ]
+        : choices,
+    []
+  )
 
   return (
     <>

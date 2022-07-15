@@ -18,16 +18,11 @@ import {
   ValueContainer,
   DynamicHeightLinkButton
 } from '@client/views/Settings/items/utils'
-import { useSelector } from 'react-redux'
-import { IStoreState } from '@client/store'
-import { getUserName } from '@client/utils/userUtils'
+import { useUserName } from '@client/utils/userUtils'
 
 export function Name() {
   const intl = useIntl()
-  const englishName = useSelector<IStoreState, string>((state) => {
-    const { userDetails } = state.profile
-    return getUserName(userDetails)
-  })
+  const englishName = useUserName()
 
   return (
     <ListViewItemSimplified
