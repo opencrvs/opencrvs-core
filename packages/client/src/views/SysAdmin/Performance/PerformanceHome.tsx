@@ -80,7 +80,6 @@ import { goToWorkflowStatus, goToCompletenessRates } from '@client/navigation'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
-import { getCurrency } from '@client/views/SysAdmin/Config/Application/utils'
 
 const Layout = styled.div`
   display: flex;
@@ -732,7 +731,7 @@ function mapStateToProps(state: IStoreState) {
     locations: offlineCountryConfiguration.locations,
     offices: offlineCountryConfiguration.offices,
     userDetails: getUserDetails(state),
-    currency: getCurrency(offlineCountryConfiguration)
+    currency: offlineCountryConfiguration.config.CURRENCY.isoCode
   }
 }
 
