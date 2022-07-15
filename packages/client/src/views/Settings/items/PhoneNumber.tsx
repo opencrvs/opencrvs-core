@@ -28,13 +28,17 @@ import {
   FloatingNotification,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
-import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
+import {
+  withOnlineStatus,
+  useOnlineStatus
+} from '@client/views/OfficeHome/LoadingIndicator'
 import { goToPhoneSettings } from '@client/navigation'
 import { useHistory } from 'react-router'
 import { SETTINGS } from '@client/navigation/routes'
 
-export function PhoneNumberCommponent({ isOnline }: { isOnline: boolean }) {
+export function PhoneNumber() {
   const intl = useIntl()
+  const isOnline = useOnlineStatus()
   const mobile = useSelector<IStoreState, string>(
     (state) => state.profile.userDetails?.mobile || ''
   )
@@ -88,5 +92,3 @@ export function PhoneNumberCommponent({ isOnline }: { isOnline: boolean }) {
     </>
   )
 }
-
-export const PhoneNumber = withOnlineStatus(PhoneNumberCommponent)
