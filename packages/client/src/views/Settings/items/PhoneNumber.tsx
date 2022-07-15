@@ -28,10 +28,7 @@ import {
   FloatingNotification,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
-import {
-  withOnlineStatus,
-  useOnlineStatus
-} from '@client/views/OfficeHome/LoadingIndicator'
+import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { goToPhoneSettings } from '@client/navigation'
 import { useHistory } from 'react-router'
 import { SETTINGS } from '@client/navigation/routes'

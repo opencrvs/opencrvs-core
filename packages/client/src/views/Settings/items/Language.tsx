@@ -44,7 +44,7 @@ interface ILanguageOptions {
 export function Language() {
   const [showModal, setShowModal] = React.useState(false)
   const [showSuccessNotification, setShowSuccessNotification] =
-    React.useState<boolean>(false)
+    React.useState(false)
   const intl = useIntl()
   const languages = useSelector(getLanguages)
   const language = useSelector(getLanguage)

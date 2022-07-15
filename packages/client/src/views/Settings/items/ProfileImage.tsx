@@ -45,7 +45,7 @@ export function ProfileImage() {
     setShowChangeAvatar((prevValue) => !prevValue)
   }
   const [showSuccessNotification, setShowSuccessNotification] =
-    React.useState<boolean>(false)
+    React.useState(false)
 
   const toggleSuccessNotification = () => {
     setShowSuccessNotification((prevValue) => !prevValue)
