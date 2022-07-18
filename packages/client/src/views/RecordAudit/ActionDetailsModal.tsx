@@ -45,7 +45,52 @@ interface IActionDetailsModalListTable {
   draft: IDeclaration | null
 }
 
-function prepareComment(
+function retrieveUniqueComments(
+  histories: IActionDetailsData[],
+  actionDetailsData: IActionDetailsData,
+  previousHistoryItemIndex: number
+) {
+  if (!Array.isArray(actionDetailsData.comments)) {
+    return []
+  }
+
+  if (previousHistoryItemIndex === -1) {
+    return actionDetailsData.comments
+      .map((comment: IDynamicValues) => comment.comment)
+      .map((comment: string) => ({ comment }))
+  }
+
+  const comments: IDynamicValues[] = []
+  actionDetailsData.comments.forEach((item: IDynamicValues, index: number) => {
+    if (
+      (histories[previousHistoryItemIndex].comments || [])[index]?.comment !==
+      item.comment
+    ) {
+      comments.push({ comment: item.comment })
+    }
+  })
+
+  return comments
+}
+
+function getHistories(draft: IDeclaration | null) {
+  const histories: IActionDetailsData[] =
+    draft?.data.history && Array.isArray(draft.data.history)
+      ? draft.data.history.sort((prevItem, nextItem) => {
+          return new Date(prevItem.date).getTime() >
+            new Date(nextItem.date).getTime()
+            ? 1
+            : -1
+        })
+      : []
+
+  return histories
+}
+
+/*
+ *  This function prepares the comments to be displayed based on status of the declaration.
+ */
+function prepareComments(
   actionDetailsData: IActionDetailsData,
   draft: IDeclaration | null
 ) {
@@ -56,28 +101,14 @@ function prepareComment(
     return []
   }
 
-  const histories: IActionDetailsData[] =
-    draft?.data.history && Array.isArray(draft.data.history)
-      ? draft.data.history.sort((prevItem, nextItem) => {
-          return new Date(prevItem.date).getTime() >
-            new Date(nextItem.date).getTime()
-            ? 1
-            : -1
-        })
-      : []
+  const histories = getHistories(draft)
   const currentHistoryItemIndex = histories.findIndex(
     (item) => item.date === actionDetailsData.date
   )
-  const previousHistoryItem =
+  const previousHistoryItemIndex =
     currentHistoryItemIndex < 0
       ? currentHistoryItemIndex
       : currentHistoryItemIndex - 1
-
-  const isSameComment =
-    previousHistoryItem === -1
-      ? false
-      : get(histories[previousHistoryItem], 'comments[0].comment') ===
-        get(actionDetailsData, 'comments[0].comment')
 
   if (actionDetailsData.action === SUBMISSION_STATUS.REJECTED) {
     return actionDetailsData.statusReason?.text
@@ -85,13 +116,11 @@ function prepareComment(
       : []
   }
 
-  if (isSameComment) {
-    return []
-  }
-
-  return actionDetailsData.comments
-    .map((comment: IDynamicValues) => comment.comment)
-    .map((comment: string) => ({ comment }))
+  return retrieveUniqueComments(
+    histories,
+    actionDetailsData,
+    previousHistoryItemIndex
+  )
 }
 
 export const ActionDetailsModalListTable = ({
@@ -270,7 +299,7 @@ export const ActionDetailsModalListTable = ({
   const declarationUpdates = dataChange(actionDetailsData)
   const collectorData = certificateCollectorData(actionDetailsData)
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
-  const content = prepareComment(actionDetailsData, draft)
+  const content = prepareComments(actionDetailsData, draft)
   return (
     <>
       {/* For Reject Reason */}
