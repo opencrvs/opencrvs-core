@@ -157,6 +157,7 @@ class UserReviewFormComponent extends React.Component<
                       [field.name]: file
                     })
                   }}
+                  allowedDocType={field.allowedDocType}
                   files={
                     this.props.formData[
                       field.name
