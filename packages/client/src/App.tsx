@@ -55,7 +55,6 @@ import { AppStore } from './store'
 import { CorrectionForm, CorrectionReviewForm } from './views/CorrectionForm'
 import { VerifyCorrector } from './views/CorrectionForm/VerifyCorrector'
 import { RecordAudit } from './views/RecordAudit/RecordAudit'
-import { ChangePhonePage } from './views/Settings/ChangePhonePage'
 import { ApplicationConfig } from './views/SysAdmin/Config/Application'
 import { CertificatesConfig } from './views/SysAdmin/Config/Certificates'
 import { UserList } from './views/SysAdmin/Team/user/UserList'
@@ -285,11 +284,6 @@ export class App extends React.Component<IAppProps> {
                                             exact
                                             path={routes.SETTINGS}
                                             component={SettingsPage}
-                                          />
-                                          <ProtectedRoute
-                                            exact
-                                            path={routes.CHANGE_PHONE}
-                                            component={ChangePhonePage}
                                           />
                                           <ProtectedRoute
                                             exact
