@@ -10,8 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
+import { connect, useDispatch, useSelector } from 'react-redux'
+import {
+  injectIntl,
+  WrappedComponentProps as IntlShapeProps,
+  useIntl
+} from 'react-intl'
 import { IStoreState } from '@client/store'
 import { getUserDetails, getUserNonce } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
@@ -24,11 +28,11 @@ import {
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import {
-  sendVerifyCode as SendVerifyCodeAction,
-  modifyUserDetails as modifyUserDetailsAction
+  sendVerifyCode,
+  modifyUserDetails
 } from '@client/profile/profileActions'
 import {
-  goToSettingsWithPhoneSuccessMsg as goToSettingsWithPhoneSuccessMsgAction,
+  goToSettingsWithPhoneSuccessMsg,
   goBack as goBackAction
 } from '@client/navigation'
 import {
@@ -119,15 +123,6 @@ const BoxedError = styled.div`
   display: flex;
 `
 
-type IProps = IntlShapeProps & {
-  userDetails: IUserDetails | null
-  nonce: string | null
-  modifyUserDetails: typeof modifyUserDetailsAction
-  goBack: typeof goBackAction
-  sendVerifyCode: typeof SendVerifyCodeAction
-  goToSettingsWithPhoneSuccessMsg: typeof goToSettingsWithPhoneSuccessMsgAction
-}
-
 const VIEW_TYPE = {
   CHANGE_NUMBER: 'change',
   VERIFY_NUMBER: 'verify'
@@ -144,269 +139,233 @@ interface IState {
   showDuplicateMobileErrorNotification: boolean
 }
 
-interface IDispatchProps {
-  sendVerifyCode: typeof SendVerifyCodeAction
-}
+export function ChangePhonePage() {
+  const [phoneNumber, setPhoneNumber] = React.useState(EMPTY_STRING)
+  const [verifyCode, setVerifyCode] = React.useState(EMPTY_STRING)
+  const [isInvalidPhoneNumber, setIsInvalidPhoneNumber] = React.useState(false)
+  const [isInvalidLength, setIsInvalidLength] = React.useState(false)
+  const [phoneNumberFormatText, setPhoneNumberFormatText] =
+    React.useState(EMPTY_STRING)
+  const [view, setView] = React.useState(VIEW_TYPE.CHANGE_NUMBER)
+  const [errorOccured, setErrorOccured] = React.useState(false)
+  const [
+    showDuplicateMobileErrorNotification,
+    setShowDuplicateMobileErrorNotification
+  ] = React.useState(false)
+  const dispatch = useDispatch()
+  const userDetails = useSelector(getUserDetails)
+  const nonce = useSelector(getUserNonce)
+  const intl = useIntl()
 
-class ChangePhoneView extends React.Component<IProps & IDispatchProps, IState> {
-  constructor(props: IProps & IDispatchProps) {
-    super(props)
-    this.state = {
-      phoneNumber: EMPTY_STRING,
-      verifyCode: EMPTY_STRING,
-      isInvalidPhoneNumber: false,
-      isInvalidLength: false,
-      phoneNumberFormatText: EMPTY_STRING,
-      view: VIEW_TYPE.CHANGE_NUMBER,
-      errorOccured: false,
-      showDuplicateMobileErrorNotification: false
-    }
+  const toggleDuplicateMobileErrorNotification = () => {
+    setShowDuplicateMobileErrorNotification((prevValue) => !prevValue)
   }
 
-  toggleDuplicateMobileErrorNotification = () => {
-    this.setState((prevState) => ({
-      showDuplicateMobileErrorNotification:
-        !prevState.showDuplicateMobileErrorNotification
-    }))
-  }
-
-  setPhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangePhoneNumber = (event: React.ChangeEvent<HTMLInputElement>) => {
     const phoneNumber = event.target.value
-    this.setState(() => ({
-      phoneNumber,
-      isInvalidPhoneNumber: !isAValidPhoneNumberFormat(phoneNumber)
-    }))
+    setPhoneNumber(phoneNumber)
+    setIsInvalidPhoneNumber(!isAValidPhoneNumberFormat(phoneNumber))
   }
-  setVerifyCode = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChangeVerifyCode = (event: React.ChangeEvent<HTMLInputElement>) => {
     const verifyCode = event.target.value
-    this.setState(() => ({
-      verifyCode,
-      isInvalidLength: verifyCode.length === 6
-    }))
+    setVerifyCode(verifyCode)
+    setIsInvalidLength(verifyCode.length === 6)
   }
-  continueButtonHandler = async (phoneNumber: string) => {
+
+  const continueButtonHandler = async (phoneNumber: string) => {
     if (!phoneNumber) return
     const userData = await queriesForUser.fetchUserDetails(
       convertToMSISDN(phoneNumber)
     )
     const userDetails = userData.data.getUserByMobile
     if (VIEW_TYPE.CHANGE_NUMBER && isNull(userDetails.id)) {
-      this.props.sendVerifyCode(convertToMSISDN(phoneNumber))
-      this.setState({
-        view: VIEW_TYPE.VERIFY_NUMBER
-      })
+      dispatch(sendVerifyCode(convertToMSISDN(phoneNumber)))
+      setView(VIEW_TYPE.VERIFY_NUMBER)
     } else {
-      this.toggleDuplicateMobileErrorNotification()
+      toggleDuplicateMobileErrorNotification()
     }
   }
 
-  changePhone = (mutation: () => void) => {
-    if (
-      !!this.state.phoneNumber &&
-      !this.state.isInvalidPhoneNumber &&
-      this.state.isInvalidLength
-    ) {
+  const callChangePhoneMutation = (mutation: () => void) => {
+    if (!!phoneNumber && !isInvalidPhoneNumber && isInvalidLength) {
       mutation()
     }
   }
 
-  phoneChangeCompleted = () => {
-    this.setState({
-      phoneNumber: EMPTY_STRING,
-      verifyCode: EMPTY_STRING,
-      phoneNumberFormatText: EMPTY_STRING,
-      errorOccured: false
-    })
-    if (this.props.userDetails) {
-      const { userDetails } = this.props
-      this.props.modifyUserDetails({
-        ...userDetails,
-        mobile: convertToMSISDN(this.state.phoneNumber)
-      })
+  const phoneChangeCompleted = () => {
+    setPhoneNumber(EMPTY_STRING)
+    setVerifyCode(EMPTY_STRING)
+    setPhoneNumberFormatText(EMPTY_STRING)
+    setErrorOccured(false)
+    if (userDetails) {
+      dispatch(
+        modifyUserDetails({
+          ...userDetails,
+          mobile: convertToMSISDN(phoneNumber)
+        })
+      )
     }
-    this.props.goToSettingsWithPhoneSuccessMsg(true)
+    dispatch(goToSettingsWithPhoneSuccessMsg(true))
   }
 
-  render() {
-    const { intl, nonce } = this.props
-    return (
-      <>
-        <SysAdminContentWrapper
-          id="user-phone-change"
-          type={SysAdminPageVariant.SUBPAGE_CENTERED}
-          backActionHandler={() => window.history.back()}
-          headerTitle={
-            this.state.view === VIEW_TYPE.CHANGE_NUMBER
-              ? intl.formatMessage(messages.changePhoneTitle)
-              : intl.formatMessage(messages.verifyPhoneTitle)
-          }
+  return (
+    <>
+      <SysAdminContentWrapper
+        id="user-phone-change"
+        type={SysAdminPageVariant.SUBPAGE_CENTERED}
+        backActionHandler={() => window.history.back()}
+        headerTitle={
+          view === VIEW_TYPE.CHANGE_NUMBER
+            ? intl.formatMessage(messages.changePhoneTitle)
+            : intl.formatMessage(messages.verifyPhoneTitle)
+        }
+      >
+        {view === VIEW_TYPE.CHANGE_NUMBER && (
+          <Container>
+            <Content>
+              <FormSectionTitle>
+                <>{intl.formatMessage(messages.changePhoneLabel)}</>
+              </FormSectionTitle>
+            </Content>
+            <Content>
+              <Field>
+                <InputField
+                  id="phoneNumber"
+                  touched={true}
+                  required={false}
+                  optionalLabel=""
+                >
+                  <HalfWidthInput
+                    id="PhoneNumber"
+                    type="number"
+                    touched={true}
+                    error={isInvalidPhoneNumber}
+                    value={phoneNumber}
+                    onChange={onChangePhoneNumber}
+                  />
+                </InputField>
+                {isInvalidPhoneNumber && (
+                  <InvalidPhoneNumber id="invalidPhoneNumber">
+                    {intl.formatMessage(
+                      messages.phoneNumberChangeFormValidationMsg,
+                      {
+                        num: intl.formatMessage({
+                          defaultMessage: '10',
+                          id: 'phone.digit'
+                        }),
+                        start: intl.formatMessage({
+                          defaultMessage: '0(4|5)',
+                          description: 'Should starts with',
+                          id: 'phone.start'
+                        })
+                      }
+                    )}
+                  </InvalidPhoneNumber>
+                )}
+              </Field>
+            </Content>
+            <Content>
+              <StyledPrimaryButton
+                id="continue-button"
+                key="continue"
+                onClick={() => {
+                  continueButtonHandler(phoneNumber)
+                }}
+                disabled={!Boolean(phoneNumber.length) || isInvalidPhoneNumber}
+              >
+                {intl.formatMessage(buttonMessages.continueButton)}
+              </StyledPrimaryButton>
+            </Content>
+          </Container>
+        )}
+        {view === VIEW_TYPE.VERIFY_NUMBER && (
+          <Container>
+            <Content>
+              <FormSectionTitle>
+                <>{intl.formatMessage(messages.verifyPhoneLabel)}</>
+              </FormSectionTitle>
+            </Content>
+            <Content>
+              <Message>
+                {intl.formatMessage(messages.confirmationPhoneMsg, {
+                  num: intl.formatMessage({
+                    defaultMessage: phoneNumber,
+                    description: 'Phone confirmation number',
+                    id: 'phone.number'
+                  })
+                })}
+              </Message>
+            </Content>
+            {errorOccured && (
+              <Content>
+                <BoxedError>
+                  <ErrorMessage>
+                    {intl.formatMessage(messages.incorrectVerifyCode)}
+                  </ErrorMessage>
+                </BoxedError>
+              </Content>
+            )}
+            <Content>
+              <Field>
+                <InputField
+                  id="verifyCode"
+                  touched={true}
+                  required={false}
+                  optionalLabel=""
+                >
+                  <HalfWidthInput
+                    id="VerifyCode"
+                    type="number"
+                    touched={true}
+                    error={isInvalidPhoneNumber}
+                    value={verifyCode}
+                    onChange={onChangeVerifyCode}
+                  />
+                </InputField>
+              </Field>
+            </Content>
+            <Content>
+              <Mutation
+                mutation={changePhoneMutation}
+                variables={{
+                  userId: get(userDetails, 'userMgntUserID'),
+                  phoneNumber: convertToMSISDN(phoneNumber),
+                  nonce: nonce,
+                  verifyCode: verifyCode
+                }}
+                onCompleted={phoneChangeCompleted}
+                onError={() => setErrorOccured(true)}
+              >
+                {(changePhone: any) => {
+                  return (
+                    <StyledPrimaryButton
+                      id="verify-button"
+                      key="verify"
+                      onClick={() => {
+                        callChangePhoneMutation(changePhone)
+                      }}
+                      disabled={!Boolean(verifyCode.length) || !isInvalidLength}
+                    >
+                      {intl.formatMessage(buttonMessages.verify)}
+                    </StyledPrimaryButton>
+                  )
+                }}
+              </Mutation>
+            </Content>
+          </Container>
+        )}
+
+        <FloatingNotification
+          id="duplicate-mobile-error-notification"
+          type={NOTIFICATION_TYPE.ERROR}
+          show={showDuplicateMobileErrorNotification}
+          callback={() => toggleDuplicateMobileErrorNotification()}
         >
-          {this.state.view === VIEW_TYPE.CHANGE_NUMBER && (
-            <Container>
-              <Content>
-                <FormSectionTitle>
-                  <>{intl.formatMessage(messages.changePhoneLabel)}</>
-                </FormSectionTitle>
-              </Content>
-              <Content>
-                <Field>
-                  <InputField
-                    id="phoneNumber"
-                    touched={true}
-                    required={false}
-                    optionalLabel=""
-                  >
-                    <HalfWidthInput
-                      id="PhoneNumber"
-                      type="number"
-                      touched={true}
-                      error={this.state.isInvalidPhoneNumber}
-                      value={this.state.phoneNumber}
-                      onChange={this.setPhoneNumber}
-                    />
-                  </InputField>
-                  {this.state.isInvalidPhoneNumber && (
-                    <InvalidPhoneNumber id="invalidPhoneNumber">
-                      {intl.formatMessage(
-                        messages.phoneNumberChangeFormValidationMsg,
-                        {
-                          num: intl.formatMessage({
-                            defaultMessage: '10',
-                            id: 'phone.digit'
-                          }),
-                          start: intl.formatMessage({
-                            defaultMessage: '0(4|5)',
-                            description: 'Should starts with',
-                            id: 'phone.start'
-                          })
-                        }
-                      )}
-                    </InvalidPhoneNumber>
-                  )}
-                </Field>
-              </Content>
-              <Content>
-                <StyledPrimaryButton
-                  id="continue-button"
-                  key="continue"
-                  onClick={() => {
-                    this.continueButtonHandler(this.state.phoneNumber)
-                  }}
-                  disabled={
-                    !Boolean(this.state.phoneNumber.length) ||
-                    this.state.isInvalidPhoneNumber
-                  }
-                >
-                  {intl.formatMessage(buttonMessages.continueButton)}
-                </StyledPrimaryButton>
-              </Content>
-            </Container>
-          )}
-          {this.state.view === VIEW_TYPE.VERIFY_NUMBER && (
-            <Container>
-              <Content>
-                <FormSectionTitle>
-                  <>{intl.formatMessage(messages.verifyPhoneLabel)}</>
-                </FormSectionTitle>
-              </Content>
-              <Content>
-                <Message>
-                  {intl.formatMessage(messages.confirmationPhoneMsg, {
-                    num: intl.formatMessage({
-                      defaultMessage: this.state.phoneNumber,
-                      description: 'Phone confirmation number',
-                      id: 'phone.number'
-                    })
-                  })}
-                </Message>
-              </Content>
-              {this.state.errorOccured && (
-                <Content>
-                  <BoxedError>
-                    <ErrorMessage>
-                      {intl.formatMessage(messages.incorrectVerifyCode)}
-                    </ErrorMessage>
-                  </BoxedError>
-                </Content>
-              )}
-              <Content>
-                <Field>
-                  <InputField
-                    id="verifyCode"
-                    touched={true}
-                    required={false}
-                    optionalLabel=""
-                  >
-                    <HalfWidthInput
-                      id="VerifyCode"
-                      type="number"
-                      touched={true}
-                      error={this.state.isInvalidPhoneNumber}
-                      value={this.state.verifyCode}
-                      onChange={this.setVerifyCode}
-                    />
-                  </InputField>
-                </Field>
-              </Content>
-              <Content>
-                <Mutation
-                  mutation={changePhoneMutation}
-                  variables={{
-                    userId: get(this.props, 'userDetails.userMgntUserID'),
-                    phoneNumber: convertToMSISDN(this.state.phoneNumber),
-                    nonce: nonce,
-                    verifyCode: this.state.verifyCode
-                  }}
-                  onCompleted={this.phoneChangeCompleted}
-                  onError={() => this.setState({ errorOccured: true })}
-                >
-                  {(changePhone: any) => {
-                    return (
-                      <StyledPrimaryButton
-                        id="verify-button"
-                        key="verify"
-                        onClick={() => {
-                          this.changePhone(changePhone)
-                        }}
-                        disabled={
-                          !Boolean(this.state.verifyCode.length) ||
-                          !this.state.isInvalidLength
-                        }
-                      >
-                        {intl.formatMessage(buttonMessages.verify)}
-                      </StyledPrimaryButton>
-                    )
-                  }}
-                </Mutation>
-              </Content>
-            </Container>
-          )}
-
-          <FloatingNotification
-            id="duplicate-mobile-error-notification"
-            type={NOTIFICATION_TYPE.ERROR}
-            show={this.state.showDuplicateMobileErrorNotification}
-            callback={() => this.toggleDuplicateMobileErrorNotification()}
-          >
-            {intl.formatMessage(userMessages.duplicateUserMobileErrorMessege, {
-              number: this.state.phoneNumber
-            })}
-          </FloatingNotification>
-        </SysAdminContentWrapper>
-      </>
-    )
-  }
+          {intl.formatMessage(userMessages.duplicateUserMobileErrorMessege, {
+            number: phoneNumber
+          })}
+        </FloatingNotification>
+      </SysAdminContentWrapper>
+    </>
+  )
 }
-
-export const ChangePhonePage = connect(
-  (store: IStoreState) => ({
-    userDetails: getUserDetails(store),
-    nonce: getUserNonce(store)
-  }),
-  {
-    modifyUserDetails: modifyUserDetailsAction,
-    goBack: goBackAction,
-    sendVerifyCode: SendVerifyCodeAction,
-    goToSettingsWithPhoneSuccessMsg: goToSettingsWithPhoneSuccessMsgAction
-  }
-)(injectIntl(ChangePhoneView))
