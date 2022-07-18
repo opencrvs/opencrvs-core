@@ -351,6 +351,9 @@ yarn compose:deps:detached
 
 # As this script is also used when setting up E2E tests,
 # where we don't want to start the app in tmux. This script ends.
+if [ $CI == "true" ]; then
+ exit 0
+fi
 
 DOCKER_STARTED=1
 echo "wait-on tcp:3447" && wait-on -l tcp:3447
