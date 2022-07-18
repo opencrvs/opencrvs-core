@@ -203,3 +203,7 @@ export function verifyToken(token: string): ITokenPayload {
   ThrowReporter.report(result)
   return result.value as ITokenPayload
 }
+
+export function getPublicKey() {
+  return publicCert
+}

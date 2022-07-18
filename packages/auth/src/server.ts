@@ -68,6 +68,7 @@ import {
   registerRquestSchema
 } from '@auth/features/system/handler'
 import { logger } from '@auth/logger'
+import { getPublicKey } from '@auth/features/authenticate/service'
 
 export async function createServer() {
   let whitelist: string[] = [HOSTNAME]
@@ -102,6 +103,14 @@ export async function createServer() {
       auth: false,
       tags: ['api'],
       description: 'Health check endpoint'
+    }
+  })
+  server.route({
+    method: 'GET',
+    path: '/.well-known',
+    handler: getPublicKey,
+    options: {
+      tags: ['api']
     }
   })
 
@@ -244,6 +253,7 @@ export async function createServer() {
   })
 
   // curl -H 'Content-Type: application/json' -d '{ "mobile": "" }' http://localhost:4040/verifyUser
+
   server.route({
     method: 'POST',
     path: '/verifyNumber',
