@@ -48,7 +48,6 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
     setIsInvalidLength(verifyCode.length === 6)
   }
   const callChangePhoneMutation = (mutation: () => void) => {
-    console.log(!!phoneNumber, phoneNumber, isInvalidLength)
     if (!!phoneNumber && isInvalidLength) {
       mutation()
     }
@@ -69,10 +68,11 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
     }
     onSuccess()
   }
-  const handleClose = () => {
-    restoreState()
-    onClose()
-  }
+  React.useEffect(() => {
+    if (!show) {
+      restoreState()
+    }
+  }, [show])
 
   return (
     <ResponsiveModal
@@ -80,7 +80,7 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
       show={show}
       title={intl.formatMessage(messages.verifyPhoneLabel)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={handleClose}>
+        <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
 
@@ -111,7 +111,7 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
           }}
         </Mutation>
       ]}
-      handleClose={handleClose}
+      handleClose={onClose}
       contentHeight={150}
       contentScrollableY={true}
     >

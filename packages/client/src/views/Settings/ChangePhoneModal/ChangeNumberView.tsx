@@ -65,12 +65,12 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
     } else {
       toggleDuplicateMobileErrorNotification()
     }
-    restoreState()
   }
-  const handleClose = () => {
-    restoreState()
-    onClose()
-  }
+  React.useEffect(() => {
+    if (!show) {
+      restoreState()
+    }
+  }, [show])
 
   return (
     <ResponsiveModal
@@ -78,7 +78,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
       show={show}
       title={intl.formatMessage(messages.changePhoneLabel)}
       actions={[
-        <TertiaryButton key="cancel" id="modal_cancel" onClick={handleClose}>
+        <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
         <PrimaryButton
@@ -92,7 +92,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
       ]}
-      handleClose={handleClose}
+      handleClose={onClose}
       contentHeight={150}
       contentScrollableY={true}
     >

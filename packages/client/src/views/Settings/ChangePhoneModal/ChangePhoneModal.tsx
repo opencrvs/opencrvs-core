@@ -36,26 +36,23 @@ export function ChangePhoneModal({ show, onClose, onSuccess }: IProps) {
     setView(VIEW_TYPE.CHANGE_NUMBER)
     setPhoneNumber(EMPTY_STRING)
   }
-  const handleSuccess = () => {
-    restoreState()
-    onSuccess()
-  }
-  const handleClose = () => {
-    restoreState()
-    onClose()
-  }
+  React.useEffect(() => {
+    if (!show) {
+      restoreState()
+    }
+  }, [show])
 
   return (
     <>
       <ChangeNumberView
         show={show && view === VIEW_TYPE.CHANGE_NUMBER}
         onSuccess={onSuccessChangeNumber}
-        onClose={handleClose}
+        onClose={onClose}
       />
       <VerifyCodeView
         show={show && view === VIEW_TYPE.VERIFY_NUMBER}
-        onSuccess={handleSuccess}
-        onClose={handleClose}
+        onSuccess={onSuccess}
+        onClose={onClose}
         data={{ phoneNumber }}
       />
     </>
