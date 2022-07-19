@@ -1,6 +1,6 @@
 # This dockerfile only installs dependencies and build all packages
 # It is used by each packages Dockerfile to copy out build artifacts
-FROM node:erbium
+FROM node:14.18.0
 
 # Make sure version variable is set
 ARG VERSION
