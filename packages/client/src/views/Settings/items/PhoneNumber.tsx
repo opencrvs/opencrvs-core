@@ -29,7 +29,7 @@ import {
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
-import { ChangePhoneModal } from '@client/views/Settings/ChangePhoneModal'
+import { ChangePhoneModal } from '@client/views/Settings/ChangePhoneModal/ChangePhoneModal'
 
 export function PhoneNumber() {
   const intl = useIntl()

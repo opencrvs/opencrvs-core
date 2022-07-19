@@ -11,8 +11,8 @@
  */
 import { EMPTY_STRING } from '@client/utils/constants'
 import * as React from 'react'
-import { ChangeNumberView } from './ChangeNumberView'
-import { VerifyCodeView } from './VerifyCodeView'
+import { ChangeNumberView } from '@client/views/Settings/ChangePhoneModal/ChangeNumberView'
+import { VerifyCodeView } from '@client/views/Settings/ChangePhoneModal/VerifyCodeView'
 
 const VIEW_TYPE = {
   CHANGE_NUMBER: 'change',
