@@ -40,9 +40,10 @@ const graphqlMocks = [
   }
 ]
 
-describe('Change phone page tests', () => {
+describe('Change phone modal tests', () => {
   let component: ReactWrapper
-  const { history } = createRouterProps('/settings/phone')
+  const onSuccessMock = jest.fn()
+  const { history } = createRouterProps('/settings')
   const { store } = createStore(history)
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
@@ -50,7 +51,7 @@ describe('Change phone page tests', () => {
     const testComponent = await createTestComponent(
       <ChangePhoneModal
         show={true}
-        onSuccess={jest.fn()}
+        onSuccess={onSuccessMock}
         onClose={jest.fn()}
       />,
       {
@@ -78,7 +79,7 @@ describe('Change phone page tests', () => {
     ).toBe(false)
   })
 
-  it('should go to verify code page', async () => {
+  it('should render verify code view', async () => {
     queriesForUser.fetchUserDetails = jest.fn(() =>
       Promise.resolve({
         data: {
@@ -100,7 +101,7 @@ describe('Change phone page tests', () => {
     )
   })
 
-  it('should go to settings page after change phone number', async () => {
+  it('should trigger onSuccess callback after change phone number', async () => {
     queriesForUser.fetchUserDetails = jest.fn(() =>
       Promise.resolve({
         data: {
@@ -140,6 +141,6 @@ describe('Change phone page tests', () => {
     })
 
     component.update()
-    expect(history.location.pathname).not.toContain('/phone')
+    expect(onSuccessMock).toBeCalledTimes(1)
   })
 })
