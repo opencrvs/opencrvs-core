@@ -112,9 +112,7 @@ export function BirthDelayedFee() {
       label: intl.formatMessage(buttonMessages.change)
     }
   }
-  const id = isString(item.label)
-    ? item.label.split(' ').join('-')
-    : 'label-component'
+  const id = BirthActionId.BIRTH_DELAYED_FEE
 
   return (
     <>
@@ -174,7 +172,7 @@ export function BirthDelayedFee() {
       </ResponsiveModal>
 
       <FloatingNotification
-        id="print-cert-notification"
+        id={`${id}_notification`}
         type={
           notificationStatus === 'success'
             ? NOTIFICATION_TYPE.SUCCESS

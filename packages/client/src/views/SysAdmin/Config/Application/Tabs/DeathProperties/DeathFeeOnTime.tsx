@@ -106,9 +106,7 @@ export function DeathFeeOnTime() {
       label: intl.formatMessage(buttonMessages.change)
     }
   }
-  const id = isString(item.label)
-    ? item.label.split(' ').join('-')
-    : 'label-component'
+  const id = DeathActionId.DEATH_ON_TIME_FEE
 
   return (
     <>
@@ -168,7 +166,7 @@ export function DeathFeeOnTime() {
       </ResponsiveModal>
 
       <FloatingNotification
-        id="print-cert-notification"
+        id={`${id}_notification`}
         type={
           notificationStatus === 'success'
             ? NOTIFICATION_TYPE.SUCCESS

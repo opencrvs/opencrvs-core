@@ -119,9 +119,7 @@ export function GovtLogo() {
       toggleModal()
     }
   }
-  const id = isString(intl.formatMessage(messages.govermentLogoLabel))
-    ? intl.formatMessage(messages.applicationNameLabel).split(' ').join('-')
-    : 'label-component'
+  const id = GeneralActionId.COUNTRY_LOGO
   return (
     <>
       <ListViewItemSimplified

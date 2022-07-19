@@ -18,7 +18,8 @@ import {
   Content,
   Field,
   Label,
-  Message
+  Message,
+  Value
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { InputField, Select } from '@opencrvs/components/lib/forms'
 import { IStoreState } from '@client/store'
@@ -78,9 +79,7 @@ export function Currency() {
       toggleModal()
     }
   }
-  const id = isString(intl.formatMessage(messages.currencyLabel))
-    ? intl.formatMessage(messages.applicationNameLabel).split(' ').join('-')
-    : 'label-component'
+  const id = GeneralActionId.CURRENCY
   const countryCurrencyName = lookup.currencies({
     code: offlineCountryConfiguration.config.CURRENCY.isoCode
   })
@@ -93,7 +92,7 @@ export function Currency() {
             {intl.formatMessage(messages.currencyLabel)}
           </Label>
         }
-        value={countryCurrencyName[0].name}
+        value={<Value id={`${id}_value`}>{countryCurrencyName[0].name}</Value>}
         actions={
           <LinkButton id={id} onClick={toggleModal}>
             {intl.formatMessage(buttonMessages.change)}
@@ -148,7 +147,7 @@ export function Currency() {
       </ResponsiveModal>
 
       <FloatingNotification
-        id="print-cert-notification"
+        id="currencyNotification"
         type={
           notificationStatus === 'success'
             ? NOTIFICATION_TYPE.SUCCESS

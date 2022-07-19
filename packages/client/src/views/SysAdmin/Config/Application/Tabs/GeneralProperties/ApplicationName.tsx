@@ -144,7 +144,7 @@ export function ApplicationName() {
       </ResponsiveModal>
 
       <FloatingNotification
-        id="print-cert-notification"
+        id="appNamenotification"
         type={
           notificationStatus === 'success'
             ? NOTIFICATION_TYPE.SUCCESS

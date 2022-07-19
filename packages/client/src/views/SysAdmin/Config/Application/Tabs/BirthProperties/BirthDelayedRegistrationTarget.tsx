@@ -106,9 +106,7 @@ export function BirthDelayedRegistrationTarget() {
       label: intl.formatMessage(buttonMessages.change)
     }
   }
-  const id = isString(item.label)
-    ? item.label.split(' ').join('-')
-    : 'label-component'
+  const id = BirthActionId.BIRTH_LATE_REGISTRATION_TARGET
 
   return (
     <>
@@ -151,13 +149,13 @@ export function BirthDelayedRegistrationTarget() {
           <Content>
             <Field>
               <InputField
-                id="applicationBirthRegTarget"
+                id="applicationBirthLateRegTarget"
                 touched={true}
                 required={false}
               >
                 <InputContainer>
                   <SmallWidthInput
-                    id="applicationBirthRegTarget"
+                    id="applicationBirthLateRegTarget"
                     type="text"
                     error={false}
                     defaultValue={
@@ -177,7 +175,7 @@ export function BirthDelayedRegistrationTarget() {
       )}
 
       <FloatingNotification
-        id="print-cert-notification"
+        id={`${id}_notification`}
         type={
           notificationStatus === 'success'
             ? NOTIFICATION_TYPE.SUCCESS

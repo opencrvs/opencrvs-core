@@ -90,7 +90,7 @@ export function PhoneNumPattern() {
       toggleModal()
     }
   }
-  const id = 'phoneNumberPattern_value_container'
+  const id = GeneralActionId.PHONE_NUMBER_PATTERN
   return (
     <>
       <ListViewItemSimplified

@@ -99,9 +99,7 @@ export function DeathRegistrationTarget() {
     }
   }
 
-  const id = isString(item.label)
-    ? item.label.split(' ').join('-')
-    : 'label-component'
+  const id = DeathActionId.DEATH_REGISTRATION_TARGET
 
   return (
     <>
@@ -163,7 +161,7 @@ export function DeathRegistrationTarget() {
       </ResponsiveModal>
 
       <FloatingNotification
-        id="print-cert-notification"
+        id={`${id}_notification`}
         type={
           notificationStatus === 'success'
             ? NOTIFICATION_TYPE.SUCCESS

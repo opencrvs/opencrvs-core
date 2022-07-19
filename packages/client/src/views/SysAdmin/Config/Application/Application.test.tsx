@@ -34,7 +34,7 @@ beforeEach(async () => {
             updateApplicationConfig: {
               APPLICATION_NAME: 'OPENCRVS',
               NID_NUMBER_PATTERN: '/^[0-9]{10}$/',
-              PHONE_NUMBER_PATTERN: '/^[0-9]{8}$/',
+              PHONE_NUMBER_PATTERN: '/^01[1-9][0-9]{8}$/',
               CURRENCY: {
                 isoCode: 'CAD',
                 languagesAndCountry: ['en-CA']
@@ -150,11 +150,7 @@ describe('application name update test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent
-        .find('#Name-of-application_value')
-        .hostNodes()
-        .first()
-        .text()
+      testComponent.find('#APPLICATION_NAME_value').hostNodes().first().text()
     ).toBe('OPENCRVS')
   })
 
@@ -173,9 +169,9 @@ describe('application name update test', () => {
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
-    expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
-    ).toBe('Name of application updated')
+    expect(testComponent.find('#appNamenotification').hostNodes().text()).toBe(
+      'Name of application updated'
+    )
   })
 })
 
@@ -246,18 +242,13 @@ describe('NID Pattern update test', () => {
         target: { id: 'NID_NUMBER_PATTERN', value: '^[0-9]{10}$' }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
-    await waitForElement(testComponent, '#nidPattern_value_container_value')
     await flushPromises()
     testComponent.update()
     expect(
-      testComponent
-        .find('#nidPattern_value_container_value')
-        .hostNodes()
-        .first()
-        .text()
+      testComponent.find('#NID_NUMBER_PATTERN_value').hostNodes().first().text()
     ).toBe('/^[0-9]{10}$/')
   })
-  it('should show success notification if appliction name change', async () => {
+  it('should show success notification if nid pattern name change', async () => {
     testComponent
       .find('#NID_NUMBER_PATTERN')
       .hostNodes()
@@ -274,7 +265,7 @@ describe('NID Pattern update test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#nidPatternNotification').hostNodes().text()
     ).toBe('NID Pattern of application updated')
   })
   it('should show valid message on valid example after clicking test example button', async () => {
@@ -373,20 +364,16 @@ describe('Phone Number Pattern update test', () => {
       .find('#PHONE_NUMBER_PATTERNInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'PHONE_NUMBER_PATTERN', value: '^[0-9]{8}$' }
+        target: { id: 'PHONE_NUMBER_PATTERN', value: '^01[1-9][0-9]{8}$' }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
-    await waitForElement(
-      testComponent,
-      '#phoneNumberPattern_value_container_value'
-    )
     expect(
       testComponent
-        .find('#phoneNumberPattern_value_container_value')
+        .find('#PHONE_NUMBER_PATTERN_value')
         .hostNodes()
         .first()
         .text()
-    ).toBe('/^[0-9]{8}$/')
+    ).toBe('/^01[1-9][0-9]{8}$/')
   })
 })
 
@@ -406,7 +393,7 @@ describe('application currency update test', () => {
     testComponent.find('#apply_change').hostNodes().simulate('click')
     await flushPromises()
     expect(
-      testComponent.find('#Currency_value').hostNodes().first().text()
+      testComponent.find('#CURRENCY_value').hostNodes().first().text()
     ).toBe('Canadian dollar')
   })
 
@@ -420,9 +407,9 @@ describe('application currency update test', () => {
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     await flushPromises()
-    expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
-    ).toBe('Currency updated')
+    expect(testComponent.find('#currencyNotification').hostNodes().text()).toBe(
+      'Currency updated'
+    )
   })
 })
 
@@ -456,7 +443,11 @@ describe('application birth registration target test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#Legally-specified_value').hostNodes().first().text()
+      testComponent
+        .find('#BIRTH_REGISTRATION_TARGET_value')
+        .hostNodes()
+        .first()
+        .text()
     ).toContain('45')
   })
 
@@ -477,7 +468,7 @@ describe('application birth registration target test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#birthRegTargetnotification').hostNodes().text()
     ).toBe('Birth registration target days updated')
   })
 })
@@ -506,35 +497,42 @@ describe('application birth late registration target test', () => {
       .find('#applicationBirthLateRegTarget')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationBirthLateRegTarget', value: 45 }
+        target: { id: 'applicationBirthLateRegTarget', value: 365 }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#Late-registration_value').hostNodes().first().text()
-    ).toContain('45')
+      testComponent
+        .find('#BIRTH_LATE_REGISTRATION_TARGET_value')
+        .hostNodes()
+        .first()
+        .text()
+    ).toContain('365')
   })
 
   it('should show success notification if appliction config change', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
     testComponent
-      .find('#BIRTH_REGISTRATION_TARGET')
+      .find('#BIRTH_LATE_REGISTRATION_TARGET')
       .hostNodes()
       .first()
       .simulate('click')
     testComponent
-      .find('#applicationBirthRegTarget')
+      .find('#applicationBirthLateRegTarget')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationBirthRegTarget', value: 30 }
+        target: { id: 'applicationBirthLateRegTarget', value: 365 }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
-    ).toBe('Birth registration target days updated')
+      testComponent
+        .find('#BIRTH_LATE_REGISTRATION_TARGET_notification')
+        .hostNodes()
+        .text()
+    ).toBe('Birth late registration target days updated')
   })
 })
 
@@ -568,7 +566,11 @@ describe('application death registration target test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#Legally-specified_value').hostNodes().first().text()
+      testComponent
+        .find('#DEATH_REGISTRATION_TARGET_value')
+        .hostNodes()
+        .first()
+        .text()
     ).toContain('10')
   })
 
@@ -589,7 +591,10 @@ describe('application death registration target test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent
+        .find('#DEATH_REGISTRATION_TARGET_notification')
+        .hostNodes()
+        .text()
     ).toBe('Death registration target days updated')
   })
 })
@@ -606,17 +611,13 @@ describe('application birth registration fee test', () => {
       .find('#applicationBirthOnTimeFee')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationDeathRegTarget', value: 5 }
+        target: { id: 'applicationBirthOnTimeFee', value: 5 }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent
-        .find('#Within-legally-specified-time_value')
-        .hostNodes()
-        .first()
-        .text()
+      testComponent.find('#BIRTH_ON_TIME_FEE_value').hostNodes().first().text()
     ).toContain('5')
   })
 
@@ -637,7 +638,7 @@ describe('application birth registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#BIRTH_ON_TIME_FEE_notification').hostNodes().text()
     ).toBe('Birth on time fee updated')
   })
 
@@ -671,7 +672,7 @@ describe('application birth registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#BIRTH_LATE_FEE_notification').hostNodes().text()
     ).toBe('Birth late fee updated')
   })
 
@@ -692,7 +693,7 @@ describe('application birth registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#Delayed-registration_value').hostNodes().at(2).text()
+      testComponent.find('#BIRTH_DELAYED_FEE_value').hostNodes().at(1).text()
     ).toContain('15')
   })
 
@@ -713,7 +714,7 @@ describe('application birth registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#BIRTH_DELAYED_FEE_notification').hostNodes().text()
     ).toBe('Birth delayed fee updated')
   })
 })
@@ -736,11 +737,7 @@ describe('application death registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent
-        .find('#Within-legally-specified-time_value')
-        .hostNodes()
-        .first()
-        .text()
+      testComponent.find('#DEATH_ON_TIME_FEE_value').hostNodes().first().text()
     ).toContain('10')
   })
 
@@ -761,7 +758,7 @@ describe('application death registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#DEATH_ON_TIME_FEE_notification').hostNodes().text()
     ).toBe('Death on time fee updated')
   })
 
@@ -782,7 +779,7 @@ describe('application death registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#Delayed-registration_value').hostNodes().at(2).text()
+      testComponent.find('#DEATH_DELAYED_FEE_value').hostNodes().at(1).text()
     ).toContain('15')
   })
 
@@ -803,7 +800,7 @@ describe('application death registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#DEATH_DELAYED_FEE_notification').hostNodes().text()
     ).toBe('Death delayed fee updated')
   })
 })

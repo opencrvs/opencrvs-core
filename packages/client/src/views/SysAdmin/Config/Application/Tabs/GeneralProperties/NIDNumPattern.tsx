@@ -85,7 +85,7 @@ export function NIDNumPattern() {
       toggleModal()
     }
   }
-  const id = 'nidPattern_value_container'
+  const id = GeneralActionId.NID_NUMBER_PATTERN
   return (
     <>
       <ListViewItemSimplified
@@ -147,7 +147,7 @@ export function NIDNumPattern() {
       </ResponsiveModal>
 
       <FloatingNotification
-        id="print-cert-notification"
+        id="nidPatternNotification"
         type={
           notificationStatus === 'success'
             ? NOTIFICATION_TYPE.SUCCESS

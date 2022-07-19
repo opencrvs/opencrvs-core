@@ -107,9 +107,7 @@ export function BirthRegistrationTarget() {
       disabled: false
     }
   }
-  const id = isString(item.label)
-    ? item.label.split(' ').join('-')
-    : 'label-component'
+  const id = BirthActionId.BIRTH_REGISTRATION_TARGET
 
   return (
     <>
@@ -175,7 +173,7 @@ export function BirthRegistrationTarget() {
       </ResponsiveModal>
 
       <FloatingNotification
-        id="print-cert-notification"
+        id="birthRegTargetnotification"
         type={
           notificationStatus === 'success'
             ? NOTIFICATION_TYPE.SUCCESS
