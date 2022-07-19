@@ -47,11 +47,18 @@ describe('Change phone page tests', () => {
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
 
-    const testComponent = await createTestComponent(<ChangePhonePage />, {
-      store,
-      history,
-      graphqlMocks
-    })
+    const testComponent = await createTestComponent(
+      <ChangePhoneModal
+        show={true}
+        onSuccess={jest.fn()}
+        onClose={jest.fn()}
+      />,
+      {
+        store,
+        history,
+        graphqlMocks
+      }
+    )
     component = testComponent
   })
 
