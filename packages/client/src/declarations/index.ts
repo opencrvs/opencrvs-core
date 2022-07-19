@@ -320,14 +320,11 @@ interface ISetInitialDeclarationsAction {
   type: typeof SET_INITIAL_DECLARATION
 }
 
-type OnSuccessDeleteDeclarationOptions = Partial<{
-  shouldUpdateFieldAgentHome: boolean
-}>
 interface IDeleteDeclarationAction {
   type: typeof DELETE_DECLARATION
   payload: {
-    declaration: IDeclaration | IPrintableDeclaration
-  } & OnSuccessDeleteDeclarationOptions
+    declarationId: string
+  }
 }
 
 interface IGetStorageDeclarationsSuccessAction {
@@ -602,10 +599,9 @@ export function archiveDeclaration(
 }
 
 export function deleteDeclaration(
-  declaration: IDeclaration | IPrintableDeclaration,
-  options?: OnSuccessDeleteDeclarationOptions
+  declarationId: string
 ): IDeleteDeclarationAction {
-  return { type: DELETE_DECLARATION, payload: { declaration, ...options } }
+  return { type: DELETE_DECLARATION, payload: { declarationId } }
 }
 
 export function writeDeclaration(
@@ -1114,7 +1110,7 @@ export async function writeRegistrarWorkqueueByUser(
 
 export async function deleteDeclarationByUser(
   userId: string,
-  declaration: IDeclaration,
+  declarationId: string,
   state: IDeclarationsState
 ): Promise<string> {
   const uID = userId || (await getCurrentUserID())
@@ -1128,7 +1124,7 @@ export async function deleteDeclarationByUser(
   })
 
   const deletedDeclarationId = currentUserData
-    ? currentUserData.declarations.findIndex((app) => app.id === declaration.id)
+    ? currentUserData.declarations.findIndex((app) => app.id === declarationId)
     : -1
 
   if (deletedDeclarationId >= 0) {
@@ -1366,7 +1362,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         Cmd.run(deleteDeclarationByUser, {
           successActionCreator: getStorageDeclarationsSuccess,
           failActionCreator: getStorageDeclarationsFailed,
-          args: [state.userID, action.payload.declaration, state]
+          args: [state.userID, action.payload.declarationId, state]
         })
       )
     case MODIFY_DECLARATION:
@@ -1856,9 +1852,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           | IUnassignDeclaration
         >(
           [
-            Cmd.action(
-              deleteDeclaration({ id: action.payload.id } as IDeclaration)
-            ),
+            Cmd.action(deleteDeclaration(action.payload.id)),
             Cmd.action(updateRegistrarWorkqueue()),
             declarationNextToUnassign
               ? Cmd.action(

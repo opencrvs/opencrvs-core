@@ -440,7 +440,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onDeleteDeclaration = (declaration: IDeclaration) => {
-    this.props.deleteDeclaration(declaration)
+    this.props.deleteDeclaration(declaration.id)
   }
 
   onCloseDeclaration = () => {
