@@ -44,8 +44,7 @@ export interface ICertificateTemplateData {
   user: string
   id: string
 }
-
-interface ICurrency {
+export interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
 }

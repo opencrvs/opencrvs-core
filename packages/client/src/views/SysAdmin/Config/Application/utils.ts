@@ -20,9 +20,8 @@ import {
 } from '@client/views/SysAdmin/Config/Application'
 import { messages } from '@client/i18n/messages/views/config'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { IBirth, ICurrency, IDeath, IFullProps, IState } from './DynamicModal'
+import { IBirth, IDeath, IFullProps, IState, ICurrency } from './DynamicModal'
 import { configApplicationMutations } from './mutations'
-import { IOfflineData } from '@client/offline/reducer'
 import { IFormConfigSettingsProps } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
 
 interface ICurrencyOptions {
@@ -41,23 +40,29 @@ type ICountrylist = {
   status: string
 }
 
-export const getCurrency = (offlineCountryConfiguration: IOfflineData) => {
-  const currency = new Intl.NumberFormat(
-    offlineCountryConfiguration.config.CURRENCY.languagesAndCountry,
-    {
-      style: 'currency',
-      currency: offlineCountryConfiguration.config.CURRENCY.isoCode
-    }
-  )
-    .format(0)
-    .replace(/[0-9.,]/g, '')
+export const getAmountWithCurrencySymbol = (
+  currency: ICurrency,
+  amount: number
+) => {
+  const amountWithSymbol = new Intl.NumberFormat(currency.languagesAndCountry, {
+    style: 'currency',
+    currency: currency.isoCode
+  }).format(amount)
 
-  return currency
+  return amountWithSymbol
 }
+
+export const getCurrencySymbol = (currency: ICurrency) => {
+  const currencySymbol = lookup.currencies({
+    code: currency.isoCode
+  })[0].symbol
+  return currencySymbol
+}
+
 export const getCurrencyObject = (value: string) => {
   const arr = value.split('-')
   return {
-    isoCode: arr.pop(),
+    isoCode: arr.pop() as string,
     languagesAndCountry: [arr.join('-')]
   }
 }

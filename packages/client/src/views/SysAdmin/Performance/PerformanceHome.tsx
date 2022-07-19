@@ -80,6 +80,7 @@ import { goToWorkflowStatus, goToCompletenessRates } from '@client/navigation'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
+import { ICurrency } from '@client/utils/referenceApi'
 
 const Layout = styled.div`
   display: flex;
@@ -181,7 +182,7 @@ const Text = styled.div`
 interface IConnectProps {
   locations: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
-  currency: string
+  currency: ICurrency
 }
 
 interface ISearchParams {
@@ -731,7 +732,7 @@ function mapStateToProps(state: IStoreState) {
     locations: offlineCountryConfiguration.locations,
     offices: offlineCountryConfiguration.offices,
     userDetails: getUserDetails(state),
-    currency: offlineCountryConfiguration.config.CURRENCY.isoCode
+    currency: offlineCountryConfiguration.config.CURRENCY
   }
 }
 

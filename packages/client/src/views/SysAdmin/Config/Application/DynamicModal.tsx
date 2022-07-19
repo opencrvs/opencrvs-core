@@ -47,7 +47,7 @@ import {
   callUpdateApplicationBirthMutation,
   callUpdateApplicationDeathMutation,
   getFormattedFee,
-  getCurrency,
+  getCurrencySymbol,
   callUpdatePhoneNumberPatternMutation,
   callUpdateGovtLogoMutation
 } from '@client/views/SysAdmin/Config/Application/utils'
@@ -881,7 +881,15 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 required={false}
               >
                 <InputContainer>
-                  <span>{getCurrency(offlineCountryConfiguration)}</span>
+                  <span>
+                    {getCurrencySymbol({
+                      isoCode:
+                        offlineCountryConfiguration.config.CURRENCY.isoCode,
+                      languagesAndCountry:
+                        offlineCountryConfiguration.config.CURRENCY
+                          .languagesAndCountry
+                    })}
+                  </span>
                   <HalfWidthInput
                     id="applicationBirthOnTimeFee"
                     type="text"
@@ -903,7 +911,15 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 required={false}
               >
                 <InputContainer>
-                  <span>{getCurrency(offlineCountryConfiguration)}</span>
+                  <span>
+                    {getCurrencySymbol({
+                      isoCode:
+                        offlineCountryConfiguration.config.CURRENCY.isoCode,
+                      languagesAndCountry:
+                        offlineCountryConfiguration.config.CURRENCY
+                          .languagesAndCountry
+                    })}
+                  </span>
                   <HalfWidthInput
                     id="applicationBirthLateFee"
                     type="text"
@@ -925,7 +941,15 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 required={false}
               >
                 <InputContainer>
-                  <span>{getCurrency(offlineCountryConfiguration)}</span>
+                  <span>
+                    {getCurrencySymbol({
+                      isoCode:
+                        offlineCountryConfiguration.config.CURRENCY.isoCode,
+                      languagesAndCountry:
+                        offlineCountryConfiguration.config.CURRENCY
+                          .languagesAndCountry
+                    })}
+                  </span>
                   <HalfWidthInput
                     id="applicationBirthDelayedFee"
                     type="text"
@@ -947,7 +971,15 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 required={false}
               >
                 <InputContainer>
-                  <span>{getCurrency(offlineCountryConfiguration)}</span>
+                  <span>
+                    {getCurrencySymbol({
+                      isoCode:
+                        offlineCountryConfiguration.config.CURRENCY.isoCode,
+                      languagesAndCountry:
+                        offlineCountryConfiguration.config.CURRENCY
+                          .languagesAndCountry
+                    })}
+                  </span>
                   <HalfWidthInput
                     id="applicationDeathOnTimeFee"
                     type="text"
@@ -969,7 +1001,15 @@ class DynamicModalComponent extends React.Component<IFullProps, IState> {
                 required={false}
               >
                 <InputContainer>
-                  <span>{getCurrency(offlineCountryConfiguration)}</span>
+                  <span>
+                    {getCurrencySymbol({
+                      isoCode:
+                        offlineCountryConfiguration.config.CURRENCY.isoCode,
+                      languagesAndCountry:
+                        offlineCountryConfiguration.config.CURRENCY
+                          .languagesAndCountry
+                    })}
+                  </span>
                   <HalfWidthInput
                     id="applicationDeathDelayedFee"
                     type="text"
