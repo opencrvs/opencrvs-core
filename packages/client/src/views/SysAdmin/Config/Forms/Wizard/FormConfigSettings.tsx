@@ -38,7 +38,7 @@ import {
 import { callApplicationConfigMutation } from '@client/views/SysAdmin/Config/Application/utils'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { messages as configMessages } from '@client/i18n/messages/views/config'
-import { IApplicationConfig } from '@client/views/SysAdmin/Config/Application/DynamicModal'
+import { IApplicationConfig } from '@client/utils/referenceApi'
 
 const Label = styled.span`
   ${({ theme }) => theme.fonts.reg16};
@@ -100,21 +100,6 @@ function FormConfigSettingsComponent() {
   const [notificationMessages, setNotificationMessages] =
     React.useState(EMPTY_STRING)
   const [isValueUpdating, setIsValueUpdating] = React.useState(false)
-  const appConfigs: IApplicationConfig = {
-    APPLICATION_NAME: offlineCountryConfiguration.config.APPLICATION_NAME,
-    NID_NUMBER_PATTERN: String(
-      offlineCountryConfiguration.config.NID_NUMBER_PATTERN
-    ),
-    PHONE_NUMBER_PATTERN: String(
-      offlineCountryConfiguration.config.PHONE_NUMBER_PATTERN
-    ),
-    COUNTRY_LOGO: offlineCountryConfiguration.config.COUNTRY_LOGO,
-    CURRENCY: offlineCountryConfiguration.config.CURRENCY,
-    BIRTH: offlineCountryConfiguration.config.BIRTH,
-    DEATH: offlineCountryConfiguration.config.DEATH,
-    HIDE_EVENT_REGISTER_INFORMATION: introductionPage,
-    ADDRESSES: numberOfAddresses
-  }
 
   const changeValue = async () => {
     if (
@@ -126,12 +111,12 @@ function FormConfigSettingsComponent() {
           modalName,
           modalName === ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION
             ? {
-                ...appConfigs,
+                ...offlineCountryConfiguration.config,
                 [ConfigActionType.HIDE_EVENT_REGISTER_INFORMATION]:
                   introductionPage
               }
             : {
-                ...appConfigs,
+                ...offlineCountryConfiguration.config,
                 [ConfigActionType.ADDRESSES]: numberOfAddresses
               },
           offlineCountryConfiguration,

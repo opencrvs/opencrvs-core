@@ -18,15 +18,18 @@ import {
   DeathActionId,
   GeneralActionId
 } from '@client/views/SysAdmin/Config/Application'
-import { messages } from '@client/i18n/messages/views/config'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { IActionType, IApplicationConfig, IState } from './DynamicModal'
 import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ConfigActionType } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { Dispatch } from 'redux'
+import { IApplicationConfig } from '@client/utils/referenceApi'
 
+export type IActionType =
+  | keyof typeof GeneralActionId
+  | keyof typeof BirthActionId
+  | keyof typeof DeathActionId
 interface ICurrencyOptions {
   [key: string]: string
 }
@@ -41,6 +44,32 @@ type ICountrylist = {
   languages: string[]
   name: string
   status: string
+}
+
+export type ICurrency = {
+  isoCode: string
+  languagesAndCountry: string[]
+}
+export type ICountryLogo = {
+  fileName: string
+  file: string
+}
+
+export type IBirth = {
+  REGISTRATION_TARGET: number
+  LATE_REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    LATE: number
+    DELAYED: number
+  }
+}
+export type IDeath = {
+  REGISTRATION_TARGET: number
+  FEE: {
+    ON_TIME: number
+    DELAYED: number
+  }
 }
 
 export const getCurrency = (offlineCountryConfiguration: IOfflineData) => {
@@ -138,89 +167,13 @@ export const getFormattedFee = (value: string) => {
   return EMPTY_STRING
 }
 
-export const getTitle = (intl: IntlShape, changeModalName: string) => {
-  if (changeModalName === GeneralActionId.APPLICATION_NAME)
-    return intl.formatMessage(messages.applicationNameLabel)
-  if (changeModalName === GeneralActionId.COUNTRY_LOGO)
-    return intl.formatMessage(messages.govermentLogoLabel)
-  else if (changeModalName === GeneralActionId.CURRENCY)
-    return intl.formatMessage(messages.currencyLabel)
-  else if (changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET)
-    return intl.formatMessage(messages.birthLegallySpecifiedDialogTitle)
-  else if (changeModalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET)
-    return intl.formatMessage(messages.birthDelayedDialogTitle)
-  else if (changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET)
-    return intl.formatMessage(messages.deathLegallySpecifiedDialogTitle)
-  else if (changeModalName === GeneralActionId.NID_NUMBER_PATTERN)
-    return intl.formatMessage(messages.nidPatternTitle)
-  else if (changeModalName === GeneralActionId.PHONE_NUMBER_PATTERN)
-    return intl.formatMessage(messages.phoneNumberPatternTitle)
-  else if (
-    changeModalName === BirthActionId.BIRTH_ON_TIME_FEE ||
-    changeModalName === DeathActionId.DEATH_ON_TIME_FEE
-  )
-    return intl.formatMessage(messages.onTimeFeeDialogTitle)
-  else if (changeModalName === BirthActionId.BIRTH_LATE_FEE)
-    return intl.formatMessage(messages.lateFeeDialogTitle)
-  else if (
-    changeModalName === BirthActionId.BIRTH_DELAYED_FEE ||
-    changeModalName === DeathActionId.DEATH_DELAYED_FEE
-  )
-    return intl.formatMessage(messages.delayedFeeDialogTitle)
-  else return EMPTY_STRING
-}
-
-export const getMessage = (intl: IntlShape, changeModalName: string) => {
-  if (changeModalName === GeneralActionId.APPLICATION_NAME)
-    return intl.formatMessage(messages.applicationNameChangeMessage)
-  else if (changeModalName === GeneralActionId.COUNTRY_LOGO)
-    return intl.formatMessage(messages.govtLogoChangeMessage)
-  else if (changeModalName === GeneralActionId.CURRENCY)
-    return intl.formatMessage(messages.applicationCurrencyChangeMessage)
-  else if (changeModalName === GeneralActionId.NID_NUMBER_PATTERN)
-    return intl.formatMessage(messages.nidPatternChangeMessage)
-  else if (changeModalName === GeneralActionId.PHONE_NUMBER_PATTERN)
-    return intl.formatMessage(messages.phoneNumberChangeMessage)
-  else return EMPTY_STRING
-}
-
-export const isApplyButtonDisabled = (
-  state: IState,
-  changeModalName: string
-) => {
-  if (changeModalName === GeneralActionId.APPLICATION_NAME) {
-    return !Boolean(state.applicationName)
-  } else if (changeModalName === GeneralActionId.COUNTRY_LOGO) {
-    return !Boolean(state.govtLogo)
-  } else if (changeModalName === GeneralActionId.CURRENCY) {
-    return !Boolean(state.currency)
-  } else if (changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET) {
-    return !Boolean(state.birthRegistrationTarget)
-  } else if (changeModalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET) {
-    return (
-      Number(state.birthLateRegistrationTarget) <
-      Number(state.birthRegistrationTarget) + 2
-    )
-  } else if (changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET) {
-    return !Boolean(state.deathRegistrationTarget)
-  } else if (changeModalName === BirthActionId.BIRTH_ON_TIME_FEE) {
-    return !Boolean(state.birthOnTimeFee)
-  } else if (changeModalName === BirthActionId.BIRTH_LATE_FEE) {
-    return !Boolean(state.birthLateFee)
-  } else if (changeModalName === BirthActionId.BIRTH_DELAYED_FEE) {
-    return !Boolean(state.birthDelayedFee)
-  } else if (changeModalName === DeathActionId.DEATH_ON_TIME_FEE) {
-    return !Boolean(state.deathOnTimeFee)
-  } else if (changeModalName === DeathActionId.DEATH_DELAYED_FEE) {
-    return !Boolean(state.deathDelayedFee)
-  } else if (changeModalName === GeneralActionId.NID_NUMBER_PATTERN) {
-    return !isValidRegEx(state.nidPattern) || !Boolean(state.nidPattern)
-  } else if (changeModalName === GeneralActionId.PHONE_NUMBER_PATTERN) {
-    return (
-      !isValidRegEx(state.phoneNumberPattern) ||
-      !Boolean(state.phoneNumberPattern)
-    )
-  } else return true
+export const isWithinFileLength = (base64data: string) => {
+  const baseStr = base64data.substring(22)
+  const decoded = window.atob(baseStr)
+  if (decoded.length >= 2000000) {
+    return false
+  }
+  return true
 }
 
 const isGeneralOrConfigAction = (

@@ -11,12 +11,7 @@
  */
 import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
-import {
-  IBirth,
-  ICountryLogo,
-  ICurrency,
-  IDeath
-} from '@client/views/SysAdmin/Config/Application/DynamicModal'
+import { IBirth, ICountryLogo, ICurrency, IDeath } from './utils'
 
 const applicationConfigMutation = gql`
   mutation updateApplicationConfig(
