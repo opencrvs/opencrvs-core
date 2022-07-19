@@ -23,6 +23,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { getUserNonce, getUserDetails } from '@client/profile/profileSelectors'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { modifyUserDetails } from '@client/profile/profileActions'
+import { Message } from '@client/views/Settings/items/components'
 
 interface IProps {
   show: boolean
@@ -115,6 +116,15 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
       contentHeight={150}
       contentScrollableY={true}
     >
+      <Message>
+        {intl.formatMessage(messages.confirmationPhoneMsg, {
+          num: intl.formatMessage({
+            defaultMessage: phoneNumber,
+            description: 'Phone confirmation number',
+            id: 'phone.number'
+          })
+        })}
+      </Message>
       <InputField
         id="verifyCode"
         touched={true}
