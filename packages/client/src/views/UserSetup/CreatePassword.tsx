@@ -26,19 +26,7 @@ import {
 } from '@client/components/ProtectedAccount'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { buttonMessages } from '@client/i18n/messages'
-
-const Header = styled.h4`
-  ${({ theme }) => theme.fonts.h2};
-  color: ${({ theme }) => theme.colors.black};
-  margin: 0px;
-`
-const Instruction = styled.p`
-  color: ${({ theme }) => theme.colors.copy};
-  margin: 13px 64px 27px 0px;
-`
-const Action = styled.div`
-  margin-top: 58px;
-`
+import { Content } from '@opencrvs/components/lib/interface/Content'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -166,10 +154,24 @@ class CreatePasswordComponent extends React.Component<IFullProps, State> {
   }
   render = () => {
     const { intl } = this.props
+    const continueActionButton = (
+      <PrimaryButton
+        id="Continue"
+        onClick={this.whatNext}
+        disabled={
+          !this.state.hasCases ||
+          !this.state.hasNumber ||
+          !this.state.validLength
+        }
+      >
+        {intl.formatMessage(buttonMessages.continueButton)}
+      </PrimaryButton>
+    )
     return (
       <>
         <ActionPageLight
           title={intl.formatMessage(messages.newPassword)}
+          hideBackground
           goBack={() => {
             this.props.goToStep(
               ProtectedAccoutStep.LANDING,
@@ -177,104 +179,95 @@ class CreatePasswordComponent extends React.Component<IFullProps, State> {
             )
           }}
         >
-          <Header>{intl.formatMessage(messages.header)}</Header>
-          <Instruction>{intl.formatMessage(messages.instruction)}</Instruction>
-          <GlobalError id="GlobalError">
-            {this.state.continuePressed && this.state.passwordMismatched && (
-              <WarningMessage>
-                {intl.formatMessage(messages.mismatch)}
-              </WarningMessage>
-            )}
-            {this.state.continuePressed &&
-              this.state.newPassword.length === 0 && (
+          <Content
+            title={intl.formatMessage(messages.header)}
+            subtitle={intl.formatMessage(messages.instruction)}
+            bottomActionButtons={[continueActionButton]}
+          >
+            <GlobalError id="GlobalError">
+              {this.state.continuePressed && this.state.passwordMismatched && (
                 <WarningMessage>
-                  {intl.formatMessage(messages.passwordRequired)}
+                  {intl.formatMessage(messages.mismatch)}
                 </WarningMessage>
               )}
-          </GlobalError>
-          <PasswordContents>
-            <InputField
-              id="newPassword"
-              label={intl.formatMessage(messages.newPassword)}
-              touched={true}
-              required={false}
-              optionalLabel=""
-            >
-              <TextInput
-                id="NewPassword"
-                type="password"
+              {this.state.continuePressed &&
+                this.state.newPassword.length === 0 && (
+                  <WarningMessage>
+                    {intl.formatMessage(messages.passwordRequired)}
+                  </WarningMessage>
+                )}
+            </GlobalError>
+            <PasswordContents>
+              <InputField
+                id="newPassword"
+                label={intl.formatMessage(messages.newPassword)}
                 touched={true}
-                value={this.state.newPassword}
-                onChange={this.checkPasswordStrength}
-                error={
-                  this.state.continuePressed &&
-                  this.state.newPassword.length === 0
-                }
-              />
-            </InputField>
-            <ValidationRulesSection>
-              <div>{intl.formatMessage(messages.validationMsg)}</div>
-              <div>
-                {this.state.validLength && <TickOn />}
-                {!this.state.validLength && <TickOff />}
-                <span>
-                  {intl.formatMessage(messages.minLength, { min: 8 })}
-                </span>
-              </div>
-              <div>
-                {this.state.hasCases && <TickOn />}
-                {!this.state.hasCases && <TickOff />}
-                <span>{intl.formatMessage(messages.hasCases)}</span>
-              </div>
-              <div>
-                {this.state.hasNumber && <TickOn />}
-                {!this.state.hasNumber && <TickOff />}
-                <span>{intl.formatMessage(messages.hasNumber)}</span>
-              </div>
-            </ValidationRulesSection>
+                required={false}
+                optionalLabel=""
+              >
+                <TextInput
+                  id="NewPassword"
+                  type="password"
+                  touched={true}
+                  value={this.state.newPassword}
+                  onChange={this.checkPasswordStrength}
+                  error={
+                    this.state.continuePressed &&
+                    this.state.newPassword.length === 0
+                  }
+                />
+              </InputField>
+              <ValidationRulesSection>
+                <div>{intl.formatMessage(messages.validationMsg)}</div>
+                <div>
+                  {this.state.validLength && <TickOn />}
+                  {!this.state.validLength && <TickOff />}
+                  <span>
+                    {intl.formatMessage(messages.minLength, { min: 8 })}
+                  </span>
+                </div>
+                <div>
+                  {this.state.hasCases && <TickOn />}
+                  {!this.state.hasCases && <TickOff />}
+                  <span>{intl.formatMessage(messages.hasCases)}</span>
+                </div>
+                <div>
+                  {this.state.hasNumber && <TickOn />}
+                  {!this.state.hasNumber && <TickOff />}
+                  <span>{intl.formatMessage(messages.hasNumber)}</span>
+                </div>
+              </ValidationRulesSection>
 
-            <InputField
-              id="newPassword"
-              label={intl.formatMessage(messages.confirmPassword)}
-              touched={true}
-              required={false}
-              optionalLabel=""
-            >
-              <TextInput
-                id="ConfirmPassword"
-                type="password"
+              <InputField
+                id="newPassword"
+                label={intl.formatMessage(messages.confirmPassword)}
                 touched={true}
-                error={
-                  this.state.continuePressed && this.state.passwordMismatched
-                }
-                value={this.state.confirmPassword}
-                onChange={this.matchPassword}
-              />
-            </InputField>
-            {this.state.passwordMismatched && (
-              <PasswordMismatch>
-                {intl.formatMessage(messages.mismatch)}
-              </PasswordMismatch>
-            )}
-            {this.state.passwordMatched && (
-              <PasswordMatch>
-                {intl.formatMessage(messages.match)}
-              </PasswordMatch>
-            )}
-          </PasswordContents>
-          <Action>
-            <PrimaryButton
-              id="Continue"
-              onClick={this.whatNext}
-              disabled={
-                !this.state.hasCases ||
-                !this.state.hasNumber ||
-                !this.state.validLength
-              }
-            >
-              {intl.formatMessage(buttonMessages.continueButton)}
-            </PrimaryButton>
-          </Action>
+                required={false}
+                optionalLabel=""
+              >
+                <TextInput
+                  id="ConfirmPassword"
+                  type="password"
+                  touched={true}
+                  error={
+                    this.state.continuePressed && this.state.passwordMismatched
+                  }
+                  value={this.state.confirmPassword}
+                  onChange={this.matchPassword}
+                />
+              </InputField>
+              {this.state.passwordMismatched && (
+                <PasswordMismatch>
+                  {intl.formatMessage(messages.mismatch)}
+                </PasswordMismatch>
+              )}
+              {this.state.passwordMatched && (
+                <PasswordMatch>
+                  {intl.formatMessage(messages.match)}
+                </PasswordMatch>
+              )}
+            </PasswordContents>
+          </Content>
         </ActionPageLight>
       </>
     )
