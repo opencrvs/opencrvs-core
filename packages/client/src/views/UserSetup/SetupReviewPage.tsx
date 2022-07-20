@@ -40,14 +40,7 @@ import {
 import { Check } from '@opencrvs/components/lib/icons'
 import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { messages } from '@client/i18n/messages/views/userSetup'
-
-const Header = styled.h4`
-  ${({ theme }) => theme.fonts.h2};
-  color: ${({ theme }) => theme.colors.black};
-`
-const Action = styled.div`
-  margin-top: 32px;
-`
+import { Content } from '@opencrvs/components/lib/interface/Content'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -190,9 +183,37 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
         submitError: true
       })
     }
+    const confirmActionButton = (
+      <Mutation
+        mutation={activateUserMutation}
+        variables={{ ...this.props.setupData }}
+        onCompleted={() => onCompleted()}
+        onError={() => onError()}
+      >
+        {(submitActivateUser: any, { loading }: { loading: any }) => {
+          if (loading) {
+            return (
+              <LoaderOverlay>
+                <Loader
+                  id="setup_submit_waiting"
+                  loadingText={intl.formatMessage(messages.waiting)}
+                />
+              </LoaderOverlay>
+            )
+          }
+          return (
+            <ConfirmButton id="Confirm" onClick={() => submitActivateUser()}>
+              <Check />
+              {intl.formatMessage(buttonMessages.confirm)}
+            </ConfirmButton>
+          )
+        }}
+      </Mutation>
+    )
     return (
       <ActionPageLight
         title={intl.formatMessage(messages.userSetupRevieTitle)}
+        hideBackground
         goBack={() => {
           this.props.goToStep(
             ProtectedAccoutStep.SECURITY_QUESTION,
@@ -200,49 +221,23 @@ class UserSetupReviewComponent extends React.Component<IFullProps, IState> {
           )
         }}
       >
-        <Header>{intl.formatMessage(messages.userSetupReviewHeader)}</Header>
-        <GlobalError id="GlobalError">
-          {this.state.submitError && (
-            <WarningMessage>
-              {intl.formatMessage(errorMessages.pleaseTryAgainError)}
-            </WarningMessage>
-          )}
-        </GlobalError>
-        <div id="UserSetupData">
-          {items.map((item: IDataProps, index: number) => (
-            <DataRow key={index} {...item} />
-          ))}
-        </div>
-        <Mutation
-          mutation={activateUserMutation}
-          variables={{ ...this.props.setupData }}
-          onCompleted={() => onCompleted()}
-          onError={() => onError()}
+        <Content
+          title={intl.formatMessage(messages.userSetupReviewHeader)}
+          bottomActionButtons={[confirmActionButton]}
         >
-          {(submitActivateUser: any, { loading }: { loading: any }) => {
-            if (loading) {
-              return (
-                <LoaderOverlay>
-                  <Loader
-                    id="setup_submit_waiting"
-                    loadingText={intl.formatMessage(messages.waiting)}
-                  />
-                </LoaderOverlay>
-              )
-            }
-            return (
-              <Action>
-                <ConfirmButton
-                  id="Confirm"
-                  onClick={() => submitActivateUser()}
-                >
-                  <Check />
-                  {intl.formatMessage(buttonMessages.confirm)}
-                </ConfirmButton>
-              </Action>
-            )
-          }}
-        </Mutation>
+          <GlobalError id="GlobalError">
+            {this.state.submitError && (
+              <WarningMessage>
+                {intl.formatMessage(errorMessages.pleaseTryAgainError)}
+              </WarningMessage>
+            )}
+          </GlobalError>
+          <div id="UserSetupData">
+            {items.map((item: IDataProps, index: number) => (
+              <DataRow key={index} {...item} />
+            ))}
+          </div>
+        </Content>
       </ActionPageLight>
     )
   }
