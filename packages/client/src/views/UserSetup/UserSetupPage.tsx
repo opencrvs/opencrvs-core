@@ -44,7 +44,7 @@ export const Container = styled.div`
   height: auto;
   padding: 0px;
   margin: 125px auto 0px auto;
-  max-width: 460px;
+  max-width: auto;
 `
 export const LogoContainer = styled.div`
   flex-direction: row;
