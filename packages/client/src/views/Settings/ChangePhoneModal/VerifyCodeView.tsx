@@ -118,11 +118,7 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
     >
       <Message>
         {intl.formatMessage(messages.confirmationPhoneMsg, {
-          num: intl.formatMessage({
-            defaultMessage: phoneNumber,
-            description: 'Phone confirmation number',
-            id: 'phone.number'
-          })
+          num: phoneNumber
         })}
       </Message>
       <InputField
