@@ -28,6 +28,10 @@ import { buttonMessages } from '@client/i18n/messages'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
 
 const TitleHolder = styled.div`
   ${({ theme }) => theme.fonts.h1};
@@ -59,21 +63,25 @@ export class SetupConfirmationView extends React.Component<
     return (
       <Page>
         <Container id="user-setup-complete-page">
-          <LogoContainer>
-            <CountryLogo src={offlineCountryConfig.config.COUNTRY_LOGO.file} />
-          </LogoContainer>
-          <TitleHolder>
-            {intl.formatMessage(messages.setupCompleteTitle)}
-          </TitleHolder>
-          <InstructionHolder>
-            {intl.formatMessage(messages.userSetupInstruction)}
-          </InstructionHolder>
-          <LoginButton
-            id="setup-login-button"
-            onClick={() => this.props.redirectToAuthentication()}
-          >
-            {intl.formatMessage(buttonMessages.login)}
-          </LoginButton>
+          <Content size={ContentSize.LARGE}>
+            <LogoContainer>
+              <CountryLogo
+                src={offlineCountryConfig.config.COUNTRY_LOGO.file}
+              />
+            </LogoContainer>
+            <TitleHolder>
+              {intl.formatMessage(messages.setupCompleteTitle)}
+            </TitleHolder>
+            <InstructionHolder>
+              {intl.formatMessage(messages.userSetupInstruction)}
+            </InstructionHolder>
+            <LoginButton
+              id="setup-login-button"
+              onClick={() => this.props.redirectToAuthentication()}
+            >
+              {intl.formatMessage(buttonMessages.login)}
+            </LoginButton>
+          </Content>
         </Container>
       </Page>
     )
