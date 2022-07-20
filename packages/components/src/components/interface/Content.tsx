@@ -202,22 +202,24 @@ export class Content extends React.Component<IProps> {
               </TertiaryButton>
             </BackButtonContainer>
           )}
-          <TopBar keepShowing={showTitleOnMobile}>
-            <TitleContainer titleColor={titleColor}>
-              {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
-              {title && (
-                <Title
-                  id={`content-name`}
-                  truncateOnMobile={truncateTitleOnMobile}
-                >
-                  {title}
-                </Title>
+          {(icon || title || topActionButtons) && (
+            <TopBar keepShowing={showTitleOnMobile}>
+              <TitleContainer titleColor={titleColor}>
+                {icon && <Icon id={`content-icon`}>{icon()}</Icon>}
+                {title && (
+                  <Title
+                    id={`content-name`}
+                    truncateOnMobile={truncateTitleOnMobile}
+                  >
+                    {title}
+                  </Title>
+                )}
+              </TitleContainer>
+              {topActionButtons && (
+                <TopActionBar>{topActionButtons}</TopActionBar>
               )}
-            </TitleContainer>
-            {topActionButtons && (
-              <TopActionBar>{topActionButtons}</TopActionBar>
-            )}
-          </TopBar>
+            </TopBar>
+          )}
           {(filterContent || tabBarContent) && (
             <HeaderBottom>
               {tabBarContent && <TopTabBar>{tabBarContent}</TopTabBar>}

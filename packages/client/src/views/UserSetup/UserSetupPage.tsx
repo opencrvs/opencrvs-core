@@ -28,10 +28,14 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
+import {
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/interface/Content'
 
 export const Page = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.gray500};
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -102,51 +106,55 @@ export class UserSetupView extends React.Component<
     return (
       <Page>
         <Container id="user-setup-landing-page">
-          <LogoContainer>
-            <CountryLogo src={offlineCountryConfig.config.COUNTRY_LOGO.file} />
-          </LogoContainer>
-          <TitleHolder>
-            {intl.formatMessage(messages.userSetupWelcomeTitle, {
-              applicationName: offlineCountryConfig.config.APPLICATION_NAME
-            })}
-          </TitleHolder>
-          <InfoHolder>
-            <NameHolder id="user-setup-name-holder">
-              {(userDetails &&
-                userDetails.name &&
-                (createNamesMap(userDetails.name as GQLHumanName[])[
-                  intl.locale
-                ] as string)) ||
-                ''}
-            </NameHolder>
-            <RoleHolder id="user-setup-role-holder">
-              {(userDetails &&
-                (userDetails.type
-                  ? `${intl.formatMessage(
-                      userMessages[userDetails.type as string]
-                    )} - ${intl.formatMessage(
-                      userMessages[userDetails.role as string]
-                    )}`
-                  : `${intl.formatMessage(
-                      userMessages[userDetails.role as string]
-                    )}`)) ||
-                ''}
-            </RoleHolder>
-          </InfoHolder>
-          <InstructionHolder>
-            {intl.formatMessage(messages.userSetupIntroduction)}
-          </InstructionHolder>
-          <NextButton
-            id="user-setup-start-button"
-            onClick={() =>
-              goToStep(ProtectedAccoutStep.PASSWORD, {
-                ...this.props.setupData,
-                userId: (userDetails && userDetails.userMgntUserID) || ''
-              })
-            }
-          >
-            {intl.formatMessage(buttonMessages.start)}
-          </NextButton>
+          <Content size={ContentSize.LARGE}>
+            <LogoContainer>
+              <CountryLogo
+                src={offlineCountryConfig.config.COUNTRY_LOGO.file}
+              />
+            </LogoContainer>
+            <TitleHolder>
+              {intl.formatMessage(messages.userSetupWelcomeTitle, {
+                applicationName: offlineCountryConfig.config.APPLICATION_NAME
+              })}
+            </TitleHolder>
+            <InfoHolder>
+              <NameHolder id="user-setup-name-holder">
+                {(userDetails &&
+                  userDetails.name &&
+                  (createNamesMap(userDetails.name as GQLHumanName[])[
+                    intl.locale
+                  ] as string)) ||
+                  ''}
+              </NameHolder>
+              <RoleHolder id="user-setup-role-holder">
+                {(userDetails &&
+                  (userDetails.type
+                    ? `${intl.formatMessage(
+                        userMessages[userDetails.type as string]
+                      )} - ${intl.formatMessage(
+                        userMessages[userDetails.role as string]
+                      )}`
+                    : `${intl.formatMessage(
+                        userMessages[userDetails.role as string]
+                      )}`)) ||
+                  ''}
+              </RoleHolder>
+            </InfoHolder>
+            <InstructionHolder>
+              {intl.formatMessage(messages.userSetupIntroduction)}
+            </InstructionHolder>
+            <NextButton
+              id="user-setup-start-button"
+              onClick={() =>
+                goToStep(ProtectedAccoutStep.PASSWORD, {
+                  ...this.props.setupData,
+                  userId: (userDetails && userDetails.userMgntUserID) || ''
+                })
+              }
+            >
+              {intl.formatMessage(buttonMessages.start)}
+            </NextButton>
+          </Content>
         </Container>
       </Page>
     )
