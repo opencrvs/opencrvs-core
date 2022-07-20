@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -27,6 +27,7 @@ import {
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { buttonMessages } from '@client/i18n/messages'
 import { Content } from '@opencrvs/components/lib/interface/Content'
+import { EMPTY_STRING } from '@client/utils/constants'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -57,18 +58,6 @@ const ValidationRulesSection = styled.div`
     }
   }
 `
-
-type State = {
-  newPassword: string
-  confirmPassword: string
-  validLength: boolean
-  hasNumber: boolean
-  hasCases: boolean
-  passwordMismatched: boolean
-  passwordMatched: boolean
-  continuePressed: boolean
-}
-
 interface IProps {
   setupData: IProtectedAccountSetupData
   goToStep: (
@@ -77,201 +66,160 @@ interface IProps {
   ) => void
 }
 
-type IFullProps = IProps & IntlShapeProps
+export function CreatePassword({ setupData, goToStep }: IProps) {
+  const intl = useIntl()
+  const [newPassword, setNewPassword] = React.useState(EMPTY_STRING)
+  const [confirmPassword, setConfirmPassword] = React.useState(EMPTY_STRING)
+  const [validLength, setValidLength] = React.useState(false)
+  const [hasNumber, setHasNumber] = React.useState(false)
+  const [hasCases, setHasCases] = React.useState(false)
+  const [passwordMismatched, setPasswordMismatched] = React.useState(false)
+  const [passwordMatched, setPasswordMatched] = React.useState(false)
+  const [continuePressed, setContinuePressed] = React.useState(false)
 
-class CreatePasswordComponent extends React.Component<IFullProps, State> {
-  constructor(props: IFullProps) {
-    super(props)
-    this.state = {
-      newPassword: '',
-      confirmPassword: '',
-      validLength: false,
-      hasNumber: false,
-      hasCases: false,
-      passwordMismatched: false,
-      passwordMatched: false,
-      continuePressed: false
+  const validateLength = (value: string) => {
+    setValidLength(value.length >= 8)
+  }
+  const validateNumber = (value: string) => {
+    setHasNumber(/\d/.test(value))
+  }
+  const validateCases = (value: string) => {
+    setHasCases(/[a-z]/.test(value) && /[A-Z]/.test(value))
+  }
+  const checkPasswordStrength = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = event.target.value
+    setNewPassword(value)
+    setConfirmPassword(EMPTY_STRING)
+    setPasswordMatched(false)
+    setPasswordMismatched(false)
+    setContinuePressed(false)
+    validateLength(value)
+    validateNumber(value)
+    validateCases(value)
+  }
+  const matchPassword = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setConfirmPassword(value)
+    setPasswordMismatched(value.length > 0 && newPassword !== value)
+    setPasswordMatched(value.length > 0 && newPassword === value)
+    setContinuePressed(false)
+  }
+  const whatNext = () => {
+    setContinuePressed(true)
+    setPasswordMismatched(
+      newPassword.length > 0 && newPassword !== confirmPassword
+    )
+    if (passwordMatched && hasCases && hasNumber && validLength) {
+      setupData.password = newPassword
+      goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
     }
   }
-  validateLength = (value: string) => {
-    this.setState(() => ({
-      validLength: value.length >= 8
-    }))
-  }
-  validateNumber = (value: string) => {
-    this.setState(() => ({
-      hasNumber: /\d/.test(value)
-    }))
-  }
-  validateCases = (value: string) => {
-    this.setState(() => ({
-      hasCases: /[a-z]/.test(value) && /[A-Z]/.test(value)
-    }))
-  }
-  checkPasswordStrength = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value
-    this.setState(() => ({
-      newPassword: value,
-      confirmPassword: '',
-      passwordMatched: false,
-      passwordMismatched: false,
-      continuePressed: false
-    }))
-    this.validateLength(value)
-    this.validateNumber(value)
-    this.validateCases(value)
-  }
-  matchPassword = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const newPassword = this.state.newPassword
-    const value = event.target.value
-    this.setState(() => ({
-      confirmPassword: value,
-      passwordMismatched: value.length > 0 && newPassword !== value,
-      passwordMatched: value.length > 0 && newPassword === value,
-      continuePressed: false
-    }))
-  }
-  whatNext = () => {
-    this.setState(() => ({
-      continuePressed: true,
-      passwordMismatched:
-        this.state.newPassword.length > 0 &&
-        this.state.newPassword !== this.state.confirmPassword
-    }))
 
-    if (
-      this.state.passwordMatched &&
-      this.state.hasCases &&
-      this.state.hasNumber &&
-      this.state.validLength
-    ) {
-      this.props.setupData.password = this.state.newPassword
-      this.props.goToStep(
-        ProtectedAccoutStep.SECURITY_QUESTION,
-        this.props.setupData
-      )
-    }
-  }
-  render = () => {
-    const { intl } = this.props
-    const continueActionButton = (
-      <PrimaryButton
-        id="Continue"
-        onClick={this.whatNext}
-        disabled={
-          !this.state.hasCases ||
-          !this.state.hasNumber ||
-          !this.state.validLength
-        }
+  const continueActionButton = (
+    <PrimaryButton
+      id="Continue"
+      onClick={whatNext}
+      disabled={!hasCases || !hasNumber || !validLength}
+    >
+      {intl.formatMessage(buttonMessages.continueButton)}
+    </PrimaryButton>
+  )
+
+  return (
+    <>
+      <ActionPageLight
+        title={intl.formatMessage(messages.newPassword)}
+        hideBackground
+        goBack={() => {
+          goToStep(ProtectedAccoutStep.LANDING, setupData)
+        }}
       >
-        {intl.formatMessage(buttonMessages.continueButton)}
-      </PrimaryButton>
-    )
-    return (
-      <>
-        <ActionPageLight
-          title={intl.formatMessage(messages.newPassword)}
-          hideBackground
-          goBack={() => {
-            this.props.goToStep(
-              ProtectedAccoutStep.LANDING,
-              this.props.setupData
-            )
-          }}
+        <Content
+          title={intl.formatMessage(messages.header)}
+          subtitle={intl.formatMessage(messages.instruction)}
+          bottomActionButtons={[continueActionButton]}
         >
-          <Content
-            title={intl.formatMessage(messages.header)}
-            subtitle={intl.formatMessage(messages.instruction)}
-            bottomActionButtons={[continueActionButton]}
-          >
-            <GlobalError id="GlobalError">
-              {this.state.continuePressed && this.state.passwordMismatched && (
-                <WarningMessage>
-                  {intl.formatMessage(messages.mismatch)}
-                </WarningMessage>
-              )}
-              {this.state.continuePressed &&
-                this.state.newPassword.length === 0 && (
-                  <WarningMessage>
-                    {intl.formatMessage(messages.passwordRequired)}
-                  </WarningMessage>
-                )}
-            </GlobalError>
-            <PasswordContents>
-              <InputField
-                id="newPassword"
-                label={intl.formatMessage(messages.newPassword)}
+          <GlobalError id="GlobalError">
+            {continuePressed && passwordMismatched && (
+              <WarningMessage>
+                {intl.formatMessage(messages.mismatch)}
+              </WarningMessage>
+            )}
+            {continuePressed && newPassword.length === 0 && (
+              <WarningMessage>
+                {intl.formatMessage(messages.passwordRequired)}
+              </WarningMessage>
+            )}
+          </GlobalError>
+          <PasswordContents>
+            <InputField
+              id="newPassword"
+              label={intl.formatMessage(messages.newPassword)}
+              touched={true}
+              required={false}
+              optionalLabel=""
+            >
+              <TextInput
+                id="NewPassword"
+                type="password"
                 touched={true}
-                required={false}
-                optionalLabel=""
-              >
-                <TextInput
-                  id="NewPassword"
-                  type="password"
-                  touched={true}
-                  value={this.state.newPassword}
-                  onChange={this.checkPasswordStrength}
-                  error={
-                    this.state.continuePressed &&
-                    this.state.newPassword.length === 0
-                  }
-                />
-              </InputField>
-              <ValidationRulesSection>
-                <div>{intl.formatMessage(messages.validationMsg)}</div>
-                <div>
-                  {this.state.validLength && <TickOn />}
-                  {!this.state.validLength && <TickOff />}
-                  <span>
-                    {intl.formatMessage(messages.minLength, { min: 8 })}
-                  </span>
-                </div>
-                <div>
-                  {this.state.hasCases && <TickOn />}
-                  {!this.state.hasCases && <TickOff />}
-                  <span>{intl.formatMessage(messages.hasCases)}</span>
-                </div>
-                <div>
-                  {this.state.hasNumber && <TickOn />}
-                  {!this.state.hasNumber && <TickOff />}
-                  <span>{intl.formatMessage(messages.hasNumber)}</span>
-                </div>
-              </ValidationRulesSection>
+                value={newPassword}
+                onChange={checkPasswordStrength}
+                error={continuePressed && newPassword.length === 0}
+              />
+            </InputField>
+            <ValidationRulesSection>
+              <div>{intl.formatMessage(messages.validationMsg)}</div>
+              <div>
+                {validLength && <TickOn />}
+                {!validLength && <TickOff />}
+                <span>
+                  {intl.formatMessage(messages.minLength, { min: 8 })}
+                </span>
+              </div>
+              <div>
+                {hasCases && <TickOn />}
+                {!hasCases && <TickOff />}
+                <span>{intl.formatMessage(messages.hasCases)}</span>
+              </div>
+              <div>
+                {hasNumber && <TickOn />}
+                {!hasNumber && <TickOff />}
+                <span>{intl.formatMessage(messages.hasNumber)}</span>
+              </div>
+            </ValidationRulesSection>
 
-              <InputField
-                id="newPassword"
-                label={intl.formatMessage(messages.confirmPassword)}
+            <InputField
+              id="newPassword"
+              label={intl.formatMessage(messages.confirmPassword)}
+              touched={true}
+              required={false}
+              optionalLabel=""
+            >
+              <TextInput
+                id="ConfirmPassword"
+                type="password"
                 touched={true}
-                required={false}
-                optionalLabel=""
-              >
-                <TextInput
-                  id="ConfirmPassword"
-                  type="password"
-                  touched={true}
-                  error={
-                    this.state.continuePressed && this.state.passwordMismatched
-                  }
-                  value={this.state.confirmPassword}
-                  onChange={this.matchPassword}
-                />
-              </InputField>
-              {this.state.passwordMismatched && (
-                <PasswordMismatch>
-                  {intl.formatMessage(messages.mismatch)}
-                </PasswordMismatch>
-              )}
-              {this.state.passwordMatched && (
-                <PasswordMatch>
-                  {intl.formatMessage(messages.match)}
-                </PasswordMatch>
-              )}
-            </PasswordContents>
-          </Content>
-        </ActionPageLight>
-      </>
-    )
-  }
+                error={continuePressed && passwordMismatched}
+                value={confirmPassword}
+                onChange={matchPassword}
+              />
+            </InputField>
+            {passwordMismatched && (
+              <PasswordMismatch>
+                {intl.formatMessage(messages.mismatch)}
+              </PasswordMismatch>
+            )}
+            {passwordMatched && (
+              <PasswordMatch>
+                {intl.formatMessage(messages.match)}
+              </PasswordMatch>
+            )}
+          </PasswordContents>
+        </Content>
+      </ActionPageLight>
+    </>
+  )
 }
-
-export const CreatePassword = injectIntl(CreatePasswordComponent)
