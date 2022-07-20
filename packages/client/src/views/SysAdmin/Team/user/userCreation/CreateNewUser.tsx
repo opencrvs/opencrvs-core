@@ -83,6 +83,7 @@ const Container = styled.div`
 
 const SpinnerWrapper = styled.div`
   background: ${({ theme }) => theme.colors.white};
+  font: ${({ theme }) => theme.fonts.bold14};
   border: solid 1px ${({ theme }) => theme.colors.grey300};
   border-radius: 4px;
   width: 244px;
@@ -91,7 +92,6 @@ const SpinnerWrapper = styled.div`
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  font-weight: bold;
 `
 
 class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
