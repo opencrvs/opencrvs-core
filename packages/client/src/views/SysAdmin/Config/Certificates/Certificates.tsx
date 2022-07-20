@@ -289,7 +289,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     const userMgntUserID =
       this.props.userDetails && this.props.userDetails.userMgntUserID
     this.setState({
-      imageUploading: true
+      imageUploading: true,
+      imageLoadingError: ''
     })
     this.toggleNotification()
 
