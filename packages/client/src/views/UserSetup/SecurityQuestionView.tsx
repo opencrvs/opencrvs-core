@@ -28,6 +28,7 @@ import {
   IProtectedAccountSetupData,
   ISecurityQuestionAnswer
 } from '@client/components/ProtectedAccount'
+import { Content } from '@opencrvs/components/lib/interface/Content'
 
 const EMPTY_VALUE = ''
 const VISIBLE_QUESTION = 3
@@ -318,6 +319,7 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
     const { intl } = this.props
     return (
       <ActionPageLight
+        hideBackground
         goBack={() => {
           this.props.goToStep(
             ProtectedAccoutStep.PASSWORD,
@@ -326,11 +328,14 @@ class SecurityQuestionView extends React.Component<IProps, IState> {
         }}
         title={intl.formatMessage(messages.userFormSecurityQuestionsTitle)}
       >
-        <H4>{intl.formatMessage(messages.userFormSecurityQuestionsHeading)}</H4>
-        <P>
-          {intl.formatMessage(messages.userFormSecurityQuestionsDescription)}
-        </P>
-        {this.showQuestionnaire()}
+        <Content
+          title={intl.formatMessage(messages.userFormSecurityQuestionsHeading)}
+          subtitle={intl.formatMessage(
+            messages.userFormSecurityQuestionsDescription
+          )}
+        >
+          {this.showQuestionnaire()}
+        </Content>
       </ActionPageLight>
     )
   }
