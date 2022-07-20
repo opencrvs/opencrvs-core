@@ -18,7 +18,8 @@ import {
   IFormSection,
   IFormSectionData,
   LOCATION_SEARCH_INPUT,
-  SIMPLE_DOCUMENT_UPLOADER
+  SIMPLE_DOCUMENT_UPLOADER,
+  SUBSECTION
 } from '@client/forms'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import {
@@ -28,7 +29,8 @@ import {
 import {
   buttonMessages as messages,
   userMessages,
-  buttonMessages
+  buttonMessages,
+  constantsMessages
 } from '@client/i18n/messages'
 import {
   goBack,
@@ -75,6 +77,7 @@ import {
   IListViewItemSimplifiedProps
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import styled from 'styled-components'
+import { Content } from '@opencrvs/components/lib/interface/Content'
 
 export interface IUserReviewFormProps {
   userId?: string
@@ -134,17 +137,21 @@ class UserReviewFormComponent extends React.Component<
 > {
   transformSectionData = () => {
     const { intl, userFormSection } = this.props
+    let nameJoined = false,
+      fieldValue = ''
     const sections: ISectionData[] = []
     getVisibleSectionGroupsBasedOnConditions(
       userFormSection,
       this.props.formData
     ).forEach((group) => {
       group.fields.forEach((field: IFormField, idx) => {
-        if (field && field.type === FIELD_GROUP_TITLE) {
+        if (field.type == SUBSECTION) {
+          return
+        } else if (field && field.type === FIELD_GROUP_TITLE) {
           sections.push({ title: intl.formatMessage(field.label), items: [] })
         } else if (field && sections.length > 0) {
           if (field.name === 'username' && !this.getValue(field)) return
-          const label =
+          let label =
             field.type === SIMPLE_DOCUMENT_UPLOADER ? (
               <DocumentUploaderContainer>
                 <SimpleDocumentUploader
@@ -173,9 +180,18 @@ class UserReviewFormComponent extends React.Component<
               'hide'
             )
           ) {
+            fieldValue = this.getValue(field)
+
+            if (['firstNamesEng', 'familyNameEng'].includes(field.name)) {
+              if (nameJoined) return
+              label = intl.formatMessage(constantsMessages.name)
+              fieldValue = this.getName(group.fields)
+              nameJoined = true
+            }
+
             sections[sections.length - 1].items.push({
               label: <Label>{label}</Label>,
-              value: <Value id={`value_${idx}`}>{this.getValue(field)}</Value>,
+              value: <Value id={`value_${idx}`}>{fieldValue}</Value>,
               actions:
                 !(
                   field.name === 'registrationOffice' &&
@@ -232,6 +248,19 @@ class UserReviewFormComponent extends React.Component<
           : String(formData[field.name])
         : (formData[field.name] as IDynamicValues).label
       : ''
+  }
+
+  getName = (fields: IFormField[]) => {
+    const firstNamesEngField = fields.find(
+      (field) => field.name === 'firstNamesEng'
+    ) as IFormField
+    const familyNameEngField = fields.find(
+      (field) => field.name === 'familyNameEng'
+    ) as IFormField
+
+    return `${this.getValue(firstNamesEngField)} ${this.getValue(
+      familyNameEngField
+    )}`
   }
 
   render() {
@@ -295,34 +324,36 @@ class UserReviewFormComponent extends React.Component<
             : userDetails?.primaryOffice?.id &&
               goToTeamUserList(userDetails.primaryOffice.id)
         }
+        hideBackground={true}
       >
-        {!this.props.userId && (
+        {/* {!this.props.userId && (
           <FormTitle id={`${section.id}_title`}>
             {intl.formatMessage(section.name)}
           </FormTitle>
-        )}
-        <Container>
-          {this.transformSectionData().map((sec, index) => {
-            return (
-              <>
-                {sec.title && <Title>{sec.title}</Title>}
-                <ListViewSimplified>
-                  {sec.items.map((item, index) => {
-                    return (
-                      <ListViewItemSimplified
-                        key={index}
-                        label={item.label}
-                        value={item.value}
-                        actions={item.actions}
-                      />
-                    )
-                  })}
-                </ListViewSimplified>
-              </>
-            )
-          })}
-          <Action>{actionComponent}</Action>
-        </Container>
+        )} */}
+        <Content title={intl.formatMessage(section.name)}>
+          <Container>
+            {this.transformSectionData().map((sec, index) => {
+              return (
+                <>
+                  <ListViewSimplified>
+                    {sec.items.map((item, index) => {
+                      return (
+                        <ListViewItemSimplified
+                          key={index}
+                          label={item.label}
+                          value={item.value}
+                          actions={item.actions}
+                        />
+                      )
+                    })}
+                  </ListViewSimplified>
+                </>
+              )
+            })}
+            <Action>{actionComponent}</Action>
+          </Container>
+        </Content>
       </ActionPageLight>
     )
   }

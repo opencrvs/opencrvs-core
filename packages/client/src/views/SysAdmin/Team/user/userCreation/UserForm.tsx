@@ -42,6 +42,8 @@ import { connect } from 'react-redux'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
+import { Content } from '@opencrvs/components/lib/interface/Content'
+import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 
 export const FormTitle = styled.div`
   ${({ theme }) => theme.fonts.h1};
@@ -157,35 +159,34 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
           }
           goBack={this.handleBackAction}
           goHome={() => goToTeamUserList(String(formData.registrationOffice))}
+          hideBackground={true}
         >
-          <FormTitle id="form-title">
-            {userId
-              ? intl.formatMessage(sysAdminMessages.editUserCommonTitle)
-              : intl.formatMessage(activeGroup.title || section.title)}
-          </FormTitle>
-          <FormFieldGenerator
-            key={activeGroup.id}
-            id={section.id}
-            onChange={(values) => this.modifyData(values)}
-            setAllFieldsDirty={false}
-            fields={getVisibleGroupFields(activeGroup)}
-            onSetTouched={(setTouchedFunc) => {
-              this.setAllFormFieldsTouched = setTouchedFunc
-            }}
-            requiredErrorMessage={messages.requiredForNewUser}
-            onUploadingStateChanged={this.onUploadingStateChanged}
-          />
-          <Action>
-            <PrimaryButton
-              id="confirm_form"
-              onClick={this.handleFormAction}
-              disabled={
-                this.state.disableContinueOnLocation || this.state.fileUploading
-              }
-            >
-              {intl.formatMessage(buttonMessages.continueButton)}
-            </PrimaryButton>
-          </Action>
+          <Content title={intl.formatMessage(userFormMessages.userDetails)}>
+            <FormFieldGenerator
+              key={activeGroup.id}
+              id={section.id}
+              onChange={(values) => this.modifyData(values)}
+              setAllFieldsDirty={false}
+              fields={getVisibleGroupFields(activeGroup)}
+              onSetTouched={(setTouchedFunc) => {
+                this.setAllFormFieldsTouched = setTouchedFunc
+              }}
+              requiredErrorMessage={messages.requiredForNewUser}
+              onUploadingStateChanged={this.onUploadingStateChanged}
+            />
+            <Action>
+              <PrimaryButton
+                id="confirm_form"
+                onClick={this.handleFormAction}
+                disabled={
+                  this.state.disableContinueOnLocation ||
+                  this.state.fileUploading
+                }
+              >
+                {intl.formatMessage(buttonMessages.continueButton)}
+              </PrimaryButton>
+            </Action>
+          </Content>
         </ActionPageLight>
       </>
     )

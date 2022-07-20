@@ -80,14 +80,6 @@ export const userSectionFormType: ISerializedFormSection = {
       id: 'user-view-group',
       fields: [
         {
-          name: 'userDetails',
-          type: FIELD_GROUP_TITLE,
-          label: userFormMessages.userDetails,
-          required: false,
-          initialValue: '',
-          validate: []
-        },
-        {
           name: 'firstNamesEng',
           type: TEXT,
           label: userFormMessages.firstNameEn,
@@ -176,12 +168,17 @@ export const userSectionFormType: ISerializedFormSection = {
           }
         },
         {
-          name: 'accountDetails',
-          type: FIELD_GROUP_TITLE,
-          label: userFormMessages.accountDetails,
-          required: false,
+          name: 'seperator',
+          type: 'SUBSECTION',
+          label: {
+            defaultMessage: ' ',
+            description: 'empty string',
+            id: 'form.field.label.empty'
+          },
           initialValue: '',
-          validate: []
+          ignoreBottomMargin: true,
+          validate: [],
+          conditionals: []
         },
         {
           name: 'role',
