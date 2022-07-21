@@ -101,7 +101,6 @@
     "ts-node": "^6.1.1",
     "typescript": "^3.7.2",
     "vite": "^3.0.0",
-    "vite-plugin-html-env": "^1.1.3",
     "vite-plugin-svgr": "^0.3.0",
     "vite-tsconfig-paths": "^3.5.0",
     "workbox-cli": "^4.0.0-alpha.0"

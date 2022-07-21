@@ -26309,11 +26309,6 @@ vfile@^4.0.0:
     unist-util-stringify-position "^2.0.0"
     vfile-message "^2.0.0"
 
-vite-plugin-html-env@^1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/vite-plugin-html-env/-/vite-plugin-html-env-1.1.3.tgz#688e89d05844f7551fb279344dc097facf14ead9"
-  integrity sha512-PAcvFNVra9msL5YyLN46fFqKxHwc3hIhy60BROL71lG6zKBFdaK5jiCkuOSxGe9V4lL0TDfkbtP/11/fwC2RXw==
-
 vite-plugin-svgr@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/vite-plugin-svgr/-/vite-plugin-svgr-0.3.0.tgz#c81ac7541df98d361249f9ac06b901ae22744a1b"
