@@ -108,7 +108,7 @@ export const LeftNavigation = (props: ILeftNavigationProps) => {
       <Version>
         {props.warning}
         <span>OpenCRVS v1.0.0</span>
-        <span>{process.env.VITE_APP_VERSION || 'Development'}</span>
+        <span>{import.meta.env.VITE_APP_VERSION || 'Development'}</span>
       </Version>
     </LeftNavigationContainer>
   )
