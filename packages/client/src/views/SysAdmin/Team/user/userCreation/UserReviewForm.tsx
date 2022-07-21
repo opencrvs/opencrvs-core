@@ -326,11 +326,6 @@ class UserReviewFormComponent extends React.Component<
         }
         hideBackground={true}
       >
-        {/* {!this.props.userId && (
-          <FormTitle id={`${section.id}_title`}>
-            {intl.formatMessage(section.name)}
-          </FormTitle>
-        )} */}
         <Content title={intl.formatMessage(section.name)}>
           <Container>
             {this.transformSectionData().map((sec, index) => {

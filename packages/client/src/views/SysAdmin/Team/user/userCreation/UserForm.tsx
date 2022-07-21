@@ -148,6 +148,9 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   render = () => {
     const { section, intl, activeGroup, userId, formData, goToTeamUserList } =
       this.props
+    const title = activeGroup?.title
+      ? intl.formatMessage(activeGroup.title)
+      : ''
 
     return (
       <>
@@ -161,7 +164,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
           goHome={() => goToTeamUserList(String(formData.registrationOffice))}
           hideBackground={true}
         >
-          <Content title={intl.formatMessage(userFormMessages.userDetails)}>
+          <Content title={title}>
             <FormFieldGenerator
               key={activeGroup.id}
               id={section.id}

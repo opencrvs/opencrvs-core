@@ -78,6 +78,7 @@ export const userSectionFormType: ISerializedFormSection = {
     },
     {
       id: 'user-view-group',
+      title: userFormMessages.userDetails,
       fields: [
         {
           name: 'firstNamesEng',
