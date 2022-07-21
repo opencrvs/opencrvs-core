@@ -48,11 +48,6 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
     setVerifyCode(verifyCode)
     setIsInvalidLength(verifyCode.length === 6)
   }
-  const callChangePhoneMutation = (mutation: () => void) => {
-    if (!!phoneNumber && isInvalidLength) {
-      mutation()
-    }
-  }
   const restoreState = () => {
     setVerifyCode(EMPTY_STRING)
     setIsInvalidLength(false)
@@ -84,25 +79,35 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
         <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
-
-        <Mutation
+        <Mutation<
+          { changePhoneMutation: string | null },
+          {
+            userId: string
+            phoneNumber: string
+            nonce: string
+            verifyCode: string
+          }
+        >
           mutation={changePhoneMutation}
-          variables={{
-            userId: get(userDetails, 'userMgntUserID'),
-            phoneNumber: convertToMSISDN(phoneNumber),
-            nonce: nonce,
-            verifyCode: verifyCode
-          }}
           onCompleted={phoneChangeCompleted}
           onError={() => setErrorOccured(true)}
         >
-          {(changePhone: any) => {
+          {(changePhone) => {
             return (
               <PrimaryButton
                 id="verify-button"
                 key="verify"
                 onClick={() => {
-                  callChangePhoneMutation(changePhone)
+                  if (userDetails?.userMgntUserID) {
+                    changePhone({
+                      variables: {
+                        userId: userDetails.userMgntUserID,
+                        phoneNumber: convertToMSISDN(phoneNumber),
+                        nonce: nonce,
+                        verifyCode: verifyCode
+                      }
+                    })
+                  }
                 }}
                 disabled={!Boolean(verifyCode.length) || !isInvalidLength}
               >
