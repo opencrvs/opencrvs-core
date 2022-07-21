@@ -24,6 +24,10 @@ import { getUserNonce, getUserDetails } from '@client/profile/profileSelectors'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { modifyUserDetails } from '@client/profile/profileActions'
 import { Message } from '@client/views/Settings/items/components'
+import {
+  ChangePhoneMutationVariables,
+  ChangePasswordMutation
+} from '@client/utils/gateway'
 
 interface IProps {
   show: boolean
@@ -79,15 +83,7 @@ export function VerifyCodeView({ show, onSuccess, onClose, data }: IProps) {
         <TertiaryButton key="cancel" id="modal_cancel" onClick={onClose}>
           {intl.formatMessage(buttonMessages.cancel)}
         </TertiaryButton>,
-        <Mutation<
-          { changePhoneMutation: string | null },
-          {
-            userId: string
-            phoneNumber: string
-            nonce: string
-            verifyCode: string
-          }
-        >
+        <Mutation<ChangePasswordMutation, ChangePhoneMutationVariables>
           mutation={changePhoneMutation}
           onCompleted={phoneChangeCompleted}
           onError={() => setErrorOccured(true)}
