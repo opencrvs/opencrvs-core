@@ -28,6 +28,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "name": "Workflow passthrough",
@@ -85,6 +89,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "name": "Metrics passthrough",
@@ -142,6 +150,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "name": "New Birth Declaration",
@@ -213,6 +225,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "urlPattern": "^/events/birth/request-for-registrar-validation$",
@@ -284,6 +300,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "name": "Birth Waiting External Resource Validation",
@@ -355,6 +375,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "name": "Death Waiting External Resource Validation",
@@ -426,6 +450,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "name": "Birth Request Correction",
@@ -497,6 +525,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "name": "Death Request Correction",
@@ -568,6 +600,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "name": "Registrar Birth Registration Waiting External Resource Validation",
@@ -639,6 +675,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "name": "Registrar Death Registration Waiting External Resource Validation",
@@ -710,6 +750,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "urlPattern": "^/events/birth/mark-validated$",
@@ -781,6 +825,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "urlPattern": "^/events/birth/new-registration$",
@@ -852,6 +900,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "name": "Birth Registration",
@@ -938,6 +990,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "urlPattern": "^/events/birth/mark-certified$",
@@ -953,6 +1009,9 @@
       "alerts": [],
       "routes": [
         {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
           "name": "Metrics -> Birth Certification",
           "secured": false,
           "host": "metrics",
@@ -961,10 +1020,7 @@
           "pathTransform": "",
           "primary": false,
           "username": "",
-          "password": "",
-          "forwardAuthHeader": true,
-          "status": "enabled",
-          "type": "http"
+          "password": ""
         },
         {
           "type": "http",
@@ -1009,6 +1065,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -1080,6 +1140,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -1137,6 +1201,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -1194,6 +1262,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -1265,6 +1337,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "urlPattern": "^/events/death/mark-validated$",
@@ -1336,6 +1412,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -1407,6 +1487,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -1478,6 +1562,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -1549,6 +1637,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -1620,6 +1712,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -1691,6 +1787,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -1748,6 +1848,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -1803,6 +1907,12 @@
       "status": "disabled",
       "rewriteUrls": false,
       "addAutoRewriteRules": true,
+      "autoRetryEnabled": false,
+      "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "name": "Hearth passthrough",
@@ -1815,8 +1925,6 @@
       "tcpHost": null,
       "tcpPort": null,
       "priority": 2,
-      "autoRetryPeriodMinutes": 60,
-      "autoRetryEnabled": false,
       "rewriteUrlsConfig": [],
       "alerts": [],
       "routes": [
@@ -1862,6 +1970,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "urlPattern": "^/events/birth/in-progress-declaration$",
@@ -1933,6 +2045,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -1979,7 +2095,9 @@
       "name": "New Death InProgress"
     },
     {
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -2024,13 +2142,15 @@
       "tcpHost": null,
       "tcpPort": null,
       "updatedBy": {
-        "id": "5da5b440fb88a30011a2439c",
+        "id": "62d7ed94241dcd0013134436",
         "name": "Super User"
       },
       "alerts": []
     },
     {
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -2075,13 +2195,15 @@
       "tcpHost": null,
       "tcpPort": null,
       "updatedBy": {
-        "id": "5da5b440fb88a30011a2439c",
+        "id": "62d7ed94241dcd0013134436",
         "name": "Super User"
       },
       "alerts": []
     },
     {
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -2097,7 +2219,7 @@
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
       "updatedBy": {
-        "id": "5da5b440fb88a30011a2439c",
+        "id": "62d7ed94241dcd0013134436",
         "name": "Super User"
       },
       "routes": [
@@ -2132,7 +2254,9 @@
       "name": "DHIS2 death notification mediator"
     },
     {
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -2147,6 +2271,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "urlPattern": "^/token/create",
@@ -2179,7 +2307,9 @@
       "priority": 1
     },
     {
-      "methods": ["GET"],
+      "methods": [
+        "GET"
+      ],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -2194,6 +2324,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "requestBody": true,
       "responseBody": true,
       "urlPattern": "^/nid/information",
@@ -2228,7 +2362,9 @@
     {
       "methods": [],
       "type": "polling",
-      "allow": ["queue-trigger"],
+      "allow": [
+        "queue-trigger"
+      ],
       "whitelist": [],
       "authType": "private",
       "matchContentTypes": [],
@@ -2270,7 +2406,7 @@
       "tcpHost": null,
       "tcpPort": null,
       "updatedBy": {
-        "id": "5db9eba64ccab800129d6155",
+        "id": "62d7ed94241dcd0013134436",
         "name": "Super User"
       },
       "alerts": [],
@@ -2279,7 +2415,9 @@
     {
       "methods": [],
       "type": "polling",
-      "allow": ["queue-trigger"],
+      "allow": [
+        "queue-trigger"
+      ],
       "whitelist": [],
       "authType": "private",
       "matchContentTypes": [],
@@ -2321,14 +2459,16 @@
       "tcpHost": null,
       "tcpPort": null,
       "updatedBy": {
-        "id": "5db9eba64ccab800129d6155",
+        "id": "62d7ed94241dcd0013134436",
         "name": "Super User"
       },
       "alerts": [],
       "priority": 1
     },
     {
-      "methods": ["POST"],
+      "methods": [
+        "POST"
+      ],
       "type": "http",
       "allow": [],
       "whitelist": [],
@@ -2373,7 +2513,7 @@
       "tcpHost": null,
       "tcpPort": null,
       "updatedBy": {
-        "id": "5ddfd8e9deb4360011a4dcb3",
+        "id": "62d7ed94241dcd0013134436",
         "name": "Super User"
       },
       "alerts": []
@@ -2404,6 +2544,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -2461,6 +2605,10 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
       "routes": [
         {
           "type": "http",
@@ -2547,11 +2695,65 @@
       "tcpHost": null,
       "tcpPort": null,
       "updatedBy": {
-        "id": "5f47a881a28a0900124bab8e",
+        "id": "62d7ed94241dcd0013134436",
         "name": "Super User"
       },
       "alerts": [],
       "priority": 1
+    },
+    {
+      "methods": [
+        "POST"
+      ],
+      "type": "http",
+      "allow": [],
+      "whitelist": [],
+      "authType": "public",
+      "matchContentTypes": [],
+      "properties": [],
+      "txViewAcl": [],
+      "txViewFullAcl": [],
+      "txRerunAcl": [],
+      "status": "enabled",
+      "rewriteUrls": false,
+      "addAutoRewriteRules": true,
+      "autoRetryEnabled": false,
+      "autoRetryPeriodMinutes": 60,
+      "routes": [
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": false,
+          "name": "Confirm Registration",
+          "secured": false,
+          "host": "workflow",
+          "port": 5050,
+          "path": "/confirm/registration",
+          "pathTransform": "",
+          "primary": true,
+          "username": "",
+          "password": ""
+        }
+      ],
+      "requestBody": true,
+      "responseBody": true,
+      "rewriteUrlsConfig": [],
+      "name": "Confirm Registration",
+      "description": "route confirm registration payload to OpenCrvsCore",
+      "urlPattern": "^/confirm/registration$",
+      "priority": 1,
+      "matchContentRegex": null,
+      "matchContentXpath": null,
+      "matchContentValue": null,
+      "matchContentJson": null,
+      "pollingSchedule": null,
+      "tcpHost": null,
+      "tcpPort": null,
+      "updatedBy": {
+        "id": "62d7ed94241dcd0013134436",
+        "name": "Super User"
+      },
+      "alerts": []
     }
   ],
   "Mediators": [],

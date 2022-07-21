@@ -10,9 +10,9 @@
 set -e
 
 # Read environment variable file for the environment
-# .env.qa
-# .env.development
-# .env.production
+# .env.development.qa
+# .env.development.development
+# .env.development.production
 if [ -f .env.$4 ]
 then
     export $(cat .env.$4 | sed 's/#.*//g' | xargs)

@@ -14,7 +14,7 @@ build
 
 # misc
 .DS_Store
-.env*
+.env.development
 *.log
 .secrets/*
 # But, keep the .gitignore so the folder is created
