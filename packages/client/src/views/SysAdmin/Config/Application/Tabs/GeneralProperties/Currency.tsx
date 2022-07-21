@@ -38,11 +38,11 @@ import {
   callApplicationConfigMutation,
   getCurrencyObject,
   getCurrencySelectOptions,
-  ICurrency
+  ICurrency,
+  NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { lookup } from 'country-data'
-import { isString } from 'lodash'
 
 export function Currency() {
   const intl = useIntl()
@@ -53,14 +53,13 @@ export function Currency() {
   const [currency, setCurrency] = React.useState(
     `${offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${offlineCountryConfiguration.config.CURRENCY.isoCode}`
   )
-  const [isValueUpdating, setIsValueUpdating] = React.useState(false)
   const [showModal, setShowModal] = React.useState(false)
   const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] = React.useState<
-    'idle' | 'success' | 'error'
-  >('idle')
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
 
   async function applicationCurrencyMutationHandler() {
+    toggleModal()
     try {
       await callApplicationConfigMutation(
         GeneralActionId.CURRENCY,
@@ -70,13 +69,11 @@ export function Currency() {
         },
         offlineCountryConfiguration,
         dispatch,
-        setIsValueUpdating
+        setNotificationStatus
       )
-      setNotificationStatus('success')
+      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
-      setNotificationStatus('error')
-    } finally {
-      toggleModal()
+      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     }
   }
   const id = GeneralActionId.CURRENCY
@@ -114,7 +111,10 @@ export function Currency() {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={!Boolean(currency)}
+            disabled={
+              !Boolean(currency) ||
+              notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            }
             onClick={() => {
               applicationCurrencyMutationHandler()
             }}
@@ -149,16 +149,20 @@ export function Currency() {
       <FloatingNotification
         id="currencyNotification"
         type={
-          notificationStatus === 'success'
+          notificationStatus === NOTIFICATION_STATUS.SUCCESS
             ? NOTIFICATION_TYPE.SUCCESS
+            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? NOTIFICATION_TYPE.IN_PROGRESS
             : NOTIFICATION_TYPE.ERROR
         }
-        show={notificationStatus !== 'idle'}
+        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
         callback={() => {
-          setNotificationStatus('idle')
+          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
         }}
       >
-        {notificationStatus === 'success'
+        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
           ? intl.formatMessage(messages.applicationCurrencyChangeNotification)
           : intl.formatMessage(messages.applicationConfigChangeError)}
       </FloatingNotification>

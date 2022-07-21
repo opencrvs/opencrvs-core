@@ -33,7 +33,8 @@ import { buttonMessages } from '@client/i18n/messages'
 import { getOfflineData } from '@client/offline/selectors'
 import {
   callApplicationConfigMutation,
-  isValidRegEx
+  isValidRegEx,
+  NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { EMPTY_STRING } from '@client/utils/constants'
@@ -49,12 +50,10 @@ export function NIDNumPattern() {
     String(offlineCountryConfiguration.config.NID_NUMBER_PATTERN)
   )
   const [nidExample, setNidExample] = React.useState(EMPTY_STRING)
-  const [isValueUpdating, setIsValueUpdating] = React.useState(false)
   const [showModal, setShowModal] = React.useState(false)
   const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] = React.useState<
-    'idle' | 'success' | 'error'
-  >('idle')
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
 
   const handleNIDPattern = (event: React.ChangeEvent<HTMLInputElement>) => {
     const pattern = event.target.value
@@ -68,6 +67,7 @@ export function NIDNumPattern() {
 
   async function nidNumberPatternMutationHandler() {
     try {
+      toggleModal()
       await callApplicationConfigMutation(
         GeneralActionId.NID_NUMBER_PATTERN,
         {
@@ -76,13 +76,11 @@ export function NIDNumPattern() {
         },
         offlineCountryConfiguration,
         dispatch,
-        setIsValueUpdating
+        setNotificationStatus
       )
-      setNotificationStatus('success')
+      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
-      setNotificationStatus('error')
-    } finally {
-      toggleModal()
+      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     }
   }
   const id = GeneralActionId.NID_NUMBER_PATTERN
@@ -120,7 +118,11 @@ export function NIDNumPattern() {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={!isValidRegEx(nidPattern) || !Boolean(nidPattern)}
+            disabled={
+              !isValidRegEx(nidPattern) ||
+              !Boolean(nidPattern) ||
+              notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            }
             onClick={() => {
               nidNumberPatternMutationHandler()
             }}
@@ -149,16 +151,20 @@ export function NIDNumPattern() {
       <FloatingNotification
         id="nidPatternNotification"
         type={
-          notificationStatus === 'success'
+          notificationStatus === NOTIFICATION_STATUS.SUCCESS
             ? NOTIFICATION_TYPE.SUCCESS
+            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? NOTIFICATION_TYPE.IN_PROGRESS
             : NOTIFICATION_TYPE.ERROR
         }
-        show={notificationStatus !== 'idle'}
+        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
         callback={() => {
-          setNotificationStatus('idle')
+          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
         }}
       >
-        {notificationStatus === 'success'
+        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
           ? intl.formatMessage(messages.nidPatternChangeNotification)
           : intl.formatMessage(messages.applicationConfigChangeError)}
       </FloatingNotification>

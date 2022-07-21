@@ -38,10 +38,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import {
   callApplicationConfigMutation,
   getCurrency,
-  getFormattedFee
+  getFormattedFee,
+  NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { isString } from 'lodash'
 import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
 
 export function BirthFeeOnTime() {
@@ -50,12 +50,10 @@ export function BirthFeeOnTime() {
   const offlineCountryConfiguration = useSelector((store: IStoreState) =>
     getOfflineData(store)
   )
-  const [isValueUpdating, setIsValueUpdating] = React.useState(false)
   const [showModal, setShowModal] = React.useState(false)
   const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] = React.useState<
-    'idle' | 'success' | 'error'
-  >('idle')
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const [birthOnTimeFee, setBirthOnTimeFee] = React.useState(
     offlineCountryConfiguration.config.BIRTH.FEE.ON_TIME.toLocaleString()
   )
@@ -65,6 +63,7 @@ export function BirthFeeOnTime() {
   }
 
   async function birthFeeOnTimeMutationHandler() {
+    toggleModal()
     try {
       await callApplicationConfigMutation(
         BirthActionId.BIRTH_ON_TIME_FEE,
@@ -84,13 +83,11 @@ export function BirthFeeOnTime() {
         },
         offlineCountryConfiguration,
         dispatch,
-        setIsValueUpdating
+        setNotificationStatus
       )
-      setNotificationStatus('success')
+      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
-      setNotificationStatus('error')
-    } finally {
-      toggleModal()
+      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     }
   }
   const item = {
@@ -136,7 +133,10 @@ export function BirthFeeOnTime() {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={!Boolean(birthOnTimeFee)}
+            disabled={
+              !Boolean(birthOnTimeFee) ||
+              notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            }
             onClick={() => {
               birthFeeOnTimeMutationHandler()
             }}
@@ -171,16 +171,20 @@ export function BirthFeeOnTime() {
       <FloatingNotification
         id={`${id}_notification`}
         type={
-          notificationStatus === 'success'
+          notificationStatus === NOTIFICATION_STATUS.SUCCESS
             ? NOTIFICATION_TYPE.SUCCESS
+            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? NOTIFICATION_TYPE.IN_PROGRESS
             : NOTIFICATION_TYPE.ERROR
         }
-        show={notificationStatus !== 'idle'}
+        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
         callback={() => {
-          setNotificationStatus('idle')
+          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
         }}
       >
-        {notificationStatus === 'success'
+        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
           ? intl.formatMessage(
               messages.applicationBirthOnTimeFeeChangeNotification
             )

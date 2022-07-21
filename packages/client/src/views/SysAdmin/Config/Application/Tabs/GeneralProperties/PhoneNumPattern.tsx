@@ -33,7 +33,8 @@ import { buttonMessages } from '@client/i18n/messages'
 import { getOfflineData } from '@client/offline/selectors'
 import {
   callApplicationConfigMutation,
-  isValidRegEx
+  isValidRegEx,
+  NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { EMPTY_STRING } from '@client/utils/constants'
@@ -50,12 +51,10 @@ export function PhoneNumPattern() {
   )
   const [phoneNumberExample, setPhoneNumberExample] =
     React.useState(EMPTY_STRING)
-  const [isValueUpdating, setIsValueUpdating] = React.useState(false)
   const [showModal, setShowModal] = React.useState(false)
   const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] = React.useState<
-    'idle' | 'success' | 'error'
-  >('idle')
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
 
   const handlePhoneNumberPattern = (
     event: React.ChangeEvent<HTMLInputElement>
@@ -73,6 +72,7 @@ export function PhoneNumPattern() {
 
   async function phoneNumberPatternMutationHandler() {
     try {
+      toggleModal()
       await callApplicationConfigMutation(
         GeneralActionId.PHONE_NUMBER_PATTERN,
         {
@@ -81,13 +81,11 @@ export function PhoneNumPattern() {
         },
         offlineCountryConfiguration,
         dispatch,
-        setIsValueUpdating
+        setNotificationStatus
       )
-      setNotificationStatus('success')
+      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
-      setNotificationStatus('error')
-    } finally {
-      toggleModal()
+      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     }
   }
   const id = GeneralActionId.PHONE_NUMBER_PATTERN
@@ -126,7 +124,9 @@ export function PhoneNumPattern() {
             key="apply"
             id="apply_change"
             disabled={
-              !isValidRegEx(phoneNumberPattern) || !Boolean(phoneNumberPattern)
+              !isValidRegEx(phoneNumberPattern) ||
+              !Boolean(phoneNumberPattern) ||
+              notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
             }
             onClick={() => {
               phoneNumberPatternMutationHandler()
@@ -156,16 +156,20 @@ export function PhoneNumPattern() {
       <FloatingNotification
         id="print-cert-notification"
         type={
-          notificationStatus === 'success'
+          notificationStatus === NOTIFICATION_STATUS.SUCCESS
             ? NOTIFICATION_TYPE.SUCCESS
+            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? NOTIFICATION_TYPE.IN_PROGRESS
             : NOTIFICATION_TYPE.ERROR
         }
-        show={notificationStatus !== 'idle'}
+        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
         callback={() => {
-          setNotificationStatus('idle')
+          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
         }}
       >
-        {notificationStatus === 'success'
+        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
           ? intl.formatMessage(messages.phoneNumberChangeNotification)
           : intl.formatMessage(messages.applicationConfigChangeError)}
       </FloatingNotification>

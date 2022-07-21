@@ -38,10 +38,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import {
   callApplicationConfigMutation,
   getCurrency,
-  getFormattedFee
+  getFormattedFee,
+  NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { isString } from 'lodash'
 import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
 
 export function DeathFeeOnTime() {
@@ -50,12 +50,10 @@ export function DeathFeeOnTime() {
   const offlineCountryConfiguration = useSelector((store: IStoreState) =>
     getOfflineData(store)
   )
-  const [isValueUpdating, setIsValueUpdating] = React.useState(false)
   const [showModal, setShowModal] = React.useState(false)
   const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] = React.useState<
-    'idle' | 'success' | 'error'
-  >('idle')
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const [deathOnTimeFee, setDeathOnTimeFee] = React.useState(
     offlineCountryConfiguration.config.DEATH.FEE.ON_TIME.toLocaleString()
   )
@@ -65,6 +63,7 @@ export function DeathFeeOnTime() {
   }
 
   async function deathFeeOnTimeMutationHandler() {
+    toggleModal()
     try {
       await callApplicationConfigMutation(
         DeathActionId.DEATH_ON_TIME_FEE,
@@ -81,13 +80,11 @@ export function DeathFeeOnTime() {
         },
         offlineCountryConfiguration,
         dispatch,
-        setIsValueUpdating
+        setNotificationStatus
       )
-      setNotificationStatus('success')
+      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
-      setNotificationStatus('error')
-    } finally {
-      toggleModal()
+      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     }
   }
   const item = {
@@ -133,7 +130,10 @@ export function DeathFeeOnTime() {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={!Boolean(deathOnTimeFee)}
+            disabled={
+              !Boolean(deathOnTimeFee) ||
+              notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            }
             onClick={() => {
               deathFeeOnTimeMutationHandler()
             }}
@@ -168,16 +168,20 @@ export function DeathFeeOnTime() {
       <FloatingNotification
         id={`${id}_notification`}
         type={
-          notificationStatus === 'success'
+          notificationStatus === NOTIFICATION_STATUS.SUCCESS
             ? NOTIFICATION_TYPE.SUCCESS
+            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? NOTIFICATION_TYPE.IN_PROGRESS
             : NOTIFICATION_TYPE.ERROR
         }
-        show={notificationStatus !== 'idle'}
+        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
         callback={() => {
-          setNotificationStatus('idle')
+          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
         }}
       >
-        {notificationStatus === 'success'
+        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
           ? intl.formatMessage(
               messages.applicationDeathOnTimeFeeChangeNotification
             )

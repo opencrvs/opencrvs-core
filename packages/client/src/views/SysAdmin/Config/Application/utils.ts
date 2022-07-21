@@ -72,6 +72,13 @@ export type IDeath = {
   }
 }
 
+export enum NOTIFICATION_STATUS {
+  SUCCESS = 'success',
+  IDLE = 'idle',
+  IN_PROGRESS = 'inProgress',
+  ERROR = 'error'
+}
+
 export const getCurrency = (offlineCountryConfiguration: IOfflineData) => {
   const currency = new Intl.NumberFormat(
     offlineCountryConfiguration.config.CURRENCY.languagesAndCountry,
@@ -190,10 +197,10 @@ export async function callApplicationConfigMutation(
   appConfig: IApplicationConfig,
   offlineCountryConfiguration: IOfflineData,
   dispatch: Dispatch,
-  setIsValueUpdating: (value: boolean) => void
+  setNotificationStatus: (status: NOTIFICATION_STATUS) => void
 ) {
   try {
-    setIsValueUpdating(true)
+    setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
     const res = await configApplicationMutations.mutateApplicationConfig(
       isGeneralOrConfigAction(configProperty)
         ? {
@@ -205,7 +212,7 @@ export async function callApplicationConfigMutation(
     )
     if (res && res.data) {
       const updatedConfigs = res.data.updateApplicationConfig
-      setIsValueUpdating(false)
+      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
       const offlineConfig = {
         config: {
           ...offlineCountryConfiguration.config,

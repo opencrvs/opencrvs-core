@@ -37,7 +37,8 @@ import { buttonMessages } from '@client/i18n/messages'
 import { getOfflineData } from '@client/offline/selectors'
 import {
   callApplicationConfigMutation,
-  isWithinFileLength
+  isWithinFileLength,
+  NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
@@ -45,7 +46,6 @@ import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfi
 import { IAttachmentValue } from '@client/forms'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
-import { isString } from 'lodash'
 
 export function GovtLogo() {
   const intl = useIntl()
@@ -55,7 +55,6 @@ export function GovtLogo() {
   )
   const [logoFileName, setLogoFileName] = React.useState(EMPTY_STRING)
   const [errorOccured, setErrorOccured] = React.useState(false)
-  const [isValueUpdating, setIsValueUpdating] = React.useState(false)
   const [errorMessages, setErrorMessages] = React.useState(EMPTY_STRING)
   const [govtLogo, setGovtLogo] = React.useState(EMPTY_STRING)
   const [isFileUploading, setIsFileUploading] = React.useState(false)
@@ -68,9 +67,8 @@ export function GovtLogo() {
     type: EMPTY_STRING,
     data: EMPTY_STRING
   })
-  const [notificationStatus, setNotificationStatus] = React.useState<
-    'idle' | 'success' | 'error'
-  >('idle')
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const handleGovtLogo = (data: string) => {
     setGovtLogo(data)
   }
@@ -88,7 +86,7 @@ export function GovtLogo() {
 
   async function govtLogoMutationHandler() {
     if (isWithinFileLength(govtLogo as string) === false) {
-      setNotificationStatus('error')
+      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
       setErrorMessages(intl.formatMessage(messages.govtLogoFileLimitError))
       setGovtLogo(EMPTY_STRING)
       handleLogoFile({
@@ -98,6 +96,7 @@ export function GovtLogo() {
       })
     }
     try {
+      toggleModal()
       await callApplicationConfigMutation(
         GeneralActionId.COUNTRY_LOGO,
         {
@@ -109,14 +108,12 @@ export function GovtLogo() {
         },
         offlineCountryConfiguration,
         dispatch,
-        setIsValueUpdating
+        setNotificationStatus
       )
-      setNotificationStatus('success')
+      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
-      setNotificationStatus('error')
+      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
       setErrorMessages(intl.formatMessage(messages.govtLogoChangeNotification))
-    } finally {
-      toggleModal()
     }
   }
   const id = GeneralActionId.COUNTRY_LOGO
@@ -153,7 +150,10 @@ export function GovtLogo() {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={!Boolean(govtLogo)}
+            disabled={
+              !Boolean(govtLogo) ||
+              notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            }
             onClick={() => {
               govtLogoMutationHandler()
             }}
@@ -197,16 +197,20 @@ export function GovtLogo() {
       <FloatingNotification
         id="print-cert-notification"
         type={
-          notificationStatus === 'success'
+          notificationStatus === NOTIFICATION_STATUS.SUCCESS
             ? NOTIFICATION_TYPE.SUCCESS
+            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? NOTIFICATION_TYPE.IN_PROGRESS
             : NOTIFICATION_TYPE.ERROR
         }
-        show={notificationStatus !== 'idle'}
+        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
         callback={() => {
-          setNotificationStatus('idle')
+          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
         }}
       >
-        {notificationStatus === 'success'
+        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
           ? intl.formatMessage(messages.govtLogoChangeNotification)
           : errorMessages}
       </FloatingNotification>

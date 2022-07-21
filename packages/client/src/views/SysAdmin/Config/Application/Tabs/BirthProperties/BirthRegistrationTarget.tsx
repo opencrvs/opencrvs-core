@@ -35,9 +35,11 @@ import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
 import { buttonMessages } from '@client/i18n/messages'
 import { getOfflineData } from '@client/offline/selectors'
-import { callApplicationConfigMutation } from '@client/views/SysAdmin/Config/Application/utils'
+import {
+  callApplicationConfigMutation,
+  NOTIFICATION_STATUS
+} from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { isString } from 'lodash'
 
 export function BirthRegistrationTarget() {
   const intl = useIntl()
@@ -45,12 +47,10 @@ export function BirthRegistrationTarget() {
   const offlineCountryConfiguration = useSelector((store: IStoreState) =>
     getOfflineData(store)
   )
-  const [isValueUpdating, setIsValueUpdating] = React.useState(false)
   const [showModal, setShowModal] = React.useState(false)
   const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] = React.useState<
-    'idle' | 'success' | 'error'
-  >('idle')
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const birthLateRegistrationTarget =
     offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET
   const [birthRegistrationTarget, setBirthRegistrationTarget] = React.useState(
@@ -67,6 +67,7 @@ export function BirthRegistrationTarget() {
   }
 
   async function birthRegTargetMutationHandler() {
+    toggleModal()
     try {
       await callApplicationConfigMutation(
         BirthActionId.BIRTH_REGISTRATION_TARGET,
@@ -87,13 +88,11 @@ export function BirthRegistrationTarget() {
         },
         offlineCountryConfiguration,
         dispatch,
-        setIsValueUpdating
+        setNotificationStatus
       )
-      setNotificationStatus('success')
+      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
-      setNotificationStatus('error')
-    } finally {
-      toggleModal()
+      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     }
   }
   const item = {
@@ -138,7 +137,10 @@ export function BirthRegistrationTarget() {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={!Boolean(birthRegistrationTarget)}
+            disabled={
+              !Boolean(birthRegistrationTarget) ||
+              notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            }
             onClick={() => {
               birthRegTargetMutationHandler()
             }}
@@ -175,16 +177,20 @@ export function BirthRegistrationTarget() {
       <FloatingNotification
         id="birthRegTargetnotification"
         type={
-          notificationStatus === 'success'
+          notificationStatus === NOTIFICATION_STATUS.SUCCESS
             ? NOTIFICATION_TYPE.SUCCESS
+            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? NOTIFICATION_TYPE.IN_PROGRESS
             : NOTIFICATION_TYPE.ERROR
         }
-        show={notificationStatus !== 'idle'}
+        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
         callback={() => {
-          setNotificationStatus('idle')
+          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
         }}
       >
-        {notificationStatus === 'success'
+        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
           ? intl.formatMessage(
               messages.applicationBirthRegTargetChangeNotification
             )

@@ -35,7 +35,10 @@ import {
   ListViewSimplified,
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
-import { callApplicationConfigMutation } from '@client/views/SysAdmin/Config/Application/utils'
+import {
+  callApplicationConfigMutation,
+  NOTIFICATION_STATUS
+} from '@client/views/SysAdmin/Config/Application/utils'
 import { Alert } from '@opencrvs/components/lib/icons/Alert'
 import { messages as configMessages } from '@client/i18n/messages/views/config'
 import { IApplicationConfig } from '@client/utils/referenceApi'
@@ -99,7 +102,8 @@ function FormConfigSettingsComponent() {
   const [showNotification, setShowNotification] = React.useState(false)
   const [notificationMessages, setNotificationMessages] =
     React.useState(EMPTY_STRING)
-  const [isValueUpdating, setIsValueUpdating] = React.useState(false)
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
 
   const changeValue = async () => {
     if (
@@ -121,7 +125,7 @@ function FormConfigSettingsComponent() {
               },
           offlineCountryConfiguration,
           dispatch,
-          setIsValueUpdating
+          setNotificationStatus
         )
         toggleConfigModal()
         setShowNotification(true)
@@ -217,6 +221,7 @@ function FormConfigSettingsComponent() {
           <PrimaryButton
             id="apply"
             key="apply"
+            disabled={notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS}
             onClick={() => {
               changeValue()
             }}
@@ -289,7 +294,11 @@ function FormConfigSettingsComponent() {
       </ResponsiveModal>
       <FloatingNotification
         id="form-settings-notification"
-        type={NOTIFICATION_TYPE.SUCCESS}
+        type={
+          notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? NOTIFICATION_TYPE.IN_PROGRESS
+            : NOTIFICATION_TYPE.SUCCESS
+        }
         show={showNotification}
         callback={() => {
           setShowNotification(false)

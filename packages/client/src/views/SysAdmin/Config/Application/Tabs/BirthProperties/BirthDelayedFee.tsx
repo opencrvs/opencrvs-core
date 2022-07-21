@@ -38,10 +38,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import {
   callApplicationConfigMutation,
   getCurrency,
-  getFormattedFee
+  getFormattedFee,
+  NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { isString } from 'lodash'
 import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
 
 export function BirthDelayedFee() {
@@ -50,12 +50,10 @@ export function BirthDelayedFee() {
   const offlineCountryConfiguration = useSelector((store: IStoreState) =>
     getOfflineData(store)
   )
-  const [isValueUpdating, setIsValueUpdating] = React.useState(false)
   const [showModal, setShowModal] = React.useState(false)
   const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] = React.useState<
-    'idle' | 'success' | 'error'
-  >('idle')
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const [birthDelayedFee, setBirthDelayedFee] = React.useState(
     offlineCountryConfiguration.config.BIRTH.FEE.DELAYED.toLocaleString()
   )
@@ -68,6 +66,7 @@ export function BirthDelayedFee() {
   }
 
   async function birthDelayedFeeMutationHandler() {
+    toggleModal()
     try {
       await callApplicationConfigMutation(
         BirthActionId.BIRTH_LATE_FEE,
@@ -87,13 +86,11 @@ export function BirthDelayedFee() {
         },
         offlineCountryConfiguration,
         dispatch,
-        setIsValueUpdating
+        setNotificationStatus
       )
-      setNotificationStatus('success')
+      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
-      setNotificationStatus('error')
-    } finally {
-      toggleModal()
+      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     }
   }
   const item = {
@@ -139,7 +136,10 @@ export function BirthDelayedFee() {
           <ApplyButton
             key="apply"
             id="apply_change"
-            disabled={!Boolean(birthDelayedFee)}
+            disabled={
+              !Boolean(birthDelayedFee) ||
+              notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            }
             onClick={() => {
               birthDelayedFeeMutationHandler()
             }}
@@ -174,16 +174,20 @@ export function BirthDelayedFee() {
       <FloatingNotification
         id={`${id}_notification`}
         type={
-          notificationStatus === 'success'
+          notificationStatus === NOTIFICATION_STATUS.SUCCESS
             ? NOTIFICATION_TYPE.SUCCESS
+            : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+            ? NOTIFICATION_TYPE.IN_PROGRESS
             : NOTIFICATION_TYPE.ERROR
         }
-        show={notificationStatus !== 'idle'}
+        show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
         callback={() => {
-          setNotificationStatus('idle')
+          setNotificationStatus(NOTIFICATION_STATUS.IDLE)
         }}
       >
-        {notificationStatus === 'success'
+        {notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
+          ? intl.formatMessage(messages.applicationConfigUpdatingMessage)
+          : notificationStatus === NOTIFICATION_STATUS.SUCCESS
           ? intl.formatMessage(
               messages.applicationBirthDelayedFeeChangeNotification
             )

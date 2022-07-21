@@ -98,102 +98,55 @@ function GeneralTabContent() {
 
 function BirthTabContent() {
   const intl = useIntl()
-  const sections: ISection[] = [
-    {
-      title: (
-        <ListGroupTitle>
-          {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
-        </ListGroupTitle>
-      )
-    },
-    {
-      title: (
-        <ListGroupTitle>
-          {intl.formatMessage(messages.registrationFeesGroupTitle)}
-        </ListGroupTitle>
-      )
-    }
-  ]
-
   return (
     <>
-      {sections.map((section, idx) => (
-        <>
-          {section.title}
-          <ListViewSimplified key={idx}>
-            {idx === 0 && (
-              <>
-                <BirthRegistrationTarget />
-                <BirthLateRegistrationPeriod />
-                <BirthDelayedRegistrationTarget />
-              </>
-            )}
+      <ListGroupTitle>
+        {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
+      </ListGroupTitle>
+      <ListViewSimplified>
+        <BirthRegistrationTarget />
+        <BirthLateRegistrationPeriod />
+        <BirthDelayedRegistrationTarget />
+      </ListViewSimplified>
 
-            {idx === 1 && (
-              <>
-                <BirthFeeOnTime />
-                <BirthLateFee />
-                <BirthDelayedFee />
-              </>
-            )}
-          </ListViewSimplified>
-        </>
-      ))}
+      <ListGroupTitle>
+        {intl.formatMessage(messages.registrationFeesGroupTitle)}
+      </ListGroupTitle>
+      <ListViewSimplified>
+        <BirthFeeOnTime />
+        <BirthLateFee />
+        <BirthDelayedFee />
+      </ListViewSimplified>
     </>
   )
 }
 
 function DeathTabContent() {
   const intl = useIntl()
-  const sections: ISection[] = [
-    {
-      title: (
-        <ListGroupTitle>
-          {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
-        </ListGroupTitle>
-      )
-    },
-    {
-      title: (
-        <ListGroupTitle>
-          {intl.formatMessage(messages.registrationFeesGroupTitle)}
-        </ListGroupTitle>
-      )
-    }
-  ]
 
   return (
     <>
-      {sections.map((section, idx) => (
-        <>
-          {section.title}
-          <ListViewSimplified key={idx}>
-            {idx === 0 && (
-              <>
-                <DeathRegistrationTarget />
-                <DeathDelayedRegistrationTarget />
-              </>
-            )}
-            {idx === 1 && (
-              <>
-                <DeathFeeOnTime />
-                <DeathDelayedFee />
-              </>
-            )}
-          </ListViewSimplified>
-        </>
-      ))}
+      <ListGroupTitle>
+        {intl.formatMessage(messages.registrationTimePeriodsGroupTitle)}
+      </ListGroupTitle>
+      <ListViewSimplified>
+        <DeathRegistrationTarget />
+        <DeathDelayedRegistrationTarget />
+      </ListViewSimplified>
+      <ListGroupTitle>
+        {intl.formatMessage(messages.registrationFeesGroupTitle)}
+      </ListGroupTitle>
+      <ListViewSimplified>
+        <DeathFeeOnTime />
+        <DeathDelayedFee />
+      </ListViewSimplified>
     </>
   )
 }
 
-function ApplicationConfigComponent() {
+export function ApplicationConfig() {
   const intl = useIntl()
   const [activeTabId, setActiveTabId] = React.useState(TabId.GENERAL)
-
-  const changeTab = (id: TabId) => {
-    setActiveTabId(id)
-  }
 
   const tabSections = [
     {
@@ -222,7 +175,7 @@ function ApplicationConfigComponent() {
           <FormTabs
             sections={tabSections}
             activeTabId={activeTabId}
-            onTabClick={(id: TabId) => changeTab(id)}
+            onTabClick={(id: TabId) => setActiveTabId(id)}
           />
         }
       >
@@ -233,5 +186,3 @@ function ApplicationConfigComponent() {
     </SysAdminContentWrapper>
   )
 }
-
-export const ApplicationConfig = ApplicationConfigComponent
