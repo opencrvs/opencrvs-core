@@ -44,12 +44,15 @@ export const getAmountWithCurrencySymbol = (
   currency: ICurrency,
   amount: number
 ) => {
-  const amountWithSymbol = new Intl.NumberFormat(currency.languagesAndCountry, {
-    style: 'currency',
-    currency: currency.isoCode
-  }).format(amount)
+  const amountWithSymbol = new Intl.NumberFormat(
+    `${currency.languagesAndCountry}-u-nu-mathsans`,
+    {
+      style: 'currency',
+      currency: currency.isoCode
+    }
+  ).format(amount)
 
-  return amountWithSymbol
+  return amountWithSymbol.normalize('NFKD').replace(/[\u0300-\u036F]/g, '')
 }
 
 export const getCurrencySymbol = (currency: ICurrency) => {
