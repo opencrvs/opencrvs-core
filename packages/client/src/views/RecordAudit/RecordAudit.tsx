@@ -766,7 +766,7 @@ const RecordAuditComp = (props: IFullProps) => {
   return (
     <>
       <DesktopHeader />
-      <Navigation deselectAllTabs={true} />
+      <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
       <BodyContainer>{getBodyContent(props)}</BodyContainer>
       <NotificationToast />
     </>
