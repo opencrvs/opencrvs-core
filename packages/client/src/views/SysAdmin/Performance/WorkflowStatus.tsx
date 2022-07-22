@@ -768,7 +768,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           {({ data, loading, error }) => {
             let total = 0
             if (loading) {
-              return <Spinner id="status-view-loader" />
+              return <Spinner id="status-view-loader" size={24} />
             }
             if (
               data &&
