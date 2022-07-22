@@ -23,7 +23,7 @@ import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profi
 import { DataSection } from '@opencrvs/components/lib/interface'
 import { ReactWrapper } from 'enzyme'
 import { COUNT_USER_WISE_DECLARATIONS } from '@client/search/queries'
-import { changeAvatarMutation } from './AvatarChangeModal'
+import { changeAvatarMutation, AvatarChangeModal } from './AvatarChangeModal'
 import * as imageUtils from '@client/utils/imageUtils'
 
 const graphqlMocks = [
@@ -164,9 +164,7 @@ describe('Settings page tests', () => {
         .simulate('change', { target: { files: [file] } })
 
       component.update()
-      expect(
-        component.find('SettingsView').state('showChangeAvatar')
-      ).toBeTruthy()
+      expect(component.find('#ChangeAvatarModal').hostNodes()).toHaveLength(1)
     })
 
     it('should show error for invalid image', async () => {
@@ -181,9 +179,9 @@ describe('Settings page tests', () => {
 
       await flushPromises()
       component.update()
-      expect(
-        component.find('SettingsView').state('imageLoadingError')
-      ).toBeTruthy()
+      expect(component.find(AvatarChangeModal).prop('error')).toContain(
+        'Image format not supported'
+      )
     })
 
     it('should change profile image', async () => {
@@ -216,7 +214,7 @@ describe('Settings page tests', () => {
       component.update()
 
       component
-        .find('SettingsView')
+        .find(AvatarChangeModal)
         .find('#apply_change')
         .hostNodes()
         .simulate('click')
@@ -225,9 +223,7 @@ describe('Settings page tests', () => {
 
       component.update()
 
-      expect(
-        component.find('SettingsView').state('showChangeAvatar')
-      ).toBeFalsy()
+      expect(component.find('#ChangeAvatarModal').hostNodes()).toHaveLength(0)
     })
 
     it('Should close change avater modal', () => {
@@ -245,9 +241,7 @@ describe('Settings page tests', () => {
       component.find('#close-btn').hostNodes().simulate('click')
       component.update()
 
-      expect(
-        component.find('SettingsView').state('showChangeAvatar')
-      ).toBeFalsy()
+      expect(component.find('#ChangeAvatarModal').hostNodes()).toHaveLength(0)
     })
   })
 })

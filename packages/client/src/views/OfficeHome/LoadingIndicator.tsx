@@ -111,19 +111,23 @@ export function withOnlineStatus<T>(
   const ONLINE_CHECK_INTERVAL = 500
 
   return function WithOnlineStatus(props: T) {
-    const [isOnline, setOnline] = React.useState(navigator.onLine)
-
-    React.useEffect(() => {
-      const intervalID = setInterval(
-        () => setOnline(navigator.onLine),
-        ONLINE_CHECK_INTERVAL
-      )
-
-      return () => clearInterval(intervalID)
-    }, [])
-
+    const isOnline = useOnlineStatus()
     return <WrappedComponent isOnline={isOnline} {...props} />
   }
+}
+
+export function useOnlineStatus() {
+  const [isOnline, setOnline] = React.useState(navigator.onLine)
+  const ONLINE_CHECK_INTERVAL = 500
+  React.useEffect(() => {
+    const intervalID = setInterval(
+      () => setOnline(navigator.onLine),
+      ONLINE_CHECK_INTERVAL
+    )
+
+    return () => clearInterval(intervalID)
+  }, [])
+  return isOnline
 }
 
 export type IOnlineStatusProps = {
