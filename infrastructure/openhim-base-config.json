@@ -2723,7 +2723,7 @@
         {
           "type": "http",
           "status": "enabled",
-          "forwardAuthHeader": false,
+          "forwardAuthHeader": true,
           "name": "Confirm Registration",
           "secured": false,
           "host": "workflow",
