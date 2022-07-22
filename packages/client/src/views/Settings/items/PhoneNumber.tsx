@@ -29,9 +29,7 @@ import {
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
-import { goToPhoneSettings } from '@client/navigation'
-import { useHistory } from 'react-router'
-import { SETTINGS } from '@client/navigation/routes'
+import { ChangePhoneModal } from '@client/views/Settings/ChangePhoneModal/ChangePhoneModal'
 
 export function PhoneNumber() {
   const intl = useIntl()
@@ -40,29 +38,20 @@ export function PhoneNumber() {
     (state) => state.profile.userDetails?.mobile || ''
   )
   const dispatch = useDispatch()
-  const onClickChange = () => dispatch(goToPhoneSettings())
 
-  const history = useHistory()
   const [showSuccessNotification, setShowSuccessNotification] =
     React.useState(false)
+  const [showModal, setShowModal] = React.useState(false)
   const toggleSuccessNotification = () => {
     setShowSuccessNotification((prevValue) => !prevValue)
   }
-
-  React.useEffect(() => {
-    if (history && history.location.state) {
-      let phonedNumberUpdated = false
-      const historyState = history.location.state as Record<string, boolean>
-      phonedNumberUpdated = historyState.phonedNumberUpdated
-      if (phonedNumberUpdated) {
-        toggleSuccessNotification()
-        history.replace({
-          pathname: SETTINGS,
-          state: { phonedNumberUpdated: false }
-        })
-      }
-    }
-  }, [history])
+  const toggleChangePhoneModal = () => {
+    setShowModal((prevValue) => !prevValue)
+  }
+  const handleSuccess = () => {
+    toggleChangePhoneModal()
+    toggleSuccessNotification()
+  }
 
   return (
     <>
@@ -74,10 +63,18 @@ export function PhoneNumber() {
         }
         value={<ValueContainer>{mobile}</ValueContainer>}
         actions={
-          <DynamicHeightLinkButton onClick={onClickChange} disabled={!isOnline}>
+          <DynamicHeightLinkButton
+            onClick={toggleChangePhoneModal}
+            disabled={!isOnline}
+          >
             {intl.formatMessage(buttonMessages.change)}
           </DynamicHeightLinkButton>
         }
+      />
+      <ChangePhoneModal
+        show={showModal}
+        onClose={toggleChangePhoneModal}
+        onSuccess={handleSuccess}
       />
       <FloatingNotification
         type={NOTIFICATION_TYPE.SUCCESS}
