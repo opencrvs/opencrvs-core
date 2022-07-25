@@ -15,7 +15,10 @@ import { createTestComponent, flushPromises } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { CertificatesConfig } from './Certificates'
 import { waitForElement } from '@client/tests/wait-for-element'
+import * as fetchMock from 'jest-fetch-mock'
+import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
 
+const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 describe('ConfigHome page when already has uploaded certificate template', () => {
   const { store, history } = createStore()
 
@@ -28,14 +31,14 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
     testComponent.update()
   })
 
-  it('shows default birth certificate template text', async () => {
-    await expect(
+  it('shows default birth certificate template text', () => {
+    expect(
       testComponent.find('#birth_value').hostNodes().first().text()
     ).toContain('Default birth certificate template')
   })
 
-  it('shows default death certificate template text', async () => {
-    await expect(
+  it('shows default death certificate template text', () => {
+    expect(
       testComponent.find('#death_value').hostNodes().first().text()
     ).toContain('Default death certificate template')
   })
@@ -58,7 +61,24 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
   })
 
   describe('Testing sub menu item on config page', () => {
-    it('should shows upload modal when clicked on upload', async () => {
+    let printCertificateSpy: jest.SpyInstance
+    let downloadFileSpy: jest.SpyInstance
+
+    beforeEach(() => {
+      fetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          blob: () => new Blob(['data'])
+        })
+      )
+      printCertificateSpy = jest.spyOn(PDFUtils, 'printCertificate')
+      downloadFileSpy = jest.spyOn(PDFUtils, 'downloadFile')
+    })
+    afterAll(() => {
+      fetch.resetMocks()
+      printCertificateSpy.mockRestore()
+      downloadFileSpy.mockRestore()
+    })
+    it('should show upload modal when clicked on upload', async () => {
       await waitForElement(
         testComponent,
         '#template-birth-action-menuToggleButton'
@@ -123,13 +143,59 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
         .simulate('click')
       await flushPromises()
       testComponent.update()
-
+      await waitForElement(testComponent, '#preview_image_field')
       testComponent.find('#preview_back').hostNodes().simulate('click')
       testComponent.update()
 
       expect(
         testComponent.find('#preview_image_field').hostNodes()
       ).toHaveLength(0)
+    })
+
+    it('should call print certificate after clicking print', async () => {
+      await waitForElement(
+        testComponent,
+        '#template-birth-action-menuToggleButton'
+      )
+      testComponent
+        .find('#template-birth-action-menuToggleButton')
+        .hostNodes()
+        .first()
+        .simulate('click')
+      testComponent.update()
+      testComponent
+        .find('#template-birth-action-menuItem1')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      testComponent.update()
+      await new Promise((resolve) => {
+        setTimeout(resolve, 200)
+      })
+      expect(printCertificateSpy).toBeCalledTimes(1)
+    })
+
+    it('should download preview certificate', async () => {
+      await waitForElement(
+        testComponent,
+        '#template-birth-action-menuToggleButton'
+      )
+      testComponent
+        .find('#template-birth-action-menuToggleButton')
+        .hostNodes()
+        .first()
+        .simulate('click')
+      testComponent.update()
+      testComponent
+        .find('#template-birth-action-menuItem2')
+        .hostNodes()
+        .simulate('click')
+      await flushPromises()
+      testComponent.update()
+      await new Promise((resolve) => {
+        setTimeout(resolve, 200)
+      })
+      expect(downloadFileSpy).toBeCalledTimes(1)
     })
   })
 })
