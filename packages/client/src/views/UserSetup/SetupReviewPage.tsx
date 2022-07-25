@@ -158,7 +158,7 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   const onError = () => {
     setSubmitError(true)
   }
-  const confirmActionButton = (
+  return (
     <Mutation<SubmitActivateUserMutation, SubmitActivateUserMutationVariables>
       mutation={activateUserMutation}
       variables={{
@@ -171,50 +171,51 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
       onError={() => onError()}
     >
       {(submitActivateUser, { loading }) => {
-        if (loading) {
-          return (
-            <LoaderOverlay>
-              <Loader
-                id="setup_submit_waiting"
-                loadingText={intl.formatMessage(messages.waiting)}
-              />
-            </LoaderOverlay>
-          )
-        }
         return (
-          <ConfirmButton id="Confirm" onClick={() => submitActivateUser()}>
-            <Check />
-            {intl.formatMessage(buttonMessages.confirm)}
-          </ConfirmButton>
+          <ActionPageLight
+            title={intl.formatMessage(messages.userSetupRevieTitle)}
+            hideBackground
+            goBack={() => {
+              goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
+            }}
+          >
+            {loading ? (
+              <Content>
+                <Loader
+                  id="setup_submit_waiting"
+                  loadingText={intl.formatMessage(messages.waiting)}
+                />
+              </Content>
+            ) : (
+              <Content
+                title={intl.formatMessage(messages.userSetupReviewHeader)}
+                bottomActionButtons={[
+                  <ConfirmButton
+                    id="Confirm"
+                    onClick={() => submitActivateUser()}
+                  >
+                    <Check />
+                    {intl.formatMessage(buttonMessages.confirm)}
+                  </ConfirmButton>
+                ]}
+              >
+                <GlobalError id="GlobalError">
+                  {submitError && (
+                    <WarningMessage>
+                      {intl.formatMessage(errorMessages.pleaseTryAgainError)}
+                    </WarningMessage>
+                  )}
+                </GlobalError>
+                <div id="UserSetupData">
+                  {items.map((item: IDataProps, index: number) => (
+                    <DataRow key={index} {...item} />
+                  ))}
+                </div>
+              </Content>
+            )}
+          </ActionPageLight>
         )
       }}
     </Mutation>
-  )
-  return (
-    <ActionPageLight
-      title={intl.formatMessage(messages.userSetupRevieTitle)}
-      hideBackground
-      goBack={() => {
-        goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
-      }}
-    >
-      <Content
-        title={intl.formatMessage(messages.userSetupReviewHeader)}
-        bottomActionButtons={[confirmActionButton]}
-      >
-        <GlobalError id="GlobalError">
-          {submitError && (
-            <WarningMessage>
-              {intl.formatMessage(errorMessages.pleaseTryAgainError)}
-            </WarningMessage>
-          )}
-        </GlobalError>
-        <div id="UserSetupData">
-          {items.map((item: IDataProps, index: number) => (
-            <DataRow key={index} {...item} />
-          ))}
-        </div>
-      </Content>
-    </ActionPageLight>
   )
 }
