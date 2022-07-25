@@ -123,7 +123,6 @@ function FormConfigSettingsComponent() {
                 ...offlineCountryConfiguration.config,
                 [ConfigActionType.ADDRESSES]: numberOfAddresses
               },
-          offlineCountryConfiguration,
           dispatch,
           setNotificationStatus
         )

@@ -86,11 +86,9 @@ export function BirthRegistrationTarget() {
             }
           }
         },
-        offlineCountryConfiguration,
         dispatch,
         setNotificationStatus
       )
-      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
       setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     }

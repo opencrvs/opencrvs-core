@@ -195,7 +195,6 @@ const isGeneralOrConfigAction = (
 export async function callApplicationConfigMutation(
   configProperty: IActionType | ConfigActionType,
   appConfig: IApplicationConfig,
-  offlineCountryConfiguration: IOfflineData,
   dispatch: Dispatch,
   setNotificationStatus: (status: NOTIFICATION_STATUS) => void
 ) {
@@ -215,16 +214,7 @@ export async function callApplicationConfigMutation(
       setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
       const offlineConfig = {
         config: {
-          ...offlineCountryConfiguration.config,
-          ...(configProperty in GeneralActionId && {
-            [configProperty]: updatedConfigs[configProperty]
-          }),
-          ...(configProperty in BirthActionId && {
-            BIRTH: updatedConfigs.BIRTH
-          }),
-          ...(configProperty in DeathActionId && {
-            DEATH: updatedConfigs.DEATH
-          })
+          ...updatedConfigs
         }
       }
       dispatch(updateOfflineConfigData(offlineConfig))

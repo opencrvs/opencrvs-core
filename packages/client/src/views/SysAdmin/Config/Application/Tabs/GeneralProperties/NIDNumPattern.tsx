@@ -74,11 +74,9 @@ export function NIDNumPattern() {
           ...offlineCountryConfiguration.config,
           NID_NUMBER_PATTERN: nidPattern as unknown as RegExp
         },
-        offlineCountryConfiguration,
         dispatch,
         setNotificationStatus
       )
-      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
       setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     }

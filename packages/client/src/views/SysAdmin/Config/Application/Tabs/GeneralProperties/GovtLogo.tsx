@@ -106,11 +106,9 @@ export function GovtLogo() {
             fileName: logoFileName
           }
         },
-        offlineCountryConfiguration,
         dispatch,
         setNotificationStatus
       )
-      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
       setNotificationStatus(NOTIFICATION_STATUS.ERROR)
       setErrorMessages(intl.formatMessage(messages.govtLogoChangeNotification))

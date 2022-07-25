@@ -70,11 +70,9 @@ export function ApplicationName() {
           ...offlineCountryConfiguration.config,
           APPLICATION_NAME: applicationName
         },
-        offlineCountryConfiguration,
         dispatch,
         setNotificationStatus
       )
-      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
       setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     }

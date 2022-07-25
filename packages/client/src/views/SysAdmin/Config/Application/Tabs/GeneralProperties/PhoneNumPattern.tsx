@@ -79,11 +79,9 @@ export function PhoneNumPattern() {
           ...offlineCountryConfiguration.config,
           PHONE_NUMBER_PATTERN: phoneNumberPattern as unknown as RegExp
         },
-        offlineCountryConfiguration,
         dispatch,
         setNotificationStatus
       )
-      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
     } catch {
       setNotificationStatus(NOTIFICATION_STATUS.ERROR)
     }

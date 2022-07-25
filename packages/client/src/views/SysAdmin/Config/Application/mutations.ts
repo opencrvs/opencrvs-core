@@ -12,6 +12,7 @@
 import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
 import { IBirth, ICountryLogo, ICurrency, IDeath } from './utils'
+import { IApplicationConfig } from '@client/utils/referenceApi'
 
 const applicationConfigMutation = gql`
   mutation updateApplicationConfig(
@@ -50,16 +51,9 @@ const applicationConfigMutation = gql`
     }
   }
 `
-async function mutateApplicationConfig(applicationConfig: {
-  [key: string]:
-    | IBirth
-    | IDeath
-    | ICurrency
-    | ICountryLogo
-    | string
-    | boolean
-    | number
-}) {
+async function mutateApplicationConfig(
+  applicationConfig: Partial<IApplicationConfig>
+) {
   return (
     client &&
     client.mutate({
