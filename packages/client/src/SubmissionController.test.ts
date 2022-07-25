@@ -13,24 +13,8 @@ import { AppStore, createStore } from '@client/store'
 import { SubmissionController } from '@client/SubmissionController'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { SubmissionAction } from './forms'
-import { createMockClient } from 'mock-apollo-client'
-import {
-  SUBMIT_BIRTH_DECLARATION,
-  APPROVE_BIRTH_DECLARATION,
-  REGISTER_BIRTH_DECLARATION,
-  REJECT_BIRTH_DECLARATION,
-  COLLECT_BIRTH_CERTIFICATE,
-  ARCHIVE_BIRTH_DECLARATION
-} from '@client/views/DataProvider/birth/mutations'
-import {
-  ARCHIVE_DEATH_DECLARATION,
-  APPROVE_DEATH_DECLARATION,
-  COLLECT_DEATH_CERTIFICATE,
-  REGISTER_DEATH_DECLARATION,
-  REJECT_DEATH_DECLARATION
-} from '@client/views/DataProvider/death/mutations'
-import { ApolloError } from 'apollo-client'
 import { flushPromises } from './tests/util'
+import { declarationReadyForStatusChange } from './declarations/submissionMiddleware'
 
 beforeEach(() => {
   Date.now = jest.fn(() => 1572408000000 + 2000000)
@@ -45,7 +29,7 @@ describe('Submission Controller', () => {
     expect(setInterval).toBeCalled()
     window.setInterval = originalInterval
     // @ts-ignore
-    window.setTimeout = (fn: (...args: any[]) => void, duration: number) => {
+    window.setTimeout = (fn: (...args: any[]) => void) => {
       return new Promise((resolve) => {
         fn()
         resolve(0)
@@ -86,6 +70,7 @@ describe('Submission Controller', () => {
           declarations: [
             {
               modifiedOn: 1572408000000,
+              action: SubmissionAction.SUBMIT_FOR_REVIEW,
               submissionStatus: SUBMISSION_STATUS.SUBMITTING
             }
           ]
@@ -179,533 +164,59 @@ describe('Submission Controller', () => {
     const subCon = new SubmissionController(store)
 
     subCon.sync()
-    console.log(store.dispatch.mock.calls[0][0])
-
     expect(store.dispatch).toHaveBeenCalledTimes(2)
-    expect(
-      store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-    ).toBe(SUBMISSION_STATUS.SUBMITTED)
-    expect(
-      store.dispatch.mock.calls[1][0].payload.declaration.submissionStatus
-    ).toBe(SUBMISSION_STATUS.SUBMITTED)
-    expect(store.dispatch.mock.calls[9][0].type).toBe(
-      'DECLARATION/DELETE_DRAFT'
+    expect(store.dispatch.mock.calls[0][0].payload.action).toBe(
+      SubmissionAction.SUBMIT_FOR_REVIEW
+    )
+    expect(store.dispatch.mock.calls[0][0].type).toBe(
+      declarationReadyForStatusChange.toString()
+    )
+    expect(store.dispatch.mock.calls[1][0].payload.action).toBe(
+      SubmissionAction.SUBMIT_FOR_REVIEW
+    )
+    expect(store.dispatch.mock.calls[1][0].type).toBe(
+      declarationReadyForStatusChange.toString()
     )
   })
 
-  // it('syncs all ready to approve birth declaration and deletes approved declaration', async () => {
-  //   const store = {
-  //     getState: () => ({
-  //       declarationsState: {
-  //         declarations: [
-  //           {
-  //             event: 'birth',
-  //             submissionStatus: SUBMISSION_STATUS.READY_TO_APPROVE,
-  //             action: Action.APPROVE_DECLARATION
-  //           }
-  //         ]
-  //       },
-  //       offline: { userDetails: { role: 'FIELD_AGENT' } },
-  //       registerForm: {
-  //         registerForm: {}
-  //       },
-  //       profile: {
-  //         tokenPayload: {
-  //           scope: []
-  //         }
-  //       }
-  //     }),
-  //     dispatch: jest.fn()
-  //   }
+  const STATUS_MAP = {
+    [SubmissionAction.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.READY_TO_SUBMIT,
+    [SubmissionAction.APPROVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_APPROVE,
+    [SubmissionAction.REGISTER_DECLARATION]:
+      SUBMISSION_STATUS.READY_TO_REGISTER,
+    [SubmissionAction.REJECT_DECLARATION]: SUBMISSION_STATUS.READY_TO_REJECT,
+    [SubmissionAction.REQUEST_CORRECTION_DECLARATION]:
+      SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
+    [SubmissionAction.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.READY_TO_CERTIFY,
+    [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ARCHIVE
+  } as const
 
-  //   // @ts-ignore
-  //   const subCon = new SubmissionController(store)
-  //   subCon.client = createMockClient()
-  //   const mutationHandler = jest.fn().mockResolvedValue({
-  //     data: { data: { markBirthAsValidated: {} } }
-  //   })
-  //   subCon.client.setRequestHandler(APPROVE_BIRTH_DECLARATION, mutationHandler)
+  Object.values(SubmissionAction).forEach((action) => {
+    it(`syncs all ${STATUS_MAP[action]} declarations`, async () => {
+      const store = {
+        getState: () => ({
+          declarationsState: {
+            declarations: [
+              {
+                submissionStatus: STATUS_MAP[action],
+                action
+              }
+            ]
+          }
+        }),
+        dispatch: jest.fn()
+      }
 
-  //   await subCon.sync()
+      // @ts-ignore
+      const subCon = new SubmissionController(store)
 
-  //   expect(mutationHandler).toHaveBeenCalledTimes(1)
-  //   expect(store.dispatch).toHaveBeenCalledTimes(5)
-  //   expect(
-  //     store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-  //   ).toBe(SUBMISSION_STATUS.APPROVED)
-  //   expect(store.dispatch.mock.calls[4][0].type).toBe(
-  //     'DECLARATION/DELETE_DRAFT'
-  //   )
-  // })
+      subCon.sync()
 
-  // it('syncs all ready to approve death declaration and deletes approved declaration', async () => {
-  //   const store = {
-  //     getState: () => ({
-  //       declarationsState: {
-  //         declarations: [
-  //           {
-  //             event: 'death',
-  //             submissionStatus: SUBMISSION_STATUS.READY_TO_APPROVE,
-  //             action: Action.APPROVE_DECLARATION
-  //           }
-  //         ]
-  //       },
-  //       offline: { userDetails: { role: 'FIELD_AGENT' } },
-  //       registerForm: {
-  //         registerForm: {}
-  //       },
-  //       profile: {
-  //         tokenPayload: {
-  //           scope: []
-  //         }
-  //       }
-  //     }),
-  //     dispatch: jest.fn()
-  //   }
-
-  //   // @ts-ignore
-  //   const subCon = new SubmissionController(store)
-  //   subCon.client = createMockClient()
-  //   const mutationHandler = jest.fn().mockResolvedValue({
-  //     data: { data: { markDeathAsValidated: {} } }
-  //   })
-  //   subCon.client.setRequestHandler(APPROVE_DEATH_DECLARATION, mutationHandler)
-
-  //   await subCon.sync()
-
-  //   expect(mutationHandler).toHaveBeenCalledTimes(1)
-  //   expect(store.dispatch).toHaveBeenCalledTimes(5)
-  //   expect(
-  //     store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-  //   ).toBe(SUBMISSION_STATUS.APPROVED)
-  //   expect(store.dispatch.mock.calls[4][0].type).toBe(
-  //     'DECLARATION/DELETE_DRAFT'
-  //   )
-  // })
-
-  // it('syncs all ready to register birth declaration and deletes registered declaration', async () => {
-  //   const store = {
-  //     getState: () => ({
-  //       declarationsState: {
-  //         declarations: [
-  //           {
-  //             event: 'birth',
-  //             submissionStatus: SUBMISSION_STATUS.READY_TO_REGISTER,
-  //             action: Action.REGISTER_DECLARATION
-  //           }
-  //         ]
-  //       },
-  //       offline: { userDetails: { role: 'FIELD_AGENT' } },
-  //       registerForm: {
-  //         registerForm: {}
-  //       },
-  //       profile: {
-  //         tokenPayload: {
-  //           scope: []
-  //         }
-  //       }
-  //     }),
-  //     dispatch: jest.fn()
-  //   }
-
-  //   // @ts-ignore
-  //   const subCon = new SubmissionController(store)
-
-  //   subCon.client = createMockClient()
-  //   const mutationHandler = jest.fn().mockResolvedValue({
-  //     data: { data: { markBirthAsValidated: {} } }
-  //   })
-  //   subCon.client.setRequestHandler(REGISTER_BIRTH_DECLARATION, mutationHandler)
-
-  //   await subCon.sync()
-
-  //   expect(mutationHandler).toHaveBeenCalledTimes(1)
-  //   expect(store.dispatch).toHaveBeenCalledTimes(5)
-  //   expect(
-  //     store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-  //   ).toBe(SUBMISSION_STATUS.REGISTERED)
-  //   expect(store.dispatch.mock.calls[4][0].type).toBe(
-  //     'DECLARATION/DELETE_DRAFT'
-  //   )
-  // })
-
-  // it('syncs all ready to register death declaration and deletes registered declaration', async () => {
-  //   const store = {
-  //     getState: () => ({
-  //       declarationsState: {
-  //         declarations: [
-  //           {
-  //             event: 'death',
-  //             submissionStatus: SUBMISSION_STATUS.READY_TO_REGISTER,
-  //             action: Action.REGISTER_DECLARATION
-  //           }
-  //         ]
-  //       },
-  //       offline: { userDetails: { role: 'FIELD_AGENT' } },
-  //       registerForm: {
-  //         registerForm: {}
-  //       },
-  //       profile: {
-  //         tokenPayload: {
-  //           scope: []
-  //         }
-  //       }
-  //     }),
-  //     dispatch: jest.fn()
-  //   }
-
-  //   // @ts-ignore
-  //   const subCon = new SubmissionController(store)
-
-  //   subCon.client = createMockClient()
-  //   const mutationHandler = jest.fn().mockResolvedValue({
-  //     data: { data: { markDeathAsValidated: {} } }
-  //   })
-  //   subCon.client.setRequestHandler(REGISTER_DEATH_DECLARATION, mutationHandler)
-
-  //   await subCon.sync()
-
-  //   expect(mutationHandler).toHaveBeenCalledTimes(1)
-  //   expect(store.dispatch).toHaveBeenCalledTimes(5)
-  //   expect(
-  //     store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-  //   ).toBe(SUBMISSION_STATUS.REGISTERED)
-  //   expect(store.dispatch.mock.calls[4][0].type).toBe(
-  //     'DECLARATION/DELETE_DRAFT'
-  //   )
-  // })
-
-  // it('syncs all ready to reject birth declaration and deletes rejected declaration', async () => {
-  //   const store = {
-  //     getState: () => ({
-  //       declarationsState: {
-  //         declarations: [
-  //           {
-  //             event: 'birth',
-  //             submissionStatus: SUBMISSION_STATUS.READY_TO_REJECT,
-  //             action: Action.REJECT_DECLARATION
-  //           }
-  //         ]
-  //       },
-  //       offline: { userDetails: { role: 'FIELD_AGENT' } },
-  //       registerForm: {
-  //         registerForm: {}
-  //       },
-  //       profile: {
-  //         tokenPayload: {
-  //           scope: []
-  //         }
-  //       }
-  //     }),
-  //     dispatch: jest.fn()
-  //   }
-
-  //   // @ts-ignore
-  //   const subCon = new SubmissionController(store)
-
-  //   subCon.client = createMockClient()
-  //   const mutationHandler = jest.fn().mockResolvedValue({
-  //     data: { data: { markBirthAsValidated: {} } }
-  //   })
-  //   subCon.client.setRequestHandler(REJECT_BIRTH_DECLARATION, mutationHandler)
-
-  //   await subCon.sync()
-
-  //   expect(mutationHandler).toHaveBeenCalledTimes(1)
-  //   expect(store.dispatch).toHaveBeenCalledTimes(5)
-  //   expect(
-  //     store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-  //   ).toBe(SUBMISSION_STATUS.REJECTED)
-  //   expect(store.dispatch.mock.calls[4][0].type).toBe(
-  //     'DECLARATION/DELETE_DRAFT'
-  //   )
-  // })
-
-  // it('syncs all ready to reject death declaration and deletes rejected declaration', async () => {
-  //   const store = {
-  //     getState: () => ({
-  //       declarationsState: {
-  //         declarations: [
-  //           {
-  //             event: 'death',
-  //             submissionStatus: SUBMISSION_STATUS.READY_TO_REJECT,
-  //             action: Action.REJECT_DECLARATION
-  //           }
-  //         ]
-  //       },
-  //       offline: { userDetails: { role: 'FIELD_AGENT' } },
-  //       registerForm: {
-  //         registerForm: {}
-  //       },
-  //       profile: {
-  //         tokenPayload: {
-  //           scope: []
-  //         }
-  //       }
-  //     }),
-  //     dispatch: jest.fn()
-  //   }
-
-  //   // @ts-ignore
-  //   const subCon = new SubmissionController(store)
-
-  //   subCon.client = createMockClient()
-  //   const mutationHandler = jest.fn().mockResolvedValue({
-  //     data: { data: { markDeathAsValidated: {} } }
-  //   })
-  //   subCon.client.setRequestHandler(REJECT_DEATH_DECLARATION, mutationHandler)
-
-  //   await subCon.sync()
-
-  //   expect(mutationHandler).toHaveBeenCalledTimes(1)
-  //   expect(store.dispatch).toHaveBeenCalledTimes(5)
-  //   expect(
-  //     store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-  //   ).toBe(SUBMISSION_STATUS.REJECTED)
-  //   expect(store.dispatch.mock.calls[4][0].type).toBe(
-  //     'DECLARATION/DELETE_DRAFT'
-  //   )
-  // })
-
-  // it('syncs all ready to certify birth declaration', async () => {
-  //   const store = {
-  //     getState: () => ({
-  //       declarationsState: {
-  //         declarations: [
-  //           {
-  //             event: 'birth',
-  //             submissionStatus: SUBMISSION_STATUS.READY_TO_CERTIFY,
-  //             action: Action.COLLECT_CERTIFICATE
-  //           }
-  //         ]
-  //       },
-  //       offline: { userDetails: { role: 'FIELD_AGENT' } },
-  //       registerForm: {
-  //         registerForm: {}
-  //       },
-  //       profile: {
-  //         tokenPayload: {
-  //           scope: []
-  //         }
-  //       }
-  //     }),
-  //     dispatch: jest.fn()
-  //   }
-
-  //   // @ts-ignore
-  //   const subCon = new SubmissionController(store)
-  //   subCon.client = createMockClient()
-  //   const mutationHandler = jest.fn().mockResolvedValue({
-  //     data: { data: { markBirthAsCertified: {} } }
-  //   })
-  //   subCon.client.setRequestHandler(COLLECT_BIRTH_CERTIFICATE, mutationHandler)
-
-  //   await subCon.sync()
-
-  //   expect(mutationHandler).toHaveBeenCalledTimes(1)
-  //   expect(store.dispatch).toHaveBeenCalledTimes(5)
-  //   expect(
-  //     store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-  //   ).toBe(SUBMISSION_STATUS.CERTIFIED)
-  // })
-
-  // it('syncs all ready to certify death declaration', async () => {
-  //   const store = {
-  //     getState: () => ({
-  //       declarationsState: {
-  //         declarations: [
-  //           {
-  //             event: 'death',
-  //             submissionStatus: SUBMISSION_STATUS.READY_TO_CERTIFY,
-  //             action: Action.COLLECT_CERTIFICATE
-  //           }
-  //         ]
-  //       },
-  //       offline: { userDetails: { role: 'FIELD_AGENT' } },
-  //       registerForm: {
-  //         registerForm: {}
-  //       },
-  //       profile: {
-  //         tokenPayload: {
-  //           scope: []
-  //         }
-  //       }
-  //     }),
-  //     dispatch: jest.fn()
-  //   }
-
-  //   // @ts-ignore
-  //   const subCon = new SubmissionController(store)
-  //   subCon.client = createMockClient()
-  //   const mutationHandler = jest.fn().mockResolvedValue({
-  //     data: { data: { markBirthAsCertified: {} } }
-  //   })
-  //   subCon.client.setRequestHandler(COLLECT_DEATH_CERTIFICATE, mutationHandler)
-
-  //   await subCon.sync()
-
-  //   expect(mutationHandler).toHaveBeenCalledTimes(1)
-  //   expect(store.dispatch).toHaveBeenCalledTimes(5)
-  //   expect(
-  //     store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-  //   ).toBe(SUBMISSION_STATUS.CERTIFIED)
-  // })
-
-  // it('syncs all ready to archive birth declarations', async () => {
-  //   const store = {
-  //     getState: () => ({
-  //       declarationsState: {
-  //         declarations: [
-  //           {
-  //             event: 'birth',
-  //             submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
-  //             action: Action.ARCHIVE_DECLARATION
-  //           }
-  //         ]
-  //       },
-  //       offline: { userDetails: { role: 'FIELD_AGENT' } },
-  //       registerForm: {
-  //         registerForm: {}
-  //       },
-  //       profile: {
-  //         tokenPayload: {
-  //           scope: []
-  //         }
-  //       }
-  //     }),
-  //     dispatch: jest.fn()
-  //   }
-
-  //   // @ts-ignore
-  //   const subCon = new SubmissionController(store)
-
-  //   subCon.client = createMockClient()
-  //   const mutationHandler = jest.fn().mockResolvedValue({
-  //     data: { data: { markEventAsArchived: {} } }
-  //   })
-  //   subCon.client.setRequestHandler(ARCHIVE_BIRTH_DECLARATION, mutationHandler)
-
-  //   await subCon.sync()
-  //   expect(mutationHandler).toHaveBeenCalledTimes(1)
-  //   expect(store.dispatch).toHaveBeenCalledTimes(5)
-  //   expect(
-  //     store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-  //   ).toBe(SUBMISSION_STATUS.ARCHIVED)
-  // })
-
-  // it('syncs all ready to archive death declarations', async () => {
-  //   const store = {
-  //     getState: () => ({
-  //       declarationsState: {
-  //         declarations: [
-  //           {
-  //             event: 'death',
-  //             submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
-  //             action: Action.ARCHIVE_DECLARATION
-  //           }
-  //         ]
-  //       },
-  //       offline: { userDetails: { role: 'FIELD_AGENT' } },
-  //       registerForm: {
-  //         registerForm: {}
-  //       },
-  //       profile: {
-  //         tokenPayload: {
-  //           scope: []
-  //         }
-  //       }
-  //     }),
-  //     dispatch: jest.fn()
-  //   }
-
-  //   // @ts-ignore
-  //   const subCon = new SubmissionController(store)
-
-  //   subCon.client = createMockClient()
-  //   const mutationHandler = jest.fn().mockResolvedValue({
-  //     data: { data: { markEventAsArchived: {} } }
-  //   })
-  //   subCon.client.setRequestHandler(ARCHIVE_DEATH_DECLARATION, mutationHandler)
-
-  //   await subCon.sync()
-
-  //   expect(mutationHandler).toHaveBeenCalledTimes(1)
-  //   expect(store.dispatch).toHaveBeenCalledTimes(5)
-  //   expect(
-  //     store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-  //   ).toBe(SUBMISSION_STATUS.ARCHIVED)
-  // })
-
-  // it('fails a declaration that has a network error', async () => {
-  //   const store = {
-  //     getState: () => ({
-  //       declarationsState: {
-  //         declarations: [
-  //           {
-  //             event: 'birth',
-  //             submissionStatus: SUBMISSION_STATUS.READY_TO_REJECT,
-  //             action: Action.REJECT_DECLARATION
-  //           }
-  //         ]
-  //       },
-  //       offline: { userDetails: { role: 'FIELD_AGENT' } },
-  //       registerForm: {
-  //         registerForm: {}
-  //       }
-  //     }),
-  //     dispatch: jest.fn()
-  //   }
-
-  //   // @ts-ignore
-  //   const subCon = new SubmissionController(store)
-
-  //   const err = new ApolloError({ networkError: new Error('network boom') })
-  //   subCon.client = createMockClient()
-  //   const mutationHandler = jest.fn().mockImplementation(() => err)
-  //   subCon.client.setRequestHandler(REJECT_BIRTH_DECLARATION, mutationHandler)
-
-  //   await subCon.sync()
-
-  //   expect(mutationHandler).toHaveBeenCalledTimes(1)
-  //   expect(store.dispatch).toHaveBeenCalledTimes(4)
-  //   expect(
-  //     store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-  //   ).toBe(SUBMISSION_STATUS.FAILED_NETWORK)
-  // })
-
-  // it('fails a declaration that has an ordinary error', async () => {
-  //   const store = {
-  //     getState: () => ({
-  //       declarationsState: {
-  //         declarations: [
-  //           {
-  //             event: 'birth',
-  //             submissionStatus: SUBMISSION_STATUS.READY_TO_REJECT,
-  //             action: Action.REJECT_DECLARATION
-  //           }
-  //         ]
-  //       },
-  //       registerForm: {
-  //         registerForm: {}
-  //       }
-  //     }),
-  //     dispatch: jest.fn()
-  //   }
-
-  //   // @ts-ignore
-  //   const subCon = new SubmissionController(store)
-
-  //   const err = new Error('boom')
-  //   subCon.client = createMockClient()
-  //   const mutationHandler = jest.fn().mockResolvedValue(() => err)
-  //   subCon.client.setRequestHandler(REJECT_BIRTH_DECLARATION, mutationHandler)
-
-  //   await subCon.sync()
-
-  //   expect(mutationHandler).toHaveBeenCalledTimes(1)
-  //   expect(store.dispatch).toHaveBeenCalledTimes(4)
-  //   expect(
-  //     store.dispatch.mock.calls[0][0].payload.declaration.submissionStatus
-  //   ).toBe(SUBMISSION_STATUS.FAILED)
-  // })
+      expect(store.dispatch).toHaveBeenCalledTimes(1)
+      expect(store.dispatch.mock.calls[0][0].payload.action).toBe(action)
+      expect(store.dispatch.mock.calls[0][0].type).toBe(
+        declarationReadyForStatusChange.toString()
+      )
+    })
+  })
 })

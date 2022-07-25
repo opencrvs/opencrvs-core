@@ -84,6 +84,7 @@ describe('Navigation for national system admin related tests', () => {
     client = createClient(store)
     getItem.mockReturnValue(natlSysAdminToken)
     await store.dispatch(checkAuth())
+    await flushPromises()
 
     testComponent = await createTestComponent(
       <OfficeHome
@@ -134,6 +135,7 @@ describe('Navigation for Registration agent related tests', () => {
     client = createClient(store)
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth())
+    await flushPromises()
 
     testComponent = await createTestComponent(
       <OfficeHome
@@ -214,6 +216,7 @@ describe('Navigation for District Registrar related tests', () => {
     client = createClient(store)
     getItem.mockReturnValue(registerScopeToken)
     await store.dispatch(checkAuth())
+    await flushPromises()
 
     testComponent = await createTestComponent(
       <Navigation menuCollapse={() => {}} />,
