@@ -23,12 +23,13 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { WarningMessage } from '@opencrvs/components/lib/forms'
 import {
   ProtectedAccoutStep,
-  IProtectedAccountSetupData
+  IProtectedAccountSetupData,
+  ISecurityQuestionAnswer
 } from '@client/components/ProtectedAccount'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { createNamesMap } from '@client/utils/data-formatting'
-import { IUserDetails } from '@client/utils/userUtils'
+import { getUserName, IUserDetails } from '@client/utils/userUtils'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import { Mutation } from 'react-apollo'
 import {
@@ -41,6 +42,10 @@ import { Check } from '@opencrvs/components/lib/icons'
 import { activateUserMutation } from '@client/views/UserSetup/queries'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { Content } from '@opencrvs/components/lib/interface/Content'
+import {
+  SubmitActivateUserMutation,
+  SubmitActivateUserMutationVariables
+} from '@client/utils/gateway'
 
 const GlobalError = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -79,11 +84,7 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
   const userDetails = useSelector<IStoreState, IUserDetails | null>(
     getUserDetails
   )
-  const englishName =
-    (userDetails &&
-      userDetails.name &&
-      (createNamesMap(userDetails.name as GQLHumanName[])['en'] as string)) ||
-    ''
+  const englishName = getUserName(userDetails)
   const mobile = (userDetails && (userDetails.mobile as string)) || ''
 
   const typeRole =
@@ -158,13 +159,18 @@ export function UserSetupReview({ setupData, goToStep }: IProps) {
     setSubmitError(true)
   }
   const confirmActionButton = (
-    <Mutation
+    <Mutation<SubmitActivateUserMutation, SubmitActivateUserMutationVariables>
       mutation={activateUserMutation}
-      variables={{ ...setupData }}
+      variables={{
+        userId: String(setupData.userId),
+        password: String(setupData.password),
+        securityQuestionAnswers:
+          setupData.securityQuestionAnswers as ISecurityQuestionAnswer[]
+      }}
       onCompleted={() => onCompleted()}
       onError={() => onError()}
     >
-      {(submitActivateUser: any, { loading }: { loading: any }) => {
+      {(submitActivateUser, { loading }) => {
         if (loading) {
           return (
             <LoaderOverlay>

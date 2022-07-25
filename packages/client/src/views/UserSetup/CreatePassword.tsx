@@ -113,7 +113,10 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
     )
     if (passwordMatched && hasCases && hasNumber && validLength) {
       setupData.password = newPassword
-      goToStep(ProtectedAccoutStep.SECURITY_QUESTION, setupData)
+      goToStep(ProtectedAccoutStep.SECURITY_QUESTION, {
+        ...setupData,
+        password: newPassword
+      })
     }
   }
 
