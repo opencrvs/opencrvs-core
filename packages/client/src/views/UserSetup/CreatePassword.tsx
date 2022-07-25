@@ -124,7 +124,7 @@ export function CreatePassword({ setupData, goToStep }: IProps) {
     <PrimaryButton
       id="Continue"
       onClick={whatNext}
-      disabled={!hasCases || !hasNumber || !validLength || !passwordMatched}
+      disabled={!hasCases || !hasNumber || !validLength}
     >
       {intl.formatMessage(buttonMessages.continueButton)}
     </PrimaryButton>
