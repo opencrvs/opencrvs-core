@@ -65,7 +65,7 @@ export function CertificationRatesReport(props: ICertificationRateProps) {
         }
 
         if (loading) {
-          return <Spinner id="certification-rates-report-loading" />
+          return <Spinner id="certification-rates-report-loading" size={24} />
         }
 
         const dataItem: GQLCertificationMetric =
