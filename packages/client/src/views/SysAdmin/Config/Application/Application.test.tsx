@@ -21,19 +21,19 @@ import { ApplicationConfig } from '@client/views/SysAdmin/Config/Application'
 import { configApplicationMutations } from './mutations'
 import { waitForElement } from '@client/tests/wait-for-element'
 
-const { store, history } = createStore()
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 let testComponent: ReactWrapper
 beforeEach(async () => {
+  jest.resetAllMocks()
   configApplicationMutations.mutateApplicationConfig = jest.fn(
     () =>
       new Promise((resolve) =>
         resolve({
           data: {
             updateApplicationConfig: {
-              APPLICATION_NAME: 'OPENCRVS',
-              NID_NUMBER_PATTERN: '/^[0-9]{10}$/',
+              APPLICATION_NAME: 'Farajaland CRVS',
+              NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
               PHONE_NUMBER_PATTERN: '/^01[1-9][0-9]{8}$/',
               CURRENCY: {
                 isoCode: 'CAD',
@@ -60,6 +60,7 @@ beforeEach(async () => {
         })
       )
   )
+  const { store, history } = createStore()
 
   testComponent = await createTestComponent(
     <ApplicationConfig></ApplicationConfig>,
@@ -143,15 +144,14 @@ describe('application name update test', () => {
       .find('#applicationName')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationName', value: 'OPENCRVS' }
+        target: { id: 'applicationName', value: 'Farajaland CRVS' }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
-    await waitForElement(testComponent, '#APPLICATION_NAME')
     testComponent.update()
     await flushPromises()
     expect(
       testComponent.find('#APPLICATION_NAME_value').hostNodes().first().text()
-    ).toBe('OPENCRVS')
+    ).toBe('Farajaland CRVS')
   })
 
   it('should show success notification if appliction name change', async () => {
@@ -164,7 +164,7 @@ describe('application name update test', () => {
       .find('#applicationName')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationName', value: 'OPENCRVS' }
+        target: { id: 'applicationName', value: 'Farajaland CRVS' }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
@@ -242,11 +242,11 @@ describe('NID Pattern update test', () => {
         target: { id: 'NID_NUMBER_PATTERN', value: '^[0-9]{10}$' }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
-    await flushPromises()
     testComponent.update()
+    await flushPromises()
     expect(
       testComponent.find('#NID_NUMBER_PATTERN_value').hostNodes().first().text()
-    ).toBe('/^[0-9]{10}$/')
+    ).toBe('/^[0-9]{9}$/')
   })
   it('should show success notification if nid pattern name change', async () => {
     testComponent
@@ -258,10 +258,9 @@ describe('NID Pattern update test', () => {
       .find('#NID_NUMBER_PATTERNInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'NID_NUMBER_PATTERN', value: '^[0-9]{10}$' }
+        target: { id: 'NID_NUMBER_PATTERN', value: '^[0-9]{9}$' }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
-    await waitForElement(testComponent, '#APPLICATION_NAME')
     testComponent.update()
     await flushPromises()
     expect(
@@ -394,7 +393,7 @@ describe('application currency update test', () => {
     await flushPromises()
     expect(
       testComponent.find('#CURRENCY_value').hostNodes().first().text()
-    ).toBe('Canadian dollar')
+    ).toBe('Zambian kwacha')
   })
 
   it('should show success notification if appliction config change', async () => {
