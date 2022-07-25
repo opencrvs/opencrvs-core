@@ -27,7 +27,7 @@ function getNetworkAddress() {
 }
 
 if (!process.env.AUTH_TOKEN) {
-  console.log('Make sure you have AUTH_TOKEN defined in .env.development file')
+  console.log('Make sure you have AUTH_TOKEN defined in .env file')
   console.log('You can get it by logging into https://ngrok.com')
   process.exit(1)
 }
