@@ -107,29 +107,6 @@ export function UserSetupPage({ setupData, goToStep }: IOwnProps) {
               applicationName: offlineCountryConfig.config.APPLICATION_NAME
             })}
           </TitleHolder>
-          <InfoHolder>
-            <NameHolder id="user-setup-name-holder">
-              {(userDetails &&
-                userDetails.name &&
-                (createNamesMap(userDetails.name as GQLHumanName[])[
-                  intl.locale
-                ] as string)) ||
-                ''}
-            </NameHolder>
-            <RoleHolder id="user-setup-role-holder">
-              {(userDetails &&
-                (userDetails.type
-                  ? `${intl.formatMessage(
-                      userMessages[userDetails.type as string]
-                    )} - ${intl.formatMessage(
-                      userMessages[userDetails.role as string]
-                    )}`
-                  : `${intl.formatMessage(
-                      userMessages[userDetails.role as string]
-                    )}`)) ||
-                ''}
-            </RoleHolder>
-          </InfoHolder>
           <InstructionHolder>
             {intl.formatMessage(messages.userSetupIntroduction)}
           </InstructionHolder>
