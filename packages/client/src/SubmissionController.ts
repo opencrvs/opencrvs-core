@@ -12,12 +12,11 @@
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { AppStore } from '@client/store'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
-import {
-  isReadyStatus,
-  declarationReadyForStatusChange,
-  READY_STATUSES,
-  ArrayElement
-} from './declarations/submissionMiddleware'
+import { declarationReadyForStatusChange } from './declarations/submissionMiddleware'
+import { Action, SubmissionAction } from '@client/forms'
+
+type ArrayElement<ArrayType extends readonly unknown[]> =
+  ArrayType extends readonly (infer ElementType)[] ? ElementType : never
 
 type IRetryStatus = ArrayElement<typeof ALLOWED_STATUS_FOR_RETRY>
 type IInProgressStatus = ArrayElement<typeof INPROGRESS_STATUS>
@@ -26,7 +25,13 @@ const INTERVAL_TIME = 5000
 const HANGING_EXPIRE_MINUTES = 15
 
 const ALLOWED_STATUS_FOR_RETRY = [
-  ...READY_STATUSES,
+  SUBMISSION_STATUS.READY_TO_SUBMIT,
+  SUBMISSION_STATUS.READY_TO_APPROVE,
+  SUBMISSION_STATUS.READY_TO_REGISTER,
+  SUBMISSION_STATUS.READY_TO_REJECT,
+  SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
+  SUBMISSION_STATUS.READY_TO_CERTIFY,
+  SUBMISSION_STATUS.READY_TO_ARCHIVE,
   SUBMISSION_STATUS.FAILED_NETWORK
 ] as const
 
@@ -40,19 +45,8 @@ const INPROGRESS_STATUS = [
   SUBMISSION_STATUS.REQUESTING_CORRECTION
 ] as const
 
-const changeStatus = {
-  [SUBMISSION_STATUS.SUBMITTING]: SUBMISSION_STATUS.READY_TO_SUBMIT,
-  [SUBMISSION_STATUS.APPROVING]: SUBMISSION_STATUS.READY_TO_APPROVE,
-  [SUBMISSION_STATUS.REGISTERING]: SUBMISSION_STATUS.READY_TO_REGISTER,
-  [SUBMISSION_STATUS.REJECTING]: SUBMISSION_STATUS.READY_TO_REJECT,
-  [SUBMISSION_STATUS.ARCHIVING]: SUBMISSION_STATUS.READY_TO_ARCHIVE,
-  [SUBMISSION_STATUS.CERTIFYING]: SUBMISSION_STATUS.READY_TO_CERTIFY,
-  [SUBMISSION_STATUS.REQUESTING_CORRECTION]:
-    SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
-} as const
-
-function isInProgressStatus(status: string): status is IInProgressStatus {
-  return INPROGRESS_STATUS.includes(status as IInProgressStatus)
+function isSubmissionAction(action: Action): action is SubmissionAction {
+  return Object.values(SubmissionAction).includes(action as SubmissionAction)
 }
 
 export class SubmissionController {
@@ -86,17 +80,20 @@ export class SubmissionController {
       .filter((app: IDeclaration) => {
         return (
           app.submissionStatus &&
+          INPROGRESS_STATUS.includes(
+            app.submissionStatus as IInProgressStatus
+          ) &&
           app.modifiedOn &&
           differenceInMinutes(now, app.modifiedOn) > HANGING_EXPIRE_MINUTES
         )
       })
       .forEach((app: IDeclaration) => {
-        const submissionStatus = app.submissionStatus
-        if (submissionStatus && isInProgressStatus(submissionStatus)) {
+        const action = app.action
+        if (action && isSubmissionAction(action)) {
           this.store.dispatch(
             declarationReadyForStatusChange({
               ...app,
-              submissionStatus: changeStatus[submissionStatus]
+              action
             })
           )
         }
@@ -104,7 +101,7 @@ export class SubmissionController {
   }
   /* eslint-disable no-console */
 
-  public sync = async () => {
+  public sync = () => {
     this.syncCount++
     console.debug(`[${this.syncCount}] Starting sync...`)
     if (!navigator.onLine || this.syncRunning) {
@@ -122,12 +119,12 @@ export class SubmissionController {
       `[${this.syncCount}] Syncing ${declarations.length} declarations`
     )
     for (const declaration of declarations) {
-      const submissionStatus = declaration.submissionStatus
-      if (submissionStatus && isReadyStatus(submissionStatus)) {
+      const action = declaration.action
+      if (action && isSubmissionAction(action)) {
         this.store.dispatch(
           declarationReadyForStatusChange({
             ...declaration,
-            submissionStatus
+            action
           })
         )
       }

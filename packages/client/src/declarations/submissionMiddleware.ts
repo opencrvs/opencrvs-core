@@ -29,46 +29,27 @@ import {
   appendGqlMetadataFromDraft
 } from '@client/transformer'
 import { Dispatch } from 'redux'
-import { IForm } from '@client/forms'
+import { IForm, SubmissionAction } from '@client/forms'
 import { showUnassigned } from '@client/notification/actions'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 
-export type ArrayElement<ArrayType extends readonly unknown[]> =
-  ArrayType extends readonly (infer ElementType)[] ? ElementType : never
-
-export type IReadyStatus = ArrayElement<typeof READY_STATUSES>
-
 type IReadyDeclaration = IDeclaration & {
-  submissionStatus: IReadyStatus
+  action: SubmissionAction
 }
 
 export const declarationReadyForStatusChange = createAction<IReadyDeclaration>(
   'DECLARATIONS/READY_FOR_STATUS_CHANGE'
 )
 
-export const READY_STATUSES = [
-  SUBMISSION_STATUS.READY_TO_SUBMIT,
-  SUBMISSION_STATUS.READY_TO_APPROVE,
-  SUBMISSION_STATUS.READY_TO_REGISTER,
-  SUBMISSION_STATUS.READY_TO_REJECT,
-  SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
-  SUBMISSION_STATUS.READY_TO_CERTIFY,
-  SUBMISSION_STATUS.READY_TO_ARCHIVE
-] as const
-
-export function isReadyStatus(status: string): status is IReadyStatus {
-  return READY_STATUSES.includes(status as IReadyStatus)
-}
-
 const STATUS_CHANGE_MAP = {
-  [SUBMISSION_STATUS.READY_TO_SUBMIT]: SUBMISSION_STATUS.SUBMITTING,
-  [SUBMISSION_STATUS.READY_TO_APPROVE]: SUBMISSION_STATUS.APPROVING,
-  [SUBMISSION_STATUS.READY_TO_REGISTER]: SUBMISSION_STATUS.REGISTERING,
-  [SUBMISSION_STATUS.READY_TO_REJECT]: SUBMISSION_STATUS.REJECTING,
-  [SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION]:
+  [SubmissionAction.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.SUBMITTING,
+  [SubmissionAction.APPROVE_DECLARATION]: SUBMISSION_STATUS.APPROVING,
+  [SubmissionAction.REGISTER_DECLARATION]: SUBMISSION_STATUS.REGISTERING,
+  [SubmissionAction.REJECT_DECLARATION]: SUBMISSION_STATUS.REJECTING,
+  [SubmissionAction.REQUEST_CORRECTION_DECLARATION]:
     SUBMISSION_STATUS.REQUESTING_CORRECTION,
-  [SUBMISSION_STATUS.READY_TO_CERTIFY]: SUBMISSION_STATUS.CERTIFYING,
-  [SUBMISSION_STATUS.READY_TO_ARCHIVE]: SUBMISSION_STATUS.ARCHIVING
+  [SubmissionAction.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.CERTIFYING,
+  [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.ARCHIVING
 } as const
 
 function getGqlDetails(form: IForm, draft: IDeclaration) {
@@ -103,10 +84,10 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       return
     }
     const declaration = action.payload
-    const { event, submissionStatus } = declaration
+    const { event, action: submissionAction } = declaration
     updateDeclaration(dispatch, {
       ...declaration,
-      submissionStatus: STATUS_CHANGE_MAP[submissionStatus]
+      submissionStatus: STATUS_CHANGE_MAP[submissionAction]
     })
     const gqlDetails = getGqlDetails(
       getRegisterForm(getState())[event],
@@ -114,17 +95,17 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
     )
     const mutation =
       event === Event.Birth
-        ? getBirthMutation(submissionStatus)
-        : getDeathMutation(submissionStatus)
+        ? getBirthMutation(submissionAction)
+        : getDeathMutation(submissionAction)
     try {
-      if (submissionStatus === SUBMISSION_STATUS.READY_TO_SUBMIT) {
+      if (submissionAction === SubmissionAction.SUBMIT_FOR_REVIEW) {
         await client.mutate({
           mutation,
           variables: {
             details: gqlDetails
           }
         })
-      } else if (submissionStatus === SUBMISSION_STATUS.READY_TO_REJECT) {
+      } else if (submissionAction === SubmissionAction.REJECT_DECLARATION) {
         await client.mutate({
           mutation,
           variables: {

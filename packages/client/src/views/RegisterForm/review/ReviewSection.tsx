@@ -66,7 +66,8 @@ import {
   DOCUMENT_UPLOADER_WITH_OPTION,
   IDocumentUploaderWithOptionsFormField,
   LOCATION_SEARCH_INPUT,
-  IAttachmentValue
+  IAttachmentValue,
+  Action
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -264,7 +265,7 @@ interface IProps {
   submitClickEvent: (
     declaration: IDeclaration,
     submissionStatus: string,
-    action: string,
+    action: Action,
     payload?: IPayload,
     downloadStatus?: DOWNLOAD_STATUS
   ) => void

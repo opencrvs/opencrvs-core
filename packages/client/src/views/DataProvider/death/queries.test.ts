@@ -13,11 +13,13 @@ import {
   GET_DEATH_REGISTRATION_FOR_CERTIFICATION,
   getDeathQueryMappings
 } from '@client/views/DataProvider/death/queries'
-import { Action } from '@client/forms'
+import { DownloadAction, SubmissionAction } from '@client/forms'
 
 describe('When calling getDeathQueryMappings', () => {
   it('Should return the Query for certification', () => {
-    const query = getDeathQueryMappings(Action.LOAD_CERTIFICATE_DECLARATION)
+    const query = getDeathQueryMappings(
+      DownloadAction.LOAD_CERTIFICATE_DECLARATION
+    )
     expect(query).not.toBe(null)
     if (query && query.query) {
       expect(query.query).toEqual(GET_DEATH_REGISTRATION_FOR_CERTIFICATION)
@@ -27,7 +29,7 @@ describe('When calling getDeathQueryMappings', () => {
   })
 
   it('Should return null', () => {
-    const query = getDeathQueryMappings(Action.SUBMIT_FOR_REVIEW)
+    const query = getDeathQueryMappings(SubmissionAction.SUBMIT_FOR_REVIEW)
     expect(query).toBe(null)
   })
 })

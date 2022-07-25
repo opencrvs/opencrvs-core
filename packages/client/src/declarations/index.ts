@@ -11,6 +11,8 @@
  */
 import {
   Action as DeclarationAction,
+  SubmissionAction,
+  DownloadAction,
   IForm,
   IFormData,
   IFormFieldValue,
@@ -153,12 +155,12 @@ interface IActionList {
 }
 
 const ACTION_LIST: IActionList = {
-  [DeclarationAction.LOAD_REVIEW_DECLARATION]:
-    DeclarationAction.LOAD_REVIEW_DECLARATION,
-  [DeclarationAction.LOAD_CERTIFICATE_DECLARATION]:
-    DeclarationAction.LOAD_CERTIFICATE_DECLARATION,
-  [DeclarationAction.LOAD_REQUESTED_CORRECTION_DECLARATION]:
-    DeclarationAction.LOAD_REVIEW_DECLARATION
+  [DownloadAction.LOAD_REVIEW_DECLARATION]:
+    DownloadAction.LOAD_REVIEW_DECLARATION,
+  [DownloadAction.LOAD_CERTIFICATE_DECLARATION]:
+    DownloadAction.LOAD_CERTIFICATE_DECLARATION,
+  [DownloadAction.LOAD_REQUESTED_CORRECTION_DECLARATION]:
+    DownloadAction.LOAD_REVIEW_DECLARATION
 }
 
 export interface IPayload {
@@ -185,7 +187,7 @@ export interface IDeclaration {
   submissionStatus?: string
   downloadStatus?: DOWNLOAD_STATUS
   downloadRetryAttempt?: number
-  action?: string
+  action?: DeclarationAction
   trackingId?: string
   compositionId?: string
   registrationNumber?: string
@@ -505,7 +507,7 @@ export function createDeclaration(event: Event, initialData?: IFormData) {
 export function makeDeclarationReadyToDownload(
   event: Event,
   compositionId: string,
-  action: string
+  action: DeclarationAction
 ): IDeclaration {
   return {
     id: compositionId,
@@ -1138,7 +1140,7 @@ export async function deleteDeclarationByUser(
 export function downloadDeclaration(
   event: Event,
   compositionId: string,
-  action: string,
+  action: DeclarationAction,
   client: ApolloClient<{}>
 ): IDownloadDeclaration {
   const declaration = makeDeclarationReadyToDownload(
@@ -1770,7 +1772,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         const modifiedDeclaration: IDeclaration = {
           ...declaration,
           submissionStatus: SUBMISSION_STATUS.READY_TO_ARCHIVE,
-          action: DeclarationAction.ARCHIVE_DECLARATION,
+          action: SubmissionAction.ARCHIVE_DECLARATION,
           payload: { id: declaration.id }
         }
         return loop(state, Cmd.action(writeDeclaration(modifiedDeclaration)))

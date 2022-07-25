@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import gql from 'graphql-tag'
-import { Action } from '@client/forms'
+import { Action, DownloadAction } from '@client/forms'
 
 export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
   query fetchBirthRegistrationForReview($id: ID!) {
@@ -501,17 +501,17 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
 `
 export function getBirthQueryMappings(action: Action) {
   switch (action) {
-    case Action.LOAD_REVIEW_DECLARATION:
+    case DownloadAction.LOAD_REVIEW_DECLARATION:
       return {
         query: GET_BIRTH_REGISTRATION_FOR_REVIEW,
         dataKey: 'fetchBirthRegistration'
       }
-    case Action.LOAD_CERTIFICATE_DECLARATION:
+    case DownloadAction.LOAD_CERTIFICATE_DECLARATION:
       return {
         query: GET_BIRTH_REGISTRATION_FOR_CERTIFICATE,
         dataKey: 'fetchBirthRegistration'
       }
-    case Action.LOAD_REQUESTED_CORRECTION_DECLARATION:
+    case DownloadAction.LOAD_REQUESTED_CORRECTION_DECLARATION:
       // TODO: Apply seperate query; currently using it
       // because the actual query is yet to be developed
       return {

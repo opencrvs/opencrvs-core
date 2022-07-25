@@ -56,7 +56,8 @@ import {
   IFormData,
   CorrectionSection,
   IFormFieldValue,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  Action
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -363,7 +364,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   confirmSubmission = (
     declaration: IDeclaration,
     submissionStatus: string,
-    action: string,
+    action: Action,
     payload?: IPayload,
     downloadStatus?: DOWNLOAD_STATUS
   ) => {

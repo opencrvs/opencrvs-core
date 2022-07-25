@@ -10,9 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import gql from 'graphql-tag'
-import { SUBMISSION_STATUS } from '@client/declarations'
 import { REQUEST_DEATH_REG_CORRECTION } from '@client/forms/correction/mutations'
-import { IReadyStatus } from '@client/declarations/submissionMiddleware'
+import { SubmissionAction } from '@client/forms'
 
 export const SUBMIT_DEATH_DECLARATION = gql`
   mutation createDeathRegistration($details: DeathRegistrationInput!) {
@@ -89,21 +88,21 @@ export const COLLECT_DEATH_CERTIFICATE = gql`
   }
 `
 
-export function getDeathMutation(status: IReadyStatus) {
-  switch (status) {
-    case SUBMISSION_STATUS.READY_TO_SUBMIT:
+export function getDeathMutation(action: SubmissionAction) {
+  switch (action) {
+    case SubmissionAction.SUBMIT_FOR_REVIEW:
       return SUBMIT_DEATH_DECLARATION
-    case SUBMISSION_STATUS.READY_TO_APPROVE:
+    case SubmissionAction.APPROVE_DECLARATION:
       return APPROVE_DEATH_DECLARATION
-    case SUBMISSION_STATUS.READY_TO_REGISTER:
+    case SubmissionAction.REGISTER_DECLARATION:
       return REGISTER_DEATH_DECLARATION
-    case SUBMISSION_STATUS.READY_TO_REJECT:
+    case SubmissionAction.REJECT_DECLARATION:
       return REJECT_DEATH_DECLARATION
-    case SUBMISSION_STATUS.READY_TO_ARCHIVE:
+    case SubmissionAction.ARCHIVE_DECLARATION:
       return ARCHIVE_DEATH_DECLARATION
-    case SUBMISSION_STATUS.READY_TO_CERTIFY:
+    case SubmissionAction.COLLECT_CERTIFICATE:
       return COLLECT_DEATH_CERTIFICATE
-    case SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION:
+    case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
       return REQUEST_DEATH_REG_CORRECTION
   }
 }
