@@ -108,10 +108,7 @@ export default function register(
     !window.Cypress // This disables the service workder for our e2e tests
   ) {
     // The URL constructor is available in all browsers that support SW.
-    const publicUrl = new URL(
-      import.meta.env.BASE_URL,
-      window.location.toString()
-    )
+    const publicUrl = new URL('', window.location.toString())
     if (publicUrl.origin !== window.location.origin) {
       // Our service worker won't work if PUBLIC_URL is on a different origin
       // from what our page is served on. This might happen if a CDN is used to
@@ -120,7 +117,7 @@ export default function register(
     }
 
     window.addEventListener('load', () => {
-      const swUrl = `${import.meta.env.BASE_URL}/service-worker.js`
+      const swUrl = '/service-worker.js'
 
       if (isLocalhost) {
         // This is running on localhost. Lets check if a service worker still exists or not.
