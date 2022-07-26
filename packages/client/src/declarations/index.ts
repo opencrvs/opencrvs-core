@@ -1592,19 +1592,22 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       if (!downloadQueueInprogress.length) {
         return loop(
           newStateAfterDownload,
-          Cmd.run(writeDeclarationByUser, {
-            args: [
-              Cmd.getState,
-              state.userID,
-              newDeclarationsAfterDownload[downloadingDeclarationIndex]
-            ],
-            failActionCreator: (err) =>
-              downloadDeclarationFail(
-                err,
-                newDeclarationsAfterDownload[downloadingDeclarationIndex],
-                clientFromSuccess
-              )
-          })
+          Cmd.list<any>([
+            Cmd.run(writeDeclarationByUser, {
+              args: [
+                Cmd.getState,
+                state.userID,
+                newDeclarationsAfterDownload[downloadingDeclarationIndex]
+              ],
+              failActionCreator: (err) =>
+                downloadDeclarationFail(
+                  err,
+                  newDeclarationsAfterDownload[downloadingDeclarationIndex],
+                  clientFromSuccess
+                )
+            }),
+            Cmd.action(updateRegistrarWorkqueue(state.userID))
+          ])
         )
       }
 
@@ -1619,7 +1622,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       // Return state, write to indexedDB and download the next ready to download declaration, all in sequence
       return loop(
         newStateAfterDownload,
-        Cmd.list(
+        Cmd.list<any>(
           [
             Cmd.run(writeDeclarationByUser, {
               args: [
@@ -1645,7 +1648,8 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
                     clientFromSuccess
                   )
               }
-            )
+            ),
+            Cmd.action(updateRegistrarWorkqueue(state.userID))
           ],
           { sequence: true }
         )

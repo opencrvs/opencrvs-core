@@ -39,6 +39,7 @@ import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { Roles } from '@client/utils/authUtils'
+import { getDownloadStatus } from '@client/views/OfficeHome/utils'
 
 export type CMethodParams = {
   declaration: IDeclarationData
@@ -64,7 +65,11 @@ export const ShowDownloadButton = ({
 
   if (declaration === null || id === null || type === null) return <></>
 
-  const downloadStatus = draft?.downloadStatus || undefined
+  const downloadStatus = getDownloadStatus(
+    declaration.assignment?.userId as string,
+    draft || undefined,
+    userDetails?.userMgntUserID as string
+  )
   let refetchQueries: RefetchQueryDescription = []
   if (
     userDetails?.role === 'FIELD_AGENT' &&
@@ -210,9 +215,12 @@ export const ShowPrintButton = ({
       ? false
       : true
     : false
-  const isDownloaded =
-    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
-    draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
+
+  const isDownloaded = getDownloadStatus(
+    declaration.assignment?.userId as string,
+    draft || undefined,
+    userDetails?.userMgntUserID as string
+  )
 
   const printButtonRoleStatusMap: { [key: string]: string[] } = {
     REGISTRATION_AGENT: [
@@ -240,20 +248,9 @@ export const ShowPrintButton = ({
     printButtonRoleStatusMap[role].includes(declaration?.status as string) &&
     showActionButton
   ) {
-    if (!isDownloaded) {
-      return (
-        <PrimaryButton
-          key={id}
-          size={'medium'}
-          id={`print-${id}`}
-          disabled={true}
-        >
-          {intl.formatMessage(buttonMessages.print)}
-        </PrimaryButton>
-      )
-    }
     return (
       <PrimaryButton
+        disabled={isDownloaded !== DOWNLOAD_STATUS.DOWNLOADED}
         key={id}
         size={'medium'}
         id={`print-${id}`}

@@ -42,6 +42,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
+  getDownloadStatus,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import {
@@ -65,6 +66,7 @@ interface IBasePrintTabProps {
   loading?: boolean
   error?: boolean
   pageSize: number
+  userId?: string
 }
 
 interface IPrintTabState {
@@ -174,7 +176,7 @@ class ReadyToPrintComponent extends React.Component<
   }
 
   transformRegisteredContent = (data: GQLEventSearchResultSet) => {
-    const { intl } = this.props
+    const { intl, userId } = this.props
     if (!data || !data.results) {
       return []
     }
@@ -185,7 +187,11 @@ class ReadyToPrintComponent extends React.Component<
         (declaration) => declaration.id === reg.id
       )
       const actions: IAction[] = []
-      const downloadStatus = foundDeclaration?.downloadStatus
+      const downloadStatus = getDownloadStatus(
+        reg.assignment?.userId as string,
+        foundDeclaration,
+        userId
+      )
 
       if (this.state.width > this.props.theme.grid.breakpoints.lg) {
         actions.push({
@@ -327,7 +333,8 @@ class ReadyToPrintComponent extends React.Component<
 
 function mapStateToProps(state: IStoreState) {
   return {
-    outboxDeclarations: state.declarationsState.declarations
+    outboxDeclarations: state.declarationsState.declarations,
+    userId: state.profile.userDetails?.userMgntUserID
   }
 }
 

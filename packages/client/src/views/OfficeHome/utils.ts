@@ -12,6 +12,7 @@
 import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
 import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/interface'
 import { orderBy } from 'lodash'
+import { DOWNLOAD_STATUS, IDeclaration } from '@client/declarations'
 
 export const getSortedItems = (
   items: IDynamicValues[],
@@ -79,4 +80,23 @@ export const changeSortedColumn = (
     newSortedCol: newSortedCol,
     newSortOrder: newSortOrder
   }
+}
+
+export function getDownloadStatus(
+  assignedUserId: string | undefined,
+  declaration: IDeclaration | undefined,
+  userId: string | undefined
+) {
+  if (declaration?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING) {
+    return declaration.downloadStatus
+  }
+
+  if (assignedUserId === undefined) {
+    return undefined
+  }
+
+  const downloadStatus =
+    assignedUserId === userId ? declaration?.downloadStatus : undefined
+
+  return downloadStatus
 }
