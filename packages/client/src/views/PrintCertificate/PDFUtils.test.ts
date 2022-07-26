@@ -40,7 +40,7 @@ describe('PDFUtils related tests', () => {
       )
     ).rejects.toThrowError('No user details found')
   })
-  describe('downloadFile functionality', () => {
+  it('downloadFile functionality', () => {
     const createElementMock = jest.fn()
     const setAttributeMock = jest.fn()
     const onClickMock = jest.fn()
