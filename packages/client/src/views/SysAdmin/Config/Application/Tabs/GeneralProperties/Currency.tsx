@@ -38,11 +38,11 @@ import {
   callApplicationConfigMutation,
   getCurrencyObject,
   getCurrencySelectOptions,
-  ICurrency,
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { lookup } from 'country-data'
+import { ICurrency } from '@client/utils/referenceApi'
 
 export function Currency() {
   const intl = useIntl()

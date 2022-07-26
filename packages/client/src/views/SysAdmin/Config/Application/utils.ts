@@ -12,7 +12,6 @@
 
 import { countries as countryList, lookup } from 'country-data'
 import { orderBy, uniqBy } from 'lodash'
-import { IntlShape } from 'react-intl'
 import {
   BirthActionId,
   DeathActionId,
@@ -44,32 +43,6 @@ type ICountrylist = {
   languages: string[]
   name: string
   status: string
-}
-
-export type ICurrency = {
-  isoCode: string
-  languagesAndCountry: string[]
-}
-export type ICountryLogo = {
-  fileName: string
-  file: string
-}
-
-export type IBirth = {
-  REGISTRATION_TARGET: number
-  LATE_REGISTRATION_TARGET: number
-  FEE: {
-    ON_TIME: number
-    LATE: number
-    DELAYED: number
-  }
-}
-export type IDeath = {
-  REGISTRATION_TARGET: number
-  FEE: {
-    ON_TIME: number
-    DELAYED: number
-  }
 }
 
 export enum NOTIFICATION_STATUS {
