@@ -1022,7 +1022,7 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     },
     setAllFieldsDirty,
     fieldsToShowValidationErrors: updatedFields,
-    isWritingDraft: state.declarationsState.isWritingDraft,
+    isWritingDraft: declaration.writingDraft ?? false,
     scope: getScope(state)
   }
 }

@@ -73,7 +73,11 @@ const SET_INITIAL_DECLARATION = 'DECLARATION/SET_INITIAL_DECLARATION'
 const STORE_DECLARATION = 'DECLARATION/STORE_DECLARATION'
 const MODIFY_DECLARATION = 'DECLARATION/MODIFY_DRAFT'
 const WRITE_DECLARATION = 'DECLARATION/WRITE_DRAFT'
+const WRITE_DECLARATION_SUCCESS = 'DECLARATION/WRITE_DRAFT_SUCCESS'
+const WRITE_DECLARATION_FAILED = 'DECLARATION/WRITE_DRAFT_FAILED'
 const DELETE_DECLARATION = 'DECLARATION/DELETE_DRAFT'
+const DELETE_DECLARATION_SUCCESS = 'DECLARATION/DELETE_DRAFT_SUCCESS'
+const DELETE_DECLARATION_FAILED = 'DECLARATION/DELETE_DRAFT_FAILED'
 const GET_DECLARATIONS_SUCCESS = 'DECLARATION/GET_DRAFTS_SUCCESS'
 const GET_DECLARATIONS_FAILED = 'DECLARATION/GET_DRAFTS_FAILED'
 const GET_WORKQUEUE_SUCCESS = 'DECLARATION/GET_WORKQUEUE_SUCCESS'
@@ -194,6 +198,7 @@ export interface IDeclaration {
   payload?: IPayload
   visitedGroupIds?: IVisitedGroupId[]
   timeLoggedMS?: number
+  writingDraft?: boolean
 }
 
 export interface IWorkqueue {
@@ -310,12 +315,23 @@ interface IClearCorrectionChange {
     declarationId: string
   }
 }
-export interface IWriteDeclarationAction {
+interface IWriteDeclarationAction {
   type: typeof WRITE_DECLARATION
   payload: {
     declaration: IDeclaration | IPrintableDeclaration
     callback?: () => void
   }
+}
+
+interface IWriteDeclarationSuccessAction {
+  type: typeof WRITE_DECLARATION_SUCCESS
+  payload: {
+    declaration: IDeclaration
+  }
+}
+
+interface IWriteDeclarationFailedAction {
+  type: typeof WRITE_DECLARATION_FAILED
 }
 
 interface ISetInitialDeclarationsAction {
@@ -354,6 +370,15 @@ interface UpdateRegistrarWorkQueueSuccessAction {
 
 interface UpdateRegistrarWorkQueueFailAction {
   type: typeof UPDATE_REGISTRAR_WORKQUEUE_FAIL
+}
+
+interface IDeleteDeclarationSuccessAction {
+  type: typeof DELETE_DECLARATION_SUCCESS
+  payload: string
+}
+
+interface IDeleteDeclarationFailedAction {
+  type: typeof DELETE_DECLARATION_FAILED
 }
 
 interface IDownloadDeclaration {
@@ -435,8 +460,12 @@ export type Action =
   | IClearCorrectionChange
   | ISetInitialDeclarationsAction
   | IWriteDeclarationAction
+  | IWriteDeclarationSuccessAction
+  | IWriteDeclarationFailedAction
   | NavigationAction
   | IDeleteDeclarationAction
+  | IDeleteDeclarationSuccessAction
+  | IDeleteDeclarationFailedAction
   | IGetStorageDeclarationsSuccessAction
   | IGetStorageDeclarationsFailedAction
   | IGetWorkqueueOfCurrentUserSuccessAction
@@ -606,12 +635,33 @@ export function deleteDeclaration(
   return { type: DELETE_DECLARATION, payload: { declarationId } }
 }
 
+function deleteDeclarationSuccess(
+  declarationId: string
+): IDeleteDeclarationSuccessAction {
+  return { type: DELETE_DECLARATION_SUCCESS, payload: declarationId }
+}
+
+function deleteDeclarationFailed(): IDeleteDeclarationFailedAction {
+  return { type: DELETE_DECLARATION_FAILED }
+}
+
 export function writeDeclaration(
   declaration: IDeclaration | IPrintableDeclaration,
   callback?: () => void
 ): IWriteDeclarationAction {
   return { type: WRITE_DECLARATION, payload: { declaration, callback } }
 }
+
+export function writeDeclarationSuccess(
+  declaration: IDeclaration
+): IWriteDeclarationSuccessAction {
+  return { type: WRITE_DECLARATION_SUCCESS, payload: { declaration } }
+}
+
+export function writeDeclarationFailed(): IWriteDeclarationFailedAction {
+  return { type: WRITE_DECLARATION_FAILED }
+}
+
 async function getCurrentUserRole(): Promise<string> {
   const userDetails = await storage.getItem('USER_DETAILS')
 
@@ -803,13 +853,9 @@ async function updateWorkqueueData(
     return
   }
 
-  const workqueueApp =
-    userWorkqueue.data[workQueueId] &&
-    userWorkqueue.data[workQueueId].results &&
-    // @ts-ignore
-    userWorkqueue.data[workQueueId].results.find(
-      (app) => app && app.id === declaration.id
-    )
+  const workqueueApp = userWorkqueue.data[workQueueId]?.results?.find(
+    (app) => app && app.id === declaration.id
+  )
   if (!workqueueApp) {
     return
   }
@@ -866,23 +912,16 @@ export async function writeDeclarationByUser(
   getState: () => IStoreState,
   userId: string,
   declaration: IDeclaration
-): Promise<string> {
+) {
   const uID = userId || (await getCurrentUserID())
   const userData = await getUserData(uID)
   const { allUserData } = userData
   let { currentUserData } = userData
 
-  const existingDeclarationId = currentUserData
-    ? currentUserData.declarations.findIndex((app) => app.id === declaration.id)
-    : -1
-
-  if (existingDeclarationId >= 0) {
-    currentUserData &&
-      currentUserData.declarations.splice(existingDeclarationId, 1)
-  }
-
   if (currentUserData) {
-    currentUserData.declarations.push(declaration)
+    currentUserData.declarations = currentUserData.declarations.map((dec) =>
+      dec.id === declaration.id ? declaration : dec
+    )
   } else {
     currentUserData = {
       userID: uID,
@@ -944,10 +983,8 @@ export async function writeDeclarationByUser(
     )
   }
 
-  return Promise.all([
-    storage.setItem('USER_DATA', JSON.stringify(allUserData)),
-    JSON.stringify(currentUserData)
-  ]).then(([_, currentUserData]) => currentUserData)
+  await storage.setItem('USER_DATA', JSON.stringify(allUserData))
+  return declaration
 }
 
 function mergeWorkQueueData(
@@ -1132,9 +1169,9 @@ export async function deleteDeclarationByUser(
   if (deletedDeclarationId >= 0) {
     currentUserData &&
       currentUserData.declarations.splice(deletedDeclarationId, 1)
-    storage.setItem('USER_DATA', JSON.stringify(allUserData))
+    await storage.setItem('USER_DATA', JSON.stringify(allUserData))
   }
-  return JSON.stringify(currentUserData)
+  return declarationId
 }
 
 export function downloadDeclaration(
@@ -1352,23 +1389,35 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
     case STORE_DECLARATION:
       return {
         ...state,
-        declarations: state.declarations
-          ? state.declarations.concat(action.payload.declaration)
-          : [action.payload.declaration]
+        declarations: state.declarations.concat(action.payload.declaration)
       }
-    case DELETE_DECLARATION:
+    case DELETE_DECLARATION: {
+      const { declarationId } = action.payload
       return loop(
         {
-          ...state
+          ...state,
+          declarations: state.declarations.map((declaration) =>
+            declaration.id === declarationId
+              ? { ...declaration, writingDraft: true }
+              : declaration
+          )
         },
         Cmd.run(deleteDeclarationByUser, {
-          successActionCreator: getStorageDeclarationsSuccess,
-          failActionCreator: getStorageDeclarationsFailed,
+          successActionCreator: deleteDeclarationSuccess,
+          failActionCreator: deleteDeclarationFailed,
           args: [state.userID, action.payload.declarationId, state]
         })
       )
+    }
+    case DELETE_DECLARATION_SUCCESS:
+      return {
+        ...state,
+        declarations: state.declarations.filter(
+          ({ id }) => id !== action.payload
+        )
+      }
     case MODIFY_DECLARATION:
-      const newDeclarations: IDeclaration[] = state.declarations || []
+      const newDeclarations = [...state.declarations]
       const currentDeclarationIndex = newDeclarations.findIndex(
         (declaration) => declaration.id === action.payload.declaration.id
       )
@@ -1403,23 +1452,42 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       return loop(state, Cmd.action(writeDeclaration(orignalAppliation)))
     }
 
-    case WRITE_DECLARATION:
+    case WRITE_DECLARATION: {
+      const {
+        declaration: { id }
+      } = action.payload
       return loop(
         {
           ...state,
-          isWritingDraft: true
+          declarations: state.declarations.map((stateDeclaration) =>
+            id === stateDeclaration.id
+              ? { ...stateDeclaration, writingDraft: true }
+              : stateDeclaration
+          )
         },
         Cmd.run(writeDeclarationByUser, {
-          successActionCreator: (response: string) => {
+          successActionCreator: (declaration: IDeclaration) => {
             if (action.payload.callback) {
               action.payload.callback()
             }
-            return getStorageDeclarationsSuccess(response)
+            return writeDeclarationSuccess(declaration)
           },
-          failActionCreator: getStorageDeclarationsFailed,
+          failActionCreator: writeDeclarationFailed,
           args: [Cmd.getState, state.userID, action.payload.declaration]
         })
       )
+    }
+    case WRITE_DECLARATION_SUCCESS: {
+      const { declaration } = action.payload
+      return {
+        ...state,
+        declarations: state.declarations.map((stateDeclaration) =>
+          declaration.id === stateDeclaration.id
+            ? { ...declaration, writingDraft: false }
+            : stateDeclaration
+        )
+      }
+    }
     case USER_DETAILS_AVAILABLE:
       return loop(
         {
