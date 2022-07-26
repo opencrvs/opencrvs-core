@@ -13,7 +13,7 @@ import { AppStore, createStore } from '@client/store'
 import { SubmissionController } from '@client/SubmissionController'
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { SubmissionAction } from './forms'
-import { flushPromises } from './tests/util'
+import { flushPromises, ACTION_STATUS_MAP } from './tests/util'
 import { declarationReadyForStatusChange } from './declarations/submissionMiddleware'
 
 beforeEach(() => {
@@ -179,26 +179,14 @@ describe('Submission Controller', () => {
     )
   })
 
-  const STATUS_MAP = {
-    [SubmissionAction.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.READY_TO_SUBMIT,
-    [SubmissionAction.APPROVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_APPROVE,
-    [SubmissionAction.REGISTER_DECLARATION]:
-      SUBMISSION_STATUS.READY_TO_REGISTER,
-    [SubmissionAction.REJECT_DECLARATION]: SUBMISSION_STATUS.READY_TO_REJECT,
-    [SubmissionAction.REQUEST_CORRECTION_DECLARATION]:
-      SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION,
-    [SubmissionAction.COLLECT_CERTIFICATE]: SUBMISSION_STATUS.READY_TO_CERTIFY,
-    [SubmissionAction.ARCHIVE_DECLARATION]: SUBMISSION_STATUS.READY_TO_ARCHIVE
-  } as const
-
   Object.values(SubmissionAction).forEach((action) => {
-    it(`syncs all ${STATUS_MAP[action]} declarations`, async () => {
+    it(`syncs all ${ACTION_STATUS_MAP[action]} declarations`, async () => {
       const store = {
         getState: () => ({
           declarationsState: {
             declarations: [
               {
-                submissionStatus: STATUS_MAP[action],
+                submissionStatus: ACTION_STATUS_MAP[action],
                 action
               }
             ]

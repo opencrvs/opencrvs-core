@@ -131,6 +131,7 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
           })
         )
         dispatch(deleteDeclaration(declaration.id))
+        return
       }
       updateDeclaration(dispatch, {
         ...declaration,
