@@ -1803,6 +1803,8 @@
       "status": "disabled",
       "rewriteUrls": false,
       "addAutoRewriteRules": true,
+      "autoRetryEnabled": false,
+      "autoRetryPeriodMinutes": 60,
       "requestBody": true,
       "responseBody": true,
       "name": "Hearth passthrough",
@@ -1815,8 +1817,6 @@
       "tcpHost": null,
       "tcpPort": null,
       "priority": 2,
-      "autoRetryPeriodMinutes": 60,
-      "autoRetryEnabled": false,
       "rewriteUrlsConfig": [],
       "alerts": [],
       "routes": [
@@ -2023,10 +2023,6 @@
       "pollingSchedule": null,
       "tcpHost": null,
       "tcpPort": null,
-      "updatedBy": {
-        "id": "5da5b440fb88a30011a2439c",
-        "name": "Super User"
-      },
       "alerts": []
     },
     {
@@ -2074,10 +2070,6 @@
       "pollingSchedule": null,
       "tcpHost": null,
       "tcpPort": null,
-      "updatedBy": {
-        "id": "5da5b440fb88a30011a2439c",
-        "name": "Super User"
-      },
       "alerts": []
     },
     {
@@ -2096,10 +2088,6 @@
       "addAutoRewriteRules": true,
       "autoRetryEnabled": false,
       "autoRetryPeriodMinutes": 60,
-      "updatedBy": {
-        "id": "5da5b440fb88a30011a2439c",
-        "name": "Super User"
-      },
       "routes": [
         {
           "type": "http",
@@ -2269,10 +2257,6 @@
       "matchContentJson": null,
       "tcpHost": null,
       "tcpPort": null,
-      "updatedBy": {
-        "id": "5db9eba64ccab800129d6155",
-        "name": "Super User"
-      },
       "alerts": [],
       "priority": 1
     },
@@ -2320,10 +2304,6 @@
       "matchContentJson": null,
       "tcpHost": null,
       "tcpPort": null,
-      "updatedBy": {
-        "id": "5db9eba64ccab800129d6155",
-        "name": "Super User"
-      },
       "alerts": [],
       "priority": 1
     },
@@ -2372,10 +2352,6 @@
       "pollingSchedule": null,
       "tcpHost": null,
       "tcpPort": null,
-      "updatedBy": {
-        "id": "5ddfd8e9deb4360011a4dcb3",
-        "name": "Super User"
-      },
       "alerts": []
     },
     {
@@ -2546,12 +2522,56 @@
       "pollingSchedule": null,
       "tcpHost": null,
       "tcpPort": null,
-      "updatedBy": {
-        "id": "5f47a881a28a0900124bab8e",
-        "name": "Super User"
-      },
       "alerts": [],
       "priority": 1
+    },
+    {
+      "methods": ["POST"],
+      "type": "http",
+      "allow": [],
+      "whitelist": [],
+      "authType": "public",
+      "matchContentTypes": [],
+      "properties": [],
+      "txViewAcl": [],
+      "txViewFullAcl": [],
+      "txRerunAcl": [],
+      "status": "enabled",
+      "rewriteUrls": false,
+      "addAutoRewriteRules": true,
+      "autoRetryEnabled": false,
+      "autoRetryPeriodMinutes": 60,
+      "routes": [
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Confirm Registration",
+          "secured": false,
+          "host": "workflow",
+          "port": 5050,
+          "path": "/confirm/registration",
+          "pathTransform": "",
+          "primary": true,
+          "username": "",
+          "password": ""
+        }
+      ],
+      "requestBody": true,
+      "responseBody": true,
+      "rewriteUrlsConfig": [],
+      "name": "Confirm Registration",
+      "description": "Confirm registration & assign a BRN",
+      "urlPattern": "^/confirm/registration$",
+      "priority": 1,
+      "matchContentRegex": null,
+      "matchContentXpath": null,
+      "matchContentValue": null,
+      "matchContentJson": null,
+      "pollingSchedule": null,
+      "tcpHost": null,
+      "tcpPort": null,
+      "alerts": []
     }
   ],
   "Mediators": [],

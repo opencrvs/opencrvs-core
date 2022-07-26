@@ -18,7 +18,7 @@ import {
 import { createStore } from '@client/store'
 import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
 import { ReactWrapper } from 'enzyme'
-import { ChangePhonePage } from './ChangePhonePage'
+import { ChangePhoneModal } from '@client/views/Settings/ChangePhoneModal/ChangePhoneModal'
 import { changePhoneMutation } from '@client/views/Settings/mutations'
 import { queriesForUser } from '@client/views/Settings/queries'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -40,18 +40,26 @@ const graphqlMocks = [
   }
 ]
 
-describe('Change phone page tests', () => {
+describe('Change phone modal tests', () => {
   let component: ReactWrapper
-  const { history } = createRouterProps('/settings/phone')
+  const onSuccessMock = jest.fn()
+  const { history } = createRouterProps('/settings')
   const { store } = createStore(history)
   beforeEach(async () => {
     store.dispatch(getStorageUserDetailsSuccess(JSON.stringify(userDetails)))
 
-    const testComponent = await createTestComponent(<ChangePhonePage />, {
-      store,
-      history,
-      graphqlMocks
-    })
+    const testComponent = await createTestComponent(
+      <ChangePhoneModal
+        show={true}
+        onSuccess={onSuccessMock}
+        onClose={jest.fn()}
+      />,
+      {
+        store,
+        history,
+        graphqlMocks
+      }
+    )
     component = testComponent
   })
 
@@ -71,7 +79,7 @@ describe('Change phone page tests', () => {
     ).toBe(false)
   })
 
-  it('should go to verify code page', async () => {
+  it('should render verify code view', async () => {
     queriesForUser.fetchUserDetails = jest.fn(() =>
       Promise.resolve({
         data: {
@@ -93,7 +101,7 @@ describe('Change phone page tests', () => {
     )
   })
 
-  it('should go to settings page after change phone number', async () => {
+  it('should trigger onSuccess callback after change phone number', async () => {
     queriesForUser.fetchUserDetails = jest.fn(() =>
       Promise.resolve({
         data: {
@@ -133,6 +141,6 @@ describe('Change phone page tests', () => {
     })
 
     component.update()
-    expect(history.location.pathname).not.toContain('/phone')
+    expect(onSuccessMock).toBeCalledTimes(1)
   })
 })

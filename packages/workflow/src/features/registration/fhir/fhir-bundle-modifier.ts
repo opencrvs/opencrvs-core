@@ -167,7 +167,7 @@ export async function invokeRegistrationValidation(
   token: string
 ) {
   try {
-    fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
+    await fetch(`${RESOURCE_SERVICE_URL}validate/registration`, {
       method: 'POST',
       body: JSON.stringify(bundle),
       headers: {
