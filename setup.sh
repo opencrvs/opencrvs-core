@@ -351,7 +351,7 @@ yarn compose:deps:detached
 
 # As this script is also used when setting up E2E tests,
 # where we don't want to start the app in tmux. This script ends.
-if [ $CI == "true" ]; then
+if [[ $CI == "true" ]]; then
  exit 0
 fi
 
