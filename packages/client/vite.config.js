@@ -20,6 +20,15 @@ process.env.VITE_APP_COUNTRY_CONFIG_URL =
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, 'env')
 
+  const noTreeshakingForEvalPlugin = () => {
+    return {
+      name: 'no-treeshaking-for-eval',
+      transform(code) {
+        if (code.match(/eval\(/)) return { moduleSideEffects: 'no-treeshake' }
+      }
+    }
+  }
+
   const htmlPlugin = () => {
     return {
       name: 'html-transform',
@@ -34,6 +43,9 @@ export default defineConfig(({ mode }) => {
     // This changes the out put dir from dist to build
     build: {
       outDir: 'build',
+      rollupOptions: {
+        plugins: [noTreeshakingForEvalPlugin()]
+      },
       commonjsOptions: {
         transformMixedEsModules: true
       }
