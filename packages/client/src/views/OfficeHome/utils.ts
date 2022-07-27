@@ -87,8 +87,14 @@ export function getDownloadStatus(
   declaration: IDeclaration | undefined,
   userId: string | undefined
 ) {
-  if (declaration?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADING) {
-    return declaration.downloadStatus
+  if (
+    [
+      DOWNLOAD_STATUS.DOWNLOADING,
+      DOWNLOAD_STATUS.FAILED_NETWORK,
+      DOWNLOAD_STATUS.FAILED
+    ].includes(declaration?.downloadStatus as DOWNLOAD_STATUS)
+  ) {
+    return declaration?.downloadStatus
   }
 
   if (assignedUserId === undefined) {

@@ -668,6 +668,78 @@ describe('RegistrarHome ready to print tab related tests', () => {
             }
           }
         })
+        .mockReturnValueOnce({
+          data: {
+            inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
+            reviewTab: { totalItems: 0, results: [] },
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: {
+              results: [
+                {
+                  id: '956281c9-1f47-4c26-948a-970dd23c4094',
+                  type: 'Death',
+                  registration: {
+                    status: 'REGISTERED',
+                    contactNumber: undefined,
+                    trackingId: 'DG6PECX',
+                    registrationNumber: '20196816020000113',
+                    eventLocationId: undefined,
+                    registeredLocationId:
+                      'd8cfd240-4b5a-4557-9df7-b1591a11d843',
+                    duplicates: [null],
+                    createdAt: '1574696143372',
+                    modifiedAt: undefined,
+                    assignment: {
+                      userId: '123',
+                      firstName: 'Kennedy',
+                      lastName: 'Mweene',
+                      officeName: 'Ibombo District Office',
+                      __typename: 'AssignmentData'
+                    }
+                  },
+                  operationHistories: [
+                    {
+                      operationType: 'REGISTERED',
+                      operatedOn: '2019-10-20T11:03:20.660Z',
+                      operatorRole: 'LOCAL_REGISTRAR',
+                      operatorName: [
+                        {
+                          firstNames: 'Mohammad',
+                          familyName: 'Ashraful',
+                          use: 'en'
+                        },
+                        {
+                          firstNames: '',
+                          familyName: null,
+                          use: 'bn'
+                        }
+                      ],
+                      operatorOfficeName: 'Alokbali Union Parishad',
+                      operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                    }
+                  ],
+                  dateOfDeath: '2019-01-18',
+                  deceasedName: [
+                    {
+                      use: 'bn',
+                      firstNames: 'ক ম আব্দুল্লাহ আল আমিন ',
+                      familyName: 'খান'
+                    },
+                    {
+                      use: 'en',
+                      firstNames: 'K M Abdullah al amin',
+                      familyName: 'Khan'
+                    }
+                  ]
+                } as GQLDeathEventSearchSet
+              ],
+              totalItems: 1
+            },
+            externalValidationTab: { totalItems: 0, results: [] }
+          }
+        })
       client.query = mockListSyncController
 
       createdTestComponent = await createTestComponent(
