@@ -39,6 +39,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import { gqlToDraftTransformer } from '@client/transformer'
 import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
+import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 
 interface IMatchParams {
   userId?: string
@@ -80,6 +81,19 @@ const Container = styled.div`
   justify-content: center;
 `
 
+const SpinnerWrapper = styled.div`
+  background: ${({ theme }) => theme.colors.white};
+  font: ${({ theme }) => theme.fonts.bold14};
+  border: solid 1px ${({ theme }) => theme.colors.grey300};
+  border-radius: 4px;
+  width: 244px;
+  height: 163px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+`
+
 class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
   async componentDidMount() {
     const { userId, client } = this.props
@@ -106,9 +120,15 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
             : intl.formatMessage(formMessages.userFormTitle)
         }
         goBack={this.props.goBack}
+        hideBackground={true}
       >
         <Container>
-          <Spinner id="user-form-submitting-spinner" />
+          <SpinnerWrapper>
+            <Spinner id="user-form-submitting-spinner" size={25} />
+            {this.props.submitting && (
+              <p>{intl.formatMessage(userFormMessages.creatingNewUser)}</p>
+            )}
+          </SpinnerWrapper>
         </Container>
       </ActionPageLight>
     )
