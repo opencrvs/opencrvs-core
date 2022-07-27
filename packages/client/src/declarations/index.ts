@@ -919,9 +919,12 @@ export async function writeDeclarationByUser(
   let { currentUserData } = userData
 
   if (currentUserData) {
-    currentUserData.declarations = currentUserData.declarations.map((dec) =>
-      dec.id === declaration.id ? declaration : dec
-    )
+    currentUserData.declarations = [
+      ...currentUserData.declarations.filter(
+        (savedDeclaration) => savedDeclaration.id !== declaration.id
+      ),
+      declaration
+    ]
   } else {
     currentUserData = {
       userID: uID,
