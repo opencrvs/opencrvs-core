@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { connect, useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { changeLanguage } from '@login/i18n/actions'
 import { ISelectOption, Select } from '@opencrvs/components/lib/select'
 import styled from 'styled-components'
@@ -22,11 +22,9 @@ import {
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
 import { useHistory, useLocation } from 'react-router'
 
-type IDispatchProps = {
-  changeLanguage: typeof changeLanguage
+type IProps = {
+  children: React.ReactNode
 }
-
-type IProps = IDispatchProps & { children: React.ReactNode }
 
 const SelectContainer = styled.div`
   display: flex;
@@ -35,25 +33,26 @@ const SelectContainer = styled.div`
   background: ${({ theme }) => theme.colors.backgroundPrimary};
 `
 
-function LanguageSelectComponent({ changeLanguage, children }: IProps) {
+export function LanguageSelect({ children }: IProps) {
   const applicationLangauges = window.config.LANGUAGES.split(',')
   const languages = useSelector(getLanguages)
   const languageOptions: ISelectOption[] = Object.values(languages)
     .map(({ lang, displayName }) => ({ value: lang, label: displayName }))
     .filter(({ value }) => applicationLangauges.includes(value))
   const storedLanguage = useSelector(getLanguage)
-  const getLanguageFromParam = useSearchQuery('language')
+  const paramLanguage = useSearchQuery('language')
+  const dispatch = useDispatch()
   const history = useHistory()
   const location = useLocation()
   React.useEffect(() => {
     async function loadLanguage() {
-      const selectLanguage = getLanguageFromParam ?? (await retrieveLanguage())
+      const selectLanguage = paramLanguage ?? (await retrieveLanguage())
 
       if (
         selectLanguage !== storedLanguage &&
         getAvailableLanguages().some((language) => language === selectLanguage)
       )
-        changeLanguage({ language: selectLanguage })
+        dispatch(changeLanguage({ language: selectLanguage }))
     }
 
     loadLanguage()
@@ -61,13 +60,13 @@ function LanguageSelectComponent({ changeLanguage, children }: IProps) {
   }, [])
 
   const onChange = ({ value }: ISelectOption) => {
-    if (getLanguageFromParam) {
+    if (paramLanguage) {
       history.replace({
         pathname: location.pathname,
         search: `language=${value}`
       })
     }
-    changeLanguage({ language: value })
+    dispatch(changeLanguage({ language: value }))
   }
 
   return (
@@ -85,7 +84,3 @@ function LanguageSelectComponent({ changeLanguage, children }: IProps) {
     </>
   )
 }
-
-export const LanguageSelect = connect(null, {
-  changeLanguage
-})(LanguageSelectComponent)
