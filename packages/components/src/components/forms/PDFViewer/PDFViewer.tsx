@@ -22,7 +22,7 @@ const Container = styled.div`
   background: ${({ theme }) => theme.colors.white};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     overflow-x: scroll;
-    padding-left: 180px;
+    align-items: start;
   }
 `
 
