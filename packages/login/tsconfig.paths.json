@@ -1,5 +1,4 @@
 {
   "compilerOptions": {
-    "paths": { "@login/*": ["./*"] }
-  }
+    "paths": { "@login/*": ["./*"] }  }
 }

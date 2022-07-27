@@ -9,26 +9,14 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-const path = require('path')
-const { ESLINT_MODES } = require('@craco/craco')
+/// <reference types="vite/client" />
 
-process.env.VITE_APP_COUNTRY_CONFIG_URL =
-  process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
+interface ImportMetaEnv {
+  readonly VITE_APP_VERSION?: string
+  readonly COUNTRY_CONFIG_URL?: string
+  // more env variables...
+}
 
-module.exports = {
-  eslint: {
-    mode: ESLINT_MODES.file
-  },
-  webpack: {
-    alias: {
-      '@client': path.resolve(__dirname, 'src/')
-    }
-  },
-  jest: {
-    configure: {
-      moduleNameMapper: {
-        '^@client(.*)$': '<rootDir>/src/$1'
-      }
-    }
-  }
+interface ImportMeta {
+  readonly env: ImportMetaEnv
 }

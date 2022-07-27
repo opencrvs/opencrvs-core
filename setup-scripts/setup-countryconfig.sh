@@ -38,7 +38,7 @@ git clone https://github.com/opencrvs/opencrvs-farajaland.git
 
 cd opencrvs-farajaland
 
-if [ $CI == "true" ]; then
+if [[ $CI == "true" ]]; then
   git checkout develop
 else
   git checkout master

@@ -5076,19 +5076,12 @@
           },
           {
             "id": "user-view-group",
+            "title": {
+              "defaultMessage": "User details",
+              "description": "User details section",
+              "id": "form.section.userDetails"
+            },
             "fields": [
-              {
-                "name": "userDetails",
-                "type": "FIELD_GROUP_TITLE",
-                "label": {
-                  "defaultMessage": "User details",
-                  "description": "User details section",
-                  "id": "form.section.userDetails"
-                },
-                "required": false,
-                "initialValue": "",
-                "validate": []
-              },
               {
                 "name": "firstNamesEng",
                 "type": "TEXT",
@@ -5232,16 +5225,17 @@
                 }
               },
               {
-                "name": "accountDetails",
-                "type": "FIELD_GROUP_TITLE",
+                "name": "seperator",
+                "type": "SUBSECTION",
                 "label": {
-                  "defaultMessage": "Account details",
-                  "description": "Account details section",
-                  "id": "form.section.accountDetails"
+                  "defaultMessage": " ",
+                  "description": "empty string",
+                  "id": "form.field.label.empty"
                 },
-                "required": false,
                 "initialValue": "",
-                "validate": []
+                "ignoreBottomMargin": true,
+                "validate": [],
+                "conditionals": []
               },
               {
                 "name": "role",
@@ -5469,18 +5463,6 @@
             "id": "preview-user-view-group",
             "fields": [
               {
-                "name": "userDetails",
-                "type": "FIELD_GROUP_TITLE",
-                "label": {
-                  "defaultMessage": "User details",
-                  "description": "User details section",
-                  "id": "form.section.userDetails"
-                },
-                "required": false,
-                "initialValue": "",
-                "validate": []
-              },
-              {
                 "name": "firstNamesEng",
                 "type": "TEXT",
                 "label": {
@@ -5623,16 +5605,17 @@
                 }
               },
               {
-                "name": "accountDetails",
-                "type": "FIELD_GROUP_TITLE",
+                "name": "seperator",
+                "type": "SUBSECTION",
                 "label": {
-                  "defaultMessage": "Account details",
-                  "description": "Account details section",
-                  "id": "form.section.accountDetails"
+                  "defaultMessage": " ",
+                  "description": "empty string",
+                  "id": "form.field.label.empty"
                 },
-                "required": false,
                 "initialValue": "",
-                "validate": []
+                "ignoreBottomMargin": true,
+                "validate": [],
+                "conditionals": []
               },
               {
                 "name": "role",

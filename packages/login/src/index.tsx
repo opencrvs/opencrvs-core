@@ -33,7 +33,7 @@ if (
 ) {
   // setup error reporting using sentry
   Sentry.init({
-    environment: process.env.NODE_ENV,
+    environment: import.meta.env.MODE,
     dsn: window.config.SENTRY
   })
 
