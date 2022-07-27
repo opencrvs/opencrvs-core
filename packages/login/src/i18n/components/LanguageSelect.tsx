@@ -10,24 +10,23 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { connect } from 'react-redux'
-import { IStoreState } from '@login/store'
+import { connect, useSelector } from 'react-redux'
 import { changeLanguage } from '@login/i18n/actions'
 import { ISelectOption, Select } from '@opencrvs/components/lib/select'
 import styled from 'styled-components'
-import { retrieveLanguage, getAvailableLanguages } from '@login/i18n/utils'
+import {
+  retrieveLanguage,
+  getAvailableLanguages,
+  useSearchQuery
+} from '@login/i18n/utils'
 import { getLanguages, getLanguage } from '@login/i18n/selectors'
-
-type IStateProps = {
-  selectedLanguage: string
-  languageOptions: ISelectOption[]
-}
+import { useHistory, useLocation } from 'react-router'
 
 type IDispatchProps = {
   changeLanguage: typeof changeLanguage
 }
 
-type IProps = IStateProps & IDispatchProps & { children: React.ReactNode }
+type IProps = IDispatchProps & { children: React.ReactNode }
 
 const SelectContainer = styled.div`
   display: flex;
@@ -36,20 +35,25 @@ const SelectContainer = styled.div`
   background: ${({ theme }) => theme.colors.backgroundPrimary};
 `
 
-function LanguageSelectComponent({
-  selectedLanguage,
-  languageOptions,
-  changeLanguage,
-  children
-}: IProps) {
+function LanguageSelectComponent({ changeLanguage, children }: IProps) {
+  const applicationLangauges = window.config.LANGUAGES.split(',')
+  const languages = useSelector(getLanguages)
+  const languageOptions: ISelectOption[] = Object.values(languages)
+    .map(({ lang, displayName }) => ({ value: lang, label: displayName }))
+    .filter(({ value }) => applicationLangauges.includes(value))
+  const storedLanguage = useSelector(getLanguage)
+  const getLanguageFromParam = useSearchQuery('language')
+  const history = useHistory()
+  const location = useLocation()
   React.useEffect(() => {
     async function loadLanguage() {
-      const savedLanguage = await retrieveLanguage()
+      const selectLanguage = getLanguageFromParam ?? (await retrieveLanguage())
+
       if (
-        savedLanguage !== selectedLanguage &&
-        getAvailableLanguages().some((language) => language === savedLanguage)
+        selectLanguage !== storedLanguage &&
+        getAvailableLanguages().some((language) => language === selectLanguage)
       )
-        changeLanguage({ language: savedLanguage })
+        changeLanguage({ language: selectLanguage })
     }
 
     loadLanguage()
@@ -57,6 +61,12 @@ function LanguageSelectComponent({
   }, [])
 
   const onChange = ({ value }: ISelectOption) => {
+    if (getLanguageFromParam) {
+      history.replace({
+        pathname: location.pathname,
+        search: `language=${value}`
+      })
+    }
     changeLanguage({ language: value })
   }
 
@@ -65,7 +75,7 @@ function LanguageSelectComponent({
       {languageOptions.length > 1 && (
         <SelectContainer>
           <Select
-            value={selectedLanguage}
+            value={storedLanguage}
             options={languageOptions}
             onChange={onChange}
           />
@@ -76,23 +86,6 @@ function LanguageSelectComponent({
   )
 }
 
-function mapStateToProps(store: IStoreState) {
-  const applicationLangauges = window.config.LANGUAGES.split(',')
-  const languageOptions: ISelectOption[] = Object.values(getLanguages(store))
-    .map(({ lang, displayName }) => ({ value: lang, label: displayName }))
-    .filter(({ value }) => applicationLangauges.includes(value))
-
-  return {
-    selectedLanguage: getLanguage(store),
-    languageOptions
-  }
-}
-
-export const LanguageSelect = connect<
-  IStateProps,
-  IDispatchProps,
-  {},
-  IStoreState
->(mapStateToProps, {
+export const LanguageSelect = connect(null, {
   changeLanguage
 })(LanguageSelectComponent)
