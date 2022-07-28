@@ -511,7 +511,8 @@ function RecordAuditBody({
     intl,
     goToUser: goToUserProfile,
     registerForm: regForm,
-    offlineData
+    offlineData,
+    draft
   }
 
   const mobileProps: IPageHeaderProps = {
