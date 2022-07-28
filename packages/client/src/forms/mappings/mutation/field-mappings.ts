@@ -394,6 +394,9 @@ export function fieldToAttachmentTransformer(
   subjectMapper?: any,
   typeMapper?: any
 ) {
+  if (draftData[sectionId][field.name] === []) {
+    return transformedData
+  }
   const attachments = (draftData[sectionId][field.name] as IAttachment[]).map(
     (attachment) => {
       return {
@@ -406,7 +409,7 @@ export function fieldToAttachmentTransformer(
       }
     }
   )
-  if (attachments.length > 0) {
+  if (attachments) {
     const selectedSectionId = alternateSectionId
       ? alternateSectionId
       : sectionId

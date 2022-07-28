@@ -26,9 +26,8 @@
     "packages/gateway/src/graphql/schema.d.ts",
     "packages/gateway/src/graphql/schema.graphql",
     "infrastructure/configure-file-monitoring.sh",
-    "packages/client/index.html",
-    "packages/login/index.html",
-    "packages/components/.storybook/preview.jsx",
+    "packages/client/public/index.html",
+    "packages/login/public/index.html",
     "grafana"
   ],
   "license": "infrastructure/license-header.txt",

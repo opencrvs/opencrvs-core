@@ -11,8 +11,10 @@
  */
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
+
 import styled from 'styled-components'
-import { Form, Field } from 'react-final-form'
+import { InjectedFormProps, WrappedFieldProps, Field } from 'redux-form'
+
 import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   InputField,
@@ -21,6 +23,7 @@ import {
   THEME_MODE,
   ErrorMessage
 } from '@opencrvs/components/lib/forms'
+
 import { stepOneFields } from '@login/views/StepOne/stepOneFields'
 import { messages } from '@login/i18n/messages/views/stepOneForm'
 
@@ -33,12 +36,11 @@ import {
   ERROR_CODE_PHONE_NUMBER_VALIDATE
 } from '@login/utils/authUtils'
 import { goToForgottenItemForm } from '@login/login/actions'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import {
   selectApplicationName,
   selectCountryLogo
 } from '@login/login/selectors'
-import * as actions from '@login/login/actions'
 
 export const Container = styled.div`
   position: relative;
@@ -134,74 +136,69 @@ export interface IProps {
   errorCode?: number
 }
 export interface IDispatchProps {
+  submitAction: (values: IAuthenticationData) => void
   forgetAction: typeof goToForgottenItemForm
 }
 
 type IStepOneForm = IProps & IDispatchProps
 
-export type FullProps = IntlShapeProps & IStepOneForm
+export type FullProps = IntlShapeProps &
+  InjectedFormProps<IAuthenticationData, IStepOneForm> &
+  IStepOneForm
 
 const userNameField = stepOneFields.username
 const passwordField = stepOneFields.password
 
-type Props = IntlShapeProps
+type Props = WrappedFieldProps & IntlShapeProps
 
 const UserNameInput = injectIntl((props: Props) => {
-  const { intl } = props
+  const { intl, meta, input, ...otherProps } = props
 
   return (
-    <Field name={userNameField.name}>
-      {({ meta, input, ...otherProps }) => (
-        <InputField
-          {...userNameField}
-          {...otherProps}
-          touched={Boolean(meta.touched)}
-          label={intl.formatMessage(userNameField.label)}
-          optionalLabel={intl.formatMessage(messages.optionalLabel)}
-          ignoreMediaQuery
-          hideAsterisk
-          mode={THEME_MODE.DARK}
-        >
-          <TextInput
-            {...userNameField}
-            {...input}
-            touched={Boolean(meta.touched)}
-            error={Boolean(meta.error)}
-            type="text"
-            ignoreMediaQuery
-          />
-        </InputField>
-      )}
-    </Field>
+    <InputField
+      {...userNameField}
+      {...otherProps}
+      touched={meta.touched}
+      label={intl.formatMessage(userNameField.label)}
+      optionalLabel={intl.formatMessage(messages.optionalLabel)}
+      ignoreMediaQuery
+      hideAsterisk
+      mode={THEME_MODE.DARK}
+    >
+      <TextInput
+        {...userNameField}
+        {...input}
+        touched={Boolean(meta.touched)}
+        error={Boolean(meta.error)}
+        type="text"
+        ignoreMediaQuery
+      />
+    </InputField>
   )
 })
 
 const Password = injectIntl((props: Props) => {
-  const { intl } = props
+  const { intl, meta, input, ...otherProps } = props
 
   return (
-    <Field name={passwordField.name}>
-      {({ meta, input, ...otherProps }) => (
-        <InputField
-          {...passwordField}
-          {...otherProps}
-          touched={Boolean(meta.touched)}
-          label={intl.formatMessage(passwordField.label)}
-          optionalLabel={intl.formatMessage(messages.optionalLabel)}
-          ignoreMediaQuery
-          hideAsterisk
-          mode={THEME_MODE.DARK}
-        >
-          <PasswordInput
-            {...passwordField}
-            {...input}
-            touched={Boolean(meta.touched)}
-            error={Boolean(meta.error)}
-            ignoreMediaQuery
-          />
-        </InputField>
-      )}
-    </Field>
+    <InputField
+      {...passwordField}
+      {...otherProps}
+      touched={meta.touched}
+      label={intl.formatMessage(passwordField.label)}
+      optionalLabel={intl.formatMessage(messages.optionalLabel)}
+      ignoreMediaQuery
+      hideAsterisk
+      mode={THEME_MODE.DARK}
+    >
+      <PasswordInput
+        {...passwordField}
+        {...input}
+        touched={Boolean(meta.touched)}
+        error={Boolean(meta.error)}
+        ignoreMediaQuery
+      />
+    </InputField>
   )
 })
 
@@ -219,12 +216,13 @@ function usePersistentCountryLogo() {
 
 export function StepOneForm({
   intl,
+  handleSubmit,
   formId,
+  submitAction,
   forgetAction,
   submissionError,
   errorCode
 }: FullProps) {
-  const dispatch = useDispatch()
   /* This might need to be converted into a state */
   const isOffline: boolean = navigator.onLine ? false : true
   const logo = usePersistentCountryLogo()
@@ -259,36 +257,36 @@ export function StepOneForm({
           )
         )}
       </Title>
-      <Form
-        onSubmit={(values: IAuthenticationData) =>
-          dispatch(actions.authenticate(values))
-        }
-      >
-        {({ handleSubmit }) => (
-          <FormWrapper id={formId} onSubmit={handleSubmit}>
-            <FieldWrapper>
-              <Field name={userNameField.name} component={UserNameInput} />
-            </FieldWrapper>
-            <FieldWrapper>
-              <Field name={passwordField.name} component={Password} />
-            </FieldWrapper>
-            <ActionWrapper>
-              <PrimaryButton id="login-mobile-submit" type="submit">
-                {intl.formatMessage(messages.submit)}
-              </PrimaryButton>
-              <StyledButtonWrapper>
-                <StyledButton
-                  id="login-forgot-password"
-                  type="button"
-                  onClick={forgetAction}
-                >
-                  {intl.formatMessage(messages.forgotPassword)}
-                </StyledButton>
-              </StyledButtonWrapper>
-            </ActionWrapper>
-          </FormWrapper>
-        )}
-      </Form>
+      <FormWrapper id={formId} onSubmit={handleSubmit(submitAction)}>
+        <FieldWrapper>
+          <Field
+            name={userNameField.name}
+            validate={userNameField.validate}
+            component={UserNameInput}
+          />
+        </FieldWrapper>
+        <FieldWrapper>
+          <Field
+            name={passwordField.name}
+            validate={passwordField.validate}
+            component={Password}
+          />
+        </FieldWrapper>
+        <ActionWrapper>
+          <PrimaryButton id="login-mobile-submit" type="submit">
+            {intl.formatMessage(messages.submit)}
+          </PrimaryButton>
+          <StyledButtonWrapper>
+            <StyledButton
+              id="login-forgot-password"
+              type="button"
+              onClick={forgetAction}
+            >
+              {intl.formatMessage(messages.forgotPassword)}
+            </StyledButton>
+          </StyledButtonWrapper>
+        </ActionWrapper>
+      </FormWrapper>
     </Container>
   )
 }

@@ -9,25 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-const { mergeConfig } = require('vite')
 module.exports = {
-  async viteFinal(config, { configType }) {
-    // return the customized config
-    return mergeConfig(config, {
-      // customize the Vite config here
-      resolve: {
-        alias: {
-          crypto: 'crypto-js'
-        }
-      }
-    })
-  },
-  typescript: {
-    reactDocgen: 'react-docgen'
-  },
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
-  core: { builder: '@storybook/builder-vite' },
-  addons: ['@storybook/addon-links', '@storybook/addon-essentials'],
-  staticDirs: ['../public'],
+  addons: [
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    '@storybook/preset-create-react-app'
+  ],
   framework: '@storybook/react'
 }

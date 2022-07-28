@@ -19,7 +19,7 @@ import {
   INFORMANT_MINIMUM_AGE
 } from '@client/utils/constants'
 import { validate as validateEmail } from 'email-validator'
-import XRegExp from 'xregexp'
+import * as XRegExp from 'xregexp'
 import { isArray } from 'util'
 import {
   NATIONAL_ID,

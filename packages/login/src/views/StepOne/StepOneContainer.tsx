@@ -11,6 +11,7 @@
  */
 import { connect } from 'react-redux'
 import { injectIntl } from 'react-intl'
+import { reduxForm } from 'redux-form'
 import {
   StepOneForm,
   IProps,
@@ -33,10 +34,13 @@ const mapStateToProps = (store: IStoreState): IProps => {
 }
 
 const mapDispatchToProps = {
+  submitAction: actions.authenticate,
   forgetAction: actions.goToForgottenItemForm
 }
 
-const stepOneForm = injectIntl(StepOneForm)
+const stepOneForm = reduxForm({
+  form: FORM_NAME
+})(injectIntl(StepOneForm) as any)
 
 export const StepOneContainer = connect<
   IProps,
