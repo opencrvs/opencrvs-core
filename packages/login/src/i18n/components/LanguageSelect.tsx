@@ -33,26 +33,26 @@ const SelectContainer = styled.div`
   background: ${({ theme }) => theme.colors.backgroundPrimary};
 `
 
-export function LanguageSelect({ children }: IProps) {
+function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
   const applicationLangauges = window.config.LANGUAGES.split(',')
+  const history = useHistory()
+  const location = useLocation()
+  const dispatch = useDispatch()
   const languages = useSelector(getLanguages)
+
   const languageOptions: ISelectOption[] = Object.values(languages)
     .map(({ lang, displayName }) => ({ value: lang, label: displayName }))
     .filter(({ value }) => applicationLangauges.includes(value))
-  const storedLanguage = useSelector(getLanguage)
-  const paramLanguage = useSearchQuery('language')
-  const dispatch = useDispatch()
-  const history = useHistory()
-  const location = useLocation()
+
   React.useEffect(() => {
     async function loadLanguage() {
-      const selectLanguage = paramLanguage ?? (await retrieveLanguage())
+      const languageToUse = paramLanguage ?? (await retrieveLanguage())
 
       if (
-        selectLanguage !== storedLanguage &&
-        getAvailableLanguages().some((language) => language === selectLanguage)
+        languageToUse !== selectedLanguage &&
+        getAvailableLanguages().some((language) => language === languageToUse)
       )
-        dispatch(changeLanguage({ language: selectLanguage }))
+        dispatch(changeLanguage({ language: languageToUse }))
     }
 
     loadLanguage()
@@ -68,15 +68,25 @@ export function LanguageSelect({ children }: IProps) {
     }
     dispatch(changeLanguage({ language: value }))
   }
+  return [languageOptions, onChange] as const
+}
+
+export function LanguageSelect({ children }: IProps) {
+  const paramLanguage = useSearchQuery('language')
+  const selectedLanguage = useSelector(getLanguage)
+  const [languageOptions, onLanguageChange] = useLanguage(
+    selectedLanguage,
+    paramLanguage
+  )
 
   return (
     <>
       {languageOptions.length > 1 && (
         <SelectContainer>
           <Select
-            value={storedLanguage}
+            value={selectedLanguage}
             options={languageOptions}
-            onChange={onChange}
+            onChange={onLanguageChange}
           />
         </SelectContainer>
       )}
