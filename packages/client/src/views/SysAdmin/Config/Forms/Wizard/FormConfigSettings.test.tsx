@@ -48,7 +48,7 @@ describe('Introduction page settings update test', () => {
       .first()
       .simulate('click')
     expect(
-      testComponent.find('#changeIntroductionPageModal').hostNodes()
+      testComponent.find('#HIDE_EVENT_REGISTER_INFORMATIONModal').hostNodes()
     ).toHaveLength(1)
   })
 
@@ -60,7 +60,7 @@ describe('Introduction page settings update test', () => {
       .simulate('click')
     testComponent.find('#cancel').hostNodes().first().simulate('click')
     expect(
-      testComponent.find('#changeIntroductionPageModal').hostNodes()
+      testComponent.find('#HIDE_EVENT_REGISTER_INFORMATIONModal').hostNodes()
     ).toHaveLength(0)
   })
 
@@ -118,9 +118,7 @@ describe('Addresses settings update test', () => {
       .hostNodes()
       .first()
       .simulate('click')
-    expect(
-      testComponent.find('#changeAddressesModal').hostNodes()
-    ).toHaveLength(1)
+    expect(testComponent.find('#ADDRESSESModal').hostNodes()).toHaveLength(1)
   })
 
   it('should change the ADDRESSES if click on apply', async () => {

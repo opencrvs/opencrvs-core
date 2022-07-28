@@ -15,6 +15,8 @@ export const stepOneFields = {
   username: {
     id: 'username',
     name: 'username',
+    // maxLength: 11,
+    validate: [],
     disabled: false,
     type: 'text',
     focusInput: false,
@@ -23,6 +25,7 @@ export const stepOneFields = {
   password: {
     id: 'password',
     name: 'password',
+    validate: [],
     disabled: false,
     type: 'password',
     focusInput: false,

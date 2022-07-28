@@ -9,14 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-/// <reference types="vite/client" />
-
-interface ImportMetaEnv {
-  readonly VITE_APP_VERSION?: string
-  readonly COUNTRY_CONFIG_URL?: string
-  // more env variables...
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv
-}
+export * from './DeathDelayedFee'
+export * from './DeathDelayedRegistrationTarget'
+export * from './DeathFeeOnTime'
+export * from './DeathRegistrationTarget'

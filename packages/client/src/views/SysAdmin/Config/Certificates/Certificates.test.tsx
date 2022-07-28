@@ -15,6 +15,41 @@ import { createTestComponent, flushPromises } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { CertificatesConfig } from './Certificates'
 import { waitForElement } from '@client/tests/wait-for-element'
+import * as fetchMock from 'jest-fetch-mock'
+import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
+import { certificateTemplateMutations } from '@client/certificate/mutations'
+
+const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+
+enum MENU_ITEM {
+  PREVIEW,
+  PRINT,
+  DOWNLOAD,
+  UPLOAD
+}
+
+async function clickOnMenuItem(
+  testComponent: ReactWrapper,
+  event: string,
+  item: MENU_ITEM
+) {
+  await waitForElement(
+    testComponent,
+    `#template-${event}-action-menuToggleButton`
+  )
+  testComponent
+    .find(`#template-${event}-action-menuToggleButton`)
+    .hostNodes()
+    .first()
+    .simulate('click')
+  testComponent.update()
+
+  testComponent
+    .find(`#template-birth-action-menuItem${item}`)
+    .hostNodes()
+    .simulate('click')
+  testComponent.update()
+}
 
 describe('ConfigHome page when already has uploaded certificate template', () => {
   const { store, history } = createStore()
@@ -28,14 +63,14 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
     testComponent.update()
   })
 
-  it('shows default birth certificate template text', async () => {
-    await expect(
+  it('shows default birth certificate template text', () => {
+    expect(
       testComponent.find('#birth_value').hostNodes().first().text()
     ).toContain('Default birth certificate template')
   })
 
-  it('shows default death certificate template text', async () => {
-    await expect(
+  it('shows default death certificate template text', () => {
+    expect(
       testComponent.find('#death_value').hostNodes().first().text()
     ).toContain('Default death certificate template')
   })
@@ -58,46 +93,61 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
   })
 
   describe('Testing sub menu item on config page', () => {
-    it('should shows upload modal when clicked on upload', async () => {
-      await waitForElement(
-        testComponent,
-        '#template-birth-action-menuToggleButton'
-      )
-      testComponent
-        .find('#template-birth-action-menuToggleButton')
-        .hostNodes()
-        .first()
-        .simulate('click')
-      testComponent.update()
+    let printCertificateSpy: jest.SpyInstance
+    let downloadFileSpy: jest.SpyInstance
+    let updateCertificateMutationSpy: jest.SpyInstance
 
-      testComponent
-        .find('#template-birth-action-menuItem3')
-        .hostNodes()
-        .simulate('click')
-      testComponent.update()
+    beforeEach(() => {
+      fetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          blob: () => new Blob(['data'])
+        })
+      )
+      printCertificateSpy = jest.spyOn(PDFUtils, 'printCertificate')
+      downloadFileSpy = jest.spyOn(PDFUtils, 'downloadFile')
+      updateCertificateMutationSpy = jest.spyOn(
+        certificateTemplateMutations,
+        'updateCertificateTemplate'
+      )
+    })
+    afterAll(() => {
+      fetch.resetMocks()
+      printCertificateSpy.mockRestore()
+      downloadFileSpy.mockRestore()
+    })
+    it('should show upload modal when clicked on upload', async () => {
+      await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.UPLOAD)
 
       expect(
         testComponent.find('#withoutVerificationPrompt').hostNodes()
       ).toHaveLength(1)
     })
 
-    it('should preview certificate template when clicked on preview', async () => {
-      await waitForElement(
-        testComponent,
-        '#template-birth-action-menuToggleButton'
-      )
+    it('should call update certificate mutation on modal confirmation', async () => {
+      await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.UPLOAD)
+      expect(
+        testComponent.find('#withoutVerificationPrompt').hostNodes()
+      ).toHaveLength(1)
+      testComponent.find('#send').hostNodes().simulate('click')
       testComponent
-        .find('#template-birth-action-menuToggleButton')
+        .find('#birth_file_uploader_field_undefined')
         .hostNodes()
         .first()
-        .simulate('click')
+        .simulate('change', {
+          target: {
+            files: [new Blob(['<svg></svg>'], { type: 'image/svg+xml' })],
+            id: 'birth_file_uploader_field_undefined'
+          }
+        })
       testComponent.update()
+      await new Promise((resolve) => {
+        setTimeout(resolve, 200)
+      })
+      expect(updateCertificateMutationSpy).toBeCalledTimes(1)
+    })
 
-      testComponent
-        .find('#template-birth-action-menuItem0')
-        .hostNodes()
-        .simulate('click')
-      testComponent.update()
+    it('should render preview certificate template when clicked on preview', async () => {
+      await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
       await waitForElement(testComponent, '#preview_image_field')
 
       expect(
@@ -106,30 +156,30 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
     })
 
     it('should go back from preview page if click on back arrow', async () => {
-      await waitForElement(
-        testComponent,
-        '#template-birth-action-menuToggleButton'
-      )
-      testComponent
-        .find('#template-birth-action-menuToggleButton')
-        .hostNodes()
-        .first()
-        .simulate('click')
-      testComponent.update()
-
-      testComponent
-        .find('#template-birth-action-menuItem0')
-        .hostNodes()
-        .simulate('click')
-      await flushPromises()
-      testComponent.update()
-
+      await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PREVIEW)
+      await waitForElement(testComponent, '#preview_image_field')
       testComponent.find('#preview_back').hostNodes().simulate('click')
       testComponent.update()
 
       expect(
         testComponent.find('#preview_image_field').hostNodes()
       ).toHaveLength(0)
+    })
+
+    it('should call print certificate after clicking print', async () => {
+      await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PRINT)
+      await new Promise((resolve) => {
+        setTimeout(resolve, 200)
+      })
+      expect(printCertificateSpy).toBeCalledTimes(1)
+    })
+
+    it('should download preview certificate', async () => {
+      await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.DOWNLOAD)
+      await new Promise((resolve) => {
+        setTimeout(resolve, 200)
+      })
+      expect(downloadFileSpy).toBeCalledTimes(1)
     })
   })
 })

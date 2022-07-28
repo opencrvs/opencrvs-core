@@ -9,12 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-/// <reference types="vite/client" />
-
-interface ImportMetaEnv {
-  // more env variables...
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv
-}
+export * from './BirthDelayedFee'
+export * from './BirthDelayedRegistrationTarget'
+export * from './BirthFeeOnTime'
+export * from './BirthLateFee'
+export * from './BirthLateRegistrationPeriod'
+export * from './BirthRegistrationTarget'

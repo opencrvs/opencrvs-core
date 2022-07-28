@@ -37,7 +37,7 @@ jobs:
     timeout-minutes: 120
     strategy:
       matrix:
-        node-version: [14.18.0]
+        node-version: [14.17.0]
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v2.3.4
