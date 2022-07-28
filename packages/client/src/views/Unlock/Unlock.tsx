@@ -21,7 +21,7 @@ import { IUserDetails, getUserName } from '@client/utils/userUtils'
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
 import { ErrorMessage } from '@opencrvs/components/lib/forms'
 import { Logout } from '@opencrvs/components/lib/icons'
-import { PINKeypad, Spinner } from '@opencrvs/components/lib/interface'
+import { PINKeypad } from '@opencrvs/components/lib/interface'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
@@ -44,15 +44,6 @@ export const PageWrapper = styled.div`
   padding: 20px;
   position: absolute;
   width: 100%;
-`
-
-const SpinnerWrapper = styled.div`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
 `
 
 export const LogoutHeader = styled.a`
@@ -80,7 +71,6 @@ const ForgottenPinLink = styled(Button)`
 interface IState {
   pin: string
   resetKey: number
-  showSpinner: boolean
 }
 type ErrorState = {
   attempt: number
@@ -110,8 +100,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
       attempt: 0,
       errorMessage: '',
       pin: '',
-      resetKey: Date.now(),
-      showSpinner: false
+      resetKey: Date.now()
     }
   }
 
@@ -148,14 +137,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
   onPinProvided = async (pin: string) => {
     const { intl } = this.props
-
-    this.setState({
-      showSpinner: true
-    })
     const pinMatched = await pinValidator.isValidPin(pin)
-    this.setState({
-      showSpinner: false
-    })
 
     if (this.state.attempt > MAX_ALLOWED_ATTEMPT) {
       return
@@ -256,11 +238,7 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
 
   render() {
     const { userDetails } = this.props
-    return this.state.showSpinner ? (
-      <SpinnerWrapper>
-        <Spinner id="hashingSpinner" />
-      </SpinnerWrapper>
-    ) : (
+    return (
       <PageWrapper id="unlockPage">
         <LogoutHeader onClick={this.logout} id="logout">
           <span>{this.props.intl.formatMessage(buttonMessages.logout)}</span>
