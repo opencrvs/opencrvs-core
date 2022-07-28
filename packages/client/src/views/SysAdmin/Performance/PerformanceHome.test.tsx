@@ -9,21 +9,28 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { PERFORMANCE_HOME } from '@client/navigation/routes'
 import { createStore } from '@client/store'
-import {
-  createRouterProps,
-  createTestApp,
-  createTestComponent,
-  flushPromises
-} from '@client/tests/util'
+import { createRouterProps, createTestComponent } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
-import { History } from 'history'
 import * as React from 'react'
-import { PerformanceHome } from './PerformanceHome'
-import { parse } from 'query-string'
-import { waitForElement } from '@client/tests/wait-for-element'
+import { PerformanceHome } from '@client/views/SysAdmin/Performance/PerformanceHome'
 import { Event } from '@client/utils/gateway'
+import { MockedProvider } from 'react-apollo/test-utils'
+import {
+  mockRegistrationCountRequest,
+  mockPerformanceMetricsRequest,
+  mockTotalCertificationsRequest,
+  mockTotalPaymentsRequest,
+  mockTotalCorrectionsRequest
+} from './utils'
+
+const graphqlMocks: MockedProvider['props']['mocks'] = [
+  mockPerformanceMetricsRequest,
+  mockRegistrationCountRequest,
+  mockTotalCertificationsRequest,
+  mockTotalPaymentsRequest,
+  mockTotalCorrectionsRequest
+]
 
 describe('Performance home test', () => {
   describe('Performance home without location in props', () => {
@@ -38,7 +45,7 @@ describe('Performance home test', () => {
       }
       app = await createTestComponent(
         <PerformanceHome
-          {...createRouterProps('/', undefined, {
+          {...createRouterProps('/performance', undefined, {
             search: {
               locationId: LOCATION_DHAKA_DIVISION.id,
               event: Event.Birth,
@@ -49,9 +56,14 @@ describe('Performance home test', () => {
         />,
         {
           store,
-          history
+          history,
+          graphqlMocks
         }
       )
+      // wait for mocked data to load mockedProvider
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100)
+      })
       app.update()
     })
 
