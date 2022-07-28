@@ -18,16 +18,11 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
-import {
-  IDeclaration,
-  IPayload,
-  SUBMISSION_STATUS,
-  DOWNLOAD_STATUS
-} from '@client/declarations'
+import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { ResponsiveModal } from '@opencrvs/components/lib/interface'
-import { Action, SubmissionAction } from '@client/forms'
+import { SubmissionAction } from '@client/forms'
 import styled from '@client/styledComponents'
 import * as React from 'react'
 
@@ -43,9 +38,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   submitDeclarationAction: (
     declaration: IDeclaration,
     submissionStatus: string,
-    action: Action,
-    payload?: IPayload,
-    downloadStatus?: DOWNLOAD_STATUS
+    action: SubmissionAction
   ) => void
   rejectDeclarationAction?: () => void
 }
@@ -438,9 +431,7 @@ class ReviewActionComponent extends React.Component<
                     ? submitDeclarationAction(
                         declaration,
                         SUBMISSION_STATUS.READY_TO_SUBMIT,
-                        SubmissionAction.SUBMIT_FOR_REVIEW,
-                        undefined,
-                        DOWNLOAD_STATUS.DOWNLOADED
+                        SubmissionAction.SUBMIT_FOR_REVIEW
                       )
                     : declarationToBeRegistered
                     ? submitDeclarationAction(
