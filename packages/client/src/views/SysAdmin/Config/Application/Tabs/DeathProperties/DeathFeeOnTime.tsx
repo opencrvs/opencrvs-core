@@ -37,7 +37,7 @@ import { buttonMessages } from '@client/i18n/messages'
 import { getOfflineData } from '@client/offline/selectors'
 import {
   callApplicationConfigMutation,
-  getCurrency,
+  getCurrencySymbol,
   getFormattedFee,
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
@@ -149,7 +149,11 @@ export function DeathFeeOnTime() {
               required={false}
             >
               <InputContainer>
-                <span>{getCurrency(offlineCountryConfiguration)}</span>
+                <span>
+                  {getCurrencySymbol(
+                    offlineCountryConfiguration.config.CURRENCY
+                  )}
+                </span>
                 <HalfWidthInput
                   id="applicationDeathOnTimeFee"
                   type="text"

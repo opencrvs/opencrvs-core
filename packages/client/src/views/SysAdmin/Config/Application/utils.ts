@@ -23,7 +23,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { ConfigActionType } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
 import { updateOfflineConfigData } from '@client/offline/actions'
 import { Dispatch } from 'redux'
-import { IApplicationConfig } from '@client/utils/referenceApi'
+import { IApplicationConfig, ICurrency } from '@client/utils/referenceApi'
 
 export type IActionType =
   | keyof typeof GeneralActionId
@@ -52,18 +52,26 @@ export enum NOTIFICATION_STATUS {
   ERROR = 'error'
 }
 
-export const getCurrency = (offlineCountryConfiguration: IOfflineData) => {
-  const currency = new Intl.NumberFormat(
-    offlineCountryConfiguration.config.CURRENCY.languagesAndCountry,
+export const getAmountWithCurrencySymbol = (
+  currency: ICurrency,
+  amount: number
+) => {
+  const amountWithSymbol = new Intl.NumberFormat(
+    `${currency.languagesAndCountry}-u-nu-mathsans`,
     {
       style: 'currency',
-      currency: offlineCountryConfiguration.config.CURRENCY.isoCode
+      currency: currency.isoCode
     }
-  )
-    .format(0)
-    .replace(/[0-9.,]/g, '')
+  ).format(amount)
 
-  return currency
+  return amountWithSymbol.normalize('NFKD').replace(/[\u0300-\u036F]/g, '')
+}
+
+export const getCurrencySymbol = (currency: ICurrency) => {
+  const currencySymbol = lookup.currencies({
+    code: currency.isoCode
+  })[0].symbol
+  return currencySymbol
 }
 export const getCurrencyObject = (value: string) => {
   const arr = value.split('-')
