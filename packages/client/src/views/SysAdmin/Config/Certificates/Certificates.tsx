@@ -56,7 +56,8 @@ import {
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import {
   executeHandlebarsTemplate,
-  printCertificate
+  printCertificate,
+  downloadFile
 } from '@client/views/PrintCertificate/PDFUtils'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import {
@@ -175,34 +176,6 @@ export const printDummyCertificate = async (
   )
 }
 
-export function printFile(data: string, fileName: string) {
-  const html =
-    '<html><head><title>' +
-    fileName +
-    '</title></head><body style="text-align:center">' +
-    data +
-    '</body></html>'
-
-  const printWindow = window.open() as Window
-  printWindow.document.write(html)
-  printWindow.document.close()
-  printWindow.print()
-  setTimeout(function () {
-    printWindow.close()
-  }, 100)
-}
-
-export function downloadFile(
-  contentType: string,
-  data: string,
-  fileName: string
-) {
-  const linkSource = `data:${contentType};base64,${window.btoa(data)}`
-  const downloadLink = document.createElement('a')
-  downloadLink.setAttribute('href', linkSource)
-  downloadLink.setAttribute('download', fileName)
-  downloadLink.click()
-}
 class CertificatesConfigComponent extends React.Component<Props, State> {
   birthCertificatefileUploader: React.RefObject<HTMLInputElement>
   deathCertificatefileUploader: React.RefObject<HTMLInputElement>
