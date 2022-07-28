@@ -470,7 +470,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       }
 
                       if (this.isQueriesInProgress()) {
-                        return <Spinner id="performance-home-loading" />
+                        return (
+                          <Spinner id="performance-home-loading" size={24} />
+                        )
                       }
 
                       return (
@@ -643,7 +645,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   >
                     <ResponsiveModalContent>
                       {loading ? (
-                        <Spinner id="modal-data-loading" />
+                        <Spinner id="modal-data-loading" size={24} />
                       ) : (
                         <>
                           {isOnline && (
@@ -682,7 +684,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     {!officeSelected && (
                       <LocationStats>
                         {!isOnline ? null : loading ? (
-                          <Spinner id="location-stats-loading" />
+                          <Spinner id="location-stats-loading" size={24} />
                         ) : (
                           <LocationStatsView
                             registrationOffices={
@@ -704,7 +706,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       {!isOnline ? (
                         <></>
                       ) : loading ? (
-                        <Spinner id="registration-status-loading" />
+                        <Spinner id="registration-status-loading" size={24} />
                       ) : (
                         <StatusWiseDeclarationCountView
                           selectedEvent={this.state.event}

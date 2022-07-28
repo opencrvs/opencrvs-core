@@ -63,7 +63,7 @@ describe('signature upload tests', () => {
       })
       testComponent.update()
 
-      const title = testComponent.find('#form-title').hostNodes().text()
+      const title = testComponent.find('#content-name').hostNodes().text()
 
       expect(title).toBe('Attach the signature')
     })
@@ -153,7 +153,7 @@ describe('signature upload tests', () => {
     })
 
     it('renders review header', () => {
-      expect(testComponent.find('#preview_title').hostNodes().text()).toBe(
+      expect(testComponent.find('#content-name').hostNodes().text()).toBe(
         'Please review the new users details'
       )
     })

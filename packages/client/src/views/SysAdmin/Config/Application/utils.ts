@@ -11,19 +11,24 @@
  */
 
 import { countries as countryList, lookup } from 'country-data'
-import { orderBy, uniqBy, omit } from 'lodash'
-import { IntlShape } from 'react-intl'
+import { orderBy, uniqBy } from 'lodash'
 import {
   BirthActionId,
   DeathActionId,
   GeneralActionId
 } from '@client/views/SysAdmin/Config/Application'
-import { messages } from '@client/i18n/messages/views/config'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { IBirth, IDeath, IFullProps, IState, ICurrency } from './DynamicModal'
-import { configApplicationMutations } from './mutations'
-import { IFormConfigSettingsProps } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
+import { configApplicationMutations } from '@client/views/SysAdmin/Config/Application/mutations'
+import { IOfflineData } from '@client/offline/reducer'
+import { ConfigActionType } from '@client/views/SysAdmin/Config/Forms/Wizard/FormConfigSettings'
+import { updateOfflineConfigData } from '@client/offline/actions'
+import { Dispatch } from 'redux'
+import { IApplicationConfig, ICurrency } from '@client/utils/referenceApi'
 
+export type IActionType =
+  | keyof typeof GeneralActionId
+  | keyof typeof BirthActionId
+  | keyof typeof DeathActionId
 interface ICurrencyOptions {
   [key: string]: string
 }
@@ -38,6 +43,13 @@ type ICountrylist = {
   languages: string[]
   name: string
   status: string
+}
+
+export enum NOTIFICATION_STATUS {
+  SUCCESS = 'success',
+  IDLE = 'idle',
+  IN_PROGRESS = 'inProgress',
+  ERROR = 'error'
 }
 
 export const getAmountWithCurrencySymbol = (
@@ -61,11 +73,10 @@ export const getCurrencySymbol = (currency: ICurrency) => {
   })[0].symbol
   return currencySymbol
 }
-
 export const getCurrencyObject = (value: string) => {
   const arr = value.split('-')
   return {
-    isoCode: arr.pop() as string,
+    isoCode: arr.pop(),
     languagesAndCountry: [arr.join('-')]
   }
 }
@@ -144,328 +155,50 @@ export const getFormattedFee = (value: string) => {
   return EMPTY_STRING
 }
 
-export const getTitle = (intl: IntlShape, changeModalName: string) => {
-  if (changeModalName === GeneralActionId.APPLICATION_NAME)
-    return intl.formatMessage(messages.applicationNameLabel)
-  if (changeModalName === GeneralActionId.GOVT_LOGO)
-    return intl.formatMessage(messages.govermentLogoLabel)
-  else if (changeModalName === GeneralActionId.CURRENCY)
-    return intl.formatMessage(messages.currencyLabel)
-  else if (changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET)
-    return intl.formatMessage(messages.birthLegallySpecifiedDialogTitle)
-  else if (changeModalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET)
-    return intl.formatMessage(messages.birthDelayedDialogTitle)
-  else if (changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET)
-    return intl.formatMessage(messages.deathLegallySpecifiedDialogTitle)
-  else if (changeModalName === GeneralActionId.NID_PATTERN)
-    return intl.formatMessage(messages.nidPatternTitle)
-  else if (changeModalName === GeneralActionId.PHONE_NUMBER)
-    return intl.formatMessage(messages.phoneNumberPatternTitle)
-  else if (
-    changeModalName === BirthActionId.BIRTH_ON_TIME_FEE ||
-    changeModalName === DeathActionId.DEATH_ON_TIME_FEE
-  )
-    return intl.formatMessage(messages.onTimeFeeDialogTitle)
-  else if (changeModalName === BirthActionId.BIRTH_LATE_FEE)
-    return intl.formatMessage(messages.lateFeeDialogTitle)
-  else if (
-    changeModalName === BirthActionId.BIRTH_DELAYED_FEE ||
-    changeModalName === DeathActionId.DEATH_DELAYED_FEE
-  )
-    return intl.formatMessage(messages.delayedFeeDialogTitle)
-  else return EMPTY_STRING
-}
-
-export const getMessage = (intl: IntlShape, changeModalName: string) => {
-  if (changeModalName === GeneralActionId.APPLICATION_NAME)
-    return intl.formatMessage(messages.applicationNameChangeMessage)
-  else if (changeModalName === GeneralActionId.GOVT_LOGO)
-    return intl.formatMessage(messages.govtLogoChangeMessage)
-  else if (changeModalName === GeneralActionId.CURRENCY)
-    return intl.formatMessage(messages.applicationCurrencyChangeMessage)
-  else if (changeModalName === GeneralActionId.NID_PATTERN)
-    return intl.formatMessage(messages.nidPatternChangeMessage)
-  else if (changeModalName === GeneralActionId.PHONE_NUMBER)
-    return intl.formatMessage(messages.phoneNumberChangeMessage)
-  else return EMPTY_STRING
-}
-
-export const isApplyButtonDisabled = (
-  state: IState,
-  changeModalName: string
-) => {
-  if (changeModalName === GeneralActionId.APPLICATION_NAME) {
-    return !Boolean(state.applicationName)
-  } else if (changeModalName === GeneralActionId.GOVT_LOGO) {
-    return !Boolean(state.govtLogo)
-  } else if (changeModalName === GeneralActionId.CURRENCY) {
-    return !Boolean(state.currency)
-  } else if (changeModalName === BirthActionId.BIRTH_REGISTRATION_TARGET) {
-    return !Boolean(state.birthRegistrationTarget)
-  } else if (changeModalName === BirthActionId.BIRTH_LATE_REGISTRATION_TARGET) {
-    return (
-      Number(state.birthLateRegistrationTarget) <
-      Number(state.birthRegistrationTarget) + 2
-    )
-  } else if (changeModalName === DeathActionId.DEATH_REGISTRATION_TARGET) {
-    return !Boolean(state.deathRegistrationTarget)
-  } else if (changeModalName === BirthActionId.BIRTH_ON_TIME_FEE) {
-    return !Boolean(state.birthOnTimeFee)
-  } else if (changeModalName === BirthActionId.BIRTH_LATE_FEE) {
-    return !Boolean(state.birthLateFee)
-  } else if (changeModalName === BirthActionId.BIRTH_DELAYED_FEE) {
-    return !Boolean(state.birthDelayedFee)
-  } else if (changeModalName === DeathActionId.DEATH_ON_TIME_FEE) {
-    return !Boolean(state.deathOnTimeFee)
-  } else if (changeModalName === DeathActionId.DEATH_DELAYED_FEE) {
-    return !Boolean(state.deathDelayedFee)
-  } else if (changeModalName === GeneralActionId.NID_PATTERN) {
-    return !isValidRegEx(state.nidPattern) || !Boolean(state.nidPattern)
-  } else if (changeModalName === GeneralActionId.PHONE_NUMBER) {
-    return (
-      !isValidRegEx(state.phoneNumberPattern) ||
-      !Boolean(state.phoneNumberPattern)
-    )
-  } else return true
-}
-
-export async function callUpdateApplicationNameMutation(
-  applicationName: string,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
-) {
-  try {
-    updatingValue(true)
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      APPLICATION_NAME: applicationName
-    })
-    if (res && res.data) {
-      updatingValue(false)
-      const APPLICATION_NAME = res.data.updateApplicationConfig.APPLICATION_NAME
-      const offlineConfig = {
-        config: {
-          ...props.offlineCountryConfiguration.config,
-          APPLICATION_NAME
-        }
-      }
-      props.updateConfig(offlineConfig)
-    }
-  } catch (err) {
-    throw err
+export const isWithinFileLength = (base64data: string) => {
+  const baseStr = base64data.substring(22)
+  const decoded = window.atob(baseStr)
+  if (decoded.length >= 2000000) {
+    return false
   }
+  return true
 }
 
-export async function callUpdateGovtLogoMutation(
-  govtLogo: string,
-  logoFileName: string,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
+const isGeneralOrConfigAction = (
+  configProperty: IActionType | ConfigActionType
+): configProperty is GeneralActionId | ConfigActionType => {
+  return (
+    Object.keys(GeneralActionId).includes(configProperty) ||
+    Object.keys(ConfigActionType).includes(configProperty)
+  )
+}
+
+export async function callApplicationConfigMutation(
+  configProperty: IActionType | ConfigActionType,
+  appConfig: IApplicationConfig,
+  dispatch: Dispatch,
+  setNotificationStatus: (status: NOTIFICATION_STATUS) => void
 ) {
   try {
-    updatingValue(true)
-
-    const COUNTRY_LOGO = {
-      file: govtLogo,
-      fileName: logoFileName
-    }
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      COUNTRY_LOGO
-    })
-    if (res && res.data) {
-      updatingValue(false)
-      const COUNTRY_LOGO_FILE =
-        res.data.updateApplicationConfig.COUNTRY_LOGO.file
-      const COUNTRY_LOGO_FILE_NAME =
-        res.data.updateApplicationConfig.COUNTRY_LOGO.fileName
-      const updatedOfflineConfig = {
-        config: {
-          ...props.offlineCountryConfiguration.config,
-          COUNTRY_LOGO: {
-            file: COUNTRY_LOGO_FILE,
-            fileName: COUNTRY_LOGO_FILE_NAME
+    setNotificationStatus(NOTIFICATION_STATUS.IN_PROGRESS)
+    const res = await configApplicationMutations.mutateApplicationConfig(
+      isGeneralOrConfigAction(configProperty)
+        ? {
+            [configProperty]: appConfig[configProperty]
           }
-        }
-      }
-      props.updateConfig(updatedOfflineConfig)
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateApplicationCurrencyMutation(
-  currency: ICurrency,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
-) {
-  try {
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      CURRENCY: currency
-    })
+        : configProperty in BirthActionId
+        ? { BIRTH: appConfig.BIRTH }
+        : { DEATH: appConfig.DEATH }
+    )
     if (res && res.data) {
-      updatingValue(false)
-      const CURRENCY = res.data.updateApplicationConfig.CURRENCY
-      omit(CURRENCY, ['__typename'])
+      const updatedConfigs = res.data.updateApplicationConfig
+      setNotificationStatus(NOTIFICATION_STATUS.SUCCESS)
       const offlineConfig = {
         config: {
-          ...props.offlineCountryConfiguration.config,
-          CURRENCY
+          ...updatedConfigs
         }
       }
-      props.updateConfig(offlineConfig)
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateApplicationBirthMutation(
-  birth: IBirth,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
-) {
-  try {
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      BIRTH: birth
-    })
-    if (res && res.data) {
-      updatingValue(false)
-      const BIRTH = res.data.updateApplicationConfig.BIRTH
-      omit(BIRTH, ['__typename'])
-      const offlineConfig = {
-        config: {
-          ...props.offlineCountryConfiguration.config,
-          BIRTH
-        }
-      }
-      props.updateConfig(offlineConfig)
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateApplicationDeathMutation(
-  death: IDeath,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
-) {
-  try {
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      DEATH: death
-    })
-    if (res && res.data) {
-      updatingValue(false)
-      const DEATH = res.data.updateApplicationConfig.DEATH
-      omit(DEATH, ['__typename'])
-      const offlineConfig = {
-        config: {
-          ...props.offlineCountryConfiguration.config,
-          DEATH
-        }
-      }
-      props.updateConfig(offlineConfig)
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateNIDPatternMutation(
-  nidPattern: string,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
-) {
-  try {
-    updatingValue(true)
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      NID_NUMBER_PATTERN: nidPattern
-    })
-    if (res && res.data) {
-      updatingValue(false)
-      const NID_NUMBER_PATTERN =
-        res.data.updateApplicationConfig.NID_NUMBER_PATTERN
-      const offlineConfig = {
-        config: {
-          ...props.offlineCountryConfiguration.config,
-          NID_NUMBER_PATTERN
-        }
-      }
-      props.updateConfig(offlineConfig)
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdatePhoneNumberPatternMutation(
-  phoneNumberPattern: string,
-  props: IFullProps,
-  updatingValue: (value: boolean) => void
-) {
-  try {
-    updatingValue(true)
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      PHONE_NUMBER_PATTERN: phoneNumberPattern
-    })
-    if (res && res.data) {
-      updatingValue(false)
-      const PHONE_NUMBER_PATTERN =
-        res.data.updateApplicationConfig.PHONE_NUMBER_PATTERN
-      const offlineConfig = {
-        config: {
-          ...props.offlineCountryConfiguration.config,
-          PHONE_NUMBER_PATTERN
-        }
-      }
-      props.updateConfig(offlineConfig)
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateHideEventRegisterInformationMutation(
-  hideEventEegisterInformation: boolean,
-  props: IFormConfigSettingsProps
-) {
-  try {
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      HIDE_EVENT_REGISTER_INFORMATION: hideEventEegisterInformation
-    })
-    if (res && res.data) {
-      const HIDE_EVENT_REGISTER_INFORMATION =
-        res.data.updateApplicationConfig.HIDE_EVENT_REGISTER_INFORMATION
-      const offlineConfig = {
-        config: {
-          ...props.applicationConfig.config,
-          HIDE_EVENT_REGISTER_INFORMATION
-        }
-      }
-      props.updateConfig(offlineConfig)
-    }
-  } catch (err) {
-    throw err
-  }
-}
-
-export async function callUpdateAddressesMutation(
-  numOfAddresses: number,
-  props: IFormConfigSettingsProps
-) {
-  try {
-    const res = await configApplicationMutations.mutateApplicationConfig({
-      ADDRESSES: numOfAddresses
-    })
-    if (res && res.data) {
-      const ADDRESSES = res.data.updateApplicationConfig.ADDRESSES
-      const offlineConfig = {
-        config: {
-          ...props.applicationConfig.config,
-          ADDRESSES
-        }
-      }
-      props.updateConfig(offlineConfig)
+      dispatch(updateOfflineConfigData(offlineConfig))
     }
   } catch (err) {
     throw err

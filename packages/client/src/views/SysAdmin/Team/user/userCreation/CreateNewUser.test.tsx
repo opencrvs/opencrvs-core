@@ -304,20 +304,20 @@ describe('create new user tests', () => {
     })
 
     it('renders review header', () => {
-      expect(testComponent.find('#preview_title').hostNodes().text()).toBe(
+      expect(testComponent.find('#content-name').hostNodes().text()).toBe(
         'Please review the new users details'
       )
     })
 
     it('clicking change button on a field takes user back to form', async () => {
       testComponent
-        .find('#btn_change_familyNameEng')
+        .find('#btn_change_firstNamesEng')
         .hostNodes()
         .first()
         .simulate('click')
       await flushPromises()
       expect(history.location.pathname).toBe('/createUser/user/user-view-group')
-      expect(history.location.hash).toBe('#familyNameEng')
+      expect(history.location.hash).toBe('#firstNamesEng')
     })
 
     it('clicking submit button submits the form data', async () => {
