@@ -104,16 +104,13 @@ export default function register(
   onNewContentAvailable?: (waitingSW: ServiceWorker | null) => void
 ) {
   if (
-    (process.env.NODE_ENV === 'production' || !isLocalhost) &&
+    (import.meta.env.PROD || !isLocalhost) &&
     'serviceWorker' in navigator &&
     // @ts-ignore
     !window.Cypress // This disables the service workder for our e2e tests
   ) {
     // The URL constructor is available in all browsers that support SW.
-    const publicUrl = new URL(
-      process.env.PUBLIC_URL!,
-      window.location.toString()
-    )
+    const publicUrl = new URL('', window.location.toString())
     if (publicUrl.origin !== window.location.origin) {
       // Our service worker won't work if PUBLIC_URL is on a different origin
       // from what our page is served on. This might happen if a CDN is used to
@@ -122,7 +119,7 @@ export default function register(
     }
 
     window.addEventListener('load', () => {
-      const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`
+      const swUrl = '/service-worker.js'
 
       if (isLocalhost) {
         // This is running on localhost. Lets check if a service worker still exists or not.
