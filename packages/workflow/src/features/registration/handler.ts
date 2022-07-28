@@ -191,6 +191,7 @@ export async function createRegistrationHandler(
     }
     const resBundle = await sendBundleToHearth(payload)
     populateCompositionWithID(payload, resBundle)
+
     if (
       event ===
         Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION ||

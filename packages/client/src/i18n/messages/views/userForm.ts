@@ -110,5 +110,10 @@ export const messages = {
     defaultMessage: 'Attachments',
     description: 'label for user signature attachment',
     id: 'form.field.label.userAttachmentSection'
+  },
+  creatingNewUser: {
+    defaultMessage: 'Creating new user',
+    description: 'label for creating new user',
+    id: 'form.field.label.creatingNewUser'
   }
 }
