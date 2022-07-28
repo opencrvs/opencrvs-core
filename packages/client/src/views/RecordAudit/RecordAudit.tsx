@@ -77,7 +77,8 @@ import {
   DECLARED,
   VALIDATED,
   REJECTED,
-  FIELD_AGENT_ROLES
+  FIELD_AGENT_ROLES,
+  IN_PROGRESS
 } from '@client/utils/constants'
 import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import { Query } from '@client/components/Query'
@@ -221,7 +222,7 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   SUBMITTING: 'orange'
 }
 
-const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
+const ARCHIVABLE_STATUSES = [IN_PROGRESS, DECLARED, VALIDATED, REJECTED]
 
 function ReinstateButton({
   toggleDisplayDialog

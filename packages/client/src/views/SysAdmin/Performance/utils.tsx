@@ -30,6 +30,16 @@ import { constantsMessages } from '@client/i18n/messages'
 import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
 import { colors } from '@opencrvs/components/lib/colors'
 import { IStatusMapping } from './reports/operational/StatusWiseDeclarationCountView'
+import {
+  PERFORMANCE_METRICS,
+  PERFORMANCE_STATS,
+  CORRECTION_TOTALS
+} from '@client/views/SysAdmin/Performance/metricsQuery'
+import { Event } from '@client/utils/gateway'
+import {
+  GET_TOTAL_CERTIFICATIONS,
+  GET_TOTAL_PAYMENTS
+} from '@client/views/SysAdmin/Performance/queries'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
@@ -287,5 +297,200 @@ export const StatusMapping: IStatusMapping = {
   ARCHIVED: {
     labelDescriptor: statusMessages.archived,
     color: colors.blue
+  }
+}
+
+export const mockPerformanceMetricsRequest = {
+  request: {
+    query: PERFORMANCE_METRICS,
+    variables: {
+      locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+      event: 'BIRTH',
+      timeEnd: new Date(1487076708000).toISOString(),
+      timeStart: new Date(1455454308000).toISOString()
+    }
+  },
+  result: {
+    data: {
+      getTotalMetrics: {
+        estimated: {
+          totalEstimation: 0,
+          maleEstimation: 0,
+          femaleEstimation: 0,
+          locationId: 'c9c4d6e9-981c-4646-98fe-4014fddebd5e',
+          estimationYear: 2022,
+          locationLevel: '',
+          __typename: 'Estimation'
+        },
+        results: [
+          {
+            total: 1,
+            gender: 'female',
+            eventLocationType: 'HEALTH_FACILITY',
+            practitionerRole: 'FIELD_AGENT',
+            timeLabel: 'within5Years',
+            __typename: 'EventMetrics'
+          },
+          {
+            total: 1,
+            gender: 'female',
+            eventLocationType: 'HEALTH_FACILITY',
+            practitionerRole: 'FIELD_AGENT',
+            timeLabel: 'withinLate',
+            __typename: 'EventMetrics'
+          },
+          {
+            total: 1,
+            gender: 'male',
+            eventLocationType: 'HEALTH_FACILITY',
+            practitionerRole: 'FIELD_AGENT',
+            timeLabel: 'within5Years',
+            __typename: 'EventMetrics'
+          },
+          {
+            total: 1,
+            gender: 'male',
+            eventLocationType: 'HEALTH_FACILITY',
+            practitionerRole: 'LOCAL_REGISTRAR',
+            timeLabel: 'within5Years',
+            __typename: 'EventMetrics'
+          }
+        ],
+        __typename: 'TotalMetricsResult'
+      }
+    }
+  }
+}
+
+export const mockRegistrationCountRequest = {
+  request: {
+    query: PERFORMANCE_STATS,
+    variables: {
+      locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+      status: [
+        'IN_PROGRESS',
+        'DECLARED',
+        'REJECTED',
+        'VALIDATED',
+        'WAITING_VALIDATION',
+        'REGISTERED'
+      ],
+      populationYear: new Date(1487076708000).getFullYear(),
+      event: Event.Birth,
+      officeSelected: false
+    }
+  },
+  result: {
+    data: {
+      fetchRegistrationCountByStatus: {
+        results: [
+          {
+            status: 'IN_PROGRESS',
+            count: 0,
+            __typename: 'StatusWiseRegistrationCount'
+          },
+          {
+            status: 'DECLARED',
+            count: 11,
+            __typename: 'StatusWiseRegistrationCount'
+          },
+          {
+            status: 'REJECTED',
+            count: 2,
+            __typename: 'StatusWiseRegistrationCount'
+          },
+          {
+            status: 'VALIDATED',
+            count: 4,
+            __typename: 'StatusWiseRegistrationCount'
+          },
+          {
+            status: 'WAITING_VALIDATION',
+            count: 0,
+            __typename: 'StatusWiseRegistrationCount'
+          },
+          {
+            status: 'REGISTERED',
+            count: 5,
+            __typename: 'StatusWiseRegistrationCount'
+          }
+        ],
+        total: 22,
+        __typename: 'RegistrationCountResult'
+      },
+      getLocationStatistics: {
+        population: 686234,
+        offices: 4,
+        registrars: 1,
+        __typename: 'LocationStatisticsResponse'
+      }
+    }
+  }
+}
+
+export const mockTotalPaymentsRequest = {
+  request: {
+    query: GET_TOTAL_PAYMENTS,
+    variables: {
+      locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+      event: 'BIRTH',
+      timeEnd: new Date(1487076708000).toISOString(),
+      timeStart: new Date(1455454308000).toISOString()
+    }
+  },
+  result: {
+    data: {
+      getTotalPayments: [
+        {
+          total: 50.5,
+          paymentType: 'certification',
+          __typename: 'PaymentMetric'
+        }
+      ]
+    }
+  }
+}
+export const mockTotalCertificationsRequest = {
+  request: {
+    query: GET_TOTAL_CERTIFICATIONS,
+    variables: {
+      locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+      event: 'BIRTH',
+      timeEnd: new Date(1487076708000).toISOString(),
+      timeStart: new Date(1455454308000).toISOString()
+    }
+  },
+  result: {
+    data: {
+      getTotalCertifications: [
+        {
+          total: 1,
+          eventType: 'BIRTH',
+          __typename: 'CertificationMetric'
+        }
+      ]
+    }
+  }
+}
+export const mockTotalCorrectionsRequest = {
+  request: {
+    query: CORRECTION_TOTALS,
+    variables: {
+      locationId: '6e1f3bce-7bcb-4bf6-8e35-0d9facdf158b',
+      event: 'BIRTH',
+      timeEnd: new Date(1487076708000).toISOString(),
+      timeStart: new Date(1455454308000).toISOString()
+    }
+  },
+  result: {
+    data: {
+      getTotalCorrections: [
+        {
+          total: 1,
+          reason: 'CLERICAL_ERROR',
+          __typename: 'CorrectionMetric'
+        }
+      ]
+    }
   }
 }
