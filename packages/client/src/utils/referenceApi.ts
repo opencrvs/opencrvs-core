@@ -25,7 +25,6 @@ export interface IFacilitiesDataResponse {
 export interface IContentResponse {
   languages: ILanguage[]
 }
-
 export interface IAssetResponse {
   logo: string
 }
@@ -33,7 +32,6 @@ export interface ICountryLogo {
   fileName: string
   file: string
 }
-
 export interface ICertificateTemplateData {
   event: Event
   status: string
@@ -44,12 +42,10 @@ export interface ICertificateTemplateData {
   user: string
   id: string
 }
-
-interface ICurrency {
+export interface ICurrency {
   isoCode: string
   languagesAndCountry: string[]
 }
-
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BIRTH: {
@@ -78,7 +74,6 @@ export interface IApplicationConfig {
   NID_NUMBER_PATTERN: RegExp
   ADDRESSES: number
 }
-
 export interface IApplicationConfigResponse {
   config: IApplicationConfig
   certificates: ICertificateTemplateData[]

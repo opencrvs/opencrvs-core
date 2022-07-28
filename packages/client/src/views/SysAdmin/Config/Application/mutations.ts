@@ -11,7 +11,7 @@
  */
 import gql from 'graphql-tag'
 import { client } from '@client/utils/apolloClient'
-import { IApplicationConfig } from './DynamicModal'
+import { IApplicationConfig } from '@client/utils/referenceApi'
 
 const applicationConfigMutation = gql`
   mutation updateApplicationConfig(
@@ -50,7 +50,9 @@ const applicationConfigMutation = gql`
     }
   }
 `
-async function mutateApplicationConfig(applicationConfig: IApplicationConfig) {
+async function mutateApplicationConfig(
+  applicationConfig: Partial<IApplicationConfig>
+) {
   return (
     client &&
     client.mutate({

@@ -68,9 +68,6 @@ describe('UserSetupPage tests', () => {
 
     const app = testComponent
     expect(app.find('#user-setup-landing-page').hostNodes()).toHaveLength(1)
-    expect(app.find('#user-setup-name-holder').hostNodes().text()).toEqual(
-      'Shakib Al Hasan'
-    )
   })
   it('go to password page', async () => {
     const testComponent = await createTestComponent(
