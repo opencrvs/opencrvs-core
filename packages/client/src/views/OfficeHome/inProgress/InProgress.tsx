@@ -74,6 +74,7 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import {
+  getDownloadStatus,
   changeSortedColumn,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
@@ -103,6 +104,7 @@ interface IBaseRegistrarHomeProps {
     healthSystemId: number
   }
   pageSize: number
+  userId?: string
 }
 
 interface IRegistrarHomeState {
@@ -209,7 +211,11 @@ export class InProgressComponent extends React.Component<
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
-      const downloadStatus = foundDeclaration?.downloadStatus
+      const downloadStatus = getDownloadStatus(
+        reg.registration?.assignment?.userId as string,
+        foundDeclaration,
+        this.props.userId
+      )
 
       if (this.state.width > this.props.theme.grid.breakpoints.lg) {
         actions.push({
@@ -690,7 +696,8 @@ export class InProgressComponent extends React.Component<
 function mapStateToProps(state: IStoreState) {
   return {
     outboxDeclarations: state.declarationsState.declarations,
-    offlineCountryConfig: getOfflineData(state)
+    offlineCountryConfig: getOfflineData(state),
+    userId: state.profile.userDetails?.userMgntUserID
   }
 }
 

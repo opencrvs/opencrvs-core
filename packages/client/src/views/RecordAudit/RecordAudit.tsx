@@ -77,7 +77,8 @@ import {
   DECLARED,
   VALIDATED,
   REJECTED,
-  FIELD_AGENT_ROLES
+  FIELD_AGENT_ROLES,
+  IN_PROGRESS
 } from '@client/utils/constants'
 import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import { Query } from '@client/components/Query'
@@ -123,6 +124,7 @@ import {
 } from './mutations'
 import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
+import { getDownloadStatus } from '@client/views/OfficeHome/utils'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -221,7 +223,7 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   SUBMITTING: 'orange'
 }
 
-const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
+const ARCHIVABLE_STATUSES = [IN_PROGRESS, DECLARED, VALIDATED, REJECTED]
 
 function ReinstateButton({
   toggleDisplayDialog
@@ -338,8 +340,13 @@ function RecordAuditBody({
   const mobileActions: React.ReactElement[] = []
   const desktopActionsView: React.ReactElement[] = []
 
+  const downloadStatus = getDownloadStatus(
+    declaration.assignment?.userId as string,
+    draft || undefined,
+    userDetails?.userMgntUserID
+  )
   const isDownloaded =
-    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+    downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
 
   if (

@@ -116,8 +116,13 @@ export const ShowUpdateButton = ({
 }: CMethodParams) => {
   const { id, type } = declaration || {}
 
+  const downloadStatus = getDownloadStatus(
+    declaration.assignment?.userId as string,
+    draft || undefined,
+    userDetails?.userMgntUserID as string
+  )
   const isDownloaded =
-    draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
+    downloadStatus === DOWNLOAD_STATUS.DOWNLOADED ||
     draft?.submissionStatus === SUBMISSION_STATUS.DRAFT
   const role = userDetails ? userDetails.role : ''
   const showActionButton = role
@@ -275,7 +280,11 @@ export const ShowReviewButton = ({
 }: CMethodParams) => {
   const { id, type } = declaration || {}
 
-  const isDownloaded = draft?.downloadStatus === DOWNLOAD_STATUS.DOWNLOADED
+  const downloadStatus = getDownloadStatus(
+    declaration.assignment?.userId as string,
+    draft || undefined,
+    userDetails?.userMgntUserID as string
+  )
   const role = userDetails ? userDetails.role : ''
   const showActionButton = role
     ? FIELD_AGENT_ROLES.includes(role)
@@ -298,20 +307,9 @@ export const ShowReviewButton = ({
     reviewButtonRoleStatusMap[role].includes(declaration?.status as string) &&
     showActionButton
   ) {
-    if (!isDownloaded) {
-      return (
-        <PrimaryButton
-          key={id}
-          size={'medium'}
-          id={`review-btn-${id}`}
-          disabled={true}
-        >
-          {intl.formatMessage(constantsMessages.review)}
-        </PrimaryButton>
-      )
-    }
     return (
       <PrimaryButton
+        disabled={downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED}
         key={id}
         size={'medium'}
         id={`review-btn-${id}`}

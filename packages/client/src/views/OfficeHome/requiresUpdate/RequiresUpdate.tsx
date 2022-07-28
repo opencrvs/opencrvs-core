@@ -41,6 +41,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
+  getDownloadStatus,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import {
@@ -67,6 +68,7 @@ interface IBaseRejectTabProps {
   onPageChange: (newPageNumber: number) => void
   loading?: boolean
   error?: boolean
+  userId?: string
 }
 
 interface IRejectTabState {
@@ -183,7 +185,11 @@ class RequiresUpdateComponent extends React.Component<
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
-      const downloadStatus = foundDeclaration?.downloadStatus
+      const downloadStatus = getDownloadStatus(
+        reg.assignment?.userId as string,
+        foundDeclaration,
+        this.props.userId
+      )
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
@@ -346,7 +352,8 @@ class RequiresUpdateComponent extends React.Component<
 function mapStateToProps(state: IStoreState) {
   return {
     scope: getScope(state),
-    outboxDeclarations: state.declarationsState.declarations
+    outboxDeclarations: state.declarationsState.declarations,
+    userId: state.profile.userDetails?.userMgntUserID
   }
 }
 

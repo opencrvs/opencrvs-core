@@ -52,11 +52,11 @@ import {
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
-  getSortedItems
+  getSortedItems,
+  getDownloadStatus
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -75,6 +75,7 @@ interface IBaseReviewTabProps {
   onPageChange: (newPageNumber: number) => void
   loading?: boolean
   error?: boolean
+  userId?: string
 }
 
 interface IReviewTabState {
@@ -138,7 +139,11 @@ class ReadyForReviewComponent extends React.Component<
       const foundDeclaration = this.props.outboxDeclarations.find(
         (declaration) => declaration.id === reg.id
       )
-      const downloadStatus = foundDeclaration?.downloadStatus
+      const downloadStatus = getDownloadStatus(
+        reg.assignment?.userId as string,
+        foundDeclaration,
+        this.props.userId
+      )
       const isDuplicate = reg.duplicates && reg.duplicates.length > 0
 
       if (downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED) {
@@ -365,7 +370,8 @@ class ReadyForReviewComponent extends React.Component<
 function mapStateToProps(state: IStoreState) {
   return {
     scope: getScope(state),
-    outboxDeclarations: state.declarationsState.declarations
+    outboxDeclarations: state.declarationsState.declarations,
+    userId: state.profile.userDetails?.userMgntUserID
   }
 }
 
