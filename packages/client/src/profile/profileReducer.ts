@@ -81,9 +81,7 @@ export const profileReducer: LoopReducer<
           Cmd.run(
             (getState: () => IStoreState) => {
               window.location.assign(
-                `${window.config.LOGIN_URL}?language=${
-                  getState().i18n.language
-                }`
+                `${window.config.LOGIN_URL}?lang=${getState().i18n.language}`
               )
             },
             { args: [Cmd.getState] }

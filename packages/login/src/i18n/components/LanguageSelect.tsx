@@ -63,7 +63,7 @@ function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
     if (paramLanguage) {
       history.replace({
         pathname: location.pathname,
-        search: `language=${value}`
+        search: `lang=${value}`
       })
     }
     dispatch(changeLanguage({ language: value }))
@@ -72,7 +72,7 @@ function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
 }
 
 export function LanguageSelect({ children }: IProps) {
-  const paramLanguage = useSearchQuery('language')
+  const paramLanguage = useSearchQuery('lang')
   const selectedLanguage = useSelector(getLanguage)
   const [languageOptions, onLanguageChange] = useLanguage(
     selectedLanguage,
