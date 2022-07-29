@@ -37,7 +37,7 @@ const Container = styled.div`
 const StyledPIN = styled(PIN)`
   margin-top: -80px;
   @media (max-height: 780px) {
-    transform: scale(0.8);
+    margin-top: 0px;
   }
 `
 
