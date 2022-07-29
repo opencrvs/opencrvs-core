@@ -76,7 +76,18 @@ const workqueue: IWorkqueue = {
     inProgressTab: {},
     notificationTab: {},
     reviewTab: {
-      results: [{ id: declaration.id, registration: {} }],
+      results: [
+        {
+          id: declaration.id,
+          registration: {
+            assignment: {
+              userId: '123',
+              firstName: 'Kennedy',
+              lastName: 'Mweene'
+            }
+          }
+        }
+      ],
       totalItems: 1
     },
     rejectTab: {},

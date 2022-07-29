@@ -704,6 +704,11 @@ describe('In Progress tab', () => {
                 id: declarationId,
                 type: 'Birth',
                 registration: {
+                  assignment: {
+                    userId: '123',
+                    firstName: 'Kennedy',
+                    lastName: 'Mweene'
+                  },
                   trackingId: 'BQ2IDOP',
                   modifiedAt: TIME_STAMP
                 },
@@ -778,6 +783,10 @@ describe('In Progress tab', () => {
         expect(
           testComponent.find('#ListItemAction-0-Update').hostNodes()
         ).toHaveLength(1)
+
+        console.log(
+          testComponent.find('#ListItemAction-0-Update').hostNodes().debug()
+        )
 
         testComponent
           .find('#ListItemAction-0-Update')

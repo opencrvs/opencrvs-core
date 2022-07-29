@@ -208,6 +208,74 @@ const mockReviewTabData = {
   ]
 }
 
+const mockUserResponseAfterAssigned = {
+  totalItems: 2,
+  results: [
+    {
+      id: '9a55d213-ad9f-4dcd-9418-340f3a7f6269',
+      type: 'Birth',
+      registration: {
+        assignment: {
+          userId: '123',
+          firstName: 'Kennedy',
+          lastName: 'Mweene',
+          officeName: 'Ibombo District Office',
+          __typename: 'AssignmentData'
+        },
+        status: 'DECLARED',
+        contactNumber: '01622688231',
+        trackingId: 'BW0UTHR',
+        registrationNumber: undefined,
+        eventLocationId: undefined,
+        registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+        createdAt: '1544188309380',
+        modifiedAt: '1544188309380'
+      },
+      dateOfBirth: '2010-10-10',
+      childName: [
+        {
+          firstNames: 'Iliyas',
+          familyName: 'Khan',
+          use: 'en'
+        },
+        {
+          firstNames: 'ইলিয়াস',
+          familyName: 'খান',
+          use: 'bn'
+        }
+      ]
+    } as GQLBirthEventSearchSet,
+    {
+      id: 'bc09200d-0160-43b4-9e2b-5b9e90424e95',
+      type: 'Death',
+      registration: {
+        status: 'VALIDATED',
+        trackingId: 'DW0UTHR',
+        registrationNumber: undefined,
+        eventLocationId: undefined,
+        contactNumber: undefined,
+        duplicates: ['308c35b4-04f8-4664-83f5-9790e790cd33'],
+        registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1',
+        createdAt: '1544188309380',
+        modifiedAt: '1544188309380'
+      },
+      dateOfDeath: '2007-01-01',
+      deceasedName: [
+        {
+          firstNames: 'Iliyas',
+          familyName: 'Khan',
+          use: 'en'
+        },
+        {
+          firstNames: 'ইলিয়াস',
+          familyName: 'খান',
+          use: 'bn'
+        }
+      ]
+    } as GQLDeathEventSearchSet
+  ]
+}
+
 describe('OfficeHome sent for review tab related tests', () => {
   let store: ReturnType<typeof createStore>['store']
   let history: ReturnType<typeof createStore>['history']
@@ -450,6 +518,18 @@ describe('OfficeHome sent for review tab related tests', () => {
           data: {
             fetchBirthRegistration: birthDeclarationForReview
           }
+        })
+        .mockReturnValueOnce({
+          data: {
+            inProgressTab: { totalItems: 0, results: [] },
+            notificationTab: { totalItems: 0, results: [] },
+            reviewTab: mockUserResponseAfterAssigned,
+            rejectTab: { totalItems: 0, results: [] },
+            approvalTab: { totalItems: 0, results: [] },
+            printTab: { totalItems: 0, results: [] },
+            externalValidationTab: { totalItems: 0, results: [] }
+          },
+          initialSyncDone: true
         })
       apolloClient.query = mockListSyncController
 
