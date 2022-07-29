@@ -12,22 +12,22 @@
 import * as React from 'react'
 import { Tab, Tabs } from '../interface/Tabs'
 
-export interface IFormTabs {
-  id: string
+export interface IFormTabs<T extends string | number = string> {
+  id: T
   title: string
   disabled?: boolean
 }
-export interface IFormTabProps {
-  sections: IFormTabs[]
+export interface IFormTabProps<T extends string | number = string> {
+  sections: Array<IFormTabs<T>>
   activeTabId: string
-  onTabClick: (tabId: string) => void
+  onTabClick: (tabId: T) => void
 }
 
-function FormTabsComponent({
+function FormTabsComponent<T extends string | number = string>({
   sections,
   activeTabId,
   onTabClick
-}: IFormTabProps) {
+}: IFormTabProps<T>) {
   return (
     <Tabs>
       {sections.map(({ title, id, disabled }) => (

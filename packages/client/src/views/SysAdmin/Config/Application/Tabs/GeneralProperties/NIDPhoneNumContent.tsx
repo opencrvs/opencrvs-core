@@ -12,14 +12,21 @@
 
 import React from 'react'
 import styled from '@client/styledComponents'
-import { Content, Field, HalfWidthInput } from './DynamicModal'
 import { InputField } from '@opencrvs/components/lib/forms'
 import { IntlShape } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import SuccessSmall from '@opencrvs/components/lib/icons/SuccessSmall'
 import { Cross } from '@opencrvs/components/lib/icons/Cross'
-import { isValidRegEx, isValidExample } from './utils'
+import {
+  isValidRegEx,
+  isValidExample
+} from '@client/views/SysAdmin/Config/Application/utils'
+import {
+  Content,
+  Field,
+  HalfWidthInput
+} from '@client/views/SysAdmin/Config/Application/Components'
 
 const ErrorMessage = styled.div`
   ${({ theme }) => theme.fonts.bold14}
