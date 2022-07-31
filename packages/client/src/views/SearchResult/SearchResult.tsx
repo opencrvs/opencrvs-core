@@ -74,6 +74,7 @@ import {
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
+import { getDownloadStatus } from '@client/views/OfficeHome/utils'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -143,6 +144,8 @@ interface IBaseSearchResultProps {
   goToPage: typeof goToPageAction
   goToPrintCertificate: typeof goToPrintCertificateAction
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
+  draft: IDeclaration[]
+  userId?: string
 }
 
 interface IMatchParams {
@@ -263,8 +266,12 @@ export class SearchResultView extends React.Component<
         (declaration) => declaration.id === reg.id
       )
       const actions: IAction[] = []
-      const downloadStatus =
-        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+
+      const downloadStatus = getDownloadStatus(
+        reg.assignment?.userId as string,
+        foundDeclaration,
+        this.props.userId
+      )
 
       const declarationIsArchived = reg.declarationStatus === 'ARCHIVED'
       const declarationIsRequestedCorrection =
@@ -457,7 +464,7 @@ export class SearchResultView extends React.Component<
                       : '',
                   name: searchType === NAME_TEXT ? searchText : ''
                 }}
-                fetchPolicy="cache-and-network"
+                fetchPolicy="network-only"
               >
                 {({ loading, error, data }) => {
                   const total = loading
@@ -525,7 +532,9 @@ export const SearchResult = connect(
     language: state.i18n.language,
     scope: getScope(state),
     userDetails: getUserDetails(state),
-    outboxDeclarations: state.declarationsState.declarations
+    outboxDeclarations: state.declarationsState.declarations,
+    userId: state.profile.userDetails?.userMgntUserID,
+    draft: state.declarationsState.declarations
   }),
   {
     goToEvents: goToEventsAction,

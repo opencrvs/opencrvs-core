@@ -367,7 +367,8 @@ export const getDraftDeclarationData = (
       (
         (declaration.data?.registration?.contactPoint as IFormSectionData)
           ?.nestedFields as IContactPointPhone
-      )?.registrationPhone.toString() || ''
+      )?.registrationPhone.toString() || '',
+    assignment: declaration.data.registration.assignment as GQLAssignmentData
   }
 }
 

@@ -85,7 +85,7 @@ import { Query } from '@client/components/Query'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { HOME } from '@client/navigation/routes'
 import { recordAuditMessages } from '@client/i18n/messages/views/recordAudit'
-import { CorrectionSection, IForm } from '@client/forms'
+import { CorrectionSection, IForm, IFormSectionData } from '@client/forms'
 import { buttonMessages } from '@client/i18n/messages'
 import { getLanguage } from '@client/i18n/selectors'
 import { IUserDetails } from '@client/utils/userUtils'
@@ -670,7 +670,7 @@ function getBodyContent({
           variables={{
             id: declarationId
           }}
-          fetchPolicy="cache-and-network"
+          fetchPolicy="network-only"
         >
           {({ loading, error, data, refetch }) => {
             if (loading) {
@@ -697,6 +697,14 @@ function getBodyContent({
                 intl,
                 draft?.data?.registration?.trackingId?.toString()
               )
+
+              if (
+                data.fetchRegistration.registration.assignment?.userId !==
+                (draft.data.registration.assignment as IFormSectionData)?.userId
+              ) {
+                refetch()
+              }
+
               declaration = {
                 ...declaration,
                 status: data.fetchRegistration?.registration?.status[0].type,

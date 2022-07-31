@@ -134,6 +134,12 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         contactRelationship
         contactPhoneNumber
         duplicates
+        assignment {
+          userId
+          firstName
+          lastName
+          officeName
+        }
         attachments {
           data
           type
@@ -379,6 +385,12 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         otherInformantType
         contact
         contactPhoneNumber
+        assignment {
+          userId
+          firstName
+          lastName
+          officeName
+        }
         status {
           comments {
             comment
