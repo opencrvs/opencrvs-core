@@ -44,7 +44,6 @@ const mockUser: IUser & { _id: string } = {
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
   role: 'LOCAL_REGISTRAR',
-  type: 'SOME_TYPE',
   status: 'active',
   primaryOfficeId: '321',
   catchmentAreaIds: [],

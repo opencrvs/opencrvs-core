@@ -43,7 +43,6 @@ import {
   TEAM_USER_LIST,
   USER_PROFILE,
   CERTIFICATE_CONFIG,
-  CHANGE_PHONE,
   APPLICATION_CONFIG,
   CERTIFICATE_CORRECTION,
   VERIFY_CORRECTOR,
@@ -359,18 +358,6 @@ export function goToSysAdminHomeTab(tabId: string) {
 
 export function goToSettings() {
   return push(SETTINGS)
-}
-export function goToPhoneSettings() {
-  return push(CHANGE_PHONE)
-}
-
-export function goToSettingsWithPhoneSuccessMsg(phonedNumberUpdated: boolean) {
-  return push({
-    pathname: SETTINGS,
-    state: {
-      phonedNumberUpdated
-    }
-  })
 }
 
 export function goToCreateNewUser() {

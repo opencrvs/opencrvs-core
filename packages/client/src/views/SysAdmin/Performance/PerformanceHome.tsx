@@ -80,7 +80,7 @@ import { goToWorkflowStatus, goToCompletenessRates } from '@client/navigation'
 import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
-import { getCurrency } from '@client/views/SysAdmin/Config/Application/utils'
+import { ICurrency } from '@client/utils/referenceApi'
 
 const Layout = styled.div`
   display: flex;
@@ -182,7 +182,7 @@ const Text = styled.div`
 interface IConnectProps {
   locations: { [key: string]: ILocation }
   offices: { [key: string]: ILocation }
-  currency: string
+  currency: ICurrency
 }
 
 interface ISearchParams {
@@ -470,7 +470,9 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       }
 
                       if (this.isQueriesInProgress()) {
-                        return <Spinner id="performance-home-loading" />
+                        return (
+                          <Spinner id="performance-home-loading" size={24} />
+                        )
                       }
 
                       return (
@@ -643,7 +645,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                   >
                     <ResponsiveModalContent>
                       {loading ? (
-                        <Spinner id="modal-data-loading" />
+                        <Spinner id="modal-data-loading" size={24} />
                       ) : (
                         <>
                           {isOnline && (
@@ -682,7 +684,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                     {!officeSelected && (
                       <LocationStats>
                         {!isOnline ? null : loading ? (
-                          <Spinner id="location-stats-loading" />
+                          <Spinner id="location-stats-loading" size={24} />
                         ) : (
                           <LocationStatsView
                             registrationOffices={
@@ -704,7 +706,7 @@ class PerformanceHomeComponent extends React.Component<Props, State> {
                       {!isOnline ? (
                         <></>
                       ) : loading ? (
-                        <Spinner id="registration-status-loading" />
+                        <Spinner id="registration-status-loading" size={24} />
                       ) : (
                         <StatusWiseDeclarationCountView
                           selectedEvent={this.state.event}
@@ -732,7 +734,7 @@ function mapStateToProps(state: IStoreState) {
     locations: offlineCountryConfiguration.locations,
     offices: offlineCountryConfiguration.offices,
     userDetails: getUserDetails(state),
-    currency: getCurrency(offlineCountryConfiguration)
+    currency: offlineCountryConfiguration.config.CURRENCY
   }
 }
 

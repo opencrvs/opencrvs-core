@@ -77,7 +77,8 @@ import {
   DECLARED,
   VALIDATED,
   REJECTED,
-  FIELD_AGENT_ROLES
+  FIELD_AGENT_ROLES,
+  IN_PROGRESS
 } from '@client/utils/constants'
 import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
 import { Query } from '@client/components/Query'
@@ -221,7 +222,7 @@ export const STATUSTOCOLOR: { [key: string]: string } = {
   SUBMITTING: 'orange'
 }
 
-const ARCHIVABLE_STATUSES = [DECLARED, VALIDATED, REJECTED]
+const ARCHIVABLE_STATUSES = [IN_PROGRESS, DECLARED, VALIDATED, REJECTED]
 
 function ReinstateButton({
   toggleDisplayDialog
@@ -510,7 +511,8 @@ function RecordAuditBody({
     intl,
     goToUser: goToUserProfile,
     registerForm: regForm,
-    offlineData
+    offlineData,
+    draft
   }
 
   const mobileProps: IPageHeaderProps = {
@@ -766,7 +768,7 @@ const RecordAuditComp = (props: IFullProps) => {
   return (
     <>
       <DesktopHeader />
-      <Navigation deselectAllTabs={true} />
+      <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
       <BodyContainer>{getBodyContent(props)}</BodyContainer>
       <NotificationToast />
     </>

@@ -21,27 +21,27 @@ import { ApplicationConfig } from '@client/views/SysAdmin/Config/Application'
 import { configApplicationMutations } from './mutations'
 import { waitForElement } from '@client/tests/wait-for-element'
 
-const { store, history } = createStore()
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 let testComponent: ReactWrapper
 beforeEach(async () => {
+  jest.resetAllMocks()
   configApplicationMutations.mutateApplicationConfig = jest.fn(
     () =>
       new Promise((resolve) =>
         resolve({
           data: {
             updateApplicationConfig: {
-              APPLICATION_NAME: 'OPENCRVS',
-              NID_NUMBER_PATTERN: '/^[0-9]{10}$/',
-              PHONE_NUMBER_PATTERN: '/^[0-9]{8}$/',
+              APPLICATION_NAME: 'Farajaland CRVS',
+              NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
+              PHONE_NUMBER_PATTERN: '/^01[1-9][0-9]{8}$/',
               CURRENCY: {
                 isoCode: 'CAD',
                 languagesAndCountry: ['en-CA']
               },
               BIRTH: {
-                REGISTRATION_TARGET: 10,
-                LATE_REGISTRATION_TARGET: 30,
+                REGISTRATION_TARGET: 45,
+                LATE_REGISTRATION_TARGET: 365,
                 FEE: {
                   ON_TIME: 5,
                   LATE: 10,
@@ -60,6 +60,7 @@ beforeEach(async () => {
         })
       )
   )
+  const { store, history } = createStore()
 
   testComponent = await createTestComponent(
     <ApplicationConfig></ApplicationConfig>,
@@ -80,13 +81,21 @@ describe('application config page test', () => {
 
 describe('application name update test', () => {
   it('should show the application name change modal of click on change', async () => {
-    testComponent.find('#changeAppName').hostNodes().first().simulate('click')
-    expect(testComponent.find('#changeAppNameModal').hostNodes()).toHaveLength(
-      1
-    )
+    testComponent
+      .find('#APPLICATION_NAME')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    expect(
+      testComponent.find('#APPLICATION_NAMEModal').hostNodes()
+    ).toHaveLength(1)
   })
   it('should disable the button if input is empty', async () => {
-    testComponent.find('#changeAppName').hostNodes().first().simulate('click')
+    testComponent
+      .find('#APPLICATION_NAME')
+      .hostNodes()
+      .first()
+      .simulate('click')
     testComponent
       .find('#applicationName')
       .hostNodes()
@@ -98,7 +107,11 @@ describe('application name update test', () => {
     ).toBeTruthy()
   })
   it('should enable the button if input any text', async () => {
-    testComponent.find('#changeAppName').hostNodes().first().simulate('click')
+    testComponent
+      .find('#APPLICATION_NAME')
+      .hostNodes()
+      .first()
+      .simulate('click')
     testComponent
       .find('#applicationName')
       .hostNodes()
@@ -110,73 +123,80 @@ describe('application name update test', () => {
     ).toBeFalsy()
   })
   it('should close the modal if click on cancel button', async () => {
-    testComponent.find('#changeAppName').hostNodes().first().simulate('click')
+    testComponent
+      .find('#APPLICATION_NAME')
+      .hostNodes()
+      .first()
+      .simulate('click')
     testComponent.find('#modal_cancel').hostNodes().first().simulate('click')
-    expect(testComponent.find('#changeAppNameModal').hostNodes()).toHaveLength(
-      0
-    )
+    expect(
+      testComponent.find('#APPLICATION_NAMEModal').hostNodes()
+    ).toHaveLength(0)
   })
 
   it('should change the application name if click on apply', async () => {
-    testComponent.find('#changeAppName').hostNodes().first().simulate('click')
+    testComponent
+      .find('#APPLICATION_NAME')
+      .hostNodes()
+      .first()
+      .simulate('click')
     testComponent
       .find('#applicationName')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationName', value: 'OPENCRVS' }
+        target: { id: 'applicationName', value: 'Farajaland CRVS' }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
-    await waitForElement(testComponent, '#changeAppName')
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent
-        .find('#Name-of-application_value')
-        .hostNodes()
-        .first()
-        .text()
-    ).toBe('OPENCRVS')
+      testComponent.find('#APPLICATION_NAME_value').hostNodes().first().text()
+    ).toBe('Farajaland CRVS')
   })
 
   it('should show success notification if appliction name change', async () => {
-    testComponent.find('#changeAppName').hostNodes().first().simulate('click')
+    testComponent
+      .find('#APPLICATION_NAME')
+      .hostNodes()
+      .first()
+      .simulate('click')
     testComponent
       .find('#applicationName')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationName', value: 'OPENCRVS' }
+        target: { id: 'applicationName', value: 'Farajaland CRVS' }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
-    expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
-    ).toBe('Name of application updated')
+    expect(testComponent.find('#appNamenotification').hostNodes().text()).toBe(
+      'Name of application updated'
+    )
   })
 })
 
 describe('NID Pattern update test', () => {
   it('should show the application config change modal of click on change', async () => {
     testComponent
-      .find('#changeNidPattern')
+      .find('#NID_NUMBER_PATTERN')
       .hostNodes()
       .first()
       .simulate('click')
     expect(
-      testComponent.find('#changeNidPatternModal').hostNodes()
+      testComponent.find('#NID_NUMBER_PATTERNModal').hostNodes()
     ).toHaveLength(1)
   })
   it('should disable the button if nidPattern is empty', async () => {
     testComponent
-      .find('#changeNidPattern')
+      .find('#NID_NUMBER_PATTERN')
       .hostNodes()
       .first()
       .simulate('click')
     testComponent
-      .find('#changeNidPatternInput')
+      .find('#NID_NUMBER_PATTERNInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'changeNidPattern', value: '' }
+        target: { id: 'NID_NUMBER_PATTERN', value: '' }
       })
     expect(
       testComponent.find('#apply_change').hostNodes().props().disabled
@@ -184,15 +204,15 @@ describe('NID Pattern update test', () => {
   })
   it('should disable the button if nidPattern is invalid', async () => {
     testComponent
-      .find('#changeNidPattern')
+      .find('#NID_NUMBER_PATTERN')
       .hostNodes()
       .first()
       .simulate('click')
     testComponent
-      .find('#changeNidPatternInput')
+      .find('#NID_NUMBER_PATTERNInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'changeNidPattern', value: '^as(po$' }
+        target: { id: 'NID_NUMBER_PATTERN', value: '^as(po$' }
       })
     expect(
       testComponent.find('#apply_change').hostNodes().props().disabled
@@ -200,117 +220,111 @@ describe('NID Pattern update test', () => {
   })
   it('should close the modal if click on cancel button', async () => {
     testComponent
-      .find('#changeNidPattern')
+      .find('#NID_NUMBER_PATTERN')
       .hostNodes()
       .first()
       .simulate('click')
     testComponent.find('#modal_cancel').hostNodes().first().simulate('click')
     expect(
-      testComponent.find('#changeNidPatternModal').hostNodes()
+      testComponent.find('#NID_NUMBER_PATTERNModal').hostNodes()
     ).toHaveLength(0)
   })
   it('should change the nid Pattern if click on apply', async () => {
     testComponent
-      .find('#changeNidPattern')
+      .find('#NID_NUMBER_PATTERN')
       .hostNodes()
       .first()
       .simulate('click')
     testComponent
-      .find('#changeNidPatternInput')
+      .find('#NID_NUMBER_PATTERNInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'changeNidPattern', value: '^[0-9]{10}$' }
+        target: { id: 'NID_NUMBER_PATTERN', value: '^[0-9]{10}$' }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
-    await waitForElement(testComponent, '#nidPattern_value_container_value')
-    await flushPromises()
     testComponent.update()
+    await flushPromises()
     expect(
-      testComponent
-        .find('#nidPattern_value_container_value')
-        .hostNodes()
-        .first()
-        .text()
-    ).toBe('/^[0-9]{10}$/')
+      testComponent.find('#NID_NUMBER_PATTERN_value').hostNodes().first().text()
+    ).toBe('/^[0-9]{9}$/')
   })
-  it('should show success notification if appliction name change', async () => {
+  it('should show success notification if nid pattern name change', async () => {
     testComponent
-      .find('#changeNidPattern')
+      .find('#NID_NUMBER_PATTERN')
       .hostNodes()
       .first()
       .simulate('click')
     testComponent
-      .find('#changeNidPatternInput')
+      .find('#NID_NUMBER_PATTERNInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'changeNidPattern', value: '^[0-9]{10}$' }
+        target: { id: 'NID_NUMBER_PATTERN', value: '^[0-9]{9}$' }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
-    await waitForElement(testComponent, '#changeAppName')
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#nidPatternNotification').hostNodes().text()
     ).toBe('NID Pattern of application updated')
   })
   it('should show valid message on valid example after clicking test example button', async () => {
     testComponent
-      .find('#changeNidPattern')
+      .find('#NID_NUMBER_PATTERN')
       .hostNodes()
       .first()
       .simulate('click')
     testComponent
-      .find('#changeNidPatternInput')
+      .find('#NID_NUMBER_PATTERNInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'changeNidPattern', value: '^[0-9]{10}$' }
+        target: { id: 'NID_NUMBER_PATTERN', value: '^[0-9]{10}$' }
       })
     await flushPromises()
     testComponent
-      .find('#changeNidPatternExampleInput')
+      .find('#NID_NUMBER_PATTERNExampleInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'changeNidPatternExample', value: '3454345678' }
+        target: { id: 'NID_NUMBER_PATTERNExample', value: '3454345678' }
       })
     await flushPromises()
     testComponent
-      .find('#test-changeNidPattern-example')
+      .find('#test-NID_NUMBER_PATTERN-example')
       .hostNodes()
       .first()
       .simulate('click')
     await flushPromises()
     expect(
       testComponent
-        .find('#changeNidPattern-example-valid-message')
+        .find('#NID_NUMBER_PATTERN-example-valid-message')
         .hostNodes()
         .text()
     ).toBe('Valid')
     expect(
-      testComponent.find('#changeNidPattern-example-valid-icon')
+      testComponent.find('#NID_NUMBER_PATTERN-example-valid-icon')
     ).toHaveLength(1)
   })
   it('should show invalid message on invalid example after clicking test example button', async () => {
     testComponent
-      .find('#changeNidPattern')
+      .find('#NID_NUMBER_PATTERN')
       .hostNodes()
       .first()
       .simulate('click')
     testComponent
-      .find('#changeNidPatternInput')
+      .find('#NID_NUMBER_PATTERNInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'changeNidPattern', value: '^[0-9]{8}$' }
+        target: { id: 'NID_NUMBER_PATTERN', value: '^[0-9]{8}$' }
       })
     await flushPromises()
     testComponent
-      .find('#changeNidPatternExampleInput')
+      .find('#NID_NUMBER_PATTERNExampleInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'changeNidPatternExample', value: '123123123' }
+        target: { id: 'NID_NUMBER_PATTERNExample', value: '123123123' }
       })
     await flushPromises()
     testComponent
-      .find('#test-changeNidPattern-example')
+      .find('#test-NID_NUMBER_PATTERN-example')
       .hostNodes()
       .first()
       .simulate('click')
@@ -318,53 +332,57 @@ describe('NID Pattern update test', () => {
 
     expect(
       testComponent
-        .find('#changeNidPattern-example-invalid-message')
+        .find('#NID_NUMBER_PATTERN-example-invalid-message')
         .hostNodes()
         .text()
     ).toBe('Invalid')
     expect(
-      testComponent.find('#changeNidPattern-example-invalid-icon')
+      testComponent.find('#NID_NUMBER_PATTERN-example-invalid-icon')
     ).toHaveLength(2)
   })
 })
 
 describe('Phone Number Pattern update test', () => {
   it('should show the application config change modal of click on change', async () => {
-    testComponent.find('#changePhnNum').hostNodes().first().simulate('click')
-    expect(testComponent.find('#changePhnNumModal').hostNodes()).toHaveLength(1)
+    testComponent
+      .find('#PHONE_NUMBER_PATTERN')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    expect(
+      testComponent.find('#PHONE_NUMBER_PATTERNModal').hostNodes()
+    ).toHaveLength(1)
   })
   it('should change the Phone Number Pattern if click on apply', async () => {
-    testComponent.find('#changePhnNum').hostNodes().first().simulate('click')
     testComponent
-      .find('#changePhnNumInput')
+      .find('#PHONE_NUMBER_PATTERN')
+      .hostNodes()
+      .first()
+      .simulate('click')
+    testComponent
+      .find('#PHONE_NUMBER_PATTERNInput')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'changePhnNum', value: '^[0-9]{8}$' }
+        target: { id: 'PHONE_NUMBER_PATTERN', value: '^01[1-9][0-9]{8}$' }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
-    await waitForElement(
-      testComponent,
-      '#phoneNumberPattern_value_container_value'
-    )
     expect(
       testComponent
-        .find('#phoneNumberPattern_value_container_value')
+        .find('#PHONE_NUMBER_PATTERN_value')
         .hostNodes()
         .first()
         .text()
-    ).toBe('/^[0-9]{8}$/')
+    ).toBe('/^01[1-9][0-9]{8}$/')
   })
 })
 
 describe('application currency update test', () => {
   it('should show the application currency change modal of click on change', async () => {
-    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
-    expect(testComponent.find('#changeCurrencyModal').hostNodes()).toHaveLength(
-      1
-    )
+    testComponent.find('#CURRENCY').hostNodes().first().simulate('click')
+    expect(testComponent.find('#CURRENCYModal').hostNodes()).toHaveLength(1)
   })
   it('should change the application currency if click on apply', async () => {
-    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
+    testComponent.find('#CURRENCY').hostNodes().first().simulate('click')
     testComponent
       .find('#selectCurrency')
       .hostNodes()
@@ -374,12 +392,12 @@ describe('application currency update test', () => {
     testComponent.find('#apply_change').hostNodes().simulate('click')
     await flushPromises()
     expect(
-      testComponent.find('#Currency_value').hostNodes().first().text()
-    ).toBe('Canadian dollar')
+      testComponent.find('#CURRENCY_value').hostNodes().first().text()
+    ).toBe('Zambian kwacha')
   })
 
   it('should show success notification if appliction config change', async () => {
-    testComponent.find('#changeCurrency').hostNodes().first().simulate('click')
+    testComponent.find('#CURRENCY').hostNodes().first().simulate('click')
     testComponent
       .find('#selectCurrency')
       .hostNodes()
@@ -388,9 +406,9 @@ describe('application currency update test', () => {
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     await flushPromises()
-    expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
-    ).toBe('Currency updated')
+    expect(testComponent.find('#currencyNotification').hostNodes().text()).toBe(
+      'Currency updated'
+    )
   })
 })
 
@@ -398,19 +416,19 @@ describe('application birth registration target test', () => {
   it('should show the application birth registration target change modal of click on change', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeBirthRegTarget')
+      .find('#BIRTH_REGISTRATION_TARGET')
       .hostNodes()
       .first()
       .simulate('click')
     expect(
-      testComponent.find('#changeBirthRegTargetModal').hostNodes()
+      testComponent.find('#BIRTH_REGISTRATION_TARGETModal').hostNodes()
     ).toHaveLength(1)
   })
 
   it('should change the birth registration target days if click on apply', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeBirthRegTarget')
+      .find('#BIRTH_REGISTRATION_TARGET')
       .hostNodes()
       .first()
       .simulate('click')
@@ -418,20 +436,24 @@ describe('application birth registration target test', () => {
       .find('#applicationBirthRegTarget')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationBirthRegTarget', value: 10 }
+        target: { id: 'applicationBirthRegTarget', value: 45 }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#Legally-specified_value').hostNodes().first().text()
-    ).toContain('10')
+      testComponent
+        .find('#BIRTH_REGISTRATION_TARGET_value')
+        .hostNodes()
+        .first()
+        .text()
+    ).toContain('45')
   })
 
   it('should show success notification if appliction config change', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeBirthRegTarget')
+      .find('#BIRTH_REGISTRATION_TARGET')
       .hostNodes()
       .first()
       .simulate('click')
@@ -445,7 +467,7 @@ describe('application birth registration target test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#birthRegTargetnotification').hostNodes().text()
     ).toBe('Birth registration target days updated')
   })
 })
@@ -454,19 +476,19 @@ describe('application birth late registration target test', () => {
   it('should show the application birth late registration target change modal of click on change', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeBirthLateRegTarget')
+      .find('#BIRTH_LATE_REGISTRATION_TARGET')
       .hostNodes()
       .first()
       .simulate('click')
     expect(
-      testComponent.find('#changeBirthLateRegTargetModal').hostNodes()
+      testComponent.find('#BIRTH_LATE_REGISTRATION_TARGETModal').hostNodes()
     ).toHaveLength(1)
   })
 
   it('should change the birth late registration target days if click on apply', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeBirthLateRegTarget')
+      .find('#BIRTH_LATE_REGISTRATION_TARGET')
       .hostNodes()
       .first()
       .simulate('click')
@@ -474,35 +496,42 @@ describe('application birth late registration target test', () => {
       .find('#applicationBirthLateRegTarget')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationBirthLateRegTarget', value: 45 }
+        target: { id: 'applicationBirthLateRegTarget', value: 365 }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#Late-registration_value').hostNodes().first().text()
-    ).toContain('45')
+      testComponent
+        .find('#BIRTH_LATE_REGISTRATION_TARGET_value')
+        .hostNodes()
+        .first()
+        .text()
+    ).toContain('365')
   })
 
   it('should show success notification if appliction config change', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeBirthRegTarget')
+      .find('#BIRTH_LATE_REGISTRATION_TARGET')
       .hostNodes()
       .first()
       .simulate('click')
     testComponent
-      .find('#applicationBirthRegTarget')
+      .find('#applicationBirthLateRegTarget')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationBirthRegTarget', value: 30 }
+        target: { id: 'applicationBirthLateRegTarget', value: 365 }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
-    ).toBe('Birth registration target days updated')
+      testComponent
+        .find('#BIRTH_LATE_REGISTRATION_TARGET_notification')
+        .hostNodes()
+        .text()
+    ).toBe('Birth late registration target days updated')
   })
 })
 
@@ -510,19 +539,19 @@ describe('application death registration target test', () => {
   it('should show the application death late registration target change modal of click on change', async () => {
     testComponent.find('#tab_death').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeDeathRegTarget')
+      .find('#DEATH_REGISTRATION_TARGET')
       .hostNodes()
       .first()
       .simulate('click')
     expect(
-      testComponent.find('#changeDeathRegTargetModal').hostNodes()
+      testComponent.find('#DEATH_REGISTRATION_TARGETModal').hostNodes()
     ).toHaveLength(1)
   })
 
   it('should change the death registration target days if click on apply', async () => {
     testComponent.find('#tab_death').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeDeathRegTarget')
+      .find('#DEATH_REGISTRATION_TARGET')
       .hostNodes()
       .first()
       .simulate('click')
@@ -530,20 +559,24 @@ describe('application death registration target test', () => {
       .find('#applicationDeathRegTarget')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationDeathRegTarget', value: 5 }
+        target: { id: 'applicationDeathRegTarget', value: 10 }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#Legally-specified_value').hostNodes().first().text()
+      testComponent
+        .find('#DEATH_REGISTRATION_TARGET_value')
+        .hostNodes()
+        .first()
+        .text()
     ).toContain('10')
   })
 
   it('should show success notification if appliction config change', async () => {
     testComponent.find('#tab_death').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeDeathRegTarget')
+      .find('#DEATH_REGISTRATION_TARGET')
       .hostNodes()
       .first()
       .simulate('click')
@@ -557,7 +590,10 @@ describe('application death registration target test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent
+        .find('#DEATH_REGISTRATION_TARGET_notification')
+        .hostNodes()
+        .text()
     ).toBe('Death registration target days updated')
   })
 })
@@ -566,7 +602,7 @@ describe('application birth registration fee test', () => {
   it('should change the birth registration on time fee if click on apply', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeBirthOnTimeFee')
+      .find('#BIRTH_ON_TIME_FEE')
       .hostNodes()
       .first()
       .simulate('click')
@@ -574,24 +610,20 @@ describe('application birth registration fee test', () => {
       .find('#applicationBirthOnTimeFee')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationDeathRegTarget', value: 5 }
+        target: { id: 'applicationBirthOnTimeFee', value: 5 }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent
-        .find('#Within-legally-specified-time_value')
-        .hostNodes()
-        .first()
-        .text()
+      testComponent.find('#BIRTH_ON_TIME_FEE_value').hostNodes().first().text()
     ).toContain('5')
   })
 
   it('should show success notification if appliction config change', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeBirthOnTimeFee')
+      .find('#BIRTH_ON_TIME_FEE')
       .hostNodes()
       .first()
       .simulate('click')
@@ -605,38 +637,30 @@ describe('application birth registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#BIRTH_ON_TIME_FEE_notification').hostNodes().text()
     ).toBe('Birth on time fee updated')
   })
 
   it('should change the birth registration late fee if click on apply', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
-    testComponent
-      .find('#changeBirthLateFee')
-      .hostNodes()
-      .first()
-      .simulate('click')
+    testComponent.find('#BIRTH_LATE_FEE').hostNodes().first().simulate('click')
     testComponent
       .find('#applicationBirthLateFee')
       .hostNodes()
       .simulate('change', {
-        target: { id: 'applicationBirthLateFee', value: 10 }
+        target: { id: 'applicationBirthLateFee', value: 45 }
       })
     testComponent.find('#apply_change').hostNodes().simulate('click')
     testComponent.update()
     await flushPromises()
     expect(
       testComponent.find('#Late-registration_value').hostNodes().first().text()
-    ).toContain('10')
+    ).toContain(45)
   })
 
   it('should show success notification if appliction config change', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
-    testComponent
-      .find('#changeBirthLateFee')
-      .hostNodes()
-      .first()
-      .simulate('click')
+    testComponent.find('#BIRTH_LATE_FEE').hostNodes().first().simulate('click')
     testComponent
       .find('#applicationBirthLateFee')
       .hostNodes()
@@ -647,14 +671,14 @@ describe('application birth registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#BIRTH_LATE_FEE_notification').hostNodes().text()
     ).toBe('Birth late fee updated')
   })
 
   it('should change the birth registration delayed fee if click on apply', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeBirthDelayedFee')
+      .find('#BIRTH_DELAYED_FEE')
       .hostNodes()
       .first()
       .simulate('click')
@@ -668,14 +692,14 @@ describe('application birth registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#Delayed-registration_value').hostNodes().at(2).text()
+      testComponent.find('#BIRTH_DELAYED_FEE_value').hostNodes().at(1).text()
     ).toContain('15')
   })
 
   it('should show success notification if appliction config change', async () => {
     testComponent.find('#tab_birth').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeBirthDelayedFee')
+      .find('#BIRTH_DELAYED_FEE')
       .hostNodes()
       .first()
       .simulate('click')
@@ -689,7 +713,7 @@ describe('application birth registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#BIRTH_DELAYED_FEE_notification').hostNodes().text()
     ).toBe('Birth delayed fee updated')
   })
 })
@@ -698,7 +722,7 @@ describe('application death registration fee test', () => {
   it('should change the death registration on time fee if click on apply', async () => {
     testComponent.find('#tab_death').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeDeathOnTimeFee')
+      .find('#DEATH_ON_TIME_FEE')
       .hostNodes()
       .first()
       .simulate('click')
@@ -712,18 +736,14 @@ describe('application death registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent
-        .find('#Within-legally-specified-time_value')
-        .hostNodes()
-        .first()
-        .text()
+      testComponent.find('#DEATH_ON_TIME_FEE_value').hostNodes().first().text()
     ).toContain('10')
   })
 
   it('should show success notification if appliction config change', async () => {
     testComponent.find('#tab_death').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeDeathOnTimeFee')
+      .find('#DEATH_ON_TIME_FEE')
       .hostNodes()
       .first()
       .simulate('click')
@@ -737,14 +757,14 @@ describe('application death registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#DEATH_ON_TIME_FEE_notification').hostNodes().text()
     ).toBe('Death on time fee updated')
   })
 
   it('should change the death registration delayed fee if click on apply', async () => {
     testComponent.find('#tab_death').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeDeathDelayedFee')
+      .find('#DEATH_DELAYED_FEE')
       .hostNodes()
       .first()
       .simulate('click')
@@ -758,14 +778,14 @@ describe('application death registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#Delayed-registration_value').hostNodes().at(2).text()
+      testComponent.find('#DEATH_DELAYED_FEE_value').hostNodes().at(1).text()
     ).toContain('15')
   })
 
   it('should show success notification if appliction config change', async () => {
     testComponent.find('#tab_death').hostNodes().first().simulate('click')
     testComponent
-      .find('#changeDeathDelayedFee')
+      .find('#DEATH_DELAYED_FEE')
       .hostNodes()
       .first()
       .simulate('click')
@@ -779,20 +799,18 @@ describe('application death registration fee test', () => {
     testComponent.update()
     await flushPromises()
     expect(
-      testComponent.find('#print-cert-notification').hostNodes().text()
+      testComponent.find('#DEATH_DELAYED_FEE_notification').hostNodes().text()
     ).toBe('Death delayed fee updated')
   })
 })
 
 describe('country logo update test', () => {
   it('should show the country logo change modal of click on change', async () => {
-    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
-    expect(testComponent.find('#changeGovtLogoModal').hostNodes()).toHaveLength(
-      1
-    )
+    testComponent.find('#COUNTRY_LOGO').hostNodes().first().simulate('click')
+    expect(testComponent.find('#COUNTRY_LOGOModal').hostNodes()).toHaveLength(1)
   })
   it('should disable the button if input file is empty', async () => {
-    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    testComponent.find('#COUNTRY_LOGO').hostNodes().first().simulate('click')
     testComponent
       .find('#upload_document')
       .hostNodes()
@@ -806,14 +824,12 @@ describe('country logo update test', () => {
     ).toBeTruthy()
   })
   it('should close the modal if click on cancel button', async () => {
-    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    testComponent.find('#COUNTRY_LOGO').hostNodes().first().simulate('click')
     testComponent.find('#modal_cancel').hostNodes().first().simulate('click')
-    expect(testComponent.find('#changeGovtLogoModal').hostNodes()).toHaveLength(
-      0
-    )
+    expect(testComponent.find('#COUNTRY_LOGOModal').hostNodes()).toHaveLength(0)
   })
   it('No error while uploading valid file', async () => {
-    testComponent.find('#changeGovtLogo').hostNodes().first().simulate('click')
+    testComponent.find('#COUNTRY_LOGO').hostNodes().first().simulate('click')
     testComponent.find('#upload_document').hostNodes().simulate('click')
     testComponent
       .find('#image_file_uploader_field')

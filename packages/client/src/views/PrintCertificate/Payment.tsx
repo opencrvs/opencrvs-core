@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { Print } from '@opencrvs/components/lib/icons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
