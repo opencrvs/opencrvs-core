@@ -46,8 +46,16 @@ export type CMethodParams = {
   intl: IntlShape
   userDetails: IUserDetails | null
   draft: IDeclaration | null
-  goToPage?: typeof goToPage
-  goToPrintCertificate?: typeof goToPrintCertificate
+  goToPage?: (
+    pageRoute: string,
+    declarationId: string,
+    pageId: string,
+    event: string
+  ) => void
+  goToPrintCertificate?: (
+    registrationId: string,
+    event: string
+  ) => void | undefined
   goToUserProfile?: typeof goToUserProfile
   goToTeamUserList?: typeof goToTeamUserList
 }

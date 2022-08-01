@@ -61,7 +61,9 @@ import {
   Loader,
   PageHeader,
   IPageHeaderProps,
-  ErrorToastNotification
+  ErrorToastNotification,
+  FloatingNotification,
+  NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
@@ -116,7 +118,8 @@ import { Mutation } from 'react-apollo'
 import {
   MarkEventAsReinstatedMutation,
   MarkEventAsReinstatedMutationVariables,
-  Event
+  Event,
+  SearchEventsQuery
 } from '@client/utils/gateway'
 import {
   REINSTATE_BIRTH_DECLARATION,
@@ -125,6 +128,7 @@ import {
 import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { getDownloadStatus } from '@client/views/OfficeHome/utils'
+import { ApolloQueryResult, OperationVariables } from 'apollo-client'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -309,7 +313,8 @@ function RecordAuditBody({
   goToUserProfile,
   goToTeamUserList,
   goBack,
-  offlineData
+  offlineData,
+  refetch
 }: {
   declaration: IDeclarationData
   draft: IDeclaration | null
@@ -320,10 +325,14 @@ function RecordAuditBody({
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
   tab: IRecordAuditTabs
+  refetch?: (
+    variables?: OperationVariables | undefined
+  ) => Promise<ApolloQueryResult<SearchEventsQuery>>
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
   const [actionDetailsData, setActionDetailsData] = React.useState({})
+  const [noLongerAssigned, setNoLongerAssigned] = React.useState(false)
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
@@ -418,13 +427,33 @@ function RecordAuditBody({
     userDetails?.role &&
     !FIELD_AGENT_ROLES.includes(userDetails.role)
   ) {
+    const reviewDeclaration = (
+      pageRoute: string,
+      declarationId: string,
+      pageId: string,
+      event: string
+    ) => {
+      if (refetch) {
+        refetch().then((response: any) => {
+          const assignedUserId =
+            response.data?.fetchRegistration?.registration?.assignment?.userId
+          if (assignedUserId === userDetails?.userMgntUserID) {
+            goToPage(pageRoute, declarationId, pageId, event)
+          } else {
+            setNoLongerAssigned(true)
+          }
+        })
+      } else {
+        goToPage(pageRoute, declarationId, pageId, event)
+      }
+    }
     actions.push(
       ShowReviewButton({
         declaration,
         intl,
         userDetails,
         draft,
-        goToPage
+        goToPage: reviewDeclaration
       })
     )
 
@@ -463,13 +492,28 @@ function RecordAuditBody({
     declaration.status === SUBMISSION_STATUS.REGISTERED ||
     declaration.status === SUBMISSION_STATUS.CERTIFIED
   ) {
+    const printCertificate = (registrationId: string, event: string) => {
+      if (refetch) {
+        refetch().then((response: any) => {
+          const assignedUserId =
+            response.data?.fetchRegistration?.registration?.assignment?.userId
+          if (assignedUserId === userDetails?.userMgntUserID) {
+            goToPrintCertificate(registrationId, event)
+          } else {
+            setNoLongerAssigned(true)
+          }
+        })
+      } else {
+        goToPrintCertificate(registrationId, event)
+      }
+    }
     actions.push(
       ShowPrintButton({
         declaration,
         intl,
         userDetails,
         draft,
-        goToPrintCertificate,
+        goToPrintCertificate: printCertificate,
         goToTeamUserList
       })
     )
@@ -549,6 +593,14 @@ function RecordAuditBody({
 
   return (
     <>
+      {noLongerAssigned && (
+        <FloatingNotification
+          show={noLongerAssigned}
+          type={NOTIFICATION_TYPE.ERROR}
+        >
+          You are no longer assigned o this declaration
+        </FloatingNotification>
+      )}
       <MobileHeader {...mobileProps} key={'record-audit-mobile-header'} />
       {hasDuplicates && (
         <StyledDuplicateWarning
@@ -726,6 +778,7 @@ function getBodyContent({
                 scope={scope}
                 userDetails={userDetails}
                 goBack={goBack}
+                refetch={refetch}
               />
             )
           }}
