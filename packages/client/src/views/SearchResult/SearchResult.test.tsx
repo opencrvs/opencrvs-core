@@ -432,6 +432,12 @@ describe('SearchResult tests', () => {
                     registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
                   },
                   dateOfDeath: '2007-01-01',
+                  assignment: {
+                    userId: '123',
+                    firstName: 'Kennedy',
+                    lastName: 'Mweene',
+                    officeName: 'HQ Office'
+                  },
                   deceasedName: [
                     {
                       __typename: 'X',
@@ -488,10 +494,16 @@ describe('SearchResult tests', () => {
   it('renders print button in search page', async () => {
     const declaration = {
       id: 'bc09200d-0160-43b4-9e2b-5b9e90424e92',
-      data: {},
+      data: {
+        registration: {
+          assignment: {
+            userId: '123'
+          }
+        }
+      },
       event: Event.Birth,
       downloadStatus: 'DOWNLOADED',
-      submissionStatus: 'REGISTERED'
+      registrationStatus: 'REGISTERED'
     }
 
     // @ts-ignore
@@ -525,7 +537,14 @@ describe('SearchResult tests', () => {
                     trackingId: 'DW0UTHR',
                     registrationNumber: null,
                     duplicates: [],
-                    registeredLocationId: '308c35b4-04f8-4664-83f5-9790e790cde1'
+                    registeredLocationId:
+                      '308c35b4-04f8-4664-83f5-9790e790cde1',
+                    assignment: {
+                      userId: '123',
+                      firstName: 'Kennedy',
+                      lastName: 'Mweene',
+                      officeName: 'HQ Office'
+                    }
                   },
                   dateOfDeath: '2007-01-01',
                   deceasedName: [

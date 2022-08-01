@@ -399,7 +399,7 @@ export const gqlToDraftTransformer = (
   if (queryData.history) {
     transformedData.history = queryData.history
   }
-  if (queryData.registration.assignment) {
+  if (queryData.registration?.assignment) {
     transformedData.registration.assignment = queryData.registration.assignment
   }
   return transformedData

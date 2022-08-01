@@ -125,6 +125,12 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
           contentType
           subject
         }
+        assignment {
+          userId
+          firstName
+          lastName
+          officeName
+        }
         status {
           comments {
             comment
@@ -355,6 +361,12 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
         otherInformantType
         contactRelationship
         contactPhoneNumber
+        assignment {
+          userId
+          firstName
+          lastName
+          officeName
+        }
         status {
           comments {
             comment

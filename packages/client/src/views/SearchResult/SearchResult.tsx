@@ -18,7 +18,7 @@ import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { Header } from '@client/components/interface/Header/Header'
 import { Query } from '@client/components/Query'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
-import { Action } from '@client/forms'
+import { Action, IFormSectionData } from '@client/forms'
 import {
   buttonMessages,
   constantsMessages,
@@ -75,6 +75,7 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { LoadingIndicator } from '@client/views/OfficeHome/LoadingIndicator'
 import { getDownloadStatus } from '@client/views/OfficeHome/utils'
+import { ApolloQueryResult, OperationVariables } from 'apollo-client'
 
 const ErrorText = styled.div`
   color: ${({ theme }) => theme.colors.negative};
@@ -144,7 +145,6 @@ interface IBaseSearchResultProps {
   goToPage: typeof goToPageAction
   goToPrintCertificate: typeof goToPrintCertificateAction
   goToDeclarationRecordAudit: typeof goToDeclarationRecordAudit
-  draft: IDeclaration[]
   userId?: string
 }
 
@@ -254,7 +254,12 @@ export class SearchResultView extends React.Component<
     return this.userHasValidateScope() || this.userHasRegisterScope()
   }
 
-  transformSearchContent = (data: QueryData) => {
+  transformSearchContent = (
+    data: QueryData,
+    refetch: (
+      variables?: OperationVariables | undefined
+    ) => Promise<ApolloQueryResult<SearchEventsQuery>>
+  ) => {
     const { intl } = this.props
     if (!data || !data.results) {
       return []
@@ -272,6 +277,14 @@ export class SearchResultView extends React.Component<
         foundDeclaration,
         this.props.userId
       )
+
+      if (
+        reg?.assignment?.userId !==
+        (foundDeclaration?.data.registration?.assignment as IFormSectionData)
+          ?.userId
+      ) {
+        refetch()
+      }
 
       const declarationIsArchived = reg.declarationStatus === 'ARCHIVED'
       const declarationIsRequestedCorrection =
@@ -466,7 +479,7 @@ export class SearchResultView extends React.Component<
                 }}
                 fetchPolicy="network-only"
               >
-                {({ loading, error, data }) => {
+                {({ loading, error, data, refetch }) => {
                   const total = loading
                     ? -1
                     : data?.searchEvents?.results?.length || 0
@@ -505,7 +518,8 @@ export class SearchResultView extends React.Component<
                             </ReactTooltip>
                             <GridTable
                               content={this.transformSearchContent(
-                                data.searchEvents
+                                data.searchEvents,
+                                refetch
                               )}
                               columns={this.getColumns()}
                               noResultText={intl.formatMessage(
@@ -533,8 +547,7 @@ export const SearchResult = connect(
     scope: getScope(state),
     userDetails: getUserDetails(state),
     outboxDeclarations: state.declarationsState.declarations,
-    userId: state.profile.userDetails?.userMgntUserID,
-    draft: state.declarationsState.declarations
+    userId: state.profile.userDetails?.userMgntUserID
   }),
   {
     goToEvents: goToEventsAction,

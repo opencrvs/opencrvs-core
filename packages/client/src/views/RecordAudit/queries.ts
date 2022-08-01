@@ -29,12 +29,6 @@ export const FETCH_DECLARATION_SHORT_INFO = gql`
           lastName
           officeName
         }
-        assignment {
-          userId
-          firstName
-          lastName
-          officeName
-        }
       }
       ... on BirthRegistration {
         child {

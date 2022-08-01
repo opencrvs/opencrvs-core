@@ -784,10 +784,6 @@ describe('In Progress tab', () => {
           testComponent.find('#ListItemAction-0-Update').hostNodes()
         ).toHaveLength(1)
 
-        console.log(
-          testComponent.find('#ListItemAction-0-Update').hostNodes().debug()
-        )
-
         testComponent
           .find('#ListItemAction-0-Update')
           .hostNodes()
