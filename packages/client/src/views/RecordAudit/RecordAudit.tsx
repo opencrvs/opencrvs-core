@@ -325,7 +325,7 @@ function RecordAuditBody({
   registerForm: IRegisterFormState
   offlineData: Partial<IOfflineData>
   tab: IRecordAuditTabs
-  refetch?: (
+  refetch: (
     variables?: OperationVariables | undefined
   ) => Promise<ApolloQueryResult<SearchEventsQuery>>
 } & IDispatchProps) {
@@ -370,8 +370,19 @@ function RecordAuditBody({
         align={ICON_ALIGNMENT.LEFT}
         icon={() => <Edit />}
         onClick={() => {
-          clearCorrectionChange(declaration.id)
-          goToCertificateCorrection(declaration.id, CorrectionSection.Corrector)
+          refetch().then((response: any) => {
+            const assignedUserId =
+              response.data?.fetchRegistration?.registration?.assignment?.userId
+            if (assignedUserId === userDetails?.userMgntUserID) {
+              clearCorrectionChange(declaration.id)
+              goToCertificateCorrection(
+                declaration.id,
+                CorrectionSection.Corrector
+              )
+            } else {
+              setNoLongerAssigned(true)
+            }
+          })
         }}
       >
         {intl.formatMessage(correctionMessages.title)}
@@ -393,7 +404,17 @@ function RecordAuditBody({
         id="archive_button"
         key="archive_button"
         icon={() => <Archive />}
-        onClick={toggleDisplayDialog}
+        onClick={() => {
+          refetch().then((response: any) => {
+            const assignedUserId =
+              response.data?.fetchRegistration?.registration?.assignment?.userId
+            if (assignedUserId === userDetails?.userMgntUserID) {
+              toggleDisplayDialog()
+            } else {
+              setNoLongerAssigned(true)
+            }
+          })
+        }}
       >
         {intl.formatMessage(buttonMessages.archive)}
       </StyledTertiaryButton>
@@ -413,7 +434,17 @@ function RecordAuditBody({
         id="reinstate_button"
         key="reinstate_button"
         icon={() => <RotateLeft />}
-        onClick={toggleDisplayDialog}
+        onClick={() => {
+          refetch().then((response: any) => {
+            const assignedUserId =
+              response.data?.fetchRegistration?.registration?.assignment?.userId
+            if (assignedUserId === userDetails?.userMgntUserID) {
+              toggleDisplayDialog()
+            } else {
+              setNoLongerAssigned(true)
+            }
+          })
+        }}
       >
         {intl.formatMessage(buttonMessages.reinstate)}
       </StyledTertiaryButton>
@@ -433,19 +464,15 @@ function RecordAuditBody({
       pageId: string,
       event: string
     ) => {
-      if (refetch) {
-        refetch().then((response: any) => {
-          const assignedUserId =
-            response.data?.fetchRegistration?.registration?.assignment?.userId
-          if (assignedUserId === userDetails?.userMgntUserID) {
-            goToPage(pageRoute, declarationId, pageId, event)
-          } else {
-            setNoLongerAssigned(true)
-          }
-        })
-      } else {
-        goToPage(pageRoute, declarationId, pageId, event)
-      }
+      refetch().then((response: any) => {
+        const assignedUserId =
+          response.data?.fetchRegistration?.registration?.assignment?.userId
+        if (assignedUserId === userDetails?.userMgntUserID) {
+          goToPage(pageRoute, declarationId, pageId, event)
+        } else {
+          setNoLongerAssigned(true)
+        }
+      })
     }
     actions.push(
       ShowReviewButton({
@@ -471,13 +498,29 @@ function RecordAuditBody({
       userDetails?.role &&
       !FIELD_AGENT_ROLES.includes(userDetails.role))
   ) {
+    const updateDeclaration = (
+      pageRoute: string,
+      declarationId: string,
+      pageId: string,
+      event: string
+    ) => {
+      refetch().then((response: any) => {
+        const assignedUserId =
+          response.data?.fetchRegistration?.registration?.assignment?.userId
+        if (assignedUserId === userDetails?.userMgntUserID) {
+          goToPage(pageRoute, declarationId, pageId, event)
+        } else {
+          setNoLongerAssigned(true)
+        }
+      })
+    }
     actions.push(
       ShowUpdateButton({
         declaration,
         intl,
         userDetails,
         draft,
-        goToPage
+        goToPage: updateDeclaration
       })
     )
     mobileActions.push(actions[actions.length - 1])
@@ -493,19 +536,15 @@ function RecordAuditBody({
     declaration.status === SUBMISSION_STATUS.CERTIFIED
   ) {
     const printCertificate = (registrationId: string, event: string) => {
-      if (refetch) {
-        refetch().then((response: any) => {
-          const assignedUserId =
-            response.data?.fetchRegistration?.registration?.assignment?.userId
-          if (assignedUserId === userDetails?.userMgntUserID) {
-            goToPrintCertificate(registrationId, event)
-          } else {
-            setNoLongerAssigned(true)
-          }
-        })
-      } else {
-        goToPrintCertificate(registrationId, event)
-      }
+      refetch().then((response: any) => {
+        const assignedUserId =
+          response.data?.fetchRegistration?.registration?.assignment?.userId
+        if (assignedUserId === userDetails?.userMgntUserID) {
+          goToPrintCertificate(registrationId, event)
+        } else {
+          setNoLongerAssigned(true)
+        }
+      })
     }
     actions.push(
       ShowPrintButton({
@@ -597,8 +636,9 @@ function RecordAuditBody({
         <FloatingNotification
           show={noLongerAssigned}
           type={NOTIFICATION_TYPE.ERROR}
+          callback={() => setNoLongerAssigned(false)}
         >
-          You are no longer assigned o this declaration
+          You are no longer assigned to this declaration
         </FloatingNotification>
       )}
       <MobileHeader {...mobileProps} key={'record-audit-mobile-header'} />
@@ -710,34 +750,34 @@ function getBodyContent({
   goBack,
   ...actionProps
 }: IFullProps) {
-  if (
-    tab === 'search' ||
-    (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
-      !workqueueDeclaration)
-  ) {
-    return (
-      <>
-        <Query
-          query={FETCH_DECLARATION_SHORT_INFO}
-          variables={{
-            id: declarationId
-          }}
-          fetchPolicy="network-only"
-        >
-          {({ loading, error, data, refetch }) => {
-            if (loading) {
-              return <Loader id="search_loader" marginPercent={35} />
-            } else if (error) {
-              return (
-                <ErrorToastNotification
-                  retryButtonText={intl.formatMessage(buttonMessages.retry)}
-                  retryButtonHandler={() => refetch()}
-                >
-                  {intl.formatMessage(errorMessages.pleaseTryAgainError)}
-                </ErrorToastNotification>
-              )
-            }
+  return (
+    <>
+      <Query
+        query={FETCH_DECLARATION_SHORT_INFO}
+        variables={{
+          id: declarationId
+        }}
+        fetchPolicy="network-only"
+      >
+        {({ loading, error, data, refetch }) => {
+          if (loading) {
+            return <Loader id="search_loader" marginPercent={35} />
+          } else if (error) {
+            return (
+              <ErrorToastNotification
+                retryButtonText={intl.formatMessage(buttonMessages.retry)}
+                retryButtonHandler={() => refetch()}
+              >
+                {intl.formatMessage(errorMessages.pleaseTryAgainError)}
+              </ErrorToastNotification>
+            )
+          }
 
+          if (
+            tab === 'search' ||
+            (draft?.submissionStatus !== SUBMISSION_STATUS.DRAFT &&
+              !workqueueDeclaration)
+          ) {
             let declaration
             if (
               draft?.data?.registration?.trackingId &&
@@ -781,54 +821,62 @@ function getBodyContent({
                 refetch={refetch}
               />
             )
-          }}
-        </Query>
-      </>
-    )
-  } else {
-    const trackingId =
-      draft?.data?.registration?.trackingId?.toString() ||
-      workqueueDeclaration?.registration?.trackingId ||
-      ''
+          } else {
+            const trackingId =
+              draft?.data?.registration?.trackingId?.toString() ||
+              workqueueDeclaration?.registration?.trackingId ||
+              ''
 
-    let declaration =
-      draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
-        ? {
-            ...getDraftDeclarationData(draft, resources, intl, trackingId),
-            assignment: workqueueDeclaration?.registration?.assignment
+            let declaration =
+              draft && draft.downloadStatus !== DOWNLOAD_STATUS.DOWNLOADING
+                ? {
+                    ...getDraftDeclarationData(
+                      draft,
+                      resources,
+                      intl,
+                      trackingId
+                    ),
+                    assignment: workqueueDeclaration?.registration?.assignment
+                  }
+                : getWQDeclarationData(
+                    workqueueDeclaration as NonNullable<
+                      typeof workqueueDeclaration
+                    >,
+                    language,
+                    trackingId
+                  )
+
+            const wqStatus = workqueueDeclaration?.registration?.status
+            const draftStatus =
+              draft?.submissionStatus?.toString() ||
+              draft?.registrationStatus?.toString() ||
+              SUBMISSION_STATUS.DRAFT
+
+            declaration = {
+              ...declaration,
+              status: wqStatus || draftStatus
+            }
+
+            return (
+              <RecordAuditBody
+                key={`record-audit-${declarationId}`}
+                {...actionProps}
+                declaration={declaration}
+                draft={draft}
+                duplicates={getPotentialDuplicateIds(workqueueDeclaration)}
+                tab={tab}
+                intl={intl}
+                scope={scope}
+                userDetails={userDetails}
+                goBack={goBack}
+                refetch={refetch}
+              />
+            )
           }
-        : getWQDeclarationData(
-            workqueueDeclaration as NonNullable<typeof workqueueDeclaration>,
-            language,
-            trackingId
-          )
-
-    const wqStatus = workqueueDeclaration?.registration?.status
-    const draftStatus =
-      draft?.submissionStatus?.toString() ||
-      draft?.registrationStatus?.toString() ||
-      SUBMISSION_STATUS.DRAFT
-
-    declaration = {
-      ...declaration,
-      status: wqStatus || draftStatus
-    }
-
-    return (
-      <RecordAuditBody
-        key={`record-audit-${declarationId}`}
-        {...actionProps}
-        declaration={declaration}
-        draft={draft}
-        duplicates={getPotentialDuplicateIds(workqueueDeclaration)}
-        tab={tab}
-        intl={intl}
-        scope={scope}
-        userDetails={userDetails}
-        goBack={goBack}
-      />
-    )
-  }
+        }}
+      </Query>
+    </>
+  )
 }
 
 const RecordAuditComp = (props: IFullProps) => {
