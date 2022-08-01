@@ -39,26 +39,26 @@ export const PageWrapper = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   padding: 20px;
-  position: absolute;
   width: 100%;
 `
 
 export const LogoutHeader = styled.a`
-  float: right;
+  width: 100%;
   color: ${({ theme }) => theme.colors.white};
   display: flex;
-  position: absolute;
-  top: 30px;
-  right: 30px;
+  justify-content: flex-end;
   span {
     margin-right: 10px;
   }
 `
 const Container = styled.div`
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
 `
 const Name = styled.p`
   color: ${({ theme }) => theme.colors.white};
