@@ -55,7 +55,8 @@ const Container = styled.div`
   margin-top: 32px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: 32px -32px -32px -32px;
+    max-width: 100vw;
+    margin: 32px -32px -32px -24px;
   }
 `
 const Content = styled.div`
