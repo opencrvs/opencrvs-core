@@ -132,10 +132,63 @@ function getPDFTemplateWithSVG(
     svgTemplate,
     declaration.data.template
   )
-  const pdfTemplate: IPDFTemplate = certificateBaseTemplate
+  const pdfTemplate: IPDFTemplate = { ...certificateBaseTemplate }
   pdfTemplate.definition.pageSize = pageSize
   updatePDFTemplateWithSVGContent(pdfTemplate, svgCode, pageSize)
+  const fonts = parseSVGFonts(svgCode)
+  if (fonts) {
+    pdfTemplate.vfs = { ...fonts }
+    const [normal, bold] = Object.keys(fonts)
+    pdfTemplate.fonts.en.derived.normal = normal
+    if (bold) {
+      pdfTemplate.fonts.en.derived.bold = bold
+    } else {
+      pdfTemplate.fonts.en.derived.bold = normal
+    }
+  }
+
   return pdfTemplate
+}
+
+function parseSVGFonts(svg: string): Record<string, string> | null {
+  const html = document.createElement('html')
+  html.innerHTML = svg
+  const textStyle = html.querySelector('style[type="text/css"]')
+  const styles = textStyle?.innerHTML.match(/\w+\W*\w+:.*/g)
+  if (styles) {
+    const entries: string[][] = []
+
+    let keysIndex = 0
+    let valuesIndex = 0
+
+    for (let i = 0; i < styles.length; i++) {
+      const [key, ...values] = styles[i].split(':')
+      const value = values.join(':')
+      if (key === 'font-family') {
+        if (!entries[keysIndex]) {
+          entries[keysIndex] = []
+        }
+        if (!entries[keysIndex][0]) {
+          entries[keysIndex][0] = value.trim().replace(';', '')
+        }
+        keysIndex += 1
+      } else if (key === 'src') {
+        if (!entries[valuesIndex]) {
+          entries[valuesIndex] = []
+        }
+        if (!entries[valuesIndex][1]) {
+          const urlValue = value.match(/\(([^)]+)\)/)
+          if (urlValue && urlValue[1]) {
+            entries[valuesIndex][1] = urlValue[1].split(',')[1] || ''
+          }
+        }
+        valuesIndex += 1
+      }
+    }
+
+    return Object.fromEntries(entries)
+  }
+  return null
 }
 
 export function downloadFile(
