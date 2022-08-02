@@ -20,9 +20,11 @@ import {
   CLICKATELL_USER,
   INFOBIP_API_KEY,
   INFOBIP_SENDER_ID,
-  INFOBIP_GATEWAY_ENDPOINT
+  INFOBIP_GATEWAY_ENDPOINT,
+  COUNTRY_CONFIG_URL
 } from '@notification/constants'
 import { logger } from '@notification/logger'
+import { INotificationPayload } from '@client/utils/referenceApi'
 
 async function sendSMSClickatell(
   msisdn: string,
@@ -104,19 +106,26 @@ async function sendSMSInfobip(to: string, text: string) {
   }
 }
 
-export async function sendSMS(
+export async function notifyCountryConfig(
   msisdn: string,
   message: string,
   convertUnicode?: boolean
 ) {
   logger.info('Using the following provider: ', SMS_PROVIDER)
   logger.info('Sending the following message: ', message)
-  switch (SMS_PROVIDER) {
-    case 'clickatell':
-      return sendSMSClickatell(msisdn, message, convertUnicode)
-    case 'infobip':
-      return sendSMSInfobip(msisdn, message)
-    default:
-      throw new Error(`Unknown sms provider ${SMS_PROVIDER}`)
+  logger.info('Notifying the country config with above payload')
+
+  const url = `${COUNTRY_CONFIG_URL}/notification`
+  try {
+    await fetch(url, {
+      method: 'POST',
+      body: JSON.stringify({
+        msisdn,
+        message
+      })
+    })
+  } catch (error) {
+    logger.error(error)
+    throw error
   }
 }

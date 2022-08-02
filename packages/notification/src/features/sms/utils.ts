@@ -14,7 +14,7 @@ import {
   COUNTRY_CONFIG_URL
 } from '@notification/constants'
 import { internal } from '@hapi/boom'
-import { sendSMS } from '@notification/features/sms/service'
+import { notifyCountryConfig } from '@notification/features/sms/service'
 import fetch from 'node-fetch'
 import * as Handlebars from 'handlebars'
 import * as Hapi from '@hapi/hapi'
@@ -84,7 +84,7 @@ export async function buildAndSendSMS(
   message: string
 ) {
   try {
-    return await sendSMS(
+    return await notifyCountryConfig(
       msisdn,
       message,
       /* send unicoded sms if provided local is not in non unicoded set */
