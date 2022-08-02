@@ -29,16 +29,20 @@ export default function getPlugins() {
               instance: logger
             }
           },
-          {
-            plugin: Sentry,
-            options: {
-              client: {
-                environment: process.env.NODE_ENV,
-                dsn: SENTRY_DSN
-              },
-              catchLogErrors: true
-            }
-          }
+          ...(!SENTRY_DSN
+            ? []
+            : [
+                {
+                  plugin: Sentry,
+                  options: {
+                    client: {
+                      environment: process.env.NODE_ENV,
+                      dsn: SENTRY_DSN
+                    },
+                    catchLogErrors: true
+                  }
+                }
+              ])
         ])
   ]
 

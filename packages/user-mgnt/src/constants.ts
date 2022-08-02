@@ -19,7 +19,7 @@ export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
-export const SENTRY_DSN = process.env.SENTRY_DSN || ''
+export const SENTRY_DSN = process.env.SENTRY_DSN
 export const QA_ENV = process.env.QA_ENV || false
 
 // Check if the token has been invalided in the auth service before it has expired

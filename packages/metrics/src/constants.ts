@@ -20,7 +20,7 @@ export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
 export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030'
-export const SENTRY_DSN = process.env.SENTRY_DSN || ''
+export const SENTRY_DSN = process.env.SENTRY_DSN
 
 // Check if the token has been invalided in the auth service before it has expired
 // This needs to be a string to make it easy to pass as an ENV var.
