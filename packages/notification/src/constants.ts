@@ -51,9 +51,7 @@ export const CERT_PUBLIC_KEY_PATH =
 
 export const AUTH_URL = process.env.AUTH_URL || 'http://localhost:4040'
 
-export const SENTRY_DSN =
-  process.env.SENTRY_DSN ||
-  'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551'
+export const SENTRY_DSN = process.env.SENTRY_DSN || ''
 
 // Check if the token has been invalided in the auth service before it has expired
 // This needs to be a string to make it easy to pass as an ENV var.
