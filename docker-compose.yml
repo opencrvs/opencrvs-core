@@ -66,8 +66,6 @@ services:
       - OPENHIM_URL=http://openhim-core:5001
       - APPLICATION_CONFIG_URL=http://config:2021/
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
-      - AUTH_URL=http://auth:4040
-      - CHECK_INVALID_TOKEN=true
   search:
     image: opencrvs/ocrvs-search:${VERSION:-latest}
     build:
@@ -79,8 +77,6 @@ services:
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - ES_HOST=elasticsearch:9200
       - HEARTH_URL=http://hearth:3447/fhir
-      - AUTH_URL=http://auth:4040
-      - CHECK_INVALID_TOKEN=true
   metrics:
     image: opencrvs/ocrvs-metrics:${VERSION:-latest}
     build:
@@ -91,12 +87,10 @@ services:
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
-      - AUTH_URL=http://auth:4040
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
       - CONFIG_API_URL=http://config:2021
       - FHIR_URL=http://openhim-core:5001/fhir
       - SEARCH_URL=http://search:9090/
-      - CHECK_INVALID_TOKEN=true
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
   # END User facing services
   auth:
@@ -119,11 +113,9 @@ services:
     restart: unless-stopped
     environment:
       - MONGO_URL=mongodb://mongo1/user-mgnt
-      - AUTH_URL=http://auth:4040
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - FHIR_URL=http://openhim-core:5001/fhir
       - HOST=0.0.0.0
-      - CHECK_INVALID_TOKEN=true
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION:-latest}
     build:
@@ -145,10 +137,8 @@ services:
       dockerfile: ./packages/notification/Dockerfile
     restart: unless-stopped
     environment:
-      - AUTH_URL=http://auth:4040
       - COUNTRY=${COUNTRY:-bgd}
       - HOST=0.0.0.0
-      - CHECK_INVALID_TOKEN=true
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
   config:
     image: opencrvs/ocrvs-config:${VERSION:-latest}
