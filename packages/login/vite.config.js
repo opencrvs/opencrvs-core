@@ -38,6 +38,14 @@ export default defineConfig(({ mode }) => {
         transformMixedEsModules: true
       }
     },
-    plugins: [htmlPlugin(), react(), tsconfigPaths()]
+    plugins: [htmlPlugin(), react(), tsconfigPaths()],
+    test: {
+      environment: 'jsdom',
+      setupFiles: './src/setupTests.ts',
+      globals: true,
+      coverage: {
+        reporter: ['text', 'json', 'html']
+      }
+    }
   }
 })
