@@ -124,98 +124,103 @@ describe('Test phone number verification form', () => {
       moxios.uninstall(client)
     })
 
-    it('should show error message', (done) => {
-      history.replace(routes.PHONE_NUMBER_VERIFICATION, {
-        forgottenItem: FORGOTTEN_ITEMS.PASSWORD
-      })
-      app.update()
-      app
-        .find('#phone-number-input')
-        .hostNodes()
-        .simulate('change', { target: { value: '01712345679' } })
-      app.find('#continue').hostNodes().simulate('submit')
-      app.update()
+    it('should show error message', () =>
+      new Promise<void>((done) => {
+        history.replace(routes.PHONE_NUMBER_VERIFICATION, {
+          forgottenItem: FORGOTTEN_ITEMS.PASSWORD
+        })
+        app.update()
+        app
+          .find('#phone-number-input')
+          .hostNodes()
+          .simulate('change', { target: { value: '01712345679' } })
+        app.find('#continue').hostNodes().simulate('submit')
+        app.update()
 
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            err: {
-              response: {
-                status: 401
-              }
-            }
-          })
-          .then(() => {
-            app.update()
-            expect(app.find('#phone-number_error').hostNodes()).toHaveLength(1)
-            done()
-          })
-      })
-    })
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent()
+          request
+            .respondWith({
+              status: 401
+            })
+            .then(() => {
+              app.update()
+              expect(app.find('#phone-number_error').hostNodes()).toHaveLength(
+                1
+              )
+              done()
+            })
+        })
+      }))
   })
 
   describe('Form redirection', () => {
     beforeEach(() => {
       moxios.install(client)
     })
-    afterEach(() => {
+
+    afterEach(function () {
       moxios.uninstall(client)
     })
 
-    it('redirects to security question form when username is chosen as forgotten item', (done) => {
-      history.replace(routes.PHONE_NUMBER_VERIFICATION, {
-        forgottenItem: FORGOTTEN_ITEMS.USERNAME
-      })
-      app.update()
-      app
-        .find('#phone-number-input')
-        .hostNodes()
-        .simulate('change', { target: { value: '01712345678' } })
-      app.find('#continue').hostNodes().simulate('submit')
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 200,
-            response: {
-              nonce: 'KkcVYTRVC6usF7Vjdi3FSw==',
-              securityQuestionKey: 'FAVORITE_SONG'
-            }
-          })
-          .then(() => {
-            expect(window.location.pathname).toContain(routes.SECURITY_QUESTION)
-            done()
-          })
-      })
-    })
+    it('redirects to security question form when username is chosen as forgotten item', () =>
+      new Promise<void>((done) => {
+        history.replace(routes.PHONE_NUMBER_VERIFICATION, {
+          forgottenItem: FORGOTTEN_ITEMS.USERNAME
+        })
+        app.update()
+        app
+          .find('#phone-number-input')
+          .hostNodes()
+          .simulate('change', { target: { value: '01712345678' } })
+        app.find('#continue').hostNodes().simulate('submit')
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent()
+          // console.log('request error', request)
+          request
+            .respondWith({
+              status: 200,
+              response: {
+                nonce: 'KkcVYTRVC6usF7Vjdi3FSw==',
+                securityQuestionKey: 'FAVORITE_SONG'
+              }
+            })
+            .then(() => {
+              expect(window.location.pathname).toContain(
+                routes.SECURITY_QUESTION
+              )
+              done()
+            })
+        })
+      }))
 
-    it('redirects to recovery code entry form form when password is chosen as forgotten item', (done) => {
-      history.replace(routes.PHONE_NUMBER_VERIFICATION, {
-        forgottenItem: FORGOTTEN_ITEMS.PASSWORD
-      })
-      app.update()
-      app
-        .find('#phone-number-input')
-        .hostNodes()
-        .simulate('change', { target: { value: '01712345678' } })
-      app.find('#continue').hostNodes().simulate('submit')
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 200,
-            response: {
-              nonce: 'KkcVYTRVC6usF7Vjdi3FSw=='
-            }
-          })
-          .then(() => {
-            expect(window.location.pathname).toContain(
-              routes.RECOVERY_CODE_ENTRY
-            )
-            done()
-          })
-      })
-    })
+    it('redirects to recovery code entry form form when password is chosen as forgotten item', () =>
+      new Promise<void>((done) => {
+        history.replace(routes.PHONE_NUMBER_VERIFICATION, {
+          forgottenItem: FORGOTTEN_ITEMS.PASSWORD
+        })
+        app.update()
+        app
+          .find('#phone-number-input')
+          .hostNodes()
+          .simulate('change', { target: { value: '01712345678' } })
+        app.find('#continue').hostNodes().simulate('submit')
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent()
+          request
+            .respondWith({
+              status: 200,
+              response: {
+                nonce: 'KkcVYTRVC6usF7Vjdi3FSw=='
+              }
+            })
+            .then(() => {
+              expect(window.location.pathname).toContain(
+                routes.RECOVERY_CODE_ENTRY
+              )
+              done()
+            })
+        })
+      }))
   })
 })
