@@ -10,6 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { IntlMessages } from '@login/i18n/reducer'
+import { resolve } from 'url'
+import { request } from './authApi'
 
 export interface ILanguage {
   lang: string
@@ -22,13 +24,8 @@ interface IContentResponse {
 }
 
 export async function loadContent(): Promise<IContentResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/content/login`
-
-  const res = await fetch(url)
-
-  if (res && res.status !== 200) {
-    throw Error(res.statusText)
-  }
-
-  return await res.json()
+  return await request<IContentResponse>({
+    url: resolve(window.config.COUNTRY_CONFIG_URL, '/content/login'),
+    method: 'GET'
+  })
 }
