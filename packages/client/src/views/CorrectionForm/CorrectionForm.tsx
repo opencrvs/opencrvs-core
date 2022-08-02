@@ -92,7 +92,7 @@ function mapStateToProps(state: IStoreState, props: IRouteProps) {
   return {
     declaration,
     sectionId,
-    isWritingDraft: state.declarationsState.isWritingDraft
+    isWritingDraft: declaration.writingDraft ?? false
   }
 }
 
