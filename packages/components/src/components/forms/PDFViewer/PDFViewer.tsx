@@ -20,6 +20,10 @@ const Container = styled.div`
   flex-direction: column;
   align-items: center;
   background: ${({ theme }) => theme.colors.white};
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    overflow-x: scroll;
+    align-items: start;
+  }
 `
 
 interface IPDFViewerProps extends React.HTMLAttributes<HTMLDivElement> {

@@ -36,6 +36,9 @@ const Container = styled.div`
 
 const StyledPIN = styled(PIN)`
   margin-top: -80px;
+  @media (max-height: 780px) {
+    margin-top: 0px;
+  }
 `
 
 const TitleText = styled.span`
@@ -44,6 +47,11 @@ const TitleText = styled.span`
   text-align: center;
   margin-top: 24px;
   margin-bottom: 16px;
+  @media (max-height: 780px) {
+    ${({ theme }) => theme.fonts.h3};
+    margin-top: 0.3em;
+    margin-bottom: 0.3em;
+  }
 `
 
 const DescriptionText = styled.span`
@@ -52,6 +60,9 @@ const DescriptionText = styled.span`
   text-align: center;
   max-width: 360px;
   margin-bottom: 40px;
+  @media (max-height: 780px) {
+    ${({ theme }) => theme.fonts.reg16};
+  }
 `
 
 const ErrorBox = styled.div`

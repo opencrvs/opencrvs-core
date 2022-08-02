@@ -31,7 +31,7 @@ import {
   DRAFT_DEATH_FORM_PAGE,
   REVIEW_EVENT_PARENT_FORM_PAGE
 } from '@client/navigation/routes'
-import { Action } from '@client/forms'
+import { DownloadAction } from '@client/forms'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IDeclarationData } from './utils'
@@ -90,7 +90,7 @@ export const ShowDownloadButton = ({
     const downLoadConfig = {
       event: type as string,
       compositionId: id,
-      action: Action.LOAD_REVIEW_DECLARATION,
+      action: DownloadAction.LOAD_REVIEW_DECLARATION,
       assignment: declaration?.assignment,
       declarationStatus: declaration.status,
       refetchQueries

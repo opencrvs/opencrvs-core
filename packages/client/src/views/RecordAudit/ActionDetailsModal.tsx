@@ -14,7 +14,11 @@ import React from 'react'
 import styled from '@client/styledComponents'
 import { goToUserProfile, IDynamicValues } from '@client/navigation'
 import { IntlShape, MessageDescriptor } from 'react-intl'
-import { SUBMISSION_STATUS } from '@client/declarations'
+import {
+  DOWNLOAD_STATUS,
+  IDeclaration,
+  SUBMISSION_STATUS
+} from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
 import { ResponsiveModal, ListTable } from '@opencrvs/components/lib/interface'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
@@ -23,7 +27,7 @@ import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { getIndividualNameObj } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/correction'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
-import { isEmpty, find, flatten, values } from 'lodash'
+import { isEmpty, find, flatten, values, get } from 'lodash'
 import {
   getFieldValue,
   DECLARATION_STATUS_LABEL,
@@ -38,13 +42,93 @@ interface IActionDetailsModalListTable {
   registerForm: IForm
   intl: IntlShape
   offlineData: Partial<IOfflineData>
+  draft: IDeclaration | null
+}
+
+function retrieveUniqueComments(
+  histories: IActionDetailsData[],
+  actionDetailsData: IActionDetailsData,
+  previousHistoryItemIndex: number
+) {
+  if (!Array.isArray(actionDetailsData.comments)) {
+    return []
+  }
+
+  if (previousHistoryItemIndex === -1) {
+    return actionDetailsData.comments
+      .map((comment: IDynamicValues) => comment.comment)
+      .map((comment: string) => ({ comment }))
+  }
+
+  const comments: IDynamicValues[] = []
+  actionDetailsData.comments.forEach((item: IDynamicValues, index: number) => {
+    if (
+      (histories[previousHistoryItemIndex].comments || [])[index]?.comment !==
+      item.comment
+    ) {
+      comments.push({ comment: item.comment })
+    }
+  })
+
+  return comments
+}
+
+function getHistories(draft: IDeclaration | null) {
+  const histories: IActionDetailsData[] =
+    draft?.data.history && Array.isArray(draft.data.history)
+      ? draft.data.history.sort((prevItem, nextItem) => {
+          return new Date(prevItem.date).getTime() >
+            new Date(nextItem.date).getTime()
+            ? 1
+            : -1
+        })
+      : []
+
+  return histories
+}
+
+/*
+ *  This function prepares the comments to be displayed based on status of the declaration.
+ */
+function prepareComments(
+  actionDetailsData: IActionDetailsData,
+  draft: IDeclaration | null
+) {
+  if (
+    null === draft ||
+    actionDetailsData.action === DOWNLOAD_STATUS.DOWNLOADED
+  ) {
+    return []
+  }
+
+  const histories = getHistories(draft)
+  const currentHistoryItemIndex = histories.findIndex(
+    (item) => item.date === actionDetailsData.date
+  )
+  const previousHistoryItemIndex =
+    currentHistoryItemIndex < 0
+      ? currentHistoryItemIndex
+      : currentHistoryItemIndex - 1
+
+  if (actionDetailsData.action === SUBMISSION_STATUS.REJECTED) {
+    return actionDetailsData.statusReason?.text
+      ? [{ comment: actionDetailsData.statusReason.text }]
+      : []
+  }
+
+  return retrieveUniqueComments(
+    histories,
+    actionDetailsData,
+    previousHistoryItemIndex
+  )
 }
 
 export const ActionDetailsModalListTable = ({
   actionDetailsData,
   registerForm,
   intl,
-  offlineData
+  offlineData,
+  draft
 }: IActionDetailsModalListTable) => {
   const [currentPage, setCurrentPage] = React.useState(1)
 
@@ -215,10 +299,7 @@ export const ActionDetailsModalListTable = ({
   const declarationUpdates = dataChange(actionDetailsData)
   const collectorData = certificateCollectorData(actionDetailsData)
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
-  const content = actionDetailsData.comments
-    .map((comment: IDynamicValues) => comment.comment)
-    .concat(actionDetailsData.statusReason?.text || [])
-    .map((comment: string) => ({ comment }))
+  const content = prepareComments(actionDetailsData, draft)
   return (
     <>
       {/* For Reject Reason */}
@@ -292,7 +373,8 @@ export const ActionDetailsModal = ({
   intl,
   goToUser,
   registerForm,
-  offlineData
+  offlineData,
+  draft
 }: {
   show: boolean
   actionDetailsData: IActionDetailsData
@@ -301,6 +383,7 @@ export const ActionDetailsModal = ({
   goToUser: typeof goToUserProfile
   registerForm: IForm
   offlineData: Partial<IOfflineData>
+  draft: IDeclaration | null
 }) => {
   if (isEmpty(actionDetailsData)) return <></>
 
@@ -345,6 +428,7 @@ export const ActionDetailsModal = ({
           registerForm={registerForm}
           intl={intl}
           offlineData={offlineData}
+          draft={draft}
         />
       </>
     </ResponsiveModal>

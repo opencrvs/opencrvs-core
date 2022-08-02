@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as queryString from 'querystring'
 import { storage } from '@client/storage'
 
 export function getAvailableLanguages() {
@@ -21,19 +20,10 @@ export function getDefaultLanguage() {
 }
 
 export async function getPreferredLanguage() {
-  const languageInUrl = queryString.parse(
-    window.location.search.replace(/^\?/, '')
-  ).language as string | undefined
-
-  const alreadyStoredLanguage = await storage.getItem('language')
-
-  if (languageInUrl) {
-    return languageInUrl
-  } else if (alreadyStoredLanguage) {
-    return alreadyStoredLanguage
-  } else {
-    return getDefaultLanguage()
-  }
+  const languageInUrl = new URLSearchParams(window.location.search).get('lang')
+  return (
+    languageInUrl ?? (await storage.getItem('language')) ?? getDefaultLanguage()
+  )
 }
 
 export function storeLanguage(language: string) {
