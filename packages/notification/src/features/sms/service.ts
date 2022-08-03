@@ -17,6 +17,7 @@ import { logger } from '@notification/logger'
 export async function notifyCountryConfig(
   msisdn: string,
   message: string,
+  token: string,
   convertUnicode?: boolean
 ) {
   logger.info(`Sending the following message: "${message}" to ${msisdn}`)
@@ -30,7 +31,11 @@ export async function notifyCountryConfig(
         msisdn,
         message,
         convertUnicode
-      })
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: token
+      }
     })
   } catch (error) {
     logger.error(error)
