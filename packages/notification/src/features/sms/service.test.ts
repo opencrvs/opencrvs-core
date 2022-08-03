@@ -16,7 +16,7 @@ import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as any
 
 describe('.sendSMS()', () => {
-  it('should throw when the fetch throws', async () => {
+  it('should check it the message has been initiated or not', async () => {
     const logSpy = jest.spyOn(logger, 'info')
     fetch.once('Success')
     await expect(notifyCountryConfig('+27845555555', 'test', 'Bearer token...'))
