@@ -15,14 +15,11 @@ import {
   HOST,
   PORT,
   CERT_PUBLIC_KEY_PATH,
-  CHECK_INVALID_TOKEN,
-  AUTH_URL,
   DEFAULT_TIMEOUT
 } from '@user-mgnt/constants'
 import getPlugins from '@user-mgnt/config/plugins'
 import * as database from '@user-mgnt/database'
 import { readFileSync } from 'fs'
-import { validateFunc } from '@opencrvs/commons'
 import { getRoutes } from '@user-mgnt/config/routes'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
@@ -46,8 +43,9 @@ export async function createServer() {
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:user-mgnt-user'
     },
-    validate: (payload: any, request: Hapi.Request) =>
-      validateFunc(payload, request, CHECK_INVALID_TOKEN, AUTH_URL)
+    validate: () => ({
+      isValid: true
+    })
   })
 
   server.auth.default('jwt')
