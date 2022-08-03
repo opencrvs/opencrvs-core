@@ -20,12 +20,11 @@ export async function notifyCountryConfig(
   token: string,
   convertUnicode?: boolean
 ) {
-  logger.info(`Sending the following message: "${message}" to ${msisdn}`)
-  logger.info('Notifying the country config with above payload')
-
   const url = `${COUNTRY_CONFIG_URL}/notification`
   try {
-    await fetch(url, {
+    logger.info(`Sending the following message: "${message}" to ${msisdn}`)
+    logger.info('Notifying the country config with above payload')
+    return await fetch(url, {
       method: 'POST',
       body: JSON.stringify({
         msisdn,
