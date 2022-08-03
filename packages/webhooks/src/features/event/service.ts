@@ -52,8 +52,53 @@ export async function transformBirthBundle(
           'supporting-documents',
           authHeader
         )
-        bundle.entry.push({ resource: child } as fhir.BundleEntry)
-        bundle.entry.push({ resource: document } as fhir.BundleEntry)
+        if (child) {
+          bundle.entry.push({ resource: child } as fhir.BundleEntry)
+        }
+        if (document) {
+          bundle.entry.push({ resource: document } as fhir.BundleEntry)
+        }
+        return bundle
+      default:
+        return bundle
+    }
+  } else {
+    throw new Error('Task has no composition reference')
+  }
+}
+
+export async function transformDeathBundle(
+  bundle: fhir.Bundle,
+  scope: string,
+  authHeader: IAuthHeader
+) {
+  if (!bundle || !bundle.entry || !bundle.entry[0].resource) {
+    throw new Error('Invalid FHIR bundle found')
+  }
+  const task: fhir.Task = bundle.entry[0].resource as fhir.Task
+  if (task && task.focus && task.focus.reference) {
+    switch (scope) {
+      case 'nationalId':
+        const composition = await getComposition(
+          task.focus.reference as string,
+          authHeader
+        )
+        const deceased: fhir.Patient = await getResourceBySection(
+          composition,
+          'deceased-details',
+          authHeader
+        )
+        const document: any = await getResourceBySection(
+          composition,
+          'supporting-documents',
+          authHeader
+        )
+        if (deceased) {
+          bundle.entry.push({ resource: deceased } as fhir.BundleEntry)
+        }
+        if (document) {
+          bundle.entry.push({ resource: document } as fhir.BundleEntry)
+        }
         return bundle
       default:
         return bundle
@@ -103,7 +148,7 @@ async function getResourceBySection(
     })
 
   if (!resourceSection || !resourceSection.entry) {
-    throw new Error(`No section found for given code: ${sectionCode}`)
+    return null
   }
   // TODO: For a proper implementation, all the documents should be requested
   // and searched to find which document is the visual identity MOSIP requires.

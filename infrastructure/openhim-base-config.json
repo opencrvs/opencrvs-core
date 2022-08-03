@@ -1506,6 +1506,20 @@
           "primary": false,
           "username": "",
           "password": ""
+        },
+        {
+          "type": "http",
+          "status": "enabled",
+          "forwardAuthHeader": true,
+          "name": "Webhooks -> Death Registration",
+          "secured": false,
+          "host": "webhooks",
+          "port": 2525,
+          "path": "",
+          "pathTransform": "",
+          "primary": false,
+          "username": "",
+          "password": ""
         }
       ],
       "requestBody": true,
