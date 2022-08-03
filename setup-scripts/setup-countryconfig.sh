@@ -66,6 +66,4 @@ yarn db:backup:restore
 echo
 echo -e "\033[32m::::::::::::::::::::: Starting Farajaland Config Server :::::::::::::::::::::\033[0m"
 echo
-export CERT_PUBLIC_KEY_PATH=$PATH_TO_OPEN_CRVS_CORE_DIRECTORY/.secrets/public-key.pem
-echo $CERT_PUBLIC_KEY_PATH
 yarn start

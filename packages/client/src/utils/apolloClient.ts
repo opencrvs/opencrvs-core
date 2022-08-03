@@ -27,7 +27,9 @@ import { AnyAction, Store } from 'redux'
 import * as Sentry from '@sentry/browser'
 import TimeoutLink from '@client/utils/timeoutLink'
 
-export let client: any
+/* jest spyOn doesn't work if the variable is left as undefined */
+export let client: any = { mutate: () => {} }
+
 export const createClient = (store: Store<IStoreState, AnyAction>) => {
   const httpLink = createHttpLink({
     uri: resolve(window.config.API_GATEWAY_URL, 'graphql')
