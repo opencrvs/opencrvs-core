@@ -52,3 +52,7 @@ export function createTestComponent(
 }
 
 export const wait = () => new Promise((res) => process.nextTick(res))
+
+export function flushPromises() {
+  return new Promise((resolve) => setImmediate(resolve))
+}

@@ -75,8 +75,7 @@ const messagesToDefine: IStepOneFormMessages = {
   },
   phoneNumberFormat: {
     id: 'validations.phoneNumberFormat',
-    defaultMessage:
-      'Must be a valid mobile phone number. Starting with 0. e.g. {example}',
+    defaultMessage: 'Must be a valid 10 digit number that starts with 0(7|9)',
     description:
       'The error message that appears on phone numbers where the first character must be a 0'
   }

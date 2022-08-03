@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 ;(window as any).config = {
-  AUTH_API_URL: 'http://localhost:4040/',
+  AUTH_API_URL: 'http://localhost:4040',
   COUNTRY: 'FAR',
   LANGUAGES: 'en,fr',
   AVAILABLE_LANGUAGES_SELECT: 'en:English,fr:Français',
