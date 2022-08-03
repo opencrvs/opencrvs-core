@@ -16,7 +16,7 @@ import {
   writeDeclaration,
   createReviewDeclaration
 } from '@client/declarations'
-import { Action, IForm, IFormData } from '@client/forms'
+import { DownloadAction, IForm, IFormData } from '@client/forms'
 import { AppStore } from '@client/store'
 import { client } from '@client/utils/apolloClient'
 // eslint-disable-next-line no-restricted-imports
@@ -37,19 +37,21 @@ interface IActionList<T> {
   [key: string]: T
 }
 
-const ACTION_LIST: IActionList<Action> = {
-  [Action.LOAD_REVIEW_DECLARATION]: Action.LOAD_REVIEW_DECLARATION,
-  [Action.LOAD_CERTIFICATE_DECLARATION]: Action.LOAD_CERTIFICATE_DECLARATION
+const ACTION_LIST: IActionList<DownloadAction> = {
+  [DownloadAction.LOAD_REVIEW_DECLARATION]:
+    DownloadAction.LOAD_REVIEW_DECLARATION,
+  [DownloadAction.LOAD_CERTIFICATE_DECLARATION]:
+    DownloadAction.LOAD_CERTIFICATE_DECLARATION
 }
 
 const REQUEST_IN_PROGRESS_STATUS: IActionList<DOWNLOAD_STATUS> = {
-  [Action.LOAD_REVIEW_DECLARATION]: DOWNLOAD_STATUS.DOWNLOADING,
-  [Action.LOAD_CERTIFICATE_DECLARATION]: DOWNLOAD_STATUS.DOWNLOADING
+  [DownloadAction.LOAD_REVIEW_DECLARATION]: DOWNLOAD_STATUS.DOWNLOADING,
+  [DownloadAction.LOAD_CERTIFICATE_DECLARATION]: DOWNLOAD_STATUS.DOWNLOADING
 }
 
 const SUCCESS_DOWNLOAD_STATUS: IActionList<DOWNLOAD_STATUS> = {
-  [Action.LOAD_REVIEW_DECLARATION]: DOWNLOAD_STATUS.DOWNLOADED,
-  [Action.LOAD_CERTIFICATE_DECLARATION]: DOWNLOAD_STATUS.DOWNLOADED
+  [DownloadAction.LOAD_REVIEW_DECLARATION]: DOWNLOAD_STATUS.DOWNLOADED,
+  [DownloadAction.LOAD_CERTIFICATE_DECLARATION]: DOWNLOAD_STATUS.DOWNLOADED
 }
 
 export class InboxController {

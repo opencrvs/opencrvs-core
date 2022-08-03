@@ -780,7 +780,7 @@ export function selectOrCreateQuestionnaireResource(
   }
   fhirBundle.entry.push(questionnaireResponseEntry)
 
-  return questionnaireResponseEntry.resource as fhir.QuestionnaireResponse
+  return questionnaireResponseEntry.resource
 }
 
 export function selectOrCreateTaskRefResource(

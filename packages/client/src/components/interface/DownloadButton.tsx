@@ -377,7 +377,7 @@ const mapDispatchToProps = (
   downloadDeclaration: (
     event: Event,
     compositionId: string,
-    action: string,
+    action: Action,
     client: ApolloClient<any>
   ) => dispatch(downloadDeclaration(event, compositionId, action, client)),
   unassignDeclaration: (id: string, client: ApolloClient<any>) =>
