@@ -192,31 +192,33 @@ export function getStartedByFieldAgent(taskHistory: fhir.Bundle): string {
   const allowedPreviousStates = ['DECLARED', 'IN_PROGRESS']
   const previousTasks = findAllPreviousTasks(taskHistory)
 
-  if (!previousTasks) {
+  const task =
+    previousTasks &&
+    previousTasks
+      .sort((a, b) => {
+        if (!a.meta?.lastUpdated || !b.meta?.lastUpdated) {
+          return -1
+        }
+        if (a.meta.lastUpdated > b.meta.lastUpdated) {
+          return 1
+        }
+        if (a.meta.lastUpdated < b.meta.lastUpdated) {
+          return -1
+        }
+        return 0
+      })
+      .find((resource) => {
+        if (!resource.businessStatus || !resource.businessStatus.coding) {
+          return false
+        }
+        return resource.businessStatus.coding.some((coding) =>
+          allowedPreviousStates.includes(coding.code as DECLARATION_STATUS)
+        )
+      })
+
+  if (!task) {
     throw new Error('Task not found!')
   }
-
-  const task = previousTasks
-    .sort((a, b) => {
-      if (!a.meta?.lastUpdated || !b.meta?.lastUpdated) {
-        return -1
-      }
-      if (a.meta.lastUpdated > b.meta.lastUpdated) {
-        return 1
-      }
-      if (a.meta.lastUpdated < b.meta.lastUpdated) {
-        return -1
-      }
-      return 0
-    })
-    .find((resource) => {
-      if (!resource.businessStatus || !resource.businessStatus.coding) {
-        return false
-      }
-      return resource.businessStatus.coding.some((coding) =>
-        allowedPreviousStates.includes(coding.code as DECLARATION_STATUS)
-      )
-    })
 
   const regLastUserExtension =
     task &&
