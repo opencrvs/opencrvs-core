@@ -13,13 +13,13 @@ export const certificateBaseTemplate = {
   definition: {
     pageMargins: [0, 0, 0, 0] as [number, number, number, number],
     defaultStyle: {
-      font: 'derived'
+      font: 'notosans'
     },
     content: []
   },
   fonts: {
     en: {
-      derived: {
+      notosans: {
         normal: 'NotoSans-Light.ttf',
         bold: 'NotoSans-Regular.ttf'
       }
