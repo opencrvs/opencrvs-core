@@ -83,10 +83,12 @@ export async function buildAndSendSMS(
   msisdn: string,
   message: string
 ) {
+  const token = request.headers.authorization
   try {
     return await notifyCountryConfig(
       msisdn,
       message,
+      token,
       /* send unicoded sms if provided local is not in non unicoded set */
       NON_UNICODED_LANGUAGES.indexOf(getDefaultLanguage()) < 0
     )
