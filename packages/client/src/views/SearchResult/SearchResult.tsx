@@ -18,7 +18,7 @@ import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { Header } from '@client/components/interface/Header/Header'
 import { Query } from '@client/components/Query'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
-import { Action } from '@client/forms'
+import { DownloadAction } from '@client/forms'
 import {
   buttonMessages,
   constantsMessages,
@@ -352,10 +352,10 @@ export class SearchResultView extends React.Component<
               ],
               action:
                 ((declarationIsRegistered || declarationIsCertified) &&
-                  Action.LOAD_CERTIFICATE_DECLARATION) ||
+                  DownloadAction.LOAD_CERTIFICATE_DECLARATION) ||
                 (declarationIsRequestedCorrection &&
-                  Action.LOAD_REQUESTED_CORRECTION_DECLARATION) ||
-                Action.LOAD_REVIEW_DECLARATION
+                  DownloadAction.LOAD_REQUESTED_CORRECTION_DECLARATION) ||
+                DownloadAction.LOAD_REVIEW_DECLARATION
             }}
             status={downloadStatus as DOWNLOAD_STATUS}
           />

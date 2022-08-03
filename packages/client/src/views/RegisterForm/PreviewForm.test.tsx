@@ -21,7 +21,8 @@ import {
   primaryInternationalAddressLines,
   secondaryAddressData,
   secondaryInternationalAddressLines,
-  eventAddressData
+  eventAddressData,
+  flushPromises
 } from '@client/tests/util'
 import {
   DRAFT_BIRTH_PARENT_FORM,
@@ -193,6 +194,7 @@ describe('when user is previewing the form data', () => {
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
       await store.dispatch(checkAuth())
+      await flushPromises()
       const data = birthReviewDraftData
 
       customDraft = { id: uuid(), data, review: true, event: Event.Birth }
@@ -324,6 +326,7 @@ describe('when user is previewing the form data', () => {
     beforeEach(async () => {
       getItem.mockReturnValue(registerScopeToken)
       await store.dispatch(checkAuth())
+      await flushPromises()
       const data = deathReviewDraftData
 
       customDraft = { id: uuid(), data, review: true, event: Event.Death }
@@ -372,6 +375,7 @@ describe('when user is previewing the form data', () => {
     beforeEach(async () => {
       getItem.mockReturnValue(validateScopeToken)
       await store.dispatch(checkAuth())
+      await flushPromises()
       const data = {
         _fhirIDMap: {
           composition: '16'

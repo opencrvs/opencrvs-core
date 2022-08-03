@@ -91,11 +91,11 @@ export function getFieldDefinition(
       ...getField(configField.identifiers, defaultForm),
       required: configField.required
     }
-    /* We need to build the field regardless of the conditionals */
-    delete serializedField.conditionals
   } else {
     serializedField = createCustomField(configField)
   }
+  /* We need to build the field regardless of the conditionals */
+  delete serializedField.conditionals
   return deserializeFormField(serializedField)
 }
 

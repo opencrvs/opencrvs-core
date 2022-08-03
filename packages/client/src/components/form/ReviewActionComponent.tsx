@@ -27,7 +27,7 @@ import {
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { ResponsiveModal } from '@opencrvs/components/lib/interface'
-import { Action } from '@client/forms'
+import { Action, SubmissionAction } from '@client/forms'
 import styled from '@client/styledComponents'
 import * as React from 'react'
 
@@ -43,7 +43,7 @@ interface IReviewActionProps extends React.HTMLAttributes<HTMLDivElement> {
   submitDeclarationAction: (
     declaration: IDeclaration,
     submissionStatus: string,
-    action: string,
+    action: Action,
     payload?: IPayload,
     downloadStatus?: DOWNLOAD_STATUS
   ) => void
@@ -55,7 +55,8 @@ const Container = styled.div`
   margin-top: 32px;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin: 32px -32px -32px -32px;
+    max-width: 100vw;
+    margin: 32px -32px -32px -24px;
   }
 `
 const Content = styled.div`
@@ -437,7 +438,7 @@ class ReviewActionComponent extends React.Component<
                     ? submitDeclarationAction(
                         declaration,
                         SUBMISSION_STATUS.READY_TO_SUBMIT,
-                        Action.SUBMIT_FOR_REVIEW,
+                        SubmissionAction.SUBMIT_FOR_REVIEW,
                         undefined,
                         DOWNLOAD_STATUS.DOWNLOADED
                       )
@@ -445,12 +446,12 @@ class ReviewActionComponent extends React.Component<
                     ? submitDeclarationAction(
                         declaration,
                         SUBMISSION_STATUS.READY_TO_REGISTER,
-                        Action.REGISTER_DECLARATION
+                        SubmissionAction.REGISTER_DECLARATION
                       )
                     : submitDeclarationAction(
                         declaration,
                         SUBMISSION_STATUS.READY_TO_APPROVE,
-                        Action.APPROVE_DECLARATION
+                        SubmissionAction.APPROVE_DECLARATION
                       )
                 }
               >

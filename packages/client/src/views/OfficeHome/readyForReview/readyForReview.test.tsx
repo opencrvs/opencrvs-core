@@ -15,7 +15,7 @@ import {
   storeDeclaration,
   modifyDeclaration
 } from '@client/declarations'
-import { Action } from '@client/forms'
+import { DownloadAction } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { checkAuth } from '@client/profile/profileActions'
 import { queries } from '@client/profile/queries'
@@ -515,7 +515,7 @@ describe('OfficeHome sent for review tab related tests', () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
         Event.Death,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-        Action.LOAD_REVIEW_DECLARATION
+        DownloadAction.LOAD_REVIEW_DECLARATION
       )
       downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
       store.dispatch(storeDeclaration(downloadedDeclaration))
@@ -672,7 +672,7 @@ describe('OfficeHome sent for review tab related tests', () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
         Event.Death,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-        Action.LOAD_REVIEW_DECLARATION
+        DownloadAction.LOAD_REVIEW_DECLARATION
       )
       downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
       store.dispatch(modifyDeclaration(downloadedDeclaration))
@@ -696,7 +696,7 @@ describe('OfficeHome sent for review tab related tests', () => {
       const downloadedDeclaration = makeDeclarationReadyToDownload(
         Event.Death,
         'bc09200d-0160-43b4-9e2b-5b9e90424e95',
-        Action.LOAD_REVIEW_DECLARATION
+        DownloadAction.LOAD_REVIEW_DECLARATION
       )
       downloadedDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
       store.dispatch(modifyDeclaration(downloadedDeclaration))

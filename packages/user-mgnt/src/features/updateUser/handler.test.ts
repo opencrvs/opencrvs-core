@@ -43,7 +43,6 @@ const mockUser = {
   email: 'j.doe@gmail.com',
   mobile: '+880123445568',
   role: 'LOCAL_REGISTRAR',
-  type: 'SOME_TYPE',
   primaryOfficeId: '321',
   catchmentAreaIds: [],
   scope: ['register'],
@@ -213,7 +212,8 @@ describe('updateUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        type: 'SOME_TYPE',
+        role: 'REGISTRATION_AGENT',
+        type: '',
         primaryOfficeId: '322',
         catchmentAreaIds: [],
         deviceId: 'D444'
@@ -269,7 +269,8 @@ describe('updateUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123111111',
-        type: 'SOME_TYPE',
+        role: 'FIELD_AGENT',
+        type: 'POLICE_OFFICER',
         primaryOfficeId: '323',
         catchmentAreaIds: [],
         deviceId: 'D444'
@@ -398,7 +399,8 @@ describe('updateUser handler', () => {
         identifiers: [{ system: 'NID', value: '1234' }],
         email: 'j.doe@gmail.com',
         mobile: '+880123445568',
-        type: 'SOME_TYPE',
+        role: 'FIELD_AGENT',
+        type: 'SOCIAL_WORKER',
         primaryOfficeId: '322',
         catchmentAreaIds: [],
         deviceId: 'D444'
