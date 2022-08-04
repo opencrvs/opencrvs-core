@@ -16,6 +16,55 @@ import { client, QUESTION_KEYS } from '@login/utils/authApi'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import * as moxios from 'moxios'
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+
+//mock api calls
+const server = setupServer(
+  rest.get(
+    `${window.config.COUNTRY_CONFIG_URL}/content/login`,
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          languages: [
+            {
+              lang: 'en',
+              displayName: 'Français',
+              messages: {
+                defaultMessage: 'Bangladesh'
+              }
+            }
+          ]
+        })
+      )
+    }
+  ),
+  rest.get(`${window.config.CONFIG_API_URL}/loginConfig`, (req, res, ctx) => {
+    return res(
+      ctx.json({
+        config: {
+          APPLICATION_NAME: 'Dummy App',
+          COUNTRY: 'FAR',
+          COUNTRY_LOGO: {
+            fileName: 'dummy-file-name',
+            file: 'dummy-logo'
+          },
+          SENTRY: '',
+          LOGROCKET: ''
+        }
+      })
+    )
+  })
+)
+
+// Enable API mocking before tests.
+beforeAll(() => server.listen())
+
+// Reset any runtime request handlers we may add during the tests.
+afterEach(() => server.resetHandlers())
+
+// Disable API mocking after the tests are done.
+afterAll(() => server.close())
 
 describe('Test phone number verification form', () => {
   let app: ReactWrapper
