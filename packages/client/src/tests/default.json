@@ -2893,7 +2893,7 @@
                   "validate": [],
                   "options": [
                     {
-                      "value": "BIRTH_CERTIFICATE",
+                      "value": "PROOF_OF_LEGAL_GUARDIANSHIP",
                       "label": {
                         "defaultMessage": "Proof of legal guardianship",
                         "description": "Label for document option Proof of legal guardianship",
