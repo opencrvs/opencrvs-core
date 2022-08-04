@@ -29,7 +29,7 @@ import {
   storeDeclaration,
   SUBMISSION_STATUS
 } from '@opencrvs/client/src/declarations'
-import { Action, CorrectionSection } from '@client/forms'
+import { SubmissionAction, CorrectionSection } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { constantsMessages } from '@client/i18n/messages'
 import { buttonMessages } from '@client/i18n/messages/buttons'
@@ -141,7 +141,7 @@ class ReviewCertificateActionComponent extends React.Component<
   readyToCertify = () => {
     const { draft } = this.props
     draft.submissionStatus = SUBMISSION_STATUS.READY_TO_CERTIFY
-    draft.action = Action.COLLECT_CERTIFICATE
+    draft.action = SubmissionAction.COLLECT_CERTIFICATE
 
     const registeredDate = getRegisteredDate(draft.data)
     const certificate = draft.data.registration.certificates[0]

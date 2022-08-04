@@ -43,14 +43,15 @@ if (
   window.location.hostname !== '127.0.0.1'
 ) {
   // setup error reporting using sentry
-  Sentry.init({
-    release: process.env.REACT_APP_VERSION,
-    environment: process.env.NODE_ENV,
-    dsn: window.config.SENTRY
-  })
+  if (window.config.SENTRY) {
+    Sentry.init({
+      release: process.env.REACT_APP_VERSION,
+      environment: process.env.NODE_ENV,
+      dsn: window.config.SENTRY
+    })
+  }
 
   // setup log rocket to ship log messages and record user errors
-
   if (window.config.LOGROCKET) {
     LogRocket.init(window.config.LOGROCKET, {
       release: process.env.REACT_APP_VERSION
@@ -58,20 +59,22 @@ if (
   }
 
   // Integrate the two
-  Sentry.configureScope((scope) => {
-    scope.addEventProcessor(async (event) => {
-      if (!event.extra) {
-        event.extra = {}
-      }
-      const sessionUrl = await new Promise((resolve) => {
-        LogRocket.getSessionURL((url) => {
-          resolve(url)
+  if (window.config.SENTRY && window.config.LOGROCKET) {
+    Sentry.configureScope((scope) => {
+      scope.addEventProcessor(async (event) => {
+        if (!event.extra) {
+          event.extra = {}
+        }
+        const sessionUrl = await new Promise((resolve) => {
+          LogRocket.getSessionURL((url) => {
+            resolve(url)
+          })
         })
+        event.extra.sessionURL = sessionUrl
+        return event
       })
-      event.extra.sessionURL = sessionUrl
-      return event
     })
-  })
+  }
 }
 
 function onNewContentAvailable(waitingSW: ServiceWorker | null) {
