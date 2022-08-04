@@ -271,16 +271,20 @@ export const ActionDetailsModalListTable = ({
           return
         }
 
-        const name = getIndividualNameObj(
-          certificate.collector.individual.name,
-          window.config.LANGUAGES
-        )
+        const name = certificate.collector?.individual
+          ? getIndividualNameObj(
+              certificate.collector.individual.name,
+              window.config.LANGUAGES
+            )
+          : {}
         const collectorLabel = () => {
           const relation = CollectorRelationLabelArray.find(
             (labelItem) =>
-              labelItem.value === certificate.collector.relationship
+              labelItem.value === certificate.collector?.relationship
           )
-          const collectorName = `${name?.firstNames} ${name?.familyName}`
+          const collectorName = `${name?.firstNames || ''} ${
+            name?.familyName || ''
+          }`
           if (relation)
             return `${collectorName} (${intl.formatMessage(relation.label)})`
           return collectorName
