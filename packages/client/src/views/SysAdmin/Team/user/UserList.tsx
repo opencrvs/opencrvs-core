@@ -361,7 +361,7 @@ function UserListComponent(props: IProps) {
         }
       ]
 
-      if (user.status !== 'deactivated' && user.status !== 'disabled') {
+      if (user.status === 'pending') {
         menuItems.push({
           label: intl.formatMessage(messages.resendSMS),
           handler: () => {
