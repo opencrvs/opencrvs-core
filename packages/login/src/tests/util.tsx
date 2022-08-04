@@ -56,3 +56,35 @@ export const wait = () => new Promise((res) => process.nextTick(res))
 export function flushPromises() {
   return new Promise((resolve) => setImmediate(resolve))
 }
+
+const MAX_TIME = process.env.CI ? 10000 : 2000
+const INTERVAL = 10
+
+export async function waitFor(condition: () => boolean) {
+  return new Promise<void>((resolve, reject) => {
+    let remainingTime = MAX_TIME
+
+    const intervalId = setInterval(() => {
+      if (remainingTime < 0) {
+        clearInterval(intervalId)
+        return reject(
+          new Error(
+            `Condition was not met in ${MAX_TIME}ms: \n\n${condition.toString()}`
+          )
+        )
+      }
+
+      let result = false
+      try {
+        result = condition()
+      } catch (err) {}
+
+      if (result) {
+        clearInterval(intervalId)
+        return resolve()
+      }
+
+      remainingTime = remainingTime - INTERVAL
+    }, INTERVAL)
+  })
+}

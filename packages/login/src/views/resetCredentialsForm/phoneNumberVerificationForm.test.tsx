@@ -11,7 +11,7 @@
  */
 import { FORGOTTEN_ITEMS } from '@login/login/actions'
 import * as routes from '@login/navigation/routes'
-import { createTestApp, flushPromises } from '@login/tests/util'
+import { createTestApp, flushPromises, waitFor } from '@login/tests/util'
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import { ReactWrapper } from 'enzyme'
@@ -161,6 +161,9 @@ describe('Test phone number verification form', () => {
         .simulate('change', { target: { value: '01755555155' } })
       app.find('#continue').hostNodes().simulate('submit')
       await flushPromises()
+      await waitFor(() =>
+        window.location.pathname.includes(routes.SECURITY_QUESTION)
+      )
       expect(window.location.pathname).toContain(routes.SECURITY_QUESTION)
     })
     it('continue button will redirect to RECOVERY_CODE_ENTRY route', async () => {
@@ -186,6 +189,9 @@ describe('Test phone number verification form', () => {
       app.find('#continue').hostNodes().simulate('submit')
       await flushPromises()
       app.update()
+      await waitFor(() =>
+        window.location.pathname.includes(routes.RECOVERY_CODE_ENTRY)
+      )
       expect(window.location.pathname).toContain(routes.RECOVERY_CODE_ENTRY)
     })
   })
@@ -213,7 +219,7 @@ describe('Test phone number verification form', () => {
         .hostNodes()
         .simulate('change', { target: { value: '01755555155' } })
       app.find('#continue').hostNodes().simulate('submit')
-      await flushPromises()
+      await waitFor(() => !!app.find('#phone-number_error').hostNodes())
       app.update()
       expect(app.find('#phone-number_error').hostNodes().text()).toBe(
         'Mobile phone number not found.'
