@@ -1040,8 +1040,7 @@ function mergeWorkQueueData(
 async function getWorkqueueData(
   state: IStoreState,
   userDetails: IUserDetails,
-  workqueuePaginationParams: IWorkqueuePaginationParams,
-  currentWorkqueue: IWorkqueue | undefined
+  workqueuePaginationParams: IWorkqueuePaginationParams
 ) {
   const registrationLocationId =
     (userDetails && getUserLocation(userDetails).id) || ''
@@ -1080,6 +1079,10 @@ async function getWorkqueueData(
     userId
   )
   let workqueue
+  const { currentUserData } = await getUserData(
+    userDetails.userMgntUserID || ''
+  )
+  const currentWorkqueue = currentUserData?.workqueue
   if (result) {
     workqueue = {
       loading: false,
@@ -1097,9 +1100,6 @@ async function getWorkqueueData(
       initialSyncDone: false
     }
   }
-  const { currentUserData } = await getUserData(
-    userDetails.userMgntUserID || ''
-  )
   if (isFieldAgent) {
     return mergeWorkQueueData(
       state,
@@ -1123,17 +1123,17 @@ export async function writeRegistrarWorkqueueByUser(
   const state = getState()
   const userDetails = getUserDetails(state) as IUserDetails
 
+  const workqueue = await getWorkqueueData(
+    state,
+    userDetails,
+    workqueuePaginationParams
+  )
+
   const uID = userDetails.userMgntUserID || ''
   const userData = await getUserData(uID)
   const { allUserData } = userData
   let { currentUserData } = userData
 
-  const workqueue = await getWorkqueueData(
-    state,
-    userDetails,
-    workqueuePaginationParams,
-    currentUserData && currentUserData.workqueue
-  )
   if (currentUserData) {
     currentUserData.workqueue = workqueue
   } else {
