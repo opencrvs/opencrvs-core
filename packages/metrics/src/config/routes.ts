@@ -40,10 +40,6 @@ import {
   exportHandler,
   monthlyExportHandler
 } from '@metrics/features/export/handler'
-import {
-  generateLegacyMetricsHandler,
-  generateLegacyEventDurationHandler
-} from '@metrics/features/legacy/handler'
 import { getEventDurationHandler } from '@metrics/features/getEventDuration/handler'
 import { totalMetricsHandler } from '@metrics/features/totalMetrics/handler'
 import { totalPaymentsHandler } from '@metrics/features/payments/handler'
@@ -490,27 +486,6 @@ export const getRoutes = () => {
         tags: ['api']
       }
     },
-
-    // Generate metrics from legacy data
-    {
-      method: 'GET',
-      path: '/generate',
-      handler: generateLegacyMetricsHandler,
-      config: {
-        tags: ['api']
-      }
-    },
-
-    // Generate metrics from legacy data
-    {
-      method: 'GET',
-      path: '/generateEventDurationMetrics',
-      handler: generateLegacyEventDurationHandler,
-      config: {
-        tags: ['api']
-      }
-    },
-
     // used for tests to check JWT auth
     {
       method: 'GET',
