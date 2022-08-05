@@ -193,7 +193,6 @@ export interface IDeclaration {
   downloadRetryAttempt?: number
   action?: DeclarationAction
   trackingId?: string
-  compositionId?: string
   registrationNumber?: string
   payload?: IPayload
   visitedGroupIds?: IVisitedGroupId[]
@@ -542,7 +541,6 @@ export function makeDeclarationReadyToDownload(
     id: compositionId,
     data: {},
     event,
-    compositionId,
     action,
     downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
   }
@@ -740,9 +738,7 @@ export function mergeDeclaredDeclarations(
   declarations: IDeclaration[],
   declaredDeclarations: GQLEventSearchSet[]
 ) {
-  const localDeclarations = declarations.map(
-    (declaration) => declaration.compositionId
-  )
+  const localDeclarations = declarations.map((declaration) => declaration.id)
 
   const declarationsNotStoredLocally = declaredDeclarations.filter(
     (declaredDeclaration) => !localDeclarations.includes(declaredDeclaration.id)

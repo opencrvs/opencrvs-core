@@ -781,9 +781,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     declarationId,
     draft:
       state.declarationsState.declarations.find(
-        (declaration) =>
-          declaration.id === declarationId ||
-          declaration.compositionId === declarationId
+        (declaration) => declaration.id === declarationId
       ) || null,
     language: getLanguage(state),
     resources: getOfflineData(state),
