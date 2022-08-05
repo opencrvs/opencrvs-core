@@ -19,7 +19,7 @@ import {
   DOWNLOAD_STATUS,
   modifyDeclaration
 } from '@client/declarations'
-import { Action } from '@client/forms'
+import { DownloadAction } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { formatUrl } from '@client/navigation'
 import {
@@ -732,7 +732,7 @@ describe('In Progress tab', () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
           Event.Birth,
           declarationId,
-          Action.LOAD_REVIEW_DECLARATION
+          DownloadAction.LOAD_REVIEW_DECLARATION
         )
         downloadableDeclaration.downloadStatus = undefined
         store.dispatch(modifyDeclaration(downloadableDeclaration))
@@ -749,7 +749,7 @@ describe('In Progress tab', () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
           Event.Birth,
           declarationId,
-          Action.LOAD_REVIEW_DECLARATION
+          DownloadAction.LOAD_REVIEW_DECLARATION
         )
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADING
         store.dispatch(modifyDeclaration(downloadableDeclaration))
@@ -766,7 +766,7 @@ describe('In Progress tab', () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
           Event.Birth,
           declarationId,
-          Action.LOAD_REVIEW_DECLARATION
+          DownloadAction.LOAD_REVIEW_DECLARATION
         )
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.DOWNLOADED
         store.dispatch(modifyDeclaration(downloadableDeclaration))
@@ -801,7 +801,7 @@ describe('In Progress tab', () => {
         const downloadableDeclaration = makeDeclarationReadyToDownload(
           Event.Birth,
           declarationId,
-          Action.LOAD_REVIEW_DECLARATION
+          DownloadAction.LOAD_REVIEW_DECLARATION
         )
         downloadableDeclaration.downloadStatus = DOWNLOAD_STATUS.FAILED
         store.dispatch(modifyDeclaration(downloadableDeclaration))

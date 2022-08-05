@@ -10,15 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import gql from 'graphql-tag'
-import { IForm, Action } from '@client/forms'
-import { IDeclaration } from '@client/declarations'
-import {
-  draftToGqlTransformer,
-  appendGqlMetadataFromDraft
-} from '@client/transformer'
 import { REQUEST_DEATH_REG_CORRECTION } from '@client/forms/correction/mutations'
+import { SubmissionAction } from '@client/forms'
 
-const SUBMIT_DEATH_DECLARATION = gql`
+export const SUBMIT_DEATH_DECLARATION = gql`
   mutation createDeathRegistration($details: DeathRegistrationInput!) {
     createDeathRegistration(details: $details) {
       trackingId
@@ -93,83 +88,21 @@ export const COLLECT_DEATH_CERTIFICATE = gql`
   }
 `
 
-export function getDeathMutationMappings(
-  action: Action,
-  payload?: any,
-  form?: IForm,
-  draft?: IDeclaration
-) {
-  let gqlDetails = {}
-  if (form && draft) {
-    gqlDetails = draftToGqlTransformer(
-      form,
-      draft.data,
-      draft.id,
-      draft.originalData
-    )
-    appendGqlMetadataFromDraft(draft, gqlDetails)
-  }
-
+export function getDeathMutation(action: SubmissionAction) {
   switch (action) {
-    case Action.SUBMIT_FOR_REVIEW:
-      return {
-        mutation: SUBMIT_DEATH_DECLARATION,
-        variables: { details: gqlDetails },
-        dataKey: 'createDeathRegistration'
-      }
-    case Action.APPROVE_DECLARATION:
-      return {
-        mutation: APPROVE_DEATH_DECLARATION,
-        variables: {
-          id: draft && draft.id,
-          details: gqlDetails
-        },
-        dataKey: 'markDeathAsValidated'
-      }
-    case Action.REGISTER_DECLARATION:
-      return {
-        mutation: REGISTER_DEATH_DECLARATION,
-        variables: {
-          id: draft && draft.id,
-          details: gqlDetails
-        },
-        dataKey: 'markDeathAsRegistered'
-      }
-    case Action.REJECT_DECLARATION:
-      return {
-        mutation: REJECT_DEATH_DECLARATION,
-        variables: {
-          ...payload
-        },
-        dataKey: 'markEventAsVoided'
-      }
-    case Action.ARCHIVE_DECLARATION:
-      return {
-        mutation: ARCHIVE_DEATH_DECLARATION,
-        variables: {
-          ...payload
-        },
-        dataKey: 'markEventAsArchived'
-      }
-    case Action.COLLECT_CERTIFICATE:
-      return {
-        mutation: COLLECT_DEATH_CERTIFICATE,
-        variables: {
-          id: draft && draft.id,
-          details: gqlDetails
-        },
-        dataKey: 'markDeathAsCertified'
-      }
-    case Action.REQUEST_CORRECTION_DECLARATION:
-      return {
-        mutation: REQUEST_DEATH_REG_CORRECTION,
-        variables: {
-          id: draft && draft.id,
-          details: gqlDetails
-        },
-        dataKey: 'requestDeathRegistrationCorrection'
-      }
-    default:
-      return null
+    case SubmissionAction.SUBMIT_FOR_REVIEW:
+      return SUBMIT_DEATH_DECLARATION
+    case SubmissionAction.APPROVE_DECLARATION:
+      return APPROVE_DEATH_DECLARATION
+    case SubmissionAction.REGISTER_DECLARATION:
+      return REGISTER_DEATH_DECLARATION
+    case SubmissionAction.REJECT_DECLARATION:
+      return REJECT_DEATH_DECLARATION
+    case SubmissionAction.ARCHIVE_DECLARATION:
+      return ARCHIVE_DEATH_DECLARATION
+    case SubmissionAction.COLLECT_CERTIFICATE:
+      return COLLECT_DEATH_CERTIFICATE
+    case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
+      return REQUEST_DEATH_REG_CORRECTION
   }
 }

@@ -39,7 +39,7 @@ import {
   DOWNLOAD_STATUS,
   SUBMISSION_STATUS
 } from '@client/declarations'
-import { Action } from '@client/forms'
+import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { withTheme } from 'styled-components'
 import { formattedDuration } from '@client/utils/date-formatting'
@@ -173,7 +173,7 @@ class ReadyForReviewComponent extends React.Component<
             downloadConfigs={{
               event: reg.event,
               compositionId: reg.id,
-              action: Action.LOAD_REVIEW_DECLARATION,
+              action: DownloadAction.LOAD_REVIEW_DECLARATION,
               assignment: reg.assignment
             }}
             key={`DownloadButton-${index}`}

@@ -69,18 +69,23 @@ export enum Sort {
   DESC = 'desc'
 }
 
-export enum Action {
+export enum SubmissionAction {
   SUBMIT_FOR_REVIEW = 'submit for review',
   APPROVE_DECLARATION = 'approve',
   REGISTER_DECLARATION = 'register',
   COLLECT_CERTIFICATE = 'collect certificate',
   REJECT_DECLARATION = 'reject',
-  LOAD_REVIEW_DECLARATION = 'load declaration data for review',
-  LOAD_CERTIFICATE_DECLARATION = 'load declaration data for certificate collection',
   ARCHIVE_DECLARATION = 'archive',
-  LOAD_REQUESTED_CORRECTION_DECLARATION = 'load declaration data for which is requested correction',
   REQUEST_CORRECTION_DECLARATION = 'request correction'
 }
+
+export enum DownloadAction {
+  LOAD_REVIEW_DECLARATION = 'load declaration data for review',
+  LOAD_CERTIFICATE_DECLARATION = 'load declaration data for certificate collection',
+  LOAD_REQUESTED_CORRECTION_DECLARATION = 'load declaration data for which is requested correction'
+}
+
+export type Action = SubmissionAction | DownloadAction
 
 export interface IFormConfig {
   questionConfig: IQuestionConfig[]

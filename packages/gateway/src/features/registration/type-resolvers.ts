@@ -854,6 +854,11 @@ export const typeResolvers: GQLResolver = {
         }
       }
 
+      const questionnaireResponse = await fetchFHIR(
+        `/QuestionnaireResponse?subject=${encounterReference}`,
+        authHeader
+      )
+
       const observation = {}
       const observations = await fetchFHIR(
         `/Observation?encounter=${encounterReference}`,
@@ -873,13 +878,8 @@ export const typeResolvers: GQLResolver = {
           causeOfDeath: CAUSE_OF_DEATH_CODE
         }
         observations.entry.map(
-          (item: fhir.Observation & { resource: fhir.Observation }) => {
-            if (
-              item.resource &&
-              item.resource.code.coding &&
-              item.resource.code.coding[0] &&
-              item.resource.code.coding[0].code
-            ) {
+          (item: fhir.BundleEntry & { resource?: fhir.Observation }) => {
+            if (item.resource?.code.coding?.[0]?.code) {
               const itemCode = item.resource.code.coding[0].code
               const observationKey = Object.keys(observationKeys).find(
                 (key) => observationKeys[key] === itemCode
@@ -898,7 +898,8 @@ export const typeResolvers: GQLResolver = {
         eventLocation:
           encounter.location &&
           encounter.location[0].location.reference.split('/')[1],
-        observation
+        observation,
+        questionnaireResponse: questionnaireResponse?.entry?.[0]?.resource?.id
       }
     },
     createdAt(composition: ITemplatedComposition) {
@@ -1268,6 +1269,11 @@ export const typeResolvers: GQLResolver = {
         }
       }
 
+      const questionnaireResponse = await fetchFHIR(
+        `/QuestionnaireResponse?subject=${encounterReference}`,
+        authHeader
+      )
+
       const observation = {}
       const observations = await fetchFHIR(
         `/Observation?encounter=${encounterReference}`,
@@ -1287,13 +1293,8 @@ export const typeResolvers: GQLResolver = {
           lastPreviousLiveBirth: LAST_LIVE_BIRTH_CODE
         }
         observations.entry.map(
-          (item: fhir.Observation & { resource: fhir.Observation }) => {
-            if (
-              item.resource &&
-              item.resource.code.coding &&
-              item.resource.code.coding[0] &&
-              item.resource.code.coding[0].code
-            ) {
+          (item: fhir.BundleEntry & { resource?: fhir.Observation }) => {
+            if (item.resource?.code.coding?.[0]?.code) {
               const itemCode = item.resource.code.coding[0].code
               const observationKey = Object.keys(observationKeys).find(
                 (key) => observationKeys[key] === itemCode
@@ -1312,7 +1313,8 @@ export const typeResolvers: GQLResolver = {
         eventLocation:
           encounter.location &&
           encounter.location[0].location.reference.split('/')[1],
-        observation
+        observation,
+        questionnaireResponse: questionnaireResponse?.entry?.[0]?.resource?.id
       }
     },
     createdAt(composition: ITemplatedComposition) {

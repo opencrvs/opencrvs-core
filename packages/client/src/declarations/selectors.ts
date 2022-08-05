@@ -28,8 +28,5 @@ export const getInitialDeclarationsLoaded = (
   getKey(store, 'initialDeclarationsLoaded')
 
 export function selectDeclaration(store: IStoreState, declarationId: string) {
-  return getKey(store, 'declarations').find(
-    ({ id, compositionId }) =>
-      declarationId === id || declarationId === compositionId
-  )
+  return getKey(store, 'declarations').find(({ id }) => declarationId === id)
 }
