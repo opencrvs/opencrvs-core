@@ -19,7 +19,6 @@ import {
 import { ReactWrapper } from 'enzyme'
 import { ApplicationConfig } from '@client/views/SysAdmin/Config/Application'
 import { configApplicationMutations } from './mutations'
-import { waitForElement } from '@client/tests/wait-for-element'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -35,6 +34,10 @@ beforeEach(async () => {
               APPLICATION_NAME: 'Farajaland CRVS',
               NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
               PHONE_NUMBER_PATTERN: '/^01[1-9][0-9]{8}$/',
+              COUNTRY_LOGO: {
+                fileName: 'logo.png',
+                file: `data:image;base64,${validImageB64String}`
+              },
               CURRENCY: {
                 isoCode: 'CAD',
                 languagesAndCountry: ['en-CA']
@@ -393,7 +396,7 @@ describe('application currency update test', () => {
     await flushPromises()
     expect(
       testComponent.find('#CURRENCY_value').hostNodes().first().text()
-    ).toBe('Zambian kwacha')
+    ).toBe('Canadian dollar')
   })
 
   it('should show success notification if appliction config change', async () => {
