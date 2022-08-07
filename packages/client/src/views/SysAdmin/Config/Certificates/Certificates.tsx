@@ -281,7 +281,10 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         this.birthCertificatefileUploader.current!.value = ''
         this.deathCertificatefileUploader.current!.value = ''
       } catch (error) {
-        if (error.message === ERROR_TYPES.IMAGE_TYPE) {
+        if (
+          error instanceof Error &&
+          error.message === ERROR_TYPES.IMAGE_TYPE
+        ) {
           this.setState(() => ({
             imageUploading: false,
             imageLoadingError: this.props.intl.formatMessage(

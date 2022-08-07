@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import { ApolloQueryResult } from 'apollo-client'
+import { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { ApolloConsumer } from 'react-apollo'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
@@ -174,7 +174,10 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
         error: true,
         loading: false,
         success: false,
-        networkError: Boolean(error.networkError) ? true : false
+        networkError:
+          error instanceof ApolloError && Boolean(error.networkError)
+            ? true
+            : false
       })
     }
   }
