@@ -22,6 +22,8 @@ import { Event } from '@client/utils/gateway'
 import { SubmissionAction } from '@client/forms'
 import { SUBMISSION_STATUS } from '.'
 import { client } from '@client/utils/apolloClient'
+import { ApolloError } from 'apollo-client'
+import { GraphQLError } from 'graphql'
 
 describe('Submission middleware', () => {
   const dispatch = jest.fn()
@@ -56,7 +58,9 @@ describe('Submission middleware', () => {
       action: SubmissionAction.SUBMIT_FOR_REVIEW,
       submissionStatus: SUBMISSION_STATUS.READY_TO_SUBMIT
     })
-    mutateSpy.mockRejectedValueOnce({ networkError: true })
+    mutateSpy.mockRejectedValueOnce(
+      new ApolloError({ networkError: new Error('Network Error') })
+    )
     await middleware(action)
     expect(mutateSpy.mock.calls.length).toBe(1)
     expect(dispatch.mock.calls.length).toBe(4)
@@ -73,9 +77,22 @@ describe('Submission middleware', () => {
       action: SubmissionAction.REJECT_DECLARATION,
       submissionStatus: SUBMISSION_STATUS.READY_TO_REJECT
     })
-    mutateSpy.mockRejectedValueOnce({
-      graphQLErrors: [{ extensions: { code: 'UNASSIGNED' } }]
-    })
+
+    mutateSpy.mockRejectedValueOnce(
+      new ApolloError({
+        graphQLErrors: [
+          new GraphQLError(
+            'GQL Error',
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            { code: 'UNASSIGNED' }
+          )
+        ]
+      })
+    )
     await middleware(action)
     expect(mutateSpy.mock.calls.length).toBe(1)
     expect(dispatch.mock.calls.length).toBe(4)
@@ -90,7 +107,7 @@ describe('Submission middleware', () => {
       action: SubmissionAction.SUBMIT_FOR_REVIEW,
       submissionStatus: SUBMISSION_STATUS.READY_TO_SUBMIT
     })
-    mutateSpy.mockRejectedValueOnce({})
+    mutateSpy.mockRejectedValueOnce(new Error('Dummy Error'))
     await middleware(action)
     expect(mutateSpy.mock.calls.length).toBe(1)
     expect(dispatch.mock.calls.length).toBe(4)
