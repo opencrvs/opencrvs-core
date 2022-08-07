@@ -19,6 +19,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
+    "useUnknownInCatchVariables": false,
     "noFallthroughCasesInSwitch": true
   },
   "include": [

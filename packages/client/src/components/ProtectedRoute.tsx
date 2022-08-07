@@ -10,50 +10,40 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  Route,
-  RouteProps,
-  RouteComponentProps,
-  withRouter
-} from 'react-router'
+import { Route } from 'react-router'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getAuthenticated } from '@client/profile/profileSelectors'
 import { hasAccessToRoute, Roles } from '@client/utils/authUtils'
-import { IUserDetails } from '@client/utils/userUtils'
 
 export interface IProps {
   roles?: Roles[]
-  authenticated: boolean
-  userDetails: IUserDetails | null
-  userDetailsFetched: boolean
 }
 
 class ProtectedRouteWrapper extends Route<
-  IProps & RouteProps & RouteComponentProps<{}>
+  IProps & ReturnType<typeof mapStateToProps>
 > {
   public render() {
-    if (!this.props.authenticated && !this.props.userDetailsFetched) {
+    const { authenticated, userDetailsFetched, userDetails, roles, ...rest } =
+      this.props
+    if (!authenticated && !userDetailsFetched) {
       return <div />
     }
-    if (this.props.roles && this.props.userDetails) {
-      if (!hasAccessToRoute(this.props.roles, this.props.userDetails)) {
+    if (roles && userDetails) {
+      if (!hasAccessToRoute(roles, userDetails)) {
         throw new Error('Unauthorised!')
       }
     }
-    return <Route {...this.props} />
+    return <Route {...rest} />
   }
 }
 
-const mapStateToProps = (store: IStoreState): IProps => {
+const mapStateToProps = (store: IStoreState, props: IProps) => {
   return {
+    ...props,
     authenticated: getAuthenticated(store),
     userDetails: store.profile.userDetails,
     userDetailsFetched: store.profile.userDetailsFetched
   }
 }
-export const ProtectedRoute = withRouter(
-  connect<IProps, {}, IProps, IStoreState>(mapStateToProps)(
-    ProtectedRouteWrapper
-  )
-) as any
+export const ProtectedRoute = connect(mapStateToProps)(ProtectedRouteWrapper)
