@@ -74,6 +74,26 @@ function findPreviousTask(
   historyResponseBundle: fhir.Bundle,
   allowedPreviousStates: DECLARATION_STATUS[]
 ) {
+  const allTasks = findAllPreviousTasks(historyResponseBundle)
+
+  const task =
+    allTasks &&
+    allTasks.find((resource) => {
+      if (!resource.businessStatus || !resource.businessStatus.coding) {
+        return false
+      }
+      return resource.businessStatus.coding.some((coding) =>
+        allowedPreviousStates.includes(coding.code as DECLARATION_STATUS)
+      )
+    })
+
+  if (!task) {
+    return null
+  }
+  return task as Task
+}
+
+function findAllPreviousTasks(historyResponseBundle: fhir.Bundle) {
   const task =
     historyResponseBundle.entry &&
     historyResponseBundle.entry
@@ -81,20 +101,11 @@ function findPreviousTask(
       .filter((resource): resource is fhir.Task =>
         Boolean(resource && isTaskResource(resource))
       )
-      .find((resource) => {
-        if (!resource.businessStatus || !resource.businessStatus.coding) {
-          return false
-        }
-
-        return resource.businessStatus.coding.some((coding) =>
-          allowedPreviousStates.includes(coding.code as DECLARATION_STATUS)
-        )
-      })
 
   if (!task) {
     return null
   }
-  return task as Task
+  return task as Task[]
 }
 
 export type Task = fhir.Task & { id: string }
@@ -178,18 +189,41 @@ export function getDeclarationType(task: Task): DECLARATION_TYPE {
 }
 
 export function getStartedByFieldAgent(taskHistory: fhir.Bundle): string {
-  const previousTask = findPreviousTask(taskHistory, [
-    'DECLARED',
-    'IN_PROGRESS'
-  ])
+  const allowedPreviousStates = ['DECLARED', 'IN_PROGRESS']
+  const previousTasks = findAllPreviousTasks(taskHistory)
 
-  if (!previousTask) {
+  const task =
+    previousTasks &&
+    previousTasks
+      .sort((a, b) => {
+        if (!a.meta?.lastUpdated || !b.meta?.lastUpdated) {
+          return -1
+        }
+        if (a.meta.lastUpdated > b.meta.lastUpdated) {
+          return 1
+        }
+        if (a.meta.lastUpdated < b.meta.lastUpdated) {
+          return -1
+        }
+        return 0
+      })
+      .find((resource) => {
+        if (!resource.businessStatus || !resource.businessStatus.coding) {
+          return false
+        }
+        return resource.businessStatus.coding.some((coding) =>
+          allowedPreviousStates.includes(coding.code as DECLARATION_STATUS)
+        )
+      })
+
+  if (!task) {
     throw new Error('Task not found!')
   }
 
   const regLastUserExtension =
-    previousTask.extension &&
-    previousTask.extension.find(
+    task &&
+    task.extension &&
+    task.extension.find(
       (extension) =>
         extension.url === 'http://opencrvs.org/specs/extension/regLastUser'
     )
