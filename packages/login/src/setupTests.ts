@@ -9,7 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-;(window as any).config = {
+import { vi } from 'vitest'
+
+const config = {
   AUTH_API_URL: 'http://localhost:4040',
   COUNTRY: 'FAR',
   LANGUAGES: 'en,fr',
@@ -18,3 +20,5 @@
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   CONFIG_API_URL: 'http://localhost:2021'
 }
+
+vi.stubGlobal('config', config)
