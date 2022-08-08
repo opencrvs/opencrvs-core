@@ -900,7 +900,6 @@ export async function setCertificateCollector(
 
   details.registration.certificates.map((certificate: any) => {
     if (!certificate?.collector) {
-      console.log(userDetails)
       certificate.collector = {
         individual: { name },
         relationship: 'PRINT_IN_ADVANCE',

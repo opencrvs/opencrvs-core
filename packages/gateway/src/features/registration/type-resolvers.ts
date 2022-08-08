@@ -221,7 +221,8 @@ export const typeResolvers: GQLResolver = {
       return (
         relatedPerson &&
         relatedPerson.relationship &&
-        relatedPerson.relationship.text
+        relatedPerson.relationship.coding &&
+        relatedPerson.relationship.coding[0].display
       )
     },
     individual: async (relatedPerson, _, authHeader) => {
