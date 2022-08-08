@@ -1,0 +1,358 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
+import { IQueryData, EVENT_STATUS } from '@client/views/OfficeHome/utils'
+import { USER_DETAILS_AVAILABLE } from '@client/profile/profileActions'
+import { storage } from '@client/storage'
+import {
+  getCurrentUserID,
+  IUserData,
+  getUserData,
+  IDeclaration,
+  SUBMISSION_STATUS,
+  updateWorkqueueData
+} from '@client/declarations'
+import { IStoreState } from '@client/store'
+import { getUserDetails, getScope } from '@client/profile/profileSelectors'
+import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
+import { syncRegistrarWorkqueue } from '@client/ListSyncController'
+import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  UpdateRegistrarWorkqueueAction,
+  UPDATE_REGISTRAR_WORKQUEUE,
+  WorkqueueActions,
+  updateRegistrarWorkqueueSuccessActionCreator,
+  updateRegistrarWorkqueueFailActionCreator,
+  IGetWorkqueueOfCurrentUserFailedAction,
+  IGetWorkqueueOfCurrentUserSuccessAction,
+  getCurrentUserWorkqueuSuccess,
+  getCurrentUserWorkqueueFailed,
+  GET_WORKQUEUE_SUCCESS,
+  UPDATE_REGISTRAR_WORKQUEUE_SUCCESS
+} from './actions'
+
+export interface IWorkqueue {
+  loading?: boolean
+  error?: boolean
+  data: IQueryData
+  initialSyncDone: boolean
+}
+
+export interface WorkqueueState {
+  workqueue: IWorkqueue
+}
+
+const workqueueInitialState: WorkqueueState = {
+  workqueue: {
+    loading: true,
+    error: false,
+    data: {
+      inProgressTab: { totalItems: 0, results: [] },
+      notificationTab: { totalItems: 0, results: [] },
+      reviewTab: { totalItems: 0, results: [] },
+      rejectTab: { totalItems: 0, results: [] },
+      approvalTab: { totalItems: 0, results: [] },
+      printTab: { totalItems: 0, results: [] },
+      externalValidationTab: { totalItems: 0, results: [] }
+    },
+    initialSyncDone: false
+  }
+}
+
+interface IWorkqueuePaginationParams {
+  userId?: string
+  pageSize: number
+  isFieldAgent: boolean
+  inProgressSkip: number
+  healthSystemSkip: number
+  reviewSkip: number
+  rejectSkip: number
+  approvalSkip: number
+  externalValidationSkip: number
+  printSkip: number
+}
+
+export function updateRegistrarWorkqueue(
+  userId?: string,
+  pageSize = 10,
+  isFieldAgent = false,
+  inProgressSkip = 0,
+  healthSystemSkip = 0,
+  reviewSkip = 0,
+  rejectSkip = 0,
+  approvalSkip = 0,
+  externalValidationSkip = 0,
+  printSkip = 0
+): UpdateRegistrarWorkqueueAction {
+  return {
+    type: UPDATE_REGISTRAR_WORKQUEUE,
+    payload: {
+      userId,
+      pageSize,
+      isFieldAgent,
+      inProgressSkip,
+      healthSystemSkip,
+      reviewSkip,
+      rejectSkip,
+      approvalSkip,
+      externalValidationSkip,
+      printSkip
+    }
+  }
+}
+
+export async function getWorkqueueOfCurrentUser(): Promise<string> {
+  // returns a 'stringified' IWorkqueue
+  const initialWorkqueue = workqueueInitialState.workqueue
+
+  const storageTable = await storage.getItem('USER_DATA')
+  if (!storageTable) {
+    return JSON.stringify(initialWorkqueue)
+  }
+
+  const currentUserID = await getCurrentUserID()
+
+  const allUserData = JSON.parse(storageTable) as IUserData[]
+
+  if (!allUserData.length) {
+    // No user-data at all
+    return JSON.stringify(initialWorkqueue)
+  }
+
+  const currentUserData = allUserData.find(
+    (uData) => uData.userID === currentUserID
+  )
+  const currentUserWorkqueue: IWorkqueue =
+    (currentUserData && currentUserData.workqueue) ||
+    workqueueInitialState.workqueue
+  return JSON.stringify(currentUserWorkqueue)
+}
+
+function mergeWorkQueueData(
+  state: IStoreState,
+  workQueueIds: (keyof IQueryData)[],
+  currentApplications: IDeclaration[] | undefined,
+  destinationWorkQueue: IWorkqueue
+) {
+  if (!currentApplications) {
+    return destinationWorkQueue
+  }
+  workQueueIds.forEach((workQueueId) => {
+    if (
+      !(
+        destinationWorkQueue.data &&
+        destinationWorkQueue.data[workQueueId]?.results
+      )
+    ) {
+      return
+    }
+    ;(
+      destinationWorkQueue.data[workQueueId].results as GQLEventSearchSet[]
+    ).forEach((declaration) => {
+      if (declaration == null) {
+        return
+      }
+      const declarationIndex = currentApplications.findIndex(
+        (app) => app && app.id === declaration.id
+      )
+      if (declarationIndex >= 0) {
+        const isDownloadFailed =
+          currentApplications[declarationIndex].submissionStatus ===
+            SUBMISSION_STATUS.FAILED_NETWORK ||
+          currentApplications[declarationIndex].submissionStatus ===
+            SUBMISSION_STATUS.FAILED
+
+        if (!isDownloadFailed) {
+          updateWorkqueueData(
+            state,
+            currentApplications[declarationIndex],
+            workQueueId,
+            destinationWorkQueue
+          )
+        }
+      }
+    })
+  })
+  return destinationWorkQueue
+}
+
+async function getWorkqueueData(
+  state: IStoreState,
+  userDetails: IUserDetails,
+  workqueuePaginationParams: IWorkqueuePaginationParams
+) {
+  const registrationLocationId =
+    (userDetails && getUserLocation(userDetails).id) || ''
+
+  const scope = getScope(state)
+  const reviewStatuses =
+    scope && scope.includes('register')
+      ? [EVENT_STATUS.DECLARED, EVENT_STATUS.VALIDATED]
+      : [EVENT_STATUS.DECLARED]
+
+  const {
+    userId,
+    pageSize,
+    isFieldAgent,
+    inProgressSkip,
+    healthSystemSkip,
+    reviewSkip,
+    rejectSkip,
+    approvalSkip,
+    externalValidationSkip,
+    printSkip
+  } = workqueuePaginationParams
+
+  const result = await syncRegistrarWorkqueue(
+    registrationLocationId,
+    reviewStatuses,
+    pageSize,
+    isFieldAgent,
+    inProgressSkip,
+    healthSystemSkip,
+    reviewSkip,
+    rejectSkip,
+    approvalSkip,
+    externalValidationSkip,
+    printSkip,
+    userId
+  )
+  let workqueue
+  const { currentUserData } = await getUserData(
+    userDetails.userMgntUserID || ''
+  )
+  const currentWorkqueue = currentUserData?.workqueue
+  if (result) {
+    workqueue = {
+      loading: false,
+      error: false,
+      data: result,
+      initialSyncDone: true
+    }
+  } else {
+    workqueue = {
+      loading: false,
+      error: true,
+      data:
+        (currentWorkqueue && currentWorkqueue.data) ||
+        (state.workqueueState && state.workqueueState.workqueue.data),
+      initialSyncDone: false
+    }
+  }
+  if (isFieldAgent) {
+    return mergeWorkQueueData(
+      state,
+      ['reviewTab', 'rejectTab'],
+      currentUserData && currentUserData.declarations,
+      workqueue
+    )
+  }
+  return mergeWorkQueueData(
+    state,
+    ['inProgressTab', 'notificationTab', 'reviewTab', 'rejectTab'],
+    currentUserData && currentUserData.declarations,
+    workqueue
+  )
+}
+
+export async function writeRegistrarWorkqueueByUser(
+  getState: () => IStoreState,
+  workqueuePaginationParams: IWorkqueuePaginationParams
+): Promise<string> {
+  const state = getState()
+  const userDetails = getUserDetails(state) as IUserDetails
+
+  const workqueue = await getWorkqueueData(
+    state,
+    userDetails,
+    workqueuePaginationParams
+  )
+
+  const uID = userDetails.userMgntUserID || ''
+  const userData = await getUserData(uID)
+  const { allUserData } = userData
+  let { currentUserData } = userData
+
+  if (currentUserData) {
+    currentUserData.workqueue = workqueue
+  } else {
+    currentUserData = {
+      userID: uID,
+      declarations: [],
+      workqueue
+    }
+    allUserData.push(currentUserData)
+  }
+  return Promise.all([
+    storage.setItem('USER_DATA', JSON.stringify(allUserData)),
+    JSON.stringify(currentUserData.workqueue)
+  ]).then(([_, currentUserWorkqueueData]) => currentUserWorkqueueData)
+}
+
+export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
+  state: WorkqueueState = workqueueInitialState,
+  action: WorkqueueActions
+): WorkqueueState | Loop<WorkqueueState, WorkqueueActions> => {
+  switch (action.type) {
+    case UPDATE_REGISTRAR_WORKQUEUE:
+      return loop(
+        {
+          workqueue: {
+            ...state.workqueue,
+            loading: true
+          }
+        },
+        Cmd.run(writeRegistrarWorkqueueByUser, {
+          successActionCreator: updateRegistrarWorkqueueSuccessActionCreator,
+          failActionCreator: updateRegistrarWorkqueueFailActionCreator,
+          args: [Cmd.getState, action.payload]
+        })
+      )
+
+    case USER_DETAILS_AVAILABLE:
+      return loop(
+        {
+          ...state
+        },
+        Cmd.run<
+          IGetWorkqueueOfCurrentUserFailedAction,
+          IGetWorkqueueOfCurrentUserSuccessAction
+        >(getWorkqueueOfCurrentUser, {
+          successActionCreator: getCurrentUserWorkqueuSuccess,
+          failActionCreator: getCurrentUserWorkqueueFailed,
+          args: []
+        })
+      )
+
+    case GET_WORKQUEUE_SUCCESS:
+      if (action.payload) {
+        const workqueue = JSON.parse(action.payload) as IWorkqueue
+        return {
+          workqueue
+        }
+      }
+      return state
+
+    case UPDATE_REGISTRAR_WORKQUEUE_SUCCESS:
+      if (action.payload) {
+        const workqueue = JSON.parse(action.payload) as IWorkqueue
+
+        return {
+          workqueue
+        }
+      }
+      return state
+
+    default:
+      return state
+  }
+}
