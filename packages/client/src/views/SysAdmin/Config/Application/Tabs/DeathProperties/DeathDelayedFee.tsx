@@ -50,13 +50,18 @@ export function DeathDelayedFee() {
   const offlineCountryConfiguration = useSelector((store: IStoreState) =>
     getOfflineData(store)
   )
-  const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] =
-    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const [deathDelayedFee, setDeathDelayedFee] = React.useState(
     offlineCountryConfiguration.config.DEATH.FEE.DELAYED.toLocaleString()
   )
+  const [showModal, setShowModal] = React.useState(false)
+  const toggleModal = () => {
+    setShowModal((prev) => !prev)
+    setDeathDelayedFee(
+      offlineCountryConfiguration.config.DEATH.FEE.DELAYED.toLocaleString()
+    )
+  }
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
 
   const handleDeathDelayedFee = (
     event: React.ChangeEvent<HTMLInputElement>

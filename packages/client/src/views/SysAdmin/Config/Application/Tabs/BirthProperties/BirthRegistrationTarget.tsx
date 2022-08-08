@@ -47,15 +47,20 @@ export function BirthRegistrationTarget() {
   const offlineCountryConfiguration = useSelector((store: IStoreState) =>
     getOfflineData(store)
   )
-  const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] =
-    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const birthLateRegistrationTarget =
     offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET
   const [birthRegistrationTarget, setBirthRegistrationTarget] = React.useState(
     String(offlineCountryConfiguration.config.BIRTH.REGISTRATION_TARGET)
   )
+  const [showModal, setShowModal] = React.useState(false)
+  const toggleModal = () => {
+    setShowModal((prev) => !prev)
+    setBirthRegistrationTarget(
+      String(offlineCountryConfiguration.config.BIRTH.REGISTRATION_TARGET)
+    )
+  }
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
 
   const handleBirthRegistrationTarget = (
     event: React.ChangeEvent<HTMLInputElement>
