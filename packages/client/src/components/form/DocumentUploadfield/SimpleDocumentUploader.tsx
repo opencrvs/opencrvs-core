@@ -178,7 +178,9 @@ class SimpleDocumentUploaderComponent extends React.Component<
         {description && <FieldDescription>{description}</FieldDescription>}
         <ErrorMessage>
           {errorMessage && (touched || this.state.error) && (
-            <ErrorText id="field-error">{errorMessage}</ErrorText>
+            <ErrorText ignoreMediaQuery id="field-error">
+              {errorMessage}
+            </ErrorText>
           )}
         </ErrorMessage>
         <DocumentListPreview

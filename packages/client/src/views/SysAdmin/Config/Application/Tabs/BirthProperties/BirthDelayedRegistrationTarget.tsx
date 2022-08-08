@@ -48,7 +48,12 @@ export function BirthDelayedRegistrationTarget() {
     getOfflineData(store)
   )
   const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => setShowModal((prev) => !prev)
+  const toggleModal = () => {
+    setShowModal((prev) => !prev)
+    setBirthLateRegistrationTarget(
+      String(offlineCountryConfiguration.config.BIRTH.LATE_REGISTRATION_TARGET)
+    )
+  }
   const [notificationStatus, setNotificationStatus] =
     React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const birthRegistrationTarget =

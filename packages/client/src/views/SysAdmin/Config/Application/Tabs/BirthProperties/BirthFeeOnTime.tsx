@@ -50,13 +50,18 @@ export function BirthFeeOnTime() {
   const offlineCountryConfiguration = useSelector((store: IStoreState) =>
     getOfflineData(store)
   )
-  const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] =
-    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const [birthOnTimeFee, setBirthOnTimeFee] = React.useState(
     offlineCountryConfiguration.config.BIRTH.FEE.ON_TIME.toLocaleString()
   )
+  const [showModal, setShowModal] = React.useState(false)
+  const toggleModal = () => {
+    setShowModal((prev) => !prev)
+    setBirthOnTimeFee(
+      offlineCountryConfiguration.config.BIRTH.FEE.ON_TIME.toLocaleString()
+    )
+  }
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const handleBirthOnTimeFee = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = String(event.target.value)
     setBirthOnTimeFee(getFormattedFee(value))
