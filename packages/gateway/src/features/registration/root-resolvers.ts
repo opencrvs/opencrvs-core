@@ -25,7 +25,8 @@ import {
   getRegistrationIds,
   getDeclarationIds,
   getStatusFromTask,
-  findExtension
+  findExtension,
+  setCertificateCollector
 } from '@gateway/features/fhir/utils'
 import {
   buildFHIRBundle,
@@ -780,6 +781,7 @@ async function markEventAsCertified(
   authHeader: IAuthHeader,
   event: EVENT_TYPE
 ) {
+  details = await setCertificateCollector(details, authHeader)
   const doc = await buildFHIRBundle(details, event, authHeader)
 
   const res = await fetchFHIR('', authHeader, 'POST', JSON.stringify(doc))

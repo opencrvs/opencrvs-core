@@ -426,7 +426,7 @@ const messagesToDefine: ICertificateMessages = {
     defaultMessage: 'ID Check',
     description:
       'Table column header showing collector ID verification info in record audit',
-    id: 'record.certificate.collector'
+    id: 'correction.summary.idCheck'
   }
 }
 
