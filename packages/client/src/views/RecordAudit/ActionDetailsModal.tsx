@@ -39,6 +39,7 @@ import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/Searc
 
 interface IActionDetailsModalListTable {
   actionDetailsData: IActionDetailsData
+  actionDetailsIndex: number
   registerForm: IForm
   intl: IntlShape
   offlineData: Partial<IOfflineData>
@@ -125,6 +126,7 @@ function prepareComments(
 
 export const ActionDetailsModalListTable = ({
   actionDetailsData,
+  actionDetailsIndex,
   registerForm,
   intl,
   offlineData,
@@ -262,9 +264,13 @@ export const ActionDetailsModalListTable = ({
     return result
   }
   const certificateCollectorData = (
-    actionDetailsData: IActionDetailsData
+    actionDetailsData: IActionDetailsData,
+    index: number
   ): IDynamicValues[] => {
     if (!actionDetailsData.certificates) return []
+
+    console.log(index)
+
     return actionDetailsData.certificates
       .map((certificate: IDynamicValues) => {
         if (!certificate) {
@@ -301,7 +307,10 @@ export const ActionDetailsModalListTable = ({
   }
 
   const declarationUpdates = dataChange(actionDetailsData)
-  const collectorData = certificateCollectorData(actionDetailsData)
+  const collectorData = certificateCollectorData(
+    actionDetailsData,
+    actionDetailsIndex
+  )
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
   const content = prepareComments(actionDetailsData, draft)
   return (
@@ -373,6 +382,7 @@ export const ActionDetailsModalListTable = ({
 export const ActionDetailsModal = ({
   show,
   actionDetailsData,
+  actionDetailsIndex,
   toggleActionDetails,
   intl,
   goToUser,
@@ -382,6 +392,7 @@ export const ActionDetailsModal = ({
 }: {
   show: boolean
   actionDetailsData: IActionDetailsData
+  actionDetailsIndex: number
   toggleActionDetails: (param: IActionDetailsData | null) => void
   intl: IntlShape
   goToUser: typeof goToUserProfile
@@ -429,6 +440,7 @@ export const ActionDetailsModal = ({
         </div>
         <ActionDetailsModalListTable
           actionDetailsData={actionDetailsData}
+          actionDetailsIndex={actionDetailsIndex}
           registerForm={registerForm}
           intl={intl}
           offlineData={offlineData}

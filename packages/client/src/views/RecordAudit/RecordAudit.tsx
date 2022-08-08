@@ -322,12 +322,17 @@ function RecordAuditBody({
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
+  const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
   const [actionDetailsData, setActionDetailsData] = React.useState({})
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
-  const toggleActionDetails = (actionItem: IActionDetailsData | null) => {
+  const toggleActionDetails = (
+    actionItem: IActionDetailsData | null,
+    itemIndex?: number
+  ) => {
     actionItem && setActionDetailsData(actionItem)
+    itemIndex && setActionDetailsIndex(itemIndex)
     setActionDetails((prevValue) => !prevValue)
   }
   const toggleDisplayDialog = () => setShowDialog((prevValue) => !prevValue)
@@ -507,6 +512,7 @@ function RecordAuditBody({
   const actionDetailsModalProps = {
     show: showActionDetails,
     actionDetailsData,
+    actionDetailsIndex,
     toggleActionDetails,
     intl,
     goToUser: goToUserProfile,

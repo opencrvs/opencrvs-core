@@ -133,6 +133,22 @@ const GetNameWithAvatar = ({
   )
 }
 
+const getIndexByAction = (histories: any, index: number): number => {
+  const newHistories = [...histories]
+  newHistories.map((item) => {
+    item.uuid = new Date().getTime()
+    return item
+  })
+
+  const uuid = newHistories[index].uuid
+  newHistories
+    .filter((item) => item.action === newHistories[index].action)
+    .findIndex((item) => item.uuid === uuid)
+  console.log(newHistories, index)
+  debugger
+  return 1
+}
+
 export const GetHistory = ({
   intl,
   draft,
@@ -141,7 +157,7 @@ export const GetHistory = ({
   toggleActionDetails,
   userDetails
 }: CMethodParams & {
-  toggleActionDetails: (actionItem: IActionDetailsData) => void
+  toggleActionDetails: (actionItem: IActionDetailsData, index?: number) => void
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const isFieldAgent =
@@ -201,12 +217,17 @@ export const GetHistory = ({
 
   const historyData = (
     historiesForDisplay as unknown as { [key: string]: any }[]
-  ).map((item) => ({
+  ).map((item, index) => ({
     date: getFormattedDate(item?.date),
     action: (
       <GetLink
         status={getStatusLabel(item?.action, item.reinstated, intl, item.user)}
-        onClick={() => toggleActionDetails(item)}
+        onClick={() =>
+          toggleActionDetails(
+            item,
+            getIndexByAction(historiesForDisplay, index)
+          )
+        }
       />
     ),
     user:
