@@ -424,7 +424,7 @@ const messagesToDefine: ICertificateMessages = {
     id: 'record.certificate.collector'
   },
   printedOnAdvance: {
-    defaultMessage: 'Collected in advance by',
+    defaultMessage: 'Printed in advance by',
     description: 'Table column header showing collector info in record audit',
     id: 'record.certificate.collectedInAdvance'
   },
