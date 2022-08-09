@@ -329,10 +329,10 @@ function RecordAuditBody({
 
   const toggleActionDetails = (
     actionItem: IActionDetailsData | null,
-    itemIndex?: number
+    itemIndex = -1
   ) => {
     actionItem && setActionDetailsData(actionItem)
-    itemIndex && setActionDetailsIndex(itemIndex)
+    setActionDetailsIndex(itemIndex)
     setActionDetails((prevValue) => !prevValue)
   }
   const toggleDisplayDialog = () => setShowDialog((prevValue) => !prevValue)

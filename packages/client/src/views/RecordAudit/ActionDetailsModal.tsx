@@ -164,13 +164,6 @@ export const ActionDetailsModalListTable = ({
     },
     { key: 'edit', label: 'Edit', width: 33.33 }
   ]
-  const certificateCollector = [
-    {
-      key: 'collector',
-      label: intl.formatMessage(certificateMessages.printedOnCollection),
-      width: 100
-    }
-  ]
   const certificateCollectorVerified = [
     {
       key: 'hasShowedVerifiedDocument',
@@ -266,44 +259,53 @@ export const ActionDetailsModalListTable = ({
   const certificateCollectorData = (
     actionDetailsData: IActionDetailsData,
     index: number
-  ): IDynamicValues[] => {
+  ): IDynamicValues => {
     if (!actionDetailsData.certificates) return []
 
-    console.log(index)
+    const certificate = actionDetailsData.certificates.filter(
+      (item: IDynamicValues) => item
+    )[index]
 
-    return actionDetailsData.certificates
-      .map((certificate: IDynamicValues) => {
-        if (!certificate) {
-          return
-        }
+    if (!certificate) {
+      return {}
+    }
 
-        const name = certificate.collector?.individual
-          ? getIndividualNameObj(
-              certificate.collector.individual.name,
-              window.config.LANGUAGES
-            )
-          : {}
-        const collectorLabel = () => {
-          const relation = CollectorRelationLabelArray.find(
-            (labelItem) =>
-              labelItem.value === certificate.collector?.relationship
-          )
-          const collectorName = `${name?.firstNames || ''} ${
-            name?.familyName || ''
-          }`
-          if (relation)
-            return `${collectorName} (${intl.formatMessage(relation.label)})`
-          return collectorName
-        }
+    const name = certificate.collector?.individual
+      ? getIndividualNameObj(
+          certificate.collector.individual.name,
+          window.config.LANGUAGES
+        )
+      : {}
+    const collectorLabel = () => {
+      const relation = CollectorRelationLabelArray.find(
+        (labelItem) => labelItem.value === certificate.collector?.relationship
+      )
+      const collectorName = `${name?.firstNames || ''} ${
+        name?.familyName || ''
+      }`
+      if (relation)
+        return `${collectorName} (${intl.formatMessage(relation.label)})`
+      if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
+        const otherRelation = CollectorRelationLabelArray.find(
+          (labelItem) =>
+            labelItem.value === certificate.collector?.otherRelationship
+        )
+        const otherRelationLabel = otherRelation
+          ? intl.formatMessage(otherRelation.label)
+          : ''
+        return `${collectorName} (${otherRelationLabel})`
+      }
+      return collectorName
+    }
 
-        return {
-          hasShowedVerifiedDocument: certificate.hasShowedVerifiedDocument
-            ? intl.formatMessage(certificateMessages.idCheckVerify)
-            : intl.formatMessage(certificateMessages.idCheckWithoutVerify),
-          collector: collectorLabel()
-        }
-      })
-      .filter((item: IDynamicValues) => null != item)
+    return {
+      hasShowedVerifiedDocument: certificate.hasShowedVerifiedDocument
+        ? intl.formatMessage(certificateMessages.idCheckVerify)
+        : intl.formatMessage(certificateMessages.idCheckWithoutVerify),
+      collector: collectorLabel(),
+      otherRelationship: certificate.collector?.otherRelationship,
+      relationship: certificate.collector?.relationship
+    }
   }
 
   const declarationUpdates = dataChange(actionDetailsData)
@@ -311,6 +313,16 @@ export const ActionDetailsModalListTable = ({
     actionDetailsData,
     actionDetailsIndex
   )
+  const certificateCollector = [
+    {
+      key: 'collector',
+      label:
+        collectorData.relationship === 'PRINT_IN_ADVANCE'
+          ? intl.formatMessage(certificateMessages.printedOnAdvance)
+          : intl.formatMessage(certificateMessages.printedOnCollection),
+      width: 100
+    }
+  ]
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
   const content = prepareComments(actionDetailsData, draft)
   return (
@@ -359,9 +371,9 @@ export const ActionDetailsModalListTable = ({
         noResultText=" "
         hideBoxShadow={true}
         columns={certificateCollector}
-        content={collectorData}
+        content={[collectorData]}
         pageSize={10}
-        totalItems={collectorData.length}
+        totalItems={1}
         currentPage={currentPage}
         onPageChange={pageChangeHandler}
       />
@@ -369,9 +381,9 @@ export const ActionDetailsModalListTable = ({
         noResultText=" "
         hideBoxShadow={true}
         columns={certificateCollectorVerified}
-        content={collectorData}
+        content={[collectorData]}
         pageSize={10}
-        totalItems={collectorData.length}
+        totalItems={1}
         currentPage={currentPage}
         onPageChange={pageChangeHandler}
       />

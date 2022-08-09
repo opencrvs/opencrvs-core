@@ -36,6 +36,7 @@ import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
+import { v4 as uuid } from 'uuid'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -136,17 +137,17 @@ const GetNameWithAvatar = ({
 const getIndexByAction = (histories: any, index: number): number => {
   const newHistories = [...histories]
   newHistories.map((item) => {
-    item.uuid = new Date().getTime()
+    item.uuid = uuid()
     return item
   })
 
-  const uuid = newHistories[index].uuid
-  newHistories
+  const uid = newHistories[index].uuid
+  const actionIndex = newHistories
     .filter((item) => item.action === newHistories[index].action)
-    .findIndex((item) => item.uuid === uuid)
-  console.log(newHistories, index)
-  debugger
-  return 1
+    .reverse()
+    .findIndex((item) => item.uuid === uid)
+
+  return actionIndex
 }
 
 export const GetHistory = ({
@@ -222,12 +223,10 @@ export const GetHistory = ({
     action: (
       <GetLink
         status={getStatusLabel(item?.action, item.reinstated, intl, item.user)}
-        onClick={() =>
-          toggleActionDetails(
-            item,
-            getIndexByAction(historiesForDisplay, index)
-          )
-        }
+        onClick={() => {
+          const actionIndex = getIndexByAction(historiesForDisplay, index)
+          toggleActionDetails(item, actionIndex)
+        }}
       />
     ),
     user:
