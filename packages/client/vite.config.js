@@ -55,6 +55,15 @@ export default defineConfig(({ mode }) => {
         crypto: 'crypto-js'
       }
     },
-    plugins: [htmlPlugin(), react(), tsconfigPaths()]
+    plugins: [htmlPlugin(), react(), tsconfigPaths()],
+    test: {
+      environment: 'jsdom',
+      setupFiles: './src/setupTests.ts',
+      testTimeout: 30000,
+      globals: true,
+      coverage: {
+        reporter: ['text', 'json', 'html']
+      }
+    }
   }
 })

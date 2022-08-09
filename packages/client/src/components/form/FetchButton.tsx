@@ -26,6 +26,7 @@ import { Spinner } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
 import { IQuery } from '@opencrvs/client/src/forms'
+import { isNavigatorOnline } from '@client/utils'
 
 interface IFetchButtonProps {
   id: string
@@ -137,7 +138,7 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
   }
 
   handleConnectionChange = () => {
-    const condition = navigator.onLine ? 'online' : 'offline'
+    const condition = isNavigatorOnline() ? 'online' : 'offline'
     if (condition === 'online') {
       return this.setState({ isDisconnected: false })
     }

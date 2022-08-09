@@ -24,12 +24,13 @@ import { SUBMISSION_STATUS } from '.'
 import { client } from '@client/utils/apolloClient'
 import { ApolloError } from 'apollo-client'
 import { GraphQLError } from 'graphql'
+import { vi, SpyInstance } from 'vitest'
 
 describe('Submission middleware', () => {
-  const dispatch = jest.fn()
-  const getState = jest.fn()
-  const next = jest.fn()
-  let mutateSpy: jest.SpyInstance
+  const dispatch = vi.fn()
+  const getState = vi.fn()
+  const next = vi.fn()
+  let mutateSpy: SpyInstance
 
   const middleware = submissionMiddleware({
     dispatch,
@@ -39,9 +40,13 @@ describe('Submission middleware', () => {
   beforeEach(async () => {
     const { store } = await createTestStore()
     getState.mockImplementation(() => store.getState())
-    mutateSpy = jest
+    mutateSpy = vi
       .spyOn(client, 'mutate')
       .mockImplementation(() => Promise.resolve())
+  })
+
+  afterEach(() => {
+    vi.clearAllMocks()
   })
 
   it('should do nothing if not declarationReadyForStatusChange action', () => {

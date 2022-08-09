@@ -20,7 +20,7 @@ import { History } from 'history'
 import { createTestComponent, flushPromises } from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
-import routeData from 'react-router'
+import { Route } from 'react-router'
 
 const draft: IFormDraft = {
   event: Event.Birth,
@@ -115,9 +115,11 @@ const graphqlMocks: MockedResponse[] = [
 function WrappedSaveActionModal() {
   const [status, setStatus] = React.useState<ActionStatus>(ActionStatus.MODAL)
   return (
-    <SaveActionContext.Provider value={{ status, setStatus }}>
-      <SaveActionModal />
-    </SaveActionContext.Provider>
+    <Route path={'/config/form/wizard/:event'}>
+      <SaveActionContext.Provider value={{ status, setStatus }}>
+        <SaveActionModal />
+      </SaveActionContext.Provider>
+    </Route>
   )
 }
 
@@ -128,8 +130,8 @@ describe('SaveActionModal', () => {
   let history: History
 
   beforeEach(async () => {
-    jest.spyOn(routeData, 'useParams').mockReturnValue({ event: Event.Birth })
     ;({ store, history } = createStore())
+    history.push('/config/form/wizard/birth')
     component = await createTestComponent(<WrappedSaveActionModal />, {
       store,
       history,

@@ -89,16 +89,15 @@ export enum SVGFile {
   type = 'image/svg+xml'
 }
 
-type Props = WrappedComponentProps &
-  Pick<RouteComponentProps, 'history'> & {
-    userDetails: IUserDetails | null
-    scope: Scope | null
-    offlineResources: IOfflineData
-    registerForm: {
-      birth: IForm
-      death: IForm
-    }
-  } & { updateOfflineCertificate: typeof updateOfflineCertificate }
+type Props = WrappedComponentProps & {
+  userDetails: IUserDetails | null
+  scope: Scope | null
+  offlineResources: IOfflineData
+  registerForm: {
+    birth: IForm
+    death: IForm
+  }
+} & { updateOfflineCertificate: typeof updateOfflineCertificate }
 
 interface State {
   selectedSubMenuItem: string
@@ -113,7 +112,7 @@ interface State {
 function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
   return new Promise((resolve, _) => {
     const reader = new FileReader()
-    reader.onloadend = () => resolve(reader.result)
+    reader.onload = () => resolve(reader.result)
     reader.readAsDataURL(blob)
   })
 }
@@ -128,7 +127,8 @@ async function updatePreviewSvgWithSampleSignature(
     (image) => image.getAttribute('data-content') === 'signature'
   )
   if (signatureImage) {
-    const res = await fetch('/assets/sample-signature.png')
+    const baseURL = window.location.origin
+    const res = await fetch(`${baseURL}/assets/sample-signature.png`)
     const blob = await res.blob()
     const base64signature = await blobToBase64(blob)
     signatureImage.setAttribute('xlink:href', base64signature as string)
