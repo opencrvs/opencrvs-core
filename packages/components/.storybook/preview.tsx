@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import React from 'react'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
-import { getTheme } from '../src/components/theme'
+import { getTheme, ITheme } from '../src/components/theme'
 import WebFont from 'webfontloader'
 
 WebFont.load({
@@ -18,11 +19,8 @@ WebFont.load({
     families: ['Noto+Sans:600', 'Noto+Sans:400']
   }
 })
-const language = process.env.REACT_APP_LANGUAGE
-  ? process.env.REACT_APP_LANGUAGE
-  : 'en'
 
-const GlobalStyle = createGlobalStyle`
+const GlobalStyle = createGlobalStyle<any>`
 html,
 body,
 #__next,
@@ -65,7 +63,7 @@ fieldset, legend
 `
 export const decorators = [
   (Story) => (
-    <ThemeProvider theme={getTheme(language)}>
+    <ThemeProvider theme={getTheme()}>
       <GlobalStyle />
       <Story />
     </ThemeProvider>
