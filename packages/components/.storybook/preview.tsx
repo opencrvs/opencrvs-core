@@ -11,7 +11,7 @@
  */
 import React from 'react'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
-import { getTheme, ITheme } from '../src/components/theme'
+import { getTheme } from '../src/components/theme'
 import WebFont from 'webfontloader'
 
 WebFont.load({
@@ -20,7 +20,7 @@ WebFont.load({
   }
 })
 
-const GlobalStyle = createGlobalStyle<any>`
+const GlobalStyle = createGlobalStyle`
 html,
 body,
 #__next,
@@ -28,8 +28,6 @@ body,
 #default-layout {
   width: 100%;
   height: 100%;
-  ${({ theme }) => theme.fonts.text}
-  color: ${({ theme }) => theme.colors.neutralD};
   overflow-x: hidden;
   .page-content {
     position: relative;
