@@ -147,7 +147,7 @@
       cron:
         name: 'mount encrypted folder'
         special_time: reboot
-        job: '/opt/opencrvs/infrastructure/cryptfs/reboot.sh -pF {{encrypt_passphrase_file}} >> /var/log/cryptfs-reboot.log'
+        job: 'bash /opt/opencrvs/infrastructure/cryptfs/reboot.sh -pF {{encrypt_passphrase_file}} >> /var/log/cryptfs-reboot.log'
       when: st.stat.exists and encrypt_data
 
     # https://stackoverflow.com/a/24765946
