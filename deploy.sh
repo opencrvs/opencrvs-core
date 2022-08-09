@@ -247,8 +247,8 @@ docker_stack_deploy() {
 
   echo "Pulling all docker images. This might take a while"
 
-#   ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && \
-#     '$ENV_VARIABLES' docker-compose -f docker-compose.deps.yml -f docker-compose.yml -f docker-compose.deploy.yml '$(echo $environment_compose | tr "-c" "-f")' '$replicas_compose'pull'
+  ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && \
+    '$ENV_VARIABLES' docker-compose -f docker-compose.deps.yml -f docker-compose.yml -f docker-compose.deploy.yml '$(echo $environment_compose | tr "-c" "-f")' '$(echo $replicas_compose | tr "-c" "-f")'pull'
 
   echo "Updating docker swarm stack with new compose files"
   ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && \
