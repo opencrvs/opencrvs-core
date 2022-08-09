@@ -267,6 +267,11 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
       child {
         id
         multipleBirth
+        identifier {
+          id
+          type
+          otherType
+        }
         name {
           use
           firstNames

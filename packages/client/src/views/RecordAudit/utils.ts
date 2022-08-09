@@ -55,6 +55,7 @@ export interface IDeclarationData {
   informant?: string
   informantContact?: string
   brnDrn?: string
+  nid?: string
   assignment?: GQLAssignmentData
 }
 
@@ -349,10 +350,15 @@ export const getDraftDeclarationData = (
   intl: IntlShape,
   trackingId: string
 ): IDeclarationData => {
+  console.log('WHAAAT: ', JSON.stringify(declaration.data?.child))
   return {
     id: declaration.id,
     name: getDraftDeclarationName(declaration),
     type: declaration.event || '',
+    /*nid:
+      declaration.data?.child?.identifier.filter(
+        (id) => id.type === 'NATIONAL_ID'
+      )[0].id || '',*/
     brnDrn:
       declaration.data?.registration?.registrationNumber?.toString() || '',
     trackingId: trackingId,
