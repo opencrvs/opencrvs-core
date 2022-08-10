@@ -9,7 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-module.exports = {
+import type { StorybookConfig } from '@storybook/core-common'
+
+const config: StorybookConfig = {
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
     '@storybook/addon-links',
@@ -18,3 +20,5 @@ module.exports = {
   ],
   framework: '@storybook/react'
 }
+
+module.exports = config
