@@ -56,10 +56,7 @@ export const colors = {
   placeholderCopy: '#959595', // grey400
   disabled: '#CCCCCC', // grey300
   background: '#F5F5F5', // grey100
-  backgroundPrimary: '#36304E',
-
-  // Storybook branding
-  brand: '#0058E0' // blue
+  backgroundPrimary: '#36304E'
 }
 
 export const gradients = {

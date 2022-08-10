@@ -10,13 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { create } from '@storybook/theming'
-import { getTheme } from '../src/components/theme'
 
-const theme = getTheme()
+const BRAND_BLUE = '#0058E0'
 
 export default create({
   base: 'light',
-  colorSecondary: theme.colors.brand,
+  colorPrimary: BRAND_BLUE,
+  colorSecondary: BRAND_BLUE,
   brandTitle: 'OpenCRVS Design System',
   brandUrl: 'https://opencrvs.org',
   brandImage: 'logo.png',
