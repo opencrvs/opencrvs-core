@@ -15,7 +15,7 @@ import { IColumn, IDynamicValues } from './types'
 import React from 'react'
 
 export default {
-  title: 'Data/GridTable',
+  title: 'Data/GridTable (deprecated)',
   component: GridTable
 } as Meta
 
