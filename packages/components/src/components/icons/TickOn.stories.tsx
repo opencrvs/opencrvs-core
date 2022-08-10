@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { TickOn } from '.'
 
 export default {
-  title: 'Components/icons/TickOn',
+  title: 'Typography/Icon/TickOn',
   component: TickOn
 } as Meta
 

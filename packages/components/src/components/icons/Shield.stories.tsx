@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Shield } from '.'
 
 export default {
-  title: 'Components/icons/Shield',
+  title: 'Typography/Icon/Shield',
   component: Shield
 } as Meta
 

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Upload } from '.'
 
 export default {
-  title: 'Components/icons/Upload',
+  title: 'Typography/Icon/Upload',
   component: Upload
 } as Meta
 

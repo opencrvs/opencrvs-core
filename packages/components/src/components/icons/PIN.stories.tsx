@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { PIN } from './PIN'
 
 export default {
-  title: 'Components/icons/PIN',
+  title: 'Typography/Icon/PIN',
   component: PIN
 } as Meta
 

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Next } from '.'
 
 export default {
-  title: 'Components/icons/Next',
+  title: 'Typography/Icon/Next',
   component: Next
 } as Meta
 

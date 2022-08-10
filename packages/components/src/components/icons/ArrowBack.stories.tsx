@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ArrowBack } from './ArrowBack'
 
 export default {
-  title: 'Components/icons/ArrowBack',
+  title: 'Typography/Icon/ArrowBack',
   component: ArrowBack
 } as Meta
 

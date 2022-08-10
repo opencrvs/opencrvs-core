@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Online } from '.'
 
 export default {
-  title: 'Components/icons/Online',
+  title: 'Typography/Icon/Online',
   component: Online
 } as Meta
 

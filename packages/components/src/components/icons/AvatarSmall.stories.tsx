@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { AvatarSmall } from './AvatarSmall'
 
 export default {
-  title: 'Components/icons/AvatarSmall',
+  title: 'Typography/Icon/AvatarSmall',
   component: AvatarSmall
 } as Meta
 

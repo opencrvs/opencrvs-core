@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { DeclarationIcon } from './DeclarationIcon'
 
 export default {
-  title: 'Components/icons/DeclarationIcon',
+  title: 'Typography/Icon/DeclarationIcon',
   component: DeclarationIcon
 } as Meta
 

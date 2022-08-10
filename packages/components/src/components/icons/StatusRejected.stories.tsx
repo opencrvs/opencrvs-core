@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { StatusRejected } from '.'
 
 export default {
-  title: 'Components/icons/StatusRejected',
+  title: 'Typography/Icon/StatusRejected',
   component: StatusRejected
 } as Meta
 

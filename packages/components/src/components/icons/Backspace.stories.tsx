@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Backspace } from './Backspace'
 
 export default {
-  title: 'Components/icons/Backspace',
+  title: 'Typography/Icon/Backspace',
   component: Backspace
 } as Meta
 

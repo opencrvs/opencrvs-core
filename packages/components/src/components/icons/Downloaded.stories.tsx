@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Downloaded } from './Downloaded'
 
 export default {
-  title: 'Components/icons/Downloaded',
+  title: 'Typography/Icon/Downloaded',
   component: Downloaded
 } as Meta
 

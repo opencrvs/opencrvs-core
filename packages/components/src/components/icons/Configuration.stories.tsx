@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Configuration } from './Configuration'
 
 export default {
-  title: 'Components/icons/Configuration',
+  title: 'Typography/Icon/Configuration',
   component: Configuration
 } as Meta
 

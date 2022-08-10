@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Phone } from '.'
 
 export default {
-  title: 'Components/icons/Phone',
+  title: 'Typography/Icon/Phone',
   component: Phone
 } as Meta
 

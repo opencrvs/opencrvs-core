@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { MinusTransparent } from '.'
 
 export default {
-  title: 'Components/icons/MinusTransparent',
+  title: 'Typography/Icon/MinusTransparent',
   component: MinusTransparent
 } as Meta
 

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { LogoutNavigation } from './LogoutNavigation'
 
 export default {
-  title: 'Components/icons/LogoutNavigation',
+  title: 'Typography/Icon/LogoutNavigation',
   component: LogoutNavigation
 } as Meta
 

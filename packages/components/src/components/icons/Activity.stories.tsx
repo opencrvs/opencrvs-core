@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Activity } from './Activity'
 
 export default {
-  title: 'Components/icons/Activity',
+  title: 'Typography/Icon/Activity',
   component: Activity
 } as Meta
 

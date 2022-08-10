@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { SortIcon } from './SortIcon'
 
 export default {
-  title: 'Components/icons/SortIcon',
+  title: 'Typography/Icon/SortIcon',
   component: SortIcon
 } as Meta
 

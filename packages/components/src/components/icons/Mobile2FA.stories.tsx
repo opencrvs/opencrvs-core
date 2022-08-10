@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Mobile2FA } from '.'
 
 export default {
-  title: 'Components/icons/Mobile2FA',
+  title: 'Typography/Icon/Mobile2FA',
   component: Mobile2FA
 } as Meta
 

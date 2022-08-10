@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { MapPin } from '.'
 
 export default {
-  title: 'Components/icons/MapPin',
+  title: 'Typography/Icon/MapPin',
   component: MapPin
 } as Meta
 

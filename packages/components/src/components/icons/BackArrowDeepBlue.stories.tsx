@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { BackArrowDeepBlue } from './BackArrowDeepBlue'
 
 export default {
-  title: 'Components/icons/BackArrowDeepBlue',
+  title: 'Typography/Icon/BackArrowDeepBlue',
   component: BackArrowDeepBlue
 } as Meta
 
