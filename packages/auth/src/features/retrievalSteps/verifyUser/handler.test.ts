@@ -69,6 +69,7 @@ describe('verifyUser handler receives a request', () => {
     it('generates a mobile verification code and sends it to sms gateway', async () => {
       server = await createServerWithEnvironment({ NODE_ENV: 'production' })
 
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const reloadedCodeService = require('../../verifyCode/service')
 
       jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')

@@ -36,13 +36,13 @@ export default async function verifyNumberHandler(
   h: Hapi.ResponseToolkit
 ): Promise<IVerifyNumberResponse> {
   const payload = request.payload as IVerifyNumberPayload
-  let retrievalStepInfo: IRetrievalStepInformation
+
   // Looks for step1 data. Throws exception if not found
-  retrievalStepInfo = await getRetrievalStepInformation(payload.nonce).catch(
-    () => {
-      throw unauthorized()
-    }
-  )
+  const retrievalStepInfo = await getRetrievalStepInformation(
+    payload.nonce
+  ).catch(() => {
+    throw unauthorized()
+  })
   // Throws exception if not ready for step2
   if (
     retrievalStepInfo.status !==

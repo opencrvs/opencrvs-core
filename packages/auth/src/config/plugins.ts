@@ -15,7 +15,7 @@ import { SENTRY_DSN } from '@auth/constants'
 import { logger } from '@auth/logger'
 
 export default function getPlugins() {
-  const plugins: any[] = [
+  const plugins = [
     {
       plugin: Pino,
       options: {
