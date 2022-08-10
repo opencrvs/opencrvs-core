@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Check } from './Check'
 
 export default {
-  title: 'Typography/Icon/Check',
+  title: 'Styles/Icon/Check',
   component: Check
 } as Meta
 

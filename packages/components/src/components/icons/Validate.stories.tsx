@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Validate } from '.'
 
 export default {
-  title: 'Typography/Icon/Validate',
+  title: 'Styles/Icon/Validate',
   component: Validate
 } as Meta
 

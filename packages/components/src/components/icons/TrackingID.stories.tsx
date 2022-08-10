@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { TrackingID } from '.'
 
 export default {
-  title: 'Typography/Icon/TrackingID',
+  title: 'Styles/Icon/TrackingID',
   component: TrackingID
 } as Meta
 

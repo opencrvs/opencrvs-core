@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { StatusProgress } from '.'
 
 export default {
-  title: 'Typography/Icon/StatusProgress',
+  title: 'Styles/Icon/StatusProgress',
   component: StatusProgress
 } as Meta
 

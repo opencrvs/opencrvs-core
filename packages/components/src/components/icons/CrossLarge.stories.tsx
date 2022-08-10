@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { CrossLarge } from './CrossLarge'
 
 export default {
-  title: 'Typography/Icon/CrossLarge',
+  title: 'Styles/Icon/CrossLarge',
   component: CrossLarge
 } as Meta
 

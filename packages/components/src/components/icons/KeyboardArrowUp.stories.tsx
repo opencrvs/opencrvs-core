@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { KeyboardArrowUp } from '.'
 
 export default {
-  title: 'Typography/Icon/KeyboardArrowUp',
+  title: 'Styles/Icon/KeyboardArrowUp',
   component: KeyboardArrowUp
 } as Meta
 

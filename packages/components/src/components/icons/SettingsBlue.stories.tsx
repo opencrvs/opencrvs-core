@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { SettingsBlue } from '.'
 
 export default {
-  title: 'Typography/Icon/SettingsBlue',
+  title: 'Styles/Icon/SettingsBlue',
   component: SettingsBlue
 } as Meta
 

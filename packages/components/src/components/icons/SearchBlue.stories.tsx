@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { SearchBlue } from '.'
 
 export default {
-  title: 'Typography/Icon/SearchBlue',
+  title: 'Styles/Icon/SearchBlue',
   component: SearchBlue
 } as Meta
 

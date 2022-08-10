@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Plus } from '.'
 
 export default {
-  title: 'Typography/Icon/Plus',
+  title: 'Styles/Icon/Plus',
   component: Plus
 } as Meta
 

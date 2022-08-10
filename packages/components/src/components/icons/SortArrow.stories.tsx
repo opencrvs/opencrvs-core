@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { SortArrow } from './SortArrow'
 
 export default {
-  title: 'Typography/Icon/SortArrow',
+  title: 'Styles/Icon/SortArrow',
   component: SortArrow
 } as Meta
 

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { StatusCertified } from '.'
 
 export default {
-  title: 'Typography/Icon/StatusCertified',
+  title: 'Styles/Icon/StatusCertified',
   component: StatusCertified
 } as Meta
 

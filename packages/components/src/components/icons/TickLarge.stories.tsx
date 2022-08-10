@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { TickLarge } from '.'
 
 export default {
-  title: 'Typography/Icon/TickLarge',
+  title: 'Styles/Icon/TickLarge',
   component: TickLarge
 } as Meta
 

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Location } from '.'
 
 export default {
-  title: 'Typography/Icon/Location',
+  title: 'Styles/Icon/Location',
   component: Location
 } as Meta
 

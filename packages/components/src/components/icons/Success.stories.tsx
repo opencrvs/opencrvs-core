@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Success } from '.'
 
 export default {
-  title: 'Typography/Icon/Success',
+  title: 'Styles/Icon/Success',
   component: Success
 } as Meta
 

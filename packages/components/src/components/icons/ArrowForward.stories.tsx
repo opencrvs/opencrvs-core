@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ArrowForward } from './ArrowForward'
 
 export default {
-  title: 'Typography/Icon/ArrowForward',
+  title: 'Styles/Icon/ArrowForward',
   component: ArrowForward
 } as Meta
 

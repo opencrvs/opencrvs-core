@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ClearText } from './ClearText'
 
 export default {
-  title: 'Typography/Icon/ClearText',
+  title: 'Styles/Icon/ClearText',
   component: ClearText
 } as Meta
 

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { StatusPendingOffline } from '.'
 
 export default {
-  title: 'Typography/Icon/StatusPendingOffline',
+  title: 'Styles/Icon/StatusPendingOffline',
   component: StatusPendingOffline
 } as Meta
 

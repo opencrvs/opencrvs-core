@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { DeclarationsOrangeAmber } from './DeclarationsOrangeAmber'
 
 export default {
-  title: 'Typography/Icon/DeclarationsOrangeAmber',
+  title: 'Styles/Icon/DeclarationsOrangeAmber',
   component: DeclarationsOrangeAmber
 } as Meta
 

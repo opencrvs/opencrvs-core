@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Calendar } from './Calendar'
 
 export default {
-  title: 'Typography/Icon/Calendar',
+  title: 'Styles/Icon/Calendar',
   component: Calendar
 } as Meta
 

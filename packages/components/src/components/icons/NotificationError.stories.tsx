@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { NotificationError } from './NotificationError'
 
 export default {
-  title: 'Typography/Icon/NotificationError',
+  title: 'Styles/Icon/NotificationError',
   component: NotificationError
 } as Meta
 

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Offline } from '.'
 
 export default {
-  title: 'Typography/Icon/Offline',
+  title: 'Styles/Icon/Offline',
   component: Offline
 } as Meta
 

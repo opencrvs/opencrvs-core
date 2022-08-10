@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Duplicate } from './Duplicate'
 
 export default {
-  title: 'Typography/Icon/Duplicate',
+  title: 'Styles/Icon/Duplicate',
   component: Duplicate
 } as Meta
 

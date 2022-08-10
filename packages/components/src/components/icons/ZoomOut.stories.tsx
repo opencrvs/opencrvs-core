@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ZoomOut } from '.'
 
 export default {
-  title: 'Typography/Icon/ZoomOut',
+  title: 'Styles/Icon/ZoomOut',
   component: ZoomOut
 } as Meta
 

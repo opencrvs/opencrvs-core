@@ -14,7 +14,7 @@ import React from 'react'
 import { Expandable } from './Expandable'
 
 export default {
-  title: 'Typography/Icon/Expandable',
+  title: 'Styles/Icon/Expandable',
   component: Expandable
 } as Meta
 

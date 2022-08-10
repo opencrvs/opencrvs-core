@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { StatusWaiting } from '.'
 
 export default {
-  title: 'Typography/Icon/StatusWaiting',
+  title: 'Styles/Icon/StatusWaiting',
   component: StatusWaiting
 } as Meta
 

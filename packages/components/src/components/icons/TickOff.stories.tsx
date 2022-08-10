@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { TickOff } from '.'
 
 export default {
-  title: 'Typography/Icon/TickOff',
+  title: 'Styles/Icon/TickOff',
   component: TickOff
 } as Meta
 

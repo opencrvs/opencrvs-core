@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Delete } from './Delete'
 
 export default {
-  title: 'Typography/Icon/Delete',
+  title: 'Styles/Icon/Delete',
   component: Delete
 } as Meta
 

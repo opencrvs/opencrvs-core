@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { HeaderLogo } from './HeaderLogo'
 
 export default {
-  title: 'Typography/Icon/HeaderLogo',
+  title: 'Styles/Icon/HeaderLogo',
   component: HeaderLogo
 } as Meta
 

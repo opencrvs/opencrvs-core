@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { VerticalThreeDots } from '.'
 
 export default {
-  title: 'Typography/Icon/VerticalThreeDots',
+  title: 'Styles/Icon/VerticalThreeDots',
   component: VerticalThreeDots
 } as Meta
 

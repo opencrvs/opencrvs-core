@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { SystemBlue } from '.'
 
 export default {
-  title: 'Typography/Icon/SystemBlue',
+  title: 'Styles/Icon/SystemBlue',
   component: SystemBlue
 } as Meta
 

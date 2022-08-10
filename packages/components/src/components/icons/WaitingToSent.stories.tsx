@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { WaitingToSent } from './WaitingToSent'
 
 export default {
-  title: 'Typography/Icon/WaitingToSent',
+  title: 'Styles/Icon/WaitingToSent',
   component: WaitingToSent
 } as Meta
 

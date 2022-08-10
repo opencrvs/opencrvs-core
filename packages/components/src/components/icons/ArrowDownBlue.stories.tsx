@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ArrowDownBlue } from './ArrowDownBlue'
 
 export default {
-  title: 'Typography/Icon/ArrowDownBlue',
+  title: 'Styles/Icon/ArrowDownBlue',
   component: ArrowDownBlue
 } as Meta
 
