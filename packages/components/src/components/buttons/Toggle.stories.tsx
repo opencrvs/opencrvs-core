@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Toggle } from './Toggle'
 
 export default {
-  title: 'Form/Button/Toggle',
+  title: 'Form/Toggle',
   component: Toggle
 } as Meta
 

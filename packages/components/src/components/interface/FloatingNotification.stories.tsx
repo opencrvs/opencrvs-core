@@ -31,6 +31,6 @@ FloatingNotificationView.args = {
 }
 
 export default {
-  title: 'Components/Interface/FloatingNotification',
+  title: 'Data/FloatingNotification',
   component: FloatingNotification
 } as Meta

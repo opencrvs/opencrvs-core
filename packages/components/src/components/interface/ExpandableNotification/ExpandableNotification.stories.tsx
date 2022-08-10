@@ -14,7 +14,7 @@ import { ExpandableNotification } from './ExpandableNotification'
 import React from 'react'
 
 export default {
-  title: 'Components/Interface/ExpandableNotification/ExpandableNotification',
+  title: 'Data/ExpandableNotification',
   component: ExpandableNotification
 } as Meta
 

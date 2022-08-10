@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { TextArea } from './TextArea'
 
 export default {
-  title: 'Components/forms/TextArea',
+  title: 'Form/TextArea',
   component: TextArea
 } as Meta
 

@@ -18,7 +18,7 @@ import {
 import styled from 'styled-components'
 
 export default {
-  title: 'Components/Interface/FormConfigElementCard',
+  title: 'Data/FormConfigElementCard',
   component: FormConfigElementCard
 } as Meta
 

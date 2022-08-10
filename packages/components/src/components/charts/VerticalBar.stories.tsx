@@ -15,7 +15,7 @@ import { VerticalBar } from './VerticalBar'
 import { IDataPoint } from './datapoint'
 
 export default {
-  title: 'Components/Charts/VerticalBar',
+  title: 'Data/Charts/VerticalBar',
   component: VerticalBar
 } as Meta
 

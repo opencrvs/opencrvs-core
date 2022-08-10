@@ -16,7 +16,7 @@ import { IRightMenu } from './Desktop/DesktopHeader'
 import React from 'react'
 
 export default {
-  title: 'Components/Interface/Header/AppHeader',
+  title: 'Layout/Header/AppHeader',
   component: AppHeader
 } as Meta
 

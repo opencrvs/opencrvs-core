@@ -48,7 +48,7 @@ interface IProps {
 }
 
 export default {
-  title: 'Components/Interface/ExpandingMenu',
+  title: 'Layout/ExpandingMenu',
   component: ExpandingMenu,
   argTypes: {
     showMenu: {

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Select, ISelectProps } from './Select'
 
 export default {
-  title: 'Components/forms/Select',
+  title: 'Form/Select',
   component: Select
 } as Meta
 

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Link } from '.'
 
 export default {
-  title: 'Components/Typography/Link',
+  title: 'Typography/Link',
   component: Link
 } as Meta
 

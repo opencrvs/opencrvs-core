@@ -21,6 +21,6 @@ EventTopBarView.args = {
 }
 
 export default {
-  title: 'Components/Interface/EventTopBar',
+  title: 'Layout/EventTopBar',
   component: EventTopBar
 } as Meta

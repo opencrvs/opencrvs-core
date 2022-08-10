@@ -28,6 +28,6 @@ TopBarView.args = {
 }
 
 export default {
-  title: 'Components/Interface/TopBar',
+  title: 'Layout/TopBar',
   component: TopBar
 }

@@ -18,7 +18,7 @@ const Template: Story<{ label: string }> = (args) => {
 }
 
 export default {
-  title: 'Components/Interface/Warning',
+  title: 'Data/Warning',
   component: Warning
 } as Meta
 

@@ -26,6 +26,6 @@ ErrorNotificationView.args = {
 }
 
 export default {
-  title: 'Components/Interface/ErrorToastNotification',
+  title: 'Data/ErrorToastNotification',
   component: ErrorToastNotification
 } as Meta

@@ -24,6 +24,6 @@ LoaderView.args = {
 }
 
 export default {
-  title: 'Components/Interface/Loader',
+  title: 'Data/Loader',
   component: Loader
 } as Meta

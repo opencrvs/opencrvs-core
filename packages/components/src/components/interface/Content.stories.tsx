@@ -59,6 +59,6 @@ Default.args = {
 }
 
 export default {
-  title: 'Components/Interface/Content',
+  title: 'Layout/Content',
   component: Content
 } as Meta

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { VerifyingIndicator } from '.'
 
 export default {
-  title: 'Components/forms/VerifyingIndicator',
+  title: 'Form/VerifyingIndicator',
   component: VerifyingIndicator
 } as Meta
 

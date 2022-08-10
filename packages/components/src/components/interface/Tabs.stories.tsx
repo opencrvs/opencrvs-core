@@ -14,7 +14,7 @@ import { Tabs, Tab, IProps } from './Tabs'
 import React from 'react'
 
 export default {
-  title: 'Components/Interface/Tabs',
+  title: 'Data/Tabs',
   component: Tabs
 } as Meta
 

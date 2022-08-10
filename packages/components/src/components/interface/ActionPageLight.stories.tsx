@@ -36,6 +36,6 @@ ActionPageLightView.args = {
 }
 
 export default {
-  title: 'Components/Interface/ActionPageLight',
+  title: 'Layout/ActionPageLight',
   component: ActionPageLight
 } as Meta

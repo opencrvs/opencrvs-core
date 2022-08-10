@@ -15,7 +15,7 @@ import { TriLineChart } from './TriLineChart'
 import { ITheme } from '../theme'
 
 export default {
-  title: 'Components/Charts/TriLineChart',
+  title: 'Data/Charts/TriLineChart',
   component: TriLineChart
 } as Meta
 

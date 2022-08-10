@@ -14,7 +14,7 @@ import { PaginationModified, IPaginationProps } from './PaginationModified'
 import React from 'react'
 
 export default {
-  title: 'Components/Interface/DataTable/PaginationModified',
+  title: 'Data/PaginationModified',
   component: PaginationModified
 } as Meta
 

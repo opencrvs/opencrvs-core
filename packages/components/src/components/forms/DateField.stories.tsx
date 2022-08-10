@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { DateField, IProps } from './DateField'
 
 export default {
-  title: 'Components/forms/DateField',
+  title: 'Form/DateField',
   component: DateField
 } as Meta
 

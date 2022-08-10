@@ -64,6 +64,6 @@ groupSetting.args = {
 }
 
 export default {
-  title: 'Components/Interface/NavigationGroup',
+  title: 'Layout/NavigationGroup',
   component: NavigationGroup
 } as Meta

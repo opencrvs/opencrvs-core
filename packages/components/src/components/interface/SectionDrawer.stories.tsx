@@ -37,6 +37,6 @@ SectionDrawerView.args = {
   expansionButtonHandler: () => alert('Expansion clicked')
 }
 export default {
-  title: 'Components/Interface/SectionDrawer',
+  title: 'Data/SectionDrawer',
   component: SectionDrawer
 } as Meta
