@@ -28,7 +28,6 @@
     "infrastructure/configure-file-monitoring.sh",
     "packages/client/public/index.html",
     "packages/login/public/index.html",
-    "packages/components/.storybook/manager-head.html",
     "grafana"
   ],
   "license": "infrastructure/license-header.txt",

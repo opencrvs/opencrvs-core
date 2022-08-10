@@ -9,16 +9,28 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import type { StorybookConfig } from '@storybook/core-common'
 
-const config: StorybookConfig = {
+import { BRAND_BLUE } from './theme'
+
+const config = {
   stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
   addons: [
     '@storybook/addon-links',
     '@storybook/addon-essentials',
     '@storybook/preset-create-react-app'
   ],
-  framework: '@storybook/react'
+  framework: '@storybook/react',
+
+  managerHead: (head: string) => {
+    return `${head}
+    <link rel="icon" href="favicon.png" />
+    <style type="text/css">
+      #storybook-explorer-tree .sidebar-item[data-selected=false] svg {
+        color: ${BRAND_BLUE};
+      }
+    </style>
+    `
+  }
 }
 
 module.exports = config

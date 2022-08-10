@@ -11,7 +11,7 @@
  */
 import { create } from '@storybook/theming'
 
-const BRAND_BLUE = '#0058E0'
+export const BRAND_BLUE = '#0058E0'
 
 export default create({
   base: 'light',
