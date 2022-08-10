@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { AddUser } from './AddUser'
 
 export default {
-  title: 'Styles/Icon/AddUser',
+  title: 'Styles/Icons/AddUser',
   component: AddUser
 } as Meta
 

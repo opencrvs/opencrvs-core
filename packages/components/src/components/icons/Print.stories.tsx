@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Print } from '.'
 
 export default {
-  title: 'Styles/Icon/Print',
+  title: 'Styles/Icons/Print',
   component: Print
 } as Meta
 

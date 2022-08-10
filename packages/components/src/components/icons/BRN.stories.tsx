@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { BRN } from './BRN'
 
 export default {
-  title: 'Styles/Icon/BRN',
+  title: 'Styles/Icons/BRN',
   component: BRN
 } as Meta
 

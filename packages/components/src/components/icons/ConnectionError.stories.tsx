@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ConnectionError } from './ConnectionError'
 
 export default {
-  title: 'Styles/Icon/ConnectionError',
+  title: 'Styles/Icons/ConnectionError',
   component: ConnectionError
 } as Meta
 

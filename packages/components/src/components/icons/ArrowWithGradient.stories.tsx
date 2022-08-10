@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ArrowWithGradient } from './ArrowWithGradient'
 
 export default {
-  title: 'Styles/Icon/ArrowWithGradient',
+  title: 'Styles/Icons/ArrowWithGradient',
   component: ArrowWithGradient
 } as Meta
 

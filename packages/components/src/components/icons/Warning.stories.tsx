@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Warning } from '.'
 
 export default {
-  title: 'Styles/Icon/Warning',
+  title: 'Styles/Icons/Warning',
   component: Warning
 } as Meta
 

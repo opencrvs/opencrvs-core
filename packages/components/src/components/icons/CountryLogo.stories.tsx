@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { CountryLogo } from '.'
 
 export default {
-  title: 'Styles/Icon/CountryLogo',
+  title: 'Styles/Icons/CountryLogo',
   component: CountryLogo
 } as Meta
 

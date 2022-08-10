@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { DraftSimple } from './DraftSimple'
 
 export default {
-  title: 'Styles/Icon/DraftSimple',
+  title: 'Styles/Icons/DraftSimple',
   component: DraftSimple
 } as Meta
 

@@ -14,7 +14,7 @@ import React from 'react'
 import { EyeOff } from './EyeOff'
 
 export default {
-  title: 'Styles/Icon/EyeOff',
+  title: 'Styles/Icons/EyeOff',
   component: EyeOff
 } as Meta
 

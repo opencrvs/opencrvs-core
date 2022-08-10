@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Cross } from './Cross'
 
 export default {
-  title: 'Styles/Icon/Cross',
+  title: 'Styles/Icons/Cross',
   component: Cross
 } as Meta
 
