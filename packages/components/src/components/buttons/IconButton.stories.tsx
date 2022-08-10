@@ -16,7 +16,7 @@ import { IconButton, IButtonProps } from '.'
 const Template: Story<IButtonProps> = (args) => <IconButton {...args} />
 
 export default {
-  title: 'Components/Buttons/IconButton',
+  title: 'Form/Button/IconButton',
   component: IconButton,
   argTypes: {
     icon: {

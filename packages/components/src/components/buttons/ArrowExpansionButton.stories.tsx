@@ -19,7 +19,7 @@ const Template: Story<IExpansionButtonProps> = (args) => (
 )
 
 export default {
-  title: 'Components/Buttons/ArrowExpansionButton',
+  title: 'Form/Button/ArrowExpansionButton',
   component: ArrowExpansionButton
 } as Meta
 
