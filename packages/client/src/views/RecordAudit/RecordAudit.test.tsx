@@ -38,7 +38,11 @@ import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { checkAuth } from '@client/profile/profileActions'
 import { FETCH_DECLARATION_SHORT_INFO } from './queries'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { getCurrentUserWorkqueuSuccess, IWorkqueue } from '@client/workqueue'
+import {
+  getCurrentUserWorkqueuSuccess,
+  IWorkqueue,
+  workqueueInitialState
+} from '@client/workqueue'
 
 const declaration: IDeclaration = createDeclaration(
   Event.Birth,
@@ -71,6 +75,7 @@ declaration.data.history = [
 ]
 
 const workqueue: IWorkqueue = {
+  ...workqueueInitialState.workqueue,
   data: {
     inProgressTab: {},
     notificationTab: {},

@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export * from './reducer'
-export * from './actions'
-export * from './selectors'
+import { IStoreState } from '@client/store'
+
+export function selectWorkqueuePagination(store: IStoreState) {
+  return store.workqueueState.workqueue.pagination
+}

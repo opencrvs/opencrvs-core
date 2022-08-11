@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { LoopReducer, Loop, loop, Cmd } from 'redux-loop'
-import { IQueryData, EVENT_STATUS } from '@client/views/OfficeHome/utils'
 import { USER_DETAILS_AVAILABLE } from '@client/profile/profileActions'
 import { storage } from '@client/storage'
 import {
@@ -25,7 +24,10 @@ import { IStoreState } from '@client/store'
 import { getUserDetails, getScope } from '@client/profile/profileSelectors'
 import { IUserDetails, getUserLocation } from '@client/utils/userUtils'
 import { syncRegistrarWorkqueue } from '@client/ListSyncController'
-import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
+import {
+  GQLEventSearchSet,
+  GQLEventSearchResultSet
+} from '@opencrvs/gateway/src/graphql/schema'
 import {
   UpdateRegistrarWorkqueueAction,
   UPDATE_REGISTRAR_WORKQUEUE,
@@ -37,13 +39,34 @@ import {
   getCurrentUserWorkqueuSuccess,
   getCurrentUserWorkqueueFailed,
   GET_WORKQUEUE_SUCCESS,
-  UPDATE_REGISTRAR_WORKQUEUE_SUCCESS
+  UPDATE_REGISTRAR_WORKQUEUE_SUCCESS,
+  UPDATE_WORKQUEUE_PAGINATION
 } from './actions'
+
+export interface IQueryData {
+  inProgressTab: GQLEventSearchResultSet
+  notificationTab: GQLEventSearchResultSet
+  reviewTab: GQLEventSearchResultSet
+  rejectTab: GQLEventSearchResultSet
+  approvalTab: GQLEventSearchResultSet
+  printTab: GQLEventSearchResultSet
+  externalValidationTab: GQLEventSearchResultSet
+}
+
+export const EVENT_STATUS = {
+  IN_PROGRESS: 'IN_PROGRESS',
+  DECLARED: 'DECLARED',
+  VALIDATED: 'VALIDATED',
+  REGISTERED: 'REGISTERED',
+  REJECTED: 'REJECTED',
+  WAITING_VALIDATION: 'WAITING_VALIDATION'
+}
 
 export interface IWorkqueue {
   loading?: boolean
   error?: boolean
   data: IQueryData
+  pagination: Record<keyof IQueryData, number>
   initialSyncDone: boolean
 }
 
@@ -51,10 +74,19 @@ export interface WorkqueueState {
   workqueue: IWorkqueue
 }
 
-const workqueueInitialState: WorkqueueState = {
+export const workqueueInitialState: WorkqueueState = {
   workqueue: {
     loading: true,
     error: false,
+    pagination: {
+      inProgressTab: 1,
+      notificationTab: 1,
+      reviewTab: 1,
+      rejectTab: 1,
+      approvalTab: 1,
+      externalValidationTab: 1,
+      printTab: 1
+    },
     data: {
       inProgressTab: { totalItems: 0, results: [] },
       notificationTab: { totalItems: 0, results: [] },
@@ -84,28 +116,14 @@ interface IWorkqueuePaginationParams {
 export function updateRegistrarWorkqueue(
   userId?: string,
   pageSize = 10,
-  isFieldAgent = false,
-  inProgressSkip = 0,
-  healthSystemSkip = 0,
-  reviewSkip = 0,
-  rejectSkip = 0,
-  approvalSkip = 0,
-  externalValidationSkip = 0,
-  printSkip = 0
+  isFieldAgent = false
 ): UpdateRegistrarWorkqueueAction {
   return {
     type: UPDATE_REGISTRAR_WORKQUEUE,
     payload: {
       userId,
       pageSize,
-      isFieldAgent,
-      inProgressSkip,
-      healthSystemSkip,
-      reviewSkip,
-      rejectSkip,
-      approvalSkip,
-      externalValidationSkip,
-      printSkip
+      isFieldAgent
     }
   }
 }
@@ -233,6 +251,7 @@ async function getWorkqueueData(
   const currentWorkqueue = currentUserData?.workqueue
   if (result) {
     workqueue = {
+      ...(currentWorkqueue ?? workqueueInitialState.workqueue),
       loading: false,
       error: false,
       data: result,
@@ -240,6 +259,7 @@ async function getWorkqueueData(
     }
   } else {
     workqueue = {
+      ...(currentWorkqueue ?? workqueueInitialState.workqueue),
       loading: false,
       error: true,
       data:
@@ -304,6 +324,27 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
 ): WorkqueueState | Loop<WorkqueueState, WorkqueueActions> => {
   switch (action.type) {
     case UPDATE_REGISTRAR_WORKQUEUE:
+      const {
+        printTab,
+        reviewTab,
+        approvalTab,
+        inProgressTab,
+        externalValidationTab,
+        rejectTab,
+        notificationTab
+      } = state.workqueue.pagination
+
+      const paginationParams: IWorkqueuePaginationParams = {
+        ...action.payload,
+        inProgressSkip: Math.max(inProgressTab - 1, 0),
+        healthSystemSkip: Math.max(notificationTab - 1, 0),
+        reviewSkip: Math.max(reviewTab - 1, 0),
+        rejectSkip: Math.max(rejectTab - 1, 0),
+        approvalSkip: Math.max(approvalTab - 1, 0),
+        externalValidationSkip: Math.max(externalValidationTab - 1, 0),
+        printSkip: Math.max(printTab - 1, 0)
+      }
+
       return loop(
         {
           workqueue: {
@@ -314,7 +355,7 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
         Cmd.run(writeRegistrarWorkqueueByUser, {
           successActionCreator: updateRegistrarWorkqueueSuccessActionCreator,
           failActionCreator: updateRegistrarWorkqueueFailActionCreator,
-          args: [Cmd.getState, action.payload]
+          args: [Cmd.getState, paginationParams]
         })
       )
 
@@ -351,6 +392,18 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
         }
       }
       return state
+
+    case UPDATE_WORKQUEUE_PAGINATION:
+      return {
+        ...state,
+        workqueue: {
+          ...state.workqueue,
+          pagination: {
+            ...state.workqueue.pagination,
+            ...action.payload
+          }
+        }
+      }
 
     default:
       return state

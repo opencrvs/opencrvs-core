@@ -40,7 +40,6 @@ import {
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { IUserDetails } from '@client/utils/userUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import { IQueryData } from '@client/views/OfficeHome/utils'
 import {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
@@ -66,6 +65,7 @@ import { RefetchQueryDescription } from 'apollo-client/core/watchQueryOptions'
 import {
   UpdateRegistrarWorkqueueAction,
   updateRegistrarWorkqueue,
+  IQueryData,
   IWorkqueue
 } from '@client/workqueue'
 
