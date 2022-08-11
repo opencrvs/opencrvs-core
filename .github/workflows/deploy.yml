@@ -63,11 +63,9 @@ jobs:
           cd ../
       - name: Set CORE_VERSION from inputs
         if: ${{ github.event.inputs.core-image-tag }}
-        run: echo "CORE_VERSION=${{ github.event.inputs.core-image-tag }}" >> $GITHUB_ENV
-
-      - name: Get CORE_VERSION
-        if: ${{ !github.event.inputs.core-image-tag }}
-        run: echo "CORE_VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
+        run: |
+          echo "CORE_VERSION=${{ github.event.inputs.core-image-tag }}" >> $GITHUB_ENV
+          git checkout ${{ env.CORE_VERSION }}
 
       - name: Login to DockerHub
         uses: docker/login-action@v1
