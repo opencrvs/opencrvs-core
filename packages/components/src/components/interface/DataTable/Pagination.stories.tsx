@@ -14,7 +14,7 @@ import { Pagination, IPaginationCustomProps } from './Pagination'
 import React from 'react'
 
 export default {
-  title: 'Data/Pagination',
+  title: 'Controls/Pagination',
   component: Pagination
 } as Meta
 

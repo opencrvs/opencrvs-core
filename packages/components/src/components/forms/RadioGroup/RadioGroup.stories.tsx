@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { RadioGroup, IRadioGroupProps } from './RadioGroup'
 
 export default {
-  title: 'Form/RadioGroup',
+  title: 'Input/Radio/Radio group',
   component: RadioGroup
 } as Meta
 

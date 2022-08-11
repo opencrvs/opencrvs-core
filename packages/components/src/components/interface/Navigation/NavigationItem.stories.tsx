@@ -76,6 +76,6 @@ itemConfiguration.args = {
 }
 
 export default {
-  title: 'Layout/NavigationItem',
+  title: 'Layout/Side navigation/Side navigation item',
   component: NavigationItem
 }

@@ -82,7 +82,15 @@ export const parameters = {
   },
   options: {
     storySort: {
-      order: ['Welcome', 'Styles', 'Typography', 'Layout', 'Form', 'Data']
+      order: [
+        'Welcome',
+        'Styles',
+        'Typography',
+        'Layout',
+        'Controls',
+        'Input',
+        'Data'
+      ]
     }
   }
 }

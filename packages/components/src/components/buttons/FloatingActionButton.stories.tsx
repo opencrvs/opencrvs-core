@@ -14,7 +14,7 @@ import { FloatingActionButton, IButtonProps } from '.'
 import React from 'react'
 
 export default {
-  title: 'Form/Button/FloatingActionButton',
+  title: 'Controls/Button/Floating action button',
   component: FloatingActionButton
 } as Meta
 

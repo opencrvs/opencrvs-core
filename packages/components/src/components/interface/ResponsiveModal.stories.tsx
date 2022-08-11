@@ -48,6 +48,6 @@ ResponsiveModalView.args = {
   }
 }
 export default {
-  title: 'Layout/ResponsiveModal',
+  title: 'Layout/Dialog',
   component: ResponsiveModal
 } as Meta

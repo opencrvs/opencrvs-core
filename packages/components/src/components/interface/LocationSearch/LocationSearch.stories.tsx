@@ -14,7 +14,7 @@ import { LocationSearch, ISearchLocation } from './LocationSearch'
 import React from 'react'
 
 export default {
-  title: 'Form/LocationSearch',
+  title: 'Input/LocationSearch',
   component: LocationSearch
 } as Meta
 

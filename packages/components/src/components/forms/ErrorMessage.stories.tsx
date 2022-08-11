@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ErrorMessage } from './ErrorMessage'
 
 export default {
-  title: 'Form/ErrorMessage',
+  title: 'Input/ErrorMessage',
   component: ErrorMessage
 } as Meta
 

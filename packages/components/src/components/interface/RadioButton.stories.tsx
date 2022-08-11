@@ -14,7 +14,7 @@ import { RadioButton } from '.'
 import React from 'react'
 
 export default {
-  title: 'Form/RadioButton',
+  title: 'Input/Radio/Radio',
   component: RadioButton
 } as Meta
 

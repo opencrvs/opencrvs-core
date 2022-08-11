@@ -16,7 +16,7 @@ import { MinusTransparent, PlusTransparent } from '../icons'
 import { ColumnContentAlignment, IAction } from '../interface'
 
 export default {
-  title: 'Form/Button/ListItemAction',
+  title: 'Controls/Button/ListItemAction',
   component: ListItemAction
 } as Meta
 

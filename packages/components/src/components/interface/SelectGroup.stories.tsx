@@ -48,6 +48,6 @@ SelectGroupView.args = {
   ]
 }
 export default {
-  title: 'Form/SelectGroup (deprecated)',
+  title: 'Input/SelectGroup (deprecated)',
   component: SelectGroup
 } as Meta

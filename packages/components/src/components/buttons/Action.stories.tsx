@@ -17,7 +17,7 @@ import { Action, IActionProps } from './Action'
 const Template: Story<IActionProps> = (args) => <Action {...args} />
 
 export default {
-  title: 'Form/Button/Action',
+  title: 'Controls/Button/Action (deprecated)',
   component: Action
 } as Meta
 

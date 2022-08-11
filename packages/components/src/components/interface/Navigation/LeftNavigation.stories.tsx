@@ -31,6 +31,6 @@ leftNavigationView.args = {
 }
 
 export default {
-  title: 'Layout/Navigation',
+  title: 'Layout/Side navigation/Side navigation',
   component: LeftNavigation
 } as Meta

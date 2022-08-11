@@ -38,6 +38,6 @@ subItemBranding.args = {
 }
 
 export default {
-  title: 'Layout/NavigationSubItem',
+  title: 'Layout/Side navigation/Side navigation sub-item',
   component: NavigationSubItem
 } as Meta

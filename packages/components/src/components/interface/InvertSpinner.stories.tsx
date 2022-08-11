@@ -21,6 +21,6 @@ InvertSpinnerView.args = {
 }
 
 export default {
-  title: 'Form/InvertSpinner (deprecated)',
+  title: 'Input/InvertSpinner (deprecated)',
   component: InvertSpinner
 } as Meta
