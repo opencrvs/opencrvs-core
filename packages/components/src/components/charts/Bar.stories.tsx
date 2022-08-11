@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Bar, IBarChartProps } from './Bar'
 
 export default {
-  title: 'Data/Charts/Bar',
+  title: 'Data/Charts/Bar (deprecated)',
   component: Bar
 } as Meta
 

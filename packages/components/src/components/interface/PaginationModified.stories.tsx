@@ -14,7 +14,7 @@ import { PaginationModified, IPaginationProps } from './PaginationModified'
 import React from 'react'
 
 export default {
-  title: 'Data/Pagination',
+  title: 'Controls/Pagination',
   component: PaginationModified
 } as Meta
 
