@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { LogoutBlack } from '.'
 
 export default {
-  title: 'Components/icons/LogoutBlack',
+  title: 'Styles/Icons/LogoutBlack',
   component: LogoutBlack
 } as Meta
 

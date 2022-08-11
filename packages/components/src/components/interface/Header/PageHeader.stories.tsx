@@ -16,7 +16,7 @@ import React from 'react'
 import { CircleButton } from '../../buttons'
 
 export default {
-  title: 'Components/Interface/Header/PageHeader',
+  title: 'Layout/Header/PageHeader',
   component: PageHeader
 } as Meta
 

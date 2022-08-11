@@ -28,6 +28,6 @@ PINKeypadView.args = {
 }
 
 export default {
-  title: 'Components/Interface/PINKeypad',
+  title: 'Input/PIN entry',
   component: PINKeypad
 } as Meta

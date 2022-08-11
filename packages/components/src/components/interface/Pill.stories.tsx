@@ -30,7 +30,7 @@ const Template: Story<IPillProps> = (args) => {
 }
 
 export default {
-  title: 'Components/Interface/Pill',
+  title: 'Data/Pill',
   component: Pill
 } as Meta
 

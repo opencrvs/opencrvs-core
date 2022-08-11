@@ -26,7 +26,7 @@ interface ISearchToolProps {
 }
 
 export default {
-  title: 'Components/Interface/SearchTool',
+  title: 'Controls/Search',
   component: SearchTool
 }
 

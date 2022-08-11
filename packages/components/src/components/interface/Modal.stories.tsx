@@ -51,6 +51,6 @@ ModalView.args = {
 }
 
 export default {
-  title: 'Components/Interface/Modal',
+  title: 'Layout/Modal (deprecated)',
   component: Modal
 } as Meta

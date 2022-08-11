@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { FormattedNumberCurrency } from './FormattedNumberCurrency'
 
 export default {
-  title: 'Components/symbol/FormattedNumberCurrency',
+  title: 'Typography/Currency',
   component: FormattedNumberCurrency
 } as Meta
 

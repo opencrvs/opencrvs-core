@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Outbox } from '.'
 
 export default {
-  title: 'Components/icons/Outbox',
+  title: 'Styles/Icons/Outbox',
   component: Outbox
 } as Meta
 

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { SuccessSmall } from './SuccessSmall'
 
 export default {
-  title: 'Components/icons/SuccessSmall',
+  title: 'Styles/Icons/SuccessSmall',
   component: SuccessSmall
 } as Meta
 

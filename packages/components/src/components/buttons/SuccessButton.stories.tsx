@@ -18,7 +18,7 @@ const Template: Story<IButtonProps> = (args) => (
 )
 
 export default {
-  title: 'Components/Buttons/SuccessButton',
+  title: 'Controls/Button/SuccessButton',
   component: SuccessButton,
   argTypes: {
     icon: {

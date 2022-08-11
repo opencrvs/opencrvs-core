@@ -14,7 +14,7 @@ import React from 'react'
 import { ProgressBar } from './ProgressBar'
 
 export default {
-  title: 'Components/forms/ProgressBar',
+  title: 'Data/Charts/Horizontal bar',
   component: ProgressBar
 } as Meta
 
