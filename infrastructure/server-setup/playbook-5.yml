@@ -143,11 +143,25 @@
       script: ../cryptfs/mount.sh -p {{encrypt_passphrase}}
       when: st.stat.exists and encrypt_data
 
-    - name: 'Setup crontab to mount encrypted folder'
-      cron:
-        name: 'mount encrypted folder'
-        special_time: reboot
-        job: 'bash /opt/opencrvs/infrastructure/cryptfs/reboot.sh -pF {{encrypt_passphrase_file}} >> /var/log/cryptfs-reboot.log'
+    - name: Copy reboot.service systemd file
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/reboot.service
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+        content: |
+          [Unit]
+          Description=Mount encrypted dir
+
+          [Service]
+          ExecStart=bash /opt/opencrvs/infrastructure/cryptfs/reboot.sh -pF {{encrypt_passphrase_file}} >> /var/log/cryptfs-reboot.log 2>&1
+
+          [Install]
+          WantedBy=multi-user.target
+      when: st.stat.exists and encrypt_data
+
+    - name: 'Setup systemd to mount encrypted folder'
+      shell: systemctl daemon-reload && systemctl enable reboot.service
       when: st.stat.exists and encrypt_data
 
     # https://stackoverflow.com/a/24765946
