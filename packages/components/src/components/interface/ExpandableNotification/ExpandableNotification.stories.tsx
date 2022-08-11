@@ -14,7 +14,7 @@ import { ExpandableNotification } from './ExpandableNotification'
 import React from 'react'
 
 export default {
-  title: 'Data/ExpandableNotification',
+  title: 'Data/ExpandableNotification (deprecated)',
   component: ExpandableNotification
 } as Meta
 

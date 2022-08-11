@@ -15,7 +15,7 @@ import { ArrowForward } from '../icons'
 import { ImageUploader } from './ImageUploader'
 
 export default {
-  title: 'Input/ImageUploader',
+  title: 'Input/File upload',
   component: ImageUploader
 } as Meta
 

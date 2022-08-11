@@ -18,7 +18,7 @@ import { TextInput } from '../TextInput'
 import { InputField, IInputFieldProps } from './InputField'
 
 export default {
-  title: 'Input/InputField',
+  title: 'Input/Input field',
   component: InputField
 } as Meta
 

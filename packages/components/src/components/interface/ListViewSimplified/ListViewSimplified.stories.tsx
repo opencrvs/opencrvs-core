@@ -26,7 +26,7 @@ const Template: Story = ({ children, ...args }) => {
 }
 
 export default {
-  title: 'Data/ListViewSimplified',
+  title: 'Data/List',
   component: ListViewSimplified
 } as Meta
 

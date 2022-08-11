@@ -60,6 +60,6 @@ ToggleMenuView.args = {
 }
 
 export default {
-  title: 'Data/ToggleMenu',
+  title: 'Data/Profile menu',
   component: ToggleMenu
 } as Meta

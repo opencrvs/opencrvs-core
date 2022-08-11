@@ -15,7 +15,7 @@ import { PasswordInput, IPasswordInputProps } from './PasswordInput'
 import React from 'react'
 
 export default {
-  title: 'Input/PasswordInput',
+  title: 'Input/Password input',
   component: PasswordInput
 } as Meta
 

@@ -26,6 +26,6 @@ ErrorNotificationView.args = {
 }
 
 export default {
-  title: 'Data/ErrorToastNotification',
+  title: 'Data/Toast/Error with retry',
   component: ErrorToastNotification
 } as Meta

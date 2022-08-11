@@ -22,7 +22,7 @@ interface IProps {
 }
 
 export default {
-  title: 'Data/ViewData/DataSection',
+  title: 'Data/ViewData (deprecated)/DataSection',
   component: DataSection
 } as Meta
 
