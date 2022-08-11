@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { DisabledArrow } from './DisabledArrow'
 
 export default {
-  title: 'Components/icons/DisabledArrow',
+  title: 'Styles/Icons/DisabledArrow',
   component: DisabledArrow
 } as Meta
 

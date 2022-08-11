@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { RotateLeft } from '.'
 
 export default {
-  title: 'Components/icons/RotateLeft',
+  title: 'Styles/Icons/RotateLeft',
   component: RotateLeft
 } as Meta
 

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Error } from './Error'
 
 export default {
-  title: 'Components/icons/Error',
+  title: 'Styles/Icons/Error',
   component: Error
 } as Meta
 

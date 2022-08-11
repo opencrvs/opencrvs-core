@@ -28,6 +28,6 @@ BannerView.args = {
 }
 
 export default {
-  title: 'Components/Interface/Banner',
+  title: 'Layout/Banner (deprecated)',
   component: Banner
 } as Meta

@@ -36,6 +36,6 @@ ActionPageView.args = {
 }
 
 export default {
-  title: 'Components/Interface/ActionPage',
+  title: 'Layout/Action page (deprecated)',
   component: ActionPage
 } as Meta

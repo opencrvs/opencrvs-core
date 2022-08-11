@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Archive } from './Archive'
 
 export default {
-  title: 'Components/icons/Archive',
+  title: 'Styles/Icons/Archive',
   component: Archive
 } as Meta
 

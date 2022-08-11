@@ -26,10 +26,11 @@ const Template: Story<ILeftNavigationProps> = (args) => (
 export const leftNavigationView = Template.bind({})
 
 leftNavigationView.args = {
-  applicationName: 'Bangladesh CRVS'
+  applicationName: 'Bangladesh CRVS',
+  navigationWidth: 300
 }
 
 export default {
-  title: 'Components/Interface/Navigation',
+  title: 'Layout/Side navigation/Side navigation',
   component: LeftNavigation
 } as Meta

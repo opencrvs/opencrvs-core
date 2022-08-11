@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { AvatarLarge } from './AvatarLarge'
 
 export default {
-  title: 'Components/icons/AvatarLarge',
+  title: 'Styles/Icons/AvatarLarge',
   component: AvatarLarge
 } as Meta
 

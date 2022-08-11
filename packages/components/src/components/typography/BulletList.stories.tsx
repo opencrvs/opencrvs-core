@@ -19,7 +19,7 @@ interface IProps {
 }
 
 export default {
-  title: 'Components/typography/BulletList',
+  title: 'Typography/Bullet list',
   component: BulletList
 } as Meta
 

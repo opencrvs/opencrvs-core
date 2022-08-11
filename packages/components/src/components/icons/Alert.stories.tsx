@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { Alert } from './Alert'
 
 export default {
-  title: 'Components/icons/Alert',
+  title: 'Styles/Icons/Alert',
   component: Alert
 } as Meta
 

@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { SettingsNavigation } from './SettingsNavigation'
 
 export default {
-  title: 'Components/icons/SettingsNavigation',
+  title: 'Styles/Icons/SettingsNavigation',
   component: SettingsNavigation
 } as Meta
 

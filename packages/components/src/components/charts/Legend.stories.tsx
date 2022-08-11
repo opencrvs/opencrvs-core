@@ -15,7 +15,7 @@ import { MinusTransparent, PlusTransparent } from '../icons'
 import { Legend, ILegendProps } from './Legend'
 
 export default {
-  title: 'Components/Charts/Legend',
+  title: 'Data/Charts/Legend (deprecated)',
   component: Legend
 } as Meta
 

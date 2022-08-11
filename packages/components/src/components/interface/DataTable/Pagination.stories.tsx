@@ -14,7 +14,7 @@ import { Pagination, IPaginationCustomProps } from './Pagination'
 import React from 'react'
 
 export default {
-  title: 'Components/Interface/DataTable/Pagination',
+  title: 'Controls/Pagination (deprecated)',
   component: Pagination
 } as Meta
 

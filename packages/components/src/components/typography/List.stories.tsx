@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { List, IListProps } from '.'
 
 export default {
-  title: 'Components/Typography/List',
+  title: 'Typography/Number list',
   component: List
 } as Meta
 

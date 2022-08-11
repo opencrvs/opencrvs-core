@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ThreeDots } from '.'
 
 export default {
-  title: 'Components/icons/ThreeDots',
+  title: 'Styles/Icons/ThreeDots',
   component: ThreeDots
 } as Meta
 

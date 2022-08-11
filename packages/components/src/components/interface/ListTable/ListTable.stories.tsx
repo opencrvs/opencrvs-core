@@ -16,7 +16,7 @@ import { ArrowDownBlue } from '../../icons'
 import React from 'react'
 
 export default {
-  title: 'Components/Interface/ListTable',
+  title: 'Data/Table',
   component: ListTable
 } as Meta
 

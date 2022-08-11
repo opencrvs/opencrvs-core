@@ -21,6 +21,6 @@ BoxView.args = {
 }
 
 export default {
-  title: 'Components/Interface/Box',
+  title: 'Layout/Box',
   component: Box
 } as Meta

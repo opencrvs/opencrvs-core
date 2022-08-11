@@ -22,7 +22,7 @@ import React from 'react'
 import { IDynamicValues } from 'src/components/common-types'
 
 export default {
-  title: 'Components/Interface/DataTable/DataTable',
+  title: 'Data/DataTable (deprecated)',
   component: DataTable
 } as Meta
 
