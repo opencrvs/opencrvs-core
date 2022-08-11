@@ -12,5 +12,5 @@
 import { IStoreState } from '@client/store'
 
 export function selectWorkqueuePagination(store: IStoreState) {
-  return store.workqueueState.workqueue.pagination
+  return store.workqueueState.pagination
 }

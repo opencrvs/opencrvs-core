@@ -66,27 +66,18 @@ export interface IWorkqueue {
   loading?: boolean
   error?: boolean
   data: IQueryData
-  pagination: Record<keyof IQueryData, number>
   initialSyncDone: boolean
 }
 
 export interface WorkqueueState {
   workqueue: IWorkqueue
+  pagination: Record<keyof IQueryData, number>
 }
 
 export const workqueueInitialState: WorkqueueState = {
   workqueue: {
     loading: true,
     error: false,
-    pagination: {
-      inProgressTab: 1,
-      notificationTab: 1,
-      reviewTab: 1,
-      rejectTab: 1,
-      approvalTab: 1,
-      externalValidationTab: 1,
-      printTab: 1
-    },
     data: {
       inProgressTab: { totalItems: 0, results: [] },
       notificationTab: { totalItems: 0, results: [] },
@@ -97,6 +88,15 @@ export const workqueueInitialState: WorkqueueState = {
       externalValidationTab: { totalItems: 0, results: [] }
     },
     initialSyncDone: false
+  },
+  pagination: {
+    inProgressTab: 1,
+    notificationTab: 1,
+    reviewTab: 1,
+    rejectTab: 1,
+    approvalTab: 1,
+    externalValidationTab: 1,
+    printTab: 1
   }
 }
 
@@ -332,7 +332,7 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
         externalValidationTab,
         rejectTab,
         notificationTab
-      } = state.workqueue.pagination
+      } = state.pagination
 
       const paginationParams: IWorkqueuePaginationParams = {
         ...action.payload,
@@ -347,6 +347,7 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
 
       return loop(
         {
+          ...state,
           workqueue: {
             ...state.workqueue,
             loading: true
@@ -378,6 +379,7 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
       if (action.payload) {
         const workqueue = JSON.parse(action.payload) as IWorkqueue
         return {
+          ...state,
           workqueue
         }
       }
@@ -388,6 +390,7 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
         const workqueue = JSON.parse(action.payload) as IWorkqueue
 
         return {
+          ...state,
           workqueue
         }
       }
@@ -396,12 +399,9 @@ export const workqueueReducer: LoopReducer<WorkqueueState, WorkqueueActions> = (
     case UPDATE_WORKQUEUE_PAGINATION:
       return {
         ...state,
-        workqueue: {
-          ...state.workqueue,
-          pagination: {
-            ...state.workqueue.pagination,
-            ...action.payload
-          }
+        pagination: {
+          ...state.pagination,
+          ...action.payload
         }
       }
 
