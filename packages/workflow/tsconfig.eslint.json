@@ -11,6 +11,6 @@
     "build",
     "scripts",
     "acceptance-tests",
-    "src/setupTests.ts",
+    "src/setupTests.ts"
   ]
 }

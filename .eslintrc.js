@@ -18,7 +18,6 @@ module.exports = {
     'plugin:import/typescript',
     'prettier'
   ],
-  ignorePatterns: ['data/*', 'packages/workflow', '*.d.ts'],
   plugins: ['@typescript-eslint', 'import'],
   env: {
     es6: true,
