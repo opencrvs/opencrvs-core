@@ -17,12 +17,15 @@ import { noop } from 'lodash'
 import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
 import { authApi } from './utils/authApi'
+// eslint-disable-next-line import/no-unassigned-import
 import 'core-js/features/array/flat'
+// eslint-disable-next-line import/no-unassigned-import
 import 'jsdom-worker'
 import { roleQueries } from './forms/user/query/queries'
 import { userQueries } from './user/queries'
 import debounce from 'lodash/debounce'
 import { mockOfflineData } from './tests/mock-offline-data'
+// eslint-disable-next-line import/no-unassigned-import
 import './tests/queryMock'
 
 if (process.env.CI) {

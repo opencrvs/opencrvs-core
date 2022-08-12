@@ -10,16 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 module.exports = {
-  extends: [
-    'eslint-config-react-app',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:prettier/recommended',
-    'plugin:import/errors',
-    'plugin:import/warnings',
-    'plugin:import/typescript',
-    'prettier'
-  ],
-  plugins: ['react', '@typescript-eslint', 'import'],
+  root: true,
+  extends: ['../../.eslintrc.js', 'eslint-config-react-app'],
+  plugins: ['react'],
   env: {
     es6: true,
     browser: true,
@@ -27,48 +20,6 @@ module.exports = {
     jest: true
   },
   rules: {
-    'prettier/prettier': [
-      'error',
-      {
-        printWidth: 80,
-        singleQuote: true,
-        useTabs: false,
-        tabWidth: 2,
-        trailingComma: 'none',
-        semi: false
-      }
-    ],
-    'no-console': 'off',
-    'no-return-assign': 'off',
-    'no-unreachable': 2,
-    'import/no-extraneous-dependencies': 'off',
-    'import/no-unresolved': 'off',
-    'import/prefer-default-export': 'off',
-    'import/no-named-as-default': 'off',
-    'import/no-relative-parent-imports': 2,
-    'import/named': 0,
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/no-non-null-assertion': 'off',
-    '@typescript-eslint/no-unused-vars': 'off',
-    '@typescript-eslint/no-empty-interface': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/explicit-member-accessibility': 'off',
-    '@typescript-eslint/interface-name-prefix': 'off',
-    '@typescript-eslint/prefer-interface': 'off',
-    '@typescript-eslint/array-type': 'off',
-    '@typescript-eslint/no-object-literal-type-assertion': 'off',
-    '@typescript-eslint/ban-types': [
-      'error',
-      {
-        types: {
-          '{}': false
-        },
-        extendDefaults: true
-      }
-    ],
-    '@typescript-eslint/ban-ts-comment': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-empty-function': 'off',
     'react/no-unescaped-entities': 'off',
     'react/destructuring-assignment': 'off',
     'react/jsx-filename-extension': [
