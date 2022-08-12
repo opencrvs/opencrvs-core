@@ -491,13 +491,13 @@ describe('User list tests', () => {
         })
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-1-menuToggleButton'
+          '#user-item-2-menuToggleButton'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
-          '#user-item-1-menuItem1'
+          '#user-item-2-menuItem1'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Resend SMS invite')
         menuOptionButton.hostNodes().simulate('click')
@@ -512,13 +512,13 @@ describe('User list tests', () => {
         )
         const toggleButtonElement = await waitForElement(
           component,
-          '#user-item-1-menuToggleButton'
+          '#user-item-2-menuToggleButton'
         )
 
         toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
-          '#user-item-1-menuItem1'
+          '#user-item-2-menuItem1'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Resend SMS invite')
         menuOptionButton.hostNodes().simulate('click')
@@ -536,7 +536,7 @@ describe('User list tests', () => {
         toggleButtonElement.hostNodes().first().simulate('click')
         const menuOptionButton = await waitForElement(
           component,
-          '#user-item-1-menuItem2'
+          '#user-item-1-menuItem1'
         )
         expect(menuOptionButton.hostNodes().text()).toBe('Deactivate')
         menuOptionButton.first().simulate('click')
