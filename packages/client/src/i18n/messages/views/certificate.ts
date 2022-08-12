@@ -77,6 +77,7 @@ interface ICertificateMessages
   noAffidavitModalDescription: MessageDescriptor
   signedAffidavitFileLabel: MessageDescriptor
   printedOnCollection: MessageDescriptor
+  printedOnAdvance: MessageDescriptor
   collectorIDCheck: MessageDescriptor
 }
 
@@ -422,11 +423,16 @@ const messagesToDefine: ICertificateMessages = {
     description: 'Table column header showing collector info in record audit',
     id: 'record.certificate.collector'
   },
+  printedOnAdvance: {
+    defaultMessage: 'Printed in advance by',
+    description: 'Table column header showing collector info in record audit',
+    id: 'record.certificate.collectedInAdvance'
+  },
   collectorIDCheck: {
     defaultMessage: 'ID Check',
     description:
       'Table column header showing collector ID verification info in record audit',
-    id: 'record.certificate.collector'
+    id: 'correction.summary.idCheck'
   }
 }
 
