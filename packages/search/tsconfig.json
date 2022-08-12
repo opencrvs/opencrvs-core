@@ -2,7 +2,9 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "baseUrl": "./src",
-    "paths": { "@search/*": ["./*"] },
+    "paths": {
+      "@search/*": ["./*"]
+    },
     "target": "es6",
     "module": "commonjs",
     "outDir": "build/dist",
@@ -30,7 +32,6 @@
     "build",
     "scripts",
     "acceptance-tests",
-    "src/setupTests.ts",
-    "src/**/*.test.ts"
+    "src/setupTests.ts"
   ]
 }
