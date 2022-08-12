@@ -19,7 +19,9 @@ import { logger } from '@gateway/logger'
 export const getPlugins = () => {
   const plugins: any[] = []
 
-  Sentry.init({ dsn: SENTRY_DSN, environment: process.env.NODE_ENV })
+  if (SENTRY_DSN) {
+    Sentry.init({ dsn: SENTRY_DSN, environment: process.env.NODE_ENV })
+  }
 
   plugins.push(JWT, {
     plugin: Pino,
