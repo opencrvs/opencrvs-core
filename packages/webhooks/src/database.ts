@@ -25,7 +25,8 @@ db.on('connected', () => {
 })
 
 // tslint:disable-next-line
-const wait = (time: number) => new Promise(resolve => setTimeout(resolve, time))
+const wait = (time: number) =>
+  new Promise((resolve) => setTimeout(resolve, time))
 
 let redisConnection: IORedis.Redis
 
@@ -37,7 +38,7 @@ const connect = async (): Promise<void> => {
   try {
     redisConnection = new IORedis(REDIS_HOST)
 
-    redisConnection.on('error', error => {
+    redisConnection.on('error', (error) => {
       logger.error('Redis connection error', error)
     })
 
