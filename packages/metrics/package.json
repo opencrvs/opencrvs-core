@@ -10,7 +10,7 @@
     "test": "yarn test:compilation && jest --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "lint": "tslint --project ./tsconfig.json",
+    "lint": "eslint -c .eslintrc.js --ext .ts --fix ./src",
     "precommit": "yarn lint && lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",

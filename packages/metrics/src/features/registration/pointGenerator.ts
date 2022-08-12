@@ -544,7 +544,7 @@ export async function generateDeclarationStartedPoint(
     throw new Error('Task not found')
   }
 
-  let role: string = ''
+  let role = ''
 
   if (status === Events.IN_PROGRESS_DEC) {
     isNotification(composition)

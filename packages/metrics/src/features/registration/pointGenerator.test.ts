@@ -447,7 +447,9 @@ describe('Verify point generation', () => {
     })
   })
   it('returns rejected point', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const payload = require('./test-data/rejected.json')
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const taskHistory = require('./test-data/task-history.json')
 
     fetchTaskHistory.mockResolvedValueOnce(taskHistory)

@@ -766,9 +766,9 @@ export async function fetchLocationWiseEventEstimations(
     GROUP BY gender`
   )
 
-  let totalRegistrationInTargetDay: number = 0
-  let totalMaleRegistrationInTargetDay: number = 0
-  let totalFemaleRegistrationInTargetDay: number = 0
+  let totalRegistrationInTargetDay = 0
+  let totalMaleRegistrationInTargetDay = 0
+  let totalFemaleRegistrationInTargetDay = 0
   registrationsInTargetDaysPoints.forEach((point) => {
     totalRegistrationInTargetDay += point.total
     if (point.gender === 'male') {
