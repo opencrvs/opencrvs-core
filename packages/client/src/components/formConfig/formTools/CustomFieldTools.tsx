@@ -107,7 +107,7 @@ const ListRow = styled.div`
 
 const LanguageSelect = styled(Select)`
   width: 175px;
-  border: solid 2px ${({ theme }) => theme.colors.indigoDark};
+  border: solid 2px ${({ theme }) => theme.colors.primaryDark};
   border-radius: 2px;
   .react-select__control {
     max-height: 32px;
@@ -118,7 +118,7 @@ const LanguageSelect = styled(Select)`
   }
   div {
     ${({ theme }) => theme.fonts.reg14};
-    color: ${({ theme }) => theme.colors.indigoDark};
+    color: ${({ theme }) => theme.colors.primaryDark};
   }
 `
 

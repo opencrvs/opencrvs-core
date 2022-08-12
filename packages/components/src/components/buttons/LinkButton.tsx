@@ -32,13 +32,13 @@ export const LinkButton = styled(Button)<{
   }
 
   &:active {
-    color: ${({ theme }) => theme.colors.indigoDark};
+    color: ${({ theme }) => theme.colors.primaryDark};
     text-decoration-line: underline;
     text-underline-offset: 4px;
   }
 
   &:hover {
-    color: ${({ theme }) => theme.colors.indigoDark};
+    color: ${({ theme }) => theme.colors.primaryDark};
     text-decoration-line: underline;
     text-underline-offset: 4px;
   }

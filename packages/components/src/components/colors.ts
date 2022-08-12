@@ -10,7 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-export const colors = {
+import darken from 'polished/lib/color/darken'
+
+const config = {
   // Pallete
   primary: '#4972BB', // indigo
   secondary: '#4A8AD7', // blue
@@ -23,11 +25,6 @@ export const colors = {
   blue: '#4A8AD7', // certified
   teal: '#4CC1BA', // charts
   yellow: '#EDC55E', // focus state
-
-  // Darks
-  indigoDark: '#42639C',
-  redDark: '#994040',
-  greenDark: '#409977',
 
   // Lights
   tealLight: '#D3EEE4',
@@ -66,4 +63,15 @@ export const gradients = {
 export const shadows = {
   light: 'box-shadow: 0px 2px 6px rgba(53, 67, 93, 0.32)',
   heavy: 'box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54)'
+}
+
+/**
+ * Color palette with auto-generated light / dark colors from color configuration
+ */
+export const colors = {
+  ...config,
+
+  primaryDark: darken(0.075)(config.primary),
+  positiveDark: darken(0.075)(config.positive),
+  negativeDark: darken(0.075)(config.negative)
 }

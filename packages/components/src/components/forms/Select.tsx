@@ -105,7 +105,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     background-color: ${({ theme }) => theme.colors.primary};
     color: ${({ theme }) => theme.colors.white};
     &:active {
-      background: ${({ theme }) => theme.colors.indigoDark};
+      background: ${({ theme }) => theme.colors.primaryDark};
       color: ${({ theme }) => theme.colors.white};
     }
   }
