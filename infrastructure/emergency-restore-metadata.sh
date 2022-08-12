@@ -116,17 +116,22 @@ docker run --rm --network=$NETWORK appropriate/curl curl -X POST 'http://influxd
 # Restore all data from a backup into Hearth, OpenHIM, User, Application-config and any other service related Mongo databases
 #--------------------------------------------------------------------------------------------------
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/hearth-dev-$1.gz"
+ -c "mongorestore $(mongo_credentials) --host $HOST --drop --gzip --archive=/data/backups/mongo/hearth-dev-$1.gz"
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/openhim-dev-$1.gz"
+ -c "mongorestore $(mongo_credentials) --host $HOST --drop --gzip --archive=/data/backups/mongo/openhim-dev-$1.gz"
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/user-mgnt-$1.gz"
+ -c "mongorestore $(mongo_credentials) --host $HOST --drop --gzip --archive=/data/backups/mongo/user-mgnt-$1.gz"
 docker run --rm -v /data/backups/mongo:/data/backups/mongo --network=$NETWORK mongo:4.4 bash \
- -c "mongorestore --host $HOST --drop --gzip --archive=/data/backups/mongo/application-config-$1.gz"
+ -c "mongorestore $(mongo_credentials) --host $HOST --drop --gzip --archive=/data/backups/mongo/application-config-$1.gz"
+
+# Register backup folder as an Elasticsearch repository for restoring the search data
+#-------------------------------------------------------------------------------------
+docker run --rm --network=$NETWORK appropriate/curl curl -XPUT -H "Content-Type: application/json;charset=UTF-8" "http://$(elasticsearch_host)/_snapshot/ocrvs" -d '{ "type": "fs", "settings": { "location": "/data/backups/elasticsearch", "compress": true }}'
 
 # Restore all data from a backup into search
 #-------------------------------------------
-docker run --rm --network=$NETWORK appropriate/curl curl -X POST "http://$(elasticsearch_host)/_snapshot/ocrvs/snapshot_$1/_restore?pretty"
+
+docker run --rm --network=$NETWORK appropriate/curl curl -X POST "http://$(elasticsearch_host)/_snapshot/ocrvs/snapshot_$1/_restore?pretty" -H 'Content-Type: application/json' -d '{ "indices": "ocrvs" }'
 
 # Get the container ID and host details of any running InfluxDB container, as the only way to restore is by using the Influxd CLI inside a running opencrvs_metrics container
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
