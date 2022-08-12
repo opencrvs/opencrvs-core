@@ -9,67 +9,181 @@ Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 graphic logo are (registered/a) trademark(s) of Plan International.-->
 
 import { Meta, ColorPalette, ColorItem } from '@storybook/addon-docs'
-import { colors } from '@opencrvs/components/lib/colors'
+import { colors, shadows, gradients } from '@opencrvs/components/lib/colors'
+import { Box } from '@opencrvs/components/lib/interface/Box'
+import styled from 'styled-components'
+
+export const LightShadowBox = styled.div`
+  border: 1px solid ${colors.grey300};
+  padding: 16px;
+  ${shadows.light}
+`
+
+export const HeavyShadowBox = styled.div`
+  border: 1px solid ${colors.grey300};
+  padding: 16px;
+  ${shadows.heavy}
+`
 
 <Meta title="Styles/Colors" />
 
-<h1>Colors</h1>
+# Colors
 
-<h2>Palette</h2>
+## Palette
+
 <ColorPalette>
   <ColorItem
-    title="colors.greyscale"
-    subtitle="Greyscale"
-    colors={{
-      White: colors.white,
-      Grey100: colors.grey100,
-      Grey200: colors.grey200,
-      Grey300: colors.grey300,
-      Grey400: colors.grey400,
-      Grey500: colors.grey500,
-      Grey600: colors.grey600
-    }}
-  />
-  <ColorItem
     title="colors.primary"
-    subtitle="Indigo"
-    colors={{ Primary: colors.primary, 'Primary Dark': colors.primaryDark }}
+    subtitle="Primary"
+    colors={{ primary: colors.primary, primaryDark: colors.primaryDark }}
   />
   <ColorItem
     title="colors.secondary"
-    subtitle="Blue"
-    colors={{ Secondary: colors.secondary }}
+    subtitle="Secondary"
+    colors={{ secondary: colors.secondary }}
   />
   <ColorItem
     title="colors.tertiary"
     subtitle="Grey"
-    colors={{ Tertiary: colors.tertiary }}
+    colors={{ tertiary: colors.tertiary }}
   />
-</ColorPalette>
-
-<h2>Status</h2>
-<ColorPalette>
+  <ColorItem
+    title="colors.purple"
+    subtitle="Purple"
+    colors={{ purple: colors.purple }}
+  />
+  <ColorItem
+    title="colors.orange"
+    subtitle="Orange"
+    colors={{ orange: colors.orange }}
+  />
+  <ColorItem title="colors.red" subtitle="Red" colors={{ red: colors.red }} />
+  <ColorItem
+    title="colors.green"
+    subtitle="Green"
+    colors={{ green: colors.green }}
+  />
+  <ColorItem
+    title="colors.blue"
+    subtitle="Blue"
+    colors={{ blue: colors.blue }}
+  />
+  <ColorItem
+    title="colors.teal"
+    subtitle="Teal"
+    colors={{ teal: colors.teal, tealLight: colors.tealLight }}
+  />
+  <ColorItem
+    title="colors.yellow"
+    subtitle="Yellow"
+    colors={{ yellow: colors.yellow }}
+  />
+  <ColorItem
+    title="colors.grey"
+    subtitle="Monochrome"
+    colors={{
+      white: colors.white,
+      grey100: colors.grey100,
+      grey200: colors.grey200,
+      grey300: colors.grey300,
+      grey400: colors.grey400,
+      grey500: colors.grey500,
+      grey600: colors.grey600
+    }}
+  />
   <ColorItem
     title="colors.positive"
     subtitle="Status Green"
     colors={{
-      Positive: colors.positive,
-      'Positive Dark': colors.positiveDark
+      positive: colors.positive,
+      positiveDark: colors.positiveDark
     }}
   />
   <ColorItem
     title="colors.neutral"
     subtitle="Status Orange"
     colors={{
-      Neutral: colors.neutral
+      neutral: colors.neutral
     }}
   />
   <ColorItem
     title="colors.negative"
     subtitle="Status Red"
     colors={{
-      Negative: colors.negative,
-      'Negative Dark': colors.negativeDark
+      negative: colors.negative,
+      negativeDark: colors.negativeDark
+    }}
+  />
+  <ColorItem
+    title="colors.opacity"
+    subtitle="Translucent"
+    colors={{
+      opacity24: colors.opacity24,
+      opacity54: colors.opacity54
+    }}
+  />
+  <ColorItem
+    title="colors.opacity"
+    subtitle="Translucent"
+    colors={{
+      opacity24: colors.opacity24,
+      opacity54: colors.opacity54
+    }}
+  />
+  <ColorItem
+    title="colors.copy"
+    subtitle="Copy"
+    colors={{
+      copy: colors.copy
+    }}
+  />
+  <ColorItem
+    title="colors.supportingCopy"
+    subtitle="Supporting copy"
+    colors={{
+      supportingCopy: colors.supportingCopy
+    }}
+  />
+  <ColorItem
+    title="colors.placeholderCopy"
+    subtitle="Placeholder copy"
+    colors={{
+      placeholderCopy: colors.placeholderCopy
+    }}
+  />
+  <ColorItem
+    title="colors.disabled"
+    subtitle="Disabled"
+    colors={{
+      disabled: colors.disabled
+    }}
+  />
+  <ColorItem
+    title="colors.background"
+    subtitle="Background"
+    colors={{
+      background: colors.background
+    }}
+  />
+  <ColorItem
+    title="colors.backgroundPrimary"
+    subtitle="Background with primary color"
+    colors={{
+      backgroundPrimary: colors.backgroundPrimary
     }}
   />
 </ColorPalette>
+
+## Gradient
+
+? do we wanna include gradient here
+
+## Shadows
+
+**Light**
+
+<LightShadowBox />
+
+**Heavy**
+
+<HeavyShadowBox />

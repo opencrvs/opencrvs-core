@@ -1,0 +1,104 @@
+<!--This Source Code Form is subject to the terms of the Mozilla Public
+License, v. 2.0. If a copy of the MPL was not distributed with this
+file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+OpenCRVS is also distributed under the terms of the Civil Registration
+& Healthcare Disclaimer located at http://opencrvs.org/license.
+
+Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+graphic logo are (registered/a) trademark(s) of Plan International.-->
+
+import { Meta, ColorPalette, ColorItem } from '@storybook/addon-docs'
+import styled from 'styled-components'
+import { getTheme } from '@opencrvs/components/lib/theme'
+
+export const theme = getTheme()
+
+export const H1 = styled.span`
+  ${theme.fonts.h1}
+`
+
+export const H2 = styled.span`
+  ${theme.fonts.h2}
+`
+
+export const H3 = styled.span`
+  ${theme.fonts.h3}
+`
+
+export const H4 = styled.span`
+  ${theme.fonts.h4}
+`
+
+export const Bold18 = styled.span`
+  ${theme.fonts.bold18}
+`
+
+export const Bold16 = styled.span`
+  ${theme.fonts.bold16}
+`
+
+export const Bold14 = styled.span`
+  ${theme.fonts.bold14}
+`
+
+export const Bold12 = styled.span`
+  ${theme.fonts.bold12}
+`
+
+export const Reg18 = styled.span`
+  ${theme.fonts.reg18}
+`
+
+export const Reg16 = styled.span`
+  ${theme.fonts.reg16}
+`
+
+export const Reg14 = styled.span`
+  ${theme.fonts.reg14}
+`
+
+export const Reg12 = styled.span`
+  ${theme.fonts.reg12}
+`
+
+<Meta title="Styles/Typography" />
+
+# Typography
+
+**Font:** Noto Sans
+
+**Weights:** 400 (regular), 600 (semibold)
+
+<br />
+
+## Headings
+
+| Font&nbsp;style | Example                                                                                                     |
+| --------------- | ----------------------------------------------------------------------------------------------------------- |
+| h1              | <H1>Our vision is that every person on the planet is...</H1>                                                |
+| h2              | <H2>Our vision is that every person on the planet is recognised, protected...</H2>                          |
+| h3              | <H3>Our vision is that every person on the planet is recognised, protected and provided...</H3>             |
+| h4              | <H4>Our vision is that every person on the planet is recognised, protected and provided for from birth</H4> |
+
+<br />
+
+## Bold body styles
+
+| Font&nbsp;style | Example                                                                                                             |
+| --------------- | ------------------------------------------------------------------------------------------------------------------- |
+| bold18          | <Bold18>Our vision is that every person on the planet is recognised, protected and provided for from birth</Bold18> |
+| bold16          | <Bold16>Our vision is that every person on the planet is recognised, protected and provided for from birth</Bold16> |
+| bold14          | <Bold14>Our vision is that every person on the planet is recognised, protected and provided for from birth</Bold14> |
+| bold12          | <Bold12>Our vision is that every person on the planet is recognised, protected and provided for from birth</Bold12> |
+
+<br />
+
+## Regular body styles
+
+| Font&nbsp;style | Example                                                                                                           |
+| --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| reg18           | <Reg18>Our vision is that every person on the planet is recognised, protected and provided for from birth</Reg18> |
+| reg16           | <Reg16>Our vision is that every person on the planet is recognised, protected and provided for from birth</Reg16> |
+| reg14           | <Reg14>Our vision is that every person on the planet is recognised, protected and provided for from birth</Reg14> |
+| reg12           | <Reg12>Our vision is that every person on the planet is recognised, protected and provided for from birth</Reg12> |

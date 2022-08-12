@@ -11,6 +11,7 @@
  */
 
 import darken from 'polished/lib/color/darken'
+import lighten from 'polished/lib/color/lighten'
 
 const config = {
   // Pallete
@@ -25,9 +26,6 @@ const config = {
   blue: '#4A8AD7', // certified
   teal: '#4CC1BA', // charts
   yellow: '#EDC55E', // focus state
-
-  // Lights
-  tealLight: '#D3EEE4',
 
   // Status
   positive: '#49B78D', // green
@@ -47,7 +45,7 @@ const config = {
   opacity24: 'rgba(41, 47, 51, 0.24)',
   opacity54: 'rgba(41, 47, 51, 0.54)',
 
-  // Alternative defintions
+  // Alternative definitions
   copy: '#222222', // grey600
   supportingCopy: '#5B5B5B', // grey500
   placeholderCopy: '#959595', // grey400
@@ -73,5 +71,6 @@ export const colors = {
 
   primaryDark: darken(0.075)(config.primary),
   positiveDark: darken(0.075)(config.positive),
-  negativeDark: darken(0.075)(config.negative)
+  negativeDark: darken(0.075)(config.negative),
+  tealLight: lighten(0.075)(config.teal)
 }
