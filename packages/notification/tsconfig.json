@@ -1,14 +1,22 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "paths": { "@notification/*": ["./*"] },
+    "paths": {
+      "@notification/*": [
+        "./*"
+      ]
+    },
     "target": "es6",
     "module": "commonjs",
     "outDir": "build/dist",
     "sourceMap": true,
     "moduleResolution": "node",
     "rootDir": ".",
-    "lib": ["esnext.asynciterable", "es6", "es2017"],
+    "lib": [
+      "esnext.asynciterable",
+      "es6",
+      "es2017"
+    ],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -16,15 +24,21 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": [
+      "fhir",
+      "jest"
+    ]
   },
-  "include": ["src/**/*.ts", "typings", "tslint-rules"],
+  "include": [
+    "src/**/*.ts",
+    "typings",
+    "tslint-rules"
+  ],
   "exclude": [
     "node_modules",
     "build",
     "scripts",
     "acceptance-tests",
-    "src/setupTests.ts",
-    "src/**/*.test.ts"
+    "src/setupTests.ts"
   ]
 }

@@ -9,17 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-
-// eslint-disable-next-line import/no-unassigned-import
-import '@opencrvs/commons/monitoring'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('app-module-path').addPath(require('path').join(__dirname, '../'))
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('dotenv').config({
-  path: `${process.cwd()}/.env`
-})
-
-import { createServer } from '@notification/server'
-
-createServer().then((server) => server.start())
+module.exports = {
+  extends: '../../.eslintrc.js',
+  root: true,
+  env: {
+    es6: true
+  },
+  overrides: [
+    {
+      files: ['*.ts'],
+      parserOptions: {
+        project: ['./tsconfig.json', './tsconfig.eslint.json']
+      }
+    }
+  ]
+}

@@ -148,33 +148,25 @@ export async function sendBirthRejectionConfirmation(
 
 export const inProgressNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
-  trackingId: Joi.string()
-    .length(7)
-    .required(),
+  trackingId: Joi.string().length(7).required(),
   crvsOffice: Joi.string().required()
 })
 
 export const declarationNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
-  trackingId: Joi.string()
-    .length(7)
-    .required(),
+  trackingId: Joi.string().length(7).required(),
   name: Joi.string().required()
 })
 
 export const registrationNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
   name: Joi.string().required(),
-  trackingId: Joi.string()
-    .length(7)
-    .required(),
+  trackingId: Joi.string().length(7).required(),
   registrationNumber: Joi.string().required()
 })
 
 export const rejectionNotificationSchema = Joi.object({
   msisdn: Joi.string().required(),
-  trackingId: Joi.string()
-    .length(7)
-    .required(),
+  trackingId: Joi.string().length(7).required(),
   name: Joi.string().required()
 })
