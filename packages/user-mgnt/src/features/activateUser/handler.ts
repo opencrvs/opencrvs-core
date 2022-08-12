@@ -56,7 +56,7 @@ export default async function activateUser(
   user.passwordHash = hash
   user.status = statuses.ACTIVE
   user.securityQuestionAnswers = userUpdateData.securityQNAs.map(
-    securityQNA => {
+    (securityQNA) => {
       return {
         questionKey: securityQNA.questionKey,
         answerHash: generateHash(securityQNA.answer.toLowerCase(), salt)
@@ -82,7 +82,5 @@ const securityQNASchema = Joi.object({
 export const requestSchema = Joi.object({
   userId: Joi.string().required(),
   password: Joi.string().required(),
-  securityQNAs: Joi.array()
-    .items(securityQNASchema)
-    .required()
+  securityQNAs: Joi.array().items(securityQNASchema).required()
 })

@@ -11,7 +11,7 @@
  */
 import { model, Schema, Document } from 'mongoose'
 // tslint:disable-next-line
-import { statuses } from '../utils/userUtils'
+import { statuses } from '@user-mgnt/utils/userUtils'
 import { IUserName, UserNameSchema } from '@user-mgnt/model/user'
 
 export interface ISystem {
