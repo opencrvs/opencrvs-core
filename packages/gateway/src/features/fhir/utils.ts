@@ -57,7 +57,11 @@ import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
 import { IMetricsParam } from '@gateway/features/metrics/root-resolvers'
 import { URLSearchParams } from 'url'
 import { logger } from '@gateway/logger'
-import { GQLRegStatus } from '@gateway/graphql/schema'
+import {
+  GQLBirthRegistrationInput,
+  GQLDeathRegistrationInput,
+  GQLRegStatus
+} from '@gateway/graphql/schema'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
 
 export interface ITimeLoggedResponse {
@@ -886,7 +890,7 @@ export function getDownloadedExtensionStatus(task: fhir.Task) {
   return extension?.valueString
 }
 export async function setCertificateCollector(
-  details: any,
+  details: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
   authHeader: IAuthHeader
 ) {
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
@@ -898,7 +902,7 @@ export async function setCertificateCollector(
     firstNames: nameItem.given.join(' ')
   }))
 
-  details.registration.certificates.map((certificate: any) => {
+  ;(details?.registration?.certificates || []).map((certificate: any) => {
     if (!certificate?.collector) {
       certificate.collector = {
         individual: { name },
