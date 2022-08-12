@@ -2440,8 +2440,7 @@ export const builders: IFieldBuilders = {
           fieldValue: string,
           context: any
         ) => {
-          let location
-          location = selectOrCreateLocationRefResource(
+          const location = selectOrCreateLocationRefResource(
             context.event === EVENT_TYPE.BIRTH
               ? BIRTH_CORRECTION_ENCOUNTER_CODE
               : DEATH_CORRECTION_ENCOUNTER_CODE,
@@ -3544,7 +3543,7 @@ export const builders: IFieldBuilders = {
 }
 
 export async function buildFHIRBundle(
-  reg: object,
+  reg: Record<string, unknown>,
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {

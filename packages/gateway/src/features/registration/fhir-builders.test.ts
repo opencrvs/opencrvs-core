@@ -18,7 +18,8 @@ import {
 import {
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
-  FHIR_OBSERVATION_CATEGORY_URL
+  FHIR_OBSERVATION_CATEGORY_URL,
+  EVENT_TYPE
 } from '@gateway/features/fhir/constants'
 import {
   BIRTH_TYPE_CODE,
@@ -29,7 +30,6 @@ import {
   NUMBER_FOEATAL_DEATH_CODE,
   LAST_LIVE_BIRTH_CODE
 } from '@gateway/features/fhir/templates'
-import { EVENT_TYPE } from '@gateway/features/fhir/constants'
 import * as _ from 'lodash'
 import {
   mockTask,

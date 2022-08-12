@@ -77,8 +77,8 @@ async function transformField(
 }
 
 export default async function transformObj(
-  sourceObj: object,
-  targetObj: object,
+  sourceObj: Record<string, unknown>,
+  targetObj: Record<string, unknown>,
   fieldBuilders: IFieldBuilders,
   context: { _index?: any; authHeader: IAuthHeader },
   currentPropNamePath: string[] = []
