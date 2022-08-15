@@ -18,9 +18,7 @@ export const NOTIFICATION_SERVICE_URL =
 export const CERT_PUBLIC_KEY_PATH =
   (process.env.CERT_PUBLIC_KEY_PATH as string) ||
   '../../.secrets/public-key.pem'
-export const SENTRY_DSN =
-  process.env.SENTRY_DSN ||
-  'https://2ed906a0ba1c4de2ae3f3f898ec9df0b@sentry.io/1774551'
+export const SENTRY_DSN = process.env.SENTRY_DSN
 export const QA_ENV = process.env.QA_ENV || false
 
 export const AVATAR_API = 'https://eu.ui-avatars.com/api/?name='
