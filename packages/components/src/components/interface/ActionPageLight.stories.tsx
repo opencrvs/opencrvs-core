@@ -24,7 +24,9 @@ interface IProps {
 const Template: Story<IProps> = (args) => (
   <ActionPageLight {...args}>
     <Box>
-      <h3>Children elements will go here</h3>
+      <h3>
+        This component is deprecated. Please see &lt;Frame&gt; for correct use.
+      </h3>
     </Box>
   </ActionPageLight>
 )
@@ -36,6 +38,6 @@ ActionPageLightView.args = {
 }
 
 export default {
-  title: 'Layout/Page',
+  title: 'Layout/Action Page Light (deprecated)',
   component: ActionPageLight
 } as Meta
