@@ -11,7 +11,7 @@
  */
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import React from 'react'
-import { AppHeader } from '../interface'
+import { AppHeader, PageHeader } from '../interface'
 import { LeftNavigation } from '../interface/Navigation/LeftNavigation'
 import { leftNavigationView } from '../interface/Navigation/LeftNavigation.stories'
 import { NavigationGroup } from '../interface/Navigation/NavigationGroup'
@@ -20,6 +20,7 @@ import {
   groupSetting
 } from '../interface/Navigation/NavigationGroup.stories'
 import { Frame } from './Frame'
+import { Content } from '../interface/Content'
 
 export default {
   title: 'Layout/Frame',
@@ -36,6 +37,25 @@ export const WithLeftNavigation: ComponentStory<typeof Frame> = () => (
       </LeftNavigation>
     }
   >
-    Include your content here
+    <Content title="Example title">Hi!</Content>
+  </Frame>
+)
+
+WithLeftNavigation.parameters = {
+  layout: 'fullscreen'
+}
+
+export const ActionPage: ComponentStory<typeof Frame> = () => (
+  <Frame
+    header={
+      <PageHeader
+        mobileTitle="Hello!"
+        desktopTitle="Hello!"
+        goBack={() => alert('Go back triggered')}
+        goBackLabel="BACK"
+      />
+    }
+  >
+    <Content title="Example title">Hi!</Content>
   </Frame>
 )
