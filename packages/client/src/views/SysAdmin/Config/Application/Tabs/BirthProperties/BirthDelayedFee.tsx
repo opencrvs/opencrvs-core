@@ -50,13 +50,18 @@ export function BirthDelayedFee() {
   const offlineCountryConfiguration = useSelector((store: IStoreState) =>
     getOfflineData(store)
   )
-  const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] =
-    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const [birthDelayedFee, setBirthDelayedFee] = React.useState(
     offlineCountryConfiguration.config.BIRTH.FEE.DELAYED.toLocaleString()
   )
+  const [showModal, setShowModal] = React.useState(false)
+  const toggleModal = () => {
+    setShowModal((prev) => !prev)
+    setBirthDelayedFee(
+      offlineCountryConfiguration.config.BIRTH.FEE.DELAYED.toLocaleString()
+    )
+  }
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
 
   const handleBirthDelayedFee = (
     event: React.ChangeEvent<HTMLInputElement>

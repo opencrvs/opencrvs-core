@@ -139,6 +139,8 @@ export enum DOWNLOAD_STATUS {
 }
 
 export const processingStates = [
+  SUBMISSION_STATUS.READY_TO_ARCHIVE,
+  SUBMISSION_STATUS.ARCHIVING,
   SUBMISSION_STATUS.READY_TO_SUBMIT,
   SUBMISSION_STATUS.SUBMITTING,
   SUBMISSION_STATUS.READY_TO_APPROVE,
@@ -193,7 +195,6 @@ export interface IDeclaration {
   downloadRetryAttempt?: number
   action?: DeclarationAction
   trackingId?: string
-  compositionId?: string
   registrationNumber?: string
   payload?: IPayload
   visitedGroupIds?: IVisitedGroupId[]
@@ -542,7 +543,6 @@ export function makeDeclarationReadyToDownload(
     id: compositionId,
     data: {},
     event,
-    compositionId,
     action,
     downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
   }
@@ -740,9 +740,7 @@ export function mergeDeclaredDeclarations(
   declarations: IDeclaration[],
   declaredDeclarations: GQLEventSearchSet[]
 ) {
-  const localDeclarations = declarations.map(
-    (declaration) => declaration.compositionId
-  )
+  const localDeclarations = declarations.map((declaration) => declaration.id)
 
   const declarationsNotStoredLocally = declaredDeclarations.filter(
     (declaredDeclaration) => !localDeclarations.includes(declaredDeclaration.id)
@@ -2027,11 +2025,8 @@ export function filterProcessingDeclarations(
   }
 }
 
-export function filterProcessingDeclarationsFromQuery(
-  queryData: IQueryData,
-  storedDeclarations: IDeclaration[]
-): IQueryData {
-  const processingDeclarationIds = storedDeclarations
+export function getProcessingDeclarationIds(declarations: IDeclaration[]) {
+  return declarations
     .filter(
       (declaration) =>
         declaration.submissionStatus &&
@@ -2040,6 +2035,14 @@ export function filterProcessingDeclarationsFromQuery(
         )
     )
     .map((declaration) => declaration.id)
+}
+
+export function filterProcessingDeclarationsFromQuery(
+  queryData: IQueryData,
+  storedDeclarations: IDeclaration[]
+): IQueryData {
+  const processingDeclarationIds =
+    getProcessingDeclarationIds(storedDeclarations)
 
   return {
     inProgressTab: filterProcessingDeclarations(

@@ -28,10 +28,8 @@ import {
 import { FullBodyContent } from '@opencrvs/components/lib/layout'
 import {
   IDeclaration,
-  IPayload,
   SUBMISSION_STATUS,
-  writeDeclaration,
-  DOWNLOAD_STATUS
+  writeDeclaration
 } from '@client/declarations'
 import { ReviewAction } from '@client/components/form/ReviewActionComponent'
 import {
@@ -67,7 +65,7 @@ import {
   IDocumentUploaderWithOptionsFormField,
   LOCATION_SEARCH_INPUT,
   IAttachmentValue,
-  Action
+  SubmissionAction
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -265,9 +263,7 @@ interface IProps {
   submitClickEvent: (
     declaration: IDeclaration,
     submissionStatus: string,
-    action: Action,
-    payload?: IPayload,
-    downloadStatus?: DOWNLOAD_STATUS
+    action: SubmissionAction
   ) => void
   scope: Scope | null
   offlineCountryConfiguration: IOfflineData
@@ -611,7 +607,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
     })
   }
 
-  getLabelForDocType = (docForWhom: string, docType: string) => {
+  getLabelForDocType = (_: string, docType: string) => {
     const { intl } = this.props
     const documentSection = this.props.registerForm[
       this.props.draft.event
@@ -1418,7 +1414,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
         draft.data[section.id] || {},
         draft.data
       )
-      visibleGroups.forEach((group, index) => {
+      visibleGroups.forEach((group) => {
         group.fields
           .filter(
             (field) =>

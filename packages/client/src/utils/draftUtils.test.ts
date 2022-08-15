@@ -149,8 +149,7 @@ describe('draftUtils tests', () => {
           },
           event: 'birth',
           trackingId: 'BZX12Y',
-          submissionStatus: 'DECLARED',
-          compositionId: '1'
+          submissionStatus: 'DECLARED'
         })
       })
     })
@@ -199,8 +198,7 @@ describe('draftUtils tests', () => {
           },
           event: 'death',
           trackingId: 'BZX12Y',
-          submissionStatus: 'DECLARED',
-          compositionId: '1'
+          submissionStatus: 'DECLARED'
         })
       })
     })
