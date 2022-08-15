@@ -234,7 +234,7 @@ services:
 
   setup-elasticsearch-users:
     image: ubuntu:bionic
-    entrypoint: ['bash', '/usr/app/setup-users.sh']
+    entrypoint: ['bash', '/usr/app/setup.sh']
     restart: on-failure
     depends_on:
       - elasticsearch

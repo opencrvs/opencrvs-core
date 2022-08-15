@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -7,14 +9,15 @@
 #
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
-cluster.name: 'docker-cluster'
-network.host: 0.0.0.0
 
-# minimum_master_nodes need to be explicitly set when bound on a public IP
-# set to 1 to allow single node clusters
-# Details: https://github.com/elastic/elasticsearch/pull/17288
-discovery.zen.minimum_master_nodes: 1
-path.repo: ['/data/backups/elasticsearch']
-discovery.type: single-node
-xpack.security.enabled: true
-xpack.security.authc.api_key.enabled: true
+set -eu
+set -o pipefail
+
+source "$(dirname "${BASH_SOURCE[0]}")/setup-helpers.sh"
+
+echo "-------- $(date) --------"
+
+log 'Waiting for availability of Elasticsearch'
+wait_for_elasticsearch
+
+ensure_settings "{\"index\":{\"number_of_replicas\":0}}"
