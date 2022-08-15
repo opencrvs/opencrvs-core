@@ -35,7 +35,8 @@ import {
   getLoggedInPractitionerResource,
   getPractitionerOffice,
   getPractitionerPrimaryLocation,
-  getPractitionerRef
+  getPractitionerRef,
+  getUserByToken
 } from '@workflow/features/user/utils'
 import { logger } from '@workflow/logger'
 import { getTokenPayload, ITokenPayload } from '@workflow/utils/authUtils'
@@ -307,7 +308,8 @@ export async function touchBundle(
   setupLastRegUser(taskResource, practitioner)
 
   /* setting regAssigned valueReference here if regAssigned extension exists */
-  setupRegAssigned(taskResource, practitioner)
+  await setupRegAssigned(taskResource, practitioner, token)
+
   /* check if the status of any event draft is not published and setting configuration extension*/
   await checkFormDraftStatusToAddTestExtension(taskResource, token)
 
@@ -518,10 +520,11 @@ export function setupLastRegUser(
   return taskResource
 }
 
-export function setupRegAssigned(
+export async function setupRegAssigned(
   taskResource: fhir.Task,
-  practitioner: fhir.Practitioner
-): fhir.Task {
+  practitioner: fhir.Practitioner,
+  token: string
+) {
   if (!taskResource.extension) {
     taskResource.extension = []
   }
@@ -531,6 +534,14 @@ export function setupRegAssigned(
     )
   })
   if (setupRegAssignedExtension) {
+    const practitionerDetails = await getUserByToken(token)
+    if (
+      setupRegAssignedExtension.valueString === RegStatus.REJECTED &&
+      practitionerDetails.role === 'FIELD_AGENT'
+    ) {
+      return taskResource
+    }
+
     if (!setupRegAssignedExtension.valueReference) {
       setupRegAssignedExtension.valueReference = {}
     }
