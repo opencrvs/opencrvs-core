@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { IDynamicValues, IAction, IColumn } from './types'
+import { IDynamicValues, IAction, IColumn, IActionObject } from './types'
 import styled from 'styled-components'
-import { IActionObject, ColumnContentAlignment } from '..'
+import { ColumnContentAlignment } from '..'
 
 export interface IGridTableRow {
   displayItems: IDynamicValues[]

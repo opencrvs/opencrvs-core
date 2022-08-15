@@ -13,8 +13,8 @@ import * as React from 'react'
 import { grid } from '../../grid'
 import styled from 'styled-components'
 import { IDomProps } from './AppHeader'
-import { CircleButton } from '@opencrvs/components/lib/buttons'
-import { BackArrowDeepBlue, Cross } from '@opencrvs/components/lib/icons'
+import { CircleButton } from '../../buttons'
+import { BackArrowDeepBlue, Cross } from '../../icons'
 
 const PageHeaderWrapper = styled.div`
   padding: 8px 16px;

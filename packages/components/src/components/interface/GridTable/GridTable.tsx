@@ -11,7 +11,6 @@
  */
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { ListItemAction } from '../../buttons'
 import { grid } from '../../grid'
 import { IDynamicValues, IActionObject, IAction, IColumn } from './types'
 import { GridTableRowDesktop } from './GridTableRowDeskop'
@@ -19,6 +18,7 @@ import { ITheme } from 'src/components/theme'
 import { SortIcon } from '../../icons/SortIcon'
 import { connect } from 'react-redux'
 import { GridTableRowMobile } from './GridTableRowMobile'
+import { ListItemAction } from './ListItemAction'
 
 const Wrapper = styled.div`
   width: 100%;
