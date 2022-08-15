@@ -18,3 +18,5 @@ path.repo: ['/data/backups/elasticsearch']
 discovery.type: single-node
 xpack.security.enabled: true
 xpack.security.authc.api_key.enabled: true
+
+index.number_of_replicas: 0
