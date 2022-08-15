@@ -310,6 +310,7 @@ services:
       - kibana
     cap_add: ['CHOWN', 'DAC_OVERRIDE', 'SETGID', 'SETUID']
     cap_drop: ['ALL']
+    restart: always
     ports:
       - 8200:8200
     networks:
