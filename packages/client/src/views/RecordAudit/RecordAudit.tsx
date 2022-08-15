@@ -124,6 +124,7 @@ import {
 } from './mutations'
 import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
+import { Frame } from '@opencrvs/components/lib/Frame'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -134,14 +135,6 @@ const DesktopHeader = styled(Header)`
 const MobileHeader = styled(PageHeader)`
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
-  }
-`
-
-const BodyContainer = styled.div`
-  margin-left: 0px;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 250px;
-    padding: 0px 24px;
   }
 `
 
@@ -772,12 +765,16 @@ function getBodyContent({
 
 const RecordAuditComp = (props: IFullProps) => {
   return (
-    <>
-      <DesktopHeader />
-      <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
-      <BodyContainer>{getBodyContent(props)}</BodyContainer>
+    <Frame
+      header={<DesktopHeader />}
+      navigation={
+        <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
+      }
+    >
+      {getBodyContent(props)}
+
       <NotificationToast />
-    </>
+    </Frame>
   )
 }
 
