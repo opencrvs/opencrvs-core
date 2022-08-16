@@ -302,7 +302,7 @@ services:
       - overlay_net
     restart: always
     deploy:
-      replicas: 3
+      replicas: 2
   apm-server:
     image: docker.elastic.co/apm/apm-server:7.15.2
     depends_on:
@@ -316,7 +316,7 @@ services:
     networks:
       - overlay_net
     deploy:
-      replicas: 3
+      replicas: 2
     command:
       [
         'apm-server',
