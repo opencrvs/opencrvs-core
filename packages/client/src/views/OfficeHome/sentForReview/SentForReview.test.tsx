@@ -149,6 +149,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     const TIME_STAMP = '1544188309380'
     Date.now = jest.fn(() => 1554055200000)
 
+    const sentForApprovalDate = '2019-10-20T11:03:20.660Z'
     const testComponent = await createTestComponent(
       <SentForReview
         queryData={{
@@ -169,6 +170,27 @@ describe('RegistrationHome sent for approval tab related tests', () => {
                   createdAt: TIME_STAMP,
                   modifiedAt: TIME_STAMP
                 },
+                operationHistories: [
+                  {
+                    operationType: 'VALIDATED',
+                    operatedOn: sentForApprovalDate,
+                    operatorRole: 'LOCAL_REGISTRAR',
+                    operatorName: [
+                      {
+                        firstNames: 'Mohammad',
+                        familyName: 'Ashraful',
+                        use: 'en'
+                      },
+                      {
+                        firstNames: '',
+                        familyName: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeName: 'Alokbali Union Parishad',
+                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                  }
+                ],
                 dateOfBirth: '2010-10-10',
                 childName: [
                   {
@@ -225,7 +247,10 @@ describe('RegistrationHome sent for approval tab related tests', () => {
 
     testComponent.update()
     const data = testComponent.find(GridTable).prop('content')
-    const EXPECTED_DATE_OF_DECLARATION = formattedDuration(Number(TIME_STAMP))
+    const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
+      new Date(sentForApprovalDate)
+    )
+
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
     expect(data[0].eventTimeElapsed).toBe('8 years ago')

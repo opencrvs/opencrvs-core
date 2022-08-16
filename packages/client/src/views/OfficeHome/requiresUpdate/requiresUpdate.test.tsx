@@ -163,6 +163,8 @@ describe('OfficeHome sent for update tab related tests', () => {
   it('renders all items returned from graphql query in sent for update tab', async () => {
     const TIME_STAMP = '1544188309380'
 
+    const birthEventRejectedDate = '2019-10-20T11:03:20.660Z'
+
     const testComponent = await createTestComponent(
       // @ts-ignore
       <RequiresUpdate
@@ -184,6 +186,27 @@ describe('OfficeHome sent for update tab related tests', () => {
                   createdAt: TIME_STAMP,
                   modifiedAt: TIME_STAMP + 1
                 },
+                operationHistories: [
+                  {
+                    operationType: 'REJECTED',
+                    operatedOn: '2021-10-20T11:03:20.660Z',
+                    operatorRole: 'LOCAL_REGISTRAR',
+                    operatorName: [
+                      {
+                        firstNames: 'Mohammad',
+                        familyName: 'Ashraful',
+                        use: 'en'
+                      },
+                      {
+                        firstNames: '',
+                        familyName: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeName: 'Alokbali Union Parishad',
+                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                  }
+                ],
                 dateOfBirth: '2010-10-10',
                 childName: [
                   {
@@ -212,6 +235,27 @@ describe('OfficeHome sent for update tab related tests', () => {
                   createdAt: TIME_STAMP,
                   modifiedAt: TIME_STAMP
                 },
+                operationHistories: [
+                  {
+                    operationType: 'REJECTED',
+                    operatedOn: birthEventRejectedDate,
+                    operatorRole: 'LOCAL_REGISTRAR',
+                    operatorName: [
+                      {
+                        firstNames: 'Mohammad',
+                        familyName: 'Ashraful',
+                        use: 'en'
+                      },
+                      {
+                        firstNames: '',
+                        familyName: '',
+                        use: 'bn'
+                      }
+                    ],
+                    operatorOfficeName: 'Alokbali Union Parishad',
+                    operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                  }
+                ],
                 dateOfDeath: '2007-01-01',
                 deceasedName: [
                   {
@@ -235,7 +279,9 @@ describe('OfficeHome sent for update tab related tests', () => {
 
     const table = await waitForElement(testComponent, GridTable)
     const data = table.prop('content')
-    const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
+    const EXPECTED_DATE_OF_REJECTION = formattedDuration(
+      new Date(birthEventRejectedDate)
+    )
 
     expect(data.length).toBe(2)
     expect(data[1].id).toBe('bc09200d-0160-43b4-9e2b-5b9e90424e95')
