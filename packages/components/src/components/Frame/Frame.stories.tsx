@@ -11,7 +11,7 @@
  */
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import React from 'react'
-import { AppHeader, PageHeader } from '../interface'
+import { AppHeader, PageHeader, EventTopBar } from '../interface'
 import { LeftNavigation } from '../interface/Navigation/LeftNavigation'
 import { leftNavigationView } from '../interface/Navigation/LeftNavigation.stories'
 import { NavigationGroup } from '../interface/Navigation/NavigationGroup'
@@ -74,10 +74,15 @@ export const PageTemplateFlow: ComponentStory<typeof Frame> = () => (
         mobileTitle="Hello!"
         desktopTitle="Hello!"
         goBack={() => alert('Go back triggered')}
-        goBackLabel="BACK"
       />
     }
   >
+    <Content title="Example ">Hi!</Content>
+  </Frame>
+)
+
+export const PageTemplateForm: ComponentStory<typeof Frame> = () => (
+  <Frame header={<EventTopBar title="Hello!" />}>
     <Content title="Example title">Hi!</Content>
   </Frame>
 )
