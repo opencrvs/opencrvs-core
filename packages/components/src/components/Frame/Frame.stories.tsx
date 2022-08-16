@@ -27,7 +27,7 @@ export default {
   component: Frame
 } as ComponentMeta<typeof Frame>
 
-export const WithLeftNavigation: ComponentStory<typeof Frame> = () => (
+export const PageTemplateContentLarge: ComponentStory<typeof Frame> = () => (
   <Frame
     header={<AppHeader title="OpenCRVS" />}
     navigation={
@@ -43,11 +43,31 @@ export const WithLeftNavigation: ComponentStory<typeof Frame> = () => (
   </Frame>
 )
 
-WithLeftNavigation.parameters = {
+PageTemplateContentLarge.parameters = {
   layout: 'fullscreen'
 }
 
-export const ActionPage: ComponentStory<typeof Frame> = () => (
+export const PageTemplateContentMedium: ComponentStory<typeof Frame> = () => (
+  <Frame
+    header={<AppHeader title="OpenCRVS" />}
+    navigation={
+      <LeftNavigation {...leftNavigationView.args}>
+        <NavigationGroup {...groupDeclaration.args} />
+        <NavigationGroup {...groupSetting.args} />
+      </LeftNavigation>
+    }
+  >
+    <Content size={ContentSize.NORMAL} title="Example title">
+      Hi!
+    </Content>
+  </Frame>
+)
+
+PageTemplateContentMedium.parameters = {
+  layout: 'fullscreen'
+}
+
+export const PageTemplateFlow: ComponentStory<typeof Frame> = () => (
   <Frame
     header={
       <PageHeader
@@ -62,4 +82,4 @@ export const ActionPage: ComponentStory<typeof Frame> = () => (
   </Frame>
 )
 
-ActionPage.parameters = { layout: 'fullscreen' }
+PageTemplateFlow.parameters = { layout: 'fullscreen' }
