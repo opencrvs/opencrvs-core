@@ -82,11 +82,13 @@ export function GovtLogo() {
     setIsFileUploading(isUploading)
   }
   const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => setShowModal((prev) => !prev)
+  const toggleModal = () => {
+    setShowModal((prev) => !prev)
+    setErrorMessages(EMPTY_STRING)
+  }
 
   async function govtLogoMutationHandler() {
-    if (isWithinFileLength(govtLogo as string) === false) {
-      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
+    if (!isWithinFileLength(govtLogo)) {
       setErrorMessages(intl.formatMessage(messages.govtLogoFileLimitError))
       setGovtLogo(EMPTY_STRING)
       handleLogoFile({
@@ -94,24 +96,27 @@ export function GovtLogo() {
         type: EMPTY_STRING,
         data: EMPTY_STRING
       })
-    }
-    try {
-      toggleModal()
-      await callApplicationConfigMutation(
-        GeneralActionId.COUNTRY_LOGO,
-        {
-          ...offlineCountryConfiguration.config,
-          COUNTRY_LOGO: {
-            file: govtLogo,
-            fileName: logoFileName
-          }
-        },
-        dispatch,
-        setNotificationStatus
-      )
-    } catch {
-      setNotificationStatus(NOTIFICATION_STATUS.ERROR)
-      setErrorMessages(intl.formatMessage(messages.govtLogoChangeNotification))
+    } else {
+      try {
+        toggleModal()
+        await callApplicationConfigMutation(
+          GeneralActionId.COUNTRY_LOGO,
+          {
+            ...offlineCountryConfiguration.config,
+            COUNTRY_LOGO: {
+              file: govtLogo,
+              fileName: logoFileName
+            }
+          },
+          dispatch,
+          setNotificationStatus
+        )
+      } catch {
+        setNotificationStatus(NOTIFICATION_STATUS.ERROR)
+        setErrorMessages(
+          intl.formatMessage(messages.govtLogoChangeNotification)
+        )
+      }
     }
   }
   const id = GeneralActionId.COUNTRY_LOGO
@@ -186,6 +191,7 @@ export function GovtLogo() {
               }}
               files={logoFile}
               onUploadingStateChanged={onUploadingStateChanged}
+              touched
               error={errorMessages}
             />
           </Field>

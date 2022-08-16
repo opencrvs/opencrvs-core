@@ -46,13 +46,18 @@ export function DeathRegistrationTarget() {
   const offlineCountryConfiguration = useSelector((store: IStoreState) =>
     getOfflineData(store)
   )
-  const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] =
-    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const [deathRegistrationTarget, setDeathRegistrationTarget] = React.useState(
     String(offlineCountryConfiguration.config.DEATH.REGISTRATION_TARGET)
   )
+  const [showModal, setShowModal] = React.useState(false)
+  const toggleModal = () => {
+    setShowModal((prev) => !prev)
+    setDeathRegistrationTarget(
+      String(offlineCountryConfiguration.config.DEATH.REGISTRATION_TARGET)
+    )
+  }
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
 
   const handleDeathRegistrationTarget = (
     event: React.ChangeEvent<HTMLInputElement>

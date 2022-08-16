@@ -51,7 +51,10 @@ export function ApplicationName() {
     offlineCountryConfiguration.config.APPLICATION_NAME
   )
   const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => setShowModal((prev) => !prev)
+  const toggleModal = () => {
+    setShowModal((prev) => !prev)
+    setApplicationName(offlineCountryConfiguration.config.APPLICATION_NAME)
+  }
   const handleApplicationName = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {

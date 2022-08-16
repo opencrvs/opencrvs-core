@@ -1096,6 +1096,16 @@ export const builders: IFieldBuilders = {
         )
         observation.id = fieldValue as string
       }
+    },
+    questionnaireResponse: (fhirBundle, fieldValue: string, context) => {
+      const questionnaireResponse = selectOrCreateQuestionnaireResource(
+        context.event === EVENT_TYPE.BIRTH
+          ? BIRTH_ENCOUNTER_CODE
+          : DEATH_ENCOUNTER_CODE,
+        fhirBundle,
+        context
+      )
+      questionnaireResponse.id = fieldValue
     }
   },
   createdAt: (fhirBundle, fieldValue, context) => {

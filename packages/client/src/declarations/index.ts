@@ -139,6 +139,8 @@ export enum DOWNLOAD_STATUS {
 }
 
 export const processingStates = [
+  SUBMISSION_STATUS.READY_TO_ARCHIVE,
+  SUBMISSION_STATUS.ARCHIVING,
   SUBMISSION_STATUS.READY_TO_SUBMIT,
   SUBMISSION_STATUS.SUBMITTING,
   SUBMISSION_STATUS.READY_TO_APPROVE,
@@ -193,7 +195,6 @@ export interface IDeclaration {
   downloadRetryAttempt?: number
   action?: DeclarationAction
   trackingId?: string
-  compositionId?: string
   registrationNumber?: string
   payload?: IPayload
   visitedGroupIds?: IVisitedGroupId[]
@@ -542,7 +543,6 @@ export function makeDeclarationReadyToDownload(
     id: compositionId,
     data: {},
     event,
-    compositionId,
     action,
     downloadStatus: DOWNLOAD_STATUS.READY_TO_DOWNLOAD
   }
@@ -740,9 +740,7 @@ export function mergeDeclaredDeclarations(
   declarations: IDeclaration[],
   declaredDeclarations: GQLEventSearchSet[]
 ) {
-  const localDeclarations = declarations.map(
-    (declaration) => declaration.compositionId
-  )
+  const localDeclarations = declarations.map((declaration) => declaration.id)
 
   const declarationsNotStoredLocally = declaredDeclarations.filter(
     (declaredDeclaration) => !localDeclarations.includes(declaredDeclaration.id)
@@ -1040,8 +1038,7 @@ function mergeWorkQueueData(
 async function getWorkqueueData(
   state: IStoreState,
   userDetails: IUserDetails,
-  workqueuePaginationParams: IWorkqueuePaginationParams,
-  currentWorkqueue: IWorkqueue | undefined
+  workqueuePaginationParams: IWorkqueuePaginationParams
 ) {
   const registrationLocationId =
     (userDetails && getUserLocation(userDetails).id) || ''
@@ -1080,6 +1077,10 @@ async function getWorkqueueData(
     userId
   )
   let workqueue
+  const { currentUserData } = await getUserData(
+    userDetails.userMgntUserID || ''
+  )
+  const currentWorkqueue = currentUserData?.workqueue
   if (result) {
     workqueue = {
       loading: false,
@@ -1097,9 +1098,6 @@ async function getWorkqueueData(
       initialSyncDone: false
     }
   }
-  const { currentUserData } = await getUserData(
-    userDetails.userMgntUserID || ''
-  )
   if (isFieldAgent) {
     return mergeWorkQueueData(
       state,
@@ -1123,17 +1121,17 @@ export async function writeRegistrarWorkqueueByUser(
   const state = getState()
   const userDetails = getUserDetails(state) as IUserDetails
 
+  const workqueue = await getWorkqueueData(
+    state,
+    userDetails,
+    workqueuePaginationParams
+  )
+
   const uID = userDetails.userMgntUserID || ''
   const userData = await getUserData(uID)
   const { allUserData } = userData
   let { currentUserData } = userData
 
-  const workqueue = await getWorkqueueData(
-    state,
-    userDetails,
-    workqueuePaginationParams,
-    currentUserData && currentUserData.workqueue
-  )
   if (currentUserData) {
     currentUserData.workqueue = workqueue
   } else {
@@ -2027,11 +2025,8 @@ export function filterProcessingDeclarations(
   }
 }
 
-export function filterProcessingDeclarationsFromQuery(
-  queryData: IQueryData,
-  storedDeclarations: IDeclaration[]
-): IQueryData {
-  const processingDeclarationIds = storedDeclarations
+export function getProcessingDeclarationIds(declarations: IDeclaration[]) {
+  return declarations
     .filter(
       (declaration) =>
         declaration.submissionStatus &&
@@ -2040,6 +2035,14 @@ export function filterProcessingDeclarationsFromQuery(
         )
     )
     .map((declaration) => declaration.id)
+}
+
+export function filterProcessingDeclarationsFromQuery(
+  queryData: IQueryData,
+  storedDeclarations: IDeclaration[]
+): IQueryData {
+  const processingDeclarationIds =
+    getProcessingDeclarationIds(storedDeclarations)
 
   return {
     inProgressTab: filterProcessingDeclarations(

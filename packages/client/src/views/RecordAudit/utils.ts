@@ -36,8 +36,8 @@ import { formatLongDate } from '@client/utils/date-formatting'
 import { IDynamicValues } from '@client/navigation'
 import { countryMessages } from '@client/i18n/messages/constants'
 import { IUserDetails } from '@client/utils/userUtils'
-import { FIELD_AGENT_ROLES } from '@client/utils/constants'
-
+import { EMPTY_STRING, FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { Event } from '@client/utils/gateway'
 interface IStatus {
   [key: string]: MessageDescriptor
 }
@@ -154,7 +154,7 @@ export const getFieldValue = (
     const offlineIndex = get(fieldObj, 'dynamicOptions.resource')
     const offlineResourceValues = get(offlineData, offlineIndex)
     const offlineResourceValue = get(offlineResourceValues, original)
-    original = offlineResourceValue?.name || ''
+    original = offlineResourceValue?.name || EMPTY_STRING
   }
   if (fieldObj.type === 'SELECT_WITH_OPTIONS') {
     const selectedOption = fieldObj.options.find(
@@ -178,40 +178,47 @@ export const getLocation = (
   resources: IOfflineData,
   intl: IntlShape
 ) => {
-  let locationType = ''
-  let locationId = ''
-  let district = ''
-  let state = ''
-  let internationalDistrict = ''
-  let internationalState = ''
-  let country = ''
+  let locationType = EMPTY_STRING
+  let locationId = EMPTY_STRING
+  let district = EMPTY_STRING
+  let state = EMPTY_STRING
+  let internationalDistrict = EMPTY_STRING
+  let internationalState = EMPTY_STRING
+  let country = EMPTY_STRING
 
-  if (declaration.event === 'death') {
-    locationType = declaration.data?.deathEvent?.placeOfDeath?.toString() || ''
-    locationId = declaration.data?.deathEvent?.deathLocation?.toString() || ''
+  if (declaration.event === Event.Death) {
+    locationType =
+      declaration.data?.deathEvent?.placeOfDeath?.toString() || EMPTY_STRING
+    locationId =
+      declaration.data?.deathEvent?.deathLocation?.toString() || EMPTY_STRING
 
-    district = declaration.data?.deathEvent?.district?.toString() || ''
-    state = declaration.data?.deathEvent?.state?.toString() || ''
-    country = declaration.data?.deathEvent?.country?.toString() || ''
+    district =
+      declaration.data?.deathEvent?.district?.toString() || EMPTY_STRING
+    state = declaration.data?.deathEvent?.state?.toString() || EMPTY_STRING
+    country = declaration.data?.deathEvent?.country?.toString() || EMPTY_STRING
 
     // when address is outside of default country
     internationalDistrict =
-      declaration.data?.deathEvent?.internationalDistrict?.toString() || ''
+      declaration.data?.deathEvent?.internationalDistrict?.toString() ||
+      EMPTY_STRING
     internationalState =
-      declaration.data?.deathEvent?.internationalState?.toString() || ''
+      declaration.data?.deathEvent?.internationalState?.toString() ||
+      EMPTY_STRING
   } else {
-    locationType = declaration.data?.child?.placeOfBirth?.toString() || ''
-    locationId = declaration.data?.child?.birthLocation?.toString() || ''
+    locationType =
+      declaration.data?.child?.placeOfBirth?.toString() || EMPTY_STRING
+    locationId =
+      declaration.data?.child?.birthLocation?.toString() || EMPTY_STRING
 
-    district = declaration.data?.child?.district?.toString() || ''
-    state = declaration.data?.child?.state?.toString() || ''
-    country = declaration.data?.child?.country?.toString() || ''
+    district = declaration.data?.child?.district?.toString() || EMPTY_STRING
+    state = declaration.data?.child?.state?.toString() || EMPTY_STRING
+    country = declaration.data?.child?.country?.toString() || EMPTY_STRING
 
     // when address is outside of default country
     internationalDistrict =
-      declaration.data?.child?.internationalDistrict?.toString() || ''
+      declaration.data?.child?.internationalDistrict?.toString() || EMPTY_STRING
     internationalState =
-      declaration.data?.child?.internationalState?.toString() || ''
+      declaration.data?.child?.internationalState?.toString() || EMPTY_STRING
   }
   if (locationType === 'HEALTH_FACILITY' && locationId) {
     const facility = resources.facilities[locationId]
@@ -225,7 +232,7 @@ export const getLocation = (
     )
     const healthFacility = generateLocationName(facility, intl)
 
-    let location = ''
+    let location = EMPTY_STRING
     if (healthFacility) location = healthFacility + ', '
     if (district) location = location + district.name + ', '
     if (state) location = location + state.name + ', '
@@ -234,7 +241,7 @@ export const getLocation = (
   }
   if (locationType === 'OTHER' || locationType === 'PRIVATE_HOME') {
     if (country && country !== window.config.COUNTRY) {
-      let location = ''
+      let location = EMPTY_STRING
       if (internationalDistrict) location = internationalDistrict + ', '
       if (internationalState) location = location + internationalState + ', '
       location = location + intl.formatMessage(countryMessages[country])
@@ -247,17 +254,18 @@ export const getLocation = (
   // when address is default residence address of deceased
   if (locationType === 'DECEASED_USUAL_RESIDENCE') {
     const countryResidence =
-      declaration.data?.deceased?.countryPrimary?.toString() || ''
+      declaration.data?.deceased?.countryPrimary?.toString() || EMPTY_STRING
 
     if (countryResidence !== window.config.COUNTRY) {
       // residence address is other than default country
       const internationalDistrictResidence =
         declaration.data?.deceased?.internationalDistrictPrimary?.toString() ||
-        ''
+        EMPTY_STRING
       const internationalStateResidence =
-        declaration.data?.deceased?.internationalStatePrimary?.toString() || ''
+        declaration.data?.deceased?.internationalStatePrimary?.toString() ||
+        EMPTY_STRING
 
-      let location = ''
+      let location = EMPTY_STRING
       if (internationalDistrictResidence)
         location = internationalDistrictResidence + ', '
       if (internationalStateResidence)
@@ -268,9 +276,9 @@ export const getLocation = (
       return location
     } else {
       const districtResidence =
-        declaration.data?.deceased?.districtPrimary?.toString() || ''
+        declaration.data?.deceased?.districtPrimary?.toString() || EMPTY_STRING
       const stateResidence =
-        declaration.data?.deceased?.statePrimary?.toString() || ''
+        declaration.data?.deceased?.statePrimary?.toString() || EMPTY_STRING
 
       return generateFullLocation(
         districtResidence,
@@ -281,7 +289,7 @@ export const getLocation = (
       )
     }
   }
-  return ''
+  return EMPTY_STRING
 }
 
 export const getFormattedDate = (date: Date) => {
@@ -293,7 +301,7 @@ export const getFormattedDate = (date: Date) => {
 }
 
 export const getCaptitalizedWord = (word: string | undefined): string => {
-  if (!word) return ''
+  if (!word) return EMPTY_STRING
   return word.toUpperCase()[0] + word.toLowerCase().slice(1)
 }
 
@@ -301,7 +309,7 @@ export const removeUnderscore = (word: string): string => {
   const wordArray = word.split('_')
   const finalWord = wordArray.reduce(
     (accum, cur, idx) => (idx > 0 ? accum + ' ' + cur : cur),
-    ''
+    EMPTY_STRING
   )
   return finalWord
 }
@@ -319,9 +327,9 @@ export const isDeathDeclaration = (
 }
 
 export const getDraftDeclarationName = (declaration: IDeclaration) => {
-  let name = ''
+  let name = EMPTY_STRING
   let declarationName
-  if (declaration.event === 'birth') {
+  if (declaration.event === Event.Birth) {
     declarationName = declaration.data?.child
   } else {
     declarationName = declaration.data?.deceased
@@ -352,22 +360,25 @@ export const getDraftDeclarationData = (
   return {
     id: declaration.id,
     name: getDraftDeclarationName(declaration),
-    type: declaration.event || '',
+    type: declaration.event || EMPTY_STRING,
     brnDrn:
-      declaration.data?.registration?.registrationNumber?.toString() || '',
+      declaration.data?.registration?.registrationNumber?.toString() ||
+      EMPTY_STRING,
     trackingId: trackingId,
-    dateOfBirth: declaration.data?.child?.childBirthDate?.toString() || '',
-    dateOfDeath: declaration.data?.deathEvent?.deathDate?.toString() || '',
-    placeOfBirth: getLocation(declaration, resources, intl) || '',
-    placeOfDeath: getLocation(declaration, resources, intl) || '',
+    dateOfBirth:
+      declaration.data?.child?.childBirthDate?.toString() || EMPTY_STRING,
+    dateOfDeath:
+      declaration.data?.deathEvent?.deathDate?.toString() || EMPTY_STRING,
+    placeOfBirth: getLocation(declaration, resources, intl) || EMPTY_STRING,
+    placeOfDeath: getLocation(declaration, resources, intl) || EMPTY_STRING,
     informant:
       ((declaration.data?.registration?.contactPoint as IFormSectionData)
-        ?.value as string) || '',
+        ?.value as string) || EMPTY_STRING,
     informantContact:
       (
         (declaration.data?.registration?.contactPoint as IFormSectionData)
           ?.nestedFields as IContactPointPhone
-      )?.registrationPhone.toString() || ''
+      )?.registrationPhone.toString() || EMPTY_STRING
   }
 }
 
@@ -376,7 +387,7 @@ export const getWQDeclarationData = (
   language: string,
   trackingId: string
 ) => {
-  let name = ''
+  let name = EMPTY_STRING
   if (
     isBirthDeclaration(workqueueDeclaration) &&
     workqueueDeclaration.childName
@@ -391,13 +402,14 @@ export const getWQDeclarationData = (
   return {
     id: workqueueDeclaration?.id,
     name,
-    type: (workqueueDeclaration?.type && workqueueDeclaration.type) || '',
-    status: workqueueDeclaration?.registration?.status || '',
+    type:
+      (workqueueDeclaration?.type && workqueueDeclaration.type) || EMPTY_STRING,
+    status: workqueueDeclaration?.registration?.status || EMPTY_STRING,
     assignment: workqueueDeclaration?.registration?.assignment,
     trackingId: trackingId,
-    dateOfBirth: '',
-    placeOfBirth: '',
-    informant: ''
+    dateOfBirth: EMPTY_STRING,
+    placeOfBirth: EMPTY_STRING,
+    informant: EMPTY_STRING
   }
 }
 
@@ -405,11 +417,13 @@ export const getGQLDeclaration = (
   data: IGQLDeclaration,
   language: string
 ): IDeclarationData => {
-  let name = ''
+  let name = EMPTY_STRING
   if (data.child) {
-    name = getName(data.child.name, language)
+    name = data.child.name ? getName(data.child.name, language) : EMPTY_STRING
   } else if (data.deceased) {
-    name = getName(data.deceased.name, language)
+    name = data.deceased.name
+      ? getName(data.deceased.name, language)
+      : EMPTY_STRING
   }
   return {
     id: data?.id,
@@ -418,9 +432,9 @@ export const getGQLDeclaration = (
     status: data?.registration?.status[0].type,
     trackingId: data?.registration?.trackingId,
     assignment: data?.registration?.assignment,
-    dateOfBirth: '',
-    placeOfBirth: '',
-    informant: ''
+    dateOfBirth: EMPTY_STRING,
+    placeOfBirth: EMPTY_STRING,
+    informant: EMPTY_STRING
   }
 }
 
@@ -450,9 +464,13 @@ export const getStatusLabel = (
           status: intl.formatMessage(DECLARATION_STATUS_LABEL[status])
         })
       : status === 'DECLARED'
-      ? findMessage(status, userDetails.role ? userDetails.role : '', intl)
+      ? findMessage(
+          status,
+          userDetails.role ? userDetails.role : EMPTY_STRING,
+          intl
+        )
       : intl.formatMessage(DECLARATION_STATUS_LABEL[status])
-  return ''
+  return EMPTY_STRING
 }
 
 const findMessage = (status: string, userRole: string, intl: IntlShape) => {
