@@ -1,17 +1,15 @@
 {
   "extends": "./tsconfig.json",
   "include": [
+    "resources/**/*.ts",
     "src/**/*.ts",
     "typings",
-    "tslint-rules",
-    "__mocks__/elasticsearch.ts",
-    "src/**/*.test.ts",
-    "test/setupJest.ts",
+    "test/setupJest.ts"
   ],
   "exclude": [
     "node_modules",
     "build",
     "scripts",
-    "acceptance-tests"
+    "acceptance-tests",
   ]
 }
