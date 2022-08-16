@@ -174,7 +174,7 @@ export class PasswordInput extends React.Component<
       <StyledField>
         <StyledInput
           ref={this.$element}
-          {...this.props}
+          {...(this.props as any)}
           type={this.state.isVisible ? 'text' : 'password'}
         />
         {!ignoreVisibility && (
