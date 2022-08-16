@@ -104,7 +104,9 @@ export const getPreviousOperationDateByOperationType = (
       })
 
   const prevOperationHistory =
-    prevOperationHistoriesByType.length > 0 && prevOperationHistoriesByType[0]
+    prevOperationHistoriesByType &&
+    prevOperationHistoriesByType.length > 0 &&
+    prevOperationHistoriesByType[0]
 
   if (!prevOperationHistory || !prevOperationHistory.operatedOn) {
     return null
