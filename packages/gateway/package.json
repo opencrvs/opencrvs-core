@@ -17,7 +17,7 @@
     "gen:schema:watch": "nodemon --on-change-only -e graphql -i src/graphql/schema.graphql -x 'yarn gen:schema'",
     "gen:types:watch": "nodemon --on-change-only -w src/graphql/schema.graphql -x 'yarn gen:types'",
     "open:cov": "yarn test && opener coverage/index.html",
-    "lint": "eslint -c .eslintrc.js --ext .ts --fix ./src",
+    "lint": "eslint -c .eslintrc.js --fix ./src",
     "precommit": "yarn lint && lint-staged"
   },
   "dependencies": {

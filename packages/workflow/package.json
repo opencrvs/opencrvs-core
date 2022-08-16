@@ -10,7 +10,7 @@
     "test": "jest --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "lint": "eslint -c .eslintrc.js --ext .ts --fix ./src",
+    "lint": "eslint -c .eslintrc.js --fix ./src",
     "precommit": "yarn lint && lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
