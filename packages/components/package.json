@@ -20,9 +20,6 @@
     "recharts": "^1.4.0",
     "styled-components": "^5.2.0",
     "ts-jest": "26.4.4",
-    "tslint": "^5.7.0",
-    "tslint-config-prettier": "^1.10.0",
-    "tslint-react": "^3.2.0",
     "webfontloader": "^1.6.28"
   },
   "scripts": {
@@ -38,7 +35,7 @@
   "lint-staged": {
     "src/**/*.{ts,tsx,json}": [
       "prettier --write",
-      "tslint",
+      "eslint",
       "stylelint",
       "git add"
     ]
