@@ -3,7 +3,6 @@
   "include": [
     "src/**/*.ts",
     "typings",
-    "tslint-rules",
     "src/**/*.test.ts"
   ],
   "exclude": [

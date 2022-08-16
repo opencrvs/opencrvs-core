@@ -33,7 +33,6 @@
   "include": [
     "src/**/*.ts",
     "typings",
-    "tslint-rules",
     "__mocks__/elasticsearch.ts"
   ],
   "exclude": [

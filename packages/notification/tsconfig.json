@@ -32,7 +32,6 @@
   "include": [
     "src/**/*.ts",
     "typings",
-    "tslint-rules"
   ],
   "exclude": [
     "node_modules",
