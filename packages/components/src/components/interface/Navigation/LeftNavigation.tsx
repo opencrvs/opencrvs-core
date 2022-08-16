@@ -26,6 +26,7 @@ export interface ILeftNavigationProps {
 const LeftNavigationContainer = styled.div<{
   navigationWidth?: number
 }>`
+  position: relative;
   top: 0px;
   width: ${({ navigationWidth }) =>
     navigationWidth ? navigationWidth : 249}px;
