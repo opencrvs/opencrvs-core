@@ -23,8 +23,11 @@ export default function getPlugins() {
         logPayload: false,
         instance: logger
       }
-    },
-    {
+    }
+  ]
+
+  if (SENTRY_DSN) {
+    plugins.push({
       plugin: Sentry,
       options: {
         client: {
@@ -33,8 +36,7 @@ export default function getPlugins() {
         },
         catchLogErrors: true
       }
-    }
-  ]
-
+    })
+  }
   return plugins
 }

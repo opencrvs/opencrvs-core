@@ -153,6 +153,14 @@ export async function getLoggedInPractitionerLocations(
   return await getPractitionerLocations(practitionerResource.id)
 }
 
+export async function getUserByToken(token: string) {
+  const tokenPayload = getTokenPayload(token)
+
+  return await getUser(tokenPayload.sub, {
+    Authorization: `Bearer ${token}`
+  })
+}
+
 export async function getLoggedInPractitionerResource(
   token: string
 ): Promise<fhir.Practitioner> {
