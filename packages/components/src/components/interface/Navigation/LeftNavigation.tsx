@@ -21,11 +21,11 @@ export interface ILeftNavigationProps {
   name?: string | null
   role?: string | null
   warning?: JSX.Element | null
+  className?: string
 }
 const LeftNavigationContainer = styled.div<{
   navigationWidth?: number
 }>`
-  position: fixed;
   top: 0px;
   width: ${({ navigationWidth }) =>
     navigationWidth ? navigationWidth : 249}px;
@@ -95,7 +95,10 @@ const Version = styled.div`
 
 export const LeftNavigation = (props: ILeftNavigationProps) => {
   return (
-    <LeftNavigationContainer navigationWidth={props.navigationWidth}>
+    <LeftNavigationContainer
+      navigationWidth={props.navigationWidth}
+      className={props.className}
+    >
       <ApplicationNameContainer>
         <ApplicationName>{props.applicationName}</ApplicationName>
       </ApplicationNameContainer>

@@ -21,22 +21,36 @@ export interface IFrameProps {
   children: React.ReactNode
 }
 
-const BodyContainer = styled.div`
-  margin-left: 0px;
+const FrameGrid = styled.div`
+  display: grid;
+  height: 100vh;
+  max-height: 100vh;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    'navigation header'
+    'navigation content';
+`
 
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 250px; /* Width of the left navigation */
-    padding: 0px 24px;
-  }
+const FrameNavigation = styled.nav`
+  grid-area: navigation;
+`
+const FrameHeader = styled.header`
+  grid-area: header;
+`
+const FrameMainContent = styled.main`
+  grid-area: content;
+  height: 100%;
+  overflow-y: auto;
+  background: ${({ theme }) => theme.colors.background};
 `
 
 export function Frame({ header, navigation, children }: IFrameProps) {
   return (
-    <>
-      {header}
-      {navigation}
-
-      <BodyContainer>{children}</BodyContainer>
-    </>
+    <FrameGrid>
+      <FrameNavigation>{navigation}</FrameNavigation>
+      <FrameHeader>{header}</FrameHeader>
+      <FrameMainContent>{children}</FrameMainContent>
+    </FrameGrid>
   )
 }

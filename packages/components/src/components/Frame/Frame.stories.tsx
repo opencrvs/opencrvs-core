@@ -20,7 +20,7 @@ import {
   groupSetting
 } from '../interface/Navigation/NavigationGroup.stories'
 import { Frame } from './Frame'
-import { Content } from '../interface/Content'
+import { Content, ContentSize } from '../interface/Content'
 
 export default {
   title: 'Layout/Frame',
@@ -37,7 +37,9 @@ export const WithLeftNavigation: ComponentStory<typeof Frame> = () => (
       </LeftNavigation>
     }
   >
-    <Content title="Example title">Hi!</Content>
+    <Content size={ContentSize.LARGE} title="Example title">
+      Hi!
+    </Content>
   </Frame>
 )
 
@@ -59,3 +61,5 @@ export const ActionPage: ComponentStory<typeof Frame> = () => (
     <Content title="Example title">Hi!</Content>
   </Frame>
 )
+
+ActionPage.parameters = { layout: 'fullscreen' }
