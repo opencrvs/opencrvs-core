@@ -34,7 +34,6 @@ export default async function activateUser(
 ) {
   const userUpdateData = request.payload as IActivateUserPayload
 
-  // tslint:disable-next-line
   const user: IUserModel | null = await User.findById(userUpdateData.userId)
   if (!user) {
     logger.error(
@@ -65,7 +64,6 @@ export default async function activateUser(
   )
 
   try {
-    // tslint:disable-next-line
     await User.update({ _id: user._id }, user)
   } catch (err) {
     logger.error(err.message)

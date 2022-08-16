@@ -144,7 +144,6 @@ export const fetchEstimateByLocation = async (
       const valueArray: [] = JSON.parse(extension.valueString as string)
       // Checking upto fromYear is risky as most of the time we won't
       // have any estimation data for recent years
-      // tslint:disable-next-line
       for (let key = toYear; key > 1; key--) {
         valueArray.forEach((data) => {
           if (key in data) {
@@ -162,7 +161,6 @@ export const fetchEstimateByLocation = async (
     ) {
       estimateExtensionFound = true
       const valueArray: [] = JSON.parse(extension.valueString as string)
-      // tslint:disable-next-line
       for (let key = toYear; key > 1; key--) {
         valueArray.forEach((data) => {
           if (key in data) {

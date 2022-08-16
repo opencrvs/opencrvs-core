@@ -75,10 +75,8 @@ export function getRandomQuestionKey(
         (securityQnA) => securityQnA.questionKey !== questionKeyToSkip
       )
     : securityQuestionAnswers
-  return filteredQuestions[
-    // tslint:disable-next-line
-    Math.floor(Math.random() * filteredQuestions.length)
-  ].questionKey
+  return filteredQuestions[Math.floor(Math.random() * filteredQuestions.length)]
+    .questionKey
 }
 
 export const requestSchema = Joi.object({

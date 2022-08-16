@@ -61,7 +61,6 @@ export default async function searchUsers(
     criteria = { ...criteria, status }
   }
 
-  // tslint:disable-next-line
   const userList: IUserModel[] = await User.find(criteria)
     .skip(skip)
     .limit(count)
@@ -70,7 +69,6 @@ export default async function searchUsers(
     })
 
   return {
-    // tslint:disable-next-line
     totalItems: await User.find(criteria).count(),
     results: userList
   }
