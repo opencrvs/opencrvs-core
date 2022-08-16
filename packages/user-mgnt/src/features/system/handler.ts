@@ -65,11 +65,11 @@ export async function registerSystemClient(
     ) {
       systemScopes.push('demo')
     }
-    /* tslint:disable */
+
     const client_id = uuid()
     const secret_id = uuid()
     const sha_secret = uuid()
-    /* tslint:enable */
+
     const { hash, salt } = generateSaltedHash(secret_id)
 
     const practitioner = createFhirPractitioner(systemAdminUser, true)

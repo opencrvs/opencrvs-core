@@ -88,10 +88,8 @@ export async function authenticate(
 }
 
 export async function authenticateSystem(
-  /* tslint:disable */
   client_id: string,
   client_secret: string
-  /* tslint:enable */
 ): Promise<ISystemAuthentication> {
   const url = resolve(USER_MANAGEMENT_URL, '/verifySystem')
 

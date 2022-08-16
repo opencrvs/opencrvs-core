@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-/* tslint:disable */
 export function createServerWithEnvironment(env: any) {
   jest.resetModules()
   process.env = { ...process.env, ...env }

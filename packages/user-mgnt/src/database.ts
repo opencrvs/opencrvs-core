@@ -24,7 +24,6 @@ db.on('connected', () => {
   logger.info('Connected to MongoDB')
 })
 
-// tslint:disable-next-line
 const wait = (time: number) =>
   new Promise((resolve) => setTimeout(resolve, time))
 

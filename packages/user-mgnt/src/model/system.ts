@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { model, Schema, Document } from 'mongoose'
-// tslint:disable-next-line
 import { statuses } from '@user-mgnt/utils/userUtils'
 import { IUserName, UserNameSchema } from '@user-mgnt/model/user'
 
