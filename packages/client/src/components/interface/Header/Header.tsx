@@ -615,4 +615,8 @@ export const Header = connect(
 /** @deprecated since the introduction of `<Frame>` */
 export const MarginedHeader = styled(Header)`
   margin-left: 249px;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 0;
+  }
 `
