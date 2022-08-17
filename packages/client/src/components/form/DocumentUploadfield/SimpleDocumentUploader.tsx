@@ -9,11 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ImageUploader } from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
-import { IFormFieldValue, IAttachmentValue } from '@client/forms'
-import Jimp from 'jimp'
+import { IAttachmentValue } from '@client/forms'
 import * as React from 'react'
 import {
   WrappedComponentProps as IntlShapeProps,
@@ -23,22 +21,14 @@ import {
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
-import { getBase64String, ErrorMessage } from './DocumentUploaderWithOption'
-
-const DocumentUploader = styled(ImageUploader)`
-  color: ${({ theme }) => theme.colors.primary};
-  background: ${({ theme }) => theme.colors.white};
-  border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
-  border-radius: 4px;
-  ${({ theme }) => theme.fonts.bold14};
-  height: 40px;
-  text-transform: initial;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-left: 0px;
-    margin-top: 10px;
-  }
-`
+import { ErrorMessage } from './DocumentUploaderWithOption'
+import {
+  selectForPreview,
+  closePreviewSection,
+  DocumentUploader,
+  handleFileChange,
+  onDelete
+} from './utils'
 
 const FieldDescription = styled.div`
   margin-top: 0px;
@@ -77,85 +67,6 @@ class SimpleDocumentUploaderComponent extends React.Component<
     }
   }
 
-  handleFileChange = (uploadedImage: File) => {
-    if (!uploadedImage) {
-      return
-    }
-    const allowedDocType = this.props.allowedDocType
-
-    this.setState(() => ({
-      filesBeingUploaded: [
-        ...this.state.filesBeingUploaded,
-        {
-          label: uploadedImage.name
-        }
-      ]
-    }))
-
-    this.props.onUploadingStateChanged &&
-      this.props.onUploadingStateChanged(true)
-
-    getBase64String(uploadedImage).then((data) => {
-      let base64String = data as string
-      base64String = base64String.split('base64,')[1]
-      Jimp.read(new Buffer(base64String, 'base64'))
-        .then((buffer) => {
-          if (
-            allowedDocType &&
-            allowedDocType.length > 0 &&
-            !allowedDocType.includes(buffer.getMIME())
-          ) {
-            throw new Error('File type not supported')
-          }
-          return data as string
-        })
-        .then((buffer) => {
-          this.props.onUploadingStateChanged &&
-            this.props.onUploadingStateChanged(false)
-          this.props.onComplete({
-            name: uploadedImage.name,
-            type: uploadedImage.type,
-            data: buffer
-          })
-          this.setState({
-            error: ''
-          })
-          this.setState({
-            filesBeingUploaded: []
-          })
-        })
-        .catch(() => {
-          this.props.onUploadingStateChanged &&
-            this.props.onUploadingStateChanged(false)
-          this.setState({
-            filesBeingUploaded: []
-          })
-          allowedDocType &&
-            allowedDocType.length > 0 &&
-            this.setState({
-              error: this.props.intl.formatMessage(messages.fileUploadError, {
-                type: allowedDocType
-                  .map((docTypeStr) => docTypeStr.split('/').pop())
-                  .join(', ')
-              })
-            })
-        })
-    })
-  }
-
-  selectForPreview = (previewImage: IFormFieldValue) => {
-    this.setState({ previewImage: previewImage as IAttachmentValue })
-  }
-
-  closePreviewSection = () => {
-    this.setState({ previewImage: null })
-  }
-
-  onDelete = (image: IFormFieldValue) => {
-    this.props.onComplete('')
-    this.closePreviewSection()
-  }
-
   render() {
     const {
       label,
@@ -183,9 +94,9 @@ class SimpleDocumentUploaderComponent extends React.Component<
         </ErrorMessage>
         <DocumentListPreview
           attachment={files}
-          onSelect={this.selectForPreview}
+          onSelect={() => selectForPreview.bind(this, this.state.previewImage)}
           label={label}
-          onDelete={this.onDelete}
+          onDelete={() => onDelete.bind(this)}
           processingDocuments={this.state.filesBeingUploaded}
         />
         {this.state.previewImage && (
@@ -193,15 +104,15 @@ class SimpleDocumentUploaderComponent extends React.Component<
             previewImage={this.state.previewImage}
             disableDelete={disableDeleteInPreview}
             title={intl.formatMessage(buttonMessages.preview)}
-            goBack={this.closePreviewSection}
-            onDelete={this.onDelete}
+            goBack={() => closePreviewSection.bind(this)}
+            onDelete={() => onDelete.bind(this)}
           />
         )}
         {(!files || !files.data) && (
           <DocumentUploader
             id="upload_document"
             title={intl.formatMessage(messages.uploadFile)}
-            handleFileChange={this.handleFileChange}
+            handleFileChange={() => handleFileChange.bind(this)}
           />
         )}
       </>
