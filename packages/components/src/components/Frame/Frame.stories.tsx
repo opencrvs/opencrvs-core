@@ -102,10 +102,7 @@ export const PageTemplateContentSideColumn = () => (
     }
   >
     <Frame.Layout>
-      <Content title="Example title" size={ContentSize.FULL}>
-        This is the main content
-      </Content>
-
+      <Content title="Example title">This is the main content</Content>
       <Box>This is the sidepanel content</Box>
     </Frame.Layout>
   </Frame>
@@ -125,9 +122,7 @@ export const PageTemplateContentMultipleSideColumns = () => (
   >
     <Frame.Layout>
       <Frame.Section>
-        <Content title="Example title" size={ContentSize.FULL}>
-          This is the main content
-        </Content>
+        <Content title="Example title">This is the main content</Content>
       </Frame.Section>
 
       <Frame.Section>

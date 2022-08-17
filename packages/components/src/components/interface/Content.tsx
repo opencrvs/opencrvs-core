@@ -150,8 +150,7 @@ const Icon = styled.div`
 
 export enum ContentSize {
   LARGE = 'large',
-  NORMAL = 'normal',
-  FULL = 'full'
+  NORMAL = 'normal'
 }
 
 interface IProps {
