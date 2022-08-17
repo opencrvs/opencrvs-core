@@ -79,9 +79,6 @@ export const resolvers: GQLResolver = {
         sort
       }
       if (locationIds) {
-        if (locationIds.length <= 0 || locationIds.includes('')) {
-          return await Promise.reject(new Error('Invalid location id'))
-        }
         searchCriteria.declarationLocationId = locationIds
       } else if (authHeader && !hasScope(authHeader, 'register')) {
         // Only register scope user can search without locationIds
