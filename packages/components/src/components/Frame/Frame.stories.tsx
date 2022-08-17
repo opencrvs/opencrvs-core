@@ -81,10 +81,12 @@ export const PageTemplateFlow: ComponentStory<typeof Frame> = () => (
   </Frame>
 )
 
+PageTemplateFlow.parameters = { layout: 'fullscreen' }
+
 export const PageTemplateForm: ComponentStory<typeof Frame> = () => (
   <Frame header={<EventTopBar title="Hello!" />}>
     <Content title="Example title">Hi!</Content>
   </Frame>
 )
 
-PageTemplateFlow.parameters = { layout: 'fullscreen' }
+PageTemplateForm.parameters = { layout: 'fullscreen' }

@@ -19,7 +19,7 @@ import {
 } from 'react-intl'
 import { Event } from '@client/utils/gateway'
 import { constantsMessages, buttonMessages } from '@client/i18n/messages'
-import { EventTopBar } from '@opencrvs/components/lib/interface'
+import { FixedEventTopBar } from '@opencrvs/components/lib/interface'
 import { messages } from '@client/i18n/messages/views/eventInfo'
 import styled from '@client/styledComponents'
 import {
@@ -110,7 +110,7 @@ function EventInfoComponet(props: IFullProps) {
 
   return (
     <Container id={`${eventType}-info-container`}>
-      <EventTopBar
+      <FixedEventTopBar
         title={intl.formatMessage(topBarTitle)}
         goHome={props.goToHome}
       />

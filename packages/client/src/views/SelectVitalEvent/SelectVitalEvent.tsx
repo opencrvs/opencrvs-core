@@ -15,7 +15,10 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import { EventTopBar, RadioButton } from '@opencrvs/components/lib/interface'
+import {
+  FixedEventTopBar,
+  RadioButton
+} from '@opencrvs/components/lib/interface'
 import { BodyContent, Container } from '@opencrvs/components/lib/layout'
 import { Event } from '@client/utils/gateway'
 import {
@@ -125,7 +128,7 @@ class SelectVitalEventView extends React.Component<
         className={PAGE_TRANSITIONS_CLASSNAME}
       >
         <Container>
-          <EventTopBar
+          <FixedEventTopBar
             title={intl.formatMessage(messages.registerNewEventTitle)}
             goHome={this.props.goToHome}
           />
