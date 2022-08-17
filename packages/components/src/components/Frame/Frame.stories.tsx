@@ -11,7 +11,7 @@
  */
 import { ComponentMeta } from '@storybook/react'
 import React from 'react'
-import { AppHeader, PageHeader, EventTopBar } from '../interface'
+import { AppHeader, PageHeader, EventTopBar, Box } from '../interface'
 import { LeftNavigation } from '../interface/Navigation/LeftNavigation'
 import { leftNavigationView } from '../interface/Navigation/LeftNavigation.stories'
 import { NavigationGroup } from '../interface/Navigation/NavigationGroup'
@@ -101,15 +101,42 @@ export const PageTemplateContentSideColumn = () => (
       </LeftNavigation>
     }
   >
-    <Frame.Layout sideColumn>
+    <Frame.Layout>
       <Content title="Example title" size={ContentSize.FULL}>
         This is the main content
       </Content>
-      <Content title="Sidepanel title" size={ContentSize.FULL}>
-        This is the sidepanel content
-      </Content>
+
+      <Box>This is the sidepanel content</Box>
     </Frame.Layout>
   </Frame>
 )
 
 PageTemplateContentSideColumn.parameters = { layout: 'fullscreen' }
+
+export const PageTemplateContentMultipleSideColumns = () => (
+  <Frame
+    header={<AppHeader title="OpenCRVS" />}
+    navigation={
+      <LeftNavigation {...leftNavigationView.args}>
+        <NavigationGroup {...groupDeclaration.args} />
+        <NavigationGroup {...groupSetting.args} />
+      </LeftNavigation>
+    }
+  >
+    <Frame.Layout>
+      <Frame.Section>
+        <Content title="Example title" size={ContentSize.FULL}>
+          This is the main content
+        </Content>
+      </Frame.Section>
+
+      <Frame.Section>
+        <Box>This is the sidepanel content</Box>
+        <Box>This is the sidepanel content</Box>
+        <Box>This is the sidepanel content</Box>
+      </Frame.Section>
+    </Frame.Layout>
+  </Frame>
+)
+
+PageTemplateContentMultipleSideColumns.parameters = { layout: 'fullscreen' }

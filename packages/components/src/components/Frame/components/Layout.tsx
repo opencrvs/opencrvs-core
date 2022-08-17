@@ -1,27 +1,28 @@
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
+import { Content } from '../../interface/Content'
 
-const sideColumnLayout = css`
+export const Layout = styled.section<{ sideColumn?: boolean }>`
   display: grid;
   width: 100%;
-  gap: 16px;
+  gap: 24px;
   grid-template-columns: 1fr auto;
   max-width: min(1140px, 100% - 24px - 24px);
-  margin: 0 auto;
+  margin: 24px auto;
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
     grid-template-columns: 1fr;
-    gap: 0;
-
-    > :last-child {
-      margin-top: 0;
-    }
+    gap: 24px;
   }
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     max-width: 100%;
+    gap: 0;
+    margin: 0;
   }
-`
 
-export const Layout = styled.section<{ sideColumn?: boolean }>`
-  ${({ sideColumn }) => sideColumn && sideColumnLayout}
+  ${Content} {
+    margin: 0;
+    width: 100%;
+    max-width: 100%;
+  }
 `

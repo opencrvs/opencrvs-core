@@ -26,13 +26,6 @@ const Container = styled(Box)<{ size: string }>`
   );
   box-sizing: border-box;
 
-  ${({ size }) =>
-    size === 'full' &&
-    `
-    width: 100%;
-    max-width: 100%;
-  `}
-
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     height: 100%;
     margin: 0;
@@ -179,7 +172,7 @@ interface IProps {
   className?: string
 }
 
-export class Content extends React.Component<IProps> {
+export class UnstyledContent extends React.Component<IProps> {
   render() {
     const {
       icon,
@@ -195,10 +188,12 @@ export class Content extends React.Component<IProps> {
       subtitle,
       children,
       bottomActionButtons,
-      size
+      size,
+      className
     } = this.props
+
     return (
-      <Container size={size as string}>
+      <Container size={size as string} className={className}>
         <Header>
           {backButtonLabel && (
             <BackButtonContainer>
@@ -248,3 +243,7 @@ export class Content extends React.Component<IProps> {
     )
   }
 }
+
+// Allows styling <Content> inside styled`` -template blocks
+// https://web.archive.org/web/20220725170839/https://styled-components.com/docs/advanced#caveat
+export const Content = styled(UnstyledContent)``
