@@ -70,7 +70,38 @@ export const colors = {
   ...config,
 
   primaryDark: darken(0.075)(config.primary),
+  primaryLight: lighten(0.075)(config.primary),
+  primaryLighter: lighten(0.1)(config.primary),
+
+  purpleDark: darken(0.075)(config.purple),
+  purpleLight: lighten(0.075)(config.purple),
+  purpleLighter: lighten(0.1)(config.purple),
+
+  orangeDark: darken(0.075)(config.orange),
+  orangeLight: lighten(0.05)(config.orange),
+  orangeLighter: lighten(0.1)(config.orange),
+
+  redDark: darken(0.075)(config.red),
+  redLight: lighten(0.075)(config.red),
+  redLighter: lighten(0.1)(config.red),
+
+  greenDark: darken(0.075)(config.green),
+  greenLight: lighten(0.075)(config.green),
+  greenLighter: lighten(0.1)(config.green),
+
+  blueDark: darken(0.075)(config.blue),
+  blueLight: lighten(0.075)(config.blue),
+  blueLighter: lighten(0.1)(config.blue),
+
+  tealDark: darken(0.075)(config.teal),
+  tealLight: lighten(0.075)(config.teal),
+  tealLighter: lighten(0.1)(config.teal),
+
+  yellowDark: darken(0.075)(config.yellow),
+  yellowLight: lighten(0.075)(config.yellow),
+  yellowLighter: lighten(0.1)(config.yellow),
+
   positiveDark: darken(0.075)(config.positive),
-  negativeDark: darken(0.075)(config.negative),
-  tealLight: lighten(0.075)(config.teal)
+  neutralDark: darken(0.075)(config.neutral),
+  negativeDark: darken(0.075)(config.negative)
 }

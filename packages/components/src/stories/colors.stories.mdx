@@ -13,18 +13,6 @@ import { colors, shadows, gradients } from '@opencrvs/components/lib/colors'
 import { Box } from '@opencrvs/components/lib/interface/Box'
 import styled from 'styled-components'
 
-export const LightShadowBox = styled.div`
-  border: 1px solid ${colors.grey300};
-  padding: 16px;
-  ${shadows.light}
-`
-
-export const HeavyShadowBox = styled.div`
-  border: 1px solid ${colors.grey300};
-  padding: 16px;
-  ${shadows.heavy}
-`
-
 <Meta title="Styles/Colors" />
 
 # Colors
@@ -35,48 +23,82 @@ export const HeavyShadowBox = styled.div`
   <ColorItem
     title="colors.primary"
     subtitle="Primary"
-    colors={{ primary: colors.primary, primaryDark: colors.primaryDark }}
-  />
-  <ColorItem
-    title="colors.secondary"
-    subtitle="Secondary"
-    colors={{ secondary: colors.secondary }}
-  />
-  <ColorItem
-    title="colors.tertiary"
-    subtitle="Grey"
-    colors={{ tertiary: colors.tertiary }}
+    colors={{
+      primaryLighter: colors.primaryLighter,
+      primaryLight: colors.primaryLight,
+      primary: colors.primary,
+      primaryDark: colors.primaryDark
+    }}
   />
   <ColorItem
     title="colors.purple"
     subtitle="Purple"
-    colors={{ purple: colors.purple }}
+    colors={{
+      purpleLighter: colors.purpleLighter,
+      purpleLight: colors.purpleLight,
+      purple: colors.purple,
+      purpleDark: colors.purpleDark
+    }}
   />
   <ColorItem
     title="colors.orange"
     subtitle="Orange"
-    colors={{ orange: colors.orange }}
+    colors={{
+      orangeLighter: colors.orangeLighter,
+      orangeLight: colors.orangeLight,
+      orange: colors.orange,
+      orangeDark: colors.orangeDark
+    }}
   />
-  <ColorItem title="colors.red" subtitle="Red" colors={{ red: colors.red }} />
+  <ColorItem
+    title="colors.red"
+    subtitle="Red"
+    colors={{
+      redLighter: colors.redLighter,
+      redLight: colors.redLight,
+      red: colors.red,
+      redDark: colors.redDark
+    }}
+  />
   <ColorItem
     title="colors.green"
     subtitle="Green"
-    colors={{ green: colors.green }}
+    colors={{
+      greenLighter: colors.greenLighter,
+      greenLight: colors.greenLight,
+      green: colors.green,
+      greenDark: colors.greenDark
+    }}
   />
   <ColorItem
     title="colors.blue"
     subtitle="Blue"
-    colors={{ blue: colors.blue }}
+    colors={{
+      blueLighter: colors.blueLighter,
+      blueLight: colors.blueLight,
+      blue: colors.blue,
+      blueDark: colors.blueDark
+    }}
   />
   <ColorItem
     title="colors.teal"
     subtitle="Teal"
-    colors={{ teal: colors.teal, tealLight: colors.tealLight }}
+    colors={{
+      tealLighter: colors.tealLighter,
+      tealLight: colors.tealLight,
+      teal: colors.teal,
+      tealDark: colors.tealDark
+    }}
   />
   <ColorItem
     title="colors.yellow"
     subtitle="Yellow"
-    colors={{ yellow: colors.yellow }}
+    colors={{
+      yellowLighter: colors.yellowLighter,
+      yellowLight: colors.yellowLight,
+      yellow: colors.yellow,
+      yellowDark: colors.yellowDark
+    }}
   />
   <ColorItem
     title="colors.grey"
@@ -92,6 +114,19 @@ export const HeavyShadowBox = styled.div`
     }}
   />
   <ColorItem
+    title="colors.opacity"
+    subtitle="Translucent"
+    colors={{
+      opacity24: colors.opacity24,
+      opacity54: colors.opacity54
+    }}
+  />
+</ColorPalette>
+
+## Application
+
+<ColorPalette>
+  <ColorItem
     title="colors.positive"
     subtitle="Status Green"
     colors={{
@@ -103,7 +138,8 @@ export const HeavyShadowBox = styled.div`
     title="colors.neutral"
     subtitle="Status Orange"
     colors={{
-      neutral: colors.neutral
+      neutral: colors.neutral,
+      neutralDark: colors.neutralDark
     }}
   />
   <ColorItem
@@ -115,21 +151,10 @@ export const HeavyShadowBox = styled.div`
     }}
   />
   <ColorItem
-    title="colors.opacity"
-    subtitle="Translucent"
+    title="colors.background"
+    subtitle="Background"
     colors={{
-      opacity24: colors.opacity24,
-      opacity54: colors.opacity54
+      background: colors.background
     }}
   />
 </ColorPalette>
-
-## Shadows
-
-**Light**
-
-<LightShadowBox />
-
-**Heavy**
-
-<HeavyShadowBox />
