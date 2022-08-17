@@ -1252,10 +1252,24 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 required: true
               },
+
+              {
+                name: 'registrationPhone',
+                type: 'TEL',
+                label: {
+                  defaultMessage: 'Phone number',
+                  id: 'form.field.label.declaration.phone',
+                  description: 'Input label for phone input'
+                },
+                required: true,
+                initialValue: '',
+                validate: []
+              },
               {
                 name: 'nationality',
                 type: 'SELECT_WITH_OPTIONS',
                 label: formMessageDescriptors.nationality,
+                value: 'SELECTED_COUNTRY',
                 required: true,
                 initialValue:
                   typeof window !== 'undefined'
@@ -1285,6 +1299,46 @@ export const registerForms: IDefaultRegisterForms = {
                     operation: 'arrayToFieldTransformer'
                   }
                 }
+              },
+
+              {
+                name: 'state',
+                type: 'TEXT',
+                label: {
+                  defaultMessage: 'State of Origin',
+                  id: 'form.field.label.state',
+                  description: 'Title for the state select'
+                },
+                required: false,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ]
+              },
+
+              {
+                name: 'ethnic',
+                type: 'TEXT',
+                label: {
+                  defaultMessage: 'Ethnic Origin',
+                  id: 'form.field.label.ethnic',
+                  description: 'Title for the ethnic origin'
+                },
+                required: false,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ]
               },
               {
                 name: 'iD',
@@ -1743,6 +1797,20 @@ export const registerForms: IDefaultRegisterForms = {
                 initialValue: '',
                 required: true
               },
+
+              {
+                name: 'registrationPhone',
+                type: 'TEL',
+                label: {
+                  defaultMessage: 'Phone number',
+                  id: 'form.field.label.declaration.phone',
+                  description: 'Input label for phone input'
+                },
+                required: true,
+                initialValue: '',
+                validate: []
+              },
+
               {
                 name: 'nationality',
                 type: 'SELECT_WITH_OPTIONS',
@@ -1776,6 +1844,46 @@ export const registerForms: IDefaultRegisterForms = {
                     operation: 'arrayToFieldTransformer'
                   }
                 }
+              },
+
+              {
+                name: 'state',
+                type: 'TEXT',
+                label: {
+                  defaultMessage: 'State of Origin',
+                  id: 'form.field.label.state',
+                  description: 'Title for the state select'
+                },
+                required: false,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ]
+              },
+
+              {
+                name: 'ethnic',
+                type: 'TEXT',
+                label: {
+                  defaultMessage: 'Ethnic Origin',
+                  id: 'form.field.label.ethnic',
+                  description: 'Title for the ethnic origin'
+                },
+                required: false,
+                initialValue: '',
+                validate: [],
+                conditionals: [
+                  {
+                    action: 'hide',
+                    expression:
+                      '!values.detailsExist && !mothersDetailsExistBasedOnContactAndInformant'
+                  }
+                ]
               },
               {
                 name: 'iD',

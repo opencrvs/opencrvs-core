@@ -576,11 +576,12 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
             }
       }
     },
+
     {
       name: 'statePrimary',
       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
       label: {
-        defaultMessage: 'Province',
+        defaultMessage: 'State',
         description: 'Title for the state select',
         id: 'form.field.label.state'
       },
@@ -647,7 +648,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       name: 'districtPrimary',
       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
       label: {
-        defaultMessage: 'District',
+        defaultMessage: 'Local Government Area',
         description: 'Title for the district select',
         id: 'form.field.label.district'
       },
@@ -1660,7 +1661,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       name: 'stateSecondary',
       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
       label: {
-        defaultMessage: 'Province',
+        defaultMessage: 'State',
         description: 'Title for the state select',
         id: 'form.field.label.state'
       },
@@ -2735,7 +2736,7 @@ export function getPlaceOfEventAddressFields(
       customisable: false,
       type: 'SELECT_WITH_DYNAMIC_OPTIONS',
       label: {
-        defaultMessage: 'Province',
+        defaultMessage: 'State',
         description: 'Title for the state select',
         id: 'form.field.label.state'
       },
