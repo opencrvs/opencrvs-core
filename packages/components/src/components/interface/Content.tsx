@@ -26,6 +26,13 @@ const Container = styled(Box)<{ size: string }>`
   );
   box-sizing: border-box;
 
+  ${({ size }) =>
+    size === 'full' &&
+    `
+    width: 100%;
+    max-width: 100%;
+  `}
+
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     height: 100%;
     margin: 0;
@@ -150,7 +157,8 @@ const Icon = styled.div`
 
 export enum ContentSize {
   LARGE = 'large',
-  NORMAL = 'normal'
+  NORMAL = 'normal',
+  FULL = 'full'
 }
 
 interface IProps {
@@ -168,6 +176,7 @@ interface IProps {
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   size?: ContentSize
+  className?: string
 }
 
 export class Content extends React.Component<IProps> {

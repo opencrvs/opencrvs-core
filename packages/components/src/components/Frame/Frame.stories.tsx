@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ComponentMeta, ComponentStory } from '@storybook/react'
+import { ComponentMeta } from '@storybook/react'
 import React from 'react'
 import { AppHeader, PageHeader, EventTopBar } from '../interface'
 import { LeftNavigation } from '../interface/Navigation/LeftNavigation'
@@ -27,7 +27,7 @@ export default {
   component: Frame
 } as ComponentMeta<typeof Frame>
 
-export const PageTemplateContentLarge: ComponentStory<typeof Frame> = () => (
+export const PageTemplateContentLarge = () => (
   <Frame
     header={<AppHeader title="OpenCRVS" />}
     navigation={
@@ -47,7 +47,7 @@ PageTemplateContentLarge.parameters = {
   layout: 'fullscreen'
 }
 
-export const PageTemplateContentMedium: ComponentStory<typeof Frame> = () => (
+export const PageTemplateContentMedium = () => (
   <Frame
     header={<AppHeader title="OpenCRVS" />}
     navigation={
@@ -67,7 +67,7 @@ PageTemplateContentMedium.parameters = {
   layout: 'fullscreen'
 }
 
-export const PageTemplateFlow: ComponentStory<typeof Frame> = () => (
+export const PageTemplateFlow = () => (
   <Frame
     header={
       <PageHeader
@@ -83,10 +83,33 @@ export const PageTemplateFlow: ComponentStory<typeof Frame> = () => (
 
 PageTemplateFlow.parameters = { layout: 'fullscreen' }
 
-export const PageTemplateForm: ComponentStory<typeof Frame> = () => (
+export const PageTemplateForm = () => (
   <Frame header={<EventTopBar title="Hello!" />}>
     <Content title="Example title">Hi!</Content>
   </Frame>
 )
 
 PageTemplateForm.parameters = { layout: 'fullscreen' }
+
+export const PageTemplateContentSideColumn = () => (
+  <Frame
+    header={<AppHeader title="OpenCRVS" />}
+    navigation={
+      <LeftNavigation {...leftNavigationView.args}>
+        <NavigationGroup {...groupDeclaration.args} />
+        <NavigationGroup {...groupSetting.args} />
+      </LeftNavigation>
+    }
+  >
+    <Frame.Layout sideColumn>
+      <Content title="Example title" size={ContentSize.FULL}>
+        This is the main content
+      </Content>
+      <Content title="Sidepanel title" size={ContentSize.FULL}>
+        This is the sidepanel content
+      </Content>
+    </Frame.Layout>
+  </Frame>
+)
+
+PageTemplateContentSideColumn.parameters = { layout: 'fullscreen' }

@@ -11,6 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+import { Layout } from './components/Layout'
 
 export interface IFrameProps {
   /** Accepts a header component that will be rendered at the top-most portion of an application frame */
@@ -54,3 +55,5 @@ export function Frame({ header, navigation, children }: IFrameProps) {
     </FrameGrid>
   )
 }
+
+Frame.Layout = Layout
