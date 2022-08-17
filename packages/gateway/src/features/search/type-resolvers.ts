@@ -26,7 +26,7 @@ interface ISearchDataTemplate {
   [key: string]: any
 }
 export interface ISearchCriteria {
-  declarationLocationId?: string
+  declarationLocationId?: string[]
   declarationLocationHirarchyId?: string
   status?: string[]
   type?: string[]
