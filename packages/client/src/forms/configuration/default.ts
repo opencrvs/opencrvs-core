@@ -2333,7 +2333,8 @@ export const registerForms: IDefaultRegisterForms = {
                 validate: [],
                 options: [
                   {
-                    value: birthDocumentTypeFhirMapping.BIRTH_CERTIFICATE,
+                    value:
+                      birthDocumentTypeFhirMapping.PROOF_OF_LEGAL_GUARDIANSHIP,
                     label: formMessageDescriptors.legalGuardianProof
                   },
                   {
