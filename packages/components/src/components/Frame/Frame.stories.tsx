@@ -146,6 +146,23 @@ export const PageTemplateSequentialContents = () => (
       </LeftNavigation>
     }
   >
+    <Content title="Example title">This is the main content</Content>
+    <Content title="Example title">This is the main content</Content>
+  </Frame>
+)
+
+PageTemplateSequentialContents.parameters = { layout: 'fullscreen' }
+
+export const PageTemplateSequentialContentsWrapped = () => (
+  <Frame
+    header={<AppHeader title="OpenCRVS" />}
+    navigation={
+      <LeftNavigation {...leftNavigationView.args}>
+        <NavigationGroup {...groupDeclaration.args} />
+        <NavigationGroup {...groupSetting.args} />
+      </LeftNavigation>
+    }
+  >
     <Frame.Layout>
       <Frame.Section>
         <Content title="Example title">This is the main content</Content>
@@ -155,4 +172,4 @@ export const PageTemplateSequentialContents = () => (
   </Frame>
 )
 
-PageTemplateSequentialContents.parameters = { layout: 'fullscreen' }
+PageTemplateSequentialContentsWrapped.parameters = { layout: 'fullscreen' }
