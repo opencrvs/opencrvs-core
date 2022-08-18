@@ -70,9 +70,7 @@ const TableHeader = styled.div<{
   }
 `
 
-const TableHeaderText = styled.div<{
-  isSorted?: boolean
-}>`
+const TableHeaderText = styled.div`
   ${({ theme }) => theme.fonts.bold14};
   color: ${({ theme }) => theme.colors.grey600};
 `
@@ -448,7 +446,7 @@ export class Table extends React.Component<ITableProps, ITableState> {
                           preference.sortFunction(preference.key)
                         }
                       >
-                        <TableHeaderText isSorted={preference.isSorted}>
+                        <TableHeaderText>
                           {preference.label}
                           <ToggleSortIcon
                             toggle={
