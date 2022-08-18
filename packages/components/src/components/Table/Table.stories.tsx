@@ -23,6 +23,5 @@ export const OneColumnOneRow = () => (
   <Table
     columns={[{ label: 'Lunch places', width: 100, key: 'lunchPlace' }]}
     content={[{ lunchPlace: 'The Greasy Spoon' }]}
-    noResultText="No lunch places available"
   />
 )
