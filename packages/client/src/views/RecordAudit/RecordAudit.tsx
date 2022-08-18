@@ -322,12 +322,17 @@ function RecordAuditBody({
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
+  const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
   const [actionDetailsData, setActionDetailsData] = React.useState({})
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
-  const toggleActionDetails = (actionItem: IActionDetailsData | null) => {
+  const toggleActionDetails = (
+    actionItem: IActionDetailsData | null,
+    itemIndex = -1
+  ) => {
     actionItem && setActionDetailsData(actionItem)
+    setActionDetailsIndex(itemIndex)
     setActionDetails((prevValue) => !prevValue)
   }
   const toggleDisplayDialog = () => setShowDialog((prevValue) => !prevValue)
@@ -507,6 +512,7 @@ function RecordAuditBody({
   const actionDetailsModalProps = {
     show: showActionDetails,
     actionDetailsData,
+    actionDetailsIndex,
     toggleActionDetails,
     intl,
     goToUser: goToUserProfile,
@@ -781,9 +787,7 @@ function mapStateToProps(state: IStoreState, props: RouteProps): IStateProps {
     declarationId,
     draft:
       state.declarationsState.declarations.find(
-        (declaration) =>
-          declaration.id === declarationId ||
-          declaration.compositionId === declarationId
+        (declaration) => declaration.id === declarationId
       ) || null,
     language: getLanguage(state),
     resources: getOfflineData(state),

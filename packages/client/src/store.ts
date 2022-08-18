@@ -63,6 +63,7 @@ import {
   formConfigReducer,
   IFormConfigState
 } from './forms/configuration/formConfig/reducer'
+import { submissionMiddleware } from './declarations/submissionMiddleware'
 
 export interface IStoreState {
   profile: ProfileState
@@ -107,7 +108,9 @@ export const createStore = <T>(
     workqueueState: registrarWorkqueueReducer,
     formConfig: formConfigReducer
   })
+  // @ts-ignore
   const enhancer = compose(
+    applyMiddleware(submissionMiddleware),
     install(config),
     applyMiddleware(routerMiddleware(history)),
     // @ts-ignore types are not correct for this module yet

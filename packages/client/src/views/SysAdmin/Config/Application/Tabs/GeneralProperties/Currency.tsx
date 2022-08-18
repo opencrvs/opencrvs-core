@@ -54,7 +54,12 @@ export function Currency() {
     `${offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${offlineCountryConfiguration.config.CURRENCY.isoCode}`
   )
   const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => setShowModal((prev) => !prev)
+  const toggleModal = () => {
+    setShowModal((prev) => !prev)
+    setCurrency(
+      `${offlineCountryConfiguration.config.CURRENCY.languagesAndCountry[0]}-${offlineCountryConfiguration.config.CURRENCY.isoCode}`
+    )
+  }
   const [notificationStatus, setNotificationStatus] =
     React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
 

@@ -12,13 +12,14 @@
 import {
   DOWNLOAD_STATUS,
   IDeclaration,
-  SUBMISSION_STATUS
+  SUBMISSION_STATUS,
+  getProcessingDeclarationIds
 } from '@client/declarations'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { Header } from '@client/components/interface/Header/Header'
 import { Query } from '@client/components/Query'
 import { IViewHeadingProps } from '@client/components/ViewHeading'
-import { Action } from '@client/forms'
+import { DownloadAction } from '@client/forms'
 import {
   buttonMessages,
   constantsMessages,
@@ -252,176 +253,182 @@ export class SearchResultView extends React.Component<
   }
 
   transformSearchContent = (data: QueryData) => {
-    const { intl } = this.props
     if (!data || !data.results) {
       return []
     }
 
     const transformedData = transformData(data, this.props.intl)
-    return transformedData.map((reg, index) => {
-      const foundDeclaration = this.props.outboxDeclarations.find(
-        (declaration) => declaration.id === reg.id
-      )
-      const actions: IAction[] = []
-      const downloadStatus =
-        (foundDeclaration && foundDeclaration.downloadStatus) || undefined
 
-      const declarationIsArchived = reg.declarationStatus === 'ARCHIVED'
-      const declarationIsRequestedCorrection =
-        reg.declarationStatus === 'REQUESTED_CORRECTION'
-      const declarationIsRegistered = reg.declarationStatus === 'REGISTERED'
-      const declarationIsCertified = reg.declarationStatus === 'CERTIFIED'
-      const declarationIsRejected = reg.declarationStatus === 'REJECTED'
-      const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
-      const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
-      const isDuplicate =
-        reg.duplicates &&
-        reg.duplicates.length > 0 &&
-        reg.declarationStatus !== SUBMISSION_STATUS.CERTIFIED &&
-        reg.declarationStatus !== SUBMISSION_STATUS.REGISTERED
-      const { intl, match, userDetails } = this.props
-      const { searchText, searchType } = match.params
-      if (this.state.width > this.props.theme.grid.breakpoints.lg) {
-        if (
-          (declarationIsRegistered || declarationIsCertified) &&
-          this.userHasCertifyScope()
-        ) {
-          actions.push({
-            label: this.props.intl.formatMessage(buttonMessages.print),
-            handler: (
-              e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
-            ) => {
-              e && e.stopPropagation()
-              this.props.goToPrintCertificate(reg.id, reg.event)
-            },
-            disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
-          })
-        } else if (
-          (declarationIsValidated && this.userHasRegisterScope()) ||
-          (!declarationIsValidated &&
-            !declarationIsRegistered &&
-            !declarationIsCertified &&
-            !declarationIsArchived &&
-            this.userHasValidateOrRegistrarScope())
-        ) {
-          actions.push({
-            label:
-              declarationIsRejected || declarationIsInProgress
-                ? this.props.intl.formatMessage(constantsMessages.update)
-                : this.props.intl.formatMessage(constantsMessages.review),
-            handler: () =>
-              this.props.goToPage(
-                REVIEW_EVENT_PARENT_FORM_PAGE,
-                reg.id,
-                'review',
-                reg.event.toLowerCase()
-              ),
-            disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
-          })
-        }
-      }
-      actions.push({
-        actionComponent: (
-          <DownloadButton
-            key={reg.id}
-            downloadConfigs={{
-              event: reg.event,
-              compositionId: reg.id,
-              assignment: reg.assignment,
-              refetchQueries: [
-                {
-                  query: SEARCH_EVENTS,
-                  variables: {
-                    locationIds: this.userHasRegisterScope()
-                      ? null
-                      : userDetails
-                      ? [getUserLocation(userDetails).id]
-                      : [],
-                    sort: SEARCH_RESULT_SORT,
-                    trackingId:
-                      searchType === TRACKING_ID_TEXT ? searchText : '',
-                    registrationNumber:
-                      searchType === BRN_DRN_TEXT ? searchText : '',
-                    contactNumber:
-                      searchType === PHONE_TEXT
-                        ? convertToMSISDN(searchText)
-                        : '',
-                    name: searchType === NAME_TEXT ? searchText : ''
-                  }
-                }
-              ],
-              action:
-                ((declarationIsRegistered || declarationIsCertified) &&
-                  Action.LOAD_CERTIFICATE_DECLARATION) ||
-                (declarationIsRequestedCorrection &&
-                  Action.LOAD_REQUESTED_CORRECTION_DECLARATION) ||
-                Action.LOAD_REVIEW_DECLARATION
-            }}
-            status={downloadStatus as DOWNLOAD_STATUS}
-          />
+    const processingDeclarationIds = getProcessingDeclarationIds(
+      this.props.outboxDeclarations
+    )
+
+    return transformedData
+      .filter(({ id }) => !processingDeclarationIds.includes(id))
+      .map((reg, index) => {
+        const foundDeclaration = this.props.outboxDeclarations.find(
+          (declaration) => declaration.id === reg.id
         )
+        const actions: IAction[] = []
+        const downloadStatus =
+          (foundDeclaration && foundDeclaration.downloadStatus) || undefined
+
+        const declarationIsArchived = reg.declarationStatus === 'ARCHIVED'
+        const declarationIsRequestedCorrection =
+          reg.declarationStatus === 'REQUESTED_CORRECTION'
+        const declarationIsRegistered = reg.declarationStatus === 'REGISTERED'
+        const declarationIsCertified = reg.declarationStatus === 'CERTIFIED'
+        const declarationIsRejected = reg.declarationStatus === 'REJECTED'
+        const declarationIsValidated = reg.declarationStatus === 'VALIDATED'
+        const declarationIsInProgress = reg.declarationStatus === 'IN_PROGRESS'
+        const isDuplicate =
+          reg.duplicates &&
+          reg.duplicates.length > 0 &&
+          reg.declarationStatus !== SUBMISSION_STATUS.CERTIFIED &&
+          reg.declarationStatus !== SUBMISSION_STATUS.REGISTERED
+        const { intl, match, userDetails } = this.props
+        const { searchText, searchType } = match.params
+        if (this.state.width > this.props.theme.grid.breakpoints.lg) {
+          if (
+            (declarationIsRegistered || declarationIsCertified) &&
+            this.userHasCertifyScope()
+          ) {
+            actions.push({
+              label: this.props.intl.formatMessage(buttonMessages.print),
+              handler: (
+                e: React.MouseEvent<HTMLButtonElement, MouseEvent> | undefined
+              ) => {
+                e && e.stopPropagation()
+                this.props.goToPrintCertificate(reg.id, reg.event)
+              },
+              disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+            })
+          } else if (
+            (declarationIsValidated && this.userHasRegisterScope()) ||
+            (!declarationIsValidated &&
+              !declarationIsRegistered &&
+              !declarationIsCertified &&
+              !declarationIsArchived &&
+              this.userHasValidateOrRegistrarScope())
+          ) {
+            actions.push({
+              label:
+                declarationIsRejected || declarationIsInProgress
+                  ? this.props.intl.formatMessage(constantsMessages.update)
+                  : this.props.intl.formatMessage(constantsMessages.review),
+              handler: () =>
+                this.props.goToPage(
+                  REVIEW_EVENT_PARENT_FORM_PAGE,
+                  reg.id,
+                  'review',
+                  reg.event.toLowerCase()
+                ),
+              disabled: downloadStatus !== DOWNLOAD_STATUS.DOWNLOADED
+            })
+          }
+        }
+        actions.push({
+          actionComponent: (
+            <DownloadButton
+              key={reg.id}
+              downloadConfigs={{
+                event: reg.event,
+                compositionId: reg.id,
+                assignment: reg.assignment,
+                refetchQueries: [
+                  {
+                    query: SEARCH_EVENTS,
+                    variables: {
+                      locationIds: this.userHasRegisterScope()
+                        ? null
+                        : userDetails
+                        ? [getUserLocation(userDetails).id]
+                        : [],
+                      sort: SEARCH_RESULT_SORT,
+                      trackingId:
+                        searchType === TRACKING_ID_TEXT ? searchText : '',
+                      registrationNumber:
+                        searchType === BRN_DRN_TEXT ? searchText : '',
+                      contactNumber:
+                        searchType === PHONE_TEXT
+                          ? convertToMSISDN(searchText)
+                          : '',
+                      name: searchType === NAME_TEXT ? searchText : ''
+                    }
+                  }
+                ],
+                action:
+                  ((declarationIsRegistered || declarationIsCertified) &&
+                    DownloadAction.LOAD_CERTIFICATE_DECLARATION) ||
+                  (declarationIsRequestedCorrection &&
+                    DownloadAction.LOAD_REQUESTED_CORRECTION_DECLARATION) ||
+                  DownloadAction.LOAD_REVIEW_DECLARATION
+              }}
+              status={downloadStatus as DOWNLOAD_STATUS}
+            />
+          )
+        })
+        const event =
+          (reg.event &&
+            intl.formatMessage(
+              dynamicConstantsMessages[reg.event.toLowerCase()]
+            )) ||
+          ''
+        const dateOfEvent =
+          reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))
+        const isValidatedOnReview =
+          reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
+          this.userHasRegisterScope()
+            ? true
+            : false
+        const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
+        const NameComponent = reg.name ? (
+          <NameContainer
+            isBoldLink={true}
+            id={`name_${index}`}
+            onClick={() =>
+              this.props.goToDeclarationRecordAudit('search', reg.id)
+            }
+          >
+            {reg.name}
+          </NameContainer>
+        ) : (
+          <NoNameContainer
+            id={`name_${index}`}
+            onClick={() =>
+              this.props.goToDeclarationRecordAudit('search', reg.id)
+            }
+          >
+            {intl.formatMessage(constantsMessages.noNameProvided)}
+          </NoNameContainer>
+        )
+        return {
+          ...reg,
+          event,
+          name: reg.name && reg.name.toLowerCase(),
+          iconWithName: (
+            <IconWithName
+              status={reg.declarationStatus}
+              name={NameComponent}
+              isValidatedOnReview={isValidatedOnReview}
+              isDuplicate={isDuplicate}
+              isArchived={isArchived}
+            />
+          ),
+          iconWithNameEvent: (
+            <IconWithNameEvent
+              status={reg.declarationStatus}
+              name={NameComponent}
+              event={event}
+              isDuplicate={isDuplicate}
+              isValidatedOnReview={isValidatedOnReview}
+              isArchived={isArchived}
+            />
+          ),
+          dateOfEvent,
+          actions
+        }
       })
-      const event =
-        (reg.event &&
-          intl.formatMessage(
-            dynamicConstantsMessages[reg.event.toLowerCase()]
-          )) ||
-        ''
-      const dateOfEvent =
-        reg.dateOfEvent && formattedDuration(new Date(reg.dateOfEvent))
-      const isValidatedOnReview =
-        reg.declarationStatus === SUBMISSION_STATUS.VALIDATED &&
-        this.userHasRegisterScope()
-          ? true
-          : false
-      const isArchived = reg.declarationStatus === SUBMISSION_STATUS.ARCHIVED
-      const NameComponent = reg.name ? (
-        <NameContainer
-          isBoldLink={true}
-          id={`name_${index}`}
-          onClick={() =>
-            this.props.goToDeclarationRecordAudit('search', reg.id)
-          }
-        >
-          {reg.name}
-        </NameContainer>
-      ) : (
-        <NoNameContainer
-          id={`name_${index}`}
-          onClick={() =>
-            this.props.goToDeclarationRecordAudit('search', reg.id)
-          }
-        >
-          {intl.formatMessage(constantsMessages.noNameProvided)}
-        </NoNameContainer>
-      )
-      return {
-        ...reg,
-        event,
-        name: reg.name && reg.name.toLowerCase(),
-        iconWithName: (
-          <IconWithName
-            status={reg.declarationStatus}
-            name={NameComponent}
-            isValidatedOnReview={isValidatedOnReview}
-            isDuplicate={isDuplicate}
-            isArchived={isArchived}
-          />
-        ),
-        iconWithNameEvent: (
-          <IconWithNameEvent
-            status={reg.declarationStatus}
-            name={NameComponent}
-            event={event}
-            isDuplicate={isDuplicate}
-            isValidatedOnReview={isValidatedOnReview}
-            isArchived={isArchived}
-          />
-        ),
-        dateOfEvent,
-        actions
-      }
-    })
   }
 
   render() {

@@ -82,7 +82,7 @@ services:
     depends_on:
       - kibana
     volumes:
-      - '/tmp/compose/infrastructure/monitoring/kibana/config.ndjson:/config.ndjson'
+      - '/opt/opencrvs/infrastructure/monitoring/kibana/config.ndjson:/config.ndjson'
     networks:
       - overlay_net
     deploy:
@@ -185,8 +185,8 @@ services:
     volumes:
       - '/data/elasticsearch:/usr/share/elasticsearch/data'
       - '/data/backups/elasticsearch:/data/backups/elasticsearch'
-      - '/tmp/compose/infrastructure/elasticsearch/elasticsearch.yml:/config/elasticsearch.yml'
-      - '/tmp/compose/infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
+      - '/opt/opencrvs/infrastructure/elasticsearch/elasticsearch.yml:/config/elasticsearch.yml'
+      - '/opt/opencrvs/infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
     deploy:
       replicas: 1
       placement:
@@ -215,7 +215,7 @@ services:
       - KIBANA_USERNAME=${KIBANA_USERNAME}
       - KIBANA_PASSWORD=${KIBANA_PASSWORD}
     volumes:
-      - '/tmp/compose/infrastructure/elasticsearch:/usr/app'
+      - '/opt/opencrvs/infrastructure/elasticsearch:/usr/app'
     networks:
       - overlay_net
     deploy:
@@ -227,8 +227,8 @@ services:
     image: jertel/elastalert2:2.3.0
     restart: unless-stopped
     volumes:
-      - '/tmp/compose/infrastructure/monitoring/elastalert/elastalert.yaml:/opt/elastalert/config.yaml'
-      - '/tmp/compose/infrastructure/monitoring/elastalert/rules:/opt/elastalert/rules'
+      - '/opt/opencrvs/infrastructure/monitoring/elastalert/elastalert.yaml:/opt/elastalert/config.yaml'
+      - '/opt/opencrvs/infrastructure/monitoring/elastalert/rules:/opt/elastalert/rules'
     networks:
       - overlay_net
     deploy:

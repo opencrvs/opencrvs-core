@@ -15,6 +15,7 @@ import { IDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { createTestComponent } from '@client/tests/util'
 import { createStore } from '@client/store'
+import { SubmissionAction } from '@client/forms'
 
 describe('OutBox tests', () => {
   const birthApp = {
@@ -60,7 +61,7 @@ describe('OutBox tests', () => {
     submissionStatus: 'READY_TO_SUBMIT',
     savedOn: 1562834811371,
     modifiedOn: 1562834888006,
-    action: 'submit for review'
+    action: SubmissionAction.SUBMIT_FOR_REVIEW
   }
   const deathApp = {
     id: '29d787ba-3676-4671-82ed-9da5de2ec714',
@@ -109,7 +110,7 @@ describe('OutBox tests', () => {
     submissionStatus: 'READY_TO_SUBMIT',
     savedOn: 1562846186040,
     modifiedOn: 1562846292423,
-    action: 'submit for review'
+    action: SubmissionAction.SUBMIT_FOR_REVIEW
   }
 
   const statuses = [

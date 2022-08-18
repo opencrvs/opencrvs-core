@@ -44,7 +44,7 @@ import {
   IFormData,
   IPreviewGroup,
   REVIEW_OVERRIDE_POSITION,
-  Action
+  SubmissionAction
 } from '@client/forms'
 import { lookup } from 'country-data'
 import {
@@ -929,7 +929,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
 
   makeCorrection = () => {
     const declaration = this.props.declaration
-    declaration.action = Action.REQUEST_CORRECTION_DECLARATION
+    declaration.action = SubmissionAction.REQUEST_CORRECTION_DECLARATION
     declaration.submissionStatus = SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
     updateDeclarationRegistrationWithCorrection(declaration, {
       userPrimaryOffice: this.props.userPrimaryOffice

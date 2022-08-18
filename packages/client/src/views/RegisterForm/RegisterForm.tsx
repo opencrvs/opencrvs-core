@@ -56,7 +56,8 @@ import {
   IFormData,
   CorrectionSection,
   IFormFieldValue,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SubmissionAction
 } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
@@ -71,11 +72,7 @@ import { HOME } from '@client/navigation/routes'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import styled, { keyframes } from '@client/styledComponents'
-import {
-  Scope,
-  hasRegisterScope,
-  hasRegistrationClerkScope
-} from '@client/utils/authUtils'
+import { Scope } from '@client/utils/authUtils'
 import { ReviewSection } from '@client/views/RegisterForm/review/ReviewSection'
 import {
   getVisibleSectionGroupsBasedOnConditions,
@@ -93,7 +90,6 @@ import {
   formMessages
 } from '@client/i18n/messages'
 import {
-  PAGE_TRANSITIONS_ENTER_TIME,
   PAGE_TRANSITIONS_CLASSNAME,
   PAGE_TRANSITIONS_TIMING_FUNC_N_FILL_MODE,
   PAGE_TRANSITIONS_EXIT_TIME,
@@ -363,7 +359,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   confirmSubmission = (
     declaration: IDeclaration,
     submissionStatus: string,
-    action: string,
+    action: SubmissionAction,
     payload?: IPayload,
     downloadStatus?: DOWNLOAD_STATUS
   ) => {
@@ -440,7 +436,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
   }
 
   onDeleteDeclaration = (declaration: IDeclaration) => {
-    this.props.deleteDeclaration(declaration)
+    this.props.deleteDeclaration(declaration.id)
   }
 
   onCloseDeclaration = () => {
@@ -1021,7 +1017,7 @@ function mapStateToProps(state: IStoreState, props: IFormProps & RouteProps) {
     },
     setAllFieldsDirty,
     fieldsToShowValidationErrors: updatedFields,
-    isWritingDraft: state.declarationsState.isWritingDraft,
+    isWritingDraft: declaration.writingDraft ?? false,
     scope: getScope(state)
   }
 }
