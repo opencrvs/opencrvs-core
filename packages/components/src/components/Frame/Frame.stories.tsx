@@ -173,3 +173,13 @@ export const PageTemplateSequentialContentsWrapped = () => (
 )
 
 PageTemplateSequentialContentsWrapped.parameters = { layout: 'fullscreen' }
+
+export const PageTemplateCentered = () => (
+  <Frame header={<AppHeader title="OpenCRVS" />}>
+    <Frame.LayoutCentered>
+      <Box>Box content goes here</Box>
+    </Frame.LayoutCentered>
+  </Frame>
+)
+
+PageTemplateCentered.parameters = { layout: 'fullscreen' }
