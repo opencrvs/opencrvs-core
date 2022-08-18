@@ -3801,7 +3801,7 @@
                     "description": "Option for form field: Type of ID",
                     "id": "form.field.label.iDTypeNationalID"
                   },
-                  "required": false,
+                  "required": true,
                   "initialValue": "",
                   "validate": [
                     {
