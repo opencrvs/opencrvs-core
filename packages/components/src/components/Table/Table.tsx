@@ -11,10 +11,14 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Pagination } from './DataTable/Pagination'
-import { LoadMore } from './GridTable/LoadMore'
-import { IColumn, IDynamicValues, IFooterFColumn } from './GridTable/types'
-import { ColumnContentAlignment } from './GridTable'
+import { Pagination } from '../interface/DataTable/Pagination'
+import { LoadMore } from '../interface/GridTable/LoadMore'
+import {
+  IColumn,
+  IDynamicValues,
+  IFooterFColumn
+} from '../interface/GridTable/types'
+import { ColumnContentAlignment } from '../interface/GridTable'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean
@@ -289,12 +293,12 @@ const defaultConfiguration = {
   currentPage: 1
 }
 
-interface ITableViewProps {
+export interface ITableProps {
   id?: string
   content: IDynamicValues[]
   columns: IColumn[]
   footerColumns?: IFooterFColumn[]
-  noResultText: string
+  noResultText?: string
   tableHeight?: number
   rowStyle?: {
     height: IBreakpoint
@@ -318,7 +322,7 @@ interface ITableViewProps {
   noPagination?: boolean
 }
 
-interface ITableViewState {
+interface ITableState {
   sortIconInverted: boolean
   sortKey: string | null
   tableOffsetTop: number
@@ -329,10 +333,7 @@ interface IBreakpoint {
   md: number
 }
 
-export class TableView extends React.Component<
-  ITableViewProps,
-  ITableViewState
-> {
+export class Table extends React.Component<ITableProps, ITableState> {
   tableRef = React.createRef<HTMLDivElement>()
   state = {
     sortIconInverted: false,
@@ -374,7 +375,7 @@ export class TableView extends React.Component<
     return true
   }
 
-  componentDidUpdate(prevProps: ITableViewProps) {
+  componentDidUpdate(prevProps: ITableProps) {
     if (prevProps.isLoading && !this.props.isLoading) {
       this.setState({
         tableOffsetTop:
@@ -513,7 +514,7 @@ export class TableView extends React.Component<
               </TableScroller>
               {footerColumns && content.length > 1 && (
                 <TableFooter
-                  id={'TableView-' + id + '-footer'}
+                  id={'Table-' + id + '-footer'}
                   totalWidth={totalWidth}
                   columns={columns}
                 >
@@ -525,7 +526,7 @@ export class TableView extends React.Component<
                 </TableFooter>
               )}
             </TableScrollerHorizontal>
-            {content.length <= 0 && (
+            {content.length <= 0 && noResultText && (
               <ErrorText id="no-record" isFullPage={isFullPage}>
                 {noResultText}
               </ErrorText>
