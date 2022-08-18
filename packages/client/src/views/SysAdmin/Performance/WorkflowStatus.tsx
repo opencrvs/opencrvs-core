@@ -61,7 +61,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
-import { Table } from '@opencrvs/components/lib/interface/Table'
+import { Table } from '@opencrvs/components/lib/Table'
 import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
 import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
 import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
