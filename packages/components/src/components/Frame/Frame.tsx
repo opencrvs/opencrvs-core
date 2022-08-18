@@ -11,8 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Layout } from './components/Layout'
-import { LayoutCentered } from './components/LayoutCentered'
+import { Layout, LayoutCentered } from './components/Layout'
 import { Section } from './components/Section'
 
 export interface IFrameProps {

@@ -48,3 +48,11 @@ export const Layout = styled.section`
       }
     `}
 `
+
+export const LayoutCentered = styled.div`
+  display: grid;
+  height: calc(100% - 104px);
+  justify-content: center;
+  align-content: center;
+  margin: 24px auto;
+`
