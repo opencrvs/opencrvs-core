@@ -28,10 +28,8 @@ import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completen
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { SortArrow } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
-import {
-  ColumnContentAlignment,
-  TableView
-} from '@opencrvs/components/lib/interface'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/interface'
+import { Table } from '@opencrvs/components/lib/Table'
 import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
 import { orderBy } from 'lodash'
 import { parse } from 'query-string'
@@ -501,7 +499,7 @@ function FieldAgentListComponent(props: IProps) {
             if (error) {
               return (
                 <>
-                  <TableView
+                  <Table
                     id={'field-agent-error-list'}
                     noResultText={intl.formatMessage(
                       messages.fieldAgentsNoResult
@@ -521,7 +519,7 @@ function FieldAgentListComponent(props: IProps) {
                 data.searchFieldAgents.totalItems
               return (
                 <TableDiv>
-                  <TableView
+                  <Table
                     id={'field-agent-list'}
                     noResultText={intl.formatMessage(
                       messages.fieldAgentsNoResult

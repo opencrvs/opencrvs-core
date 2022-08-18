@@ -33,9 +33,9 @@ import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   LoadingGrey,
-  ColumnContentAlignment,
-  TableView
+  ColumnContentAlignment
 } from '@opencrvs/components/lib/interface'
+import { Table } from '@opencrvs/components/lib/Table'
 import {
   NOTIFICATION_TYPE,
   ToastNotification
@@ -345,7 +345,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
   getLoadingAuditListView(hasError?: boolean) {
     return (
       <>
-        <TableView
+        <Table
           id="loading-audit-list"
           isLoading={true}
           columns={this.getAuditColumns()}
@@ -404,7 +404,7 @@ class UserAuditListComponent extends React.Component<Props, State> {
                       0
 
                     return (
-                      <TableView
+                      <Table
                         columns={this.getAuditColumns()}
                         content={this.getAuditData(data, user)}
                         noResultText={intl.formatMessage(messages.noAuditFound)}

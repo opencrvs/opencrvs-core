@@ -11,7 +11,7 @@
  */
 
 import React from 'react'
-import { TableView } from '@opencrvs/components/lib/interface/TableView'
+import { Table } from '@opencrvs/components/lib/Table'
 import { Divider } from '@opencrvs/components/lib/interface/Divider'
 import styled from '@client/styledComponents'
 import {
@@ -302,7 +302,7 @@ export const GetHistory = ({
       <Divider />
       <Heading>{intl.formatMessage(constantsMessages.history)}</Heading>
       <TableDiv>
-        <TableView
+        <Table
           id="task-history"
           fixedWidth={1088}
           noResultText=""

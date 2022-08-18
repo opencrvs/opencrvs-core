@@ -49,9 +49,9 @@ import {
 import { lookup } from 'country-data'
 import {
   ActionPageLight,
-  ColumnContentAlignment,
-  TableView
+  ColumnContentAlignment
 } from '@opencrvs/components/lib/interface'
+import { Table } from '@opencrvs/components/lib/Table'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import {
   SuccessButton,
@@ -210,7 +210,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             bottomActionButtons={[continueButton]}
             showTitleOnMobile={true}
           >
-            <TableView
+            <Table
               isLoading={false}
               noPagination
               content={this.getChanges(formSections)}
@@ -239,8 +239,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></TableView>
-            <TableView
+            ></Table>
+            <Table
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -260,9 +260,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></TableView>
+            ></Table>
 
-            <TableView
+            <Table
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -280,9 +280,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></TableView>
+            ></Table>
 
-            <TableView
+            <Table
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -302,9 +302,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></TableView>
+            ></Table>
 
-            <TableView
+            <Table
               hideTableBottomBorder={true}
               isLoading={false}
               content={[
@@ -322,9 +322,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></TableView>
+            ></Table>
 
-            <TableView
+            <Table
               isLoading={false}
               content={[
                 {
@@ -343,7 +343,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                 }
               ]}
               noResultText={intl.formatMessage(constantsMessages.noResults)}
-            ></TableView>
+            ></Table>
             <FormFieldGenerator
               id={this.group.id}
               onChange={(values) => {

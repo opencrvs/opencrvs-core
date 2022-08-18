@@ -61,7 +61,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
-import { TableView } from '@opencrvs/components/lib/interface/TableView'
+import { Table } from '@opencrvs/components/lib/interface/Table'
 import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
 import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
 import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
@@ -780,7 +780,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
 
             return (
               <>
-                <TableView
+                <Table
                   id="declaration-status-list"
                   content={getContent(data)}
                   columns={getColumns()}
