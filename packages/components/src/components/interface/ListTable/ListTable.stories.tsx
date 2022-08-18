@@ -16,7 +16,7 @@ import { ArrowDownBlue } from '../../icons'
 import React from 'react'
 
 export default {
-  title: 'Data/Table',
+  title: 'Deprecated/Table',
   component: ListTable
 } as Meta
 

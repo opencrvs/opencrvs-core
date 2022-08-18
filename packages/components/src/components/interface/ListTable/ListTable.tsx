@@ -319,6 +319,9 @@ interface IBreakpoint {
   md: number
 }
 
+/**
+ * @deprecated in favour of `<Table>`
+ */
 export class ListTable extends React.Component<
   IListTableProps,
   IListTableState

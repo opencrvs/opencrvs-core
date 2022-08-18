@@ -34,6 +34,7 @@ type ReactChild = React.ReactNodeArray | ReactText
 
 export interface IColumn {
   label?: string | React.ReactNode
+  /** Width in percentage */
   width: number
   key: string
   errorValue?: string
