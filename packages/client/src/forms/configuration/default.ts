@@ -3006,7 +3006,7 @@ export const registerForms: IDefaultRegisterForms = {
                 name: 'iD',
                 type: 'TEXT',
                 label: formMessageDescriptors.iDTypeNationalID,
-                required: false,
+                required: true,
                 initialValue: '',
                 validate: [
                   {

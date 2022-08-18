@@ -32,23 +32,4 @@ export const EXPECTED_BIRTH_REGISTRATION_IN_DAYS =
   process.env.EXPECTED_BIRTH_REGISTRATION_IN_DAYS || 45
 export const CONFIG_API_URL =
   process.env.CONFIG_API_URL || 'http://localhost:2021'
-export const mockFetchConfig = {
-  API_GATEWAY_URL: 'http://localhost:7070/',
-  CONFIG_API_URL: 'http://localhost:2021',
-  LOGIN_URL: 'http://localhost:3020',
-  AUTH_URL: 'http://localhost:4040',
-  RESOURCES_URL: 'http://localhost:3040',
-  APPLICATION_NAME: 'Farajaland CRVS',
-  FIELD_AGENT_AUDIT_LOCATIONS: 'DISTRICT',
-  DECLARATION_AUDIT_LOCATIONS: 'DISTRICT',
-  HIDE_EVENT_REGISTER_INFORMATION: false,
-  EXTERNAL_VALIDATION_WORKQUEUE: false,
-  PHONE_NUMBER_PATTERN: '/^0(7|9)[0-9]{1}[0-9]{7}$/',
-  NID_NUMBER_PATTERN: '/^[0-9]{9}$/',
-  CURRENCY: {
-    isoCode: 'ZMW',
-    languagesAndCountry: ['en-ZM']
-  },
-  ADDRESSES: 1
-}
 export const DEFAULT_TIMEOUT = 600000

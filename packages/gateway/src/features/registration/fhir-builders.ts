@@ -85,6 +85,8 @@ import {
 } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
+import { APPLICATION_CONFIG_URL } from '@gateway/constants'
+import fetch from 'node-fetch'
 
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
@@ -153,6 +155,34 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         'value',
         context
       )
+      // TODO: only do for National ID.
+      const configResponse: IApplicationConfigResponse = await fetch(
+        `${APPLICATION_CONFIG_URL}integrationConfig`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            ...context.authHeader
+          }
+        }
+      )
+        .then((response) => {
+          return response.json()
+        })
+        .catch((error) => {
+          return Promise.reject(
+            new Error(`Config request failed: ${error.message}`)
+          )
+        })
+
+      if (
+        configResponse &&
+        configResponse.config.INTEGRATIONS.length &&
+        configResponse.config.INTEGRATIONS[0].name === 'MOSIP' &&
+        configResponse.config.INTEGRATIONS[0].enabled === statuses.ACTIVE
+      ) {
+        // TODO: Verify with MOSIP then use MOSIP token to find existing person
+      }
       if (!person.id) {
         const personSearchSet = await fetchFHIR(
           `/Patient?identifier=${fieldValue}`,
@@ -3675,4 +3705,23 @@ export interface ITaskBundle extends fhir.Bundle {
   resourceType: fhir.code
   // prettier-ignore
   entry: [ITaskBundleEntry]
+}
+
+interface IIntegration {
+  name: string
+  enabled: string
+}
+interface IApplicationConfig {
+  INTEGRATIONS: [IIntegration]
+}
+
+export interface IApplicationConfigResponse {
+  config: IApplicationConfig
+}
+
+const statuses = {
+  PENDING: 'pending',
+  ACTIVE: 'active',
+  DISABLED: 'disabled',
+  DEACTIVATED: 'deactivated'
 }

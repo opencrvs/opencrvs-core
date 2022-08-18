@@ -606,6 +606,7 @@ type ApplicationConfiguration {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INTEGRATIONS: [Integration]
 }
 
 input ApplicationConfigurationInput {
@@ -620,6 +621,7 @@ input ApplicationConfigurationInput {
   PHONE_NUMBER_PATTERN: String
   NID_NUMBER_PATTERN: String
   ADDRESSES: Int
+  INTEGRATIONS: [IntegrationInput]
 }
 
 input FormDraftInput {
@@ -1060,6 +1062,11 @@ type Death {
   FEE: DeathFee
 }
 
+type Integration {
+  name: String
+  status: String
+}
+
 input BirthInput {
   REGISTRATION_TARGET: Int
   LATE_REGISTRATION_TARGET: Int
@@ -1079,6 +1086,11 @@ input CurrencyInput {
 input DeathInput {
   REGISTRATION_TARGET: Int
   FEE: DeathFeeInput
+}
+
+input IntegrationInput {
+  name: String
+  status: String
 }
 
 input QuestionInput {
