@@ -76,34 +76,6 @@
         hour: '0'
         job: '/usr/bin/docker system prune -af >> /var/log/docker-prune.log'
 
-    - name: Inserts Elasticsearch super user username environment variable to crontab
-      cron:
-        name: ELASTICSEARCH_ADMIN_USER
-        env: yes
-        job: 'elastic'
-      when: elasticsearch_superuser_password is defined
-
-    - name: Inserts Elasticsearch super user password environment variable to crontab
-      cron:
-        name: ELASTICSEARCH_ADMIN_PASSWORD
-        env: yes
-        job: '{{ elasticsearch_superuser_password }}'
-      when: elasticsearch_superuser_password is defined
-
-    - name: Inserts MongoDB username environment variable to crontab
-      cron:
-        name: MONGODB_ADMIN_USER
-        env: yes
-        job: '{{ mongodb_admin_username }}'
-      when: mongodb_admin_username is defined
-
-    - name: Inserts MongoDB password environment variable to crontab
-      cron:
-        name: MONGODB_ADMIN_PASSWORD
-        env: yes
-        job: '{{ mongodb_admin_password }}'
-      when: mongodb_admin_password is defined
-
     - name: 'Setup crontab to backup the opencrvs data'
       cron:
         name: 'backup opencrvs'
@@ -148,7 +120,7 @@
           Description=Mount encrypted dir
 
           [Service]
-          ExecStart=bash /opt/opencrvs/infrastructure/cryptfs/reboot.sh -pF {{encrypt_passphrase_file}} >> /var/log/cryptfs-reboot.log 2>&1
+          ExecStart=bash /opt/opencrvs/infrastructure/cryptfs/reboot.sh -pF /data/secrets/opencrvs.secrets >> /var/log/cryptfs-reboot.log 2>&1
 
           [Install]
           WantedBy=multi-user.target
@@ -236,6 +208,27 @@
         group: 1000
         owner: 1000
         mode: ugo+rwx
+
+    - name: 'Create secrets directory'
+      file:
+        path: /data/secrets
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+
+    - name: Save secrets into folder for access
+      ansible.builtin.copy:
+        dest: /data/secrets/opencrvs.secrets
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+        content: |
+          ENCRYPT_PASSPHRASE={{encrypt_passphrase}}
+          MONGODB_ADMIN_PASSWORD={{ mongodb_admin_password }}
+          MONGODB_ADMIN_USER={{ mongodb_admin_username }}
+          ELASTICSEARCH_ADMIN_PASSWORD={{elasticsearch_superuser_password}}
+          ELASTICSEARCH_ADMIN_USER=elastic
 
     - name: 'Install UFW'
       apt:

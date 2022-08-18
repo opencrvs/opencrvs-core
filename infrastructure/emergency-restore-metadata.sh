@@ -42,6 +42,8 @@ fi
 
 REPLICAS=$2
 
+source /data/secrets/opencrvs.secrets
+
 # Retrieve 2-step verification to continue
 #-----------------------------------------
 function ask_yes_or_no() {

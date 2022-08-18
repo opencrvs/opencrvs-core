@@ -62,6 +62,8 @@ PRODUCTION_IP=$4
 REMOTE_DIR=$5
 REPLICAS=$6
 
+source /data/secrets/opencrvs.secrets
+
 # Select docker network and replica set in production
 #----------------------------------------------------
 if [ "$REPLICAS" = "0" ]; then

@@ -13,7 +13,7 @@
 FS_FILE=/cryptfs_file_sparse.img  # -f, --file
 MOUNT_PATH=/data                  # -m, --mount
 DEV_MAP_NAME=cryptfs              # -n, --name
-                                  # -pf, --passphraseFilepath (required - path to a file containing the decryption passphrase in the format encrypt_passphrase=XXXX. We recommend this file is stored on a USB and removable in emergencies)
+                                  # -pf, --passphraseFilepath (required - path to a file containing the decryption passphrase in the format ENCRYPT_PASSPHRASE=XXXX. We recommend this file is stored on a USB and removable in emergencies)
 # options
 while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
   -f | --file )
@@ -49,7 +49,7 @@ else
 fi
 
 # open the LUKS device and set a mapping name
-echo $encrypt_passphrase | cryptsetup -d - luksOpen $LOOP_DEVICE $DEV_MAP_NAME || true
+echo $ENCRYPT_PASSPHRASE | cryptsetup -d - luksOpen $LOOP_DEVICE $DEV_MAP_NAME || true
 
 # mount the device to a folder
 mount /dev/mapper/$DEV_MAP_NAME $MOUNT_PATH || true
