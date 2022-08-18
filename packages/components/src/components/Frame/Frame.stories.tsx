@@ -37,8 +37,8 @@ export const PageTemplateContentLarge = () => (
       </LeftNavigation>
     }
   >
-    <Content size={ContentSize.LARGE} title="Example title">
-      Hi!
+    <Content size={ContentSize.LARGE} title="Content title">
+      Page content goes here
     </Content>
   </Frame>
 )
@@ -57,8 +57,8 @@ export const PageTemplateContentMedium = () => (
       </LeftNavigation>
     }
   >
-    <Content size={ContentSize.NORMAL} title="Example title">
-      Hi!
+    <Content size={ContentSize.NORMAL} title="Content title">
+      Page content goes here
     </Content>
   </Frame>
 )
@@ -71,13 +71,13 @@ export const PageTemplateFlow = () => (
   <Frame
     header={
       <PageHeader
-        mobileTitle="Hello!"
-        desktopTitle="Hello!"
+        mobileTitle="Page title"
+        desktopTitle="Page title"
         goBack={() => alert('Go back triggered')}
       />
     }
   >
-    <Content title="Example ">Hi!</Content>
+    <Content title="Content title ">Page content goes here</Content>
   </Frame>
 )
 
@@ -85,7 +85,7 @@ PageTemplateFlow.parameters = { layout: 'fullscreen' }
 
 export const PageTemplateForm = () => (
   <Frame header={<EventTopBar title="Hello!" />}>
-    <Content title="Example title">Hi!</Content>
+    <Content title="Content title">Page content goes here</Content>
   </Frame>
 )
 
@@ -102,8 +102,8 @@ export const PageTemplateContentSideColumn = () => (
     }
   >
     <Frame.Layout>
-      <Content title="Example title">This is the main content</Content>
-      <Box>This is the sidepanel content</Box>
+      <Content title="Content title">Page content goes here</Content>
+      <Box>Side content content goes here</Box>
     </Frame.Layout>
   </Frame>
 )
@@ -122,13 +122,13 @@ export const PageTemplateContentMultipleSideColumns = () => (
   >
     <Frame.Layout>
       <Frame.Section>
-        <Content title="Example title">This is the main content</Content>
+        <Content title="Content title">Page content goes here</Content>
       </Frame.Section>
 
       <Frame.Section>
-        <Box>This is the sidepanel content</Box>
-        <Box>This is the sidepanel content</Box>
-        <Box>This is the sidepanel content</Box>
+        <Box>Side content content goes here</Box>
+        <Box>Side content content goes here</Box>
+        <Box>Side content content goes here</Box>
       </Frame.Section>
     </Frame.Layout>
   </Frame>
@@ -146,8 +146,8 @@ export const PageTemplateSequentialContents = () => (
       </LeftNavigation>
     }
   >
-    <Content title="Example title">This is the main content</Content>
-    <Content title="Example title">This is the main content</Content>
+    <Content title="Content title">Page content goes here</Content>
+    <Content title="Content title">Page content goes here</Content>
   </Frame>
 )
 
@@ -165,8 +165,8 @@ export const PageTemplateSequentialContentsWrapped = () => (
   >
     <Frame.Layout>
       <Frame.Section>
-        <Content title="Example title">This is the main content</Content>
-        <Content title="Example title">This is the main content</Content>
+        <Content title="Content title">Page content goes here</Content>
+        <Content title="Content title">Page content goes here </Content>
       </Frame.Section>
     </Frame.Layout>
   </Frame>
