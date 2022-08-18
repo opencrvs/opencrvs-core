@@ -198,6 +198,15 @@ cp $COUNTRY_CONFIG_PATH/backups/openhim-dev.gz /tmp/opencrvs/infrastructure/defa
 cp $COUNTRY_CONFIG_PATH/backups/user-mgnt.gz /tmp/opencrvs/infrastructure/default_backups/user-mgnt.gz
 cp $COUNTRY_CONFIG_PATH/backups/application-config.gz /tmp/opencrvs/infrastructure/default_backups/application-config.gz
 
+# Copy decrypt script
+cp $COUNTRY_CONFIG_PATH/decrypt.sh /tmp/opencrvs/infrastructure/cryptfs/decrypt.sh
+
+# Copy emergency backup script
+cp $COUNTRY_CONFIG_PATH/emergency-backup-metadata.sh /tmp/opencrvs/infrastructure/emergency-backup-metadata.sh
+
+# Copy emergency restore script
+cp $COUNTRY_CONFIG_PATH/emergency-restore-metadata.sh /tmp/opencrvs/infrastructure/emergency-restore-metadata.sh
+
 # Copy selected country default updates to infrastructure default_updates folder
 [[ -d $COUNTRY_CONFIG_PATH/updates/generated ]] && cp $COUNTRY_CONFIG_PATH/updates/generated/*.json /tmp/opencrvs/infrastructure/default_updates
 
