@@ -7,6 +7,7 @@
   "dependencies": {
     "@craco/craco": "^6.4.3",
     "@opencrvs/components": "^1.0.0",
+    "@reduxjs/toolkit": "^1.8.3",
     "@sentry/browser": "^4.6.3",
     "@types/bcryptjs": "^2.4.2",
     "@types/history": "^4.6.2",

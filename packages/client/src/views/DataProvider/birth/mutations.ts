@@ -10,13 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import gql from 'graphql-tag'
-import { IForm, Action } from '@client/forms'
-import { IDeclaration } from '@client/declarations'
-import {
-  draftToGqlTransformer,
-  appendGqlMetadataFromDraft
-} from '@client/transformer'
 import { REQUEST_BIRTH_REG_CORRECTION } from '@client/forms/correction/mutations'
+import { SubmissionAction } from '@client/forms'
 
 export const SUBMIT_BIRTH_DECLARATION = gql`
   mutation createBirthRegistration($details: BirthRegistrationInput!) {
@@ -99,83 +94,21 @@ export const MARK_EVENT_UNASSIGNED = gql`
   }
 `
 
-export function getBirthMutationMappings(
-  action: Action,
-  payload?: any,
-  form?: IForm,
-  draft?: IDeclaration
-) {
-  let gqlDetails = {}
-  if (form && draft) {
-    gqlDetails = draftToGqlTransformer(
-      form,
-      draft.data,
-      draft.id,
-      draft.originalData
-    )
-    appendGqlMetadataFromDraft(draft, gqlDetails)
-  }
-
+export function getBirthMutation(action: SubmissionAction) {
   switch (action) {
-    case Action.SUBMIT_FOR_REVIEW:
-      return {
-        mutation: SUBMIT_BIRTH_DECLARATION,
-        variables: { details: gqlDetails },
-        dataKey: 'createBirthRegistration'
-      }
-    case Action.APPROVE_DECLARATION:
-      return {
-        mutation: APPROVE_BIRTH_DECLARATION,
-        variables: {
-          id: draft && draft.id,
-          details: gqlDetails
-        },
-        dataKey: 'markBirthAsValidated'
-      }
-    case Action.REGISTER_DECLARATION:
-      return {
-        mutation: REGISTER_BIRTH_DECLARATION,
-        variables: {
-          id: draft && draft.id,
-          details: gqlDetails
-        },
-        dataKey: 'markBirthAsRegistered'
-      }
-    case Action.REJECT_DECLARATION:
-      return {
-        mutation: REJECT_BIRTH_DECLARATION,
-        variables: {
-          ...payload
-        },
-        dataKey: 'markEventAsVoided'
-      }
-    case Action.ARCHIVE_DECLARATION:
-      return {
-        mutation: ARCHIVE_BIRTH_DECLARATION,
-        variables: {
-          ...payload
-        },
-        dataKey: 'markEventAsArchived'
-      }
-    case Action.COLLECT_CERTIFICATE:
-      return {
-        mutation: COLLECT_BIRTH_CERTIFICATE,
-        variables: {
-          id: draft && draft.id,
-          details: gqlDetails
-        },
-        dataKey: 'markBirthAsCertified'
-      }
-    case Action.REQUEST_CORRECTION_DECLARATION:
-      return {
-        mutation: REQUEST_BIRTH_REG_CORRECTION,
-        variables: {
-          id: draft && draft.id,
-          details: gqlDetails
-        },
-        dataKey: 'requestBirthRegistrationCorrection'
-      }
-    default:
-      return null
+    case SubmissionAction.SUBMIT_FOR_REVIEW:
+      return SUBMIT_BIRTH_DECLARATION
+    case SubmissionAction.APPROVE_DECLARATION:
+      return APPROVE_BIRTH_DECLARATION
+    case SubmissionAction.REGISTER_DECLARATION:
+      return REGISTER_BIRTH_DECLARATION
+    case SubmissionAction.REJECT_DECLARATION:
+      return REJECT_BIRTH_DECLARATION
+    case SubmissionAction.ARCHIVE_DECLARATION:
+      return ARCHIVE_BIRTH_DECLARATION
+    case SubmissionAction.COLLECT_CERTIFICATE:
+      return COLLECT_BIRTH_CERTIFICATE
+    case SubmissionAction.REQUEST_CORRECTION_DECLARATION:
+      return REQUEST_BIRTH_REG_CORRECTION
   }
 }

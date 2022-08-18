@@ -31,7 +31,7 @@ import { Dispatch } from 'redux'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope } from '@opencrvs/client/src/utils/authUtils'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { IFormData, Action } from '@client/forms'
+import { IFormData, DownloadAction } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import {
   QueryProvider,
@@ -96,7 +96,7 @@ export class ReviewFormView extends React.Component<IProps> {
       return (
         <QueryProvider
           event={this.props.event}
-          action={Action.LOAD_REVIEW_DECLARATION}
+          action={DownloadAction.LOAD_REVIEW_DECLARATION}
           payload={{ id: this.props.declarationId }}
         >
           <QueryContext.Consumer>

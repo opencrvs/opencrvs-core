@@ -15,8 +15,6 @@ import {
   HOST,
   PORT,
   CERT_PUBLIC_KEY_PATH,
-  CHECK_INVALID_TOKEN,
-  AUTH_URL,
   DEFAULT_TIMEOUT
 } from '@metrics/constants'
 import getPlugins from '@metrics/config/plugins'
@@ -28,7 +26,6 @@ import {
   INFLUX_HOST,
   INFLUX_PORT
 } from '@metrics/influxdb/constants'
-import { validateFunc } from '@opencrvs/commons'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -51,8 +48,9 @@ export async function createServer() {
       issuer: 'opencrvs:auth-service',
       audience: 'opencrvs:metrics-user'
     },
-    validate: (payload: any, request: Hapi.Request) =>
-      validateFunc(payload, request, CHECK_INVALID_TOKEN, AUTH_URL)
+    validate: () => ({
+      isValid: true
+    })
   })
 
   server.auth.default('jwt')
@@ -62,9 +60,9 @@ export async function createServer() {
 
   server.ext({
     type: 'onRequest',
-    method(request: Hapi.Request & { sentryScope: any }, h) {
+    method(request: Hapi.Request & { sentryScope?: any }, h) {
       if (request.payload) {
-        request.sentryScope.setExtra('payload', request.payload)
+        request.sentryScope?.setExtra('payload', request.payload)
       }
       return h.continue
     }

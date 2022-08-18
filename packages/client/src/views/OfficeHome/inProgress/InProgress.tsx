@@ -59,7 +59,7 @@ import { messages } from '@client/i18n/messages/views/registrarHome'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
-import { Action } from '@client/forms'
+import { DownloadAction } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
@@ -233,7 +233,7 @@ export class InProgressComponent extends React.Component<
             downloadConfigs={{
               event: event as string,
               compositionId: reg.id,
-              action: Action.LOAD_REVIEW_DECLARATION,
+              action: DownloadAction.LOAD_REVIEW_DECLARATION,
               assignment: reg?.registration?.assignment
             }}
             key={`DownloadButton-${index}`}

@@ -27,7 +27,7 @@ import {
 } from '@client/declarations'
 import { FormFieldGenerator } from '@client/components/form'
 import {
-  Action,
+  DownloadAction,
   IForm,
   IFormData,
   IFormField,
@@ -364,7 +364,7 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       return (
         <QueryProvider
           event={event}
-          action={Action.LOAD_CERTIFICATE_DECLARATION}
+          action={DownloadAction.LOAD_CERTIFICATE_DECLARATION}
           payload={{ id: declarationId }}
           fetchPolicy="no-cache"
         >

@@ -36,7 +36,7 @@ import {
 } from '@client/i18n/messages'
 import { IStoreState } from '@client/store'
 import { IDeclaration, DOWNLOAD_STATUS } from '@client/declarations'
-import { Action } from '@client/forms'
+import { DownloadAction } from '@client/forms'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
@@ -210,7 +210,7 @@ class ReadyToPrintComponent extends React.Component<
             downloadConfigs={{
               event: reg.event,
               compositionId: reg.id,
-              action: Action.LOAD_REVIEW_DECLARATION,
+              action: DownloadAction.LOAD_REVIEW_DECLARATION,
               assignment: reg.assignment
             }}
             key={`DownloadButton-${index}`}

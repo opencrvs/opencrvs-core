@@ -50,13 +50,18 @@ export function DeathFeeOnTime() {
   const offlineCountryConfiguration = useSelector((store: IStoreState) =>
     getOfflineData(store)
   )
-  const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => setShowModal((prev) => !prev)
-  const [notificationStatus, setNotificationStatus] =
-    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const [deathOnTimeFee, setDeathOnTimeFee] = React.useState(
     offlineCountryConfiguration.config.DEATH.FEE.ON_TIME.toLocaleString()
   )
+  const [showModal, setShowModal] = React.useState(false)
+  const toggleModal = () => {
+    setShowModal((prev) => !prev)
+    setDeathOnTimeFee(
+      offlineCountryConfiguration.config.DEATH.FEE.ON_TIME.toLocaleString()
+    )
+  }
+  const [notificationStatus, setNotificationStatus] =
+    React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
   const handleDeathOnTimeFee = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = String(event.target.value)
     setDeathOnTimeFee(getFormattedFee(value))
