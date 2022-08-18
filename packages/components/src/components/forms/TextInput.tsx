@@ -144,7 +144,7 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
       <StyledInput
         ref={$element}
         name={otherProps.id}
-        {...(otherProps as any)}
+        {...otherProps}
         autoComplete={process.env.NODE_ENV === 'production' ? 'off' : undefined}
         maxLength={maxLength}
         disabled={isDisabled}
