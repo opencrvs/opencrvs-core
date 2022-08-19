@@ -186,6 +186,31 @@ export const resolvers: GQLResolver = {
             searchResult.body.hits.hits) ||
           []
       }
+    },
+    async searchRecord(
+      _,
+      {
+        event,
+        eventLocationId,
+        childFirstName,
+        childLastName,
+        childsDob,
+        deceasedsFirstName,
+        deceasedsLastName,
+        dateOfDeath,
+        dateOfEventStart,
+        dateOfEventEnd
+      },
+      authHeader
+    ) {
+      if (authHeader && !hasScope(authHeader, 'recordsearch')) {
+        return await Promise.reject(new Error('User does not have permission'))
+      }
+
+      return {
+        results: [],
+        totalItems: 0
+      }
     }
   }
 }

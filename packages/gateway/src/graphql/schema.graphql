@@ -131,6 +131,18 @@ type Query {
     status: [String]
     type: [String]
   ): EventProgressResultSet
+  searchRecord(
+    event: String
+    eventLocationId: String
+    childFirstName: String
+    childLastName: String
+    childsDob: String
+    deceasedsFirstName: String
+    deceasedsLastName: String
+    dateOfDeath: String
+    dateOfEventStart: String
+    dateOfEventEnd: String
+  ): EventProgressResultSet
   getRoles(
     title: String
     value: ComparisonInput
