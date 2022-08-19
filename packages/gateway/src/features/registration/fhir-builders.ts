@@ -87,6 +87,7 @@ import { IAuthHeader } from '@gateway/common-types'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
 import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 import fetch from 'node-fetch'
+import { logger } from '@gateway/logger'
 
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
@@ -155,6 +156,10 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         'value',
         context
       )
+      logger.info('createIDBuilder: fhirBundle', JSON.stringify(fhirBundle))
+      logger.info('createIDBuilder: person', JSON.stringify(person))
+      logger.info('createIDBuilder: sectionCode', JSON.stringify(sectionCode))
+      logger.info('createIDBuilder: sectionTitle', JSON.stringify(sectionTitle))
       // TODO: only do for National ID.
       const configResponse: IApplicationConfigResponse = await fetch(
         `${APPLICATION_CONFIG_URL}integrationConfig`,
@@ -174,7 +179,7 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
             new Error(`Config request failed: ${error.message}`)
           )
         })
-
+      logger.info('configResponse', JSON.stringify(configResponse))
       if (
         configResponse &&
         configResponse.config.INTEGRATIONS.length &&
