@@ -17,6 +17,12 @@ import { Story, Meta } from '@storybook/react'
 import { Button } from './Button'
 import { Activity } from '../icons/Activity'
 
+const Container = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`
+
 export default {
   title: 'Controls/MyButton',
   component: Button
@@ -27,85 +33,93 @@ export default {
 
 export const All = () => (
   <>
-    <Button appearance="primary">Primary</Button>
-    <Button appearance="positive">Positive</Button>
-    <Button appearance="negative">Negative</Button>
-    <Button appearance="secondary">Secondary</Button>
-    <Button appearance="tertiary" size="small">
-      Tertiary
-    </Button>
-    <Button appearance="icon" size="large">
-      <Activity />
-    </Button>
-    <Button appearance="icon" size="medium">
-      <Activity />
-    </Button>
-    <Button appearance="icon" size="small">
-      <Activity />
-    </Button>
-    <Button appearance="primary" withIcon>
-      <Activity stroke="#ffffff" />
-      Primary
-    </Button>
-    <Button appearance="tertiary" size="small" withIcon>
-      <Activity />
-      Primary
-    </Button>
+    <Container>
+      <Button appearance="primary">Primary</Button>
+      <Button appearance="positive">Positive</Button>
+      <Button appearance="negative">Negative</Button>
+      <Button appearance="secondary">Secondary</Button>
+      <Button appearance="tertiary" size="small">
+        Tertiary
+      </Button>
+      <Button appearance="icon" size="medium">
+        <Activity />
+      </Button>
+      <Button appearance="primary" withIcon>
+        <Activity stroke="#ffffff" />
+        Primary
+      </Button>
+      <Button appearance="secondary" withIcon>
+        <Activity />
+        Secondary
+      </Button>
+      <Button appearance="tertiary" size="small" withIcon>
+        <Activity />
+        Primary
+      </Button>
+    </Container>
   </>
 )
 
 export const Sizes = () => (
   <>
-    <Button appearance="primary" size="large">
-      Default
-    </Button>
-    <Button appearance="primary" size="medium">
-      Default
-    </Button>
-    <Button appearance="primary" size="small">
-      Small
-    </Button>
+    <Container>
+      <Button appearance="primary" size="large">
+        Default
+      </Button>
+      <Button appearance="primary" size="medium">
+        Default
+      </Button>
+      <Button appearance="primary" size="small">
+        Small
+      </Button>
+    </Container>
   </>
 )
 
 export const Icon = () => (
   <>
-    <Button appearance="icon" size="large">
-      <Activity />
-    </Button>
-    <Button appearance="icon" size="medium">
-      <Activity />
-    </Button>
-    <Button appearance="icon" size="small">
-      <Activity />
-    </Button>
+    <Container>
+      <Button appearance="icon" size="large">
+        <Activity />
+      </Button>
+      <Button appearance="icon" size="medium">
+        <Activity />
+      </Button>
+      <Button appearance="icon" size="small">
+        <Activity />
+      </Button>
+    </Container>
   </>
 )
 
 export const Loading = () => (
   <>
-    <Button appearance="primary" size="large" isLoading>
-      Primary
-    </Button>
-    <Button appearance="secondary" isLoading>
-      Secondary
-    </Button>
-    <Button appearance="tertiary" isLoading>
-      Tertiary
-    </Button>
+    <Container>
+      <Button appearance="primary" size="large" isLoading>
+        Primary
+      </Button>
+      <Button appearance="secondary" isLoading>
+        Secondary
+      </Button>
+      <Button appearance="tertiary" isLoading>
+        Tertiary
+      </Button>
+    </Container>
   </>
 )
 
 export const Disabled = () => (
   <>
-    <Button appearance="primary" isDisabled>
-      Primary
-    </Button>
-    <Button appearance="secondary" isDisabled>
-      Secondary
-    </Button>
-    <Button appearance="tertiary" isDisabled>
-      Tertiary
-    </Button>
+    <Container>
+      <Button appearance="primary" isDisabled>
+        Primary
+      </Button>
+      <Button appearance="secondary" isDisabled>
+        Secondary
+      </Button>
+      <Button appearance="tertiary" isDisabled>
+        Tertiary
+      </Button>
+    </Container>
   </>
 )

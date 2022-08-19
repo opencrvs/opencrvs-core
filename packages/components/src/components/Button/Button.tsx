@@ -97,11 +97,11 @@ export const StyledButton = styled.button<
   }
 
   svg {
-    height: ${(props) => (props.size === SIZE.SMALL ? '18' : '24')}px;
-    width: ${(props) => (props.size === SIZE.SMALL ? '18' : '24')}px;
+    height: ${(props) => (props.size === SIZE.SMALL ? '20' : '24')}px;
+    width: ${(props) => (props.size === SIZE.SMALL ? '20' : '24')}px;
     vertical-align: top;
-    margin-right: ${(props) => (props.size === SIZE.SMALL ? '-5' : '-8')}px;
-    margin-left: ${(props) => (props.size === SIZE.SMALL ? '-5' : '-8')}px;
+    margin-right: ${(props) => (props.size === SIZE.SMALL ? '-6' : '-8')}px;
+    margin-left: ${(props) => (props.size === SIZE.SMALL ? '-6' : '-8')}px;
     margin-top: ${(props) => (props.size === SIZE.SMALL ? '3' : '0')}px;
     pointer-events: none;
   }
@@ -130,7 +130,11 @@ export const StyledButton = styled.button<
     props.isLoading &&
     `
         opacity: 0.8;
-
+        svg {
+          margin-left: ${props.size === SIZE.SMALL ? '-1' : '-2'}px;
+          margin-right: ${props.size === SIZE.SMALL ? '6' : '8'}px;
+          }
+          
         ${Text} {
           opacity: 0.8;
         }
@@ -146,8 +150,7 @@ export const StyledButton = styled.button<
           svg {
             margin-left: ${props.size === SIZE.SMALL ? '-1' : '-2'}px;
             margin-right: ${props.size === SIZE.SMALL ? '6' : '8'}px;
-          }
-          // padding: ${props.size === SIZE.SMALL ? '7' : '12'}px;
+            }
         `}
     
   
@@ -161,7 +164,7 @@ export const StyledButton = styled.button<
           !props.isLoading &&
           `
           &:hover {
-            background: #42639C;
+            background: theme.colors.primary;
           }
 
           &:focus:not(:hover) {
@@ -248,7 +251,7 @@ export const StyledButton = styled.button<
   
             &:focus, &:active {
               color #42639C;;
-              box-shadow:0px 0px 0px 3    px #EDC55E inset;
+              box-shadow:0px 0px 0px 3px #EDC55E inset;
           `
         }
       `}
@@ -257,7 +260,7 @@ export const StyledButton = styled.button<
     props.appearance === APPEARANCE.TERTIARY &&
     `
       height: 32px;
-      padding: 0 12px;
+      padding: 0 8px;
       background: #FFFFFF;
       color: #4972BB;
       font-size: 14px;
@@ -268,12 +271,13 @@ export const StyledButton = styled.button<
             &:hover {
               background: #EEEEEE;
             }
-            &:focus {
+            &:focus:not(:hover) {
               background: #EDC55E;
               color: #222222
             }
-            &:active {
+            &:focus, &:active {
               background: #EEEEEE;
+              box-shadow:0px 0px 0px 3px #EDC55E inset;
             }
           `
         }
@@ -293,11 +297,11 @@ export const StyledButton = styled.button<
                   background: #EEEEEE;
                   color: #42639C;
                 }
-                &:focus {
+                &:focus:not(:hover) {
                   background: #EDC55E;
                   color: #222222
                 }
-                &:active {
+                &:focus, &:active {
                   background: #EEEEEE;
                   color: #42639C;
                 }
@@ -359,7 +363,7 @@ export const Button = forwardRef<
           ref={ref}
         >
           <>
-            {isLoading && <Spinner id="button-loading" size={48} />}
+            {isLoading && <Spinner id="button-loading" size={24} />}
             <Text>{children}</Text>
           </>
         </StyledButton>
@@ -376,7 +380,7 @@ export const Button = forwardRef<
           ref={ref}
         >
           <>
-            {isLoading && <Spinner id="button-loading" size={48} />}
+            {isLoading && <Spinner id="button-loading" size={24} />}
             <Text>{children}</Text>
           </>
         </StyledButton>
