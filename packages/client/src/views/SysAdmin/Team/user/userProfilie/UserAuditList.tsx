@@ -351,7 +351,6 @@ class UserAuditListComponent extends React.Component<Props, State> {
           columns={this.getAuditColumns()}
           content={[]}
           noResultText={this.props.intl.formatMessage(messages.noAuditFound)}
-          hideBoxShadow={true}
           hideTableHeader={
             this.state.viewportWidth <= this.props.theme.grid.breakpoints.md
           }
@@ -409,7 +408,6 @@ class UserAuditListComponent extends React.Component<Props, State> {
                         content={this.getAuditData(data, user)}
                         noResultText={intl.formatMessage(messages.noAuditFound)}
                         isLoading={loading}
-                        hideBoxShadow={true}
                         hideTableHeader={
                           this.state.viewportWidth <= theme.grid.breakpoints.md
                         }

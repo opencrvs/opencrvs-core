@@ -306,7 +306,6 @@ export const GetHistory = ({
           id="task-history"
           fixedWidth={1088}
           noResultText=""
-          hideBoxShadow={true}
           columns={columns}
           content={historyData}
           alignItemCenter={true}

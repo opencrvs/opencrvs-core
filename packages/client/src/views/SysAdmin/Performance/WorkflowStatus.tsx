@@ -786,7 +786,6 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                   columns={getColumns()}
                   isLoading={loading || Boolean(error)}
                   noResultText={intl.formatMessage(constantsMessages.noResults)}
-                  hideBoxShadow
                   fixedWidth={2050}
                   tableHeight={150}
                   highlightRowOnMouseOver

@@ -505,7 +505,6 @@ function FieldAgentListComponent(props: IProps) {
                       messages.fieldAgentsNoResult
                     )}
                     isLoading={true}
-                    hideBoxShadow={true}
                     columns={getColumns(data && data.searchFieldAgents)}
                     content={getContent(data && data.searchFieldAgents)}
                   />

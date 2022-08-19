@@ -21,24 +21,18 @@ import { ColumnContentAlignment } from '../interface/GridTable'
 import { PaginationModified } from '../interface/PaginationModified'
 
 const Wrapper = styled.div<{
-  hideBoxShadow?: boolean
   isFullPage?: boolean
   fixedWidth: number | undefined
 }>`
   ${({ fixedWidth }) =>
     fixedWidth ? `width: ${fixedWidth}px;` : `width: 100%`}
 
-  @media (max-width: ${({ fixedWidth, theme }) => fixedWidth}px) {
+  @media (max-width: ${({ fixedWidth }) => fixedWidth}px) {
     width: 100%;
   }
   background: ${({ theme }) => theme.colors.white};
-  ${({ hideBoxShadow, isFullPage, theme }) =>
-    isFullPage
-      ? `padding-bottom: 24px;`
-      : hideBoxShadow
-      ? `padding: 24px 0;`
-      : `padding: 24px;
-    ${theme.shadows.light};`}
+  ${({ isFullPage }) =>
+    isFullPage ? `padding-bottom: 24px;` : `padding: 24px 0;`}
 `
 const TableTitleLoading = styled.span`
   background: ${({ theme }) => theme.colors.background};
@@ -309,7 +303,6 @@ export interface ITableProps {
   currentPage?: number
   isLoading?: boolean
   tableTitle?: string
-  hideBoxShadow?: boolean
   hideTableHeader?: boolean
   hideTableBottomBorder?: boolean
   alignItemCenter?: boolean
@@ -399,7 +392,6 @@ export class Table extends React.Component<ITableProps, ITableState> {
       tableTitle,
       tableHeight,
       rowStyle,
-      hideBoxShadow,
       hideTableHeader,
       hideTableBottomBorder,
       alignItemCenter,
@@ -418,7 +410,6 @@ export class Table extends React.Component<ITableProps, ITableState> {
         {!isLoading && (
           <Wrapper
             id={`listTable-${id}`}
-            hideBoxShadow={hideBoxShadow}
             isFullPage={isFullPage}
             fixedWidth={fixedWidth}
             ref={this.tableRef}

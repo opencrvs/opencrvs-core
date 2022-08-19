@@ -214,7 +214,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               isLoading={false}
               noPagination
               content={this.getChanges(formSections)}
-              hideBoxShadow={true}
               hideTableBottomBorder={true}
               columns={[
                 {
@@ -248,7 +247,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                   requestedBy: this.getRequestedBy()
                 }
               ]}
-              hideBoxShadow={true}
               columns={[
                 {
                   label: intl.formatMessage(
@@ -270,7 +268,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                   idCheck: this.getIdCheck()
                 }
               ]}
-              hideBoxShadow={true}
               columns={[
                 {
                   label: intl.formatMessage(messages.correctionSummaryIdCheck),
@@ -290,7 +287,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                   reasonForRequest: this.getReasonForRequest()
                 }
               ]}
-              hideBoxShadow={true}
               columns={[
                 {
                   label: intl.formatMessage(
@@ -312,7 +308,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                   comments: this.getComments()
                 }
               ]}
-              hideBoxShadow={true}
               columns={[
                 {
                   label: intl.formatMessage(messages.correctionSummaryComments),
@@ -331,7 +326,6 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                   supportingDocuments: this.getSupportingDocuments()
                 }
               ]}
-              hideBoxShadow={true}
               columns={[
                 {
                   label: intl.formatMessage(
