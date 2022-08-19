@@ -83,7 +83,6 @@ export const StyledButton = styled.button<
   ${(props) =>
     !props.isLoading &&
     `
-
         &:hover {
           
         }
@@ -164,7 +163,7 @@ export const StyledButton = styled.button<
           !props.isLoading &&
           `
           &:hover {
-            background: theme.colors.primary;
+            background: #42506B;
           }
 
           &:focus:not(:hover) {
@@ -173,7 +172,7 @@ export const StyledButton = styled.button<
           }
 
           &:focus, &:active {
-            background-color #42639C;
+            background-color #42506B;
             box-shadow:0px 0px 0px 3px #EDC55E inset;
           }
           `
@@ -190,7 +189,7 @@ export const StyledButton = styled.button<
             !props.isLoading &&
             `
               &:hover {
-                background: #49B78D;
+                background: #2C6E55;
               }
               &:focus:not(:hover) {
                 color: #222222;
