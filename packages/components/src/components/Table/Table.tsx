@@ -11,7 +11,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Pagination } from '../interface/DataTable/Pagination'
 import { LoadMore } from '../interface/GridTable/LoadMore'
 import {
   IColumn,
@@ -19,6 +18,7 @@ import {
   IFooterFColumn
 } from '../interface/GridTable/types'
 import { ColumnContentAlignment } from '../interface/GridTable'
+import { PaginationModified } from '../interface/PaginationModified'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean
@@ -563,7 +563,7 @@ export class Table extends React.Component<ITableProps, ITableState> {
         {totalItems > pageSize && (
           <>
             {!loadMoreText && !noPagination && (
-              <Pagination
+              <PaginationModified
                 initialPage={currentPage}
                 totalPages={Math.ceil(totalItems / pageSize)}
                 onPageChange={this.onPageChange}
