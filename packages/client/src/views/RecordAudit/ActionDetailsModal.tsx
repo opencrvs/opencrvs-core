@@ -36,6 +36,7 @@ import {
 import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import { IActionDetailsData } from './History'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
+import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: IActionDetailsData
@@ -186,6 +187,11 @@ export const ActionDetailsModalListTable = ({
     actionDetailsData: IActionDetailsData
   ): IDynamicValues[] => {
     const result: IDynamicValues[] = []
+
+    if (actionDetailsData.action === DOWNLOAD_STATUS.DOWNLOADED) {
+      return result
+    }
+
     actionDetailsData.input.forEach((item: { [key: string]: any }) => {
       const editedValue = actionDetailsData.output.find(
         (oi: { valueId: string; valueCode: string }) =>
@@ -260,7 +266,7 @@ export const ActionDetailsModalListTable = ({
     actionDetailsData: IActionDetailsData,
     index: number
   ): IDynamicValues => {
-    if (!actionDetailsData.certificates) return []
+    if (!actionDetailsData.certificates) return {}
 
     const certificate = actionDetailsData.certificates.filter(
       (item: IDynamicValues) => item
@@ -286,7 +292,7 @@ export const ActionDetailsModalListTable = ({
       if (relation)
         return `${collectorName} (${intl.formatMessage(relation.label)})`
       if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
-        const otherRelation = CollectorRelationLabelArray.find(
+        const otherRelation = certificateCollectorRelationLabelArray.find(
           (labelItem) =>
             labelItem.value === certificate.collector?.otherRelationship
         )
@@ -367,26 +373,30 @@ export const ActionDetailsModalListTable = ({
       )}
 
       {/* For Certificate */}
-      <ListTable
-        noResultText=" "
-        hideBoxShadow={true}
-        columns={certificateCollector}
-        content={[collectorData]}
-        pageSize={10}
-        totalItems={1}
-        currentPage={currentPage}
-        onPageChange={pageChangeHandler}
-      />
-      <ListTable
-        noResultText=" "
-        hideBoxShadow={true}
-        columns={certificateCollectorVerified}
-        content={[collectorData]}
-        pageSize={10}
-        totalItems={1}
-        currentPage={currentPage}
-        onPageChange={pageChangeHandler}
-      />
+      {!isEmpty(collectorData) && (
+        <ListTable
+          noResultText=" "
+          hideBoxShadow={true}
+          columns={certificateCollector}
+          content={[collectorData]}
+          pageSize={10}
+          totalItems={1}
+          currentPage={currentPage}
+          onPageChange={pageChangeHandler}
+        />
+      )}
+      {!isEmpty(collectorData) && (
+        <ListTable
+          noResultText=" "
+          hideBoxShadow={true}
+          columns={certificateCollectorVerified}
+          content={[collectorData]}
+          pageSize={10}
+          totalItems={1}
+          currentPage={currentPage}
+          onPageChange={pageChangeHandler}
+        />
+      )}
     </>
   )
 }
