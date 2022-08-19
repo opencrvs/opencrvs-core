@@ -13,16 +13,15 @@ set -e
 # .env.qa
 # .env.development
 # .env.production
-if [ -f .env.$4 ]
+if [ -f .env.$3 ]
 then
-    export $(cat .env.$4 | sed 's/#.*//g' | xargs)
+    export $(cat .env.$3 | sed 's/#.*//g' | xargs)
 fi
 
 print_usage_and_exit () {
-    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no --update-metadata=yes|no HOST ENV VERSION COUNTRY_CONFIG_VERSION COUNTRY_CONFIG_PATH REPLICAS'
+    echo 'Usage: ./deploy.sh --clear-data=yes|no --restore-metadata=yes|no HOST ENV VERSION COUNTRY_CONFIG_VERSION COUNTRY_CONFIG_PATH REPLICAS'
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
     echo "  --restore-metadata must have a value of 'yes' or 'no' set e.g. --restore-metadata=yes"
-    echo "  --update-metadata must have a value of 'yes' or 'no' set e.g. --update-metadata=yes"
     echo "  ENV can be 'production' or 'development' or 'qa' or 'demo'"
     echo '  HOST    is the server to deploy to'
     echo "  VERSION can be any OpenCRVS Core docker image tag or 'latest'"
@@ -42,39 +41,34 @@ if [ -z "$2" ] || { [ $2 != '--restore-metadata=no' ] && [ $2 != '--restore-meta
     print_usage_and_exit
 fi
 
-if [ -z "$3" ] || { [ $3 != '--update-metadata=no' ] && [ $3 != '--update-metadata=yes' ] ;} ; then
-    echo 'Error: Argument --update-metadata is required in postition 3.'
+if [ -z "$3" ] ; then
+    echo 'Error: Argument ENV is required in position 3.'
     print_usage_and_exit
 fi
 
 if [ -z "$4" ] ; then
-    echo 'Error: Argument ENV is required in position 4.'
+    echo 'Error: Argument HOST is required in position 4.'
     print_usage_and_exit
 fi
 
 if [ -z "$5" ] ; then
-    echo 'Error: Argument HOST is required in position 5.'
+    echo 'Error: Argument VERSION is required in position 5.'
     print_usage_and_exit
 fi
+
 
 if [ -z "$6" ] ; then
-    echo 'Error: Argument VERSION is required in position 6.'
+    echo 'Error: Argument COUNTRY_CONFIG_VERSION is required in position 6.'
     print_usage_and_exit
 fi
 
-
 if [ -z "$7" ] ; then
-    echo 'Error: Argument COUNTRY_CONFIG_VERSION is required in position 7.'
+    echo 'Error: Argument COUNTRY_CONFIG_PATH is required in position 7.'
     print_usage_and_exit
 fi
 
 if [ -z "$8" ] ; then
-    echo 'Error: Argument COUNTRY_CONFIG_PATH is required in position 8.'
-    print_usage_and_exit
-fi
-
-if [ -z "$9" ] ; then
-    echo 'Error: Argument REPLICAS is required in position 9.'
+    echo 'Error: Argument REPLICAS is required in position 8.'
     print_usage_and_exit
 fi
 
@@ -138,12 +132,12 @@ if [ -z "$DOCKERHUB_REPO" ] ; then
     print_usage_and_exit
 fi
 
-ENV=$4
-HOST=$5
-VERSION=$6
-COUNTRY_CONFIG_VERSION=$7
-COUNTRY_CONFIG_PATH=$8
-REPLICAS=$9
+ENV=$3
+HOST=$4
+VERSION=$5
+COUNTRY_CONFIG_VERSION=$6
+COUNTRY_CONFIG_PATH=$7
+REPLICAS=$8
 SSH_USER=${SSH_USER:-root}
 SSH_HOST=${SSH_HOST:-$HOST}
 LOG_LOCATION=${LOG_LOCATION:-/var/log}
@@ -190,7 +184,6 @@ echo "Deploying COUNTRY_CONFIG_VERSION $COUNTRY_CONFIG_VERSION to $SSH_HOST..."
 echo
 
 mkdir -p /tmp/opencrvs/infrastructure/default_backups
-mkdir -p /tmp/opencrvs/infrastructure/default_updates
 mkdir -p /tmp/opencrvs/infrastructure/cryptfs
 
 # Copy selected country default backups to infrastructure default_backups folder
@@ -207,9 +200,6 @@ cp $COUNTRY_CONFIG_PATH/emergency-backup-metadata.sh /tmp/opencrvs/infrastructur
 
 # Copy emergency restore script
 cp $COUNTRY_CONFIG_PATH/emergency-restore-metadata.sh /tmp/opencrvs/infrastructure/emergency-restore-metadata.sh
-
-# Copy selected country default updates to infrastructure default_updates folder
-[[ -d $COUNTRY_CONFIG_PATH/updates/generated ]] && cp $COUNTRY_CONFIG_PATH/updates/generated/*.json /tmp/opencrvs/infrastructure/default_updates
 
 # Copy all infrastructure files to the server
 rsync -rP docker-compose* infrastructure $SSH_USER@$SSH_HOST:/opt/opencrvs/
@@ -318,11 +308,4 @@ if [ $2 == "--restore-metadata=yes" ] ; then
     echo "Restoring metadata..."
     echo
     ssh $SSH_USER@$SSH_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD /opt/opencrvs/infrastructure/restore-metadata.sh $REPLICAS $ENV"
-fi
-
-if [ $3 == "--update-metadata=yes" ] ; then
-    echo
-    echo "Updating existing metadata..."
-    echo
-    ssh $SSH_USER@$SSH_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD /opt/opencrvs/infrastructure/restore-metadata-updates.sh $REPLICAS"
 fi
