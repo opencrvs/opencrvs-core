@@ -18,7 +18,7 @@ import { Button } from './Button'
 import { Activity } from '../icons/Activity'
 
 export default {
-  title: 'Controls/Button',
+  title: 'Controls/MyButton',
   component: Button
 } as Meta
 
