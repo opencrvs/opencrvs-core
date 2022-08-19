@@ -77,7 +77,7 @@ export const StyledButton = styled.button<
     props.size === SIZE.LARGE &&
     `
       height: 48px;
-      padding: 0 21px;
+      padding: 0 20px;
       `}
 
   ${(props) =>
@@ -144,6 +144,7 @@ export const StyledButton = styled.button<
     props.withIcon &&
     `
           svg {
+            margin-left: ${props.size === SIZE.SMALL ? '-1' : '-2'}px;
             margin-right: ${props.size === SIZE.SMALL ? '6' : '8'}px;
           }
           // padding: ${props.size === SIZE.SMALL ? '7' : '12'}px;
@@ -194,7 +195,7 @@ export const StyledButton = styled.button<
               }
     
               &:focus, &:active {
-                background-color #49B78D;;
+                background-color #2C6E55;
                 box-shadow:0px 0px 0px 3px #EDC55E inset;
               }
             `
@@ -247,7 +248,7 @@ export const StyledButton = styled.button<
   
             &:focus, &:active {
               color #42639C;;
-              box-shadow:0px 0px 0px 3px #EDC55E inset;
+              box-shadow:0px 0px 0px 3    px #EDC55E inset;
           `
         }
       `}
