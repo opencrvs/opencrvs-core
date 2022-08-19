@@ -32,10 +32,12 @@ if (
   window.location.hostname !== '127.0.0.1'
 ) {
   // setup error reporting using sentry
-  Sentry.init({
-    environment: process.env.NODE_ENV,
-    dsn: window.config.SENTRY
-  })
+  if (window.config.SENTRY) {
+    Sentry.init({
+      environment: process.env.NODE_ENV,
+      dsn: window.config.SENTRY
+    })
+  }
 
   // setup log rocket to ship log messages and record user errors
   if (window.config.LOGROCKET) {
@@ -43,20 +45,22 @@ if (
   }
 
   // Integrate the two
-  Sentry.configureScope((scope) => {
-    scope.addEventProcessor(async (event) => {
-      if (!event.extra) {
-        event.extra = {}
-      }
-      const sessionUrl = await new Promise((resolve) => {
-        LogRocket.getSessionURL((url) => {
-          resolve(url)
+  if (window.config.SENTRY && window.config.LOGROCKET) {
+    Sentry.configureScope((scope) => {
+      scope.addEventProcessor(async (event) => {
+        if (!event.extra) {
+          event.extra = {}
+        }
+        const sessionUrl = await new Promise((resolve) => {
+          LogRocket.getSessionURL((url) => {
+            resolve(url)
+          })
         })
+        event.extra.sessionURL = sessionUrl
+        return event
       })
-      event.extra.sessionURL = sessionUrl
-      return event
     })
-  })
+  }
 }
 const { store, history } = createStore()
 ReactDOM.render(

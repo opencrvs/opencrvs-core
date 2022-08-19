@@ -51,7 +51,11 @@ export function NIDNumPattern() {
   )
   const [nidExample, setNidExample] = React.useState(EMPTY_STRING)
   const [showModal, setShowModal] = React.useState(false)
-  const toggleModal = () => setShowModal((prev) => !prev)
+  const toggleModal = () => {
+    setShowModal((prev) => !prev)
+    setNidPattern(String(offlineCountryConfiguration.config.NID_NUMBER_PATTERN))
+    setNidExample(EMPTY_STRING)
+  }
   const [notificationStatus, setNotificationStatus] =
     React.useState<NOTIFICATION_STATUS>(NOTIFICATION_STATUS.IDLE)
 

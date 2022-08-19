@@ -13,7 +13,7 @@ import * as React from 'react'
 import styled from '@client/styledComponents'
 import { ResponsiveModal } from '@opencrvs/components/lib/interface'
 import { FormFieldGenerator } from '@client/components/form'
-import { IFormSectionData, Action, SubmissionAction } from '@client/forms'
+import { IFormSectionData, SubmissionAction } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { hasFormError } from '@client/forms/utils'
 import { IRejectRegistrationForm } from '@opencrvs/client/src/review/reject-registration'
@@ -43,7 +43,7 @@ interface IProps {
   confirmRejectionEvent: (
     declaration: IDeclaration,
     status: string,
-    action: Action,
+    action: SubmissionAction,
     payload: IPayload
   ) => void
 }

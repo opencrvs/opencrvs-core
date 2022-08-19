@@ -168,7 +168,6 @@ export const transformSearchQueryDataToDraft = (
     data.registration && data.registration.contactNumber
   declaration.trackingId = data.registration && data.registration.trackingId
   declaration.submissionStatus = data.registration && data.registration.status
-  declaration.compositionId = data.id
   declaration.createdAt =
     data.registration?.createdAt && data.registration.createdAt
 

@@ -39,6 +39,7 @@ import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/Searc
 
 interface IActionDetailsModalListTable {
   actionDetailsData: IActionDetailsData
+  actionDetailsIndex: number
   registerForm: IForm
   intl: IntlShape
   offlineData: Partial<IOfflineData>
@@ -125,6 +126,7 @@ function prepareComments(
 
 export const ActionDetailsModalListTable = ({
   actionDetailsData,
+  actionDetailsIndex,
   registerForm,
   intl,
   offlineData,
@@ -161,13 +163,6 @@ export const ActionDetailsModalListTable = ({
       width: 33.33
     },
     { key: 'edit', label: 'Edit', width: 33.33 }
-  ]
-  const certificateCollector = [
-    {
-      key: 'collector',
-      label: intl.formatMessage(certificateMessages.printedOnCollection),
-      width: 100
-    }
   ]
   const certificateCollectorVerified = [
     {
@@ -262,42 +257,72 @@ export const ActionDetailsModalListTable = ({
     return result
   }
   const certificateCollectorData = (
-    actionDetailsData: IActionDetailsData
-  ): IDynamicValues[] => {
+    actionDetailsData: IActionDetailsData,
+    index: number
+  ): IDynamicValues => {
     if (!actionDetailsData.certificates) return []
-    return actionDetailsData.certificates
-      .map((certificate: IDynamicValues) => {
-        if (!certificate) {
-          return
-        }
 
-        const name = getIndividualNameObj(
+    const certificate = actionDetailsData.certificates.filter(
+      (item: IDynamicValues) => item
+    )[index]
+
+    if (!certificate) {
+      return {}
+    }
+
+    const name = certificate.collector?.individual
+      ? getIndividualNameObj(
           certificate.collector.individual.name,
           window.config.LANGUAGES
         )
-        const collectorLabel = () => {
-          const relation = CollectorRelationLabelArray.find(
-            (labelItem) =>
-              labelItem.value === certificate.collector.relationship
-          )
-          const collectorName = `${name?.firstNames} ${name?.familyName}`
-          if (relation)
-            return `${collectorName} (${intl.formatMessage(relation.label)})`
-          return collectorName
-        }
+      : {}
+    const collectorLabel = () => {
+      const relation = CollectorRelationLabelArray.find(
+        (labelItem) => labelItem.value === certificate.collector?.relationship
+      )
+      const collectorName = `${name?.firstNames || ''} ${
+        name?.familyName || ''
+      }`
+      if (relation)
+        return `${collectorName} (${intl.formatMessage(relation.label)})`
+      if (certificate.collector?.relationship === 'PRINT_IN_ADVANCE') {
+        const otherRelation = CollectorRelationLabelArray.find(
+          (labelItem) =>
+            labelItem.value === certificate.collector?.otherRelationship
+        )
+        const otherRelationLabel = otherRelation
+          ? intl.formatMessage(otherRelation.label)
+          : ''
+        return `${collectorName} (${otherRelationLabel})`
+      }
+      return collectorName
+    }
 
-        return {
-          hasShowedVerifiedDocument: certificate.hasShowedVerifiedDocument
-            ? intl.formatMessage(certificateMessages.idCheckVerify)
-            : intl.formatMessage(certificateMessages.idCheckWithoutVerify),
-          collector: collectorLabel()
-        }
-      })
-      .filter((item: IDynamicValues) => null != item)
+    return {
+      hasShowedVerifiedDocument: certificate.hasShowedVerifiedDocument
+        ? intl.formatMessage(certificateMessages.idCheckVerify)
+        : intl.formatMessage(certificateMessages.idCheckWithoutVerify),
+      collector: collectorLabel(),
+      otherRelationship: certificate.collector?.otherRelationship,
+      relationship: certificate.collector?.relationship
+    }
   }
 
   const declarationUpdates = dataChange(actionDetailsData)
-  const collectorData = certificateCollectorData(actionDetailsData)
+  const collectorData = certificateCollectorData(
+    actionDetailsData,
+    actionDetailsIndex
+  )
+  const certificateCollector = [
+    {
+      key: 'collector',
+      label:
+        collectorData.relationship === 'PRINT_IN_ADVANCE'
+          ? intl.formatMessage(certificateMessages.printedOnAdvance)
+          : intl.formatMessage(certificateMessages.printedOnCollection),
+      width: 100
+    }
+  ]
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
   const content = prepareComments(actionDetailsData, draft)
   return (
@@ -346,9 +371,9 @@ export const ActionDetailsModalListTable = ({
         noResultText=" "
         hideBoxShadow={true}
         columns={certificateCollector}
-        content={collectorData}
+        content={[collectorData]}
         pageSize={10}
-        totalItems={collectorData.length}
+        totalItems={1}
         currentPage={currentPage}
         onPageChange={pageChangeHandler}
       />
@@ -356,9 +381,9 @@ export const ActionDetailsModalListTable = ({
         noResultText=" "
         hideBoxShadow={true}
         columns={certificateCollectorVerified}
-        content={collectorData}
+        content={[collectorData]}
         pageSize={10}
-        totalItems={collectorData.length}
+        totalItems={1}
         currentPage={currentPage}
         onPageChange={pageChangeHandler}
       />
@@ -369,6 +394,7 @@ export const ActionDetailsModalListTable = ({
 export const ActionDetailsModal = ({
   show,
   actionDetailsData,
+  actionDetailsIndex,
   toggleActionDetails,
   intl,
   goToUser,
@@ -378,6 +404,7 @@ export const ActionDetailsModal = ({
 }: {
   show: boolean
   actionDetailsData: IActionDetailsData
+  actionDetailsIndex: number
   toggleActionDetails: (param: IActionDetailsData | null) => void
   intl: IntlShape
   goToUser: typeof goToUserProfile
@@ -425,6 +452,7 @@ export const ActionDetailsModal = ({
         </div>
         <ActionDetailsModalListTable
           actionDetailsData={actionDetailsData}
+          actionDetailsIndex={actionDetailsIndex}
           registerForm={registerForm}
           intl={intl}
           offlineData={offlineData}
