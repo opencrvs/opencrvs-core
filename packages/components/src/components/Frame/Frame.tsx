@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Layout } from './components/Layout'
+import { Layout, LayoutCentered } from './components/Layout'
 import { Section } from './components/Section'
 
 export interface IFrameProps {
@@ -58,4 +58,5 @@ export function Frame({ header, navigation, children }: IFrameProps) {
 }
 
 Frame.Layout = Layout
+Frame.LayoutCentered = LayoutCentered
 Frame.Section = Section
