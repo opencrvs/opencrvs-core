@@ -285,7 +285,7 @@ elif [[ "$ENV" = "demo" ]]; then
   ENVIRONMENT_COMPOSE="-c docker-compose.countryconfig.demo-deploy.yml -c docker-compose.prod-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.demo-deploy.yml /opt/opencrvs/docker-compose.prod-deploy.yml"
 else
-  echo "Unknown error running docker-compose on server as ENV is not staging, qa or production."
+  echo "Unknown error running docker-compose on server as ENV is not staging, qa, demo or production."
   exit 1
 fi
 
