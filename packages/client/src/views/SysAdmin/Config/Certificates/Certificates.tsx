@@ -29,7 +29,6 @@ import {
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
-import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import {
   FloatingNotification,
@@ -39,14 +38,9 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE } from '@client/utils/constants'
-import {
-  ERROR_TYPES,
-  validateCertificateTemplate
-} from '@client/utils/imageUtils'
-import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { IAttachmentValue, IFormFieldValue, IForm } from '@client/forms'
+import { IAttachmentValue, IForm } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import {
@@ -65,8 +59,13 @@ import {
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { updateOfflineCertificate } from '@client/offline/actions'
-import { ICertificateTemplateData } from '@client/utils/referenceApi'
 import { IDeclaration } from '@client/declarations'
+import {
+  updatePreviewSvgWithSampleSignature,
+  closePreviewSection,
+  onDelete,
+  handleSelectFile
+} from './utils'
 
 const HiddenInput = styled.input`
   display: none;
@@ -108,34 +107,6 @@ interface State {
   showPrompt: boolean
   eventName: string
   previewImage: IAttachmentValue | null
-}
-
-function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
-  return new Promise((resolve, _) => {
-    const reader = new FileReader()
-    reader.onloadend = () => resolve(reader.result)
-    reader.readAsDataURL(blob)
-  })
-}
-
-async function updatePreviewSvgWithSampleSignature(
-  svgCode: string
-): Promise<string> {
-  const html = document.createElement('html')
-  html.innerHTML = svgCode
-  const certificateImages = html.querySelectorAll('image')
-  const signatureImage = Array.from(certificateImages).find(
-    (image) => image.getAttribute('data-content') === 'signature'
-  )
-  if (signatureImage) {
-    const res = await fetch('/assets/sample-signature.png')
-    const blob = await res.blob()
-    const base64signature = await blobToBase64(blob)
-    signatureImage.setAttribute('xlink:href', base64signature as string)
-  }
-
-  svgCode = html.getElementsByTagName('svg')[0].outerHTML
-  return unescape(encodeURIComponent(svgCode))
 }
 
 export const printDummyCertificate = async (
@@ -254,46 +225,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     ]
     return menuItems
   }
-  handleSelectFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { id, files } = event.target
-    const eventName: string = id.split('_')[0]
-    const certificateId: string = id.split('_')[4]
-    const status = 'ACTIVE'
-    const userMgntUserID =
-      this.props.userDetails && this.props.userDetails.userMgntUserID
-    this.setState({
-      imageUploading: true,
-      imageLoadingError: ''
-    })
-    this.toggleNotification()
-
-    if (files && files.length > 0) {
-      try {
-        const svgCode = await validateCertificateTemplate(files[0])
-        this.updateCertificateTemplate(
-          certificateId,
-          svgCode,
-          files[0].name,
-          userMgntUserID as string,
-          status,
-          eventName
-        )
-        this.birthCertificatefileUploader.current!.value = ''
-        this.deathCertificatefileUploader.current!.value = ''
-      } catch (error) {
-        if (error.message === ERROR_TYPES.IMAGE_TYPE) {
-          this.setState(() => ({
-            imageUploading: false,
-            imageLoadingError: this.props.intl.formatMessage(
-              imageUploadMessages.imageFormat
-            )
-          }))
-          this.birthCertificatefileUploader.current!.value = ''
-          this.deathCertificatefileUploader.current!.value = ''
-        }
-      }
-    }
-  }
 
   toggleNotification = () => {
     this.setState((state) => ({
@@ -307,46 +238,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 
   selectForPreview = (previewImage: IAttachmentValue) => {
     this.setState({ previewImage: previewImage })
-  }
-
-  closePreviewSection = () => {
-    this.setState({ previewImage: null })
-  }
-
-  onDelete = (image: IFormFieldValue) => {
-    this.closePreviewSection()
-  }
-
-  async updateCertificateTemplate(
-    id: string,
-    svgCode: string,
-    svgFilename: string,
-    user: string,
-    status: string,
-    event: string
-  ) {
-    try {
-      const res = await certificateTemplateMutations.updateCertificateTemplate(
-        id,
-        svgCode,
-        svgFilename,
-        user,
-        status,
-        event
-      )
-      if (res && res.createOrUpdateCertificateSVG) {
-        this.setState({ imageUploading: false })
-        this.props.updateOfflineCertificate(
-          res.createOrUpdateCertificateSVG as ICertificateTemplateData
-        )
-      }
-    } catch (err) {
-      this.setState({
-        imageLoadingError: this.props.intl.formatMessage(
-          imageUploadMessages.imageFormat
-        )
-      })
-    }
   }
 
   render() {
@@ -393,7 +284,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 id={`birth_file_uploader_field_${offlineResources.templates.certificates?.birth.id}`}
                 type="file"
                 accept={ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.join(',')}
-                onChange={this.handleSelectFile}
+                onChange={() => handleSelectFile.bind(this)}
               />
             </>
           )
@@ -425,7 +316,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 id={`death_file_uploader_field_${offlineResources.templates.certificates?.death.id}`}
                 type="file"
                 accept={ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.join(',')}
-                onChange={this.handleSelectFile}
+                onChange={() => handleSelectFile.bind(this)}
               />
             </>
           )
@@ -543,8 +434,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   ? intl.formatMessage(messages.birthTemplate)
                   : intl.formatMessage(messages.deathTemplate)
               }
-              goBack={this.closePreviewSection}
-              onDelete={this.onDelete}
+              goBack={() => closePreviewSection.bind(this)}
+              onDelete={() => onDelete.bind(this)}
             />
           )}
         </SysAdminContentWrapper>
