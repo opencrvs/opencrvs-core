@@ -85,6 +85,10 @@ import {
 } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
+import {
+  GQLBirthRegistrationInput,
+  GQLDeathRegistrationInput
+} from '@gateway/graphql/schema'
 
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
@@ -3543,7 +3547,7 @@ export const builders: IFieldBuilders = {
 }
 
 export async function buildFHIRBundle(
-  reg: Record<string, unknown>,
+  reg: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
@@ -3560,7 +3564,12 @@ export async function buildFHIRBundle(
   if (authHeader) {
     context.authHeader = authHeader
   }
-  await transformObj(reg, fhirBundle, builders, context)
+  await transformObj(
+    reg as Record<string, unknown>,
+    fhirBundle,
+    builders,
+    context
+  )
   return fhirBundle
 }
 

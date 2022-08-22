@@ -1,6 +1,15 @@
 {
   "extends": "./tsconfig.json",
   "include": [
-    "src/**/*.test.ts"
+    "src/**/*.ts",
+    "typings",
+    "src/**/*.test.ts",
+    "test/setupJest.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "scripts",
+    "acceptance-tests",
   ]
 }

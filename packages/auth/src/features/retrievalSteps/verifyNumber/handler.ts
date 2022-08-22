@@ -14,8 +14,7 @@ import * as Joi from 'joi'
 import {
   storeRetrievalStepInformation,
   getRetrievalStepInformation,
-  RetrievalSteps,
-  IRetrievalStepInformation
+  RetrievalSteps
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { checkVerificationCode } from '@auth/features/verifyCode/service'
 import { unauthorized } from '@hapi/boom'
