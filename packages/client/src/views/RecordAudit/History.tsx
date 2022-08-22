@@ -29,13 +29,19 @@ import {
 import { CMethodParams } from './ActionButtons'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import { IAvatar, getIndividualNameObj } from '@client/utils/userUtils'
+import {
+  IAvatar,
+  getIndividualNameObj,
+  IUserDetails
+} from '@client/utils/userUtils'
 import { goToUserProfile } from '@client/navigation'
 import { AvatarSmall } from '@client/components/Avatar'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
 import { DOWNLOAD_STATUS, SUBMISSION_STATUS } from '@client/declarations'
 import { useIntl } from 'react-intl'
 import { Box } from '@opencrvs/components/lib/icons/Box'
+import { v4 as uuid } from 'uuid'
+import { History, HumanName } from '@client/utils/gateway'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -133,6 +139,22 @@ const GetNameWithAvatar = ({
   )
 }
 
+const getIndexByAction = (histories: any, index: number): number => {
+  const newHistories = [...histories]
+  newHistories.map((item) => {
+    item.uuid = uuid()
+    return item
+  })
+
+  const uid = newHistories[index].uuid
+  const actionIndex = newHistories
+    .filter((item) => item.action === newHistories[index].action)
+    .reverse()
+    .findIndex((item) => item.uuid === uid)
+
+  return actionIndex
+}
+
 export const GetHistory = ({
   intl,
   draft,
@@ -141,7 +163,7 @@ export const GetHistory = ({
   toggleActionDetails,
   userDetails
 }: CMethodParams & {
-  toggleActionDetails: (actionItem: IActionDetailsData) => void
+  toggleActionDetails: (actionItem: IActionDetailsData, index?: number) => void
 }) => {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const isFieldAgent =
@@ -199,14 +221,20 @@ export const GetHistory = ({
     sortedHistory
   )
 
-  const historyData = (
-    historiesForDisplay as unknown as { [key: string]: any }[]
-  ).map((item) => ({
+  const historyData = (historiesForDisplay as History[]).map((item, index) => ({
     date: getFormattedDate(item?.date),
     action: (
       <GetLink
-        status={getStatusLabel(item?.action, item.reinstated, intl, item.user)}
-        onClick={() => toggleActionDetails(item)}
+        status={getStatusLabel(
+          item?.action as string,
+          !!item.reinstated,
+          intl,
+          item?.user as IUserDetails
+        )}
+        onClick={() => {
+          const actionIndex = getIndexByAction(historiesForDisplay, index)
+          toggleActionDetails(item, actionIndex)
+        }}
       />
     ),
     user:
@@ -214,16 +242,16 @@ export const GetHistory = ({
         <HealthSystemUser />
       ) : (
         <GetNameWithAvatar
-          id={item.user.id}
-          nameObject={item.user.name}
-          avatar={item.user?.avatar}
+          id={item?.user?.id as string}
+          nameObject={item?.user?.name as (GQLHumanName | null)[]}
+          avatar={item.user?.avatar as IAvatar}
           language={window.config.LANGUAGES}
         />
       ),
     type: intl.formatMessage(
       item.dhis2Notification && !item.user?.role
         ? userMessages.healthSystem
-        : userMessages[item.user.role as string]
+        : userMessages[item?.user?.role as string]
     ),
     location:
       item.dhis2Notification && !item.user?.role ? (
@@ -232,9 +260,9 @@ export const GetHistory = ({
         <>{item.office?.name}</>
       ) : (
         <GetLink
-          status={item.office?.name}
+          status={item.office?.name as string}
           onClick={() => {
-            goToTeamUserList && goToTeamUserList(item.office.id)
+            goToTeamUserList && goToTeamUserList(item?.office?.id as string)
           }}
         />
       )
