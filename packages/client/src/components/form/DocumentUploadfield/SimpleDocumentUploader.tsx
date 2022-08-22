@@ -24,6 +24,12 @@ import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { getBase64String, ErrorMessage } from './DocumentUploaderWithOption'
+import {
+  closePreviewSection,
+  handleFileChange,
+  onDelete,
+  selectForPreview
+} from './utils'
 
 const DocumentUploader = styled(ImageUploader)`
   color: ${({ theme }) => theme.colors.primary};
@@ -77,85 +83,6 @@ class SimpleDocumentUploaderComponent extends React.Component<
     }
   }
 
-  handleFileChange = (uploadedImage: File) => {
-    if (!uploadedImage) {
-      return
-    }
-    const allowedDocType = this.props.allowedDocType
-
-    this.setState(() => ({
-      filesBeingUploaded: [
-        ...this.state.filesBeingUploaded,
-        {
-          label: uploadedImage.name
-        }
-      ]
-    }))
-
-    this.props.onUploadingStateChanged &&
-      this.props.onUploadingStateChanged(true)
-
-    getBase64String(uploadedImage).then((data) => {
-      let base64String = data as string
-      base64String = base64String.split('base64,')[1]
-      Jimp.read(new Buffer(base64String, 'base64'))
-        .then((buffer) => {
-          if (
-            allowedDocType &&
-            allowedDocType.length > 0 &&
-            !allowedDocType.includes(buffer.getMIME())
-          ) {
-            throw new Error('File type not supported')
-          }
-          return data as string
-        })
-        .then((buffer) => {
-          this.props.onUploadingStateChanged &&
-            this.props.onUploadingStateChanged(false)
-          this.props.onComplete({
-            name: uploadedImage.name,
-            type: uploadedImage.type,
-            data: buffer
-          })
-          this.setState({
-            error: ''
-          })
-          this.setState({
-            filesBeingUploaded: []
-          })
-        })
-        .catch(() => {
-          this.props.onUploadingStateChanged &&
-            this.props.onUploadingStateChanged(false)
-          this.setState({
-            filesBeingUploaded: []
-          })
-          allowedDocType &&
-            allowedDocType.length > 0 &&
-            this.setState({
-              error: this.props.intl.formatMessage(messages.fileUploadError, {
-                type: allowedDocType
-                  .map((docTypeStr) => docTypeStr.split('/').pop())
-                  .join(', ')
-              })
-            })
-        })
-    })
-  }
-
-  selectForPreview = (previewImage: IFormFieldValue) => {
-    this.setState({ previewImage: previewImage as IAttachmentValue })
-  }
-
-  closePreviewSection = () => {
-    this.setState({ previewImage: null })
-  }
-
-  onDelete = (image: IFormFieldValue) => {
-    this.props.onComplete('')
-    this.closePreviewSection()
-  }
-
   render() {
     const {
       label,
@@ -183,9 +110,9 @@ class SimpleDocumentUploaderComponent extends React.Component<
         </ErrorMessage>
         <DocumentListPreview
           attachment={files}
-          onSelect={this.selectForPreview}
+          onSelect={() => selectForPreview.bind(this)}
           label={label}
-          onDelete={this.onDelete}
+          onDelete={() => onDelete.bind(this)}
           processingDocuments={this.state.filesBeingUploaded}
         />
         {this.state.previewImage && (
@@ -193,15 +120,15 @@ class SimpleDocumentUploaderComponent extends React.Component<
             previewImage={this.state.previewImage}
             disableDelete={disableDeleteInPreview}
             title={intl.formatMessage(buttonMessages.preview)}
-            goBack={this.closePreviewSection}
-            onDelete={this.onDelete}
+            goBack={() => closePreviewSection.bind(this)}
+            onDelete={() => onDelete.bind(this)}
           />
         )}
         {(!files || !files.data) && (
           <DocumentUploader
             id="upload_document"
             title={intl.formatMessage(messages.uploadFile)}
-            handleFileChange={this.handleFileChange}
+            handleFileChange={() => handleFileChange.bind(this)}
           />
         )}
       </>

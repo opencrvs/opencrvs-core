@@ -67,6 +67,12 @@ import {
 import { updateOfflineCertificate } from '@client/offline/actions'
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
 import { IDeclaration } from '@client/declarations'
+import {
+  blobToBase64,
+  updatePreviewSvgWithSampleSignature,
+  closePreviewSection,
+  onDelete
+} from './utils'
 
 const HiddenInput = styled.input`
   display: none;
@@ -108,34 +114,6 @@ interface State {
   showPrompt: boolean
   eventName: string
   previewImage: IAttachmentValue | null
-}
-
-function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
-  return new Promise((resolve, _) => {
-    const reader = new FileReader()
-    reader.onloadend = () => resolve(reader.result)
-    reader.readAsDataURL(blob)
-  })
-}
-
-async function updatePreviewSvgWithSampleSignature(
-  svgCode: string
-): Promise<string> {
-  const html = document.createElement('html')
-  html.innerHTML = svgCode
-  const certificateImages = html.querySelectorAll('image')
-  const signatureImage = Array.from(certificateImages).find(
-    (image) => image.getAttribute('data-content') === 'signature'
-  )
-  if (signatureImage) {
-    const res = await fetch('/assets/sample-signature.png')
-    const blob = await res.blob()
-    const base64signature = await blobToBase64(blob)
-    signatureImage.setAttribute('xlink:href', base64signature as string)
-  }
-
-  svgCode = html.getElementsByTagName('svg')[0].outerHTML
-  return unescape(encodeURIComponent(svgCode))
 }
 
 export const printDummyCertificate = async (
@@ -307,14 +285,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
 
   selectForPreview = (previewImage: IAttachmentValue) => {
     this.setState({ previewImage: previewImage })
-  }
-
-  closePreviewSection = () => {
-    this.setState({ previewImage: null })
-  }
-
-  onDelete = (image: IFormFieldValue) => {
-    this.closePreviewSection()
   }
 
   async updateCertificateTemplate(
@@ -543,8 +513,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   ? intl.formatMessage(messages.birthTemplate)
                   : intl.formatMessage(messages.deathTemplate)
               }
-              goBack={this.closePreviewSection}
-              onDelete={this.onDelete}
+              goBack={() => closePreviewSection.bind(this)}
+              onDelete={() => onDelete.bind(this)}
             />
           )}
         </SysAdminContentWrapper>
