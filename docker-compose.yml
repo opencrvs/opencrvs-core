@@ -155,3 +155,14 @@ services:
       - SEARCH_URL=http://search:9090/
       - METRICS_URL=http://metrics:1050
       - CHECK_INVALID_TOKEN=true
+
+  documents:
+    image: opencrvs/ocrvs-documents:${VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./packages/documents/Dockerfile
+    restart: unless-stopped
+    environment:
+      - COUNTRY=${COUNTRY:-bgd}
+      - HOST=0.0.0.0
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040

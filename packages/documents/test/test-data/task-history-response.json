@@ -1,0 +1,161 @@
+{
+  "resourceType": "Bundle",
+  "id": "2b28732a-2973-40eb-a629-9ed251763a22",
+  "meta": {
+    "lastUpdated": "2019-10-08T12:16:50.194+00:00"
+  },
+  "type": "history",
+  "total": 2,
+  "link": [
+    {
+      "relation": "self",
+      "url": "http://localhost:3447/fhir/_history"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "http://localhost:3447/fhir/Task/e172627c-8490-44da-a702-80a082f978f5/_history/e4eb6bd4-0dc4-4365-84a8-e6446edffb15",
+      "resource": {
+        "resourceType": "Task",
+        "status": "requested",
+        "code": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/types",
+              "code": "BIRTH"
+            }
+          ]
+        },
+        "focus": {
+          "reference": "Composition/88d1ca01-eeae-40c1-a891-5f35ed9cb38f"
+        },
+        "id": "e172627c-8490-44da-a702-80a082f978f5",
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/birth-tracking-id",
+            "value": "B06VELO"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/birth-registration-number",
+            "value": "2019333494B06VELO4"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person",
+            "valueString": "MOTHER"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person-phone-number",
+            "valueString": "01700000105"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastLocation",
+            "valueReference": {
+              "reference": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastOffice",
+            "valueReference": {
+              "reference": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastUser",
+            "valueReference": {
+              "reference": "Practitioner/70cf7c52-2cc5-41fa-a5f4-6dea9af29bd3"
+            }
+          }
+        ],
+        "lastModified": "2019-10-08T07:18:46.560Z",
+        "businessStatus": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/reg-status",
+              "code": "REGISTERED"
+            }
+          ]
+        },
+        "meta": {
+          "lastUpdated": "2019-10-08T07:18:46.656+00:00",
+          "versionId": "e4eb6bd4-0dc4-4365-84a8-e6446edffb15"
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Task/e172627c-8490-44da-a702-80a082f978f5"
+      }
+    },
+    {
+      "fullUrl": "http://localhost:3447/fhir/Task/e172627c-8490-44da-a702-80a082f978f5/_history/558f7fff-443b-4732-8231-295fb6b7c4e6",
+      "resource": {
+        "resourceType": "Task",
+        "status": "requested",
+        "code": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/types",
+              "code": "BIRTH"
+            }
+          ]
+        },
+        "focus": {
+          "reference": "Composition/88d1ca01-eeae-40c1-a891-5f35ed9cb38f"
+        },
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person",
+            "valueString": "MOTHER"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person-phone-number",
+            "valueString": "01700000105"
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastUser",
+            "valueReference": {
+              "reference": "Practitioner/4bb03541-116e-4ce2-8ea4-407f307f7579"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastLocation",
+            "valueReference": {
+              "reference": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastOffice",
+            "valueReference": {
+              "reference": "Location/fb5b7377-0c00-407d-97a1-0a7f08ed727b"
+            }
+          }
+        ],
+        "lastModified": "2019-10-06T07:18:17.277Z",
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/birth-tracking-id",
+            "value": "B06VELO"
+          }
+        ],
+        "businessStatus": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/reg-status",
+              "code": "DECLARED"
+            }
+          ]
+        },
+        "meta": {
+          "lastUpdated": "2019-10-08T07:18:17.533+00:00",
+          "versionId": "558f7fff-443b-4732-8231-295fb6b7c4e6"
+        },
+        "id": "e172627c-8490-44da-a702-80a082f978f5"
+      },
+      "request": {
+        "method": "POST",
+        "url": "Task"
+      }
+    }
+  ]
+}
