@@ -126,7 +126,11 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
           {this.props.submitting ? (
             <SpinnerWrapper>
               <Spinner id="user-form-submitting-spinner" size={25} />
-              <p>{intl.formatMessage(userFormMessages.creatingNewUser)}</p>
+              <p>
+                {this.props.userId
+                  ? intl.formatMessage(userFormMessages.updatingUser)
+                  : intl.formatMessage(userFormMessages.creatingNewUser)}
+              </p>
             </SpinnerWrapper>
           ) : (
             <Spinner id="user-form-submitting-spinner" size={25} />
