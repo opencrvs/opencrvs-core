@@ -167,13 +167,12 @@ export const StyledButton = styled.button<
           }
 
           &:focus:not(:hover) {
-            color: #222222;
-            background-color: #EDC55E;;
+            box-shadow:0px 0px 0px 3px #EDC55E;
           }
 
           &:focus, &:active {
             background-color #42506B;
-            box-shadow:0px 0px 0px 3px #EDC55E inset;
+            box-shadow:0px 0px 0px 3px #93ACD7;
           }
           `
         }
@@ -184,7 +183,6 @@ export const StyledButton = styled.button<
     `
       background: #409977;
       color: #FFFFFF;
-    S
           ${
             !props.isLoading &&
             `
@@ -192,13 +190,13 @@ export const StyledButton = styled.button<
                 background: #2C6E55;
               }
               &:focus:not(:hover) {
-                color: #222222;
-                background-color: #EDC55E;;
+                box-shadow:0px 0px 0px 3px #EDC55E;
               }
+    
     
               &:focus, &:active {
                 background-color #2C6E55;
-                box-shadow:0px 0px 0px 3px #EDC55E inset;
+                box-shadow:0px 0px 0px 3px #92D4BB;
               }
             `
           }
@@ -216,14 +214,15 @@ export const StyledButton = styled.button<
               &:hover {
                 background: #994040;
               }
+
               &:focus:not(:hover) {
-                color: #222222;
-                background-color: #EDC55E;;
+                box-shadow:0px 0px 0px 3px #EDC55E;
               }
+    
     
               &:focus, &:active {
                 background-color #994040;;
-                box-shadow:0px 0px 0px 3px #EDC55E inset;
+                box-shadow:0px 0px 0px 3px #E79393;
               }
             `
           }
@@ -242,15 +241,15 @@ export const StyledButton = styled.button<
               border: 2px solid #42639C;
               color: #42639C;
             }
-            &:focus:not(:hover) {
-              color: #222222;
-              background-color: #EDC55E;;
-              border: 2px solid #EDC55E;
-            }
+
+             &:focus:not(:hover) {
+            box-shadow:0px 0px 0px 3px #EDC55E;
+             }
+
   
             &:focus, &:active {
               color #42639C;;
-              box-shadow:0px 0px 0px 3px #EDC55E inset;
+              box-shadow:0px 0px 0px 3px #93ACD7;
           `
         }
       `}
@@ -269,14 +268,16 @@ export const StyledButton = styled.button<
           `
             &:hover {
               background: #EEEEEE;
+              color: #42639C;
             }
             &:focus:not(:hover) {
-              background: #EDC55E;
-              color: #222222
+              box-shadow:0px 0px 0px 3px #EDC55E;
             }
+  
             &:focus, &:active {
               background: #EEEEEE;
-              box-shadow:0px 0px 0px 3px #EDC55E inset;
+              color: #42639C;
+              box-shadow:0px 0px 0px 3px #93ACD7;
             }
           `
         }
@@ -297,9 +298,9 @@ export const StyledButton = styled.button<
                   color: #42639C;
                 }
                 &:focus:not(:hover) {
-                  background: #EDC55E;
-                  color: #222222
+                  box-shadow:0px 0px 0px 3px #EDC55E;
                 }
+      
                 &:focus, &:active {
                   background: #EEEEEE;
                   color: #42639C;
