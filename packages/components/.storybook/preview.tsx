@@ -11,16 +11,9 @@
  */
 import React from 'react'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
-import WebFont from 'webfontloader'
 import { getTheme } from '@opencrvs/components/lib/theme'
 
 const theme = getTheme()
-
-WebFont.load({
-  google: {
-    families: ['Noto+Sans:600', 'Noto+Sans:400']
-  }
-})
 
 const GlobalStyle = createGlobalStyle`
 html,
@@ -41,9 +34,13 @@ body,
   @font-face {
     /* stylelint-disable-next-line opencrvs/no-font-styles */
     font-family: ${theme.fonts.fontFamily};
+    font-style: normal;
+    font-weight: 400;
   }
   *:not(i) {
     font-family: ${theme.fonts.fontFamily};
+    font-style: normal;
+    font-weight: 400;
   }
 }
 

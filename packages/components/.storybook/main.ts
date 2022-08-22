@@ -23,6 +23,9 @@ const config = {
 
   managerHead: (head: string) => {
     return `${head}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="icon" href="favicon.png" />
     <style type="text/css">
       #storybook-explorer-tree .sidebar-item[data-selected=false] svg {
