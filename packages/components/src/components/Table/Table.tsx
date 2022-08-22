@@ -11,7 +11,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { LoadMore } from '../interface/GridTable/LoadMore'
 import {
   IColumn,
   IDynamicValues,
@@ -311,7 +310,6 @@ export interface ITableProps {
   hideTableHeader?: boolean
   hideTableBottomBorder?: boolean
   alignItemCenter?: boolean
-  loadMoreText?: string
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean
   fixedWidth?: number
@@ -401,7 +399,6 @@ export class Table extends React.Component<ITableProps, ITableState> {
       hideTableBottomBorder,
       alignItemCenter,
       footerColumns,
-      loadMoreText,
       highlightRowOnMouseOver,
       isFullPage,
       fixedWidth,
@@ -556,24 +553,12 @@ export class Table extends React.Component<ITableProps, ITableState> {
             </TableHeader>
           </LoadingContainer>
         )}
-        {totalItems > pageSize && (
-          <>
-            {!loadMoreText && !noPagination && (
-              <PaginationModified
-                initialPage={currentPage}
-                totalPages={Math.ceil(totalItems / pageSize)}
-                onPageChange={this.onPageChange}
-              />
-            )}
-            {loadMoreText && (
-              <LoadMore
-                initialPage={currentPage}
-                loadMoreText={loadMoreText}
-                onLoadMore={this.onPageChange}
-                usageTableType={'list'}
-              />
-            )}
-          </>
+        {totalItems > pageSize && !noPagination && (
+          <PaginationModified
+            initialPage={currentPage}
+            totalPages={Math.ceil(totalItems / pageSize)}
+            onPageChange={this.onPageChange}
+          />
         )}
       </>
     )

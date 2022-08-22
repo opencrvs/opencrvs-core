@@ -417,13 +417,6 @@ class UserAuditListComponent extends React.Component<Props, State> {
                         onPageChange={(currentPage: number) => {
                           this.setCurrentPage(currentPage)
                         }}
-                        loadMoreText={intl.formatMessage(
-                          messages.showMoreAuditList,
-                          {
-                            pageSize: DEFAULT_LIST_SIZE,
-                            totalItems: totalItems
-                          }
-                        )}
                       />
                     )
                   }

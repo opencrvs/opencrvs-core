@@ -538,12 +538,6 @@ function FieldAgentListComponent(props: IProps) {
                     onPageChange={(currentPage: number) => {
                       setCurrentPageNumber(currentPage)
                     }}
-                    loadMoreText={intl.formatMessage(
-                      messages.showMoreUsersLinkLabel,
-                      {
-                        pageSize: DEFAULT_FIELD_AGENT_LIST_SIZE
-                      }
-                    )}
                     isFullPage
                     highlightRowOnMouseOver
                   />
