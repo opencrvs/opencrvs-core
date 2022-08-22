@@ -37,6 +37,7 @@ import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
 import { IActionDetailsData } from './History'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
+import { CorrectionReason } from '@client/forms/correction/reason'
 
 interface IActionDetailsModalListTable {
   actionDetailsData: IActionDetailsData
@@ -125,6 +126,25 @@ function prepareComments(
   )
 }
 
+const getReasonForRequest = (reasonValue: string, intl: IntlShape) => {
+  switch (reasonValue) {
+    case CorrectionReason.CLERICAL_ERROR:
+      return intl.formatMessage(messages.clericalError)
+
+    case CorrectionReason.MATERIAL_ERROR:
+      return intl.formatMessage(messages.materialError)
+
+    case CorrectionReason.MATERIAL_OMISSION:
+      return intl.formatMessage(messages.materialOmission)
+
+    case CorrectionReason.JUDICIAL_ORDER:
+      return intl.formatMessage(messages.judicialOrder)
+
+    default:
+      return '-'
+  }
+}
+
 export const ActionDetailsModalListTable = ({
   actionDetailsData,
   actionDetailsIndex,
@@ -149,6 +169,13 @@ export const ActionDetailsModalListTable = ({
     {
       key: 'text',
       label: intl.formatMessage(constantsMessages.reason),
+      width: 100
+    }
+  ]
+  const correctionReasonColumn = [
+    {
+      key: 'text',
+      label: intl.formatMessage(constantsMessages.requestReason),
       width: 100
     }
   ]
@@ -344,6 +371,24 @@ export const ActionDetailsModalListTable = ({
               {
                 text: intl.formatMessage(
                   getRejectionReasonDisplayValue(actionDetailsData.reason)
+                )
+              }
+            ]}
+          />
+        )}
+
+      {/* For Correction Reason */}
+      {actionDetailsData.reason &&
+        actionDetailsData.action === SUBMISSION_STATUS.REQUESTED_CORRECTION && (
+          <ListTable
+            noResultText=" "
+            hideBoxShadow={true}
+            columns={correctionReasonColumn}
+            content={[
+              {
+                text: getReasonForRequest(
+                  actionDetailsData.reason as string,
+                  intl
                 )
               }
             ]}
