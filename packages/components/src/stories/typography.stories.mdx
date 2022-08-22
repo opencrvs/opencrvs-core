@@ -8,61 +8,34 @@ OpenCRVS is also distributed under the terms of the Civil Registration
 Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 graphic logo are (registered/a) trademark(s) of Plan International.-->
 
-import { Meta, ColorPalette, ColorItem } from '@storybook/addon-docs'
+import { Meta, Typeset, ColorPalette, ColorItem } from '@storybook/addon-docs'
 import styled from 'styled-components'
 import { getTheme } from '@opencrvs/components/lib/theme'
 
 export const theme = getTheme()
 
-export const H1 = styled.span`
-  ${theme.fonts.h1}
-`
-
-export const H2 = styled.span`
-  ${theme.fonts.h2}
-`
-
-export const H3 = styled.span`
-  ${theme.fonts.h3}
-`
-
-export const H4 = styled.span`
-  ${theme.fonts.h4}
-`
-
-export const Bold18 = styled.span`
-  ${theme.fonts.bold18}
-`
-
-export const Bold16 = styled.span`
-  ${theme.fonts.bold16}
-`
-
-export const Bold14 = styled.span`
-  ${theme.fonts.bold14}
-`
-
-export const Bold12 = styled.span`
-  ${theme.fonts.bold12}
-`
-
-export const Reg18 = styled.span`
-  ${theme.fonts.reg18}
-`
-
-export const Reg16 = styled.span`
-  ${theme.fonts.reg16}
-`
-
-export const Reg14 = styled.span`
-  ${theme.fonts.reg14}
-`
-
-export const Reg12 = styled.span`
-  ${theme.fonts.reg12}
-`
-
 <Meta title="Styles/Typography" />
+
+export const typography = {
+  type: {
+    primary: theme.fonts.fontFamily
+  },
+  weight: {
+    regular: '400',
+    bold: '600'
+  },
+  size: {
+    s1: 12,
+    s2: 14,
+    m1: 16,
+    m2: 18,
+    m3: 21,
+    l1: 24,
+    l2: 36
+  }
+}
+
+export const SampleText = 'The gold standard for digital civil registration'
 
 # Typography
 
@@ -74,33 +47,75 @@ Currently OpenCRVS supports Noto Sans in 400 (regular) and 600 (semi-bold). We w
 
 <br />
 
+### Font sizes
+
+<Typeset
+  fontSizes={[
+    Number(typography.size.l2),
+    Number(typography.size.l1),
+    Number(typography.size.m3),
+    Number(typography.size.m2),
+    Number(typography.size.m1),
+    Number(typography.size.s2),
+    Number(typography.size.s1)
+  ]}
+  fontWeight={typography.weight.bold}
+  sampleText={SampleText}
+  fontFamily={typography.type.primary}
+/>{' '}
+
 ### Headings
 
-| Font&nbsp;style | Example                                                                                                     |
-| --------------- | ----------------------------------------------------------------------------------------------------------- |
-| h1              | <H1>Our vision is that every person on the planet is...</H1>                                                |
-| h2              | <H2>Our vision is that every person on the planet is recognised, protected...</H2>                          |
-| h3              | <H3>Our vision is that every person on the planet is recognised, protected and provided...</H3>             |
-| h4              | <H4>Our vision is that every person on the planet is recognised, protected and provided for from birth</H4> |
+<Typeset
+  fontSizes={['36px']}
+  sampleText="Heading 1"
+  fontWeight={typography.weight.bold}
+  fontFamily={typography.type.primary}
+/>
+<Typeset
+  fontSizes={['24px']}
+  sampleText="Heading 2"
+  fontWeight={typography.weight.bold}
+  fontFamily={typography.type.primary}
+/>
+<Typeset
+  fontSizes={['21px']}
+  sampleText="Heading 3"
+  fontWeight={typography.weight.bold}
+  fontFamily={typography.type.primary}
+/>
 
-<br />
+<Typeset
+  fontSizes={['18px']}
+  sampleText="Heading 4"
+  fontWeight={typography.weight.bold}
+  fontFamily={typography.type.primary}
+/>
 
-### Bold body styles
+### Body
 
-| Font&nbsp;style | Example                                                                                                             |
-| --------------- | ------------------------------------------------------------------------------------------------------------------- |
-| bold18          | <Bold18>Our vision is that every person on the planet is recognised, protected and provided for from birth</Bold18> |
-| bold16          | <Bold16>Our vision is that every person on the planet is recognised, protected and provided for from birth</Bold16> |
-| bold14          | <Bold14>Our vision is that every person on the planet is recognised, protected and provided for from birth</Bold14> |
-| bold12          | <Bold12>Our vision is that every person on the planet is recognised, protected and provided for from birth</Bold12> |
+<Typeset
+  fontSizes={['18px']}
+  sampleText="Body text 1"
+  fontWeight={typography.weight.regular}
+  fontFamily={typography.type.primary}
+/>
+<Typeset
+  fontSizes={['16px']}
+  sampleText="Body text 2"
+  fontWeight={typography.weight.regular}
+  fontFamily={typography.type.primary}
+/>
+<Typeset
+  fontSizes={['14px']}
+  sampleText="Body text 3"
+  fontWeight={typography.weight.regular}
+  fontFamily={typography.type.primary}
+/>
 
-<br />
-
-### Regular body styles
-
-| Font&nbsp;style | Example                                                                                                           |
-| --------------- | ----------------------------------------------------------------------------------------------------------------- |
-| reg18           | <Reg18>Our vision is that every person on the planet is recognised, protected and provided for from birth</Reg18> |
-| reg16           | <Reg16>Our vision is that every person on the planet is recognised, protected and provided for from birth</Reg16> |
-| reg14           | <Reg14>Our vision is that every person on the planet is recognised, protected and provided for from birth</Reg14> |
-| reg12           | <Reg12>Our vision is that every person on the planet is recognised, protected and provided for from birth</Reg12> |
+<Typeset
+  fontSizes={['12px']}
+  sampleText="Body text 4"
+  fontWeight={typography.weight.regular}
+  fontFamily={typography.type.primary}
+/>
