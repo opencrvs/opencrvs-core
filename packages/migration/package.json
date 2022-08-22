@@ -13,7 +13,8 @@
     "precommit": "lint-staged"
   },
   "dependencies": {
-    "migrate-mongo": "^9.0.0"
+    "migrate-mongo": "^9.0.0",
+    "influx": "^5.0.7"
   },
   "devDependencies": {
     "prettier": "^2.5.0"
