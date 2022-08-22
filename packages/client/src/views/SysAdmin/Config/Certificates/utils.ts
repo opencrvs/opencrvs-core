@@ -1,10 +1,9 @@
-import { certificateTemplateMutations } from '@client/certificate/mutations'
-import { ICertificateTemplateData } from '@client/utils/referenceApi'
-import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import {
   ERROR_TYPES,
   validateCertificateTemplate
 } from '@client/utils/imageUtils'
+import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
+import { IAttachmentValue, IFormFieldValue, IForm } from '@client/forms'
 
 export const blobToBase64 = (
   blob: Blob
@@ -35,89 +34,33 @@ export const updatePreviewSvgWithSampleSignature = async (
   svgCode = html.getElementsByTagName('svg')[0].outerHTML
   return unescape(encodeURIComponent(svgCode))
 }
+export const simpleFunction = (thisObj: any) => {
+  console.log('called simple function', thisObj)
+}
+
+export const toggleNotification = (thisObj: any) => {
+  thisObj.setState((state: { showNotification: any }) => ({
+    showNotification: !state.showNotification
+  }))
+}
+
+export const togglePrompt = (thisObj: any) => {
+  thisObj.setState((prevState: { showPrompt: any }) => ({
+    showPrompt: !prevState.showPrompt
+  }))
+}
+
+export const selectForPreview = (
+  thisObj: any,
+  previewImage: IAttachmentValue
+) => {
+  thisObj.setState({ previewImage: previewImage })
+}
 
 export const closePreviewSection = (thisObj: any) => {
   thisObj.setState({ previewImage: null })
 }
 
-export const onDelete = (thisObj: any) => {
+export const onDelete = (thisObj: any, image: IFormFieldValue) => {
   thisObj.closePreviewSection()
 }
-
-export const updateCertificateTemplate = async (
-  thisObj: any,
-  id: string,
-  svgCode: string,
-  svgFilename: string,
-  user: string,
-  status: string,
-  event: string
-) => {
-  try {
-    const res = await certificateTemplateMutations.updateCertificateTemplate(
-      id,
-      svgCode,
-      svgFilename,
-      user,
-      status,
-      event
-    )
-    if (res && res.createOrUpdateCertificateSVG) {
-      thisObj.setState({ imageUploading: false })
-      thisObj.props.updateOfflineCertificate(
-        res.createOrUpdateCertificateSVG as ICertificateTemplateData
-      )
-    }
-  } catch (err) {
-    thisObj.setState({
-      imageLoadingError: thisObj.props.intl.formatMessage(
-        imageUploadMessages.imageFormat
-      )
-    })
-  }
-}
-
-// export const handleSelectFile = async (
-//   thisObj: any,
-//   event: React.ChangeEvent<HTMLInputElement>
-// ) => {
-//   console.log('handle select')
-//   const { id, files } = event.target
-//   const eventName: string = id.split('_')[0]
-//   const certificateId: string = id.split('_')[4]
-//   const status = 'ACTIVE'
-//   const userMgntUserID =
-//     thisObj.props.userDetails && thisObj.props.userDetails.userMgntUserID
-//   thisObj.setState({
-//     imageUploading: true,
-//     imageLoadingError: ''
-//   })
-//   thisObj.toggleNotification()
-
-//   if (files && files.length > 0) {
-//     try {
-//       const svgCode = await validateCertificateTemplate(files[0])
-//       updateCertificateTemplate.bind(
-//         certificateId,
-//         svgCode,
-//         files[0].name,
-//         userMgntUserID as string,
-//         status,
-//         eventName
-//       )
-//       thisObj.birthCertificatefileUploader.current!.value = ''
-//       thisObj.deathCertificatefileUploader.current!.value = ''
-//     } catch (error) {
-//       if (error.message === ERROR_TYPES.IMAGE_TYPE) {
-//         thisObj.setState(() => ({
-//           imageUploading: false,
-//           imageLoadingError: thisObj.props.intl.formatMessage(
-//             imageUploadMessages.imageFormat
-//           )
-//         }))
-//         thisObj.birthCertificatefileUploader.current!.value = ''
-//         thisObj.deathCertificatefileUploader.current!.value = ''
-//       }
-//     }
-//   }
-// }

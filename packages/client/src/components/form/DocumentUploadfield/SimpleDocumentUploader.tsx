@@ -21,14 +21,28 @@ import {
 import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
-import { ErrorMessage } from './DocumentUploaderWithOption'
+import { getBase64String, ErrorMessage } from './DocumentUploaderWithOption'
 import {
-  selectForPreview,
   closePreviewSection,
-  DocumentUploader,
   handleFileChange,
-  onDelete
+  onDelete,
+  selectForPreview
 } from './utils'
+
+const DocumentUploader = styled(ImageUploader)`
+  color: ${({ theme }) => theme.colors.primary};
+  background: ${({ theme }) => theme.colors.white};
+  border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
+  border-radius: 4px;
+  ${({ theme }) => theme.fonts.bold14};
+  height: 40px;
+  text-transform: initial;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    margin-left: 0px;
+    margin-top: 10px;
+  }
+`
 
 const FieldDescription = styled.div`
   margin-top: 0px;
@@ -94,7 +108,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
         </ErrorMessage>
         <DocumentListPreview
           attachment={files}
-          onSelect={() => selectForPreview.bind(this, this.state.previewImage)}
+          onSelect={() => selectForPreview.bind(this)}
           label={label}
           onDelete={() => onDelete.bind(this)}
           processingDocuments={this.state.filesBeingUploaded}

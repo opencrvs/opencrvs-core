@@ -14,6 +14,10 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import * as React from 'react'
 import {
+  ERROR_TYPES,
+  validateCertificateTemplate
+} from '@client/utils/imageUtils'
+import {
   FormattedMessage,
   injectIntl,
   IntlShape,
@@ -61,16 +65,11 @@ import {
 import { updateOfflineCertificate } from '@client/offline/actions'
 import { IDeclaration } from '@client/declarations'
 import {
+  blobToBase64,
   updatePreviewSvgWithSampleSignature,
   closePreviewSection,
-  onDelete,
-  updateCertificateTemplate
+  onDelete
 } from './utils'
-import {
-  ERROR_TYPES,
-  validateCertificateTemplate
-} from '@client/utils/imageUtils'
-import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 
 const HiddenInput = styled.input`
   display: none;
@@ -260,8 +259,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     if (files && files.length > 0) {
       try {
         const svgCode = await validateCertificateTemplate(files[0])
-        updateCertificateTemplate.bind(
-          this,
+        this.updateCertificateTemplate(
           certificateId,
           svgCode,
           files[0].name,
@@ -285,6 +283,53 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       }
     }
   }
+
+  toggleNotification = () => {
+    this.setState((state) => ({
+      showNotification: !state.showNotification
+    }))
+  }
+
+  togglePrompt = () => {
+    this.setState((prevState) => ({ showPrompt: !prevState.showPrompt }))
+  }
+
+  selectForPreview = (previewImage: IAttachmentValue) => {
+    this.setState({ previewImage: previewImage })
+  }
+
+  async updateCertificateTemplate(
+    id: string,
+    svgCode: string,
+    svgFilename: string,
+    user: string,
+    status: string,
+    event: string
+  ) {
+    try {
+      const res = await certificateTemplateMutations.updateCertificateTemplate(
+        id,
+        svgCode,
+        svgFilename,
+        user,
+        status,
+        event
+      )
+      if (res && res.createOrUpdateCertificateSVG) {
+        this.setState({ imageUploading: false })
+        this.props.updateOfflineCertificate(
+          res.createOrUpdateCertificateSVG as ICertificateTemplateData
+        )
+      }
+    } catch (err) {
+      this.setState({
+        imageLoadingError: this.props.intl.formatMessage(
+          imageUploadMessages.imageFormat
+        )
+      })
+    }
+  }
+
   render() {
     const {
       eventName,

@@ -1,37 +1,7 @@
-import { ImageUploader } from '@opencrvs/components/lib/forms'
-import { IAttachmentValue, IFormFieldValue } from '@client/forms'
-import styled from 'styled-components'
-import { getBase64String } from './DocumentUploaderWithOption'
+import { getBase64String, ErrorMessage } from './DocumentUploaderWithOption'
 import Jimp from 'jimp'
-import { formMessages as messages } from '@client/i18n/messages'
-
-export const selectForPreview = (
-  thisObj: any,
-  previewImage: IFormFieldValue
-) => {
-  thisObj.setState({
-    previewImage: previewImage as IAttachmentValue
-  })
-}
-
-export const closePreviewSection = (thisObj: any) => {
-  thisObj.setState({ previewImage: null })
-}
-
-export const DocumentUploader = styled(ImageUploader)`
-  color: ${({ theme }) => theme.colors.primary};
-  background: ${({ theme }) => theme.colors.white};
-  border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
-  border-radius: 4px;
-  ${({ theme }) => theme.fonts.bold14};
-  height: 40px;
-  text-transform: initial;
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    margin-left: 0px;
-    margin-top: 10px;
-  }
-`
+import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
+import { IFormFieldValue, IAttachmentValue } from '@client/forms'
 
 export const handleFileChange = (thisObj: any, uploadedImage: File) => {
   if (!uploadedImage) {
@@ -91,7 +61,7 @@ export const handleFileChange = (thisObj: any, uploadedImage: File) => {
           thisObj.setState({
             error: thisObj.props.intl.formatMessage(messages.fileUploadError, {
               type: allowedDocType
-                .map((docTypeStr: any) => docTypeStr.split('/').pop())
+                .map((docTypeStr: string) => docTypeStr.split('/').pop())
                 .join(', ')
             })
           })
@@ -99,7 +69,18 @@ export const handleFileChange = (thisObj: any, uploadedImage: File) => {
   })
 }
 
+export const selectForPreview = (
+  thisObj: any,
+  previewImage: IFormFieldValue
+) => {
+  thisObj.setState({ previewImage: previewImage as IAttachmentValue })
+}
+
+export const closePreviewSection = (thisObj: any) => {
+  thisObj.setState({ previewImage: null })
+}
+
 export const onDelete = (thisObj: any, image: IFormFieldValue) => {
   thisObj.props.onComplete('')
-  closePreviewSection.bind(thisObj)
+  thisObj.closePreviewSection()
 }
