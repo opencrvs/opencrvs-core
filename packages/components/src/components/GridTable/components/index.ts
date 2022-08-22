@@ -10,5 +10,5 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export * from './LoadMore'
-export * from './GridTableRowDeskop'
+export * from './GridTableRowDesktop'
 export * from './GridTableRowMobile'

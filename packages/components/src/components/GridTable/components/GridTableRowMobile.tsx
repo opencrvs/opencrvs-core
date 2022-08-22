@@ -16,7 +16,7 @@ import {
   IconWrapper,
   Error,
   ContentWrapper
-} from './GridTableRowDeskop'
+} from './GridTableRowDesktop'
 import { IActionObject, IAction } from '../../interface'
 
 const StyledBox = styled.div`
