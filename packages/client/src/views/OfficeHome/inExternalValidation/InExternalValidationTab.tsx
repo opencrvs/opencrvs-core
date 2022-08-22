@@ -11,10 +11,10 @@
  */
 import * as React from 'react'
 import {
-  GridTable,
+  Workqueue,
   COLUMNS,
   SORT_ORDER
-} from '@opencrvs/components/lib/GridTable'
+} from '@opencrvs/components/lib/Workqueue'
 import { ITheme, withTheme } from '@client/styledComponents'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import { transformData } from '@client/search/transformer'
@@ -232,7 +232,7 @@ function InExternalValidationComponent(props: IProps) {
       error={props.error}
       noContent={transformWaitingValidationContent(data).length <= 0}
     >
-      <GridTable
+      <Workqueue
         content={transformWaitingValidationContent(data)}
         loading={props.loading}
         columns={columns}

@@ -15,7 +15,7 @@ import styled from 'styled-components'
 import { ColumnContentAlignment } from '..'
 import { IActionObject, IAction } from '../../interface'
 
-export interface IGridTableRow {
+export interface IWorkqueueRow {
   displayItems: IDynamicValues[]
   columns: IColumn[]
   getRowClickHandler: (
@@ -80,7 +80,7 @@ export const IconWrapper = styled(ContentWrapper)`
   padding-top: 8px;
 `
 
-export const GridTableRowDesktop = (props: IGridTableRow) => {
+export const WorkqueueRowDesktop = (props: IWorkqueueRow) => {
   return (
     <>
       {props.displayItems.map((item, index) => {

@@ -18,7 +18,7 @@ import {
   IFooterFColumn,
   ColumnContentAlignment,
   LoadMore
-} from '../GridTable'
+} from '../Workqueue'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean

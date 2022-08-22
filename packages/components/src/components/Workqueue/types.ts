@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ColumnContentAlignment } from './GridTable'
+import { ColumnContentAlignment } from './Workqueue'
 import * as React from 'react'
 import { IAction } from '../interface'
 

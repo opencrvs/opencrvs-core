@@ -14,9 +14,9 @@ import styled, { withTheme } from 'styled-components'
 import { ListItemAction } from '../buttons'
 import { grid } from '../grid'
 import { IDynamicValues, IColumn } from './types'
-import { GridTableRowDesktop } from './components/GridTableRowDesktop'
-import { GridTableRowMobile } from './components/GridTableRowMobile'
-import { ITheme } from 'src/components/theme'
+import { WorkqueueRowDesktop } from './components/WorkqueueRowDesktop'
+import { WorkqueueRowMobile } from './components/WorkqueueRowMobile'
+import { ITheme } from '../theme'
 import { SortIcon } from '../icons/SortIcon'
 import { connect } from 'react-redux'
 import { IAction, IActionObject } from '../interface'
@@ -114,7 +114,7 @@ export enum SORT_ORDER {
   DESCENDING = 'desc'
 }
 
-interface IGridTableProps {
+interface IWorkqueueProps {
   theme: ITheme
   content: IDynamicValues[]
   columns: IColumn[]
@@ -128,14 +128,14 @@ interface IGridTableProps {
   hideLastBorder?: boolean
 }
 
-interface IGridTableState {
+interface IWorkqueueState {
   width: number
   expanded: string[]
 }
 
-export class GridTableComp extends React.Component<
-  IGridTableProps,
-  IGridTableState
+export class WorkqueueComp extends React.Component<
+  IWorkqueueProps,
+  IWorkqueueState
 > {
   state = {
     width: window.innerWidth,
@@ -206,7 +206,7 @@ export class GridTableComp extends React.Component<
           </TableHeader>
         )}
         {!isMobileView ? (
-          <GridTableRowDesktop
+          <WorkqueueRowDesktop
             columns={this.props.columns}
             displayItems={content}
             clickable={this.props.clickable}
@@ -215,7 +215,7 @@ export class GridTableComp extends React.Component<
             hideLastBorder={this.props.hideLastBorder}
           />
         ) : (
-          <GridTableRowMobile
+          <WorkqueueRowMobile
             columns={this.props.columns}
             displayItems={content}
             clickable={this.props.clickable}
@@ -231,4 +231,4 @@ export class GridTableComp extends React.Component<
   }
 }
 
-export const GridTable = connect(null, {})(withTheme(GridTableComp))
+export const Workqueue = connect(null, {})(withTheme(WorkqueueComp))

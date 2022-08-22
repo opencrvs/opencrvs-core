@@ -10,13 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { ColumnContentAlignment, GridTable } from './GridTable'
+import { ColumnContentAlignment, Workqueue } from './Workqueue'
 import { IColumn, IDynamicValues } from './types'
 import React from 'react'
 
 export default {
   title: 'Data/Workqueue table',
-  component: GridTable
+  component: Workqueue
 } as Meta
 
 interface IProps {
@@ -255,7 +255,7 @@ const columns = [
   }
 ]
 
-const Template: Story<IProps> = (args) => <GridTable {...args} />
+const Template: Story<IProps> = (args) => <Workqueue {...args} />
 export const GridView = Template.bind({})
 GridView.args = {
   content: list,

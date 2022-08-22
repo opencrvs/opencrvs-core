@@ -9,6 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export * from './GridTable'
-export * from './types'
-export * from './components'
+export * from './LoadMore'
+export * from './WorkqueueRowDesktop'
+export * from './WorkqueueRowMobile'

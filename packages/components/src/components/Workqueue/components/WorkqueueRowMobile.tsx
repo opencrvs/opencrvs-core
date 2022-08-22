@@ -12,11 +12,11 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import {
-  IGridTableRow,
+  IWorkqueueRow,
   IconWrapper,
   Error,
   ContentWrapper
-} from './GridTableRowDesktop'
+} from './WorkqueueRowDesktop'
 import { IActionObject, IAction } from '../../interface'
 
 const StyledBox = styled.div`
@@ -44,7 +44,7 @@ const RowWrapper = styled.div<{
   cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
 `
 
-export const GridTableRowMobile = (props: IGridTableRow) => {
+export const WorkqueueRowMobile = (props: IWorkqueueRow) => {
   return (
     <>
       {props.displayItems.map((item, index) => {

@@ -15,7 +15,7 @@ import { ExpansionButton } from './ExpansionButton'
 import { ArrowExpansionButton } from './ArrowExpansionButton'
 import { IAction, IActionComponent } from '../interface/ListItem'
 import { PrimaryButton } from './PrimaryButton'
-import { ColumnContentAlignment } from '../interface'
+import { ColumnContentAlignment } from '../Workqueue'
 
 const Container = styled.div`
   background: ${({ theme }) => theme.colors.white};

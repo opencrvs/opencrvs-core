@@ -13,7 +13,7 @@ import {
   IDynamicValues,
   COLUMNS,
   SORT_ORDER
-} from '@opencrvs/components/lib/GridTable'
+} from '@opencrvs/components/lib/Workqueue'
 import { orderBy } from 'lodash'
 
 export const getSortedItems = (
