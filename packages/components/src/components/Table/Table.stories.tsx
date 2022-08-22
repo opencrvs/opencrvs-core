@@ -23,20 +23,26 @@ export default {
 
 export const OneColumnOneRow = () => (
   <Table
-    columns={[{ label: 'Lunch places', width: 100, key: 'lunchPlace' }]}
-    content={[{ lunchPlace: 'The Greasy Spoon' }]}
+    columns={[{ label: 'User', width: 100, key: 'user' }]}
+    content={[{ user: 'Mike Smith' }]}
   />
 )
 
 export const TwoColumnsTwoRows = () => (
   <Table
     columns={[
-      { label: 'Lunch places', width: 50, key: 'place' },
-      { label: 'Rating', width: 50, key: 'rating' }
+      { label: 'User', width: 50, key: 'user' },
+      { label: 'Start date', width: 50, key: 'time' }
     ]}
     content={[
-      { place: 'The Greasy Spoon', rating: '4 stars' },
-      { place: 'The Dinner Diner', rating: '2 stars' }
+      {
+        user: 'Mike Smith',
+        time: '10 April 2022'
+      },
+      {
+        user: 'Stevie Nicks',
+        time: '12 May 2021'
+      }
     ]}
   />
 )
@@ -44,16 +50,36 @@ export const TwoColumnsTwoRows = () => (
 export const ThreeColumnsFiveRows = () => (
   <Table
     columns={[
-      { label: 'Lunch places', width: 30, key: 'place' },
-      { label: 'Rating', width: 30, key: 'rating' },
-      { label: 'Lunch time', width: 40, key: 'time' }
+      { label: 'User', width: 30, key: 'user' },
+      { label: 'Start date', width: 30, key: 'time' },
+      { label: 'Status', width: 40, key: 'status' }
     ]}
     content={[
-      { place: 'The Greasy Spoon', rating: '4 stars', time: '10 am - 2 pm' },
-      { place: 'The Dinner Diner', rating: '2 stars', time: '10 am - 1 pm' },
-      { place: 'Pizzeria Uno', rating: '5 stars', time: '10 am - 1 pm' },
-      { place: 'The Krusty Krab', rating: '3 stars', time: '10 am - 2 pm' },
-      { place: 'Steak Saloon', rating: '1 star', time: '9 am - 11 am' }
+      {
+        user: 'Mike Smith',
+        time: '10 April 2022',
+        status: 'Active'
+      },
+      {
+        user: 'Stevie Nicks',
+        time: '12 May 2021',
+        status: 'Active'
+      },
+      {
+        user: 'Ellie Crouch',
+        time: '1 November 2020',
+        status: 'Active'
+      },
+      {
+        user: 'Jill Cross',
+        time: '23 October 2021',
+        status: 'Inactive'
+      },
+      {
+        user: 'Rebecca Finch',
+        time: '11 March 2021',
+        status: 'Active'
+      }
     ]}
   />
 )
@@ -61,102 +87,102 @@ export const ThreeColumnsFiveRows = () => (
 export const PaginationAndFooter = () => {
   const content = [
     {
-      place: 'The Greasy Spoon',
-      rating: '4 stars',
-      time: '10 am - 2 pm',
-      visits: 2,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '90.9%'
     },
     {
-      place: 'The Dinner Diner',
-      rating: '2 stars',
-      time: '10 am - 1 pm',
-      visits: 1,
-      isAccessible: 'Yes'
+      user: 'Stevie Nicks',
+      time: '12 May 2021',
+      status: 'Active',
+      registrations: 102,
+      rating: '95.1%'
     },
     {
-      place: 'Pizzeria Uno',
-      rating: '5 stars',
-      time: '10 am - 1 pm',
-      visits: 10,
-      isAccessible: 'Yes'
+      user: 'Ellie Crouch',
+      time: '1 November 2020',
+      status: 'Active',
+      registrations: 92,
+      rating: '93.4%'
     },
     {
-      place: 'The Krusty Krab',
-      rating: '3 stars',
-      time: '10 am - 2 pm',
-      visits: 3,
-      isAccessible: 'Yes'
+      user: 'Jill Cross',
+      time: '23 October 2021',
+      status: 'Inactive',
+      registrations: 100,
+      rating: '92.4%'
     },
     {
-      place: 'Steak Saloon',
-      rating: '1 star',
-      time: '9 am - 11 am',
-      visits: 5,
-      isAccessible: 'Yes'
+      user: 'Rebecca Finch',
+      time: '11 March 2021',
+      status: 'Active',
+      registrations: 132,
+      rating: '98.2%'
     },
     {
-      place: 'Brasserie',
-      rating: '1 star',
-      time: '9 am - 11 am',
-      visits: 5,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Bistro',
-      rating: '1 star',
-      time: '9 am - 11 am',
-      visits: 2,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Tapas Bar',
-      rating: '1 star',
-      time: '9 am - 11 am',
-      visits: 9,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Italian Restaurant',
-      rating: '1 star',
-      time: '9 am - 11 am',
-      visits: 10,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Steakhouse',
-      rating: '1 star',
-      time: '9 am - 11 am',
-      visits: 12,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Seafood Restaurant',
-      rating: '1 star',
-      time: '8 am - 11 am',
-      visits: 20,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Indian Restaurant',
-      rating: '1 star',
-      time: '11 am - 1 pm',
-      visits: 10,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'French Restaurant',
-      rating: '1 star',
-      time: '9 am - 2 pm',
-      visits: 10,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Bistro-Style Diner',
-      rating: '1 star',
-      time: '9 am - 3 pm',
-      visits: 15,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     }
   ]
 
@@ -165,14 +191,18 @@ export const PaginationAndFooter = () => {
   return (
     <Table
       columns={[
-        { label: 'Lunch places', width: 20, key: 'place' },
-        { label: 'Rating', width: 20, key: 'rating' },
-        { label: 'Lunch time', width: 20, key: 'time' },
-        { label: 'Times visited', width: 20, key: 'visits' },
-        { label: 'Wheelchair accessible?', width: 20, key: 'isAccessible' }
+        { label: 'User', width: 20, key: 'user' },
+        { label: 'Started', width: 20, key: 'time' },
+        { label: 'Status', width: 20, key: 'status' },
+        { label: 'Registrations', width: 20, key: 'registrations' },
+        { label: 'Performance', width: 20, key: 'rating' }
       ]}
       footerColumns={[
-        { label: 'Note that the lunch times might have changed', width: 100 }
+        { label: '', width: 20 },
+        { label: '', width: 20 },
+        { label: '', width: 20 },
+        { label: 'Avg. 102', width: 20 },
+        { label: 'Avg. 95.4%', width: 20 }
       ]}
       pageSize={5}
       currentPage={currentPage}
@@ -186,102 +216,102 @@ export const PaginationAndFooter = () => {
 export const PaginationFooterAndSorting = () => {
   const content = [
     {
-      place: 'The Greasy Spoon',
-      rating: '4 stars',
-      time: '10 am - 2 pm',
-      visits: 2,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '90.9%'
     },
     {
-      place: 'The Dinner Diner',
-      rating: '2 stars',
-      time: '10 am - 1 pm',
-      visits: 1,
-      isAccessible: 'Yes'
+      user: 'Stevie Nicks',
+      time: '12 May 2021',
+      status: 'Active',
+      registrations: 102,
+      rating: '95.1%'
     },
     {
-      place: 'Pizzeria Uno',
-      rating: '5 stars',
-      time: '10 am - 1 pm',
-      visits: 10,
-      isAccessible: 'Yes'
+      user: 'Ellie Crouch',
+      time: '1 November 2020',
+      status: 'Active',
+      registrations: 92,
+      rating: '93.4%'
     },
     {
-      place: 'The Krusty Krab',
-      rating: '3 stars',
-      time: '10 am - 2 pm',
-      visits: 3,
-      isAccessible: 'Yes'
+      user: 'Jill Cross',
+      time: '23 October 2021',
+      status: 'Inactive',
+      registrations: 100,
+      rating: '92.4%'
     },
     {
-      place: 'Steak Saloon',
-      rating: '1 star',
-      time: '9 am - 11 am',
-      visits: 5,
-      isAccessible: 'Yes'
+      user: 'Rebecca Finch',
+      time: '11 March 2021',
+      status: 'Active',
+      registrations: 132,
+      rating: '98.2%'
     },
     {
-      place: 'Brasserie',
-      rating: '1 star',
-      time: '9 am - 11 am',
-      visits: 5,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Bistro',
-      rating: '1 star',
-      time: '9 am - 11 am',
-      visits: 2,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Tapas Bar',
-      rating: '1 star',
-      time: '9 am - 11 am',
-      visits: 9,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Italian Restaurant',
-      rating: '1 star',
-      time: '9 am - 11 am',
-      visits: 10,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Steakhouse',
-      rating: '1 star',
-      time: '9 am - 11 am',
-      visits: 12,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Seafood Restaurant',
-      rating: '1 star',
-      time: '8 am - 11 am',
-      visits: 20,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Indian Restaurant',
-      rating: '1 star',
-      time: '11 am - 1 pm',
-      visits: 10,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'French Restaurant',
-      rating: '1 star',
-      time: '9 am - 2 pm',
-      visits: 10,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     },
     {
-      place: 'Bistro-Style Diner',
-      rating: '1 star',
-      time: '9 am - 3 pm',
-      visits: 15,
-      isAccessible: 'Yes'
+      user: 'Mike Smith',
+      time: '10 April 2022',
+      status: 'Active',
+      registrations: 80,
+      rating: '92%'
     }
   ]
 
@@ -291,27 +321,27 @@ export const PaginationFooterAndSorting = () => {
   return (
     <Table
       columns={[
-        { label: 'Lunch places', width: 20, key: 'place' },
-        { label: 'Rating', width: 20, key: 'rating' },
-        { label: 'Lunch time', width: 20, key: 'time' },
+        { label: 'User', width: 20, key: 'user' },
+        { label: 'Started', width: 20, key: 'time' },
+        { label: 'Status', width: 20, key: 'status' },
         {
-          label: 'Times visited',
+          label: 'Registrations',
           width: 20,
-          key: 'visits',
+          key: 'registrations',
           isSortable: true,
           icon: <SortArrow active={Boolean(sortOrder)} />,
           sortFunction: () => {
             setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
           }
         },
-        { label: 'Wheelchair accessible?', width: 20, key: 'isAccessible' }
+        { label: 'Performance', width: 20, key: 'rating' }
       ]}
       footerColumns={[
-        { label: 'Total', width: 20 },
-        { label: 'Empty', width: 20 },
         { label: '', width: 20 },
-        { label: '20  ', width: 20 },
-        { label: '', width: 20 }
+        { label: '', width: 20 },
+        { label: '', width: 20 },
+        { label: 'Avg. 10,000', width: 20 },
+        { label: 'Avg. 95.4%', width: 20 }
       ]}
       pageSize={5}
       currentPage={currentPage}
