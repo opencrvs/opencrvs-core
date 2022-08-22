@@ -51,7 +51,7 @@ const TableHeader = styled.div<{
   background: ${({ theme }) => theme.colors.grey100};
   padding: 10px 0px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 2px 2px 0 0;
 
@@ -103,9 +103,7 @@ const RowWrapper = styled.div<{
   min-height: 48px;
   padding-top: 10px;
   padding-bottom: 10px;
-  border-bottom: 1px solid
-    ${({ theme, columns }) =>
-      columns.length > 5 ? theme.colors.grey100 : theme.colors.grey200};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
 
   &:last-child {
     ${({ hideTableBottomBorder }) =>
@@ -156,13 +154,20 @@ const RowWrapper = styled.div<{
   }
 `
 const TableFooter = styled(RowWrapper)`
-  padding-right: 10px;
-  background: ${({ theme }) => theme.colors.grey200};
+  display: flex;
+  align-items: center;
+  background: ${({ theme }) => theme.colors.grey100};
   border-top: 2px solid ${({ theme }) => theme.colors.grey500};
   border-bottom: none;
   & span {
     color: ${({ theme }) => theme.colors.copy};
-    ${({ theme }) => theme.fonts.bold16};
+    ${({ theme }) => theme.fonts.bold14};
+  }
+  & span:first-child {
+    padding-left: 8px;
+  }
+  & span:last-child {
+    padding-right: 8px;
   }
 `
 
@@ -264,7 +269,7 @@ const TableHeaderWrapper = styled.div`
 const ToggleSortIcon = styled.div<{
   toggle?: boolean
 }>`
-  margin-left: 5px;
+  margin-left: 6px;
   display: inline;
   svg {
     transform: ${({ toggle }) => (toggle ? 'rotate(180deg)' : 'none')};

@@ -44,8 +44,8 @@ export const TwoColumnsTwoRows = () => (
 export const ThreeColumnsFiveRows = () => (
   <Table
     columns={[
-      { label: 'Lunch places', width: 40, key: 'place' },
-      { label: 'Rating', width: 20, key: 'rating' },
+      { label: 'Lunch places', width: 30, key: 'place' },
+      { label: 'Rating', width: 30, key: 'rating' },
       { label: 'Lunch time', width: 40, key: 'time' }
     ]}
     content={[
@@ -307,7 +307,11 @@ export const PaginationFooterAndSorting = () => {
         { label: 'Wheelchair accessible?', width: 20, key: 'isAccessible' }
       ]}
       footerColumns={[
-        { label: 'Note that the lunch times might have changed', width: 100 }
+        { label: 'Total', width: 20 },
+        { label: 'Empty', width: 20 },
+        { label: '', width: 20 },
+        { label: '20  ', width: 20 },
+        { label: '', width: 20 }
       ]}
       pageSize={5}
       currentPage={currentPage}
