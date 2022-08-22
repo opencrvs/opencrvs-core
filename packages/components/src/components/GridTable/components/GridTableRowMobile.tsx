@@ -10,15 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { IAction } from './types'
 import styled from 'styled-components'
-import { IActionObject } from '..'
 import {
   IGridTableRow,
   IconWrapper,
   Error,
   ContentWrapper
 } from './GridTableRowDeskop'
+import { IActionObject, IAction } from '../../interface'
 
 const StyledBox = styled.div`
   color: ${({ theme }) => theme.colors.copy};

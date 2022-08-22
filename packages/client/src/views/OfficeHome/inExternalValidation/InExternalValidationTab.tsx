@@ -14,7 +14,7 @@ import {
   GridTable,
   COLUMNS,
   SORT_ORDER
-} from '@opencrvs/components/lib/interface'
+} from '@opencrvs/components/lib/GridTable'
 import { ITheme, withTheme } from '@client/styledComponents'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import { transformData } from '@client/search/transformer'

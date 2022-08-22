@@ -25,9 +25,8 @@ import {
   GridTable,
   COLUMNS,
   SORT_ORDER,
-  ColumnContentAlignment,
-  IAction
-} from '@opencrvs/components/lib/interface'
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/GridTable'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -51,6 +50,7 @@ import { Scope } from '@client/utils/authUtils'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
+import { IAction } from '@opencrvs/components/lib/interface'
 const ToolTipContainer = styled.span`
   text-align: center;
 `

@@ -20,7 +20,7 @@ import {
   MobileWrapper,
   DesktopWrapper
 } from '@opencrvs/components/lib/styleForPagination'
-import { NoResultText } from '@opencrvs/components/lib/interface/GridTable/GridTable'
+import { NoResultText } from '@opencrvs/components/lib/GridTable/GridTable'
 import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
 import {
   LoadingIndicator,

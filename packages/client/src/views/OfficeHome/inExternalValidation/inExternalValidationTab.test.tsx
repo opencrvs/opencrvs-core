@@ -23,7 +23,7 @@ import { readFileSync } from 'fs'
 import { checkAuth } from '@client/profile/profileActions'
 import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { GridTable } from '@opencrvs/components/lib/GridTable'
 import { History } from 'history'
 
 const EVENT_CREATION_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)

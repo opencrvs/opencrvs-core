@@ -11,7 +11,7 @@
  */
 import { Meta, Story } from '@storybook/react'
 import { ListTable } from './ListTable'
-import { IColumn, IDynamicValues, IFooterFColumn } from '../GridTable/types'
+import { IColumn, IDynamicValues, IFooterFColumn } from '../../GridTable/types'
 import { ArrowDownBlue } from '../../icons'
 import React from 'react'
 

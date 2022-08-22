@@ -19,10 +19,10 @@ import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
   GridTable,
-  IAction,
   COLUMNS,
-  SORT_ORDER
-} from '@opencrvs/components/lib/interface'
+  SORT_ORDER,
+  IDynamicValues
+} from '@opencrvs/components/lib/GridTable'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -55,8 +55,8 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
+import { IAction } from '@opencrvs/components/lib/interface'
 
 const ToolTipContainer = styled.span`
   text-align: center;

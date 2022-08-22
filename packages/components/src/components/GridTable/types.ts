@@ -9,10 +9,9 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IAction } from '../ListItem'
 import { ColumnContentAlignment } from './GridTable'
 import * as React from 'react'
-export { IAction, IActionObject } from '../ListItem'
+import { IAction } from '../interface'
 
 enum GQLRegStatus {
   DECLARED = 'DECLARED',
@@ -28,9 +27,6 @@ export interface IStatus {
   practitionerRole: string
   officeName: string | Array<string | null> | null
 }
-
-type ReactText = string | number
-type ReactChild = React.ReactNodeArray | ReactText
 
 export interface IColumn {
   label?: string | React.ReactNode

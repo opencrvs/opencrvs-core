@@ -13,11 +13,11 @@ import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 import {
-  ColumnContentAlignment,
   GridTable,
+  ColumnContentAlignment,
   COLUMNS,
   SORT_ORDER
-} from '@opencrvs/components/lib/interface/GridTable'
+} from '@opencrvs/components/lib/GridTable'
 import {
   GQLHumanName,
   GQLEventSearchResultSet,
