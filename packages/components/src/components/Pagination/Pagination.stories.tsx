@@ -10,28 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { PaginationModified, IPaginationProps } from './PaginationModified'
+import { Pagination, IPaginationProps } from './Pagination'
 import React from 'react'
 
 export default {
   title: 'Controls/Pagination',
-  component: PaginationModified
+  component: Pagination
 } as Meta
 
-const Template: Story<IPaginationProps> = (args) => (
-  <PaginationModified {...args} />
-)
-export const PaginationDesktop = Template.bind({})
-PaginationDesktop.args = {
-  size: 'small',
+const Template: Story<IPaginationProps> = (args) => <Pagination {...args} />
+export const PaginationView = Template.bind({})
+PaginationView.args = {
   initialPage: 1,
   totalPages: 10,
   onPageChange: (pageNo: number) => alert(`${pageNo}`)
-}
-export const MobilePagination = Template.bind({})
-MobilePagination.args = {
-  initialPage: 1,
-  totalPages: 10,
-  onPageChange: (pageNo: number) => alert(`${pageNo}`),
-  size: 'large'
 }
