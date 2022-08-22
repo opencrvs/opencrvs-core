@@ -50,9 +50,9 @@ export const TwoColumnsTwoRows = () => (
 export const ThreeColumnsFiveRows = () => (
   <Table
     columns={[
-      { label: 'User', width: 30, key: 'user' },
-      { label: 'Start date', width: 30, key: 'time' },
-      { label: 'Status', width: 40, key: 'status' }
+      { label: 'User', width: 33, key: 'user' },
+      { label: 'Start date', width: 33, key: 'time' },
+      { label: 'Status', width: 34, key: 'status' }
     ]}
     content={[
       {
