@@ -11,10 +11,9 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { DeprecatedPagination } from './DataTable/Pagination'
-import { LoadMore } from './GridTable/LoadMore'
 import { IColumn, IDynamicValues, IFooterFColumn } from './GridTable/types'
 import { ColumnContentAlignment } from './GridTable'
+import { Pagination } from '../Pagination'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean
@@ -564,7 +563,7 @@ export class TableView extends React.Component<
         {totalItems > pageSize && (
           <>
             {!loadMoreText && !noPagination && (
-              <DeprecatedPagination
+              <Pagination
                 initialPage={currentPage}
                 totalPages={Math.ceil(totalItems / pageSize)}
                 onPageChange={this.onPageChange}

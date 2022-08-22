@@ -12,7 +12,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Document, Page } from 'react-pdf'
-import { DeprecatedPagination, Spinner } from '../../interface'
+import { Spinner } from '../../interface'
+import { Pagination } from '../../Pagination'
 
 const Container = styled.div`
   ${({ theme }) => theme.shadows.heavy};
@@ -65,7 +66,7 @@ class PDFViewer extends React.Component<IPDFViewerProps, IPDFViewerState> {
           <Page pageNumber={currentPage} />
         </Document>
         {this.state.numPages > 1 && (
-          <DeprecatedPagination
+          <Pagination
             initialPage={currentPage}
             totalPages={numPages}
             onPageChange={this.onPageChange}
