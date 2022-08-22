@@ -62,7 +62,7 @@ interface IState {
   currentPage: number
 }
 
-export class Pagination extends React.Component<
+export class DeprecatedPagination extends React.Component<
   IPaginationCustomProps,
   IState
 > {

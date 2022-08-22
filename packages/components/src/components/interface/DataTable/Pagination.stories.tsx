@@ -10,16 +10,16 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { Pagination, IPaginationCustomProps } from './Pagination'
+import { DeprecatedPagination, IPaginationCustomProps } from './Pagination'
 import React from 'react'
 
 export default {
   title: 'Controls/Pagination (deprecated)',
-  component: Pagination
+  component: DeprecatedPagination
 } as Meta
 
 const Template: Story<IPaginationCustomProps> = (args) => (
-  <Pagination {...args} />
+  <DeprecatedPagination {...args} />
 )
 export const PaginationView = Template.bind({})
 PaginationView.args = {

@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Pagination, SortAndFilter } from '..'
+import { DeprecatedPagination, SortAndFilter } from '..'
 import { Omit } from '../../omit'
 import styled from 'styled-components'
 
@@ -299,7 +299,7 @@ export class DataTable extends React.Component<
           ).map((item, index) => this.props.cellRenderer(item, index))}
         </StyledList>
         {!zeroPagination && data.length > 0 && (
-          <Pagination
+          <DeprecatedPagination
             initialPage={initialPage}
             totalPages={totalPages}
             onPageChange={this.onPageChange}

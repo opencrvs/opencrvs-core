@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Pagination } from './DataTable/Pagination'
+import { DeprecatedPagination } from './DataTable/Pagination'
 import { LoadMore } from './GridTable/LoadMore'
 import { IColumn, IDynamicValues, IFooterFColumn } from './GridTable/types'
 import { ColumnContentAlignment } from './GridTable'
@@ -564,7 +564,7 @@ export class TableView extends React.Component<
         {totalItems > pageSize && (
           <>
             {!loadMoreText && !noPagination && (
-              <Pagination
+              <DeprecatedPagination
                 initialPage={currentPage}
                 totalPages={Math.ceil(totalItems / pageSize)}
                 onPageChange={this.onPageChange}
