@@ -77,47 +77,47 @@ export const updateCertificateTemplate = async (
   }
 }
 
-export const handleSelectFile = async (
-  thisObj: any,
-  event: React.ChangeEvent<HTMLInputElement>
-) => {
-  const { id, files } = event.target
-  const eventName: string = id.split('_')[0]
-  const certificateId: string = id.split('_')[4]
-  const status = 'ACTIVE'
-  const userMgntUserID =
-    thisObj.props.userDetails && thisObj.props.userDetails.userMgntUserID
-  thisObj.setState({
-    imageUploading: true,
-    imageLoadingError: ''
-  })
-  thisObj.toggleNotification()
+// export const handleSelectFile = async (
+//   thisObj: any,
+//   event: React.ChangeEvent<HTMLInputElement>
+// ) => {
+//   console.log('handle select')
+//   const { id, files } = event.target
+//   const eventName: string = id.split('_')[0]
+//   const certificateId: string = id.split('_')[4]
+//   const status = 'ACTIVE'
+//   const userMgntUserID =
+//     thisObj.props.userDetails && thisObj.props.userDetails.userMgntUserID
+//   thisObj.setState({
+//     imageUploading: true,
+//     imageLoadingError: ''
+//   })
+//   thisObj.toggleNotification()
 
-  if (files && files.length > 0) {
-    try {
-      const svgCode = await validateCertificateTemplate(files[0])
-      updateCertificateTemplate.bind(
-        thisObj,
-        certificateId,
-        svgCode,
-        files[0].name,
-        userMgntUserID as string,
-        status,
-        eventName
-      )
-      thisObj.birthCertificatefileUploader.current!.value = ''
-      thisObj.deathCertificatefileUploader.current!.value = ''
-    } catch (error) {
-      if (error.message === ERROR_TYPES.IMAGE_TYPE) {
-        thisObj.setState(() => ({
-          imageUploading: false,
-          imageLoadingError: thisObj.props.intl.formatMessage(
-            imageUploadMessages.imageFormat
-          )
-        }))
-        thisObj.birthCertificatefileUploader.current!.value = ''
-        thisObj.deathCertificatefileUploader.current!.value = ''
-      }
-    }
-  }
-}
+//   if (files && files.length > 0) {
+//     try {
+//       const svgCode = await validateCertificateTemplate(files[0])
+//       updateCertificateTemplate.bind(
+//         certificateId,
+//         svgCode,
+//         files[0].name,
+//         userMgntUserID as string,
+//         status,
+//         eventName
+//       )
+//       thisObj.birthCertificatefileUploader.current!.value = ''
+//       thisObj.deathCertificatefileUploader.current!.value = ''
+//     } catch (error) {
+//       if (error.message === ERROR_TYPES.IMAGE_TYPE) {
+//         thisObj.setState(() => ({
+//           imageUploading: false,
+//           imageLoadingError: thisObj.props.intl.formatMessage(
+//             imageUploadMessages.imageFormat
+//           )
+//         }))
+//         thisObj.birthCertificatefileUploader.current!.value = ''
+//         thisObj.deathCertificatefileUploader.current!.value = ''
+//       }
+//     }
+//   }
+// }

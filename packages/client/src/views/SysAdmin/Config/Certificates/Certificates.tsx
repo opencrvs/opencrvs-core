@@ -64,8 +64,13 @@ import {
   updatePreviewSvgWithSampleSignature,
   closePreviewSection,
   onDelete,
-  handleSelectFile
+  updateCertificateTemplate
 } from './utils'
+import {
+  ERROR_TYPES,
+  validateCertificateTemplate
+} from '@client/utils/imageUtils'
+import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 
 const HiddenInput = styled.input`
   display: none;
@@ -239,7 +244,47 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
   selectForPreview = (previewImage: IAttachmentValue) => {
     this.setState({ previewImage: previewImage })
   }
+  handleSelectFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, files } = event.target
+    const eventName: string = id.split('_')[0]
+    const certificateId: string = id.split('_')[4]
+    const status = 'ACTIVE'
+    const userMgntUserID =
+      this.props.userDetails && this.props.userDetails.userMgntUserID
+    this.setState({
+      imageUploading: true,
+      imageLoadingError: ''
+    })
+    this.toggleNotification()
 
+    if (files && files.length > 0) {
+      try {
+        const svgCode = await validateCertificateTemplate(files[0])
+        updateCertificateTemplate.bind(
+          this,
+          certificateId,
+          svgCode,
+          files[0].name,
+          userMgntUserID as string,
+          status,
+          eventName
+        )
+        this.birthCertificatefileUploader.current!.value = ''
+        this.deathCertificatefileUploader.current!.value = ''
+      } catch (error) {
+        if (error.message === ERROR_TYPES.IMAGE_TYPE) {
+          this.setState(() => ({
+            imageUploading: false,
+            imageLoadingError: this.props.intl.formatMessage(
+              imageUploadMessages.imageFormat
+            )
+          }))
+          this.birthCertificatefileUploader.current!.value = ''
+          this.deathCertificatefileUploader.current!.value = ''
+        }
+      }
+    }
+  }
   render() {
     const {
       eventName,
@@ -284,7 +329,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 id={`birth_file_uploader_field_${offlineResources.templates.certificates?.birth.id}`}
                 type="file"
                 accept={ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.join(',')}
-                onChange={() => handleSelectFile.bind(this)}
+                onChange={this.handleSelectFile}
               />
             </>
           )
@@ -316,7 +361,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 id={`death_file_uploader_field_${offlineResources.templates.certificates?.death.id}`}
                 type="file"
                 accept={ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.join(',')}
-                onChange={() => handleSelectFile.bind(this)}
+                onChange={this.handleSelectFile}
               />
             </>
           )
