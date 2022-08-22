@@ -19,7 +19,7 @@
     "prettier": "^2.5.0"
   },
   "lint-staged": {
-    "src/**/*.{ts,graphql}": [
+    "src/**/*.{js}": [
       "prettier --write",
       "git add"
     ]
