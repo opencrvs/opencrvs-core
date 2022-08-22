@@ -14,7 +14,7 @@ import styled from 'styled-components'
 import { LoadMore } from '../GridTable/LoadMore'
 import { IColumn, IDynamicValues, IFooterFColumn } from '../GridTable/types'
 import { ColumnContentAlignment } from '../GridTable'
-import { Pagination } from 'src/components/Pagination'
+import { Pagination } from '../../Pagination'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean
