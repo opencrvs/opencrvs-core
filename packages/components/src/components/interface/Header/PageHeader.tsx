@@ -15,7 +15,8 @@ import styled from 'styled-components'
 import { IDomProps } from './AppHeader'
 
 const PageHeaderWrapper = styled.div`
-  padding: 8px 16px;
+  padding: 0 16px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
