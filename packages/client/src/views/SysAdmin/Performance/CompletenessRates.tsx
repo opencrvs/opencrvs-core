@@ -137,48 +137,52 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
               ? locationId
               : '0'
         }}
+        onCompleted={({ hasChildLocation }) => {
+          const childJurisdictionType = getJurisidictionType(hasChildLocation)
+          if (!childJurisdictionType) {
+            setBase({ baseType: COMPLETENESS_RATE_REPORT_BASE.TIME })
+          }
+        }}
       >
         {({ data, loading, error }) => {
-          const options: IPerformanceSelectOption[] = [
-            {
-              label: intl.formatMessage(messages.overTime),
-              value: COMPLETENESS_RATE_REPORT_BASE.TIME
-            }
-          ]
-          if (
+          const childJurisdictionType =
             data &&
             data.hasChildLocation &&
-            data.hasChildLocation.type === 'ADMIN_STRUCTURE'
-          ) {
-            const jurisdictionType = getJurisidictionType(data.hasChildLocation)
+            getJurisidictionType(data.hasChildLocation)
 
-            options.push({
-              label: intl.formatMessage(messages.byLocation, {
-                jurisdictionType
-              }),
-              value: COMPLETENESS_RATE_REPORT_BASE.LOCATION,
-              type: jurisdictionType || ''
-            })
-          }
+          const options: (IPerformanceSelectOption & { disabled?: boolean })[] =
+            [
+              {
+                label: intl.formatMessage(messages.overTime),
+                value: COMPLETENESS_RATE_REPORT_BASE.TIME
+              },
+              {
+                label: intl.formatMessage(messages.byLocation, {
+                  childJurisdictionType
+                }),
+                value: COMPLETENESS_RATE_REPORT_BASE.LOCATION,
+                type: childJurisdictionType || '',
+                disabled: !childJurisdictionType
+              }
+            ]
 
           return (
             <>
-              {options.length > 1 && (
-                <SegmentedControl
-                  id="base-select"
-                  value={base.baseType}
-                  options={options}
-                  onChange={(option) =>
-                    setBase({
-                      baseType: option.value as COMPLETENESS_RATE_REPORT_BASE,
-                      locationJurisdictionType: option.type
-                    })
-                  }
-                />
-              )}
+              <SegmentedControl
+                id="base-select"
+                value={base.baseType}
+                options={options}
+                onChange={(option) =>
+                  setBase({
+                    baseType: option.value as COMPLETENESS_RATE_REPORT_BASE,
+                    locationJurisdictionType: option.type
+                  })
+                }
+              />
               <LocationPicker
                 additionalLocations={getAdditionalLocations(intl)}
                 selectedLocationId={locationId || NATIONAL_ADMINISTRATIVE_LEVEL}
+                requiredLocationTypes={'ADMIN_STRUCTURE'}
                 onChangeLocation={(newLocationId) => {
                   props.goToCompletenessRates(
                     eventType as Event,
