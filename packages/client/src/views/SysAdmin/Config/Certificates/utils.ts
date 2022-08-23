@@ -1,9 +1,4 @@
-import {
-  ERROR_TYPES,
-  validateCertificateTemplate
-} from '@client/utils/imageUtils'
-import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
-import { IAttachmentValue, IFormFieldValue, IForm } from '@client/forms'
+import { IAttachmentValue, IFormFieldValue } from '@client/forms'
 
 export const blobToBase64 = (
   blob: Blob

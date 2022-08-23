@@ -9,9 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { ImageUploader } from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
-import { IAttachmentValue } from '@client/forms'
+import { IFormFieldValue, IAttachmentValue } from '@client/forms'
+import Jimp from 'jimp'
 import * as React from 'react'
 import {
   WrappedComponentProps as IntlShapeProps,

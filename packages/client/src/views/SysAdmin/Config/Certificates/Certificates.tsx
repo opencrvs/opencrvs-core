@@ -14,10 +14,6 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import * as React from 'react'
 import {
-  ERROR_TYPES,
-  validateCertificateTemplate
-} from '@client/utils/imageUtils'
-import {
   FormattedMessage,
   injectIntl,
   IntlShape,
@@ -33,6 +29,7 @@ import {
   TertiaryButton
 } from '@opencrvs/components/lib/buttons'
 import { messages } from '@client/i18n/messages/views/config'
+import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import {
   FloatingNotification,
@@ -42,6 +39,11 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE } from '@client/utils/constants'
+import {
+  ERROR_TYPES,
+  validateCertificateTemplate
+} from '@client/utils/imageUtils'
+import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
 import { IAttachmentValue, IForm } from '@client/forms'
@@ -63,9 +65,9 @@ import {
   ListViewItemSimplified
 } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { updateOfflineCertificate } from '@client/offline/actions'
+import { ICertificateTemplateData } from '@client/utils/referenceApi'
 import { IDeclaration } from '@client/declarations'
 import {
-  blobToBase64,
   updatePreviewSvgWithSampleSignature,
   closePreviewSection,
   onDelete
@@ -228,20 +230,6 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       }
     ]
     return menuItems
-  }
-
-  toggleNotification = () => {
-    this.setState((state) => ({
-      showNotification: !state.showNotification
-    }))
-  }
-
-  togglePrompt = () => {
-    this.setState((prevState) => ({ showPrompt: !prevState.showPrompt }))
-  }
-
-  selectForPreview = (previewImage: IAttachmentValue) => {
-    this.setState({ previewImage: previewImage })
   }
   handleSelectFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const { id, files } = event.target
