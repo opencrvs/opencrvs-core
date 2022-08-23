@@ -9,34 +9,23 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
-import { ColumnContentAlignment, Workqueue } from './Workqueue'
-import { IColumn, IDynamicValues } from './types'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
+import { Workqueue } from './Workqueue'
+import { DeclarationIcon } from '../icons'
 import React from 'react'
 
 export default {
   title: 'Data/Workqueue',
   component: Workqueue
-} as Meta
+} as ComponentMeta<typeof Workqueue>
 
-interface IProps {
-  content: IDynamicValues[]
-  columns: IColumn[]
-  renderExpandedComponent?: (eventId: string) => React.ReactNode
-  noResultText: string
-  hideTableHeader?: boolean
-  onPageChange?: (currentPage: number) => void
-  pageSize?: number
-  totalItems: number
-  currentPage?: number
-  expandable?: boolean
-  clickable?: boolean
-  showPaginated?: boolean
-  loading?: boolean
-  loadMoreText: string
-  width: number
-  expanded: string[]
-}
+export const Empty: ComponentStory<typeof Workqueue> = () => (
+  <Workqueue
+    content={[]}
+    columns={columns}
+    noResultText="No records require review"
+  />
+)
 
 function reviewClicked() {
   alert('review clicked')
@@ -44,10 +33,11 @@ function reviewClicked() {
 
 const list = [
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '3 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-12-10',
-    event: 'birth',
+    event: 'Birth',
     actions: [
       {
         label: 'review',
@@ -56,10 +46,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '5 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-11-10',
-    event: 'death',
+    event: 'Death',
     actions: [
       {
         label: 'review',
@@ -68,10 +59,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '23 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-11-10',
-    event: 'marriage',
+    event: 'Marriage',
     actions: [
       {
         label: 'review',
@@ -80,10 +72,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '12 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-09-10',
-    event: 'birth',
+    event: 'Birth',
     actions: [
       {
         label: 'review',
@@ -92,10 +85,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '3 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-10',
-    event: 'birth',
+    event: 'Birth',
     actions: [
       {
         label: 'review',
@@ -104,10 +98,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '18 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-10',
-    event: 'marriage',
+    event: 'Marriage',
     actions: [
       {
         label: 'review',
@@ -116,10 +111,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '23 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-09',
-    event: 'birth',
+    event: 'Birth',
     actions: [
       {
         label: 'review',
@@ -128,10 +124,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '7 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-08',
-    event: 'birth',
+    event: 'Birth',
     actions: [
       {
         label: 'review',
@@ -140,10 +137,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '9 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-09',
-    event: 'death',
+    event: 'Death',
     actions: [
       {
         label: 'review',
@@ -152,10 +150,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '11 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-09',
-    event: 'marriage',
+    event: 'Marriage',
     actions: [
       {
         label: 'review',
@@ -164,10 +163,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '3 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-06',
-    event: 'birth',
+    event: 'Birth',
     actions: [
       {
         label: 'review',
@@ -176,10 +176,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '5 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-09',
-    event: 'birth',
+    event: 'Birth',
     actions: [
       {
         label: 'review',
@@ -188,10 +189,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '3 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-09',
-    event: 'death',
+    event: 'Death',
     actions: [
       {
         label: 'review',
@@ -200,10 +202,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '7 days ago',
     tracking_id: '1234567',
     date_of_event: '2017-10-09',
-    event: 'marriage',
+    event: 'Marriage',
     actions: [
       {
         label: 'review',
@@ -212,10 +215,11 @@ const list = [
     ]
   },
   {
+    icon: <DeclarationIcon color="orange" />,
     date_of_declaration: '9 days ago',
     tracking_id: '1234567',
     createdAt: '2017-10-09',
-    event: 'birth',
+    event: 'Birth',
     actions: [
       {
         label: 'review',
@@ -226,6 +230,10 @@ const list = [
 ]
 
 const columns = [
+  {
+    width: 10,
+    key: 'icon'
+  },
   {
     label: 'Type',
     width: 14,
@@ -247,21 +255,18 @@ const columns = [
     key: 'date_of_event'
   },
   {
-    label: 'Action',
     width: 20,
     key: 'actions',
-    isActionColumn: true,
-    alignment: ColumnContentAlignment.CENTER
+    isActionColumn: true
   }
 ]
 
-const Template: Story<IProps> = (args) => <Workqueue {...args} />
-export const GridView = Template.bind({})
-GridView.args = {
+export const DefaultUsage: ComponentStory<typeof Workqueue> = (args) => (
+  <Workqueue {...args} />
+)
+
+DefaultUsage.args = {
   content: list,
   columns,
-  noResultText: 'No result to display',
-  expandable: false,
-  totalItems: list.length || 0,
-  pageSize: list.length
+  noResultText: 'No result to display'
 }
