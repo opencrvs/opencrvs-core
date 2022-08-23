@@ -145,6 +145,6 @@ ResultListView.args = {
   ]
 }
 export default {
-  title: 'Data/ResultList (deprecated)',
+  title: 'Deprecated/ResultList',
   component: ResultList
 } as Meta
