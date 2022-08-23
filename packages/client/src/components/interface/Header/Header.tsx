@@ -72,7 +72,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import styled, { ThemeConsumer } from 'styled-components'
 import { getJurisdictionLocationIdFromUserDetails } from '@client/views/SysAdmin/Performance/utils'
-import { Navigation } from '@client/components/interface/Navigation'
+import { FixedNavigation } from '@client/components/interface/Navigation'
 import { Avatar } from '@client/components/Avatar'
 import { RouteComponentProps, withRouter } from 'react-router'
 import {
@@ -247,7 +247,7 @@ class HeaderComp extends React.Component<IFullProps, IState> {
           showMenu={this.state.showMenu}
           menuCollapse={() => this.toggleMenu()}
           navigation={() => (
-            <Navigation
+            <FixedNavigation
               navigationWidth={320}
               menuCollapse={() => this.toggleMenu()}
               userInfo={userInfo}
@@ -611,3 +611,12 @@ export const Header = connect(
     goToTeamUserListAction: goToTeamUserList
   }
 )(injectIntl(withTheme(withRouter(HeaderComp))))
+
+/** @deprecated since the introduction of `<Frame>` */
+export const MarginedHeader = styled(Header)`
+  margin-left: 249px;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    margin-left: 0;
+  }
+`

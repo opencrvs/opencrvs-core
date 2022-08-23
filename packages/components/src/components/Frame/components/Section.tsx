@@ -9,23 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
-import { StatusGray } from '../icons'
-import { Chip } from './Chip'
-import React from 'react'
+import styled from 'styled-components'
 
-interface IProps {
-  status: JSX.Element
-  text: string
-}
-const Template: Story<IProps> = (args) => <Chip {...args} />
-export const ChipView = Template.bind({})
-ChipView.args = {
-  status: <StatusGray />,
-  text: 'Birth'
-}
+export const Section = styled.div`
+  display: grid;
+  gap: 24px;
 
-export default {
-  title: 'Layout/Chip',
-  component: Chip
-} as Meta
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    gap: 0;
+  }
+`

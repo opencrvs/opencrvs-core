@@ -9,11 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as React from 'react'
-import styled, { StyledComponentBase } from 'styled-components'
-import { grid } from '../grid'
-
-export const Wrapper = styled.div`
-  margin: auto;
-  max-width: ${grid.breakpoints.lg}px;
-`
+export * from './Layout'

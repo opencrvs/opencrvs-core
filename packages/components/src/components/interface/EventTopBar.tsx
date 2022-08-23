@@ -25,7 +25,7 @@ const TopBar = styled.div`
   align-items: center;
   top: 0;
   width: 100%;
-  position: fixed;
+  position: relative;
   z-index: 1;
 `
 const TopBarTitle = styled.h4`
@@ -54,6 +54,7 @@ export interface IEventTopBarProps {
   menuItems?: IToggleMenuItem[]
   iconColor?: string
   topBarActions?: React.ReactNode[]
+  className?: string
 }
 
 export interface IEventTopBarMenuAction {
@@ -75,10 +76,11 @@ export const EventTopBar = (props: IEventTopBarProps) => {
     menuItems,
     iconColor = 'purple',
     topBarActions,
-    pageIcon
+    pageIcon,
+    className
   } = props
   return (
-    <TopBar>
+    <TopBar className={className}>
       <Item>
         {pageIcon || <DeclarationIcon color={iconColor} />}
         <TopBarTitle>{title}</TopBarTitle>
@@ -114,3 +116,8 @@ export const EventTopBar = (props: IEventTopBarProps) => {
     </TopBar>
   )
 }
+
+/** @deprecated since the introduction of `<Frame>` */
+export const FixedEventTopBar = styled(EventTopBar)`
+  position: fixed;
+`

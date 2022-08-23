@@ -10,9 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { IAction } from './types'
+import { IAction, IActionObject } from './types'
 import styled from 'styled-components'
-import { IActionObject } from '..'
 import {
   IGridTableRow,
   IconWrapper,

@@ -9,25 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Story, Meta } from '@storybook/react'
-import { TopBar } from './TopBar'
-import React from 'react'
-
-const Template: Story<{ id?: string }> = () => (
-  <TopBar>
-    <p>Declarations in Progress</p>
-    <p>Declarations in review</p>
-    <p>Declarations Ready to Print</p>
-  </TopBar>
-)
-
-export const TopBarView = Template.bind({})
-
-TopBarView.args = {
-  id: 'birth'
-}
-
-export default {
-  title: 'Deprecated/TopBar',
-  component: TopBar
-}
+export * from './Frame'
