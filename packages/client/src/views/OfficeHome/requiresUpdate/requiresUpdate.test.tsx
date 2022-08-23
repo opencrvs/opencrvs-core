@@ -30,7 +30,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
 import { FETCH_REGISTRATION_BY_COMPOSITION } from '@client/views/OfficeHome/queries'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
@@ -233,7 +233,7 @@ describe('OfficeHome sent for update tab related tests', () => {
       { store, history }
     )
 
-    const table = await waitForElement(testComponent, GridTable)
+    const table = await waitForElement(testComponent, Workqueue)
     const data = table.prop('content')
     const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
 
@@ -261,7 +261,7 @@ describe('OfficeHome sent for update tab related tests', () => {
       { store, history }
     )
 
-    const table = await waitForElement(testComponent, GridTable)
+    const table = await waitForElement(testComponent, Workqueue)
 
     const data = table.prop('content')
     expect(data.length).toBe(0)

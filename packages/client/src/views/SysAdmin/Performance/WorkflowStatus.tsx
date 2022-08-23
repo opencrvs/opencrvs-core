@@ -33,8 +33,10 @@ import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completen
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/interface'
-import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import {
+  IColumn,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/Workqueue'
 import {
   GQLEventProgressSet,
   GQLHumanName,

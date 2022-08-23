@@ -18,11 +18,11 @@ import styled, { ITheme } from '@client/styledComponents'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
-  GridTable,
+  Workqueue,
   COLUMNS,
   SORT_ORDER,
   IDynamicValues
-} from '@opencrvs/components/lib/GridTable'
+} from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -349,7 +349,7 @@ class ReadyForReviewComponent extends React.Component<
             )}
           </ToolTipContainer>
         </ReactTooltip>
-        <GridTable
+        <Workqueue
           content={this.transformDeclaredContent(data)}
           columns={this.getColumns()}
           loading={this.props.loading}

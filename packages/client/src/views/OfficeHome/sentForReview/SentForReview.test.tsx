@@ -17,7 +17,7 @@ import {
   resizeWindow
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
 import { merge } from 'lodash'
@@ -224,7 +224,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
     )
 
     testComponent.update()
-    const data = testComponent.find(GridTable).prop('content')
+    const data = testComponent.find(Workqueue).prop('content')
     const EXPECTED_DATE_OF_DECLARATION = formattedDuration(Number(TIME_STAMP))
     expect(data.length).toBe(2)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
@@ -256,7 +256,7 @@ describe('RegistrationHome sent for approval tab related tests', () => {
       { store, history }
     )
 
-    const data = (await waitForElement(testComponent, GridTable)).prop(
+    const data = (await waitForElement(testComponent, Workqueue)).prop(
       'content'
     )
     expect(data.length).toBe(0)

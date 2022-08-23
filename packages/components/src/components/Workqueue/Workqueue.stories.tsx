@@ -15,7 +15,7 @@ import { IColumn, IDynamicValues } from './types'
 import React from 'react'
 
 export default {
-  title: 'Data/Workqueue table',
+  title: 'Data/Workqueue',
   component: Workqueue
 } as Meta
 

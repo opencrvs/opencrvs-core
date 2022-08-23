@@ -22,11 +22,11 @@ import { transformData } from '@client/search/transformer'
 import { IStoreState } from '@client/store'
 import styled, { ITheme } from '@client/styledComponents'
 import {
-  GridTable,
+  Workqueue,
   COLUMNS,
   SORT_ORDER,
   ColumnContentAlignment
-} from '@opencrvs/components/lib/GridTable'
+} from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -333,7 +333,7 @@ class SentForReviewComponent extends React.Component<
             )}
           </ToolTipContainer>
         </ReactTooltip>
-        <GridTable
+        <Workqueue
           content={this.transformValidatedContent(data)}
           columns={this.getColumns()}
           loading={this.props.loading}
