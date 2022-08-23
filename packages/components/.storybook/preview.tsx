@@ -11,14 +11,10 @@
  */
 import React from 'react'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
-import { getTheme } from '../src/components/theme'
+import { getTheme } from '@opencrvs/components/lib/theme'
 import WebFont from 'webfontloader'
 
-WebFont.load({
-  google: {
-    families: ['Noto+Sans:600', 'Noto+Sans:400']
-  }
-})
+const theme = getTheme()
 
 const GlobalStyle = createGlobalStyle`
 html,
@@ -38,12 +34,17 @@ body,
   }
   @font-face {
     /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: "Noto Sans";
+    font-family: ${theme.fonts.fontFamily};
+    font-style: normal;
+    font-weight: 400;
   }
   *:not(i) {
-    font-family: "Noto Sans";
+    font-family: ${theme.fonts.fontFamily};
+    font-style: normal;
+    font-weight: 400;
   }
 }
+
 body,
 h1, h2, h3, h4, h5, h6,
 blockquote, p, pre, code,
@@ -61,12 +62,18 @@ fieldset, legend
 `
 export const decorators = [
   (Story) => (
-    <ThemeProvider theme={getTheme()}>
+    <ThemeProvider theme={theme}>
       <GlobalStyle />
       <Story />
     </ThemeProvider>
   )
 ]
+
+WebFont.load({
+  google: {
+    families: ['Noto+Sans:600', 'Noto+Sans:400']
+  }
+})
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },

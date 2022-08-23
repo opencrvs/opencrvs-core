@@ -29,7 +29,7 @@ export interface IFonts {
 }
 
 export const fonts = (): IFonts => {
-  const fontFamily = 'Noto Sans'
+  const fontFamily = "'Noto Sans', sans-serif"
   return {
     fontFamily,
 

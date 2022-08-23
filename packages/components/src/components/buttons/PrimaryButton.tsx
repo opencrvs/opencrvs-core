@@ -22,7 +22,7 @@ export const PrimaryButton = styled(Button)`
   ${({ theme }) => theme.fonts.bold16};
 
   &:hover:enabled {
-    background: ${({ theme }) => theme.colors.indigoDark};
+    background: ${({ theme }) => theme.colors.primaryDark};
   }
   &:focus {
     background: ${({ theme }) => theme.colors.yellow};
@@ -35,7 +35,7 @@ export const PrimaryButton = styled(Button)`
   }
 
   &:active:enabled {
-    background: ${({ theme }) => theme.colors.indigoDark};
+    background: ${({ theme }) => theme.colors.primaryDark};
     color: ${({ theme }) => theme.colors.white};
   }
 
