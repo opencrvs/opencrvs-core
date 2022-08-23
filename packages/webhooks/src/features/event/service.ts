@@ -47,6 +47,16 @@ export async function transformBirthBundle(
           'child-details',
           authHeader
         )
+        const mother: fhir.Patient = await getResourceBySection(
+          composition,
+          'mother-details',
+          authHeader
+        )
+        const informant: fhir.Patient = await getResourceBySection(
+          composition,
+          'informant-details',
+          authHeader
+        )
         const document: any = await getResourceBySection(
           composition,
           'supporting-documents',
@@ -57,6 +67,12 @@ export async function transformBirthBundle(
         }
         if (document) {
           bundle.entry.push({ resource: document } as fhir.BundleEntry)
+        }
+        if (mother) {
+          bundle.entry.push({ resource: mother } as fhir.BundleEntry)
+        }
+        if (informant) {
+          bundle.entry.push({ resource: informant } as fhir.BundleEntry)
         }
         return bundle
       default:
@@ -93,11 +109,19 @@ export async function transformDeathBundle(
           'supporting-documents',
           authHeader
         )
+        const informant: fhir.Patient = await getResourceBySection(
+          composition,
+          'informant-details',
+          authHeader
+        )
         if (deceased) {
           bundle.entry.push({ resource: deceased } as fhir.BundleEntry)
         }
         if (document) {
           bundle.entry.push({ resource: document } as fhir.BundleEntry)
+        }
+        if (informant) {
+          bundle.entry.push({ resource: informant } as fhir.BundleEntry)
         }
         return bundle
       default:
