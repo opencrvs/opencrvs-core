@@ -30,8 +30,8 @@ const StyledButton = styled(Button)`
   ${({ theme }) => theme.fonts.bold16};
 
   &:hover:enabled {
-    border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
-    color: ${({ theme }) => theme.colors.indigoDark};
+    border: ${({ theme }) => `2px solid ${theme.colors.primaryDark}`};
+    color: ${({ theme }) => theme.colors.primaryDark};
     background: ${({ theme }) => theme.colors.grey100};
   }
 
@@ -50,8 +50,8 @@ const StyledButton = styled(Button)`
   }
 
   &:active:enabled {
-    border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
-    color: ${({ theme }) => theme.colors.indigoDark};
+    border: ${({ theme }) => `2px solid ${theme.colors.primaryDark}`};
+    color: ${({ theme }) => theme.colors.primaryDark};
     background: ${({ theme }) => theme.colors.grey100};
   }
 

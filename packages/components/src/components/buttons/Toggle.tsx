@@ -32,7 +32,7 @@ const CheckBoxLabel = styled.label<{ checked: boolean }>`
     checked ? theme.colors.positive : theme.colors.grey300};
   :hover {
     background: ${({ checked, theme }) =>
-      checked ? theme.colors.greenDark : theme.colors.grey400};
+      checked ? theme.colors.positiveDark : theme.colors.grey400};
   }
   cursor: pointer;
   &::after {

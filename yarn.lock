@@ -5133,7 +5133,7 @@
     lodash "^4.17.21"
     ts-dedent "^2.0.0"
 
-"@storybook/addon-docs@6.5.10":
+"@storybook/addon-docs@6.5.10", "@storybook/addon-docs@^6.5.10":
   version "6.5.10"
   resolved "https://registry.yarnpkg.com/@storybook/addon-docs/-/addon-docs-6.5.10.tgz#dde18b5659e8033651e139a231a7f69306433b92"
   integrity sha512-1kgjo3f0vL6GN8fTwLL05M/q/kDdzvuqwhxPY/v5hubFb3aQZGr2yk9pRBaLAbs4bez0yG0ASXcwhYnrEZUppg==
@@ -6721,16 +6721,7 @@
   dependencies:
     "@types/react" "*"
 
-"@types/react@*":
-  version "17.0.38"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.38.tgz#f24249fefd89357d5fa71f739a686b8d7c7202bd"
-  integrity sha512-SI92X1IA+FMnP3qM5m4QReluXzhcmovhZnLNm3pyeQlooi02qI7sLiepEYqT678uNiyc25XfCqxREFpy3W7YhQ==
-  dependencies:
-    "@types/prop-types" "*"
-    "@types/scheduler" "*"
-    csstype "^3.0.2"
-
-"@types/react@^16", "@types/react@^16.9.4":
+"@types/react@*", "@types/react@^16", "@types/react@^16.9.4":
   version "16.14.21"
   resolved "https://registry.yarnpkg.com/@types/react/-/react-16.14.21.tgz#35199b21a278355ec7a3c40003bd6a334bd4ae4a"
   integrity sha512-rY4DzPKK/4aohyWiDRHS2fotN5rhBSK6/rz1X37KzNna9HJyqtaGAbq9fVttrEPWF5ywpfIP1ITL8Xi2QZn6Eg==
