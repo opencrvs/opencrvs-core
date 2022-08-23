@@ -38,6 +38,7 @@
     "build",
     "scripts",
     "acceptance-tests",
+    "src/**/*.test.ts",
     "src/setupTests.ts"
   ]
 }
