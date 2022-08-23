@@ -15,7 +15,7 @@ const INFLUX_HOST = process.env.INFLUX_HOST || 'localhost'
 const INFLUX_PORT = process.env.INFLUX_PORT || 8086
 const INFLUX_DB = process.env.INFLUX_DB || 'ocrvs'
 
-export const up = async (db, client) => {
+export const up = async (db) => {
   const influx = new InfluxDB({
     host: INFLUX_HOST,
     database: INFLUX_DB,
@@ -46,37 +46,43 @@ export const up = async (db, client) => {
     timestamp: time.getNanoTime()
   }))
 
-  const rejectedPointsWithCorrectStartedBy = (await Promise.all(
-    rejectedPoints.map(async (point) => ({
-      ...point,
-      startedBy: await getCorrectStartedBy(db, point.compositionId)
+  const startedByMap = getCompositionIdToStartedByMap(db, rejectedPoints.map(({ compositionId }) => compositionId))
+
+  const rejectedPointsWithCorrectStartedBy = rejectedPoints
+    .map(({ compositionId, timestamp, ...tags }) => ({
+      measurement: 'declarations_rejected',
+      tags: {...tags, startedBy: startedByMap[compositionId]},
+      fields: { compositionId },
+      timestamp
     }))
-  )).map(({ compositionId, timestamp, ...tags }) => ({
-    measurement: 'declarations_rejected',
-    tags: {...tags},
-    fields: { compositionId },
-    timestamp
-  }))
 
   influx.dropMeasurement('declarations_rejected')
 
   influx.writePoints(rejectedPointsWithCorrectStartedBy)
 }
 
-async function getCorrectStartedBy(db, compositionId) {
-  const [ startingTask ] = await getStartingTask(db, compositionId)
-  return startingTask.extension[0].valueReference.reference.split('/')[1]
+async function getCompositionIdToStartedByMap(db, compositionIds) {
+  const extractId = (reference) => reference.split('/')[1]
+  const cursor = await getTaskCursor(db, compositionIds)
+  const startedByMap = new Map()
+  cursor.forEach((task) => {
+    const compositionId = extractId(task.focus.reference)
+    if (startedByMap.has(compositionId)) return
+    startedByMap.set(compositionId, extractId(task.extension[0].valueReference.reference))
+  })
+  return startedByMap
 }
 
-function getStartingTask(db, compositionId) {
+function getTaskCursor(db, compositionIds) {
   const query = {
     $match: {
       'businessStatus.coding.code': { $in: ['IN_PROGRESS', 'DECLARED', 'VALIDATED']},
-      'focus.reference': `Composition/${compositionId}`
+      'focus.reference': { $in: compositionIds.map((compositionId) => `Composition/${compositionId}`)}
     }
   }
   const projection = {
     $project: {
+      'focus.reference': 1,
       extension: {
         $filter: {
           input: '$extension',
@@ -94,11 +100,9 @@ function getStartingTask(db, compositionId) {
     }
   }
   const sort = { $sort: { 'meta.lastUpdated': 1 } }
-  const limit = { $limit: 1 }
   return db
     .collection('Task_history')
-    .aggregate([query, projection, sort, limit])
-    .toArray()
+    .aggregate([query, projection, sort])
 }
 
-export const down = async (db, client) => {}
+export const down = async () => {}
