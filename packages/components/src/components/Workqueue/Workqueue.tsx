@@ -11,14 +11,14 @@
  */
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { ListItemAction } from '../buttons'
 import { grid } from '../grid'
-import { IDynamicValues, IColumn } from './types'
+import { IDynamicValues, IColumn, IActionObject } from './types'
 import { WorkqueueRowDesktop } from './components/WorkqueueRowDesktop'
 import { WorkqueueRowMobile } from './components/WorkqueueRowMobile'
 import { ITheme } from '../theme'
 import { SortIcon } from '../icons/SortIcon'
-import { IAction, IActionObject } from '../interface'
+import { IAction } from '../common-types'
+import { ListItemAction } from '../interface/GridTable/ListItemAction'
 
 const Wrapper = styled.div`
   width: 100%;

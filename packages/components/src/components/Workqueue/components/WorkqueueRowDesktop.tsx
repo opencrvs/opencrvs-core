@@ -10,10 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { IDynamicValues, IColumn } from '../types'
 import styled from 'styled-components'
-import { ColumnContentAlignment } from '..'
-import { IActionObject, IAction } from '../../interface'
+import {
+  IActionObject,
+  ColumnContentAlignment,
+  IAction,
+  IColumn,
+  IDynamicValues
+} from '..'
 
 export interface IWorkqueueRow {
   displayItems: IDynamicValues[]

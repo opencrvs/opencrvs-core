@@ -11,7 +11,6 @@
  */
 import { ColumnContentAlignment } from './Workqueue'
 import * as React from 'react'
-import { IAction } from '../interface'
 
 enum GQLRegStatus {
   DECLARED = 'DECLARED',
@@ -64,3 +63,15 @@ export interface IDynamicValues {
     | undefined
     | Record<string, unknown>
 }
+
+export interface IActionObject {
+  label: string
+  handler: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  icon?: () => React.ReactNode
+  disabled?: boolean
+}
+
+export interface IActionComponent {
+  actionComponent: JSX.Element
+}
+export type IAction = IActionObject | IActionComponent

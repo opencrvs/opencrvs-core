@@ -17,7 +17,7 @@ import {
   Error,
   ContentWrapper
 } from './WorkqueueRowDesktop'
-import { IActionObject, IAction } from '../../interface'
+import { IActionObject, IAction } from '../types'
 
 const StyledBox = styled.div`
   color: ${({ theme }) => theme.colors.copy};

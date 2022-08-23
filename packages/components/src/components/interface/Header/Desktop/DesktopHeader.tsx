@@ -30,7 +30,6 @@ const HeaderContainer = styled.div`
   position: sticky;
   align-items: center;
   top: 0;
-  margin-left: 249px;
   z-index: 2;
   background: ${({ theme }) => theme.colors.white};
 `

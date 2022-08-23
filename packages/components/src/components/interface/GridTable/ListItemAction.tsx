@@ -11,12 +11,11 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { ExpansionButton } from './ExpansionButton'
-import { ArrowExpansionButton } from './ArrowExpansionButton'
-import { IAction, IActionComponent } from '../interface/ListItem'
-import { PrimaryButton } from './PrimaryButton'
-import { ColumnContentAlignment } from '../Workqueue'
-
+import { ExpansionButton } from '../../buttons/ExpansionButton'
+import { ArrowExpansionButton } from '../../buttons/ArrowExpansionButton'
+import { PrimaryButton } from '../../buttons/PrimaryButton'
+import { ColumnContentAlignment, IAction } from '../../common-types'
+import { IActionComponent } from '../../Workqueue'
 const Container = styled.div`
   background: ${({ theme }) => theme.colors.white};
   display: flex;
