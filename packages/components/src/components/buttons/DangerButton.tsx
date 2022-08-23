@@ -15,7 +15,7 @@ import { PrimaryButton } from './PrimaryButton'
 export const DangerButton = styled(PrimaryButton)`
   background-color: ${({ theme }) => theme.colors.negative};
   &:hover:enabled {
-    background: ${({ theme }) => theme.colors.redDark};
+    background: ${({ theme }) => theme.colors.negativeDark};
   }
   &:focus {
     outline: none;

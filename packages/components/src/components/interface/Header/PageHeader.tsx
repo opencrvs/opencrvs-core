@@ -17,7 +17,8 @@ import { CircleButton } from '../../buttons'
 import { BackArrowDeepBlue, Cross } from '../../icons'
 
 const PageHeaderWrapper = styled.div`
-  padding: 8px 16px;
+  padding: 0 16px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;

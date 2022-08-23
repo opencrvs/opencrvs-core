@@ -14,7 +14,7 @@ import { Pagination, IPaginationCustomProps } from './Pagination'
 import React from 'react'
 
 export default {
-  title: 'Controls/Pagination (deprecated)',
+  title: 'Deprecated/Pagination',
   component: Pagination
 } as Meta
 

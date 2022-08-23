@@ -15,7 +15,7 @@ import { PrimaryButton } from './PrimaryButton'
 export const SuccessButton = styled(PrimaryButton)`
   background-color: ${({ theme }) => theme.colors.positive};
   &:hover:enabled {
-    background: ${({ theme }) => theme.colors.greenDark};
+    background: ${({ theme }) => theme.colors.positiveDark};
   }
   &:focus {
     outline: none;

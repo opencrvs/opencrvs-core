@@ -144,13 +144,13 @@ const StyledPrimaryButton = styled(PrimaryButton)`
     display: none;
   }
   &:hover {
-    background: ${({ theme }) => theme.colors.indigoDark};
+    background: ${({ theme }) => theme.colors.primaryDark};
   }
   &:focus {
     background: ${({ theme }) => theme.colors.yellow};
   }
   &:active {
-    background: ${({ theme }) => theme.colors.indigoDark};
+    background: ${({ theme }) => theme.colors.primaryDark};
   }
 `
 

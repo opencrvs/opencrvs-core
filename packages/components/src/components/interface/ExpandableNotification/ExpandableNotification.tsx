@@ -40,7 +40,7 @@ const NotificationBar = styled.div`
   ${({ theme }) => theme.shadows.heavy};
   z-index: 3;
   &:hover {
-    ${({ theme }) => theme.colors.indigoDark};
+    ${({ theme }) => theme.colors.primaryDark};
   }
 `
 const ExpandableOverlay = styled.div<{ show: boolean }>`
