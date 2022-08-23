@@ -18,7 +18,6 @@ import { WorkqueueRowDesktop } from './components/WorkqueueRowDesktop'
 import { WorkqueueRowMobile } from './components/WorkqueueRowMobile'
 import { ITheme } from '../theme'
 import { SortIcon } from '../icons/SortIcon'
-import { connect } from 'react-redux'
 import { IAction, IActionObject } from '../interface'
 
 const Wrapper = styled.div`
@@ -231,4 +230,4 @@ export class WorkqueueComp extends React.Component<
   }
 }
 
-export const Workqueue = connect(null, {})(withTheme(WorkqueueComp))
+export const Workqueue = withTheme(WorkqueueComp)
