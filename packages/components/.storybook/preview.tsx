@@ -12,6 +12,7 @@
 import React from 'react'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
 import { getTheme } from '@opencrvs/components/lib/theme'
+import WebFont from 'webfontloader'
 
 const theme = getTheme()
 
@@ -67,6 +68,12 @@ export const decorators = [
     </ThemeProvider>
   )
 ]
+
+WebFont.load({
+  google: {
+    families: ['Noto+Sans:600', 'Noto+Sans:400']
+  }
+})
 
 export const parameters = {
   actions: { argTypesRegex: '^on[A-Z].*' },
