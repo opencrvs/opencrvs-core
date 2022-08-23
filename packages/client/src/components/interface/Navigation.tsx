@@ -275,7 +275,7 @@ export const NavigationView = (props: IFullProps) => {
     data,
     storedDeclarations
   )
-
+  const appVer = String(localStorage.getItem('application-version'))
   const fieldAgentLocationId = userDetails && getUserLocation(userDetails).id
 
   React.useEffect(() => {
@@ -318,6 +318,7 @@ export const NavigationView = (props: IFullProps) => {
   return (
     <LeftNavigation
       applicationName={offlineCountryConfiguration.config.APPLICATION_NAME}
+      applicationVersion={appVer}
       navigationWidth={navigationWidth}
       name={userInfo && userInfo.name}
       role={userInfo && userInfo.role}
