@@ -11,5 +11,12 @@
  */
 import { addons } from '@storybook/addons'
 import theme from './theme'
+import WebFont from 'webfontloader'
+
+WebFont.load({
+  google: {
+    families: ['Noto+Sans:600', 'Noto+Sans:400']
+  }
+})
 
 addons.setConfig({ theme })
