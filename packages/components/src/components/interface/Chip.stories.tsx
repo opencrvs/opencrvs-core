@@ -26,6 +26,6 @@ ChipView.args = {
 }
 
 export default {
-  title: 'Layout/Chip (deprecated)',
+  title: 'Layout/Chip',
   component: Chip
 } as Meta

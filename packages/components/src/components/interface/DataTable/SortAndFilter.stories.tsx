@@ -15,7 +15,7 @@ import React from 'react'
 import { ISelectGroupValue } from '../SelectGroup'
 
 export default {
-  title: 'Data/DataTable (deprecated)/SortAndFilter',
+  title: 'Deprecated/DataTable/SortAndFilter',
   component: SortAndFilter
 } as Meta
 

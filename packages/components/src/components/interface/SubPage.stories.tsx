@@ -34,6 +34,6 @@ SubPageView.args = {
 }
 
 export default {
-  title: 'Layout/Sub page (deprecated)',
+  title: 'Deprecated/Sub page',
   component: SubPage
 } as Meta

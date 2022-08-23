@@ -30,6 +30,6 @@ ListItemExpansionView.args = {
 }
 
 export default {
-  title: 'Data/ListItemExpansion (deprecated)',
+  title: 'Deprecated/ListItemExpansion',
   component: ListItemExpansion
 } as Meta

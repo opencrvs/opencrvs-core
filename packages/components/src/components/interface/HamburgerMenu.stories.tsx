@@ -38,6 +38,6 @@ HamburgerMenuView.args = {
 }
 
 export default {
-  title: 'Layout/Hamburger (deprecated)',
+  title: 'Deprecated/Hamburger',
   component: HamburgerMenu
 }
