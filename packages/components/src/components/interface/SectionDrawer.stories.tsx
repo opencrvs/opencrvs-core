@@ -37,6 +37,6 @@ SectionDrawerView.args = {
   expansionButtonHandler: () => alert('Expansion clicked')
 }
 export default {
-  title: 'Data/SectionDrawer (deprecated)',
+  title: 'Deprecated/SectionDrawer',
   component: SectionDrawer
 } as Meta

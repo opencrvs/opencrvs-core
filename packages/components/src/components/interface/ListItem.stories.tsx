@@ -68,6 +68,6 @@ ListItemView.args = {
 }
 
 export default {
-  title: 'Data/ListItem (deprecated)',
+  title: 'Deprecated/ListItem',
   component: ListItem
 } as Meta

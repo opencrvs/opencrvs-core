@@ -28,6 +28,6 @@ TopBarView.args = {
 }
 
 export default {
-  title: 'Layout/TopBar (deprecated)',
+  title: 'Deprecated/TopBar',
   component: TopBar
 }

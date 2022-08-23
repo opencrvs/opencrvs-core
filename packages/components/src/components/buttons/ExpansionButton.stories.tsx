@@ -18,7 +18,7 @@ const Template: Story<IExpansionButtonProps> = (args) => (
 )
 
 export default {
-  title: 'Controls/Button/ExpansionButton (deprecated)',
+  title: 'Deprecated/Button/ExpansionButton',
   component: ExpansionButton
 } as Meta
 
