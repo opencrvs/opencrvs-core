@@ -114,17 +114,26 @@ export enum SORT_ORDER {
   DESCENDING = 'desc'
 }
 
-interface IWorkqueueProps {
+interface IComponentWithTheme {
   theme: ITheme
+}
+
+interface IWorkqueueProps extends IComponentWithTheme {
+  /** Workqueue data */
   content: IDynamicValues[]
+  /** Data columns */
   columns: IColumn[]
-  renderExpandedComponent?: (eventId: string) => React.ReactNode
+  /** Text if there are now content on the table */
   noResultText?: string
-  hideTableHeader?: boolean
-  clickable?: boolean
+  /** Hides `noResultText` if true */
   loading?: boolean
-  sortedCol?: COLUMNS
+  /** Hides Workqueue header */
+  hideTableHeader?: boolean
+  /** Globally enables or disables clickable headers */
+  clickable?: boolean
+  /** Sets the direction of the sort icon */
   sortOrder?: SORT_ORDER
+  /** Adds `border-bottom: 0` on desktop */
   hideLastBorder?: boolean
 }
 

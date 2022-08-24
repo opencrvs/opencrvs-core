@@ -11,10 +11,10 @@
  */
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { Workqueue } from './Workqueue'
-import { DeclarationIcon, Download } from '../icons'
+import { DeclarationIcon, Download, Downloaded } from '../icons'
 import React from 'react'
 import { Stack } from '../Stack'
-import { CircleButton } from '../buttons'
+import { CircleButton, LinkButton } from '../buttons'
 
 export default {
   title: 'Data/Workqueue',
@@ -28,293 +28,173 @@ const onReviewClick = () => {
 const IconWithName = ({ children }: { children: string }) => (
   <Stack gap={16}>
     <DeclarationIcon color="orange" />
-    {children}
+    <LinkButton onClick={() => alert('John Doe clicked')}>
+      {children}
+    </LinkButton>
   </Stack>
 )
 
-const DownloadButton = () => (
-  <CircleButton>
-    <Download />
-  </CircleButton>
-)
+export const Default: ComponentStory<typeof Workqueue> = () => {
+  const content = [
+    {
+      iconWithName: <IconWithName>John Doe</IconWithName>,
+      date_of_declaration: '3 days ago',
+      tracking_id: '1234567',
+      date_of_event: '2017-12-10',
+      event: 'Birth',
+      actions: [
+        {
+          label: 'Review',
+          handler: onReviewClick
+        },
+        {
+          actionComponent: (
+            <CircleButton>
+              <Downloaded />
+            </CircleButton>
+          )
+        }
+      ]
+    },
+    {
+      iconWithName: <IconWithName>John Doe</IconWithName>,
+      date_of_declaration: '5 days ago',
+      tracking_id: '1234567',
+      date_of_event: '2017-11-10',
+      event: 'Death',
+      actions: [
+        {
+          actionComponent: (
+            <CircleButton>
+              <Download />
+            </CircleButton>
+          )
+        }
+      ]
+    },
+    {
+      iconWithName: <IconWithName>John Doe</IconWithName>,
+      date_of_declaration: '23 days ago',
+      tracking_id: '1234567',
+      date_of_event: '2017-11-10',
+      event: 'Marriage',
+      actions: [
+        {
+          label: 'Review',
+          handler: onReviewClick
+        },
+        {
+          actionComponent: (
+            <CircleButton>
+              <Downloaded />
+            </CircleButton>
+          )
+        }
+      ]
+    },
+    {
+      iconWithName: <IconWithName>John Doe</IconWithName>,
+      date_of_declaration: '12 days ago',
+      tracking_id: '1234567',
+      date_of_event: '2017-09-10',
+      event: 'Birth',
+      actions: [
+        {
+          label: 'Review',
+          handler: onReviewClick
+        },
+        {
+          actionComponent: (
+            <CircleButton>
+              <Downloaded />
+            </CircleButton>
+          )
+        }
+      ]
+    },
+    {
+      iconWithName: <IconWithName>John Doe</IconWithName>,
+      date_of_declaration: '3 days ago',
+      tracking_id: '1234567',
+      date_of_event: '2017-10-10',
+      event: 'Birth',
+      actions: [
+        {
+          actionComponent: (
+            <CircleButton>
+              <Download />
+            </CircleButton>
+          )
+        }
+      ]
+    },
+    {
+      iconWithName: <IconWithName>John Doe</IconWithName>,
+      date_of_declaration: '18 days ago',
+      tracking_id: '1234567',
+      date_of_event: '2017-10-10',
+      event: 'Marriage',
+      actions: [
+        {
+          actionComponent: (
+            <CircleButton>
+              <Download />
+            </CircleButton>
+          )
+        }
+      ]
+    },
+    {
+      iconWithName: <IconWithName>John Doe</IconWithName>,
+      date_of_declaration: '23 days ago',
+      tracking_id: '1234567',
+      date_of_event: '2017-10-09',
+      event: 'Birth',
+      actions: [
+        {
+          actionComponent: (
+            <CircleButton>
+              <Download />
+            </CircleButton>
+          )
+        }
+      ]
+    }
+  ]
 
-const content = [
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '3 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-12-10',
-    event: 'Birth',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '5 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-11-10',
-    event: 'Death',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '23 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-11-10',
-    event: 'Marriage',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '12 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-09-10',
-    event: 'Birth',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '3 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-10-10',
-    event: 'Birth',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '18 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-10-10',
-    event: 'Marriage',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '23 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-10-09',
-    event: 'Birth',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '7 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-10-08',
-    event: 'Birth',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '9 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-10-09',
-    event: 'Death',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '11 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-10-09',
-    event: 'Marriage',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '3 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-10-06',
-    event: 'Birth',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '5 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-10-09',
-    event: 'Birth',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '3 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-10-09',
-    event: 'Death',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '7 days ago',
-    tracking_id: '1234567',
-    date_of_event: '2017-10-09',
-    event: 'Marriage',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  },
-  {
-    iconWithName: <IconWithName>John Doe</IconWithName>,
-    date_of_declaration: '9 days ago',
-    tracking_id: '1234567',
-    createdAt: '2017-10-09',
-    event: 'Birth',
-    actions: [
-      {
-        label: 'Review',
-        handler: onReviewClick
-      },
-      {
-        actionComponent: <DownloadButton />
-      }
-    ]
-  }
-]
+  const columns = [
+    {
+      label: 'Name',
+      width: 20,
+      key: 'iconWithName'
+    },
+    {
+      label: 'Type',
+      width: 20,
+      key: 'event'
+    },
+    {
+      label: 'Date of Declaration',
+      width: 20,
+      key: 'date_of_declaration'
+    },
+    {
+      label: 'Date of event',
+      width: 20,
+      key: 'date_of_event'
+    },
+    {
+      width: 20,
+      key: 'actions',
+      isActionColumn: true
+    }
+  ]
 
-const columns = [
-  {
-    label: 'Name',
-    width: 20,
-    key: 'iconWithName'
-  },
-  {
-    label: 'Type',
-    width: 20,
-    key: 'event'
-  },
-  {
-    label: 'Date of Declaration',
-    width: 20,
-    key: 'date_of_declaration'
-  },
-  {
-    label: 'Date of event',
-    width: 20,
-    key: 'date_of_event'
-  },
-  {
-    width: 20,
-    key: 'actions',
-    isActionColumn: true
-  }
-]
-
-export const Default: ComponentStory<typeof Workqueue> = (args) => (
-  <Workqueue {...args} />
-)
-
-Default.args = {
-  content,
-  columns,
-  noResultText: 'No result to display'
+  return (
+    <Workqueue
+      content={content}
+      columns={columns}
+      noResultText="No result to display"
+    />
+  )
 }
