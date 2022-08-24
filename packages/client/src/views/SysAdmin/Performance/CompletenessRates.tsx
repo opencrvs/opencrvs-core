@@ -139,7 +139,10 @@ function CompletenessRatesComponent(props: ICompletenessRateProps) {
         }}
         onCompleted={({ hasChildLocation }) => {
           const childJurisdictionType = getJurisidictionType(hasChildLocation)
-          if (!childJurisdictionType) {
+          if (
+            !childJurisdictionType &&
+            base.baseType === COMPLETENESS_RATE_REPORT_BASE.LOCATION
+          ) {
             setBase({ baseType: COMPLETENESS_RATE_REPORT_BASE.TIME })
           }
         }}
