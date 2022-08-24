@@ -55,8 +55,7 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
-import { IAction } from '@opencrvs/components/lib/interface'
+import { IAction } from '@opencrvs/components/lib/common-types'
 
 const ToolTipContainer = styled.span`
   text-align: center;

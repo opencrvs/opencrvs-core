@@ -13,4 +13,9 @@ export interface IDynamicValues {
   [key: string]: string
 }
 
-export { ColumnContentAlignment, IColumn, IAction } from './Workqueue'
+export {
+  ColumnContentAlignment,
+  IColumn,
+  IAction,
+  IActionObject
+} from './Workqueue'
