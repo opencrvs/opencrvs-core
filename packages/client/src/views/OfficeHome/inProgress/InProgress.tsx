@@ -561,7 +561,6 @@ export class InProgressComponent extends React.Component<
         columns={this.getColumns()}
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
-        sortedCol={this.state.sortedCol}
         hideLastBorder={!isShowPagination}
       />
     )
@@ -577,7 +576,6 @@ export class InProgressComponent extends React.Component<
         columns={this.getColumns()}
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
-        sortedCol={this.state.sortedCol}
         hideLastBorder={!isShowPagination}
       />
     )
@@ -671,7 +669,6 @@ export class InProgressComponent extends React.Component<
             content={this.transformDraftContent()}
             columns={this.getColumns()}
             loading={isFieldAgent ? false : this.props.loading}
-            sortedCol={this.state.sortedCol}
             sortOrder={this.state.sortOrder}
             hideLastBorder={!isShowPagination}
           />

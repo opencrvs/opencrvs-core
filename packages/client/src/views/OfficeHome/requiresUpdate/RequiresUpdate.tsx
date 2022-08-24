@@ -335,7 +335,6 @@ class RequiresUpdateComponent extends React.Component<
           columns={this.getColumns()}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
-          sortedCol={this.state.sortedCol}
           hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>
