@@ -17,7 +17,6 @@ interface IConstantsMessages
   address: MessageDescriptor
   allEvents: MessageDescriptor
   allStatuses: MessageDescriptor
-  areYouSure: MessageDescriptor
   informantContactNumber: MessageDescriptor
   declaration: MessageDescriptor
   declarations: MessageDescriptor
@@ -145,7 +144,6 @@ interface IConstantsMessages
   percentageOfEstimation: MessageDescriptor
   averageRateOfRegistrations: MessageDescriptor
   estimatedNumberOfEvents: MessageDescriptor
-  registerConfirmModalDesc: MessageDescriptor
   registeredWithinTargetd: MessageDescriptor
   registeredInTargetd: MessageDescriptor
   timePeriod: MessageDescriptor
@@ -288,11 +286,6 @@ const messagesToDefine: IConstantsMessages = {
     description:
       'Label for the workflow timestamp when the status is waiting_validation',
     id: 'constants.declarationSentForExternalValidationOn'
-  },
-  areYouSure: {
-    defaultMessage: ' ',
-    description: 'Description for are you sure label in modals',
-    id: 'constants.areYouSure'
   },
   birth: {
     defaultMessage: 'Birth',
@@ -550,12 +543,6 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Reason',
     description: 'Label for Reason the declaration was rejected',
     id: 'constants.reason'
-  },
-  registerConfirmModalDesc: {
-    defaultMessage: ' ',
-    description:
-      'Description for confirmation modal when registering declaration',
-    id: 'constants.registerConfirmModalDesc'
   },
   registered: {
     defaultMessage: 'Registered',
