@@ -13,7 +13,6 @@ import React from 'react'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import WebFont from 'webfontloader'
-import { addParameters } from '@storybook/react'
 
 const theme = getTheme()
 
@@ -76,7 +75,7 @@ WebFont.load({
   }
 })
 
-addParameters({
+export const parameters = {
   viewMode: 'docs',
   actions: { argTypesRegex: '^on[A-Z].*' },
   controls: {
@@ -98,4 +97,4 @@ addParameters({
       ]
     }
   }
-})
+}
