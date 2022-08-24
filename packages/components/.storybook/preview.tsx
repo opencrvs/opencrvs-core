@@ -40,8 +40,6 @@ body,
   }
   *:not(i) {
     font-family: ${theme.fonts.fontFamily};
-    font-style: normal;
-    font-weight: 400;
   }
 }
 
