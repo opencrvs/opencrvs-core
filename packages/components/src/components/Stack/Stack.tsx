@@ -13,7 +13,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-export interface IStackProps {
+export interface IStackProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Gap between the stack items in pixels  */
   gap?: number
   /** Stack direction */
@@ -24,7 +24,6 @@ export interface IStackProps {
   alignItems?: 'flex-start' | 'flex-end' | 'center' | undefined
   /** Wraps stack to multiple rows */
   wrap?: boolean
-  children?: React.ReactNode
 }
 
 export const StyledStack = styled.div<IStackProps>`

@@ -35,3 +35,22 @@ Default.args = {
   gap: 8,
   wrap: false
 }
+
+export const Vertical = Template.bind({})
+Vertical.args = {
+  direction: 'column',
+  alignItems: 'flex-start'
+}
+
+const HugeTemplate: ComponentStory<typeof Stack> = (args) => (
+  <Stack {...args}>
+    {Array.from({ length: 30 }, (_, i) => (
+      <Pill label={`Label ${i + 1}`} />
+    ))}
+  </Stack>
+)
+
+export const HorizontalWrapping = HugeTemplate.bind({})
+HorizontalWrapping.args = {
+  wrap: true
+}
