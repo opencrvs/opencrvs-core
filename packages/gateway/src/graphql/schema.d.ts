@@ -1963,12 +1963,28 @@ export interface QueryToSearchRecordArgs {
   eventLocationId?: string
   childFirstName?: string
   childLastName?: string
-  childsDob?: string
-  deceasedsFirstName?: string
-  deceasedsLastName?: string
-  dateOfDeath?: string
-  dateOfEventStart?: string
-  dateOfEventEnd?: string
+  childDoB?: string
+  deceasedFirstNames?: string
+  deceasedFamilyName?: string
+  deathDate?: string
+  deathDateStart?: string
+  deathDateEnd?: string
+  motherFirstNames?: string
+  motherFamilyName?: string
+  motherDoB?: string
+  motherIdentifier?: string
+  fatherFirstNames?: string
+  fatherFamilyName?: string
+  fatherDoB?: string
+  fatherIdentifier?: string
+  informantFirstNames?: string
+  informantFamilyName?: string
+  contactNumber?: string
+  registrationNumber?: string
+  trackingId?: string
+  dateOfRegistration?: string
+  dateOfRegistrationStart?: string
+  dateOfRegistrationEnd?: string
 }
 export interface QueryToSearchRecordResolver<TParent = any, TResult = any> {
   (

@@ -136,12 +136,28 @@ type Query {
     eventLocationId: String
     childFirstName: String
     childLastName: String
-    childsDob: String
-    deceasedsFirstName: String
-    deceasedsLastName: String
-    dateOfDeath: String
-    dateOfEventStart: String
-    dateOfEventEnd: String
+    childDoB: String
+    deceasedFirstNames: String
+    deceasedFamilyName: String
+    deathDate: String
+    deathDateStart: String
+    deathDateEnd: String
+    motherFirstNames: String
+    motherFamilyName: String
+    motherDoB: String
+    motherIdentifier: String
+    fatherFirstNames: String
+    fatherFamilyName: String
+    fatherDoB: String
+    fatherIdentifier: String
+    informantFirstNames: String
+    informantFamilyName: String
+    contactNumber: String
+    registrationNumber: String
+    trackingId: String
+    dateOfRegistration: String
+    dateOfRegistrationStart: String
+    dateOfRegistrationEnd: String
   ): EventProgressResultSet
   getRoles(
     title: String
