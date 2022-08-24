@@ -25,7 +25,8 @@ import {
   Workqueue,
   COLUMNS,
   SORT_ORDER,
-  ColumnContentAlignment
+  ColumnContentAlignment,
+  IAction
 } from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
@@ -50,7 +51,7 @@ import { Scope } from '@client/utils/authUtils'
 import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { DownloadAction } from '@client/forms'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
-import { IAction } from '@opencrvs/components/lib/interface'
+
 const ToolTipContainer = styled.span`
   text-align: center;
 `
