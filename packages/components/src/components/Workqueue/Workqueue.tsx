@@ -68,10 +68,11 @@ const ContentWrapper = styled.span<{
 
 const ColumnContainer = styled.div<{
   width: number
+  clickable: boolean
 }>`
   width: ${({ width }) => width}%;
   display: flex;
-  cursor: pointer;
+  ${({ clickable }) => clickable && `cursor: pointer;`}
 `
 
 const ColumnTitleWrapper = styled.div<{ alignment?: string }>`
@@ -190,6 +191,7 @@ export class WorkqueueComp extends React.Component<
                     ? () => preference.sortFunction!(preference.key)
                     : undefined
                 }
+                clickable={Boolean(preference.sortFunction)}
               >
                 <ColumnTitleWrapper>
                   {preference.label && preference.label}
