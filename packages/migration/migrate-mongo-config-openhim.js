@@ -19,7 +19,7 @@ const config = {
   },
   migrationsDir: 'migrations/openhim',
   changelogCollectionName: 'changelog',
-  migrationFileExtension: '.js',
+  migrationFileExtension: '.cjs',
   useFileHash: false,
   moduleSystem: 'esm'
 }
