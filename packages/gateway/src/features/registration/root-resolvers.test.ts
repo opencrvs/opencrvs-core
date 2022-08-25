@@ -2050,6 +2050,7 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
         [JSON.stringify(mockTaskBundle)],
+        [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)]
       )
       fetch.mockResponseOnce([
@@ -2080,6 +2081,7 @@ describe('Registration root resolvers', () => {
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponses(
         [JSON.stringify(mockTaskBundle)],
+        [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)]
       )
       fetch.mockResponseOnce(JSON.stringify({ unexpected: true }))
@@ -2135,6 +2137,7 @@ describe('Registration root resolvers', () => {
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
         [JSON.stringify(mockTaskBundle)],
+        [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)]
       )
       fetch.mockResponseOnce(
