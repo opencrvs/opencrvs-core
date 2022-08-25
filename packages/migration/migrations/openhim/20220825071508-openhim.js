@@ -9,19 +9,13 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-const config = {
-  mongodb: {
-    url: process.env.MONGO_URL || "mongodb://localhost/hearth-dev",
-    options: {
-      useNewUrlParser: true, // removes a deprecation warning when connecting
-      useUnifiedTopology: true, // removes a deprecating warning when connecting
-    }
-  },
-  migrationsDir: "migrations",
-  changelogCollectionName: "changelog",
-  migrationFileExtension: ".js",
-  useFileHash: false,
-  moduleSystem: 'esm',
+export const up = async (db, client) => {
+  const results = await db.collection('channels').find({})
+  process.stdout.write(results)
 }
 
-export default config
+export const down = async (db, client) => {
+  // TODO write the statements to rollback your migration (if possible)
+  // Example:
+  // await db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: false}});
+}

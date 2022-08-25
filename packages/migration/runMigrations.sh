@@ -9,5 +9,10 @@
 # Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
 # graphic logo are (registered/a) trademark(s) of Plan International.
 
-yarn migrate-mongo up
-yarn migrate-mongo status
+# hearth migrations
+yarn migrate-mongo up --file migrate-mongo-config-hearth.js
+yarn migrate-mongo status --file migrate-mongo-config-hearth.js
+
+#openhim migrations
+yarn migrate-mongo up --file migrate-mongo-config-openhim.js
+yarn migrate-mongo status --file migrate-mongo-config-openhim.js
