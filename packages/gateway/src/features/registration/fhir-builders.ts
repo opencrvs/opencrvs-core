@@ -85,9 +85,6 @@ import {
 } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
-import { APPLICATION_CONFIG_URL } from '@gateway/constants'
-import fetch from 'node-fetch'
-import { logger } from '@gateway/logger'
 
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
@@ -156,53 +153,6 @@ function createIDBuilder(sectionCode: string, sectionTitle: string) {
         'value',
         context
       )
-      logger.info('createIDBuilder: fhirBundle', JSON.stringify(fhirBundle))
-      logger.info('createIDBuilder: person', JSON.stringify(person))
-      logger.info('createIDBuilder: sectionCode', JSON.stringify(sectionCode))
-      logger.info('createIDBuilder: sectionTitle', JSON.stringify(sectionTitle))
-      // TODO: only do for National ID.
-      const configResponse: IApplicationConfigResponse = await fetch(
-        `${APPLICATION_CONFIG_URL}integrationConfig`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            ...context.authHeader
-          }
-        }
-      )
-        .then((response) => {
-          return response.json()
-        })
-        .catch((error) => {
-          return Promise.reject(
-            new Error(`Config request failed: ${error.message}`)
-          )
-        })
-      logger.info('configResponse', JSON.stringify(configResponse))
-      if (
-        configResponse &&
-        configResponse.config.INTEGRATIONS.length &&
-        configResponse.config.INTEGRATIONS[0].name === 'MOSIP' &&
-        configResponse.config.INTEGRATIONS[0].enabled === statuses.ACTIVE
-      ) {
-        // TODO: Verify with MOSIP then use MOSIP token to find existing person
-      }
-      if (!person.id) {
-        const personSearchSet = await fetchFHIR(
-          `/Patient?identifier=${fieldValue}`,
-          context.authHeader
-        )
-        if (
-          person &&
-          personSearchSet &&
-          personSearchSet.entry &&
-          personSearchSet.entry[0] &&
-          personSearchSet.entry[0].resource
-        ) {
-          person.id = personSearchSet.entry[0].resource.id
-        }
-      }
     },
     type: (fhirBundle: ITemplatedBundle, fieldValue: string, context: any) => {
       const person = selectOrCreatePersonResource(
@@ -3720,23 +3670,4 @@ export interface ITaskBundle extends fhir.Bundle {
   resourceType: fhir.code
   // prettier-ignore
   entry: [ITaskBundleEntry]
-}
-
-interface IIntegration {
-  name: string
-  enabled: string
-}
-interface IApplicationConfig {
-  INTEGRATIONS: [IIntegration]
-}
-
-export interface IApplicationConfigResponse {
-  config: IApplicationConfig
-}
-
-const statuses = {
-  PENDING: 'pending',
-  ACTIVE: 'active',
-  DISABLED: 'disabled',
-  DEACTIVATED: 'deactivated'
 }

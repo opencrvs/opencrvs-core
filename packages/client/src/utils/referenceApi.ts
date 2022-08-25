@@ -49,7 +49,7 @@ export interface ICurrency {
 
 interface IIntegration {
   name: string
-  enabled: string
+  status: string
 }
 export interface IApplicationConfig {
   APPLICATION_NAME: string
