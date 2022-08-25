@@ -17,6 +17,7 @@ import { ListViewSimplified } from '@opencrvs/components/lib/interface/ListViewS
 import { userMessages as messages } from '@client/i18n/messages'
 import { Navigation } from '@client/components/interface/Navigation'
 import { Content } from '@opencrvs/components/lib/interface/Content'
+import { Frame } from '@opencrvs/components/lib/Frame'
 import {
   Name,
   Role,
@@ -27,38 +28,27 @@ import {
   ProfileImage
 } from '@client/views/Settings/items'
 
-const BodyContainer = styled.div`
-  margin-left: 0px;
-  margin-top: 0px;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 274px;
-    margin-top: 24px;
-    margin-right: 24px;
-  }
-`
-
 export function SettingsPage() {
   const intl = useIntl()
   return (
-    <>
-      <Header title={intl.formatMessage(messages.settingsTitle)} />
-      <Navigation />
-      <BodyContainer>
-        <Content
-          title={intl.formatMessage(messages.settingsTitle)}
-          showTitleOnMobile={true}
-        >
-          <ListViewSimplified>
-            <Name />
-            <PhoneNumber />
-            <Role />
-            <Language />
-            <Password />
-            <PIN />
-            <ProfileImage />
-          </ListViewSimplified>
-        </Content>
-      </BodyContainer>
-    </>
+    <Frame
+      header={<Header title={intl.formatMessage(messages.settingsTitle)} />}
+      navigation={<Navigation />}
+    >
+      <Content
+        title={intl.formatMessage(messages.settingsTitle)}
+        showTitleOnMobile={true}
+      >
+        <ListViewSimplified>
+          <Name />
+          <PhoneNumber />
+          <Role />
+          <Language />
+          <Password />
+          <PIN />
+          <ProfileImage />
+        </ListViewSimplified>
+      </Content>
+    </Frame>
   )
 }

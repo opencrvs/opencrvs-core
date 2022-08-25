@@ -72,12 +72,7 @@ import { RouteComponentProps } from 'react-router'
 import styled from 'styled-components'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { userMutations } from '@client/user/mutations'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
-import {
-  PaginationWrapper,
-  MobileWrapper,
-  DesktopWrapper
-} from '@opencrvs/components/lib/styleForPagination'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
   ListViewItemSimplified,
   ListViewSimplified
@@ -587,32 +582,15 @@ function UserListComponent(props: IProps) {
               )}
             </ListViewSimplified>
             {totalData > DEFAULT_FIELD_AGENT_LIST_SIZE && (
-              <PaginationWrapper>
-                <DesktopWrapper>
-                  <PaginationModified
-                    size={'small'}
-                    initialPage={currentPageNumber}
-                    totalPages={Math.ceil(
-                      totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                    )}
-                    onPageChange={(currentPage: number) =>
-                      setCurrentPageNumber(currentPage)
-                    }
-                  />
-                </DesktopWrapper>
-                <MobileWrapper>
-                  <PaginationModified
-                    size={'large'}
-                    initialPage={currentPageNumber}
-                    totalPages={Math.ceil(
-                      totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
-                    )}
-                    onPageChange={(currentPage: number) =>
-                      setCurrentPageNumber(currentPage)
-                    }
-                  />
-                </MobileWrapper>
-              </PaginationWrapper>
+              <Pagination
+                initialPage={currentPageNumber}
+                totalPages={Math.ceil(
+                  totalData / DEFAULT_FIELD_AGENT_LIST_SIZE
+                )}
+                onPageChange={(currentPage: number) =>
+                  setCurrentPageNumber(currentPage)
+                }
+              />
             )}
             <UserAuditActionModal
               show={toggleActivation.modalVisible}

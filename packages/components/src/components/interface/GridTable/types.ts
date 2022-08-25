@@ -9,10 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IAction } from '../ListItem'
 import { ColumnContentAlignment } from './GridTable'
 import * as React from 'react'
-export { IAction, IActionObject } from '../ListItem'
 
 enum GQLRegStatus {
   DECLARED = 'DECLARED',
@@ -69,3 +67,15 @@ export interface IDynamicValues {
     | undefined
     | Record<string, unknown>
 }
+
+export interface IActionObject {
+  label: string
+  handler: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  icon?: () => React.ReactNode
+  disabled?: boolean
+}
+
+export interface IActionComponent {
+  actionComponent: JSX.Element
+}
+export type IAction = IActionObject | IActionComponent

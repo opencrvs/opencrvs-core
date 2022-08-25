@@ -10,6 +10,4 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export * from './Content'
-export * from './Page'
 export * from './PageWrapper'
-export * from './Wrapper'

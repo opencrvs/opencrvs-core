@@ -20,18 +20,17 @@ import { Box } from './Box'
 const Container = styled(Box)<{ size: string }>`
   position: relative;
   margin: 24px auto;
-  max-width: ${({ size }) => (size === 'large' ? '1140px' : '778px')};
+  max-width: min(
+    ${({ size }) => (size === 'large' ? '1140px' : '778px')},
+    100% - 24px - 24px
+  );
   box-sizing: border-box;
 
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin: 24px;
-  }
-
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    height: 100%;
     margin: 0;
     border: 0;
     border-radius: 0;
+    max-width: 100%;
   }
 `
 const Header = styled.div`
@@ -168,9 +167,10 @@ interface IProps {
   children?: React.ReactNode
   bottomActionButtons?: ReactElement[]
   size?: ContentSize
+  className?: string
 }
 
-export class Content extends React.Component<IProps> {
+export class UnstyledContent extends React.Component<IProps> {
   render() {
     const {
       icon,
@@ -186,10 +186,12 @@ export class Content extends React.Component<IProps> {
       subtitle,
       children,
       bottomActionButtons,
-      size
+      size,
+      className
     } = this.props
+
     return (
-      <Container size={size as string}>
+      <Container size={size as string} className={className}>
         <Header>
           {backButtonLabel && (
             <BackButtonContainer>
@@ -239,3 +241,7 @@ export class Content extends React.Component<IProps> {
     )
   }
 }
+
+// Allows styling <Content> inside styled`` -template blocks
+// https://web.archive.org/web/20220725170839/https://styled-components.com/docs/advanced#caveat
+export const Content = styled(UnstyledContent)``

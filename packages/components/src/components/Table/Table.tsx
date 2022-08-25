@@ -11,13 +11,9 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import {
-  IColumn,
-  IDynamicValues,
-  IFooterFColumn
-} from '../interface/GridTable/types'
-import { ColumnContentAlignment } from '../interface/GridTable'
-import { PaginationModified } from '../interface/PaginationModified'
+import { Pagination } from '../Pagination'
+import { IDynamicValues } from '../common-types'
+import { IColumn, IFooterFColumn, ColumnContentAlignment } from '../interface'
 
 const Wrapper = styled.div<{
   isFullPage?: boolean
@@ -554,7 +550,7 @@ export class Table extends React.Component<ITableProps, ITableState> {
           </LoadingContainer>
         )}
         {totalItems > pageSize && !noPagination && (
-          <PaginationModified
+          <Pagination
             initialPage={currentPage}
             totalPages={Math.ceil(totalItems / pageSize)}
             onPageChange={this.onPageChange}

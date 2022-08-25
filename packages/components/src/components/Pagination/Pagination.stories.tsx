@@ -10,32 +10,18 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { ActionPage } from './ActionPage'
-import { Box } from './Box'
+import { Pagination, IPaginationProps } from './Pagination'
 import React from 'react'
 
-interface IProps {
-  title?: string
-  backLabel?: string
-  icon?: () => React.ReactNode
-  goBack: () => void
-}
-
-const Template: Story<IProps> = (args) => (
-  <ActionPage {...args}>
-    <Box>
-      <h3>Children elements will go here</h3>
-    </Box>
-  </ActionPage>
-)
-export const ActionPageView = Template.bind({})
-ActionPageView.args = {
-  title: 'Register',
-  backLabel: 'BACK',
-  goBack: () => alert('Back button clicked')
-}
-
 export default {
-  title: 'Layout/Action page (deprecated)',
-  component: ActionPage
+  title: 'Controls/Pagination',
+  component: Pagination
 } as Meta
+
+const Template: Story<IPaginationProps> = (args) => <Pagination {...args} />
+export const PaginationView = Template.bind({})
+PaginationView.args = {
+  initialPage: 1,
+  totalPages: 10,
+  onPageChange: (pageNo: number) => alert(`${pageNo}`)
+}

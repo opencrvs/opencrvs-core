@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import styled from 'styled-components'
-export const MobileWrapper = styled.div`
-  display: none;
-  @media only screen and (max-width: 1023px) {
-    display: inline-flex;
-    align-items: center;
-    margin-left: auto;
-    margin-right: auto;
+
+export const Section = styled.div`
+  display: grid;
+  gap: 24px;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    gap: 0;
   }
 `

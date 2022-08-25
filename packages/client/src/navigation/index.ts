@@ -579,13 +579,9 @@ export function goToPerformanceView(userDetails: IUserDetails) {
 
 export function goToTeamView(userDetails: IUserDetails) {
   if (userDetails && userDetails.role) {
-    if (NATL_ADMIN_ROLES.includes(userDetails.role)) {
-      return goToTeamSearch()
-    } else {
-      return goToTeamUserList(
-        (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
-      )
-    }
+    return goToTeamUserList(
+      (userDetails.primaryOffice && userDetails.primaryOffice.id) || ''
+    )
   }
 }
 

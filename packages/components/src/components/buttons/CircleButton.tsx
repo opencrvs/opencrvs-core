@@ -34,13 +34,13 @@ const Button = styled.button<ICircleButtonProps & { size: IButtonSize }>`
   &:hover:not([disabled]) {
     ${({ theme, dark }) =>
       dark
-        ? theme.colors.indigoDark
+        ? theme.colors.primaryDark
         : 'background-color: ' + theme.colors.grey200};
   }
   &:not([data-focus-visible-added]):not([disabled]):hover {
     ${({ theme, dark }) =>
       dark
-        ? theme.colors.indigoDark
+        ? theme.colors.primaryDark
         : 'background-color: ' + theme.colors.grey200};
   }
   cursor: pointer;
@@ -63,7 +63,7 @@ const Button = styled.button<ICircleButtonProps & { size: IButtonSize }>`
   &:disabled {
     cursor: default;
     path {
-      stroke: ${({ theme }) => theme.colors.disabled};
+      stroke: ${({ theme }) => theme.colors.grey200};
     }
   }
 `

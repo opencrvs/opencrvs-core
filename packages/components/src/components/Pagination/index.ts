@@ -9,14 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from 'styled-components'
-
-export const DesktopWrapper = styled.div`
-  display: flex;
-  margin-right: 80%;
-  float: left;
-  width: 30%;
-  @media only screen and (max-width: 1023px) {
-    display: none;
-  }
-`
+export * from './Pagination'

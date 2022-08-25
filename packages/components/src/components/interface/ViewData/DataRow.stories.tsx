@@ -14,7 +14,7 @@ import { DataRow, IDataProps } from './DataRow'
 import React from 'react'
 
 export default {
-  title: 'Data/ViewData (deprecated)/DataRow',
+  title: 'Deprecated/ViewData/DataRow',
   component: DataRow
 } as Meta
 

@@ -52,6 +52,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { UnbuplishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
+import styled from '@client/styledComponents'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -201,7 +202,7 @@ type IFullProps = IProps &
   IStateProps &
   IDispatchProps &
   IntlShapeProps &
-  RouteComponentProps<{ tabId: string }>
+  RouteComponentProps<{ tabId: string }> & { className?: string }
 
 const getSettingsAndLogout = (props: IFullProps) => {
   const {
@@ -255,7 +256,8 @@ export const NavigationView = (props: IFullProps) => {
     menuCollapse,
     userInfo,
     offlineCountryConfiguration,
-    updateRegistrarWorkqueue
+    updateRegistrarWorkqueue,
+    className
   } = props
   const tabId = deselectAllTabs
     ? ''
@@ -323,6 +325,7 @@ export const NavigationView = (props: IFullProps) => {
       role={userInfo && userInfo.role}
       avatar={() => userInfo && userInfo.avatar}
       warning={isMobileDevice() ? <></> : <UnbuplishedWarning hideIcon />}
+      className={className}
     >
       {userDetails?.role === 'FIELD_AGENT' ? (
         <>
@@ -654,3 +657,8 @@ export const Navigation = connect<
   goToSettings,
   updateRegistrarWorkqueue
 })(injectIntl(withRouter(NavigationView)))
+
+/** @deprecated since the introduction of `<Frame>` */
+export const FixedNavigation = styled(Navigation)`
+  position: fixed;
+`
