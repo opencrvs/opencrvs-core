@@ -19,7 +19,7 @@ interface ILabelValuePairProps {
 }
 
 export default {
-  title: 'Data/ViewData (deprecated)/LabelValuePair',
+  title: 'Deprecated/ViewData/LabelValuePair',
   component: LabelValuePair
 } as Meta
 

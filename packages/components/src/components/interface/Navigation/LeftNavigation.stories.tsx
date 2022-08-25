@@ -26,8 +26,7 @@ const Template: Story<ILeftNavigationProps> = (args) => (
 export const leftNavigationView = Template.bind({})
 
 leftNavigationView.args = {
-  applicationName: 'Bangladesh CRVS',
-  navigationWidth: 300
+  applicationName: 'OpenCRVS'
 }
 
 export default {
