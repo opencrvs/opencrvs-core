@@ -45,3 +45,32 @@ export interface IFilter {
   status?: string[]
   type?: string[]
 }
+
+export interface IAdvancedSearchParam {
+  event: String
+  eventLocationId: String
+  childFirstNames: String
+  childLastName: String
+  childDoB: String
+  deceasedFirstNames: String
+  deceasedFamilyName: String
+  deathDate: String
+  dateOfEventStart: String
+  dateOfEventEnd: String
+  motherFirstNames: String
+  motherFamilyName: String
+  motherDoB: String
+  motherIdentifier: String
+  fatherFirstNames: String
+  fatherFamilyName: String
+  fatherDoB: String
+  fatherIdentifier: String
+  informantFirstNames: String
+  informantFamilyName: String
+  contactNumber: String
+  registrationNumber: String
+  trackingId: String
+  dateOfRegistration: String
+  dateOfRegistrationStart: String
+  dateOfRegistrationEnd: String
+}

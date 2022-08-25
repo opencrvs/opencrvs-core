@@ -16,7 +16,8 @@ import {
   searchDeclaration,
   getAllDocumentsHandler,
   getStatusWiseRegistrationCountHandler,
-  populateHierarchicalLocationIdsHandler
+  populateHierarchicalLocationIdsHandler,
+  advancedRecordSearch
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 import {
@@ -32,7 +33,8 @@ const enum RouteScope {
   SYSADMIN = 'sysadmin',
   CERTIFY = 'certify',
   NATLSYSADMIN = 'natlsysadmin',
-  PERFORMANCE = 'performance'
+  PERFORMANCE = 'performance',
+  RECORD_SEARCH = 'recordsearch'
 }
 
 export const getRoutes = () => {
@@ -181,6 +183,20 @@ export const getRoutes = () => {
         auth: {
           scope: [RouteScope.SYSADMIN]
         },
+        description:
+          'Populates hierarchical location ids for the legacy indexes'
+      }
+    },
+    {
+      method: 'POST',
+      path: '/advancedRecordSearch',
+      handler: advancedRecordSearch,
+      config: {
+        tags: ['api'],
+        auth: false,
+        // auth: {
+        //   scope: [RouteScope.RECORD_SEARCH]
+        // },
         description:
           'Populates hierarchical location ids for the legacy indexes'
       }

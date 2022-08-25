@@ -16,13 +16,16 @@ import {
   searchComposition,
   DEFAULT_SIZE
 } from '@search/features/search/service'
-import { ISearchQuery } from '@search/features/search/types'
+import {
+  IAdvancedSearchParam,
+  ISearchQuery
+} from '@search/features/search/types'
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
 import { ApiResponse } from '@elastic/elasticsearch'
 import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
 import { updateComposition } from '@search/elasticsearch/dbhelper'
-import { capitalize } from '@search/features/search/utils'
+import { advancedQueryBuilder, capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
 export async function searchDeclaration(
@@ -247,6 +250,29 @@ export async function populateHierarchicalLocationIdsHandler(
     }
 
     return h.response(updatedCompositionCounts).code(200)
+  } catch (err) {
+    return internal(err)
+  }
+}
+
+export async function advancedRecordSearch(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  try {
+    const payload = request.payload as IAdvancedSearchParam
+    console.log(JSON.stringify(advancedQueryBuilder(payload)))
+
+    const response = await client.search({
+      index: OPENCRVS_INDEX_NAME,
+      type: 'compositions',
+      body: {
+        query: advancedQueryBuilder(payload)
+      }
+    })
+
+    const resp = { payload, response }
+    return h.response(resp).code(200)
   } catch (err) {
     return internal(err)
   }

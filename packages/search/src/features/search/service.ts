@@ -11,7 +11,11 @@
  */
 import { client, ISearchResponse } from '@search/elasticsearch/client'
 import { ApiResponse } from '@elastic/elasticsearch'
-import { ISearchQuery, SortOrder } from '@search/features/search/types'
+import {
+  IAdvancedSearchParam,
+  ISearchQuery,
+  SortOrder
+} from '@search/features/search/types'
 import { queryBuilder, EMPTY_STRING } from '@search/features/search/utils'
 import { logger } from '@search/logger'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
@@ -90,3 +94,5 @@ export function formatSearchParams(params: ISearchQuery) {
     }
   }
 }
+
+export function advancedSearchComposition(params: IAdvancedSearchParam) {}
