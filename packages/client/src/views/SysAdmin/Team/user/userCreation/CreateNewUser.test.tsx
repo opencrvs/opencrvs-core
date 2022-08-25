@@ -37,6 +37,8 @@ import { UserSection } from '@client/forms'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { History } from 'history'
+import { vi, Mock } from 'vitest'
+
 export const mockRoles = {
   data: {
     getRoles: [
@@ -216,8 +218,8 @@ describe('create new user tests', () => {
   let testComponent: ReactWrapper
 
   beforeEach(async () => {
-    ;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
-    ;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
+    ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     const s = createStore()
     store = s.store
     history = s.history
@@ -333,7 +335,7 @@ describe('create new user tests', () => {
 describe('edit user tests', () => {
   const { store, history } = createStore()
   let component: ReactWrapper<{}, {}>
-  const submitMock: jest.Mock = jest.fn()
+  const submitMock: Mock = vi.fn()
 
   const graphqlMocks = [
     {
@@ -394,8 +396,8 @@ describe('edit user tests', () => {
   ]
 
   beforeEach(() => {
-    ;(roleQueries.fetchRoles as jest.Mock).mockReturnValue(mockRoles)
-    ;(userQueries.searchUsers as jest.Mock).mockReturnValue(mockUsers)
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
+    ;(userQueries.searchUsers as Mock).mockReturnValue(mockUsers)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   })
 

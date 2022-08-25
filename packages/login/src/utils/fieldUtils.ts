@@ -11,8 +11,6 @@
  */
 import { MessageDescriptor } from 'react-intl'
 import { Validation } from '@login/utils/validate'
-import { Field } from 'redux-form'
-import { IInputFieldProps } from '@opencrvs/components/lib/forms'
 
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
@@ -35,9 +33,5 @@ export type IReduxFormFieldProps = {
 } & Omit<Ii18nReduxFormFieldProps, 'placeholder' | 'label'>
 
 export type IFieldGroup = {
-  [key: string]: IReduxFormFieldProps
-}
-
-export type IFieldRefGroup = {
-  [key: string]: React.RefObject<Field<IReduxFormFieldProps & IInputFieldProps>>
+  [key: string]: Ii18nReduxFormFieldProps
 }

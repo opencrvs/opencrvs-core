@@ -23,6 +23,7 @@ import { AppStore, createStore } from '@client/store'
 import { mockDeclarationData, flushPromises } from '@client/tests/util'
 import { IUserDetails } from '@client/utils/userUtils'
 import { storage } from '@client/storage'
+import { vi } from 'vitest'
 
 describe('query result filtering tests', () => {
   describe('.filterProcessingDeclarations()', () => {
@@ -293,7 +294,7 @@ describe('archiveDeclaration tests', () => {
     }
 
     // Mocking storage reading
-    storage.getItem = jest.fn((key: string) => {
+    storage.getItem = vi.fn((key: string) => {
       switch (key) {
         case 'USER_DATA':
         case 'USER_DETAILS':
@@ -304,7 +305,7 @@ describe('archiveDeclaration tests', () => {
     })
 
     // Mocking storage writing
-    storage.setItem = jest.fn((key: string, value: string) => {
+    storage.setItem = vi.fn((key: string, value: string) => {
       switch (key) {
         case 'USER_DATA':
         case 'USER_DETAILS':

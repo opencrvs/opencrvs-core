@@ -12,6 +12,7 @@
 import * as React from 'react'
 import { Online, Offline } from '@opencrvs/components/lib/icons'
 import styled from '@client/styledComponents'
+import { isNavigatorOnline } from '@client/utils'
 
 const StyledOnline = styled.div`
   position: absolute;
@@ -26,7 +27,7 @@ const StyledOffline = styled.div`
 `
 
 const ConnectivityStatus = () => {
-  return navigator.onLine ? (
+  return isNavigatorOnline() ? (
     <StyledOnline>
       <Online />
     </StyledOnline>
