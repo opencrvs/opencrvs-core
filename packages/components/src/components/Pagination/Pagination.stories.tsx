@@ -9,14 +9,19 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from 'styled-components'
+import { Meta, Story } from '@storybook/react'
+import { Pagination, IPaginationProps } from './Pagination'
+import React from 'react'
 
-export const DesktopWrapper = styled.div`
-  display: flex;
-  margin-right: 80%;
-  float: left;
-  width: 30%;
-  @media only screen and (max-width: 1023px) {
-    display: none;
-  }
-`
+export default {
+  title: 'Controls/Pagination',
+  component: Pagination
+} as Meta
+
+const Template: Story<IPaginationProps> = (args) => <Pagination {...args} />
+export const PaginationView = Template.bind({})
+PaginationView.args = {
+  initialPage: 1,
+  totalPages: 10,
+  onPageChange: (pageNo: number) => alert(`${pageNo}`)
+}

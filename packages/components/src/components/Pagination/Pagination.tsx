@@ -23,37 +23,65 @@ export interface IPaginationProps {
   totalPages: number
   onPageChange: (page: number) => void
   siblingCount?: number
-  size?: IPaginationVariant
 }
 
 interface IButtonProps {
   disabled: boolean
 }
 
+const PaginationWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+const DesktopWrapper = styled.div`
+  display: flex;
+  float: left;
+  @media only screen and (max-width: 1023px) {
+    display: none;
+  }
+`
+
+const MobileWrapper = styled.div`
+  display: none;
+  @media only screen and (max-width: 1023px) {
+    display: inline-flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+`
+
 const PaginationContainer = styled.div`
   margin-top: 8px;
-  height: 48px;
-  padding: 16px;
+  padding: 8px;
   color: ${({ theme }) => theme.colors.primary};
   display: flex;
   align-items: center;
   justify-content: center;
 `
-const Icon = styled(Button)`
-  cursor: pointer;
-  opacity: ${(props: IButtonProps) => (props.disabled ? 0.5 : 1)};
-  border: none;
-  outline: none;
-  &:disabled {
-    background: none;
-  }
-`
+
 const StyledPagination = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 2px;
 `
+
+const PageNumberButton = styled(Button)`
+  width: auto;
+  height: auto;
+  &:hover {
+    border-bottom: solid 2px ${({ theme }) => theme.colors.grey300};
+    margin-bottom: -2px;
+  }
+
+  &:focus-visible {
+    border-bottom: solid 2px ${({ theme }) => theme.colors.yellow};
+    margin-bottom: -2px;
+  }
+`
+
 const StyledPageNumber = styled.span<{ isCurrentPage: boolean; size?: string }>`
   ${({ theme, size }) =>
     size && size === 'large' ? theme.fonts.h3 : theme.fonts.bold14};
@@ -66,17 +94,8 @@ interface IState {
   currentPage: number
 }
 
-const ModifiedCircleButton = styled(CircleButton)`
-  width: auto;
-  height: auto;
-  border-radius: 16px;
-`
-
-export class PaginationModified extends React.Component<
-  IPaginationProps,
-  IState
-> {
-  constructor(props: IPaginationProps, {}) {
+export class Pagination extends React.Component<IPaginationProps, IState> {
+  constructor(props: IPaginationProps) {
     super(props)
 
     const { initialPage, totalPages } = props
@@ -140,7 +159,7 @@ export class PaginationModified extends React.Component<
     }
   }
 
-  render() {
+  renderPages(size: IPaginationVariant) {
     const { totalPages } = this.props
     const { currentPage } = this.state
 
@@ -150,49 +169,56 @@ export class PaginationModified extends React.Component<
     const pages = this.paginationRow(this.state.currentPage, totalPages, 1)
     return (
       <PaginationContainer id="pagination">
-        <Icon
+        <CircleButton
+          size={'medium'}
           onClick={() => {
             this.changePage(currentPage - 1)
           }}
           disabled={!this.canGoToPreviousPage()}
         >
-          {this.props.size && this.props.size === 'small' ? (
+          {size === 'small' ? (
             <Previous id="prev" />
           ) : (
             <PreviousLarge id="prev" />
           )}
-        </Icon>
+        </CircleButton>
         <StyledPagination>
           {pages.map((page, id) => (
-            <ModifiedCircleButton
-              size={this.props.size ? this.props.size : 'small'}
+            <PageNumberButton
+              size={size}
               id={`page-number-${id}`}
               onClick={() => this.changePage(page)}
             >
               <StyledPageNumber
-                size={this.props.size || 'small'}
+                size={size}
                 isCurrentPage={
                   typeof page === 'number' && page === this.state.currentPage
                 }
               >
                 {page}
               </StyledPageNumber>
-            </ModifiedCircleButton>
+            </PageNumberButton>
           ))}
         </StyledPagination>
-        <Icon
+        <CircleButton
+          size={'medium'}
           onClick={() => {
             this.changePage(currentPage + 1)
           }}
           disabled={!this.canGoToNextPage()}
         >
-          {this.props.size && this.props.size === 'small' ? (
-            <Next id="next" />
-          ) : (
-            <NextLarge id="next" />
-          )}
-        </Icon>
+          {size === 'small' ? <Next id="next" /> : <NextLarge id="next" />}
+        </CircleButton>
       </PaginationContainer>
+    )
+  }
+
+  render() {
+    return (
+      <PaginationWrapper>
+        <DesktopWrapper>{this.renderPages('small')}</DesktopWrapper>
+        <MobileWrapper>{this.renderPages('large')}</MobileWrapper>
+      </PaginationWrapper>
     )
   }
 }
