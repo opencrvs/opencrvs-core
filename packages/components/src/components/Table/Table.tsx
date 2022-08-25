@@ -12,8 +12,12 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Pagination } from '../Pagination'
-import { IDynamicValues } from '../common-types'
-import { IColumn, IFooterFColumn, ColumnContentAlignment } from '../interface'
+import {
+  IColumn,
+  IFooterFColumn,
+  ColumnContentAlignment,
+  IDynamicValues
+} from '../interface'
 
 const Wrapper = styled.div<{
   isFullPage?: boolean

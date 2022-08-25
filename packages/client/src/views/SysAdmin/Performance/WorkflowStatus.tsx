@@ -33,7 +33,6 @@ import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completen
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
 import {
   GQLEventProgressSet,
@@ -63,6 +62,7 @@ import {
 import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/interface'
 
 const ToolTipContainer = styled.span`
   text-align: center;
