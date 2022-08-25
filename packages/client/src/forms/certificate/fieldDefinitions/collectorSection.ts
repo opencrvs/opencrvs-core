@@ -21,6 +21,7 @@ import {
   SIMPLE_DOCUMENT_UPLOADER,
   TEXT
 } from '@client/forms'
+import { CorrectorRelationship } from '@client/forms/correction/corrector'
 import {
   identityOptions,
   identityHelperTextMapper,
@@ -29,7 +30,7 @@ import {
 } from '@client/forms/identity'
 import { fieldValidationDescriptorToValidationFunction } from '@client/forms/mappings/deserializer'
 import { conditionals } from '@client/forms/utils'
-import { formMessages } from '@client/i18n/messages'
+import { formMessages, userMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { validIDNumber } from '@client/utils/validate'
 import { RadioSize } from '@opencrvs/components/lib/forms'
@@ -573,3 +574,18 @@ export const collectDeathCertificateFormSection: IFormSection = {
     }
   ]
 }
+
+export const certificateCollectorRelationLabelArray = [
+  {
+    value: CorrectorRelationship.LOCAL_REGISTRAR,
+    label: userMessages.LOCAL_REGISTRAR
+  },
+  {
+    value: CorrectorRelationship.NATIONAL_REGISTRAR,
+    label: userMessages.NATIONAL_REGISTRAR
+  },
+  {
+    value: CorrectorRelationship.REGISTRATION_AGENT,
+    label: userMessages.REGISTRATION_AGENT
+  }
+]
