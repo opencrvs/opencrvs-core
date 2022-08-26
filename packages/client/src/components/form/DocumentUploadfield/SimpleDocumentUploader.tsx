@@ -23,6 +23,7 @@ import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { getBase64String, ErrorMessage } from './DocumentUploaderWithOption'
+import { Transform } from 'json2csv'
 
 const DocumentUploader = styled(ImageUploader)`
   color: ${({ theme }) => theme.colors.primary};
@@ -56,6 +57,7 @@ type IFullProps = {
   touched?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
+  previewTransformer?: (files: IAttachmentValue) => IAttachmentValue
 } & IntlShapeProps
 
 type IState = {
@@ -130,6 +132,13 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   selectForPreview = (previewImage: IFormFieldValue) => {
+    if (this.props.previewTransformer) {
+      return this.setState({
+        previewImage: this.props.previewTransformer(
+          previewImage as IAttachmentValue
+        )
+      })
+    }
     this.setState({ previewImage: previewImage as IAttachmentValue })
   }
 
@@ -140,6 +149,20 @@ class SimpleDocumentUploaderComponent extends React.Component<
   onDelete = (image: IFormFieldValue) => {
     this.props.onComplete('')
     this.closePreviewSection()
+  }
+  // previewTransformer = async (e: any) => {
+  //   e.preventDefault()
+  //   const reader = new FileReader()
+  //   reader.onload = (e) => {
+  //     const text = e.target.result
+  //     console.log(text, 'preview transformer')
+  //     return text
+  //   }
+  //   reader.readAsText(e.target.files[0])
+  // }
+
+  handleDarkSideForce = (image: any) => {
+    return image.toString()
   }
 
   render() {

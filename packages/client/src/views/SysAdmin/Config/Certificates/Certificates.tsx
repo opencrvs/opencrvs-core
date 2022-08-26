@@ -67,6 +67,7 @@ import {
 import { updateOfflineCertificate } from '@client/offline/actions'
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
 import { IDeclaration } from '@client/declarations'
+import { SimpleDocumentUploader } from '@client/components/form/DocumentUploadfield/SimpleDocumentUploader'
 
 const HiddenInput = styled.input`
   display: none;
@@ -391,12 +392,24 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   )}
                 />
               )}
-              <HiddenInput
+              {/* <HiddenInput
                 ref={this.birthCertificatefileUploader}
                 id={`birth_file_uploader_field_${offlineResources.templates.certificates?.birth.id}`}
                 type="file"
                 accept={ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE.join(',')}
                 onChange={this.handleSelectFile}
+              /> */}
+              <SimpleDocumentUploader
+                label={'previewText'}
+                name={intl.formatMessage(messages.govermentLogoLabel)}
+                onComplete={(file) => {
+                  console.log('file complete', file)
+                  return file
+                }}
+                onUploadingStateChanged={(file) => {
+                  console.log('file complete', file)
+                  return file
+                }}
               />
             </>
           )
