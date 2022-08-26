@@ -58,7 +58,7 @@ services:
     networks:
       - overlay_net
     configs:
-      - source: metricbeat-conf
+      - source: metricbeat-conf.{{ts}}
         target: /usr/share/metricbeat/metricbeat.yml
       - source: metricbeat-rollover-policy.{{ts}}
         target: /usr/share/metricbeat/rollover-policy.json
@@ -661,7 +661,7 @@ configs:
     file: ./infrastructure/hearth-plugins/checkDuplicateTask.js
   hearth-queryparam-extensions-conf.{{ts}}:
     file: ./infrastructure/hearth-queryparam-extensions.json
-  metricbeat-conf:
+  metricbeat-conf.{{ts}}:
     file: ./infrastructure/monitoring/beats/metricbeat.yml
   mongo-init.{{ts}}:
     file: ./infrastructure/mongodb/docker-entrypoint-initdb.d/create-mongo-users.sh
