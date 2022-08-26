@@ -261,8 +261,6 @@ export async function advancedRecordSearch(
 ) {
   try {
     const payload = request.payload as IAdvancedSearchParam
-    console.log(JSON.stringify(advancedQueryBuilder(payload)))
-
     const response = await client.search({
       index: OPENCRVS_INDEX_NAME,
       type: 'compositions',
