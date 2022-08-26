@@ -305,7 +305,29 @@ export interface IMosipSeederPayload {
   request: IMosipRequest
 }
 
-export async function getMosipUINToken(patient: fhir.Patient) {
+export interface IMosipErrors {
+  errorCode: string
+  errorMessage: string
+  actionMessage: string
+}
+
+export interface IMosipSeederResponseContent {
+  authStatus: boolean
+  authToken: string
+}
+
+export interface IMosipSeederResponse {
+  id: 'mosip.identity.auth'
+  version: 'v1'
+  responseTime: string
+  transactionID: string
+  response: IMosipSeederResponseContent
+  errors: IMosipErrors[]
+}
+
+export async function getMosipUINToken(
+  patient: fhir.Patient
+): Promise<IMosipSeederResponse> {
   let submittedNationalIDInForm: string = ''
   const identifiers = patient?.identifier?.filter(
     (identifier: fhir.Identifier) => {

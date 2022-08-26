@@ -22,8 +22,8 @@ import {
 import {
   getFromFhir,
   getRegStatusCode,
-  fetchExistingRegStatusCode
-  /*updateResourceInHearth*/
+  fetchExistingRegStatusCode,
+  updateResourceInHearth
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   generateBirthTrackingId,
@@ -724,25 +724,65 @@ export async function validateDeceasedDetails(
           'MOSIP RESPONSE: ',
           JSON.stringify(mosipTokenSeederResponse)
         )
-        // TODO: get uin token from mosipTokenSeederResponse
-
-        /*const birthPatient: fhir.Patient = await getFromFhir(
-          `/Patient?identifier=${mosipUINToken}`
-        )
-        if (birthPatient && birthPatient.identifier) {
-          // If existing patient can be found
-          // mark existing OpenCRVS birth patient as deceased with link to this patient
-          // Keep both Patient copies as a history of name at birth, may not be that recorde for name at death etc ...
-          // One should not overwrite the other
-          birthPatient.deceasedBoolean = true
-          birthPatient.identifier.push({
-            type: 'DECEASED_PATIENT_ENTRY',
-            value: patient.id
+        if (
+          mosipTokenSeederResponse.errors.length ||
+          !mosipTokenSeederResponse.response.authToken
+        ) {
+          logger.info(
+            `MOSIP token request failed with errors: ${JSON.stringify(
+              mosipTokenSeederResponse.errors
+            )}`
+          )
+        } else {
+          const birthPatientBundle: fhir.Bundle = await getFromFhir(
+            `/Patient?identifier=${mosipTokenSeederResponse.response.authToken}`
+          )
+          logger.info(
+            `Patient bundle returned by MOSIP Token Seeder search: ${JSON.stringify(
+              birthPatientBundle
+            )}`
+          )
+          let birthPatient: fhir.Patient = {}
+          if (
+            birthPatientBundle &&
+            birthPatientBundle.entry &&
+            birthPatientBundle.entry.length
+          ) {
+            birthPatientBundle.entry.forEach((entry) => {
+              const bundlePatient = entry.resource as fhir.Patient
+              const selectedIdentifier = bundlePatient.identifier?.filter(
+                (identifier) => {
+                  return (
+                    identifier.type === 'MOSIP_UINTOKEN' &&
+                    identifier.value ===
+                      mosipTokenSeederResponse.response.authToken
+                  )
+                }
+              )[0]
+              if (selectedIdentifier) {
+                birthPatient = bundlePatient
+              }
+            })
+          }
+          logger.info(`birthPatient: ${JSON.stringify(birthPatient)}`)
+          if (birthPatient && birthPatient.identifier) {
+            // If existing patient can be found
+            // mark existing OpenCRVS birth patient as deceased with link to this patient
+            // Keep both Patient copies as a history of name at birth, may not be that recorde for name at death etc ...
+            // One should not overwrite the other
+            birthPatient.deceasedBoolean = true
+            birthPatient.identifier.push({
+              type: 'DECEASED_PATIENT_ENTRY',
+              value: patient.id
+            } as fhir.CodeableConcept)
+          }
+          await updateResourceInHearth(birthPatient)
+          // mark patient with link to the birth patient
+          patient.identifier?.push({
+            type: 'BIRTH_PATIENT_ENTRY',
+            value: birthPatient.id
           } as fhir.CodeableConcept)
         }
-        await updateResourceInHearth(birthPatient)
-        // mark patient as deceased with link to the birth patient
-        */
       } catch (err) {
         logger.info(`MOSIP token seeder request failed: ${JSON.stringify(err)}`)
       }

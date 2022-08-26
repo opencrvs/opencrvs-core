@@ -522,6 +522,7 @@ export interface GQLRegistration {
   _fhirID?: string
   draftId?: string
   trackingId?: string
+  mosipAid?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
@@ -859,6 +860,7 @@ export interface GQLRegistrationInput {
   _fhirID?: string
   draftId?: string
   trackingId?: string
+  mosipAid?: string
   registrationNumber?: string
   paperFormID?: string
   page?: string
@@ -1067,7 +1069,9 @@ export interface GQLInputOutput {
 export const enum GQLIdentityIDType {
   PASSPORT = 'PASSPORT',
   NATIONAL_ID = 'NATIONAL_ID',
-  MOSIP_UIN = 'MOSIP_UIN',
+  MOSIP_UINTOKEN = 'MOSIP_UINTOKEN',
+  DECEASED_PATIENT_ENTRY = 'DECEASED_PATIENT_ENTRY',
+  BIRTH_PATIENT_ENTRY = 'BIRTH_PATIENT_ENTRY',
   DRIVING_LICENSE = 'DRIVING_LICENSE',
   BIRTH_REGISTRATION_NUMBER = 'BIRTH_REGISTRATION_NUMBER',
   DEATH_REGISTRATION_NUMBER = 'DEATH_REGISTRATION_NUMBER',
@@ -3925,6 +3929,7 @@ export interface GQLRegistrationTypeResolver<TParent = any> {
   _fhirID?: RegistrationTo_fhirIDResolver<TParent>
   draftId?: RegistrationToDraftIdResolver<TParent>
   trackingId?: RegistrationToTrackingIdResolver<TParent>
+  mosipAid?: RegistrationToMosipAidResolver<TParent>
   registrationNumber?: RegistrationToRegistrationNumberResolver<TParent>
   paperFormID?: RegistrationToPaperFormIDResolver<TParent>
   page?: RegistrationToPageResolver<TParent>
@@ -3959,6 +3964,10 @@ export interface RegistrationToTrackingIdResolver<
   TParent = any,
   TResult = any
 > {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface RegistrationToMosipAidResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

@@ -646,6 +646,7 @@ type Registration {
   _fhirID: ID
   draftId: String
   trackingId: String
+  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -972,6 +973,7 @@ input RegistrationInput {
   _fhirID: ID
   draftId: String
   trackingId: String
+  mosipAid: String
   registrationNumber: String
   paperFormID: String
   page: String
@@ -1180,7 +1182,9 @@ type InputOutput {
 enum IdentityIDType {
   PASSPORT
   NATIONAL_ID
-  MOSIP_UIN
+  MOSIP_UINTOKEN
+  DECEASED_PATIENT_ENTRY
+  BIRTH_PATIENT_ENTRY
   DRIVING_LICENSE
   BIRTH_REGISTRATION_NUMBER
   DEATH_REGISTRATION_NUMBER
