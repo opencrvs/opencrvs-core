@@ -270,7 +270,7 @@ services:
     networks:
       - overlay_net
     deploy:
-      replicas: 1
+      replicas: 2
     command:
       [
         'apm-server',
@@ -320,7 +320,7 @@ services:
         - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
         - 'traefik.port=80'
         - 'traefik.docker.network=opencrvs_overlay_net'
-      replicas: 1
+      replicas: 2
     networks:
       - overlay_net
     logging:
@@ -342,7 +342,7 @@ services:
         - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
         - 'traefik.port=80'
         - 'traefik.docker.network=opencrvs_overlay_net'
-      replicas: 0
+      replicas: 2
     networks:
       - overlay_net
     logging:
@@ -362,7 +362,7 @@ services:
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
         - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
-      replicas: 1
+      replicas: 2
     environment:
       - APN_SERVICE_URL=http://apm-server:8200
     networks:
@@ -386,7 +386,7 @@ services:
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
         - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
-      replicas: 1
+      replicas: 2
     networks:
       - overlay_net
     logging:
@@ -414,7 +414,7 @@ services:
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
         - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
-      replicas: 1
+      replicas: 2
     networks:
       - overlay_net
     logging:
@@ -431,7 +431,7 @@ services:
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
       - MONGO_URL=mongodb://user-mgnt:${USER_MGNT_MONGODB_PASSWORD}@mongo1/user-mgnt?replicaSet=rs0
     deploy:
-      replicas: 1
+      replicas: 2
     networks:
       - overlay_net
     logging:
@@ -446,7 +446,7 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
-      replicas: 1
+      replicas: 2
     networks:
       - overlay_net
     logging:
@@ -471,7 +471,7 @@ services:
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
         - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
-      replicas: 1
+      replicas: 2
     networks:
       - overlay_net
     logging:
@@ -486,7 +486,7 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
-      replicas: 1
+      replicas: 2
     networks:
       - overlay_net
     logging:
@@ -502,7 +502,7 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
-      replicas: 1
+      replicas: 2
     networks:
       - overlay_net
     logging:
@@ -517,7 +517,7 @@ services:
       - APN_SERVICE_URL=http://apm-server:8200
       - CERT_PUBLIC_KEY_PATH=/run/secrets/jwt-public-key.{{ts}}
     deploy:
-      replicas: 1
+      replicas: 2
     networks:
       - overlay_net
     logging:
@@ -543,7 +543,7 @@ services:
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
         - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
-      replicas: 1
+      replicas: 2
     networks:
       - overlay_net
     logging:
@@ -559,7 +559,7 @@ services:
     depends_on:
       - mongo1
     deploy:
-      replicas: 1
+      replicas: 2
     secrets:
       - jwt-public-key.{{ts}}
     configs:
@@ -592,7 +592,7 @@ services:
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
-      replicas: 1
+      replicas: 2
     networks:
       - overlay_net
     logging:
@@ -610,7 +610,7 @@ services:
         - 'traefik.frontend.headers.STSSeconds=31536000'
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
-      replicas: 1
+      replicas: 2
     configs:
       - source: openhim-console-conf.{{ts}}
         target: /usr/share/nginx/html/config/default.json
@@ -639,7 +639,7 @@ services:
         - 'traefik.frontend.headers.STSIncludeSubdomains=true'
         - 'traefik.frontend.headers.STSPreload=true'
         - 'traefik.frontend.headers.customResponseHeaders=Pragma:no-cache||Cache-control:no-store||X-Robots-Tag:none'
-      replicas: 1
+      replicas: 2
     networks:
       - overlay_net
     logging:
