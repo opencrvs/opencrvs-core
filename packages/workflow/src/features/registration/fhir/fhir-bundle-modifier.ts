@@ -703,8 +703,7 @@ export async function validateDeceasedDetails(
       )
     })
   logger.info(
-    'validateDeceasedDetails: configResponse',
-    JSON.stringify(configResponse)
+    `validateDeceasedDetails: configResponse ${JSON.stringify(configResponse)}`
   )
   if (
     configResponse &&
@@ -721,8 +720,7 @@ export async function validateDeceasedDetails(
       try {
         const mosipTokenSeederResponse = await getMosipUINToken(patient)
         logger.info(
-          'MOSIP RESPONSE: ',
-          JSON.stringify(mosipTokenSeederResponse)
+          `MOSIP RESPONSE: ${JSON.stringify(mosipTokenSeederResponse)}`
         )
         if (
           mosipTokenSeederResponse.errors.length ||
