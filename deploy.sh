@@ -191,6 +191,7 @@ echo
 
 mkdir -p /tmp/opencrvs/infrastructure/default_backups
 mkdir -p /tmp/opencrvs/infrastructure/default_updates
+mkdir -p /tmp/opencrvs/infrastructure/cryptfs
 
 # Copy selected country default backups to infrastructure default_backups folder
 cp $COUNTRY_CONFIG_PATH/backups/hearth-dev.gz /tmp/opencrvs/infrastructure/default_backups/hearth-dev.gz
