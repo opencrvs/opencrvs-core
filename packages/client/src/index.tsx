@@ -54,7 +54,7 @@ if (
   // setup log rocket to ship log messages and record user errors
   if (window.config.LOGROCKET) {
     LogRocket.init(window.config.LOGROCKET, {
-      release: process.env.REACT_APP_VERSION
+      release: import.meta.env.VITE_APP_VERSION
     })
   }
 

@@ -35,6 +35,7 @@ import { Store } from 'redux'
 import { storage } from '@client/storage'
 import { Event } from '@client/utils/gateway'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { vi, Mock } from 'vitest'
 
 describe('when user has starts a new declaration', () => {
   describe('In case of insecured page show unlock screen', () => {
@@ -58,7 +59,7 @@ describe('when user has starts a new declaration', () => {
         USER_DATA: JSON.stringify(userData),
         screenLock: 'true'
       }
-      ;(storage.getItem as jest.Mock).mockImplementation(
+      ;(storage.getItem as Mock).mockImplementation(
         (param: keyof typeof indexedDB) => Promise.resolve(indexedDB[param])
       )
       const testApp = await createTestApp()
@@ -122,6 +123,7 @@ describe('when user has starts a new declaration', () => {
             .hostNodes()
             .simulate('change', { target: { checked: true } })
           app.find('#next_section').hostNodes().simulate('click')
+          app.update()
           await waitForElement(app, '#contactPoint_MOTHER')
           app
             .find('#contactPoint_MOTHER')
@@ -224,7 +226,7 @@ describe('when user has starts a new declaration', () => {
           await flushPromises()
         })
         it('stores the value to a new draft and move to next section', () => {
-          const mockCalls = (storage.setItem as jest.Mock).mock.calls
+          const mockCalls = (storage.setItem as Mock).mock.calls
           const userData = mockCalls[mockCalls.length - 1]
           const storedDeclarations = JSON.parse(
             userData[userData.length - 1]
@@ -263,7 +265,7 @@ describe('when user has starts a new declaration', () => {
 
       describe('when user enters childBirthDate and clicks to documents page', () => {
         beforeEach(async () => {
-          Date.now = jest.fn(() => 1549607679507) // 08-02-2019
+          Date.now = vi.fn(() => 1549607679507) // 08-02-2019
           await waitForElement(app, '#childBirthDate-dd')
           app
             .find('#childBirthDate-dd')
@@ -297,7 +299,6 @@ describe('when user has starts a new declaration', () => {
             await flushPromises()
             app.update()
           })
-
           it('renders list of document upload field', async () => {
             const fileInputs = app
               .find('#form_section_id_documents-view-group')
@@ -316,7 +317,6 @@ describe('when user has starts a new declaration', () => {
               .children().length
             expect(fileInputs).toEqual(4)
           })
-
           it('No error while uploading valid file', async () => {
             selectOption(app, '#uploadDocForMother', 'Birth certificate')
             app.update()
@@ -342,7 +342,6 @@ describe('when user has starts a new declaration', () => {
               ''
             )
           })
-
           it('Error while uploading invalid file', async () => {
             selectOption(app, '#uploadDocForMother', 'Birth certificate')
             app.update()
@@ -379,7 +378,6 @@ describe('when user has starts a new declaration', () => {
             .first()
             .simulate('click')
         })
-
         it('renders preview page', async () => {
           const button = await waitForElement(app, '#back-to-review-button')
 
@@ -391,7 +389,6 @@ describe('when user has starts a new declaration', () => {
           )
           expect(changeNameButton.hostNodes()).toHaveLength(2)
         })
-
         it('should go to input field when user press change button to edit information', async () => {
           const backToReviewButton = await waitForElement(
             app,

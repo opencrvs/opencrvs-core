@@ -22,16 +22,16 @@ import {
 import { storeDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { Payment } from './Payment'
-import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
 import { queries } from '@client/profile/queries'
 import { checkAuth } from '@client/profile/profileActions'
+import { vi, Mock } from 'vitest'
 
-const getItem = window.localStorage.getItem as jest.Mock
-;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
+const getItem = window.localStorage.getItem as Mock
+;(queries.fetchUserDetails as Mock).mockReturnValue(mockUserResponse)
 
 describe('verify collector tests', () => {
   const { store, history } = createStore()
-  const mockLocation: any = jest.fn()
+  const mockLocation: any = vi.fn()
 
   const birthDeclaration = {
     id: 'mockBirth1234',
@@ -106,7 +106,7 @@ describe('verify collector tests', () => {
     // Commenting out this test because receipt templates are not currently configurable
 
     it('print payment receipt', async () => {
-      const printMoneyReceiptSpy = jest.spyOn(PDFUtils, 'printMoneyReceipt')
+      const printMoneyReceiptSpy = vi.spyOn(PDFUtils, 'printMoneyReceipt')
       const testComponent = await createTestComponent(
         <Payment
           location={mockLocation}

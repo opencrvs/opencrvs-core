@@ -11,11 +11,16 @@
  */
 import React from 'react'
 import { ThemeProvider, createGlobalStyle } from 'styled-components'
-import { getTheme } from '@opencrvs/components/lib/theme'
 import WebFont from 'webfontloader'
+import { getTheme } from '@opencrvs/components/lib/theme'
 
 const theme = getTheme()
 
+WebFont.load({
+  google: {
+    families: ['Noto+Sans:600', 'Noto+Sans:400']
+  }
+})
 const GlobalStyle = createGlobalStyle`
 html,
 body,

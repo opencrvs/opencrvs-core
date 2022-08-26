@@ -5,6 +5,7 @@
   "license": "MPL-2.0",
   "private": true,
   "dependencies": {
+    "@storybook/core-server": "^6.5.9",
     "css-animation": "^2.0.4",
     "jest": "26.6.0",
     "patch-package": "^6.1.2",
@@ -24,17 +25,18 @@
     "tslint": "^5.7.0",
     "tslint-config-prettier": "^1.10.0",
     "tslint-react": "^3.2.0",
+    "vite": "^3.0.0",
     "webfontloader": "^1.6.28"
   },
   "scripts": {
     "precommit": "lint-staged",
     "clean": "rimraf lib",
-    "start": "concurrently 'start-storybook -s public --ci --quiet -p 6060' 'tsc -w'",
+    "start": "concurrently 'start-storybook --ci --quiet -p 6060' 'tsc -w'",
     "build": "yarn clean && tsc",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "build:clean": "rm -rf lib",
-    "storybook": "start-storybook -p 6060 -s public",
-    "build-storybook": "build-storybook -s public"
+    "storybook": "start-storybook -p 6060",
+    "build-storybook": "build-storybook"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,json}": [
@@ -45,13 +47,13 @@
     ]
   },
   "devDependencies": {
-    "@storybook/addon-actions": "6.5.10",
+    "@storybook/addon-actions": "^6.5.10",
     "@storybook/addon-docs": "^6.5.10",
-    "@storybook/addon-essentials": "6.5.10",
-    "@storybook/addon-links": "6.5.10",
-    "@storybook/node-logger": "6.5.10",
-    "@storybook/preset-create-react-app": "^3.2.0",
-    "@storybook/react": "6.5.10",
+    "@storybook/addon-essentials": "^6.5.10",
+    "@storybook/addon-links": "^6.5.10",
+    "@storybook/builder-vite": "^0.2.2",
+    "@storybook/node-logger": "^6.5.10",
+    "@storybook/react": "^6.5.10",
     "@types/jest": "^26.0.14",
     "@types/lodash": "^4.14.126",
     "@types/node": "^10.12.5",

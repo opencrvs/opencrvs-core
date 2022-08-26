@@ -25,6 +25,7 @@ import { GQLBirthEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { History } from 'history'
+import { vi, Mock } from 'vitest'
 
 const EVENT_CREATION_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
 const SEND_FOR_VALIDATION_TIME = 1582912800000 // Fri Feb 28 2020 20:00:00 GMT+0200 (Eastern European Standard Time)
@@ -38,7 +39,7 @@ export const registerScopeToken = jwt.sign(
     audience: 'opencrvs:gateway-user'
   }
 )
-const getItem = window.localStorage.getItem as jest.Mock
+const getItem = window.localStorage.getItem as Mock
 
 const birthEventSearchSet: GQLBirthEventSearchSet = {
   id: '956281c9-1f47-4c26-948a-970dd23c4094',
@@ -75,7 +76,7 @@ describe('Registrar home external validation tab tests', () => {
 
   beforeEach(async () => {
     const SECONDARY_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
-    Date.now = jest.fn(() => SECONDARY_TIME)
+    Date.now = vi.fn(() => SECONDARY_TIME)
     const { store: testStore, history: testHistory } = await createTestStore()
     getItem.mockReturnValue(registerScopeToken)
     testStore.dispatch(checkAuth())

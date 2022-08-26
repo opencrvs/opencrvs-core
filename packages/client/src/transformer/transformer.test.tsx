@@ -27,19 +27,18 @@ import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import { Store } from 'redux'
 import { v4 as uuid } from 'uuid'
-import {
-  draftToGqlTransformer,
-  gqlToDraftTransformer
-} from '@client/transformer'
+import { draftToGqlTransformer } from '@client/transformer'
 import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
 import { getOfflineDataSuccess } from '@client/offline/actions'
 import { IForm } from '@opencrvs/client/src/forms'
 import { Event } from '@client/utils/gateway'
 import { clone } from 'lodash'
-import * as fetchAny from 'jest-fetch-mock'
 import { birthDraftData } from '@client/tests/mock-drafts'
+import createFetchMock from 'vitest-fetch-mock'
+import { vi } from 'vitest'
 
-const fetch = fetchAny as any
+const fetch = createFetchMock(vi)
+fetch.enableMocks()
 
 interface IPersonDetails {
   [key: string]: any

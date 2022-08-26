@@ -26,6 +26,7 @@ import {
   IDeclaration
 } from '@client/declarations'
 import { DRAFT_BIRTH_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
+import { vi } from 'vitest'
 
 import { Event } from '@client/utils/gateway'
 import { storage } from '@client/storage'
@@ -59,7 +60,7 @@ describe('when user logs in', () => {
   beforeEach(() => {
     // Mocking storage reading
     // @ts-ignore
-    storage.getItem = jest.fn((key: string) => {
+    storage.getItem = vi.fn((key: string) => {
       switch (key) {
         case 'USER_DATA':
         case 'USER_DETAILS':
@@ -71,7 +72,7 @@ describe('when user logs in', () => {
 
     // Mocking storage writing
     // @ts-ignore
-    storage.setItem = jest.fn((key: string, value: string) => {
+    storage.setItem = vi.fn((key: string, value: string) => {
       switch (key) {
         case 'USER_DATA':
         case 'USER_DETAILS':
@@ -104,7 +105,7 @@ describe('when user logs in', () => {
 
     beforeAll(async () => {
       draft = createDeclaration(Event.Death)
-      jest.mock('lodash/debounce', () => jest.fn((fn) => fn))
+      vi.mock('lodash/debounce', () => vi.fn((fn) => fn))
       const { store } = await createTestStore()
       await writeDeclarationByUser(
         store.getState,
@@ -144,7 +145,7 @@ describe('when there is no user-data saved', () => {
   it('should return an empty array', async () => {
     // Mocking storage reading
     // @ts-ignore
-    storage.getItem = jest.fn((key: string): string => {
+    storage.getItem = vi.fn((key: string): string => {
       switch (key) {
         case 'USER_DATA':
           return '[]'
@@ -164,7 +165,7 @@ describe('when user is in the register form before initial draft load', () => {
   it('throws error when draft not found after initial drafts load', async () => {
     const { store, history } = await createTestStore()
 
-    const mock: any = jest.fn()
+    const mock: any = vi.fn()
     const draft = createDeclaration(Event.Birth)
     const form = await getRegisterFormFromStore(store, Event.Birth)
 
