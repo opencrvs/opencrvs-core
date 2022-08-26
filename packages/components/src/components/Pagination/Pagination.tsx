@@ -25,10 +25,6 @@ export interface IPaginationProps {
   siblingCount?: number
 }
 
-interface IButtonProps {
-  disabled: boolean
-}
-
 const PaginationWrapper = styled.div`
   display: flex;
   align-items: center;
@@ -215,7 +211,7 @@ export class Pagination extends React.Component<IPaginationProps, IState> {
 
   render() {
     return (
-      <PaginationWrapper>
+      <PaginationWrapper id="pagination_container">
         <DesktopWrapper>{this.renderPages('small')}</DesktopWrapper>
         <MobileWrapper>{this.renderPages('large')}</MobileWrapper>
       </PaginationWrapper>
