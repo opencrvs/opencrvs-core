@@ -314,9 +314,9 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
   }
 
   if (params.dateOfEventStart || params.dateOfEventEnd) {
-    // if (!params.event) {
-    //   throw new Error('Event is required for date range search')
-    // }
+    if (!params.event) {
+      throw new Error('Event is required for date range search')
+    }
     if (!params.dateOfEventStart) {
       throw new Error(
         'dateOfEventStart must be provided along with dateOfEventEnd'
@@ -328,21 +328,22 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
       )
     }
 
-    // childDoB: {
-    //   gte: params.dateOfEventStart,
-    //   lte: params.dateOfEventEnd
-    // }
+    let fieldName
+    const eventWiseFieldName = {
+      Birth: 'childDoB',
+      Death: 'deathDate'
+    }
+    if (params.event in eventWiseFieldName) {
+      fieldName = eventWiseFieldName[params.event]
+    } else {
+      throw Error('Invalid Event')
+    }
 
     must.push({
-      aggs: {
-        range: {
-          date_range: {
-            field: 'childDoB',
-            ranges: [
-              { from: params.dateOfEventStart },
-              { to: params.dateOfEventEnd }
-            ]
-          }
+      range: {
+        [fieldName]: {
+          gte: params.dateOfEventStart,
+          lte: params.dateOfEventEnd
         }
       }
     })
@@ -464,10 +465,37 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
     })
   }
 
-  if (params.dateOfRegistration) {
+  if (
+    !params.dateOfEventStart &&
+    !params.dateOfRegistrationEnd &&
+    params.dateOfRegistration
+  ) {
     must.push({
       match: {
         dateOfRegistration: params.dateOfRegistration
+      }
+    })
+  }
+
+  if (params.dateOfRegistrationStart || params.dateOfRegistrationEnd) {
+    if (!params.dateOfRegistrationStart) {
+      throw new Error(
+        'dateOfRegistrationStart  must be provided along with dateOfRegistrationEnd'
+      )
+    }
+
+    if (!params.dateOfRegistrationEnd) {
+      throw new Error(
+        'dateOfRegistrationEnd  must be provided along with dateOfRegistrationStart'
+      )
+    }
+
+    must.push({
+      range: {
+        dateOfDeclaration: {
+          gte: params.dateOfRegistrationStart,
+          lte: params.dateOfRegistrationEnd
+        }
       }
     })
   }

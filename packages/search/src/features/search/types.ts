@@ -47,30 +47,30 @@ export interface IFilter {
 }
 
 export interface IAdvancedSearchParam {
-  event: String
-  eventLocationId: String
-  childFirstNames: String
-  childLastName: String
-  childDoB: String
-  deceasedFirstNames: String
-  deceasedFamilyName: String
-  deathDate: String
-  dateOfEventStart: String
-  dateOfEventEnd: String
-  motherFirstNames: String
-  motherFamilyName: String
-  motherDoB: String
-  motherIdentifier: String
-  fatherFirstNames: String
-  fatherFamilyName: String
-  fatherDoB: String
-  fatherIdentifier: String
-  informantFirstNames: String
-  informantFamilyName: String
-  contactNumber: String
-  registrationNumber: String
-  trackingId: String
-  dateOfRegistration: String
-  dateOfRegistrationStart: String
-  dateOfRegistrationEnd: String
+  event: string
+  eventLocationId: string
+  childFirstNames: string
+  childLastName: string
+  childDoB: string
+  deceasedFirstNames: string
+  deceasedFamilyName: string
+  deathDate: string
+  dateOfEventStart: string
+  dateOfEventEnd: string
+  motherFirstNames: string
+  motherFamilyName: string
+  motherDoB: string
+  motherIdentifier: string
+  fatherFirstNames: string
+  fatherFamilyName: string
+  fatherDoB: string
+  fatherIdentifier: string
+  informantFirstNames: string
+  informantFamilyName: string
+  contactNumber: string
+  registrationNumber: string
+  trackingId: string
+  dateOfRegistration: string
+  dateOfRegistrationStart: string
+  dateOfRegistrationEnd: string
 }
