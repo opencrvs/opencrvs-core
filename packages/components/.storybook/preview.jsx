@@ -18,8 +18,8 @@ WebFont.load({
     families: ['Noto+Sans:600', 'Noto+Sans:400']
   }
 })
-const language = process.env.REACT_APP_LANGUAGE
-  ? process.env.REACT_APP_LANGUAGE
+const language = process.env.VITE_APP_LANGUAGE
+  ? process.env.VITE_APP_LANGUAGE
   : 'en'
 
 const GlobalStyle = createGlobalStyle`

@@ -16,8 +16,9 @@ import {
 import { mockDeathDeclarationData, mockOfflineData } from '@client/tests/util'
 import { createIntl } from 'react-intl'
 import { Event } from '@client/utils/gateway'
-import { omit, cloneDeep } from 'lodash'
+import { omit } from 'lodash'
 import { validImageB64String } from '@client/tests/mock-offline-data'
+import { vi } from 'vitest'
 
 const intl = createIntl({
   locale: 'en'
@@ -41,9 +42,9 @@ describe('PDFUtils related tests', () => {
     ).rejects.toThrowError('No user details found')
   })
   it('downloadFile functionality', () => {
-    const createElementMock = jest.fn()
-    const setAttributeMock = jest.fn()
-    const onClickMock = jest.fn()
+    const createElementMock = vi.fn()
+    const setAttributeMock = vi.fn()
+    const onClickMock = vi.fn()
     const anchor = document.createElement('a')
     anchor.setAttribute = setAttributeMock
     anchor.onclick = onClickMock()
