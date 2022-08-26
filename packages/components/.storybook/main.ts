@@ -11,20 +11,23 @@
  */
 
 import { BRAND_BLUE } from './theme'
-const { mergeConfig } = require('vite')
+import { mergeConfig } from 'vite'
+import type { ViteFinal } from '@storybook/builder-vite'
+
+const viteFinal: ViteFinal = async (config) => {
+  // return the customized config
+  return mergeConfig(config, {
+    // customize the Vite config here
+    resolve: {
+      alias: {
+        crypto: 'crypto-js'
+      }
+    }
+  })
+}
 
 const config = {
-  async viteFinal(config, { configType }) {
-    // return the customized config
-    return mergeConfig(config, {
-      // customize the Vite config here
-      resolve: {
-        alias: {
-          crypto: 'crypto-js'
-        }
-      }
-    })
-  },
+  viteFinal,
   typescript: {
     reactDocgen: 'react-docgen'
   },
@@ -46,4 +49,4 @@ const config = {
   }
 }
 
-module.exports = config
+export default config
