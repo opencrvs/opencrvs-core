@@ -20,12 +20,11 @@ import {
 import getPlugins from '@documents/config/plugins'
 import { getRoutes } from '@documents/config/routes'
 import { readFileSync } from 'fs'
-import { minioClient } from '@documents/minio/client'
+import { MINIO_HOST, MINIO_PORT } from '@documents/minio/constants'
 import {
-  MINIO_BUCKET,
-  MINIO_HOST,
-  MINIO_PORT
-} from '@documents/minio/constants'
+  defaultMinioBucketExists,
+  createDefaultMinioBucket
+} from '@documents/utils'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -70,9 +69,9 @@ export async function createServer() {
 
   async function start() {
     try {
-      const bucketExists = await minioClient.bucketExists(MINIO_BUCKET)
+      const bucketExists = await defaultMinioBucketExists()
       if (!bucketExists) {
-        await minioClient.makeBucket(MINIO_BUCKET, 'COUNTRY')
+        await createDefaultMinioBucket()
       }
       server.log('info', `Minio started on ${MINIO_HOST}:${MINIO_PORT}`)
       await server.start()

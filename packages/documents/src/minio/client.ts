@@ -16,6 +16,6 @@ export const minioClient = new Minio.Client({
   endPoint: MINIO_HOST,
   port: Number(MINIO_PORT),
   useSSL: false,
-  accessKey: process.env.MINIO_USERNAME || '12345678',
-  secretKey: process.env.MINIO_PASSWORD || 'password'
+  accessKey: process.env.MINIO_USERNAME || 'minioadmin',
+  secretKey: process.env.MINIO_PASSWORD || 'minioadmin'
 })

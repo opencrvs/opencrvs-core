@@ -30,6 +30,8 @@ export const NOTIFICATION_URL =
 export const WORKFLOW_URL = process.env.WORKFLOW_URL || 'http://localhost:5050/'
 export const COUNTRY_CONFIG_URL =
   process.env.COUNTRY_CONFIG_URL || 'http://localhost:3040'
+export const DOCUMENTS_URL =
+  process.env.DOCUMENTS_URL || 'http://localhost:9050'
 export const SENTRY_DSN = process.env.SENTRY_DSN
 
 export const PRODUCTION = process.env.NODE_ENV === 'production'

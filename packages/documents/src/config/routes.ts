@@ -15,7 +15,7 @@ export const getRoutes = () => {
   const routes = [
     // upload a document
     {
-      method: 'GET',
+      method: 'POST',
       path: '/upload',
       handler: documentUploadHandler,
       config: {

@@ -9,11 +9,41 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { minioClient } from '@documents/minio/client'
+import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
+import { v4 as uuid } from 'uuid'
+import { fromBuffer } from 'file-type'
+
+export interface IDocumentPayload {
+  fileData: string
+  metaData: object
+}
+
+export type IFileInfo = {
+  ext: string
+  mime: string
+}
 
 export async function documentUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  return 'Hello'
+  const payload = request.payload as IDocumentPayload
+  const ref = uuid()
+  try {
+    const base64String = payload.fileData.split(',')[1]
+    const base64Decoded = Buffer.from(base64String, 'base64')
+    const fileType = (await fromBuffer(base64Decoded)) as IFileInfo
+    const generateFileName = `${ref}.${fileType.ext}`
+
+    await minioClient.putObject(MINIO_BUCKET, generateFileName, base64Decoded, {
+      'content-type': fileType.mime,
+      ...payload.metaData
+    })
+
+    return h.response({ refUrl: `/${MINIO_BUCKET}/${ref}` }).code(200)
+  } catch (error) {
+    return Promise.reject(new Error(`request failed: ${error.message}`))
+  }
 }

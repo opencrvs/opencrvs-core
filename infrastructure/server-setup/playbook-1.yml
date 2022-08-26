@@ -22,6 +22,8 @@
           - mongodb_admin_username is defined
           - mongodb_admin_password is defined
           - elasticsearch_superuser_password is defined
+          - minio_access_key is defined
+          - minio_secret_key is defined
     - name: 'Add docker repository key'
       apt_key:
         url: https://download.docker.com/linux/ubuntu/gpg
@@ -85,6 +87,20 @@
         env: yes
         job: '{{ elasticsearch_superuser_password }}'
       when: elasticsearch_superuser_password is defined
+
+    - name: Inserts Minio super user username environment variable to crontab
+      cron:
+        name: MINIO_ACCESS_KEY
+        env: yes
+        job: 'minio'
+      when: minio_access_key is defined
+
+    - name: Inserts Minio super user password environment variable to crontab
+      cron:
+        name: MINIO_SECRET_KEY
+        env: yes
+        job: '{{ minio_secret_key }}'
+      when: minio_secret_key is defined
 
     - name: Inserts MongoDB username environment variable to crontab
       cron:
@@ -207,6 +223,22 @@
     - name: 'Create elasticsearch backup directory'
       file:
         path: /data/backups/elasticsearch
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+
+    - name: 'Create minio data directory'
+      file:
+        path: /data/minio
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+
+    - name: 'Create minio backup directory'
+      file:
+        path: /data/backups/minio
         state: directory
         group: 1000
         owner: 1000

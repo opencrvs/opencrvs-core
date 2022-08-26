@@ -45,3 +45,7 @@ services:
   config:
     environment:
       - NODE_ENV=production
+
+  documents:
+    environment:
+      - NODE_ENV=production

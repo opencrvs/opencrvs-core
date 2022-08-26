@@ -199,6 +199,21 @@ services:
     networks:
       - overlay_net
 
+  # Configure elasticsearch
+  minio:
+    environment:
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+    volumes:
+      - '/data/minio:/usr/share/minio/data'
+      - '/data/backups/minio:/data/backups/minio'
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    command: server --address ":9000" --console-address ":9001" /data/minio
+    networks:
+      - overlay_net
+
   setup-elasticsearch-users:
     image: ubuntu:bionic
     entrypoint: ['bash', '/usr/app/setup-users.sh']

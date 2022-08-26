@@ -59,13 +59,4 @@ services:
 
   minio:
     image: minio/minio:RELEASE.2022-08-13T21-54-44Z
-    ports:
-      - '9000:9000'
-      - '9001:9001'
-    environment:
-      - MINIO_ACCESS_KEY=12345678
-      - MINIO_SECRET_KEY=password
-    command: server --address ":9000" --console-address ":9001" /data
-    volumes:
-      - minio_data:/data
     restart: unless-stopped
