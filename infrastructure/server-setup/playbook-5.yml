@@ -64,13 +64,6 @@
         username: '{{dockerhub_username}}'
         password: '{{dockerhub_password}}'
 
-    # Docker compose is installed only so that images
-    # can be downloaded before updating docker stack
-    - name: 'Install docker-compose'
-      apt:
-        name: docker-compose
-        state: present
-
     - name: 'Setup crontab to clean up docker images'
       cron:
         name: 'cleanup docker images'
