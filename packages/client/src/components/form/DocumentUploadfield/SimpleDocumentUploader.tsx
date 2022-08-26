@@ -13,7 +13,6 @@ import { ImageUploader } from '@opencrvs/components/lib/forms'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { IFormFieldValue, IAttachmentValue } from '@client/forms'
-import Jimp from 'jimp'
 import * as React from 'react'
 import {
   WrappedComponentProps as IntlShapeProps,
@@ -77,7 +76,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
     }
   }
 
-  handleFileChange = (uploadedImage: File) => {
+  handleFileChange = async (uploadedImage: File) => {
     if (!uploadedImage) {
       return
     }
@@ -95,52 +94,39 @@ class SimpleDocumentUploaderComponent extends React.Component<
     this.props.onUploadingStateChanged &&
       this.props.onUploadingStateChanged(true)
 
-    getBase64String(uploadedImage).then((data) => {
-      let base64String = data as string
-      base64String = base64String.split('base64,')[1]
-      Jimp.read(new Buffer(base64String, 'base64'))
-        .then((buffer) => {
-          if (
-            allowedDocType &&
-            allowedDocType.length > 0 &&
-            !allowedDocType.includes(buffer.getMIME())
-          ) {
-            throw new Error('File type not supported')
-          }
-          return data as string
+    if (
+      allowedDocType &&
+      allowedDocType.length > 0 &&
+      !allowedDocType.includes(uploadedImage.type)
+    ) {
+      this.props.onUploadingStateChanged &&
+        this.props.onUploadingStateChanged(false)
+      this.setState({
+        filesBeingUploaded: []
+      })
+      this.setState({
+        error: this.props.intl.formatMessage(messages.fileUploadError, {
+          type:
+            allowedDocType.join() === 'image/png'
+              ? 'png'
+              : allowedDocType.join()
         })
-        .then((buffer) => {
-          this.props.onUploadingStateChanged &&
-            this.props.onUploadingStateChanged(false)
-          this.props.onComplete({
-            name: uploadedImage.name,
-            type: uploadedImage.type,
-            data: buffer
-          })
-          this.setState({
-            error: ''
-          })
-          this.setState({
-            filesBeingUploaded: []
-          })
-        })
-        .catch(() => {
-          this.props.onUploadingStateChanged &&
-            this.props.onUploadingStateChanged(false)
-          this.setState({
-            filesBeingUploaded: []
-          })
-          allowedDocType &&
-            allowedDocType.length > 0 &&
-            this.setState({
-              error: this.props.intl.formatMessage(messages.fileUploadError, {
-                type: allowedDocType
-                  .map((docTypeStr) => docTypeStr.split('/').pop())
-                  .join(', ')
-              })
-            })
-        })
-    })
+      })
+    } else {
+      this.props.onUploadingStateChanged &&
+        this.props.onUploadingStateChanged(false)
+      this.props.onComplete({
+        name: uploadedImage.name,
+        type: uploadedImage.type,
+        data: await getBase64String(uploadedImage)
+      })
+      this.setState({
+        error: ''
+      })
+      this.setState({
+        filesBeingUploaded: []
+      })
+    }
   }
 
   selectForPreview = (previewImage: IFormFieldValue) => {

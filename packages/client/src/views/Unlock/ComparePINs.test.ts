@@ -12,6 +12,7 @@
 import { pinValidator } from '@client/views/Unlock/ComparePINs'
 import * as bcrypt from 'bcryptjs'
 import { pinLoader } from '@client/views/Unlock/utils'
+import { vi } from 'vitest'
 
 describe('Compare two PINs', () => {
   const pin = '1212'
@@ -19,7 +20,7 @@ describe('Compare two PINs', () => {
   beforeEach(() => {
     const salt = bcrypt.genSaltSync(10)
     const hash = bcrypt.hashSync(pin, salt)
-    pinLoader.loadUserPin = jest.fn(async () => Promise.resolve(hash))
+    pinLoader.loadUserPin = vi.fn(async () => Promise.resolve(hash))
   })
 
   it('should return true when PINs match', async () => {

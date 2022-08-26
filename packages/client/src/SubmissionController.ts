@@ -14,6 +14,7 @@ import { AppStore } from '@client/store'
 import differenceInMinutes from 'date-fns/differenceInMinutes'
 import { declarationReadyForStatusChange } from './declarations/submissionMiddleware'
 import { Action, SubmissionAction } from '@client/forms'
+import { isNavigatorOnline } from './utils'
 
 type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never
@@ -104,7 +105,7 @@ export class SubmissionController {
   public sync = () => {
     this.syncCount++
     console.debug(`[${this.syncCount}] Starting sync...`)
-    if (!navigator.onLine || this.syncRunning) {
+    if (!isNavigatorOnline() || this.syncRunning) {
       console.debug(
         `[${this.syncCount}] Sync exiting early (offline or already syncing)`
       )
