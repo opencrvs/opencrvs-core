@@ -12,7 +12,7 @@ graphic logo are (registered/a) trademark(s) of Plan International.
 const {
   upsertChannel,
   removeChannel
-} = require('../../utils/openhim-utils.cjs')
+} = require('../../utils/openhim-helpers.cjs')
 
 const newChannel = {
   methods: ['POST'],
