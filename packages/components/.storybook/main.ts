@@ -24,6 +24,10 @@ const viteFinal: ViteFinal = async (config) => {
       alias: {
         crypto: 'crypto-js'
       }
+    },
+    build: {
+      minify: false,
+      sourcemap: false
     }
   })
 }
