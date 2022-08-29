@@ -21,7 +21,7 @@ on:
           - qa
           - production
           - config
-      backupEnvironment:
+      backup_environment:
         type: choice
         description: Environment to create backups to
         required: true
@@ -34,20 +34,20 @@ on:
       replicas:
         description: No of replicas deployed in the environemt
         required: true
-      versionLabel:
+      version_label:
         description: The version label for the backups
         required: true
 jobs:
   backup:
-    environment: $INPUT_ENVIRONMENT
+    environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
     env:
-      BACKUP_HOST: farajaland-$INPUT_BACKUP_ENVIRONMENT.opencrvs.org
-      SSH_HOST: farajaland-$INPUT_ENVIRONMENT.opencrvs.org
+      BACKUP_HOST: farajaland-${{ github.event.inputs.backup_environment }}.opencrvs.org
+      SSH_HOST: farajaland-${{ github.event.inputs.environment }}.opencrvs.org
     steps:
       - name: Run emergency-backup-metadata in given environment
         run: |
           ssh root@$SSH_HOST
           cd /opt/opencrvs/infrastructure
-          ./emergency-backup-metadata.sh root $BACKUP_HOST 22 $SSH_HOST /data/backups/ $REPLICAS $VERSIONLABEL
+          ./emergency-backup-metadata.sh root $BACKUP_HOST 22 $SSH_HOST /data/backups/ ${{ github.event.inputs.replicas }} ${{ github.event.inputs.version_label }}
 
