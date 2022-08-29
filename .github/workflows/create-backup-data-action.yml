@@ -37,6 +37,7 @@ on:
       versionLabel:
         description: The version label for the backups
         required: true
+  pull_request:
 jobs:
   backup:
     environment: $INPUT_ENVIRONMENT
