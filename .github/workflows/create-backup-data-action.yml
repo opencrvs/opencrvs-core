@@ -41,9 +41,6 @@ jobs:
   backup:
     environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
-    env:
-      BACKUP_HOST: farajaland-${{ github.event.inputs.backup_environment }}.opencrvs.org
-      SSH_HOST: farajaland-${{ github.event.inputs.environment }}.opencrvs.org
     steps:
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
@@ -51,5 +48,12 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: Run emergency-backup-metadata in given environment
-        run: ssh root@$SSH_HOST "/opt/opencrvs/infrastructure/emergency-backup-metadata.sh root $BACKUP_HOST 22 $SSH_HOST /data/backups/ ${{ github.event.inputs.replicas }} ${{ github.event.inputs.version_label }}"
+        run: ssh root@$SSH_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD ELASTICSEARCH_ADMIN_USER=$ELASTICSEARCH_ADMIN_USER ELASTICSEARCH_ADMIN_PASSWORD=$ELASTICSEARCH_ADMIN_PASSWORD /opt/opencrvs/infrastructure/emergency-backup-metadata.sh root $BACKUP_HOST 22 $SSH_HOST /data/backups/ ${{ github.event.inputs.replicas }} ${{ github.event.inputs.version_label }}"
+        env:
+          BACKUP_HOST: farajaland-${{ github.event.inputs.backup_environment }}.opencrvs.org
+          SSH_HOST: farajaland-${{ github.event.inputs.environment }}.opencrvs.org
+          MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
+          MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
+          ELASTICSEARCH_ADMIN_USER: elastic
+          ELASTICSEARCH_ADMIN_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
 
