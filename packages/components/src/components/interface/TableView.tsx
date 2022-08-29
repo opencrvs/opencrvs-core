@@ -11,7 +11,6 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Pagination } from './DataTable/Pagination'
 import {
   IColumn,
   IDynamicValues,
@@ -19,6 +18,7 @@ import {
   ColumnContentAlignment,
   LoadMore
 } from '../Workqueue'
+import { Pagination } from '../Pagination'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean

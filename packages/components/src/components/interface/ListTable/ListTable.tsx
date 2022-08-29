@@ -11,10 +11,14 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Pagination } from '../DataTable/Pagination'
-import { IColumn, IDynamicValues, IFooterFColumn } from '../../Workqueue/types'
-import { LoadMore } from '../../Workqueue/components/LoadMore'
-import { ColumnContentAlignment } from '../../Workqueue'
+import { Pagination } from '../../Pagination'
+import { ColumnContentAlignment } from '../../common-types'
+import {
+  IDynamicValues,
+  IColumn,
+  IFooterFColumn,
+  LoadMore
+} from '../../Workqueue'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean
