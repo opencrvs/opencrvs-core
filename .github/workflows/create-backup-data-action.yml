@@ -1,0 +1,53 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+name: Create backup data
+
+on: 
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Environment to create backup from
+        required: true
+        options:
+          - staging
+          - qa
+          - production
+          - config
+      backupEnvironment:
+        type: choice
+        description: Environment to create backups to
+        required: true
+        default: config
+        options:
+          - staging
+          - qa
+          - production
+          - config
+      replicas:
+        description: No of replicas deployed in the environemt
+        required: true
+      versionLabel:
+        description: The version label for the backups
+        required: true
+jobs:
+  backup:
+    environment: $INPUT_ENVIRONMENT
+    runs-on: ubuntu-latest
+    env:
+      BACKUP_HOST: farajaland-$INPUT_BACKUP_ENVIRONMENT.opencrvs.org
+      SSH_HOST: farajaland-$INPUT_ENVIRONMENT.opencrvs.org
+    steps:
+      - name: Run emergency-backup-metadata in given environment
+        run: |
+          ssh root@$SSH_HOST
+          cd /opt/opencrvs/infrastructure
+          ./emergency-backup-metadata.sh root $BACKUP_HOST 22 $SSH_HOST /data/backups/ $REPLICAS $VERSIONLABEL
+
