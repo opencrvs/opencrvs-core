@@ -35,7 +35,7 @@
     "deploy": "bash deploy.sh",
     "cov:client": "cd packages/client && yarn open:cov",
     "cov:login": "cd packages/login && yarn open:cov",
-    "build": "lerna run build --stream --concurrency=1",
+    "build": "lerna run build --stream --concurrency=1 && lerna run build-storybook",
     "build:image": "export VERSION=`git log -1 --pretty=format:%h` && docker build --build-arg VERSION=${VERSION} -t opencrvs-build . && unset VERSION",
     "build:clean": "lerna run build:clean",
     "check:license": "license-check-and-add check -f infrastructure/license-config.json",
