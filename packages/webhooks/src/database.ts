@@ -12,8 +12,7 @@
 import * as mongoose from 'mongoose'
 import { MONGO_URL, REDIS_HOST } from '@webhooks/constants'
 import { logger } from '@webhooks/logger'
-import * as IORedis from 'ioredis'
-
+import Redis, * as IORedis from 'ioredis'
 const db = mongoose.connection
 
 db.on('disconnected', () => {
@@ -35,7 +34,7 @@ export function getRedis(): IORedis.Redis {
 
 const connect = async (): Promise<void> => {
   try {
-    redisConnection = new IORedis(REDIS_HOST)
+    redisConnection = new Redis(REDIS_HOST)
 
     redisConnection.on('error', (error) => {
       logger.error('Redis connection error', error)
