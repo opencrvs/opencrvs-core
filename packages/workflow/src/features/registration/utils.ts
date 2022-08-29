@@ -34,7 +34,6 @@ import {
 import { Events } from '@workflow/features/events/handler'
 import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
-import { v4 as uuid } from 'uuid'
 
 interface INotificationPayload {
   msisdn: string
@@ -338,7 +337,7 @@ export async function getMosipUINToken(
     submittedNationalIDInForm = `${identifiers[0].value}`
   }
   const payload: IMosipSeederPayload = {
-    id: uuid(),
+    id: '',
     version: '',
     metadata: '',
     requesttime: '',

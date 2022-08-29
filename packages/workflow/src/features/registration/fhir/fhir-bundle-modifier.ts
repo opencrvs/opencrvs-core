@@ -731,6 +731,12 @@ export async function validateDeceasedDetails(
               mosipTokenSeederResponse.errors
             )}`
           )
+        } else if (mosipTokenSeederResponse.response.authStatus === false) {
+          logger.info(
+            `MOSIP token request failed with false authStatus: ${JSON.stringify(
+              mosipTokenSeederResponse.errors
+            )}`
+          )
         } else {
           const birthPatientBundle: fhir.Bundle = await getFromFhir(
             `/Patient?identifier=${mosipTokenSeederResponse.response.authToken}`
