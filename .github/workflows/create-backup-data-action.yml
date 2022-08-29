@@ -45,6 +45,11 @@ jobs:
       BACKUP_HOST: farajaland-${{ github.event.inputs.backup_environment }}.opencrvs.org
       SSH_HOST: farajaland-${{ github.event.inputs.environment }}.opencrvs.org
     steps:
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_KEY }}
+          known_hosts: ${{ secrets.KNOWN_HOSTS }}
       - name: Run emergency-backup-metadata in given environment
         run: |
           ssh root@$SSH_HOST
