@@ -13,6 +13,7 @@
 import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { Text } from './Text'
+import { Stack } from '../Stack'
 
 export default {
   title: 'Typography/Text',
@@ -29,9 +30,8 @@ Default.args = {
   as: 'h1'
 }
 
-/* TODO: Use `<Stack>` when Workqueue-pull request is merged */
 export const Heading = () => (
-  <>
+  <Stack direction="column" alignItems="flex-start">
     <Text variant="hero" as="h1">
       The gold standard for digital...
     </Text>
@@ -47,11 +47,11 @@ export const Heading = () => (
     <Text variant="h4" as="h4">
       The gold standard for digital civil registration
     </Text>
-  </>
+  </Stack>
 )
 
 export const Body = () => (
-  <>
+  <Stack direction="column" alignItems="flex-start">
     <Text variant="reg18" as="p">
       The gold standard for digital civil registration
     </Text>
@@ -76,5 +76,5 @@ export const Body = () => (
     <Text variant="bold12" as="p">
       The gold standard for digital civil registration
     </Text>
-  </>
+  </Stack>
 )
