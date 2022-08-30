@@ -59,9 +59,6 @@
     "postinstall-postinstall": "^2.0.0"
   },
   "resolutions": {
-    "//": "See https://github.com/facebook/create-react-app/issues/11773",
-    "react-error-overlay": "6.0.9",
-    "babel-loader": "8.1.0",
     "underscore": ">1.12.1",
     "//": "See https://github.com/opencrvs/opencrvs-core/issues/3820",
     "@types/react": "^16.9.4"

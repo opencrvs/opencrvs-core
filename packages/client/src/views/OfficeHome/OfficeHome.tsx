@@ -47,7 +47,6 @@ import {
   NOTIFICATION_TYPE,
   Spinner
 } from '@opencrvs/components/lib/interface'
-import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -76,15 +75,6 @@ type IOwnProps = RouteComponentProps<{
   tabId: string
   selectorId?: string
 }>
-export interface IQueryData {
-  inProgressTab: GQLEventSearchResultSet
-  notificationTab: GQLEventSearchResultSet
-  reviewTab: GQLEventSearchResultSet
-  rejectTab: GQLEventSearchResultSet
-  approvalTab: GQLEventSearchResultSet
-  printTab: GQLEventSearchResultSet
-  externalValidationTab: GQLEventSearchResultSet
-}
 
 export const StyledSpinner = styled(Spinner)`
   margin: 20% auto;
@@ -140,15 +130,6 @@ interface IOfficeHomeState {
 type IOfficeHomeProps = IntlShapeProps &
   IDispatchProps &
   IBaseOfficeHomeStateProps
-
-export const EVENT_STATUS = {
-  IN_PROGRESS: 'IN_PROGRESS',
-  DECLARED: 'DECLARED',
-  VALIDATED: 'VALIDATED',
-  REGISTERED: 'REGISTERED',
-  REJECTED: 'REJECTED',
-  WAITING_VALIDATION: 'WAITING_VALIDATION'
-}
 
 export class OfficeHomeView extends React.Component<
   IOfficeHomeProps,
