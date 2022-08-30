@@ -16,22 +16,21 @@ import { IUserData } from '@client/declarations'
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
 export async function validateApplicationVersion() {
-  const appVer = localStorage.getItem('application-version')
+  const runningVer = localStorage.getItem('running-version')
 
   if (
-    !appVer ||
-    (appVer !== APPLICATION_VERSION &&
-      isNewAppVersion(appVer, APPLICATION_VERSION))
+    !runningVer ||
+    (runningVer !== APPLICATION_VERSION &&
+      isNewAppVersion(runningVer, APPLICATION_VERSION))
   ) {
-    localStorage.setItem('application-version', APPLICATION_VERSION)
+    localStorage.setItem('running-version', APPLICATION_VERSION)
     const userData = await storage.getItem('USER_DATA')
     const allUserData: IUserData[] = !userData
       ? []
       : (JSON.parse(userData) as IUserData[])
 
-    allUserData.map((userData) => {
+    allUserData.forEach((userData) => {
       userData['declarations'] = []
-      return userData
     })
 
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))
