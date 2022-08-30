@@ -40,7 +40,9 @@ import { findExtension } from '@gateway/features/fhir/utils'
 import * as fetchAny from 'jest-fetch-mock'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
+import { IAuthHeader } from '@gateway/common-types'
 
+type AuthHeader = { Authorization?: string } & IAuthHeader
 test('should build a minimal FHIR registration document without error', async () => {
   const fhir = await buildFHIRBundle(
     {
@@ -868,14 +870,14 @@ test('creates task with contact other relationship', async () => {
   expect(simpleFhir).toBeDefined()
 
   const taskResource = (
-    simpleFhir.entry.find(
-      ({ resource }) => resource.resourceType === 'Task'
+    simpleFhir?.entry?.find(
+      ({ resource }) => resource?.resourceType === 'Task'
     ) as fhir.BundleEntry
   ).resource as fhir.Task
 
   expect(taskResource).toBeDefined()
   expect(
-    taskResource.extension.some((taskExtension) =>
+    taskResource?.extension?.some((taskExtension) =>
       _.isEqual(taskExtension, {
         url: 'http://opencrvs.org/specs/extension/contact-person',
         valueString: 'OTHER'
@@ -884,7 +886,7 @@ test('creates task with contact other relationship', async () => {
   ).toBe(true)
 
   expect(
-    taskResource.extension.some((taskExtension) =>
+    taskResource?.extension?.some((taskExtension) =>
       _.isEqual(taskExtension, {
         url: 'http://opencrvs.org/specs/extension/contact-relationship',
         valueString: 'Friend'
@@ -1031,7 +1033,7 @@ describe('checkUserAssignment()', () => {
       audience: 'opencrvs:gateway-user'
     }
   )
-  const authHeaderRegCert = {
+  const authHeaderRegCert: AuthHeader = {
     Authorization: `Bearer ${registerCertifyToken}`
   }
   it('should return true if user is assigned on task', async () => {
