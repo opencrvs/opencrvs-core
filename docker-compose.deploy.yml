@@ -551,6 +551,14 @@ services:
       options:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'config'
+  migration:
+    environment:
+      - MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1/hearth-dev?replicaSet=rs0
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'migration'
   # Configure other dependencies with deployment specifc details
   hearth:
     environment:
