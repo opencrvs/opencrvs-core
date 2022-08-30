@@ -18,7 +18,7 @@ import styled from 'styled-components'
 type Element = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span'
 
 export interface ITextProps extends React.HTMLAttributes<HTMLSpanElement> {
-  /** Typographic variant */
+  /** Typographic variant. Defines how the text looks like */
   variant: IFont
   /** Element type. Required for making semantically correct hierarchies, for example `h2` or `p` */
   as: Element
