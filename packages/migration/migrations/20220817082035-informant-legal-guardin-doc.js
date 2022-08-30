@@ -13,19 +13,17 @@ export const up = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await db
-        .collection('DocumentReference')
-        .updateMany(
-          { 'subject.display': 'LEGAL_GUARDIAN_PROOF' },
-          {
-            $set: { 'type.coding.$[elem].code': 'PROOF_OF_LEGAL_GUARDIANSHIP' }
-          },
-          {
-            arrayFilters: [
-              { 'elem.system': 'http://opencrvs.org/specs/supporting-doc-type' }
-            ]
-          }
-        )
+      await db.collection('DocumentReference').updateMany(
+        { 'subject.display': 'LEGAL_GUARDIAN_PROOF' },
+        {
+          $set: { 'type.coding.$[elem].code': 'PROOF_OF_LEGAL_GUARDIANSHIP' }
+        },
+        {
+          arrayFilters: [
+            { 'elem.system': 'http://opencrvs.org/specs/supporting-doc-type' }
+          ]
+        }
+      )
     })
   } finally {
     await session.endSession()
@@ -36,17 +34,15 @@ export const down = async (db, client) => {
   const session = client.startSession()
   try {
     await session.withTransaction(async () => {
-      await db
-        .collection('DocumentReference')
-        .updateMany(
-          { 'subject.display': 'LEGAL_GUARDIAN_PROOF' },
-          { $set: { 'type.coding.$[elem].code': 'BIRTH_CERTIFICATE' } },
-          {
-            arrayFilters: [
-              { 'elem.system': 'http://opencrvs.org/specs/supporting-doc-type' }
-            ]
-          }
-        )
+      await db.collection('DocumentReference').updateMany(
+        { 'subject.display': 'LEGAL_GUARDIAN_PROOF' },
+        { $set: { 'type.coding.$[elem].code': 'BIRTH_CERTIFICATE' } },
+        {
+          arrayFilters: [
+            { 'elem.system': 'http://opencrvs.org/specs/supporting-doc-type' }
+          ]
+        }
+      )
     })
   } finally {
     await session.endSession()
