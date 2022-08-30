@@ -554,6 +554,7 @@ services:
   migration:
     environment:
       - MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1/hearth-dev?replicaSet=rs0
+      - OPENHIM_MONGODB_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1/openhim-dev?replicaSet=rs0
     logging:
       driver: gelf
       options:

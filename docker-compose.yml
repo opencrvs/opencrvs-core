@@ -163,6 +163,7 @@ services:
     restart: unless-stopped
     environment:
       - MONGO_URL=mongodb://mongo1/hearth-dev
+      - OPENHIM_MONGODB_URL=mongodb://mongo1/openhim-dev
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
