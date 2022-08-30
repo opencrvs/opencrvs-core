@@ -11,14 +11,14 @@
  */
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { grid } from '../../grid'
-import { IDynamicValues, IActionObject, IAction, IColumn } from './types'
-import { GridTableRowDesktop } from './GridTableRowDeskop'
-import { ITheme } from 'src/components/theme'
-import { SortIcon } from '../../icons/SortIcon'
-import { connect } from 'react-redux'
-import { GridTableRowMobile } from './GridTableRowMobile'
-import { ListItemAction } from './ListItemAction'
+import { grid } from '../grid'
+import { IDynamicValues, IColumn, IActionObject } from './types'
+import { WorkqueueRowDesktop } from './components/WorkqueueRowDesktop'
+import { WorkqueueRowMobile } from './components/WorkqueueRowMobile'
+import { ITheme } from '../theme'
+import { SortIcon } from '../icons/SortIcon'
+import { IAction } from '../common-types'
+import { ListItemAction } from '../interface/GridTable/ListItemAction'
 
 const Wrapper = styled.div`
   width: 100%;
@@ -68,10 +68,11 @@ const ContentWrapper = styled.span<{
 
 const ColumnContainer = styled.div<{
   width: number
+  clickable: boolean
 }>`
   width: ${({ width }) => width}%;
   display: flex;
-  cursor: pointer;
+  ${({ clickable }) => clickable && `cursor: pointer;`}
 `
 
 const ColumnTitleWrapper = styled.div<{ alignment?: string }>`
@@ -113,28 +114,37 @@ export enum SORT_ORDER {
   DESCENDING = 'desc'
 }
 
-interface IGridTableProps {
+interface IComponentWithTheme {
   theme: ITheme
+}
+
+interface IWorkqueueProps extends IComponentWithTheme {
+  /** Workqueue data */
   content: IDynamicValues[]
+  /** Data columns */
   columns: IColumn[]
-  renderExpandedComponent?: (eventId: string) => React.ReactNode
+  /** Text if there are now content on the table */
   noResultText?: string
-  hideTableHeader?: boolean
-  clickable?: boolean
+  /** Hides `noResultText` if true */
   loading?: boolean
-  sortedCol?: COLUMNS
+  /** Hides Workqueue header */
+  hideTableHeader?: boolean
+  /** Globally enables or disables clickable headers */
+  clickable?: boolean
+  /** Sets the direction of the sort icon */
   sortOrder?: SORT_ORDER
+  /** Adds `border-bottom: 0` on desktop */
   hideLastBorder?: boolean
 }
 
-interface IGridTableState {
+interface IWorkqueueState {
   width: number
   expanded: string[]
 }
 
-export class GridTableComp extends React.Component<
-  IGridTableProps,
-  IGridTableState
+export class WorkqueueComp extends React.Component<
+  IWorkqueueProps,
+  IWorkqueueState
 > {
   state = {
     width: window.innerWidth,
@@ -190,6 +200,7 @@ export class GridTableComp extends React.Component<
                     ? () => preference.sortFunction!(preference.key)
                     : undefined
                 }
+                clickable={Boolean(preference.sortFunction)}
               >
                 <ColumnTitleWrapper>
                   {preference.label && preference.label}
@@ -205,7 +216,7 @@ export class GridTableComp extends React.Component<
           </TableHeader>
         )}
         {!isMobileView ? (
-          <GridTableRowDesktop
+          <WorkqueueRowDesktop
             columns={this.props.columns}
             displayItems={content}
             clickable={this.props.clickable}
@@ -214,7 +225,7 @@ export class GridTableComp extends React.Component<
             hideLastBorder={this.props.hideLastBorder}
           />
         ) : (
-          <GridTableRowMobile
+          <WorkqueueRowMobile
             columns={this.props.columns}
             displayItems={content}
             clickable={this.props.clickable}
@@ -230,4 +241,4 @@ export class GridTableComp extends React.Component<
   }
 }
 
-export const GridTable = connect(null, {})(withTheme(GridTableComp))
+export const Workqueue = withTheme(WorkqueueComp)

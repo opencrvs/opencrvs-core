@@ -10,14 +10,14 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { IAction, IActionObject } from './types'
 import styled from 'styled-components'
 import {
-  IGridTableRow,
+  IWorkqueueRow,
   IconWrapper,
   Error,
   ContentWrapper
-} from './GridTableRowDeskop'
+} from './WorkqueueRowDesktop'
+import { IActionObject, IAction } from '../types'
 
 const StyledBox = styled.div`
   color: ${({ theme }) => theme.colors.copy};
@@ -44,7 +44,7 @@ const RowWrapper = styled.div<{
   cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
 `
 
-export const GridTableRowMobile = (props: IGridTableRow) => {
+export const WorkqueueRowMobile = (props: IWorkqueueRow) => {
   return (
     <>
       {props.displayItems.map((item, index) => {

@@ -17,10 +17,7 @@ import {
   COMPLETENESS_RATE_REPORT_BASE
 } from '@client/views/SysAdmin/Performance/CompletenessRates'
 import { SortArrow } from '@opencrvs/components/lib/icons'
-import {
-  ListTable,
-  ColumnContentAlignment
-} from '@opencrvs/components/lib/interface'
+import { ListTable } from '@opencrvs/components/lib/interface'
 import { orderBy } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
@@ -30,6 +27,7 @@ import {
 } from '@opencrvs/gateway/src/graphql/schema'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { CompletenessRateTime } from '@client/views/SysAdmin/Performance/utils'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 
 interface ITableProps extends WrappedComponentProps {
   loading: boolean

@@ -12,20 +12,14 @@
 import { Meta, Story } from '@storybook/react'
 import { Pill, IPillProps } from './Pill'
 import React from 'react'
-import styled from 'styled-components'
-
-const Container = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-`
+import { Stack } from '../Stack'
 
 const Template: Story<IPillProps> = (args) => {
   return (
-    <Container>
+    <Stack>
       <Pill {...args} />
       <Pill {...args} size="medium" />
-    </Container>
+    </Stack>
   )
 }
 

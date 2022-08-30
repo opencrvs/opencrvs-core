@@ -11,11 +11,11 @@
  */
 import * as React from 'react'
 import { BodyContent } from '@opencrvs/components/lib/layout'
+import { Spinner } from '@opencrvs/components/lib/interface'
 import {
-  GridTable,
-  ColumnContentAlignment,
-  Spinner
-} from '@opencrvs/components/lib/interface'
+  Workqueue,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/Workqueue'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import {
   constantsMessages,
@@ -219,7 +219,7 @@ class Outbox extends React.Component<IFullProps, IState> {
 
     return (
       <Container>
-        <GridTable
+        <Workqueue
           hideTableHeader={true}
           content={this.transformDeclarationsReadyToSend()}
           columns={[
