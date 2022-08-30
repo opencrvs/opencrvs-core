@@ -111,7 +111,7 @@ function CustomizedAxisTick(props: IThemedAxisTickProps) {
         y={0}
         dy={24}
         fill={theme.colors.copy}
-        fontFamily={theme.fonts.fontFamily}
+        fontFamily={theme.fontFamily}
         fontSize={12}
         fontWeight="normal"
       >

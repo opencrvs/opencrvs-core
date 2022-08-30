@@ -9,103 +9,111 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export interface IFonts {
-  fontFamily: string
+import { css } from 'styled-components'
 
-  h1: string
-  h2: string
-  h3: string
-  h4: string
+export const family = "'Noto Sans', sans-serif"
 
-  bold16: string
-  bold18: string
-  bold14: string
-  bold12: string
+/* stylelint-disable opencrvs/no-font-styles */
+const hero = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 56px;
+  line-height: 120%;
+`
+const h1 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 36px;
+  line-height: 120%;
+`
+const h2 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 140%;
+`
+const h3 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 140%;
+`
+const h4 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 140%;
+`
+const reg18 = css`
+  font-family: ${family};
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 140%;
+`
 
-  reg18: string
-  reg16: string
-  reg14: string
-  reg12: string
+const bold18 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 140%;
+`
+
+const reg16 = css`
+  font-family: ${family};
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+`
+
+const bold16 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 140%;
+`
+
+const reg14 = css`
+  font-family: ${family};
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+`
+
+const bold14 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 140%;
+`
+
+const reg12 = css`
+  font-family: ${family};
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 140%;
+`
+
+const bold12 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 140%;
+`
+
+export const fonts = {
+  hero,
+  h1,
+  h2,
+  h3,
+  h4,
+  bold18,
+  bold16,
+  bold14,
+  bold12,
+  reg18,
+  reg16,
+  reg14,
+  reg12
 }
 
-export const fonts = (): IFonts => {
-  const fontFamily = "'Noto Sans', sans-serif"
-  return {
-    fontFamily,
-
-    // Headings
-
-    h1: `font-family: ${fontFamily};
-    font-size: 36px;
-    font-weight: 600;
-    line-height: 54px;
-    `,
-
-    h2: `font-family: ${fontFamily};
-    font-size: 24px;
-    font-weight: 600;
-    line-height: 36px;
-    `,
-
-    h3: `font-family: ${fontFamily};
-    font-size: 21px;
-    font-weight: 600;
-    line-height: 32px;
-    `,
-
-    h4: `font-family: ${fontFamily};
-      font-size: 18px;
-      font-weight: 600;
-      line-height: 27px;
-      `,
-
-    // Bold Body Styles
-
-    bold18: `font-family: ${fontFamily};
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 27px;
-    `,
-
-    bold16: `font-family: ${fontFamily};
-      font-size: 16px;
-      font-weight: 600;
-      line-height: 24px;
-      `,
-
-    bold14: `font-family: ${fontFamily};
-      font-size: 14px;
-      font-weight: 600;
-      line-height: 21px;
-      `,
-
-    bold12: `font-family: ${fontFamily};
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 18px;
-      `,
-
-    // Regular Body Styles
-
-    reg18: `font-family: ${fontFamily};
-      font-size: 18px;
-      font-weight: 400;
-      line-height: 27px;`,
-
-    reg16: `font-family: ${fontFamily};
-      font-size: 16px;
-      font-weight: 400;
-      line-height: 24px;`,
-
-    reg14: `font-family: ${fontFamily};
-      font-size: 14px;
-      font-weight: 400;
-      line-height: 21px;`,
-
-    reg12: `font-family: ${fontFamily};
-      font-size: 12px;
-      font-weight: 400;
-      line-height: 18px;
-      `
-  }
-}
+export type IFont = keyof typeof fonts

@@ -11,39 +11,28 @@
  */
 
 import React from 'react'
-import { fonts } from '../fonts'
+import { fonts, IFont } from '../fonts'
+import { colors, IColor } from '../colors'
 import styled from 'styled-components'
 
 type Element = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p' | 'span'
 
-type Variant =
-  | 'heading-hero'
-  | 'heading-xl'
-  | 'heading-l'
-  | 'heading-m'
-  | 'heading-s'
-
-const fontStyle: { [variant in Variant]: string } = {
-  'heading-hero': fonts().h1,
-  'heading-xl': fonts().h1,
-  'heading-l': fonts().h2,
-  'heading-m': fonts().h3,
-  'heading-s': fonts().h3
-}
-
 export interface ITextProps extends React.HTMLAttributes<HTMLSpanElement> {
-  /** Typographic variant of the text */
-  variant: Variant
-  /** Element type */
+  /** Typographic variant */
+  variant: IFont
+  /** Element type. Required for making semantically correct hierarchies, for example `h2` or `p` */
   as: Element
+  /** Color */
+  color?: IColor
 }
 
-const StyledText = styled.span<{ variant: Variant }>`
-  ${({ variant }) => fontStyle[variant]}
+const StyledText = styled.span<{ variant: IFont }>`
+  ${({ variant }) => fonts[variant]}
+  ${({ color }) => color && `color: ${colors[color]};`}
 `
 
 /** Text helps present your content with correct hierarchy and font sizes */
-export const Text = ({ variant, as, ...props }: ITextProps) => {
+export const Text = ({ variant, as, color = 'copy', ...props }: ITextProps) => {
   const Component = StyledText.withComponent(as)
-  return <Component variant={variant} {...props} />
+  return <Component variant={variant} color={color} {...props} />
 }

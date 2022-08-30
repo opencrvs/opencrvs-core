@@ -25,6 +25,56 @@ const Template: ComponentStory<typeof Text> = (args) => (
 
 export const Default = Template.bind({})
 Default.args = {
-  variant: 'heading-xl',
+  variant: 'h1',
   as: 'h1'
 }
+
+/* TODO: Use `<Stack>` when Workqueue-pull request is merged */
+export const Heading = () => (
+  <>
+    <Text variant="hero" as="h1">
+      The gold standard for digital...
+    </Text>
+    <Text variant="h1" as="h2">
+      The gold standard for digital civil registration
+    </Text>
+    <Text variant="h2" as="h3">
+      The gold standard for digital civil registration
+    </Text>
+    <Text variant="h3" as="h4">
+      The gold standard for digital civil registration
+    </Text>
+    <Text variant="h4" as="h4">
+      The gold standard for digital civil registration
+    </Text>
+  </>
+)
+
+export const Body = () => (
+  <>
+    <Text variant="reg18" as="p">
+      The gold standard for digital civil registration
+    </Text>
+    <Text variant="bold18" as="p">
+      The gold standard for digital civil registration
+    </Text>
+    <Text variant="reg16" as="p">
+      The gold standard for digital civil registration
+    </Text>
+    <Text variant="bold16" as="p">
+      The gold standard for digital civil registration
+    </Text>
+    <Text variant="reg14" as="p">
+      The gold standard for digital civil registration
+    </Text>
+    <Text variant="bold14" as="p">
+      The gold standard for digital civil registration
+    </Text>
+    <Text variant="reg12" as="p">
+      The gold standard for digital civil registration
+    </Text>
+    <Text variant="bold12" as="p">
+      The gold standard for digital civil registration
+    </Text>
+  </>
+)

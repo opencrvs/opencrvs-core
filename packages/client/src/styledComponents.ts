@@ -22,9 +22,7 @@
  */
 
 import * as styledComponents from 'styled-components'
-import { ITheme as IThemeInterface } from '@opencrvs/components/lib/theme'
-
-export type ITheme = IThemeInterface
+import { getTheme } from '@opencrvs/components/lib/theme'
 
 const {
   default: styled,
@@ -33,7 +31,9 @@ const {
   keyframes,
   ThemeProvider,
   withTheme
-} = styledComponents as styledComponents.ThemedStyledComponentsModule<ITheme>
+} = styledComponents as styledComponents.ThemedStyledComponentsModule<
+  ReturnType<typeof getTheme>
+>
 
 export { css, createGlobalStyle, keyframes, ThemeProvider, withTheme }
 export default styled
