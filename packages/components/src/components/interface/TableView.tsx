@@ -11,9 +11,13 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { IColumn, IDynamicValues, IFooterFColumn } from './GridTable/types'
-import { LoadMore } from './GridTable/LoadMore'
-import { ColumnContentAlignment } from './GridTable'
+import {
+  IColumn,
+  IDynamicValues,
+  IFooterFColumn,
+  ColumnContentAlignment,
+  LoadMore
+} from '../Workqueue'
 import { Pagination } from '../Pagination'
 
 const Wrapper = styled.div<{

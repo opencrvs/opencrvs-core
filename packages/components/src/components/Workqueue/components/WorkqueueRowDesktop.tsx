@@ -10,11 +10,16 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { IDynamicValues, IAction, IColumn, IActionObject } from './types'
 import styled from 'styled-components'
-import { ColumnContentAlignment } from '..'
+import {
+  IActionObject,
+  ColumnContentAlignment,
+  IAction,
+  IColumn,
+  IDynamicValues
+} from '..'
 
-export interface IGridTableRow {
+export interface IWorkqueueRow {
   displayItems: IDynamicValues[]
   columns: IColumn[]
   getRowClickHandler: (
@@ -79,7 +84,7 @@ export const IconWrapper = styled(ContentWrapper)`
   padding-top: 8px;
 `
 
-export const GridTableRowDesktop = (props: IGridTableRow) => {
+export const WorkqueueRowDesktop = (props: IWorkqueueRow) => {
   return (
     <>
       {props.displayItems.map((item, index) => {

@@ -14,10 +14,7 @@ import React from 'react'
 import { TableView } from '@opencrvs/components/lib/interface/TableView'
 import { Divider } from '@opencrvs/components/lib/interface/Divider'
 import styled from '@client/styledComponents'
-import {
-  ISearchLocation,
-  ColumnContentAlignment
-} from '@opencrvs/components/lib/interface'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { getFormattedDate, getPageItems, getStatusLabel } from './utils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'

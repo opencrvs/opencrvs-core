@@ -13,11 +13,11 @@ import { Uploaded } from '@opencrvs/components/lib/icons/Uploaded'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 
 import {
+  Workqueue,
   ColumnContentAlignment,
-  GridTable,
   COLUMNS,
   SORT_ORDER
-} from '@opencrvs/components/lib/interface/GridTable'
+} from '@opencrvs/components/lib/Workqueue'
 import {
   GQLHumanName,
   GQLEventSearchResultSet,
@@ -66,7 +66,7 @@ import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { FormTabs } from '@opencrvs/components/lib/forms'
-import { IAction } from '@opencrvs/components/lib/interface/GridTable/types'
+import { IAction } from '@opencrvs/components/lib/common-types'
 import {
   IconWithName,
   IconWithNameEvent,
@@ -556,12 +556,11 @@ export class InProgressComponent extends React.Component<
     isShowPagination: boolean
   ) => {
     return (
-      <GridTable
+      <Workqueue
         content={this.transformRemoteDraftsContent(data)}
         columns={this.getColumns()}
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
-        sortedCol={this.state.sortedCol}
         hideLastBorder={!isShowPagination}
       />
     )
@@ -572,12 +571,11 @@ export class InProgressComponent extends React.Component<
     isShowPagination: boolean
   ) => {
     return (
-      <GridTable
+      <Workqueue
         content={this.transformRemoteDraftsContent(data)}
         columns={this.getColumns()}
         loading={this.props.loading}
         sortOrder={this.state.sortOrder}
-        sortedCol={this.state.sortedCol}
         hideLastBorder={!isShowPagination}
       />
     )
@@ -667,11 +665,10 @@ export class InProgressComponent extends React.Component<
         noContent={noContent}
       >
         {(!selectorId || selectorId === SELECTOR_ID.ownDrafts) && (
-          <GridTable
+          <Workqueue
             content={this.transformDraftContent()}
             columns={this.getColumns()}
             loading={isFieldAgent ? false : this.props.loading}
-            sortedCol={this.state.sortedCol}
             sortOrder={this.state.sortOrder}
             hideLastBorder={!isShowPagination}
           />

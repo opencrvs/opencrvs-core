@@ -15,7 +15,7 @@ import {
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
 import styled from 'styled-components'
-import { NoResultText } from '@opencrvs/components/lib/interface/GridTable/GridTable'
+import { NoResultText } from '@opencrvs/components/lib/Workqueue'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
   LoadingIndicator,

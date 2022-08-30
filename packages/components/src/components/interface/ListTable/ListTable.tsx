@@ -11,10 +11,14 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { LoadMore } from '../GridTable/LoadMore'
-import { IColumn, IDynamicValues, IFooterFColumn } from '../GridTable/types'
-import { ColumnContentAlignment } from '../GridTable'
 import { Pagination } from '../../Pagination'
+import { ColumnContentAlignment } from '../../common-types'
+import {
+  IDynamicValues,
+  IColumn,
+  IFooterFColumn,
+  LoadMore
+} from '../../Workqueue'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean
