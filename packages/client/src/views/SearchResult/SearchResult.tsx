@@ -53,10 +53,10 @@ import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 
 import {
   ColumnContentAlignment,
-  GridTable,
+  Workqueue,
   IAction,
   COLUMNS
-} from '@opencrvs/components/lib/interface'
+} from '@opencrvs/components/lib/Workqueue'
 import { Frame } from '@opencrvs/components/lib/Frame'
 
 import { SearchEventsQuery } from '@client/utils/gateway'
@@ -495,7 +495,7 @@ export class SearchResultView extends React.Component<
                             )}
                           </ToolTipContainer>
                         </ReactTooltip>
-                        <GridTable
+                        <Workqueue
                           content={this.transformSearchContent(
                             data.searchEvents
                           )}

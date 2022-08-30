@@ -45,8 +45,6 @@ body,
   }
   *:not(i) {
     font-family: ${theme.fonts.fontFamily};
-    font-style: normal;
-    font-weight: 400;
   }
 }
 
@@ -81,6 +79,7 @@ WebFont.load({
 })
 
 export const parameters = {
+  viewMode: 'docs',
   actions: { argTypesRegex: '^on[A-Z].*' },
   controls: {
     matchers: {

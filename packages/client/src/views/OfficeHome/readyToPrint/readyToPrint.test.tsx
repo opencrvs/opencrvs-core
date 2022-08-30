@@ -28,7 +28,7 @@ import {
 import { waitForElement } from '@client/tests/wait-for-element'
 import { createClient } from '@client/utils/apolloClient'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
 import * as React from 'react'
@@ -313,7 +313,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
       { store, history }
     )
 
-    const element = await waitForElement(testComponent, GridTable)
+    const element = await waitForElement(testComponent, Workqueue)
     const data = element.prop('content')
     const EXPECTED_DATE_OF_DECLARATION = formattedDuration(Number(TIME_STAMP))
 
@@ -339,7 +339,7 @@ describe('RegistrarHome ready to print tab related tests', () => {
     )
 
     testComponent.update()
-    const data = testComponent.find(GridTable).prop('content')
+    const data = testComponent.find(Workqueue).prop('content')
     expect(data.length).toBe(0)
   })
 

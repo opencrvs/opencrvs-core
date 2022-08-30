@@ -32,7 +32,7 @@ import { REGISTRATION_HOME_QUERY } from '@client/views/OfficeHome/queries'
 import { OfficeHome } from '@client/views/OfficeHome/OfficeHome'
 import { EVENT_STATUS } from '@client/views/OfficeHome/utils'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import ApolloClient from 'apollo-client'
 import { ReactWrapper } from 'enzyme'
 import { merge } from 'lodash'
@@ -281,9 +281,9 @@ describe('OfficeHome sent for review tab related tests', () => {
       { store, history }
     )
 
-    const gridTable = await waitForElement(testComponent, GridTable)
+    const workqueue = await waitForElement(testComponent, Workqueue)
 
-    const data = gridTable.prop('content')
+    const data = workqueue.prop('content')
     const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
       Number.parseInt(TIME_STAMP)
     )
@@ -318,8 +318,8 @@ describe('OfficeHome sent for review tab related tests', () => {
       { store, history }
     )
 
-    const gridTable = await waitForElement(testComponent, GridTable)
-    const data = gridTable.prop('content')
+    const workqueue = await waitForElement(testComponent, Workqueue)
+    const data = workqueue.prop('content')
     expect(data.length).toBe(0)
   })
 

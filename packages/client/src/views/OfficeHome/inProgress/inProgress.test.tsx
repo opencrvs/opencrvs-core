@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { GridTable } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import {
   createDeclaration,
   IDeclaration,
@@ -292,7 +292,7 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-      const data = testComponent.find(GridTable).prop('content')
+      const data = testComponent.find(Workqueue).prop('content')
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(TIME_STAMP)
 
       expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
@@ -542,7 +542,7 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-      const data = testComponent.find(GridTable).prop('content')
+      const data = testComponent.find(Workqueue).prop('content')
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
       expect(data[0].id).toBe('956281c9-1f47-4c26-948a-970dd23c4094')
       expect(data[0].name).toBe('k m abdullah al amin khan')
@@ -881,7 +881,7 @@ describe('In Progress tab', () => {
         setTimeout(resolve, 100)
       })
       testComponent.update()
-      const data = testComponent.find(GridTable).prop('content')
+      const data = testComponent.find(Workqueue).prop('content')
       const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
 
       expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')

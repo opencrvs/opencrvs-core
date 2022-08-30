@@ -31,18 +31,18 @@ import {
 } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import {
-  LoadingGrey,
-  ColumnContentAlignment
-} from '@opencrvs/components/lib/interface'
 import { Table } from '@opencrvs/components/lib/Table'
+import { LoadingGrey } from '@opencrvs/components/lib/interface'
 import {
   NOTIFICATION_TYPE,
   ToastNotification
 } from '@client/components/interface/ToastNotification'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { ITheme } from '@opencrvs/components/lib/theme'
-import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import {
+  IColumn,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/Workqueue'
 import { getUserAuditDescription } from '@client/views/SysAdmin/Team/utils'
 import { constantsMessages } from '@client/i18n/messages/constants'
 import {

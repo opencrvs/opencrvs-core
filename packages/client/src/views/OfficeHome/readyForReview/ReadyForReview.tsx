@@ -18,11 +18,11 @@ import styled, { ITheme } from '@client/styledComponents'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
   ColumnContentAlignment,
-  GridTable,
-  IAction,
+  Workqueue,
   COLUMNS,
-  SORT_ORDER
-} from '@opencrvs/components/lib/interface'
+  SORT_ORDER,
+  IDynamicValues
+} from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -55,8 +55,7 @@ import {
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
-import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
+import { IAction } from '@opencrvs/components/lib/common-types'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -349,12 +348,11 @@ class ReadyForReviewComponent extends React.Component<
             )}
           </ToolTipContainer>
         </ReactTooltip>
-        <GridTable
+        <Workqueue
           content={this.transformDeclaredContent(data)}
           columns={this.getColumns()}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
-          sortedCol={this.state.sortedCol}
           hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>

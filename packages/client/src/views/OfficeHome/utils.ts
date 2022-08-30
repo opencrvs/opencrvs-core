@@ -9,8 +9,11 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
-import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/interface'
+import {
+  IDynamicValues,
+  COLUMNS,
+  SORT_ORDER
+} from '@opencrvs/components/lib/Workqueue'
 import { orderBy } from 'lodash'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 export interface IQueryData {

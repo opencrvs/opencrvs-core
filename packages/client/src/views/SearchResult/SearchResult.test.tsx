@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Spinner, GridTable } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/interface'
+import { Workqueue } from '@opencrvs/components/lib/Workqueue'
 import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
 import { merge } from 'lodash'
 import * as React from 'react'
@@ -323,7 +324,7 @@ describe('SearchResult tests', () => {
       setTimeout(resolve, 100)
     })
     testComponent.update()
-    const data = testComponent.find(GridTable).prop('content')
+    const data = testComponent.find(Workqueue).prop('content')
     expect(data.length).toEqual(6)
   })
 

@@ -47,10 +47,7 @@ import {
   SubmissionAction
 } from '@client/forms'
 import { lookup } from 'country-data'
-import {
-  ActionPageLight,
-  ColumnContentAlignment
-} from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import {
@@ -88,6 +85,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { IGQLLocation } from '@client/utils/userUtils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 
 const SupportingDocument = styled.div`
   display: flex;
