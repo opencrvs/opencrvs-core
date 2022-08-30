@@ -14,6 +14,7 @@ import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { Text } from './Text'
 import { Stack } from '../Stack'
+import { UserIcon } from '../icons/User.stories'
 
 export default {
   title: 'Typography/Text',
@@ -46,6 +47,15 @@ export const Heading = () => (
     </Text>
     <Text variant="h4" as="h4">
       The gold standard for digital civil registration
+    </Text>
+  </Stack>
+)
+
+export const HeadingWithIcon = () => (
+  <Stack>
+    <UserIcon />
+    <Text variant="h4" as="span">
+      Profile page
     </Text>
   </Stack>
 )
