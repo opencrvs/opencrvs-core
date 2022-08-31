@@ -33,6 +33,7 @@ on:
           - config
       replicas:
         description: No of replicas deployed in the environemt
+        default: "1"
         required: true
       version_label:
         description: The version label for the backups
