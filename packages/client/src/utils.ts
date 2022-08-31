@@ -18,11 +18,7 @@ export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 export async function validateApplicationVersion() {
   const runningVer = localStorage.getItem('running-version')
 
-  if (
-    !runningVer ||
-    (runningVer !== APPLICATION_VERSION &&
-      isNewAppVersion(runningVer, APPLICATION_VERSION))
-  ) {
+  if (!runningVer || runningVer !== APPLICATION_VERSION) {
     localStorage.setItem('running-version', APPLICATION_VERSION)
     const userData = await storage.getItem('USER_DATA')
     const allUserData: IUserData[] = !userData
@@ -35,16 +31,4 @@ export async function validateApplicationVersion() {
 
     await storage.setItem('USER_DATA', JSON.stringify(allUserData))
   }
-}
-
-function isNewAppVersion(oldVer: string, newVer: string) {
-  const oldParts = oldVer.split('.')
-  const newParts = newVer.split('.')
-  for (let i = 0; i < newParts.length; i++) {
-    const a = Number(newParts[i])
-    const b = Number(oldParts[i])
-    if (a > b) return true
-    if (a < b) return false
-  }
-  return false
 }
