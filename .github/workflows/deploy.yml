@@ -10,6 +10,17 @@
 name: Deploy
 
 on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
+      core-image-tag:
+        type: string
+        required: true
+      farajaland-image-tag:
+        type: string
+        required: true
   workflow_dispatch:
     inputs:
       environment:

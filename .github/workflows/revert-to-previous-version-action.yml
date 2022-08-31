@@ -19,33 +19,67 @@ on:
         default: config
         options:
           - config
+          - staging
       replicas:
         description: No of replicas deployed in the environemt
         default: "1"
         required: true
-      version_label:
+      version_tag:
         type: choice
-        description: The version to revert back to
+        description: The version tag to revert back to
         required: true
         default: v1.0.1
         options:
           - v1.0.1
 jobs:
-  backup:
+  get-image-tags:
+    runs-on: ubuntu-latest
+    outputs:
+      core-image-tag: ${{ steps.core.outputs.core-image-tag }}
+      farajaland-image-tag: ${{ steps.farajaland.outputs.farajaland-image-tag }}
+    env:
+      VERSION_TAG: ${{ github.event.inputs.version_tag }}
+    steps:
+      - name: Checking out core repo
+        uses: actions/checkout@v2
+      - name: Checking out the country config repo
+        run: |
+          git clone https://github.com/opencrvs/opencrvs-farajaland.git
+      - name: Set core image tag as output
+        id: core
+        run: |
+          cd opencrvs-core
+          echo "::set-output name=core-image-tag::$(git rev-parse --short=7 tags/$VERSION_TAG)"
+          cd ../
+      - name: Set farajaland image tag as output
+        id: farajaland
+        run: |
+          cd opencrvs-farajaland
+          echo "::set-output name=farajaland-image-tag::$(git rev-parse --short=7 tags/$VERSION_TAG)"
+          cd ../
+  deploy:
+    needs: get-image-tags
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: ${{ github.event.inputs.environment }}
+      core-image-tag: ${{ needs.get-image-tags.outputs.core-image-tag }}
+      farajaland-image-tag: ${{ needs.get-image-tags.outputs.farajaland-image-tag }}
+  restore-data:
+    needs: deploy
     environment: ${{ github.event.inputs.environment }}
     runs-on: ubuntu-latest
     env:
       SSH_HOST: farajaland-${{ github.event.inputs.environment }}.opencrvs.org
       REPLICAS: ${{ github.event.inputs.replicas }}
-      VERSION_LABEL: ${{ github.event.inputs.version_label }}
+      VERSION_TAG: ${{ github.event.inputs.version_tag }}
     steps:
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
         with:
           key: ${{ secrets.SSH_KEY }}
           known_hosts: ${{ secrets.KNOWN_HOSTS }}
-      - name: Create backup data in given environment and copy it over to the backup environment
-        run: ssh root@$SSH_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD ELASTICSEARCH_ADMIN_USER=$ELASTICSEARCH_ADMIN_USER ELASTICSEARCH_ADMIN_PASSWORD=$ELASTICSEARCH_ADMIN_PASSWORD /opt/opencrvs/infrastructure/emergency-restore-metadata.sh $VERSION_LABEL $REPLICAS "
+      - name: Restore previous version data
+        run: ssh root@$SSH_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD ELASTICSEARCH_ADMIN_USER=$ELASTICSEARCH_ADMIN_USER ELASTICSEARCH_ADMIN_PASSWORD=$ELASTICSEARCH_ADMIN_PASSWORD /opt/opencrvs/infrastructure/emergency-restore-metadata.sh $VERSION_TAG $REPLICAS"
         env:
           MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
           MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
