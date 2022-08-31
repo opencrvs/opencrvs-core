@@ -9,10 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from 'styled-components'
-
-export const H4 = styled.h4`
-  ${({ theme }) => theme.fonts.h2};
-  color: ${({ theme }) => theme.colors.copy};
-  margin: 0;
-`
+export * from './Text'

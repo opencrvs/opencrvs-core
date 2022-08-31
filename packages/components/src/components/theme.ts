@@ -10,22 +10,16 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { colors, gradients, shadows } from './colors'
-import { fonts, IFonts } from './fonts'
-import { grid, IGrid } from './grid'
+import { fonts, family as fontFamily } from './fonts'
+import { grid } from './grid'
 
-// Use alpha-2 country codes
-
-export interface ITheme {
-  colors: typeof colors
-  gradients: typeof gradients
-  shadows: typeof shadows
-  fonts: IFonts
-  grid: IGrid
-}
-export const getTheme = (): ITheme => ({
+export const getTheme = () => ({
   colors,
   gradients,
   shadows,
-  fonts: fonts(),
+  fonts,
+  fontFamily,
   grid
 })
+
+export type ITheme = ReturnType<typeof getTheme>

@@ -11,7 +11,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { IFonts } from '../fonts'
+import { IFont } from '../fonts'
 
 type IPillType = 'active' | 'inactive' | 'pending' | 'default'
 
@@ -35,7 +35,7 @@ const colorMap: Record<IPillType, string> = {
   pending: 'rgba(252, 236, 217, 1)'
 }
 
-const fontMap: Record<IPillSize, keyof IFonts> = {
+const fontMap: Record<IPillSize, IFont> = {
   small: 'bold12',
   medium: 'bold14'
 }

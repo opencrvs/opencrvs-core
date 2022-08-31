@@ -22,7 +22,6 @@ import { TextInput, Select, InputError } from '@opencrvs/components/lib/forms'
 import { find, at } from 'lodash'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { H4 } from '@opencrvs/components/lib/typography/Headings'
 import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData,
