@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Header } from '@client/components/interface/Header/Header'
+import { Header } from '@client/components/Header/Header'
 import {
   Content,
   ContentSize

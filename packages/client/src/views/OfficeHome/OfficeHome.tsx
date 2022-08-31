@@ -16,7 +16,7 @@ import {
   SUBMISSION_STATUS,
   updateRegistrarWorkqueue
 } from '@client/declarations'
-import { Header } from '@client/components/interface/Header/Header'
+import { Header } from '@client/components/Header/Header'
 import { messages as certificateMessage } from '@client/i18n/messages/views/certificate'
 import {
   goToEvents,
