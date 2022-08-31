@@ -210,12 +210,7 @@ export const resolvers: GQLResolver = {
       }
 
       ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-        try {
-          const r = await markRecordAsDownloadedAndAssigned(hit._id, authHeader)
-          console.log(r)
-        } catch (err) {
-          console.log(err.message)
-        }
+        await markRecordAsDownloadedAndAssigned(hit._id, authHeader)
       })
 
       return {
