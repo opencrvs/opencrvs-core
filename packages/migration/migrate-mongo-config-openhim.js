@@ -11,17 +11,17 @@
  */
 const config = {
   mongodb: {
-    url: process.env.MONGO_URL || "mongodb://localhost/hearth-dev",
+    url: process.env.OPENHIM_MONGO_URL || 'mongodb://localhost/openhim-dev',
     options: {
       useNewUrlParser: true, // removes a deprecation warning when connecting
-      useUnifiedTopology: true, // removes a deprecating warning when connecting
+      useUnifiedTopology: true // removes a deprecating warning when connecting
     }
   },
-  migrationsDir: "migrations",
-  changelogCollectionName: "changelog",
-  migrationFileExtension: ".js",
+  migrationsDir: 'migrations/openhim',
+  changelogCollectionName: 'changelog',
+  migrationFileExtension: '.cjs',
   useFileHash: false,
-  moduleSystem: 'esm',
+  moduleSystem: 'esm'
 }
 
 export default config

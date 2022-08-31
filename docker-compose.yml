@@ -162,7 +162,8 @@ services:
       dockerfile: ./packages/migration/Dockerfile
     restart: unless-stopped
     environment:
-      - MONGO_URL=mongodb://mongo1/hearth-dev
+      - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
+      - OPENHIM_MONGO_URL=mongodb://mongo1/openhim-dev
       - INFLUX_HOST=influxdb
       - INFLUX_PORT=8086
       - INFLUX_DB=ocrvs
