@@ -11,10 +11,11 @@
  */
 import * as Hapi from '@hapi/hapi'
 import { logger } from '@search/logger'
-import { internal } from '@hapi/boom'
+import { badRequest, internal } from '@hapi/boom'
 import {
   searchComposition,
-  DEFAULT_SIZE
+  DEFAULT_SIZE,
+  advancedSearch
 } from '@search/features/search/service'
 import {
   IAdvancedSearchParam,
@@ -25,7 +26,7 @@ import { ICompositionBody, EVENT } from '@search/elasticsearch/utils'
 import { ApiResponse } from '@elastic/elasticsearch'
 import { getLocationHirarchyIDs } from '@search/features/fhir/fhir-utils'
 import { updateComposition } from '@search/elasticsearch/dbhelper'
-import { advancedQueryBuilder, capitalize } from '@search/features/search/utils'
+import { capitalize } from '@search/features/search/utils'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
 
 export async function searchDeclaration(
@@ -260,18 +261,11 @@ export async function advancedRecordSearch(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const payload = request.payload as IAdvancedSearchParam
-    const response = await client.search({
-      index: OPENCRVS_INDEX_NAME,
-      type: 'compositions',
-      body: {
-        query: advancedQueryBuilder(payload)
-      }
-    })
-
-    const resp = { payload, response }
-    return h.response(resp).code(200)
+    const response = await advancedSearch(
+      request.payload as IAdvancedSearchParam
+    )
+    return h.response(response).code(200)
   } catch (err) {
-    return internal(err)
+    return badRequest(err.message)
   }
 }

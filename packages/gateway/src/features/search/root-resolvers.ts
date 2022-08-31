@@ -10,10 +10,15 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ApiResponse } from '@elastic/elasticsearch'
-import { postSearch } from '@gateway/features/fhir/utils'
-import { ISearchCriteria } from '@gateway/features/search/type-resolvers'
+import { postAdvancedSearch, postSearch } from '@gateway/features/fhir/utils'
+import {
+  IAdvancedSearchParam,
+  ISearchCriteria
+} from '@gateway/features/search/type-resolvers'
 import { hasScope, inScope } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
+import { Options } from '@hapi/boom'
+import { markRecordAsDownloadedAndAssigned } from '@gateway/features/registration/root-resolvers'
 
 // Complete definition of the Search response
 interface IShardsResponse {
@@ -187,45 +192,43 @@ export const resolvers: GQLResolver = {
           []
       }
     },
-    async searchRecord(
-      _,
-      {
-        event,
-        eventLocationId,
-        childFirstName,
-        childLastName,
-        childDoB,
-        deceasedFirstNames,
-        deceasedFamilyName,
-        deathDate,
-        deathDateStart,
-        deathDateEnd,
-        motherFirstNames,
-        motherFamilyName,
-        motherDoB,
-        motherIdentifier,
-        fatherFirstNames,
-        fatherFamilyName,
-        fatherDoB,
-        fatherIdentifier,
-        informantFirstNames,
-        informantFamilyName,
-        contactNumber,
-        registrationNumber,
-        trackingId,
-        dateOfRegistration,
-        dateOfRegistrationStart,
-        dateOfRegistrationEnd
-      },
-      authHeader
-    ) {
+    async searchRecord(_, searchCriteria: IAdvancedSearchParam, authHeader) {
       if (authHeader && !hasScope(authHeader, 'recordsearch')) {
         return await Promise.reject(new Error('User does not have permission'))
       }
 
+      const searchResult: ApiResponse<ISearchResponse<any>> =
+        await postAdvancedSearch(authHeader, searchCriteria)
+
+      if (
+        searchResult &&
+        searchResult.statusCode &&
+        searchResult.statusCode >= 400
+      ) {
+        const errMsg = searchResult as Options<string>
+        return await Promise.reject(new Error(errMsg.message))
+      }
+
+      ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
+        try {
+          const r = await markRecordAsDownloadedAndAssigned(hit._id, authHeader)
+          console.log(r)
+        } catch (err) {
+          console.log(err.message)
+        }
+      })
+
       return {
-        results: [],
-        totalItems: 0
+        totalItems:
+          (searchResult &&
+            searchResult.body.hits &&
+            searchResult.body.hits.total.value) ||
+          0,
+        results:
+          (searchResult &&
+            searchResult.body.hits &&
+            searchResult.body.hits.hits) ||
+          []
       }
     }
   }
