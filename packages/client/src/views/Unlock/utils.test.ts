@@ -12,6 +12,7 @@ import { pinLoader } from './utils'
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+import { vi } from 'vitest'
 
 describe('Unlock page loads Properly', () => {
   const expectedPin =
@@ -29,12 +30,12 @@ describe('Unlock page loads Properly', () => {
       ])
     }
 
-    storage.getItem = jest.fn(async (key: string) =>
+    storage.getItem = vi.fn(async (key: string) =>
       // @ts-ignore
       Promise.resolve(indexedDB[key])
     )
 
-    storage.setItem = jest.fn(
+    storage.setItem = vi.fn(
       // @ts-ignore
       async (key: string, value: string) => (indexedDB[key] = value)
     )

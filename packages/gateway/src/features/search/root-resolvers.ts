@@ -87,7 +87,11 @@ export const resolvers: GQLResolver = {
         if (locationIds.length <= 0 || locationIds.includes('')) {
           return await Promise.reject(new Error('Invalid location id'))
         }
-        searchCriteria.declarationLocationId = locationIds
+        if (locationIds.length === 1) {
+          searchCriteria.declarationLocationId = locationIds[0]
+        } else {
+          searchCriteria.declarationLocationId = locationIds
+        }
       } else if (authHeader && !hasScope(authHeader, 'register')) {
         // Only register scope user can search without locationIds
         return await Promise.reject(new Error('User does not have permission'))

@@ -10,3 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
+
+export function isNavigatorOnline() {
+  return navigator.onLine
+}

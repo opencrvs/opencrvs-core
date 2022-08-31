@@ -9,11 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-/* eslint-disable @typescript-eslint/no-var-requires */
-import { GlobalWithFetchMock } from 'jest-fetch-mock'
 import { storage } from '@client/storage'
 import { IUserData } from './declarations'
-import { noop } from 'lodash'
 import * as CommonUtils from '@client/utils/commonUtils'
 import { referenceApi } from './utils/referenceApi'
 import { authApi } from './utils/authApi'
@@ -21,104 +18,16 @@ import 'core-js/features/array/flat'
 import 'jsdom-worker'
 import { roleQueries } from './forms/user/query/queries'
 import { userQueries } from './user/queries'
-import debounce from 'lodash/debounce'
 import { mockOfflineData } from './tests/mock-offline-data'
 import './tests/queryMock'
-
-if (process.env.CI) {
-  jest.setTimeout(30000)
-}
-
-jest.mock('@client/forms/configuration/default', () => ({
-  ...jest.requireActual('@client/forms/configuration/default'),
-  registerForms: mockOfflineData.forms.registerForm
-}))
-
-jest.mock('@client/forms/user/fieldDefinitions/createUser', () => ({
-  createUserForm: mockOfflineData.forms.userForm
-}))
-
-/*
- * Initialize mocks
- */
-
-const customGlobal: GlobalWithFetchMock = global as GlobalWithFetchMock
-customGlobal.fetch = require('jest-fetch-mock')
-customGlobal.fetchMock = customGlobal.fetch
-jest.mock('lodash/debounce', () => jest.fn((fn) => fn))
-
-/*
- * Local storage
- */
-
-const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn()
-}
-
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-  writable: true
-})
-
-/*
- * Page Visibility
- */
-
-const hiddenMock = jest.fn()
-Object.defineProperty(document, 'hidden', {
-  get() {
-    return hiddenMock()
-  },
-  set(bool) {
-    hiddenMock.mockReturnValue(Boolean(bool))
-  }
-})
-
-/*
- * Storage module
- */
-
-const storageGetItemMock = jest.fn()
-const storageSetItemMock = jest.fn()
-storage.getItem = storageGetItemMock
-storage.setItem = storageSetItemMock
-
-/*
- * Console
- */
-
-const warn = jest.fn()
-const error = jest.fn()
-const debug = jest.fn()
-/* eslint-disable no-console */
-console.warn = warn
-console.error = error
-console.debug = debug
-
-/* eslint-enable no-console */
-/*
- * GraphQL Queries
- */
-
-const { queries } = require('./profile/queries')
-queries.fetchUserDetails = jest.fn()
-roleQueries.fetchRoles = jest.fn()
-userQueries.searchUsers = jest.fn()
+import { vi } from 'vitest'
+import createFetchMock from 'vitest-fetch-mock'
 
 /*
  * Navigator & Window
  */
-
-const navigatorMock = {
-  onLine: true
-}
-;(window as any).navigator = navigatorMock
-window.HTMLElement.prototype.scrollIntoView = jest.fn()
-;(window as any).scrollTo = noop
-;(window as any).config = {
+window.HTMLElement.prototype.scrollIntoView = vi.fn()
+const config = {
   API_GATEWAY_URL: 'http://localhost:7070/',
   CONFIG_API_URL: 'http://localhost:2021',
   LOGIN_URL: 'http://localhost:3020',
@@ -155,19 +64,90 @@ window.HTMLElement.prototype.scrollIntoView = jest.fn()
   ADDRESSES: 1
 }
 
+vi.stubGlobal('config', config)
+
+/*
+ * GraphQL Queries
+ */
+/* eslint-disable import/first */
+import { queries } from './profile/queries'
+
 /*
  * Country configuration
  */
-
-const {
+/* eslint-disable import/first */
+import {
   mockUserResponse,
   mockConfigResponse,
   userDetails,
   validToken,
-  getItem
-} = require('./tests/util')
+  getItem,
+  setItem
+} from './tests/util'
 
-jest.mock(
+vi.doMock('@client/forms/configuration/default', async () => ({
+  ...((await vi.importActual('@client/forms/configuration/default')) as any),
+  registerForms: mockOfflineData.forms.registerForm
+}))
+
+vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
+  createUserForm: mockOfflineData.forms.userForm
+}))
+
+/*
+ * Initialize mocks
+ */
+const fetchMock = createFetchMock(vi)
+fetchMock.enableMocks()
+
+const localStorageMock = {
+  getItem,
+  setItem,
+  removeItem: vi.fn(),
+  clear: vi.fn()
+}
+
+vi.stubGlobal('localStorage', localStorageMock)
+
+/*
+ * Page Visibility
+ */
+
+const hiddenMock = vi.fn()
+Object.defineProperty(document, 'hidden', {
+  get() {
+    return hiddenMock()
+  },
+  set(bool) {
+    hiddenMock.mockReturnValue(Boolean(bool))
+  }
+})
+
+/*
+ * Storage module
+ */
+
+const storageGetItemMock = vi.fn()
+const storageSetItemMock = vi.fn()
+storage.getItem = storageGetItemMock
+storage.setItem = storageSetItemMock
+
+/*
+ * Console
+ */
+
+const warn = vi.fn()
+const error = vi.fn()
+const debug = vi.fn()
+/* eslint-disable no-console */
+console.warn = warn
+console.error = error
+console.debug = debug
+queries.fetchUserDetails = vi.fn()
+roleQueries.fetchRoles = vi.fn()
+userQueries.searchUsers = vi.fn()
+
+vi.doMock(
   '@client/utils/referenceApi',
   (): {
     referenceApi: typeof referenceApi
@@ -185,7 +165,7 @@ jest.mock(
   })
 )
 
-jest.mock(
+vi.doMock(
   '@client/utils/authApi',
   (): {
     authApi: typeof authApi
@@ -201,7 +181,7 @@ beforeEach(() => {
    * Reset all mocks
    */
 
-  ;(debounce as jest.Mock).mockImplementation((fn) => fn)
+  getItem.mockReturnValue(validToken)
   storageGetItemMock.mockReset()
   storageSetItemMock.mockReset()
   warn.mockReset()
@@ -209,7 +189,7 @@ beforeEach(() => {
   debug.mockReset()
   hiddenMock.mockReset()
 
-  Date.now = jest.fn(() => 1487076708000) // 2017-02-14
+  Date.now = vi.fn(() => 1487076708000) // 2017-02-14
 
   /*
    * Assign sane defaults for everything
@@ -217,11 +197,10 @@ beforeEach(() => {
    * in the test suite
    */
 
-  jest.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
+  vi.spyOn(CommonUtils, 'isMobileDevice').mockReturnValue(true)
   window.history.replaceState({}, '', '/')
 
-  getItem.mockReturnValue(validToken)
-  queries.fetchUserDetails.mockReturnValue(mockUserResponse)
+  queries.fetchUserDetails = vi.fn().mockReturnValue(mockUserResponse)
 
   const userData: IUserData[] = [
     {
@@ -244,3 +223,15 @@ beforeEach(() => {
     (key: keyof typeof indexedDB, value: string) => (indexedDB[key] = value)
   )
 })
+vi.mock('lodash/debounce', () => ({
+  default: vi.fn().mockImplementation((arg) => arg)
+}))
+vi.mock('./utils', () => ({ isNavigatorOnline: () => true }))
+
+vi.mock('react-router', async () => ({
+  ...((await vi.importActual('react-router')) as any),
+  useParams: () => ({
+    event: 'birth',
+    section: 'child'
+  })
+}))

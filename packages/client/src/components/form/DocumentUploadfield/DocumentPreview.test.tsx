@@ -12,9 +12,10 @@
 import * as React from 'react'
 import { createShallowRenderedComponent } from '@client/tests/util'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
+import { vi } from 'vitest'
 
 describe('image upload component', () => {
-  const mock = jest.fn()
+  const mock = vi.fn()
   const testComponent = createShallowRenderedComponent(
     <DocumentPreview
       previewImage={{
