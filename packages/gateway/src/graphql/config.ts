@@ -89,6 +89,7 @@ export const getApolloConfig = (): Config => {
   return {
     typeDefs,
     resolvers,
+    nodeEnv: 'development',
     context: async ({ request, h }) => {
       try {
         const userId = getUserId({
