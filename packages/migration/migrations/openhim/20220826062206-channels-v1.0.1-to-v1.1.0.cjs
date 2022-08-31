@@ -75,6 +75,7 @@ exports.up = async (db, client) => {
 }
 
 exports.down = async (db, client) => {
+  const session = client.startSession()
   try {
     await session.withTransaction(async () => {
       await removeChannel(db, newChannel)
