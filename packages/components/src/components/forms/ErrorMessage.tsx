@@ -16,5 +16,4 @@ export const ErrorMessage = styled.p`
   background: ${({ theme }) => theme.colors.negative};
   padding: 8px 24px;
   text-align: center;
-  width: 100%;
 `
