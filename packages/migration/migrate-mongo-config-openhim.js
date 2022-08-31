@@ -11,7 +11,7 @@
  */
 const config = {
   mongodb: {
-    url: process.env.OPENHIM_MONGODB_URL || 'mongodb://localhost/openhim-dev',
+    url: process.env.OPENHIM_MONGO_URL || 'mongodb://localhost/openhim-dev',
     options: {
       useNewUrlParser: true, // removes a deprecation warning when connecting
       useUnifiedTopology: true // removes a deprecating warning when connecting

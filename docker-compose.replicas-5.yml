@@ -32,8 +32,8 @@ services:
 
   migration:
     environment:
-      - MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/hearth-dev?replicaSet=rs0
-      - OPENHIM_MONGODB_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/openhim-dev?replicaSet=rs0
+      - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/hearth-dev?replicaSet=rs0
+      - OPENHIM_MONGO_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1,mongo2,mongo3,mongo4,mongo5/openhim-dev?replicaSet=rs0
     depends_on:
       - mongo1
       - mongo2
