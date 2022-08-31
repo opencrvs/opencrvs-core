@@ -306,8 +306,6 @@ export async function touchBundle(
   const practitioner = await getLoggedInPractitionerResource(token)
 
   const payload = getTokenPayload(token)
-  console.log(payload)
-
   /* setting lastRegLocation here */
   if (!payload.scope.includes(USER_SCOPE.RECORD_SEARCH)) {
     await setupLastRegLocation(taskResource, practitioner)
