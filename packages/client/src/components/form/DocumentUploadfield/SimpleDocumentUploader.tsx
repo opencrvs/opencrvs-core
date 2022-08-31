@@ -23,7 +23,6 @@ import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { getBase64String, ErrorMessage } from './DocumentUploaderWithOption'
-import { Transform } from 'json2csv'
 
 const DocumentUploader = styled(ImageUploader)`
   color: ${({ theme }) => theme.colors.primary};
@@ -55,6 +54,7 @@ type IFullProps = {
   disableDeleteInPreview?: boolean
   onComplete: (files: IAttachmentValue | {}) => void
   touched?: boolean
+  className?: string
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
   previewTransformer?: (files: IAttachmentValue) => IAttachmentValue
@@ -150,16 +150,6 @@ class SimpleDocumentUploaderComponent extends React.Component<
     this.props.onComplete('')
     this.closePreviewSection()
   }
-  // previewTransformer = async (e: any) => {
-  //   e.preventDefault()
-  //   const reader = new FileReader()
-  //   reader.onload = (e) => {
-  //     const text = e.target.result
-  //     console.log(text, 'preview transformer')
-  //     return text
-  //   }
-  //   reader.readAsText(e.target.files[0])
-  // }
 
   handleDarkSideForce = (image: any) => {
     return image.toString()
@@ -210,6 +200,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
         )}
         {(!files || !files.data) && (
           <DocumentUploader
+            className={this.props.className}
             id="upload_document"
             title={intl.formatMessage(messages.uploadFile)}
             handleFileChange={this.handleFileChange}

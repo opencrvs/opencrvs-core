@@ -187,9 +187,6 @@ export function GovtLogo() {
               files={logoFile}
               onUploadingStateChanged={onUploadingStateChanged}
               error={errorMessages}
-              previewTransformer={(file: any) => {
-                return returnSelectFileString(file)
-              }}
             />
           </Field>
         </Content>
@@ -217,8 +214,4 @@ export function GovtLogo() {
       </FloatingNotification>
     </>
   )
-}
-function returnSelectFileString(file: any) {
-  console.log(file)
-  return file
 }

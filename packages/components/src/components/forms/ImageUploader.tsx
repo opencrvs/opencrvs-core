@@ -38,6 +38,7 @@ interface IImagePickerProps {
   handleFileChange: (file: File) => void
   onClick?: (event: React.MouseEvent<HTMLElement>) => void
   disabled?: boolean
+  className?: string
 }
 
 export class ImageUploader extends React.Component<IImagePickerProps, {}> {
