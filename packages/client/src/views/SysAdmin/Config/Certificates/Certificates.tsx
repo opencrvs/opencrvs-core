@@ -47,7 +47,7 @@ import {
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { IAttachmentValue, IFormFieldValue, IForm } from '@client/forms'
+import { IAttachmentValue, IForm, IFormFieldValue } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import {
@@ -569,8 +569,8 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   ? intl.formatMessage(messages.birthTemplate)
                   : intl.formatMessage(messages.deathTemplate)
               }
-              goBack={this.closePreviewSection}
-              onDelete={this.onDelete}
+              goBack={() => this.closePreviewSection.bind(this)}
+              onDelete={() => this.onDelete.bind(this)}
             />
           )}
         </SysAdminContentWrapper>

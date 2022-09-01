@@ -23,6 +23,12 @@ import styled from 'styled-components'
 import { DocumentListPreview } from './DocumentListPreview'
 import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { getBase64String, ErrorMessage } from './DocumentUploaderWithOption'
+import {
+  closePreviewSection,
+  handleFileChange,
+  onDelete,
+  selectForPreview
+} from './utils'
 
 const DocumentUploader = styled(ImageUploader)`
   color: ${({ theme }) => theme.colors.primary};
@@ -184,9 +190,9 @@ class SimpleDocumentUploaderComponent extends React.Component<
         </ErrorMessage>
         <DocumentListPreview
           attachment={files}
-          onSelect={this.selectForPreview}
+          onSelect={() => selectForPreview.bind(this)}
           label={label}
-          onDelete={this.onDelete}
+          onDelete={() => onDelete.bind(this)}
           processingDocuments={this.state.filesBeingUploaded}
         />
         {this.state.previewImage && (
@@ -194,8 +200,8 @@ class SimpleDocumentUploaderComponent extends React.Component<
             previewImage={this.state.previewImage}
             disableDelete={disableDeleteInPreview}
             title={intl.formatMessage(buttonMessages.preview)}
-            goBack={this.closePreviewSection}
-            onDelete={this.onDelete}
+            goBack={() => closePreviewSection.bind(this)}
+            onDelete={() => onDelete.bind(this)}
           />
         )}
         {(!files || !files.data) && (
@@ -203,7 +209,7 @@ class SimpleDocumentUploaderComponent extends React.Component<
             className={this.props.className}
             id="upload_document"
             title={intl.formatMessage(messages.uploadFile)}
-            handleFileChange={this.handleFileChange}
+            handleFileChange={() => handleFileChange.bind(this)}
           />
         )}
       </>
