@@ -56,6 +56,7 @@ type IFullProps = {
   touched?: boolean
   onUploadingStateChanged?: (isUploading: boolean) => void
   requiredErrorMessage?: MessageDescriptor
+  previewTransformer?: (files: IAttachmentValue) => IAttachmentValue
 } & IntlShapeProps
 
 type IState = {
@@ -130,6 +131,13 @@ class SimpleDocumentUploaderComponent extends React.Component<
   }
 
   selectForPreview = (previewImage: IFormFieldValue) => {
+    if (this.props.previewTransformer) {
+      return this.setState({
+        previewImage: this.props.previewTransformer(
+          previewImage as IAttachmentValue
+        )
+      })
+    }
     this.setState({ previewImage: previewImage as IAttachmentValue })
   }
 

@@ -124,9 +124,33 @@ function getPDFTemplateWithSVG(
 ): IPDFTemplate {
   let svgTemplate
   if (declaration.event === Event.Birth) {
-    svgTemplate = offlineResource.templates.certificates!.birth.definition
+    if (
+      offlineResource.templates.certificates!.birth.definition.includes(
+        'data:image/svg+xml;base64'
+      )
+    ) {
+      svgTemplate = atob(
+        offlineResource.templates.certificates!.birth.definition.split(
+          'data:image/svg+xml;base64,'
+        )[1]
+      )
+    } else {
+      svgTemplate = offlineResource.templates.certificates!.birth.definition
+    }
   } else {
-    svgTemplate = offlineResource.templates.certificates!.death.definition
+    if (
+      offlineResource.templates.certificates!.death.definition.includes(
+        'data:image/svg+xml;base64'
+      )
+    ) {
+      svgTemplate = atob(
+        offlineResource.templates.certificates!.death.definition.split(
+          'data:image/svg+xml;base64,'
+        )[1]
+      )
+    } else {
+      svgTemplate = offlineResource.templates.certificates!.death.definition
+    }
   }
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,
@@ -143,7 +167,12 @@ export function downloadFile(
   data: string,
   fileName: string
 ) {
-  const linkSource = `data:${contentType};base64,${window.btoa(data)}`
+  let linkSource
+  if (data.includes('data:image/svg+xml;base64')) {
+    linkSource = data
+  } else {
+    linkSource = `data:${contentType};base64,${window.btoa(data)}`
+  }
   const downloadLink = document.createElement('a')
   downloadLink.setAttribute('href', linkSource)
   downloadLink.setAttribute('download', fileName)
