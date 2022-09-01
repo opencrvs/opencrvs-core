@@ -1793,3 +1793,15 @@ export function wrapInBundle(...resources: [fhir.Resource | string]): string {
     }))
   })
 }
+
+export const mosipSuccessMock = JSON.stringify({
+  transactionID: '5763906453',
+  version: '1.0',
+  id: 'mosip.identity.auth',
+  errors: null,
+  responseTime: '2022-08-30T08:15:11.033Z',
+  response: {
+    authStatus: true,
+    authToken: '257803821990055124230310596669133515'
+  }
+})
