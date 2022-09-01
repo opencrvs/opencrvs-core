@@ -100,7 +100,7 @@ interface IBaseProps {
   event: Event
   pageRoute: string
   declarationId: string
-  declaration: IPrintableDeclaration | undefined
+  declaration: IPrintableDeclaration
   formSection: IFormSection
   formGroup: IFormSectionGroup
   offlineCountryConfiguration: IOfflineData
@@ -357,55 +357,6 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
     )
     const declarationToBeCertified = declaration
 
-    if (
-      !declarationToBeCertified ||
-      !declarationToBeCertified.data.registration.regStatus
-    ) {
-      return (
-        <QueryProvider
-          event={event}
-          action={DownloadAction.LOAD_CERTIFICATE_DECLARATION}
-          payload={{ id: declarationId }}
-          fetchPolicy="no-cache"
-        >
-          <QueryContext.Consumer>
-            {({ loading, error, data, dataKey }) => {
-              if (loading) {
-                return <StyledSpinner id="print-certificate-spinner" />
-              }
-              if (error) {
-                Sentry.captureException(error)
-
-                return (
-                  <ErrorText id="print-certificate-queue-error-text">
-                    {intl.formatMessage(errorMessages.printQueryError)}
-                  </ErrorText>
-                )
-              }
-              if (data) {
-                const retrievedData = data[dataKey as keyof typeof data]
-                const transformedData: IFormData = gqlToDraftTransformer(
-                  registerForm,
-                  retrievedData
-                )
-
-                const newDeclarationToBeCertified = createReviewDeclaration(
-                  declarationId,
-                  transformedData,
-                  event
-                )
-
-                if (declarationToBeCertified) {
-                  this.props.modifyDeclaration(newDeclarationToBeCertified)
-                } else {
-                  this.props.storeDeclaration(newDeclarationToBeCertified)
-                }
-              }
-            }}
-          </QueryContext.Consumer>
-        </QueryProvider>
-      )
-    }
     return (
       <>
         <ActionPageLight
@@ -528,7 +479,7 @@ const mapStateToProps = (
 
   const declaration = state.declarationsState.declarations.find(
     (declaration) => declaration.id === registrationId
-  ) as IPrintableDeclaration | undefined
+  ) as IPrintableDeclaration
 
   const formSection = getCollectCertificateForm(event, state)
   const userDetails = getUserDetails(state)
