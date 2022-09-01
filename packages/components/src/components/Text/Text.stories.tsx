@@ -33,19 +33,19 @@ Default.args = {
 
 export const Heading = () => (
   <Stack direction="column" alignItems="flex-start">
-    <Text variant="hero" as="h1">
+    <Text variant="hero" element="h1">
       The gold standard for digital...
     </Text>
-    <Text variant="h1" as="h2">
+    <Text variant="h1" element="h2">
       The gold standard for digital civil registration
     </Text>
-    <Text variant="h2" as="h3">
+    <Text variant="h2" element="h3">
       The gold standard for digital civil registration
     </Text>
-    <Text variant="h3" as="h4">
+    <Text variant="h3" element="h4">
       The gold standard for digital civil registration
     </Text>
-    <Text variant="h4" as="h4">
+    <Text variant="h4" element="h4">
       The gold standard for digital civil registration
     </Text>
   </Stack>
@@ -54,7 +54,7 @@ export const Heading = () => (
 export const HeadingWithIcon = () => (
   <Stack>
     <UserIcon />
-    <Text variant="h4" as="span">
+    <Text variant="h4" element="span">
       Profile page
     </Text>
   </Stack>
@@ -62,28 +62,28 @@ export const HeadingWithIcon = () => (
 
 export const Body = () => (
   <Stack direction="column" alignItems="flex-start">
-    <Text variant="reg18" as="p">
+    <Text variant="reg18" element="p">
       The gold standard for digital civil registration
     </Text>
-    <Text variant="bold18" as="p">
+    <Text variant="bold18" element="p">
       The gold standard for digital civil registration
     </Text>
-    <Text variant="reg16" as="p">
+    <Text variant="reg16" element="p">
       The gold standard for digital civil registration
     </Text>
-    <Text variant="bold16" as="p">
+    <Text variant="bold16" element="p">
       The gold standard for digital civil registration
     </Text>
-    <Text variant="reg14" as="p">
+    <Text variant="reg14" element="p">
       The gold standard for digital civil registration
     </Text>
-    <Text variant="bold14" as="p">
+    <Text variant="bold14" element="p">
       The gold standard for digital civil registration
     </Text>
-    <Text variant="reg12" as="p">
+    <Text variant="reg12" element="p">
       The gold standard for digital civil registration
     </Text>
-    <Text variant="bold12" as="p">
+    <Text variant="bold12" element="p">
       The gold standard for digital civil registration
     </Text>
   </Stack>

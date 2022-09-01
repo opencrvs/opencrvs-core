@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export * from './Box'
-export * from './Header'
 export * from './Spinner'
 export * from './Tabs'
 export * from './Modal'
@@ -29,7 +28,6 @@ export * from './ExpandingMenu/ExpandingMenu'
 export * from './ExpandableNotification/ExpandableNotification'
 export * from './Loader'
 export * from './Header/AppHeader'
-export * from './Header/PageHeader'
 export * from './ToggleMenu'
 export * from './ViewData'
 export * from './ResponsiveModal'

@@ -13,7 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { BackArrowDeepBlue, Cross } from '../icons'
 import { CircleButton } from '../buttons'
-import { IPageHeaderProps, PageHeader } from './Header/PageHeader'
+import { AppBar, IAppBarProps } from '../AppBar'
 const ActionContainer = styled.div`
   width: 100%;
 `
@@ -66,7 +66,7 @@ export class ActionPageLight extends React.Component<
 > {
   getHeaderLeft = () => {
     const { icon, goBack, backLabel } = this.props
-    return [
+    return (
       <BackButtonContainer
         id="action_page_back_button"
         onClick={goBack}
@@ -75,24 +75,24 @@ export class ActionPageLight extends React.Component<
         <CircleButton>{(icon && icon()) || <BackArrowDeepBlue />}</CircleButton>
         <BackButtonText>{backLabel ? backLabel : ''}</BackButtonText>
       </BackButtonContainer>
-    ]
+    )
   }
   getHeaderRight = () => {
     const { goHome } = this.props
-    return [
-      (goHome && (
+    return (
+      goHome && (
         <CircleButton id="crcl-btn" onClick={goHome} key="crcl-btn">
           <Cross color="currentColor" />
         </CircleButton>
-      )) || <></>
-    ]
+      )
+    )
   }
 
   render() {
     const { id, title, hideBackground } = this.props
 
-    const pageHeaderProps: IPageHeaderProps = {
-      id: 'pageHeader',
+    const appBarProps: IAppBarProps = {
+      id: 'appBar',
       mobileTitle: title,
       mobileLeft: this.getHeaderLeft(),
       mobileRight: this.getHeaderRight(),
@@ -103,7 +103,7 @@ export class ActionPageLight extends React.Component<
 
     return (
       <ActionContainer id={id}>
-        <PageHeader {...pageHeaderProps} />
+        <AppBar {...appBarProps} />
         <Container hideBackground={hideBackground}>
           {this.props.children}
         </Container>

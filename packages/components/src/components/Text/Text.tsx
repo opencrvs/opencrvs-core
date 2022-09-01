@@ -21,18 +21,25 @@ export interface ITextProps extends React.HTMLAttributes<HTMLSpanElement> {
   /** Typographic variant. Defines how the text looks like */
   variant: IFont
   /** Element type. Required for making semantically correct hierarchies, for example `h2` or `p` */
-  as: Element
+  element: Element
   /** Color */
   color?: IColor
 }
 
-const StyledText = styled.span<{ variant: IFont }>`
+const StyledText = styled.span<{ variant: IFont; color: IColor }>`
   ${({ variant }) => fonts[variant]}
-  ${({ color }) => color && `color: ${colors[color]};`}
+  ${({ color }) => `color: ${colors[color]};`}
 `
 
 /** Text helps present your content with correct hierarchy and font sizes */
-export const Text = ({ variant, as, color = 'copy', ...props }: ITextProps) => {
-  const Component = StyledText.withComponent(as)
-  return <Component variant={variant} color={color} {...props} />
-}
+export const Text = ({
+  variant,
+  element,
+  color = 'copy',
+  children,
+  ...props
+}: ITextProps) => (
+  <StyledText variant={variant} color={color} as={element} {...props}>
+    {children}
+  </StyledText>
+)

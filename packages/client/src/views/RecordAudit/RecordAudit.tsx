@@ -59,8 +59,6 @@ import { IOfflineData } from '@client/offline/reducer'
 import {
   ResponsiveModal,
   Loader,
-  PageHeader,
-  IPageHeaderProps,
   ErrorToastNotification
 } from '@opencrvs/components/lib/interface'
 import { getScope } from '@client/profile/profileSelectors'
@@ -125,6 +123,7 @@ import {
 import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { Frame } from '@opencrvs/components/lib/Frame'
+import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -132,7 +131,7 @@ const DesktopHeader = styled(Header)`
   }
 `
 
-const MobileHeader = styled(PageHeader)`
+const MobileHeader = styled(AppBar)`
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
@@ -514,7 +513,7 @@ function RecordAuditBody({
     draft
   }
 
-  const mobileProps: IPageHeaderProps = {
+  const mobileProps: IAppBarProps = {
     id: 'mobileHeader',
     mobileTitle:
       declaration.name || intl.formatMessage(recordAuditMessages.noName),
