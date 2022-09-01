@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import { Warning } from '../icons'
-import { Paragraph } from '../typography'
 import styled from 'styled-components'
+import { Text } from '../Text'
 
 interface IErrorTextProps {
   id?: string
@@ -35,16 +35,14 @@ const Container = styled.div<{ ignoreMediaQuery?: boolean }>`
       : ''
   }}
 `
-const StyledParagraph = styled(Paragraph)`
-  ${({ theme }) => theme.fonts.bold16};
-  color: ${({ theme }) => theme.colors.negative};
-`
 
 export function ErrorText(props: IErrorTextProps) {
   return (
     <Container id={props.id} ignoreMediaQuery={props.ignoreMediaQuery}>
       <Warning />
-      <StyledParagraph>{props.children}</StyledParagraph>
+      <Text variant="bold16" element="p" color="negative">
+        {props.children}
+      </Text>
     </Container>
   )
 }

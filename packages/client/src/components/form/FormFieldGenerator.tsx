@@ -20,7 +20,8 @@ import {
   WarningMessage,
   RadioSize
 } from '@opencrvs/components/lib/forms'
-import { Paragraph, Link } from '@opencrvs/components/lib/typography'
+import { Link } from '@opencrvs/components/lib/typography'
+import { Text } from '@opencrvs/components/lib/Text'
 import {
   internationaliseFieldObject,
   getConditionalActionsForField,
@@ -431,14 +432,14 @@ function GeneratedInputField({
     const label = fieldDefinition.label as unknown as MessageDescriptor
 
     return (
-      <Paragraph fontSize={fieldDefinition.fontSize}>
+      <Text variant={fieldDefinition.fontVariant ?? 'reg16'} element="p">
         <FormattedMessage
           {...label}
           values={{
             [fieldDefinition.name]: value as any
           }}
         />
-      </Paragraph>
+      </Text>
     )
   }
   if (fieldDefinition.type === LIST) {

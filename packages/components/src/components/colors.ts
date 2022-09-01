@@ -105,3 +105,5 @@ export const colors = {
   neutralDark: darken(0.2)(config.neutral),
   negativeDark: darken(0.2)(config.negative)
 }
+
+export type IColor = keyof typeof colors

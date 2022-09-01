@@ -36,6 +36,7 @@ import { IUserDetails } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'
 import { IQuestionConfig } from './questionConfig'
+import { IFont } from '@opencrvs/components/lib/fonts'
 
 export const TEXT = 'TEXT'
 export const TEL = 'TEL'
@@ -560,7 +561,7 @@ export interface IDynamicListFormField extends IFormFieldBase {
 }
 export interface IParagraphFormField extends IFormFieldBase {
   type: typeof PARAGRAPH
-  fontSize?: string
+  fontVariant?: string
 }
 export interface IImageUploaderWithOptionsFormField extends IFormFieldBase {
   type: typeof IMAGE_UPLOADER_WITH_OPTIONS
@@ -1093,7 +1094,7 @@ export interface Ii18nListFormField extends Ii18nFormFieldBase {
 }
 export interface Ii18nParagraphFormField extends Ii18nFormFieldBase {
   type: typeof PARAGRAPH
-  fontSize?: string
+  fontVariant?: IFont
 }
 export interface Ii18nImageUploaderWithOptionsFormField
   extends Ii18nFormFieldBase {
