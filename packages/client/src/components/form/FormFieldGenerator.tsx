@@ -432,7 +432,7 @@ function GeneratedInputField({
     const label = fieldDefinition.label as unknown as MessageDescriptor
 
     return (
-      <Text variant={fieldDefinition.fontVariant ?? 'reg16'} as="p">
+      <Text variant={fieldDefinition.fontVariant ?? 'reg16'} element="p">
         <FormattedMessage
           {...label}
           values={{
