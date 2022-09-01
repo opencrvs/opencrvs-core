@@ -22,7 +22,7 @@ import {
   testFhirBundle,
   testFhirBundleWithIdsForDeath,
   officeMock,
-  patientMock,
+  mosipDeceasedPatientMock,
   mosipSuccessMock
 } from '@workflow/test/utils'
 import { Events } from '@workflow/features/events/handler'
@@ -220,12 +220,10 @@ describe('Verify utility functions', () => {
 })
 
 describe('getMosipUINToken functions', () => {
-  it('Calls mosip token seeder function and returns success', async () => {
+  it.only('Calls mosip token seeder function and returns success', async () => {
     fetch.mockResponse(mosipSuccessMock)
-    const mosipResponse = await getMosipUINToken(patientMock)
-
-    expect(trackingId).toBeDefined()
-    expect(trackingId.length).toBe(7)
-    expect(trackingId).toMatch(/^B/)
+    const mosipResponse = await getMosipUINToken(mosipDeceasedPatientMock)
+    const response = await JSON.parse(mosipSuccessMock)
+    expect(mosipResponse).toEqual(response)
   })
 })

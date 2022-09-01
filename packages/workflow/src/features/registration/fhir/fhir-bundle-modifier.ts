@@ -723,7 +723,8 @@ export async function validateDeceasedDetails(
           `MOSIP RESPONSE: ${JSON.stringify(mosipTokenSeederResponse)}`
         )
         if (
-          mosipTokenSeederResponse.errors.length ||
+          (mosipTokenSeederResponse.errors &&
+            mosipTokenSeederResponse.errors.length) ||
           !mosipTokenSeederResponse.response.authToken
         ) {
           logger.info(
@@ -779,13 +780,13 @@ export async function validateDeceasedDetails(
               type: 'DECEASED_PATIENT_ENTRY',
               value: patient.id
             } as fhir.CodeableConcept)
+            await updateResourceInHearth(birthPatient)
+            // mark patient with link to the birth patient
+            patient.identifier?.push({
+              type: 'BIRTH_PATIENT_ENTRY',
+              value: birthPatient.id
+            } as fhir.CodeableConcept)
           }
-          await updateResourceInHearth(birthPatient)
-          // mark patient with link to the birth patient
-          patient.identifier?.push({
-            type: 'BIRTH_PATIENT_ENTRY',
-            value: birthPatient.id
-          } as fhir.CodeableConcept)
         }
       } catch (err) {
         logger.info(`MOSIP token seeder request failed: ${JSON.stringify(err)}`)
