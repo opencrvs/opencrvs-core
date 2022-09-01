@@ -36,10 +36,7 @@ export const Text = ({
   variant,
   element,
   color = 'copy',
-  children,
   ...props
 }: ITextProps) => (
-  <StyledText variant={variant} color={color} as={element} {...props}>
-    {children}
-  </StyledText>
+  <StyledText variant={variant} color={color} as={element} {...props} />
 )
