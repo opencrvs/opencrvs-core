@@ -73,6 +73,7 @@ import {
   ApplyButton,
   Field
 } from '@client/views/SysAdmin/Config/Application/Components'
+import { replace } from 'lodash'
 
 const HiddenInput = styled.input`
   display: none;
@@ -129,24 +130,7 @@ function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
 async function updatePreviewSvgWithSampleSignature(
   svgCode: string
 ): Promise<string> {
-  console.log(svgCode)
-
-  const html = document.createElement('html')
-  html.innerHTML = svgCode
-  const certificateImages = html.querySelectorAll('image')
-  const signatureImage = Array.from(certificateImages).find(
-    (image) => image.getAttribute('data-content') === 'signature'
-  )
-  if (signatureImage) {
-    const baseURL = window.location.origin
-    const res = await fetch(`${baseURL}/assets/sample-signature.png`)
-    const blob = await res.blob()
-    const base64signature = await blobToBase64(blob)
-    signatureImage.setAttribute('xlink:href', base64signature as string)
-  }
-
-  svgCode = html.getElementsByTagName('svg')[0].outerHTML
-  return unescape(encodeURIComponent(svgCode))
+  return atob(svgCode.split('data:image/svg+xml;base64,')[1])
 }
 
 export const printDummyCertificate = async (
@@ -231,15 +215,10 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
             event,
             this.props.registerForm
           )
-
           svgCode = executeHandlebarsTemplate(svgCode, dummyTemplateData)
-          svgCode = await updatePreviewSvgWithSampleSignature(svgCode)
-          const linkSource = `data:${SVGFile.type};base64,${window.btoa(
-            svgCode
-          )}`
           this.setState({
             eventName: event,
-            previewImage: { type: SVGFile.type, data: linkSource }
+            previewImage: { type: SVGFile.type, data: svgCode }
           })
         }
       },
@@ -610,7 +589,6 @@ function mapStateToProps(state: IStoreState) {
 }
 
 function modifyPreviewImage(file: any) {
-  console.log(file, 'modified')
   return file
 }
 
