@@ -49,6 +49,9 @@ jobs:
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
       - name: Checking out the country config repo
         run: |
           git clone https://github.com/opencrvs/opencrvs-farajaland.git
