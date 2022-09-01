@@ -26,7 +26,7 @@ import {
 } from '@search/features/registration/assignment/handler'
 import { deleteOCRVSIndexHandler } from '@search/features/delete/handler'
 
-const enum RouteScope {
+export const enum RouteScope {
   DECLARE = 'declare',
   VALIDATE = 'validate',
   REGISTER = 'register',
