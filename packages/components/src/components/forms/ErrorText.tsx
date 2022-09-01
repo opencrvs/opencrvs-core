@@ -40,7 +40,7 @@ export function ErrorText(props: IErrorTextProps) {
   return (
     <Container id={props.id} ignoreMediaQuery={props.ignoreMediaQuery}>
       <Warning />
-      <Text variant="bold16" as="p" color="negative">
+      <Text variant="bold16" element="p" color="negative">
         {props.children}
       </Text>
     </Container>
