@@ -14,7 +14,7 @@ import styled from '@client/styledComponents'
 import { ApolloQueryResult } from 'apollo-client'
 import { ApolloConsumer } from 'react-apollo'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import {
   WrappedComponentProps as IntlShapeProps,

@@ -22,7 +22,7 @@ import * as React from 'react'
 // eslint-disable-next-line no-restricted-imports
 import { Query as ApolloQuery, QueryProps } from 'react-apollo'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 
 export function Query<T = any>(props: QueryProps<T>) {
   return (

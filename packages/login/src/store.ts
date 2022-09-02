@@ -34,7 +34,7 @@ import {
 import { reducer as formReducer, FormStateMap, FormAction } from 'redux-form'
 import { loginReducer, LoginState } from '@login/login/reducer'
 import { intlReducer, IntlState } from '@login/i18n/reducer'
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 import createSentryMiddleware from 'redux-sentry-middleware'
 
 export interface IStoreState {

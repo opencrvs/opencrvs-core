@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 // eslint-disable-next-line no-restricted-imports
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/react'
 import styled from '@client/styledComponents'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { PageWrapper } from '@opencrvs/components/lib/layout/PageWrapper'
@@ -40,60 +40,50 @@ const ErrorMessage = styled.div`
 
 type IFullProps = React.PropsWithChildren<IntlShapeProps>
 
-interface IErrorInfo extends React.ErrorInfo {
-  [key: string]: string
-}
+const development = ['127.0.0.1', 'localhost'].includes(
+  window.location.hostname
+)
 
 class StyledErrorBoundaryComponent extends React.Component<IFullProps> {
   state = { error: null, authError: false }
 
-  componentDidCatch(error: Error, errorInfo: IErrorInfo) {
+  onError = (error: Error) => {
     this.setState({ error, authError: error.message === '401' })
-
-    Sentry.withScope((scope) => {
-      Object.keys(errorInfo).forEach((key) => {
-        scope.setExtra(key, errorInfo[key])
-      })
-      Sentry.captureException(error)
-    })
   }
 
   render() {
     const { intl } = this.props
-    if (this.state.error) {
-      if (
-        window.location.hostname !== 'localhost' &&
-        window.location.hostname !== '127.0.0.1'
-      ) {
-        Sentry.showReportDialog()
-      }
 
-      return (
-        <PageWrapper>
-          <ErrorContainer>
-            <ErrorTitle>
-              {this.state.authError &&
-                intl.formatMessage(errorMessages.errorCodeUnauthorized)}
-              {this.state.authError
-                ? intl.formatMessage(errorMessages.errorTitleUnauthorized)
-                : intl.formatMessage(errorMessages.errorTitle)}
-            </ErrorTitle>
-            <ErrorMessage>
-              {intl.formatMessage(errorMessages.unknownErrorDescription)}
-            </ErrorMessage>
-            <TertiaryButton
-              id="GoToHomepage"
-              onClick={() => (window.location.href = '/')}
-            >
-              {intl.formatMessage(buttonMessages.goToHomepage)}
-            </TertiaryButton>
-          </ErrorContainer>
-        </PageWrapper>
-      )
-    } else {
-      // when there's not an error, render children untouched
-      return this.props.children
-    }
+    return (
+      <Sentry.ErrorBoundary
+        showDialog={!development}
+        onError={this.onError}
+        fallback={
+          <PageWrapper>
+            <ErrorContainer>
+              <ErrorTitle>
+                {this.state.authError &&
+                  intl.formatMessage(errorMessages.errorCodeUnauthorized)}
+                {this.state.authError
+                  ? intl.formatMessage(errorMessages.errorTitleUnauthorized)
+                  : intl.formatMessage(errorMessages.errorTitle)}
+              </ErrorTitle>
+              <ErrorMessage>
+                {intl.formatMessage(errorMessages.unknownErrorDescription)}
+              </ErrorMessage>
+              <TertiaryButton
+                id="GoToHomepage"
+                onClick={() => (window.location.href = '/')}
+              >
+                {intl.formatMessage(buttonMessages.goToHomepage)}
+              </TertiaryButton>
+            </ErrorContainer>
+          </PageWrapper>
+        }
+      >
+        {this.props.children}
+      </Sentry.ErrorBoundary>
+    )
   }
 }
 
