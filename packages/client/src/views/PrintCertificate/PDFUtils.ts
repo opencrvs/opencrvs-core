@@ -123,34 +123,19 @@ function getPDFTemplateWithSVG(
   pageSize: PageSize
 ): IPDFTemplate {
   let svgTemplate
-  if (declaration.event === Event.Birth) {
-    if (
-      offlineResource.templates.certificates!.birth.definition.includes(
-        'data:image/svg+xml;base64'
-      )
-    ) {
-      svgTemplate = atob(
-        offlineResource.templates.certificates!.birth.definition.split(
-          'data:image/svg+xml;base64,'
-        )[1]
-      )
-    } else {
-      svgTemplate = offlineResource.templates.certificates!.birth.definition
-    }
+  if (
+    offlineResource.templates.certificates![
+      declaration.event
+    ].definition.includes('data:image/svg+xml;base64')
+  ) {
+    svgTemplate = atob(
+      offlineResource.templates.certificates![
+        declaration.event
+      ].definition.split('data:image/svg+xml;base64,')[1]
+    )
   } else {
-    if (
-      offlineResource.templates.certificates!.death.definition.includes(
-        'data:image/svg+xml;base64'
-      )
-    ) {
-      svgTemplate = atob(
-        offlineResource.templates.certificates!.death.definition.split(
-          'data:image/svg+xml;base64,'
-        )[1]
-      )
-    } else {
-      svgTemplate = offlineResource.templates.certificates!.death.definition
-    }
+    svgTemplate =
+      offlineResource.templates.certificates![declaration.event].definition
   }
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,

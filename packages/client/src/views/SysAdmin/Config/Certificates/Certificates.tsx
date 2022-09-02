@@ -568,7 +568,43 @@ function mapStateToProps(state: IStoreState) {
 }
 
 function modifyPreviewImage(file: any) {
-  return file
+  let fileData = atob(file.data.split('data:image/svg+xml;base64,')[1])
+  const listToChange = [
+    '{{registrationNumber}}',
+    '{{certificateDate}}',
+    '{{childFirstName}}',
+    '{{childFamilyName}}',
+    '{{eventDate}}',
+    '{{placeOfBirth}}',
+    '{{registrationLocation}}',
+    '{{deceasedFirstName}}',
+    '{{deceasedFamilyName}}',
+    '{{placeOfDeath}}',
+    '{{registrarName}}',
+    '{{role}}'
+  ]
+  const replacedWith = [
+    '2022BLOQITK',
+    '02 September 2022',
+    'Jane',
+    'Smith',
+    '19th May 2021',
+    'Ibombo, Central',
+    'Ibombo District Ofce, Ibombo District, Central Province',
+    'Jane',
+    'Smith',
+    'Ibombo, Central',
+    'Cornel Prime',
+    'Registrar'
+  ]
+
+  for (let i = 0; i < listToChange.length; i++) {
+    fileData = fileData.replace(listToChange[i], replacedWith[i])
+  }
+  const linkSource = `data:image/svg+xml;base64,${btoa(fileData)}`
+  const doc = file
+  doc.data = linkSource
+  return doc
 }
 
 export const CertificatesConfig = connect(mapStateToProps, {
