@@ -568,7 +568,7 @@ function mapStateToProps(state: IStoreState) {
 }
 
 function modifyPreviewImage(file: any) {
-  let fileData = atob(file.data.split('data:image/svg+xml;base64,')[1])
+  let fileData = atob(file.data.split(',')[1])
   const listToChange = [
     '{{registrationNumber}}',
     '{{certificateDate}}',

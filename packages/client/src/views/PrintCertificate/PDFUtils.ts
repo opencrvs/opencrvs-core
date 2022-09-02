@@ -131,7 +131,7 @@ function getPDFTemplateWithSVG(
     svgTemplate = atob(
       offlineResource.templates.certificates![
         declaration.event
-      ].definition.split('data:image/svg+xml;base64,')[1]
+      ].definition.split(',')[1]
     )
   } else {
     svgTemplate =
@@ -153,7 +153,7 @@ export function downloadFile(
   fileName: string
 ) {
   let linkSource
-  if (data.includes('data:image/svg+xml;base64')) {
+  if (data.includes(`data:${contentType};base64`)) {
     linkSource = data
   } else {
     linkSource = `data:${contentType};base64,${window.btoa(data)}`
