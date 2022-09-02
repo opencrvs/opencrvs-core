@@ -15,7 +15,8 @@ import { statuses } from '../utils/userUtils'
 import { IUserName, UserNameSchema } from '@user-mgnt/model/user'
 
 export interface ISystem {
-  name: IUserName[]
+  name: string
+  createdBy: IUserName[]
   username: string
   client_id: string
   secretHash: string
@@ -24,13 +25,17 @@ export interface ISystem {
   practitionerId: string
   scope: string[]
   status: string
+  settings: {
+    dailyQuota: number
+  }
   creationDate?: number
 }
 
 export interface ISystemModel extends ISystem, Document {}
 
 const systemSchema = new Schema({
-  name: { type: [UserNameSchema], required: true },
+  name: { type: String, required: true },
+  createdBy: { type: [UserNameSchema], required: true },
   username: { type: String, required: true },
   client_id: { type: String, required: true },
   secretHash: { type: String, required: true },
@@ -42,6 +47,9 @@ const systemSchema = new Schema({
     type: String,
     enum: [statuses.PENDING, statuses.ACTIVE, statuses.DISABLED],
     default: statuses.PENDING
+  },
+  settings: {
+    dailyQuota: { type: String, required: true }
   },
   creationDate: { type: Number, default: Date.now }
 })

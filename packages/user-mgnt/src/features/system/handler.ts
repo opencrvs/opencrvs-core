@@ -29,7 +29,11 @@ import {
 } from '@user-mgnt/features/createUser/service'
 
 interface IRegisterSystemPayload {
+  name: string
   scope: string
+  settings: {
+    dailyQuota: number
+  }
 }
 
 interface IRegisterSystemResponse {
@@ -42,7 +46,7 @@ export async function registerSystemClient(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { scope } = request.payload as IRegisterSystemPayload
+  const { scope, name, settings } = request.payload as IRegisterSystemPayload
   try {
     const token: ITokenPayload = getTokenPayload(
       request.headers.authorization.split(' ')[1]
@@ -95,14 +99,16 @@ export async function registerSystemClient(
     }
     const system = {
       client_id,
-      name: systemAdminUser.name,
+      name,
+      createdBy: systemAdminUser.name,
       username: systemAdminUser.username,
       status: statuses.ACTIVE,
       scope: systemScopes,
       practitionerId,
       secretHash: hash,
       salt,
-      sha_secret
+      sha_secret,
+      settings
     }
 
     await System.create(system)
@@ -120,7 +126,11 @@ export async function registerSystemClient(
 }
 
 export const reqRegisterSystemSchema = Joi.object({
-  scope: Joi.string().required()
+  scope: Joi.string().required(),
+  name: Joi.string().required(),
+  settings: Joi.object({
+    dailyQuota: Joi.number().required()
+  })
 })
 
 export const resRegisterSystemSchema = Joi.object({
@@ -290,13 +300,17 @@ export async function getSystemHandler(
     throw unauthorized()
   }
   return {
-    name: `${system.name[0].given} ${system.name[0].family}`,
+    name: system.name,
+    createdBy: `${system.createdBy[0].given} ${system.createdBy[0].family}`,
     client_id: system.client_id,
     username: system.username,
     status: system.status,
     scope: system.scope,
     sha_secret: system.sha_secret,
-    practitionerId: system.practitionerId
+    practitionerId: system.practitionerId,
+    settings: {
+      dailyQuota: system.settings.dailyQuota
+    }
   }
 }
 
@@ -306,10 +320,14 @@ export const getSystemRequestSchema = Joi.object({
 
 export const getSystemResponseSchema = Joi.object({
   name: Joi.string(),
+  createdBy: Joi.string(),
   username: Joi.string(),
   client_id: Joi.string(),
   status: Joi.string(),
   scope: Joi.array().items(Joi.string()),
   sha_secret: Joi.string(),
-  practitionerId: Joi.string()
+  practitionerId: Joi.string(),
+  settings: Joi.object({
+    dailyQuota: Joi.number()
+  })
 })
