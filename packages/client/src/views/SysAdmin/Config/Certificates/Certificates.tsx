@@ -109,7 +109,7 @@ interface State {
 async function updatePreviewSvgWithSampleSignature(
   svgCode: string
 ): Promise<string> {
-  return atob(svgCode.split('data:image/svg+xml;base64,')[1])
+  return atob(svgCode.split(',')[1])
 }
 
 export const printDummyCertificate = async (
