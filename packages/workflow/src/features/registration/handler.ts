@@ -38,7 +38,10 @@ import {
 import {
   sendEventNotification,
   sendRegisteredNotification,
-  isEventNonNotifiable
+  isEventNonNotifiable,
+  getEventType,
+  getComposition,
+  getPatientBySection
 } from '@workflow/features/registration/utils'
 import {
   taskHasInput,
@@ -55,7 +58,10 @@ import {
   BIRTH_REG_NUMBER_SYSTEM,
   DEATH_REG_NUMBER_SYSTEM
 } from '@workflow/features/registration/fhir/constants'
-import { getTaskResource } from '@workflow/features/registration/fhir/fhir-template'
+import {
+  getSectionEntryBySectionCode,
+  getTaskResource
+} from '@workflow/features/registration/fhir/fhir-template'
 import {
   REINSTATED_EXTENSION_URL,
   REQUEST_CORRECTION_EXTENSION_URL
@@ -423,6 +429,32 @@ export async function markEventAsCertifiedHandler(
       request.payload as fhir.Bundle,
       getToken(request)
     )
+
+    const event = getEventType(request.payload as fhir.Bundle)
+    const composition = getComposition(payload)
+
+    const section = getSectionEntryBySectionCode(
+      composition,
+      event === EVENT_TYPE.BIRTH ? CHILD_SECTION_CODE : DECEASED_SECTION_CODE
+    )
+    const patient = getPatientBySection(payload, section)
+
+    const patientFromFhir: fhir.Patient =
+      patient && (await getFromFhir(`/Patient/${patient.id}`))
+
+    if (patientFromFhir) {
+      payload.entry =
+        payload &&
+        payload.entry &&
+        payload.entry.map((e) => {
+          if (e.resource?.id === patientFromFhir.id) {
+            return { resource: patientFromFhir }
+          } else {
+            return e
+          }
+        })
+    }
+
     return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)

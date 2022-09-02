@@ -42,6 +42,15 @@ interface INotificationPayload {
   crvsOffice?: string
   registrationNumber?: string
 }
+export type Composition = fhir.Composition & { id: string }
+export type Patient = fhir.Patient & { id: string }
+export enum FHIR_RESOURCE_TYPE {
+  COMPOSITION = 'Composition',
+  TASK = 'Task',
+  ENCOUNTER = 'Encounter',
+  PAYMENT_RECONCILIATION = 'PaymentReconciliation',
+  PATIENT = 'Patient'
+}
 
 export function generateBirthTrackingId(): string {
   return generateTrackingId('B')
@@ -278,7 +287,6 @@ export function isEventNonNotifiable(event: Events) {
     ].indexOf(event) >= 0
   )
 }
-
 interface IMosipAuthData {
   vid?: string
   name?: string
@@ -375,4 +383,45 @@ export async function getMosipUINToken(
   const body = await res.json()
 
   return body
+}
+
+export function getResourceByType<T = fhir.Resource>(
+  bundle: fhir.Bundle,
+  type: string
+): T | undefined {
+  const bundleEntry =
+    bundle &&
+    bundle.entry &&
+    bundle.entry.find((entry) => {
+      if (!entry.resource) {
+        return false
+      } else {
+        return entry.resource.resourceType === type
+      }
+    })
+  return bundleEntry && (bundleEntry.resource as T)
+}
+
+export function getComposition(bundle: fhir.Bundle) {
+  return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+}
+
+export function getPatientBySection(
+  bundle: fhir.Bundle,
+  section: fhir.Reference
+) {
+  return (
+    bundle &&
+    bundle.entry &&
+    (bundle.entry.find((entry) => {
+      if (!entry.resource) {
+        return false
+      } else {
+        return (
+          entry.resource.resourceType === 'Patient' &&
+          entry.fullUrl === section.reference
+        )
+      }
+    })?.resource as fhir.Patient)
+  )
 }
