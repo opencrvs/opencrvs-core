@@ -524,6 +524,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 }
                 disableDeleteInPreview={false}
                 name={'Simple'}
+                allowedDocType={['image/svg+xml']}
                 key="cancel"
                 onComplete={(file) => {
                   this.handleCertificateFile(
