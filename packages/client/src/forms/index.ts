@@ -12,12 +12,12 @@
 import { ValidationInitializer } from '@client/utils/validate'
 import { MessageDescriptor } from 'react-intl'
 import {
-  ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
   ICheckboxOption as CheckboxComponentOption,
   THEME_MODE,
   RadioSize
 } from '@opencrvs/components/lib/forms'
+import { ISelectOption as SelectComponentOption } from '@opencrvs/components/lib/Select'
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { IDynamicValues } from '@opencrvs/client/src/navigation'

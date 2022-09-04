@@ -15,7 +15,7 @@ import { PaperClip, Delete } from '@opencrvs/components/lib/icons'
 import { IFileValue, IAttachmentValue, IFormFieldValue } from '@client/forms'
 import { Spinner } from '@opencrvs/components/lib/interface'
 import { withTheme, ITheme } from '@client/styledComponents'
-import { ISelectOption } from '@opencrvs/components/lib/forms'
+import { ISelectOption } from '@opencrvs/components/lib/Select'
 import { Button } from '@opencrvs/components/lib/buttons/Button'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'
 const Wrapper = styled.div`

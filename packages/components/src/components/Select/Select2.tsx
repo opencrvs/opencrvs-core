@@ -15,12 +15,12 @@ import styled from 'styled-components'
 import { IndicatorProps } from 'react-select/lib/components/indicators'
 import { ArrowDownBlue } from '../icons'
 
-export interface ISelectOption {
+export interface ISelect2Option {
   value: string
   label: string
 }
 
-export interface ISelectProps<T extends ISelectOption = ISelectOption> {
+export interface ISelect2Props<T extends ISelect2Option = ISelect2Option> {
   id?: string
   value: string
   options: T[]
@@ -95,7 +95,7 @@ const StyledSelect = styled(ReactSelect)<{
   }
 `
 
-const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
+const DropdownIndicator = (props: IndicatorProps<ISelect2Option>) => {
   return (
     components.DropdownIndicator && (
       <components.DropdownIndicator {...props}>
@@ -105,7 +105,7 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
   )
 }
 
-function getSelectedOption<T extends ISelectOption>(
+function getSelectedOption<T extends ISelect2Option>(
   value: string,
   options: T[]
 ): T | null {
@@ -117,8 +117,8 @@ function getSelectedOption<T extends ISelectOption>(
   return null
 }
 
-export function Select<T extends ISelectOption = ISelectOption>(
-  props: ISelectProps<T>
+export function Select2<T extends ISelect2Option = ISelect2Option>(
+  props: ISelect2Props<T>
 ) {
   function handleChange(item: T) {
     if (props.onChange) {

@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { Select, ISelectOption } from '../forms/Select'
+import { Select, ISelectOption } from '../Select'
 
 export enum SelectFieldType {
   Date
@@ -65,7 +65,7 @@ export class SelectGroup extends React.Component<ISelectGroupProps> {
 
     return (
       <Wrapper>
-        {options.map(option => {
+        {options.map((option) => {
           return (
             <StyledSelect
               id={`${name}_${option.value}`}

@@ -21,7 +21,7 @@ import {
   Message,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { InputField, Select } from '@opencrvs/components/lib/forms'
+import { Select } from '@opencrvs/components/lib/Select'
 import { IStoreState } from '@client/store'
 import {
   FloatingNotification,
@@ -43,6 +43,7 @@ import {
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { lookup } from 'country-data'
 import { ICurrency } from '@client/utils/referenceApi'
+import { InputField } from '@opencrvs/components/lib/forms'
 
 export function Currency() {
   const intl = useIntl()

@@ -33,12 +33,8 @@ import { getDefaultLanguage } from '@client/i18n/utils'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import {
-  InputField,
-  Select,
-  TextArea,
-  TextInput
-} from '@opencrvs/components/lib/forms'
+import { InputField, TextArea, TextInput } from '@opencrvs/components/lib/forms'
+import { Select } from '@opencrvs/components/lib/Select'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import {
   ListViewSimplified,

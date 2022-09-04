@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Select, ISelectOption as SelectComponentOptions } from './../forms'
+import { Select, ISelectOption as SelectComponentOptions } from '../Select'
 import { DocumentImage } from './components/DocumentImage'
 
 const Container = styled.div`

@@ -12,7 +12,6 @@
 export * from './InputField/InputField'
 export * from './InputField/InputError'
 export * from './TextInput'
-export * from './Select'
 export * from './RadioGroup/RadioGroup'
 export * from './TextArea'
 export * from './SubSectionDivider'
