@@ -10,11 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  RadioGroup,
-  TextInput,
-  RadioSize
-} from '@opencrvs/components/lib/forms'
+import { TextInput } from '@opencrvs/components/lib/forms'
+import { RadioGroup, RadioSize } from '@opencrvs/components/lib/Radio'
 import { CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'

@@ -11,11 +11,11 @@
  */
 import { ValidationInitializer } from '@client/utils/validate'
 import { MessageDescriptor } from 'react-intl'
+import { THEME_MODE } from '@opencrvs/components/lib/forms'
 import {
   IRadioOption as RadioComponentOption,
-  THEME_MODE,
   RadioSize
-} from '@opencrvs/components/lib/forms'
+} from '@opencrvs/components/lib/Radio'
 import { ICheckboxOption as CheckboxComponentOption } from '@opencrvs/components/lib/Checkbox'
 import { ISelectOption as SelectComponentOption } from '@opencrvs/components/lib/Select'
 import { ApolloQueryResult } from 'apollo-client'

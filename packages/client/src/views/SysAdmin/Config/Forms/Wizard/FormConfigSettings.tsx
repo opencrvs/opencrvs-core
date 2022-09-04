@@ -30,7 +30,7 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import styled from 'styled-components'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
-import { RadioGroup } from '@opencrvs/components/lib/forms'
+import { RadioGroup } from '@opencrvs/components/lib/Radio'
 import {
   ListViewSimplified,
   ListViewItemSimplified
