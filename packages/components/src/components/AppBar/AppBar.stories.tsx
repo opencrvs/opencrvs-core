@@ -12,16 +12,29 @@
 import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { AppBar } from './AppBar'
-import { CircleButton, PrimaryButton, SecondaryButton } from '../buttons'
-import { BackArrowDeepBlue, HelpBlue } from '../icons'
+import { CircleButton, SecondaryButton } from '../buttons'
+import {
+  BackArrowDeepBlue,
+  ForwardArrowDeepBlue,
+  Hamburger,
+  HelpBlue,
+  DeclarationIcon
+} from '../icons'
 import { Stack } from '../Stack'
+import { SearchBlueIcon } from '../icons/SearchBlue.stories'
+import { SearchTool } from '../interface'
+import { noop } from 'lodash'
 
 export default {
   title: 'Layout/AppBar',
   component: AppBar
 } as ComponentMeta<typeof AppBar>
 
-const Template: ComponentStory<typeof AppBar> = (args) => <AppBar {...args} />
+const Template: ComponentStory<typeof AppBar> = (args) => (
+  <div style={{ minHeight: '150px' }}>
+    <AppBar {...args} />
+  </div>
+)
 
 export const Default = Template.bind({}) as ComponentStory<typeof AppBar>
 Default.args = {
@@ -43,16 +56,80 @@ Default.args = {
         <HelpBlue>Button</HelpBlue>
       </CircleButton>
       <SecondaryButton>Button</SecondaryButton>
-      <PrimaryButton>Button</PrimaryButton>
+      <SecondaryButton>Button</SecondaryButton>
     </Stack>
   ),
+  mobileRight: <SecondaryButton>Button</SecondaryButton>
+}
+Default.parameters = {
+  layout: 'fullscreen'
+}
+
+export const Search = Template.bind({}) as ComponentStory<typeof AppBar>
+Search.args = {
+  mobileLeft: (
+    <CircleButton>
+      <Hamburger />
+    </CircleButton>
+  ),
+  mobileTitle: 'Search',
   mobileRight: (
+    <CircleButton>
+      <SearchBlueIcon />
+    </CircleButton>
+  ),
+  desktopLeft: (
     <Stack gap={16}>
       <CircleButton>
-        <HelpBlue>Button</HelpBlue>
+        <BackArrowDeepBlue />
       </CircleButton>
+      <CircleButton>
+        <ForwardArrowDeepBlue />
+      </CircleButton>
+    </Stack>
+  ),
+  desktopCenter: (
+    <SearchTool
+      language="english"
+      onClearText={noop}
+      searchHandler={noop}
+      searchTypeList={[
+        {
+          icon: noop,
+          invertIcon: noop,
+          label: 'Dhaka',
+          placeHolderText: 'Dhaka',
+          value: 'Dhaka'
+        },
+        {
+          icon: noop,
+          invertIcon: noop,
+          label: 'Chittagong',
+          placeHolderText: 'Chittagong',
+          value: 'Chittagong'
+        }
+      ]}
+    />
+  ),
+  desktopRight: <SecondaryButton>Button</SecondaryButton>
+}
+
+Search.parameters = {
+  layout: 'fullscreen'
+}
+
+export const Declaration = Template.bind({}) as ComponentStory<typeof AppBar>
+
+Declaration.args = {
+  mobileLeft: <DeclarationIcon />,
+  desktopLeft: <DeclarationIcon />,
+  mobileTitle: 'Birth declaration',
+  desktopTitle: 'Birth declaration',
+  mobileRight: <Hamburger />,
+  desktopRight: (
+    <Stack gap={16}>
       <SecondaryButton>Button</SecondaryButton>
-      <PrimaryButton>Button</PrimaryButton>
+      <SecondaryButton>Button</SecondaryButton>
     </Stack>
   )
 }

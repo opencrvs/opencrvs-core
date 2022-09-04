@@ -12,6 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { grid } from '../grid'
+import { Stack } from '../Stack'
 import { Text } from '../Text'
 import { useWindowSize } from './useWindowSize'
 
@@ -23,6 +24,7 @@ const AppBarWrapper = styled.div`
   justify-content: space-between;
   background: ${({ theme }) => theme.colors.white};
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  gap: 16px;
 `
 
 const Left = styled.div`
@@ -31,11 +33,17 @@ const Left = styled.div`
   align-items: center;
   flex: 1;
   gap: 16px;
+  grid-column: 1;
 `
+
+const Center = styled.div``
+
 const Actions = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: right;
+  flex: 1;
 `
 const Title = styled(Text)`
   white-space: nowrap;
@@ -50,13 +58,14 @@ interface IProps {
   mobileRight?: React.ReactNode
   desktopLeft?: React.ReactNode
   desktopTitle?: React.ReactNode
+  desktopCenter?: React.ReactNode
   desktopRight?: React.ReactNode
 }
 
 export type IAppBarProps = IProps & React.HTMLAttributes<HTMLSpanElement>
 
 /**
- * `AppBar` is a header component used by `AppBar`. It always either renders either mobile or desktop props.
+ * `AppBar` is a header component usually used by `Frame`. It always either renders either mobile or desktop props.
  * The component gives flexibility on what is shown on either mobile or desktop.
  */
 export const AppBar = (props: IAppBarProps) => {
@@ -66,22 +75,22 @@ export const AppBar = (props: IAppBarProps) => {
     return (
       <AppBarWrapper id={props.id} className={props.className}>
         <Left>
-          {props.desktopLeft && <Actions>{props.desktopLeft}</Actions>}
+          {props.desktopLeft && <Stack>{props.desktopLeft}</Stack>}
           {props.desktopTitle && (
             <Title variant="h4" element="h1">
               {props.desktopTitle}
             </Title>
           )}
         </Left>
-
-        {props.desktopRight && <Actions>{props.desktopRight}</Actions>}
+        <Center>{props.desktopCenter}</Center>
+        <Actions>{props.desktopRight}</Actions>
       </AppBarWrapper>
     )
   } else {
     return (
       <AppBarWrapper id={props.id} className={props.className}>
         <Left>
-          {props.mobileLeft && <Actions>{props.mobileLeft}</Actions>}
+          {props.mobileLeft && <Stack>{props.mobileLeft}</Stack>}
           {props.mobileTitle && (
             <Title variant="h4" element="h1">
               {props.mobileTitle}

@@ -14,6 +14,40 @@ import { SearchBlue, ClearText } from '../../icons'
 import { Button } from '../../buttons'
 import styled from 'styled-components'
 
+const SearchBox = styled.div`
+  background: ${({ theme }) => theme.colors.grey200};
+  box-sizing: border-box;
+  border-radius: 40px;
+  width: 664px;
+  height: 40px;
+
+  &:hover {
+    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+  }
+
+  &:focus-within {
+    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+    background: ${({ theme }) => theme.colors.white};
+  }
+
+  &:active {
+    outline: 1px solid ${({ theme }) => theme.colors.grey600};
+  }
+
+  &:focus-within input {
+    background: ${({ theme }) => theme.colors.white};
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
+    width: 100%;
+  }
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    width: 100%;
+    margin: auto;
+  }
+`
+
 const Wrapper = styled.form`
   align-items: center;
   border-radius: 2px;
@@ -139,9 +173,13 @@ interface IProps {
   language: string
   searchHandler: (searchText: string, searchType: string) => void
   onClearText?: () => void
+  className?: string
 }
 export class SearchTool extends React.Component<IProps, IState> {
-  static getDerivedStateFromProps(nextProps: IProps, previousState: IState) {
+  static getDerivedStateFromProps: React.GetDerivedStateFromProps<
+    IProps,
+    IState
+  > = (nextProps, previousState) => {
     if (nextProps.language !== previousState.language) {
       return {
         selectedSearchType: nextProps.searchTypeList.find(
@@ -244,31 +282,33 @@ export class SearchTool extends React.Component<IProps, IState> {
   render() {
     const { placeHolderText } = this.state.selectedSearchType
     return (
-      <Wrapper onSubmit={this.search}>
-        <SearchBlue id="searchIconButton" onClick={this.search} />
-        <SearchTextInput
-          id="searchText"
-          type="text"
-          autoComplete="off"
-          placeholder={placeHolderText}
-          onChange={this.onChangeHandler}
-          value={this.state.searchParam}
-        />
-        {this.state.searchParam && (
-          <ClearTextIcon onClick={this.onClearTextHandler} />
-        )}
-        <DropDown id="searchType" onClick={this.toggleDropdownDisplay}>
-          <SelectedSearchCriteria>
-            <span className="selected-icon">
-              {this.state.selectedSearchType.invertIcon}
-            </span>
-            <span className="selected-label">
-              {this.state.selectedSearchType.label}
-            </span>
-          </SelectedSearchCriteria>
-        </DropDown>
-        {this.dropdown()}
-      </Wrapper>
+      <SearchBox className={this.props.className}>
+        <Wrapper onSubmit={this.search}>
+          <SearchBlue id="searchIconButton" onClick={this.search} />
+          <SearchTextInput
+            id="searchText"
+            type="text"
+            autoComplete="off"
+            placeholder={placeHolderText}
+            onChange={this.onChangeHandler}
+            value={this.state.searchParam}
+          />
+          {this.state.searchParam && (
+            <ClearTextIcon onClick={this.onClearTextHandler} />
+          )}
+          <DropDown id="searchType" onClick={this.toggleDropdownDisplay}>
+            <SelectedSearchCriteria>
+              <span className="selected-icon">
+                {this.state.selectedSearchType.invertIcon}
+              </span>
+              <span className="selected-label">
+                {this.state.selectedSearchType.label}
+              </span>
+            </SelectedSearchCriteria>
+          </DropDown>
+          {this.dropdown()}
+        </Wrapper>
+      </SearchBox>
     )
   }
 }
