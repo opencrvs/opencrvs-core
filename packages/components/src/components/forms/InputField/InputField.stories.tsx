@@ -14,7 +14,7 @@ import { Meta, Story } from '@storybook/react'
 import { ValidIndicator, VerifyingIndicator } from '..'
 import { ArrowWithGradient } from '../../icons'
 import { Select } from '../../Select'
-import { TextInput } from '../TextInput'
+import { TextInput } from '../../TextInput/TextInput'
 import { InputField, IInputFieldProps } from './InputField'
 import { DateField } from '../../DateField'
 

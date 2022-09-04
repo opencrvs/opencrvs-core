@@ -10,7 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/forms'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
 import { ResponsiveModal } from '@opencrvs/components/lib/interface'

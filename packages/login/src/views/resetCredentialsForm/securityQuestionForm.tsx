@@ -21,7 +21,8 @@ import {
   QUESTION_KEYS
 } from '@login/utils/authApi'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/forms'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'

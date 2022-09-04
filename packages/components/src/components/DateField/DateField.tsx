@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { ITextInputProps, IRef, TextInput } from '../forms/TextInput'
+import { ITextInputProps, IRef, TextInput } from '../TextInput/TextInput'
 import { InputLabel } from '../forms/InputField/InputLabel'
 import { Omit } from '../omit'
 
