@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from 'styled-components'
 export interface IGrid {
   breakpoints: {
     xs: number
@@ -39,8 +38,3 @@ export const grid: IGrid = {
   minWidth: 320,
   margin: 20
 }
-
-export const FlexGrid = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-`
