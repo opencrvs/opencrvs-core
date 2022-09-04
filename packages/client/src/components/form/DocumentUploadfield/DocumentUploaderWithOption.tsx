@@ -9,11 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  ImageUploader,
-  ISelectOption,
-  Select
-} from '@opencrvs/components/lib/forms'
+import { ISelectOption, Select } from '@opencrvs/components/lib/forms'
+import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
 import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { IFileValue, IFormFieldValue, IAttachmentValue } from '@client/forms'
