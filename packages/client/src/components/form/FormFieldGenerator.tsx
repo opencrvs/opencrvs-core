@@ -12,13 +12,13 @@
 import * as React from 'react'
 import {
   CheckboxGroup,
-  DateField,
   RadioGroup,
   Select,
   TextArea,
   TextInput,
   RadioSize
 } from '@opencrvs/components/lib/forms'
+import { DateField } from '@opencrvs/components/lib/DateField'
 import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { Link } from '@opencrvs/components/lib/typography'
 import { Text } from '@opencrvs/components/lib/Text'

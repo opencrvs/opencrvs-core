@@ -11,8 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { ITextInputProps, IRef, TextInput } from './TextInput'
-import { InputLabel } from './InputField/InputLabel'
+import { ITextInputProps, IRef, TextInput } from '../forms/TextInput'
+import { InputLabel } from '../forms/InputField/InputLabel'
 import { Omit } from '../omit'
 
 const DateWrapper = styled.div`
