@@ -10,18 +10,19 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
+import * as Recharts from 'recharts'
+import { ITheme } from 'src/components/theme'
+import styled, { withTheme } from 'styled-components'
+
+const {
   CartesianGrid,
   Legend,
   Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis
-} from 'recharts'
-import { ITheme } from 'src/components/theme'
-import styled, { withTheme } from 'styled-components'
+} = Recharts
 
 const Container = styled.div`
   box-sizing: border-box;
@@ -101,7 +102,7 @@ interface IThemedAxisTickProps extends IAxisTickProps {
 }
 
 function CustomizedAxisTick(props: IThemedAxisTickProps) {
-  const { x, y, stroke, payload, theme } = props
+  const { x, y, payload, theme } = props
   const values = payload.value.split(' ')
 
   return (
@@ -125,7 +126,7 @@ function CustomizedAxisTick(props: IThemedAxisTickProps) {
   )
 }
 
-class TriLineChartComponent extends React.Component<IProps> {
+class LineChartComponent extends React.Component<IProps> {
   render() {
     const {
       data,
@@ -145,7 +146,7 @@ class TriLineChartComponent extends React.Component<IProps> {
     return (
       <Container>
         <ResponsiveContainer height={500}>
-          <LineChart
+          <Recharts.LineChart
             data={data}
             margin={{
               top: chartTop,
@@ -215,11 +216,11 @@ class TriLineChartComponent extends React.Component<IProps> {
               verticalAlign="top"
               align="right"
             />
-          </LineChart>
+          </Recharts.LineChart>
         </ResponsiveContainer>
       </Container>
     )
   }
 }
 
-export const TriLineChart = withTheme(TriLineChartComponent)
+export const LineChart = withTheme(LineChartComponent)

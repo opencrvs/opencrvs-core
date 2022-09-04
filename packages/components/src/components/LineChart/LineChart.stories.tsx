@@ -11,12 +11,12 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { TriLineChart } from './TriLineChart'
+import { LineChart } from './LineChart'
 import { ITheme } from '../theme'
 
 export default {
   title: 'Data/Charts/Line graph',
-  component: TriLineChart
+  component: LineChart
 } as Meta
 
 interface IProps {
@@ -43,10 +43,10 @@ interface ILineDataPoint {
   registrationPercentage: string
 }
 
-const Template: Story<IProps> = (args) => <TriLineChart {...args} />
+const Template: Story<IProps> = (args) => <LineChart {...args} />
 
-export const SampleTriLineChart = Template.bind({})
-SampleTriLineChart.args = {
+export const SampleLineChart = Template.bind({})
+SampleLineChart.args = {
   data: [
     {
       label: 'Oct',
