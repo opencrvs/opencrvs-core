@@ -42,7 +42,7 @@ import {
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
+import { Currency } from '@opencrvs/components/lib/Currency'
 
 export function DeathFeeOnTime() {
   const intl = useIntl()
@@ -93,7 +93,7 @@ export function DeathFeeOnTime() {
   const item = {
     label: intl.formatMessage(messages.withinLegallySpecifiedTimeLabel),
     value: (
-      <FormattedNumberCurrency
+      <Currency
         value={offlineCountryConfiguration.config.DEATH.FEE.ON_TIME}
         currency={offlineCountryConfiguration.config.CURRENCY.isoCode}
         languagesAndCountry={

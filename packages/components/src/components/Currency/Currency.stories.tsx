@@ -11,19 +11,15 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { FormattedNumberCurrency } from './FormattedNumberCurrency'
+import { Currency } from './Currency'
 
 export default {
   title: 'Typography/Currency',
-  component: FormattedNumberCurrency
+  component: Currency
 } as Meta
 
 const Template: Story<{}> = () => (
-  <FormattedNumberCurrency
-    value={1000}
-    currency={'AUD'}
-    languagesAndCountry={'en-AU'}
-  />
+  <Currency value={1000} currency={'AUD'} languagesAndCountry={'en-AU'} />
 )
 
-export const FormattedNumberCurrencyView = Template.bind({})
+export const CurrencyView = Template.bind({})

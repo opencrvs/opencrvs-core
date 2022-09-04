@@ -17,7 +17,7 @@ interface IProps {
   languagesAndCountry: string
 }
 
-export const FormattedNumberCurrency = (props: IProps) => {
+export const Currency = (props: IProps) => {
   const numberWithCurrencySymbol = new Intl.NumberFormat(
     `${props.languagesAndCountry}-u-nu-mathsans`,
     {

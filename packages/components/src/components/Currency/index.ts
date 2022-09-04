@@ -10,4 +10,4 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-export * from './FormattedNumberCurrency'
+export * from './Currency'

@@ -42,7 +42,7 @@ import {
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
+import { Currency } from '@opencrvs/components/lib/Currency'
 
 export function BirthDelayedFee() {
   const intl = useIntl()
@@ -99,7 +99,7 @@ export function BirthDelayedFee() {
   const item = {
     label: intl.formatMessage(messages.delayedRegistrationLabel),
     value: (
-      <FormattedNumberCurrency
+      <Currency
         value={offlineCountryConfiguration.config.BIRTH.FEE.DELAYED}
         currency={offlineCountryConfiguration.config.CURRENCY.isoCode}
         languagesAndCountry={
