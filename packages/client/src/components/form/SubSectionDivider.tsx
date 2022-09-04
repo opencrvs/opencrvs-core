@@ -15,7 +15,6 @@ import {
   ISubSectionProps,
   SubSectionDivider as SubSectionDividerComponent
 } from '@opencrvs/components/lib/SubSectionDivider'
-import { Omit } from '@opencrvs/client/src/utils'
 import { formMessages } from '@client/i18n/messages'
 
 export const SubSectionDivider = injectIntl(function FormInputField(

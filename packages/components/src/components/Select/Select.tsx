@@ -13,7 +13,6 @@ import * as React from 'react'
 import { default as ReactSelect, components } from 'react-select'
 import styled from 'styled-components'
 import { Props } from 'react-select/lib/Select'
-import { Omit } from '../omit'
 import { ArrowDownBlue } from '../icons'
 import { IndicatorProps } from 'react-select/lib/components/indicators'
 
