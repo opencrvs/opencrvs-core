@@ -23,7 +23,7 @@ import {
   ResponsiveModal,
   Warning
 } from '@opencrvs/components/lib/interface'
-import { FullBodyContent } from '@opencrvs/components/lib/layout'
+import { FullBodyContent } from '@opencrvs/components/lib/Content'
 import {
   IDeclaration,
   SUBMISSION_STATUS,

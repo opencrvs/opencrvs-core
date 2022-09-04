@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Content } from './Content'
+import { Content } from '../Content'
 
 const Page = styled.div`
   display: flex;

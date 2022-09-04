@@ -32,7 +32,7 @@ import {
   Spinner,
   Warning
 } from '@opencrvs/components/lib/interface'
-import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+import { Container, BodyContent } from '@opencrvs/components/lib/Content'
 import {
   deleteDeclaration,
   IDeclaration,

@@ -19,7 +19,7 @@ import {
   FixedEventTopBar,
   RadioButton
 } from '@opencrvs/components/lib/interface'
-import { BodyContent, Container } from '@opencrvs/components/lib/layout'
+import { BodyContent, Container } from '@opencrvs/components/lib/Content'
 import { Event } from '@client/utils/gateway'
 import {
   goBack,
