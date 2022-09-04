@@ -35,10 +35,10 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
 import {
   InputField,
-  PasswordInput,
   THEME_MODE,
   ErrorMessage
 } from '@opencrvs/components/lib/forms'
+import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
 import { injectIntl, WrappedComponentProps, useIntl } from 'react-intl'
 import {
   constantsMessages,
