@@ -16,9 +16,9 @@ import { Form, Field } from 'react-final-form'
 import {
   TextInput,
   InputField,
-  THEME_MODE,
-  ErrorMessage
+  THEME_MODE
 } from '@opencrvs/components/lib/forms'
+import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
 import { Mobile2FA } from '@opencrvs/components/lib/icons'
 import { stepTwoFields } from '@login/views/StepTwo/stepTwoFields'
 import {

@@ -33,11 +33,8 @@ import {
 } from '@opencrvs/components/lib/buttons'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { GQLHumanName } from '@opencrvs/gateway/src/graphql/schema'
-import {
-  InputField,
-  THEME_MODE,
-  ErrorMessage
-} from '@opencrvs/components/lib/forms'
+import { InputField, THEME_MODE } from '@opencrvs/components/lib/forms'
+import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
 import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
 import { injectIntl, WrappedComponentProps, useIntl } from 'react-intl'
 import {

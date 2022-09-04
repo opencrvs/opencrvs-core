@@ -17,9 +17,9 @@ import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
 import {
   InputField,
   TextInput,
-  THEME_MODE,
-  ErrorMessage
+  THEME_MODE
 } from '@opencrvs/components/lib/forms'
+import { ErrorMessage } from '@opencrvs/components/lib/ErrorMessage'
 import { PasswordInput } from '@opencrvs/components/lib/PasswordInput'
 import { stepOneFields } from '@login/views/StepOne/stepOneFields'
 import { messages } from '@login/i18n/messages/views/stepOneForm'
