@@ -11,7 +11,7 @@
  */
 import { ValidationInitializer } from '@client/utils/validate'
 import { MessageDescriptor } from 'react-intl'
-import { THEME_MODE } from '@opencrvs/components/lib/forms'
+import { THEME_MODE } from '@opencrvs/components/lib/InputField'
 import {
   IRadioOption as RadioComponentOption,
   RadioSize

@@ -22,7 +22,7 @@ import {
   Message,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { InputField } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
 import { IStoreState } from '@client/store'
 import {
   FloatingNotification,

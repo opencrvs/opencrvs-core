@@ -14,7 +14,7 @@ import {
   TertiaryButton,
   PrimaryButton
 } from '@opencrvs/components/lib/buttons'
-import { InputField } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/Select'
 import {

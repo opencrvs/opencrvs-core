@@ -17,7 +17,7 @@ import {
 import * as React from 'react'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
-import { InputField } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { useIntl } from 'react-intl'
 import { EMPTY_STRING } from '@client/utils/constants'

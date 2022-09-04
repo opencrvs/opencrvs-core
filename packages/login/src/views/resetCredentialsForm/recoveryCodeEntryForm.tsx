@@ -16,7 +16,7 @@ import {
 } from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
 import { PrimaryButton, LinkButton } from '@opencrvs/components/lib/buttons'
-import { InputField } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import * as React from 'react'

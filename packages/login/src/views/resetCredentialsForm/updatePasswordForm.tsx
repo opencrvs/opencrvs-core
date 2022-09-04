@@ -16,7 +16,7 @@ import {
 } from '@login/login/actions'
 import { authApi } from '@login/utils/authApi'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { InputField } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'

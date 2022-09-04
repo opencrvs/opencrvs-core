@@ -18,7 +18,7 @@ import {
   QUESTION_KEYS
 } from '@client/i18n/messages'
 import styled from 'styled-components'
-import { InputError } from '@opencrvs/components/lib/forms'
+import { InputError } from '@opencrvs/components/lib/InputField'
 import { TextInput } from '@opencrvs/components/lib/TextInput'
 import { Select } from '@opencrvs/components/lib/Select'
 import { find, at } from 'lodash'
