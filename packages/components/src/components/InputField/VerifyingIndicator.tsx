@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { ITheme } from 'src/components/theme'
+import { ITheme } from '../theme'
 
 const StyledSpan = styled.span`
   color: ${({ theme }) => theme.colors.primary};

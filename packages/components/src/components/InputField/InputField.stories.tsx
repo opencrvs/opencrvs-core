@@ -11,12 +11,13 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { ValidIndicator, VerifyingIndicator } from '../forms'
 import { ArrowWithGradient } from '../icons'
 import { Select } from '../Select'
 import { TextInput } from '../TextInput/TextInput'
 import { InputField, IInputFieldProps } from './InputField'
 import { DateField } from '../DateField'
+import { VerifyingIndicator } from './VerifyingIndicator'
+import { ValidIndicator } from './ValidIndicator'
 
 export default {
   title: 'Input/Input field',

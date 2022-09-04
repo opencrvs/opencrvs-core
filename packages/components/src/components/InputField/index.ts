@@ -12,3 +12,5 @@
 export * from './InputError'
 export * from './InputLabel'
 export * from './InputField'
+export * from './ValidIndicator'
+export * from './VerifyingIndicator'
