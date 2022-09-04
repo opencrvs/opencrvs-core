@@ -11,7 +11,7 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { BulletList } from '.'
+import { BulletList } from './BulletList'
 
 interface IProps {
   id?: string

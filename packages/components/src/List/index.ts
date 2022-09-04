@@ -9,15 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { Link } from '.'
-
-export default {
-  title: 'Controls/Link',
-  component: Link
-} as Meta
-
-const Template: Story<{}> = () => <Link>Hello</Link>
-
-export const LinkView = Template.bind({})
+export * from './List'

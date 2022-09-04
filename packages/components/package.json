@@ -37,7 +37,8 @@
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "build:clean": "rm -rf lib",
     "storybook": "start-storybook -p 6060",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "recreate-src-index-ts": "bash recreate-src-index-ts.sh"
   },
   "lint-staged": {
     "src/**/*.{ts,tsx,json}": [

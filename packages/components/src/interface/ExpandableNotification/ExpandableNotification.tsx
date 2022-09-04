@@ -15,7 +15,7 @@ import { Button } from '../../buttons'
 import { Spinner } from '../Spinner'
 import { KeyboardArrowUp, KeyboardArrowDown, Outbox } from '../../icons'
 import { colors } from '../../colors'
-import { ITheme } from 'src/components/theme'
+import { ITheme } from '../../theme'
 
 export interface IState {
   expand: boolean

@@ -10,5 +10,3 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export * from './Link'
-export * from './List'
-export * from './BulletList'

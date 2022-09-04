@@ -11,17 +11,13 @@
  */
 import React from 'react'
 import { Meta, Story } from '@storybook/react'
-import { List, IListProps } from '.'
+import { Link } from './Link'
 
 export default {
-  title: 'Typography/Number list',
-  component: List
+  title: 'Controls/Link',
+  component: Link
 } as Meta
 
-const Template: Story<IListProps> = (args) => <List {...args} />
+const Template: Story<{}> = () => <Link>Hello</Link>
 
-export const ListView = Template.bind({})
-ListView.args = {
-  id: 'ListView',
-  list: ['Item1', 'Item2', 'Item3']
-}
+export const LinkView = Template.bind({})

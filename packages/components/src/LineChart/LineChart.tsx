@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import * as Recharts from 'recharts'
-import { ITheme } from 'src/components/theme'
+import { ITheme } from '../theme'
 import styled, { withTheme } from 'styled-components'
 
 const {
