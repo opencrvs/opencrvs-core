@@ -15,9 +15,9 @@ import {
   IColumn,
   IDynamicValues,
   IFooterFColumn,
-  ColumnContentAlignment,
-  LoadMore
+  ColumnContentAlignment
 } from '../Workqueue'
+import { LoadMore } from '../Workqueue/components/LoadMore'
 import { Pagination } from '../Pagination'
 
 const Wrapper = styled.div<{

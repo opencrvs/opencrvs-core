@@ -13,7 +13,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { ITextInputProps, IRef, TextInput } from '../TextInput/TextInput'
 import { InputLabel } from '../InputField/InputLabel'
-import { Omit } from '../omit'
 
 const DateWrapper = styled.div`
   width: 100%;
@@ -21,7 +20,7 @@ const DateWrapper = styled.div`
 export const NoticeWrapper = styled.div`
   padding-bottom: 16px;
 `
-export interface IProps {
+interface IProps {
   id: string
   disabled?: boolean
   meta?: { touched: boolean; error: string }
@@ -31,7 +30,7 @@ export interface IProps {
   onChange: (dateString: string) => void
 }
 
-export interface IState {
+interface IState {
   dd: string
   mm: string
   yyyy: string

@@ -10,15 +10,17 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
-import { DateField, IProps } from './DateField'
+import { ComponentMeta, ComponentStory } from '@storybook/react'
+import { DateField } from './DateField'
 
 export default {
   title: 'Input/Date input',
   component: DateField
-} as Meta
+} as ComponentMeta<typeof DateField>
 
-const Template: Story<IProps> = (args) => <DateField {...args} />
+const Template: ComponentStory<typeof DateField> = (args) => (
+  <DateField {...args} />
+)
 
 export const DateFieldView = Template.bind({})
 DateFieldView.args = {

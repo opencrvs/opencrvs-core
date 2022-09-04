@@ -11,4 +11,3 @@
  */
 export * from './Workqueue'
 export * from './types'
-export * from './components'
