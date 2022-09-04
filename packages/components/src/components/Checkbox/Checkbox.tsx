@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Tick, TickLarge } from '../../icons'
+import { Tick, TickLarge } from '../icons'
 
 const Wrapper = styled.li`
   padding-top: 5px;

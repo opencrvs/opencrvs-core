@@ -11,11 +11,11 @@
  */
 import * as React from 'react'
 import {
-  CheckboxGroup,
   RadioGroup,
   TextInput,
   RadioSize
 } from '@opencrvs/components/lib/forms'
+import { CheckboxGroup } from '@opencrvs/components/lib/Checkbox'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'
 import { DateField } from '@opencrvs/components/lib/DateField'
