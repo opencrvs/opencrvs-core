@@ -15,7 +15,7 @@ import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWr
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/config'
 import styled from 'styled-components'
-import { FormTabs } from '@opencrvs/components/lib/forms'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { ListViewSimplified } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import {
   ApplicationName,

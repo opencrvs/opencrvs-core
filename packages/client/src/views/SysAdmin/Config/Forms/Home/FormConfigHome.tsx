@@ -34,7 +34,7 @@ import {
   defaultActionState
 } from './ActionsModal'
 import { ActionsNotification } from './ActionsNotification'
-import { FormTabs } from '@opencrvs/components/lib/forms'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 
 const StyledWarning = styled(Warning)`
   margin: 24px auto 16px;
