@@ -20,7 +20,7 @@ import {
   Loader
 } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { WarningMessage } from '@opencrvs/components/lib/forms'
+import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData,

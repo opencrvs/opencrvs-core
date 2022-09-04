@@ -17,9 +17,9 @@ import {
   Select,
   TextArea,
   TextInput,
-  WarningMessage,
   RadioSize
 } from '@opencrvs/components/lib/forms'
+import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { Link } from '@opencrvs/components/lib/typography'
 import { Text } from '@opencrvs/components/lib/Text'
 import {

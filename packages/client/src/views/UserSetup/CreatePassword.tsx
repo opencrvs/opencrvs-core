@@ -14,11 +14,8 @@ import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import {
-  InputField,
-  TextInput,
-  WarningMessage
-} from '@opencrvs/components/lib/forms'
+import { InputField, TextInput } from '@opencrvs/components/lib/forms'
+import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
 import {
   ProtectedAccoutStep,
