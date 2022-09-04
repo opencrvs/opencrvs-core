@@ -62,7 +62,7 @@ import {
 } from './utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { countries } from '@client/forms/countries'
-import { PDFViewer } from '@opencrvs/components/lib/forms'
+import { PDFViewer } from '@opencrvs/components/lib/PDFViewer'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { hasRegisterScope } from '@client/utils/authUtils'
 
