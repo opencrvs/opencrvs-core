@@ -9,6 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export * from './Bar'
 export * from './Legend'
-export * from './VerticalBar'

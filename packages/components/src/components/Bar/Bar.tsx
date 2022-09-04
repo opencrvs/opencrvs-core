@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { IDataPoint } from './datapoint'
+import { IDataPoint } from '../chart-datapoint-types'
 import { ITheme } from '../theme'
 
 export interface IBarChartProps {

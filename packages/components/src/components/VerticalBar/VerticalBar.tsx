@@ -22,8 +22,8 @@ import {
   Cell
 } from 'recharts'
 import { ITheme } from '../theme'
-import { IDataPoint } from './datapoint'
-import { CustomizedXAxisTick } from './AxisTick'
+import { IDataPoint } from '../chart-datapoint-types'
+import { CustomizedXAxisTick } from './components/AxisTick'
 
 const Container = styled.div`
   margin-top: 30px;

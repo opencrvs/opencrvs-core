@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { IDataPoint, ICategoryDataPoint } from './datapoint'
+import { IDataPoint, ICategoryDataPoint } from '../chart-datapoint-types'
 import { ITheme } from '../theme'
 
 interface ILegendDataPoint extends IDataPoint {
