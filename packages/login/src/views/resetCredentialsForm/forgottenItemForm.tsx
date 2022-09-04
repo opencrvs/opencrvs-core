@@ -11,7 +11,7 @@
  */
 import { goToHome, goToPhoneNumberVerificationForm } from '@login/login/actions'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import {
   ActionPageLight,
   RadioButton

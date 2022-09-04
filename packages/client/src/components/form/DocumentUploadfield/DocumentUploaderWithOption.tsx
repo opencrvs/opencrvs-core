@@ -11,7 +11,7 @@
  */
 import { ISelectOption, Select } from '@opencrvs/components/lib/forms'
 import { ImageUploader } from '@opencrvs/components/lib/ImageUploader'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import { IFileValue, IFormFieldValue, IAttachmentValue } from '@client/forms'
 import { ALLOWED_IMAGE_TYPE, EMPTY_STRING } from '@client/utils/constants'

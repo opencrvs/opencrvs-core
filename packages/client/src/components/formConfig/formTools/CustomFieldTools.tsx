@@ -39,7 +39,7 @@ import {
   TextArea,
   TextInput
 } from '@opencrvs/components/lib/forms'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import {
   ListViewSimplified,
   ListViewItemSimplified
