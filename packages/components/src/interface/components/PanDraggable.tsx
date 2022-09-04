@@ -154,10 +154,10 @@ export default class ReactPanZoom extends React.PureComponent<
           userSelect: 'none',
           width: this.props.width
         }}
-        ref={ref => (this.panWrapper = ref)}
+        ref={(ref) => (this.panWrapper = ref)}
       >
         <div
-          ref={ref => (ref ? (this.panContainer = ref) : null)}
+          ref={(ref) => (ref ? (this.panContainer = ref) : null)}
           style={{
             transform: `matrix(${this.state.matrixData.toString()})`
           }}

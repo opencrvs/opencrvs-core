@@ -1,5 +1,6 @@
 {
   "name": "@opencrvs/components",
+  "main": "lib/index",
   "version": "1.0.1",
   "description": "OpenCRVS UI Component library",
   "license": "MPL-2.0",

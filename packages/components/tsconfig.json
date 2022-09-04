@@ -4,14 +4,18 @@
     "outDir": "lib/",
     "module": "ESNext",
     "target": "es6",
-    "lib": ["es6", "dom", "es2017"],
+    "lib": [
+      "es6",
+      "dom",
+      "es2017"
+    ],
     "sourceMap": true,
     "allowJs": false,
     "declaration": true,
     "jsx": "react",
     "moduleResolution": "node",
     "esModuleInterop": true,
-    "rootDir": "src/components",
+    "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -28,6 +32,13 @@
     // differently, so there's a conflict.
     "skipLibCheck": true
   },
-  "include": ["src/**/*.tsx", "src/**/*.ts", "typings", "tslint-rules"],
-  "exclude": ["node_modules", "lib"]
+  "include": [
+    "src/**/*.tsx",
+    "stories/**/*.ts",
+    "typings"
+  ],
+  "exclude": [
+    "node_modules",
+    "lib"
+  ]
 }
