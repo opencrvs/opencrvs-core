@@ -57,11 +57,11 @@ import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
-  ResponsiveModal,
   PageHeader,
   IPageHeaderProps,
   ErrorToastNotification
 } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'

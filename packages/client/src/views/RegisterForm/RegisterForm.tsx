@@ -28,9 +28,9 @@ import {
   EventTopBar,
   IEventTopBarProps,
   IEventTopBarMenuAction,
-  ResponsiveModal,
   Warning
 } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Container, BodyContent } from '@opencrvs/components/lib/Content'
 import {

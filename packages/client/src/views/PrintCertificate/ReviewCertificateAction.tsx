@@ -18,10 +18,8 @@ import {
 import { Check } from '@opencrvs/components/lib/icons'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 
-import {
-  ResponsiveModal,
-  ActionPageLight
-} from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import {
   IPrintableDeclaration,
   modifyDeclaration,

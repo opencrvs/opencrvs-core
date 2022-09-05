@@ -12,10 +12,10 @@
 import * as React from 'react'
 import {
   ListViewItemSimplified,
-  ResponsiveModal,
   FloatingNotification,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
   userMessages,

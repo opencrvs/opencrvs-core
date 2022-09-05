@@ -34,9 +34,9 @@ import { buttonMessages } from '@client/i18n/messages/buttons'
 import {
   FloatingNotification,
   NOTIFICATION_TYPE,
-  ResponsiveModal,
   ToggleMenu
 } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE } from '@client/utils/constants'
 import {

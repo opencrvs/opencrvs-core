@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'
 import { useIntl } from 'react-intl'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Mutation } from 'react-apollo'
 import { changePhoneMutation } from '@client/views/Settings/mutations'

@@ -16,9 +16,9 @@ import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   FloatingNotification,
-  NOTIFICATION_TYPE,
-  ResponsiveModal
+  NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { buttonMessages } from '@client/i18n/messages'

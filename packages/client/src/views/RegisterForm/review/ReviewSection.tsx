@@ -20,9 +20,9 @@ import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/li
 import {
   DocumentViewer,
   IDocumentViewerOptions,
-  ResponsiveModal,
   Warning
 } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { FullBodyContent } from '@opencrvs/components/lib/Content'
 import {
   IDeclaration,

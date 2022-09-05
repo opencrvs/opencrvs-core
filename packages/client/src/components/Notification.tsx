@@ -19,8 +19,7 @@ import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
 import {
   NOTIFICATION_TYPE,
-  FloatingNotification,
-  ResponsiveModal
+  FloatingNotification
 } from '@opencrvs/components/lib/interface'
 import {
   hideBackgroundSyncedNotification,

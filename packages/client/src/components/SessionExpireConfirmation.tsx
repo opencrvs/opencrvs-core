@@ -12,7 +12,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { IStoreState } from '@client/store'
 import { redirectToAuthentication } from '@client/profile/profileActions'

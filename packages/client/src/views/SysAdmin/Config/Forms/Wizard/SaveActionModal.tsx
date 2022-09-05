@@ -30,7 +30,7 @@ import {
   PrimaryButton
 } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextArea } from '@opencrvs/components/lib/TextArea'

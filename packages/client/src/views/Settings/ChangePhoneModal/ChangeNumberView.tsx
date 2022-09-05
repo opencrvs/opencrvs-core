@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import {
-  ResponsiveModal,
   FloatingNotification,
   NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import * as React from 'react'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { userMessages as messages, buttonMessages } from '@client/i18n/messages'

@@ -27,9 +27,9 @@ import { IStoreState } from '@client/store'
 import {
   FloatingNotification,
   ListViewItemSimplified,
-  NOTIFICATION_TYPE,
-  ResponsiveModal
+  NOTIFICATION_TYPE
 } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
