@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { Document, Page } from 'react-pdf'
-import { Spinner } from '../interface'
+import { Spinner } from '../Spinner'
 import { Pagination } from '../Pagination'
 
 const Container = styled.div`

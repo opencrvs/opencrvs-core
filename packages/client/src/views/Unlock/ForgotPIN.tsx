@@ -44,7 +44,7 @@ import {
   buttonMessages
 } from '@client/i18n/messages'
 import { userQueries } from '@client/user/queries'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { AvatarLarge } from '@client/components/Avatar'
 import { getUserName } from '@client/utils/userUtils'

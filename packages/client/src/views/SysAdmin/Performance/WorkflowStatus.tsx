@@ -62,7 +62,7 @@ import {
   Content,
   ContentSize
 } from '@opencrvs/components/lib/interface/Content'
-import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { TableView } from '@opencrvs/components/lib/interface/TableView'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 

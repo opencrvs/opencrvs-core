@@ -17,7 +17,7 @@ import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { Select } from '@opencrvs/components/lib/Select'
 import { DateField } from '@opencrvs/components/lib/DateField'
 import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
-import { Link } from '@opencrvs/components/lib/typography'
+import { Link } from '@opencrvs/components/lib/Link'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
   internationaliseFieldObject,

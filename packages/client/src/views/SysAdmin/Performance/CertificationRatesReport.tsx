@@ -28,7 +28,7 @@ import {
   NOTIFICATION_TYPE,
   ToastNotification
 } from '@client/components/interface/ToastNotification'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { GQLCertificationMetric } from '@opencrvs/gateway/src/graphql/schema.d'
 interface ICertificationRateData {
   label: string

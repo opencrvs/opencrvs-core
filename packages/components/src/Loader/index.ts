@@ -9,21 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { create } from '@storybook/theming'
-import { getTheme } from '@opencrvs/components/lib/theme'
-
-export const BRAND_BLUE =
-  '#0058E0' /* Also see `main.ts`, if you're going to change this */
-
-const theme = getTheme()
-
-export default create({
-  base: 'light',
-  colorPrimary: BRAND_BLUE,
-  colorSecondary: BRAND_BLUE,
-  brandTitle: 'OpenCRVS Design System',
-  brandUrl: 'https://opencrvs.org',
-  brandImage: 'logo.png',
-  brandTarget: '_self',
-  fontBase: theme.fontFamily
-})
+export * from './Loader'

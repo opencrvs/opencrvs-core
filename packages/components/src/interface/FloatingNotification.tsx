@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled, { keyframes, withTheme } from 'styled-components'
 import { CrossLarge, Error, Success, Warning } from '../icons'
-import { Spinner } from './Spinner'
+import { Spinner } from '../Spinner'
 import { ITheme } from '../theme'
 import NotificationError from '../icons/NotificationError'
 

@@ -34,7 +34,7 @@
   },
   "include": [
     "src/**/*.tsx",
-    "stories/**/*.ts",
+    "src/**/*.ts",
     "typings"
   ],
   "exclude": [

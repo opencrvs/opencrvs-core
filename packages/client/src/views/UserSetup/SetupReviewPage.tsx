@@ -16,11 +16,11 @@ import styled from 'styled-components'
 import {
   ActionPageLight,
   DataRow,
-  IDataProps,
-  Loader
+  IDataProps
 } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
+import { Loader } from '@opencrvs/components/lib/Loader'
 import {
   ProtectedAccoutStep,
   IProtectedAccountSetupData,

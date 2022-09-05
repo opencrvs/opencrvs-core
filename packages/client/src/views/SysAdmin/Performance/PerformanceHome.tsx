@@ -18,9 +18,9 @@ import { generateLocations } from '@client/utils/locationUtils'
 import {
   Box,
   ISearchLocation,
-  ResponsiveModal,
-  Spinner
+  ResponsiveModal
 } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'

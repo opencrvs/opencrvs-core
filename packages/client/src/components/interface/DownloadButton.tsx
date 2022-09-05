@@ -11,7 +11,8 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import { Spinner, ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { IActionObject } from '@opencrvs/components/lib/Workqueue'
 import { Download } from '@opencrvs/components/lib/icons'
 import {

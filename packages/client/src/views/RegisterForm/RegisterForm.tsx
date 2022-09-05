@@ -29,9 +29,9 @@ import {
   IEventTopBarProps,
   IEventTopBarMenuAction,
   ResponsiveModal,
-  Spinner,
   Warning
 } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Container, BodyContent } from '@opencrvs/components/lib/Content'
 import {
   deleteDeclaration,

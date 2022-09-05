@@ -13,7 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { ExpansionButton } from './../buttons'
 import * as ReactDOM from 'react-dom'
-import { Link } from '../typography'
+import { Link } from '../Link'
 
 const SectionDrawerContainer = styled.div<{ expanded: boolean }>`
   background: ${({ theme }) => theme.colors.white};

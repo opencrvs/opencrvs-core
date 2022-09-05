@@ -11,7 +11,8 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Spinner } from './Spinner'
+import { Spinner } from '../Spinner'
+
 export interface ILoader {
   id: string
   loadingText?: string

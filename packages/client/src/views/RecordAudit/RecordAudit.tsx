@@ -58,11 +58,11 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   ResponsiveModal,
-  Loader,
   PageHeader,
   IPageHeaderProps,
   ErrorToastNotification
 } from '@opencrvs/components/lib/interface'
+import { Loader } from '@opencrvs/components/lib/Loader'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
