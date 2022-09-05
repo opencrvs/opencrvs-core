@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled, { StyledComponentBase } from 'styled-components'
-import { Button, IButtonProps } from '../buttons'
+import styled from 'styled-components'
+import { Button, IButtonProps } from '../../buttons'
 
 export const Tabs = styled.div`
   position: relative;

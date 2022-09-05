@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Tab, Tabs } from '../interface/Tabs'
+import { Tab, Tabs } from './components/Tabs'
 
 export interface IFormTabs<T extends string | number = string> {
   id: T
