@@ -46,6 +46,12 @@ import { totalPaymentsHandler } from '@metrics/features/payments/handler'
 import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
 import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
 import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
+import {
+  getAdvancedSearchByClient,
+  postAdvancedSearchByClient,
+  requestSchema,
+  responseSchema
+} from '@metrics/features/searchMetrics/handler'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -226,6 +232,35 @@ export const getRoutes = () => {
       handler: markRejectedHandler,
       config: {
         tags: ['api']
+      }
+    },
+
+    // Advanced Search quota
+    {
+      method: 'GET',
+      path: '/advancedSearch',
+      handler: getAdvancedSearchByClient,
+      config: {
+        tags: ['api'],
+        validate: {
+          query: Joi.object({
+            clientId: Joi.string().required()
+          })
+        },
+        response: {
+          schema: responseSchema
+        }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/advancedSearch',
+      handler: postAdvancedSearchByClient,
+      config: {
+        tags: ['api'],
+        validate: {
+          payload: requestSchema
+        }
       }
     },
 
