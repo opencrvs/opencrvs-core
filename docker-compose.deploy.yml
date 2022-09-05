@@ -555,6 +555,8 @@ services:
     environment:
       - HEARTH_MONGO_URL=mongodb://hearth:${HEARTH_MONGODB_PASSWORD}@mongo1/hearth-dev?replicaSet=rs0
       - OPENHIM_MONGO_URL=mongodb://openhim:${OPENHIM_MONGODB_PASSWORD}@mongo1/openhim-dev?replicaSet=rs0
+    networks:
+      - overlay_net
     logging:
       driver: gelf
       options:
