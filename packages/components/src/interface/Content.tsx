@@ -15,7 +15,7 @@ import styled from 'styled-components'
 import { ICON_ALIGNMENT, TertiaryButton } from '../buttons'
 import { colors } from '../colors'
 import { BackArrow } from '../icons'
-import { Box } from './Box'
+import { Box } from '../Box'
 
 const Container = styled(Box)<{ size: string }>`
   position: relative;

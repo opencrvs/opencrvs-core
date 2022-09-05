@@ -15,7 +15,7 @@ import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
-import { Box, ISearchLocation } from '@opencrvs/components/lib/interface'
+import { ISearchLocation } from '@opencrvs/components/lib/interface'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
@@ -78,6 +78,7 @@ import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
+import { Box } from '@opencrvs/components/lib/Box'
 
 const Layout = styled.div`
   display: flex;

@@ -11,7 +11,7 @@
  */
 import { ComponentMeta } from '@storybook/react'
 import React from 'react'
-import { AppHeader, PageHeader, EventTopBar, Box } from '../interface'
+import { AppHeader, PageHeader, EventTopBar } from '../interface'
 import { LeftNavigation } from '../interface/Navigation/LeftNavigation'
 import { leftNavigationView } from '../interface/Navigation/LeftNavigation.stories'
 import { NavigationGroup } from '../interface/Navigation/NavigationGroup'
@@ -21,6 +21,7 @@ import {
 } from '../interface/Navigation/NavigationGroup.stories'
 import { Frame } from './Frame'
 import { Content, ContentSize } from '../interface/Content'
+import { Box } from '../Box'
 
 export default {
   title: 'Layout/Frame',
