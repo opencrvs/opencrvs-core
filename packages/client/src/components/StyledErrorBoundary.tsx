@@ -16,7 +16,7 @@ import styled from '@client/styledComponents'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { PageWrapper } from '@opencrvs/components/lib/PageWrapper'
 import { TertiaryButton } from '@opencrvs/components/lib/buttons'
-import { Box } from '@opencrvs/components/lib/interface/Box'
+import { Box } from '@opencrvs/components/lib/Box'
 import { errorMessages, buttonMessages } from '@client/i18n/messages'
 
 const ErrorContainer = styled(Box)`

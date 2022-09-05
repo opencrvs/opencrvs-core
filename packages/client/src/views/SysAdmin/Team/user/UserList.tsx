@@ -77,7 +77,7 @@ import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
   ListViewItemSimplified,
   ListViewSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { useCallback } from 'react'
 import {
   withOnlineStatus,

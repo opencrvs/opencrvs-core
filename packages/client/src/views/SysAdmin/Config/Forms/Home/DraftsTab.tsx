@@ -13,7 +13,7 @@ import React from 'react'
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { selectFormDraft } from '@client/forms/configuration/formConfig/selectors'

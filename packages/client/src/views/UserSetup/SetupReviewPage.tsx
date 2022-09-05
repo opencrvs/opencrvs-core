@@ -13,11 +13,8 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import {
-  ActionPageLight,
-  DataRow,
-  IDataProps
-} from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { DataRow, IDataProps } from '@opencrvs/components/lib/ViewData'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { Loader } from '@opencrvs/components/lib/Loader'

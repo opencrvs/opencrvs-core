@@ -72,7 +72,7 @@ import {
   ListViewSimplified,
   ListViewItemSimplified,
   IListViewItemSimplifiedProps
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import styled from 'styled-components'
 import { Content } from '@opencrvs/components/lib/Content'
 

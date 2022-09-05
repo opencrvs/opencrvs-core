@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { IconButton, LinkButton, PrimaryButton } from '../../buttons'
+import { IconButton, LinkButton, PrimaryButton } from '../buttons'
 
 const Container = styled.div`
   display: flex;

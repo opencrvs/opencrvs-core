@@ -14,7 +14,10 @@ import { IStoreState } from '@client/store'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Content } from '@opencrvs/components/lib/Content'
@@ -29,7 +32,6 @@ import {
 import styled from 'styled-components'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
 import { RadioGroup } from '@opencrvs/components/lib/Radio'
-import { ListViewSimplified } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import {
   callApplicationConfigMutation,
   NOTIFICATION_STATUS

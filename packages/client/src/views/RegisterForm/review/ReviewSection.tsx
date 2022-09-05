@@ -132,7 +132,7 @@ import {
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { DuplicateWarning } from '@client/views/Duplicates/DuplicateWarning'
 
 const Deleted = styled.del`

@@ -12,7 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { IDataProps, DataRow } from './DataRow'
-import { LinkButton } from '../../buttons'
+import { LinkButton } from '../buttons'
 
 const Container = styled.div`
   margin-top: 48px;

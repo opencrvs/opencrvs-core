@@ -31,7 +31,10 @@ import {
 import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import { buttonMessages } from '@client/i18n/messages/buttons'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import {
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
@@ -58,7 +61,6 @@ import {
   downloadFile
 } from '@client/views/PrintCertificate/PDFUtils'
 import { Content } from '@opencrvs/components/lib/Content'
-import { ListViewSimplified } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { updateOfflineCertificate } from '@client/offline/actions'
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
 import { IDeclaration } from '@client/declarations'
