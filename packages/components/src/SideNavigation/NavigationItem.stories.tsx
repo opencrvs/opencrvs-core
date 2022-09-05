@@ -11,12 +11,12 @@
  */
 
 import React from 'react'
-import { Meta, Story } from '@storybook/react'
+import { Story } from '@storybook/react'
 import { NavigationItem, INavigationItemProps } from './NavigationItem'
-import { DeclarationIconSmall } from '../../icons/DeclarationIconSmall'
-import { Activity } from '../../icons/Activity'
-import { Users } from '../../icons/Users'
-import { Configuration } from '../../icons/Configuration'
+import { DeclarationIconSmall } from '../icons/DeclarationIconSmall'
+import { Activity } from '../icons/Activity'
+import { Users } from '../icons/Users'
+import { Configuration } from '../icons/Configuration'
 
 const Template: Story<INavigationItemProps> = (args) => (
   <NavigationItem {...args} />

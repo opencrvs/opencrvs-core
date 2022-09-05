@@ -21,10 +21,10 @@ import {
 } from '@client/declarations'
 import { IStoreState } from '@opencrvs/client/src/store'
 import { DeclarationIconSmall } from '@opencrvs/components/lib/icons/DeclarationIconSmall'
-import { LeftNavigation } from '@opencrvs/components/lib/interface/Navigation/LeftNavigation'
-import { NavigationGroup } from '@opencrvs/components/lib/interface/Navigation/NavigationGroup'
-import { NavigationItem } from '@opencrvs/components/lib/interface/Navigation/NavigationItem'
-import { NavigationSubItem } from '@opencrvs/components/lib/interface/Navigation/NavigationSubItem'
+import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
+import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
+import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
+import { NavigationSubItem } from '@opencrvs/components/lib/SideNavigation/NavigationSubItem'
 import { connect } from 'react-redux'
 import {
   goToHomeTab,

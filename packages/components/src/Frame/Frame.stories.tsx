@@ -12,13 +12,13 @@
 import { ComponentMeta } from '@storybook/react'
 import React from 'react'
 import { AppHeader, PageHeader, EventTopBar } from '../interface'
-import { LeftNavigation } from '../interface/Navigation/LeftNavigation'
-import { leftNavigationView } from '../interface/Navigation/LeftNavigation.stories'
-import { NavigationGroup } from '../interface/Navigation/NavigationGroup'
+import { LeftNavigation } from '../SideNavigation/LeftNavigation'
+import { leftNavigationView } from '../SideNavigation/LeftNavigation.stories'
+import { NavigationGroup } from '../SideNavigation/NavigationGroup'
 import {
   groupDeclaration,
   groupSetting
-} from '../interface/Navigation/NavigationGroup.stories'
+} from '../SideNavigation/NavigationGroup.stories'
 import { Frame } from './Frame'
 import { Content, ContentSize } from '../Content'
 import { Box } from '../Box'
