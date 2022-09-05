@@ -11,7 +11,6 @@
  */
 export * from './Header'
 export * from './ActionPageLight'
-export * from './SectionDrawer'
 export * from './SearchTool'
 export * from './Header/AppHeader'
 export * from './Header/PageHeader'
