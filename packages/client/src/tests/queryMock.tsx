@@ -19,6 +19,7 @@
 
 import * as React from 'react'
 import { ComponentProps } from '@client/utils/react'
+import { vi } from 'vitest'
 // eslint-disable-next-line no-restricted-imports
 import { Query as ApolloQuery } from 'react-apollo'
 type Props = ComponentProps<ApolloQuery>
@@ -29,6 +30,6 @@ const mockQuery = function Query(props: Props) {
   return <ApolloQuery {...propsWithoutFetchPolicy} />
 }
 
-jest.mock('@client/components/Query', () => ({
+vi.mock('@client/components/Query', () => ({
   Query: mockQuery
 }))

@@ -11,7 +11,6 @@
  */
 import { connect } from 'react-redux'
 import { injectIntl } from 'react-intl'
-import { reduxForm } from 'redux-form'
 import {
   IProps,
   IDispatchProps,
@@ -46,9 +45,7 @@ const mapDispatchToProps: IDispatchProps = {
   onResendSMS: actions.resendSMS
 }
 
-const stepTwoForm = reduxForm({
-  form: FORM_NAME
-})(injectIntl(StepTwoForm) as any)
+const stepTwoForm = injectIntl(StepTwoForm)
 
 export const StepTwoContainer = connect<
   IProps,

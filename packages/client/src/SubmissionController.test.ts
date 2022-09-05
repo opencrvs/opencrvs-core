@@ -15,19 +15,21 @@ import { SUBMISSION_STATUS } from '@client/declarations'
 import { SubmissionAction } from './forms'
 import { flushPromises, ACTION_STATUS_MAP } from './tests/util'
 import { declarationReadyForStatusChange } from './declarations/submissionMiddleware'
+import { vi } from 'vitest'
 
 beforeEach(() => {
-  Date.now = jest.fn(() => 1572408000000 + 2000000)
+  Date.now = vi.fn(() => 1572408000000 + 2000000)
 })
 
 describe('Submission Controller', () => {
   it('starts the interval', () => {
     const originalInterval = window.setInterval
-    window.setInterval = jest.fn()
+    const setInterval = vi.fn()
+    vi.stubGlobal('setInterval', setInterval)
     const { store } = createStore()
     new SubmissionController(store).start()
     expect(setInterval).toBeCalled()
-    window.setInterval = originalInterval
+    vi.stubGlobal('setInterval', originalInterval)
     // @ts-ignore
     window.setTimeout = (fn: (...args: any[]) => void) => {
       return new Promise((resolve) => {
@@ -51,7 +53,7 @@ describe('Submission Controller', () => {
           registerForm: {}
         }
       }),
-      dispatch: jest.fn()
+      dispatch: vi.fn()
     }
 
     const subCon = new SubmissionController(store as unknown as AppStore)
@@ -79,7 +81,7 @@ describe('Submission Controller', () => {
           registerForm: {}
         }
       }),
-      dispatch: jest.fn()
+      dispatch: vi.fn()
     }
 
     const subCon = new SubmissionController(store as unknown as AppStore)
@@ -102,7 +104,7 @@ describe('Submission Controller', () => {
           registerForm: {}
         }
       }),
-      dispatch: jest.fn()
+      dispatch: vi.fn()
     }
 
     // @ts-ignore
@@ -157,7 +159,7 @@ describe('Submission Controller', () => {
           registerForm: {}
         }
       }),
-      dispatch: jest.fn()
+      dispatch: vi.fn()
     }
 
     // @ts-ignore
@@ -192,7 +194,7 @@ describe('Submission Controller', () => {
             ]
           }
         }),
-        dispatch: jest.fn()
+        dispatch: vi.fn()
       }
 
       // @ts-ignore
