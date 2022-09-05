@@ -76,6 +76,13 @@ jobs:
           cd opencrvs-farajaland
           git checkout ${{ env.COUNTRY_CONFIG_VERSION }}
           cd ../
+
+      # Get latest version hashes from core if they are not given as inputs
+      - name: Get COUNTRY_CONFIG_VERSION
+        if: ${{ !github.event.inputs.farajaland-image-tag }}
+        run: echo "CORE_VERSION=$(git rev-parse --short=7 HEAD)" >> $GITHUB_ENV
+
+      # Set tag version if they are given as inputs
       - name: Set CORE_VERSION from inputs
         if: ${{ github.event.inputs.core-image-tag }}
         run: echo "CORE_VERSION=${{ github.event.inputs.core-image-tag }}" >> $GITHUB_ENV
