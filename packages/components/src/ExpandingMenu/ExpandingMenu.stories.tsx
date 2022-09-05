@@ -25,7 +25,7 @@ import {
   LogoutBlack,
   LogoutBlue,
   Hamburger
-} from '../../icons'
+} from '../icons'
 import React from 'react'
 
 interface IUserDetails {
