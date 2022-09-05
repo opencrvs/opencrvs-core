@@ -58,9 +58,9 @@ import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   PageHeader,
-  IPageHeaderProps,
-  ErrorToastNotification
+  IPageHeaderProps
 } from '@opencrvs/components/lib/interface'
+import { ErrorToastNotification } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { getScope } from '@client/profile/profileSelectors'
