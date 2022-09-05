@@ -48,7 +48,7 @@ import {
   NoWifi
 } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
-import { ToggleMenu } from '@opencrvs/components/lib/interface'
+import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { BodyContent } from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'

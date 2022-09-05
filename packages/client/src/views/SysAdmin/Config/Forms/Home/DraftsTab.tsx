@@ -25,7 +25,7 @@ import {
   draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { ToggleMenu } from '@opencrvs/components/lib/interface'
+import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Pill } from '@opencrvs/components/lib/Pill'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { goToFormConfigWizard } from '@client/navigation'

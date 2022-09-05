@@ -13,7 +13,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { TertiaryButton, CircleButton } from '../buttons'
 import { DeclarationIcon, Cross, VerticalThreeDots } from '../icons'
-import { ToggleMenu } from '.'
+import { ToggleMenu } from '../ToggleMenu'
 
 const TopBar = styled.div`
   padding: 0 ${({ theme }) => theme.grid.margin}px;

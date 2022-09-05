@@ -33,9 +33,9 @@ import { userMessages } from '@client/i18n/messages'
 import { LANG_EN } from '@client/utils/constants'
 import {
   ISearchLocation,
-  ToggleMenu,
   LoadingGrey
 } from '@opencrvs/components/lib/interface'
+import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import {
   Toast,
   NOTIFICATION_TYPE as FLOATING_NOTIFICATION_TYPE

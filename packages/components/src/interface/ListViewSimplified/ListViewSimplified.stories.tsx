@@ -15,7 +15,7 @@ import {
   ListViewItemSimplified
 } from './ListViewSimplified'
 import React from 'react'
-import { ToggleMenu } from '../ToggleMenu'
+import { ToggleMenu } from '../../ToggleMenu'
 import { VerticalThreeDots, AvatarSmall, AvatarLarge } from '../../icons'
 import { LinkButton, PrimaryButton } from '../../buttons'
 import { Pill } from '../../Pill'
