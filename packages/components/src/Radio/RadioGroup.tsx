@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { RadioButton } from '../interface/RadioButton'
+import { RadioButton } from './RadioButton'
 import { NoticeWrapper } from '../DateField'
 import { InputLabel } from '../InputField/InputLabel'
 import styled from 'styled-components'

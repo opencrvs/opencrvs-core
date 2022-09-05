@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { RadioButton } from '.'
+import { RadioButton } from './RadioButton'
 import React from 'react'
 
 export default {

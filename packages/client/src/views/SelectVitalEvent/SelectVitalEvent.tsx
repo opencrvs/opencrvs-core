@@ -15,10 +15,8 @@ import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
-import {
-  FixedEventTopBar,
-  RadioButton
-} from '@opencrvs/components/lib/interface'
+import { FixedEventTopBar } from '@opencrvs/components/lib/interface'
+import { RadioButton } from '@opencrvs/components/lib/Radio'
 import { BodyContent, Container } from '@opencrvs/components/lib/Content'
 import { Event } from '@client/utils/gateway'
 import {

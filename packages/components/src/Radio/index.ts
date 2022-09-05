@@ -10,4 +10,5 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export * from './Radio'
+export * from './RadioButton'
 export * from './RadioGroup'
