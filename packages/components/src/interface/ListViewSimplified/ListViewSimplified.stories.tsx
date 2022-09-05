@@ -18,7 +18,7 @@ import React from 'react'
 import { ToggleMenu } from '../ToggleMenu'
 import { VerticalThreeDots, AvatarSmall, AvatarLarge } from '../../icons'
 import { LinkButton, PrimaryButton } from '../../buttons'
-import { Pill } from '../Pill'
+import { Pill } from '../../Pill'
 import styled from 'styled-components'
 
 const Template: Story = ({ children, ...args }) => {

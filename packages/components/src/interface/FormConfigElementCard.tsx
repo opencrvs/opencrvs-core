@@ -13,7 +13,7 @@ import React from 'react'
 import styled from 'styled-components'
 import { ArrowUp, ArrowDown, Trash } from '../icons'
 import { CircleButton } from '../buttons'
-import { Pill } from './Pill'
+import { Pill } from '../Pill'
 
 const Card = styled.div<{ selected: boolean }>`
   display: flex;

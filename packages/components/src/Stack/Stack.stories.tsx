@@ -12,7 +12,7 @@
 import React from 'react'
 import { ComponentMeta, ComponentStory } from '@storybook/react'
 import { Stack } from './Stack'
-import { Pill } from '../interface'
+import { Pill } from '../Pill'
 
 export default {
   title: 'Layout/Stack',

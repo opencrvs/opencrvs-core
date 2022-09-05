@@ -24,7 +24,7 @@ import {
   draftStatusMessages
 } from '@client/i18n/messages/views/formConfig'
 import { Value, DraftVersion } from './components'
-import { Pill } from '@opencrvs/components/lib/interface'
+import { Pill } from '@opencrvs/components/lib/Pill'
 import { isDefaultDraft } from '@client/views/SysAdmin/Config/Forms/utils'
 
 function EventDrafts({ event }: { event: Event }) {

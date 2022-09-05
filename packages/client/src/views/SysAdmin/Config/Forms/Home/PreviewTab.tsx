@@ -26,7 +26,7 @@ import {
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { DraftStatus, Event } from '@client/utils/gateway'
 import { Value, DraftVersion } from './components'
-import { Pill } from '@opencrvs/components/lib/interface'
+import { Pill } from '@opencrvs/components/lib/Pill'
 import { ActionStatus } from '@client/views/SysAdmin/Config/Forms/utils'
 import { ActionContext, Actions } from './ActionsModal'
 
