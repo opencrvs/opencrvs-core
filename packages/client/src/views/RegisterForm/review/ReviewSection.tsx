@@ -17,11 +17,11 @@ import {
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/Select'
+import { Warning } from '@opencrvs/components/lib/interface'
 import {
   DocumentViewer,
-  IDocumentViewerOptions,
-  Warning
-} from '@opencrvs/components/lib/interface'
+  IDocumentViewerOptions
+} from '@opencrvs/components/lib/DocumentViewer'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { FullBodyContent } from '@opencrvs/components/lib/Content'
 import {
