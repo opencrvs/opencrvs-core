@@ -18,7 +18,6 @@ import {
   inValidImageB64String
 } from '@client/tests/util'
 import { GET_BIRTH_REGISTRATION_FOR_CERTIFICATE } from '@client/views/DataProvider/birth/queries'
-import { GET_DEATH_REGISTRATION_FOR_CERTIFICATION } from '@client/views/DataProvider/death/queries'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { CollectorForm } from './CollectorForm'
@@ -31,6 +30,7 @@ import {
   lateBirthCertificationResponseWithFather,
   onTimeBirthCertificationResponse
 } from '@client/tests/mock-graphql-responses'
+import { vi } from 'vitest'
 
 let store: AppStore
 let history: History
@@ -306,7 +306,7 @@ describe('Certificate collector test for a birth registration without father det
       })
 
       it('continue to payment section when the mandatory fields are filled and birth event is between 45 days and 5 years', async () => {
-        Date.now = jest.fn(() => 1538352000000) // 2018-10-01
+        Date.now = vi.fn(() => 1538352000000) // 2018-10-01
         await waitForElement(component, '#noAffidavitAgreementAFFIDAVIT')
         component
           .find('#noAffidavitAgreementAFFIDAVIT')
@@ -415,7 +415,7 @@ describe('Test for a free birth registration', () => {
 
 describe('Certificate collector test for a birth registration with father details', () => {
   const { store, history } = createStore()
-  const mockLocation: any = jest.fn()
+  const mockLocation: any = vi.fn()
   const graphqlMock = lateBirthCertificationResponseWithFather
 
   describe('Test collector group', () => {

@@ -62,7 +62,7 @@ Dependencies are required. Ensure you have satisfied all the following requireme
 - **Admin rights**: You must have admin rights over your computer and a sudo password
 - **Disk space and RAM:** A minimum of 20GB of hard drive space available and at least 16GB of RAM. If you are using virtualisation, ensure this is dedicated to the environment.
 - **Docker**: On Ubuntu, install [Docker](https://docs.docker.com/engine/install/ubuntu/) & [Docker Compose](https://docs.docker.com/compose/install/). On Mac, install [Docker for Mac](https://docs.docker.com/desktop/mac/install/). On Mac, in Docker for Mac preferences, assign 4 CPUs, at least 8GB Memory or more, Swap 4GB and 4 CPUs if your system allows. Elastic search needs a lot of memory to run. On Ubuntu we set enough RAM automatically. OpenCRVS has been tested on Docker version 20.10.11 and docker-compose version 1.29.2
-- **Nodejs:** You must install Node v.14.15.0, v14.15.4, 14.17.0 or v14.18.1 (this release has been tested on those versions) using [Node Version Manager](https://nodejs.org/en/download/package-manager/#nvm). OpenCRVS has not been tested on newer versions of Node and you may experience issues if you are using an untested Node version.
+- **Nodejs:** You must install Node v.14.17.0, v.14.17.6, v14.18.0 or v14.18.1 (this release has been tested on those versions) using [Node Version Manager](https://nodejs.org/en/download/package-manager/#nvm). OpenCRVS has not been tested on newer versions of Node and you may experience issues if you are using an untested Node version.
 - **Yarn:** Install the [Yarn Package Manager](https://classic.yarnpkg.com/en/docs/install) for Node
 - **Chrome:** Install [Google Chrome](https://www.google.com/chrome). The OpenCRVS client application is a progressive web application.
 - **tmux:** Install [tmux](https://github.com/tmux/tmux/wiki). Multiple terminal windows are required to run OpenCRVS Core alongside the default country configuration. On Ubuntu run: `sudo apt-get install tmux` to install. On Mac, you can install tmux using Homebrew or MacPorts.
@@ -192,7 +192,7 @@ This is a work in progress
 OpenHIM is designed to ease interoperability between OpenCRVS and external systems such as Health & National ID. It provides external access to the system via secure APIs. OpenHIM channels and governs internal transactions, routing, orchestrating and translating requests into [FHIR](https://www.hl7.org/fhir/) between services and the database layer.
 
 1. Visit [`http://localhost:8888/#!/login`](http://localhost:8888/#!/login)
-2. Login. username: **root@openhim.org** / Password: **password**
+2. Login. username: **root@openhim.org** / Password: **wXV8xSW2Ju5X3EPn**
 
    When logging into OpenCRVS core locally, OpenHIM will display an error " ..if you are using a self-signed certificate, you may first need to instruct your browser to accept it.
 

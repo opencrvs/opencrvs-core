@@ -27,10 +27,12 @@ import { Event } from '@client/utils/gateway'
 import { cloneDeep } from 'lodash'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { push } from 'connected-react-router'
+import * as pdfRender from '@client/pdfRenderer'
+import { vi } from 'vitest'
 
 describe('when user wants to review death certificate', () => {
   let component: ReactWrapper<{}, {}>
-
+  const spy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
   beforeEach(async () => {
     const { history, location, match } = createRouterProps(
       '/',
@@ -69,6 +71,10 @@ describe('when user wants to review death certificate', () => {
       />,
       { store, history }
     )
+  })
+
+  afterAll(() => {
+    spy.mockReset()
   })
 
   it('displays have the Continue and print Button', async () => {
@@ -243,7 +249,6 @@ describe('when user wants to review birth certificate', () => {
     const confirmBtn = await waitForElement(component, '#confirm-print')
     confirmBtn.hostNodes().simulate('click')
     component.update()
-
     component.find('#print-certificate').hostNodes().simulate('click')
     component.update()
 

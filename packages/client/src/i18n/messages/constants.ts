@@ -85,6 +85,7 @@ interface IConstantsMessages
   pendingConnection: MessageDescriptor
   performanceTitle: MessageDescriptor
   reason: MessageDescriptor
+  requestReason: MessageDescriptor
   registered: MessageDescriptor
   inReviewStatus: MessageDescriptor
   incompleteStatus: MessageDescriptor
@@ -543,6 +544,11 @@ const messagesToDefine: IConstantsMessages = {
     defaultMessage: 'Reason',
     description: 'Label for Reason the declaration was rejected',
     id: 'constants.reason'
+  },
+  requestReason: {
+    defaultMessage: 'Reason for request',
+    description: 'Label for Reason the declaration was corrected',
+    id: 'constants.requestReason'
   },
   registered: {
     defaultMessage: 'Registered',
