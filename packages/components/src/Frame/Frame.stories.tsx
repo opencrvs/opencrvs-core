@@ -20,7 +20,7 @@ import {
   groupSetting
 } from '../interface/Navigation/NavigationGroup.stories'
 import { Frame } from './Frame'
-import { Content, ContentSize } from '../interface/Content'
+import { Content, ContentSize } from '../Content'
 import { Box } from '../Box'
 
 export default {

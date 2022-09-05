@@ -16,7 +16,7 @@ import { Header } from '@client/components/interface/Header/Header'
 import { ListViewSimplified } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { userMessages as messages } from '@client/i18n/messages'
 import { Navigation } from '@client/components/interface/Navigation'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import { Content } from '@opencrvs/components/lib/Content'
 import { Frame } from '@opencrvs/components/lib/Frame'
 import {
   Name,

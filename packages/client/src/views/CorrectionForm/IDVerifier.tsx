@@ -26,7 +26,7 @@ import { identityNameMapper } from '@client/forms/identity'
 import { LabelValuePair } from '@opencrvs/components/lib/interface'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import { Content } from '@opencrvs/components/lib/Content'
 
 interface IVerifierActionProps {
   positiveAction: {

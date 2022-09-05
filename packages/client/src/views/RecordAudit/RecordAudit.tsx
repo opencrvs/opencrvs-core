@@ -11,10 +11,7 @@
  */
 import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import {
   Navigation,
   WORKQUEUE_TABS

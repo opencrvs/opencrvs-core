@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import styled, { css } from 'styled-components'
-import { Content } from '../../interface/Content'
+import { Content } from '../../Content'
 import React from 'react'
 
 export const Layout = styled.section`

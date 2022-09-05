@@ -50,7 +50,11 @@ import {
 import { AvatarSmall } from '@client/components/Avatar'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
-import { BodyContent } from '@opencrvs/components/lib/Content'
+import {
+  BodyContent,
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   GQLHumanName,
@@ -79,10 +83,6 @@ import {
   withOnlineStatus,
   LoadingIndicator
 } from '@client/views/OfficeHome/LoadingIndicator'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { ApolloError } from 'apollo-client'
 
