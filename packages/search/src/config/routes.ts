@@ -193,10 +193,9 @@ export const getRoutes = () => {
       handler: advancedRecordSearch,
       config: {
         tags: ['api'],
-        auth: false,
-        // auth: {
-        //   scope: [RouteScope.RECORD_SEARCH]
-        // },
+        auth: {
+          scope: [RouteScope.RECORD_SEARCH]
+        },
         description:
           'Populates hierarchical location ids for the legacy indexes'
       }
