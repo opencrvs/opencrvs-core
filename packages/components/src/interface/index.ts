@@ -12,7 +12,6 @@
 export * from './Box'
 export * from './Header'
 export * from './Tabs'
-export * from './Modal'
 export * from './FloatingNotification'
 export * from './ActionPageLight'
 export * from './SelectGroup'
