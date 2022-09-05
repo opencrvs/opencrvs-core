@@ -25,7 +25,7 @@ import { selectFormDraft } from '@client/forms/configuration/formConfig/selector
 import { PreviewTab } from './PreviewTab'
 import { PublishedTab } from './PublishedTab'
 import styled from '@client/styledComponents'
-import { Warning } from '@opencrvs/components/lib/interface'
+import { Alert } from '@opencrvs/components/lib/Alert'
 import { constantsMessages } from '@client/i18n/messages'
 import {
   ActionState,
@@ -36,7 +36,7 @@ import {
 import { ActionsNotification } from './ActionsNotification'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 
-const StyledWarning = styled(Warning)`
+const StyledWarning = styled(Alert)`
   margin: 24px auto 16px;
   max-width: 778px;
 `

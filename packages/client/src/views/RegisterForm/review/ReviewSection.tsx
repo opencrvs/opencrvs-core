@@ -17,7 +17,7 @@ import {
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { ISelectOption as SelectComponentOptions } from '@opencrvs/components/lib/Select'
-import { Warning } from '@opencrvs/components/lib/interface'
+import { Alert } from '@opencrvs/components/lib/Alert'
 import {
   DocumentViewer,
   IDocumentViewerOptions
@@ -1611,7 +1611,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                 </InputWrapper>
               )}
               {totalFileSizeExceeded && (
-                <Warning
+                <Alert
                   label={intl.formatMessage(
                     constantsMessages.totalFileSizeExceed,
                     { fileSize: bytesToSize(ACCUMULATED_FILE_SIZE) }

@@ -11,7 +11,7 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { Alert } from '../icons'
+import { Alert as AlertIcon } from '../icons'
 import { colors } from '../colors'
 
 const Conatiner = styled.div`
@@ -28,7 +28,7 @@ const Conatiner = styled.div`
   ${({ theme }) => theme.fonts.bold16}
 `
 
-export function Warning({
+export function Alert({
   label,
   ...props
 }: {
@@ -37,7 +37,7 @@ export function Warning({
 } & React.HTMLAttributes<HTMLDivElement>) {
   return (
     <Conatiner {...props}>
-      {!props.hideIcon && <Alert color="invert" />}
+      {!props.hideIcon && <AlertIcon color="invert" />}
       <p>{label}</p>
     </Conatiner>
   )

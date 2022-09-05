@@ -9,20 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
-import { Warning } from './Warning'
-import React from 'react'
-
-const Template: Story<{ label: string }> = (args) => {
-  return <Warning {...args} />
-}
-
-export default {
-  title: 'Data/Alert',
-  component: Warning
-} as Meta
-
-export const Default = Template.bind({})
-Default.args = {
-  label: 'Nothing is currently published. Awating to be published: Birth, Death'
-}
+export * from './Alert'
