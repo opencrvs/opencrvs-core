@@ -515,7 +515,7 @@ describe('Verify fhir bundle modifier functions', () => {
     }
 
     it('assignment is not done for reg agent downloading validated declaration', async () => {
-      const taskResource = testFhirBundle.entry[1].resource
+      const taskResource = testFhirBundle.entry[1].resource as fhir.Task
       taskResource?.extension?.push({
         url: `${OPENCRVS_SPECIFICATION_URL}extension/regAssigned`,
         valueString: 'VALIDATED'
