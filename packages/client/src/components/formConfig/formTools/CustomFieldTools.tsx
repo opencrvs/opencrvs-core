@@ -41,7 +41,7 @@ import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import {
   ListViewSimplified,
   ListViewItemSimplified
-} from '@opencrvs/components/lib/interface'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { camelCase, debounce } from 'lodash'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProp } from 'react-intl'

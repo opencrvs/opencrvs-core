@@ -23,7 +23,7 @@ import {
   buttonMessages,
   userMessages
 } from '@client/i18n/messages'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { useOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { ChangePhoneModal } from '@client/views/Settings/ChangePhoneModal/ChangePhoneModal'

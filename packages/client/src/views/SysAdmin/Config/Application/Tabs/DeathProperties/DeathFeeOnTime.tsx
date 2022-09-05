@@ -24,7 +24,7 @@ import {
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { IStoreState } from '@client/store'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { DeathActionId } from '@client/views/SysAdmin/Config/Application'

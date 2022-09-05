@@ -23,7 +23,7 @@ import {
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { Select } from '@opencrvs/components/lib/Select'
 import { IStoreState } from '@client/store'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'

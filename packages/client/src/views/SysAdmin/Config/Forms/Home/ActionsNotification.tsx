@@ -16,7 +16,6 @@ import {
   isNotifiable,
   NOTIFICATION_TYPE_MAP
 } from '@client/views/SysAdmin/Config/Forms/utils'
-import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
 import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { useIntl } from 'react-intl'
 import { statusChangeActionMessages } from '@client/i18n/messages/views/formConfig'
