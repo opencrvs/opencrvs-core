@@ -9,14 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-export * from './Header'
-export * from './ActionPageLight'
-export * from './SectionDrawer'
-export * from './SearchTool'
-export * from './Header/AppHeader'
-export * from './Header/PageHeader'
-export * from './ViewData'
-export * from './EventTopBar'
-export * from './ListTable'
-export * from './LocationSearch/LocationSearch'
-export * from './TableView'
+export * from './ExpandableNotification'

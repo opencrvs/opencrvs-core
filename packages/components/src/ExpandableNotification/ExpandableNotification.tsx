@@ -11,11 +11,11 @@
  */
 import * as React from 'react'
 import styled, { withTheme } from 'styled-components'
-import { Button } from '../../buttons'
-import { Spinner } from '../../Spinner'
-import { KeyboardArrowUp, KeyboardArrowDown, Outbox } from '../../icons'
-import { colors } from '../../colors'
-import { ITheme } from '../../theme'
+import { Button } from '../buttons'
+import { Spinner } from '../Spinner'
+import { KeyboardArrowUp, KeyboardArrowDown, Outbox } from '../icons'
+import { colors } from '../colors'
+import { ITheme } from '../theme'
 
 export interface IState {
   expand: boolean
