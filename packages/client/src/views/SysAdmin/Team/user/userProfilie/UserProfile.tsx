@@ -31,10 +31,8 @@ import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { userMessages } from '@client/i18n/messages'
 import { LANG_EN } from '@client/utils/constants'
-import {
-  ISearchLocation,
-  LoadingGrey
-} from '@opencrvs/components/lib/interface'
+import { LoadingGrey } from '@opencrvs/components/lib/interface'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
 import {
   Toast,

@@ -57,10 +57,7 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { IDynamicValues } from '@opencrvs/components/lib/common-types'
-import {
-  ActionPageLight,
-  ISearchLocation
-} from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import ApolloClient from 'apollo-client'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
