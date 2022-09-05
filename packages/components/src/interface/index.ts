@@ -11,8 +11,6 @@
  */
 export * from './Header'
 export * from './ActionPageLight'
-export * from './SelectGroup'
-export * from './DataTable/SortAndFilter'
 export * from './SectionDrawer'
 export * from './SearchTool'
 export * from './ExpandableNotification/ExpandableNotification'
