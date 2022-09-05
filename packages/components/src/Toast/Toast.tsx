@@ -120,7 +120,7 @@ const NotificationMessage = styled.div`
   min-width: 160px;
 `
 
-class FloatingNotificationComp extends React.Component<FullProps> {
+class ToastComp extends React.Component<FullProps> {
   autoHideTimeout = setTimeout(
     this.closeNotification,
     NOTIFICATION_AUTO_HIDE_TIMEOUT
@@ -173,4 +173,4 @@ class FloatingNotificationComp extends React.Component<FullProps> {
   }
 }
 
-export const FloatingNotification = withTheme(FloatingNotificationComp)
+export const Toast = withTheme(ToastComp)

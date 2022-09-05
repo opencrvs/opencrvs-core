@@ -10,11 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  ListViewItemSimplified,
-  FloatingNotification,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
@@ -144,7 +141,7 @@ export function Language() {
           placeholder=""
         />
       </ResponsiveModal>
-      <FloatingNotification
+      <Toast
         type={NOTIFICATION_TYPE.SUCCESS}
         show={showSuccessNotification}
         callback={toggleSuccessNotification}
@@ -155,7 +152,7 @@ export function Language() {
             language: languages[selectedLanguage].displayName
           }}
         />
-      </FloatingNotification>
+      </Toast>
     </>
   )
 }

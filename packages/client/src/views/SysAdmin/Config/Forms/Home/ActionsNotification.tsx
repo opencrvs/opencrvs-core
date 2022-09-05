@@ -16,10 +16,8 @@ import {
   isNotifiable,
   NOTIFICATION_TYPE_MAP
 } from '@client/views/SysAdmin/Config/Forms/utils'
-import {
-  FloatingNotification,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { useIntl } from 'react-intl'
 import { statusChangeActionMessages } from '@client/i18n/messages/views/formConfig'
 import { useSelector } from 'react-redux'
@@ -38,7 +36,7 @@ export function ActionsNotification() {
   )
 
   return (
-    <FloatingNotification
+    <Toast
       type={
         isNotifiable(status)
           ? NOTIFICATION_TYPE_MAP[status]
@@ -56,6 +54,6 @@ export function ActionsNotification() {
           event: intl.formatMessage(constantsMessages[event]),
           version
         })}
-    </FloatingNotification>
+    </Toast>
   )
 }

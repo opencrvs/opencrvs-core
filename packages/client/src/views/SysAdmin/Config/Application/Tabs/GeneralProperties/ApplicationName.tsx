@@ -24,11 +24,8 @@ import {
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { IStoreState } from '@client/store'
-import {
-  FloatingNotification,
-  ListViewItemSimplified,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
@@ -146,7 +143,7 @@ export function ApplicationName() {
         </Content>
       </ResponsiveModal>
 
-      <FloatingNotification
+      <Toast
         id="appNamenotification"
         type={
           notificationStatus === NOTIFICATION_STATUS.SUCCESS
@@ -165,7 +162,7 @@ export function ApplicationName() {
           : notificationStatus === NOTIFICATION_STATUS.SUCCESS
           ? intl.formatMessage(messages.applicationNameChangeNotification)
           : intl.formatMessage(messages.applicationConfigChangeError)}
-      </FloatingNotification>
+      </Toast>
     </>
   )
 }

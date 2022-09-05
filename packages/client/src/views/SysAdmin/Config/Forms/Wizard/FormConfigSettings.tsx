@@ -14,10 +14,8 @@ import { IStoreState } from '@client/store'
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
-import {
-  FloatingNotification,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Content } from '@opencrvs/components/lib/interface/Content'
 import { messages } from '@client/i18n/messages/views/formConfig'
@@ -31,10 +29,7 @@ import {
 import styled from 'styled-components'
 import { Toggle } from '@opencrvs/components/lib/buttons/Toggle'
 import { RadioGroup } from '@opencrvs/components/lib/Radio'
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { ListViewSimplified } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import {
   callApplicationConfigMutation,
   NOTIFICATION_STATUS
@@ -291,7 +286,7 @@ function FormConfigSettingsComponent() {
           </ErrorContent>
         )}
       </ResponsiveModal>
-      <FloatingNotification
+      <Toast
         id="form-settings-notification"
         type={
           notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
@@ -304,7 +299,7 @@ function FormConfigSettingsComponent() {
         }}
       >
         {notificationMessages}
-      </FloatingNotification>
+      </Toast>
     </Containter>
   )
 }

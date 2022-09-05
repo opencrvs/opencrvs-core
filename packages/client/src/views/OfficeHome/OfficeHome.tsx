@@ -42,10 +42,7 @@ import {
   SYS_ADMIN_ROLES,
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
-import {
-  FloatingNotification,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -479,7 +476,7 @@ export class OfficeHomeView extends React.Component<
         <NotificationToast showPaginated={this.showPaginated} />
 
         {this.state.showCertificateToast && (
-          <FloatingNotification
+          <Toast
             id="print-cert-notification"
             type={NOTIFICATION_TYPE.SUCCESS}
             show={this.state.showCertificateToast}
@@ -488,7 +485,7 @@ export class OfficeHomeView extends React.Component<
             }}
           >
             {intl.formatMessage(certificateMessage.toastMessage)}
-          </FloatingNotification>
+          </Toast>
         )}
       </Frame>
     )

@@ -32,10 +32,10 @@ import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import {
-  FloatingNotification,
-  NOTIFICATION_TYPE,
+  ListViewItemSimplified,
   ToggleMenu
 } from '@opencrvs/components/lib/interface'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE } from '@client/utils/constants'
@@ -60,10 +60,7 @@ import {
   downloadFile
 } from '@client/views/PrintCertificate/PDFUtils'
 import { Content } from '@opencrvs/components/lib/interface/Content'
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { ListViewSimplified } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
 import { updateOfflineCertificate } from '@client/offline/actions'
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
 import { IDeclaration } from '@client/declarations'
@@ -479,7 +476,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               </ListViewContainer>
             </Content>
           )}
-          <FloatingNotification
+          <Toast
             type={
               imageLoadingError
                 ? NOTIFICATION_TYPE.ERROR
@@ -505,7 +502,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   : eventName
               }}
             />
-          </FloatingNotification>
+          </Toast>
           <ResponsiveModal
             id="withoutVerificationPrompt"
             show={showPrompt}

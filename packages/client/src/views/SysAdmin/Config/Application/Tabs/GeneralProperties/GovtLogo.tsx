@@ -24,11 +24,8 @@ import {
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { IStoreState } from '@client/store'
-import {
-  FloatingNotification,
-  ListViewItemSimplified,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/interface'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
@@ -198,7 +195,7 @@ export function GovtLogo() {
         </Content>
       </ResponsiveModal>
 
-      <FloatingNotification
+      <Toast
         id="print-cert-notification"
         type={
           notificationStatus === NOTIFICATION_STATUS.SUCCESS
@@ -217,7 +214,7 @@ export function GovtLogo() {
           : notificationStatus === NOTIFICATION_STATUS.SUCCESS
           ? intl.formatMessage(messages.govtLogoChangeNotification)
           : errorMessages}
-      </FloatingNotification>
+      </Toast>
     </>
   )
 }

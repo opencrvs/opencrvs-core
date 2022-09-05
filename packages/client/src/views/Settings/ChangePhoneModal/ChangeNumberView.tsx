@@ -9,10 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import {
-  FloatingNotification,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import * as React from 'react'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -127,7 +124,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
           onChange={onChangePhoneNumber}
         />
       </InputField>
-      <FloatingNotification
+      <Toast
         id="duplicate-mobile-error-notification"
         type={NOTIFICATION_TYPE.ERROR}
         show={showDuplicateMobileErrorNotification}
@@ -136,7 +133,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
         {intl.formatMessage(messages.duplicateUserMobileErrorMessege, {
           number: phoneNumber
         })}
-      </FloatingNotification>
+      </Toast>
     </ResponsiveModal>
   )
 }
