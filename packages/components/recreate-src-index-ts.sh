@@ -10,7 +10,7 @@
 
 cd src
 
-# File header
+# Insert file header to index.ts
 cat > index.ts <<- EOM
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -25,12 +25,12 @@ cat > index.ts <<- EOM
  */
 EOM
 
-# Loop through directories starting with capitalized A-Z
+# Loop through directories starting with capitalized A-Z and append them to index.ts
 for directory in [A-Z]*/; do
   echo "export * from './${directory::-1}'"
 done >> index.ts
 
-# File footer
+# Append file footer to to index.ts
 cat >> index.ts <<- EOM
 
 export * from './colors'
