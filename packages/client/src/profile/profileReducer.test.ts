@@ -19,11 +19,11 @@ import {
   mockRegistrarUserResponse
 } from '@client/tests/util'
 import { storage } from '@client/storage'
-import * as changeLanguageActions from '@client/i18n/actions'
+import { vi, Mock } from 'vitest'
 
-storage.removeItem = jest.fn()
+storage.removeItem = vi.fn()
 
-const removeItem = window.localStorage.removeItem as jest.Mock
+const removeItem = window.localStorage.removeItem as Mock
 
 describe('profileReducer tests', () => {
   let store: AppStore

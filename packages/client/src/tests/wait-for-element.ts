@@ -18,7 +18,7 @@ const INTERVAL = 10
 const SECONDS_INTERVAL = 1000
 
 export async function waitForSeconds(time: number) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     let remainingTime = time * 1000
 
     const intervalId = setInterval(() => {
@@ -32,7 +32,7 @@ export async function waitForSeconds(time: number) {
 }
 
 export async function waitFor(condition: () => boolean) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     let remainingTime = MAX_TIME
 
     const intervalId = setInterval(() => {

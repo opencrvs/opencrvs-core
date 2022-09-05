@@ -19,6 +19,7 @@ import {
 import { Event } from '@client/utils/gateway'
 import { messages } from '@client/i18n/messages/views/correction'
 import { fieldValueSectionExchangeTransformer } from '@client/forms/mappings/mutation'
+import { userMessages } from '@client/i18n/messages'
 
 export enum CorrectorRelationship {
   //death
@@ -32,7 +33,10 @@ export enum CorrectorRelationship {
   ANOTHER_AGENT = 'ANOTHER_AGENT',
   REGISTRAR = 'REGISTRAR',
   COURT = 'COURT',
-  OTHER = 'OTHER'
+  OTHER = 'OTHER',
+  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
+  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR',
+  REGISTRATION_AGENT = 'REGISTRATION_AGENT'
 }
 
 export const CollectorRelationLabelArray = [

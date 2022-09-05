@@ -80,7 +80,7 @@ import {
   FIELD_AGENT_ROLES,
   IN_PROGRESS
 } from '@client/utils/constants'
-import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
+import { IQueryData } from '@client/views/OfficeHome/utils'
 import { Query } from '@client/components/Query'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { HOME } from '@client/navigation/routes'
@@ -322,12 +322,17 @@ function RecordAuditBody({
 } & IDispatchProps) {
   const [showDialog, setShowDialog] = React.useState(false)
   const [showActionDetails, setActionDetails] = React.useState(false)
+  const [actionDetailsIndex, setActionDetailsIndex] = React.useState(-1)
   const [actionDetailsData, setActionDetailsData] = React.useState({})
 
   if (!registerForm.registerForm || !declaration.type) return <></>
 
-  const toggleActionDetails = (actionItem: IActionDetailsData | null) => {
+  const toggleActionDetails = (
+    actionItem: IActionDetailsData | null,
+    itemIndex = -1
+  ) => {
     actionItem && setActionDetailsData(actionItem)
+    setActionDetailsIndex(itemIndex)
     setActionDetails((prevValue) => !prevValue)
   }
   const toggleDisplayDialog = () => setShowDialog((prevValue) => !prevValue)
@@ -507,6 +512,7 @@ function RecordAuditBody({
   const actionDetailsModalProps = {
     show: showActionDetails,
     actionDetailsData,
+    actionDetailsIndex,
     toggleActionDetails,
     intl,
     goToUser: goToUserProfile,

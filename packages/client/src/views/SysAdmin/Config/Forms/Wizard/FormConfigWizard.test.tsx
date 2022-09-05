@@ -18,20 +18,12 @@ import {
   natlSysAdminToken
 } from '@client/tests/util'
 import { FormConfigWizard } from './FormConfigWizard'
-import routeData from 'react-router'
-import { BirthSection } from '@client/forms'
-import { Event } from '@client/utils/gateway'
 import { checkAuth } from '@client/profile/profileActions'
 import { FieldEnabled } from '@client/forms/configuration'
 
 let component: ReactWrapper<{}, {}>
-
 describe('FormConfigWizard', () => {
   beforeEach(async () => {
-    jest
-      .spyOn(routeData, 'useParams')
-      .mockReturnValue({ event: Event.Birth, section: BirthSection.Child })
-
     const { store, history } = createStore()
     getItem.mockReturnValue(natlSysAdminToken)
     store.dispatch(checkAuth())
@@ -40,11 +32,9 @@ describe('FormConfigWizard', () => {
       history
     })
   })
-
   it('should load properly', () => {
     expect(component.exists('FormConfigWizard')).toBeTruthy()
   })
-
   describe('for default non customisable fields', () => {
     it('it should not show toggle buttons', () => {
       component
@@ -58,7 +48,6 @@ describe('FormConfigWizard', () => {
       expect(component.exists('Toggle')).toBeFalsy()
     })
   })
-
   describe('for default customisable fields', () => {
     it('should toggle the hidden property', () => {
       component
@@ -68,7 +57,6 @@ describe('FormConfigWizard', () => {
         .childAt(0)
         .simulate('click')
       component.update()
-
       component
         .find('[id="birth.child.child-view-group.attendantAtBirth_hide"]')
         .hostNodes()
@@ -81,7 +69,6 @@ describe('FormConfigWizard', () => {
       )
     })
   })
-
   describe('for custom fields', () => {
     beforeEach(() => {
       component.find('#add-TEXT-btn').hostNodes().first().simulate('click')

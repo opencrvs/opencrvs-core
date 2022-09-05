@@ -14,11 +14,12 @@ import {
   timeElapsed,
   getCountryTranslations
 } from '@client/views/PrintCertificate/utils'
+import { vi } from 'vitest'
 
 describe('calculateDays, timeElapsed tests', () => {
   it('timeElapsedInWords function returns required time duration in words', () => {
     // @ts-ignore
-    Date.now = jest.fn(() => new Date('2019-01-01'))
+    Date.now = vi.fn(() => new Date('2019-01-01'))
 
     let days = calculateDaysFromToday('1985-08-18')
 
