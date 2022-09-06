@@ -65,14 +65,14 @@ export async function transformBirthBundle(
         if (child) {
           bundle.entry.push({ resource: child } as fhir.BundleEntry)
         }
-        if (document) {
-          bundle.entry.push({ resource: document } as fhir.BundleEntry)
-        }
         if (mother) {
           bundle.entry.push({ resource: mother } as fhir.BundleEntry)
         }
         if (informant) {
           bundle.entry.push({ resource: informant } as fhir.BundleEntry)
+        }
+        if (document) {
+          bundle.entry.push({ resource: document } as fhir.BundleEntry)
         }
         return bundle
       default:
