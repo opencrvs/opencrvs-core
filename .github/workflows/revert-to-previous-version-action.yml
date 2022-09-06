@@ -37,19 +37,17 @@ jobs:
     outputs:
       core-image-tag: ${{ steps.core.outputs.core-image-tag }}
       farajaland-image-tag: ${{ steps.farajaland.outputs.farajaland-image-tag }}
-    env:
-      VERSION_TAG: ${{ github.event.inputs.version_tag }}
     steps:
       - name: Checking out core repo
         uses: actions/checkout@v2
         with:
-          ref: refs/tags/$VERSION_TAG
+          ref: refs/tags/${{ github.event.inputs.version_tag }}
       - name: Checking out the country config repo
         uses: actions/checkout@v2
         with:
           repository: opencrvs/opencrvs-farajaland
           path: opencrvs-farajaland
-          ref: refs/tags/$VERSION_TAG
+          ref: refs/tags/${{ github.event.inputs.version_tag }}
       - name: Set core image tag as output
         id: core
         run: echo "::set-output name=core-image-tag::$(git rev-parse --short=7 HEAD)"
