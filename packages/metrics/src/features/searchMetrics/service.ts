@@ -1,4 +1,10 @@
 import { query } from '@metrics/influxdb/client'
+import { getTokenPayload } from '@metrics/utils/authUtils'
+
+export function getClientIdFromToken(token: string) {
+  const payload = getTokenPayload(token)
+  return payload.sub
+}
 
 export async function fetchTotalSearchRequestByClientId(clientId: string) {
   return await query(

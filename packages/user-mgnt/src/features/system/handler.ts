@@ -301,7 +301,7 @@ export async function getSystemHandler(
   }
   return {
     name: system.name,
-    createdBy: `${system.createdBy[0].given} ${system.createdBy[0].family}`,
+    createdBy: `${system.createdBy[0]?.given} ${system.createdBy[0]?.family}`,
     client_id: system.client_id,
     username: system.username,
     status: system.status,
@@ -309,7 +309,7 @@ export async function getSystemHandler(
     sha_secret: system.sha_secret,
     practitionerId: system.practitionerId,
     settings: {
-      dailyQuota: system.settings.dailyQuota
+      dailyQuota: system.settings.dailyQuota || 0
     }
   }
 }

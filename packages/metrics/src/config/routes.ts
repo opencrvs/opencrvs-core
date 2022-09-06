@@ -9,49 +9,48 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import * as Joi from 'joi'
-import {
-  inProgressHandler,
-  markBirthRegisteredHandler,
-  newBirthRegistrationHandler,
-  markCertifiedHandler,
-  markValidatedHandler,
-  markRejectedHandler,
-  waitingExternalValidationHandler,
-  markDeathRegisteredHandler,
-  newDeathRegistrationHandler,
-  newDeclarationHandler,
-  registrarRegistrationWaitingExternalValidationHandler,
-  requestForRegistrarValidationHandler,
-  requestCorrectionHandler
-} from '@metrics/features/registration/handler'
-import {
-  metricsDeleteMeasurementHandler,
-  metricsHandler
-} from '@metrics/features/metrics/handler'
-import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
-import { locationWiseEventEstimationsHandler } from '@metrics/features/locationWiseEventEstimations/handler'
+import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
+import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
 import {
   declarationsStartedHandler,
   declarationStartedMetricsByPractitionersHandler
 } from '@metrics/features/declarationsStarted/handler'
-import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
 import {
   exportHandler,
   monthlyExportHandler
 } from '@metrics/features/export/handler'
 import { getEventDurationHandler } from '@metrics/features/getEventDuration/handler'
-import { totalMetricsHandler } from '@metrics/features/totalMetrics/handler'
-import { totalPaymentsHandler } from '@metrics/features/payments/handler'
-import { totalCorrectionsHandler } from '@metrics/features/corrections/handler'
+import { getTimeLoggedHandler } from '@metrics/features/getTimeLogged/handler'
 import { locationStatisticsHandler } from '@metrics/features/locationStatistics/handler'
-import { totalCertificationsHandler } from '@metrics/features/certifications/handler'
+import { locationWiseEventEstimationsHandler } from '@metrics/features/locationWiseEventEstimations/handler'
+import {
+  metricsDeleteMeasurementHandler,
+  metricsHandler
+} from '@metrics/features/metrics/handler'
+import { monthWiseEventEstimationsHandler } from '@metrics/features/monthWiseEventEstimations/handler'
+import { totalPaymentsHandler } from '@metrics/features/payments/handler'
+import {
+  inProgressHandler,
+  markBirthRegisteredHandler,
+  markCertifiedHandler,
+  markDeathRegisteredHandler,
+  markRejectedHandler,
+  markValidatedHandler,
+  newBirthRegistrationHandler,
+  newDeathRegistrationHandler,
+  newDeclarationHandler,
+  registrarRegistrationWaitingExternalValidationHandler,
+  requestCorrectionHandler,
+  requestForRegistrarValidationHandler,
+  waitingExternalValidationHandler
+} from '@metrics/features/registration/handler'
 import {
   getAdvancedSearchByClient,
   postAdvancedSearchByClient,
-  requestSchema,
   responseSchema
 } from '@metrics/features/searchMetrics/handler'
+import { totalMetricsHandler } from '@metrics/features/totalMetrics/handler'
+import * as Joi from 'joi'
 
 const enum RouteScope {
   NATLSYSADMIN = 'natlsysadmin'
@@ -242,11 +241,6 @@ export const getRoutes = () => {
       handler: getAdvancedSearchByClient,
       config: {
         tags: ['api'],
-        validate: {
-          query: Joi.object({
-            clientId: Joi.string().required()
-          })
-        },
         response: {
           schema: responseSchema
         }
@@ -257,10 +251,7 @@ export const getRoutes = () => {
       path: '/advancedSearch',
       handler: postAdvancedSearchByClient,
       config: {
-        tags: ['api'],
-        validate: {
-          payload: requestSchema
-        }
+        tags: ['api']
       }
     },
 

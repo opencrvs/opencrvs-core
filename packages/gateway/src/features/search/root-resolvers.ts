@@ -10,15 +10,25 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { ApiResponse } from '@elastic/elasticsearch'
-import { postAdvancedSearch, postSearch } from '@gateway/features/fhir/utils'
+import {
+  getMetrics,
+  postAdvancedSearch,
+  postMetrics,
+  postSearch
+} from '@gateway/features/fhir/utils'
+import { markRecordAsDownloadedAndAssigned } from '@gateway/features/registration/root-resolvers'
 import {
   IAdvancedSearchParam,
   ISearchCriteria
 } from '@gateway/features/search/type-resolvers'
-import { hasScope, inScope } from '@gateway/features/user/utils'
+import {
+  getSystem,
+  getTokenPayload,
+  hasScope,
+  inScope
+} from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
-import { markRecordAsDownloadedAndAssigned } from '@gateway/features/registration/root-resolvers'
 
 // Complete definition of the Search response
 interface IShardsResponse {
@@ -200,6 +210,21 @@ export const resolvers: GQLResolver = {
       if (authHeader && !hasScope(authHeader, 'recordsearch')) {
         return await Promise.reject(new Error('User does not have permission'))
       }
+
+      const payload = getTokenPayload(authHeader.Authorization)
+      const system = await getSystem({ systemId: payload.sub }, authHeader)
+
+      const getTotalRequest = await getMetrics(
+        '/advancedSearch',
+        {},
+        authHeader
+      )
+
+      if (getTotalRequest.total >= system.settings.dailyQuota) {
+        return await Promise.reject(new Error('Daily search quota exceeded'))
+      }
+
+      await postMetrics('/advancedSearch', {}, authHeader)
 
       const searchResult: ApiResponse<ISearchResponse<any>> =
         await postAdvancedSearch(authHeader, searchCriteria)

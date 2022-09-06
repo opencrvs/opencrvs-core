@@ -1,18 +1,12 @@
-import * as Hapi from '@hapi/hapi'
-import * as Joi from 'joi'
 import { internal } from '@hapi/boom'
-import { writePoints } from '@metrics/influxdb/client'
+import * as Hapi from '@hapi/hapi'
+import { IPoints } from '@metrics/features/registration'
 import {
-  IAdvancedSearchFields,
-  IAdvancedSearchTags,
-  IPoints
-} from '@metrics/features/registration'
-import { fetchTotalSearchRequestByClientId } from '@metrics/features/searchMetrics/service'
-
-export const requestSchema = Joi.object({
-  clientId: Joi.string().required(),
-  ip_address: Joi.string().required()
-})
+  fetchTotalSearchRequestByClientId,
+  getClientIdFromToken
+} from '@metrics/features/searchMetrics/service'
+import { writePoints } from '@metrics/influxdb/client'
+import * as Joi from 'joi'
 
 export const responseSchema = Joi.object({
   total: Joi.number()
@@ -23,9 +17,8 @@ export async function getAdvancedSearchByClient(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const totalSearchResult = await fetchTotalSearchRequestByClientId(
-      request.query.clientId
-    )
+    const clientId = getClientIdFromToken(request.headers.authorization)
+    const totalSearchResult = await fetchTotalSearchRequestByClientId(clientId)
     const total = totalSearchResult.length > 0 ? totalSearchResult[0].count : 0
     return h.response({ total }).code(200)
   } catch (err) {
@@ -38,8 +31,8 @@ export async function postAdvancedSearchByClient(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const { clientId } = request.payload as IAdvancedSearchFields
-    const { ip_address } = request.payload as IAdvancedSearchTags
+    const clientId = getClientIdFromToken(request.headers.authorization)
+    const ip_address = request.info.remoteAddress
     const point: IPoints = {
       fields: { clientId },
       measurement: 'search_requests',
@@ -47,7 +40,7 @@ export async function postAdvancedSearchByClient(
       timestamp: undefined
     }
     await writePoints([point])
-    return h.response().code(200)
+    return h.response({}).code(200)
   } catch (err) {
     return internal(err)
   }
