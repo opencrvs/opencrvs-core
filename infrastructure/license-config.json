@@ -29,7 +29,10 @@
     "packages/client/index.html",
     "packages/login/index.html",
     "packages/components/.storybook/preview.jsx",
-    "grafana"
+    "grafana",
+    "packages/scheduler/start.sh",
+    "packages/scheduler/cronTabFiles/*",
+    "packages/scheduler/jobs/*"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {
