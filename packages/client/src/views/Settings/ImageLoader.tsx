@@ -46,10 +46,12 @@ export function ImageLoaderComp({
         const image = await validateImage(files[0])
         onImageLoaded({ type: files[0].type, data: image })
       } catch (error) {
-        if (error.message === ERROR_TYPES.OVERSIZED) {
-          onError(intl.formatMessage(messages.overSized))
-        } else {
-          onError(intl.formatMessage(messages.imageFormat))
+        if (error instanceof Error) {
+          if (error.message === ERROR_TYPES.OVERSIZED) {
+            onError(intl.formatMessage(messages.overSized))
+          } else {
+            onError(intl.formatMessage(messages.imageFormat))
+          }
         }
       } finally {
         fileUploader.current!.value = ''

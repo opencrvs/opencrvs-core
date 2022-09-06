@@ -24,7 +24,6 @@ module.exports = {
     es6: true,
     browser: true,
     node: true,
-    jest: true
   },
   rules: {
     'react-hooks/exhaustive-deps': 'error',

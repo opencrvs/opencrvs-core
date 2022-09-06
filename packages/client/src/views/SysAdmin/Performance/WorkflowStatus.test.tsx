@@ -23,6 +23,7 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { FETCH_EVENTS_WITH_PROGRESS } from './queries'
 import { GraphQLError } from 'graphql'
 import { match } from 'react-router'
+import { vi } from 'vitest'
 
 describe('Workflow status tests', () => {
   let store: AppStore
@@ -36,7 +37,7 @@ describe('Workflow status tests', () => {
     const testStore = await createTestStore()
     store = testStore.store
     history = testStore.history
-    Date.now = jest.fn(() => 1590220497869)
+    Date.now = vi.fn(() => 1590220497869)
   })
 
   describe('events with progress fetched successfully', () => {

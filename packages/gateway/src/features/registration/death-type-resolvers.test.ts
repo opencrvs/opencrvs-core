@@ -281,13 +281,13 @@ describe('Registration type resolvers', () => {
     it('returns RelatedPerson otherRelationship', async () => {
       fetch.mockResponseOnce(
         JSON.stringify({
-          text: 'Nephew'
+          coding: [{ display: 'Nephew' }]
         })
       )
       // @ts-ignore
       const relationship = await typeResolvers.RelatedPerson.otherRelationship({
         relationship: {
-          text: 'Nephew'
+          coding: [{ display: 'Nephew' }]
         }
       })
 

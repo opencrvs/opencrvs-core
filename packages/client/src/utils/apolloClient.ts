@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import ApolloClient from 'apollo-client'
+import { ApolloClient } from 'apollo-client'
 import { setContext } from 'apollo-link-context'
 import { ApolloLink, from } from 'apollo-link'
 import { createHttpLink } from 'apollo-link-http'
@@ -27,7 +27,6 @@ import { AnyAction, Store } from 'redux'
 import * as Sentry from '@sentry/react'
 import TimeoutLink from '@client/utils/timeoutLink'
 
-/* jest spyOn doesn't work if the variable is left as undefined */
 export let client: any = { mutate: () => {} }
 
 export const createClient = (store: Store<IStoreState, AnyAction>) => {

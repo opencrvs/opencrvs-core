@@ -10,10 +10,11 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { isMobileDevice } from '@client/utils/commonUtils'
+import { Mock } from 'vitest'
 
 describe('Common Utils Test', () => {
   beforeEach(() => {
-    ;(isMobileDevice as jest.Mock).mockRestore()
+    ;(isMobileDevice as Mock).mockRestore()
   })
 
   it('Should simulate Mobile Devise', () => {

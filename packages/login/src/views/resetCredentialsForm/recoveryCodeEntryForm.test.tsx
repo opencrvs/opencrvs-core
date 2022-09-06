@@ -32,10 +32,6 @@ describe('Test recvery code entry form', () => {
     app.update()
   })
 
-  afterEach(() => {
-    moxios.uninstall(client)
-  })
-
   describe('Valid page header and subheader', () => {
     const nonce = '123456789'
     const mobile = '01712345678'
@@ -46,6 +42,10 @@ describe('Test recvery code entry form', () => {
         mobile
       })
       app.update()
+    })
+
+    afterEach(() => {
+      moxios.uninstall(client)
     })
 
     describe('When recovery code is not resent', () => {
@@ -61,37 +61,45 @@ describe('Test recvery code entry form', () => {
     })
 
     describe('When recovery code is resent', () => {
-      it('loads valid header', (done) => {
-        app.find('#retrieve-login-mobile-resend').hostNodes().simulate('click')
-        moxios.wait(() => {
-          const request = moxios.requests.mostRecent()
-          request
-            .respondWith({
-              status: 200
-            })
-            .then(() => {
-              expect(app.text()).toContain('Verification code resent')
-              done()
-            })
-        })
-      })
+      it('loads valid header', () =>
+        new Promise<void>((done) => {
+          app
+            .find('#retrieve-login-mobile-resend')
+            .hostNodes()
+            .simulate('click')
+          moxios.wait(() => {
+            const request = moxios.requests.mostRecent()
+            request
+              .respondWith({
+                status: 200
+              })
+              .then(() => {
+                expect(app.text()).toContain('Verification code resent')
+                done()
+              })
+          })
+        }))
 
-      it('loads valid subheader', (done) => {
-        app.find('#retrieve-login-mobile-resend').hostNodes().simulate('click')
-        moxios.wait(() => {
-          const request = moxios.requests.mostRecent()
-          request
-            .respondWith({
-              status: 200
-            })
-            .then(() => {
-              expect(app.text()).toContain(
-                `We just resent you another code to ${mobile}`
-              )
-              done()
-            })
-        })
-      })
+      it('loads valid subheader', () =>
+        new Promise<void>((done) => {
+          app
+            .find('#retrieve-login-mobile-resend')
+            .hostNodes()
+            .simulate('click')
+          moxios.wait(() => {
+            const request = moxios.requests.mostRecent()
+            request
+              .respondWith({
+                status: 200
+              })
+              .then(() => {
+                expect(app.text()).toContain(
+                  `We just resent you another code to ${mobile}`
+                )
+                done()
+              })
+          })
+        }))
     })
   })
 
@@ -105,6 +113,10 @@ describe('Test recvery code entry form', () => {
         mobile
       })
       app.update()
+    })
+
+    afterEach(() => {
+      moxios.uninstall(client)
     })
 
     it('show field error when recovery code of invalid length is given', () => {
@@ -128,48 +140,52 @@ describe('Test recvery code entry form', () => {
       app.update()
     })
 
-    it('redirects to security question form when valid recovery code is given', (done) => {
-      app
-        .find('#recovery-code-input')
-        .hostNodes()
-        .simulate('change', { target: { value: '000000' } })
-      app.find('#continue').hostNodes().simulate('submit')
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 200,
-            response: {
-              nonce: 'KkcVYTRVC6usF7Vjdi3FSw==',
-              securityQuestionKey: 'FAVORITE_SONG'
-            }
-          })
-          .then(() => {
-            expect(window.location.pathname).toContain(routes.SECURITY_QUESTION)
-            done()
-          })
-      })
-    })
+    it('redirects to security question form when valid recovery code is given', () =>
+      new Promise<void>((done) => {
+        app
+          .find('#recovery-code-input')
+          .hostNodes()
+          .simulate('change', { target: { value: '000000' } })
+        app.find('#continue').hostNodes().simulate('submit')
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent()
+          request
+            .respondWith({
+              status: 200,
+              response: {
+                nonce: 'KkcVYTRVC6usF7Vjdi3FSw==',
+                securityQuestionKey: 'FAVORITE_SONG'
+              }
+            })
+            .then(() => {
+              expect(window.location.pathname).toContain(
+                routes.SECURITY_QUESTION
+              )
+              done()
+            })
+        })
+      }))
 
-    it('does not redirect to sucerity quetion form when invalid recovery code is given', (done) => {
-      app
-        .find('#recovery-code-input')
-        .hostNodes()
-        .simulate('change', { target: { value: '123456' } })
-      app.find('#continue').hostNodes().simulate('submit')
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 401
-          })
-          .then(() => {
-            expect(window.location.pathname).toContain(
-              routes.RECOVERY_CODE_ENTRY
-            )
-            done()
-          })
-      })
-    })
+    it('does not redirect to sucerity quetion form when invalid recovery code is given', () =>
+      new Promise<void>((done) => {
+        app
+          .find('#recovery-code-input')
+          .hostNodes()
+          .simulate('change', { target: { value: '123456' } })
+        app.find('#continue').hostNodes().simulate('submit')
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent()
+          request
+            .respondWith({
+              status: 401
+            })
+            .then(() => {
+              expect(window.location.pathname).toContain(
+                routes.RECOVERY_CODE_ENTRY
+              )
+              done()
+            })
+        })
+      }))
   })
 })

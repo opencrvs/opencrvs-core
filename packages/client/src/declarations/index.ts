@@ -45,7 +45,7 @@ import { DECLARED_DECLARATION_SEARCH_QUERY_COUNT } from '@client/utils/constants
 import { transformSearchQueryDataToDraft } from '@client/utils/draftUtils'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
 import { getQueryMapping } from '@client/views/DataProvider/QueryProvider'
-import { EVENT_STATUS, IQueryData } from '@client/views/OfficeHome/OfficeHome'
+import { EVENT_STATUS, IQueryData } from '@client/views/OfficeHome/utils'
 import {
   GQLEventSearchResultSet,
   GQLEventSearchSet,
@@ -139,6 +139,8 @@ export enum DOWNLOAD_STATUS {
 }
 
 export const processingStates = [
+  SUBMISSION_STATUS.READY_TO_ARCHIVE,
+  SUBMISSION_STATUS.ARCHIVING,
   SUBMISSION_STATUS.READY_TO_SUBMIT,
   SUBMISSION_STATUS.SUBMITTING,
   SUBMISSION_STATUS.READY_TO_APPROVE,
@@ -2023,11 +2025,8 @@ export function filterProcessingDeclarations(
   }
 }
 
-export function filterProcessingDeclarationsFromQuery(
-  queryData: IQueryData,
-  storedDeclarations: IDeclaration[]
-): IQueryData {
-  const processingDeclarationIds = storedDeclarations
+export function getProcessingDeclarationIds(declarations: IDeclaration[]) {
+  return declarations
     .filter(
       (declaration) =>
         declaration.submissionStatus &&
@@ -2036,6 +2035,14 @@ export function filterProcessingDeclarationsFromQuery(
         )
     )
     .map((declaration) => declaration.id)
+}
+
+export function filterProcessingDeclarationsFromQuery(
+  queryData: IQueryData,
+  storedDeclarations: IDeclaration[]
+): IQueryData {
+  const processingDeclarationIds =
+    getProcessingDeclarationIds(storedDeclarations)
 
   return {
     inProgressTab: filterProcessingDeclarations(

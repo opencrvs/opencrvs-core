@@ -15,11 +15,12 @@ import { createStore } from '@client/store'
 import * as React from 'react'
 import { GQLDeclarationsStartedMetrics } from '@opencrvs/gateway/src/graphql/schema'
 import * as locationUtils from '@client/utils/locationUtils'
+import { vi } from 'vitest'
 
 describe('Registration rates report', () => {
   const { store, history } = createStore()
   beforeEach(async () => {
-    jest.spyOn(locationUtils, 'getJurisidictionType').mockReturnValue('UNION')
+    vi.spyOn(locationUtils, 'getJurisidictionType').mockReturnValue('UNION')
   })
 
   it('renders loading indicator', async () => {

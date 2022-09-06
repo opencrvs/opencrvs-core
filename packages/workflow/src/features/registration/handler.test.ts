@@ -35,6 +35,7 @@ import {
   deathTaskMock,
   relatedPersonMock,
   hearthResponseMock,
+  userResponseMock,
   wrapInBundle
 } from '@workflow/test/utils'
 import { cloneDeep } from 'lodash'
@@ -1146,7 +1147,8 @@ describe('markEventAsDownloadedAndAssignedHandler', () => {
       [upazilaMock, { status: 200 }],
       [unionMock, { status: 200 }],
       [officeMock, { status: 200 }],
-      [hearthResponseMock, { status: 200 }]
+      [hearthResponseMock, { status: 200 }],
+      [userResponseMock, { status: 200 }]
     )
   })
 
@@ -3145,7 +3147,8 @@ describe('markDownloadedEventAsAssignedOrUnassignedHandler', () => {
       [upazilaMock, { status: 200 }],
       [unionMock, { status: 200 }],
       [officeMock, { status: 200 }],
-      [hearthResponseMock, { status: 200 }]
+      [hearthResponseMock, { status: 200 }],
+      [userResponseMock, { status: 200 }]
     )
   })
 
