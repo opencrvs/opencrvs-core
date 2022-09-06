@@ -32,9 +32,20 @@ export class DocumentImage extends React.Component<IProps> {
 
   render() {
     const { image, id } = this.props
+    let imageSrc
+    if (
+      image &&
+      image.split(':').length > 0 &&
+      image.split(':')[0] === 'data'
+    ) {
+      imageSrc = image
+    } else {
+      imageSrc = `${process.env.MINIO_URL || 'http://localhost:9000'}${image}`
+    }
+
     return (
       <ImageContainer id={id}>
-        {image && <PanViewer key={Math.random()} image={image} />}
+        {imageSrc && <PanViewer key={Math.random()} image={imageSrc} />}
       </ImageContainer>
     )
   }
