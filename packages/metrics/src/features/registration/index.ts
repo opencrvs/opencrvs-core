@@ -217,7 +217,7 @@ export interface IAdvancedSearchFields {
 }
 
 export interface IAdvancedSearchTags {
-  ip_address: string
+  ipAddress: string
 }
 
 export interface IAdvancedSearchPoints {

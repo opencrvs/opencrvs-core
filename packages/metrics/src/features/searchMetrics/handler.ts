@@ -32,11 +32,11 @@ export async function postAdvancedSearchByClient(
 ) {
   try {
     const clientId = getClientIdFromToken(request.headers.authorization)
-    const ip_address = request.info.remoteAddress
+    const ipAddress = request.info.remoteAddress
     const point: IPoints = {
       fields: { clientId },
       measurement: 'search_requests',
-      tags: { ip_address },
+      tags: { ipAddress },
       timestamp: undefined
     }
     await writePoints([point])
