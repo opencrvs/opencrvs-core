@@ -24,7 +24,7 @@ on:
         description: No of replicas deployed in the environemt
         default: "1"
         required: true
-      version_tag:
+      version-tag:
         type: choice
         description: The version tag to deploy
         required: true
@@ -32,38 +32,12 @@ on:
         options:
           - v1.0.1
 jobs:
-  get-image-tags:
-    runs-on: ubuntu-latest
-    outputs:
-      core-image-tag: ${{ steps.core.outputs.core-image-tag }}
-      farajaland-image-tag: ${{ steps.farajaland.outputs.farajaland-image-tag }}
-    steps:
-      - name: Checking out core repo
-        uses: actions/checkout@v2
-        with:
-          ref: refs/tags/${{ github.event.inputs.version_tag }}
-      - name: Checking out the country config repo
-        uses: actions/checkout@v2
-        with:
-          repository: opencrvs/opencrvs-farajaland
-          path: opencrvs-farajaland
-          ref: refs/tags/${{ github.event.inputs.version_tag }}
-      - name: Set core image tag as output
-        id: core
-        run: echo "::set-output name=core-image-tag::$(git rev-parse --short=7 HEAD)"
-      - name: Set farajaland image tag as output
-        id: farajaland
-        run: |
-          cd opencrvs-farajaland
-          echo "::set-output name=farajaland-image-tag::$(git rev-parse --short=7 HEAD)"
-          cd ../
   deploy:
-    needs: get-image-tags
     uses: ./.github/workflows/deploy.yml
     with:
-      environment: ${{ github.event.inputs.environment }}
-      core-image-tag: ${{ needs.get-image-tags.outputs.core-image-tag }}
-      farajaland-image-tag: ${{ needs.get-image-tags.outputs.farajaland-image-tag }}
+      environment: ${{ inputs.environment }}
+      core-image-tag: ${{ inputs.version-tag }}
+      farajaland-image-tag: ${{ inputs.version-tag }}
     secrets:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}

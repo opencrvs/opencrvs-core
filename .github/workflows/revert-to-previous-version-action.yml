@@ -24,7 +24,7 @@ on:
         description: No of replicas deployed in the environemt
         default: "1"
         required: true
-      version_tag:
+      version-tag:
         type: choice
         description: The version tag to revert back to
         required: true
@@ -32,46 +32,37 @@ on:
         options:
           - v1.0.1
 jobs:
-  get-image-tags:
-    runs-on: ubuntu-latest
-    outputs:
-      core-image-tag: ${{ steps.core.outputs.core-image-tag }}
-      farajaland-image-tag: ${{ steps.farajaland.outputs.farajaland-image-tag }}
-    steps:
-      - name: Checking out core repo
-        uses: actions/checkout@v2
-        with:
-          ref: refs/tags/${{ github.event.inputs.version_tag }}
-      - name: Checking out the country config repo
-        uses: actions/checkout@v2
-        with:
-          repository: opencrvs/opencrvs-farajaland
-          path: opencrvs-farajaland
-          ref: refs/tags/${{ github.event.inputs.version_tag }}
-      - name: Set core image tag as output
-        id: core
-        run: echo "::set-output name=core-image-tag::$(git rev-parse --short=7 HEAD)"
-      - name: Set farajaland image tag as output
-        id: farajaland
-        run: |
-          cd opencrvs-farajaland
-          echo "::set-output name=farajaland-image-tag::$(git rev-parse --short=7 HEAD)"
-          cd ../
   deploy:
-    needs: get-image-tags
     uses: ./.github/workflows/deploy.yml
     with:
-      environment: ${{ github.event.inputs.environment }}
-      core-image-tag: ${{ needs.get-image-tags.outputs.core-image-tag }}
-      farajaland-image-tag: ${{ needs.get-image-tags.outputs.farajaland-image-tag }}
+      environment: ${{ inputs.environment }}
+      core-image-tag: ${{ inputs.version-tag }}
+      farajaland-image-tag: ${{ inputs.version-tag }}
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+      DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
+      DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
+      KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+      KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
+      MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
+      MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
+      ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
   restore-data:
     needs: deploy
-    environment: ${{ github.event.inputs.environment }}
+    environment: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     env:
-      SSH_HOST: farajaland-${{ github.event.inputs.environment }}.opencrvs.org
-      REPLICAS: ${{ github.event.inputs.replicas }}
-      VERSION_TAG: ${{ github.event.inputs.version_tag }}
+      SSH_HOST: farajaland-${{ inputs.environment }}.opencrvs.org
+      REPLICAS: ${{ inputs.replicas }}
+      VERSION_TAG: ${{ inputs.version-tag }}
     steps:
       - name: Install SSH Key
         uses: shimataro/ssh-key-action@v2
