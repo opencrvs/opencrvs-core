@@ -1,0 +1,68 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+# graphic logo are (registered/a) trademark(s) of Plan International.
+name: Deploy given version
+
+on: 
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        description: Environment to deploy to
+        required: true
+        default: config
+        options:
+          - config
+          - staging
+      replicas:
+        description: No of replicas deployed in the environemt
+        default: "1"
+        required: true
+      version_tag:
+        type: choice
+        description: The version tag to deploy
+        required: true
+        default: v1.0.1
+        options:
+          - v1.0.1
+jobs:
+  get-image-tags:
+    runs-on: ubuntu-latest
+    outputs:
+      core-image-tag: ${{ steps.core.outputs.core-image-tag }}
+      farajaland-image-tag: ${{ steps.farajaland.outputs.farajaland-image-tag }}
+    env:
+      VERSION_TAG: ${{ github.event.inputs.version_tag }}
+    steps:
+      - name: Checking out core repo
+        uses: actions/checkout@v2
+        with:
+          ref: refs/tags/$VERSION_TAG
+      - name: Checking out the country config repo
+        uses: actions/checkout@v2
+        with:
+          repository: opencrvs/opencrvs-farajaland
+          path: opencrvs-farajaland
+          ref: refs/tags/$VERSION_TAG
+      - name: Set core image tag as output
+        id: core
+        run: echo "::set-output name=core-image-tag::$(git rev-parse --short=7 HEAD)"
+      - name: Set farajaland image tag as output
+        id: farajaland
+        run: |
+          cd opencrvs-farajaland
+          echo "::set-output name=farajaland-image-tag::$(git rev-parse --short=7 HEAD)"
+          cd ../
+  deploy:
+    needs: get-image-tags
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: ${{ github.event.inputs.environment }}
+      core-image-tag: ${{ needs.get-image-tags.outputs.core-image-tag }}
+      farajaland-image-tag: ${{ needs.get-image-tags.outputs.farajaland-image-tag }}
