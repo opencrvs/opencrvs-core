@@ -64,3 +64,20 @@ jobs:
       environment: ${{ github.event.inputs.environment }}
       core-image-tag: ${{ needs.get-image-tags.outputs.core-image-tag }}
       farajaland-image-tag: ${{ needs.get-image-tags.outputs.farajaland-image-tag }}
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
+      KNOWN_HOSTS: ${{ secrets.KNOWN_HOSTS }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+      DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
+      DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
+      KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+      KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
+      MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
+      MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
+      ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}

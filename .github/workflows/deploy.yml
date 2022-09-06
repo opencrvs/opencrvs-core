@@ -21,6 +21,39 @@ on:
       farajaland-image-tag:
         type: string
         required: true
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
+      SSH_KEY:
+        required: true
+      KNOWN_HOSTS:
+        required: true
+      SMTP_PORT:
+        required: true
+      SMTP_HOST:
+        required: true
+      SMTP_USERNAME:
+        required: true
+      SMTP_PASSWORD:
+        required: true
+      ALERT_EMAIL:
+        required: true
+      DOCKERHUB_ACCOUNT:
+        required: true
+      DOCKERHUB_REPO:
+        required: true
+      KIBANA_USERNAME:
+        required: true
+      KIBANA_PASSWORD:
+        required: true
+      MONGODB_ADMIN_USER:
+        required: true
+      MONGODB_ADMIN_PASSWORD:
+        required: true
+      ELASTICSEARCH_SUPERUSER_PASSWORD:
+        required: true
   workflow_dispatch:
     inputs:
       environment:
