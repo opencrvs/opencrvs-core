@@ -42,20 +42,22 @@ jobs:
     steps:
       - name: Checking out core repo
         uses: actions/checkout@v2
+        with:
+          ref: refs/tags/$VERSION_TAG
       - name: Checking out the country config repo
-        run: |
-          git clone https://github.com/opencrvs/opencrvs-farajaland.git
+        uses: actions/checkout@v2
+        with:
+          repository: opencrvs/opencrvs-farajaland
+          path: opencrvs-farajaland
+          ref: refs/tags/$VERSION_TAG
       - name: Set core image tag as output
         id: core
-        run: |
-          cd opencrvs-core
-          echo "::set-output name=core-image-tag::$(git rev-parse --short=7 tags/$VERSION_TAG)"
-          cd ../
+        run: echo "::set-output name=core-image-tag::$(git rev-parse --short=7 HEAD)"
       - name: Set farajaland image tag as output
         id: farajaland
         run: |
           cd opencrvs-farajaland
-          echo "::set-output name=farajaland-image-tag::$(git rev-parse --short=7 tags/$VERSION_TAG)"
+          echo "::set-output name=farajaland-image-tag::$(git rev-parse --short=7 HEAD)"
           cd ../
   deploy:
     needs: get-image-tags
