@@ -29,7 +29,7 @@ export async function documentUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const payload = request.payload as IDocumentPayload
+  const payload = JSON.parse(request.payload as string) as IDocumentPayload
   const ref = uuid()
   try {
     const base64String = payload.fileData.split(',')[1]
@@ -42,7 +42,9 @@ export async function documentUploadHandler(
       ...payload.metaData
     })
 
-    return h.response({ refUrl: `/${MINIO_BUCKET}/${ref}` }).code(200)
+    return h
+      .response({ refUrl: `/${MINIO_BUCKET}/${generateFileName}` })
+      .code(200)
   } catch (error) {
     return Promise.reject(new Error(`request failed: ${error.message}`))
   }
