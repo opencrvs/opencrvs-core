@@ -21,6 +21,7 @@ on:
           - qa
           - production
           - config
+          - migrate
       core-image-tag:
         description: Core DockerHub image tag
         required: false
@@ -34,7 +35,7 @@ jobs:
     timeout-minutes: 60
     strategy:
       matrix:
-        node-version: [14.17.0]
+        node-version: [14.18.0]
     steps:
       - name: Checking out git repo
         uses: actions/checkout@v2
@@ -161,3 +162,21 @@ jobs:
           ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
         run: |
           yarn deploy:config farajaland-config.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1
+
+      - name: Deploy to migrate
+        if: ${{ github.event.inputs.environment == 'migrate' }}
+        env:
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          ALERT_EMAIL: ${{ secrets.ALERT_EMAIL }}
+          DOCKERHUB_ACCOUNT: ${{ secrets.DOCKERHUB_ACCOUNT }}
+          DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_REPO }}
+          KIBANA_USERNAME: ${{ secrets.KIBANA_USERNAME }}
+          KIBANA_PASSWORD: ${{ secrets.KIBANA_PASSWORD }}
+          MONGODB_ADMIN_USER: ${{ secrets.MONGODB_ADMIN_USER }}
+          MONGODB_ADMIN_PASSWORD: ${{ secrets.MONGODB_ADMIN_PASSWORD }}
+          ELASTICSEARCH_SUPERUSER_PASSWORD: ${{ secrets.ELASTICSEARCH_SUPERUSER_PASSWORD }}
+        run: |
+          yarn deploy:staging farajaland-migrate.opencrvs.org ${{ env.CORE_VERSION }} ${{ env.COUNTRY_CONFIG_VERSION }} opencrvs-farajaland 1

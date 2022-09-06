@@ -19,6 +19,7 @@ import { pinValidator } from '@client/views/Unlock/ComparePINs'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { waitForElement } from '@client/tests/wait-for-element'
+import { vi, Mock } from 'vitest'
 
 const clearPassword = (component: ReactWrapper) => {
   const backSpaceElem = component.find('#keypad-backspace').hostNodes()
@@ -31,7 +32,7 @@ const clearPassword = (component: ReactWrapper) => {
 
 describe('Unlock page loads Properly', () => {
   let testComponent: ReactWrapper
-  const onForgetPinMock: jest.Mock = jest.fn()
+  const onForgetPinMock: Mock = vi.fn()
   beforeEach(async () => {
     await flushPromises()
 
@@ -51,12 +52,12 @@ describe('Unlock page loads Properly', () => {
       locked_time: undefined
     }
 
-    storage.getItem = jest.fn(async (key: string) =>
+    storage.getItem = vi.fn(async (key: string) =>
       // @ts-ignore
       Promise.resolve(indexedDB[key])
     )
 
-    storage.setItem = jest.fn(
+    storage.setItem = vi.fn(
       // @ts-ignore
       async (key: string, value: string) => (indexedDB[key] = value)
     )
@@ -95,11 +96,11 @@ describe('Unlock page loads Properly', () => {
 
 describe('For wrong inputs', () => {
   let testComponent: ReactWrapper
-  const onForgetPinMock: jest.Mock = jest.fn()
+  const onForgetPinMock: Mock = vi.fn()
 
   beforeEach(async () => {
     await flushPromises()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     const { store, history } = createStore()
     testComponent = await createTestComponent(
       <Unlock onCorrectPinMatch={() => null} onForgetPin={onForgetPinMock} />,
@@ -107,7 +108,7 @@ describe('For wrong inputs', () => {
     )
 
     // These tests are only for wrong inputs, so this mock fn only returns a promise of false
-    pinValidator.isValidPin = jest.fn(async (pin) => Promise.resolve(false))
+    pinValidator.isValidPin = vi.fn(async (pin) => Promise.resolve(false))
   })
   it('Should Display Incorrect error message', async () => {
     const numberElem = testComponent.find('#keypad-1').hostNodes()
@@ -139,12 +140,12 @@ describe('For wrong inputs', () => {
 
 describe('Pin locked session', () => {
   let testComponent: ReactWrapper
-  const onForgetPinMock: jest.Mock = jest.fn()
+  const onForgetPinMock: Mock = vi.fn()
   beforeEach(async () => {
     await flushPromises()
-    jest.clearAllMocks()
+    vi.clearAllMocks()
 
-    Date.now = jest.fn(() => 1578308937586)
+    Date.now = vi.fn(() => 1578308937586)
     // mock indexeddb
     const indexedDB = {
       USER_DETAILS: JSON.stringify({ userMgntUserID: 'shakib75' }),
@@ -161,12 +162,12 @@ describe('Pin locked session', () => {
       locked_time: '1578308927392'
     }
 
-    storage.getItem = jest.fn(async (key: string) =>
+    storage.getItem = vi.fn(async (key: string) =>
       // @ts-ignore
       Promise.resolve(indexedDB[key])
     )
 
-    storage.setItem = jest.fn(
+    storage.setItem = vi.fn(
       // @ts-ignore
       async (key: string, value: string) => (indexedDB[key] = value)
     )
@@ -196,11 +197,11 @@ describe('Pin locked session', () => {
 })
 
 describe('Logout Sequence', () => {
-  const onForgetPinMock: jest.Mock = jest.fn()
+  const onForgetPinMock: Mock = vi.fn()
 
   it('should clear lock-related indexeddb entries upon logout', async () => {
     const { store, history } = createStore()
-    const redirect = jest.fn()
+    const redirect = vi.fn()
     const testComponent = await createTestComponent(
       <Unlock
         onCorrectPinMatch={() => redirect}
@@ -213,7 +214,7 @@ describe('Logout Sequence', () => {
       SECURITY_PIN_EXPIRED_AT: 1234
     }
     // @ts-ignore
-    storage.removeItem = jest.fn((key: string) => {
+    storage.removeItem = vi.fn((key: string) => {
       // @ts-ignore
       delete indexeddb[key]
     })

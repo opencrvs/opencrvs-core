@@ -10,11 +10,13 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { referenceApi } from '@client/utils/referenceApi'
-import * as fetchMock from 'jest-fetch-mock'
+import { vi } from 'vitest'
+import createFetchMock from 'vitest-fetch-mock'
 
-jest.unmock('@client/utils/referenceApi')
+vi.unmock('@client/utils/referenceApi')
 
-const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+const fetch = createFetchMock(vi)
+fetch.enableMocks()
 
 export const mockFetchLocations = {
   data: {
