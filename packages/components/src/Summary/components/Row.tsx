@@ -107,6 +107,7 @@ export const Row = ({
     </RowLabelContainer>
     <RowValueContainer
       data-testid={props['data-testid'] && `${props['data-testid']}-value`}
+      data-testclass={locked && 'locked'}
     >
       <RowValue value={value} placeholder={placeholder} locked={locked} />
     </RowValueContainer>

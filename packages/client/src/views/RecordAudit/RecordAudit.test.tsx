@@ -167,10 +167,16 @@ describe('Record audit summary for a draft death declaration', () => {
   })
 
   it('Check values for saved declarations', async () => {
-    expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
-    expect(component.find('#type_value').hostNodes().text()).toBe('Death')
-    expect(component.exists('#drn_value')).toBeFalsy()
-    expect(component.find('#placeOfDeath_value').hostNodes()).toHaveLength(1)
+    expect(
+      component.find({ 'data-testid': 'status-value' }).hostNodes().text()
+    ).toBe('Draft')
+    expect(
+      component.find({ 'data-testid': 'type-value' }).hostNodes().text()
+    ).toBe('Death')
+    expect(component.exists({ 'data-testid': 'drn-value' })).toBeFalsy()
+    expect(
+      component.find({ 'data-testid': 'placeOfDeath-value' }).hostNodes()
+    ).toHaveLength(1)
   })
 })
 
@@ -252,13 +258,31 @@ describe('Record audit summary for WorkQueue declarations', () => {
   })
 
   it('Check values for WQ declarations', async () => {
-    expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
-    expect(component.find('#type_value').hostNodes().text()).toBe('Birth')
+    expect(
+      component.find({ 'data-testid': 'status-value' }).hostNodes().text()
+    ).toBe('Draft')
+    expect(
+      component.find({ 'data-testid': 'type-value' }).hostNodes().text()
+    ).toBe('Birth')
     expect(component.find('#content-name').hostNodes().text()).toBe(
       'Shakib Al Hasan'
     )
-    expect(component.find('#placeOfBirth_grey').hostNodes()).toHaveLength(1)
-    expect(component.find('#placeOfDeath_grey').hostNodes()).toHaveLength(0)
+    expect(
+      component
+        .find({
+          'data-testid': 'placeOfBirth-value',
+          'data-testclass': 'locked'
+        })
+        .hostNodes()
+    ).toHaveLength(1)
+    expect(
+      component
+        .find({
+          'data-testid': 'placeOfDeath-value',
+          'data-testclass': 'locked'
+        })
+        .hostNodes()
+    ).toHaveLength(0)
   })
 })
 
@@ -396,10 +420,12 @@ describe('Record audit summary for GQLQuery', () => {
   })
 
   it('Check values for GQL declarations', async () => {
-    expect(component.find('#status_value').hostNodes().text()).toBe(
-      'Registered'
-    )
-    expect(component.find('#type_value').hostNodes().text()).toBe('Death')
+    expect(
+      component.find({ 'data-testid': 'status-value' }).hostNodes().text()
+    ).toBe('Registered')
+    expect(
+      component.find({ 'data-testid': 'type-value' }).hostNodes().text()
+    ).toBe('Death')
     expect(component.find('#placeOfBirth_grey').hostNodes()).toHaveLength(0)
     expect(component.find('#placeOfDeath_grey').hostNodes()).toHaveLength(1)
   })
