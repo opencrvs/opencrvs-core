@@ -28,7 +28,7 @@ const Template: ComponentStory<typeof Text> = (args) => (
 export const Default = Template.bind({})
 Default.args = {
   variant: 'h1',
-  as: 'h1'
+  element: 'h1'
 }
 
 export const Heading = () => (
