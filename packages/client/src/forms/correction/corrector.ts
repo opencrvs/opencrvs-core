@@ -62,18 +62,6 @@ export const CollectorRelationLabelArray = [
   {
     value: CorrectorRelationship.OTHER,
     label: messages.others
-  },
-  {
-    value: CorrectorRelationship.LOCAL_REGISTRAR,
-    label: userMessages.LOCAL_REGISTRAR
-  },
-  {
-    value: CorrectorRelationship.NATIONAL_REGISTRAR,
-    label: userMessages.NATIONAL_REGISTRAR
-  },
-  {
-    value: CorrectorRelationship.REGISTRATION_AGENT,
-    label: userMessages.REGISTRATION_AGENT
   }
 ]
 

@@ -124,12 +124,18 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
         hideBackground={true}
       >
         <Container>
-          <SpinnerWrapper>
+          {this.props.submitting ? (
+            <SpinnerWrapper>
+              <Spinner id="user-form-submitting-spinner" size={25} />
+              <p>
+                {this.props.userId
+                  ? intl.formatMessage(userFormMessages.updatingUser)
+                  : intl.formatMessage(userFormMessages.creatingNewUser)}
+              </p>
+            </SpinnerWrapper>
+          ) : (
             <Spinner id="user-form-submitting-spinner" size={25} />
-            {this.props.submitting && (
-              <p>{intl.formatMessage(userFormMessages.creatingNewUser)}</p>
-            )}
-          </SpinnerWrapper>
+          )}
         </Container>
       </ActionPageLight>
     )

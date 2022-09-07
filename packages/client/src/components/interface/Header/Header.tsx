@@ -306,6 +306,30 @@ class HeaderComp extends React.Component<IFullProps, IState> {
             }
           ]
         }
+      } else if (
+        this.props.userDetails?.role &&
+        SYS_ADMIN_ROLES.includes(this.props.userDetails?.role)
+      ) {
+        return {
+          mobileLeft: [
+            {
+              icon: () => this.hamburger(),
+              handler: this.toggleMenu
+            }
+          ],
+          mobileRight: [
+            {
+              icon: () => <AddUser />,
+              handler: () => {
+                if (locationId) {
+                  this.props.goToCreateNewUserWithLocationId(locationId)
+                } else {
+                  this.props.goToCreateNewUser()
+                }
+              }
+            }
+          ]
+        }
       } else {
         return {
           mobileLeft: [

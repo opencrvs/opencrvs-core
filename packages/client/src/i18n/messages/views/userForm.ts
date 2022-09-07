@@ -115,5 +115,10 @@ export const messages = {
     defaultMessage: 'Creating new user',
     description: 'label for creating new user',
     id: 'form.field.label.creatingNewUser'
+  },
+  updatingUser: {
+    defaultMessage: 'Updating user',
+    description: 'label for updating user',
+    id: 'form.field.label.updatingUser'
   }
 }

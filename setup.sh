@@ -219,7 +219,7 @@ do
         fi
         if [ $i == "node" ] ; then
             echo "You need to install Node, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your node installation."
-            echo "We recommend you install Node 14.18.0 or v14.18.1 as this release has been tested on those versions."
+            echo "We recommend you install Node v.14.17.0, v.14.17.6, v14.18.0 or v14.18.1 as this release has been tested on those versions."
             echo "There are various ways you can install Node.  The easiest way to get Node running with the version of your choice is using Node Version Manager."
             echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm.  For example run:\033[0m"
             echo "curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash"
@@ -287,10 +287,10 @@ echo -e "\033[32m:::::: NOW WE NEED TO CHECK THAT YOUR NODE VERSION IS SUPPORTED
 echo
 
 myNodeVersion=`echo "$(node -v)" | sed 's/v//'`
-versionTest=$(do_version_check $myNodeVersion 14.18.0)
+versionTest=$(do_version_check $myNodeVersion 14.17.0)
 if [ "$versionTest" == "LOWER" ] ; then
   echo "Sorry your Node version is not supported.  You must upgrade Node to use a supported version."
-  echo "We recommend you install Node v14.18.0 or 14.18.1 as this release has been tested on those versions."
+  echo "We recommend you install Node v.14.17.0, v.14.17.6, v14.18.0 or v14.18.1 as this release has been tested on those versions."
   echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm"
   echo "Then use nvm to install the Node version of choice.  For example run:\033[0m"
   echo "nvm install 14.18.0"
