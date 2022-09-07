@@ -96,17 +96,19 @@ export const Row = ({
   placeholder,
   locked,
   ...props
-}: ISummaryRowProps) => {
-  return (
-    <RowContainer {...props}>
-      <RowLabelContainer>
-        <Text variant="bold16" element="span">
-          {label}
-        </Text>
-      </RowLabelContainer>
-      <RowValueContainer>
-        <RowValue value={value} placeholder={placeholder} locked={locked} />
-      </RowValueContainer>
-    </RowContainer>
-  )
-}
+}: ISummaryRowProps) => (
+  <RowContainer {...props}>
+    <RowLabelContainer
+      data-testid={props['data-testid'] && `${props['data-testid']}-key`}
+    >
+      <Text variant="bold16" element="span">
+        {label}
+      </Text>
+    </RowLabelContainer>
+    <RowValueContainer
+      data-testid={props['data-testid'] && `${props['data-testid']}-value`}
+    >
+      <RowValue value={value} placeholder={placeholder} locked={locked} />
+    </RowValueContainer>
+  </RowContainer>
+)

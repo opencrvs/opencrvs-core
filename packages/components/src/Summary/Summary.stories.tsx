@@ -21,7 +21,12 @@ export default {
 
 export const Default: ComponentStory<typeof Summary> = () => (
   <Summary>
-    <Summary.Row label="Status" value="Draft" placeholder="No status" />
+    <Summary.Row
+      data-testid="status"
+      label="Status"
+      value="Draft"
+      placeholder="No status"
+    />
     <Summary.Row label="Event" value="Birth" placeholder="No event" />
     <Summary.Row label="Tracking ID" placeholder="No tracking ID" />
     <Summary.Row label="Date of birth" locked={true} />
