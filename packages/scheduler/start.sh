@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Select the crontab file based on the environment
-CRON_FILE="declarationReportCrontab"
+CRON_FILE="VSExportCrontab"
 
 echo "Loading crontab file: $CRON_FILE"
 
