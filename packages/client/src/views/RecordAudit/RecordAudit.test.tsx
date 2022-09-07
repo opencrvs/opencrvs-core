@@ -118,10 +118,16 @@ describe('Record audit summary for a draft birth declaration', () => {
   })
 
   it('Check values for saved declarations', async () => {
-    expect(component.find('#status_value').hostNodes().text()).toBe('Draft')
-    expect(component.find('#type_value').hostNodes().text()).toBe('Birth')
-    expect(component.exists('#brn_value')).toBeFalsy()
-    expect(component.find('#placeOfBirth_value').hostNodes()).toHaveLength(1)
+    expect(
+      component.find({ 'data-testid': 'status-value' }).hostNodes().text()
+    ).toBe('Draft')
+    expect(
+      component.find({ 'data-testid': 'type-value' }).hostNodes().text()
+    ).toBe('Birth')
+    expect(component.exists({ 'data-testid': 'brn-value' })).toBeFalsy()
+    expect(
+      component.find({ 'data-testid': 'placeOfBirth-value' }).hostNodes()
+    ).toHaveLength(1)
   })
 })
 

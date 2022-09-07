@@ -140,6 +140,7 @@ export const GetDeclarationInfo = ({
 
           return (
             <Summary.Row
+              data-testid={`${key}-value`}
               label={intl.formatMessage(recordAuditMessages[key])}
               placeholder={placeholder}
               value={rowValue}

@@ -46,7 +46,8 @@ const LockedBox = styled.div`
   background-color: ${colors.grey200};
 `
 
-export interface ISummaryRowProps {
+export interface ISummaryRowProps
+  extends Omit<React.HTMLAttributes<HTMLTableRowElement>, 'placeholder'> {
   /** Data row label */
   label: string
   /** Data associated with label */
@@ -93,10 +94,11 @@ export const Row = ({
   label,
   value,
   placeholder,
-  locked
+  locked,
+  ...props
 }: ISummaryRowProps) => {
   return (
-    <RowContainer>
+    <RowContainer {...props}>
       <RowLabelContainer>
         <Text variant="bold16" element="span">
           {label}
