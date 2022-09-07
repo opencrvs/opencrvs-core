@@ -244,9 +244,6 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
             modal: {
               title: {
                 message: messages.registerConfirmationTitle
-              },
-              description: {
-                message: constantsMessages.areYouSure
               }
             }
           },
@@ -273,9 +270,6 @@ const ACTION_TO_CONTENT_MAP: { [key: string]: any } = {
             modal: {
               title: {
                 message: messages.registerConfirmationTitle
-              },
-              description: {
-                message: constantsMessages.registerConfirmModalDesc
               }
             }
           },
@@ -456,10 +450,11 @@ class ReviewActionComponent extends React.Component<
             show={this.state.showSubmitModal}
             handleClose={this.toggleSubmitModalOpen}
           >
-            {intl.formatMessage(actionContent.modal.description.message, {
-              ...actionContent.modal.description.payload,
-              event: declaration.event
-            })}
+            {actionContent.modal.description &&
+              intl.formatMessage(actionContent.modal.description.message, {
+                ...actionContent.modal.description.payload,
+                event: declaration.event
+              })}
           </ResponsiveModal>
         )}
       </Container>
