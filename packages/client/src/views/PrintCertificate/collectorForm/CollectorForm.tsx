@@ -44,6 +44,7 @@ import {
 import { buttonMessages, errorMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import {
+  formatUrl,
   goBack,
   goToHomeTab,
   goToPrintCertificate,
@@ -51,7 +52,10 @@ import {
   goToReviewCertificate,
   goToVerifyCollector
 } from '@client/navigation'
-import { CERTIFICATE_COLLECTOR } from '@client/navigation/routes'
+import {
+  CERTIFICATE_COLLECTOR,
+  REGISTRAR_HOME_TAB
+} from '@client/navigation/routes'
 import { IStoreState } from '@client/store'
 import styled, { ITheme } from '@client/styledComponents'
 import { gqlToDraftTransformer } from '@client/transformer'
@@ -73,7 +77,7 @@ import { flatten, cloneDeep } from 'lodash'
 import * as React from 'react'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { connect } from 'react-redux'
-import { RouteComponentProps } from 'react-router'
+import { Redirect, RouteComponentProps } from 'react-router'
 import { withTheme } from 'styled-components'
 import { IValidationResult } from '@client/utils/validate'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
@@ -100,7 +104,7 @@ interface IBaseProps {
   event: Event
   pageRoute: string
   declarationId: string
-  declaration: IPrintableDeclaration
+  declaration: IPrintableDeclaration | undefined
   formSection: IFormSection
   formGroup: IFormSectionGroup
   offlineCountryConfiguration: IOfflineData
@@ -356,7 +360,16 @@ class CollectorFormComponent extends React.Component<IProps, IState> {
       declaration
     )
     const declarationToBeCertified = declaration
-
+    if (!declarationToBeCertified) {
+      return (
+        <Redirect
+          to={formatUrl(REGISTRAR_HOME_TAB, {
+            tabId: WORKQUEUE_TABS.readyToPrint,
+            selectorId: ''
+          })}
+        />
+      )
+    }
     return (
       <>
         <ActionPageLight
@@ -479,7 +492,7 @@ const mapStateToProps = (
 
   const declaration = state.declarationsState.declarations.find(
     (declaration) => declaration.id === registrationId
-  ) as IPrintableDeclaration
+  ) as IPrintableDeclaration | undefined
 
   const formSection = getCollectCertificateForm(event, state)
   const userDetails = getUserDetails(state)
