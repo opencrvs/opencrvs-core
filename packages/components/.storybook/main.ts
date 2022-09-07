@@ -34,8 +34,8 @@ const config = {
     reactDocgen: 'react-docgen'
   },
   stories: [
-    '../(src|stories)/**/*.stories.mdx',
-    '../(src|stories)/**/*.stories.@(js|jsx|ts|tsx)'
+    '../@(src|stories)/**/*.stories.mdx',
+    '../@(src|stories)/**/*.stories.@(js|jsx|ts|tsx)'
   ],
   core: { builder: '@storybook/builder-vite' },
   addons: ['@storybook/addon-links', '@storybook/addon-essentials'],
