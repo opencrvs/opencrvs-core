@@ -31,6 +31,20 @@ const COLLECTION_NAMES = {
   TASK: 'Task'
 }
 
+const OBSERVATION_CODE = {
+  CAUSE_OF_DEATH_METHOD: 'cause-of-death-method',
+  BIRTH_PLURALITY_OF_PREGNANCY: '57722-1',
+  BODY_WEIGHT_MEASURED: '3141-9',
+  BIRTH_ATTENDANT_TITLE: '73764-3',
+  CAUSE_OF_DEATH: 'ICD10',
+  UNCERTIFIED_MANNER_OF_DEATH: 'uncertified-manner-of-death',
+  VERBAL_AUTOPSY_DESCRIPTION: 'lay-reported-or-verbal-autopsy-description',
+  CAUSE_OF_DEATH_ESTABLISHED: 'cause-of-death-established',
+  NUM_MALE_DEPENDENTS_ON_DECEASED: 'num-male-dependents-on-deceased',
+  NUM_FEMALE_DEPENDENTS_ON_DECEASED: 'num-female-dependents-on-deceased',
+  PRESENT_AT_BIRTH_REG: 'present-at-birth-reg'
+}
+
 const connect = async () => {
   try {
     await client.connect()
@@ -42,12 +56,10 @@ const connect = async () => {
 
 async function getPastYearCompositionCursor() {
   const db = client.db(DB_NAME)
-  const today = new Date()
-  const yyyy = today.getFullYear()
   return db
     .collection(COLLECTION_NAMES.COMPOSITION)
     .find({
-      date: { $gt: `${yyyy - 1}-12-31` }
+      date: { $gt: process.argv[2], $lt: process.argv[3]  }
     })
     .project({ id: 1, title: 1, section: 1, date: 1, _id: 0 })
 }
@@ -138,7 +150,7 @@ async function setPatientsDetailsInComposition(composition, locations) {
   const patientIds = patientList.map((patient) =>
     patient.entry[0].reference.replace('Patient/', '')
   )
-  const patients = await getCollectionDocuments('Patient', patientIds)
+  const patients = await getCollectionDocuments(COLLECTION_NAMES.PATIENT, patientIds)
   await setPatientsAddress(patients, locations)
 
   composition.section.forEach((section) => {
@@ -166,43 +178,43 @@ async function setObservationDetailsInComposition(composition) {
   observations.forEach((observation) => {
     const causeOfDeathMethod = findCodeInObservation(
       observation,
-      'cause-of-death-method'
+      OBSERVATION_CODE.CAUSE_OF_DEATH_METHOD
     )
     const birthPluralityOfPregnancy = findCodeInObservation(
       observation,
-      '57722-1'
+      OBSERVATION_CODE.BIRTH_PLURALITY_OF_PREGNANCY
     )
-    const bodyWeightMeasured = findCodeInObservation(observation, '3141-9')
-    const birthAttendantTitle = findCodeInObservation(observation, '73764-3')
+    const bodyWeightMeasured = findCodeInObservation(observation, OBSERVATION_CODE.BODY_WEIGHT_MEASURED)
+    const birthAttendantTitle = findCodeInObservation(observation, OBSERVATION_CODE.BIRTH_ATTENDANT_TITLE)
     const uncertifiedMannerOfDeath = findCodeInObservation(
       observation,
-      'uncertified-manner-of-death'
+      OBSERVATION_CODE.UNCERTIFIED_MANNER_OF_DEATH
     )
     const verbalAutopsyDescription = findCodeInObservation(
       observation,
-      'lay-reported-or-verbal-autopsy-description'
+      OBSERVATION_CODE.VERBAL_AUTOPSY_DESCRIPTION
     )
     const causeOfDeathEstablished = findCodeInObservation(
       observation,
-      'cause-of-death-established'
+      OBSERVATION_CODE.CAUSE_OF_DEATH_ESTABLISHED
     )
-    const causeOfDeath = findCodeInObservation(observation, 'ICD10')
+    const causeOfDeath = findCodeInObservation(observation, OBSERVATION_CODE.CAUSE_OF_DEATH)
     const numMaleDependentsOnDeceased = findCodeInObservation(
       observation,
-      'num-male-dependents-on-deceased'
+      OBSERVATION_CODE.NUM_MALE_DEPENDENTS_ON_DECEASED
     )
     const numFemaleDependentsOnDeceased = findCodeInObservation(
       observation,
-      'num-female-dependents-on-deceased'
+      OBSERVATION_CODE.NUM_FEMALE_DEPENDENTS_ON_DECEASED
     )
     const presentAtBirthReg = findCodeInObservation(
       observation,
-      'present-at-birth-reg'
+      OBSERVATION_CODE.PRESENT_AT_BIRTH_REG
     )
 
     if (causeOfDeathMethod) {
       observationObj['causeOfDeathMethod'] =
-        causeOfDeathMethod.valueCodeableConcept.coding[0].code
+        causeOfDeathMethod.valueCodeableConcept?.coding?.[0].code
     }
     if (birthPluralityOfPregnancy) {
       observationObj['birthPluralityOfPregnancy'] =
@@ -218,7 +230,7 @@ async function setObservationDetailsInComposition(composition) {
     }
     if (uncertifiedMannerOfDeath) {
       observationObj['uncertifiedMannerOfDeath'] =
-        uncertifiedMannerOfDeath.valueCodeableConcept.coding[0].code
+        uncertifiedMannerOfDeath.valueCodeableConcept?.coding?.[0].code
     }
     if (verbalAutopsyDescription) {
       observationObj['verbalAutopsyDescription'] =
@@ -230,7 +242,7 @@ async function setObservationDetailsInComposition(composition) {
     }
     if (causeOfDeath) {
       observationObj['causeOfDeath'] =
-        causeOfDeath.valueCodeableConcept.coding[0].code
+        causeOfDeath.valueCodeableConcept?.coding?.[0].code
     }
     if (numMaleDependentsOnDeceased) {
       observationObj['numMaleDependentsOnDeceased'] =
@@ -343,43 +355,43 @@ async function setLocationInComposition(composition, locations) {
 
 async function createBirthDeclarationCSVWriter() {
   const birthCSV = createCSV({
-    path: 'Birth_Report.csv',
+    path: './scripts/Birth_Report.csv',
     append: true,
     header: [
-      { id: 'childGen' },
-      { id: 'childDOB' },
-      { id: 'childOrd' },
-      { id: 'birthCity' },
-      { id: 'birthState' },
-      { id: 'birthDistrict' },
-      { id: 'healthCenter' },
-      { id: 'officeLocation' },
-      { id: 'birthPluralityOfPregnancy' },
-      { id: 'bodyWeightMeasured' },
-      { id: 'birthAttendantTitle' },
-      { id: 'presentAtBirthReg' },
-      { id: 'motherDOB' },
-      { id: 'motherMaritalStatus' },
-      { id: 'motherOccupation' },
-      { id: 'motherEducationalAttainment' },
-      { id: 'motherCity' },
-      { id: 'motherDistrict' },
-      { id: 'motherState' },
-      { id: 'fatherDOB' },
-      { id: 'fatherMaritalStatus' },
-      { id: 'fatherOccupation' },
-      { id: 'fatherEducationalAttainment' },
-      { id: 'fatherCity' },
-      { id: 'fatherDistrict' },
-      { id: 'fatherState' },
-      { id: 'informantDOB' },
-      { id: 'informantMaritalStatus' },
-      { id: 'informantOccupation' },
-      { id: 'informantEducationalAttainment' },
-      { id: 'informantCity' },
-      { id: 'informantDistrict' },
-      { id: 'informantState' },
-      { id: 'informantRelationship' }
+      'childGen',
+      'childDOB',
+      'childOrd',
+      'birthCity',
+      'birthState',
+      'birthDistrict',
+      'healthCenter',
+      'officeLocation',
+      'birthPluralityOfPregnancy',
+      'bodyWeightMeasured',
+      'birthAttendantTitle',
+      'presentAtBirthReg',
+      'motherDOB',
+      'motherMaritalStatus',
+      'motherOccupation',
+      'motherEducationalAttainment',
+      'motherCity',
+      'motherDistrict',
+      'motherState',
+      'fatherDOB',
+      'fatherMaritalStatus',
+      'fatherOccupation',
+      'fatherEducationalAttainment',
+      'fatherCity',
+      'fatherDistrict',
+      'fatherState',
+      'informantDOB',
+      'informantMaritalStatus',
+      'informantOccupation',
+      'informantEducationalAttainment',
+      'informantCity',
+      'informantDistrict',
+      'informantState',
+      'informantRelationship'
     ]
   })
   let birthCSVHeader = [
@@ -426,32 +438,32 @@ async function createBirthDeclarationCSVWriter() {
 
 async function createDeathDeclarationCSVWriter() {
   const deathCSV = createCSV({
-    path: 'Death_Report.csv',
+    path: './scripts/Death_Report.csv',
     append: true,
     header: [
-      { id: 'deceasedGen' },
-      { id: 'deceasedDOB' },
-      { id: 'deceasedMaritalStatus' },
-      { id: 'deceasedDate' },
-      { id: 'deathCity' },
-      { id: 'deathState' },
-      { id: 'deathDistrict' },
-      { id: 'healthCenter' },
-      { id: 'officeLocation' },
-      { id: 'uncertifiedMannerOfDeath' },
-      { id: 'verbalAutopsyDescription' },
-      { id: 'causeOfDeathMethod' },
-      { id: 'causeOfDeathEstablished' },
-      { id: 'causeOfDeath' },
-      { id: 'numMaleDependentsOnDeceased' },
-      { id: 'numFemaleDependentsOnDeceased' },
-      { id: 'informantDOB' },
-      { id: 'informantMaritalStatus' },
-      { id: 'informantOccupation' },
-      { id: 'informantCity' },
-      { id: 'informantDistrict' },
-      { id: 'informantState' },
-      { id: 'informantRelationship' }
+      'deceasedGen',
+      'deceasedDOB',
+      'deceasedMaritalStatus',
+      'deceasedDate',
+      'deathCity',
+      'deathState',
+      'deathDistrict',
+      'healthCenter',
+      'officeLocation',
+      'uncertifiedMannerOfDeath',
+      'verbalAutopsyDescription',
+      'causeOfDeathMethod',
+      'causeOfDeathEstablished',
+      'causeOfDeath',
+      'numMaleDependentsOnDeceased',
+      'numFemaleDependentsOnDeceased',
+      'informantDOB',
+      'informantMaritalStatus',
+      'informantOccupation',
+      'informantCity',
+      'informantDistrict',
+      'informantState',
+      'informantRelationship'
     ]
   })
   let deathCSVHeader = [
@@ -608,7 +620,7 @@ async function makeComposotionAndExportCSVReport(
       'Successfully generated CSV report for birth and death declarations.'
     )
   } catch (error) {
-    console.log('Sorry. Something went wrong!')
+    console.log('Sorry. Something went wrong!', error)
   }
 }
 
