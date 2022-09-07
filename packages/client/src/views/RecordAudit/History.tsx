@@ -12,7 +12,7 @@
 
 import React from 'react'
 import { TableView } from '@opencrvs/components/lib/interface/TableView'
-import { Divider } from '@opencrvs/components/lib/interface/Divider'
+import { Divider } from '@opencrvs/components/lib/Divider'
 import styled from '@client/styledComponents'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { constantsMessages, userMessages } from '@client/i18n/messages'

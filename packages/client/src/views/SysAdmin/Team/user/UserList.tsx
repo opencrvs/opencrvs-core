@@ -48,12 +48,13 @@ import {
   NoWifi
 } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
+import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import {
-  ToggleMenu,
-  FloatingNotification,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
-import { BodyContent } from '@opencrvs/components/lib/layout'
+  BodyContent,
+  Content,
+  ContentSize
+} from '@opencrvs/components/lib/Content'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import {
   GQLHumanName,
@@ -76,16 +77,12 @@ import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
   ListViewItemSimplified,
   ListViewSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+} from '@opencrvs/components/lib/ListViewSimplified'
 import { useCallback } from 'react'
 import {
   withOnlineStatus,
   LoadingIndicator
 } from '@client/views/OfficeHome/LoadingIndicator'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
 import { LocationPicker } from '@client/components/LocationPicker'
 import { ApolloError } from 'apollo-client'
 
@@ -710,24 +707,24 @@ function UserListComponent(props: IProps) {
       )}
 
       {showResendSMSSuccess && (
-        <FloatingNotification
+        <Toast
           id="resend_invite_success"
           type={NOTIFICATION_TYPE.SUCCESS}
           show={showResendSMSSuccess}
           callback={() => setShowResendSMSSuccess(false)}
         >
           {intl.formatMessage(messages.resendSMSSuccess)}
-        </FloatingNotification>
+        </Toast>
       )}
       {showResendSMSError && (
-        <FloatingNotification
+        <Toast
           id="resend_invite_error"
           type={NOTIFICATION_TYPE.ERROR}
           show={showResendSMSError}
           callback={() => setShowResendSMSError(false)}
         >
           {intl.formatMessage(messages.resendSMSError)}
-        </FloatingNotification>
+        </Toast>
       )}
     </SysAdminContentWrapper>
   )

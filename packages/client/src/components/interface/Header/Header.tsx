@@ -61,11 +61,11 @@ import {
 } from '@opencrvs/components/lib/icons'
 import {
   AppHeader,
-  ExpandingMenu,
   IDomProps,
   ISearchType,
   SearchTool
 } from '@opencrvs/components/lib/interface'
+import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'

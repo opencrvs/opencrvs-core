@@ -11,8 +11,8 @@
  */
 import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
-import { Content } from '@opencrvs/components/lib/interface/Content'
-import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Currency } from '@opencrvs/components/lib/Currency'
 import { IPrintableDeclaration, modifyDeclaration } from '@client/declarations'
 import { Event } from '@client/utils/gateway'
 import { buttonMessages } from '@client/i18n/messages'
@@ -162,7 +162,7 @@ class PaymentComponent extends React.Component<IFullProps> {
               id="amountDue"
               label={intl.formatMessage(messages.amountDue)}
               value={
-                <FormattedNumberCurrency
+                <Currency
                   value={paymentAmount}
                   currency={offlineCountryConfig.config.CURRENCY.isoCode}
                   languagesAndCountry={

@@ -32,7 +32,7 @@ import { conditionals } from '@client/forms/utils'
 import { formMessages } from '@client/i18n/messages'
 import { messages as certificateMessages } from '@client/i18n/messages/views/certificate'
 import { validIDNumber } from '@client/utils/validate'
-import { RadioSize } from '@opencrvs/components/lib/forms'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export interface INameField {
   firstNamesField: string
