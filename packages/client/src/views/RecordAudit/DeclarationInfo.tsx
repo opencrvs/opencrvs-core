@@ -25,41 +25,13 @@ import {
   constantsMessages,
   dynamicConstantsMessages
 } from '@client/i18n/messages/constants'
+import { Summary } from '@opencrvs/components/lib/Summary'
 
 const MobileDiv = styled.div`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     display: inline;
   }
 `
-
-const InfoContainer = styled.div`
-  display: flex;
-  margin-bottom: 16px;
-  flex-flow: row;
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    flex-flow: column;
-  }
-`
-
-const KeyContainer = styled.div`
-  width: 190px;
-  color: ${({ theme }) => theme.colors.grey600};
-  ${({ theme }) => theme.fonts.bold16}
-`
-
-const ValueContainer = styled.div<{ value: undefined | string }>`
-  width: 325px;
-  color: ${({ theme, value }) =>
-    value ? theme.colors.grey600 : theme.colors.grey400};
-  ${({ theme }) => theme.fonts.reg16};
-`
-
-const GreyedInfo = styled.div`
-  height: 26px;
-  background-color: ${({ theme }) => theme.colors.grey200};
-  max-width: 330px;
-`
-
 const ShowOnMobile = styled.div`
   display: none;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
@@ -154,36 +126,29 @@ export const GetDeclarationInfo = ({
   ))
   return (
     <>
-      <div>
+      <Summary id="summary">
         {Object.entries(info).map(([key, value]) => {
+          const rowValue =
+            value &&
+            (key === 'dateOfBirth' || key === 'dateOfDeath'
+              ? format(new Date(value), 'MMMM dd, yyyy')
+              : value)
+
+          const placeholder = intl.formatMessage(
+            recordAuditMessages[`no${key[0].toUpperCase()}${key.slice(1)}`]
+          )
+
           return (
-            <InfoContainer id={'summary'} key={key}>
-              <KeyContainer id={`${key}`}>
-                <KeyContainer id={`${key}`}>
-                  {intl.formatMessage(recordAuditMessages[key])}
-                </KeyContainer>
-              </KeyContainer>
-              <ValueContainer id={`${key}_value`} value={value}>
-                {value ? (
-                  key === 'dateOfBirth' || key === 'dateOfDeath' ? (
-                    format(new Date(value), 'MMMM dd, yyyy')
-                  ) : (
-                    value
-                  )
-                ) : isDownloaded ? (
-                  intl.formatMessage(
-                    recordAuditMessages[
-                      `no${key[0].toUpperCase()}${key.slice(1)}`
-                    ]
-                  )
-                ) : (
-                  <GreyedInfo id={`${key}_grey`} />
-                )}
-              </ValueContainer>
-            </InfoContainer>
+            <Summary.Row
+              label={intl.formatMessage(recordAuditMessages[key])}
+              placeholder={placeholder}
+              value={rowValue}
+              locked={!value && !isDownloaded}
+            />
           )
         })}
-      </div>
+      </Summary>
+
       <ShowOnMobile>{mobileActions.map((action) => action)}</ShowOnMobile>
     </>
   )
