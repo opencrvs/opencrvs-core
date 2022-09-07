@@ -11,15 +11,22 @@
  */
 import * as React from 'react'
 import { createStore } from '@client/store'
-import { createTestComponent, flushPromises } from '@client/tests/util'
+import {
+  createTestComponent,
+  flushPromises,
+  loginAsFieldAgent
+} from '@client/tests/util'
 import { ReactWrapper } from 'enzyme'
 import { CertificatesConfig } from './Certificates'
 import { waitForElement } from '@client/tests/wait-for-element'
-import * as fetchMock from 'jest-fetch-mock'
+import createFetchMock from 'vitest-fetch-mock'
 import * as PDFUtils from '@client/views/PrintCertificate/PDFUtils'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
+import { SpyInstance, vi } from 'vitest'
+import * as pdfRender from '@client/pdfRenderer'
 
-const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
+const fetch = createFetchMock(vi)
+fetch.enableMocks()
 
 enum MENU_ITEM {
   PREVIEW,
@@ -48,19 +55,25 @@ async function clickOnMenuItem(
     .find(`#template-birth-action-menuItem${item}`)
     .hostNodes()
     .simulate('click')
+  await flushPromises()
   testComponent.update()
 }
 
-describe('ConfigHome page when already has uploaded certificate template', () => {
+describe('ConfigHome page when already has uploaded certificate template', async () => {
   const { store, history } = createStore()
-
+  await loginAsFieldAgent(store)
   let testComponent: ReactWrapper
+  const spy = vi.spyOn(pdfRender, 'printPDF').mockImplementation(() => {})
   beforeEach(async () => {
     testComponent = await createTestComponent(
-      <CertificatesConfig history={history}></CertificatesConfig>,
+      <CertificatesConfig></CertificatesConfig>,
       { store, history }
     )
     testComponent.update()
+  })
+
+  afterEach(() => {
+    spy.mockReset()
   })
 
   it('shows default birth certificate template text', () => {
@@ -93,19 +106,19 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
   })
 
   describe('Testing sub menu item on config page', () => {
-    let printCertificateSpy: jest.SpyInstance
-    let downloadFileSpy: jest.SpyInstance
-    let updateCertificateMutationSpy: jest.SpyInstance
-
+    let printCertificateSpy: SpyInstance
+    let downloadFileSpy: SpyInstance
+    let updateCertificateMutationSpy: SpyInstance
     beforeEach(() => {
+      //Mocking with Response(blob) dosen't work
       fetch.mockImplementationOnce(() =>
         Promise.resolve({
           blob: () => new Blob(['data'])
-        })
+        } as any)
       )
-      printCertificateSpy = jest.spyOn(PDFUtils, 'printCertificate')
-      downloadFileSpy = jest.spyOn(PDFUtils, 'downloadFile')
-      updateCertificateMutationSpy = jest.spyOn(
+      printCertificateSpy = vi.spyOn(PDFUtils, 'printCertificate')
+      downloadFileSpy = vi.spyOn(PDFUtils, 'downloadFile')
+      updateCertificateMutationSpy = vi.spyOn(
         certificateTemplateMutations,
         'updateCertificateTemplate'
       )
@@ -115,9 +128,13 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
       printCertificateSpy.mockRestore()
       downloadFileSpy.mockRestore()
     })
+
+    afterEach(() => {
+      printCertificateSpy.mockClear()
+      downloadFileSpy.mockClear()
+    })
     it('should show upload modal when clicked on upload', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.UPLOAD)
-
       expect(
         testComponent.find('#withoutVerificationPrompt').hostNodes()
       ).toHaveLength(1)
@@ -168,6 +185,7 @@ describe('ConfigHome page when already has uploaded certificate template', () =>
 
     it('should call print certificate after clicking print', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.PRINT)
+      testComponent.update()
       await new Promise((resolve) => {
         setTimeout(resolve, 200)
       })

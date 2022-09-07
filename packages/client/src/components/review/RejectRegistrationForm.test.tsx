@@ -16,9 +16,10 @@ import { createTestComponent } from '@client/tests/util'
 import { RejectRegistrationForm } from '@opencrvs/client/src/components/review/RejectRegistrationForm'
 import { Event } from '@client/utils/gateway'
 import { createDeclaration } from '@client/declarations'
+import { vi } from 'vitest'
 
 const { store, history } = createStore()
-const mockHandler = jest.fn()
+const mockHandler = vi.fn()
 
 describe('reject registration form', () => {
   let component: ReactWrapper<{}, {}>

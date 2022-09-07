@@ -1,4 +1,4 @@
-FROM node:erbium-alpine
+FROM node:14.18.0-alpine
 WORKDIR /usr/src/app
 
 # Override the base log level (info).
@@ -21,8 +21,8 @@ COPY packages/gateway packages/gateway
 COPY packages/commons packages/commons
 
 # set environment
-ENV REACT_APP_COUNTRY='gbr'
-ENV REACT_APP_LANGUAGE='en'
+ENV VITE_APP_COUNTRY='gbr'
+ENV VITE_APP_LANGUAGE='en'
 
 EXPOSE 6060
 WORKDIR /usr/src/app/packages/components

@@ -38,8 +38,7 @@ import {
   REVIEW_EVENT_PARENT_FORM_PAGE,
   DRAFT_DEATH_FORM_PAGE,
   HOME,
-  DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
-  REGISTRAR_HOME
+  DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP
 } from '@opencrvs/client/src/navigation/routes'
 
 import { IFormData } from '@opencrvs/client/src/forms'
@@ -53,8 +52,7 @@ import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
 import { DECLARED } from '@client/utils/constants'
-import debounce from 'lodash/debounce'
-jest.mock('lodash/debounce', () => jest.fn((fn) => fn))
+import { vi } from 'vitest'
 
 describe('when user is in the register form for birth event', () => {
   let component: ReactWrapper<{}, {}>
@@ -64,7 +62,6 @@ describe('when user is in the register form for birth event', () => {
 
   describe('when user is in the mother section', () => {
     beforeEach(async () => {
-      ;(debounce as jest.Mock).mockImplementation((fn) => fn)
       const storeContext = await createTestStore()
       store = storeContext.store
       history = storeContext.history
@@ -74,7 +71,7 @@ describe('when user is in the register form for birth event', () => {
       store.dispatch(setInitialDeclarations())
       store.dispatch(storeDeclaration(draft))
 
-      const mock: any = jest.fn()
+      const mock: any = vi.fn()
       const form = await getRegisterFormFromStore(store, Event.Birth)
       const testComponent = await createTestComponent(
         // @ts-ignore
@@ -114,7 +111,7 @@ describe('when user is in the register form for birth event', () => {
       expect(select.text()).toEqual('United States of America')
     })
     it('takes field agent to declaration submitted page when save button is clicked', async () => {
-      localStorage.getItem = jest.fn(
+      localStorage.getItem = vi.fn(
         (key: string) =>
           'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJkZWNsYXJlIiwiZGVtbyJdLCJpYXQiOjE1NjMyNTYyNDIsImV4cCI6MTU2Mzg2MTA0MiwiYXVkIjpbIm9wZW5jcnZzOmF1dGgtdXNlciIsIm9wZW5jcnZzOnVzZXItbWdudC11c2VyIiwib3BlbmNydnM6aGVhcnRoLXVzZXIiLCJvcGVuY3J2czpnYXRld2F5LXVzZXIiLCJvcGVuY3J2czpub3RpZmljYXRpb24tdXNlciIsIm9wZW5jcnZzOndvcmtmbG93LXVzZXIiLCJvcGVuY3J2czpzZWFyY2gtdXNlciIsIm9wZW5jcnZzOm1ldHJpY3MtdXNlciIsIm9wZW5jcnZzOnJlc291cmNlcy11c2VyIl0sImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjVkMWM1YTJhNTgxNjM0MDBlZjFkMDEyOSJ9.hZu0em2JA0sl-5uzck4mn4HfYdzxSmgoERA8SbWRPXEmriSYjs4PEPk9StXF_Ed5kd53VlNF9xf39DDGWqyyn76gpcMPbHJAL8nqLV82hot8fgU1WtEk865U8-9oAxaVmxAsjpHayiuD6zfKuR-ixrLFdoRKP13LdORktFCQe5e7To2w7vXArjUb6SDpSHST4Fbkhg8vzOcykweSGiNlmoEVtLzkpamS6fcTGRHkNpb_Wk_AQW9TAdw6NqG5lDEAO10auNgJpKxO8X-DQKhvEfY5TbpblR51L_U8pUXpDCAvGegMLnwmfAIoH1hMj--Wd2JhqgUvj0YrlDKI99fntA'
       )
@@ -123,7 +120,7 @@ describe('when user is in the register form for birth event', () => {
       expect(history.location.pathname).toEqual('/registration-home/progress/')
     })
     it('takes registrar to declaration submitted page when save button is clicked', async () => {
-      localStorage.getItem = jest.fn(
+      localStorage.getItem = vi.fn(
         (key: string) =>
           'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsInBlcmZvcm1hbmNlIiwiY2VydGlmeSIsImRlbW8iXSwiaWF0IjoxNTYzOTcyOTQ0LCJleHAiOjE1NjQ1Nzc3NDQsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpyZXNvdXJjZXMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1ZDFjNWEyYTU4MTYzNDAwZWYxZDAxMmIifQ.VrH31goeitKvLHQchy5HQJkQWjhK-cWisxSgQUXChK4MZQis9Ufzn7dWK3s2s0dSpnFqk-0Yj5cVlq7JgQVcniO26WhnSyXHYQk7DG-TSA5FXGYoKMhjMZCh5qOZTRaVI6yvnEsLKTYeNvkXKJ2wb6M9U5OWjUh1KGPexd9mSjUsUwZ5BDTvI0WjnBTgQ_a0-KhxjjypT8Y_VXiiY-KWLxuOpVGalv3P3nbH8dAUzEuzKsrq6q0MJsaJkgDliaz2pZd10JxnJE1VYUob2SNHFnmJnz8Llwe1lH4xa8rluIA6YBmxdkrU2VkhCBPD6VxGYRHrD3LKRa3Cgm1X0qNQTw'
       )
@@ -139,7 +136,7 @@ describe('when user is in the register form for birth event', () => {
 describe('when user is in the register form for death event', () => {
   let component: ReactWrapper<{}, {}>
 
-  const mock: any = jest.fn()
+  const mock: any = vi.fn()
   let form: IForm
   let store: AppStore
   let history: History
@@ -149,7 +146,7 @@ describe('when user is in the register form for death event', () => {
     const testStore = await createTestStore()
     store = testStore.store
     history = testStore.history
-    const mock: any = jest.fn()
+    const mock: any = vi.fn()
     draft = createDeclaration(Event.Death)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
@@ -161,7 +158,7 @@ describe('when user is in the register form for death event', () => {
       clonedForm.sections[2].optional = true
       clonedForm.sections[2].notice = messages.causeOfDeathNotice
       clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
-      const mock: any = jest.fn()
+      const mock: any = vi.fn()
       const testComponent = await createTestComponent(
         // @ts-ignore
         <RegisterForm
@@ -199,9 +196,7 @@ describe('when user is in the register form for death event', () => {
 // ID API Check not available in Farajaland form
 
   describe('when user is in deceased section', () => {
-    beforeEach(async () => {
-      ;(debounce as jest.Mock).mockImplementation((fn) => fn)
-    })
+
     it('renders loader button when idType is Birth Registration Number', async () => {
       const testComponent = await createTestComponent(
         // @ts-ignore
@@ -232,9 +227,6 @@ describe('when user is in the register form for death event', () => {
   })
 */
   describe('when user is in contact point page', () => {
-    beforeEach(async () => {
-      ;(debounce as jest.Mock).mockImplementation((fn) => fn)
-    })
     it('shows error if click continue without any value', async () => {
       const testComponent = await createTestComponent(
         // @ts-ignore
@@ -862,7 +854,7 @@ describe('when user is in the register form preview section', () => {
   let component: ReactWrapper<{}, {}>
   let store: AppStore
   let history: History
-  const mock = jest.fn()
+  const mock = vi.fn()
 
   beforeEach(async () => {
     mock.mockReset()
@@ -1000,8 +992,8 @@ describe('when user is in the register form review section', () => {
     )
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
-    const mock: any = jest.fn()
-    jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+    const mock: any = vi.fn()
+    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
     const form = await getReviewFormFromStore(store, Event.Birth)
 
@@ -1052,8 +1044,8 @@ describe('when user is in the register form from review edit', () => {
     )
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
-    const mock: any = jest.fn()
-    jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+    const mock: any = vi.fn()
+    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
     const form = await getReviewFormFromStore(store, Event.Birth)
 
@@ -1103,8 +1095,7 @@ describe('when user is in the register form from sent for review edit', () => {
   let component: ReactWrapper<{}, {}>
   let testAppStore: AppStore
   beforeEach(async () => {
-    ;(debounce as jest.Mock).mockImplementation((fn) => fn)
-    Date.now = jest.fn(() => 1582525224324)
+    Date.now = vi.fn(() => 1582525224324)
     const { store, history } = await createTestStore()
     // @ts-ignore
     const declaration = createReviewDeclaration(
@@ -1115,8 +1106,8 @@ describe('when user is in the register form from sent for review edit', () => {
     )
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(declaration))
-    const mock: any = jest.fn()
-    jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
+    const mock: any = vi.fn()
+    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['register'])
 
     const form = await getReviewFormFromStore(store, Event.Birth)
 
@@ -1156,10 +1147,9 @@ describe('when user is in the register form from sent for review edit', () => {
     )
     expect(saveDraftConfirmationModal.hostNodes()).toHaveLength(1)
   })
-
   it('clicking save confirm saves the draft', async () => {
     const DRAFT_MODIFY_TIME = 1582525379383
-    Date.now = jest.fn(() => DRAFT_MODIFY_TIME)
+    Date.now = vi.fn(() => DRAFT_MODIFY_TIME)
     selectOption(component, '#educationalAttainment', 'Tertiary')
 
     // Do some modifications
@@ -1194,7 +1184,7 @@ describe('When user is in Preview section death event', () => {
   let deathDraft
   let deathForm: IForm
 
-  const mock: any = jest.fn()
+  const mock: any = vi.fn()
 
   beforeEach(async () => {
     const testStore = await createTestStore()
@@ -1204,7 +1194,7 @@ describe('When user is in Preview section death event', () => {
     const draft = createDeclaration(Event.Death)
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(draft))
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // @ts-ignore
     deathDraft = createReviewDeclaration(
       uuid(),
@@ -1216,7 +1206,7 @@ describe('When user is in Preview section death event', () => {
     store.dispatch(setInitialDeclarations())
     store.dispatch(storeDeclaration(deathDraft))
 
-    jest.spyOn(profileSelectors, 'getScope').mockReturnValue(['declare'])
+    vi.spyOn(profileSelectors, 'getScope').mockReturnValue(['declare'])
 
     deathForm = await getRegisterFormFromStore(store, Event.Death)
     const nTestComponent = await createTestComponent(
@@ -1319,7 +1309,7 @@ describe('When user is in Preview section death event in offline mode', () => {
   let store: AppStore
   let history: History
 
-  const mock: any = jest.fn()
+  const mock: any = vi.fn()
 
   beforeEach(async () => {
     const testStore = await createTestStore()
@@ -1334,7 +1324,7 @@ describe('When user is in Preview section death event in offline mode', () => {
       value: false,
       writable: true
     })
-    jest.clearAllMocks()
+    vi.clearAllMocks()
     // @ts-ignore
     deathDraft = createReviewDeclaration(
       uuid(),

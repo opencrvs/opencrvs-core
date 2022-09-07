@@ -1811,7 +1811,7 @@ describe('Registration root resolvers', () => {
           { id: compositionID },
           authHeaderRegCert
         )
-      ).rejects.toThrowError('ASSIGNMENT_PROBLEM')
+      ).rejects.toThrowError('User has been unassigned')
     })
 
     it("throws an error when the user doesn't have register scope", async () => {

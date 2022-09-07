@@ -31,7 +31,11 @@ services:
           - node.role == manager
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'traefik'
   metricbeat:
     image: docker.elastic.co/beats/metricbeat:7.17.0
 
@@ -62,7 +66,11 @@ services:
         target: /usr/share/metricbeat/metricbeat.yml
       - source: metricbeat-rollover-policy.{{ts}}
         target: /usr/share/metricbeat/rollover-policy.json
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'metricbeat'
   setup-kibana-config:
     image: curlimages/curl:7.83.1
     entrypoint:
@@ -82,7 +90,7 @@ services:
     depends_on:
       - kibana
     volumes:
-      - '/tmp/compose/infrastructure/monitoring/kibana/config.ndjson:/config.ndjson'
+      - '/opt/opencrvs/infrastructure/monitoring/kibana/config.ndjson:/config.ndjson'
     networks:
       - overlay_net
     deploy:
@@ -90,7 +98,11 @@ services:
       placement:
         constraints:
           - node.role == manager
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'setup-kibana-config'
   kibana:
     image: docker.elastic.co/kibana/kibana:7.17.0
     restart: always
@@ -114,7 +126,11 @@ services:
         target: /usr/share/kibana/config/kibana.yml
     depends_on:
       - elasticsearch
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'kibana'
   # Configure mongo nodes as a replica set
   mongo1:
     command: mongod --auth --replSet rs0 --keyFile /etc/mongodb-keyfile
@@ -150,7 +166,11 @@ services:
         target: /docker-entrypoint-initdb.d/create-mongo-users.sh
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'mongo1'
   mongo-on-update:
     image: mongo:4.4
     command: bash /on-deploy.sh
@@ -174,19 +194,27 @@ services:
       - WEBHOOKS_MONGODB_PASSWORD=${WEBHOOKS_MONGODB_PASSWORD}
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'mongo-on-update'
   # Configure redis
   redis:
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'redis'
   # Configure elasticsearch
   elasticsearch:
     volumes:
       - '/data/elasticsearch:/usr/share/elasticsearch/data'
       - '/data/backups/elasticsearch:/data/backups/elasticsearch'
-      - '/tmp/compose/infrastructure/elasticsearch/elasticsearch.yml:/config/elasticsearch.yml'
-      - '/tmp/compose/infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
+      - '/opt/opencrvs/infrastructure/elasticsearch/elasticsearch.yml:/config/elasticsearch.yml'
+      - '/opt/opencrvs/infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
     deploy:
       replicas: 1
       placement:
@@ -198,6 +226,11 @@ services:
       - 9200:9200
     networks:
       - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'elasticsearch'
 
   # Configure elasticsearch
   minio:
@@ -225,7 +258,7 @@ services:
 
   setup-elasticsearch-users:
     image: ubuntu:bionic
-    entrypoint: ['bash', '/usr/app/setup-users.sh']
+    entrypoint: ['bash', '/usr/app/setup.sh']
     restart: on-failure
     depends_on:
       - elasticsearch
@@ -239,7 +272,7 @@ services:
       - KIBANA_USERNAME=${KIBANA_USERNAME}
       - KIBANA_PASSWORD=${KIBANA_PASSWORD}
     volumes:
-      - '/tmp/compose/infrastructure/elasticsearch:/usr/app'
+      - '/opt/opencrvs/infrastructure/elasticsearch:/usr/app'
     networks:
       - overlay_net
     deploy:
@@ -247,12 +280,17 @@ services:
       placement:
         constraints:
           - node.role == manager
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'setup-elasticsearch-users'
   elastalert:
     image: jertel/elastalert2:2.3.0
     restart: unless-stopped
     volumes:
-      - '/tmp/compose/infrastructure/monitoring/elastalert/elastalert.yaml:/opt/elastalert/config.yaml'
-      - '/tmp/compose/infrastructure/monitoring/elastalert/rules:/opt/elastalert/rules'
+      - '/opt/opencrvs/infrastructure/monitoring/elastalert/elastalert.yaml:/opt/elastalert/config.yaml'
+      - '/opt/opencrvs/infrastructure/monitoring/elastalert/rules:/opt/elastalert/rules'
     networks:
       - overlay_net
     deploy:
@@ -260,6 +298,11 @@ services:
       placement:
         constraints:
           - node.role == manager
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'elastalert'
 
   logstash:
     image: logstash:7.17.0
@@ -282,6 +325,8 @@ services:
     networks:
       - overlay_net
     restart: always
+    deploy:
+      replicas: 2
   apm-server:
     image: docker.elastic.co/apm/apm-server:7.15.2
     depends_on:
@@ -289,12 +334,13 @@ services:
       - kibana
     cap_add: ['CHOWN', 'DAC_OVERRIDE', 'SETGID', 'SETUID']
     cap_drop: ['ALL']
+    restart: always
     ports:
       - 8200:8200
     networks:
       - overlay_net
     deploy:
-      replicas: 1
+      replicas: 2
     command:
       [
         'apm-server',
@@ -313,7 +359,11 @@ services:
     configs:
       - source: apm.{{ts}}
         target: /usr/share/apm-server/apm-server.yml
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'apm-server'
   # Configure influxdb
   influxdb:
     volumes:
@@ -326,7 +376,11 @@ services:
           - node.labels.data1 == true
     networks:
       - overlay_net
-
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'influxdb'
   # Configure webapps and add traefik config
   client:
     environment:

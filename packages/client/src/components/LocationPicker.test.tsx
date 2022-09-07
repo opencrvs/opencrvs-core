@@ -16,12 +16,13 @@ import { LocationPicker } from './LocationPicker'
 import { AppStore, createStore } from '@client/store'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
+import { vi } from 'vitest'
 
 describe('location picker tests', () => {
   let store: AppStore
   let history: History
   let component: ReactWrapper
-  const onChangeLocationMock = jest.fn()
+  const onChangeLocationMock = vi.fn()
 
   beforeAll(async () => {
     const appStore = createStore()

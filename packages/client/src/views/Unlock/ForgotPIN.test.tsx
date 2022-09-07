@@ -22,14 +22,15 @@ import { storage } from '@client/storage'
 import { SCREEN_LOCK } from '@client/components/ProtectedPage'
 import { SECURITY_PIN_EXPIRED_AT } from '@client/utils/constants'
 import { History } from 'history'
+import { vi, Mock } from 'vitest'
 
 describe('ForgotPIN tests', () => {
   let component: ReactWrapper
   let store: AppStore
   let history: History
-  const goBackMock: jest.Mock = jest.fn()
-  const onVerifyPasswordMock = jest.fn()
-  userQueries.verifyPasswordById = jest.fn()
+  const goBackMock: Mock = vi.fn()
+  const onVerifyPasswordMock = vi.fn()
+  userQueries.verifyPasswordById = vi.fn()
 
   beforeAll(async () => {
     ;({ store, history } = await createStore())
@@ -124,7 +125,7 @@ describe('ForgotPIN tests', () => {
   })
 
   it('wrong password submission shows error', async () => {
-    ;(userQueries.verifyPasswordById as jest.Mock).mockRejectedValueOnce({
+    ;(userQueries.verifyPasswordById as Mock).mockRejectedValueOnce({
       data: {
         verifyPasswordById: null
       },
@@ -160,7 +161,7 @@ describe('ForgotPIN tests', () => {
   })
 
   it('correct password submission triggers onVerifyPassword', async () => {
-    ;(userQueries.verifyPasswordById as jest.Mock).mockReturnValueOnce({
+    ;(userQueries.verifyPasswordById as Mock).mockReturnValueOnce({
       data: {
         verifyPasswordById: {
           id: '5eba726866458970cf2e23c2',
@@ -191,7 +192,7 @@ describe('ForgotPIN tests', () => {
       [SECURITY_PIN_EXPIRED_AT]: 1234
     }
 
-    storage.removeItem = jest.fn((key: string) => {
+    storage.removeItem = vi.fn((key: string) => {
       delete indexeddb[key]
       return Promise.resolve()
     })
@@ -211,7 +212,7 @@ describe('ForgotPIN tests', () => {
       [SECURITY_PIN_EXPIRED_AT]: 1234
     }
 
-    storage.removeItem = jest.fn((key: string) => {
+    storage.removeItem = vi.fn((key: string) => {
       delete indexeddb[key]
       return Promise.resolve()
     })
@@ -220,7 +221,7 @@ describe('ForgotPIN tests', () => {
     delete (window as { location?: Location }).location
     window.location = {
       ...originalLocation,
-      assign: jest.fn()
+      assign: vi.fn()
     }
 
     const forgotPasswordButton = await waitForElement(

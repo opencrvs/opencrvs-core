@@ -13,7 +13,6 @@ import * as React from 'react'
 import {
   createTestComponent,
   flushPromises,
-  validToken,
   mockUserResponse,
   userDetails
 } from '@client/tests/util'
@@ -28,6 +27,7 @@ import {
 import { UserSetupPage } from '@client/views/UserSetup/UserSetupPage'
 import { ProtectedAccount } from '@client/components/ProtectedAccount'
 import { History } from 'history'
+import { Mock } from 'vitest'
 
 const nameObj = {
   data: {
@@ -48,7 +48,7 @@ const nameObj = {
 }
 
 merge(mockUserResponse, nameObj)
-;(queries.fetchUserDetails as jest.Mock).mockReturnValue(mockUserResponse)
+;(queries.fetchUserDetails as Mock).mockReturnValue(mockUserResponse)
 
 describe('UserSetupPage tests', () => {
   let store: AppStore
