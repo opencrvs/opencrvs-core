@@ -10,8 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { BodyContent } from '@opencrvs/components/lib/layout'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { BodyContent } from '@opencrvs/components/lib/Content'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import {
   Workqueue,
   ColumnContentAlignment

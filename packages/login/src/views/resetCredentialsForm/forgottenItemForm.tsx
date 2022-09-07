@@ -11,11 +11,9 @@
  */
 import { goToHome, goToPhoneNumberVerificationForm } from '@login/login/actions'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
-import {
-  ActionPageLight,
-  RadioButton
-} from '@opencrvs/components/lib/interface'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { RadioButton } from '@opencrvs/components/lib/Radio'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { connect } from 'react-redux'

@@ -42,7 +42,7 @@ import { connect } from 'react-redux'
 import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import { Content } from '@opencrvs/components/lib/Content'
 import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 
 export const FormTitle = styled.div`

@@ -45,10 +45,7 @@ import {
 } from './queries'
 import { CompletenessDataTable } from './reports/completenessRates/CompletenessDataTable'
 import { useCallback } from 'react'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import format from '@client/utils/date-formatting'
 import { SegmentedControl } from '@client/components/SegmentedControl'

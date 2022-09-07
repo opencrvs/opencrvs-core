@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { ListViewItemSimplified } from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
 import * as React from 'react'
 import {
   ListContainer,
@@ -28,7 +28,7 @@ import {
   NOTIFICATION_TYPE,
   ToastNotification
 } from '@client/components/interface/ToastNotification'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { GQLCertificationMetric } from '@opencrvs/gateway/src/graphql/schema.d'
 interface ICertificationRateData {
   label: string

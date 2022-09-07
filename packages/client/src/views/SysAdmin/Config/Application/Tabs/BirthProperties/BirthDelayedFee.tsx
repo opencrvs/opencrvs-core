@@ -22,14 +22,11 @@ import {
   Label,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { InputField } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
 import { IStoreState } from '@client/store'
-import {
-  FloatingNotification,
-  ListViewItemSimplified,
-  NOTIFICATION_TYPE,
-  ResponsiveModal
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { BirthActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
@@ -42,7 +39,7 @@ import {
   NOTIFICATION_STATUS
 } from '@client/views/SysAdmin/Config/Application/utils'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { FormattedNumberCurrency } from '@opencrvs/components/lib/symbol'
+import { Currency } from '@opencrvs/components/lib/Currency'
 
 export function BirthDelayedFee() {
   const intl = useIntl()
@@ -99,7 +96,7 @@ export function BirthDelayedFee() {
   const item = {
     label: intl.formatMessage(messages.delayedRegistrationLabel),
     value: (
-      <FormattedNumberCurrency
+      <Currency
         value={offlineCountryConfiguration.config.BIRTH.FEE.DELAYED}
         currency={offlineCountryConfiguration.config.CURRENCY.isoCode}
         languagesAndCountry={
@@ -178,7 +175,7 @@ export function BirthDelayedFee() {
         </Content>
       </ResponsiveModal>
 
-      <FloatingNotification
+      <Toast
         id={`${id}_notification`}
         type={
           notificationStatus === NOTIFICATION_STATUS.SUCCESS
@@ -199,7 +196,7 @@ export function BirthDelayedFee() {
               messages.applicationBirthDelayedFeeChangeNotification
             )
           : intl.formatMessage(messages.applicationConfigChangeError)}
-      </FloatingNotification>
+      </Toast>
     </>
   )
 }

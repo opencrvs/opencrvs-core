@@ -41,10 +41,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
 import format from '@client/utils/date-formatting'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IAvatar } from '@client/utils/userUtils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { userMessages } from '@client/i18n/messages'

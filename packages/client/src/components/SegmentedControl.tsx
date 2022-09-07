@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import styled from '@client/styledComponents'
-import { ISelectProps } from '@opencrvs/components/lib/select'
+import { ISelect2Props } from '@opencrvs/components/lib/Select/Select2'
 import React from 'react'
 import { IPerformanceSelectOption } from '@client/views/SysAdmin/Performance/PerformanceSelect'
 import { Button } from '@opencrvs/components/lib/buttons'
@@ -41,7 +41,7 @@ const Container = styled.div`
   height: 32px;
 `
 export function SegmentedControl(
-  props: Omit<ISelectProps, 'options' | 'onChange'> & {
+  props: Omit<ISelect2Props, 'options' | 'onChange'> & {
     options: IPerformanceSelectOption[]
     onChange: (option: IPerformanceSelectOption) => void
   }

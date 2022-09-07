@@ -15,12 +15,9 @@ import { ILocation } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { IStoreState } from '@client/store'
 import { generateLocations } from '@client/utils/locationUtils'
-import {
-  Box,
-  ISearchLocation,
-  ResponsiveModal,
-  Spinner
-} from '@opencrvs/components/lib/interface'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { parse } from 'query-string'
 import { ITheme } from '@opencrvs/components/lib/theme'
@@ -29,10 +26,7 @@ import { connect } from 'react-redux'
 import { RouteComponentProps } from 'react-router'
 import styled, { withTheme } from 'styled-components'
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import subYears from 'date-fns/subYears'
 import { PerformanceSelect } from '@client/views/SysAdmin/Performance/PerformanceSelect'
@@ -81,6 +75,7 @@ import { withOnlineStatus } from '@client/views/OfficeHome/LoadingIndicator'
 import { NoWifi } from '@opencrvs/components/lib/icons'
 import { REGISTRAR_ROLES } from '@client/utils/constants'
 import { ICurrency } from '@client/utils/referenceApi'
+import { Box } from '@opencrvs/components/lib/Box'
 
 const Layout = styled.div`
   display: flex;
