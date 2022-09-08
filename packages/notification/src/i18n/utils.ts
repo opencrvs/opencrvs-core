@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 export function getAvailableLanguages() {
-  const LANGUAGES = (process.env.LANGUAGES && process.env.LANGUAGES) || 'bn,en'
+  const LANGUAGES = (process.env.LANGUAGES && process.env.LANGUAGES) || 'en,fr'
   return LANGUAGES.split(',')
 }
 

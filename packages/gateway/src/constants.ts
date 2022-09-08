@@ -39,7 +39,7 @@ export const QA_ENV = process.env.QA_ENV || false
 // This needs to be a string to make it easy to pass as an ENV var.
 export const CHECK_INVALID_TOKEN = process.env.CHECK_INVALID_TOKEN || 'false'
 export function getLanguages() {
-  const LANGUAGES = process.env.LANGUAGES || 'bn,en'
+  const LANGUAGES = process.env.LANGUAGES || 'en,fr'
   return LANGUAGES.split(',')
 }
 
