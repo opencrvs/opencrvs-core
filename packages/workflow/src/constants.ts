@@ -30,7 +30,7 @@ export const USER_MANAGEMENT_URL =
 export const SENTRY_DSN = process.env.SENTRY_DSN
 
 function getAvailableLanguages() {
-  const LANGUAGES = (process.env.LANGUAGES && process.env.LANGUAGES) || 'en,fr'
+  const LANGUAGES = process.env.LANGUAGES || 'en,fr'
   return LANGUAGES.split(',')
 }
 
