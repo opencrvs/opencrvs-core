@@ -21,6 +21,6 @@ EventTopBarView.args = {
 }
 
 export default {
-  title: 'Layout/Header/Event header',
+  title: 'Deprecated/Header/Event header',
   component: EventTopBar
 } as Meta

@@ -16,6 +16,6 @@ import React from 'react'
 const Template: Story<{}> = () => <Header>OPENCRVS</Header>
 export const HeaderView = Template.bind({})
 export default {
-  title: 'Layout/Header',
+  title: 'Deprecated/Header',
   component: Header
 } as Meta
