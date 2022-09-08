@@ -27,10 +27,7 @@ import { messages } from '@client/i18n/messages/views/userSetup'
 import { buttonMessages } from '@client/i18n/messages'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 
 const TitleHolder = styled.div`
   ${({ theme }) => theme.fonts.h1};

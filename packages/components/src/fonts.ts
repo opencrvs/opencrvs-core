@@ -1,0 +1,119 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import { css } from 'styled-components'
+
+export const family = "'Noto Sans', sans-serif"
+
+/* stylelint-disable opencrvs/no-font-styles */
+const hero = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 56px;
+  line-height: 120%;
+`
+const h1 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 36px;
+  line-height: 120%;
+`
+const h2 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 140%;
+`
+const h3 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 140%;
+`
+const h4 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 140%;
+`
+const reg18 = css`
+  font-family: ${family};
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 140%;
+`
+
+const bold18 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 140%;
+`
+
+const reg16 = css`
+  font-family: ${family};
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 140%;
+`
+
+const bold16 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 140%;
+`
+
+const reg14 = css`
+  font-family: ${family};
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 140%;
+`
+
+const bold14 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 140%;
+`
+
+const reg12 = css`
+  font-family: ${family};
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 140%;
+`
+
+const bold12 = css`
+  font-family: ${family};
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 140%;
+`
+
+export const fonts = {
+  hero,
+  h1,
+  h2,
+  h3,
+  h4,
+  bold18,
+  bold16,
+  bold14,
+  bold12,
+  reg18,
+  reg16,
+  reg14,
+  reg12
+}
+
+export type IFont = keyof typeof fonts

@@ -39,14 +39,12 @@ body,
   }
   @font-face {
     /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${theme.fonts.fontFamily};
+    font-family: ${theme.fontFamily};
     font-style: normal;
     font-weight: 400;
   }
   *:not(i) {
-    font-family: ${theme.fonts.fontFamily};
-    font-style: normal;
-    font-weight: 400;
+    font-family: ${theme.fontFamily};
   }
 }
 
@@ -81,6 +79,7 @@ WebFont.load({
 })
 
 export const parameters = {
+  viewMode: 'docs',
   actions: { argTypesRegex: '^on[A-Z].*' },
   controls: {
     matchers: {

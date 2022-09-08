@@ -17,7 +17,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import {
   ISearchLocation,
   LocationSearch
-} from '@opencrvs/components/lib/interface'
+} from '@opencrvs/components/lib/LocationSearch'
 import { connect } from 'react-redux'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'

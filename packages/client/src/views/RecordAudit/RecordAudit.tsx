@@ -11,10 +11,7 @@
  */
 import React from 'react'
 import { Header } from '@client/components/interface/Header/Header'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import {
   Navigation,
   WORKQUEUE_TABS
@@ -57,12 +54,12 @@ import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
 import {
-  ResponsiveModal,
-  Loader,
   PageHeader,
-  IPageHeaderProps,
-  ErrorToastNotification
+  IPageHeaderProps
 } from '@opencrvs/components/lib/interface'
+import { ErrorToastNotification } from '@opencrvs/components/lib/Toast'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Loader } from '@opencrvs/components/lib/Loader'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {

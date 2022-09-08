@@ -33,8 +33,10 @@ import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completen
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/interface'
-import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import {
+  IColumn,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/Workqueue'
 import {
   GQLEventProgressSet,
   GQLHumanName,
@@ -56,11 +58,8 @@ import subYears from 'date-fns/subYears'
 import differenceInSeconds from 'date-fns/differenceInSeconds'
 import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
 import { colors } from '@opencrvs/components/lib/colors'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
-import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { TableView } from '@opencrvs/components/lib/interface/TableView'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 

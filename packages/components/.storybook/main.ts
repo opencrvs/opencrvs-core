@@ -37,7 +37,10 @@ const config = {
   typescript: {
     reactDocgen: 'react-docgen'
   },
-  stories: ['../src/**/*.stories.mdx', '../src/**/*.stories.@(js|jsx|ts|tsx)'],
+  stories: [
+    '../(src|stories)/**/*.stories.mdx',
+    '../(src|stories)/**/*.stories.@(js|jsx|ts|tsx)'
+  ],
   core: { builder: '@storybook/builder-vite' },
   addons: ['@storybook/addon-links', '@storybook/addon-essentials'],
   staticDirs: ['../public'],

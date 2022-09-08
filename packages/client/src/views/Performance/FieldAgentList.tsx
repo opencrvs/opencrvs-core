@@ -28,10 +28,8 @@ import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completen
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { SortArrow } from '@opencrvs/components/lib/icons'
 import { AvatarSmall } from '@client/components/Avatar'
-import {
-  ColumnContentAlignment,
-  TableView
-} from '@opencrvs/components/lib/interface'
+import { TableView } from '@opencrvs/components/lib/interface'
+import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { GQLSearchFieldAgentResult } from '@opencrvs/gateway/src/graphql/schema'
 import { orderBy } from 'lodash'
 import { parse } from 'query-string'
@@ -43,10 +41,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 import { ILocation } from '@client/offline/reducer'
 import format from '@client/utils/date-formatting'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IAvatar } from '@client/utils/userUtils'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { userMessages } from '@client/i18n/messages'

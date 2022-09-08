@@ -25,5 +25,5 @@ export default create({
   brandUrl: 'https://opencrvs.org',
   brandImage: 'logo.png',
   brandTarget: '_self',
-  fontBase: theme.fonts.fontFamily
+  fontBase: theme.fontFamily
 })

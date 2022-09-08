@@ -10,12 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  ListViewItemSimplified,
-  ResponsiveModal,
-  FloatingNotification,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
   userMessages,
@@ -31,7 +28,7 @@ import {
 } from '@client/views/Settings/items/components'
 import { useSelector, useDispatch } from 'react-redux'
 import { TertiaryButton, PrimaryButton } from '@opencrvs/components/lib/buttons'
-import { Select } from '@opencrvs/components/lib/forms'
+import { Select } from '@opencrvs/components/lib/Select'
 import { getAvailableLanguages } from '@client/i18n/utils'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { changeLanguage as changeLanguageActionCreator } from '@client/i18n/actions'
@@ -144,7 +141,7 @@ export function Language() {
           placeholder=""
         />
       </ResponsiveModal>
-      <FloatingNotification
+      <Toast
         type={NOTIFICATION_TYPE.SUCCESS}
         show={showSuccessNotification}
         callback={toggleSuccessNotification}
@@ -155,7 +152,7 @@ export function Language() {
             language: languages[selectedLanguage].displayName
           }}
         />
-      </FloatingNotification>
+      </Toast>
     </>
   )
 }

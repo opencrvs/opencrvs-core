@@ -61,11 +61,11 @@ import {
 } from '@opencrvs/components/lib/icons'
 import {
   AppHeader,
-  ExpandingMenu,
   IDomProps,
   ISearchType,
   SearchTool
 } from '@opencrvs/components/lib/interface'
+import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -294,6 +294,30 @@ class HeaderComp extends React.Component<IFullProps, IState> {
               handler: () =>
                 this.props.changeTeamLocation && this.props.changeTeamLocation()
             },
+            {
+              icon: () => <AddUser />,
+              handler: () => {
+                if (locationId) {
+                  this.props.goToCreateNewUserWithLocationId(locationId)
+                } else {
+                  this.props.goToCreateNewUser()
+                }
+              }
+            }
+          ]
+        }
+      } else if (
+        this.props.userDetails?.role &&
+        SYS_ADMIN_ROLES.includes(this.props.userDetails?.role)
+      ) {
+        return {
+          mobileLeft: [
+            {
+              icon: () => this.hamburger(),
+              handler: this.toggleMenu
+            }
+          ],
+          mobileRight: [
             {
               icon: () => <AddUser />,
               handler: () => {

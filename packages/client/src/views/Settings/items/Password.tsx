@@ -10,11 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import {
-  ListViewItemSimplified,
-  FloatingNotification,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { useIntl, FormattedMessage } from 'react-intl'
 import {
   LabelContainer,
@@ -70,13 +67,13 @@ export function Password() {
         showPasswordChange={showModal}
         passwordChanged={changePassword}
       />
-      <FloatingNotification
+      <Toast
         type={NOTIFICATION_TYPE.SUCCESS}
         show={showSuccessNotification}
         callback={toggleSuccessNotification}
       >
         <FormattedMessage {...userMessages.passwordUpdated} />
-      </FloatingNotification>
+      </Toast>
     </>
   )
 }

@@ -38,6 +38,15 @@ interface INotificationPayload {
   crvsOffice?: string
   registrationNumber?: string
 }
+export type Composition = fhir.Composition & { id: string }
+export type Patient = fhir.Patient & { id: string }
+export enum FHIR_RESOURCE_TYPE {
+  COMPOSITION = 'Composition',
+  TASK = 'Task',
+  ENCOUNTER = 'Encounter',
+  PAYMENT_RECONCILIATION = 'PaymentReconciliation',
+  PATIENT = 'Patient'
+}
 
 export function generateBirthTrackingId(): string {
   return generateTrackingId('B')
@@ -272,5 +281,46 @@ export function isEventNonNotifiable(event: Events) {
       Events.REGISTRAR_BIRTH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION,
       Events.REGISTRAR_DEATH_REGISTRATION_WAITING_EXTERNAL_RESOURCE_VALIDATION
     ].indexOf(event) >= 0
+  )
+}
+
+export function getResourceByType<T = fhir.Resource>(
+  bundle: fhir.Bundle,
+  type: string
+): T | undefined {
+  const bundleEntry =
+    bundle &&
+    bundle.entry &&
+    bundle.entry.find((entry) => {
+      if (!entry.resource) {
+        return false
+      } else {
+        return entry.resource.resourceType === type
+      }
+    })
+  return bundleEntry && (bundleEntry.resource as T)
+}
+
+export function getComposition(bundle: fhir.Bundle) {
+  return getResourceByType<Composition>(bundle, FHIR_RESOURCE_TYPE.COMPOSITION)
+}
+
+export function getPatientBySection(
+  bundle: fhir.Bundle,
+  section: fhir.Reference
+) {
+  return (
+    bundle &&
+    bundle.entry &&
+    (bundle.entry.find((entry) => {
+      if (!entry.resource) {
+        return false
+      } else {
+        return (
+          entry.resource.resourceType === 'Patient' &&
+          entry.fullUrl === section.reference
+        )
+      }
+    })?.resource as fhir.Patient)
   )
 }

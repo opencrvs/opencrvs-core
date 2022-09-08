@@ -34,10 +34,7 @@ import { FormFieldGenerator } from '@client/components/form'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
 import { correctReasonSection } from '@client/forms/correction/reason'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { groupHasError } from './utils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 
