@@ -22,7 +22,7 @@ import {
 } from '../icons'
 import { Stack } from '../Stack'
 import { SearchBlueIcon } from '../icons/SearchBlue.stories'
-import { SearchTool } from '../interface'
+import { SearchTool } from '../SearchTool'
 import { noop } from 'lodash'
 
 export default {
@@ -133,3 +133,5 @@ Declaration.args = {
     </Stack>
   )
 }
+
+Declaration.parameters = { layout: 'fullscreen' }
