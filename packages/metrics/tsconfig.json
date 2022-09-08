@@ -20,6 +20,6 @@
     "noUnusedLocals": true,
     "types": ["fhir", "jest"]
   },
-  "include": ["src/**/*.ts", "typings", "tslint-rules"],
-  "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
+  "include": ["src/**/*.ts", "scripts", "typings", "tslint-rules"],
+  "exclude": ["node_modules", "build", "acceptance-tests"]
 }

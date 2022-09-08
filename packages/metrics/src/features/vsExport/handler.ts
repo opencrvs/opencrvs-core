@@ -11,6 +11,7 @@
  */
 
 import * as Hapi from '@hapi/hapi'
+import { VS_EXPORT_SCRIPT_PATH } from '@metrics/constants'
 import { logger } from '@metrics/logger'
 import { fork } from 'child_process'
 
@@ -29,9 +30,8 @@ export async function annualVSExportHandler(
       .code(422)
   }
 
-  const scriptFilePath = './scripts/reportGenerator.js'
   const childArgv = [startDate, endDate]
-  const script = fork(scriptFilePath, childArgv)
+  const script = fork(VS_EXPORT_SCRIPT_PATH, childArgv)
   script.on('close', (code) => {
     logger.info(`child process exited with code ${code}`)
   })

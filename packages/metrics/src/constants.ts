@@ -46,3 +46,7 @@ export const mockFetchConfig = {
   ADDRESSES: 1
 }
 export const DEFAULT_TIMEOUT = 600000
+export const VS_EXPORT_SCRIPT_PATH =
+  process.env.NODE_ENV === 'production'
+    ? '../scripts/reportGenerator.js'
+    : './scripts/reportGenerator.ts'
