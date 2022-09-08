@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { RadioGroup } from '@opencrvs/components/lib/forms'
+import { RadioGroup } from '@opencrvs/components/lib/Radio'
 import { InputField } from '@client/components/form/InputField'
 import {
   Ii18nFormField,

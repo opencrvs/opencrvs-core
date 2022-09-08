@@ -30,7 +30,8 @@ import {
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
 import { UserReviewForm } from '@client/views/SysAdmin/Team/user/userCreation/UserReviewForm'
-import { ActionPageLight, Spinner } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import ApolloClient from 'apollo-client'
 import * as React from 'react'
 import { withApollo } from 'react-apollo'
@@ -123,12 +124,18 @@ class CreateNewUserComponent extends React.Component<Props & IDispatchProps> {
         hideBackground={true}
       >
         <Container>
-          <SpinnerWrapper>
+          {this.props.submitting ? (
+            <SpinnerWrapper>
+              <Spinner id="user-form-submitting-spinner" size={25} />
+              <p>
+                {this.props.userId
+                  ? intl.formatMessage(userFormMessages.updatingUser)
+                  : intl.formatMessage(userFormMessages.creatingNewUser)}
+              </p>
+            </SpinnerWrapper>
+          ) : (
             <Spinner id="user-form-submitting-spinner" size={25} />
-            {this.props.submitting && (
-              <p>{intl.formatMessage(userFormMessages.creatingNewUser)}</p>
-            )}
-          </SpinnerWrapper>
+          )}
         </Container>
       </ActionPageLight>
     )

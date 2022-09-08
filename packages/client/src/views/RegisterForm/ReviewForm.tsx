@@ -13,7 +13,7 @@ import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import styled, { withTheme, ITheme } from '@client/styledComponents'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import {
   RegisterForm,
   FullProps

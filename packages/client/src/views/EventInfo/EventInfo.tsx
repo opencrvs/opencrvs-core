@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { RouteComponentProps } from 'react-router'
-import { Container, BodyContent } from '@opencrvs/components/lib/layout'
+import { Container, BodyContent } from '@opencrvs/components/lib/Content'
 import {
   WrappedComponentProps as IntlShapeProps,
   MessageDescriptor,
@@ -28,7 +28,7 @@ import {
   PrimaryButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
-import { BulletList } from '@opencrvs/components/lib/typography'
+import { BulletList } from '@opencrvs/components/lib/BulletList'
 import { connect } from 'react-redux'
 import {
   goBack,

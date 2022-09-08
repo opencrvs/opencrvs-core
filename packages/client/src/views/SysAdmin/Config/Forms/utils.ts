@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { NOTIFICATION_TYPE } from '@opencrvs/components/lib/interface'
+import { NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 
 export const REDIRECT_DELAY = 2000
 

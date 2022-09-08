@@ -11,13 +11,13 @@
  */
 import { ValidationInitializer } from '@client/utils/validate'
 import { MessageDescriptor } from 'react-intl'
+import { THEME_MODE } from '@opencrvs/components/lib/InputField'
 import {
-  ISelectOption as SelectComponentOption,
   IRadioOption as RadioComponentOption,
-  ICheckboxOption as CheckboxComponentOption,
-  THEME_MODE,
   RadioSize
-} from '@opencrvs/components/lib/forms'
+} from '@opencrvs/components/lib/Radio'
+import { ICheckboxOption as CheckboxComponentOption } from '@opencrvs/components/lib/Checkbox'
+import { ISelectOption as SelectComponentOption } from '@opencrvs/components/lib/Select'
 import { ApolloQueryResult } from 'apollo-client'
 import { GQLQuery } from '@opencrvs/gateway/src/graphql/schema.d'
 import { IDynamicValues } from '@opencrvs/client/src/navigation'
@@ -31,7 +31,7 @@ import * as responseTransformers from './mappings/response-transformers'
 import * as validators from '@opencrvs/client/src/utils/validate'
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
-import { ISearchLocation } from '@opencrvs/components/lib/interface'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { IUserDetails } from '@client/utils/userUtils'
 import { messages } from '@client/i18n/messages/views/formConfig'
 import { IFormDraft } from '@client/forms/configuration/formDrafts/utils'

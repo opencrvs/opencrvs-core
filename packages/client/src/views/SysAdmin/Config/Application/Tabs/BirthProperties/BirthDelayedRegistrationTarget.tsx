@@ -22,14 +22,11 @@ import {
   SmallWidthInput,
   Value
 } from '@client/views/SysAdmin/Config/Application/Components'
-import { InputField } from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
 import { IStoreState } from '@client/store'
-import {
-  FloatingNotification,
-  ListViewItemSimplified,
-  NOTIFICATION_TYPE,
-  ResponsiveModal
-} from '@opencrvs/components/lib/interface'
+import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { BirthActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
 import { messages } from '@client/i18n/messages/views/config'
@@ -177,7 +174,7 @@ export function BirthDelayedRegistrationTarget() {
         </ResponsiveModal>
       )}
 
-      <FloatingNotification
+      <Toast
         id={`${id}_notification`}
         type={
           notificationStatus === NOTIFICATION_STATUS.SUCCESS
@@ -198,7 +195,7 @@ export function BirthDelayedRegistrationTarget() {
               messages.applicationBirthLateRegTargetChangeNotification
             )
           : intl.formatMessage(messages.applicationConfigChangeError)}
-      </FloatingNotification>
+      </Toast>
     </>
   )
 }

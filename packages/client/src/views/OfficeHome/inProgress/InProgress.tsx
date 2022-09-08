@@ -65,7 +65,7 @@ import { DownloadButton } from '@client/components/interface/DownloadButton'
 import { getDraftInformantFullName } from '@client/utils/draftUtils'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
-import { FormTabs } from '@opencrvs/components/lib/forms'
+import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 import { IAction } from '@opencrvs/components/lib/common-types'
 import {
   IconWithName,

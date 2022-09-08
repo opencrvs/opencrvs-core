@@ -18,7 +18,9 @@ import {
   QUESTION_KEYS
 } from '@client/i18n/messages'
 import styled from 'styled-components'
-import { TextInput, Select, InputError } from '@opencrvs/components/lib/forms'
+import { InputError } from '@opencrvs/components/lib/InputField'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { Select } from '@opencrvs/components/lib/Select'
 import { find, at } from 'lodash'
 import { ActionPageLight } from '@opencrvs/components/lib/interface'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
@@ -27,7 +29,7 @@ import {
   IProtectedAccountSetupData,
   ISecurityQuestionAnswer
 } from '@client/components/ProtectedAccount'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import { Content } from '@opencrvs/components/lib/Content'
 
 const EMPTY_VALUE = ''
 const VISIBLE_QUESTION = 3
