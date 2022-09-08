@@ -15,7 +15,7 @@ import { ExpansionButton } from '../../buttons/ExpansionButton'
 import { ArrowExpansionButton } from '../../buttons/ArrowExpansionButton'
 import { PrimaryButton } from '../../buttons/PrimaryButton'
 import { ColumnContentAlignment, IAction } from '../../common-types'
-import { IActionComponent } from '../../Workqueue'
+import { IActionComponent } from '..'
 const Container = styled.div`
   background: ${({ theme }) => theme.colors.white};
   display: flex;
