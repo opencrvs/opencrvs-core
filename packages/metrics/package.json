@@ -34,7 +34,7 @@
     "jsonwebtoken": "^8.3.0",
     "jwt-decode": "^2.2.0",
     "tsconfig-paths": "^3.13.0",
-    "mongodb": "^4.9.0",
+    "mongodb" : "3.7.3",
     "node-fetch": "^2.6.7",
     "pino": "^6.0.0",
     "typescript": "^3.7.2"
