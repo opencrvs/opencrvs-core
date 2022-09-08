@@ -15,7 +15,7 @@ import { MobileHeader, IMobileHeaderProps } from './MobileHeader'
 import React from 'react'
 
 export default {
-  title: 'Layout/Header/Mobile/MobileHeader',
+  title: 'Deprecated/Header/Mobile/MobileHeader',
   component: MobileHeader
 } as Meta
 

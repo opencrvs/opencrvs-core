@@ -14,7 +14,7 @@ import { DesktopHeader, IDesktopHeaderProps } from './DesktopHeader'
 import React from 'react'
 
 export default {
-  title: 'Layout/Header/Desktop/DesktopHeader',
+  title: 'Deprecated/Header/Desktop/DesktopHeader',
   component: DesktopHeader
 } as Meta
 
