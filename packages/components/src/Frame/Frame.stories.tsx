@@ -11,7 +11,7 @@
  */
 import { ComponentMeta } from '@storybook/react'
 import React from 'react'
-import { EventTopBar } from '../interface'
+import { EventTopBar } from '../EventTopBar'
 import { LeftNavigation } from '../SideNavigation/LeftNavigation'
 import { leftNavigationView } from '../SideNavigation/LeftNavigation.stories'
 import { NavigationGroup } from '../SideNavigation/NavigationGroup'
