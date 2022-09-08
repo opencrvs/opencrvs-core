@@ -485,7 +485,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 : NOTIFICATION_TYPE.SUCCESS
             }
             show={showNotification}
-            callback={
+            onClose={
               imageUploading ? undefined : () => this.toggleNotification()
             }
           >

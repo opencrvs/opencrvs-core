@@ -711,7 +711,7 @@ function UserListComponent(props: IProps) {
           id="resend_invite_success"
           type={NOTIFICATION_TYPE.SUCCESS}
           show={showResendSMSSuccess}
-          callback={() => setShowResendSMSSuccess(false)}
+          onClose={() => setShowResendSMSSuccess(false)}
         >
           {intl.formatMessage(messages.resendSMSSuccess)}
         </Toast>
@@ -721,7 +721,7 @@ function UserListComponent(props: IProps) {
           id="resend_invite_error"
           type={NOTIFICATION_TYPE.ERROR}
           show={showResendSMSError}
-          callback={() => setShowResendSMSError(false)}
+          onClose={() => setShowResendSMSError(false)}
         >
           {intl.formatMessage(messages.resendSMSError)}
         </Toast>

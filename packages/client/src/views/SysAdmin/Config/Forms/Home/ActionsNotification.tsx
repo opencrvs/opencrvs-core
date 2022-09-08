@@ -42,7 +42,7 @@ export function ActionsNotification() {
           : NOTIFICATION_TYPE.ERROR
       }
       show={isNotifiable(status)}
-      callback={
+      onClose={
         status !== ActionStatus.PROCESSING
           ? () => setAction({ status: ActionStatus.IDLE })
           : undefined

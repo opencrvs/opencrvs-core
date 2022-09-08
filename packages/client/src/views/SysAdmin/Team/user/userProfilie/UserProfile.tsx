@@ -433,7 +433,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                         id="resend_invite_success"
                         type={FLOATING_NOTIFICATION_TYPE.SUCCESS}
                         show={showResendSMSSuccess}
-                        callback={() =>
+                        onClose={() =>
                           this.setState({ showResendSMSSuccess: false })
                         }
                       >
@@ -445,7 +445,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                         id="resend_invite_error"
                         type={FLOATING_NOTIFICATION_TYPE.ERROR}
                         show={showResendSMSError}
-                        callback={() =>
+                        onClose={() =>
                           this.setState({ showResendSMSError: false })
                         }
                       >

@@ -480,7 +480,7 @@ export class OfficeHomeView extends React.Component<
             id="print-cert-notification"
             type={NOTIFICATION_TYPE.SUCCESS}
             show={this.state.showCertificateToast}
-            callback={() => {
+            onClose={() => {
               this.setState({ showCertificateToast: false })
             }}
           >

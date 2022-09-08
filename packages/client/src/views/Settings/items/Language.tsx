@@ -144,7 +144,7 @@ export function Language() {
       <Toast
         type={NOTIFICATION_TYPE.SUCCESS}
         show={showSuccessNotification}
-        callback={toggleSuccessNotification}
+        onClose={toggleSuccessNotification}
       >
         <FormattedMessage
           {...userMessages.changeLanguageSuccessMessage}

@@ -128,7 +128,7 @@ export function ChangeNumberView({ show, onSuccess, onClose }: IProps) {
         id="duplicate-mobile-error-notification"
         type={NOTIFICATION_TYPE.ERROR}
         show={showDuplicateMobileErrorNotification}
-        callback={() => toggleDuplicateMobileErrorNotification()}
+        onClose={() => toggleDuplicateMobileErrorNotification()}
       >
         {intl.formatMessage(messages.duplicateUserMobileErrorMessege, {
           number: phoneNumber

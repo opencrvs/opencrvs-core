@@ -10,32 +10,35 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { keyframes, withTheme } from 'styled-components'
-import { CrossLarge, Error, Success, Warning } from '../icons'
+import styled, { keyframes, withTheme, css } from 'styled-components'
+import { Success, HelpWhite, Cross } from '../icons'
 import { Spinner } from '../Spinner'
 import { ITheme } from '../theme'
 import NotificationError from '../icons/NotificationError'
+import { CircleButton, Button } from '../buttons'
+import { Text } from '../Text'
 
 const NOTIFICATION_AUTO_HIDE_TIMEOUT = 20000 // 20 seconds
 
 export enum NOTIFICATION_TYPE {
   SUCCESS = 'success',
-  WARNING = 'warning',
+  NEUTRAL = 'neutral',
   IN_PROGRESS = 'inProgress',
-  ERROR = 'error',
-  ALTERNATE_ERROR = 'alternateError'
+  ERROR = 'error'
 }
 
-interface IProps {
+export interface IToastProps {
   id?: string
   show: boolean
   type?: NOTIFICATION_TYPE
-  callback?: (event?: React.MouseEvent<HTMLDivElement>) => void
+  onClose?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   className?: string
+  onActionClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
+  actionText?: string
   children: React.ReactNode
 }
 
-type FullProps = IProps & { theme: ITheme }
+type FullProps = IToastProps & { theme: ITheme }
 
 const easeInFromBottom = keyframes`
   from { bottom: -200px; }
@@ -47,77 +50,81 @@ const easeInFromTop = keyframes`
   to { top: 56px; }
 `
 
-const NotificationContainer = styled.div`
+const NotificationContainer = styled.div<{
+  $type?: NOTIFICATION_TYPE
+  $show: boolean
+}>`
+  --color: ${({ $type, theme }) => `
+    ${$type === NOTIFICATION_TYPE.SUCCESS ? theme.colors.positiveDark : ''}
+    ${$type === NOTIFICATION_TYPE.IN_PROGRESS ? theme.colors.primaryDark : ''}
+    ${$type === NOTIFICATION_TYPE.ERROR ? theme.colors.negativeDark : ''}
+    ${$type === NOTIFICATION_TYPE.NEUTRAL ? theme.colors.neutralDark : ''}
+    ${$type === undefined ? theme.colors.positiveDark : ''}
+  `};
+
   position: fixed;
-  padding: 4px 8px;
   width: 50%;
+  max-width: 520px;
+  min-height: 52px;
   transform: translateX(-50%);
   left: 50%;
   display: flex;
-  box-shadow: rgba(53, 67, 93, 0.54) 0px 2px 8px;
-  background: ${({ theme }) => theme.colors.secondary};
+  filter: drop-shadow(0px 2px 4px rgba(34, 34, 34, 0.24));
   z-index: 1;
-  justify-content: space-between;
   align-items: center;
-  box-sizing: border-box;
+  border-radius: 4px;
+  border: 2px solid var(--color);
+  border-left-width: 0px;
+  background: linear-gradient(
+    to right,
+    var(--color) 48px,
+    ${({ theme }) => theme.colors.white} 48px
+  );
 
-  &.show {
-    animation: ${easeInFromBottom} 500ms;
-    bottom: 100px;
-  }
+  ${({ $show }) =>
+    $show
+      ? css`
+          animation: ${easeInFromBottom} 500ms ease-in-out;
+          bottom: 100px;
+        `
+      : `display: none;`}
 
-  &.hide {
-    display: none;
-  }
-
-  &.success {
-    background: ${({ theme }) => theme.colors.positive};
-  }
-  &.inProgress {
-    background: ${({ theme }) => theme.colors.primary};
-  }
-  &.error {
-    background: ${({ theme }) => theme.colors.negative};
-  }
-  &.warning {
-    background: ${({ theme }) => theme.colors.neutral};
-  }
-  &.alternateError {
-    background: ${({ theme }) => theme.colors.negative};
-  }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
 
-    &.show {
-      animation: ${easeInFromTop} 500ms;
-      top: 56px;
-      bottom: auto;
-    }
+    ${({ $show }) =>
+      $show &&
+      css`
+        animation: ${easeInFromTop} 500ms ease-in-out;
+        top: 56px;
+        bottom: auto;
+      `}
   }
 `
 
-const Content = styled.div`
+const IconContainer = styled.div`
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  justify-content: center;
+  width: 48px;
 `
-const Cancel = styled.div`
-  padding: 8px;
 
-  transform: scale(0.8);
+const Close = styled(CircleButton)`
+  color: var(--color) !important;
+`
 
-  &.clickable {
-    cursor: pointer;
-  }
+const ButtonText = styled(Text)`
+  color: var(--color) !important;
+  padding: 0 4px;
 `
 
 const NotificationMessage = styled.div`
+  ${({ theme }) => theme.fonts.bold16};
+  color: var(--color);
   position: relative;
-  ${({ theme }) => theme.fonts.reg16};
   padding: 8px 16px;
-  margin: 8px;
-  color: ${({ theme }) => theme.colors.white};
   min-width: 160px;
+  max-width: calc(100% - 48px);
+  flex: 1;
 `
 
 class ToastComp extends React.Component<FullProps> {
@@ -132,41 +139,58 @@ class ToastComp extends React.Component<FullProps> {
 
   // Issue 3203: The notification will be disappeared automatically
   closeNotification() {
-    if (this.props && this.props.callback) {
-      this.props.callback()
+    if (this.props && this.props.onClose) {
+      this.props.onClose()
     }
   }
 
   render() {
-    const { id, type, show, children, callback, className, theme } = this.props
+    const {
+      id,
+      type,
+      show,
+      children,
+      onClose,
+      className,
+      theme,
+      onActionClick,
+      actionText
+    } = this.props
     return (
       <NotificationContainer
         id={id}
-        className={
-          (type ? type : '') + (show ? ' show' : ' hide') + ' ' + className
-        }
+        $type={type}
+        $show={show}
+        className={className}
+        role="alert"
       >
-        <Content>
+        <IconContainer>
           {type === NOTIFICATION_TYPE.SUCCESS && <Success />}
-          {type === NOTIFICATION_TYPE.WARNING && <Warning />}
-          {type === NOTIFICATION_TYPE.ALTERNATE_ERROR && <NotificationError />}
-          {type === NOTIFICATION_TYPE.ERROR && <Error />}
+          {type === NOTIFICATION_TYPE.NEUTRAL && <HelpWhite />}
+          {type === NOTIFICATION_TYPE.ERROR && <NotificationError />}
           {type === NOTIFICATION_TYPE.IN_PROGRESS && (
             <Spinner
               id="in-progress-floating-notification"
               baseColor={theme.colors.white}
+              size={24}
             />
           )}
-          <NotificationMessage>{children}</NotificationMessage>
-        </Content>
-        {callback && (
-          <Cancel
-            id={`${id}Cancel`}
-            onClick={callback}
-            className={' clickable'}
-          >
-            <CrossLarge />
-          </Cancel>
+        </IconContainer>
+
+        <NotificationMessage>{children}</NotificationMessage>
+
+        {onActionClick && (
+          <Button onClick={onActionClick}>
+            <ButtonText variant="bold14" element="span">
+              {actionText}
+            </ButtonText>
+          </Button>
+        )}
+
+        {onClose && (
+          <Close id={id + 'Cancel'} onClick={onClose}>
+            <Cross color="currentColor" />
+          </Close>
         )}
       </NotificationContainer>
     )

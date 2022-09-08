@@ -153,7 +153,7 @@ export function ApplicationName() {
             : NOTIFICATION_TYPE.ERROR
         }
         show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
-        callback={() => {
+        onClose={() => {
           setNotificationStatus(NOTIFICATION_STATUS.IDLE)
         }}
       >

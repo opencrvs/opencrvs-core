@@ -126,9 +126,7 @@ export function ProfileImage() {
             : NOTIFICATION_TYPE.SUCCESS
         }
         show={showSuccessNotification}
-        callback={
-          imageUploading ? undefined : () => toggleSuccessNotification()
-        }
+        onClose={imageUploading ? undefined : () => toggleSuccessNotification()}
       >
         <FormattedMessage
           {...(imageUploading

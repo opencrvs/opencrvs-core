@@ -32,7 +32,7 @@ export function SaveActionNotification() {
           : NOTIFICATION_TYPE.ERROR
       }
       show={isNotifiable(status)}
-      callback={
+      onClose={
         status !== ActionStatus.PROCESSING
           ? () => setStatus(ActionStatus.IDLE)
           : undefined

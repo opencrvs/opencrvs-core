@@ -70,7 +70,7 @@ export function Password() {
       <Toast
         type={NOTIFICATION_TYPE.SUCCESS}
         show={showSuccessNotification}
-        callback={toggleSuccessNotification}
+        onClose={toggleSuccessNotification}
       >
         <FormattedMessage {...userMessages.passwordUpdated} />
       </Toast>

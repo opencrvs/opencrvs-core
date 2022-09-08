@@ -296,7 +296,7 @@ function FormConfigSettingsComponent() {
             : NOTIFICATION_TYPE.SUCCESS
         }
         show={showNotification}
-        callback={() => {
+        onClose={() => {
           setShowNotification(false)
         }}
       >
