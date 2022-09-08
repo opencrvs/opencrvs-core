@@ -59,7 +59,7 @@ import {
   SearchBlue,
   AddUser
 } from '@opencrvs/components/lib/icons'
-import { AppHeader, IDomProps } from '@opencrvs/components/lib/interface'
+import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
 import { SearchTool, ISearchType } from '@opencrvs/components/lib/SearchTool'
 import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { ITheme } from '@opencrvs/components/lib/theme'
