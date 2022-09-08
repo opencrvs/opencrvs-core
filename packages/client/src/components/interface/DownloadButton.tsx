@@ -38,7 +38,6 @@ import { GQLAssignmentData } from '@opencrvs/gateway/src/graphql/schema'
 import { IStoreState } from '@client/store'
 import { AvatarVerySmall } from '@client/components/Avatar'
 import {
-  ROLE_LOCAL_REGISTRAR,
   FIELD_AGENT_ROLES,
   ROLE_REGISTRATION_AGENT
 } from '@client/utils/constants'
