@@ -11,8 +11,8 @@
  */
 import { Meta, Story } from '@storybook/react'
 import { ListTable } from './ListTable'
-import { IColumn, IDynamicValues, IFooterFColumn } from '../../Workqueue/types'
-import { ArrowDownBlue } from '../../icons'
+import { IColumn, IDynamicValues, IFooterFColumn } from '../Workqueue/types'
+import { ArrowDownBlue } from '../icons'
 import React from 'react'
 
 export default {

@@ -13,7 +13,7 @@ import { PrimaryButton, TertiaryButton } from '@opencrvs/components/lib/buttons'
 import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { Content } from '@opencrvs/components/lib/Content'
 
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import {
   createReviewDeclaration,

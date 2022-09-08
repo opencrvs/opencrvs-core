@@ -11,10 +11,10 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Pagination } from '../../Pagination'
-import { ColumnContentAlignment } from '../../common-types'
-import { IDynamicValues, IColumn, IFooterFColumn } from '../../Workqueue'
-import { LoadMore } from '../../Workqueue/components/LoadMore'
+import { Pagination } from '../Pagination'
+import { ColumnContentAlignment } from '../common-types'
+import { IDynamicValues, IColumn, IFooterFColumn } from '../Workqueue'
+import { LoadMore } from '../Workqueue/components/LoadMore'
 
 const Wrapper = styled.div<{
   hideBoxShadow?: boolean
