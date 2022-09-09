@@ -58,7 +58,6 @@ async function extractMessages() {
     (obj: ILanguage) => obj.lang === 'en'
   ).messages
   try {
-    // tslint:disable-next-line:no-console
     console.log(
       `${chalk.yellow('Checking translations in notification service ...')}`
     )
@@ -69,7 +68,6 @@ async function extractMessages() {
 
       if (!englishTranslations.hasOwnProperty(messageKey)) {
         missingKeys = true
-        // tslint:disable-next-line:no-console
         console.log(
           `${chalk.red(
             `No English translation key exists for messageKey.  Remeber to translate and add for all locales!!!: ${chalk.white(
@@ -81,7 +79,6 @@ async function extractMessages() {
         )
       }
       if (contentfulIds && !existsInContentful(contentfulIds, messageKey)) {
-        // tslint:disable-next-line:no-console
         console.log(
           `${chalk.red(
             `You have set up a Contentful Content Management System.  OpenCRVS core has created this new key in this version: ${chalk.white(
@@ -89,7 +86,6 @@ async function extractMessages() {
             )} in ${chalk.white(`${messageKey}`)}`
           )}`
         )
-        // tslint:disable-next-line:no-console
         console.log(
           `${chalk.yellow(
             'This key must be migrated into your Contentful CMS.  Saving to ...'
@@ -101,7 +97,6 @@ async function extractMessages() {
       }
       if (!descriptions.data.hasOwnProperty(messageKey)) {
         missingKeys = true
-        // tslint:disable-next-line:no-console
         console.log(
           `${chalk.red(
             `No description exists for messageKey: ${chalk.white(
@@ -114,7 +109,6 @@ async function extractMessages() {
       }
 
       if (missingKeys) {
-        // tslint:disable-next-line:no-console
         console.log(
           `${chalk.red('WARNING: ')}${chalk.yellow(
             'Fix missing keys in locale files first.'
@@ -130,7 +124,6 @@ async function extractMessages() {
       )
     })
   } catch (err) {
-    // tslint:disable-next-line:no-console
     console.log(err)
     process.exit(1)
     return

@@ -34,6 +34,7 @@ const animation = {
   },
 
   appear() {
+    // eslint-disable-next-line prefer-spread, prefer-rest-params
     return this.enter.apply(this, arguments)
   },
 
