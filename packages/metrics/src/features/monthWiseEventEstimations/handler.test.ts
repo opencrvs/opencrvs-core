@@ -41,6 +41,7 @@ describe('verify monthWiseEventEstimations handler', () => {
   })
 
   it('returns ok for valid request', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const utilService = require('../metrics/utils')
     readPoints.mockResolvedValueOnce([
       {

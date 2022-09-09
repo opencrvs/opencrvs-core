@@ -86,7 +86,7 @@ const mockQuestion = {
   initialValue: 'myValue'
 } as unknown as IQuestion & { _id: string }
 
-let mockQuestions = [mockQuestion]
+const mockQuestions = [mockQuestion]
 
 describe('getQuestions', () => {
   let server: any

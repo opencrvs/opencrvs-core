@@ -87,6 +87,10 @@ import {
 } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
+import {
+  GQLBirthRegistrationInput,
+  GQLDeathRegistrationInput
+} from '@gateway/graphql/schema'
 
 function createNameBuilder(sectionCode: string, sectionTitle: string) {
   return {
@@ -2446,8 +2450,7 @@ export const builders: IFieldBuilders = {
           fieldValue: string,
           context: any
         ) => {
-          let location
-          location = selectOrCreateLocationRefResource(
+          const location = selectOrCreateLocationRefResource(
             context.event === EVENT_TYPE.BIRTH
               ? BIRTH_CORRECTION_ENCOUNTER_CODE
               : DEATH_CORRECTION_ENCOUNTER_CODE,
@@ -3572,7 +3575,7 @@ export const builders: IFieldBuilders = {
 }
 
 export async function buildFHIRBundle(
-  reg: object,
+  reg: GQLBirthRegistrationInput | GQLDeathRegistrationInput,
   eventType: EVENT_TYPE,
   authHeader: IAuthHeader
 ) {
@@ -3589,7 +3592,12 @@ export async function buildFHIRBundle(
   if (authHeader) {
     context.authHeader = authHeader
   }
-  await transformObj(reg, fhirBundle, builders, context)
+  await transformObj(
+    reg as Record<string, unknown>,
+    fhirBundle,
+    builders,
+    context
+  )
   return fhirBundle
 }
 

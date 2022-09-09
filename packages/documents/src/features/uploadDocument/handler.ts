@@ -17,7 +17,7 @@ import { fromBuffer } from 'file-type'
 
 export interface IDocumentPayload {
   fileData: string
-  metaData: object
+  metaData?: Record<string, string>
 }
 
 export type IFileInfo = {

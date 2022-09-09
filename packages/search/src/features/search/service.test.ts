@@ -165,7 +165,6 @@ describe('elasticsearch params formatter', () => {
                 term: {
                   'eventLocationId.keyword': {
                     value: '456',
-                    // tslint:disable-next-line
                     boost: 2.0
                   }
                 }
@@ -174,7 +173,6 @@ describe('elasticsearch params formatter', () => {
                 term: {
                   'declarationLocationId.keyword': {
                     value: '123',
-                    // tslint:disable-next-line
                     boost: 2.0
                   }
                 }
@@ -286,7 +284,7 @@ describe('elasticsearch params formatter', () => {
                 term: {
                   'eventLocationId.keyword': {
                     value: '456',
-                    // tslint:disable-next-line
+
                     boost: 2.0
                   }
                 }
@@ -295,7 +293,7 @@ describe('elasticsearch params formatter', () => {
                 term: {
                   'declarationLocationId.keyword': {
                     value: '123',
-                    // tslint:disable-next-line
+
                     boost: 2.0
                   }
                 }

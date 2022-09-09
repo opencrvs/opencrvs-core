@@ -819,7 +819,7 @@ export function selectOrCreateTaskRefResource(
 export function setObjectPropInResourceArray(
   resource: fhir.Resource,
   label: string,
-  value: string | string[] | object,
+  value: string | string[] | Record<string, unknown>,
   propName: string,
   context: any,
   contextProperty?: string
@@ -1016,7 +1016,7 @@ export function removeDuplicatesFromComposition(
 export const fetchFHIR = <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
-  method: string = 'GET',
+  method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
   return fetch(`${FHIR_URL}${suffix}`, {
@@ -1305,7 +1305,7 @@ export function hasRequestCorrectionExtension(task: fhir.Task) {
 export const fetchDOCUMENTS = <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
-  method: string = 'GET',
+  method = 'GET',
   body: string | undefined = undefined
 ): Promise<T> => {
   return fetch(`${DOCUMENTS_URL}${suffix}`, {
