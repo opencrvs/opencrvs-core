@@ -46,6 +46,9 @@ body,
   *:not(i) {
     font-family: ${theme.fontFamily};
   }
+  .os-padding {
+    z-index: 0;
+  }
 }
 
 body,
