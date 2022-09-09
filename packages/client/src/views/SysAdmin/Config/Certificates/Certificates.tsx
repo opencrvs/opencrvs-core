@@ -100,16 +100,41 @@ interface State {
   showPrompt: boolean
   eventName: string
   previewImage: IAttachmentValue | null
-  certImage: string
   imageFile: IAttachmentValue
   imageFileName: string
-  eventType: string
+}
+
+function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
+  return new Promise((resolve, _) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.readAsDataURL(blob)
+  })
 }
 
 async function updatePreviewSvgWithSampleSignature(
   svgCode: string
 ): Promise<string> {
-  return atob(svgCode.split(',')[1])
+  const html = document.createElement('html')
+  if (svgCode.includes('data:image/svg+xml;base64')) {
+    svgCode = atob(svgCode.split(',')[1])
+  }
+  html.innerHTML = svgCode
+
+  const certificateImages = html.querySelectorAll('image')
+  const signatureImage = Array.from(certificateImages).find(
+    (image) => image.getAttribute('data-content') === 'signature'
+  )
+
+  if (signatureImage) {
+    const baseURL = window.location.origin
+    const res = await fetch(`${baseURL}/assets/sample-signature.png`)
+    const blob = await res.blob()
+    const base64signature = await blobToBase64(blob)
+    signatureImage.setAttribute('xlink:href', base64signature as string)
+  }
+  svgCode = html.getElementsByTagName('svg')[0].outerHTML
+  return unescape(encodeURIComponent(svgCode))
 }
 
 export const printDummyCertificate = async (
@@ -165,14 +190,12 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
       showPrompt: false,
       eventName: '',
       previewImage: null,
-      certImage: '',
       imageFile: {
         name: EMPTY_STRING,
         type: EMPTY_STRING,
         data: EMPTY_STRING
       },
-      imageFileName: EMPTY_STRING,
-      eventType: ''
+      imageFileName: EMPTY_STRING
     }
   }
 
@@ -196,9 +219,13 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
           )
 
           svgCode = executeHandlebarsTemplate(svgCode, dummyTemplateData)
+          svgCode = await updatePreviewSvgWithSampleSignature(svgCode)
+          const linkSource = `data:${SVGFile.type};base64,${window.btoa(
+            svgCode
+          )}`
           this.setState({
             eventName: event,
-            previewImage: { type: SVGFile.type, data: svgCode }
+            previewImage: { type: SVGFile.type, data: linkSource }
           })
         }
       },
@@ -279,16 +306,11 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     this.setState({ ...this.state, imageUploading: isUploading })
   }
 
-  handleCertificateFile(
-    file: IAttachmentValue | string,
-    eventType: 'birth' | 'death'
-  ) {
+  handleCertificateFile(file: IAttachmentValue) {
     this.setState({
       ...this.state,
-      certImage: file as string,
-      imageFile: file as IAttachmentValue,
-      imageFileName: (file as IAttachmentValue).name ?? EMPTY_STRING,
-      eventType: eventType
+      imageFile: file,
+      imageFileName: file.name ?? EMPTY_STRING
     })
   }
 
@@ -306,7 +328,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     this.setState({ previewImage: null })
   }
 
-  onDelete = (image: IFormFieldValue) => {
+  onDelete = () => {
     this.closePreviewSection()
   }
 
@@ -524,33 +546,42 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                 }
                 disableDeleteInPreview={false}
                 name={'Simple'}
-                allowedDocType={['image/svg+xml']}
+                allowedDocType={[SVGFile.type]}
                 key="cancel"
                 onComplete={(file) => {
-                  this.handleCertificateFile(
-                    file as IAttachmentValue | string,
-                    'death'
-                  )
+                  this.handleCertificateFile(file as IAttachmentValue)
                 }}
                 files={this.state.imageFile}
                 onUploadingStateChanged={this.onUploadingStateChanged}
-                previewTransformer={(file: any) => {
-                  return modifyPreviewImage(file)
+                previewTransformer={(file) => {
+                  const dummyTemplateData = getDummyCertificateTemplateData(
+                    this.state.eventName,
+                    this.props.registerForm
+                  )
+                  let svgCode = atob(file.data.split(',')[1])
+                  svgCode = executeHandlebarsTemplate(
+                    svgCode,
+                    dummyTemplateData
+                  )
+                  const data = `data:${SVGFile.type};base64,${window.btoa(
+                    svgCode
+                  )}`
+                  return { ...file, data }
                 }}
               />
             </Field>
           </ResponsiveModal>
           {this.state.previewImage && (
             <DocumentPreview
-              previewImage={modifyPreviewImage(this.state.previewImage)}
+              previewImage={this.state.previewImage}
               disableDelete={true}
               title={
                 eventName === Event.Birth
                   ? intl.formatMessage(messages.birthTemplate)
                   : intl.formatMessage(messages.deathTemplate)
               }
-              goBack={() => this.closePreviewSection.bind(this)}
-              onDelete={() => this.onDelete.bind(this)}
+              goBack={this.closePreviewSection}
+              onDelete={this.onDelete}
             />
           )}
         </SysAdminContentWrapper>
@@ -566,46 +597,6 @@ function mapStateToProps(state: IStoreState) {
     userDetails: getUserDetails(state),
     scope: getScope(state)
   }
-}
-
-function modifyPreviewImage(file: any) {
-  let fileData = atob(file.data.split(',')[1])
-  const listToChange = [
-    '{{registrationNumber}}',
-    '{{certificateDate}}',
-    '{{childFirstName}}',
-    '{{childFamilyName}}',
-    '{{eventDate}}',
-    '{{placeOfBirth}}',
-    '{{registrationLocation}}',
-    '{{deceasedFirstName}}',
-    '{{deceasedFamilyName}}',
-    '{{placeOfDeath}}',
-    '{{registrarName}}',
-    '{{role}}'
-  ]
-  const replacedWith = [
-    '2022BLOQITK',
-    '02 September 2022',
-    'Jane',
-    'Smith',
-    '19th May 2021',
-    'Ibombo, Central',
-    'Ibombo District Ofce, Ibombo District, Central Province',
-    'Jane',
-    'Smith',
-    'Ibombo, Central',
-    'Cornel Prime',
-    'Registrar'
-  ]
-
-  for (let i = 0; i < listToChange.length; i++) {
-    fileData = fileData.replace(listToChange[i], replacedWith[i])
-  }
-  const linkSource = `data:image/svg+xml;base64,${btoa(fileData)}`
-  const doc = file
-  doc.data = linkSource
-  return doc
 }
 
 export const CertificatesConfig = connect(mapStateToProps, {
