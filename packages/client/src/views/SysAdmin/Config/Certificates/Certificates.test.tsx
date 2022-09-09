@@ -142,22 +142,11 @@ describe('ConfigHome page when already has uploaded certificate template', async
       ).toHaveLength(1)
     })
 
-    it.only('should call update certificate mutation on modal confirmation', async () => {
+    it('should call update certificate mutation on modal confirmation', async () => {
       await clickOnMenuItem(testComponent, 'birth', MENU_ITEM.UPLOAD)
       expect(
         testComponent.find('#withoutVerificationPrompt').hostNodes()
       ).toHaveLength(1)
-      // testComponent.find('#upload_document').hostNodes().simulate('click')
-      // testComponent
-      //   .find('#image_file_uploader_field')
-      //   .hostNodes()
-      //   .first()
-      //   .simulate('change', {
-      //     target: {
-      //       files: [new Blob(['<svg></svg>'], { type: 'image/svg+xml' })],
-      //       id: 'image_file_uploader_field'
-      //     }
-      //   })
       testComponent.find('#upload_document').hostNodes().simulate('click')
       testComponent
         .find('#image_file_uploader_field')
@@ -167,20 +156,23 @@ describe('ConfigHome page when already has uploaded certificate template', async
             files: [
               getFileFromBase64String(
                 validImageB64String,
-                'image/svg+xml',
+                'certificate.svg',
                 'image/svg+xml'
               )
             ]
           }
         })
-      testComponent.update()
-      await flushPromises()
 
-      console.log(testComponent.find('#preview-list-undefined').debug())
+      await new Promise((resolve) => {
+        setTimeout(resolve, 50)
+      })
+
+      testComponent.update()
+      expect(
+        testComponent.find('#apply_change').hostNodes().props().disabled
+      ).toBeFalsy()
 
       testComponent.find('#apply_change').hostNodes().simulate('click')
-
-      // testComponent.update()
       testComponent.update()
 
       await new Promise((resolve) => {
