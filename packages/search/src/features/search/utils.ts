@@ -336,7 +336,7 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
     if (params.event in eventWiseFieldName) {
       fieldName = eventWiseFieldName[params.event]
     } else {
-      throw Error('Invalid Event')
+      throw Error('Invalid Event. Valid events are: Birth, Death, etc.')
     }
 
     must.push({
@@ -466,7 +466,7 @@ export function advancedQueryBuilder(params: IAdvancedSearchParam) {
   }
 
   if (
-    !params.dateOfEventStart &&
+    !params.dateOfRegistrationStart &&
     !params.dateOfRegistrationEnd &&
     params.dateOfRegistration
   ) {

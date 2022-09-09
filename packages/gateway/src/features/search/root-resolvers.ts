@@ -224,8 +224,6 @@ export const resolvers: GQLResolver = {
         return await Promise.reject(new Error('Daily search quota exceeded'))
       }
 
-      await postMetrics('/advancedSearch', {}, authHeader)
-
       const searchResult: ApiResponse<ISearchResponse<any>> =
         await postAdvancedSearch(authHeader, searchCriteria)
 
@@ -239,6 +237,7 @@ export const resolvers: GQLResolver = {
       }
 
       ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
+        await postMetrics('/advancedSearch', {}, authHeader)
         await markRecordAsDownloadedAndAssigned(hit._id, authHeader)
       })
 
