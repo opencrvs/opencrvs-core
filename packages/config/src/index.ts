@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-// tslint:disable-next-line no-import-side-effect
+
+// eslint-disable-next-line import/no-unassigned-import
 import '@opencrvs/commons/monitoring'
 
 import { createServer } from '@config/server'

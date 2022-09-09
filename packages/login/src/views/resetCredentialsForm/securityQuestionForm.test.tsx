@@ -11,11 +11,60 @@
  */
 import { FORGOTTEN_ITEMS } from '@login/login/actions'
 import * as routes from '@login/navigation/routes'
-import { createTestApp, wait } from '@login/tests/util'
+import { createTestApp } from '@login/tests/util'
 import { client, QUESTION_KEYS } from '@login/utils/authApi'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
 import * as moxios from 'moxios'
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
+
+//mock api calls
+const server = setupServer(
+  rest.get(
+    `${window.config.COUNTRY_CONFIG_URL}/content/login`,
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          languages: [
+            {
+              lang: 'en',
+              displayName: 'Français',
+              messages: {
+                defaultMessage: 'Bangladesh'
+              }
+            }
+          ]
+        })
+      )
+    }
+  ),
+  rest.get(`${window.config.CONFIG_API_URL}/loginConfig`, (req, res, ctx) => {
+    return res(
+      ctx.json({
+        config: {
+          APPLICATION_NAME: 'Dummy App',
+          COUNTRY: 'FAR',
+          COUNTRY_LOGO: {
+            fileName: 'dummy-file-name',
+            file: 'dummy-logo'
+          },
+          SENTRY: '',
+          LOGROCKET: ''
+        }
+      })
+    )
+  })
+)
+
+// Enable API mocking before tests.
+beforeAll(() => server.listen())
+
+// Reset any runtime request handlers we may add during the tests.
+afterEach(() => server.resetHandlers())
+
+// Disable API mocking after the tests are done.
+afterAll(() => server.close())
 
 describe('Test phone number verification form', () => {
   let app: ReactWrapper
@@ -82,104 +131,103 @@ describe('Test phone number verification form', () => {
       moxios.install(client)
     })
 
-    afterEach(() => {
-      moxios.uninstall(client)
-    })
-
-    it('redirects to success page for a valid submission when username is chosen as forgotten item', (done) => {
-      history.replace(routes.SECURITY_QUESTION, {
-        forgottenItem: FORGOTTEN_ITEMS.USERNAME,
-        nonce,
-        securityQuestionKey
-      })
-      app.update()
-      app
-        .find('#security-answer-input')
-        .hostNodes()
-        .simulate('change', { target: { value: 'Gotham' } })
-      app.find('#continue').hostNodes().simulate('submit')
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 200,
-            response: {
-              matched: true,
-              nonce: 'KkcVYTRVC6usF7Vjdi3FSw=='
-            }
-          })
-          .then(() => {
-            moxios.wait(() => {
-              const request = moxios.requests.mostRecent()
-              request
-                .respondWith({
-                  status: 200
-                })
-                .then(() => {
-                  expect(window.location.pathname).toContain(routes.SUCCESS)
-                  done()
-                })
+    it('redirects to success page for a valid submission when username is chosen as forgotten item', () =>
+      new Promise<void>((done) => {
+        history.replace(routes.SECURITY_QUESTION, {
+          forgottenItem: FORGOTTEN_ITEMS.USERNAME,
+          nonce,
+          securityQuestionKey
+        })
+        app.update()
+        app
+          .find('#security-answer-input')
+          .hostNodes()
+          .simulate('change', { target: { value: 'Gotham' } })
+        app.find('#continue').hostNodes().simulate('submit')
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent()
+          request
+            .respondWith({
+              status: 200,
+              response: {
+                matched: true,
+                nonce: 'KkcVYTRVC6usF7Vjdi3FSw=='
+              }
             })
-          })
-      })
-    })
+            .then(() => {
+              moxios.wait(() => {
+                const request = moxios.requests.mostRecent()
+                request
+                  .respondWith({
+                    status: 200
+                  })
+                  .then(() => {
+                    expect(window.location.pathname).toContain(routes.SUCCESS)
+                    done()
+                  })
+              })
+            })
+        })
+      }))
 
-    it('redirects to password update for for a valid submission when password is chosen as forgotten item', (done) => {
-      history.replace(routes.SECURITY_QUESTION, {
-        forgottenItem: FORGOTTEN_ITEMS.PASSWORD,
-        nonce,
-        securityQuestionKey
-      })
-      app.update()
-      app
-        .find('#security-answer-input')
-        .hostNodes()
-        .simulate('change', { target: { value: 'Gotham' } })
-      app.find('#continue').hostNodes().simulate('submit')
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 200,
-            response: {
-              matched: true,
-              nonce: 'KkcVYTRVC6usF7Vjdi3FSw=='
-            }
-          })
-          .then(() => {
-            expect(window.location.pathname).toContain(routes.UPDATE_PASSWORD)
-            done()
-          })
-      })
-    })
+    it('redirects to password update for for a valid submission when password is chosen as forgotten item', () =>
+      new Promise<void>((done) => {
+        history.replace(routes.SECURITY_QUESTION, {
+          forgottenItem: FORGOTTEN_ITEMS.PASSWORD,
+          nonce,
+          securityQuestionKey
+        })
+        app.update()
+        app
+          .find('#security-answer-input')
+          .hostNodes()
+          .simulate('change', { target: { value: 'Gotham' } })
+        app.find('#continue').hostNodes().simulate('submit')
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent()
+          request
+            .respondWith({
+              status: 200,
+              response: {
+                matched: true,
+                nonce: 'KkcVYTRVC6usF7Vjdi3FSw=='
+              }
+            })
+            .then(() => {
+              expect(window.location.pathname).toContain(routes.UPDATE_PASSWORD)
+              done()
+            })
+        })
+      }))
 
-    it('updates header as the answer for the given question is wrong and another question key is sent as response', (done) => {
-      history.replace(routes.SECURITY_QUESTION, {
-        forgottenItem: FORGOTTEN_ITEMS.USERNAME,
-        nonce,
-        securityQuestionKey
-      })
+    it('updates header as the answer for the given question is wrong and another question key is sent as response', () =>
+      new Promise<void>((done) => {
+        history.replace(routes.SECURITY_QUESTION, {
+          forgottenItem: FORGOTTEN_ITEMS.USERNAME,
+          nonce,
+          securityQuestionKey
+        })
 
-      app.update()
+        app.update()
 
-      app.find('#continue').hostNodes().simulate('submit')
+        app.find('#continue').hostNodes().simulate('submit')
 
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 200,
-            response: {
-              matched: false,
-              nonce: 'tzKZutCOJfgz+3nRnyehCQ==',
-              securityQuestionKey: QUESTION_KEYS.FAVORITE_FOOD
-            }
-          })
-          .then(() => {
-            expect(app.text()).toContain('What is your favorite food?')
-            done()
-          })
-      })
-    })
+        moxios.wait(() => {
+          const request = moxios.requests.mostRecent()
+          request
+            .respondWith({
+              status: 200,
+              response: {
+                matched: false,
+                nonce: 'tzKZutCOJfgz+3nRnyehCQ==',
+                securityQuestionKey: QUESTION_KEYS.FAVORITE_FOOD
+              }
+            })
+            .then(() => {
+              expect(app.text()).toContain('What is your favorite food?')
+              done()
+            })
+        })
+      }))
   })
 })

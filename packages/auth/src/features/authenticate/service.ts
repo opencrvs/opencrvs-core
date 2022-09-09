@@ -38,7 +38,7 @@ const cert = readFileSync(CERT_PRIVATE_KEY_PATH)
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
 const sign = promisify(jwt.sign) as (
-  payload: string | Buffer | object,
+  payload: string | Buffer | Record<string, unknown>,
   secretOrPrivateKey: jwt.Secret,
   options?: jwt.SignOptions
 ) => Promise<string>
@@ -88,10 +88,8 @@ export async function authenticate(
 }
 
 export async function authenticateSystem(
-  /* tslint:disable */
   client_id: string,
   client_secret: string
-  /* tslint:enable */
 ): Promise<ISystemAuthentication> {
   const url = resolve(USER_MANAGEMENT_URL, '/verifySystem')
 

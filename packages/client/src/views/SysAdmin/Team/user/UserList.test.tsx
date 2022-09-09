@@ -15,7 +15,6 @@ import {
   createTestComponent,
   flushPromises,
   mockOfflineDataDispatch,
-  userDetails,
   mockUserResponse
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
@@ -28,13 +27,14 @@ import { UserList } from './UserList'
 import { userMutations } from '@client/user/mutations'
 import * as actions from '@client/profile/profileActions'
 import { offlineDataReady } from '@client/offline/actions'
+import { vi, Mock } from 'vitest'
 
 describe('user list without admin scope', () => {
   let store: AppStore
   let history: History<any>
 
   it('no add user button', async () => {
-    Date.now = jest.fn(() => 1487076708000)
+    Date.now = vi.fn(() => 1487076708000)
     ;({ store, history } = await createStore())
     const action = {
       type: actions.SET_USER_DETAILS,
@@ -84,7 +84,7 @@ describe('User list tests', () => {
   let history: History<any>
 
   beforeAll(async () => {
-    Date.now = jest.fn(() => 1487076708000)
+    Date.now = vi.fn(() => 1487076708000)
     ;({ store, history } = await createStore())
 
     const action = {
@@ -224,108 +224,8 @@ describe('User list tests', () => {
       expect(app.find('#no-record').hostNodes()).toHaveLength(1)
     })
 
-    describe('Table responsiveness test', () => {
-      let component: ReactWrapper<{}, {}>
-      const userListMock = [
-        {
-          request: {
-            query: SEARCH_USERS,
-            variables: {
-              primaryOfficeId: '0d8474da-0361-4d32-979e-af91f012340a',
-              count: 10,
-              skip: 0
-            }
-          },
-          result: {
-            data: {
-              searchUsers: {
-                totalItems: 5,
-                results: [
-                  {
-                    id: '5d08e102542c7a19fc55b790',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Rabindranath',
-                        familyName: 'Tagore'
-                      }
-                    ],
-                    username: 'r.tagore',
-                    role: 'REGISTRATION_AGENT',
-                    type: 'ENTREPENEUR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b791',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Mohammad',
-                        familyName: 'Ashraful'
-                      }
-                    ],
-                    username: 'm.ashraful',
-                    role: 'LOCAL_REGISTRAR',
-                    type: 'CHAIRMAN',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b792',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Muhammad Abdul',
-                        familyName: 'Muid Khan'
-                      }
-                    ],
-                    username: 'ma.muidkhan',
-                    role: 'DISTRICT_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'pending',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b793',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Nasreen Pervin',
-                        familyName: 'Huq'
-                      }
-                    ],
-                    username: 'np.huq',
-                    role: 'STATE_REGISTRAR',
-                    type: 'MAYOR',
-                    status: 'active',
-                    underInvestigation: false
-                  },
-                  {
-                    id: '5d08e102542c7a19fc55b795',
-                    name: [
-                      {
-                        use: 'en',
-                        firstNames: 'Md. Ariful',
-                        familyName: 'Islam'
-                      }
-                    ],
-                    username: 'ma.islam',
-                    role: 'FIELD_AGENT',
-                    type: 'HOSPITAL',
-                    status: 'disabled',
-                    underInvestigation: false
-                  }
-                ]
-              }
-            }
-          }
-        }
-      ]
-    })
-
     describe('when there is a result from query', () => {
-      userMutations.resendSMSInvite = jest.fn()
+      userMutations.resendSMSInvite = vi.fn()
       let component: ReactWrapper<{}, {}>
       const userListMock = [
         {
@@ -486,7 +386,7 @@ describe('User list tests', () => {
       })
 
       it('clicking on menu options Resend SMS invite sends invite', async () => {
-        ;(userMutations.resendSMSInvite as jest.Mock).mockResolvedValueOnce({
+        ;(userMutations.resendSMSInvite as Mock).mockResolvedValueOnce({
           data: { resendSMSInvite: 'true' }
         })
         const toggleButtonElement = await waitForElement(
@@ -507,7 +407,7 @@ describe('User list tests', () => {
       })
 
       it('clicking on menu options Resend SMS invite shows error if any submission error', async () => {
-        ;(userMutations.resendSMSInvite as jest.Mock).mockRejectedValueOnce(
+        ;(userMutations.resendSMSInvite as Mock).mockRejectedValueOnce(
           new Error('Something went wrong')
         )
         const toggleButtonElement = await waitForElement(

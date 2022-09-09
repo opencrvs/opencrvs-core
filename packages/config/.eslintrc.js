@@ -9,4 +9,17 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-/// <reference types="react-scripts" />
+module.exports = {
+  extends: '../../.eslintrc.js',
+  env: {
+    es6: true
+  },
+  overrides: [
+    {
+      files: ['*.ts'],
+      parserOptions: {
+        project: ['./tsconfig.json', './tsconfig.eslint.json']
+      }
+    }
+  ]
+}

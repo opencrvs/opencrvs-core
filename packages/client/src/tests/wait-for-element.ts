@@ -18,7 +18,7 @@ const INTERVAL = 10
 const SECONDS_INTERVAL = 1000
 
 export async function waitForSeconds(time: number) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     let remainingTime = time * 1000
 
     const intervalId = setInterval(() => {
@@ -32,7 +32,7 @@ export async function waitForSeconds(time: number) {
 }
 
 export async function waitFor(condition: () => boolean) {
-  return new Promise((resolve, reject) => {
+  return new Promise<void>((resolve, reject) => {
     let remainingTime = MAX_TIME
 
     const intervalId = setInterval(() => {
@@ -75,12 +75,14 @@ export async function waitForElement(
   selector: string
 ): Promise<ReactWrapper<any, any>>
 
-export async function waitForElement<T>(
+export async function waitForElement<T extends string | (() => void)>(
   rootComponent: ReactWrapper,
   selector: T
 ) {
   try {
-    await waitFor(() => rootComponent.update().find(selector).length > 0)
+    await waitFor(
+      () => rootComponent.update().find(selector as string).length > 0
+    )
   } catch (err) {
     throw new Error(
       `Couldn't find selector ${
@@ -88,5 +90,5 @@ export async function waitForElement<T>(
       } from component in ${MAX_TIME}ms`
     )
   }
-  return rootComponent.update().find(selector)
+  return rootComponent.update().find(selector as string)
 }
