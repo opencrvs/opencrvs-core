@@ -10,7 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { buttonMessages, errorMessages } from '@client/i18n/messages'
-import { ErrorToastNotification } from '@opencrvs/components/lib/Toast'
+import {
+  NOTIFICATION_TYPE as TOAST_TYPE,
+  Toast
+} from '@opencrvs/components/lib/Toast'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 
@@ -24,12 +27,14 @@ const notificationActionButtonHandler = () => {
 
 function getErrorNotification(intl: any) {
   return (
-    <ErrorToastNotification
-      retryButtonText={intl.formatMessage(buttonMessages.retry)}
-      retryButtonHandler={notificationActionButtonHandler}
+    <Toast
+      type={TOAST_TYPE.ERROR}
+      actionText={intl.formatMessage(buttonMessages.retry)}
+      onActionClick={notificationActionButtonHandler}
+      show={true}
     >
       {intl.formatMessage(errorMessages.pageLoadFailed)}
-    </ErrorToastNotification>
+    </Toast>
   )
 }
 
