@@ -30,80 +30,87 @@ export const ToastToggler = ({ type, closable, retryable, children }) => {
 # Toast
 
 Toast is a message that pop ups from the bottom of the interface on a desktop, and from the top of the interface on mobile. It provides feedback on the outcome of an action.
+Toast can be used inside any view, it doesn't have to be on the application root level element.
 
 ## Success
 
-<Story name="Success">
+<Story name="Success" storyName="Success">
   <ToastToggler type={NOTIFICATION_TYPE.SUCCESS}>
     Hi! I'm a success toast
   </ToastToggler>
-  <Source
-    dark
-    code={`
+</Story>
+
+<Source
+  dark
+  code={`
 <Toast type={NOTIFICATION_TYPE.SUCCESS} show={isVisible}>
   Hi! I'm a success toast
 </Toast>
     `}
-  />
-</Story>
+/>
 
 ## Neutral
 
-<Story name="Neutral">
+<Story name="Neutral" storyName="Neutral">
   <ToastToggler type={NOTIFICATION_TYPE.NEUTRAL}>
     Hi! I'm a neutral toast
   </ToastToggler>
-  <Source
-    dark
-    code={`
-<Toast type={NOTIFICATION_TYPE.NEUTRAL} show={isVisible}>
-  Hi! I'm a neutral toast
-</Toast>
-    `}
-  />
 </Story>
+
+<Source
+  dark
+  code={`
+<Toast type={NOTIFICATION_TYPE.NEUTRAL} show={isVisible}>
+Hi! I'm a neutral toast
+</Toast>
+  `}
+/>
 
 ## Error
 
-<Story name="Error">
+<Story name="Error" storyName="Error">
   <ToastToggler type={NOTIFICATION_TYPE.ERROR}>
     Hi! I'm an error toast
   </ToastToggler>
-  <Source
-    dark
-    code={`
+</Story>
+
+<Source
+  dark
+  code={`
 <Toast type={NOTIFICATION_TYPE.ERROR} show={isVisible}>
   Hi! I'm an error toast
 </Toast>
     `}
-  />
-</Story>
+/>
 
 ## In progress
 
-<Story name="In progress">
+<Story name="In progress" storyName="In progress">
   <ToastToggler type={NOTIFICATION_TYPE.IN_PROGRESS}>
     Hi! I'm an in progress toast
   </ToastToggler>
-  <Source
-    dark
-    code={`
+</Story>
+
+<Source
+  dark
+  code={`
 <Toast type={NOTIFICATION_TYPE.IN_PROGRESS} show={isVisible}>
   Hi! I'm an in progress toast
 </Toast>
     `}
-  />
-</Story>
+/>
 
 ## Closable
 
-<Story name="Closable">
+<Story name="Closable" storyName="Closable">
   <ToastToggler type={NOTIFICATION_TYPE.IN_PROGRESS} closable>
     Hi! I'm a closable toast
   </ToastToggler>
-  <Source
-    dark
-    code={`
+</Story>
+
+<Source
+  dark
+  code={`
 <Toast
   type={NOTIFICATION_TYPE.SUCCESS}
   show={isVisible}
@@ -112,18 +119,19 @@ Toast is a message that pop ups from the bottom of the interface on a desktop, a
   Hi! I'm a closable toast
 </Toast>
     `}
-  />
-</Story>
+/>
 
 ## Retryable
 
-<Story name="Retryable">
+<Story name="Retryable" storyName="Retryable">
   <ToastToggler type={NOTIFICATION_TYPE.IN_PROGRESS} retryable>
     Hi! I'm a retryable toast
   </ToastToggler>
-  <Source
-    dark
-    code={`
+</Story>
+
+<Source
+  dark
+  code={`
 <Toast
   type={NOTIFICATION_TYPE.SUCCESS}
   show={isVisible}
@@ -133,18 +141,19 @@ Toast is a message that pop ups from the bottom of the interface on a desktop, a
   Hi! I'm a retryable toast
 </Toast>
     `}
-  />
-</Story>
+/>
 
 ## Retryable and closable
 
-<Story name="Retryable and closable">
+<Story name="Retryable and closable" storyName="Retryable and closable">
   <ToastToggler type={NOTIFICATION_TYPE.IN_PROGRESS} retryable closable>
     Hi! I'm a retryable and closable toast
   </ToastToggler>
-  <Source
-    dark
-    code={`
+</Story>
+
+<Source
+  dark
+  code={`
 <Toast
   type={NOTIFICATION_TYPE.SUCCESS}
   show={isVisible}
@@ -155,20 +164,24 @@ Toast is a message that pop ups from the bottom of the interface on a desktop, a
   Hi! I'm a retryable toast
 </Toast>
     `}
-  />
-</Story>
+/>
 
 ## Long text, retryable and closable
 
-<Story name="Long text, retryable and closable">
+<Story
+  name="Long text, retryable and closable"
+  storyName="Long text, retryable and closable"
+>
   <ToastToggler type={NOTIFICATION_TYPE.SUCCESS} retryable closable>
     Hi! I'm a retryable and closable toast. I also have a very long text within
     the toast. This illustrates how the toast stretches when the content is
     lengthy.
   </ToastToggler>
-  <Source
-    dark
-    code={`
+</Story>
+
+<Source
+  dark
+  code={`
 <Toast
   type={NOTIFICATION_TYPE.SUCCESS}
   show={isVisible}
@@ -181,5 +194,4 @@ Toast is a message that pop ups from the bottom of the interface on a desktop, a
   lengthy.
 </Toast>
     `}
-  />
-</Story>
+/>
