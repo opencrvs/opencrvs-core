@@ -745,6 +745,9 @@ export const typeResolvers: GQLResolver = {
     },
     statusReason: (task: fhir.Task) => task.statusReason || null,
     reason: (task: fhir.Task) => task.reason?.text || null,
+    otherReason: (task: fhir.Task) => {
+      return task.reason?.extension ? task.reason?.extension[0].valueString : ''
+    },
     date: (task: fhir.Task) => task.meta?.lastUpdated,
     dhis2Notification: (task: fhir.Task) =>
       task.identifier?.some(

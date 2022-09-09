@@ -428,6 +428,8 @@ export const GET_BIRTH_REGISTRATION_FOR_CERTIFICATE = gql`
         statusReason {
           text
         }
+        reason
+        otherReason
         location {
           id
           name

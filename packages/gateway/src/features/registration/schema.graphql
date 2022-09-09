@@ -227,6 +227,7 @@ type History {
   action: RegStatus
   statusReason: StatusReason
   reason: String
+  otherReason: String
   reinstated: Boolean # -> extension(url='http://opencrvs.org/specs/extension/regReinstated')
   location: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastLocation').valueReference
   office: Location # -> extension(url='http://opencrvs.org/specs/extension/regLastOffice').valueReference
@@ -355,6 +356,7 @@ input CorrectionInput {
   location: LocationInput
   data: String
   reason: String
+  otherReason: String
   note: String
 }
 

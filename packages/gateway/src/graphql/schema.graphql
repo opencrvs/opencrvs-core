@@ -710,6 +710,7 @@ type History {
   action: RegStatus
   statusReason: StatusReason
   reason: String
+  otherReason: String
   reinstated: Boolean
   location: Location
   office: Location
@@ -1336,6 +1337,7 @@ input CorrectionInput {
   location: LocationInput
   data: String
   reason: String
+  otherReason: String
   note: String
 }
 

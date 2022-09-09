@@ -81,7 +81,8 @@ import {
   OPENCRVS_SPECIFICATION_URL,
   FHIR_SPECIFICATION_URL,
   EVENT_TYPE,
-  ASSIGNED_EXTENSION_URL
+  ASSIGNED_EXTENSION_URL,
+  REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL
 } from '@gateway/features/fhir/constants'
 import { IAuthHeader } from '@gateway/common-types'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
@@ -2513,6 +2514,22 @@ export const builders: IFieldBuilders = {
           taskResource.reason = {}
         }
         taskResource.reason.text = fieldValue
+      },
+      otherReason: (
+        fhirBundle: ITemplatedBundle,
+        fieldValue: string,
+        context: any
+      ) => {
+        const taskResource = selectOrCreateTaskRefResource(fhirBundle, context)
+        if (!taskResource.reason) {
+          taskResource.reason = {}
+        }
+        taskResource.reason.extension = [
+          {
+            url: REQUEST_CORRECTION_OTHER_REASON_EXTENSION_URL,
+            valueString: fieldValue
+          }
+        ]
       },
       note: (
         fhirBundle: ITemplatedBundle,

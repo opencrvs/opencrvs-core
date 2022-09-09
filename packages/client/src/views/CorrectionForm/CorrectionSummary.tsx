@@ -88,6 +88,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { IGQLLocation } from '@client/utils/userUtils'
 import { WORKQUEUE_TABS } from '@client/components/interface/Navigation'
 import { getCurrencySymbol } from '@client/views/SysAdmin/Config/Application/utils'
+import { draftToGqlTransformer } from '@client/transformer'
 
 const SupportingDocument = styled.div`
   display: flex;
@@ -840,8 +841,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
         )
       case CorrectionReason.OTHER:
         return this.getReason(
-          (reasonType.nestedFields as IFormSectionData)
-            .reasonForChange as string
+          (reasonType.nestedFields as IFormSectionData).otherReason as string
         )
       default:
         return '-'

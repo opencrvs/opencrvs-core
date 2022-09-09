@@ -586,6 +586,7 @@ export interface GQLHistory {
   action?: GQLRegStatus
   statusReason?: GQLStatusReason
   reason?: string
+  otherReason?: string
   reinstated?: boolean
   location?: GQLLocation
   office?: GQLLocation
@@ -1223,6 +1224,7 @@ export interface GQLCorrectionInput {
   location?: GQLLocationInput
   data?: string
   reason?: string
+  otherReason?: string
   note?: string
 }
 
@@ -4107,6 +4109,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   action?: HistoryToActionResolver<TParent>
   statusReason?: HistoryToStatusReasonResolver<TParent>
   reason?: HistoryToReasonResolver<TParent>
+  otherReason?: HistoryToOtherReasonResolver<TParent>
   reinstated?: HistoryToReinstatedResolver<TParent>
   location?: HistoryToLocationResolver<TParent>
   office?: HistoryToOfficeResolver<TParent>
@@ -4135,6 +4138,10 @@ export interface HistoryToStatusReasonResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToReasonResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToOtherReasonResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

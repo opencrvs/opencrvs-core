@@ -126,7 +126,11 @@ function prepareComments(
   )
 }
 
-const getReasonForRequest = (reasonValue: string, intl: IntlShape) => {
+const getReasonForRequest = (
+  reasonValue: string,
+  otherReason: string,
+  intl: IntlShape
+) => {
   switch (reasonValue) {
     case CorrectionReason.CLERICAL_ERROR:
       return intl.formatMessage(messages.clericalError)
@@ -140,6 +144,8 @@ const getReasonForRequest = (reasonValue: string, intl: IntlShape) => {
     case CorrectionReason.JUDICIAL_ORDER:
       return intl.formatMessage(messages.judicialOrder)
 
+    case CorrectionReason.OTHER:
+      return otherReason
     default:
       return '-'
   }
@@ -388,6 +394,7 @@ export const ActionDetailsModalListTable = ({
               {
                 text: getReasonForRequest(
                   actionDetailsData.reason as string,
+                  actionDetailsData.otherReason,
                   intl
                 )
               }

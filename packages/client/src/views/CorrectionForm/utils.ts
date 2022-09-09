@@ -127,7 +127,7 @@ export function updateDeclarationRegistrationWithCorrection(
   declaration: IDeclaration,
   meta?: { userPrimaryOffice?: IGQLLocation }
 ): void {
-  const correctionValues: Record<string, any> = {}
+  let correctionValues: Record<string, any> = {}
   const { data } = declaration
 
   if (data.corrector && data.corrector.relationship) {
@@ -144,6 +144,12 @@ export function updateDeclarationRegistrationWithCorrection(
 
     if (data.reason.additionalComment) {
       correctionValues.note = data.reason.additionalComment
+    }
+
+    if ((data.reason.type as IFormSectionData).nestedFields) {
+      const nestedFields = (data.reason.type as IFormSectionData)
+        .nestedFields as IFormSectionData
+      correctionValues = { ...correctionValues, ...nestedFields }
     }
   }
 
