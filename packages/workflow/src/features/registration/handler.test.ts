@@ -43,7 +43,7 @@ import {
 import { cloneDeep } from 'lodash'
 import { populateCompositionWithID } from '@workflow/features/registration/handler'
 import * as fetchAny from 'jest-fetch-mock'
-import { mockFormDraft } from '../../utils/formDraftUtils.test'
+import { mockFormDraft } from '@workflow/utils/formDraftUtils.test'
 
 const fetch = fetchAny as any
 
