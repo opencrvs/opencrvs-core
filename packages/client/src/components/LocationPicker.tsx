@@ -116,7 +116,7 @@ function LocationPickerComponent(props: LocationPickerProps) {
   const [modalVisible, setModalVisible] = useState<boolean>(false)
 
   const offlineSearchableLocations = generateLocations(
-    offlineLocations,
+    { ...offlineLocations, ...offlineOffices },
     intl,
     jurisidictionTypeFilter,
     locationTypeFilter
@@ -127,14 +127,6 @@ function LocationPickerComponent(props: LocationPickerProps) {
     ...offlineSearchableLocations
   ]
 
-  if (
-    (locationTypeFilter &&
-      locationTypeFilter.includes(LocationType.CRVS_OFFICE)) ||
-    !locationTypeFilter
-  ) {
-    const offlineSearchableOffices = generateLocations(offlineOffices, intl)
-    searchableLocations.push(...offlineSearchableOffices)
-  }
   const selectedSearchedLocation = searchableLocations.find(
     ({ id }) => id === selectedLocationId
   ) as ISearchLocation
