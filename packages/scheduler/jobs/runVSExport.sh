@@ -1,4 +1,10 @@
 #!/bin/bash
 
 echo 'Calling VSExport end-point in metrics...'
-curl "http://localhost:1050/annualVSExport?startDate=2022-09-01&endDate=2022-09-02"
+
+END_DATE=$(date +%Y-%m-%d)
+YEAR=$(date +%Y)
+ONE_YEAR_FROM_NOW=$(( YEAR - 1 ))
+START_DATE="${ONE_YEAR_FROM_NOW}$(date +-%m-%d)"
+
+curl "$METRICS_URL/annualVSExport?startDate=$START_DATE&endDate=$END_DATE"

@@ -5,6 +5,10 @@ RUN apk add --update --no-cache bash curl
 
 WORKDIR /usr/scheduler
 
+# Set metrics URL
+ARG METRICS_URL
+ENV METRICS_URL=$METRICS_URL
+
 # Copy files
 COPY jobs/*.* ./jobs/
 COPY cronTabFiles/VSExportCrontab ./
