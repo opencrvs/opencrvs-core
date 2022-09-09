@@ -580,6 +580,16 @@ services:
       options:
         gelf-address: 'udp://127.0.0.1:12201'
         tag: 'metrics'
+  scheduler:
+    deploy:
+      replicas: 1
+    networks:
+      - overlay_net
+    logging:
+      driver: gelf
+      options:
+        gelf-address: 'udp://127.0.0.1:12201'
+        tag: 'scheduler'
   config:
     secrets:
       - jwt-public-key.{{ts}}
