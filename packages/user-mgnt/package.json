@@ -10,8 +10,8 @@
     "test": "jest  --coverage --silent --noStackTrace && yarn test:compilation",
     "test:watch": "jest --watch",
     "open:cov": "yarn test && opener coverage/index.html",
-    "lint": "tslint --project ./tsconfig.json",
-    "precommit": "tslint --project ./tsconfig.json && lint-staged",
+    "lint": "eslint -c .eslintrc.js --fix ./src",
+    "precommit": "yarn lint && lint-staged",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
     "build:clean": "rm -rf build"
@@ -54,8 +54,6 @@
     "prettier": "^2.5.1",
     "ts-jest": "^26.4.4",
     "ts-node": "^6.1.1",
-    "tslint": "^5.17.0",
-    "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "^3.7.2"
   },
   "lint-staged": {

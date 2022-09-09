@@ -69,11 +69,11 @@ export async function registerSystemClient(
     ) {
       systemScopes.push('demo')
     }
-    /* tslint:disable */
+
     const client_id = uuid()
     const secret_id = uuid()
     const sha_secret = uuid()
-    /* tslint:enable */
+
     const { hash, salt } = generateSaltedHash(secret_id)
 
     const practitioner = createFhirPractitioner(systemAdminUser, true)
@@ -173,7 +173,6 @@ export async function deactivateSystemClient(
     system.status = statuses.DEACTIVATED
 
     try {
-      // tslint:disable-next-line
       await System.update({ _id: system._id }, system)
     } catch (err) {
       logger.error(err.message)
@@ -216,7 +215,6 @@ export async function reactivateSystemClient(
     system.status = statuses.ACTIVE
 
     try {
-      // tslint:disable-next-line
       await System.update({ _id: system._id }, system)
     } catch (err) {
       logger.error(err.message)
@@ -250,7 +248,6 @@ export async function verifySystemHandler(
 ) {
   const { client_id, client_secret } = request.payload as IVerifyPayload
 
-  // tslint:disable-next-line
   const system: ISystemModel | null = await System.findOne({ client_id })
 
   if (!system) {
@@ -292,7 +289,6 @@ export async function getSystemHandler(
 ) {
   const { systemId } = request.payload as IGetSystemPayload
 
-  // tslint:disable-next-line
   const system: ISystemModel | null = await System.findOne({ _id: systemId })
 
   if (!system) {
