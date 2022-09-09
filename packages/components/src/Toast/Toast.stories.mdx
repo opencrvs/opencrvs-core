@@ -1,0 +1,185 @@
+import styled from 'styled-components'
+import { Meta, Source, Canvas, Story } from '@storybook/addon-docs'
+import { PrimaryButton } from '../buttons'
+import { useState } from 'react'
+import { Toast, NOTIFICATION_TYPE } from './Toast'
+
+export const ToastToggler = ({ type, closable, retryable, children }) => {
+  const [isVisible, setVisible] = useState(false)
+  return (
+    <>
+      <br />
+      <PrimaryButton onClick={() => setVisible(!isVisible)}>
+        {isVisible ? 'Close' : 'Open'} toast
+      </PrimaryButton>
+      <Toast
+        type={type}
+        onClose={closable ? () => setVisible(false) : undefined}
+        show={isVisible}
+        onActionClick={retryable ? () => alert('Retried') : undefined}
+        actionText="Retry"
+      >
+        {children}
+      </Toast>
+    </>
+  )
+}
+
+<Meta title="Layout/Toast" component={Toast} />
+
+# Toast
+
+Toast is a message that pop ups from the bottom of the interface on a desktop, and from the top of the interface on mobile. It provides feedback on the outcome of an action.
+
+## Success
+
+<Story name="Success">
+  <ToastToggler type={NOTIFICATION_TYPE.SUCCESS}>
+    Hi! I'm a success toast
+  </ToastToggler>
+  <Source
+    dark
+    code={`
+<Toast type={NOTIFICATION_TYPE.SUCCESS} show={isVisible}>
+  Hi! I'm a success toast
+</Toast>
+    `}
+  />
+</Story>
+
+## Neutral
+
+<Story name="Neutral">
+  <ToastToggler type={NOTIFICATION_TYPE.NEUTRAL}>
+    Hi! I'm a neutral toast
+  </ToastToggler>
+  <Source
+    dark
+    code={`
+<Toast type={NOTIFICATION_TYPE.NEUTRAL} show={isVisible}>
+  Hi! I'm a neutral toast
+</Toast>
+    `}
+  />
+</Story>
+
+## Error
+
+<Story name="Error">
+  <ToastToggler type={NOTIFICATION_TYPE.ERROR}>
+    Hi! I'm an error toast
+  </ToastToggler>
+  <Source
+    dark
+    code={`
+<Toast type={NOTIFICATION_TYPE.ERROR} show={isVisible}>
+  Hi! I'm an error toast
+</Toast>
+    `}
+  />
+</Story>
+
+## In progress
+
+<Story name="In progress">
+  <ToastToggler type={NOTIFICATION_TYPE.IN_PROGRESS}>
+    Hi! I'm an in progress toast
+  </ToastToggler>
+  <Source
+    dark
+    code={`
+<Toast type={NOTIFICATION_TYPE.IN_PROGRESS} show={isVisible}>
+  Hi! I'm an in progress toast
+</Toast>
+    `}
+  />
+</Story>
+
+## Closable
+
+<Story name="Closable">
+  <ToastToggler type={NOTIFICATION_TYPE.IN_PROGRESS} closable>
+    Hi! I'm a closable toast
+  </ToastToggler>
+  <Source
+    dark
+    code={`
+<Toast
+  type={NOTIFICATION_TYPE.SUCCESS}
+  show={isVisible}
+  onClose={() => setVisible(false)}
+>
+  Hi! I'm a closable toast
+</Toast>
+    `}
+  />
+</Story>
+
+## Retryable
+
+<Story name="Retryable">
+  <ToastToggler type={NOTIFICATION_TYPE.IN_PROGRESS} retryable>
+    Hi! I'm a retryable toast
+  </ToastToggler>
+  <Source
+    dark
+    code={`
+<Toast
+  type={NOTIFICATION_TYPE.SUCCESS}
+  show={isVisible}
+  onAction={() => alert('Retried')}
+  actionText="Retry"
+>
+  Hi! I'm a retryable toast
+</Toast>
+    `}
+  />
+</Story>
+
+## Retryable and closable
+
+<Story name="Retryable and closable">
+  <ToastToggler type={NOTIFICATION_TYPE.IN_PROGRESS} retryable closable>
+    Hi! I'm a retryable and closable toast
+  </ToastToggler>
+  <Source
+    dark
+    code={`
+<Toast
+  type={NOTIFICATION_TYPE.SUCCESS}
+  show={isVisible}
+  onAction={() => alert('Retried')}
+  actionText="Retry"
+  onClose={() => setVisible(false)}
+>
+  Hi! I'm a retryable toast
+</Toast>
+    `}
+  />
+</Story>
+
+## Long text, retryable and closable
+
+<Story name="Long text, retryable and closable">
+  <ToastToggler type={NOTIFICATION_TYPE.SUCCESS} retryable closable>
+    Hi! I'm a retryable and closable toast. I also have a very long text within
+    the toast. This illustrates how the toast stretches when the content is
+    lengthy.
+  </ToastToggler>
+  <Source
+    dark
+    code={`
+<Toast
+  type={NOTIFICATION_TYPE.SUCCESS}
+  show={isVisible}
+  onAction={() => alert('Retried')}
+  actionText="Retry"
+  onClose={() => setVisible(false)}
+>
+  Hi! I'm a retryable and closable toast. I also have a very long text within
+  the toast. This illustrates how the toast stretches when the content is
+  lengthy.
+</Toast>
+    `}
+  />
+</Story>
