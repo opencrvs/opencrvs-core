@@ -237,9 +237,12 @@ export const resolvers: GQLResolver = {
       }
 
       ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-        await postMetrics('/advancedSearch', {}, authHeader)
         await markRecordAsDownloadedAndAssigned(hit._id, authHeader)
       })
+
+      if (searchResult.body.hits.hits) {
+        await postMetrics('/advancedSearch', {}, authHeader)
+      }
 
       return {
         totalItems:
