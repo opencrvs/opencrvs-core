@@ -169,6 +169,8 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
       history {
+        otherReason
+        requester
         date
         action
         reinstated
@@ -403,6 +405,8 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
       maleDependentsOfDeceased
       femaleDependentsOfDeceased
       history {
+        otherReason
+        requester
         date
         action
         reinstated

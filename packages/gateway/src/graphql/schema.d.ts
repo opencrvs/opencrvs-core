@@ -583,6 +583,7 @@ export const enum GQLBirthRegType {
 export interface GQLHistory {
   user?: GQLUser
   date?: GQLDate
+  requester?: string
   action?: GQLRegStatus
   statusReason?: GQLStatusReason
   reason?: string
@@ -4106,6 +4107,7 @@ export interface QuestionnaireQuestionToValueResolver<
 export interface GQLHistoryTypeResolver<TParent = any> {
   user?: HistoryToUserResolver<TParent>
   date?: HistoryToDateResolver<TParent>
+  requester?: HistoryToRequesterResolver<TParent>
   action?: HistoryToActionResolver<TParent>
   statusReason?: HistoryToStatusReasonResolver<TParent>
   reason?: HistoryToReasonResolver<TParent>
@@ -4126,6 +4128,10 @@ export interface HistoryToUserResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToDateResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToRequesterResolver<TParent = any, TResult = any> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

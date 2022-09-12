@@ -179,6 +179,8 @@ export const GET_BIRTH_REGISTRATION_FOR_REVIEW = gql`
         value
       }
       history {
+        otherReason
+        requester
         date
         action
         reinstated

@@ -707,6 +707,7 @@ enum BirthRegType {
 type History {
   user: User
   date: Date
+  requester: String
   action: RegStatus
   statusReason: StatusReason
   reason: String

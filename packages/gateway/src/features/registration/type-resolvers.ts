@@ -54,7 +54,8 @@ import {
   SYSTEM_FILE_NAME_SYSTEM,
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
-  REINSTATED_EXTENSION_URL
+  REINSTATED_EXTENSION_URL,
+  REQUESTING_INDIVIDUAL
 } from '@gateway/features/fhir/constants'
 import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
@@ -742,6 +743,14 @@ export const typeResolvers: GQLResolver = {
         task.extension &&
         findExtension(REINSTATED_EXTENSION_URL, task.extension)
       return extension !== undefined
+    },
+    requester: (task: fhir.Task) => {
+      const requestedBy = findExtension(
+        REQUESTING_INDIVIDUAL,
+        task.extension as fhir.Extension[]
+      )
+
+      return requestedBy?.valueString || ''
     },
     statusReason: (task: fhir.Task) => task.statusReason || null,
     reason: (task: fhir.Task) => task.reason?.text || null,
