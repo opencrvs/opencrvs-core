@@ -26,6 +26,7 @@ import { PreviewTab } from './PreviewTab'
 import { PublishedTab } from './PublishedTab'
 import styled from '@client/styledComponents'
 import { Alert } from '@opencrvs/components/lib/Alert'
+import { Text } from '@opencrvs/components/lib/Text'
 import { constantsMessages } from '@client/i18n/messages'
 import {
   ActionState,
@@ -36,12 +37,12 @@ import {
 import { ActionsNotification } from './ActionsNotification'
 import { FormTabs } from '@opencrvs/components/lib/FormTabs'
 
-const StyledWarning = styled(Alert)`
+const StyledAlert = styled(Alert)`
   margin: 24px auto 16px;
   max-width: 778px;
 `
 
-export function UnpublishedWarning() {
+export function UnpublishedWarning({ compact }: { compact?: boolean }) {
   const intl = useIntl()
   const { status: birthStatus } = useSelector((store: IStoreState) =>
     selectFormDraft(store, Event.Birth)
@@ -57,14 +58,24 @@ export function UnpublishedWarning() {
     events.push(intl.formatMessage(constantsMessages[Event.Death]))
   }
 
+  if (compact) {
+    return (
+      <Text color="negativeDark" variant="bold16" element="p">
+        {intl.formatMessage(messages.publishedWarning, {
+          events: events.join(', ')
+        })}
+      </Text>
+    )
+  }
+
   return (
     <>
       {events.length > 0 && (
-        <StyledWarning type="info">
+        <StyledAlert type="warning">
           {intl.formatMessage(messages.publishedWarning, {
             events: events.join(', ')
           })}
-        </StyledWarning>
+        </StyledAlert>
       )}
     </>
   )

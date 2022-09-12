@@ -80,7 +80,7 @@ const Version = styled.div`
   height: auto;
   position: absolute;
   bottom: 0px;
-  padding: 24px 12px;
+  padding: 16px;
   span:last-child {
     display: none;
   }
