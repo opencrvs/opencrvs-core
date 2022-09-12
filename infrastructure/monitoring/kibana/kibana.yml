@@ -104,8 +104,7 @@ xpack.actions.preconfiguredAlertHistoryEsIndex: true
 
 # =================== System: Logging ===================
 # Set the value of this setting to off to suppress all logging output, or to debug to log everything. Defaults to 'info'
-#logging.root.level: debug
-
+logging.root.level: error
 # Enables you to specify a file where Kibana stores log output.
 #logging.appenders.default:
 #  type: file
