@@ -37,15 +37,6 @@ body,
       height: 100%;
     }
   }
-  @font-face {
-    /* stylelint-disable-next-line opencrvs/no-font-styles */
-    font-family: ${theme.fontFamily};
-    font-style: normal;
-    font-weight: 400;
-  }
-  *:not(i) {
-    font-family: ${theme.fontFamily};
-  }
   .os-padding {
     z-index: 0;
   }
