@@ -30,8 +30,6 @@ const Wrapper = styled.div<{
     width: 100%;
   }
   background: ${({ theme }) => theme.colors.white};
-  ${({ isFullPage }) =>
-    isFullPage ? `padding-bottom: 24px;` : `padding: 24px 0;`}
 `
 const TableTitleLoading = styled.span`
   background: ${({ theme }) => theme.colors.background};
@@ -50,7 +48,7 @@ const TableHeader = styled.div<{
   background: ${({ theme }) => theme.colors.grey100};
   padding: 10px 0px;
   display: flex;
-  align-items: center;
+  align-items: top;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
   border-radius: 2px 2px 0 0;
 
@@ -154,9 +152,9 @@ const RowWrapper = styled.div<{
 `
 const TableFooter = styled(RowWrapper)`
   display: flex;
-  align-items: center;
+  align-items: top;
   background: ${({ theme }) => theme.colors.grey100};
-  border-top: 2px solid ${({ theme }) => theme.colors.grey500};
+  border-top: 2px solid ${({ theme }) => theme.colors.grey300};
   border-bottom: none;
   & span {
     color: ${({ theme }) => theme.colors.copy};
