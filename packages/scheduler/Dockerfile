@@ -10,9 +10,9 @@ ARG METRICS_URL
 ENV METRICS_URL=$METRICS_URL
 
 # Copy files
-COPY jobs/*.* ./jobs/
-COPY cronTabFiles/VSExportCrontab ./
-COPY start.sh .
+COPY packages/scheduler/jobs/*.* ./jobs/
+COPY packages/scheduler/cronTabFiles/VSExportCrontab ./
+COPY packages/scheduler/start.sh .
 
 # create cron.log file
 RUN touch /var/log/cron.log
