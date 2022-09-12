@@ -184,8 +184,7 @@ services:
   elasticsearch:
     volumes:
       - '/data/elasticsearch:/usr/share/elasticsearch/data'
-      - '/data/backups/elasticsearch:/data/backups/elasticsearch'
-      - '/opt/opencrvs/infrastructure/elasticsearch/elasticsearch.yml:/config/elasticsearch.yml'
+      - '/data/backups/elasticsearch:/usr/share/elasticsearch/backup'
       - '/opt/opencrvs/infrastructure/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml'
     deploy:
       replicas: 1
@@ -294,7 +293,7 @@ services:
   influxdb:
     volumes:
       - '/data/influxdb:/var/lib/influxdb'
-      - '/data/backups/influxdb:/data/backups/influxdb'
+      - '/data/backups/influxdb:/tmp'
     deploy:
       replicas: 1
       placement:

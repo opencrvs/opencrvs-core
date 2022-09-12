@@ -198,6 +198,19 @@
         owner: 1000
         mode: ugo+rwx
 
+    - name: 'Create influxdb data directory'
+      file:
+        path: /data/influxdb
+        state: directory
+
+    - name: 'Create influxdb backup directory'
+      file:
+        path: /data/backups/influxdb
+        state: directory
+        group: 1000
+        owner: 1000
+        mode: g+rwx
+
     - name: 'Install UFW'
       apt:
         name: ufw
@@ -274,19 +287,6 @@
         name: vm.max_map_count
         value: 262144
         state: present
-
-    - name: 'Create influxdb data directory'
-      file:
-        path: /data/influxdb
-        state: directory
-
-    - name: 'Create influxdb backup directory'
-      file:
-        path: /data/backups/influxdb
-        state: directory
-        group: 1000
-        owner: 1000
-        mode: g+rwx
 
     - name: 'Create acme file for traefik'
       file:
