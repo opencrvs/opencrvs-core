@@ -240,7 +240,7 @@ export const resolvers: GQLResolver = {
         await markRecordAsDownloadedAndAssigned(hit._id, authHeader)
       })
 
-      if (searchResult.body.hits.hits) {
+      if (searchResult.body.hits.total.value) {
         await postMetrics('/advancedSearch', {}, authHeader)
       }
 
