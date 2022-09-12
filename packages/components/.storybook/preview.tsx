@@ -27,6 +27,7 @@ body,
 #__next,
 #__layout,
 #default-layout {
+  font-family: ${theme.fontFamily};
   width: 100%;
   height: 100%;
   overflow-x: hidden;
