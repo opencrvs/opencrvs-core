@@ -28,6 +28,7 @@ const notificationActionButtonHandler = () => {
 function getErrorNotification(intl: any) {
   return (
     <Toast
+      id="error-toast"
       type={TOAST_TYPE.ERROR}
       actionText={intl.formatMessage(buttonMessages.retry)}
       onActionClick={notificationActionButtonHandler}
