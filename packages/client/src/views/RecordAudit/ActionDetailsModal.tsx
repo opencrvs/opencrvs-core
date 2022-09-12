@@ -126,6 +126,16 @@ function prepareComments(
   )
 }
 
+const requesterLabelMapper = (requester: string, intl: IntlShape) => {
+  const requesterIndividual = CollectorRelationLabelArray.find(
+    (labelItem) => labelItem.value === requester
+  )
+
+  return requesterIndividual?.label
+    ? intl.formatMessage(requesterIndividual.label)
+    : ''
+}
+
 const getReasonForRequest = (
   reasonValue: string,
   otherReason: string,
@@ -164,6 +174,13 @@ export const ActionDetailsModalListTable = ({
   if (registerForm === undefined) return <></>
 
   const sections = registerForm?.sections || []
+  const requesterColumn = [
+    {
+      key: 'requester',
+      label: intl.formatMessage(messages.correctionSummaryRequestedBy),
+      width: 100
+    }
+  ]
   const commentsColumn = [
     {
       key: 'comment',
@@ -364,6 +381,10 @@ export const ActionDetailsModalListTable = ({
   ]
   const pageChangeHandler = (cp: number) => setCurrentPage(cp)
   const content = prepareComments(actionDetailsData, draft)
+  const requesterLabel = requesterLabelMapper(
+    actionDetailsData.requester as string,
+    intl
+  )
   return (
     <>
       {/* For Reject Reason */}
@@ -382,6 +403,16 @@ export const ActionDetailsModalListTable = ({
             ]}
           />
         )}
+
+      {/* Correction Requester */}
+      {actionDetailsData.requester && (
+        <ListTable
+          noResultText=" "
+          hideBoxShadow={true}
+          columns={requesterColumn}
+          content={[{ requester: requesterLabel }]}
+        />
+      )}
 
       {/* For Correction Reason */}
       {actionDetailsData.reason &&
@@ -403,12 +434,14 @@ export const ActionDetailsModalListTable = ({
         )}
 
       {/* For Comments */}
-      <ListTable
-        noResultText=" "
-        hideBoxShadow={true}
-        columns={commentsColumn}
-        content={content}
-      />
+      {content.length > 0 && (
+        <ListTable
+          noResultText=" "
+          hideBoxShadow={true}
+          columns={commentsColumn}
+          content={content}
+        />
+      )}
 
       {/* For Data Updated */}
       {declarationUpdates.length > 0 && (
