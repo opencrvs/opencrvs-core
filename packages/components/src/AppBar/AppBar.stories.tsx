@@ -51,7 +51,7 @@ Default.args = {
     </CircleButton>
   ),
   desktopRight: (
-    <Stack gap={16}>
+    <Stack gap={8}>
       <CircleButton>
         <HelpBlue>Button</HelpBlue>
       </CircleButton>
@@ -65,8 +65,8 @@ Default.parameters = {
   layout: 'fullscreen'
 }
 
-export const Search = Template.bind({}) as ComponentStory<typeof AppBar>
-Search.args = {
+export const Home = Template.bind({}) as ComponentStory<typeof AppBar>
+Home.args = {
   mobileLeft: (
     <CircleButton>
       <Hamburger />
@@ -79,7 +79,7 @@ Search.args = {
     </CircleButton>
   ),
   desktopLeft: (
-    <Stack gap={16}>
+    <Stack gap={8}>
       <CircleButton>
         <BackArrowDeepBlue />
       </CircleButton>
@@ -97,16 +97,23 @@ Search.args = {
         {
           icon: noop,
           invertIcon: noop,
-          label: 'Dhaka',
-          placeHolderText: 'Dhaka',
-          value: 'Dhaka'
+          label: 'Tracking ID',
+          placeHolderText: 'Search',
+          value: 'Tracking ID'
         },
         {
           icon: noop,
           invertIcon: noop,
-          label: 'Chittagong',
-          placeHolderText: 'Chittagong',
-          value: 'Chittagong'
+          label: 'BRN/DRN',
+          placeHolderText: 'Search',
+          value: 'BRN/DRN'
+        },
+        {
+          icon: noop,
+          invertIcon: noop,
+          label: 'Phone no.',
+          placeHolderText: 'Search',
+          value: 'Phone no.'
         }
       ]}
     />
@@ -114,7 +121,7 @@ Search.args = {
   desktopRight: <SecondaryButton>Button</SecondaryButton>
 }
 
-Search.parameters = {
+Home.parameters = {
   layout: 'fullscreen'
 }
 
@@ -127,9 +134,9 @@ Declaration.args = {
   desktopTitle: 'Birth declaration',
   mobileRight: <Hamburger />,
   desktopRight: (
-    <Stack gap={16}>
-      <SecondaryButton>Button</SecondaryButton>
-      <SecondaryButton>Button</SecondaryButton>
+    <Stack gap={8}>
+      <SecondaryButton>Save</SecondaryButton>
+      <SecondaryButton>Exit</SecondaryButton>
     </Stack>
   )
 }
