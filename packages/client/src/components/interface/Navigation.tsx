@@ -38,7 +38,7 @@ import {
 import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { getUserLocation, IUserDetails } from '@client/utils/userUtils'
-import { Activity, Users } from '@opencrvs/components/lib/icons'
+import { Activity, PaperPlane, Users } from '@opencrvs/components/lib/icons'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { Configuration } from '@opencrvs/components/lib/icons/Configuration'
@@ -66,6 +66,7 @@ export const WORKQUEUE_TABS = {
   requiresUpdate: 'requiresUpdate',
   sentForApproval: 'approvals',
   readyToPrint: 'print',
+  outbox: 'outbox',
   externalValidation: 'waitingValidation',
   performance: 'performance',
   team: 'team',
@@ -101,6 +102,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
+    WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -111,6 +113,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
+    WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -121,6 +124,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
+    WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -131,6 +135,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.readyToPrint,
     WORKQUEUE_TABS.performance,
     WORKQUEUE_TABS.team,
+    WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup,
     GROUP_ID.menuGroup
   ],
@@ -312,7 +317,8 @@ export const NavigationView = (props: IFullProps) => {
       window.config.EXTERNAL_VALIDATION_WORKQUEUE && !initialSyncDone
         ? 0
         : filteredData.externalValidationTab?.totalItems || 0,
-    readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0
+    readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0,
+    outbox: 0
   }
 
   return (
@@ -479,6 +485,24 @@ export const NavigationView = (props: IFullProps) => {
                       isSelected={tabId === WORKQUEUE_TABS.readyToPrint}
                       onClick={() => {
                         props.goToHomeTab(WORKQUEUE_TABS.readyToPrint)
+                        menuCollapse && menuCollapse()
+                      }}
+                    />
+                  )}
+                {userDetails?.role &&
+                  USER_SCOPE[userDetails.role].includes(
+                    WORKQUEUE_TABS.outbox
+                  ) && (
+                    <NavigationItem
+                      icon={() => <PaperPlane />}
+                      id={`navigation_${WORKQUEUE_TABS.outbox}`}
+                      label={intl.formatMessage(
+                        navigationMessages[WORKQUEUE_TABS.outbox]
+                      )}
+                      count={declarationCount.outbox}
+                      isSelected={tabId === WORKQUEUE_TABS.outbox}
+                      onClick={() => {
+                        props.goToHomeTab(WORKQUEUE_TABS.outbox)
                         menuCollapse && menuCollapse()
                       }}
                     />
