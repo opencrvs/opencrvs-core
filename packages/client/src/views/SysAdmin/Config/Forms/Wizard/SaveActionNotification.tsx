@@ -16,7 +16,7 @@ import {
   NOTIFICATION_TYPE_MAP,
   isNotifiable
 } from '@client/views/SysAdmin/Config/Forms/utils'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { useIntl } from 'react-intl'
 import { saveActionMessages } from '@client/i18n/messages/views/formConfig'
 
@@ -26,11 +26,7 @@ export function SaveActionNotification() {
 
   return (
     <Toast
-      type={
-        isNotifiable(status)
-          ? NOTIFICATION_TYPE_MAP[status]
-          : NOTIFICATION_TYPE.ERROR
-      }
+      type={isNotifiable(status) ? NOTIFICATION_TYPE_MAP[status] : 'warning'}
       show={isNotifiable(status)}
       onClose={
         status !== ActionStatus.PROCESSING

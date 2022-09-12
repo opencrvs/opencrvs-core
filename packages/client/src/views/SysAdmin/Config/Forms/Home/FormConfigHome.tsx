@@ -41,7 +41,7 @@ const StyledWarning = styled(Alert)`
   max-width: 778px;
 `
 
-export function UnbuplishedWarning({ hideIcon }: { hideIcon?: boolean }) {
+export function UnbuplishedWarning() {
   const intl = useIntl()
   const { status: birthStatus } = useSelector((store: IStoreState) =>
     selectFormDraft(store, Event.Birth)
@@ -60,12 +60,11 @@ export function UnbuplishedWarning({ hideIcon }: { hideIcon?: boolean }) {
   return (
     <>
       {events.length > 0 && (
-        <StyledWarning
-          hideIcon={hideIcon}
-          label={intl.formatMessage(messages.publishedWarning, {
+        <StyledWarning type="info">
+          {intl.formatMessage(messages.publishedWarning, {
             events: events.join(', ')
           })}
-        />
+        </StyledWarning>
       )}
     </>
   )

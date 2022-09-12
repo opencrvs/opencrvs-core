@@ -21,7 +21,7 @@ import {
 } from '@client/views/SysAdmin/Config/Application/Components'
 import { IStoreState } from '@client/store'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { GeneralActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
@@ -151,10 +151,10 @@ export function NIDNumPattern() {
         id="nidPatternNotification"
         type={
           notificationStatus === NOTIFICATION_STATUS.SUCCESS
-            ? NOTIFICATION_TYPE.SUCCESS
+            ? 'success'
             : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-            ? NOTIFICATION_TYPE.IN_PROGRESS
-            : NOTIFICATION_TYPE.ERROR
+            ? 'loading'
+            : 'warning'
         }
         show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
         onClose={() => {

@@ -790,14 +790,14 @@ class RegisterFormView extends React.Component<FullProps, State> {
                         >
                           {isFileSizeExceeded(declaration) &&
                             isDocumentUploadPage && (
-                              <Alert
-                                label={intl.formatMessage(
+                              <Alert type="warning">
+                                {intl.formatMessage(
                                   constantsMessages.totalFileSizeExceed,
                                   {
                                     fileSize: bytesToSize(ACCUMULATED_FILE_SIZE)
                                   }
                                 )}
-                              />
+                              </Alert>
                             )}
                           <FormFieldGenerator
                             id={activeSectionGroup.id}

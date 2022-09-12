@@ -16,7 +16,7 @@ import {
   isNotifiable,
   NOTIFICATION_TYPE_MAP
 } from '@client/views/SysAdmin/Config/Forms/utils'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { useIntl } from 'react-intl'
 import { statusChangeActionMessages } from '@client/i18n/messages/views/formConfig'
 import { useSelector } from 'react-redux'
@@ -36,11 +36,7 @@ export function ActionsNotification() {
 
   return (
     <Toast
-      type={
-        isNotifiable(status)
-          ? NOTIFICATION_TYPE_MAP[status]
-          : NOTIFICATION_TYPE.ERROR
-      }
+      type={isNotifiable(status) ? NOTIFICATION_TYPE_MAP[status] : 'warning'}
       show={isNotifiable(status)}
       onClose={
         status !== ActionStatus.PROCESSING

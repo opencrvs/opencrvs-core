@@ -22,7 +22,7 @@ import { userMessages, buttonMessages } from '@client/i18n/messages'
 import { ImageLoader } from '@client/views/Settings/ImageLoader'
 import { IImage } from '@client/utils/imageUtils'
 import { AvatarChangeModal } from '@client/views/Settings/AvatarChangeModal'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { useSelector, useDispatch } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { IUserDetails, useUserName } from '@client/utils/userUtils'
@@ -120,11 +120,7 @@ export function ProfileImage() {
         onAvatarChanged={changeAvatar}
       />
       <Toast
-        type={
-          imageUploading
-            ? NOTIFICATION_TYPE.IN_PROGRESS
-            : NOTIFICATION_TYPE.SUCCESS
-        }
+        type={imageUploading ? 'loading' : 'success'}
         show={showSuccessNotification}
         onClose={imageUploading ? undefined : () => toggleSuccessNotification()}
       >

@@ -54,11 +54,11 @@ export function DuplicateWarning({
               const duplicateQuery = data?.[`duplicate${idx}`]
               if (duplicateQuery?.registration?.trackingId) {
                 return (
-                  <Alert
-                    label={intl.formatMessage(errorMessages.duplicateWarning, {
+                  <Alert type="warning">
+                    {intl.formatMessage(errorMessages.duplicateWarning, {
                       trackingId: duplicateQuery.registration.trackingId
                     })}
-                  />
+                  </Alert>
                 )
               }
               return <></>

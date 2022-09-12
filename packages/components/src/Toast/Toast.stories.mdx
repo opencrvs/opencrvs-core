@@ -2,7 +2,7 @@ import styled from 'styled-components'
 import { Meta, Source, Canvas, Story } from '@storybook/addon-docs'
 import { PrimaryButton } from '../buttons'
 import { useState } from 'react'
-import { Toast, NOTIFICATION_TYPE } from './Toast'
+import { Toast } from './Toast'
 
 export const ToastToggler = ({ type, closable, retryable, children }) => {
   const [isVisible, setVisible] = useState(false)
@@ -30,20 +30,18 @@ export const ToastToggler = ({ type, closable, retryable, children }) => {
 # Toast
 
 Toast is a message that pop ups from the bottom of the interface on a desktop, and from the top of the interface on mobile. It provides feedback on the outcome of an action.
-Toast can be used inside any view, it doesn't have to be on the application root level element.
+Toast can be used inside any view, it doesn't have to be on the application root level element. Toast is an animated and position fixed `<Alert>`.
 
 ## Success
 
 <Story name="Success" storyName="Success">
-  <ToastToggler type={NOTIFICATION_TYPE.SUCCESS}>
-    Hi! I'm a success toast
-  </ToastToggler>
+  <ToastToggler type="success">Hi! I'm a success toast</ToastToggler>
 </Story>
 
 <Source
   dark
   code={`
-<Toast type={NOTIFICATION_TYPE.SUCCESS} show={isVisible}>
+<Toast type="success" show={isVisible}>
   Hi! I'm a success toast
 </Toast>
     `}
@@ -52,15 +50,13 @@ Toast can be used inside any view, it doesn't have to be on the application root
 ## Neutral
 
 <Story name="Neutral" storyName="Neutral">
-  <ToastToggler type={NOTIFICATION_TYPE.NEUTRAL}>
-    Hi! I'm a neutral toast
-  </ToastToggler>
+  <ToastToggler type="neutral">Hi! I'm a neutral toast</ToastToggler>
 </Story>
 
 <Source
   dark
   code={`
-<Toast type={NOTIFICATION_TYPE.NEUTRAL} show={isVisible}>
+<Toast type="neutral" show={isVisible}>
 Hi! I'm a neutral toast
 </Toast>
   `}
@@ -69,15 +65,13 @@ Hi! I'm a neutral toast
 ## Error
 
 <Story name="Error" storyName="Error">
-  <ToastToggler type={NOTIFICATION_TYPE.ERROR}>
-    Hi! I'm an error toast
-  </ToastToggler>
+  <ToastToggler type="warning">Hi! I'm an error toast</ToastToggler>
 </Story>
 
 <Source
   dark
   code={`
-<Toast type={NOTIFICATION_TYPE.ERROR} show={isVisible}>
+<Toast type="warning" show={isVisible}>
   Hi! I'm an error toast
 </Toast>
     `}
@@ -86,15 +80,13 @@ Hi! I'm a neutral toast
 ## In progress
 
 <Story name="In progress" storyName="In progress">
-  <ToastToggler type={NOTIFICATION_TYPE.IN_PROGRESS}>
-    Hi! I'm an in progress toast
-  </ToastToggler>
+  <ToastToggler type="loading">Hi! I'm an in progress toast</ToastToggler>
 </Story>
 
 <Source
   dark
   code={`
-<Toast type={NOTIFICATION_TYPE.IN_PROGRESS} show={isVisible}>
+<Toast type="loading" show={isVisible}>
   Hi! I'm an in progress toast
 </Toast>
     `}
@@ -103,7 +95,7 @@ Hi! I'm a neutral toast
 ## Closable
 
 <Story name="Closable" storyName="Closable">
-  <ToastToggler type={NOTIFICATION_TYPE.IN_PROGRESS} closable>
+  <ToastToggler type="loading" closable>
     Hi! I'm a closable toast
   </ToastToggler>
 </Story>
@@ -112,7 +104,7 @@ Hi! I'm a neutral toast
   dark
   code={`
 <Toast
-  type={NOTIFICATION_TYPE.SUCCESS}
+  type="success"
   show={isVisible}
   onClose={() => setVisible(false)}
 >
@@ -124,7 +116,7 @@ Hi! I'm a neutral toast
 ## Retryable
 
 <Story name="Retryable" storyName="Retryable">
-  <ToastToggler type={NOTIFICATION_TYPE.IN_PROGRESS} retryable>
+  <ToastToggler type="loading" retryable>
     Hi! I'm a retryable toast
   </ToastToggler>
 </Story>
@@ -133,9 +125,9 @@ Hi! I'm a neutral toast
   dark
   code={`
 <Toast
-  type={NOTIFICATION_TYPE.SUCCESS}
+  type="success"
   show={isVisible}
-  onAction={() => alert('Retried')}
+  onActionClick={() => alert('Retried')}
   actionText="Retry"
 >
   Hi! I'm a retryable toast
@@ -146,7 +138,7 @@ Hi! I'm a neutral toast
 ## Retryable and closable
 
 <Story name="Retryable and closable" storyName="Retryable and closable">
-  <ToastToggler type={NOTIFICATION_TYPE.IN_PROGRESS} retryable closable>
+  <ToastToggler type="loading" retryable closable>
     Hi! I'm a retryable and closable toast
   </ToastToggler>
 </Story>
@@ -155,9 +147,9 @@ Hi! I'm a neutral toast
   dark
   code={`
 <Toast
-  type={NOTIFICATION_TYPE.SUCCESS}
+  type="success"
   show={isVisible}
-  onAction={() => alert('Retried')}
+  onActionClick={() => alert('Retried')}
   actionText="Retry"
   onClose={() => setVisible(false)}
 >
@@ -172,7 +164,7 @@ Hi! I'm a neutral toast
   name="Long text, retryable and closable"
   storyName="Long text, retryable and closable"
 >
-  <ToastToggler type={NOTIFICATION_TYPE.SUCCESS} retryable closable>
+  <ToastToggler type="success" retryable closable>
     Hi! I'm a retryable and closable toast. I also have a very long text within
     the toast. This illustrates how the toast stretches when the content is
     lengthy.
@@ -183,9 +175,9 @@ Hi! I'm a neutral toast
   dark
   code={`
 <Toast
-  type={NOTIFICATION_TYPE.SUCCESS}
+  type="success"
   show={isVisible}
-  onAction={() => alert('Retried')}
+  onActionClick={() => alert('Retried')}
   actionText="Retry"
   onClose={() => setVisible(false)}
 >

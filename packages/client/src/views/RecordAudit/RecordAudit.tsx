@@ -57,7 +57,7 @@ import {
   PageHeader,
   IPageHeaderProps
 } from '@opencrvs/components/lib/interface'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Loader } from '@opencrvs/components/lib/Loader'
 import { getScope } from '@client/profile/profileSelectors'
@@ -669,7 +669,7 @@ function getBodyContent({
             } else if (error) {
               return (
                 <Toast
-                  type={NOTIFICATION_TYPE.ERROR}
+                  type="warning"
                   actionText={intl.formatMessage(buttonMessages.retry)}
                   onActionClick={() => refetch()}
                   show={true}

@@ -10,35 +10,20 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import styled, { keyframes, withTheme, css } from 'styled-components'
-import { Check, Help, Cross } from '../icons'
-import { Spinner } from '../Spinner'
-import { ITheme } from '../theme'
-import NotificationError from '../icons/NotificationError'
-import { CircleButton, TertiaryButton } from '../buttons'
-import { Text } from '../Text'
+import styled, { keyframes, css } from 'styled-components'
+import { Alert } from '../Alert'
 
 const NOTIFICATION_AUTO_HIDE_TIMEOUT = 20000 // 20 seconds
 
-export enum NOTIFICATION_TYPE {
-  SUCCESS = 'success',
-  NEUTRAL = 'neutral',
-  IN_PROGRESS = 'inProgress',
-  ERROR = 'error'
-}
+type ToastType = 'success' | 'neutral' | 'loading' | 'warning'
 
-export interface IToastProps {
-  id?: string
+export interface IToastProps extends React.HTMLAttributes<HTMLDivElement> {
   show: boolean
-  type?: NOTIFICATION_TYPE
+  type?: ToastType
   onClose?: (event?: React.MouseEvent<HTMLButtonElement>) => void
-  className?: string
   onActionClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
   actionText?: string
-  children: React.ReactNode
 }
-
-type FullProps = IToastProps & { theme: ITheme }
 
 const easeInFromBottom = keyframes`
   from { bottom: -200px; }
@@ -50,35 +35,15 @@ const easeInFromTop = keyframes`
   to { top: 56px; }
 `
 
-const NotificationContainer = styled.div<{
-  $type?: NOTIFICATION_TYPE
+const ToastAlert = styled(Alert)<{
   $show: boolean
 }>`
-  --color: ${({ $type, theme }) => `
-    ${$type === NOTIFICATION_TYPE.SUCCESS ? theme.colors.positiveDark : ''}
-    ${$type === NOTIFICATION_TYPE.IN_PROGRESS ? theme.colors.primaryDark : ''}
-    ${$type === NOTIFICATION_TYPE.ERROR ? theme.colors.negativeDark : ''}
-    ${$type === NOTIFICATION_TYPE.NEUTRAL ? theme.colors.yellowDark : ''}
-    ${$type === undefined ? theme.colors.positiveDark : ''}
-  `};
-
   position: fixed;
   width: 50%;
   max-width: 520px;
-  min-height: 52px;
   transform: translateX(-50%);
   left: 50%;
-  display: flex;
-  filter: drop-shadow(0px 2px 4px rgba(34, 34, 34, 0.24));
   z-index: 1;
-  border-radius: 4px;
-  border: 2px solid var(--color);
-  border-left-width: 0px;
-  background: linear-gradient(
-    to right,
-    var(--color) 48px,
-    ${({ theme }) => theme.colors.white} 48px
-  );
 
   ${({ $show }) =>
     $show
@@ -101,41 +66,7 @@ const NotificationContainer = styled.div<{
   }
 `
 
-const IconContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 48px;
-  width: 48px;
-  color: ${({ theme }) => theme.colors.white};
-`
-
-const Close = styled(CircleButton)`
-  color: var(--color) !important;
-  margin-top: 4px;
-  margin-right: 4px;
-`
-
-const ActionButton = styled(TertiaryButton)`
-  margin-top: 8px;
-`
-
-const ButtonText = styled(Text)`
-  color: var(--color) !important;
-  padding: 0 4px;
-`
-
-const NotificationMessage = styled.div`
-  ${({ theme }) => theme.fonts.bold16};
-  color: var(--color);
-  position: relative;
-  padding: 13px 16px;
-  min-width: 160px;
-  max-width: calc(100% - 48px);
-  flex: 1;
-`
-
-class ToastComp extends React.Component<FullProps> {
+export class Toast extends React.Component<IToastProps> {
   autoHideTimeout = setTimeout(
     this.closeNotification,
     NOTIFICATION_AUTO_HIDE_TIMEOUT
@@ -153,56 +84,7 @@ class ToastComp extends React.Component<FullProps> {
   }
 
   render() {
-    const {
-      id,
-      type,
-      show,
-      children,
-      onClose,
-      className,
-      theme,
-      onActionClick,
-      actionText
-    } = this.props
-    return (
-      <NotificationContainer
-        id={id}
-        $type={type}
-        $show={show}
-        className={className}
-        role="alert"
-      >
-        <IconContainer>
-          {type === NOTIFICATION_TYPE.SUCCESS && <Check />}
-          {type === NOTIFICATION_TYPE.NEUTRAL && <Help />}
-          {type === NOTIFICATION_TYPE.ERROR && <NotificationError />}
-          {type === NOTIFICATION_TYPE.IN_PROGRESS && (
-            <Spinner
-              id="in-progress-floating-notification"
-              baseColor={theme.colors.white}
-              size={22}
-            />
-          )}
-        </IconContainer>
-
-        <NotificationMessage>{children}</NotificationMessage>
-
-        {onActionClick && (
-          <ActionButton onClick={onActionClick}>
-            <ButtonText variant="bold14" element="span">
-              {actionText}
-            </ButtonText>
-          </ActionButton>
-        )}
-
-        {onClose && (
-          <Close id={id + 'Cancel'} onClick={onClose}>
-            <Cross color="currentColor" />
-          </Close>
-        )}
-      </NotificationContainer>
-    )
+    const { type, show, ...props } = this.props
+    return <ToastAlert type={type ?? 'neutral'} $show={show} {...props} />
   }
 }
-
-export const Toast = withTheme(ToastComp)

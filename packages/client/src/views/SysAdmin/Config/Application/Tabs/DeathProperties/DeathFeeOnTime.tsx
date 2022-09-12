@@ -25,7 +25,7 @@ import {
 import { InputField } from '@opencrvs/components/lib/InputField'
 import { IStoreState } from '@client/store'
 import { ListViewItemSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { DeathActionId } from '@client/views/SysAdmin/Config/Application'
 import { useIntl } from 'react-intl'
@@ -173,10 +173,10 @@ export function DeathFeeOnTime() {
         id={`${id}_notification`}
         type={
           notificationStatus === NOTIFICATION_STATUS.SUCCESS
-            ? NOTIFICATION_TYPE.SUCCESS
+            ? 'success'
             : notificationStatus === NOTIFICATION_STATUS.IN_PROGRESS
-            ? NOTIFICATION_TYPE.IN_PROGRESS
-            : NOTIFICATION_TYPE.ERROR
+            ? 'loading'
+            : 'warning'
         }
         show={notificationStatus !== NOTIFICATION_STATUS.IDLE}
         onClose={() => {

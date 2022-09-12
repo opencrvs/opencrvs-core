@@ -9,20 +9,100 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
+import { ComponentStory, ComponentMeta } from '@storybook/react'
 import { Alert } from './Alert'
-import React from 'react'
+import React, { useState } from 'react'
 
-const Template: Story<{ label: string }> = (args) => {
+const Template: ComponentStory<typeof Alert> = (args) => {
   return <Alert {...args} />
 }
 
 export default {
   title: 'Data/Alert',
   component: Alert
-} as Meta
+} as ComponentMeta<typeof Alert>
 
-export const Default = Template.bind({})
-Default.args = {
-  label: 'Nothing is currently published. Awating to be published: Birth, Death'
+export const Success = Template.bind({})
+Success.args = {
+  type: 'success',
+  children:
+    'Nothing is currently published. Awaiting to be published: Birth, Death',
+  onClose: undefined
+}
+
+export const Neutral = Template.bind({})
+Neutral.args = {
+  type: 'neutral',
+  children:
+    'Nothing is currently published. Awaiting to be published: Birth, Death',
+  onClose: undefined
+}
+
+export const Warning = Template.bind({})
+Warning.args = {
+  type: 'warning',
+  children:
+    'Nothing is currently published. Awaiting to be published: Birth, Death',
+  onClose: undefined
+}
+
+export const Info = Template.bind({})
+Info.args = {
+  type: 'info',
+  children:
+    'Nothing is currently published. Awaiting to be published: Birth, Death',
+  onClose: undefined
+}
+
+export const Loading = Template.bind({})
+Loading.args = {
+  type: 'loading',
+  children:
+    'Nothing is currently published. Awaiting to be published: Birth, Death',
+  onClose: undefined
+}
+
+export const Closable = () => {
+  const [isVisible, setVisible] = useState(true)
+
+  return (
+    isVisible && (
+      <Alert type="success" onClose={() => setVisible(false)}>
+        Hello, I'm closable!
+      </Alert>
+    )
+  )
+}
+
+export const Retryable = () => (
+  <Alert
+    type="success"
+    actionText="Retry"
+    onActionClick={() => alert('Retried')}
+  >
+    Hello, I'm a retriable alert!
+  </Alert>
+)
+
+export const RetryableAndClosable = () => {
+  const [isVisible, setVisible] = useState(true)
+  return (
+    isVisible && (
+      <Alert
+        type="success"
+        onActionClick={() => alert('Retried')}
+        actionText="Retry"
+        onClose={() => setVisible(false)}
+      >
+        Hi! I'm a retryable and closable toast. I also have a very long text
+        within the toast. This illustrates how the toast stretches when the
+        content is lengthy.
+        <br />
+        <br />
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mauris
+        libero, tempor ut egestas quis, suscipit ac erat. Donec lacinia mi id
+        augue scelerisque, vel vehicula eros lobortis.
+      </Alert>
+    )
+  )
 }

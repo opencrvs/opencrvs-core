@@ -42,7 +42,7 @@ import {
   SYS_ADMIN_ROLES,
   PERFORMANCE_MANAGEMENT_ROLES
 } from '@client/utils/constants'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -478,7 +478,7 @@ export class OfficeHomeView extends React.Component<
         {this.state.showCertificateToast && (
           <Toast
             id="print-cert-notification"
-            type={NOTIFICATION_TYPE.SUCCESS}
+            type="success"
             show={this.state.showCertificateToast}
             onClose={() => {
               this.setState({ showCertificateToast: false })

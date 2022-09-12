@@ -17,7 +17,7 @@ import { userMessages } from '@client/i18n/messages/user'
 import { WrappedComponentProps as IntlShapeProps, injectIntl } from 'react-intl'
 import { getLanguage } from '@opencrvs/client/src/i18n/selectors'
 import { IStoreState } from '@opencrvs/client/src/store'
-import { NOTIFICATION_TYPE, Toast } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import {
   hideBackgroundSyncedNotification,
   hideConfigurationErrorNotification,
@@ -122,7 +122,7 @@ class Component extends React.Component<
         )}
         {configurationErrorVisible && (
           <Toast
-            type={NOTIFICATION_TYPE.ERROR}
+            type="warning"
             id="configErrorShowNotification"
             show={configurationErrorVisible}
             onClose={this.hideConfigurationErrorNotification}
@@ -145,7 +145,7 @@ class Component extends React.Component<
           <Toast
             id="submissionSuccessToast"
             show={Boolean(submitFormSuccessToast)}
-            type={NOTIFICATION_TYPE.SUCCESS}
+            type="success"
             onClose={this.hideSubmitFormSuccessToast}
           >
             {submitFormSuccessToast === TOAST_MESSAGES.UPDATE_SUCCESS
@@ -158,7 +158,7 @@ class Component extends React.Component<
           <Toast
             id="submissionErrorToast"
             show={Boolean(submitFormErrorToast)}
-            type={NOTIFICATION_TYPE.ERROR}
+            type="warning"
             onClose={this.hideSubmitFormErrorToast}
           >
             {intl.formatMessage(messages.userFormFail)}
@@ -168,7 +168,7 @@ class Component extends React.Component<
           <Toast
             id="userAuditSuccessToast"
             show={userAuditSuccessToast.visible}
-            type={NOTIFICATION_TYPE.SUCCESS}
+            type="success"
             onClose={this.hideUserAuditSuccessToast}
           >
             {intl.formatMessage(messages.userAuditSuccess, {
@@ -181,7 +181,7 @@ class Component extends React.Component<
           <Toast
             id="PINUpdateSuccessToast"
             show={showPINUpdateSuccess}
-            type={NOTIFICATION_TYPE.SUCCESS}
+            type="success"
             onClose={this.props.hidePINUpdateSuccessToast}
           >
             {intl.formatMessage(messages.updatePINSuccess)}
@@ -191,7 +191,7 @@ class Component extends React.Component<
           <Toast
             id="PINUpdateSuccessToast"
             show={Boolean(downloadDeclarationFailedToast)}
-            type={NOTIFICATION_TYPE.ERROR}
+            type="warning"
             onClose={this.props.hideDownloadDeclarationFailedToast}
           >
             {intl.formatMessage(messages.downloadDeclarationFailed)}
@@ -201,7 +201,7 @@ class Component extends React.Component<
           <Toast
             id="unassignedModal"
             show
-            type={NOTIFICATION_TYPE.ERROR}
+            type="warning"
             onClose={this.props.hideUnassignedModal}
           >
             {intl.formatMessage(messages.unassigned, {
@@ -213,7 +213,7 @@ class Component extends React.Component<
           <Toast
             id="createUserDuplicateMobileFailedToast"
             show={Boolean(userCreateDuplicateMobileFailedToast.visible)}
-            type={NOTIFICATION_TYPE.ERROR}
+            type="warning"
             onClose={this.hideCreateUserFormErrorToast}
           >
             {intl.formatMessage(userMessages.duplicateUserMobileErrorMessege, {

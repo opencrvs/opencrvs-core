@@ -11,34 +11,120 @@
  */
 import React from 'react'
 import styled from 'styled-components'
-import { Alert as AlertIcon } from '../icons'
+import { Check, Help, Cross, NotificationError, Notification } from '../icons'
+import { CircleButton, TertiaryButton } from '../buttons'
+import { Spinner } from '../Spinner'
+import { Text } from '../Text'
 import { colors } from '../colors'
 
-const Conatiner = styled.div`
-  box-sizing: border-box;
+export type AlertType = 'success' | 'neutral' | 'loading' | 'info' | 'warning'
+
+const Container = styled.div<{
+  $type?: AlertType
+}>`
+  --color: ${({ $type, theme }) => `
+    ${$type === 'success' ? theme.colors.positiveDark : ''}
+    ${$type === 'loading' ? theme.colors.primaryDark : ''}
+    ${$type === 'info' ? theme.colors.primaryDark : ''}
+    ${$type === 'warning' ? theme.colors.negativeDark : ''}
+    ${$type === 'neutral' ? theme.colors.orangeDark : ''}
+    ${$type === undefined ? theme.colors.positiveDark : ''}
+  `};
+
+  min-height: 52px;
   display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 0 16px;
-  /* stylelint-disable-next-line color-no-hex */
-  background-color: #fff3f3;
+  filter: drop-shadow(0px 2px 4px rgba(34, 34, 34, 0.24));
   border-radius: 4px;
-  border: 1px solid ${colors.red};
-  color: ${colors.red};
-  ${({ theme }) => theme.fonts.bold16}
+  border: 2px solid var(--color);
+  border-left-width: 0px;
+  background: linear-gradient(
+    to right,
+    var(--color) 48px,
+    ${({ theme }) => theme.colors.white} 48px
+  );
 `
 
-export function Alert({
-  label,
-  ...props
-}: {
-  label: React.ReactNode
-  hideIcon?: boolean
-} & React.HTMLAttributes<HTMLDivElement>) {
-  return (
-    <Conatiner {...props}>
-      {!props.hideIcon && <AlertIcon color="invert" />}
-      <p>{label}</p>
-    </Conatiner>
-  )
+const IconContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 48px;
+  width: 48px;
+  color: ${({ theme }) => theme.colors.white};
+`
+
+const Close = styled(CircleButton)`
+  color: var(--color) !important;
+  margin-top: 4px;
+  margin-right: 4px;
+`
+
+const ActionButton = styled(TertiaryButton)`
+  margin-top: 8px;
+`
+
+const ButtonText = styled(Text)`
+  color: var(--color) !important;
+  padding: 0 4px;
+`
+
+const NotificationMessage = styled.div`
+  ${({ theme }) => theme.fonts.bold16};
+  color: var(--color);
+  position: relative;
+  padding: 13px 16px;
+  min-width: 160px;
+  max-width: calc(100% - 48px);
+  flex: 1;
+`
+
+export interface IAlertProps extends React.HTMLAttributes<HTMLDivElement> {
+  type: AlertType
+  onClose?: (event?: React.MouseEvent<HTMLButtonElement>) => void
+  onActionClick?: (event?: React.MouseEvent<HTMLButtonElement>) => void
+  actionText?: string
 }
+
+/**
+ * Alert informs about persistent conditions or important information. See `<Toast>` for informing users about feedback of their actions.
+ */
+export const Alert = ({
+  type,
+  onClose,
+  onActionClick,
+  actionText,
+  children,
+  ...props
+}: IAlertProps) => (
+  <Container $type={type} {...props}>
+    <IconContainer>
+      {type === 'success' && <Check />}
+      {type === 'neutral' && <Help />}
+      {type === 'warning' && <NotificationError />}
+      {type === 'info' && <Notification />}
+      {type === 'loading' && (
+        <Spinner
+          id="in-progress-floating-notification"
+          baseColor={colors.white}
+          size={22}
+        />
+      )}
+    </IconContainer>
+
+    <NotificationMessage>{children}</NotificationMessage>
+
+    {onActionClick && (
+      <ActionButton onClick={onActionClick}>
+        <ButtonText variant="bold14" element="span">
+          {actionText}
+        </ButtonText>
+      </ActionButton>
+    )}
+
+    {onClose && (
+      <Close id={props.id + '_cancel'} onClick={onClose}>
+        <Cross color="currentColor" />
+      </Close>
+    )}
+  </Container>
+)

@@ -36,7 +36,7 @@ import {
   ListViewSimplified
 } from '@opencrvs/components/lib/ListViewSimplified'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE } from '@client/utils/constants'
@@ -479,10 +479,10 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
           <Toast
             type={
               imageLoadingError
-                ? NOTIFICATION_TYPE.ERROR
+                ? 'warning'
                 : this.state.imageUploading
-                ? NOTIFICATION_TYPE.IN_PROGRESS
-                : NOTIFICATION_TYPE.SUCCESS
+                ? 'loading'
+                : 'success'
             }
             show={showNotification}
             onClose={

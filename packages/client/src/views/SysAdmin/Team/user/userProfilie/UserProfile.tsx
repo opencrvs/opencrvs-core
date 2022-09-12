@@ -34,10 +34,7 @@ import { LANG_EN } from '@client/utils/constants'
 import { LoadingGrey } from '@opencrvs/components/lib/interface'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
-import {
-  Toast,
-  NOTIFICATION_TYPE as FLOATING_NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/Toast'
+import { Toast } from '@opencrvs/components/lib/Toast'
 
 import { Status } from '@client/views/SysAdmin/Team/user/UserList'
 import { messages as sysMessages } from '@client/i18n/messages/views/sysAdmin'
@@ -431,7 +428,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                     {showResendSMSSuccess && (
                       <Toast
                         id="resend_invite_success"
-                        type={FLOATING_NOTIFICATION_TYPE.SUCCESS}
+                        type="success"
                         show={showResendSMSSuccess}
                         onClose={() =>
                           this.setState({ showResendSMSSuccess: false })
@@ -443,7 +440,7 @@ class UserProfileComponent extends React.Component<Props, State> {
                     {showResendSMSError && (
                       <Toast
                         id="resend_invite_error"
-                        type={FLOATING_NOTIFICATION_TYPE.ERROR}
+                        type="warning"
                         show={showResendSMSError}
                         onClose={() =>
                           this.setState({ showResendSMSError: false })
