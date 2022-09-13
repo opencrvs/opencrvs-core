@@ -21,7 +21,8 @@ import {
   Workqueue,
   COLUMNS,
   SORT_ORDER,
-  IDynamicValues
+  IDynamicValues,
+  IAction
 } from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
@@ -52,10 +53,11 @@ import {
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
+  getPreviousOperationDateByOperationType,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { IAction } from '@opencrvs/components/lib/common-types'
+import { RegStatus } from '@client/utils/gateway'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -197,7 +199,11 @@ class ReadyForReviewComponent extends React.Component<
           reg.dateOfEvent.length > 0 &&
           new Date(reg.dateOfEvent)) ||
         ''
-      const createdAt = (reg.createdAt && parseInt(reg.createdAt)) || ''
+      const createdAt =
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          RegStatus.Declared
+        ) || ''
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}

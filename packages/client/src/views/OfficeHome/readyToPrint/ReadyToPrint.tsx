@@ -20,7 +20,8 @@ import {
   ColumnContentAlignment,
   Workqueue,
   SORT_ORDER,
-  COLUMNS
+  COLUMNS,
+  IAction
 } from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
@@ -41,6 +42,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
+  getPreviousOperationDateByOperationType,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import {
@@ -50,7 +52,7 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { IAction } from '@opencrvs/components/lib/common-types'
+import { RegStatus } from '@client/utils/gateway'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -229,9 +231,11 @@ class ReadyToPrintComponent extends React.Component<
         reg.dateOfEvent.length > 0 &&
         new Date(reg.dateOfEvent)
       const registered =
-        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
-          ? new Date(reg.modifiedAt)
-          : new Date(Number(reg.modifiedAt))) || ''
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          RegStatus.Registered
+        ) || ''
+
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
