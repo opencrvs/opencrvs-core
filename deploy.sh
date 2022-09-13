@@ -332,13 +332,13 @@ docker_stack_deploy() {
 FILES_TO_ROTATE="/opt/opencrvs/docker-compose.deploy.yml"
 
 if [ "$REPLICAS" = "3" ]; then
-  REPLICAS_COMPOSE="-c docker-compose.replicas-3.yml -c docker-compose.countryconfig.replicas-3.yml"
+  REPLICAS_COMPOSE="docker-compose.replicas-3.yml docker-compose.countryconfig.replicas-3.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.replicas-3.yml"
 elif [ "$REPLICAS" = "5" ]; then
-  REPLICAS_COMPOSE="-c docker-compose.replicas-5.yml -c docker-compose.countryconfig.replicas-5.yml"
+  REPLICAS_COMPOSE="docker-compose.replicas-5.yml docker-compose.countryconfig.replicas-5.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.replicas-5.yml"
 elif [ "$REPLICAS" = "1" ]; then
-  REPLICAS_COMPOSE="-c docker-compose.countryconfig.replicas-1.yml"
+  REPLICAS_COMPOSE="docker-compose.countryconfig.replicas-1.yml"
 else
   echo "Unknown error running docker-compose on server as REPLICAS is not 1, 3 or 5."
   exit 1
@@ -355,7 +355,7 @@ elif [[ "$ENV" = "production" ]]; then
   ENVIRONMENT_COMPOSE="docker-compose.countryconfig.prod-deploy.yml docker-compose.prod-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.prod-deploy.yml /opt/opencrvs/docker-compose.prod-deploy.yml"
 elif [[ "$ENV" = "demo" ]]; then
-  ENVIRONMENT_COMPOSE="-c docker-compose.countryconfig.demo-deploy.yml -c docker-compose.prod-deploy.yml"
+  ENVIRONMENT_COMPOSE="docker-compose.countryconfig.demo-deploy.yml docker-compose.prod-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.demo-deploy.yml /opt/opencrvs/docker-compose.prod-deploy.yml"
 else
   echo "Unknown error running docker-compose on server as ENV is not staging, qa or production."
