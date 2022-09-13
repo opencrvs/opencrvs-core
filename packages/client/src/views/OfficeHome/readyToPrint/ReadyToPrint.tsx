@@ -18,11 +18,11 @@ import { transformData } from '@client/search/transformer'
 import { ITheme } from '@client/styledComponents'
 import {
   ColumnContentAlignment,
-  GridTable,
-  IAction,
+  Workqueue,
   SORT_ORDER,
-  COLUMNS
-} from '@opencrvs/components/lib/interface'
+  COLUMNS,
+  IAction
+} from '@opencrvs/components/lib/Workqueue'
 import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
@@ -42,6 +42,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
+  getPreviousOperationDateByOperationType,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import {
@@ -51,6 +52,7 @@ import {
   NameContainer
 } from '@client/views/OfficeHome/components'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { RegStatus } from '@client/utils/gateway'
 
 interface IBasePrintTabProps {
   theme: ITheme
@@ -229,9 +231,11 @@ class ReadyToPrintComponent extends React.Component<
         reg.dateOfEvent.length > 0 &&
         new Date(reg.dateOfEvent)
       const registered =
-        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
-          ? new Date(reg.modifiedAt)
-          : new Date(Number(reg.modifiedAt))) || ''
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          RegStatus.Registered
+        ) || ''
+
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}
@@ -312,12 +316,11 @@ class ReadyToPrintComponent extends React.Component<
         noResultText={intl.formatMessage(wqMessages.noRecordsReadyToPrint)}
         noContent={this.transformRegisteredContent(data).length <= 0}
       >
-        <GridTable
+        <Workqueue
           content={this.transformRegisteredContent(data)}
           columns={this.getColumns()}
           loading={this.props.loading}
           sortOrder={this.state.sortOrder}
-          sortedCol={this.state.sortedCol}
           hideLastBorder={!isShowPagination}
         />
       </WQContentWrapper>

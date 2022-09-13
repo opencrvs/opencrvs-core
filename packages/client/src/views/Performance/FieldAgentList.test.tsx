@@ -19,9 +19,9 @@ import { waitForElement } from '@client/tests/wait-for-element'
 import { FETCH_FIELD_AGENTS_WITH_PERFORMANCE_DATA } from '@client/views/SysAdmin/Performance/queries'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import { stringify } from 'query-string'
 import * as React from 'react'
 import { FieldAgentList } from './FieldAgentList'
+import { vi } from 'vitest'
 
 describe('Field agent list tests', () => {
   let component: ReactWrapper<{}, {}>
@@ -29,7 +29,7 @@ describe('Field agent list tests', () => {
   let history: History<any>
 
   beforeAll(async () => {
-    Date.now = jest.fn(() => 1487076708000)
+    Date.now = vi.fn(() => 1487076708000)
     ;({ store, history } = await createTestStore())
   })
 

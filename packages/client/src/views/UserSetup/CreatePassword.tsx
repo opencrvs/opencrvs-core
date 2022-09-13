@@ -12,13 +12,11 @@
 import * as React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
-import {
-  InputField,
-  TextInput,
-  WarningMessage
-} from '@opencrvs/components/lib/forms'
+import { InputField } from '@opencrvs/components/lib/InputField'
+import { TextInput } from '@opencrvs/components/lib/TextInput'
+import { WarningMessage } from '@opencrvs/components/lib/WarningMessage'
 import { TickOff, TickOn } from '@opencrvs/components/lib/icons'
 import {
   ProtectedAccoutStep,
@@ -26,7 +24,7 @@ import {
 } from '@client/components/ProtectedAccount'
 import { messages } from '@client/i18n/messages/views/userSetup'
 import { buttonMessages } from '@client/i18n/messages'
-import { Content } from '@opencrvs/components/lib/interface/Content'
+import { Content } from '@opencrvs/components/lib/Content'
 import { EMPTY_STRING } from '@client/utils/constants'
 
 const GlobalError = styled.div`

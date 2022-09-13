@@ -23,7 +23,7 @@ print_usage_and_exit () {
     echo "  --clear-data must have a value of 'yes' or 'no' set e.g. --clear-data=yes"
     echo "  --restore-metadata must have a value of 'yes' or 'no' set e.g. --restore-metadata=yes"
     echo "  --update-metadata must have a value of 'yes' or 'no' set e.g. --update-metadata=yes"
-    echo "  ENV can be 'production' or 'development' or 'qa'"
+    echo "  ENV can be 'production' or 'development' or 'qa' or 'demo'"
     echo '  HOST    is the server to deploy to'
     echo "  VERSION can be any OpenCRVS Core docker image tag or 'latest'"
     echo "  COUNTRY_CONFIG_VERSION can be any OpenCRVS Country Configuration docker image tag or 'latest'"
@@ -189,42 +189,52 @@ echo
 echo "Deploying COUNTRY_CONFIG_VERSION $COUNTRY_CONFIG_VERSION to $SSH_HOST..."
 echo
 
-mkdir -p /tmp/compose/infrastructure/default_backups
-mkdir -p /tmp/compose/infrastructure/default_updates
+mkdir -p /tmp/opencrvs/infrastructure/default_backups
+mkdir -p /tmp/opencrvs/infrastructure/default_updates
+mkdir -p /tmp/opencrvs/infrastructure/cryptfs
 
 # Copy selected country default backups to infrastructure default_backups folder
-cp $COUNTRY_CONFIG_PATH/backups/hearth-dev.gz /tmp/compose/infrastructure/default_backups/hearth-dev.gz
-cp $COUNTRY_CONFIG_PATH/backups/openhim-dev.gz /tmp/compose/infrastructure/default_backups/openhim-dev.gz
-cp $COUNTRY_CONFIG_PATH/backups/user-mgnt.gz /tmp/compose/infrastructure/default_backups/user-mgnt.gz
-cp $COUNTRY_CONFIG_PATH/backups/application-config.gz /tmp/compose/infrastructure/default_backups/application-config.gz
+cp $COUNTRY_CONFIG_PATH/backups/hearth-dev.gz /tmp/opencrvs/infrastructure/default_backups/hearth-dev.gz
+cp $COUNTRY_CONFIG_PATH/backups/openhim-dev.gz /tmp/opencrvs/infrastructure/default_backups/openhim-dev.gz
+cp $COUNTRY_CONFIG_PATH/backups/user-mgnt.gz /tmp/opencrvs/infrastructure/default_backups/user-mgnt.gz
+cp $COUNTRY_CONFIG_PATH/backups/application-config.gz /tmp/opencrvs/infrastructure/default_backups/application-config.gz
+
+# Copy decrypt script
+cp $COUNTRY_CONFIG_PATH/decrypt.sh /tmp/opencrvs/infrastructure/cryptfs/decrypt.sh
+
+# Copy emergency backup script
+cp $COUNTRY_CONFIG_PATH/emergency-backup-metadata.sh /tmp/opencrvs/infrastructure/emergency-backup-metadata.sh
+
+# Copy emergency restore script
+cp $COUNTRY_CONFIG_PATH/emergency-restore-metadata.sh /tmp/opencrvs/infrastructure/emergency-restore-metadata.sh
 
 # Copy selected country default updates to infrastructure default_updates folder
-[[ -d $COUNTRY_CONFIG_PATH/updates/generated ]] && cp $COUNTRY_CONFIG_PATH/updates/generated/*.json /tmp/compose/infrastructure/default_updates
+[[ -d $COUNTRY_CONFIG_PATH/updates/generated ]] && cp $COUNTRY_CONFIG_PATH/updates/generated/*.json /tmp/opencrvs/infrastructure/default_updates
 
 # Copy all infrastructure files to the server
-rsync -rP docker-compose* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/
+rsync -rP docker-compose* infrastructure $SSH_USER@$SSH_HOST:/opt/opencrvs/
 
 # Copy all country compose files to the server
-rsync -rP $COUNTRY_CONFIG_PATH/docker-compose.countryconfig* infrastructure $SSH_USER@$SSH_HOST:/tmp/compose/
+rsync -rP $COUNTRY_CONFIG_PATH/docker-compose.countryconfig* infrastructure $SSH_USER@$SSH_HOST:/opt/opencrvs/
 
 # Override configuration files with country specific files
-rsync -rP /tmp/compose/infrastructure $SSH_USER@$SSH_HOST:/tmp/compose
+rsync -rP /tmp/opencrvs/infrastructure $SSH_USER@$SSH_HOST:/opt/opencrvs
 
 rotate_secrets() {
   files_to_rotate=$1
   echo "ROTATING SECRETS ON: $files_to_rotate"
-  ssh $SSH_USER@$SSH_HOST '/tmp/compose/infrastructure/rotate-secrets.sh '$files_to_rotate' | tee -a '$LOG_LOCATION'/rotate-secrets.log'
+  ssh $SSH_USER@$SSH_HOST '/opt/opencrvs/infrastructure/rotate-secrets.sh '$files_to_rotate' | tee -a '$LOG_LOCATION'/rotate-secrets.log'
 }
 
 # Setup configuration files and compose file for the deployment domain
-ssh $SSH_USER@$SSH_HOST "SMTP_HOST=$SMTP_HOST SMTP_PORT=$SMTP_PORT SMTP_USERNAME=$SMTP_USERNAME SMTP_PASSWORD=$SMTP_PASSWORD ALERT_EMAIL=$ALERT_EMAIL /tmp/compose/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
+ssh $SSH_USER@$SSH_HOST "SMTP_HOST=$SMTP_HOST SMTP_PORT=$SMTP_PORT SMTP_USERNAME=$SMTP_USERNAME SMTP_PASSWORD=$SMTP_PASSWORD ALERT_EMAIL=$ALERT_EMAIL /opt/opencrvs/infrastructure/setup-deploy-config.sh $HOST | tee -a $LOG_LOCATION/setup-deploy-config.log"
 
 docker_stack_deploy() {
   environment_compose=$1
   replicas_compose=$2
   echo "DEPLOYING THIS ENVIRONMENT: $environment_compose"
   echo "DEPLOYING THESE REPLICAS: $replicas_compose"
-  ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && \
+  ssh $SSH_USER@$SSH_HOST 'cd /opt/opencrvs && \
     HOSTNAME='$HOST' \
     VERSION='$VERSION' \
     COUNTRY_CONFIG_VERSION='$COUNTRY_CONFIG_VERSION' \
@@ -247,16 +257,16 @@ docker_stack_deploy() {
     docker stack deploy --prune -c docker-compose.deps.yml -c docker-compose.yml -c docker-compose.deploy.yml '$environment_compose' '$replicas_compose' --with-registry-auth opencrvs'
 }
 
-FILES_TO_ROTATE="/tmp/compose/docker-compose.deploy.yml"
+FILES_TO_ROTATE="/opt/opencrvs/docker-compose.deploy.yml"
 
 if [ "$REPLICAS" = "3" ]; then
-  REPLICAS_COMPOSE="-c docker-compose.replicas-3.yml"
-  FILES_TO_ROTATE="${FILES_TO_ROTATE} /tmp/compose/docker-compose.replicas-3.yml"
+  REPLICAS_COMPOSE="-c docker-compose.replicas-3.yml -c docker-compose.countryconfig.replicas-3.yml"
+  FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.replicas-3.yml"
 elif [ "$REPLICAS" = "5" ]; then
-  REPLICAS_COMPOSE="-c docker-compose.replicas-5.yml"
-  FILES_TO_ROTATE="${FILES_TO_ROTATE} /tmp/compose/docker-compose.replicas-5.yml"
+  REPLICAS_COMPOSE="-c docker-compose.replicas-5.yml -c docker-compose.countryconfig.replicas-5.yml"
+  FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.replicas-5.yml"
 elif [ "$REPLICAS" = "1" ]; then
-  REPLICAS_COMPOSE=""
+  REPLICAS_COMPOSE="-c docker-compose.countryconfig.replicas-1.yml"
 else
   echo "Unknown error running docker-compose on server as REPLICAS is not 1, 3 or 5."
   exit 1
@@ -265,13 +275,16 @@ fi
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
   ENVIRONMENT_COMPOSE="-c docker-compose.countryconfig.staging-deploy.yml -c docker-compose.staging-deploy.yml"
-  FILES_TO_ROTATE="${FILES_TO_ROTATE} /tmp/compose/docker-compose.countryconfig.staging-deploy.yml /tmp/compose/docker-compose.staging-deploy.yml"
+  FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.staging-deploy.yml /opt/opencrvs/docker-compose.staging-deploy.yml"
 elif [[ "$ENV" = "qa" ]]; then
   ENVIRONMENT_COMPOSE="-c docker-compose.countryconfig.qa-deploy.yml -c docker-compose.qa-deploy.yml"
-  FILES_TO_ROTATE="${FILES_TO_ROTATE} /tmp/compose/docker-compose.countryconfig.qa-deploy.yml /tmp/compose/docker-compose.qa-deploy.yml"
+  FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.qa-deploy.yml /opt/opencrvs/docker-compose.qa-deploy.yml"
 elif [[ "$ENV" = "production" ]]; then
   ENVIRONMENT_COMPOSE="-c docker-compose.countryconfig.prod-deploy.yml -c docker-compose.prod-deploy.yml"
-  FILES_TO_ROTATE="${FILES_TO_ROTATE} /tmp/compose/docker-compose.countryconfig.prod-deploy.yml /tmp/compose/docker-compose.prod-deploy.yml"
+  FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.prod-deploy.yml /opt/opencrvs/docker-compose.prod-deploy.yml"
+elif [[ "$ENV" = "demo" ]]; then
+  ENVIRONMENT_COMPOSE="-c docker-compose.countryconfig.demo-deploy.yml -c docker-compose.prod-deploy.yml"
+  FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.demo-deploy.yml /opt/opencrvs/docker-compose.prod-deploy.yml"
 else
   echo "Unknown error running docker-compose on server as ENV is not staging, qa or production."
   exit 1
@@ -297,19 +310,19 @@ if [ $1 == "--clear-data=yes" ] ; then
         ELASTICSEARCH_ADMIN_PASSWORD=$ELASTICSEARCH_SUPERUSER_PASSWORD \
         MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER \
         MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD \
-        /tmp/compose/infrastructure/clear-all-data.sh $REPLICAS $ENV"
+        /opt/opencrvs/infrastructure/clear-all-data.sh $REPLICAS $ENV"
 fi
 
 if [ $2 == "--restore-metadata=yes" ] ; then
     echo
     echo "Restoring metadata..."
     echo
-    ssh $SSH_USER@$SSH_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD /tmp/compose/infrastructure/restore-metadata.sh $REPLICAS $ENV"
+    ssh $SSH_USER@$SSH_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD /opt/opencrvs/infrastructure/restore-metadata.sh $REPLICAS $ENV"
 fi
 
 if [ $3 == "--update-metadata=yes" ] ; then
     echo
     echo "Updating existing metadata..."
     echo
-    ssh $SSH_USER@$SSH_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD /tmp/compose/infrastructure/restore-metadata-updates.sh $REPLICAS"
+    ssh $SSH_USER@$SSH_HOST "MONGODB_ADMIN_USER=$MONGODB_ADMIN_USER MONGODB_ADMIN_PASSWORD=$MONGODB_ADMIN_PASSWORD /opt/opencrvs/infrastructure/restore-metadata-updates.sh $REPLICAS"
 fi

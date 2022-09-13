@@ -32,7 +32,7 @@ import { messages } from '@client/i18n/messages/views/formConfig'
 import { IStoreState } from '@client/store'
 import styled from '@client/styledComponents'
 import { useFieldDefinition } from '@client/views/SysAdmin/Config/Forms/hooks'
-import { FormConfigElementCard } from '@opencrvs/components/lib/interface/FormConfigElementCard'
+import { FormConfigElementCard } from '@opencrvs/components/lib/FormConfigElementCard'
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useDispatch, useSelector } from 'react-redux'
@@ -134,7 +134,9 @@ export const Canvas = React.forwardRef<HTMLDivElement, ICanvasProps>(
               id={fieldId}
               key={fieldId}
               selected={isSelected}
-              onClick={() => setSelectedField(fieldId)}
+              onClick={() => {
+                setSelectedField(fieldId)
+              }}
               movable={isCustom && isSelected}
               status={
                 isHidden ? intl.formatMessage(messages.hidden) : undefined

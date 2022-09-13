@@ -16,10 +16,7 @@ import {
   NOTIFICATION_TYPE_MAP,
   isNotifiable
 } from '@client/views/SysAdmin/Config/Forms/utils'
-import {
-  FloatingNotification,
-  NOTIFICATION_TYPE
-} from '@opencrvs/components/lib/interface'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
 import { useIntl } from 'react-intl'
 import { saveActionMessages } from '@client/i18n/messages/views/formConfig'
 
@@ -28,7 +25,7 @@ export function SaveActionNotification() {
   const { status, setStatus } = React.useContext(SaveActionContext)
 
   return (
-    <FloatingNotification
+    <Toast
       type={
         isNotifiable(status)
           ? NOTIFICATION_TYPE_MAP[status]
@@ -42,6 +39,6 @@ export function SaveActionNotification() {
       }
     >
       {isNotifiable(status) && intl.formatMessage(saveActionMessages[status])}
-    </FloatingNotification>
+    </Toast>
   )
 }

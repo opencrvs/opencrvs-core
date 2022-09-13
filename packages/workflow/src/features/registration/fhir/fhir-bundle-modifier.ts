@@ -66,7 +66,6 @@ export async function modifyRegistrationBundle(
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
-  // tslint:disable-next-line
   fhirBundle = setTrackingId(fhirBundle)
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task

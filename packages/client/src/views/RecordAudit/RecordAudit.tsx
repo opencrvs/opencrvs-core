@@ -10,11 +10,8 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Header } from '@client/components/interface/Header/Header'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
+import { Header } from '@client/components/Header/Header'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import {
   Navigation,
   WORKQUEUE_TABS
@@ -56,13 +53,9 @@ import { IStoreState } from '@client/store'
 import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import {
-  ResponsiveModal,
-  Loader,
-  PageHeader,
-  IPageHeaderProps,
-  ErrorToastNotification
-} from '@opencrvs/components/lib/interface'
+import { ErrorToastNotification } from '@opencrvs/components/lib/Toast'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
+import { Loader } from '@opencrvs/components/lib/Loader'
 import { getScope } from '@client/profile/profileSelectors'
 import { Scope, hasRegisterScope } from '@client/utils/authUtils'
 import {
@@ -80,7 +73,7 @@ import {
   FIELD_AGENT_ROLES,
   IN_PROGRESS
 } from '@client/utils/constants'
-import { IQueryData } from '@client/views/OfficeHome/OfficeHome'
+import { IQueryData } from '@client/views/OfficeHome/utils'
 import { Query } from '@client/components/Query'
 import { FETCH_DECLARATION_SHORT_INFO } from '@client/views/RecordAudit/queries'
 import { HOME } from '@client/navigation/routes'
@@ -124,6 +117,8 @@ import {
 } from './mutations'
 import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
+import { Frame } from '@opencrvs/components/lib/Frame'
+import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -131,17 +126,9 @@ const DesktopHeader = styled(Header)`
   }
 `
 
-const MobileHeader = styled(PageHeader)`
+const MobileHeader = styled(AppBar)`
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
-  }
-`
-
-const BodyContainer = styled.div`
-  margin-left: 0px;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-left: 250px;
-    padding: 0px 24px;
   }
 `
 
@@ -521,7 +508,7 @@ function RecordAuditBody({
     draft
   }
 
-  const mobileProps: IPageHeaderProps = {
+  const mobileProps: IAppBarProps = {
     id: 'mobileHeader',
     mobileTitle:
       declaration.name || intl.formatMessage(recordAuditMessages.noName),
@@ -772,12 +759,16 @@ function getBodyContent({
 
 const RecordAuditComp = (props: IFullProps) => {
   return (
-    <>
-      <DesktopHeader />
-      <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
-      <BodyContainer>{getBodyContent(props)}</BodyContainer>
+    <Frame
+      header={<DesktopHeader />}
+      navigation={
+        <Navigation deselectAllTabs={true} loadWorkqueueStatuses={false} />
+      }
+    >
+      {getBodyContent(props)}
+
       <NotificationToast />
-    </>
+    </Frame>
   )
 }
 

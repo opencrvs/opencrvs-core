@@ -18,7 +18,7 @@ import {
   mockOfflineDataDispatch
 } from '@client/tests/util'
 import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { waitForElement } from '@client/tests/wait-for-element'

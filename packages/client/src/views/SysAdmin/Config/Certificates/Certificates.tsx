@@ -32,11 +32,12 @@ import { messages } from '@client/i18n/messages/views/config'
 import { messages as imageUploadMessages } from '@client/i18n/messages/views/imageUpload'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import {
-  FloatingNotification,
-  NOTIFICATION_TYPE,
-  ResponsiveModal,
-  ToggleMenu
-} from '@opencrvs/components/lib/interface'
+  ListViewItemSimplified,
+  ListViewSimplified
+} from '@opencrvs/components/lib/ListViewSimplified'
+import { ToggleMenu } from '@opencrvs/components/lib/ToggleMenu'
+import { Toast, NOTIFICATION_TYPE } from '@opencrvs/components/lib/Toast'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE } from '@client/utils/constants'
 import {
@@ -59,11 +60,7 @@ import {
   printCertificate,
   downloadFile
 } from '@client/views/PrintCertificate/PDFUtils'
-import { Content } from '@opencrvs/components/lib/interface/Content'
-import {
-  ListViewSimplified,
-  ListViewItemSimplified
-} from '@opencrvs/components/lib/interface/ListViewSimplified/ListViewSimplified'
+import { Content } from '@opencrvs/components/lib/Content'
 import { updateOfflineCertificate } from '@client/offline/actions'
 import { ICertificateTemplateData } from '@client/utils/referenceApi'
 import { IDeclaration } from '@client/declarations'
@@ -89,16 +86,15 @@ export enum SVGFile {
   type = 'image/svg+xml'
 }
 
-type Props = WrappedComponentProps &
-  Pick<RouteComponentProps, 'history'> & {
-    userDetails: IUserDetails | null
-    scope: Scope | null
-    offlineResources: IOfflineData
-    registerForm: {
-      birth: IForm
-      death: IForm
-    }
-  } & { updateOfflineCertificate: typeof updateOfflineCertificate }
+type Props = WrappedComponentProps & {
+  userDetails: IUserDetails | null
+  scope: Scope | null
+  offlineResources: IOfflineData
+  registerForm: {
+    birth: IForm
+    death: IForm
+  }
+} & { updateOfflineCertificate: typeof updateOfflineCertificate }
 
 interface State {
   selectedSubMenuItem: string
@@ -113,7 +109,7 @@ interface State {
 function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
   return new Promise((resolve, _) => {
     const reader = new FileReader()
-    reader.onloadend = () => resolve(reader.result)
+    reader.onload = () => resolve(reader.result)
     reader.readAsDataURL(blob)
   })
 }
@@ -128,7 +124,8 @@ async function updatePreviewSvgWithSampleSignature(
     (image) => image.getAttribute('data-content') === 'signature'
   )
   if (signatureImage) {
-    const res = await fetch('/assets/sample-signature.png')
+    const baseURL = window.location.origin
+    const res = await fetch(`${baseURL}/assets/sample-signature.png`)
     const blob = await res.blob()
     const base64signature = await blobToBase64(blob)
     signatureImage.setAttribute('xlink:href', base64signature as string)
@@ -281,7 +278,10 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         this.birthCertificatefileUploader.current!.value = ''
         this.deathCertificatefileUploader.current!.value = ''
       } catch (error) {
-        if (error.message === ERROR_TYPES.IMAGE_TYPE) {
+        if (
+          error instanceof Error &&
+          error.message === ERROR_TYPES.IMAGE_TYPE
+        ) {
           this.setState(() => ({
             imageUploading: false,
             imageLoadingError: this.props.intl.formatMessage(
@@ -476,7 +476,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               </ListViewContainer>
             </Content>
           )}
-          <FloatingNotification
+          <Toast
             type={
               imageLoadingError
                 ? NOTIFICATION_TYPE.ERROR
@@ -502,7 +502,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   : eventName
               }}
             />
-          </FloatingNotification>
+          </Toast>
           <ResponsiveModal
             id="withoutVerificationPrompt"
             show={showPrompt}

@@ -16,12 +16,25 @@
   become: yes
   become_method: sudo
   tasks:
+    - name: 'Create app directory'
+      file:
+        path: /opt/opencrvs
+        state: directory
     - name: 'Check mandatory variables are defined'
       assert:
         that:
           - mongodb_admin_username is defined
           - mongodb_admin_password is defined
           - elasticsearch_superuser_password is defined
+          - country_config_path is defined
+
+    - name: Setting global variables accessed by country configuration playbook
+      ansible.builtin.set_fact:
+        mongodb_admin_password={{ mongodb_admin_password }}
+        mongodb_admin_username={{ mongodb_admin_username }}
+        elasticsearch_superuser_password={{elasticsearch_superuser_password}}
+        disk_encryption_key={{ disk_encryption_key }}
+
     - name: 'Add docker repository'
       apt_repository:
         repo: 'deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} edge'
@@ -71,47 +84,12 @@
         hour: '0'
         job: '/usr/bin/docker system prune -af >> /var/log/docker-prune.log'
 
-    - name: Inserts Elasticsearch super user username environment variable to crontab
-      cron:
-        name: ELASTICSEARCH_ADMIN_USER
-        env: yes
-        job: 'elastic'
-      when: elasticsearch_superuser_password is defined
-
-    - name: Inserts Elasticsearch super user password environment variable to crontab
-      cron:
-        name: ELASTICSEARCH_ADMIN_PASSWORD
-        env: yes
-        job: '{{ elasticsearch_superuser_password }}'
-      when: elasticsearch_superuser_password is defined
-
-    - name: Inserts Elasticsearch super user password environment variable to crontab
-      cron:
-        name: ELASTICSEARCH_SUPERUSER_PASSWORD
-        env: yes
-        job: '{{ elasticsearch_superuser_password }}'
-      when: elasticsearch_superuser_password is defined
-
-    - name: Inserts MongoDB username environment variable to crontab
-      cron:
-        name: MONGODB_ADMIN_USER
-        env: yes
-        job: '{{ mongodb_admin_username }}'
-      when: mongodb_admin_username is defined
-
-    - name: Inserts MongoDB password environment variable to crontab
-      cron:
-        name: MONGODB_ADMIN_PASSWORD
-        env: yes
-        job: '{{ mongodb_admin_password }}'
-      when: mongodb_admin_password is defined
-
     - name: 'Setup crontab to backup the opencrvs data'
       cron:
         name: 'backup opencrvs'
         minute: '0'
         hour: '0'
-        job: 'cd / && bash /tmp/compose/infrastructure/emergency-backup-metadata.sh {{ external_backup_server_user }} {{ external_backup_server_ip }} {{ external_backup_server_ssh_port }} {{ manager_production_server_ip }} {{ external_backup_server_remote_directory }} 5 >> /var/log/opencrvs-backup.log 2>&1'
+        job: 'cd / && bash /opt/opencrvs/infrastructure/emergency-backup-metadata.sh {{ external_backup_server_user }} {{ external_backup_server_ip }} {{ external_backup_server_ssh_port }} {{ manager_production_server_ip }} {{ external_backup_server_remote_directory }} 5 >> /var/log/opencrvs-backup.log 2>&1'
       when: external_backup_server_ip is defined
 
     - name: Copy MongoDB replication security key file to nodes
@@ -132,11 +110,11 @@
       register: st
 
     - name: 'Bootstrap encrypted data folder'
-      script: ../cryptfs/bootstrap.sh -s 100g -p {{encrypt_passphrase}}
+      script: ../cryptfs/bootstrap.sh -s 100g -p {{disk_encryption_key}}
       when: (not st.stat.exists) and encrypt_data
 
     - name: 'Mount encrypted data folder'
-      script: ../cryptfs/mount.sh -p {{encrypt_passphrase}}
+      script: ../cryptfs/mount.sh -p {{disk_encryption_key}}
       when: st.stat.exists and encrypt_data
 
     # https://stackoverflow.com/a/24765946
@@ -216,7 +194,7 @@
         state: directory
         group: 1000
         owner: 1000
-        mode: g+rwx
+        mode: ugo+rwx
 
     - name: 'Install UFW'
       apt:
@@ -264,6 +242,8 @@
         state: enabled
         default: deny
         direction: incoming
+
+    - include_tasks: '{{ country_config_path }}/playbook.yml'
 
 - hosts: docker-manager-first
   become: yes

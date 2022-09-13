@@ -32,6 +32,7 @@ import { Dispatch } from 'redux'
 import { IForm, SubmissionAction } from '@client/forms'
 import { showUnassigned } from '@client/notification/actions'
 import { FIELD_AGENT_ROLES } from '@client/utils/constants'
+import { ApolloError } from 'apollo-client'
 
 type IReadyDeclaration = IDeclaration & {
   action: SubmissionAction
@@ -124,7 +125,17 @@ export const submissionMiddleware: Middleware<{}, IStoreState> =
       updateWorkqueue(getState(), dispatch)
       dispatch(deleteDeclaration(declaration.id))
     } catch (error) {
-      if (error.graphQLErrors?.[0]?.extensions.code === 'UNASSIGNED') {
+      if (!(error instanceof ApolloError)) {
+        updateDeclaration(dispatch, {
+          ...declaration,
+          submissionStatus: SUBMISSION_STATUS.FAILED
+        })
+        return
+      }
+      if (
+        error.graphQLErrors.length > 0 &&
+        error.graphQLErrors[0].extensions.code === 'UNASSIGNED'
+      ) {
         dispatch(
           showUnassigned({
             trackingId: declaration.data.registration.trackingId as string

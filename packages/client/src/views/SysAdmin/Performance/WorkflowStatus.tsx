@@ -33,8 +33,10 @@ import { SORT_ORDER } from '@client/views/SysAdmin/Performance/reports/completen
 import { SysAdminContentWrapper } from '@client/views/SysAdmin/SysAdminContentWrapper'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
 import { ArrowDownBlue } from '@opencrvs/components/lib/icons'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/interface'
-import { IColumn } from '@opencrvs/components/lib/interface/GridTable/types'
+import {
+  IColumn,
+  ColumnContentAlignment
+} from '@opencrvs/components/lib/Workqueue'
 import {
   GQLEventProgressSet,
   GQLHumanName,
@@ -56,16 +58,10 @@ import subYears from 'date-fns/subYears'
 import differenceInSeconds from 'date-fns/differenceInSeconds'
 import { messages as statusMessages } from '@client/i18n/messages/views/registrarHome'
 import { colors } from '@opencrvs/components/lib/colors'
-import {
-  Content,
-  ContentSize
-} from '@opencrvs/components/lib/interface/Content'
-import { Spinner } from '@opencrvs/components/lib/interface/Spinner'
-import { TableView } from '@opencrvs/components/lib/interface/TableView'
-import { PaginationWrapper } from '@opencrvs/components/lib/styleForPagination/PaginationWrapper'
-import { DesktopWrapper } from '@opencrvs/components/lib/styleForPagination/DesktopWrapper'
-import { PaginationModified } from '@opencrvs/components/lib/interface/PaginationModified'
-import { MobileWrapper } from '@opencrvs/components/lib/styleForPagination/MobileWrapper'
+import { Content, ContentSize } from '@opencrvs/components/lib/Content'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
+import { TableView } from '@opencrvs/components/lib/Table'
+import { Pagination } from '@opencrvs/components/lib/Pagination'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -795,24 +791,11 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 />
                 {error && <ToastNotification type={NOTIFICATION_TYPE.ERROR} />}
                 {total > pageSize && (
-                  <PaginationWrapper id="pagination_container">
-                    <DesktopWrapper>
-                      <PaginationModified
-                        size="small"
-                        initialPage={currentPageNumber}
-                        totalPages={Math.ceil(total / pageSize)}
-                        onPageChange={onPageChange}
-                      />
-                    </DesktopWrapper>
-                    <MobileWrapper>
-                      <PaginationModified
-                        size="large"
-                        initialPage={currentPageNumber}
-                        totalPages={Math.ceil(total / pageSize)}
-                        onPageChange={onPageChange}
-                      />
-                    </MobileWrapper>
-                  </PaginationWrapper>
+                  <Pagination
+                    initialPage={currentPageNumber}
+                    totalPages={Math.ceil(total / pageSize)}
+                    onPageChange={onPageChange}
+                  />
                 )}
               </>
             )

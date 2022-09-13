@@ -29,9 +29,10 @@ import {
   Navigation
 } from '@client/components/interface/Navigation'
 import { ReactWrapper } from 'enzyme'
+import { Mock, vi } from 'vitest'
 
-const getItem = window.localStorage.getItem as jest.Mock
-const mockFetchUserDetails = jest.fn()
+const getItem = window.localStorage.getItem as Mock
+const mockFetchUserDetails = vi.fn()
 
 const nameObj = {
   data: {
@@ -67,8 +68,8 @@ const nameObjNatlSysAdmin = {
   }
 }
 
-storage.getItem = jest.fn()
-storage.setItem = jest.fn()
+storage.getItem = vi.fn()
+storage.setItem = vi.fn()
 
 let { store, history } = createStore()
 let client = createClient(store)

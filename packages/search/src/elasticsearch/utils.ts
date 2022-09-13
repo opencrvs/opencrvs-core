@@ -31,7 +31,7 @@ export const enum EVENT {
 
 export const IN_PROGRESS_STATUS = 'IN_PROGRESS'
 export const ARCHIVED_STATUS = 'ARCHIVED'
-const DECLARED_STATUS = 'DECLARED'
+export const DECLARED_STATUS = 'DECLARED'
 export const REJECTED_STATUS = 'REJECTED'
 export const VALIDATED_STATUS = 'VALIDATED'
 const WAITING_VALIDATION_STATUS = 'WAITING_VALIDATION'
@@ -403,7 +403,7 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
   const validStatusMapping = {
     [ARCHIVED_STATUS]: [DECLARED_STATUS, REJECTED_STATUS, VALIDATED_STATUS],
     [IN_PROGRESS_STATUS]: [null],
-    [DECLARED_STATUS]: [ARCHIVED_STATUS],
+    [DECLARED_STATUS]: [ARCHIVED_STATUS, null],
     [REJECTED_STATUS]: [
       DECLARED_STATUS,
       IN_PROGRESS_STATUS,

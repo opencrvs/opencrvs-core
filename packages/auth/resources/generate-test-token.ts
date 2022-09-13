@@ -52,7 +52,7 @@ if (options.help) {
     },
     { header: 'Options', optionList }
   ])
-  // tslint:disable-next-line no-console
+  // eslint-disable-next-line no-console
   console.log(usage)
   process.exit(0)
 }
@@ -61,7 +61,7 @@ process.env.CONFIG_TOKEN_EXPIRY = options.expiresIn
 process.env.CERT_PRIVATE_KEY_PATH = join(__dirname, '../test/cert.key')
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, '../test/cert.key.pub')
 
-// tslint:disable-next-line no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { createToken } = require('@auth/features/authenticate/service')
 
 createToken(
@@ -70,6 +70,6 @@ createToken(
   options.audience,
   options.issuer
 ).then((token: string) =>
-  // tslint:disable-next-line no-console
+  // eslint-disable-next-line no-console
   console.log(token)
 )

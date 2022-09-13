@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { ResponsiveModal } from '@opencrvs/components/lib/interface'
+import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import {
   TertiaryButton,
   DangerButton,
@@ -29,7 +29,7 @@ import { FormFieldGenerator } from '@client/components/form'
 import styled from '@client/styledComponents'
 import { IFormSectionData } from '@client/forms'
 import { hasFormError } from '@client/forms/utils'
-import { ErrorText } from '@opencrvs/components/lib/forms/ErrorText'
+import { ErrorText } from '@opencrvs/components/lib/ErrorText'
 import { USER_AUDIT_ACTION } from '@client/user/queries'
 import { Dispatch } from 'redux'
 import {

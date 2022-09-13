@@ -12,7 +12,8 @@
 import { create } from '@storybook/theming'
 import { getTheme } from '@opencrvs/components/lib/theme'
 
-export const BRAND_BLUE = '#0058E0'
+export const BRAND_BLUE =
+  '#0058E0' /* Also see `main.ts`, if you're going to change this */
 
 const theme = getTheme()
 
@@ -24,5 +25,5 @@ export default create({
   brandUrl: 'https://opencrvs.org',
   brandImage: 'logo.png',
   brandTarget: '_self',
-  fontBase: theme.fonts.fontFamily
+  fontBase: theme.fontFamily
 })

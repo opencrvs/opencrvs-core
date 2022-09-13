@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import styled from '@client/styledComponents'
-import { ApolloQueryResult } from 'apollo-client'
+import { ApolloError, ApolloQueryResult } from 'apollo-client'
 import { ApolloConsumer } from 'react-apollo'
 // eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/browser'
@@ -22,10 +22,11 @@ import {
   IntlShape
 } from 'react-intl'
 import { buttonMessages } from '@client/i18n/messages'
-import { Spinner } from '@opencrvs/components/lib/interface'
+import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { Success, Error } from '@opencrvs/components/lib/icons'
 import { IQuery } from '@opencrvs/client/src/forms'
+import { isNavigatorOnline } from '@client/utils'
 
 interface IFetchButtonProps {
   id: string
@@ -137,7 +138,7 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
   }
 
   handleConnectionChange = () => {
-    const condition = navigator.onLine ? 'online' : 'offline'
+    const condition = isNavigatorOnline() ? 'online' : 'offline'
     if (condition === 'online') {
       return this.setState({ isDisconnected: false })
     }
@@ -174,7 +175,10 @@ class FetchButton extends React.Component<IFullProps, IFetchButtonState> {
         error: true,
         loading: false,
         success: false,
-        networkError: Boolean(error.networkError) ? true : false
+        networkError:
+          error instanceof ApolloError && Boolean(error.networkError)
+            ? true
+            : false
       })
     }
   }

@@ -20,19 +20,20 @@ import { AppStore } from '@client/store'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { History } from 'history'
+import { Mock, vi } from 'vitest'
 
 describe('date picker tests', () => {
   let component: ReactWrapper
   let store: AppStore
   let history: History
-  let onDatesChangeMock: jest.Mock
+  let onDatesChangeMock: Mock
 
   beforeEach(async () => {
-    Date.now = jest.fn(() => 1592233232409)
+    Date.now = vi.fn(() => 1592233232409)
     const appStore = await createTestStore()
     store = appStore.store
     history = appStore.history
-    onDatesChangeMock = jest.fn()
+    onDatesChangeMock = vi.fn()
     component = await createTestComponent(
       <DateRangePicker
         startDate={new Date(2020, 4, 16)}
