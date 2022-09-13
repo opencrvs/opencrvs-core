@@ -34,16 +34,17 @@ const Left = styled.div`
   flex: 1;
   gap: 16px;
   grid-column: 1;
+  overflow: hidden;
 `
 
 const Center = styled.div``
 
-const Actions = styled.div`
+const Actions = styled.div<{ $flex?: '1' | 'none' }>`
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: right;
-  flex: 1;
+  flex: ${({ $flex }) => $flex ?? '1'};
 `
 const Title = styled(Text)`
   white-space: nowrap;
@@ -67,6 +68,8 @@ export type IAppBarProps = IProps & React.HTMLAttributes<HTMLSpanElement>
 /**
  * `AppBar` is a header component usually used by `Frame`. It always either renders either mobile or desktop props.
  * The component gives flexibility on what is shown on either mobile or desktop.
+ *
+ * **Note:** You can only use either `desktopTitle` or `desktopCenter` at the same time.
  */
 export const AppBar = (props: IAppBarProps) => {
   const { width } = useWindowSize()
@@ -82,8 +85,10 @@ export const AppBar = (props: IAppBarProps) => {
             </Title>
           )}
         </Left>
-        <Center>{props.desktopCenter}</Center>
-        <Actions>{props.desktopRight}</Actions>
+        {!props.desktopTitle && <Center>{props.desktopCenter}</Center>}
+        <Actions $flex={props.desktopCenter ? '1' : 'none'}>
+          {props.desktopRight}
+        </Actions>
       </AppBarWrapper>
     )
   } else {
