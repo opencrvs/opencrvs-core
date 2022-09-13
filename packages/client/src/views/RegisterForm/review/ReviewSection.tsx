@@ -128,8 +128,10 @@ import { DocumentPreview } from '@client/components/form/DocumentUploadfield/Doc
 import { generateLocations } from '@client/utils/locationUtils'
 import {
   bytesToSize,
+  fatherDoesNotExistAndStateIsFather,
   isCorrection,
-  isFileSizeExceeded
+  isFileSizeExceeded,
+  motherDoesNotExistAndStateIsMother
 } from '@client/views/CorrectionForm/utils'
 import {
   ListViewSimplified,
@@ -1668,7 +1670,17 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                   })}
                   <LinkButton
                     id="edit-document"
-                    disabled={isCorrection(declaration)}
+                    disabled={
+                      isCorrection(declaration) ||
+                      motherDoesNotExistAndStateIsMother(
+                        declaration,
+                        sectionName
+                      ) ||
+                      fatherDoesNotExistAndStateIsFather(
+                        declaration,
+                        sectionName
+                      )
+                    }
                     onClick={() =>
                       this.editLinkClickHandlerForDraft(
                         documentsSection.id,
