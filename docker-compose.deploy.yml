@@ -237,6 +237,7 @@ services:
     environment:
       - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - MINIO_BUCKET_REGION=${MINIO_BUCKET_REGION}
     volumes:
       - '/data/minio:/usr/share/minio/data'
       - '/data/backups/minio:/data/backups/minio'

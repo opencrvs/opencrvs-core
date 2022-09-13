@@ -29,7 +29,7 @@ export async function documentUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const payload = JSON.parse(request.payload as string) as IDocumentPayload
+  const payload = request.payload as IDocumentPayload
   const ref = uuid()
   try {
     const base64String = payload.fileData.split(',')[1]

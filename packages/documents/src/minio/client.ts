@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { MINIO_HOST, MINIO_PORT } from '@documents/minio/constants'
+import {
+  MINIO_BUCKET,
+  MINIO_BUCKET_REGION,
+  MINIO_HOST,
+  MINIO_PORT
+} from '@documents/minio/constants'
 import * as Minio from 'minio'
 
 export const minioClient = new Minio.Client({
@@ -19,3 +24,35 @@ export const minioClient = new Minio.Client({
   accessKey: process.env.MINIO_USERNAME || 'minioadmin',
   secretKey: process.env.MINIO_PASSWORD || 'minioadmin'
 })
+
+export async function defaultMinioBucketExists() {
+  return minioClient.bucketExists(MINIO_BUCKET)
+}
+
+export async function createDefaultMinioBucket() {
+  const policy = `
+    {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+            "Action": [
+                "s3:GetObject"
+            ],
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                "*"
+                ]
+            },
+            "Resource": [
+                "arn:aws:s3:::${MINIO_BUCKET}/*"
+            ],
+            "Sid": ""
+            }
+        ]
+    }
+    `
+
+  await minioClient.makeBucket(MINIO_BUCKET, MINIO_BUCKET_REGION)
+  return minioClient.setBucketPolicy(MINIO_BUCKET, policy)
+}

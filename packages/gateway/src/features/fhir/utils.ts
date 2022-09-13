@@ -1302,27 +1302,21 @@ export function hasRequestCorrectionExtension(task: fhir.Task) {
   return extension
 }
 
-export const fetchDOCUMENTS = <T = any>(
+export const fetchDOCUMENTS = async <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
   method = 'GET',
-  body: string | undefined = undefined
+  body: any | undefined = undefined
 ): Promise<T> => {
-  return fetch(`${DOCUMENTS_URL}${suffix}`, {
+  const result = await fetch(`${DOCUMENTS_URL}${suffix}`, {
     method,
     headers: {
       ...authHeader
     },
     body
   })
-    .then((response) => {
-      return response.json()
-    })
-    .catch((error) => {
-      return Promise.reject(
-        new Error(`Documents Service request failed: ${error.message}`)
-      )
-    })
+  const res = await result.json()
+  return await res
 }
 
 export async function uploadBase64ToMinio(
@@ -1333,9 +1327,7 @@ export async function uploadBase64ToMinio(
     '/upload',
     authHeader,
     'POST',
-    JSON.stringify({
-      fileData: fileData
-    })
+    { fileData: fileData }
   )
 
   return docUploadResponse.refUrl

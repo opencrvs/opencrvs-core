@@ -24,7 +24,7 @@ import { MINIO_HOST, MINIO_PORT } from '@documents/minio/constants'
 import {
   defaultMinioBucketExists,
   createDefaultMinioBucket
-} from '@documents/utils'
+} from '@documents/minio/client'
 
 const publicCert = readFileSync(CERT_PUBLIC_KEY_PATH)
 
@@ -45,7 +45,7 @@ export async function createServer() {
     verifyOptions: {
       algorithms: ['RS256'],
       issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:metrics-user'
+      audience: 'opencrvs:documents-user'
     },
     validate: () => ({
       isValid: true
