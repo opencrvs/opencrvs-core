@@ -438,11 +438,17 @@ export async function markEventAsCertifiedHandler(
       payload.entry =
         payload &&
         payload.entry &&
-        payload.entry.map((e) => {
-          if (e.resource?.id === patientFromFhir.id) {
-            return { resource: patientFromFhir }
+        payload.entry.map((entry) => {
+          if (entry.resource?.id === patientFromFhir.id) {
+            return {
+              ...entry,
+              resource: {
+                ...entry.resource,
+                identifier: patientFromFhir.identifier
+              }
+            }
           } else {
-            return e
+            return entry
           }
         })
     }
