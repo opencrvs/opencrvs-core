@@ -122,7 +122,7 @@ export const Alert = ({
     )}
 
     {onClose && (
-      <Close id={props.id + '_cancel'} onClick={onClose}>
+      <Close id={props.id + 'Cancel'} onClick={onClose}>
         <Cross color="currentColor" />
       </Close>
     )}
