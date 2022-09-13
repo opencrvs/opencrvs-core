@@ -403,7 +403,7 @@ export function isValidOperationHistory(body: IBirthCompositionBody) {
   const validStatusMapping = {
     [ARCHIVED_STATUS]: [DECLARED_STATUS, REJECTED_STATUS, VALIDATED_STATUS],
     [IN_PROGRESS_STATUS]: [null],
-    [DECLARED_STATUS]: [ARCHIVED_STATUS, IN_PROGRESS_STATUS, null],
+    [DECLARED_STATUS]: [ARCHIVED_STATUS, null],
     [REJECTED_STATUS]: [
       DECLARED_STATUS,
       IN_PROGRESS_STATUS,
