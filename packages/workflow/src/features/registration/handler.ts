@@ -351,7 +351,6 @@ export async function markEventAsRegisteredCallbackHandler(
     // have time to complete indexing the previous waiting for external validation state before we update the search index with a BRN / DRN
     // If an external system is being used, then its processing time will mean a wait is not required.
     if (!VALIDATING_EXTERNALLY) {
-      // tslint:disable-next-line
       await new Promise((resolve) => setTimeout(resolve, 2000))
     }
     // Trigger an event for the registration

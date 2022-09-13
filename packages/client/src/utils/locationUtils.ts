@@ -102,7 +102,11 @@ function generateSearchableLocations(
   const generated: ISearchLocation[] = locations.map((location: ILocation) => {
     let locationName = generateLocationName(location, intl)
 
-    if (location.partOf && location.partOf !== 'Location/0') {
+    if (
+      location.partOf &&
+      location.partOf !== 'Location/0' &&
+      location.type !== 'CRVS_OFFICE'
+    ) {
       const locRef = location.partOf.split('/')[1]
       let parent
       if (

@@ -5,13 +5,21 @@
   "eslint.validate": [
     "javascript",
     "javascriptreact",
-    { "language": "typescript", "autoFix": true },
-    { "language": "typescriptreact", "autoFix": true }
+    {
+      "language": "typescript",
+      "autoFix": true
+    },
+    {
+      "language": "typescriptreact",
+      "autoFix": true
+    }
   ],
   "typescript.updateImportsOnFileMove.enabled": "always",
   "eslint.workingDirectories": [
-    { "directory": "./packages/client", "changeProcessCWD": true },
-    { "directory": "./packages/login", "changeProcessCWD": true }
+    {
+      "pattern": "./packages/*/",
+      "changeProcessCWD": true
+    }
   ],
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true

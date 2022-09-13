@@ -88,10 +88,8 @@ export default class ReactPanZoom extends React.PureComponent<
       mouseDown: false
     }
   }
-  // tslint:disable-next-line: member-ordering
   public state = this.getInitialState()
 
-  // tslint:disable-next-line: member-ordering
   public componentDidUpdate(prevProps: IReactPanZoomProps) {
     const { matrixData } = this.state
     if (matrixData[0] !== this.props.zoom) {
@@ -103,7 +101,6 @@ export default class ReactPanZoom extends React.PureComponent<
       })
     }
   }
-  // tslint:disable-next-line: member-ordering
   public reset = () => {
     const matrixData = [0.4, 0, 0, 0.4, 0, 0]
     this.setState({ matrixData })
@@ -112,7 +109,6 @@ export default class ReactPanZoom extends React.PureComponent<
     }
   }
 
-  // tslint:disable-next-line: member-ordering
   public onClick = (e: React.MouseEvent) => {
     if (this.state.comesFromDragging) {
       return
@@ -123,21 +119,17 @@ export default class ReactPanZoom extends React.PureComponent<
     }
   }
 
-  // tslint:disable-next-line: member-ordering
   public onTouchStart = (e: React.TouchEvent) => {
     const { pageX, pageY } = e.touches[0]
     this.panStart(pageX, pageY, e)
   }
-  // tslint:disable-next-line: member-ordering
   public onTouchEnd = (e: any) => {
     this.onMouseUp(e)
   }
-  // tslint:disable-next-line: member-ordering
   public onTouchMove = (e: React.TouchEvent) => {
     this.updateMousePosition(e.touches[0].pageX, e.touches[0].pageY)
   }
 
-  // tslint:disable-next-line: member-ordering
   public render() {
     return (
       <div

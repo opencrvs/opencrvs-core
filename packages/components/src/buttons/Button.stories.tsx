@@ -12,9 +12,8 @@
 import React from 'react'
 import { Story, Meta } from '@storybook/react'
 
-import { Button, IButtonProps } from './Button'
+import { Button, IButtonProps, ICON_ALIGNMENT } from './Button'
 import { MinusTransparent, PlusTransparent } from '../icons'
-import { ICON_ALIGNMENT } from './Button'
 
 const Template: Story<IButtonProps> = (args) => (
   <Button {...args}>{args.children}</Button>
