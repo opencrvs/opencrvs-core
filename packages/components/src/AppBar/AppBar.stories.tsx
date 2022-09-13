@@ -18,10 +18,13 @@ import {
   ForwardArrowDeepBlue,
   Hamburger,
   HelpBlue,
-  DeclarationIcon
+  DeclarationIcon,
+  SearchBlue,
+  Phone,
+  BRN,
+  TrackingID
 } from '../icons'
 import { Stack } from '../Stack'
-import { SearchBlueIcon } from '../icons/SearchBlue.stories'
 import { SearchTool } from '../SearchTool'
 import { noop } from 'lodash'
 
@@ -73,11 +76,7 @@ Home.args = {
     </CircleButton>
   ),
   mobileTitle: 'Search',
-  mobileRight: (
-    <CircleButton>
-      <SearchBlueIcon />
-    </CircleButton>
-  ),
+  mobileRight: <SearchBlue />,
   desktopLeft: (
     <Stack gap={8}>
       <CircleButton>
@@ -95,22 +94,22 @@ Home.args = {
       searchHandler={noop}
       searchTypeList={[
         {
-          icon: noop,
-          invertIcon: noop,
+          icon: <TrackingID />,
+          invertIcon: <TrackingID />,
           label: 'Tracking ID',
           placeHolderText: 'Search',
           value: 'Tracking ID'
         },
         {
-          icon: noop,
-          invertIcon: noop,
+          icon: <BRN />,
+          invertIcon: <BRN />,
           label: 'BRN/DRN',
           placeHolderText: 'Search',
           value: 'BRN/DRN'
         },
         {
-          icon: noop,
-          invertIcon: noop,
+          icon: <Phone />,
+          invertIcon: <Phone />,
           label: 'Phone no.',
           placeHolderText: 'Search',
           value: 'Phone no.'
