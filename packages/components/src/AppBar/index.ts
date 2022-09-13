@@ -9,18 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
-import { EventTopBar, IEventTopBarProps } from './EventTopBar'
-import React from 'react'
-
-const Template: Story<IEventTopBarProps> = (args) => <EventTopBar {...args} />
-export const EventTopBarView = Template.bind({})
-EventTopBarView.args = {
-  id: 'Event Top Bar',
-  title: 'Event Title'
-}
-
-export default {
-  title: 'Layout/Header/Event header',
-  component: EventTopBar
-} as Meta
+export * from './AppBar'

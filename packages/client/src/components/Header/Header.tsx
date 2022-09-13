@@ -59,12 +59,8 @@ import {
   SearchBlue,
   AddUser
 } from '@opencrvs/components/lib/icons'
-import {
-  AppHeader,
-  IDomProps,
-  ISearchType,
-  SearchTool
-} from '@opencrvs/components/lib/interface'
+import { AppHeader, IDomProps } from '@opencrvs/components/lib/AppHeader'
+import { SearchTool, ISearchType } from '@opencrvs/components/lib/SearchTool'
 import { ExpandingMenu } from '@opencrvs/components/lib/ExpandingMenu'
 import { ITheme } from '@opencrvs/components/lib/theme'
 import * as React from 'react'
@@ -154,38 +150,13 @@ const StyledPrimaryButton = styled(PrimaryButton)`
   }
 `
 
-const SearchBox = styled.div`
+const Search = styled(SearchTool)`
   position: static;
-  width: 664px;
-  height: 40px;
   left: calc(50% - 624px / 2 + 24px);
   top: calc(50% - 40px / 2);
-  background: ${({ theme }) => theme.colors.grey200};
-  box-sizing: border-box;
-  border-radius: 40px;
   margin: 0px 80px 0px 12px;
-  &:hover {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
-  }
-
-  &:focus-within {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
-    background: ${({ theme }) => theme.colors.white};
-  }
-  &:active {
-    outline: 1px solid ${({ theme }) => theme.colors.grey600};
-  }
-  &:focus-within input {
-    background: ${({ theme }) => theme.colors.white};
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.xl}px) {
-    width: 100%;
-  }
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    width: 100%;
-    margin: auto;
-  }
 `
+
 const HeaderCenter = styled.div`
   padding: 8px 16px;
   height: 40px;
@@ -445,18 +416,16 @@ class HeaderComp extends React.Component<IFullProps, IState> {
     ]
 
     return (
-      <SearchBox>
-        <SearchTool
-          key="searchMenu"
-          language={language}
-          searchText={searchText}
-          selectedSearchType={selectedSearchType}
-          searchTypeList={searchTypeList}
-          searchHandler={(text, type) =>
-            props.goToSearchResult(text, type, isMobile)
-          }
-        />
-      </SearchBox>
+      <Search
+        key="searchMenu"
+        language={language}
+        searchText={searchText}
+        selectedSearchType={selectedSearchType}
+        searchTypeList={searchTypeList}
+        searchHandler={(text, type) =>
+          props.goToSearchResult(text, type, isMobile)
+        }
+      />
     )
   }
 

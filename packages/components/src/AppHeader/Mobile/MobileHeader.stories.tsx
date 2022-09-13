@@ -10,12 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { Hamburger, SearchDark } from '../../../icons'
+import { Hamburger, SearchDark } from '../../icons'
 import { MobileHeader, IMobileHeaderProps } from './MobileHeader'
 import React from 'react'
 
 export default {
-  title: 'Layout/Header/Mobile/MobileHeader',
+  title: 'Deprecated/Header/Mobile/MobileHeader',
   component: MobileHeader
 } as Meta
 

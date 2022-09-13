@@ -10,7 +10,6 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { colors } from '../colors'
 
 export const BRN = (props: React.HTMLAttributes<SVGElement>) => {
   return (
@@ -21,7 +20,7 @@ export const BRN = (props: React.HTMLAttributes<SVGElement>) => {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <g clip-path="url(#clip0_5955_18252)">
+      <g clipPath="url(#clip0_5955_18252)">
         <path
           fillRule="evenodd"
           clipRule="evenodd"

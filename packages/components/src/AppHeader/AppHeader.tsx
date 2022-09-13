@@ -11,7 +11,7 @@
  */
 import * as React from 'react'
 import { DesktopHeader, IDesktopHeaderProps } from './Desktop/DesktopHeader'
-import { grid } from '../../grid'
+import { grid } from '../grid'
 import { MobileHeader, IMobileHeaderProps } from './Mobile/MobileHeader'
 
 export interface IDomProps {

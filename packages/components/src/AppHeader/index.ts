@@ -9,14 +9,4 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { Meta, Story } from '@storybook/react'
-import { DesktopHeader, IDesktopHeaderProps } from './DesktopHeader'
-import React from 'react'
-
-export default {
-  title: 'Layout/Header/Desktop/DesktopHeader',
-  component: DesktopHeader
-} as Meta
-
-const Template: Story<IDesktopHeaderProps> = (args) => <DesktopHeader />
-export const DesktopHeaderView = Template.bind({})
+export * from './AppHeader'

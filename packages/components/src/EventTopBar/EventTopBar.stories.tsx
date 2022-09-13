@@ -9,16 +9,18 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import styled from 'styled-components'
+import { Meta, Story } from '@storybook/react'
+import { EventTopBar, IEventTopBarProps } from './EventTopBar'
+import React from 'react'
 
-export const Header = styled.section`
-  display: flex;
-  flex-direction: column;
+const Template: Story<IEventTopBarProps> = (args) => <EventTopBar {...args} />
+export const EventTopBarView = Template.bind({})
+EventTopBarView.args = {
+  id: 'Event Top Bar',
+  title: 'Event Title'
+}
 
-  color: ${({ theme }) => theme.colors.white};
-
-  overflow: visible;
-  ${({ theme }) => theme.gradients.primary};
-  ${({ theme }) => theme.shadows.light};
-  position: relative;
-`
+export default {
+  title: 'Deprecated/Header/Event header',
+  component: EventTopBar
+} as Meta

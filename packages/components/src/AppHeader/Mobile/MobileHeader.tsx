@@ -10,9 +10,9 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import { Hamburger } from '../../../icons/Hamburger'
+import { Hamburger } from '../../icons/Hamburger'
 import styled from 'styled-components'
-import { CircleButton } from '../../../buttons'
+import { CircleButton } from '../../buttons'
 import { IDomProps } from '../AppHeader'
 
 interface IMenuAction {

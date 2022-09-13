@@ -31,7 +31,8 @@ import {
 } from '@opencrvs/components/lib/icons'
 import styled from 'styled-components'
 import { LinkButton } from '@opencrvs/components/lib/buttons'
-import { LoadingGrey, TableView } from '@opencrvs/components/lib/interface'
+import { LoadingGrey } from '@opencrvs/components/lib/ListTable'
+import { TableView } from '@opencrvs/components/lib/Table'
 import {
   NOTIFICATION_TYPE,
   ToastNotification

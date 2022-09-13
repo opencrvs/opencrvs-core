@@ -9,91 +9,89 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import { css } from 'styled-components'
-
 export const family = "'Noto Sans', sans-serif"
 
 /* stylelint-disable opencrvs/no-font-styles */
-const hero = css`
+const hero = `
   font-family: ${family};
   font-weight: 600;
   font-size: 56px;
   line-height: 120%;
 `
-const h1 = css`
+const h1 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 36px;
   line-height: 120%;
 `
-const h2 = css`
+const h2 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 24px;
   line-height: 140%;
 `
-const h3 = css`
+const h3 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 21px;
   line-height: 140%;
 `
-const h4 = css`
+const h4 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 18px;
   line-height: 140%;
 `
-const reg18 = css`
+const reg18 = `
   font-family: ${family};
   font-weight: 400;
   font-size: 18px;
   line-height: 140%;
 `
 
-const bold18 = css`
+const bold18 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 18px;
   line-height: 140%;
 `
 
-const reg16 = css`
+const reg16 = `
   font-family: ${family};
   font-weight: 400;
   font-size: 16px;
   line-height: 140%;
 `
 
-const bold16 = css`
+const bold16 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 16px;
   line-height: 140%;
 `
 
-const reg14 = css`
+const reg14 = `
   font-family: ${family};
   font-weight: 400;
   font-size: 14px;
   line-height: 140%;
 `
 
-const bold14 = css`
+const bold14 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 14px;
   line-height: 140%;
 `
 
-const reg12 = css`
+const reg12 = `
   font-family: ${family};
   font-weight: 400;
   font-size: 12px;
   line-height: 140%;
 `
 
-const bold12 = css`
+const bold12 = `
   font-family: ${family};
   font-weight: 600;
   font-size: 12px;
