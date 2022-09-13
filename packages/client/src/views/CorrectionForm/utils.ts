@@ -36,7 +36,8 @@ import {
   TEXTAREA,
   WARNING,
   LOCATION_SEARCH_INPUT,
-  IAttachmentValue
+  IAttachmentValue,
+  Section
 } from '@client/forms'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { Errors, getValidationErrorsForForm } from '@client/forms/validation'
@@ -96,6 +97,24 @@ export function isCorrection(declaration: IDeclaration) {
   return (
     registrationStatus === SUBMISSION_STATUS.REGISTERED ||
     registrationStatus === SUBMISSION_STATUS.CERTIFIED
+  )
+}
+
+export function motherDoesNotExistAndStateIsMother(
+  declaration: IDeclaration,
+  activeState: string
+) {
+  return (
+    !Boolean(declaration.data.mother.detailsExist) && activeState === 'mother'
+  )
+}
+
+export function fatherDoesNotExistAndStateIsFather(
+  declaration: IDeclaration,
+  activeState: string
+) {
+  return (
+    !Boolean(declaration.data.father.detailsExist) && activeState === 'father'
   )
 }
 
