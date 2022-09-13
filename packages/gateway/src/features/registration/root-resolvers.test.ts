@@ -1811,7 +1811,7 @@ describe('Registration root resolvers', () => {
           { id: compositionID },
           authHeaderRegCert
         )
-      ).rejects.toThrowError('ASSIGNMENT_PROBLEM')
+      ).rejects.toThrowError('User has been unassigned')
     })
 
     it("throws an error when the user doesn't have register scope", async () => {
@@ -2049,20 +2049,19 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
         [JSON.stringify(mockUserDetails)],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Patient/12423/_history/1' }
+              }
+            ]
+          })
+        ],
         [JSON.stringify(mockUserDetails)]
       )
-      fetch.mockResponseOnce([
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Patient/12423/_history/1' }
-            }
-          ]
-        })
-      ])
       const id = 'df3fb104-4c2c-486f-97b3-edbeabcd4422'
       const result = await resolvers.Mutation.markBirthAsCertified(
         {},
@@ -2080,7 +2079,6 @@ describe('Registration root resolvers', () => {
 
     it("throws an error when the response isn't what we expect", async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
         [JSON.stringify(mockUserDetails)],
         [JSON.stringify(mockUserDetails)]
       )
@@ -2136,20 +2134,20 @@ describe('Registration root resolvers', () => {
     }
     it('posts a fhir bundle', async () => {
       fetch.mockResponses(
-        [JSON.stringify(mockTaskBundle)],
         [JSON.stringify(mockUserDetails)],
+        [
+          JSON.stringify({
+            resourceType: 'Bundle',
+            entry: [
+              {
+                response: { location: 'Task/12423/_history/1' }
+              }
+            ]
+          })
+        ],
         [JSON.stringify(mockUserDetails)]
       )
-      fetch.mockResponseOnce(
-        JSON.stringify({
-          resourceType: 'Bundle',
-          entry: [
-            {
-              response: { location: 'Task/12423/_history/1' }
-            }
-          ]
-        })
-      )
+
       const result = await resolvers.Mutation.markDeathAsCertified(
         {},
         { details },
