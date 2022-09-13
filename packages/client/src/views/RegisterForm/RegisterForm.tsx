@@ -20,7 +20,8 @@ import {
   ICON_ALIGNMENT,
   PrimaryButton,
   TertiaryButton,
-  SecondaryButton
+  SecondaryButton,
+  DangerButton
 } from '@opencrvs/components/lib/buttons'
 import { BackArrow } from '@opencrvs/components/lib/icons'
 import {
@@ -212,6 +213,7 @@ type State = {
   rejectFormOpen: boolean
   hasError: boolean
   showConfirmationModal: boolean
+  confirmDeleteDeclarationModal: boolean
   isFileUploading: boolean
   startTime: number
 }
@@ -242,6 +244,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       rejectFormOpen: false,
       hasError: false,
       showConfirmationModal: false,
+      confirmDeleteDeclarationModal: false,
       isFileUploading: false,
       startTime: 0
     }
@@ -400,6 +403,12 @@ class RegisterFormView extends React.Component<FullProps, State> {
   toggleConfirmationModal = () => {
     this.setState((prevState) => ({
       showConfirmationModal: !prevState.showConfirmationModal
+    }))
+  }
+
+  toggleConfirmDeleteModalOpen = () => {
+    this.setState((prevState) => ({
+      confirmDeleteDeclarationModal: !prevState.confirmDeleteDeclarationModal
     }))
   }
 
@@ -604,7 +613,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
       declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
         ? {
             label: intl.formatMessage(buttonMessages.deleteDeclaration),
-            handler: () => this.onDeleteDeclaration(declaration)
+            handler: () => this.toggleConfirmDeleteModalOpen()
           }
         : {
             label: intl.formatMessage(buttonMessages.closeDeclaration),
@@ -618,6 +627,7 @@ class RegisterFormView extends React.Component<FullProps, State> {
             this.logTime(duration)
           }}
         ></TimeMounted>
+
         <StyledContainer
           className={PAGE_TRANSITIONS_CLASSNAME}
           id="informant_parent_view"
@@ -905,6 +915,37 @@ class RegisterFormView extends React.Component<FullProps, State> {
           >
             {intl.formatMessage(
               messages.saveDeclarationConfirmModalDescription
+            )}
+          </ResponsiveModal>
+
+          <ResponsiveModal
+            id="delete_declaration_confirmation"
+            title={intl.formatMessage(
+              messages.deleteDeclarationConfirmModalTitle
+            )}
+            show={this.state.confirmDeleteDeclarationModal}
+            handleClose={this.toggleConfirmDeleteModalOpen}
+            responsive={false}
+            contentHeight={80}
+            actions={[
+              <TertiaryButton
+                id="cancel_delete"
+                key="cancel_delete"
+                onClick={this.toggleConfirmDeleteModalOpen}
+              >
+                {intl.formatMessage(buttonMessages.cancel)}
+              </TertiaryButton>,
+              <DangerButton
+                id="confirm_delete"
+                key="confirm_delete"
+                onClick={() => this.onDeleteDeclaration(declaration)}
+              >
+                {intl.formatMessage(buttonMessages.delete)}
+              </DangerButton>
+            ]}
+          >
+            {intl.formatMessage(
+              messages.deleteDeclarationConfirmModalDescription
             )}
           </ResponsiveModal>
         </StyledContainer>

@@ -13,6 +13,25 @@ import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/typ
 import { COLUMNS, SORT_ORDER } from '@opencrvs/components/lib/interface'
 import { orderBy } from 'lodash'
 import { ITaskHistory } from '@client/declarations'
+import { GQLEventSearchResultSet } from '@opencrvs/gateway/src/graphql/schema'
+export interface IQueryData {
+  inProgressTab: GQLEventSearchResultSet
+  notificationTab: GQLEventSearchResultSet
+  reviewTab: GQLEventSearchResultSet
+  rejectTab: GQLEventSearchResultSet
+  approvalTab: GQLEventSearchResultSet
+  printTab: GQLEventSearchResultSet
+  externalValidationTab: GQLEventSearchResultSet
+}
+
+export const EVENT_STATUS = {
+  IN_PROGRESS: 'IN_PROGRESS',
+  DECLARED: 'DECLARED',
+  VALIDATED: 'VALIDATED',
+  REGISTERED: 'REGISTERED',
+  REJECTED: 'REJECTED',
+  WAITING_VALIDATION: 'WAITING_VALIDATION'
+}
 
 export const getSortedItems = (
   items: IDynamicValues[],

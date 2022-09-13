@@ -11,11 +11,66 @@
  */
 import { FORGOTTEN_ITEMS } from '@login/login/actions'
 import * as routes from '@login/navigation/routes'
-import { createTestApp, wait } from '@login/tests/util'
-import { client } from '@login/utils/authApi'
+import { createTestApp, flushPromises, waitFor } from '@login/tests/util'
+import { rest } from 'msw'
+import { setupServer } from 'msw/node'
 import { ReactWrapper } from 'enzyme'
 import { History } from 'history'
-import * as moxios from 'moxios'
+
+//mock api calls
+const server = setupServer(
+  rest.get(
+    `${window.config.COUNTRY_CONFIG_URL}/content/login`,
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          languages: [
+            {
+              lang: 'en',
+              displayName: 'Français',
+              messages: {
+                defaultMessage: 'Bangladesh'
+              }
+            }
+          ]
+        })
+      )
+    }
+  ),
+  rest.get(`${window.config.CONFIG_API_URL}/loginConfig`, (req, res, ctx) => {
+    return res(
+      ctx.json({
+        config: {
+          APPLICATION_NAME: 'Dummy App',
+          COUNTRY: 'FAR',
+          COUNTRY_LOGO: {
+            fileName: 'dummy-file-name',
+            file: 'dummy-logo'
+          },
+          SENTRY: '',
+          LOGROCKET: ''
+        }
+      })
+    )
+  }),
+  rest.post(`${window.config.AUTH_API_URL}/verifyUser`, (req, res, ctx) => {
+    return res(
+      ctx.json({
+        nonce: 'KkcVYTRVC6usF7Vjdi3FSw==',
+        securityQuestionKey: 'FAVORITE_MOVIE'
+      })
+    )
+  })
+)
+
+// Enable API mocking before tests.
+beforeAll(() => server.listen())
+
+// Reset any runtime request handlers we may add during the tests.
+afterEach(() => server.resetHandlers())
+
+// Disable API mocking after the tests are done.
+afterAll(() => server.close())
 
 describe('Test phone number verification form', () => {
   let app: ReactWrapper
@@ -85,14 +140,10 @@ describe('Test phone number verification form', () => {
 
   describe('Valid submission', () => {
     beforeEach(() => {
-      moxios.install(client)
       history.replace(routes.PHONE_NUMBER_VERIFICATION, {
         forgottenItem: FORGOTTEN_ITEMS.USERNAME
       })
       app.update()
-    })
-    afterEach(() => {
-      moxios.uninstall(client)
     })
 
     it("doesn't shows field error when valid phone number is given", () => {
@@ -103,67 +154,62 @@ describe('Test phone number verification form', () => {
       expect(app.find('#phone-number_error').hostNodes()).toHaveLength(0)
     })
 
-    it('continue button call valid endpoint when valid phone number is given', async () => {
+    it('continue button will redirect to SECURITY_QUESTION route', async () => {
       app
         .find('#phone-number-input')
         .hostNodes()
-        .simulate('change', { target: { value: '01711111111' } })
+        .simulate('change', { target: { value: '01755555155' } })
       app.find('#continue').hostNodes().simulate('submit')
-      await wait()
-
-      const request = moxios.requests.mostRecent()
-      expect(request.url).toMatch(/verifyUser/)
+      await flushPromises()
+      await waitFor(() =>
+        window.location.pathname.includes(routes.SECURITY_QUESTION)
+      )
+      expect(window.location.pathname).toContain(routes.SECURITY_QUESTION)
+    })
+    it('continue button will redirect to RECOVERY_CODE_ENTRY route', async () => {
+      //change verifyUser api response
+      server.use(
+        rest.post(
+          `${window.config.AUTH_API_URL}/verifyUser`,
+          (req, res, ctx) => {
+            return res(
+              ctx.status(200),
+              ctx.json({
+                nonce: 'KkcVYTRVC6usF7Vjdi3FSw=='
+              })
+            )
+          }
+        )
+      )
+      app
+        .find('#phone-number-input')
+        .hostNodes()
+        .simulate('change', { target: { value: '01755555155' } })
+      app.update()
+      app.find('#continue').hostNodes().simulate('submit')
+      await flushPromises()
+      app.update()
+      await waitFor(() =>
+        window.location.pathname.includes(routes.RECOVERY_CODE_ENTRY)
+      )
+      expect(window.location.pathname).toContain(routes.RECOVERY_CODE_ENTRY)
     })
   })
 
   describe('Valid phone number, invalid submission', () => {
-    beforeEach(() => {
-      moxios.install(client)
-    })
-    afterEach(() => {
-      moxios.uninstall(client)
-    })
-
-    it('should show error message', (done) => {
-      history.replace(routes.PHONE_NUMBER_VERIFICATION, {
-        forgottenItem: FORGOTTEN_ITEMS.PASSWORD
-      })
-      app.update()
-      app
-        .find('#phone-number-input')
-        .hostNodes()
-        .simulate('change', { target: { value: '01712345679' } })
-      app.find('#continue').hostNodes().simulate('submit')
-      app.update()
-
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            err: {
-              response: {
-                status: 401
-              }
-            }
-          })
-          .then(() => {
-            app.update()
-            expect(app.find('#phone-number_error').hostNodes()).toHaveLength(1)
-            done()
-          })
-      })
-    })
-  })
-
-  describe('Form redirection', () => {
-    beforeEach(() => {
-      moxios.install(client)
-    })
-    afterEach(() => {
-      moxios.uninstall(client)
-    })
-
-    it('redirects to security question form when username is chosen as forgotten item', (done) => {
+    it('should show error message if number is not found', async () => {
+      //change verifyUser api response
+      server.use(
+        rest.post(
+          `${window.config.AUTH_API_URL}/verifyUser`,
+          (req, res, ctx) => {
+            return res(
+              ctx.status(401),
+              ctx.json({ message: 'Internal Server Error' })
+            )
+          }
+        )
+      )
       history.replace(routes.PHONE_NUMBER_VERIFICATION, {
         forgottenItem: FORGOTTEN_ITEMS.USERNAME
       })
@@ -171,51 +217,13 @@ describe('Test phone number verification form', () => {
       app
         .find('#phone-number-input')
         .hostNodes()
-        .simulate('change', { target: { value: '01712345678' } })
+        .simulate('change', { target: { value: '01755555155' } })
       app.find('#continue').hostNodes().simulate('submit')
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 200,
-            response: {
-              nonce: 'KkcVYTRVC6usF7Vjdi3FSw==',
-              securityQuestionKey: 'FAVORITE_SONG'
-            }
-          })
-          .then(() => {
-            expect(window.location.pathname).toContain(routes.SECURITY_QUESTION)
-            done()
-          })
-      })
-    })
-
-    it('redirects to recovery code entry form form when password is chosen as forgotten item', (done) => {
-      history.replace(routes.PHONE_NUMBER_VERIFICATION, {
-        forgottenItem: FORGOTTEN_ITEMS.PASSWORD
-      })
+      await waitFor(() => !!app.find('#phone-number_error').hostNodes())
       app.update()
-      app
-        .find('#phone-number-input')
-        .hostNodes()
-        .simulate('change', { target: { value: '01712345678' } })
-      app.find('#continue').hostNodes().simulate('submit')
-      moxios.wait(() => {
-        const request = moxios.requests.mostRecent()
-        request
-          .respondWith({
-            status: 200,
-            response: {
-              nonce: 'KkcVYTRVC6usF7Vjdi3FSw=='
-            }
-          })
-          .then(() => {
-            expect(window.location.pathname).toContain(
-              routes.RECOVERY_CODE_ENTRY
-            )
-            done()
-          })
-      })
+      expect(app.find('#phone-number_error').hostNodes().text()).toBe(
+        'Mobile phone number not found.'
+      )
     })
   })
 })

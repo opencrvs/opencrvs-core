@@ -33,10 +33,10 @@ import {
 import { Event } from '@client/utils/gateway'
 import { countries } from '@client/forms/countries'
 import { OFFLINE_LOCATIONS_KEY, LocationType } from '@client/offline/reducer'
-
 import { formMessages } from '@client/i18n/messages'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { phoneNumberFormat, dateNotInFuture } from '@client/utils/validate'
+import { vi } from 'vitest'
 
 export interface IMotherSectionFormData {
   firstName: string
@@ -49,7 +49,7 @@ describe('form component', () => {
     const { store, history } = createStore()
     const draft = createDeclaration(Event.Birth)
     store.dispatch(storeDeclaration(draft))
-    const modifyDraft = jest.fn()
+    const modifyDraft = vi.fn()
     component = await createTestComponent(
       <FormFieldGenerator
         id="mother"
@@ -151,7 +151,7 @@ describe('form component', () => {
 
 describe('when field definition has location search input', () => {
   let component: ReactWrapper<{}, {}>
-  const modifyDraft = jest.fn()
+  const modifyDraft = vi.fn()
 
   beforeEach(async () => {
     const { store, history } = createStore()
@@ -221,7 +221,7 @@ describe('when user is in the register section', () => {
     const { store, history } = createStore()
     const draft = createDeclaration(Event.Birth)
     store.dispatch(storeDeclaration(draft))
-    const modifyDraft = jest.fn()
+    const modifyDraft = vi.fn()
     component = await createTestComponent(
       <FormFieldGenerator
         id="registration"
@@ -262,7 +262,7 @@ describe('when field definition has nested fields', () => {
     const { store, history } = createStore()
     const draft = createDeclaration(Event.Birth)
     store.dispatch(storeDeclaration(draft))
-    const modifyDraft = jest.fn()
+    const modifyDraft = vi.fn()
     component = await createTestComponent(
       <FormFieldGenerator
         id="registration"
@@ -397,7 +397,7 @@ describe('when field definition has nested fields', () => {
 
 describe('when field definition has date field', () => {
   let component: ReactWrapper<{}, {}>
-  const modifyDraft = jest.fn()
+  const modifyDraft = vi.fn()
   const FUTURE_DATE = new Date(2020, 11, 7)
 
   async function updateDateField(
@@ -432,7 +432,7 @@ describe('when field definition has date field', () => {
   }
 
   beforeAll(() => {
-    Date.now = jest.fn(() => 1603367390211)
+    Date.now = vi.fn(() => 1603367390211)
   })
 
   describe('in case of static date field', () => {
@@ -470,7 +470,7 @@ describe('when field definition has date field', () => {
 
 describe('when field definition has number field', () => {
   let component: ReactWrapper<{}, {}>
-  const modifyDraftMock = jest.fn()
+  const modifyDraftMock = vi.fn()
 
   beforeEach(async () => {
     const { store, history } = createStore()
@@ -498,7 +498,7 @@ describe('when field definition has number field', () => {
   })
 
   it('field does not take input of non numeric characters', async () => {
-    const eventPreventDefaultMock = jest.fn()
+    const eventPreventDefaultMock = vi.fn()
     const numberInputElement = await waitForElement(
       component,
       'input#multipleBirth'
@@ -514,8 +514,8 @@ describe('when field definition has number field', () => {
 
 describe('when field definition has select field on mobile device', () => {
   let component: ReactWrapper<{}, {}>
-  const modifyDraftMock = jest.fn()
-  const scrollMock = jest.fn()
+  const modifyDraftMock = vi.fn()
+  const scrollMock = vi.fn()
 
   beforeAll(async () => {
     resizeWindow(412, 755)

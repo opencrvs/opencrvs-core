@@ -419,7 +419,6 @@ async function updateCompositionWithDuplicates(
   duplicates: string[]
 ) {
   const duplicateCompositions = await Promise.all(
-    // tslint:disable-next-line
     duplicates.map((duplicate) => getCompositionById(duplicate))
   )
 

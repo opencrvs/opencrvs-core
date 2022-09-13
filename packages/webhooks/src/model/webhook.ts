@@ -34,7 +34,7 @@ export interface IWebhook {
   sha_secret: string
   trigger: string
 }
-// tslint:disable-next-line
+
 export const ClientSchema = new Schema(
   {
     client_id: String,

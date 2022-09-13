@@ -30,7 +30,7 @@ interface ISearchDataTemplate {
   [key: string]: any
 }
 export interface ISearchCriteria {
-  declarationLocationId?: string[]
+  declarationLocationId?: string[] | string
   declarationLocationHirarchyId?: string
   status?: string[]
   type?: string[]
@@ -114,7 +114,6 @@ const getDeceasedName = (source: ISearchDataTemplate) => {
 
 export const searchTypeResolvers: GQLResolver = {
   EventSearchSet: {
-    // tslint:disable-next-line
     __resolveType(obj: ISearchEventDataTemplate) {
       if (obj._type === 'compositions' && obj._source.event === 'Birth') {
         return 'BirthEventSearchSet'

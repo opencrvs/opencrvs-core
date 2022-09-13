@@ -14,8 +14,9 @@ import { createTestComponent, validToken } from '@client/tests/util'
 import { createStore } from '@client/store'
 import { checkAuth } from '@client/profile/profileActions'
 import { SetupConfirmationPage } from '@client/views/UserSetup/SetupConfirmationPage'
+import { Mock } from 'vitest'
 
-const getItem = window.localStorage.getItem as jest.Mock
+const getItem = window.localStorage.getItem as Mock
 
 describe('Setup confirmation page tests', () => {
   const { store, history } = createStore()

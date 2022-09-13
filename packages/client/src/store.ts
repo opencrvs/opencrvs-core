@@ -115,11 +115,9 @@ export const createStore = <T>(
     applyMiddleware(routerMiddleware(history)),
     // @ts-ignore types are not correct for this module yet
     applyMiddleware(createSentryMiddleware(Sentry)),
-    // tslint:disable no-any
     typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
       ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
       : (f: any) => f
-    // tslint:enable no-any
   ) as StoreEnhancer<IStoreState>
 
   const store = enhancedCreateStore<IStoreState, AnyAction>(

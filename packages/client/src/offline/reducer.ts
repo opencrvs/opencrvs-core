@@ -37,6 +37,7 @@ import {
   ISVGTemplate
 } from '@client/pdfRenderer/transformer/types'
 import { find, merge } from 'lodash'
+import { isNavigatorOnline } from '@client/utils'
 export const OFFLINE_LOCATIONS_KEY = 'locations'
 export const OFFLINE_FACILITIES_KEY = 'facilities'
 
@@ -307,11 +308,35 @@ function reducer(
           },
           Cmd.list([
             // Try loading data regardless as it might have been updated.
-            navigator.onLine ? dataLoadingCmds : Cmd.none
+            isNavigatorOnline() ? dataLoadingCmds : Cmd.none
           ])
         )
       }
       return loop(state, dataLoadingCmds)
+    }
+    case actions.UPDATE_OFFLINE_CERTIFICATE: {
+      const { templates } = state.offlineData
+      const { certificate } = action.payload
+      if (!templates || !templates.certificates) return state
+      else
+        return {
+          ...state,
+          offlineData: {
+            ...state.offlineData,
+            templates: {
+              ...templates,
+              certificates: {
+                ...templates.certificates,
+                [certificate.event]: {
+                  ...templates.certificates[certificate.event],
+                  definition: certificate.svgCode,
+                  fileName: certificate.svgFilename,
+                  lastModifiedDate: certificate.svgDateUpdated
+                }
+              }
+            }
+          }
+        }
     }
     case actions.UPDATE_OFFLINE_CONFIG: {
       merge(window.config, action.payload.config)
