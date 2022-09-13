@@ -60,7 +60,7 @@ import { messages as statusMessages } from '@client/i18n/messages/views/registra
 import { colors } from '@opencrvs/components/lib/colors'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { TableView } from '@opencrvs/components/lib/interface/TableView'
+import { TableView } from '@opencrvs/components/lib/Table'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 
 const ToolTipContainer = styled.span`

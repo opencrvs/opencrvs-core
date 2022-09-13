@@ -18,7 +18,7 @@ import { WorkqueueRowMobile } from './components/WorkqueueRowMobile'
 import { ITheme } from '../theme'
 import { SortIcon } from '../icons/SortIcon'
 import { IAction } from '../common-types'
-import { ListItemAction } from '../interface/GridTable/ListItemAction'
+import { ListItemAction } from './components/ListItemAction'
 
 const Wrapper = styled.div`
   width: 100%;

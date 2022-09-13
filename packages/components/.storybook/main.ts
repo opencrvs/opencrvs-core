@@ -30,9 +30,6 @@ const viteFinal: ViteFinal = async (config) => {
 
 const config = {
   viteFinal,
-  typescript: {
-    reactDocgen: 'react-docgen'
-  },
   stories: [
     '../@(src|stories)/**/*.stories.mdx',
     '../@(src|stories)/**/*.stories.@(js|jsx|ts|tsx)'
@@ -58,4 +55,4 @@ const config = {
   }
 }
 
-module.exports = config
+export default config

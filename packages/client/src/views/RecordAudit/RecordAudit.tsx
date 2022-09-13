@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import React from 'react'
-import { Header } from '@client/components/interface/Header/Header'
+import { Header } from '@client/components/Header/Header'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import {
   Navigation,
@@ -53,10 +53,6 @@ import { IStoreState } from '@client/store'
 import { GQLEventSearchSet } from '@opencrvs/gateway/src/graphql/schema'
 import { getOfflineData } from '@client/offline/selectors'
 import { IOfflineData } from '@client/offline/reducer'
-import {
-  PageHeader,
-  IPageHeaderProps
-} from '@opencrvs/components/lib/interface'
 import { Toast } from '@opencrvs/components/lib/Toast'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { Loader } from '@opencrvs/components/lib/Loader'
@@ -122,6 +118,7 @@ import {
 import { selectDeclaration } from '@client/declarations/selectors'
 import { errorMessages } from '@client/i18n/messages/errors'
 import { Frame } from '@opencrvs/components/lib/Frame'
+import { AppBar, IAppBarProps } from '@opencrvs/components/lib/AppBar'
 
 const DesktopHeader = styled(Header)`
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
@@ -129,7 +126,7 @@ const DesktopHeader = styled(Header)`
   }
 `
 
-const MobileHeader = styled(PageHeader)`
+const MobileHeader = styled(AppBar)`
   @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     display: none;
   }
@@ -511,7 +508,7 @@ function RecordAuditBody({
     draft
   }
 
-  const mobileProps: IPageHeaderProps = {
+  const mobileProps: IAppBarProps = {
     id: 'mobileHeader',
     mobileTitle:
       declaration.name || intl.formatMessage(recordAuditMessages.noName),

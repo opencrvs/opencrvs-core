@@ -30,7 +30,7 @@ import { RouteComponentProps, withRouter } from 'react-router'
 import styled from 'styled-components'
 import { Title } from './commons'
 import { messages as sharedMessages } from '@login/i18n/messages/views/resetCredentialsForm'
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 
 const Actions = styled.div`
   padding: 32px 0;

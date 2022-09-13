@@ -34,7 +34,6 @@ export default async function activateUser(
 ) {
   const userUpdateData = request.payload as IActivateUserPayload
 
-  // tslint:disable-next-line
   const user: IUserModel | null = await User.findById(userUpdateData.userId)
   if (!user) {
     logger.error(
@@ -56,7 +55,7 @@ export default async function activateUser(
   user.passwordHash = hash
   user.status = statuses.ACTIVE
   user.securityQuestionAnswers = userUpdateData.securityQNAs.map(
-    securityQNA => {
+    (securityQNA) => {
       return {
         questionKey: securityQNA.questionKey,
         answerHash: generateHash(securityQNA.answer.toLowerCase(), salt)
@@ -65,7 +64,6 @@ export default async function activateUser(
   )
 
   try {
-    // tslint:disable-next-line
     await User.update({ _id: user._id }, user)
   } catch (err) {
     logger.error(err.message)
@@ -82,7 +80,5 @@ const securityQNASchema = Joi.object({
 export const requestSchema = Joi.object({
   userId: Joi.string().required(),
   password: Joi.string().required(),
-  securityQNAs: Joi.array()
-    .items(securityQNASchema)
-    .required()
+  securityQNAs: Joi.array().items(securityQNASchema).required()
 })

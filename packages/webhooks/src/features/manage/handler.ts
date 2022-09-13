@@ -181,7 +181,6 @@ export async function listWebhooksHandler(
         .code(400)
     }
     try {
-      // tslint:disable-next-line
       const entries = await Webhook.find({
         'createdBy.client_id': system.client_id
       }).sort({
@@ -219,7 +218,6 @@ export async function deleteWebhookHandler(
     return h.response('No webhook id in URL params').code(400)
   }
   try {
-    // tslint:disable-next-line
     await Webhook.findOneAndRemove({ webhookId })
   } catch (err) {
     return h.response(`Could not delete webhook: ${webhookId}`).code(400)

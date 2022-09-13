@@ -324,7 +324,7 @@ export async function getCurrentAndLowerLocationLevels(
     )
   const oneLevelLowerLocationColumn =
     locationLevelOfQueryId &&
-    locationLevelOfQueryId.replace(/\d/, (level) =>
+    locationLevelOfQueryId.replace(/\d/, (level: string) =>
       level === '5' ? level : String(Number(level) + 1)
     )
 
@@ -468,7 +468,10 @@ const populateBirthKeyFigurePoint = (
   groupedByGenderData: IGroupedByGender[],
   estimation: number
 ): IBirthKeyFigures => {
-  if (!groupedByGenderData || groupedByGenderData === []) {
+  if (
+    !groupedByGenderData ||
+    (Array.isArray(groupedByGenderData) && groupedByGenderData.length === 0)
+  ) {
     return generateEmptyBirthKeyFigure(figureLabel, estimation)
   }
   let percentage = 0
@@ -766,9 +769,9 @@ export async function fetchLocationWiseEventEstimations(
     GROUP BY gender`
   )
 
-  let totalRegistrationInTargetDay: number = 0
-  let totalMaleRegistrationInTargetDay: number = 0
-  let totalFemaleRegistrationInTargetDay: number = 0
+  let totalRegistrationInTargetDay = 0
+  let totalMaleRegistrationInTargetDay = 0
+  let totalFemaleRegistrationInTargetDay = 0
   registrationsInTargetDaysPoints.forEach((point) => {
     totalRegistrationInTargetDay += point.total
     if (point.gender === 'male') {

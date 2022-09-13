@@ -18,7 +18,7 @@ import {
 import { Check } from '@opencrvs/components/lib/icons'
 import { Content } from '@opencrvs/components/lib/Content'
 
-import { ActionPageLight } from '@opencrvs/components/lib/interface'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import {
   IPrintableDeclaration,

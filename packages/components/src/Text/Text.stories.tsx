@@ -28,27 +28,13 @@ const Template: ComponentStory<typeof Text> = (args) => (
 export const Default = Template.bind({})
 Default.args = {
   variant: 'h1',
-  as: 'h1'
+  element: 'h1'
 }
 
 export const Heading = () => (
-  <Stack direction="column" alignItems="flex-start">
-    <Text variant="hero" element="h1">
-      The gold standard for digital...
-    </Text>
-    <Text variant="h1" element="h2">
-      The gold standard for digital civil registration
-    </Text>
-    <Text variant="h2" element="h3">
-      The gold standard for digital civil registration
-    </Text>
-    <Text variant="h3" element="h4">
-      The gold standard for digital civil registration
-    </Text>
-    <Text variant="h4" element="h4">
-      The gold standard for digital civil registration
-    </Text>
-  </Stack>
+  <Text variant="h1" element="h1">
+    The gold standard for digital civil registration
+  </Text>
 )
 
 export const HeadingWithIcon = () => (
@@ -60,31 +46,25 @@ export const HeadingWithIcon = () => (
   </Stack>
 )
 
+export const HeadingWithColour = () => (
+  <Text variant="h4" element="h4" color="red">
+    No data provided
+  </Text>
+)
+
 export const Body = () => (
-  <Stack direction="column" alignItems="flex-start">
-    <Text variant="reg18" element="p">
-      The gold standard for digital civil registration
-    </Text>
-    <Text variant="bold18" element="p">
-      The gold standard for digital civil registration
-    </Text>
-    <Text variant="reg16" element="p">
-      The gold standard for digital civil registration
-    </Text>
-    <Text variant="bold16" element="p">
-      The gold standard for digital civil registration
-    </Text>
-    <Text variant="reg14" element="p">
-      The gold standard for digital civil registration
-    </Text>
-    <Text variant="bold14" element="p">
-      The gold standard for digital civil registration
-    </Text>
-    <Text variant="reg12" element="p">
-      The gold standard for digital civil registration
-    </Text>
-    <Text variant="bold12" element="p">
-      The gold standard for digital civil registration
-    </Text>
-  </Stack>
+  <Text variant="reg16" element="p">
+    OpenCRVS is highly configurable, interoperable and scalable, making it
+    ideally suited for use in low resource settings. It uses standards-based and
+    proven technologies to provide effective digital civil registration services
+    for the long-term. An open-source, digital civil registration system
+    designed to positively transform civil registration services in low-resource
+    settings.
+  </Text>
+)
+
+export const Caption = () => (
+  <Text variant="reg12" element="p">
+    OpenCRVS is highly configurable
+  </Text>
 )

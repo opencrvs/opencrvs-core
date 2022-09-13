@@ -12,7 +12,6 @@
 import { getTokenPayload } from '@metrics/utils/authUtils'
 
 const token =
-  // tslint:disable-next-line:max-line-length
   'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiIiLCJpYXQiOjE1NDE1NzY5NjUsImV4cCI6MTU3MzExMjk2NSwiYXVkIjoiIiwic3ViIjoiMSIsInNjb3BlIjoiWydwZXJmb3JtYW5jZSddIn0.huK3iFFi01xkwHvQZQAOnScrz0rJ50EsxpZA3a1Ynao'
 
 describe('authUtils', () => {
