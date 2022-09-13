@@ -10,13 +10,12 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-import type { ViteFinal } from '@storybook/builder-vite'
 const { mergeConfig } = require('vite')
 
 const BRAND_BLUE =
   '#0058E0' /* See `theme.ts`. Cannot be imported from there due to 'Cannot use import statement outside a module' */
 
-const viteFinal: ViteFinal = async (config) => {
+const viteFinal = async (config) => {
   // return the customized config
   return mergeConfig(config, {
     // customize the Vite config here
@@ -28,7 +27,7 @@ const viteFinal: ViteFinal = async (config) => {
   })
 }
 
-const config = {
+module.exports = {
   viteFinal,
   stories: [
     '../@(src|stories)/**/*.stories.mdx',
@@ -43,7 +42,7 @@ const config = {
   staticDirs: ['../public'],
   framework: '@storybook/react',
 
-  managerHead: (head: string) => {
+  managerHead: (head) => {
     return `${head}
     <link rel="icon" href="favicon.png" />
     <style type="text/css">
@@ -54,5 +53,3 @@ const config = {
     `
   }
 }
-
-export default config
