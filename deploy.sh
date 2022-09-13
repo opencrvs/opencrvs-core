@@ -317,7 +317,7 @@ docker_stack_deploy() {
 
     echo "Downloading $tag"
 
-    until ssh $SSH_USER@$SSH_HOST "cd /tmp/compose && docker pull $tag"
+    until ssh $SSH_USER@$SSH_HOST "cd /opt/opencrvs && docker pull $tag"
     do
       echo "Server failed to download $tag. Retrying..."
       sleep 5
@@ -325,7 +325,7 @@ docker_stack_deploy() {
   done
 
   echo "Updating docker swarm stack with new compose files"
-  ssh $SSH_USER@$SSH_HOST 'cd /tmp/compose && \
+  ssh $SSH_USER@$SSH_HOST 'cd /opt/opencrvs && \
     '$ENV_VARIABLES' docker stack deploy --prune -c '$(split_and_join " " " -c " "$SHARED_COMPOSE_FILES $environment_compose $replicas_compose")' --with-registry-auth opencrvs'
 }
 
@@ -333,10 +333,10 @@ FILES_TO_ROTATE="/opt/opencrvs/docker-compose.deploy.yml"
 
 if [ "$REPLICAS" = "3" ]; then
   REPLICAS_COMPOSE="-c docker-compose.replicas-3.yml -c docker-compose.countryconfig.replicas-3.yml"
-  FILES_TO_ROTATE="${FILES_TO_ROTATE} /tmp/compose/docker-compose.replicas-3.yml"
+  FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.replicas-3.yml"
 elif [ "$REPLICAS" = "5" ]; then
   REPLICAS_COMPOSE="-c docker-compose.replicas-5.yml -c docker-compose.countryconfig.replicas-5.yml"
-  FILES_TO_ROTATE="${FILES_TO_ROTATE} /tmp/compose/docker-compose.replicas-5.yml"
+  FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.replicas-5.yml"
 elif [ "$REPLICAS" = "1" ]; then
   REPLICAS_COMPOSE="-c docker-compose.countryconfig.replicas-1.yml"
 else
@@ -347,13 +347,13 @@ fi
 # Deploy the OpenCRVS stack onto the swarm
 if [[ "$ENV" = "development" ]]; then
   ENVIRONMENT_COMPOSE="docker-compose.countryconfig.staging-deploy.yml docker-compose.staging-deploy.yml"
-  FILES_TO_ROTATE="${FILES_TO_ROTATE} /tmp/compose/docker-compose.countryconfig.staging-deploy.yml /tmp/compose/docker-compose.staging-deploy.yml"
+  FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.staging-deploy.yml /opt/opencrvs/docker-compose.staging-deploy.yml"
 elif [[ "$ENV" = "qa" ]]; then
   ENVIRONMENT_COMPOSE="docker-compose.countryconfig.qa-deploy.yml docker-compose.qa-deploy.yml"
-  FILES_TO_ROTATE="${FILES_TO_ROTATE} /tmp/compose/docker-compose.countryconfig.qa-deploy.yml /tmp/compose/docker-compose.qa-deploy.yml"
+  FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.qa-deploy.yml /opt/opencrvs/docker-compose.qa-deploy.yml"
 elif [[ "$ENV" = "production" ]]; then
   ENVIRONMENT_COMPOSE="docker-compose.countryconfig.prod-deploy.yml docker-compose.prod-deploy.yml"
-  FILES_TO_ROTATE="${FILES_TO_ROTATE} /tmp/compose/docker-compose.countryconfig.prod-deploy.yml /tmp/compose/docker-compose.prod-deploy.yml"
+  FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.prod-deploy.yml /opt/opencrvs/docker-compose.prod-deploy.yml"
 elif [[ "$ENV" = "demo" ]]; then
   ENVIRONMENT_COMPOSE="-c docker-compose.countryconfig.demo-deploy.yml -c docker-compose.prod-deploy.yml"
   FILES_TO_ROTATE="${FILES_TO_ROTATE} /opt/opencrvs/docker-compose.countryconfig.demo-deploy.yml /opt/opencrvs/docker-compose.prod-deploy.yml"
