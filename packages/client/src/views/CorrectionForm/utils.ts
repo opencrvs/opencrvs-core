@@ -105,7 +105,9 @@ export function motherDoesNotExistAndStateIsMother(
   activeState: string
 ) {
   return (
-    !Boolean(declaration.data.mother.detailsExist) && activeState === 'mother'
+    !Boolean(declaration.data.mother.detailsExist) &&
+    activeState === 'mother' &&
+    declaration.data.registration.informantType.value !== 'MOTHER'
   )
 }
 
@@ -114,7 +116,9 @@ export function fatherDoesNotExistAndStateIsFather(
   activeState: string
 ) {
   return (
-    !Boolean(declaration.data.father.detailsExist) && activeState === 'father'
+    !Boolean(declaration.data.father.detailsExist) &&
+    activeState === 'father' &&
+    declaration.data.registration.informantType.value !== 'FATHER'
   )
 }
 
