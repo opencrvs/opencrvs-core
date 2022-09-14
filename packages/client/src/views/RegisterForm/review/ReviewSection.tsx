@@ -1656,6 +1656,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             <ResponsiveDocumentViewer
               isRegisterScope={this.userHasRegisterScope()}
             >
+              {console.log(declaration)}
               <DocumentViewer
                 id={'document_section_' + this.state.activeSection}
                 key={'Document_section_' + this.state.activeSection}
