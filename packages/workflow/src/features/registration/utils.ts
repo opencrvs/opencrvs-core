@@ -73,7 +73,6 @@ export async function sendEventNotification(
   authHeader: { Authorization: string }
 ) {
   logger.info(`sendEventNotification method for event: ${event}`)
-  // tslint:disable-next-line
   switch (event) {
     case Events.BIRTH_IN_PROGRESS_DEC:
       await sendNotification('birthInProgressSMS', msisdn, authHeader, {

@@ -41,6 +41,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import {
   changeSortedColumn,
+  getPreviousOperationDateByOperationType,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import {
@@ -52,6 +53,7 @@ import {
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { Downloaded } from '@opencrvs/components/lib/icons/Downloaded'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
+import { RegStatus } from '@client/utils/gateway'
 
 interface IBaseRejectTabProps {
   theme: ITheme
@@ -239,9 +241,11 @@ class RequiresUpdateComponent extends React.Component<
           )) ||
         ''
       const sentForUpdates =
-        (reg.modifiedAt && Number.isNaN(Number(reg.modifiedAt))
-          ? new Date(reg.modifiedAt)
-          : new Date(Number(reg.modifiedAt))) || ''
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          RegStatus.Rejected
+        ) || ''
+
       const dateOfEvent =
         reg.dateOfEvent &&
         reg.dateOfEvent.length > 0 &&

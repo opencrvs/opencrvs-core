@@ -14,8 +14,13 @@ import * as Sentry from 'hapi-sentry'
 import { SENTRY_DSN } from '@auth/constants'
 import { logger } from '@auth/logger'
 
+interface IHapiPlugin {
+  plugin: typeof Sentry | typeof Pino
+  options: Record<string, unknown>
+}
+
 export default function getPlugins() {
-  const plugins: any[] = [
+  const plugins: IHapiPlugin[] = [
     {
       plugin: Pino,
       options: {

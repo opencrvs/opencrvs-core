@@ -75,12 +75,14 @@ export async function waitForElement(
   selector: string
 ): Promise<ReactWrapper<any, any>>
 
-export async function waitForElement<T>(
+export async function waitForElement<T extends string | (() => void)>(
   rootComponent: ReactWrapper,
   selector: T
 ) {
   try {
-    await waitFor(() => rootComponent.update().find(selector).length > 0)
+    await waitFor(
+      () => rootComponent.update().find(selector as string).length > 0
+    )
   } catch (err) {
     throw new Error(
       `Couldn't find selector ${
@@ -88,5 +90,5 @@ export async function waitForElement<T>(
       } from component in ${MAX_TIME}ms`
     )
   }
-  return rootComponent.update().find(selector)
+  return rootComponent.update().find(selector as string)
 }
