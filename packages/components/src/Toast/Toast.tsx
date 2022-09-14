@@ -15,7 +15,7 @@ import { Alert } from '../Alert'
 
 const NOTIFICATION_AUTO_HIDE_TIMEOUT = 20000 // 20 seconds
 
-type ToastType = 'success' | 'neutral' | 'loading' | 'warning'
+type ToastType = 'success' | 'warning' | 'loading' | 'error'
 
 export interface IToastProps extends React.HTMLAttributes<HTMLDivElement> {
   show: boolean
@@ -39,6 +39,7 @@ const ToastAlert = styled(Alert)<{
   $show: boolean
 }>`
   position: fixed;
+  filter: drop-shadow(0px 2px 4px rgba(34, 34, 34, 0.24));
   width: 50%;
   max-width: 520px;
   transform: translateX(-50%);
@@ -86,6 +87,6 @@ export class Toast extends React.Component<IToastProps> {
 
   render() {
     const { type, show, ...props } = this.props
-    return <ToastAlert type={type ?? 'neutral'} $show={show} {...props} />
+    return <ToastAlert type={type ?? 'warning'} $show={show} {...props} />
   }
 }

@@ -33,7 +33,6 @@ const Container = styled.div<{
 
   min-height: 52px;
   display: flex;
-  filter: drop-shadow(0px 2px 4px rgba(34, 34, 34, 0.24));
   border-radius: 4px;
   border: 2px solid var(--color);
   border-left-width: 0px;

@@ -30,17 +30,17 @@ Success.args = {
   onClose: undefined
 }
 
-export const Neutral = Template.bind({})
-Neutral.args = {
-  type: 'neutral',
+export const Warning = Template.bind({})
+Warning.args = {
+  type: 'warning',
   children:
     'Nothing is currently published. Awaiting to be published: Birth, Death',
   onClose: undefined
 }
 
-export const Warning = Template.bind({})
-Warning.args = {
-  type: 'warning',
+export const Error = Template.bind({})
+Error.args = {
+  type: 'error',
   children:
     'Nothing is currently published. Awaiting to be published: Birth, Death',
   onClose: undefined
