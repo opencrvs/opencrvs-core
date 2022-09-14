@@ -67,7 +67,6 @@ import { getUser } from '@gateway/features/user/utils'
 
 export const typeResolvers: GQLResolver = {
   EventRegistration: {
-    // tslint:disable-next-line
     __resolveType(obj) {
       if (obj.type.coding[0].code === 'birth-declaration') {
         return 'BirthRegistration'
@@ -236,7 +235,6 @@ export const typeResolvers: GQLResolver = {
         return
       }
       if (relatedPerson.patient.reference.startsWith('RelatedPerson')) {
-        // tslint:disable-next-line
         relatedPerson = await fetchFHIR(
           `/${relatedPerson.patient.reference}`,
           authHeader
@@ -869,7 +867,6 @@ export const typeResolvers: GQLResolver = {
   },
 
   DeathRegistration: {
-    // tslint:disable-next-line
     async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
       // Preparing Encounter
       const encounterSection = findCompositionSection(
@@ -1284,7 +1281,6 @@ export const typeResolvers: GQLResolver = {
     }
   },
   BirthRegistration: {
-    // tslint:disable-next-line
     async _fhirIDMap(composition: ITemplatedComposition, _, authHeader) {
       // Preparing Encounter
       const encounterSection = findCompositionSection(

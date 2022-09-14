@@ -88,7 +88,6 @@ export async function userAuditHandler(
     }
 
     try {
-      // tslint:disable-next-line
       await User.update({ _id: user._id }, user)
     } catch (err) {
       logger.error(err.message)

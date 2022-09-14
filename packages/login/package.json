@@ -15,7 +15,7 @@
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
     "@vitejs/plugin-react": "^2.0.0",
-    "axios": "^0.21.1",
+    "axios": "^0.27.2",
     "connected-react-router": "^6.5.2",
     "country-data": "^0.0.31",
     "eslint": "^7.11.0",

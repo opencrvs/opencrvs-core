@@ -1221,6 +1221,7 @@ describe('fhirUtils', () => {
     )
   })
   it('returns practitioner who started the declaration', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const taskHistory = require('./test-data/task-history.json')
 
     expect(getStartedByFieldAgent(taskHistory)).toEqual(
@@ -1228,6 +1229,7 @@ describe('fhirUtils', () => {
     )
   })
   it('throws error if no task associated with declared or in progress declaration ', () => {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const taskHistory = require('./test-data/task-history.json')
     taskHistory.entry[1].resource.businessStatus.coding[0].code = ''
 

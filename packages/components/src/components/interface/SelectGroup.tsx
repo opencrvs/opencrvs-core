@@ -65,7 +65,7 @@ export class SelectGroup extends React.Component<ISelectGroupProps> {
 
     return (
       <Wrapper>
-        {options.map(option => {
+        {options.map((option) => {
           return (
             <StyledSelect
               id={`${name}_${option.value}`}

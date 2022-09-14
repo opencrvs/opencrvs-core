@@ -150,6 +150,7 @@ for (let i = 0; i < 14; i++) {
 }
 merge(mockUserResponse, nameObj)
 
+const mockDeclarationDateStr = '2019-10-20T11:03:20.660Z'
 const mockReviewTabData = {
   totalItems: 2,
   results: [
@@ -166,6 +167,27 @@ const mockReviewTabData = {
         createdAt: '1544188309380',
         modifiedAt: '1544188309380'
       },
+      operationHistories: [
+        {
+          operationType: 'DECLARED',
+          operatedOn: mockDeclarationDateStr,
+          operatorRole: 'LOCAL_REGISTRAR',
+          operatorName: [
+            {
+              firstNames: 'Mohammad',
+              familyName: 'Ashraful',
+              use: 'en'
+            },
+            {
+              firstNames: '',
+              familyName: '',
+              use: 'bn'
+            }
+          ],
+          operatorOfficeName: 'Alokbali Union Parishad',
+          operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+        }
+      ],
       dateOfBirth: '2010-10-10',
       childName: [
         {
@@ -285,7 +307,7 @@ describe('OfficeHome sent for review tab related tests', () => {
 
     const data = gridTable.prop('content')
     const EXPECTED_DATE_OF_DECLARATION = formattedDuration(
-      Number.parseInt(TIME_STAMP)
+      new Date(mockDeclarationDateStr)
     )
 
     expect(data.length).toBe(2)
