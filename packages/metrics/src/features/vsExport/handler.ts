@@ -15,7 +15,7 @@ import { VS_EXPORT_SCRIPT_PATH } from '@metrics/constants'
 import { logger } from '@metrics/logger'
 import { fork } from 'child_process'
 
-export async function annualVSExportHandler(
+export async function vsExportHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
