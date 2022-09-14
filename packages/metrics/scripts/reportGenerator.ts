@@ -162,7 +162,7 @@ const connect = async () => {
   }
 }
 
-async function getPastYearCompositionCursor() {
+async function getCompositionCursor() {
   const db = client.db(DB_NAME)
   return db
     .collection(COLLECTION_NAMES.COMPOSITION)
@@ -186,7 +186,7 @@ async function getCollectionDocuments(collectionName: string, ids: string[]) {
   }
 }
 
-async function getObservationDocuments(encounterId: string) {
+async function getObservationDocByEncounterId(encounterId: string) {
   const db = client.db(DB_NAME)
   return db
     .collection(COLLECTION_NAMES.OBSERVATION)
@@ -196,7 +196,7 @@ async function getObservationDocuments(encounterId: string) {
     .toArray()
 }
 
-async function getTaskDocuments(compositionId: string) {
+async function getTaskDocByCompositionId(compositionId: string) {
   const db = client.db(DB_NAME)
   return db
     .collection(COLLECTION_NAMES.TASK)
@@ -214,11 +214,11 @@ function getValueFromExt(doc: fhir.Patient, extURL: string) {
   if (!doc.extension) {
     return ''
   }
-  const docExt = doc.extension.find((obj: { url: any }) => obj.url === extURL)
+  const docExt = doc.extension.find((obj) => obj.url === extURL)
   return docExt ? docExt.valueString : ''
 }
 
-function makePatientsObject(patient: fhir.Patient) {
+function makePatientObject(patient: fhir.Patient) {
   return {
     gender: patient.gender ?? '',
     birthDate: patient.birthDate ?? '',
@@ -283,7 +283,7 @@ async function setPatientsDetailsInComposition(
       const patientId = section.entry[0].reference.replace('Patient/', '')
       const patient = patients.find(({ id }) => id === patientId)
       if (patient && section.title) {
-        fullComposition[TITLE_MAP[section.title]] = makePatientsObject(patient)
+        fullComposition[TITLE_MAP[section.title]] = makePatientObject(patient)
       }
     }
   })
@@ -324,9 +324,9 @@ async function setLocationInComposition(
   fullComposition['eventState'] = stateLocation?.name ?? ''
   fullComposition['eventCity'] = location.address?.city ?? ''
 
-  const [task] = (await getTaskDocuments(`Composition/${composition.id}`)) as [
-    fhir.Task
-  ]
+  const [task] = (await getTaskDocByCompositionId(
+    `Composition/${composition.id}`
+  )) as [fhir.Task]
 
   const officeLocationId = task.extension
     ?.find((obj) => obj.url === officeLocationExtURL)
@@ -345,7 +345,7 @@ async function setObservationDetailsInComposition(
       typeof section.entry?.[0].reference === 'string' &&
       section.entry[0].reference.startsWith('Encounter/')
   )
-  const observations = (await getObservationDocuments(
+  const observations = (await getObservationDocByEncounterId(
     String(encounter?.entry?.[0].reference)
   )) as fhir.Observation[]
   const observationObj: IObservation = {
@@ -485,7 +485,7 @@ async function setInformantDetailsInComposition(
 
   fullComposition.informant = {
     relationship: relatedPerson[0].relationship?.coding?.[0].code ?? '',
-    ...makePatientsObject(patient[0])
+    ...makePatientObject(patient[0])
   }
 }
 
@@ -633,7 +633,7 @@ async function createDeathDeclarationCSVWriter() {
   return deathCSV
 }
 
-async function makeComposotionAndExportCSVReport(
+async function makeCompositionAndExportCSVReport(
   compositionsCursor: Cursor<any>,
   locations: fhir.Location[]
 ) {
@@ -847,12 +847,12 @@ async function makeComposotionAndExportCSVReport(
 
 const startScript = async () => {
   await connect()
-  const compositionsCursor = await getPastYearCompositionCursor()
+  const compositionsCursor = await getCompositionCursor()
   const locations: fhir.Location[] = await getCollectionDocuments(
     COLLECTION_NAMES.LOCATION,
     []
   )
-  await makeComposotionAndExportCSVReport(compositionsCursor, locations)
+  await makeCompositionAndExportCSVReport(compositionsCursor, locations)
   process.exit()
 }
 
