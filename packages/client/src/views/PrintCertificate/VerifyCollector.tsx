@@ -71,9 +71,6 @@ class VerifyCollectorComponent extends React.Component<IFullProps> {
     const registeredDate = getRegisteredDate(this.props.declaration.data)
     const { offlineCountryConfiguration } = this.props
 
-    this.props.declaration.data.registration.certificates[0]
-      .hasShowedVerifiedDocument
-
     const declaration = { ...this.props.declaration }
     if (declaration.data.registration.certificates.length) {
       declaration.data.registration.certificates[0].hasShowedVerifiedDocument =
