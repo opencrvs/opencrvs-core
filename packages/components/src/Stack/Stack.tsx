@@ -27,19 +27,15 @@ export interface IStackProps extends React.HTMLAttributes<HTMLDivElement> {
   wrap?: boolean
 }
 
-export const StyledStack = styled.div<
-  IStackProps & {
-    // styled-components doesn't pass $-prefixed values to DOM, like it does for "direction" and "wrap"
-    $direction: IStackProps['direction']
-    $wrap: IStackProps['wrap']
-  }
->`
+export const StyledStack = styled.div<{
+  [Property in keyof IStackProps as `$${Property}`]: IStackProps[Property]
+}>`
   display: flex;
   flex-wrap: ${({ $wrap }) => ($wrap ? 'wrap' : 'nowrap')};
   flex-direction: ${({ $direction }) => $direction};
-  justify-content: ${({ justifyContent }) => justifyContent};
-  align-items: ${({ alignItems }) => alignItems};
-  gap: ${({ gap }) => `${gap}px`};
+  justify-content: ${({ $justifyContent }) => $justifyContent};
+  align-items: ${({ $alignItems }) => $alignItems};
+  gap: ${({ $gap }) => `${$gap}px`};
 `
 
 /**
@@ -57,9 +53,9 @@ export const Stack = ({
 }: IStackProps) => (
   <StyledStack
     $direction={direction}
-    justifyContent={justifyContent}
-    alignItems={alignItems}
-    gap={gap}
+    $justifyContent={justifyContent}
+    $alignItems={alignItems}
+    $gap={gap}
     $wrap={wrap}
     {...props}
   />
