@@ -1,0 +1,40 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
+ * graphic logo are (registered/a) trademark(s) of Plan International.
+ */
+import { model, Schema, Document } from 'mongoose'
+
+export enum Event {
+  BIRTH = 'birth',
+  DEATH = 'death'
+}
+
+export interface IVSExportModel extends Document {
+  event: Event
+  year: number
+  fileName: string
+  fileSize: number
+  url: string
+  createdOn: number
+}
+
+const vsExportSchema = new Schema({
+  event: {
+    type: String,
+    enum: [Event.BIRTH, Event.DEATH]
+  },
+  year: { type: Number },
+  fileName: { type: String },
+  fileSize: { type: Number },
+  url: { type: String },
+  createdOn: { type: Number, default: Date.now }
+})
+
+export default model<IVSExportModel>('vsexports', vsExportSchema)
