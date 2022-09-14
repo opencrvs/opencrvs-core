@@ -64,6 +64,7 @@ import {
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { PERFORMANCE_HOME } from '@client/navigation/routes'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
+import { Outbox } from './outbox/Outbox'
 
 export interface IProps extends IButtonProps {
   active?: boolean
@@ -417,6 +418,7 @@ export class OfficeHomeView extends React.Component<
                   error={error}
                 />
               )}
+              {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
             </>
           ) : (
             <>
