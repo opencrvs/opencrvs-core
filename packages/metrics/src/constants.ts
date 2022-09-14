@@ -21,6 +21,7 @@ export const USER_MANAGEMENT_URL =
   process.env.USER_MANAGEMENT_URL || 'http://localhost:3030'
 export const SENTRY_DSN = process.env.SENTRY_DSN
 
+export const MONGO_URL = process.env.MONGO_URL || 'mongodb://localhost/reports'
 export const SEARCH_URL = process.env.SEARCH_URL || 'http://localhost:9090/'
 export const EXPECTED_BIRTH_REGISTRATION_IN_DAYS =
   process.env.EXPECTED_BIRTH_REGISTRATION_IN_DAYS || 45
