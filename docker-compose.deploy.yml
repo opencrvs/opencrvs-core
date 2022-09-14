@@ -184,7 +184,7 @@ services:
   elasticsearch:
     volumes:
       - '/data/elasticsearch:/usr/share/elasticsearch/data'
-      - '/data/backups/elasticsearch:/usr/share/elasticsearch/backup'
+      - '/data/backups/elasticsearch:/data/backups/elasticsearch'
     deploy:
       replicas: 1
       placement:
@@ -192,7 +192,7 @@ services:
           - node.labels.data1 == true
     environment:
       - ELASTIC_PASSWORD=${ELASTICSEARCH_SUPERUSER_PASSWORD}
-      - path.repo=/usr/share/elasticsearch/backup
+      - path.repo=/data/backups/elasticsearch
       - cluster.name=docker-cluster
       - network.host=0.0.0.0
       - discovery.zen.minimum_master_nodes=1

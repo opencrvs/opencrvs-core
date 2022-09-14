@@ -27,11 +27,11 @@ services:
       - '9300:9300'
     volumes:
       - './data/elasticsearch:/usr/share/elasticsearch/data'
-      - './data/backups/elasticsearch:/usr/share/elasticsearch/backup'
+      - './data/backups/elasticsearch:/data/backups/elasticsearch'
     environment:
       - 'discovery.type=single-node'
       - 'cluster.routing.allocation.disk.threshold_enabled=false'
-      - path.repo=/usr/share/elasticsearch/backup
+      - path.repo=/data/backups/elasticsearch
       - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
       - bootstrap.system_call_filter=false
 
