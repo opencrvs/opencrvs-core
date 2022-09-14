@@ -57,7 +57,7 @@ Loading.args = {
   onClose: undefined
 }
 
-export const Closable = () => {
+export const Dismissable = () => {
   const [isVisible, setVisible] = useState(true)
 
   return (

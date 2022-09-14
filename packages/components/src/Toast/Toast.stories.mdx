@@ -4,7 +4,7 @@ import { SecondaryButton } from '../buttons'
 import { useState } from 'react'
 import { Toast } from './Toast'
 
-export const ToastToggler = ({ type, closable, retryable, children }) => {
+export const ToastToggler = ({ type, dismissable, actionable, children }) => {
   const [isVisible, setVisible] = useState(false)
   return (
     <>
@@ -14,9 +14,9 @@ export const ToastToggler = ({ type, closable, retryable, children }) => {
       </SecondaryButton>
       <Toast
         type={type}
-        onClose={closable ? () => setVisible(false) : undefined}
+        onClose={dismissable ? () => setVisible(false) : undefined}
         show={isVisible}
-        onActionClick={retryable ? () => alert('Retried') : undefined}
+        onActionClick={actionable ? () => alert('Retried') : undefined}
         actionText="Retry"
       >
         {children}
@@ -95,7 +95,7 @@ Hello! I'm a warning toast
 ## Dismissable
 
 <Story name="Dismissable" storyName="Dismissable">
-  <ToastToggler type="loading" closable>
+  <ToastToggler type="loading" dismissable>
     Hello! I'm a dismissbale toast
   </ToastToggler>
 </Story>
@@ -115,8 +115,8 @@ Hello! I'm a warning toast
 
 ## With action
 
-<Story name="With action" storyName="With action">
-  <ToastToggler type="error" retryable>
+<Story name="With Action" storyName="With Action">
+  <ToastToggler type="error" actionable>
     Hello! I'm a toast with action button
   </ToastToggler>
 </Story>
@@ -137,8 +137,8 @@ Hello! I'm a warning toast
 
 ## With action and dismiss
 
-<Story name="With action and dismiss" storyName="With action and dismiss">
-  <ToastToggler type="error" retryable closable>
+<Story name="With Action And Dismiss" storyName="With Action And Dismiss">
+  <ToastToggler type="error" actionable dismissable>
     Hello! I'm a toast with an action and dismiss button
   </ToastToggler>
 </Story>
@@ -160,8 +160,8 @@ Hello! I'm a warning toast
 
 ## Multiple lines
 
-<Story name="Multiple lines" storyName="Multiple lines">
-  <ToastToggler type="error" retryable closable>
+<Story name="Multiple Lines" storyName="Multiple Lines">
+  <ToastToggler type="error" actionable dismissable>
     Hello! I'm a toast with an action and dismiss button. I also have a very
     long text within the toast. This illustrates how the toast stretches when
     the content is lengthy.
