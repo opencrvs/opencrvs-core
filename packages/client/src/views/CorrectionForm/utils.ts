@@ -136,6 +136,10 @@ export function updateDeclarationRegistrationWithCorrection(
     ).value || data.corrector.relationship) as string
   }
 
+  correctionValues.hasShowedVerifiedDocument = Boolean(
+    data.corrector?.hasShowedVerifiedDocument
+  )
+
   if (data.reason) {
     if (data.reason.type) {
       correctionValues.reason = ((data.reason.type as IFormSectionData).value ||

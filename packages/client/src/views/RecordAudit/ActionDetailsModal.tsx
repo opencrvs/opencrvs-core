@@ -33,7 +33,10 @@ import {
   DECLARATION_STATUS_LABEL,
   getFormattedDate
 } from './utils'
-import { CollectorRelationLabelArray } from '@client/forms/correction/corrector'
+import {
+  CollectorRelationLabelArray,
+  CorrectorRelationLabelArray
+} from '@client/forms/correction/corrector'
 import { IActionDetailsData } from './History'
 import { getRejectionReasonDisplayValue } from '@client/views/SearchResult/SearchResult'
 import { certificateCollectorRelationLabelArray } from '@client/forms/certificate/fieldDefinitions/collectorSection'
@@ -127,7 +130,7 @@ function prepareComments(
 }
 
 const requesterLabelMapper = (requester: string, intl: IntlShape) => {
-  const requesterIndividual = CollectorRelationLabelArray.find(
+  const requesterIndividual = CorrectorRelationLabelArray.find(
     (labelItem) => labelItem.value === requester
   )
 
@@ -411,6 +414,27 @@ export const ActionDetailsModalListTable = ({
           hideBoxShadow={true}
           columns={requesterColumn}
           content={[{ requester: requesterLabel }]}
+        />
+      )}
+
+      {/* Correction Requester Id Verified */}
+      {actionDetailsData.requester && (
+        <ListTable
+          noResultText=" "
+          hideBoxShadow={true}
+          columns={certificateCollectorVerified}
+          content={[
+            {
+              hasShowedVerifiedDocument:
+                actionDetailsData.hasShowedVerifiedDocument
+                  ? intl.formatMessage(certificateMessages.idCheckVerify)
+                  : intl.formatMessage(certificateMessages.idCheckWithoutVerify)
+            }
+          ]}
+          pageSize={10}
+          totalItems={1}
+          currentPage={currentPage}
+          onPageChange={pageChangeHandler}
         />
       )}
 

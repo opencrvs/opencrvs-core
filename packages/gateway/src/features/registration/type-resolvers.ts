@@ -55,7 +55,8 @@ import {
   FHIR_SPECIFICATION_URL,
   OPENCRVS_SPECIFICATION_URL,
   REINSTATED_EXTENSION_URL,
-  REQUESTING_INDIVIDUAL
+  REQUESTING_INDIVIDUAL,
+  HAS_SHOWED_VERIFIED_DOCUMENT
 } from '@gateway/features/fhir/constants'
 import { ITemplatedComposition } from '@gateway/features/registration/fhir-builders'
 import fetch from 'node-fetch'
@@ -656,6 +657,18 @@ export const typeResolvers: GQLResolver = {
         }`,
         authHeader
       )) as fhir.RelatedPerson
+    },
+    async hasShowedVerifiedDocument(
+      docRef: fhir.DocumentReference,
+      _,
+      authHeader
+    ) {
+      const hasShowedDocument = findExtension(
+        HAS_SHOWED_VERIFIED_DOCUMENT,
+        docRef.extension as fhir.Extension[]
+      )
+
+      return Boolean(hasShowedDocument?.valueString)
     }
   },
   Identifier: {
@@ -743,6 +756,14 @@ export const typeResolvers: GQLResolver = {
         task.extension &&
         findExtension(REINSTATED_EXTENSION_URL, task.extension)
       return extension !== undefined
+    },
+    hasShowedVerifiedDocument: (task: fhir.Task) => {
+      const hasShowedDocument = findExtension(
+        HAS_SHOWED_VERIFIED_DOCUMENT,
+        task.extension as fhir.Extension[]
+      )
+
+      return Boolean(hasShowedDocument?.valueString)
     },
     requester: (task: fhir.Task) => {
       const requestedBy = findExtension(

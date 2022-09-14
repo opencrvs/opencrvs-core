@@ -39,6 +39,33 @@ export enum CorrectorRelationship {
   REGISTRATION_AGENT = 'REGISTRATION_AGENT'
 }
 
+export const CorrectorRelationLabelArray = [
+  { value: CorrectorRelationship.INFORMANT, label: messages.informant },
+  { value: CorrectorRelationship.MOTHER, label: messages.mother },
+  { value: CorrectorRelationship.FATHER, label: messages.father },
+  { value: CorrectorRelationship.CHILD, label: messages.child },
+  {
+    value: CorrectorRelationship.LEGAL_GUARDIAN,
+    label: messages.legalGuardian
+  },
+  {
+    value: CorrectorRelationship.ANOTHER_AGENT,
+    label: messages.anotherRegOrFieldAgent
+  },
+  {
+    value: CorrectorRelationship.REGISTRAR,
+    label: messages.me
+  },
+  {
+    value: CorrectorRelationship.COURT,
+    label: messages.court
+  },
+  {
+    value: CorrectorRelationship.OTHER,
+    label: messages.others
+  }
+]
+
 export const CollectorRelationLabelArray = [
   { value: CorrectorRelationship.MOTHER, label: messages.mother },
   { value: CorrectorRelationship.FATHER, label: messages.father },

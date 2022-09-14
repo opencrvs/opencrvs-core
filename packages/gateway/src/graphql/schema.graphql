@@ -708,6 +708,7 @@ type History {
   user: User
   date: Date
   requester: String
+  hasShowedVerifiedDocument: Boolean
   action: RegStatus
   statusReason: StatusReason
   reason: String

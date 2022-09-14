@@ -814,8 +814,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       corrector &&
       ((corrector as IFormSectionData).hasShowedVerifiedDocument as boolean)
     return idChecked
-      ? this.props.intl.formatMessage(messages.idCheckWithoutVerify)
-      : this.props.intl.formatMessage(messages.idCheckVerify)
+      ? this.props.intl.formatMessage(messages.idCheckVerify)
+      : this.props.intl.formatMessage(messages.idCheckWithoutVerify)
   }
 
   getReasonForRequest = () => {

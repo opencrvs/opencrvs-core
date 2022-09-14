@@ -584,6 +584,7 @@ export interface GQLHistory {
   user?: GQLUser
   date?: GQLDate
   requester?: string
+  hasShowedVerifiedDocument?: boolean
   action?: GQLRegStatus
   statusReason?: GQLStatusReason
   reason?: string
@@ -4108,6 +4109,7 @@ export interface GQLHistoryTypeResolver<TParent = any> {
   user?: HistoryToUserResolver<TParent>
   date?: HistoryToDateResolver<TParent>
   requester?: HistoryToRequesterResolver<TParent>
+  hasShowedVerifiedDocument?: HistoryToHasShowedVerifiedDocumentResolver<TParent>
   action?: HistoryToActionResolver<TParent>
   statusReason?: HistoryToStatusReasonResolver<TParent>
   reason?: HistoryToReasonResolver<TParent>
@@ -4132,6 +4134,13 @@ export interface HistoryToDateResolver<TParent = any, TResult = any> {
 }
 
 export interface HistoryToRequesterResolver<TParent = any, TResult = any> {
+  (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
+}
+
+export interface HistoryToHasShowedVerifiedDocumentResolver<
+  TParent = any,
+  TResult = any
+> {
   (parent: TParent, args: {}, context: any, info: GraphQLResolveInfo): TResult
 }
 

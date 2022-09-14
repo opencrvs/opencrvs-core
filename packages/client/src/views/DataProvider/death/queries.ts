@@ -171,6 +171,7 @@ export const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
       history {
         otherReason
         requester
+        hasShowedVerifiedDocument
         date
         action
         reinstated

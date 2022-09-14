@@ -186,13 +186,13 @@ class VerifyCorrectorComponent extends React.Component<IFullProps> {
                 positiveAction: {
                   label: intl.formatMessage(messages.idCheckVerify),
                   handler: () => {
-                    this.handleVerification(false)
+                    this.handleVerification(true)
                   }
                 },
                 negativeAction: {
                   label: intl.formatMessage(messages.idCheckWithoutVerify),
                   handler: () => {
-                    this.handleVerification(true)
+                    this.handleVerification(false)
                   }
                 }
               }}
