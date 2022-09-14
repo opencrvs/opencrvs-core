@@ -91,6 +91,7 @@ services:
       - COUNTRY_CONFIG_URL=http://countryconfig:3040/
       - CONFIG_API_URL=http://config:2021
       - FHIR_URL=http://openhim-core:5001/fhir
+      - MONGO_URL=mongodb://mongo1/reports
       - HEARTH_MONGO_URL=mongodb://mongo1/hearth-dev
       - SEARCH_URL=http://search:9090/
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
