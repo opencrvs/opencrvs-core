@@ -140,7 +140,6 @@ export function queryBuilder(
       term: {
         'eventLocationId.keyword': {
           value: eventLocationId,
-          // tslint:disable-next-line
           boost: 2.0
         }
       }
@@ -174,7 +173,7 @@ export function queryBuilder(
       term: {
         'declarationLocationHirarchyIds.keyword': {
           value: declarationLocationHirarchyId,
-          // tslint:disable-next-line
+
           boost: 2.0
         }
       }

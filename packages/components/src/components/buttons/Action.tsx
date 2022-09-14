@@ -10,12 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import * as React from 'react'
-import styled, { StyledComponentBase } from 'styled-components'
+import styled from 'styled-components'
 
-import { ITheme } from '../theme'
 import { Button, IButtonProps } from './Button'
-import { ArrowWithGradient } from '../icons'
-import { DisabledArrow } from '../icons'
+import { ArrowWithGradient, DisabledArrow } from '../icons'
 
 const ActionContainer = styled(Button)`
   width: 100%;
