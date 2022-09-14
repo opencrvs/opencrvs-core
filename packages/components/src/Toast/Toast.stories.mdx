@@ -42,7 +42,7 @@ Toast can be used inside any view, it doesn't have to be on the application root
   dark
   code={`
 <Toast type="success" show={isVisible}>
-  Hi! I'm a success toast
+  Hello! I'm a success toast
 </Toast>
     `}
 />
@@ -57,7 +57,7 @@ Toast can be used inside any view, it doesn't have to be on the application root
   dark
   code={`
 <Toast type="warning" show={isVisible}>
-Hi! I'm a warning toast
+Hello! I'm a warning toast
 </Toast>
   `}
 />
@@ -72,7 +72,7 @@ Hi! I'm a warning toast
   dark
   code={`
 <Toast type="error" show={isVisible}>
-  Hi! I'm an error toast
+  Hello! I'm an error toast
 </Toast>
     `}
 />
@@ -87,7 +87,7 @@ Hi! I'm a warning toast
   dark
   code={`
 <Toast type="loading" show={isVisible}>
-  Hi! I'm an in progress toast
+  Hello! I'm a loading toast
 </Toast>
     `}
 />
@@ -96,7 +96,7 @@ Hi! I'm a warning toast
 
 <Story name="Dismissable" storyName="Dismissable">
   <ToastToggler type="loading" closable>
-    Hi! I'm a closable toast
+    Hello! I'm a dismissbale toast
   </ToastToggler>
 </Story>
 
@@ -108,7 +108,7 @@ Hi! I'm a warning toast
   show={isVisible}
   onClose={() => setVisible(false)}
 >
-  Hi! I'm a closable toast
+  Hello! I'm a dismissbale toast
 </Toast>
     `}
 />
@@ -130,7 +130,7 @@ Hi! I'm a warning toast
   onActionClick={() => alert('Retried')}
   actionText="Retry"
 >
-  Hi! I'm a retryable toast
+  Hello! I'm a toast with an action button
 </Toast>
     `}
 />
@@ -153,7 +153,7 @@ Hi! I'm a warning toast
   actionText="Retry"
   onClose={() => setVisible(false)}
 >
-  Hi! I'm a retryable toast
+  Hello! I'm a toast with an action and dismiss button
 </Toast>
     `}
 />
@@ -178,9 +178,9 @@ Hi! I'm a warning toast
   actionText="Retry"
   onClose={() => setVisible(false)}
 >
-  Hi! I'm a retryable and closable toast. I also have a very long text within
-  the toast. This illustrates how the toast stretches when the content is
-  lengthy.
+    Hello! I'm a toast with an action and dismiss button. I also have a very
+    long text within the toast. This illustrates how the toast stretches when
+    the content is lengthy.
 </Toast>
     `}
 />
