@@ -25,14 +25,14 @@ export interface IToastProps extends React.HTMLAttributes<HTMLDivElement> {
   actionText?: string
 }
 
-const easeInFromBottom = keyframes`
-  from { bottom: -200px; }
-  to { bottom: 100px; }
+const deepToast = keyframes`
+  from { bottom: -10px; }
+  to { bottom: 80px; }
 `
 
-const easeInFromTop = keyframes`
-  from { top: -200px; }
-  to { top: 56px; }
+const shallowToast = keyframes`
+  from { bottom: -10px; }
+  to { bottom: 24px; }
 `
 
 const ToastAlert = styled(Alert)<{
@@ -41,7 +41,7 @@ const ToastAlert = styled(Alert)<{
   position: fixed;
   filter: drop-shadow(0px 2px 4px rgba(34, 34, 34, 0.24));
   width: 50%;
-  max-width: 520px;
+  max-width: 564px;
   transform: translateX(-50%);
   left: 50%;
   z-index: 1;
@@ -49,21 +49,19 @@ const ToastAlert = styled(Alert)<{
   ${({ $show }) =>
     $show
       ? css`
-          animation: ${easeInFromBottom} 500ms ease-in-out;
-          bottom: 100px;
+          animation: ${deepToast} 400ms ease-in-out;
+          bottom: 80px;
         `
       : `display: none;`}
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
-    margin: 16px;
 
     ${({ $show }) =>
       $show &&
       css`
-        animation: ${easeInFromTop} 500ms ease-in-out;
-        top: 64px;
-        bottom: auto;
+        animation: ${shallowToast} 400ms ease-in-out;
+        bottom: 24px;
       `}
   }
 `
