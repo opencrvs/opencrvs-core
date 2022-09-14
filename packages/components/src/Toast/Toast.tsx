@@ -87,6 +87,6 @@ export class Toast extends React.Component<IToastProps> {
 
   render() {
     const { type, show, ...props } = this.props
-    return <ToastAlert type={type ?? 'warning'} $show={show} {...props} />
+    return <ToastAlert type={type ?? 'error'} $show={show} {...props} />
   }
 }

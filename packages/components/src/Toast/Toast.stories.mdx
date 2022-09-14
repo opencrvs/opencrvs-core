@@ -56,8 +56,8 @@ Toast can be used inside any view, it doesn't have to be on the application root
 <Source
   dark
   code={`
-<Toast type="neutral" show={isVisible}>
-Hi! I'm a neutral toast
+<Toast type="warning" show={isVisible}>
+Hi! I'm a warning toast
 </Toast>
   `}
 />
@@ -65,13 +65,13 @@ Hi! I'm a neutral toast
 ## Error
 
 <Story name="Error" storyName="Error">
-  <ToastToggler type="Error">Hi! I'm an error toast</ToastToggler>
+  <ToastToggler type="error">Hi! I'm an error toast</ToastToggler>
 </Story>
 
 <Source
   dark
   code={`
-<Toast type="warning" show={isVisible}>
+<Toast type="error" show={isVisible}>
   Hi! I'm an error toast
 </Toast>
     `}
