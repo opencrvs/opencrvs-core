@@ -299,7 +299,7 @@ services:
   influxdb:
     volumes:
       - '/data/influxdb:/var/lib/influxdb'
-      - '/data/backups/influxdb:/tmp'
+      - '/data/backups/influxdb:/data/backups/influxdb'
     deploy:
       replicas: 1
       placement:
