@@ -72,7 +72,7 @@ const NotificationMessage = styled.div`
   ${({ theme }) => theme.fonts.bold16};
   color: var(--color);
   position: relative;
-  padding: 13px 16px;
+  padding: 12px 24px 12px 16px;
   min-width: 160px;
   max-width: calc(100% - 48px);
   flex: 1;

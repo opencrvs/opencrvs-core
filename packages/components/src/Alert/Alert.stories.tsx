@@ -25,40 +25,35 @@ export default {
 export const Success = Template.bind({})
 Success.args = {
   type: 'success',
-  children:
-    'Nothing is currently published. Awaiting to be published: Birth, Death',
+  children: "Hello, I'm an alert to show a success message",
   onClose: undefined
 }
 
 export const Warning = Template.bind({})
 Warning.args = {
   type: 'warning',
-  children:
-    'Nothing is currently published. Awaiting to be published: Birth, Death',
+  children: "Hello, I'am an alert to show a warning message",
   onClose: undefined
 }
 
 export const Error = Template.bind({})
 Error.args = {
   type: 'error',
-  children:
-    'Nothing is currently published. Awaiting to be published: Birth, Death',
+  children: "Hello, I'm an alert to show an error message",
   onClose: undefined
 }
 
 export const Info = Template.bind({})
 Info.args = {
   type: 'info',
-  children:
-    'Nothing is currently published. Awaiting to be published: Birth, Death',
+  children: "Hello, I'm an alert to show an helpful message",
   onClose: undefined
 }
 
 export const Loading = Template.bind({})
 Loading.args = {
   type: 'loading',
-  children:
-    'Nothing is currently published. Awaiting to be published: Birth, Death',
+  children: "Hello, I'm an alert to show something is loading",
   onClose: undefined
 }
 
@@ -67,41 +62,32 @@ export const Closable = () => {
 
   return (
     isVisible && (
-      <Alert type="success" onClose={() => setVisible(false)}>
-        Hello, I'm closable!
+      <Alert type="warning" onClose={() => setVisible(false)}>
+        Hello, I'm an alert that you can dismiss!
       </Alert>
     )
   )
 }
 
-export const Retryable = () => (
-  <Alert
-    type="success"
-    actionText="Retry"
-    onActionClick={() => alert('Retried')}
-  >
-    Hello, I'm a retriable alert!
+export const WithAction = () => (
+  <Alert type="error" actionText="Retry" onActionClick={() => alert('Retried')}>
+    Hello, I'm an alert with an action button!
   </Alert>
 )
 
-export const RetryableAndClosable = () => {
+export const WithActionAndDismiss = () => {
   const [isVisible, setVisible] = useState(true)
   return (
     isVisible && (
       <Alert
-        type="success"
-        onActionClick={() => alert('Retried')}
-        actionText="Retry"
+        type="warning"
+        onActionClick={() => alert('Reviewed')}
+        actionText="Review"
         onClose={() => setVisible(false)}
       >
-        Hi! I'm a retryable and closable toast. I also have a very long text
-        within the toast. This illustrates how the toast stretches when the
-        content is lengthy.
-        <br />
-        <br />
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis mauris
-        libero, tempor ut egestas quis, suscipit ac erat. Donec lacinia mi id
-        augue scelerisque, vel vehicula eros lobortis.
+        Hi! I'm an alert with a action button and dismiss close button. I also
+        have a very long text within the toast. This illustrates how the toast
+        stretches when the content is lengthy.
       </Alert>
     )
   )
