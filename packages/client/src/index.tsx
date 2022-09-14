@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
+// eslint-disable-next-line import/no-unassigned-import
 import 'focus-visible/dist/focus-visible.js'
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'

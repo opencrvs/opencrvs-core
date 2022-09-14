@@ -11,10 +11,9 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { Next, Previous } from '../icons'
+import { Next, Previous, PreviousLarge, NextLarge } from '../icons'
 import { Button } from '../buttons/Button'
 import { CircleButton } from '../buttons'
-import { PreviousLarge, NextLarge } from '../icons'
 
 export type IPaginationVariant = 'small' | 'large' // small for desktop and large for mobile
 

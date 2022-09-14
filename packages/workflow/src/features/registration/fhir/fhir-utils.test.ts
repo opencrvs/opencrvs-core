@@ -185,8 +185,7 @@ describe('Verify getBirthRegistrationNumber', () => {
           valueString: 'MOTHER'
         },
         {
-          url:
-            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
           valueString: '+8801622688231'
         }
       ]
@@ -277,8 +276,7 @@ describe('Verify getPaperFormID', () => {
           valueString: 'MOTHER'
         },
         {
-          url:
-            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
           valueString: '+8801622688231'
         }
       ]
@@ -309,8 +307,7 @@ describe('Verify getPaperFormID', () => {
           valueString: 'MOTHER'
         },
         {
-          url:
-            'http://opencrvs.org/specs/extension/contact-person-phone-number',
+          url: 'http://opencrvs.org/specs/extension/contact-person-phone-number',
           valueString: '+8801622688231'
         }
       ]

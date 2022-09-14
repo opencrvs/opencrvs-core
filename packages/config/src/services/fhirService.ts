@@ -19,7 +19,7 @@ export interface IAuthHeader {
 export const fetchFHIR = <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
-  method: string = 'GET'
+  method = 'GET'
 ): Promise<T> => {
   return fetch(`${FHIR_URL}${suffix}`, {
     method,
@@ -35,7 +35,7 @@ export const fetchFHIR = <T = any>(
 export const deleteFHIR = async (
   suffix: string,
   authHeader: IAuthHeader,
-  method: string = 'DELETE'
+  method = 'DELETE'
 ) => {
   return fetch(`${FHIR_URL}${suffix}`, {
     method,

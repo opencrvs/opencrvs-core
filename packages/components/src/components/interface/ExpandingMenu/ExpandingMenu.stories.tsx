@@ -10,7 +10,7 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 import { Meta, Story } from '@storybook/react'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import { ExpandingMenu } from './ExpandingMenu'
 import styled from 'styled-components'
 import {
@@ -26,7 +26,6 @@ import {
   LogoutBlue,
   Hamburger
 } from '../../icons'
-import React from 'react'
 
 interface IUserDetails {
   name: string

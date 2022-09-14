@@ -4,7 +4,11 @@
     "outDir": "lib/",
     "module": "ESNext",
     "target": "es6",
-    "lib": ["es6", "dom", "es2017"],
+    "lib": [
+      "es6",
+      "dom",
+      "es2017"
+    ],
     "sourceMap": true,
     "allowJs": false,
     "declaration": true,
@@ -28,6 +32,13 @@
     // differently, so there's a conflict.
     "skipLibCheck": true
   },
-  "include": ["src/**/*.tsx", "src/**/*.ts", "typings", "tslint-rules"],
-  "exclude": ["node_modules", "lib"]
+  "include": [
+    "src/**/*.tsx",
+    "src/**/*.ts",
+    "typings",
+  ],
+  "exclude": [
+    "node_modules",
+    "lib"
+  ]
 }
