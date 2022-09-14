@@ -55,12 +55,13 @@ const ToastAlert = styled(Alert)<{
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     width: 100%;
+    margin: 16px;
 
     ${({ $show }) =>
       $show &&
       css`
         animation: ${easeInFromTop} 500ms ease-in-out;
-        top: 56px;
+        top: 64px;
         bottom: auto;
       `}
   }

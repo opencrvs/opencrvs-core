@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import { Meta, Source, Canvas, Story } from '@storybook/addon-docs'
-import { PrimaryButton } from '../buttons'
+import { SecondaryButton } from '../buttons'
 import { useState } from 'react'
 import { Toast } from './Toast'
 
@@ -9,9 +9,9 @@ export const ToastToggler = ({ type, closable, retryable, children }) => {
   return (
     <>
       <br />
-      <PrimaryButton onClick={() => setVisible(!isVisible)}>
-        {isVisible ? 'Close' : 'Open'} toast
-      </PrimaryButton>
+      <SecondaryButton onClick={() => setVisible(!isVisible)}>
+        {isVisible ? 'Close' : 'Open'}
+      </SecondaryButton>
       <Toast
         type={type}
         onClose={closable ? () => setVisible(false) : undefined}
@@ -47,10 +47,10 @@ Toast can be used inside any view, it doesn't have to be on the application root
     `}
 />
 
-## Neutral
+## Warning
 
-<Story name="Neutral" storyName="Neutral">
-  <ToastToggler type="neutral">Hi! I'm a neutral toast</ToastToggler>
+<Story name="Warning" storyName="Warning">
+  <ToastToggler type="warning">Hi! I'm a neutral toast</ToastToggler>
 </Story>
 
 <Source
@@ -65,7 +65,7 @@ Hi! I'm a neutral toast
 ## Error
 
 <Story name="Error" storyName="Error">
-  <ToastToggler type="warning">Hi! I'm an error toast</ToastToggler>
+  <ToastToggler type="Error">Hi! I'm an error toast</ToastToggler>
 </Story>
 
 <Source
@@ -116,7 +116,7 @@ Hi! I'm a neutral toast
 ## Retryable
 
 <Story name="Retryable" storyName="Retryable">
-  <ToastToggler type="loading" retryable>
+  <ToastToggler type="error" retryable>
     Hi! I'm a retryable toast
   </ToastToggler>
 </Story>
@@ -138,7 +138,7 @@ Hi! I'm a neutral toast
 ## Retryable and closable
 
 <Story name="Retryable and closable" storyName="Retryable and closable">
-  <ToastToggler type="loading" retryable closable>
+  <ToastToggler type="error" retryable closable>
     Hi! I'm a retryable and closable toast
   </ToastToggler>
 </Story>
@@ -164,7 +164,7 @@ Hi! I'm a neutral toast
   name="Long text, retryable and closable"
   storyName="Long text, retryable and closable"
 >
-  <ToastToggler type="success" retryable closable>
+  <ToastToggler type="error" retryable closable>
     Hi! I'm a retryable and closable toast. I also have a very long text within
     the toast. This illustrates how the toast stretches when the content is
     lengthy.

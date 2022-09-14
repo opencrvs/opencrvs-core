@@ -17,7 +17,7 @@ import { Spinner } from '../Spinner'
 import { Text } from '../Text'
 import { colors } from '../colors'
 
-export type AlertType = 'success' | 'neutral' | 'loading' | 'info' | 'warning'
+export type AlertType = 'success' | 'warning' | 'loading' | 'info' | 'error'
 
 const Container = styled.div<{
   $type?: AlertType
@@ -26,8 +26,8 @@ const Container = styled.div<{
     ${$type === 'success' ? theme.colors.positiveDark : ''}
     ${$type === 'loading' ? theme.colors.primaryDark : ''}
     ${$type === 'info' ? theme.colors.primaryDark : ''}
-    ${$type === 'warning' ? theme.colors.negativeDark : ''}
-    ${$type === 'neutral' ? theme.colors.orangeDark : ''}
+    ${$type === 'error' ? theme.colors.negativeDark : ''}
+    ${$type === 'warning' ? theme.colors.orangeDark : ''}
     ${$type === undefined ? theme.colors.positiveDark : ''}
   `};
 
@@ -61,6 +61,7 @@ const Close = styled(CircleButton)`
 
 const ActionButton = styled(TertiaryButton)`
   margin-top: 8px;
+  margin-right: 8px;
 `
 
 const ButtonText = styled(Text)`
@@ -99,14 +100,14 @@ export const Alert = ({
   <Container $type={type} {...props}>
     <IconContainer>
       {type === 'success' && <Check />}
-      {type === 'neutral' && <Help />}
-      {type === 'warning' && <NotificationError />}
+      {type === 'warning' && <Help />}
+      {type === 'error' && <NotificationError />}
       {type === 'info' && <Notification />}
       {type === 'loading' && (
         <Spinner
           id="in-progress-floating-notification"
           baseColor={colors.white}
-          size={22}
+          size={20}
         />
       )}
     </IconContainer>
