@@ -11,12 +11,14 @@
  */
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
+// eslint-disable-next-line import/no-relative-parent-imports
 import { createServer } from '../../server'
 import {
   patientMock,
   compositionMock,
   deathCompositionMock
-} from '@workflow/test/utils'
+  // eslint-disable-next-line import/no-relative-parent-imports
+} from '../../test/utils'
 import * as fetchAny from 'jest-fetch-mock'
 
 const fetch = fetchAny as any

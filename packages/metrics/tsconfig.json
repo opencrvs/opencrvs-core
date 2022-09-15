@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "paths": { "@metrics/*": ["./*"] },
+    "paths": {
+      "@metrics/*": [
+        "./*"
+      ]
+    },
     "target": "es6",
     "module": "commonjs",
     "outDir": "build/dist",
@@ -10,7 +14,11 @@
     "skipLibCheck": true,
     "moduleResolution": "node",
     "rootDir": ".",
-    "lib": ["esnext.asynciterable", "es6", "es2017"],
+    "lib": [
+      "esnext.asynciterable",
+      "es6",
+      "es2017"
+    ],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -18,8 +26,20 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": [
+      "fhir",
+      "jest"
+    ]
   },
-  "include": ["src/**/*.ts", "scripts", "typings", "tslint-rules"],
-  "exclude": ["node_modules", "build", "acceptance-tests"]
+  "include": [
+    "src/**/*.ts",
+    "scripts",
+    "typings"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "scripts",
+    "acceptance-tests"
+  ]
 }

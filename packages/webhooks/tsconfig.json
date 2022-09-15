@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "baseUrl": "./src",
-    "paths": { "@webhooks/*": ["./*"] },
+    "paths": {
+      "@webhooks/*": [
+        "./*"
+      ]
+    },
     "target": "es6",
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
@@ -10,7 +14,11 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "rootDir": ".",
-    "lib": ["esnext.asynciterable", "es6", "es2017"],
+    "lib": [
+      "esnext.asynciterable",
+      "es6",
+      "es2017"
+    ],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -18,9 +26,16 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "types": ["fhir", "jest"]
+    "types": [
+      "fhir",
+      "jest"
+    ]
   },
-  "include": ["resources/**/*.ts", "src/**/*.ts", "typings", "tslint-rules"],
+  "include": [
+    "resources/**/*.ts",
+    "src/**/*.ts",
+    "typings"
+  ],
   "exclude": [
     "node_modules",
     "build",

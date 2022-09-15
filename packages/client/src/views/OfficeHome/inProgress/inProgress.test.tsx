@@ -820,6 +820,7 @@ describe('In Progress tab', () => {
   describe('When Notification (Hospital) tab is selected', () => {
     it('Should render all items returned from graphQL', async () => {
       const TIME_STAMP = '1562912635549'
+      const birthNotificationSentDateStr = '2019-10-20T11:03:20.660Z'
       const drafts: IDeclaration[] = []
       drafts.push(createDeclaration(Event.Birth))
       const testComponent = await createTestComponent(
@@ -837,6 +838,27 @@ describe('In Progress tab', () => {
                     trackingId: 'BQ2IDOP',
                     modifiedAt: TIME_STAMP
                   },
+                  operationHistories: [
+                    {
+                      operationType: 'IN_PROGRESS',
+                      operatedOn: birthNotificationSentDateStr,
+                      operatorRole: 'LOCAL_REGISTRAR',
+                      operatorName: [
+                        {
+                          firstNames: 'Mohammad',
+                          familyName: 'Ashraful',
+                          use: 'en'
+                        },
+                        {
+                          firstNames: '',
+                          familyName: '',
+                          use: 'bn'
+                        }
+                      ],
+                      operatorOfficeName: 'Alokbali Union Parishad',
+                      operatorOfficeAlias: ['আলোকবালী  ইউনিয়ন পরিষদ']
+                    }
+                  ],
                   childName: [
                     {
                       use: 'en',
@@ -882,7 +904,9 @@ describe('In Progress tab', () => {
       })
       testComponent.update()
       const data = testComponent.find(GridTable).prop('content')
-      const EXPECTED_DATE_OF_REJECTION = formattedDuration(Number(TIME_STAMP))
+      const EXPECTED_DATE_OF_REJECTION = formattedDuration(
+        new Date(birthNotificationSentDateStr)
+      )
 
       expect(data[0].id).toBe('f0a1ca2c-6a14-4b9e-a627-c3e2e110587e')
       expect(data[0].name).toBe('anik hoque')

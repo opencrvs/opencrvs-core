@@ -62,7 +62,6 @@ async function transformField(
   }
 
   if (isBuilderFunction(fieldBuilderForVal)) {
-    // tslint:disable-next-line
     await fieldBuilderForVal(targetObj, sourceVal, context)
     return targetObj
   }
@@ -77,20 +76,21 @@ async function transformField(
 }
 
 export default async function transformObj(
-  sourceObj: object,
-  targetObj: object,
+  sourceObj: Record<string, unknown>,
+  targetObj: Record<string, unknown>,
   fieldBuilders: IFieldBuilders,
   context: { _index?: any; authHeader: IAuthHeader },
   currentPropNamePath: string[] = []
 ) {
   // ensure the sourceObj has Object in its prototype chain
   // graphql-js creates objects with Object.create(null)
-  // tslint:disable-next-line
   sourceObj = Object.assign({}, sourceObj)
   for (const currentPropName in sourceObj) {
     if (sourceObj.hasOwnProperty(currentPropName)) {
       if (Array.isArray(sourceObj[currentPropName])) {
-        for (const [index, arrayVal] of sourceObj[currentPropName].entries()) {
+        for (const [index, arrayVal] of (
+          sourceObj[currentPropName] as Array<unknown>
+        ).entries()) {
           context._index = { ...context._index, [currentPropName]: index }
 
           /* context._index = {

@@ -32,7 +32,8 @@
     "grafana",
     "packages/scheduler/start.sh",
     "packages/scheduler/cronTabFiles/*",
-    "packages/scheduler/jobs/*"
+    "packages/scheduler/jobs/*",
+    ".nvmrc"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {

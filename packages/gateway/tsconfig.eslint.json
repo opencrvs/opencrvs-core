@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "typings",
+    "__mocks__/elasticsearch.ts",
+    "src/**/*.test.ts",
+    "test/setupJest.ts",
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "scripts",
+    "acceptance-tests"
+  ]
+}

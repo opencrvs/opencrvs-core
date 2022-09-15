@@ -2225,7 +2225,10 @@ export function loginAsFieldAgent(store: AppStore) {
   )
 }
 
-export function createRouterProps<T, Params>(
+export function createRouterProps<
+  T,
+  Params extends { [K in keyof Params]?: string | undefined }
+>(
   path: string,
   locationState?: T,
   {

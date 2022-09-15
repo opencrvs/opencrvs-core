@@ -219,7 +219,7 @@ do
         fi
         if [ $i == "node" ] ; then
             echo "You need to install Node, or if you did, we can't find it and perhaps it is not in your PATH. Please fix your node installation."
-            echo "We recommend you install Node v.14.17.0, v.14.17.6, v14.18.0 or v14.18.1 as this release has been tested on those versions."
+            echo "We recommend you install Node 14.18.0 or v14.18.1 as this release has been tested on those versions."
             echo "There are various ways you can install Node.  The easiest way to get Node running with the version of your choice is using Node Version Manager."
             echo "Documentation is here: https://nodejs.org/en/download/package-manager/#nvm.  For example run:\033[0m"
             echo "curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash"

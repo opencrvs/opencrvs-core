@@ -43,7 +43,7 @@ export class CheckboxGroup extends React.Component<ICheckboxGroup> {
 
     this.props.onChange(
       this.props.value.indexOf(value) > -1
-        ? this.props.value.filter(val => val !== value)
+        ? this.props.value.filter((val) => val !== value)
         : this.props.value.concat(value)
     )
   }
@@ -54,7 +54,7 @@ export class CheckboxGroup extends React.Component<ICheckboxGroup> {
     return (
       <Wrapper>
         <List>
-          {options.map(option => {
+          {options.map((option) => {
             return (
               <Checkbox
                 {...props}
