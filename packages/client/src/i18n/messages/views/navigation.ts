@@ -90,6 +90,11 @@ const messagesToDefine: INavigationMessages = {
     description: 'Certificates label in navigation',
     id: 'navigation.certificate'
   },
+  vsreports: {
+    defaultMessage: 'Vsreports',
+    description: 'Vsreports label in navigation',
+    id: 'navigation.vsreports'
+  },
   completenessRates: {
     defaultMessage: 'Completeness rates',
     description: 'Completeness rates in navigation',
