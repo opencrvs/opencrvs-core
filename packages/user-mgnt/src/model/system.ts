@@ -14,7 +14,7 @@ import { statuses } from '@user-mgnt/utils/userUtils'
 import { IUserName, UserNameSchema } from '@user-mgnt/model/user'
 
 export interface ISystem {
-  name: string
+  name: IUserName[]
   createdBy: IUserName[]
   username: string
   client_id: string
@@ -33,7 +33,7 @@ export interface ISystem {
 export interface ISystemModel extends ISystem, Document {}
 
 const systemSchema = new Schema({
-  name: { type: String, required: true },
+  name: { type: [UserNameSchema], required: true },
   createdBy: { type: [UserNameSchema], required: true },
   username: { type: String, required: true },
   client_id: { type: String, required: true },
@@ -48,7 +48,7 @@ const systemSchema = new Schema({
     default: statuses.PENDING
   },
   settings: {
-    dailyQuota: { type: String, required: true }
+    dailyQuota: { type: String, default: 0 }
   },
   creationDate: { type: Number, default: Date.now }
 })

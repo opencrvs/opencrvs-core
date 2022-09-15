@@ -74,11 +74,6 @@ export interface IAdvancedSearchParam {
   dateOfRegistrationEnd?: string
 }
 
-interface IGQLOperationHistorySearchSet {
-  operatedOn?: GQLDate
-  notificationFacilityName?: string
-}
-
 const getTimeLoggedDataByStatus = (
   timeLoggedData: IEventDurationResponse[],
   status: string

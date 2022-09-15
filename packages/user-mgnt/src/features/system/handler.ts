@@ -27,9 +27,10 @@ import {
   createFhirPractitionerRole,
   postFhir
 } from '@user-mgnt/features/createUser/service'
+import { IUserName } from '@user-mgnt/model/user'
 
 interface IRegisterSystemPayload {
-  name: string
+  name: IUserName[]
   scope: string
   settings: {
     dailyQuota: number
@@ -99,7 +100,7 @@ export async function registerSystemClient(
     }
     const system = {
       client_id,
-      name,
+      name: name || systemAdminUser.name,
       createdBy: systemAdminUser.name,
       username: systemAdminUser.username,
       status: statuses.ACTIVE,
@@ -127,9 +128,15 @@ export async function registerSystemClient(
 
 export const reqRegisterSystemSchema = Joi.object({
   scope: Joi.string().required(),
-  name: Joi.string().required(),
+  name: Joi.array().items(
+    Joi.object({
+      given: Joi.array().items(Joi.string()),
+      use: Joi.string(),
+      family: Joi.string()
+    })
+  ),
   settings: Joi.object({
-    dailyQuota: Joi.number().required()
+    dailyQuota: Joi.number()
   })
 })
 
@@ -295,8 +302,13 @@ export async function getSystemHandler(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
+
+  const systemName = `${system.name[0]?.given || ''} ${
+    system.name[0]?.family || ''
+  }`.trim()
+  const createdBy = `${system.createdBy[0]?.given} ${system.createdBy[0]?.family}`
   return {
-    name: system.name,
+    name: systemName || createdBy,
     createdBy: `${system.createdBy[0]?.given} ${system.createdBy[0]?.family}`,
     client_id: system.client_id,
     username: system.username,
