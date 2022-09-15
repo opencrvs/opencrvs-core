@@ -77,7 +77,7 @@ export const secondaryStyles = css`
 `
 
 export const tertiaryStyles = css`
-  ${({ theme }) => theme.fonts.reg14};
+  ${({ theme }) => theme.fonts.bold14};
 
   height: 32px;
   padding: 0 8px;
