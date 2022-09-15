@@ -87,11 +87,13 @@ function EventDrafts({ event }: { event: Event }) {
             )}
             type="active"
           />
+        ) : status === DraftStatus.InPreview ? (
+          <>
+            <ActionButton action={Actions.EDIT} event={event} />
+            <ActionButton action={Actions.PUBLISH} event={event} />
+          </>
         ) : (
           <>
-            {status === DraftStatus.InPreview && (
-              <ActionButton action={Actions.EDIT} event={event} />
-            )}
             <ActionButton
               action={Actions.PUBLISH}
               event={event}
