@@ -9,397 +9,86 @@
  * Copyright (C) The OpenCRVS Authors. OpenCRVS and the OpenCRVS
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
-import React, {
-  ComponentProps,
-  forwardRef,
-  PropsWithChildren,
-  ReactElement,
-  ReactNode
-} from 'react'
+
+import React from 'react'
 import styled from 'styled-components'
 import { Spinner } from '../Spinner'
+import * as styles from './Button.styles'
 
-const Text = styled.span`
-  display: inline-block;
-  vertical-align: top;
-`
+export const BUTTON_SIZES = ['small', 'medium', 'large'] as const
+export const BUTTON_VARIANTS = [
+  'primary',
+  'secondary',
+  'tertiary',
+  'positive',
+  'negative'
+] as const
+export const BUTTON_MODIFIERS = ['disabled', 'loading', 'icon'] as const
 
-const APPEARANCE = {
-  PRIMARY: 'primary',
-  POSITIVE: 'positive',
-  NEGATIVE: 'negative',
-  SECONDARY: 'secondary',
-  TERTIARY: 'tertiary',
-  ICON: 'icon'
-} as const
+export type ButtonVariant = typeof BUTTON_VARIANTS[number]
+export type ButtonModifier = typeof BUTTON_MODIFIERS[number]
 
-const SIZE = {
-  SMALL: 'small',
-  MEDIUM: 'medium',
-  LARGE: 'large'
-} as const
-
-export const StyledButton = styled.button<
-  StylingProps & { children: ReactElement }
->`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 0;
-  outline: none;
-  border-radius: 4px;
-  cursor: pointer;
-  overflow: hidden;
-  height: 40px;
-  padding: 0 12px;
-  transition: all 100ms ease-out;
-  opacity: 1;
-  margin: 0;
-  background: transparent;
-  ${({ theme }) => theme.fonts.bold16};
-
-  ${(props) =>
-    props.size === SIZE.SMALL &&
-    `
-      height: 32px;
-      theme.fonts.bold14;
-      padding: 0 12px;
-      `}
-
-  ${(props) =>
-    props.size === SIZE.MEDIUM &&
-    `
-      height: 40px;
-      padding: 0 16px;
-      `}
-
-  ${(props) =>
-    props.size === SIZE.LARGE &&
-    `
-      height: 48px;
-      padding: 0 20px;
-      `}
-
-  ${(props) =>
-    !props.isLoading &&
-    `
-        &:hover {
-
-        }
-
-        &:active {
-        }
-      `}
-
-  ${Text} {
-    opacity: 1;
-  }
-
-  svg {
-    height: ${(props) => (props.size === SIZE.SMALL ? '20' : '24')}px;
-    width: ${(props) => (props.size === SIZE.SMALL ? '20' : '24')}px;
-    vertical-align: top;
-    margin-right: ${(props) => (props.size === SIZE.SMALL ? '-6' : '-8')}px;
-    margin-left: ${(props) => (props.size === SIZE.SMALL ? '-6' : '-8')}px;
-    margin-top: ${(props) => (props.size === SIZE.SMALL ? '3' : '0')}px;
-    pointer-events: none;
-  }
-
-  ${(props) =>
-    props.disabled &&
-    `
-        cursor: not-allowed !important;
-        opacity: 0.5;
-        &:hover {
-          transform: none;
-        }
-      `}
-
-  ${(props) =>
-    props.isUnclickable &&
-    `
-        cursor: default !important;
-        pointer-events: none;
-        &:hover {
-          transform: none;
-        }
-      `}
-
-    ${(props) =>
-    props.isLoading &&
-    `
-        opacity: 0.8;
-        svg {
-          margin-left: ${props.size === SIZE.SMALL ? '-1' : '-2'}px;
-          margin-right: ${props.size === SIZE.SMALL ? '6' : '8'}px;
-          }
-
-        ${Text} {
-          opacity: 0.8;
-        }
-
-        &:hover {
-          transform: none;
-        }
-      `}
-
-    ${(props) =>
-    props.withIcon &&
-    `
-          svg {
-            margin-left: ${props.size === SIZE.SMALL ? '-1' : '-2'}px;
-            margin-right: ${props.size === SIZE.SMALL ? '6' : '8'}px;
-            }
-        `}
-
-
-    ${(props) =>
-    props.appearance === APPEARANCE.PRIMARY &&
-    `
-    background: #4972BB;
-    color: #FFFFFF;
-
-        ${
-          !props.isLoading &&
-          `
-          &:hover {
-            background: #42506B;
-          }
-
-          &:focus:not(:hover) {
-            box-shadow:0px 0px 0px 3px #EDC55E;
-          }
-
-          &:focus, &:active {
-            background-color #42506B;
-            box-shadow:0px 0px 0px 3px #93ACD7;
-          }
-          `
-        }
-      `}
-
-    ${(props) =>
-    props.appearance === APPEARANCE.POSITIVE &&
-    `
-      background: #409977;
-      color: #FFFFFF;
-          ${
-            !props.isLoading &&
-            `
-              &:hover {
-                background: #2C6E55;
-              }
-              &:focus:not(:hover) {
-                box-shadow:0px 0px 0px 3px #EDC55E;
-              }
-
-
-              &:focus, &:active {
-                background-color #2C6E55;
-                box-shadow:0px 0px 0px 3px #92D4BB;
-              }
-            `
-          }
-        `}
-
-    ${(props) =>
-    props.appearance === APPEARANCE.NEGATIVE &&
-    `
-      background: #D53F3F;
-      color: #FFFFFF;
-
-          ${
-            !props.isLoading &&
-            `
-              &:hover {
-                background: #994040;
-              }
-
-              &:focus:not(:hover) {
-                box-shadow:0px 0px 0px 3px #EDC55E;
-              }
-
-
-              &:focus, &:active {
-                background-color #994040;;
-                box-shadow:0px 0px 0px 3px #E79393;
-              }
-            `
-          }
-        `}
-
-    ${(props) =>
-    props.appearance === APPEARANCE.SECONDARY &&
-    `
-        border: 2px solid #4972BB;
-        color: #4972BB;
-
-        ${
-          !props.isLoading &&
-          `
-            &:hover {
-              border: 2px solid #42639C;
-              color: #42639C;
-            }
-
-             &:focus:not(:hover) {
-            box-shadow:0px 0px 0px 3px #EDC55E;
-             }
-
-
-            &:focus, &:active {
-              color #42639C;;
-              box-shadow:0px 0px 0px 3px #93ACD7;
-          `
-        }
-      `}
-
-    ${(props) =>
-    props.appearance === APPEARANCE.TERTIARY &&
-    `
-      height: 32px;
-      padding: 0 8px;
-      background: #FFFFFF;
-      color: #4972BB;
-      font-size: 14px;
-
-        ${
-          !props.isLoading &&
-          `
-            &:hover {
-              background: #EEEEEE;
-              color: #42639C;
-            }
-            &:focus:not(:hover) {
-              box-shadow:0px 0px 0px 3px #EDC55E;
-            }
-
-            &:focus, &:active {
-              background: #EEEEEE;
-              color: #42639C;
-              box-shadow:0px 0px 0px 3px #93ACD7;
-            }
-          `
-        }
-      `}
-
-      ${(props) =>
-    props.appearance === APPEARANCE.ICON &&
-    `
-            background: #FFFFFF;
-            color: #4972BB;
-            border-radius:100%;
-
-            ${
-              !props.isLoading &&
-              `
-                &:hover {
-                  background: #EEEEEE;
-                  color: #42639C;
-                }
-                &:focus:not(:hover) {
-                  box-shadow:0px 0px 0px 3px #EDC55E;
-                }
-
-                &:focus, &:active {
-                  background: #EEEEEE;
-                  color: #42639C;
-                }
-              `
-            }
-          `}
-`
-
-const ButtonLink = styled.a``
-
-interface StylingProps {
-  isLoading?: boolean
-  isUnclickable?: boolean
-  withIcon?: boolean
-  disabled?: boolean
-  size?: typeof SIZE[keyof typeof SIZE]
-  appearance?: typeof APPEARANCE[keyof typeof APPEARANCE]
+export interface ButtonCustomization
+  extends React.HTMLAttributes<HTMLButtonElement> {
+  /** Size of the button */
+  size?: typeof BUTTON_SIZES[number]
+  /** Element the button renders as */
+  element?: 'a' | 'button'
 }
 
-interface ConfigProps {
-  isLink?: boolean
-  ButtonWrapper?: keyof JSX.IntrinsicElements | React.ComponentType<any>
-  isDisabled?: boolean
-  isLoading?: boolean
-  loadingText?: ReactNode
+export type ButtonProps = ButtonCustomization & {
+  [variant in ButtonVariant]: boolean
+} & {
+  [modifier in ButtonModifier]: boolean
 }
 
-export const Button = forwardRef<
-  unknown,
-  PropsWithChildren<
-    ConfigProps &
-      StylingProps &
-      (JSX.IntrinsicElements['button'] & JSX.IntrinsicElements['a'])
-  >
->(
-  (
-    {
-      children,
-      isDisabled = false,
-      isLoading,
-      loadingText = null,
-      isLink,
-      withIcon,
-      ButtonWrapper = null,
-      appearance = 'tertiary',
-      ...rest
-    },
-    ref
-  ) => {
-    if (ButtonWrapper) {
-      return (
-        <StyledButton
-          as={ButtonWrapper}
-          disabled={isDisabled}
-          isLoading={isLoading}
-          withIcon={withIcon}
-          appearance={appearance}
-          {...rest}
-          ref={ref}
-        >
-          <>
-            {isLoading && <Spinner id="button-loading" size={24} />}
-            <Text>{children}</Text>
-          </>
-        </StyledButton>
-      )
-    }
-    if (isLink) {
-      return (
-        <StyledButton
-          as={ButtonLink}
-          isLoading={isLoading}
-          withIcon={withIcon}
-          appearance={appearance}
-          {...rest}
-          ref={ref}
-        >
-          <>
-            {isLoading && <Spinner id="button-loading" size={24} />}
-            <Text>{children}</Text>
-          </>
-        </StyledButton>
-      )
-    }
-    return (
-      <StyledButton
-        disabled={isDisabled}
-        isLoading={isLoading}
-        withIcon={withIcon}
-        appearance={appearance}
-        {...rest}
-        ref={ref as ComponentProps<typeof StyledButton>['ref']}
-      >
-        <>
-          {isLoading && <Spinner id="button-loading" size={24} />}
-          <Text>{children}</Text>
-        </>
-      </StyledButton>
-    )
-  }
-)
+type StyledButtonProps = Omit<ButtonProps, ButtonVariant> & {
+  variant: ButtonVariant
+}
+const StyledButton = styled.button.withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) =>
+    // https://styled-components.com/docs/api#shouldforwardprop
+    // Leave some props unpassed to DOM
+    !['loading'].includes(prop) && defaultValidatorFn(prop)
+})<StyledButtonProps>`
+  ${styles.baseStyles}
+
+  ${(props) => props.size === 'small' && styles.smallStyles(props)}
+  ${(props) => props.size === 'medium' && styles.mediumStyles}
+  ${(props) => props.size === 'large' && styles.largeStyles}
+
+  ${(props) => props.variant === 'primary' && styles.primaryStyles(props)}
+  ${(props) => props.variant === 'secondary' && styles.secondaryStyles}
+  ${(props) => props.variant === 'tertiary' && styles.tertiaryStyles}
+  ${(props) => props.variant === 'positive' && styles.positiveStyles}
+  ${(props) => props.variant === 'negative' && styles.negativeStyles}
+
+  ${(props) => props.icon && styles.globalIconStyles}
+  ${(props) => props.loading && styles.globalLoadingStyles}
+  ${(props) => props.disabled && styles.globalDisabledStyles}
+`
+
+export const Button = ({
+  size = 'medium',
+  element = 'button',
+  loading,
+  children,
+  ...props
+}: ButtonProps) => {
+  const variant = BUTTON_VARIANTS.find((variant) => props[variant]) ?? 'primary'
+
+  return (
+    <StyledButton
+      size={size}
+      variant={variant}
+      loading={loading}
+      as={element}
+      {...props}
+    >
+      {loading && (
+        <Spinner id="button-loading" size={24} baseColor="currentColor" />
+      )}
+      {children}
+    </StyledButton>
+  )
+}
