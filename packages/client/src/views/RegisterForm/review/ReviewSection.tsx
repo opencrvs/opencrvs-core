@@ -129,7 +129,7 @@ import { generateLocations } from '@client/utils/locationUtils'
 import {
   bytesToSize,
   isCorrection,
-  isFileSizeExceeded,
+  isFileSizeExceeded
 } from '@client/views/CorrectionForm/utils'
 import {
   ListViewSimplified,
@@ -1738,7 +1738,9 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
 }
 
 function motherDoesNotExistAndStateIsMother(
-  declaration: IDeclaration,
+  declaration: {
+    data: any
+  },
   activeState: string
 ) {
   return (
@@ -1750,7 +1752,9 @@ function motherDoesNotExistAndStateIsMother(
 }
 
 function fatherDoesNotExistAndStateIsFather(
-  declaration: IDeclaration,
+  declaration: {
+    data: any
+  },
   activeState: string
 ) {
   return (
