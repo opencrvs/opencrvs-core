@@ -20,7 +20,7 @@ import { History } from 'history'
 //mock api calls
 const server = setupServer(
   rest.get(
-    `${window.config.COUNTRY_CONFIG_URL}/content/login`,
+    `${window.config?.COUNTRY_CONFIG_URL}/content/login`,
     (req, res, ctx) => {
       return res(
         ctx.json({
@@ -37,7 +37,7 @@ const server = setupServer(
       )
     }
   ),
-  rest.get(`${window.config.CONFIG_API_URL}/loginConfig`, (req, res, ctx) => {
+  rest.get(`${window.config?.CONFIG_API_URL}/loginConfig`, (req, res, ctx) => {
     return res(
       ctx.json({
         config: {
@@ -53,7 +53,7 @@ const server = setupServer(
       })
     )
   }),
-  rest.post(`${window.config.AUTH_API_URL}/verifyUser`, (req, res, ctx) => {
+  rest.post(`${window.config?.AUTH_API_URL}/verifyUser`, (req, res, ctx) => {
     return res(
       ctx.json({
         nonce: 'KkcVYTRVC6usF7Vjdi3FSw==',
@@ -170,7 +170,7 @@ describe('Test phone number verification form', () => {
       //change verifyUser api response
       server.use(
         rest.post(
-          `${window.config.AUTH_API_URL}/verifyUser`,
+          `${window.config?.AUTH_API_URL}/verifyUser`,
           (req, res, ctx) => {
             return res(
               ctx.status(200),
@@ -201,7 +201,7 @@ describe('Test phone number verification form', () => {
       //change verifyUser api response
       server.use(
         rest.post(
-          `${window.config.AUTH_API_URL}/verifyUser`,
+          `${window.config?.AUTH_API_URL}/verifyUser`,
           (req, res, ctx) => {
             return res(
               ctx.status(401),

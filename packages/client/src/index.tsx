@@ -44,23 +44,23 @@ if (
   window.location.hostname !== '127.0.0.1'
 ) {
   // setup error reporting using sentry
-  if (window.config.SENTRY) {
+  if (window.config?.SENTRY) {
     Sentry.init({
       release: process.env.REACT_APP_VERSION,
       environment: process.env.NODE_ENV,
-      dsn: window.config.SENTRY
+      dsn: window.config?.SENTRY
     })
   }
 
   // setup log rocket to ship log messages and record user errors
-  if (window.config.LOGROCKET) {
-    LogRocket.init(window.config.LOGROCKET, {
+  if (window.config?.LOGROCKET) {
+    LogRocket.init(window.config?.LOGROCKET, {
       release: import.meta.env.VITE_APP_VERSION
     })
   }
 
   // Integrate the two
-  if (window.config.SENTRY && window.config.LOGROCKET) {
+  if (window.config?.SENTRY && window.config?.LOGROCKET) {
     Sentry.configureScope((scope) => {
       scope.addEventProcessor(async (event) => {
         if (!event.extra) {

@@ -306,7 +306,7 @@ export const ActionDetailsModalListTable = ({
     const name = certificate.collector?.individual
       ? getIndividualNameObj(
           certificate.collector.individual.name,
-          window.config.LANGUAGES
+          window.config?.LANGUAGES
         )
       : {}
     const collectorLabel = () => {
@@ -481,7 +481,7 @@ export const ActionDetailsModal = ({
   if (!actionDetailsData.dhis2Notification) {
     const nameObj = getIndividualNameObj(
       actionDetailsData.user.name,
-      window.config.LANGUAGES
+      window.config?.LANGUAGES
     )
     userName = nameObj
       ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`

@@ -18,7 +18,6 @@ import {
   InputField,
   TextInput,
   PasswordInput,
-  THEME_MODE,
   ErrorMessage
 } from '@opencrvs/components/lib/forms'
 import { stepOneFields } from '@login/views/StepOne/stepOneFields'
@@ -79,7 +78,7 @@ export const LogoContainer = styled.div`
 export const Title = styled.div`
   margin: auto;
   margin-top: 30px;
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.black};
   text-align: center;
   ${({ theme }) => theme.fonts.reg16};
 `
@@ -94,7 +93,7 @@ export const StyledPrimaryButton = styled(PrimaryButton)`
 `
 
 export const StyledButton = styled(LinkButton)`
-  color: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.black};
   flex-direction: row;
   justify-content: center;
   text-decoration: none;
@@ -102,7 +101,9 @@ export const StyledButton = styled(LinkButton)`
   ${({ theme }) => theme.fonts.reg16};
   :hover {
     text-decoration: underline;
-    text-decoration-color: ${({ theme }) => theme.colors.secondary};
+    /* stylelint-disable-next-line opencrvs/no-font-styles */
+    font-weight: bold;
+    text-decoration-color: ${({ theme }) => theme.colors.primary};
   }
   &:focus {
     outline: none;
@@ -112,11 +113,11 @@ export const StyledButton = styled(LinkButton)`
   &:not([data-focus-visible-added]) {
     background: transparent;
     outline: none;
-    color: ${({ theme }) => theme.colors.white};
+    color: ${({ theme }) => theme.colors.black};
   }
   &:active:not([data-focus-visible-added]):enabled {
     outline: none;
-    background: ${({ theme }) => theme.colors.yellow};
+    background: transparent;
     color: ${({ theme }) => theme.colors.copy};
   }
 `
@@ -160,7 +161,6 @@ const UserNameInput = injectIntl((props: Props) => {
           optionalLabel={intl.formatMessage(messages.optionalLabel)}
           ignoreMediaQuery
           hideAsterisk
-          mode={THEME_MODE.DARK}
         >
           <TextInput
             {...userNameField}
@@ -190,7 +190,6 @@ const Password = injectIntl((props: Props) => {
           optionalLabel={intl.formatMessage(messages.optionalLabel)}
           ignoreMediaQuery
           hideAsterisk
-          mode={THEME_MODE.DARK}
         >
           <PasswordInput
             {...passwordField}

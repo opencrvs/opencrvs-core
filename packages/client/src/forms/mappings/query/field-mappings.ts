@@ -382,12 +382,12 @@ export const eventLocationQueryTransformer =
     } else if (fieldValue && ignoreAddressFields) {
       if (
         (country &&
-          country.toUpperCase() === window.config.COUNTRY.toUpperCase() &&
+          country.toUpperCase() === window.config?.COUNTRY.toUpperCase() &&
           !ignoreAddressFields.fieldsToIgnoreForLocalAddress.includes(
             field.name
           )) ||
         (country &&
-          country.toUpperCase() !== window.config.COUNTRY.toUpperCase() &&
+          country.toUpperCase() !== window.config?.COUNTRY.toUpperCase() &&
           !ignoreAddressFields.fieldsToIgnoreForInternationalAddress.includes(
             field.name
           ))

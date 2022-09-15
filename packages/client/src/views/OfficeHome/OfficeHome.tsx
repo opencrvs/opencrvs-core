@@ -381,7 +381,7 @@ export class OfficeHomeView extends React.Component<
               )}
 
               {tabId === WORKQUEUE_TABS.externalValidation &&
-                window.config.EXTERNAL_VALIDATION_WORKQUEUE && (
+                window.config?.EXTERNAL_VALIDATION_WORKQUEUE && (
                   <InExternalValidationTab
                     queryData={{
                       data: filteredData.externalValidationTab

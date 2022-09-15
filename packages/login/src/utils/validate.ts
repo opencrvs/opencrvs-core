@@ -20,7 +20,7 @@ export interface IValidationResult {
 export type Validation = (value: string) => IValidationResult | undefined
 
 export const isAValidPhoneNumberFormat = (value: string): boolean => {
-  const pattern = window.config.PHONE_NUMBER_PATTERN
+  const pattern = window.config?.PHONE_NUMBER_PATTERN
   return new RegExp(pattern).test(value)
 }
 

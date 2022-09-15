@@ -55,7 +55,7 @@ describe('Login app step one', () => {
   })
 
   it('redirects user to verification code form once username and password are accepted', async () => {
-    moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
+    moxios.stubRequest(resolve(window.config?.AUTH_API_URL, 'authenticate'), {
       status: 200,
       response: { nonce: '12345', mobile: '+260933333333', status: 'active' }
     })
@@ -73,7 +73,7 @@ describe('Login app step one', () => {
   /* describe('when credential form is filled', () => {
 
     /*it('sends the phone number and the password to our api when user submits the form', async () => {
-      moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
+      moxios.stubRequest(resolve(window.config?.AUTH_API_URL, 'authenticate'), {
         status: 401,
         responseText: { message: 'unauthorized' }
       })
@@ -86,7 +86,7 @@ describe('Login app step one', () => {
 
     xit('handles no connectivity', async () => {
       moxios.stubRequest(
-        resolve(window.config.AUTH_API_URL, 'authenticate'),
+        resolve(window.config?.AUTH_API_URL, 'authenticate'),
         undefined
       )
       app.find('form#STEP_ONE').simulate('submit')
@@ -96,7 +96,7 @@ describe('Login app step one', () => {
     })
 
     it('displays loading spinner when the user is submitting the form', async () => {
-      moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
+      moxios.stubRequest(resolve(window.config?.AUTH_API_URL, 'authenticate'), {
         status: 400,
         responseText: { message: 'bad request' }
       })

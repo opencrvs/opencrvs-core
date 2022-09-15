@@ -193,7 +193,7 @@ export function getFullLocationNameOfFacility(
     if (parent === '0') {
       continueLoop = false
       names.push(
-        countries.find(({ value }) => value === window.config.COUNTRY)
+        countries.find(({ value }) => value === window.config?.COUNTRY)
           ?.label as MessageDescriptor
       )
     } else {

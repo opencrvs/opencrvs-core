@@ -39,7 +39,7 @@ export interface IAuthenticationData {
 }
 
 export const client = axios.create({
-  baseURL: window.config.AUTH_API_URL
+  baseURL: window.config?.AUTH_API_URL
 })
 
 export interface IAuthenticateResponse {
@@ -86,14 +86,14 @@ export function request<T>(options: AxiosRequestConfig) {
 
 const getApplicationConfig = () => {
   return request<IApplicationConfigResponse>({
-    url: resolve(window.config.CONFIG_API_URL, '/loginConfig'),
+    url: resolve(window.config?.CONFIG_API_URL, '/loginConfig'),
     method: 'GET'
   })
 }
 
 const authenticate = (data: IAuthenticationData) => {
   return request<IAuthenticateResponse>({
-    url: resolve(window.config.AUTH_API_URL, 'authenticate'),
+    url: resolve(window.config?.AUTH_API_URL, 'authenticate'),
     method: 'POST',
     data
   })
@@ -101,7 +101,7 @@ const authenticate = (data: IAuthenticationData) => {
 
 const resendSMS = (nonce: string, retrievalFlow = false) => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, '/resendSms'),
+    url: resolve(window.config?.AUTH_API_URL, '/resendSms'),
     method: 'POST',
     data: { nonce, retrievalFlow }
   })
@@ -109,7 +109,7 @@ const resendSMS = (nonce: string, retrievalFlow = false) => {
 
 const verifyCode = (data: ICodeVerifyData): Promise<IAuthenticateResponse> => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, 'verifyCode'),
+    url: resolve(window.config?.AUTH_API_URL, 'verifyCode'),
     method: 'POST',
     data
   })
@@ -125,7 +125,7 @@ const verifyUser = (
   retrieveFlow: string
 ): Promise<IUserVerifyResponse> => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, 'verifyUser'),
+    url: resolve(window.config?.AUTH_API_URL, 'verifyUser'),
     method: 'POST',
     data: { mobile, retrieveFlow }
   })
@@ -141,7 +141,7 @@ const verifyNumber = (
   code: string
 ): Promise<IVerifyNumberResponse> => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, 'verifyNumber'),
+    url: resolve(window.config?.AUTH_API_URL, 'verifyNumber'),
     method: 'POST',
     data: { nonce, code }
   })
@@ -160,7 +160,7 @@ const verifySecurityAnswer = (
   answer: string
 ): Promise<IVerifySecurityAnswerResponse> => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, 'verifySecurityAnswer'),
+    url: resolve(window.config?.AUTH_API_URL, 'verifySecurityAnswer'),
     method: 'POST',
     data: { nonce, answer }
   })
@@ -168,7 +168,7 @@ const verifySecurityAnswer = (
 
 const changePassword = (nonce: string, newPassword: string): Promise<void> => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, 'changePassword'),
+    url: resolve(window.config?.AUTH_API_URL, 'changePassword'),
     method: 'POST',
     data: { nonce, newPassword }
   })
@@ -176,7 +176,7 @@ const changePassword = (nonce: string, newPassword: string): Promise<void> => {
 
 const sendUserName = (nonce: string): Promise<void> => {
   return request({
-    url: resolve(window.config.AUTH_API_URL, 'sendUserName'),
+    url: resolve(window.config?.AUTH_API_URL, 'sendUserName'),
     method: 'POST',
     data: { nonce }
   })

@@ -204,7 +204,7 @@ export const GetHistory = ({
     })
   }
 
-  if (!window.config.EXTERNAL_VALIDATION_WORKQUEUE) {
+  if (!window.config?.EXTERNAL_VALIDATION_WORKQUEUE) {
     allHistoryData = allHistoryData.filter((obj: { [key: string]: any }) => {
       return obj.action !== 'WAITING_VALIDATION'
     })
@@ -245,7 +245,7 @@ export const GetHistory = ({
           id={item?.user?.id as string}
           nameObject={item?.user?.name as (GQLHumanName | null)[]}
           avatar={item.user?.avatar as IAvatar}
-          language={window.config.LANGUAGES}
+          language={window.config?.LANGUAGES}
         />
       ),
     type: intl.formatMessage(

@@ -17,7 +17,7 @@ export const Title = styled.div`
 `
 export const Page = styled.div`
   color: ${({ theme }) => theme.colors.copy};
-  background: ${({ theme }) => theme.colors.white};
+  background: ${({ theme }) => theme.colors.black};
   min-height: 100vh;
   display: flex;
   flex-direction: column;

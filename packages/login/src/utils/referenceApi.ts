@@ -25,7 +25,7 @@ interface IContentResponse {
 
 export async function loadContent(): Promise<IContentResponse> {
   return await request<IContentResponse>({
-    url: resolve(window.config.COUNTRY_CONFIG_URL, '/content/login'),
+    url: resolve(window.config?.COUNTRY_CONFIG_URL, '/content/login'),
     method: 'GET'
   })
 }

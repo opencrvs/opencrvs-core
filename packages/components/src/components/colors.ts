@@ -12,8 +12,8 @@
 
 export const colors = {
   // Pallete
-  primary: '#4972BB', // indigo
-  secondary: '#4A8AD7', // blue
+  primary: '#d50000', // Red
+  secondary: '#ffd600', // Yellow
   tertiary: '#CCCCCC', // grey
 
   purple: '#8049B7', // in progress
@@ -39,6 +39,7 @@ export const colors = {
 
   // Monochrome
   white: '#FFFFFF',
+  black: '#000',
   grey100: '#F5F5F5', // background
   grey200: '#E8E8E8', // dividers, hover
   grey300: '#CCCCCC', // disabled state, borders
@@ -56,11 +57,12 @@ export const colors = {
   placeholderCopy: '#959595', // grey400
   disabled: '#CCCCCC', // grey300
   background: '#F5F5F5', // grey100
-  backgroundPrimary: '#36304E'
+  backgroundPrimary: '#eceff1'
 }
 
 export const gradients = {
-  primary: 'background: linear-gradient(180deg, #42506B 0%, #485F88 100%)'
+  primary:
+    'background: linear-gradient(90deg, rgba(213,0,0,0.8309917717086834) 0%, rgba(255,255,255,0.248358718487395) 100%)'
 }
 
 export const shadows = {

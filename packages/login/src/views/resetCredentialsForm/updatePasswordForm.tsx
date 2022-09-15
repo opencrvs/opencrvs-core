@@ -58,6 +58,7 @@ const PasswordMismatch = styled.div`
 const PasswordContents = styled.div`
   color: ${({ theme }) => theme.colors.copy};
   max-width: 416px;
+  margin-top: 2em;
 `
 const ValidationRulesSection = styled.div`
   background: ${({ theme }) => theme.colors.background};

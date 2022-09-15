@@ -117,7 +117,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         (action.payload.token &&
           Cmd.run(() => {
             window.location.assign(
-              `${window.config.CLIENT_APP_URL}?token=${action.payload.token}`
+              `${window.config?.CLIENT_APP_URL}?token=${action.payload.token}`
             )
           })) ||
           Cmd.action(push(routes.STEP_TWO))
@@ -182,7 +182,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         Cmd.run(
           (getState: () => IStoreState) => {
             window.location.assign(
-              `${window.config.CLIENT_APP_URL}?token=${
+              `${window.config?.CLIENT_APP_URL}?token=${
                 action.payload.token
               }&lang=${getState().i18n.language}`
             )
@@ -197,7 +197,7 @@ export const loginReducer: LoopReducer<LoginState, actions.Action> = (
         },
         Cmd.run(() => {
           window.location.assign(
-            `${window.config.CLIENT_APP_URL}?token=${state.token}`
+            `${window.config?.CLIENT_APP_URL}?token=${state.token}`
           )
         })
       )

@@ -47,7 +47,7 @@ describe('reducer', () => {
     store = storebundle.store
 
     moxios.install(client)
-    moxios.stubRequest(resolve(window.config.AUTH_API_URL, 'authenticate'), {
+    moxios.stubRequest(resolve(window.config?.AUTH_API_URL, 'authenticate'), {
       status: 200,
       responseText: "{ nonce: '12345' }"
     })

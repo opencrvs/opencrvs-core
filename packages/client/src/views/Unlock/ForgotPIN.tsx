@@ -162,7 +162,7 @@ export function ForgotPIN(props: IForgotPINProps) {
 
   const onForgetPassword = useCallback(() => {
     logout()
-    window.location.assign(window.config.LOGIN_URL + '/forgotten-item')
+    window.location.assign(window.config?.LOGIN_URL + '/forgotten-item')
   }, [logout])
 
   function showName() {

@@ -31,7 +31,7 @@ export let client: any = { mutate: () => {} }
 
 export const createClient = (store: Store<IStoreState, AnyAction>) => {
   const httpLink = createHttpLink({
-    uri: resolve(window.config.API_GATEWAY_URL, 'graphql')
+    uri: resolve(window.config?.API_GATEWAY_URL, 'graphql')
   })
 
   const authLink = setContext((_, { headers }) => {

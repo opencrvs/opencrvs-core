@@ -172,7 +172,7 @@ export const localPhoneTransformer =
     const msisdnPhone = get(queryData, fieldName as string) as unknown as string
     const localPhone = convertToLocal(
       msisdnPhone,
-      window.config.COUNTRY,
+      window.config?.COUNTRY,
       codeReplacement
     )
     transformedData[sectionId][field.name] = localPhone

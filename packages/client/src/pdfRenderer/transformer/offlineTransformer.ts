@@ -45,7 +45,7 @@ const getCountryValue = (
   countryCode: string,
   templateData: TemplateTransformerData
 ) => {
-  return countryCode.toUpperCase() === window.config.COUNTRY.toUpperCase()
+  return countryCode.toUpperCase() === window.config?.COUNTRY.toUpperCase()
     ? countryCode
     : getValueFromDeclarationDataByKey(
         templateData.declaration.data,

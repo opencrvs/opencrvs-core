@@ -620,12 +620,12 @@ export function getUserAuditDescription(
 }
 export function checkExternalValidationStatus(status?: string | null): boolean {
   return !(
-    !window.config.EXTERNAL_VALIDATION_WORKQUEUE &&
+    !window.config?.EXTERNAL_VALIDATION_WORKQUEUE &&
     status === 'WAITING_VALIDATION'
   )
 }
 export function checkIfLocalLanguageProvided() {
-  return window.config.LANGUAGES.split(',').length > 1
+  return window.config?.LANGUAGES.split(',').length > 1
 }
 
 export function getUserRole(

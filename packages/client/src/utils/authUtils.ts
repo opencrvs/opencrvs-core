@@ -96,7 +96,7 @@ export function isTokenAboutToExpire(token: string) {
 export function refreshToken() {
   const token = getToken()
   if (isTokenAboutToExpire(token)) {
-    fetch(`${window.config.AUTH_URL}/refreshToken`, {
+    fetch(`${window.config?.AUTH_URL}/refreshToken`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

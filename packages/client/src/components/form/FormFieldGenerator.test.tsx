@@ -61,7 +61,7 @@ describe('form component', () => {
             type: SELECT_WITH_OPTIONS,
             label: formMessages.country,
             required: true,
-            initialValue: window.config.COUNTRY.toUpperCase(),
+            initialValue: window.config?.COUNTRY.toUpperCase(),
             validate: [],
             options: countries
           },
@@ -535,7 +535,7 @@ describe('when field definition has select field on mobile device', () => {
             type: SELECT_WITH_OPTIONS,
             label: formMessages.country,
             required: true,
-            initialValue: window.config.COUNTRY.toUpperCase(),
+            initialValue: window.config?.COUNTRY.toUpperCase(),
             validate: [],
             options: countries
           }

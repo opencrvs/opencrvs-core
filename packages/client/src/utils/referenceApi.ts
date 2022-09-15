@@ -81,7 +81,7 @@ export interface IApplicationConfigResponse {
 }
 
 async function loadConfig(): Promise<IApplicationConfigResponse> {
-  const url = `${window.config.CONFIG_API_URL}/config`
+  const url = `${window.config?.CONFIG_API_URL}/config`
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -106,7 +106,7 @@ async function loadConfig(): Promise<IApplicationConfigResponse> {
 }
 
 async function loadContent(): Promise<IContentResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/content/client`
+  const url = `${window.config?.COUNTRY_CONFIG_URL}/content/client`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -127,7 +127,7 @@ async function loadContent(): Promise<IContentResponse> {
 }
 
 async function loadLocations(): Promise<ILocationDataResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/locations`
+  const url = `${window.config?.COUNTRY_CONFIG_URL}/locations`
 
   const res = await fetch(url, {
     method: 'GET',
@@ -145,7 +145,7 @@ async function loadLocations(): Promise<ILocationDataResponse> {
 }
 
 async function loadFacilities(): Promise<IFacilitiesDataResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/facilities`
+  const url = `${window.config?.COUNTRY_CONFIG_URL}/facilities`
   const res = await fetch(url, {
     method: 'GET',
     headers: {
@@ -162,7 +162,7 @@ async function loadFacilities(): Promise<IFacilitiesDataResponse> {
 }
 
 async function loadPilotLocations(): Promise<ILocationDataResponse> {
-  const url = `${window.config.COUNTRY_CONFIG_URL}/pilotLocations`
+  const url = `${window.config?.COUNTRY_CONFIG_URL}/pilotLocations`
 
   const res = await fetch(url, {
     method: 'GET',

@@ -228,7 +228,7 @@ export const getLocation = (
       resources.locations[facility.partOf.split('/')[1]]
     const state = district && resources.locations[district.partOf.split('/')[1]]
     const defaultCountry = intl.formatMessage(
-      countryMessages[window.config.COUNTRY]
+      countryMessages[window.config?.COUNTRY]
     )
     const healthFacility = generateLocationName(facility, intl)
 
@@ -240,7 +240,7 @@ export const getLocation = (
     return location
   }
   if (locationType === 'OTHER' || locationType === 'PRIVATE_HOME') {
-    if (country && country !== window.config.COUNTRY) {
+    if (country && country !== window.config?.COUNTRY) {
       let location = EMPTY_STRING
       if (internationalDistrict) location = internationalDistrict + ', '
       if (internationalState) location = location + internationalState + ', '
@@ -256,7 +256,7 @@ export const getLocation = (
     const countryResidence =
       declaration.data?.deceased?.countryPrimary?.toString() || EMPTY_STRING
 
-    if (countryResidence !== window.config.COUNTRY) {
+    if (countryResidence !== window.config?.COUNTRY) {
       // residence address is other than default country
       const internationalDistrictResidence =
         declaration.data?.deceased?.internationalDistrictPrimary?.toString() ||
@@ -295,7 +295,7 @@ export const getLocation = (
 export const getFormattedDate = (date: Date) => {
   return formatLongDate(
     date.toLocaleString(),
-    window.config.LANGUAGES,
+    window.config?.LANGUAGES,
     'MMMM dd, yyyy · hh.mm a'
   )
 }

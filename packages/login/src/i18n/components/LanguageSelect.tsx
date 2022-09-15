@@ -34,7 +34,7 @@ const SelectContainer = styled.div`
 `
 
 function useLanguage(selectedLanguage: string, paramLanguage: string | null) {
-  const applicationLangauges = window.config.LANGUAGES.split(',')
+  const applicationLangauges = window.config?.LANGUAGES.split(',')
   const history = useHistory()
   const location = useLocation()
   const dispatch = useDispatch()

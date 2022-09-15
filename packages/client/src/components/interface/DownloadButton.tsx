@@ -337,7 +337,7 @@ function DownloadButtonComponent(
         ) : assignment && assignment.userId != userId ? (
           <AvatarVerySmall
             avatar={{
-              data: `${window.config.API_GATEWAY_URL}files/avatar/${assignment.userId}.jpg`,
+              data: `${window.config?.API_GATEWAY_URL}files/avatar/${assignment.userId}.jpg`,
               type: 'image/jpeg'
             }}
           />

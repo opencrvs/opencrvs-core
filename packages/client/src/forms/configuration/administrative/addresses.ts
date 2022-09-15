@@ -60,7 +60,7 @@ const primaryAddressSameAsOtherPrimaryAddress =
   'values.primaryAddressSameAsOtherPrimary'
 
 // secondary addresses are not enabled
-const secondaryAddressesDisabled = 'window.config.ADDRESSES!=2'
+const secondaryAddressesDisabled = 'window.config?.ADDRESSES!=2'
 
 export const MOTHER_DETAILS_DONT_EXIST = `(${mothersDetailsDontExist} && ${mothersDetailsDontExistBasedOnContactAndInformant})`
 
@@ -532,7 +532,7 @@ function getPrimaryAddressFields(informant: boolean): SerializedFormField[] {
       customisable: false,
       previewGroup: 'primaryAddress',
       required: true,
-      initialValue: window.config.COUNTRY.toUpperCase(),
+      initialValue: window.config?.COUNTRY.toUpperCase(),
       validate: [],
       placeholder: {
         defaultMessage: 'Select',
@@ -1612,7 +1612,7 @@ function getSecondaryAddressFields(informant: boolean): SerializedFormField[] {
       customisable: false,
       previewGroup: 'secondaryAddress',
       required: true,
-      initialValue: window.config.COUNTRY.toUpperCase(),
+      initialValue: window.config?.COUNTRY.toUpperCase(),
       validate: [],
       placeholder: {
         defaultMessage: 'Select',
@@ -2695,7 +2695,7 @@ export function getPlaceOfEventAddressFields(
       },
       previewGroup: configCase,
       required: true,
-      initialValue: window.config.COUNTRY.toUpperCase(),
+      initialValue: window.config?.COUNTRY.toUpperCase(),
       validate: [],
       placeholder: {
         defaultMessage: 'Select',

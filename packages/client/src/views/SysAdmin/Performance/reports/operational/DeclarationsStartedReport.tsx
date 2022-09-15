@@ -332,7 +332,7 @@ export const DeclarationsStartedReport = connect<
 
     let disableFieldAgentLink = !(
       isOfficeSelected ||
-      window.config.FIELD_AGENT_AUDIT_LOCATIONS.includes(
+      window.config?.FIELD_AGENT_AUDIT_LOCATIONS.includes(
         getJurisidictionType(offlineLocations, ownProps.locationId) as string
       )
     )

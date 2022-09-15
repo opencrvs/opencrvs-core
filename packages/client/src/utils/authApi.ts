@@ -15,7 +15,7 @@ import { resolve } from 'url'
 import * as Sentry from '@sentry/browser'
 
 export const client = axios.create({
-  baseURL: window.config.AUTH_URL
+  baseURL: window.config?.AUTH_URL
 })
 
 function request<T>(options: AxiosRequestConfig) {
@@ -40,7 +40,7 @@ function request<T>(options: AxiosRequestConfig) {
 
 const invalidateToken = (token: string): Promise<void> => {
   return request({
-    url: resolve(window.config.AUTH_URL, 'invalidateToken'),
+    url: resolve(window.config?.AUTH_URL, 'invalidateToken'),
     method: 'POST',
     data: { token }
   })

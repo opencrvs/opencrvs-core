@@ -174,8 +174,8 @@ function CompletenessDataTableComponent(props: ITableProps) {
               : intl.formatMessage(messages.performanceWithinTargetDaysLabel, {
                   target:
                     eventType === Event.Birth
-                      ? window.config.BIRTH.REGISTRATION_TARGET
-                      : window.config.DEATH.REGISTRATION_TARGET,
+                      ? window.config?.BIRTH.REGISTRATION_TARGET
+                      : window.config?.DEATH.REGISTRATION_TARGET,
                   withPrefix: false
                 }),
           width: 25

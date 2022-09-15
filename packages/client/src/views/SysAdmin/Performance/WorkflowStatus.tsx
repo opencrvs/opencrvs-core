@@ -375,7 +375,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
     ] as IColumn[]
     return keys.filter((item) => {
       return !(
-        !window.config.EXTERNAL_VALIDATION_WORKQUEUE &&
+        !window.config?.EXTERNAL_VALIDATION_WORKQUEUE &&
         item.key === 'timeLoggedWaitingValidation'
       )
     })
@@ -475,7 +475,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
           const nameIntl = createNamesMap(
             eventProgress && (eventProgress.name as GQLHumanName[])
           )[LANG_EN] as string
-          const localLang = window.config.LANGUAGES.split(',').find(
+          const localLang = window.config?.LANGUAGES.split(',').find(
             (lang: string) => lang !== LANG_EN
           )
           const nameLocal =
@@ -696,7 +696,7 @@ function WorkflowStatusComponent(props: WorkflowStatusProps) {
                 )
               }}
               requiredJurisdictionTypes={
-                window.config.DECLARATION_AUDIT_LOCATIONS
+                window.config?.DECLARATION_AUDIT_LOCATIONS
               }
             />
             <PerformanceSelect

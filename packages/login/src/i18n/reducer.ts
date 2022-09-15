@@ -54,7 +54,7 @@ function extractLanguageSelectConfig(
 }
 
 const supportedLanguages: ISupportedLanguages[] = extractLanguageSelectConfig(
-  window.config.AVAILABLE_LANGUAGES_SELECT
+  window.config?.AVAILABLE_LANGUAGES_SELECT
 )
 
 export const initLanguages = () => {

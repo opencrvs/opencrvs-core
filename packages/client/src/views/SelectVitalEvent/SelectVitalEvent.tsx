@@ -95,7 +95,7 @@ class SelectVitalEventView extends React.Component<
     if (this.state.goTo === '') {
       this.setState({ noEventSelectedError: true })
     } else {
-      if (window.config.HIDE_EVENT_REGISTER_INFORMATION) {
+      if (window.config?.HIDE_EVENT_REGISTER_INFORMATION) {
         let declaration: IDeclaration
         switch (this.state.goTo as Event) {
           case Event.Birth:

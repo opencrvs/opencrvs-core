@@ -419,7 +419,7 @@ function FieldAgentListComponent(props: IProps) {
                 props.goToFieldAgentList(timeStart, timeEnd, newLocationId)
               }}
               requiredJurisdictionTypes={
-                window.config.FIELD_AGENT_AUDIT_LOCATIONS
+                window.config?.FIELD_AGENT_AUDIT_LOCATIONS
               }
             />
             <PerformanceSelect

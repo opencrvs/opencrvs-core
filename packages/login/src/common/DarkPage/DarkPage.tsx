@@ -47,7 +47,7 @@ export class DarkPage extends React.Component<IPage & RouteComponentProps<{}>> {
           {submitting ? (
             <Spinner
               id="login-submitting-spinner"
-              baseColor={getTheme().colors.white}
+              baseColor={getTheme().colors.primary}
             />
           ) : (
             children

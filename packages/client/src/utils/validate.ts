@@ -56,7 +56,7 @@ export type Validation = (
 export type ValidationInitializer = (...value: any[]) => Validation
 
 export const isAValidPhoneNumberFormat = (value: string): boolean => {
-  const pattern = window.config.PHONE_NUMBER_PATTERN
+  const pattern = window.config?.PHONE_NUMBER_PATTERN
   return new RegExp(pattern).test(value)
 }
 
@@ -532,7 +532,7 @@ export const range: RangeValidation =
   }
 
 export const isAValidNIDNumberFormat = (value: string): boolean => {
-  const pattern = window.config.NID_NUMBER_PATTERN
+  const pattern = window.config?.NID_NUMBER_PATTERN
   return new RegExp(pattern).test(value)
 }
 

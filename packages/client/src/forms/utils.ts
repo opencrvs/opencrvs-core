@@ -80,8 +80,8 @@ export const VIEW_TYPE = {
 
 const REGISTRATION_TARGET_DAYS =
   window.config &&
-  window.config.BIRTH &&
-  window.config.BIRTH.REGISTRATION_TARGET
+  window.config?.BIRTH &&
+  window.config?.BIRTH.REGISTRATION_TARGET
 
 interface IRange {
   start: number
@@ -334,7 +334,7 @@ export const getFieldOptions = (
       return []
     }
     let partOf: string
-    if (dependencyVal === window.config.COUNTRY.toUpperCase()) {
+    if (dependencyVal === window.config?.COUNTRY.toUpperCase()) {
       partOf = 'Location/0'
     } else {
       partOf = `Location/${dependencyVal}`
@@ -442,7 +442,7 @@ export function isCityLocation(
 }
 
 export function isDefaultCountry(countryCode: string): boolean {
-  return countryCode === window.config.COUNTRY.toUpperCase()
+  return countryCode === window.config?.COUNTRY.toUpperCase()
 }
 
 export function getListOfLocations(
@@ -648,9 +648,9 @@ export const convertToMSISDN = (phone: string) => {
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
   const countryCode =
-    window.config.COUNTRY.toUpperCase() === 'FAR'
+    window.config?.COUNTRY.toUpperCase() === 'FAR'
       ? 'ZMB'
-      : window.config.COUNTRY.toUpperCase()
+      : window.config?.COUNTRY.toUpperCase()
 
   const countryCallingCode =
     callingCountries[countryCode].countryCallingCodes[0]

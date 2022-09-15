@@ -265,8 +265,8 @@ class RegRatesLineChartComponent extends React.Component<IProps, IState> {
                     {
                       target:
                         eventType === Event.Birth
-                          ? window.config.BIRTH.REGISTRATION_TARGET
-                          : window.config.DEATH.REGISTRATION_TARGET,
+                          ? window.config?.BIRTH.REGISTRATION_TARGET
+                          : window.config?.DEATH.REGISTRATION_TARGET,
                       withPrefix: false
                     }
                   )}

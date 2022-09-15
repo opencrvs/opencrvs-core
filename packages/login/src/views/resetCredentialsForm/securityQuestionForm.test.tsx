@@ -22,7 +22,7 @@ import { setupServer } from 'msw/node'
 //mock api calls
 const server = setupServer(
   rest.get(
-    `${window.config.COUNTRY_CONFIG_URL}/content/login`,
+    `${window.config?.COUNTRY_CONFIG_URL}/content/login`,
     (req, res, ctx) => {
       return res(
         ctx.json({
@@ -39,7 +39,7 @@ const server = setupServer(
       )
     }
   ),
-  rest.get(`${window.config.CONFIG_API_URL}/loginConfig`, (req, res, ctx) => {
+  rest.get(`${window.config?.CONFIG_API_URL}/loginConfig`, (req, res, ctx) => {
     return res(
       ctx.json({
         config: {
