@@ -32,7 +32,8 @@ import {
   getSharedContactMsisdn,
   postToHearth,
   generateEmptyBundle,
-  forwardToHearth
+  forwardToHearth,
+  mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   sendEventNotification,
@@ -345,7 +346,6 @@ export async function markEventAsRegisteredCallbackHandler(
     // have time to complete indexing the previous waiting for external validation state before we update the search index with a BRN / DRN
     // If an external system is being used, then its processing time will mean a wait is not required.
     if (!VALIDATING_EXTERNALLY) {
-      // tslint:disable-next-line
       await new Promise((resolve) => setTimeout(resolve, 2000))
     }
     // Trigger an event for the registration
@@ -415,6 +415,7 @@ export async function markEventAsCertifiedHandler(
       request.payload as fhir.Bundle,
       getToken(request)
     )
+    await mergePatientIdentifier(payload)
     return await postToHearth(payload)
   } catch (error) {
     logger.error(`Workflow/markBirthAsCertifiedHandler: error: ${error}`)

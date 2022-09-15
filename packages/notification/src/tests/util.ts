@@ -10,10 +10,10 @@
  * graphic logo are (registered/a) trademark(s) of Plan International.
  */
 
-/* tslint:disable */
 export function createServerWithEnvironment(env: any) {
   jest.resetModules()
   process.env = { ...process.env, ...env }
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   return require('../server').createServer()
 }
 export const translationsMock = {
