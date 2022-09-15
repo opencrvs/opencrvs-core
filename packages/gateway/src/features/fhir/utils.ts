@@ -1306,12 +1306,13 @@ export const fetchDOCUMENTS = async <T = any>(
   suffix: string,
   authHeader: IAuthHeader,
   method = 'GET',
-  body: any | undefined = undefined
+  body: string | undefined = undefined
 ): Promise<T> => {
   const result = await fetch(`${DOCUMENTS_URL}${suffix}`, {
     method,
     headers: {
-      ...authHeader
+      ...authHeader,
+      'Content-Type': 'application/json'
     },
     body
   })
@@ -1327,7 +1328,7 @@ export async function uploadBase64ToMinio(
     '/upload',
     authHeader,
     'POST',
-    { fileData: fileData }
+    JSON.stringify({ fileData: fileData })
   )
 
   return docUploadResponse.refUrl
