@@ -1744,8 +1744,8 @@ function motherDoesNotExistAndStateIsMother(
   return (
     !Boolean(declaration.data.mother?.detailsExist) &&
     activeState === 'mother' &&
-    declaration.data.registration?.informantType.value !== 'MOTHER' &&
-    declaration.data.registration?.contactPoint.value !== 'MOTHER'
+    declaration.data.registration?.informantType?.value !== 'MOTHER' &&
+    declaration.data.registration?.contactPoint?.value !== 'MOTHER'
   )
 }
 
@@ -1756,8 +1756,8 @@ function fatherDoesNotExistAndStateIsFather(
   return (
     !Boolean(declaration.data.father?.detailsExist) &&
     activeState === 'father' &&
-    declaration.data.registration?.informantType.value !== 'FATHER' &&
-    declaration.data.registration?.contactPoint.value !== 'FATHER'
+    declaration.data.registration?.informantType?.value !== 'FATHER' &&
+    declaration.data.registration?.contactPoint?.value !== 'FATHER'
   )
 }
 
