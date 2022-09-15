@@ -12,7 +12,7 @@
 
 import { css } from 'styled-components'
 
-export const baseStyles = css`
+export const base = css`
   ${({ theme }) => theme.fonts.bold16};
 
   display: inline-flex;
@@ -44,7 +44,7 @@ export const baseStyles = css`
   }
 `
 
-export const primaryStyles = ({ loading }: { loading: boolean }) => css`
+export const primary = ({ loading }: { loading: boolean }) => css`
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
 
@@ -62,7 +62,7 @@ export const primaryStyles = ({ loading }: { loading: boolean }) => css`
   `}
 `
 
-export const secondaryStyles = css`
+export const secondary = css`
   border: 2px solid ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.primary};
 
@@ -76,7 +76,7 @@ export const secondaryStyles = css`
   }
 `
 
-export const tertiaryStyles = css`
+export const tertiary = css`
   ${({ theme }) => theme.fonts.bold14};
 
   height: 32px;
@@ -95,7 +95,7 @@ export const tertiaryStyles = css`
   }
 `
 
-export const positiveStyles = css`
+export const positive = css`
   background: ${({ theme }) => theme.colors.positive};
   color: ${({ theme }) => theme.colors.white};
 
@@ -108,7 +108,7 @@ export const positiveStyles = css`
   }
 `
 
-export const negativeStyles = css`
+export const negative = css`
   background: ${({ theme }) => theme.colors.negative};
   color: ${({ theme }) => theme.colors.white};
 
@@ -121,27 +121,7 @@ export const negativeStyles = css`
   }
 `
 
-export const globalIconStyles = css`
-  background: ${({ theme }) => theme.colors.white};
-  color: ${({ theme }) => theme.colors.primary};
-  border-radius: 100%;
-  aspect-ratio: 1 / 1;
-
-  &:hover {
-    background: ${({ theme }) => theme.colors.grey200};
-    color: ${({ theme }) => theme.colors.primaryDark};
-  }
-  &:active {
-    background: ${({ theme }) => theme.colors.grey200};
-    color: ${({ theme }) => theme.colors.primaryDark};
-  }
-  svg {
-    margin-left: -8px;
-    margin-right: -8px;
-  }
-`
-
-export const smallStyles = ({ loading }: { loading: boolean }) => css`
+export const small = ({ loading }: { loading: boolean }) => css`
   ${({ theme }) => theme.fonts.bold14};
 
   height: 32px;
@@ -163,7 +143,7 @@ export const smallStyles = ({ loading }: { loading: boolean }) => css`
   `}
 `
 
-export const mediumStyles = css`
+export const medium = css`
   height: 40px;
   padding: 0 16px;
 
@@ -173,7 +153,7 @@ export const mediumStyles = css`
   }
 `
 
-export const largeStyles = css`
+export const large = css`
   height: 48px;
   padding: 0 20px;
 
@@ -183,7 +163,27 @@ export const largeStyles = css`
   }
 `
 
-export const globalLoadingStyles = css`
+export const icon = css`
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.primary};
+  border-radius: 100%;
+  aspect-ratio: 1 / 1;
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.primaryDark};
+  }
+  &:active {
+    background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.primaryDark};
+  }
+  svg {
+    margin-left: -8px;
+    margin-right: -8px;
+  }
+`
+
+export const loading = css`
   opacity: 0.8;
   pointer-events: none;
   user-select: none;
@@ -194,7 +194,7 @@ export const globalLoadingStyles = css`
   }
 `
 
-export const globalDisabledStyles = css`
+export const disabled = css`
   opacity: 0.5;
   pointer-events: none;
   user-select: none;

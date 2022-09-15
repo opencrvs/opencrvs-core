@@ -15,23 +15,23 @@ import styled from 'styled-components'
 import { Spinner } from '../Spinner'
 import * as styles from './Button.styles'
 
-export const BUTTON_SIZES = ['small', 'medium', 'large'] as const
-export const BUTTON_VARIANTS = [
+const BUTTON_SIZES = ['small', 'medium', 'large'] as const
+const BUTTON_VARIANTS = [
   'primary',
   'secondary',
   'tertiary',
   'positive',
   'negative'
 ] as const
-export const BUTTON_MODIFIERS = ['disabled', 'loading', 'icon'] as const
+const BUTTON_MODIFIERS = ['disabled', 'loading', 'icon'] as const
 
-export type ButtonVariant = typeof BUTTON_VARIANTS[number]
-export type ButtonModifier = typeof BUTTON_MODIFIERS[number]
+type ButtonSize = typeof BUTTON_SIZES[number]
+type ButtonVariant = typeof BUTTON_VARIANTS[number]
+type ButtonModifier = typeof BUTTON_MODIFIERS[number]
 
-export interface ButtonCustomization
-  extends React.HTMLAttributes<HTMLButtonElement> {
+interface ButtonCustomization extends React.HTMLAttributes<HTMLButtonElement> {
   /** Size of the button */
-  size?: typeof BUTTON_SIZES[number]
+  size?: ButtonSize
   /** Element the button renders as */
   element?: 'a' | 'button'
 }
@@ -51,21 +51,21 @@ const StyledButton = styled.button.withConfig({
     // Leave some props unpassed to DOM
     !['loading'].includes(prop) && defaultValidatorFn(prop)
 })<StyledButtonProps>`
-  ${styles.baseStyles}
+  ${styles.base}
 
-  ${(props) => props.size === 'small' && styles.smallStyles(props)}
-  ${(props) => props.size === 'medium' && styles.mediumStyles}
-  ${(props) => props.size === 'large' && styles.largeStyles}
+  ${(props) => props.size === 'small' && styles.small(props)}
+  ${(props) => props.size === 'medium' && styles.medium}
+  ${(props) => props.size === 'large' && styles.large}
 
-  ${(props) => props.variant === 'primary' && styles.primaryStyles(props)}
-  ${(props) => props.variant === 'secondary' && styles.secondaryStyles}
-  ${(props) => props.variant === 'tertiary' && styles.tertiaryStyles}
-  ${(props) => props.variant === 'positive' && styles.positiveStyles}
-  ${(props) => props.variant === 'negative' && styles.negativeStyles}
+  ${(props) => props.variant === 'primary' && styles.primary(props)}
+  ${(props) => props.variant === 'secondary' && styles.secondary}
+  ${(props) => props.variant === 'tertiary' && styles.tertiary}
+  ${(props) => props.variant === 'positive' && styles.positive}
+  ${(props) => props.variant === 'negative' && styles.negative}
 
-  ${(props) => props.icon && styles.globalIconStyles}
-  ${(props) => props.loading && styles.globalLoadingStyles}
-  ${(props) => props.disabled && styles.globalDisabledStyles}
+  ${(props) => props.icon && styles.icon}
+  ${(props) => props.loading && styles.loading}
+  ${(props) => props.disabled && styles.disabled}
 `
 
 export const Button = ({
