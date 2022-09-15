@@ -38,21 +38,22 @@ export const baseStyles = css`
     margin-right: 8px;
     pointer-events: none;
   }
+
+  &:focus-visible {
+    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.yellow};
+  }
 `
 
 export const primaryStyles = ({ loading }: { loading: boolean }) => css`
-  color: #fff;
+  color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
 
   &:hover {
-    background: #42506b;
-  }
-  &:focus-visible {
-    box-shadow: 0px 0px 0px 3px #edc55e;
+    background: ${({ theme }) => theme.colors.primaryDark};
   }
   &:active {
-    background-color: #42506b;
-    box-shadow: 0px 0px 0px 3px #93acd7;
+    background-color: ${({ theme }) => theme.colors.primaryDark};
+    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.primaryLight};
   }
 
   ${loading &&
@@ -62,91 +63,77 @@ export const primaryStyles = ({ loading }: { loading: boolean }) => css`
 `
 
 export const secondaryStyles = css`
-  border: 2px solid #4972bb;
-  color: #4972bb;
+  border: 2px solid ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.primary};
 
   &:hover {
-    border: 2px solid #42639c;
-    color: #42639c;
-  }
-  &:focus-visible {
-    box-shadow: 0px 0px 0px 3px #edc55e;
+    border: 2px solid ${({ theme }) => theme.colors.primaryDark};
+    color: ${({ theme }) => theme.colors.primaryDark};
   }
   &:active {
-    color: #42639c;
-    box-shadow: 0px 0px 0px 3px #93acd7;
+    color: ${({ theme }) => theme.colors.primaryDark};
+    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.primaryLight};
   }
 `
 
 export const tertiaryStyles = css`
+  ${({ theme }) => theme.fonts.reg14};
+
   height: 32px;
   padding: 0 8px;
-  background: #ffffff;
-  color: #4972bb;
-  font-size: 14px;
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.primary};
 
   &:hover {
-    background: #eeeeee;
-    color: #42639c;
-  }
-  &:focus-visible {
-    box-shadow: 0px 0px 0px 3px #edc55e;
+    background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.primaryDark};
   }
   &:active {
-    background: #eeeeee;
-    color: #42639c;
-    box-shadow: 0px 0px 0px 3px #93acd7;
+    background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.primaryDark};
+    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.primaryLighter};
   }
 `
 
 export const positiveStyles = css`
-  background: #409977;
-  color: #ffffff;
+  background: ${({ theme }) => theme.colors.positive};
+  color: ${({ theme }) => theme.colors.white};
 
   &:hover {
-    background: #2c6e55;
-  }
-  &:focus-visible {
-    box-shadow: 0px 0px 0px 3px #edc55e;
+    background: ${({ theme }) => theme.colors.positiveDark};
   }
   &:active {
-    background-color: #2c6e55;
-    box-shadow: 0px 0px 0px 3px #92d4bb;
+    background-color: ${({ theme }) => theme.colors.positiveDark};
+    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.positiveLight};
   }
 `
 
 export const negativeStyles = css`
-  background: #d53f3f;
-  color: #ffffff;
+  background: ${({ theme }) => theme.colors.negative};
+  color: ${({ theme }) => theme.colors.white};
 
   &:hover {
-    background: #994040;
-  }
-  &:focus-visible {
-    box-shadow: 0px 0px 0px 3px #edc55e;
+    background: ${({ theme }) => theme.colors.negativeDark};
   }
   &:active {
-    background-color: #994040;
-    box-shadow: 0px 0px 0px 3px #e79393;
+    background-color: ${({ theme }) => theme.colors.negativeDark};
+    box-shadow: 0px 0px 0px 3px ${({ theme }) => theme.colors.negativeLight};
   }
 `
 
 export const globalIconStyles = css`
-  background: #ffffff;
-  color: #4972bb;
+  background: ${({ theme }) => theme.colors.white};
+  color: ${({ theme }) => theme.colors.primary};
   border-radius: 100%;
   aspect-ratio: 1 / 1;
 
   &:hover {
-    background: #eeeeee;
-    color: #42639c;
-  }
-  &:focus-visible {
-    box-shadow: 0px 0px 0px 3px #edc55e;
+    background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.primaryDark};
   }
   &:active {
-    background: #eeeeee;
-    color: #42639c;
+    background: ${({ theme }) => theme.colors.grey200};
+    color: ${({ theme }) => theme.colors.primaryDark};
   }
   svg {
     margin-left: -8px;
