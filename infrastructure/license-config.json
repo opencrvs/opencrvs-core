@@ -29,7 +29,8 @@
     "packages/client/index.html",
     "packages/login/index.html",
     "packages/components/.storybook/preview.jsx",
-    "grafana"
+    "grafana",
+    ".nvmrc"
   ],
   "license": "infrastructure/license-header.txt",
   "licenseFormats": {

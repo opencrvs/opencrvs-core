@@ -22,7 +22,8 @@ import {
 import {
   getFromFhir,
   getRegStatusCode,
-  fetchExistingRegStatusCode
+  fetchExistingRegStatusCode,
+  mergePatientIdentifier
 } from '@workflow/features/registration/fhir/fhir-utils'
 import {
   generateBirthTrackingId,
@@ -66,7 +67,6 @@ export async function modifyRegistrationBundle(
     throw new Error('Invalid FHIR bundle found for declaration')
   }
   /* setting unique trackingid here */
-  // tslint:disable-next-line
   fhirBundle = setTrackingId(fhirBundle)
 
   const taskResource = selectOrCreateTaskRefResource(fhirBundle) as fhir.Task
@@ -132,6 +132,7 @@ export async function markBundleAsRequestedForCorrection(
   const taskResource = getTaskResource(bundle)
   const practitioner = await getLoggedInPractitionerResource(token)
   const regStatusCode = await fetchExistingRegStatusCode(taskResource.id)
+  await mergePatientIdentifier(bundle)
 
   if (!taskResource.extension) {
     taskResource.extension = []

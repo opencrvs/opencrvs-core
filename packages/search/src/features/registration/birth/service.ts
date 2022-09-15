@@ -11,6 +11,7 @@
  */
 import {
   indexComposition,
+  searchByCompositionId,
   updateComposition
 } from '@search/elasticsearch/dbhelper'
 import {
@@ -149,9 +150,14 @@ async function indexAndSearchComposition(
   authHeader: string,
   bundleEntries?: fhir.BundleEntry[]
 ) {
+  const result = await searchByCompositionId(compositionId)
   const body: IBirthCompositionBody = {
     event: EVENT.BIRTH,
-    createdAt: Date.now().toString(),
+    createdAt:
+      (result &&
+        result.body.hits.hits.length > 0 &&
+        result.body.hits.hits[0]._source.createdAt) ||
+      Date.now().toString(),
     operationHistories: (await getStatus(compositionId)) as IOperationHistory[]
   }
 
@@ -413,7 +419,6 @@ async function updateCompositionWithDuplicates(
   duplicates: string[]
 ) {
   const duplicateCompositions = await Promise.all(
-    // tslint:disable-next-line
     duplicates.map((duplicate) => getCompositionById(duplicate))
   )
 
