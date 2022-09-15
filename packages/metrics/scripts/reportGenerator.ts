@@ -21,7 +21,7 @@ const patientOccupationExtURL =
 const patientEduAttainmentExtURL =
   'http://opencrvs.org/specs/extension/educational-attainment'
 
-type IPatient = ReturnType<typeof makePatientsObject>
+type IPatient = ReturnType<typeof makePatientObject>
 
 type IObservation = {
   causeOfDeathMethod: string
