@@ -192,6 +192,14 @@ export const influx = new Influx.InfluxDB({
         'locationLevel3',
         'locationLevel2'
       ]
+    },
+    {
+      measurement: 'user_audit_event',
+      fields: {
+        compositionId: Influx.FieldType.STRING,
+        data: Influx.FieldType.STRING
+      },
+      tags: ['practitionerId', 'action']
     }
   ]
 })
