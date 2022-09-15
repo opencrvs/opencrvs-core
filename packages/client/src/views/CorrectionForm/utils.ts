@@ -100,28 +100,6 @@ export function isCorrection(declaration: IDeclaration) {
   )
 }
 
-export function motherDoesNotExistAndStateIsMother(
-  declaration: IDeclaration,
-  activeState: string
-) {
-  return (
-    !Boolean(declaration.data.mother.detailsExist) &&
-    activeState === 'mother' &&
-    declaration.data.registration.informantType.value !== 'MOTHER'
-  )
-}
-
-export function fatherDoesNotExistAndStateIsFather(
-  declaration: IDeclaration,
-  activeState: string
-) {
-  return (
-    !Boolean(declaration.data.father.detailsExist) &&
-    activeState === 'father' &&
-    declaration.data.registration.informantType.value !== 'FATHER'
-  )
-}
-
 export function bytesToSize(bytes: number) {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
   if (bytes == 0) return '0 Byte'

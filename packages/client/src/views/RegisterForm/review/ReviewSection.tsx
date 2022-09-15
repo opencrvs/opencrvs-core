@@ -128,10 +128,8 @@ import { DocumentPreview } from '@client/components/form/DocumentUploadfield/Doc
 import { generateLocations } from '@client/utils/locationUtils'
 import {
   bytesToSize,
-  fatherDoesNotExistAndStateIsFather,
   isCorrection,
   isFileSizeExceeded,
-  motherDoesNotExistAndStateIsMother
 } from '@client/views/CorrectionForm/utils'
 import {
   ListViewSimplified,
@@ -1737,6 +1735,30 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
       </FullBodyContent>
     )
   }
+}
+
+function motherDoesNotExistAndStateIsMother(
+  declaration: IDeclaration,
+  activeState: string
+) {
+  return (
+    !Boolean(declaration.data.mother.detailsExist) &&
+    activeState === 'mother' &&
+    declaration.data.registration.informantType.value !== 'MOTHER' &&
+    declaration.data.registration.contactPoint.value !== 'MOTHER'
+  )
+}
+
+function fatherDoesNotExistAndStateIsFather(
+  declaration: IDeclaration,
+  activeState: string
+) {
+  return (
+    !Boolean(declaration.data.father.detailsExist) &&
+    activeState === 'father' &&
+    declaration.data.registration.informantType.value !== 'FATHER' &&
+    declaration.data.registration.contactPoint.value !== 'FATHER'
+  )
 }
 
 export const ReviewSection = connect(
