@@ -52,11 +52,13 @@ import {
 } from '@client/views/OfficeHome/components'
 import {
   changeSortedColumn,
+  getPreviousOperationDateByOperationType,
   getSortedItems
 } from '@client/views/OfficeHome/utils'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { IDynamicValues } from '@opencrvs/components/lib/interface/GridTable/types'
 import { LinkButton } from '@opencrvs/components/lib/buttons/LinkButton'
+import { RegStatus } from '@client/utils/gateway'
 
 const ToolTipContainer = styled.span`
   text-align: center;
@@ -198,7 +200,11 @@ class ReadyForReviewComponent extends React.Component<
           reg.dateOfEvent.length > 0 &&
           new Date(reg.dateOfEvent)) ||
         ''
-      const createdAt = (reg.createdAt && parseInt(reg.createdAt)) || ''
+      const createdAt =
+        getPreviousOperationDateByOperationType(
+          reg.operationHistories,
+          RegStatus.Declared
+        ) || ''
       const NameComponent = reg.name ? (
         <NameContainer
           id={`name_${index}`}

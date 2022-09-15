@@ -21,6 +21,7 @@ import { createNamesMap } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
 import { SearchEventsQuery } from '@client/utils/gateway'
 import { LANG_EN } from '@client/utils/constants'
+import { ITaskHistory } from '@client/declarations'
 
 export const transformData = (
   data: SearchEventsQuery['searchEvents'],
@@ -101,7 +102,8 @@ export const transformData = (
         modifiedAt:
           assignedReg.registration &&
           (assignedReg.registration.modifiedAt ||
-            assignedReg.registration.createdAt)
+            assignedReg.registration.createdAt),
+        operationHistories: assignedReg.operationHistories as ITaskHistory[]
       }
     })
 }
