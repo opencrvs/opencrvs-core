@@ -13,7 +13,6 @@ import { IntlShape, MessageDescriptor } from 'react-intl'
 import { createPDF, printPDF } from '@client/pdfRenderer'
 import { IDeclaration } from '@client/declarations'
 import { IUserDetails } from '@opencrvs/client/src/utils/userUtils'
-import { Event } from '@client/utils/gateway'
 import { IOfflineData } from '@client/offline/reducer'
 import {
   OptionalData,
@@ -122,21 +121,8 @@ function getPDFTemplateWithSVG(
   declaration: IDeclaration,
   pageSize: PageSize
 ): IPDFTemplate {
-  let svgTemplate
-  if (
-    offlineResource.templates.certificates![
-      declaration.event
-    ].definition.includes('data:image/svg+xml;base64')
-  ) {
-    svgTemplate = atob(
-      offlineResource.templates.certificates![
-        declaration.event
-      ].definition.split(',')[1]
-    )
-  } else {
-    svgTemplate =
-      offlineResource.templates.certificates![declaration.event].definition
-  }
+  const svgTemplate =
+    offlineResource.templates.certificates![declaration.event].definition
   const svgCode = executeHandlebarsTemplate(
     svgTemplate,
     declaration.data.template
@@ -152,17 +138,13 @@ export function downloadFile(
   data: string,
   fileName: string
 ) {
-  let linkSource
-  if (data.includes(`data:${contentType};base64`)) {
-    linkSource = data
-  } else {
-    linkSource = `data:${contentType};base64,${window.btoa(data)}`
-  }
+  const linkSource = `data:${contentType};base64,${window.btoa(data)}`
   const downloadLink = document.createElement('a')
   downloadLink.setAttribute('href', linkSource)
   downloadLink.setAttribute('download', fileName)
   downloadLink.click()
 }
+
 function updatePDFTemplateWithSVGContent(
   template: IPDFTemplate,
   svg: string,

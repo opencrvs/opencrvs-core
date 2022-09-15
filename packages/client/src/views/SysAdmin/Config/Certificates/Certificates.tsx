@@ -34,11 +34,10 @@ import {
 } from '@opencrvs/components/lib/interface'
 import { VerticalThreeDots } from '@opencrvs/components/lib/icons'
 import { EMPTY_STRING } from '@client/utils/constants'
-import { ERROR_TYPES } from '@client/utils/imageUtils'
 import { certificateTemplateMutations } from '@client/certificate/mutations'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IUserDetails } from '@client/utils/userUtils'
-import { IAttachmentValue, IFormFieldValue, IForm } from '@client/forms'
+import { IAttachmentValue, IForm } from '@client/forms'
 import { Event } from '@client/utils/gateway'
 import { DocumentPreview } from '@client/components/form/DocumentUploadfield/DocumentPreview'
 import {
@@ -101,7 +100,6 @@ interface State {
   eventName: string
   previewImage: IAttachmentValue | null
   imageFile: IAttachmentValue
-  imageFileName: string
 }
 
 function blobToBase64(blob: Blob): Promise<string | null | ArrayBuffer> {
@@ -176,12 +174,8 @@ export const printDummyCertificate = async (
 }
 
 class CertificatesConfigComponent extends React.Component<Props, State> {
-  birthCertificatefileUploader: React.RefObject<HTMLInputElement>
-  deathCertificatefileUploader: React.RefObject<HTMLInputElement>
   constructor(props: Props) {
     super(props)
-    this.birthCertificatefileUploader = React.createRef()
-    this.deathCertificatefileUploader = React.createRef()
     this.state = {
       selectedSubMenuItem: this.SUB_MENU_ID.certificatesConfig,
       imageUploading: false,
@@ -194,8 +188,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
         name: EMPTY_STRING,
         type: EMPTY_STRING,
         data: EMPTY_STRING
-      },
-      imageFileName: EMPTY_STRING
+      }
     }
   }
 
@@ -259,47 +252,27 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
     ]
     return menuItems
   }
-  handleSelectFile = async (certId: any) => {
-    const certificateId: string = certId as string
+
+  handleSelectFile = async (certificateId: string) => {
     const status = 'ACTIVE'
-    const userMgntUserID =
-      this.props.userDetails && this.props.userDetails.userMgntUserID
+    const userMgntUserID = this.props.userDetails?.userMgntUserID
     this.setState({
       imageUploading: true,
       imageLoadingError: ''
     })
     this.toggleNotification()
-    const files = [this.state.imageFile]
 
-    if (files && files.length > 0) {
-      try {
-        const svgCode = files[0].data
-        this.updateCertificateTemplate(
-          certificateId,
-          svgCode,
-          files[0].name || '',
-          userMgntUserID as string,
-          status,
-          this.state.eventName
-        )
-        this.birthCertificatefileUploader.current!.value = ''
-        this.deathCertificatefileUploader.current!.value = ''
-      } catch (error) {
-        if (
-          error instanceof Error &&
-          error.message === ERROR_TYPES.IMAGE_TYPE
-        ) {
-          this.setState(() => ({
-            imageUploading: false,
-            imageLoadingError: this.props.intl.formatMessage(
-              imageUploadMessages.imageFormat
-            )
-          }))
-          this.birthCertificatefileUploader.current!.value = ''
-          this.deathCertificatefileUploader.current!.value = ''
-        }
-      }
-    }
+    // Convert base64 data to svg
+    const svgCode = atob(this.state.imageFile.data.split(',')[1])
+
+    this.updateCertificateTemplate(
+      certificateId,
+      svgCode,
+      this.state.imageFile.name || '',
+      userMgntUserID as string,
+      status,
+      this.state.eventName
+    )
   }
 
   onUploadingStateChanged = (isUploading: boolean) => {
@@ -309,8 +282,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
   handleCertificateFile(file: IAttachmentValue) {
     this.setState({
       ...this.state,
-      imageFile: file,
-      imageFileName: file.name ?? EMPTY_STRING
+      imageFile: file
     })
   }
 
@@ -521,7 +493,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
               <ApplyButton
                 key="apply"
                 id="apply_change"
-                disabled={!this.state.imageFile.name ? true : false}
+                disabled={!Boolean(this.state.imageFile.name)}
                 onClick={() => {
                   this.togglePrompt()
                   if (eventName === Event.Birth) {
@@ -545,7 +517,7 @@ class CertificatesConfigComponent extends React.Component<Props, State> {
                   this.state.imageFile.name ? this.state.imageFile.name : ''
                 }
                 disableDeleteInPreview={false}
-                name={'Simple'}
+                name="Simple"
                 allowedDocType={[SVGFile.type]}
                 key="cancel"
                 onComplete={(file) => {
