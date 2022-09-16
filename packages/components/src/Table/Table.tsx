@@ -86,7 +86,6 @@ const RowWrapper = styled.div<{
   height?: IBreakpoint
   horizontalPadding?: IBreakpoint
   hideTableBottomBorder?: boolean
-  alignItemCenter?: boolean
   columns: IColumn[]
 }>`
   width: 100%;
@@ -101,16 +100,12 @@ const RowWrapper = styled.div<{
   }
 
   display: flex;
-  ${({ alignItemCenter }) =>
-    alignItemCenter ? `align-items: center` : `align-items: start`};
   ${({ height }) =>
-    height ? `min-height:${height.lg}px;` : `min-height: 48px)`};
+    height ? `min-height: ${height.lg}px;` : `min-height: 48px;`};
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     ${({ height }) =>
-      height ? `min-height:${height.md}px` : `min-height: 48px)`};
+      height ? `min-height: ${height.md}px;` : `min-height: 48px;`};
   }
-  ${({ highlight, theme }) =>
-    highlight && `:hover { background-color: ${theme.colors.grey100};}`}
 
   & span:first-child {
     ${({ horizontalPadding }) =>
@@ -293,7 +288,6 @@ export interface ITableProps {
   isLoading?: boolean
   hideTableHeader?: boolean
   hideTableBottomBorder?: boolean
-  alignItemCenter?: boolean
   highlightRowOnMouseOver?: boolean
   isFullPage?: boolean
   fixedWidth?: number
