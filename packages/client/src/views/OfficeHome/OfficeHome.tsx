@@ -446,6 +446,7 @@ export class OfficeHomeView extends React.Component<
                   error={error}
                 />
               )}
+              {tabId === WORKQUEUE_TABS.outbox && <Outbox />}
             </>
           )}
         </BodyContainer>

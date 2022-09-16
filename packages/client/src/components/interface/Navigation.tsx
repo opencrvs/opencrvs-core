@@ -52,6 +52,10 @@ import { IOfflineData } from '@client/offline/reducer'
 import { isDeclarationInReadyToReviewStatus } from '@client/utils/draftUtils'
 import { navigationMessages } from '@client/i18n/messages/views/navigation'
 import { UnbuplishedWarning } from '@client/views/SysAdmin/Config/Forms/Home/FormConfigHome'
+import {
+  ALLOWED_STATUS_FOR_RETRY,
+  INPROGRESS_STATUS
+} from '@client/SubmissionController'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -92,6 +96,7 @@ const USER_SCOPE: IUSER_SCOPE = {
     WORKQUEUE_TABS.inProgress,
     WORKQUEUE_TABS.sentForReview,
     WORKQUEUE_TABS.requiresUpdate,
+    WORKQUEUE_TABS.outbox,
     GROUP_ID.declarationGroup
   ],
   REGISTRATION_AGENT: [
@@ -318,7 +323,14 @@ export const NavigationView = (props: IFullProps) => {
         ? 0
         : filteredData.externalValidationTab?.totalItems || 0,
     readyToPrint: !initialSyncDone ? 0 : filteredData.printTab?.totalItems || 0,
-    outbox: 0
+    outbox: storedDeclarations.filter((draft) =>
+      (
+        [
+          ...ALLOWED_STATUS_FOR_RETRY,
+          ...INPROGRESS_STATUS
+        ] as SUBMISSION_STATUS[]
+      ).includes(draft.submissionStatus as SUBMISSION_STATUS)
+    ).length
   }
 
   return (
@@ -369,6 +381,19 @@ export const NavigationView = (props: IFullProps) => {
               isSelected={tabId === WORKQUEUE_TABS.requiresUpdate}
               onClick={() => {
                 props.goToHomeTab(WORKQUEUE_TABS.requiresUpdate)
+                menuCollapse && menuCollapse()
+              }}
+            />
+            <NavigationItem
+              icon={() => <PaperPlane />}
+              id={`navigation_${WORKQUEUE_TABS.outbox}`}
+              label={intl.formatMessage(
+                navigationMessages[WORKQUEUE_TABS.outbox]
+              )}
+              count={declarationCount.outbox}
+              isSelected={tabId === WORKQUEUE_TABS.outbox}
+              onClick={() => {
+                props.goToHomeTab(WORKQUEUE_TABS.outbox)
                 menuCollapse && menuCollapse()
               }}
             />
