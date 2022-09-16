@@ -88,6 +88,7 @@ const RowWrapper = styled.div<{
   hideTableBottomBorder?: boolean
   columns: IColumn[]
 }>`
+  display: flex;
   width: 100%;
   min-height: 48px;
   padding-top: 10px;
@@ -99,43 +100,10 @@ const RowWrapper = styled.div<{
       hideTableBottomBorder && `border-bottom: 0`};
   }
 
-  display: flex;
-  ${({ height }) =>
-    height ? `min-height: ${height.lg}px;` : `min-height: 48px;`};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    ${({ height }) =>
-      height ? `min-height: ${height.md}px;` : `min-height: 48px;`};
-  }
-
-  & span:first-child {
-    ${({ horizontalPadding }) =>
-      horizontalPadding
-        ? `padding-left:${horizontalPadding.lg}px;`
-        : `padding-left: 8px;`}
-  }
-
-  & span:last-child {
-    ${({ horizontalPadding }) =>
-      horizontalPadding
-        ? `padding-right:${horizontalPadding.lg}px;`
-        : `padding-right: 8px;`}
-  }
+  ${({ height }) => height && `min-height: ${height.lg}px;`};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    & span:first-child {
-      text-align: right;
-      ${({ horizontalPadding }) =>
-        horizontalPadding
-          ? `padding-left:${horizontalPadding.md}px;`
-          : `padding-left: 8px;`}
-    }
-
-    & span:last-child {
-      ${({ horizontalPadding }) =>
-        horizontalPadding
-          ? `padding-right:${horizontalPadding.md}px;`
-          : `padding-right: 8px;`}
-    }
+    ${({ height }) => height && `min-height: ${height.md}px;`};
   }
 `
 const TableFooter = styled(RowWrapper)`
