@@ -157,7 +157,7 @@ const Row = styled.div`
 `
 const RightColumn = styled.div`
   width: 40%;
-  border-radius: 4px;
+  border-radius: 2px;
   margin-left: 24px;
 
   &:first-child {
@@ -216,7 +216,7 @@ const FormData = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.copy};
   padding: 32px;
-  border-radius: 4px;
+  border-radius: 2px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
     padding: 24px;
   }

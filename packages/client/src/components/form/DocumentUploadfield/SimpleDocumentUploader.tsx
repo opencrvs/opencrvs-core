@@ -28,7 +28,7 @@ const DocumentUploader = styled(ImageUploader)`
   color: ${({ theme }) => theme.colors.primary};
   background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `2px solid ${theme.colors.primary}`};
-  border-radius: 4px;
+  border-radius: 2px;
   ${({ theme }) => theme.fonts.bold14};
   height: 40px;
   text-transform: initial;

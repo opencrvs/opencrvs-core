@@ -85,7 +85,7 @@ const SpinnerWrapper = styled.div`
   background: ${({ theme }) => theme.colors.white};
   font: ${({ theme }) => theme.fonts.bold14};
   border: solid 1px ${({ theme }) => theme.colors.grey300};
-  border-radius: 4px;
+  border-radius: 2px;
   width: 244px;
   height: 163px;
   display: flex;

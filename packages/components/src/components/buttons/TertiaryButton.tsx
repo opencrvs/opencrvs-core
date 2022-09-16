@@ -18,11 +18,11 @@ export const TertiaryButton = styled(Button)`
   transition: background 0.4s ease;
   align-items: center;
   border: 0;
-  border-radius: 4px;
+  border-radius: 2px;
   text-transform: none !important;
   height: 32px;
   & > div {
-    padding: 0 8px;
+    padding: 0 4px;
     height: 32px;
   }
   color: ${({ theme }) => theme.colors.primary};

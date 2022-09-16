@@ -137,7 +137,7 @@ export const ModalContainer = styled.div`
   right: 50%;
   transform: translateX(50%);
   ${({ theme }) => theme.shadows.heavy};
-  border-radius: 4px;
+  border-radius: 2px;
   color: ${({ theme }) => theme.colors.copy};
 
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {

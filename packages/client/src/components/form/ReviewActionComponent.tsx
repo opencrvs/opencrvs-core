@@ -20,7 +20,7 @@ import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { Upload, Check, Cross } from '@opencrvs/components/lib/icons'
 import { IDeclaration, SUBMISSION_STATUS } from '@client/declarations'
 import { messages } from '@client/i18n/messages/views/review'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { ResponsiveModal } from '@opencrvs/components/lib/interface'
 import { SubmissionAction } from '@client/forms'
 import styled from '@client/styledComponents'
@@ -71,7 +71,7 @@ const UnderLayBackground = styled.div<{ background: string }>`
       ? theme.colors.negative
       : theme.colors.primary};
   position: absolute;
-  border-radius: 4px;
+  border-radius: 2px;
   top: 0;
   left: 0;
   width: 100%;

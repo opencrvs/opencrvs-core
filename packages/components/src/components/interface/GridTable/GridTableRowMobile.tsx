@@ -27,7 +27,7 @@ const StyledBox = styled.div`
   align-items: center;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   box-sizing: border-box;
-  border-radius: 4px;
+  border-radius: 2px;
   height: 80px;
   max-width: 520px;
   background-color: ${({ theme }) => theme.colors.white};

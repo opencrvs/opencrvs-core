@@ -83,14 +83,14 @@ export function Button({
   }
 }
 const Wrapper = styled.div`
-  padding: 0 8px;
+  padding: 0 4px;
   align-items: center;
   justify-content: space-between;
   display: flex;
   width: 100%;
 `
 const CenterWrapper = styled.div`
-  padding: 0 8px;
+  padding: 0 4px;
   align-items: center;
   justify-content: center;
   display: flex;

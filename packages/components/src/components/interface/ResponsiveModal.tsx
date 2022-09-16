@@ -49,7 +49,7 @@ const ModalContent = styled.div<{
   background-color: ${({ theme }) => theme.colors.white};
   width: ${({ width }) => (width ? width : 448)}px;
   display: flex;
-  border-radius: 4px;
+  border-radius: 2px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
   flex-direction: column;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {

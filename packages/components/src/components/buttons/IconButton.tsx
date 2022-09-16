@@ -24,7 +24,7 @@ export const IconButton = styled(Button)`
   ${({ theme }) => theme.fonts.bold14};
 
   &:hover:enabled {
-    ${({ theme }) => theme.colors.indigoDark};
+    ${({ theme }) => theme.colors.redDark};
     color: ${({ theme }) => theme.colors.white};
   }
   &:focus {

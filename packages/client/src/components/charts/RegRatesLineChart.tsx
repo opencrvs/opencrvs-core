@@ -75,7 +75,7 @@ const LegendDataValue = styled.span`
 `
 
 const LegendData = styled.div`
-  padding: 0 8px;
+  padding: 0 4px;
   width: 100%;
   ${({ theme }) => theme.fonts.reg12};
 `

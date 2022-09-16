@@ -51,16 +51,16 @@ export const FormWrapper = styled.form`
   position: relative;
   margin: auto;
   width: 100%;
-  margin-bottom: 50px;
-  margin-top: 64px;
+  margin-bottom: 30px;
+  margin-top: 48px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    margin-top: 48px;
+    margin-top: 24px;
   }
 `
 
 export const ActionWrapper = styled.div`
   position: relative;
-  margin-top: 10px;
+  margin-top: 2rem;
   display: flex;
   flex-direction: column;
 `
@@ -87,6 +87,7 @@ export const StyledPrimaryButton = styled(PrimaryButton)`
   flex-direction: row;
   display: flex;
   flex: 1;
+  text-transform: uppercase !important;
   box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.16);
   padding: 10px ${({ theme }) => theme.grid.margin}px;
   margin-bottom: 10px;
@@ -126,7 +127,7 @@ export const StyledButtonWrapper = styled.div`
   justify-content: center;
 `
 export const FieldWrapper = styled.div`
-  min-height: 6.5em;
+  margin-bottom: 0.5em;
 `
 
 export interface IProps {
@@ -159,7 +160,8 @@ const UserNameInput = injectIntl((props: Props) => {
           touched={Boolean(meta.touched)}
           label={intl.formatMessage(userNameField.label)}
           optionalLabel={intl.formatMessage(messages.optionalLabel)}
-          ignoreMediaQuery
+          // ignoreMediaQuery
+          required
           hideAsterisk
         >
           <TextInput
@@ -189,6 +191,7 @@ const Password = injectIntl((props: Props) => {
           label={intl.formatMessage(passwordField.label)}
           optionalLabel={intl.formatMessage(messages.optionalLabel)}
           ignoreMediaQuery
+          required
           hideAsterisk
         >
           <PasswordInput
@@ -233,10 +236,12 @@ export function StepOneForm({
     if (appName) document.title = appName
   }, [appName])
 
+  console.log('usePersistentCountryLogo', logo)
+
   return (
     <Container id="login-step-one-box">
       <LogoContainer>
-        <CountryLogo src={logo} />
+        <CountryLogo size="small" src={logo} />
       </LogoContainer>
       <Title>
         {submissionError && errorCode ? (

@@ -52,7 +52,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     height: 40px;
     box-shadow: none;
     ${({ theme }) => theme.fonts.reg16};
-    padding: 0 8px;
+    padding: 0 4px;
     border: solid ${({ hideBorder }) => (hideBorder ? '0px' : '2px')};
     ${({ error, touched, theme }) =>
       error && touched ? theme.colors.negative : theme.colors.copy};
@@ -105,7 +105,7 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
     background-color: ${({ theme }) => theme.colors.primary};
     color: ${({ theme }) => theme.colors.white};
     &:active {
-      background: ${({ theme }) => theme.colors.indigoDark};
+      background: ${({ theme }) => theme.colors.redDark};
       color: ${({ theme }) => theme.colors.white};
     }
   }

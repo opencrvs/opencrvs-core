@@ -22,7 +22,7 @@ const Conatiner = styled.div`
   padding: 0 16px;
   /* stylelint-disable-next-line color-no-hex */
   background-color: #fff3f3;
-  border-radius: 4px;
+  border-radius: 2px;
   border: 1px solid ${colors.red};
   color: ${colors.red};
   ${({ theme }) => theme.fonts.bold16}

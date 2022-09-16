@@ -31,7 +31,7 @@ const Padding = styled.span`
 `
 
 const PostFixPadding = styled.span`
-  padding: 0 8px;
+  padding: 0 4px;
   display: inline-flex;
   align-items: center;
   ${({ theme }) => theme.fonts.reg16};

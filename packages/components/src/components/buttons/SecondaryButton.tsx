@@ -21,17 +21,17 @@ export const SecondaryButton = ({
 }
 
 const StyledButton = styled(Button)`
-  padding: 0 8px;
+  padding: 0 4px;
   color: ${({ theme }) => theme.colors.primary};
   transition: background 0.4s ease;
-  border-radius: 4px;
+  border-radius: 2px;
   background: ${({ theme }) => theme.colors.white};
   border: ${({ theme }) => `2px solid ${theme.colors.secondary}`};
   ${({ theme }) => theme.fonts.bold16};
 
   &:hover:enabled {
-    border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
-    color: ${({ theme }) => theme.colors.indigoDark};
+    border: ${({ theme }) => `2px solid ${theme.colors.redDark}`};
+    color: ${({ theme }) => theme.colors.redDark};
     background: ${({ theme }) => theme.colors.grey100};
   }
 
@@ -50,8 +50,8 @@ const StyledButton = styled(Button)`
   }
 
   &:active:enabled {
-    border: ${({ theme }) => `2px solid ${theme.colors.indigoDark}`};
-    color: ${({ theme }) => theme.colors.indigoDark};
+    border: ${({ theme }) => `2px solid ${theme.colors.redDark}`};
+    color: ${({ theme }) => theme.colors.redDark};
     background: ${({ theme }) => theme.colors.grey100};
   }
 

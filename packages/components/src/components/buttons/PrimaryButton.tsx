@@ -12,17 +12,19 @@
 import styled from 'styled-components'
 import { Button } from './Button'
 
+/* stylelint-disable opencrvs/no-font-styles */
 export const PrimaryButton = styled(Button)`
-  padding: 0 8px;
+  padding: 0 4px;
   transition: background 0.4s ease;
-  border-radius: 4px;
+  border-radius: 2px;
+  font-size: 12px !important;
   color: ${({ theme }) => theme.colors.white};
   background: ${({ theme }) => theme.colors.primary};
   justify-content: center;
   ${({ theme }) => theme.fonts.bold16};
 
   &:hover:enabled {
-    background: ${({ theme }) => theme.colors.indigoDark};
+    background: ${({ theme }) => theme.colors.redDark};
   }
   &:focus {
     background: ${({ theme }) => theme.colors.yellow};
@@ -35,7 +37,7 @@ export const PrimaryButton = styled(Button)`
   }
 
   &:active:enabled {
-    background: ${({ theme }) => theme.colors.indigoDark};
+    background: ${({ theme }) => theme.colors.redDark};
     color: ${({ theme }) => theme.colors.white};
   }
 

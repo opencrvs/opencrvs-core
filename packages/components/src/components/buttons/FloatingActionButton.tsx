@@ -24,7 +24,7 @@ const ButtonStyled = styled.button`
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   &:hover:enabled {
-    ${({ theme }) => theme.colors.indigoDark};
+    ${({ theme }) => theme.colors.redDark};
     color: ${({ theme }) => theme.colors.white};
   }
 

@@ -25,7 +25,7 @@ const TopBarWrapper = styled.div`
     padding: 0 16px;
   }
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.sm}px) {
-    padding: 0 8px;
+    padding: 0 4px;
   }
 `
 export class TopBar extends React.Component<{ id?: string }> {

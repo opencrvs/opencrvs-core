@@ -46,7 +46,7 @@ const CanvasBox = styled.div`
   flex-direction: column;
   gap: 8px;
   border: 1px solid ${({ theme }) => theme.colors.grey300};
-  border-radius: 4px;
+  border-radius: 2px;
 `
 
 type IRouteProps = {

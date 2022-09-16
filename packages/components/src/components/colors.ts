@@ -12,7 +12,7 @@
 
 export const colors = {
   // Pallete
-  primary: '#d50000', // Red
+  primary: '#f44336', // Red
   secondary: '#ffd600', // Yellow
   tertiary: '#CCCCCC', // grey
 
@@ -25,8 +25,8 @@ export const colors = {
   yellow: '#EDC55E', // focus state
 
   // Darks
-  indigoDark: '#42639C',
-  redDark: '#994040',
+  redDark: '#b71c1c',
+  redLight: '#994040',
   greenDark: '#409977',
 
   // Lights

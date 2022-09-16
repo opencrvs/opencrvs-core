@@ -57,7 +57,7 @@ export const CancelButton = styled(TertiaryButton)`
 export const ApplyButton = styled(PrimaryButton)`
   height: 40px;
   & div {
-    padding: 0 8px;
+    padding: 0 4px;
   }
 `
 export const ErrorContent = styled.div`

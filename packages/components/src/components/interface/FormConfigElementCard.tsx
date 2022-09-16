@@ -21,7 +21,7 @@ const Card = styled.div<{ selected: boolean }>`
   border-style: ${({ selected }) => (selected ? 'solid' : 'dashed')};
   border-color: ${({ selected, theme }) =>
     selected ? theme.colors.yellow : theme.colors.grey300};
-  border-radius: 4px;
+  border-radius: 2px;
   padding: 14px 0 14px 14px;
   cursor: ${({ selected }) => (selected ? 'auto' : 'pointer')};
 

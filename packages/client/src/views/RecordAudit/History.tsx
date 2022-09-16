@@ -56,7 +56,7 @@ const LargeGreyedInfo = styled.div`
   height: 231px;
   background-color: ${({ theme }) => theme.colors.grey200};
   max-width: 100%;
-  border-radius: 4px;
+  border-radius: 2px;
   margin: 15px 0px;
 `
 

@@ -20,7 +20,7 @@ const Container = styled.div`
   top: 80px;
   background-color: ${({ theme }) => theme.colors.grey100};
   border: 1px solid ${({ theme }) => theme.colors.grey300};
-  border-radius: 4px;
+  border-radius: 2px;
   box-sizing: border-box;
   height: 720px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {

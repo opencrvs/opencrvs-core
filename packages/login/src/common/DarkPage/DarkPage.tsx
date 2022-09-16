@@ -18,7 +18,7 @@ import { getTheme } from '@opencrvs/components/lib/theme'
 
 const StyledPage = styled.div<IPage>`
   background: ${({ theme }) => theme.colors.backgroundPrimary};
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;

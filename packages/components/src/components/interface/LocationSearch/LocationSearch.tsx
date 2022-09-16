@@ -58,7 +58,7 @@ const SearchTextInput = styled.input<{ error?: boolean; touched?: boolean }>`
 const DropDownWrapper = styled.ul`
   background: ${({ theme }) => theme.colors.white};
   box-shadow: 0px 2px 8px rgba(53, 67, 93, 0.54);
-  border-radius: 4px;
+  border-radius: 2px;
   position: absolute;
   width: 100%;
   z-index: 9999;

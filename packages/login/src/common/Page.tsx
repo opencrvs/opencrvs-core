@@ -19,7 +19,7 @@ export interface IPage {
 
 const StyledPage = styled.div<IPage>`
   background: ${({ theme }) => theme.colors.background};
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   * {

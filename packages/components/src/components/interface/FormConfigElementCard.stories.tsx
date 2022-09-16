@@ -24,7 +24,7 @@ export default {
 
 const GrayedArea = styled.div`
   margin: 2px 0;
-  border-radius: 4px;
+  border-radius: 2px;
   background-color: ${({ theme }) => theme.colors.grey200};
   width: 60%;
   height: 24px;
